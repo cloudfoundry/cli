@@ -64,11 +64,11 @@ func (ui *FakeUI) Warn(message string, args ...interface{}) {
 	return
 }
 
-func (ui *FakeUI) Ask(prompt string, args ...interface{}) string {
-	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
+func (ui *FakeUI) Ask(prompt string) string {
+	ui.Prompts = append(ui.Prompts, prompt)
 
 	if len(ui.Inputs) == 0 {
-		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+		panic("No input provided to Fake UI for prompt: " + prompt)
 	}
 
 	answer := ui.Inputs[0]
@@ -77,19 +77,19 @@ func (ui *FakeUI) Ask(prompt string, args ...interface{}) string {
 }
 
 func (ui *FakeUI) ConfirmDelete(modelType, modelName string) bool {
-	return ui.Confirm(
+	return ui.Confirm(fmt.Sprintf(
 		"Really delete the %s %s?%s",
 		modelType,
 		term.EntityNameColor(modelName),
-		term.PromptColor(">"))
+		term.PromptColor(">")))
 }
 
 func (ui *FakeUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
 	return ui.ConfirmDelete(modelType, modelName)
 }
 
-func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
-	response := ui.Ask(prompt, args...)
+func (ui *FakeUI) Confirm(prompt string) bool {
+	response := ui.Ask(prompt)
 	switch strings.ToLower(response) {
 	case "y", "yes":
 		return true
@@ -97,11 +97,11 @@ func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 	return false
 }
 
-func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) string {
-	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
+func (ui *FakeUI) AskForPassword(prompt string) string {
+	ui.PasswordPrompts = append(ui.PasswordPrompts, prompt)
 
 	if len(ui.Inputs) == 0 {
-		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+		panic("No input provided to Fake UI for prompt: " + prompt)
 	}
 
 	answer := ui.Inputs[0]

@@ -49,9 +49,9 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid strin
 
 	if httpErr, ok := err.(errors.HttpError); ok {
 		switch httpErr.ErrorCode() {
-		case errors.SERVICE_KEY_NAME_TAKEN:
+		case errors.ServiceKeyNameTaken:
 			return errors.NewModelAlreadyExistsError("Service key", keyName)
-		case errors.UNBINDABLE_SERVICE:
+		case errors.UnbindableService:
 			return errors.NewUnbindableServiceError()
 		default:
 			return errors.New(httpErr.Error())
@@ -91,7 +91,7 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 		})
 
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.NOT_AUTHORIZED {
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.NotAuthorized {
 			return []models.ServiceKey{}, errors.NewNotAuthorizedError()
 		}
 		return []models.ServiceKey{}, err

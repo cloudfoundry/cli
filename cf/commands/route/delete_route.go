@@ -78,6 +78,8 @@ func (cmd *DeleteRoute) SetDependency(deps command_registry.Dependency, pluginCa
 }
 
 func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
+	var port int
+
 	host := c.String("n")
 	path := c.String("path")
 	domainName := c.Args()[0]
@@ -95,7 +97,7 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Deleting route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(url)}))
 
 	domain := cmd.domainReq.GetDomain()
-	route, err := cmd.routeRepo.Find(host, domain, path)
+	route, err := cmd.routeRepo.Find(host, domain, path, port)
 	if err != nil {
 		if _, ok := err.(*errors.ModelNotFoundError); ok {
 			cmd.ui.Warn(T("Unable to delete, route '{{.URL}}' does not exist.",

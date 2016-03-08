@@ -7,7 +7,6 @@ params:
   AWS_SECRET_ACCESS_KEY:
 
 inputs:
-- name: ci
 - name: cli
 - name: cf-cli-binaries
 - name: cf-cli-installers
@@ -54,9 +53,7 @@ run:
 
     pushd archives
       for archive in *; do
-          s3cmd --access_key=$AWS_ACCESS_KEY_ID \
-                --secret_key=$AWS_SECRET_ACCESS_KEY \
-                put $archive s3://go-cli/master/$archive
+          aws s3 cp $archive s3://go-cli/master/$archive
       done
     popd
 
@@ -73,8 +70,6 @@ run:
         os_arch="${BASH_REMATCH[2]}"
         extension="${BASH_REMATCH[3]}"
 
-        s3cmd --access_key=$AWS_ACCESS_KEY_ID \
-              --secret_key=$AWS_SECRET_ACCESS_KEY \
-              put $installer s3://go-cli/master/cf-cli_edge_installer${os_arch}${extension}
+        aws s3 cp $installer s3://go-cli/master/cf-cli_edge_installer${os_arch}${extension}
       done
     popd

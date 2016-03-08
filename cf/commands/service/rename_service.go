@@ -71,7 +71,7 @@ func (cmd *RenameService) Execute(c flags.FlagContext) {
 	err := cmd.serviceRepo.RenameService(serviceInstance, newName)
 
 	if err != nil {
-		if httpError, ok := err.(errors.HttpError); ok && httpError.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
+		if httpError, ok := err.(errors.HttpError); ok && httpError.ErrorCode() == errors.ServiceInstanceNameTaken {
 			cmd.ui.Failed(T("{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
 				map[string]interface{}{
 					"ErrorDescription":  httpError.Error(),

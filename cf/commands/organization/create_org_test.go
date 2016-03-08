@@ -105,7 +105,7 @@ var _ = Describe("create-org command", func() {
 		})
 
 		It("fails and warns the user when the org already exists", func() {
-			err := errors.NewHttpError(400, errors.ORG_EXISTS, "org already exists")
+			err := errors.NewHttpError(400, errors.OrganizationNameTaken, "org already exists")
 			orgRepo.CreateReturns(err)
 			runCommand("my-org")
 

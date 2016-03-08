@@ -135,7 +135,7 @@ var _ = Describe("create-space command", func() {
 	})
 
 	It("warns the user when a space with that name already exists", func() {
-		spaceRepo.CreateReturns(models.Space{}, errors.NewHttpError(400, errors.SPACE_EXISTS, "Space already exists"))
+		spaceRepo.CreateReturns(models.Space{}, errors.NewHttpError(400, errors.SpaceNameTaken, "Space already exists"))
 		runCommand("my-space")
 
 		Expect(ui.Outputs).To(ContainSubstrings(
@@ -214,17 +214,21 @@ var _ = Describe("create-space command", func() {
 				Name: "my-space-quota",
 				Guid: "my-space-quota-guid",
 			}
-			spaceQuotaRepo.FindByNameReturns(spaceQuota, nil)
+			spaceQuotaRepo.FindByNameAndOrgGuidReturns(spaceQuota, nil)
 			runCommand("-q", "my-space-quota", "my-space")
 
-			Expect(spaceQuotaRepo.FindByNameArgsForCall(0)).To(Equal(spaceQuota.Name))
+			spaceQuotaName, orgGuid := spaceQuotaRepo.FindByNameAndOrgGuidArgsForCall(0)
+
+			Expect(spaceQuotaName).To(Equal(spaceQuota.Name))
+			Expect(orgGuid).To(Equal(configOrg.Guid))
+
 			_, _, actualSpaceQuotaGUID := spaceRepo.CreateArgsForCall(0)
 			Expect(actualSpaceQuotaGUID).To(Equal(spaceQuota.Guid))
 		})
 
 		Context("when the space-quota provided does not exist", func() {
 			It("fails", func() {
-				spaceQuotaRepo.FindByNameReturns(models.SpaceQuota{}, errors.New("Error"))
+				spaceQuotaRepo.FindByNameAndOrgGuidReturns(models.SpaceQuota{}, errors.New("Error"))
 				runCommand("-q", "my-space-quota", "my-space")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -232,6 +236,37 @@ var _ = Describe("create-space command", func() {
 					[]string{"Error"},
 				))
 			})
+		})
+	})
+
+	Context("when the -o and -q flags are provided", func() {
+		BeforeEach(func() {
+			org := models.Organization{
+				OrganizationFields: models.OrganizationFields{
+					Name: "other-org",
+					Guid: "other-org-guid",
+				}}
+			orgRepo.FindByNameReturns(org, nil)
+
+			spaceQuota := models.SpaceQuota{
+				Name: "my-space-quota",
+				Guid: "my-space-quota-guid",
+			}
+			spaceQuotaRepo.FindByNameAndOrgGuidReturns(spaceQuota, nil)
+		})
+
+		It("assigns the space-quota from the specified org to the space", func() {
+			runCommand("my-space", "-o", "other-org", "-q", "my-space-quota")
+
+			Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("other-org"))
+			spaceName, orgGuid := spaceQuotaRepo.FindByNameAndOrgGuidArgsForCall(0)
+			Expect(spaceName).To(Equal("my-space-quota"))
+			Expect(orgGuid).To(Equal("other-org-guid"))
+
+			actualSpaceName, actualOrgGuid, actualSpaceQuotaGUID := spaceRepo.CreateArgsForCall(0)
+			Expect(actualSpaceName).To(Equal("my-space"))
+			Expect(actualOrgGuid).To(Equal("other-org-guid"))
+			Expect(actualSpaceQuotaGUID).To(Equal("my-space-quota-guid"))
 		})
 	})
 })

@@ -5,8 +5,6 @@ image: docker:///cloudfoundry/cli-ci
 inputs:
 - name: cli
   path: gopath/src/github.com/cloudfoundry/cli
-- name: ci
-  path: gopath/src/github.com/cloudfoundry/ci
 
 run:
   path: bash

@@ -1,12 +1,9 @@
 package manifest_test
 
 import (
-	"io/ioutil"
-	"os"
-	"strings"
-
-	uuid "github.com/nu7hatch/gouuid"
 	"gopkg.in/yaml.v2"
+
+	"bytes"
 
 	. "github.com/cloudfoundry/cli/cf/manifest"
 	. "github.com/onsi/ginkgo"
@@ -16,20 +13,13 @@ import (
 var _ = Describe("generate_manifest", func() {
 	Describe("Save", func() {
 		var (
-			m              AppManifest
-			uniqueFilename string
+			m AppManifest
+			f *bytes.Buffer
 		)
 
 		BeforeEach(func() {
-			guid, err := uuid.NewV4()
-			Expect(err).NotTo(HaveOccurred())
-
-			uniqueFilename = guid.String()
 			m = NewGenerator()
-		})
-
-		AfterEach(func() {
-			os.Remove(uniqueFilename)
+			f = &bytes.Buffer{}
 		})
 
 		Context("when each application in the manifest has all required attributes, and the save path has been set", func() {
@@ -38,27 +28,19 @@ var _ = Describe("generate_manifest", func() {
 				m.Memory("app1", 1024)
 				m.Instances("app1", 2)
 				m.DiskQuota("app1", 1024)
-				m.FileSavePath(uniqueFilename)
 			})
 
 			It("creates a top-level applications key", func() {
-				err := m.Save()
+				err := m.Save(f)
 				Expect(err).NotTo(HaveOccurred())
-				ymanifest := getYaml(uniqueFilename)
+				ymanifest := getYaml(f)
 				Expect(ymanifest.Applications).To(HaveLen(1))
 			})
 
-			It("creates a new file at a given path", func() {
-				err := m.Save()
-				Expect(err).NotTo(HaveOccurred())
-				_, err = os.Stat(uniqueFilename)
-				Expect(err).NotTo(HaveOccurred())
-			})
-
 			It("includes required attributes", func() {
-				err := m.Save()
+				err := m.Save(f)
 				Expect(err).NotTo(HaveOccurred())
-				applications := getYaml(uniqueFilename).Applications
+				applications := getYaml(f).Applications
 
 				Expect(applications[0].Name).To(Equal("app1"))
 				Expect(applications[0].Memory).To(Equal("1024M"))
@@ -72,9 +54,9 @@ var _ = Describe("generate_manifest", func() {
 				m.Memory("app2", 2048)
 				m.Instances("app2", 3)
 				m.DiskQuota("app2", 2048)
-				m.Save()
+				m.Save(f)
 
-				applications := getYaml(uniqueFilename).Applications
+				applications := getYaml(f).Applications
 
 				Expect(applications[1].Name).To(Equal("app2"))
 				Expect(applications[1].Memory).To(Equal("2048M"))
@@ -91,9 +73,9 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("includes services for that app", func() {
-					err := m.Save()
+					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
-					contents := getYaml(uniqueFilename)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.Services).To(ContainElement("service1"))
 					Expect(application.Services).To(ContainElement("service2"))
@@ -107,8 +89,8 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("includes the buildpack url for that app", func() {
-					m.Save()
-					contents := getYaml(uniqueFilename)
+					m.Save(f)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.Buildpack).To(Equal("buildpack"))
 				})
@@ -120,9 +102,9 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("includes the healthcheck timeout for that app", func() {
-					err := m.Save()
+					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
-					contents := getYaml(uniqueFilename)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.Timeout).To(Equal(5))
 				})
@@ -134,16 +116,16 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("includes the start command for that app", func() {
-					m.Save()
-					contents := getYaml(uniqueFilename)
+					m.Save(f)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.Command).To(Equal("start-command"))
 				})
 			})
 
 			It("includes no-route when the application has no domains", func() {
-				m.Save()
-				contents := getYaml(uniqueFilename)
+				m.Save(f)
+				contents := getYaml(f)
 				application := contents.Applications[0]
 				Expect(application.NoRoute).To(BeTrue())
 			})
@@ -154,17 +136,17 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("includes the domain", func() {
-					err := m.Save()
+					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
-					contents := getYaml(uniqueFilename)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.Domain).To(Equal("domain-name"))
 				})
 
 				It("does not include no-hostname", func() {
-					err := m.Save()
+					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
-					contents := getYaml(uniqueFilename)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.NoHostname).To(BeFalse())
 				})
@@ -176,16 +158,16 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("includes the domain", func() {
-					err := m.Save()
+					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
-					contents := getYaml(uniqueFilename)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.Domain).To(Equal("domain-name"))
 				})
 
 				It("includes no-hostname", func() {
-					m.Save()
-					contents := getYaml(uniqueFilename)
+					m.Save(f)
+					contents := getYaml(f)
 					application := contents.Applications[0]
 					Expect(application.NoHostname).To(BeTrue())
 				})
@@ -196,10 +178,10 @@ var _ = Describe("generate_manifest", func() {
 				m.Domain("app1", "foo1", "test2.com")
 				m.Domain("app1", "foo2", "test1.com")
 				m.Domain("app1", "foo2", "test2.com")
-				err := m.Save()
+				err := m.Save(f)
 				Expect(err).NotTo(HaveOccurred())
 
-				application := getYaml(uniqueFilename).Applications[0]
+				application := getYaml(f).Applications[0]
 
 				Expect(application.Name).To(Equal("app1"))
 				Expect(application.Hosts).To(ContainElement("foo1"))
@@ -216,10 +198,10 @@ var _ = Describe("generate_manifest", func() {
 			It("generates a manifest containing two hosts one domain", func() {
 				m.Domain("app1", "foo1", "test.com")
 				m.Domain("app1", "foo2", "test.com")
-				err := m.Save()
+				err := m.Save(f)
 				Expect(err).NotTo(HaveOccurred())
 
-				application := getYaml(uniqueFilename).Applications[0]
+				application := getYaml(f).Applications[0]
 
 				Expect(application.Name).To(Equal("app1"))
 				Expect(application.Hosts).To(ContainElement("foo1"))
@@ -235,10 +217,10 @@ var _ = Describe("generate_manifest", func() {
 			It("generates a manifest containing one host two domains", func() {
 				m.Domain("app1", "foo", "test1.com")
 				m.Domain("app1", "foo", "test2.com")
-				err := m.Save()
+				err := m.Save(f)
 				Expect(err).NotTo(HaveOccurred())
 
-				application := getYaml(uniqueFilename).Applications[0]
+				application := getYaml(f).Applications[0]
 
 				Expect(application.Name).To(Equal("app1"))
 				Expect(application.Host).To(Equal("foo"))
@@ -258,9 +240,9 @@ var _ = Describe("generate_manifest", func() {
 				})
 
 				It("stores each environment var", func() {
-					err := m.Save()
+					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
-					application := getYaml(uniqueFilename).Applications[0]
+					application := getYaml(f).Applications[0]
 
 					Expect(application.Env).To(Equal(map[string]interface{}{
 						"foo": "foo-value",
@@ -270,27 +252,12 @@ var _ = Describe("generate_manifest", func() {
 			})
 		})
 
-		Context("when no save path has been set", func() {
-			BeforeEach(func() {
-				m.Stack("app1", "stack-name")
-				m.Memory("app1", 1024)
-				m.Instances("app1", 2)
-				m.DiskQuota("app1", 1024)
-			})
-
-			It("returns an error", func() {
-				err := m.Save()
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("No save path has been set"))
-			})
-		})
-
 		It("returns an error when stack has not been set", func() {
 			m.Memory("app1", 1024)
 			m.Instances("app1", 2)
 			m.DiskQuota("app1", 1024)
-			m.FileSavePath(uniqueFilename)
-			err := m.Save()
+
+			err := m.Save(f)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("Error saving manifest: required attribute 'stack' missing"))
 		})
@@ -299,8 +266,8 @@ var _ = Describe("generate_manifest", func() {
 			m.Instances("app1", 2)
 			m.DiskQuota("app1", 1024)
 			m.Stack("app1", "stack")
-			m.FileSavePath(uniqueFilename)
-			err := m.Save()
+
+			err := m.Save(f)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("Error saving manifest: required attribute 'memory' missing"))
 		})
@@ -309,8 +276,8 @@ var _ = Describe("generate_manifest", func() {
 			m.Instances("app1", 2)
 			m.Memory("app1", 1024)
 			m.Stack("app1", "stack")
-			m.FileSavePath(uniqueFilename)
-			err := m.Save()
+
+			err := m.Save(f)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("Error saving manifest: required attribute 'disk_quota' missing"))
 		})
@@ -319,8 +286,8 @@ var _ = Describe("generate_manifest", func() {
 			m.DiskQuota("app1", 1024)
 			m.Memory("app1", 1024)
 			m.Stack("app1", "stack")
-			m.FileSavePath(uniqueFilename)
-			err := m.Save()
+
+			err := m.Save(f)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("Error saving manifest: required attribute 'instances' missing"))
 		})
@@ -350,20 +317,10 @@ type YApplication struct {
 	Stack      string                 `yaml:"stack"`
 }
 
-func getYamlContent(path string) []string {
-	b, err := ioutil.ReadFile(path)
-	Expect(err).NotTo(HaveOccurred())
-
-	return strings.Split(string(b), "\n")
-}
-
-func getYaml(path string) YManifest {
-	contents, err := ioutil.ReadFile(path)
-	Expect(err).NotTo(HaveOccurred())
-
+func getYaml(f *bytes.Buffer) YManifest {
 	var document YManifest
 
-	err = yaml.Unmarshal(contents, &document)
+	err := yaml.Unmarshal([]byte(f.String()), &document)
 	Expect(err).NotTo(HaveOccurred())
 
 	return document

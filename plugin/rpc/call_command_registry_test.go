@@ -25,37 +25,37 @@ var _ = Describe("calling commands in command_registry", func() {
 		ui = &testterm.FakeUI{}
 		deps.Ui = ui
 
-		cmd := command_registry.Commands.FindCommand("fake-non-codegangsta-command")
+		cmd := command_registry.Commands.FindCommand("fake-command")
 		command_registry.Commands.SetCommand(cmd.SetDependency(deps, true))
 
-		cmd2 := command_registry.Commands.FindCommand("fake-non-codegangsta-command2")
+		cmd2 := command_registry.Commands.FindCommand("fake-command2")
 		command_registry.Commands.SetCommand(cmd2.SetDependency(deps, true))
 	})
 
 	It("runs the command requirements", func() {
-		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps, false)
+		NewCommandRunner().Command([]string{"fake-command"}, deps, false)
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"Requirement executed"}))
 	})
 
 	It("calls the command Execute() func", func() {
-		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps, false)
+		NewCommandRunner().Command([]string{"fake-command"}, deps, false)
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"Command Executed"}))
 	})
 
 	It("sets the dependency of the command", func() {
-		NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command"}, deps, false)
+		NewCommandRunner().Command([]string{"fake-command"}, deps, false)
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"SetDependency() called, pluginCall true"}))
 	})
 
 	It("returns an error if any of the requirements fail", func() {
-		err := NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command2"}, deps, false)
+		err := NewCommandRunner().Command([]string{"fake-command2"}, deps, false)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Error in requirement"))
 	})
 
 	It("returns an error if invalid flag is provided", func() {
-		err := NewNonCodegangstaRunner().Command([]string{"fake-non-codegangsta-command", "-badFlag"}, deps, false)
+		err := NewCommandRunner().Command([]string{"fake-command", "-badFlag"}, deps, false)
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Invalid flag: -badFlag"))

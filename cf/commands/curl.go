@@ -83,7 +83,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 	method := c.String("X")
 	headers := c.StringSlice("H")
 	var body string
-	if c.IsSet("d") {
+	if c.String("d") != "" {
 		jsonBytes, err := util.GetContentsFromFlagValue(c.String("d"))
 		if err != nil {
 			cmd.ui.Failed(err.Error())

@@ -212,7 +212,7 @@ var _ = Describe("Server", func() {
 		Context("success", func() {
 			BeforeEach(func() {
 				outputCapture := terminal.NewTeePrinter()
-				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewNonCodegangstaRunner())
+				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewCommandRunner())
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -236,7 +236,7 @@ var _ = Describe("Server", func() {
 
 				oldStd := os.Stdout
 				os.Stdout = nil
-				client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command"}, &success)
+				client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-command"}, &success)
 				Expect(success).To(BeTrue())
 				os.Stdout = oldStd
 
@@ -278,13 +278,13 @@ var _ = Describe("Server", func() {
 
 	Describe("Plugin API", func() {
 
-		var runner *fakeRunner.FakeNonCodegangstaRunner
+		var runner *fakeRunner.FakeCommandRunner
 
 		BeforeEach(func() {
 			outputCapture := terminal.NewTeePrinter()
 			terminalOutputSwitch := terminal.NewTeePrinter()
 
-			runner = &fakeRunner.FakeNonCodegangstaRunner{}
+			runner = &fakeRunner.FakeCommandRunner{}
 			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -423,13 +423,13 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe(".CallCoreCommand", func() {
-		var runner *fakeRunner.FakeNonCodegangstaRunner
+		var runner *fakeRunner.FakeCommandRunner
 
 		Context("success", func() {
 			BeforeEach(func() {
 
 				outputCapture := terminal.NewTeePrinter()
-				runner = &fakeRunner.FakeNonCodegangstaRunner{}
+				runner = &fakeRunner.FakeCommandRunner{}
 
 				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, runner)
 				Expect(err).ToNot(HaveOccurred())
@@ -447,12 +447,12 @@ var _ = Describe("Server", func() {
 				time.Sleep(50 * time.Millisecond)
 			})
 
-			It("is able to call a non-codegangsta command", func() {
+			It("is able to call a command", func() {
 				client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 				Expect(err).ToNot(HaveOccurred())
 
 				var success bool
-				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command3"}, &success)
+				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-command3"}, &success)
 
 				Expect(err).ToNot(HaveOccurred())
 				Expect(runner.CommandCallCount()).To(Equal(1))
@@ -750,7 +750,7 @@ var _ = Describe("Server", func() {
 		Context("fail", func() {
 			BeforeEach(func() {
 				outputCapture := terminal.NewTeePrinter()
-				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewNonCodegangstaRunner())
+				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewCommandRunner())
 				Expect(err).ToNot(HaveOccurred())
 
 				err := rpcService.Start()
@@ -774,7 +774,7 @@ var _ = Describe("Server", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				var success bool
-				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command", "-invalid_flag"}, &success)
+				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-command", "-invalid_flag"}, &success)
 
 				Expect(err).To(HaveOccurred())
 				Expect(success).To(BeFalse())
@@ -785,7 +785,7 @@ var _ = Describe("Server", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				var success bool
-				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-non-codegangsta-command3"}, &success)
+				err = client.Call("CliRpcCmd.CallCoreCommand", []string{"fake-command3"}, &success)
 
 				Expect(success).To(BeFalse())
 			})

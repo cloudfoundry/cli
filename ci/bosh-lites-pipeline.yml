@@ -1,0 +1,410 @@
+---
+resources:
+- name: bosh-lite
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/bosh-lite.git
+    branch: master
+
+- name: bosh-lite-lock
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-ci
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: locks
+    pool: bosh-lites
+
+- name: cli
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths:
+    - ci
+
+- name: cli-ci
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-ci
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: cf-release-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-release.git
+    branch: master
+
+- name: etcd-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/etcd-release
+
+- name: garden-linux-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/garden-linux-release
+
+- name: diego-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/diego-release
+
+- name: diego-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-incubator/diego-release.git
+    branch: master
+
+- name: cf-routing-release-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
+    branch: release_candidate
+
+jobs:
+- name: deploy-boshlite-1
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-1-hostname}}
+  - do:
+    - aggregate:
+      - get: cli-ci
+      - get: cf-release
+        resource: cf-release-repo
+      - get: bosh-lite
+      - get: cli
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-1
+    - task: provision
+      privileged: true
+      file: cli/ci/tasks/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-1-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-1-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-1
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-1-hostname}}
+  - do:
+    - aggregate:
+      - get: etcd-release
+      - get: garden-linux-release
+      - get: diego-release
+      - get: diego-repo
+      - get: cf-release
+        resource: cf-release-repo
+      - get: cli
+    - task: deploy-diego
+      file: cli/ci/tasks/deploy-diego.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-1
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-1-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+          LITE_HOSTNAME: {{lite-1-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-boshlite-2
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-2-hostname}}
+  - do:
+    - aggregate:
+      - get: cli-ci
+      - get: cf-release
+        resource: cf-release-repo
+      - get: bosh-lite
+      - get: cli
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-2
+    - task: provision
+      privileged: true
+      file: cli/ci/tasks/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-2-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-2-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-2
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-2-hostname}}
+  - do:
+    - aggregate:
+      - get: etcd-release
+      - get: garden-linux-release
+      - get: diego-release
+      - get: diego-repo
+      - get: cf-release
+        resource: cf-release-repo
+      - get: cli
+    - task: deploy-diego
+      file: cli/ci/tasks/deploy-diego.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-2
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-2-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+          LITE_HOSTNAME: {{lite-2-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+
+- name: deploy-boshlite-3
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-3-hostname}}
+  - do:
+    - aggregate:
+      - get: cli-ci
+      - get: cf-release
+        resource: cf-release-repo
+      - get: bosh-lite
+      - get: cli
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-3
+    - task: provision
+      privileged: true
+      file: cli/ci/tasks/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-3-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-3-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-3
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-3-hostname}}
+  - do:
+    - aggregate:
+      - get: etcd-release
+      - get: garden-linux-release
+      - get: diego-release
+      - get: diego-repo
+      - get: cf-release
+        resource: cf-release-repo
+      - get: cli
+    - task: deploy-diego
+      file: cli/ci/tasks/deploy-diego.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-3
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-3-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+          LITE_HOSTNAME: {{lite-3-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-boshlite-4
+  serial: true
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-4-hostname}}
+  - do:
+    - aggregate:
+      - get: cli-ci
+      - get: cf-release
+        resource: cf-release-repo
+      - get: bosh-lite
+      - get: cli
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          LITE_INSTANCE_NAME: bosh-lite-4
+    - task: provision
+      privileged: true
+      file: cli/ci/tasks/provision-cf-lite.yml
+      config:
+        params:
+          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+          AWS_REGION: {{lite-aws-region}}
+          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+          LITE_NAME: {{lite-4-name}}
+          LITE_KEYPAIR: {{lite-keypair}}
+          LITE_HOSTNAME: {{lite-4-hostname}}
+          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-4
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-4-hostname}}
+  - do:
+    - aggregate:
+      - get: etcd-release
+      - get: garden-linux-release
+      - get: diego-release
+      - get: diego-repo
+      - get: cf-release
+        resource: cf-release-repo
+      - get: cli
+    - task: deploy-diego
+      file: cli/ci/tasks/deploy-diego.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-4
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-4-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+          LITE_HOSTNAME: {{lite-4-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock

@@ -13,6 +13,7 @@ import (
 	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/application"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	serviceCmdFakes "github.com/cloudfoundry/cli/cf/commands/service/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,6 +31,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -224,6 +228,36 @@ var _ = Describe("Push Command", func() {
 				Expect(callPush("--route-path", "the-path", "app-name")).To(BeTrue())
 			})
 		})
+
+		Describe("--app-ports flag", func() {
+			It("does not require a MinApiVersion if you don't provide it", func() {
+				cmd := &application.Push{}
+
+				fc := flags.NewFlagContext(cmd.MetaData().Flags)
+
+				reqs, err := cmd.Requirements(requirementsFactory, fc)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(reqs).NotTo(BeEmpty())
+
+				var s semver.Version
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal(""))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(s))
+			})
+
+			It("requires cf.MultipleAppPortsMinimumApiVersion when provided", func() {
+				cmd := &application.Push{}
+
+				fc := flags.NewFlagContext(cmd.MetaData().Flags)
+				fc.Parse("--app-ports", "8080,9090")
+
+				reqs, err := cmd.Requirements(requirementsFactory, fc)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(reqs).NotTo(BeEmpty())
+
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '--app-ports'"))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.MultipleAppPortsMinimumApiVersion))
+			})
+		})
 	})
 
 	Describe("when pushing a new app", func() {
@@ -242,6 +276,19 @@ var _ = Describe("Push Command", func() {
 			zipper.GetZipSizeReturns(9001, nil)
 			actor.GatherFilesReturns(nil, true, nil)
 			actor.UploadAppReturns(nil)
+		})
+
+		It("tries to find the default route for the app", func() {
+			callPush("app-name")
+
+			Expect(routeRepo.FindCallCount()).To(Equal(1))
+
+			host, domain, path, port := routeRepo.FindArgsForCall(0)
+
+			Expect(host).To(Equal("app-name"))
+			Expect(domain.Name).To(Equal("foo.cf-app.com"))
+			Expect(path).To(Equal(""))
+			Expect(port).To(Equal(0))
 		})
 
 		Context("when given a bad path", func() {
@@ -286,7 +333,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(BeZero())
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
@@ -406,7 +453,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.SpaceGuid).To(Equal("my-space-guid"))
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -448,7 +495,7 @@ var _ = Describe("Push Command", func() {
 				callPush("-t", "111", "app!name")
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("appname"))
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, _, _ := routeRepo.CreateArgsForCall(0)
@@ -603,7 +650,7 @@ var _ = Describe("Push Command", func() {
 					callPush("-t", "111", "--route-path", "the-route-path", "app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -648,7 +695,7 @@ var _ = Describe("Push Command", func() {
 					callPush("-t", "111", "app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
@@ -688,7 +735,7 @@ var _ = Describe("Push Command", func() {
 				It("provides a random hostname when the --random-route flag is passed", func() {
 					callPush("--random-route", "app-name")
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name-random-host"))
 				})
 
@@ -698,7 +745,7 @@ var _ = Describe("Push Command", func() {
 					callPush("app-name")
 
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _ := routeRepo.FindArgsForCall(0)
+					host, _, _, _ := routeRepo.FindArgsForCall(0)
 					Expect(host).To(Equal("app-name-random-host"))
 				})
 			})
@@ -1167,7 +1214,7 @@ var _ = Describe("Push Command", func() {
 				Expect(domainOrgGuid).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, domain, _ := routeRepo.FindArgsForCall(0)
+				host, domain, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("existing-app"))
 				Expect(domain.Name).To(Equal("newdomain.com"))
 
@@ -1189,7 +1236,7 @@ var _ = Describe("Push Command", func() {
 				callPush("-n", "new-host", "existing-app")
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, domain, _ := routeRepo.FindArgsForCall(0)
+				host, domain, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("new-host"))
 				Expect(domain.Name).To(Equal("example.com"))
 
@@ -1227,7 +1274,7 @@ var _ = Describe("Push Command", func() {
 				callPush("--no-hostname", "existing-app")
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, domain, _ := routeRepo.FindArgsForCall(0)
+				host, domain, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal(""))
 				Expect(domain.Name).To(Equal("example.com"))
 
@@ -1300,7 +1347,7 @@ var _ = Describe("Push Command", func() {
 		Context("when the app is already bound to the service", func() {
 			BeforeEach(func() {
 				appRepo.ReadReturns(maker.NewApp(maker.Overrides{}), nil)
-				serviceBinder.BindApplicationReturns.Error = errors.NewHttpError(500, "90003", "it don't work")
+				serviceBinder.BindApplicationReturns.Error = errors.NewHttpError(500, errors.ServiceBindingAppServiceTaken, "it don't work")
 			})
 
 			It("gracefully continues", func() {
@@ -1378,7 +1425,7 @@ var _ = Describe("Push Command", func() {
 		})
 
 		It("suggests using 'random-route' if the default route is taken", func() {
-			routeRepo.BindReturns(errors.NewHttpError(400, errors.INVALID_RELATION, "The URL not available"))
+			routeRepo.BindReturns(errors.NewHttpError(400, errors.InvalidRelation, "The URL not available"))
 
 			callPush("existing-app")
 

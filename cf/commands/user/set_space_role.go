@@ -6,6 +6,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
@@ -55,7 +56,7 @@ func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, 
 	}
 
 	var wantGuid bool
-	if cmd.config.IsMinApiVersion("2.37.0") {
+	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
 		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {

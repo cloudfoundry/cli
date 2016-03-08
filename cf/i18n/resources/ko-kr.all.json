@@ -52,7 +52,7 @@
     "translation": "\n팁: 이 오류를 억제하려면 'cf login -a API --skip-ssl-validation' 또는 'cf api API --skip-ssl-validation'을 사용하십시오."
   },
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
     "translation": ""
   },
   {
@@ -3004,10 +3004,6 @@
     "translation": "실행 보안 그룹이 설정되지 않음"
   },
   {
-    "id": "No save path has been set",
-    "translation": ""
-  },
-  {
     "id": "No security groups",
     "translation": "보안 그룹 없음"
   },
@@ -3308,8 +3304,8 @@
     "translation": "새로 작성된 조직에 지정할 할당량(이 옵션을 제외하면 기본 할당량이 지정됨)"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "새로 작성된 영역에 지정할 할당량(이 옵션을 제외하면 기본 할당량이 지정됨)"
+    "id": "Quota to assign to the newly created space",
+    "translation": "새로 작성된 영역에 지정할 할당량"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
@@ -4282,10 +4278,6 @@
   {
     "id": "Updating %s health_check_type to '%s'",
     "translation": "%s health_check_type을 '%s'(으)로 업데이트"
-  },
-  {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "플랜을 업데이트하려면 API v{{.RequiredCCAPIVersion}} 이상이 필요합니다. 현재 대상은 v{{.CurrentCCAPIVersion}}입니다."
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

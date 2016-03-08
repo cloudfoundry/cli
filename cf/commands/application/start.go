@@ -150,14 +150,10 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	doneLoggingChan := make(chan bool)
 
 	go cmd.tailStagingLogs(app, loggingStartedChan, doneLoggingChan)
-	timeout := make(chan struct{})
-	go func() {
-		time.Sleep(cmd.LogServerConnectionTimeout)
-		close(timeout)
-	}()
+	timer := time.NewTimer(cmd.LogServerConnectionTimeout)
 
 	select {
-	case <-timeout:
+	case <-timer.C:
 		cmd.ui.Warn("timeout connecting to log server, no log will be shown")
 		break
 	case <-loggingStartedChan: // block until we have established connection to Loggregator
@@ -211,6 +207,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 		}))
 
 	cmd.appDisplayer.ShowApp(startedApp, orgName, spaceName)
+
 	return
 }
 
@@ -305,37 +302,39 @@ Use '{{.Command}}' for more in depth log information.`,
 }
 
 func (cmd *Start) waitForOneRunningInstance(app models.Application) {
-	startupStartTime := time.Now()
+	timer := time.NewTimer(cmd.StartupTimeout)
 
 	for {
-		if time.Since(startupStartTime) > cmd.StartupTimeout {
+		select {
+		case <-timer.C:
 			tipMsg := T("Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.") + "\n\n"
 			tipMsg += T("Use '{{.Command}}' for more information", map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})
 
 			cmd.ui.Failed(tipMsg)
 			return
-		}
 
-		count, err := cmd.fetchInstanceCount(app.Guid)
-		if err != nil {
-			cmd.ui.Warn("Could not fetch instance count: %s", err.Error())
+		default:
+			count, err := cmd.fetchInstanceCount(app.Guid)
+			if err != nil {
+				cmd.ui.Warn("Could not fetch instance count: %s", err.Error())
+				time.Sleep(cmd.PingerThrottle)
+				continue
+			}
+
+			cmd.ui.Say(instancesDetails(count))
+
+			if count.running > 0 {
+				return
+			}
+
+			if count.flapping > 0 || count.crashed > 0 {
+				cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
+					map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})))
+				return
+			}
+
 			time.Sleep(cmd.PingerThrottle)
-			continue
 		}
-
-		cmd.ui.Say(instancesDetails(count))
-
-		if count.running > 0 {
-			return
-		}
-
-		if count.flapping > 0 || count.crashed > 0 {
-			cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-				map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})))
-			return
-		}
-
-		time.Sleep(cmd.PingerThrottle)
 	}
 }
 

@@ -18,7 +18,7 @@ import (
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
-	Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
+	Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error)
 	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
 	CreateInSpace(host, path, domainGuid, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
@@ -66,7 +66,7 @@ func normalizedPath(path string) string {
 	return path
 }
 
-func queryStringForRouteSearch(host, guid, path string) string {
+func queryStringForRouteSearch(host, guid, path string, port int) string {
 	args := []string{
 		fmt.Sprintf("host:%s", host),
 		fmt.Sprintf("domain_guid:%s", guid),
@@ -76,11 +76,15 @@ func queryStringForRouteSearch(host, guid, path string) string {
 		args = append(args, fmt.Sprintf("path:%s", normalizedPath(path)))
 	}
 
+	if port != 0 {
+		args = append(args, fmt.Sprintf("port:%d", port))
+	}
+
 	return url.QueryEscape(strings.Join(args, ";"))
 }
 
-func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
-	queryString := queryStringForRouteSearch(host, domain.Guid, path)
+func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error) {
+	queryString := queryStringForRouteSearch(host, domain.Guid, path, port)
 
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(

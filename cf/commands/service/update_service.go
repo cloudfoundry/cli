@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -83,7 +84,11 @@ func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory,
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return
+	if fc.String("p") != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumApiVersion))
+	}
+
+	return reqs, nil
 }
 
 func (cmd *UpdateService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
@@ -122,7 +127,6 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 
 	var plan models.ServicePlanFields
 	if planName != "" {
-		cmd.checkUpdateServicePlanApiVersion()
 		plan, err = cmd.findPlan(serviceInstance, planName)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
@@ -156,16 +160,6 @@ func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planN
 	err = errors.New(T("Plan does not exist for the {{.ServiceName}} service",
 		map[string]interface{}{"ServiceName": serviceInstance.ServiceOffering.Label}))
 	return
-}
-
-func (cmd *UpdateService) checkUpdateServicePlanApiVersion() {
-	if !cmd.config.IsMinApiVersion("2.16.0") {
-		cmd.ui.Failed(T("Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-			map[string]interface{}{
-				"RequiredCCAPIVersion": "2.16.0",
-				"CurrentCCAPIVersion":  cmd.config.ApiVersion(),
-			}))
-	}
 }
 
 func (cmd *UpdateService) printUpdatingServiceInstanceMessage(serviceInstanceName string) {

@@ -4,6 +4,7 @@ package fakes
 import (
 	"sync"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -129,10 +130,10 @@ type FakeReadWriter struct {
 	isSSLDisabledReturns     struct {
 		result1 bool
 	}
-	IsMinApiVersionStub        func(string) bool
+	IsMinApiVersionStub        func(semver.Version) bool
 	isMinApiVersionMutex       sync.RWMutex
 	isMinApiVersionArgsForCall []struct {
-		arg1 string
+		arg1 semver.Version
 	}
 	isMinApiVersionReturns struct {
 		result1 bool
@@ -777,10 +778,10 @@ func (fake *FakeReadWriter) IsSSLDisabledReturns(result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsMinApiVersion(arg1 string) bool {
+func (fake *FakeReadWriter) IsMinApiVersion(arg1 semver.Version) bool {
 	fake.isMinApiVersionMutex.Lock()
 	fake.isMinApiVersionArgsForCall = append(fake.isMinApiVersionArgsForCall, struct {
-		arg1 string
+		arg1 semver.Version
 	}{arg1})
 	fake.isMinApiVersionMutex.Unlock()
 	if fake.IsMinApiVersionStub != nil {
@@ -796,7 +797,7 @@ func (fake *FakeReadWriter) IsMinApiVersionCallCount() int {
 	return len(fake.isMinApiVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsMinApiVersionArgsForCall(i int) string {
+func (fake *FakeReadWriter) IsMinApiVersionArgsForCall(i int) semver.Version {
 	fake.isMinApiVersionMutex.RLock()
 	defer fake.isMinApiVersionMutex.RUnlock()
 	return fake.isMinApiVersionArgsForCall[i].arg1

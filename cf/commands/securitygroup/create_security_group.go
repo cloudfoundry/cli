@@ -91,7 +91,7 @@ Valid json file example:
 	err = cmd.securityGroupRepo.Create(name, rules)
 
 	httpErr, ok := err.(errors.HttpError)
-	if ok && httpErr.ErrorCode() == errors.SECURITY_GROUP_EXISTS {
+	if ok && httpErr.ErrorCode() == errors.SecurityGroupNameTaken {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Security group {{.security_group}} {{.error_message}}",
 			map[string]interface{}{

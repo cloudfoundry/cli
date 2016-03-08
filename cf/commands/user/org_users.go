@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors/userprint"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -105,7 +106,7 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 }
 
 func (cmd *OrgUsers) userLister() func(orgGuid string, role string) ([]models.UserFields, error) {
-	if cmd.config.IsMinApiVersion("2.21.0") {
+	if cmd.config.IsMinApiVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion) {
 		return cmd.userRepo.ListUsersInOrgForRoleWithNoUAA
 	}
 	return cmd.userRepo.ListUsersInOrgForRole

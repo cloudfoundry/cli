@@ -72,7 +72,7 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 		})
 
 		It("Fails with a reasonable message when invalid JSON is passed", func() {
-			environmentVariableGroupRepo.SetStagingReturns(cf_errors.NewHttpError(400, cf_errors.PARSE_ERROR, "Request invalid due to parse error"))
+			environmentVariableGroupRepo.SetStagingReturns(cf_errors.NewHttpError(400, cf_errors.MessageParseError, "Request invalid due to parse error"))
 			runCommand(`{"abc":"123", "invalid : "json"}`)
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Setting the contents of the staging environment variable group as my-user..."},

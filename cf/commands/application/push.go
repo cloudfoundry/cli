@@ -12,6 +12,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/applications"
@@ -84,7 +85,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 			T("Push a single app (with or without a manifest):\n"),
 			T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"),
 			T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n"),
-			"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
+			"   [--app-ports APP_PORTS] [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
 			"\n",
 			T("   Push multiple apps with a manifest:\n"),
 			T("   CF_NAME push [-f MANIFEST_PATH]\n"),
@@ -107,6 +108,10 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 		}
 
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", requiredVersion))
+	}
+
+	if fc.String("app-ports") != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumApiVersion))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{
@@ -377,7 +382,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 
 		switch httpErr := err.(type) {
 		case errors.HttpError:
-			if httpErr.ErrorCode() == errors.APP_ALREADY_BOUND {
+			if httpErr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 				err = nil
 			}
 		}

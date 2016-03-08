@@ -3,13 +3,13 @@ package manifest
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
 
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/generic"
 
 	"gopkg.in/yaml.v2"
+
+	"io"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
@@ -26,13 +26,11 @@ type AppManifest interface {
 	Instances(string, int)
 	Domain(string, string, string)
 	GetContents() []models.Application
-	FileSavePath(string)
 	Stack(string, string)
-	Save() error
+	Save(f io.Writer) error
 }
 
 type appManifest struct {
-	savePath string
 	contents []models.Application
 }
 
@@ -45,10 +43,6 @@ func (m *appManifest) Stack(appName string, stackName string) {
 	m.contents[i].Stack = &models.Stack{
 		Name: stackName,
 	}
-}
-
-func (m *appManifest) FileSavePath(savePath string) {
-	m.savePath = savePath
 }
 
 func (m *appManifest) Memory(appName string, memory int64) {
@@ -196,17 +190,7 @@ func generateAppMap(app models.Application) (generic.Map, error) {
 	return m, nil
 }
 
-func (m *appManifest) Save() error {
-	if m.savePath == "" {
-		return errors.New(T("No save path has been set"))
-	}
-
-	f, err := os.Create(m.savePath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
+func (m *appManifest) Save(f io.Writer) error {
 	y := generic.NewMap()
 
 	apps := []generic.Map{}
@@ -224,10 +208,16 @@ func (m *appManifest) Save() error {
 	y.Set("applications", apps)
 
 	contents, err := yaml.Marshal(y)
+	if err != nil {
+		return err
+	}
 
-	err = ioutil.WriteFile(m.savePath, contents, os.ModePerm)
+	_, err = f.Write(contents)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func (m *appManifest) findOrCreateApplication(name string) int {

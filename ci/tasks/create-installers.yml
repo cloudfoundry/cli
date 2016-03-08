@@ -112,6 +112,20 @@ run:
         mkbom -i bom_list Bom
         mv Bom Payload com.cloudfoundry.cli.pkg
         xar -c --compression none -f cf-cli-installer_osx.pkg com.cloudfoundry.cli.pkg Distribution
+
+        f=cf-cli-installer_osx.pkg
+        xar --sign -f $f \
+            --digestinfo-to-sign digestinfo.dat \
+            --sig-size `cat $root/ci/certs/siglen.txt` \
+            --cert-loc $root/ci/certs/Developer\ ID\ Installer_\ Cloudfoundry.org\ Foundation\,\ Inc\ \(ZS92ETKJX7\).cer \
+            --cert-loc $root/ci/certs/Developer\ ID\ Certification\ Authority.cer
+
+        openssl rsautl -sign \
+            -inkey $root/ci/certs/developer-id-installer-private-key.pem \
+            -in digestinfo.dat \
+            -out signature.dat
+        xar --inject-sig signature.dat -f $f
+
         mv cf-cli-installer_osx.pkg $root/archives/cf-cli-installer_osx.pkg
         rm -rf cf-cli com.cloudfoundry.cli.pkg/Payload com.cloudfoundry.cli.pkg/Bom bom_list
       popd

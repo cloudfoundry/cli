@@ -52,7 +52,7 @@
     "translation": "\nTIPP: Verwenden Sie 'cf login -a API --skip-ssl-validation' oder 'cf api API --skip-ssl-validation', um diesen Fehler zu unterdrücken."
   },
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
     "translation": ""
   },
   {
@@ -3004,10 +3004,6 @@
     "translation": "Es wurden keine Sicherheitsgruppen festgelegt."
   },
   {
-    "id": "No save path has been set",
-    "translation": ""
-  },
-  {
     "id": "No security groups",
     "translation": "Keine Sicherheitsgruppen"
   },
@@ -3308,8 +3304,8 @@
     "translation": "Größenbeschränkung, die der neu erstellten Organisation zugeordnet werden soll (außer wenn diese Option zu einer Zuordnung der Standardgrößenbeschränkung führt)"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "Größenbeschränkung, die dem neu erstellten Bereich zugeordnet werden soll (außer, wenn diese Option zu einer Zuordnung der Standardgrößenbeschränkung führt)"
+    "id": "Quota to assign to the newly created space",
+    "translation": "Größenbeschränkung, die dem neu erstellten Bereich zugeordnet werden soll"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
@@ -4282,10 +4278,6 @@
   {
     "id": "Updating %s health_check_type to '%s'",
     "translation": "Aktualisierung von %s health_check_type auf '%s'"
-  },
-  {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "Aktualisierung eines Plans erfordert API V{{.RequiredCCAPIVersion}} oder höher. Ihr aktuelles Ziel ist V{{.CurrentCCAPIVersion}}."
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

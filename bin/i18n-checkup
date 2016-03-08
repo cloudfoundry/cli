@@ -3,6 +3,7 @@
 set +e
 
 export PATH=$PATH:$GOPATH/bin
+ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
 
 function killed {
   exit 1
@@ -35,8 +36,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-bin/generate-language-resources
-if [ $? -ne 0 ]; then
-  printf "Failed to run `bin/generate-language-resources`"
-  exit 1
+if [[ $(git status --porcelain cf/i18n/resources) ]]; then
+  bin/generate-language-resources
+  if [ $? -ne 0 ]; then
+    printf "Failed to run `bin/generate-language-resources`"
+    exit 1
+  fi
 fi
