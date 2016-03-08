@@ -47,11 +47,6 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
       }
    }`)
 	tagsUsage := T(`   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.`)
-	exampleUsage := T(`EXAMPLE:
-   CF_NAME update-service mydb -p gold
-   CF_NAME update-service mydb -c '{"ram_gb":4}'
-   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json
-   CF_NAME update-service mydb -t "list,of, tags"`)
 
 	fs := make(map[string]flags.FlagSet)
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Change service plan for a service instance")}
@@ -67,8 +62,12 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 			paramsUsage,
 			"\n\n",
 			tagsUsage,
-			"\n\n",
-			exampleUsage,
+		},
+		Example: []string{
+			`CF_NAME update-service mydb -p gold`,
+			`CF_NAME update-service mydb -c '{"ram_gb":4}'`,
+			`CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json`,
+			`CF_NAME update-service mydb -t "list,of, tags"`,
 		},
 		Flags: fs,
 	}

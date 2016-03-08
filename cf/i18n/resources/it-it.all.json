@@ -1644,10 +1644,6 @@
     "translation": "VARIABILI DI AMBIENTE:"
   },
   {
-    "id": "EXAMPLE:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\"",
-    "translation": "ESEMPIO:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\""
-  },
-  {
     "id": "EXAMPLES",
     "translation": ""
   },
