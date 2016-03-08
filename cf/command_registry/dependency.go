@@ -18,7 +18,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/cloudfoundry/cli/utils"
 	"github.com/cloudfoundry/cli/words/generator"
@@ -79,12 +78,6 @@ func NewDependency() Dependency {
 
 	terminal.UserAskedForColors = deps.Config.ColorEnabled()
 	terminal.InitColorSupport()
-
-	if os.Getenv("CF_TRACE") != "" {
-		trace.Logger = trace.NewLogger(os.Getenv("CF_TRACE"))
-	} else {
-		trace.Logger = trace.NewLogger(deps.Config.Trace())
-	}
 
 	deps.Gateways = map[string]net.Gateway{
 		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.Ui),

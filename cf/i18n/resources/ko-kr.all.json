@@ -1652,10 +1652,6 @@
     "translation": ""
   },
   {
-    "id": "Enable CF_TRACE output for all requests and responses",
-    "translation": "모든 요청과 응답에 CF_TRACE 출력 사용"
-  },
-  {
     "id": "Enable HTTP proxying for API requests",
     "translation": "API 요청에 HTTP 프록시 사용"
   },

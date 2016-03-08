@@ -27,5 +27,6 @@ func GetHelpTemplate() string {
 
 {{.Title "` + T("GLOBAL OPTIONS:") + `"}}
    --help, -h                         ` + T("Show help") + `
+   -v                                 ` + T("Print API request diagnostics to stdout") + `
 `
 }

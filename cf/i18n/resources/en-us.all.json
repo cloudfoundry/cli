@@ -1652,10 +1652,6 @@
     "translation": "EXAMPLES"
   },
   {
-    "id": "Enable CF_TRACE output for all requests and responses",
-    "translation": "Enable CF_TRACE output for all requests and responses"
-  },
-  {
     "id": "Enable HTTP proxying for API requests",
     "translation": "Enable HTTP proxying for API requests"
   },

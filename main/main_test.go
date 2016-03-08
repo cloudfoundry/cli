@@ -81,6 +81,20 @@ var _ = Describe("main", func() {
 		})
 	})
 
+	Describe("Enables verbose output with -v", func() {
+		It("enables verbose output when -v is provided before a command", func() {
+			output := Cf("-v", "curl", "/v2/info").Wait(5 * time.Second)
+			Eventually(output.Out.Contents).ShouldNot(ContainSubstring("Invalid flag: -v"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/info HTTP/1.1"))
+		})
+
+		It("enables verbose output when -v is provided after a command", func() {
+			output := Cf("-v", "curl", "/v2/info").Wait(5 * time.Second)
+			Eventually(output.Out.Contents).ShouldNot(ContainSubstring("Invalid flag: -v"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/info HTTP/1.1"))
+		})
+	})
+
 	Describe("Shows debug information with -b or --build", func() {
 		It("prints the golang version if '--build' flag is provided", func() {
 			output := Cf("--build").Wait(1 * time.Second)
