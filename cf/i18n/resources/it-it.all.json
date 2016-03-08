@@ -1648,10 +1648,6 @@
     "translation": "ESEMPIO:\n   CF_NAME update-service mydb -p gold\n   CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n   CF_NAME update-service mydb -t \"list,of, tags\""
   },
   {
-    "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Windows Command Line:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json",
-    "translation": "ESEMPIO:\n   Linux/Mac:\n      CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n   Riga di comando di Windows:\n      CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n   Windows PowerShell:\n      CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\t\n   CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"
-  },
-  {
     "id": "EXAMPLE:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Windows Command Line:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\"",
     "translation": "ESEMPIO:\n   Linux/Mac:\n      CF_NAME create-service db-service silver mydb -c '{\"ram_gb\":4}'\n\n   Riga di comando di Windows:\n      CF_NAME create-service db-service silver mydb -c \"{\\\"ram_gb\\\":4}\"\n\n   Windows PowerShell:\n      CF_NAME create-service db-service silver mydb -c '{\\\"ram_gb\\\":4}'\n\n   CF_NAME create-service db-service silver mydb -c ~/workspace/tmp/instance_config.json\n\n   CF_NAME create-service db-service silver mydb -t \"list, of, tags\""
   },
@@ -2698,6 +2694,10 @@
   {
     "id": "Last Operation",
     "translation": "Ultima operazione"
+  },
+  {
+    "id": "Linux/Mac",
+    "translation": ""
   },
   {
     "id": "List all apps in the target space",
@@ -4438,6 +4438,14 @@
   {
     "id": "Warning: error tailing logs",
     "translation": "Avvertenza: errore di accodamento log"
+  },
+  {
+    "id": "Windows Command Line",
+    "translation": "Riga di comando di Windows"
+  },
+  {
+    "id": "Windows PowerShell",
+    "translation": ""
   },
   {
     "id": "Write curl body to FILE instead of stdout",
