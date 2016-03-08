@@ -36,7 +36,7 @@ func (cmd *ServiceKey) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME service-key mydb mykey",
 		},
 		Flags: fs,

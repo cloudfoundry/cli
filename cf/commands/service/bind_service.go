@@ -58,7 +58,7 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
 			"\n\n",
 			paramsUsage,
 		},
-		Example: []string{
+		Examples: []string{
 			fmt.Sprintf("%s:", T(`Linux/Mac`)),
 			`   CF_NAME bind-service myapp mydb -c '{"permissions":"read-only"}'`,
 			``,

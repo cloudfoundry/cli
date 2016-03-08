@@ -36,7 +36,7 @@ func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T(`CF_NAME repo-plugins [-r REPO_NAME]`),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME repo-plugins -r PrivateRepo",
 		},
 		Flags: fs,

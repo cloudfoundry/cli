@@ -52,7 +52,7 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 
    For API documentation, please visit http://apidocs.cloudfoundry.org.`),
 		},
-		Example: []string{
+		Examples: []string{
 			`CF_NAME curl "/v2/apps" -X GET -H "Content-Type: application/x-www-form-urlencoded" -d 'q=name:myapp'`,
 			`CF_NAME curl "/v2/apps" -d @/path/to/file`,
 		},

@@ -50,7 +50,7 @@ func (cmd *UpdateUserProvidedService) MetaData() command_registry.CommandMetadat
    Specify a path to a file containing JSON:
    CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`),
 		},
-		Example: []string{
+		Examples: []string{
 			`CF_NAME update-user-provided-service my-db-mine -p '{"username":"admin", "password":"pa55woRD"}'`,
 			"CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json",
 			"CF_NAME update-user-provided-service my-drain-service -l syslog://example.com",

@@ -34,7 +34,7 @@ func (cmd *CheckRoute) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME check-route HOST DOMAIN [--path PATH]"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME check-route myhost example.com            # example.com",
 			"CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo",
 		},

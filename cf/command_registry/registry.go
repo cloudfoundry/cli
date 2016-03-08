@@ -121,10 +121,10 @@ func (r *registry) CommandUsage(cmdName string) string {
 	output += T("USAGE") + ":" + "\n"
 	output += "   " + strings.Replace(strings.Join(cmd.MetaData().Usage, ""), "CF_NAME", cf.Name, -1) + "\n"
 
-	if len(cmd.MetaData().Example) > 0 {
+	if len(cmd.MetaData().Examples) > 0 {
 		output += "\n"
 		output += fmt.Sprintf("%s:\n", T("EXAMPLES"))
-		for _, e := range cmd.MetaData().Example {
+		for _, e := range cmd.MetaData().Examples {
 			output += fmt.Sprintf("   %s\n", strings.Replace(e, "CF_NAME", cf.Name, -1))
 		}
 	}

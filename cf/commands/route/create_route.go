@@ -47,7 +47,7 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
    Create a TCP route:
    CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]`),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME create-route my-space example.com                             # example.com",
 			"CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com",
 			"CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo",

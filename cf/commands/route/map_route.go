@@ -35,7 +35,7 @@ func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME map-route my-app example.com                              # example.com",
 			"CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",

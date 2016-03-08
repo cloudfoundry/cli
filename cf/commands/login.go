@@ -51,7 +51,7 @@ func (cmd *Login) MetaData() command_registry.CommandMetadata {
 			T("CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"),
 			terminal.WarningColor(T("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history")),
 		},
-		Example: []string{
+		Examples: []string{
 			T("CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)"),
 			T("CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)"),
 			T("CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)"),

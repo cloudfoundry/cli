@@ -31,7 +31,7 @@ func (cmd *ServiceKeys) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME service-keys SERVICE_INSTANCE"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME service-keys mydb",
 		},
 	}

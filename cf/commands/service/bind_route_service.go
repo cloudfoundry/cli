@@ -46,7 +46,7 @@ func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]`),
 		},
-		Example: []string{
+		Examples: []string{
 			`CF_NAME bind-route-service example.com myratelimiter --hostname myapp`,
 			`CF_NAME bind-route-service example.com myratelimiter -c file.json`,
 			`CF_NAME bind-route-service example.com myratelimiter -c '{"valid":"json"}'`,
