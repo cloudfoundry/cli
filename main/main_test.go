@@ -71,13 +71,13 @@ var _ = Describe("main", func() {
 		It("prints the cf version if '-v' flag is provided", func() {
 			output := Cf("-v").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("cf version"))
-			Ω(output.ExitCode()).To(Equal(0))
+			Expect(output.ExitCode()).To(Equal(0))
 		})
 
 		It("prints the cf version if '--version' flag is provided", func() {
 			output := Cf("--version").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("cf version"))
-			Ω(output.ExitCode()).To(Equal(0))
+			Expect(output.ExitCode()).To(Equal(0))
 		})
 	})
 
@@ -85,13 +85,13 @@ var _ = Describe("main", func() {
 		It("prints the golang version if '--build' flag is provided", func() {
 			output := Cf("--build").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("was built with Go version:"))
-			Ω(output.ExitCode()).To(Equal(0))
+			Expect(output.ExitCode()).To(Equal(0))
 		})
 
 		It("prints the golang version if '-b' flag is provided", func() {
 			output := Cf("-b").Wait(1 * time.Second)
 			Eventually(output.Out.Contents).Should(ContainSubstring("was built with Go version:"))
-			Ω(output.ExitCode()).To(Equal(0))
+			Expect(output.ExitCode()).To(Equal(0))
 		})
 	})
 
