@@ -1208,6 +1208,10 @@
     "translation": "Zip 파일을 쓸 수 없음"
   },
   {
+    "id": "Create a TCP route",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "빌드팩 작성"
   },
@@ -1256,7 +1260,7 @@
     "translation": "나중에 사용하도록 영역에 URL 작성"
   },
   {
-    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
+    "id": "Create an HTTP route",
     "translation": ""
   },
   {

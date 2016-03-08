@@ -1208,6 +1208,10 @@
     "translation": "Non è stato possibile scrivere il file zip"
   },
   {
+    "id": "Create a TCP route",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "Crea un pacchetto di build"
   },
@@ -1256,7 +1260,7 @@
     "translation": "Crea una rotta URL in uno spazio da utilizzare successivamente"
   },
   {
-    "id": "Create an HTTP route:\n   CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n   Create a TCP route:\n   CF_NAME create-route SPACE DOMAIN [--port PORT] [--random-port]",
+    "id": "Create an HTTP route",
     "translation": ""
   },
   {
