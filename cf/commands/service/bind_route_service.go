@@ -44,15 +44,15 @@ func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 		ShortName:   "brs",
 		Description: T("Bind a service instance to an HTTP route"),
 		Usage: []string{
-			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]
-
-EXAMPLES:
-   CF_NAME bind-route-service example.com myratelimiter --hostname myapp
-   CF_NAME bind-route-service example.com myratelimiter -c file.json
-   CF_NAME bind-route-service example.com myratelimiter -c '{"valid":"json"}'
-
-   In Windows PowerShell use double-quoted, escaped JSON: "{\"valid\":\"json\"}"
-   In Windows Command Line use single-quoted, escaped JSON: '{\"valid\":\"json\"}'`),
+			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]`),
+		},
+		Example: []string{
+			`CF_NAME bind-route-service example.com myratelimiter --hostname myapp`,
+			`CF_NAME bind-route-service example.com myratelimiter -c file.json`,
+			`CF_NAME bind-route-service example.com myratelimiter -c '{"valid":"json"}'`,
+			``,
+			T(`In Windows PowerShell use double-quoted, escaped JSON: "{\"valid\":\"json\"}"`),
+			T(`In Windows Command Line use single-quoted, escaped JSON: '{\"valid\":\"json\"}'`),
 		},
 		Flags: fs,
 	}

@@ -488,8 +488,8 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\nEXAMPLES:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
-    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]\n\n例:\n   CF_NAME bind-route-service example.com myratelimiter --hostname myapp\n   CF_NAME bind-route-service example.com myratelimiter -c file.json\n   CF_NAME bind-route-service example.com myratelimiter -c '{\"valid\":\"json\"}'\n\n   Windows PowerShell ではダブルクォーテーションを使用します、エスケープしたJSON: \"{\\\"valid\\\":\\\"json\\\"}\"\n   Windows コマンドラインはシングルクオーテーションを使用します、エスケープしたJSON: '{\\\"valid\\\":\\\"json\\\"}'"
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "translation": ""
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -2354,6 +2354,14 @@
   {
     "id": "Ignore manifest file",
     "translation": "マニフェスト・ファイルを無視します"
+  },
+  {
+    "id": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
+    "translation": "Windows コマンドラインはシングルクオーテーションを使用します、エスケープしたJSON: '{\\\"valid\\\":\\\"json\\\"}'"
+  },
+  {
+    "id": "In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"",
+    "translation": "Windows PowerShell ではダブルクォーテーションを使用します、エスケープしたJSON: \"{\\\"valid\\\":\\\"json\\\"}\""
   },
   {
     "id": "Include response headers in the output",
