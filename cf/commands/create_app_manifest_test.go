@@ -20,6 +20,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 )
 
 var _ = Describe("CreateAppManifest", func() {
@@ -118,14 +119,25 @@ var _ = Describe("CreateAppManifest", func() {
 	})
 
 	Describe("Execute", func() {
+		var application models.Application
+
 		BeforeEach(func() {
 			err := flagContext.Parse("app-name")
 			Expect(err).NotTo(HaveOccurred())
 			_, err = cmd.Requirements(factory, flagContext)
 			Expect(err).NotTo(HaveOccurred())
+
+			application = models.Application{}
+			application.Name = "app-name"
+		})
+
+		AfterEach(func() {
+			os.Remove("app-name_manifest.yml")
 		})
 
 		It("tries to get the app summary", func() {
+			appSummaryRepo.GetSummaryReturns(application, nil)
+
 			cmd.Execute(flagContext)
 			Expect(appSummaryRepo.GetSummaryCallCount()).To(Equal(1))
 		})
@@ -134,14 +146,17 @@ var _ = Describe("CreateAppManifest", func() {
 			BeforeEach(func() {
 				appSummaryRepo.GetSummaryReturns(models.Application{}, errors.New("get-summary-err"))
 			})
+
+			It("prints an error", func() {
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Error getting application summary: get-summary-err"},
+				))
+			})
 		})
 
 		Context("when getting the app summary succeeds", func() {
-			var application models.Application
-
 			BeforeEach(func() {
-				application = models.Application{}
-				application.Name = "app-name"
 				application.Memory = 1024
 				application.InstanceCount = 2
 				application.StackGuid = "the-stack-guid"
