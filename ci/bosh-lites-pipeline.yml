@@ -129,6 +129,27 @@ jobs:
       params:
         release: bosh-lite-lock
 
+- name: deploy-routing-release-1
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-1-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+          LITE_HOSTNAME: {{lite-1-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
 - name: deploy-boshlite-2
   serial: true
   plan:
@@ -193,6 +214,28 @@ jobs:
       put: bosh-lite-lock
       params:
         release: bosh-lite-lock
+
+- name: deploy-routing-release-2
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-2-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+          LITE_HOSTNAME: {{lite-2-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
 
 - name: deploy-boshlite-3
   serial: true
@@ -259,6 +302,27 @@ jobs:
       params:
         release: bosh-lite-lock
 
+- name: deploy-routing-release-3
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-3-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+          LITE_HOSTNAME: {{lite-3-hostname}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
 - name: deploy-boshlite-4
   serial: true
   plan:
@@ -319,6 +383,27 @@ jobs:
       config:
         params:
           LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-4
+  plan:
+  - put: bosh-lite-lock
+    params:
+      claim: {{lite-4-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      config:
+        params:
+          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+          LITE_HOSTNAME: {{lite-4-hostname}}
     ensure:
       put: bosh-lite-lock
       params:
