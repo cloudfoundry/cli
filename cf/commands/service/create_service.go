@@ -63,7 +63,7 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
 			"\n\n",
 			tipsUsage,
 		},
-		Example: []string{
+		Examples: []string{
 			fmt.Sprintf("%s:", T(`Linux/Mac`)),
 			`   CF_NAME create-service db-service silver mydb -c '{"ram_gb":4}'`,
 			``,

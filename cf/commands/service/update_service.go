@@ -63,7 +63,7 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 			"\n\n",
 			tagsUsage,
 		},
-		Example: []string{
+		Examples: []string{
 			`CF_NAME update-service mydb -p gold`,
 			`CF_NAME update-service mydb -c '{"ram_gb":4}'`,
 			`CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json`,

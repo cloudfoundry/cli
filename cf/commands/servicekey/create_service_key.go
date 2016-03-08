@@ -47,7 +47,7 @@ func (cmd *CreateServiceKey) MetaData() command_registry.CommandMetadata {
      "permissions": "read-only"
    }`),
 		},
-		Example: []string{
+		Examples: []string{
 			`CF_NAME create-service-key mydb mykey -c '{"permissions":"read-only"}'`,
 			`CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json`,
 		},

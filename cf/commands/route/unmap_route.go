@@ -34,7 +34,7 @@ func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME unmap-route my-app example.com                              # example.com",
 			"CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",

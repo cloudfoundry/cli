@@ -50,7 +50,7 @@ func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 
    Prompts for confirmation unless '-f' is provided.`),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME install-plugin ~/Downloads/plugin-foobar",
 			"CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64",
 			"CF_NAME install-plugin -r My-Repo plugin-echo",

@@ -42,7 +42,7 @@ func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
 		},
 		Flags: fs,

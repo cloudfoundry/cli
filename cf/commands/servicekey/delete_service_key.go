@@ -34,7 +34,7 @@ func (cmd *DeleteServiceKey) MetaData() command_registry.CommandMetadata {
 		Usage: []string{
 			T("CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"),
 		},
-		Example: []string{
+		Examples: []string{
 			"CF_NAME delete-service-key mydb mykey",
 		},
 		Flags: fs,
