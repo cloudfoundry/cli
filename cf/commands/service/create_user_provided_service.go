@@ -9,6 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
 
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -46,22 +48,22 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
    CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{"key1":"value1","key2":"value2"}'
 
    Specify a path to a file containing JSON:
-   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE
-
-EXAMPLE:
-   CF_NAME create-user-provided-service my-db-mine -p "username, password"
-   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json
-   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com
-   CF_NAME create-user-provided-service my-route-service -r https://example.com
-
-   Linux/Mac:
-   CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'
-
-   Windows Command Line
-   CF_NAME create-user-provided-service my-db-mine -p "{\"username\":\"admin\",\"password\":\"pa55woRD\"}"
-
-   Windows PowerShell
-   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'`),
+   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE`),
+		},
+		Example: []string{
+			`CF_NAME create-user-provided-service my-db-mine -p "username, password"`,
+			`CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json`,
+			`CF_NAME create-user-provided-service my-drain-service -l syslog://example.com`,
+			`CF_NAME create-user-provided-service my-route-service -r https://example.com`,
+			``,
+			fmt.Sprintf("%s:", T(`Linux/Mac`)),
+			`   CF_NAME create-user-provided-service my-db-mine -p '{"username":"admin","password":"pa55woRD"}'`,
+			``,
+			fmt.Sprintf("%s:", T(`Windows Command Line`)),
+			`   CF_NAME create-user-provided-service my-db-mine -p "{\"username\":\"admin\",\"password\":\"pa55woRD\"}"`,
+			``,
+			fmt.Sprintf("%s:", T(`Windows PowerShell`)),
+			`   CF_NAME create-user-provided-service my-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'`,
 		},
 		Flags: fs,
 	}
