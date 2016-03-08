@@ -157,12 +157,12 @@ type CommandMetadata struct {
 	Flags           map[string]flags.FlagSet
 	SkipFlagParsing bool
 	TotalArgs       int
-	Example         []string
+	Examples        []string
 }
 ```
 [Source code](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/command.go#L16)
 
-The `Example` field represents the set of lines to be printed when printing examples in the help text.
+The `Examples` field represents the set of lines to be printed when printing examples in the help text.
 
 `Requirements()` returns a list of requirements that need to be met before a command can be invoked.
 
