@@ -6,42 +6,56 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/trace"
 	"golang.org/x/net/websocket"
 )
 
+//go:generate counterfeiter . HttpClientInterface
 type HttpClientInterface interface {
-	Do(req *http.Request) (resp *http.Response, err error)
+	RequestDumperInterface
+
+	Do(*http.Request) (*http.Response, error)
+	ExecuteCheckRedirect(req *http.Request, via []*http.Request) error
 }
 
-var NewHttpClient = func(tr *http.Transport) HttpClientInterface {
-	return &http.Client{
-		Transport:     tr,
-		CheckRedirect: PrepareRedirect,
+type client struct {
+	*http.Client
+	dumper RequestDumper
+}
+
+var NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
+	client := client{
+		&http.Client{
+			Transport: tr,
+		},
+		dumper,
 	}
+	client.CheckRedirect = client.checkRedirect
+
+	return &client
 }
 
-func PrepareRedirect(req *http.Request, via []*http.Request) error {
+func (cl *client) ExecuteCheckRedirect(req *http.Request, via []*http.Request) error {
+	return cl.CheckRedirect(req, via)
+}
+
+func (cl *client) checkRedirect(req *http.Request, via []*http.Request) error {
 	if len(via) > 1 {
 		return errors.New(T("stopped after 1 redirect"))
 	}
 
 	prevReq := via[len(via)-1]
-	copyHeaders(prevReq, req, getBaseDomain(req.URL.String()) == getBaseDomain(via[0].URL.String()))
-	dumpRequest(req)
+	cl.copyHeaders(prevReq, req, getBaseDomain(req.URL.String()) == getBaseDomain(via[0].URL.String()))
+	cl.dumper.DumpRequest(req)
 
 	return nil
 }
 
-func copyHeaders(from *http.Request, to *http.Request, sameDomain bool) {
+func (cl *client) copyHeaders(from *http.Request, to *http.Request, sameDomain bool) {
 	for key, values := range from.Header {
 		// do not copy POST-specific headers
 		if key != "Content-Type" && key != "Content-Length" && !(!sameDomain && key == "Authorization") {
@@ -50,26 +64,12 @@ func copyHeaders(from *http.Request, to *http.Request, sameDomain bool) {
 	}
 }
 
-func dumpRequest(req *http.Request) {
-	shouldDisplayBody := !strings.Contains(req.Header.Get("Content-Type"), "multipart/form-data")
-	dumpedRequest, err := httputil.DumpRequest(req, shouldDisplayBody)
-	if err != nil {
-		trace.Logger.Printf(T("Error dumping request\n{{.Err}}\n", map[string]interface{}{"Err": err}))
-	} else {
-		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("REQUEST:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedRequest)))
-		if !shouldDisplayBody {
-			trace.Logger.Println(T("[MULTIPART/FORM-DATA CONTENT HIDDEN]"))
-		}
-	}
+func (cl *client) DumpRequest(req *http.Request) {
+	cl.dumper.DumpRequest(req)
 }
 
-func dumpResponse(res *http.Response) {
-	dumpedResponse, err := httputil.DumpResponse(res, true)
-	if err != nil {
-		trace.Logger.Printf(T("Error dumping response\n{{.Err}}\n", map[string]interface{}{"Err": err}))
-	} else {
-		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("RESPONSE:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedResponse)))
-	}
+func (cl *client) DumpResponse(res *http.Response) {
+	cl.dumper.DumpResponse(res)
 }
 
 func WrapNetworkErrors(host string, err error) error {
