@@ -47,6 +47,14 @@ run:
     EOF
     ####
 
+    cat<<EOF > cf-routing-release-repo/post-routing-release-deploy-overrides.yml
+    properties:
+      cc:
+        default_to_diego_backend: true
+      router:
+        enable_routing_api: true
+    EOF
+
     pushd cf-routing-release-repo
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD create release --force
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release --rebase
@@ -57,7 +65,6 @@ run:
       ####
       # DELETEME
       # UAA SSL ISSUE: https://www.pivotaltracker.com/story/show/115208829
-
       sed -i".bak" -e "s/port: -1/port: 8443\n    sslCertificate: |\n      -----BEGIN CERTIFICATE-----\n      MIIEJzCCAw+gAwIBAgIJAKcbTg\/7imgFMA0GCSqGSIb3DQEBBQUAMGoxCzAJBgNV\n      BAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQKEw1DbG91ZCBGb3Vu\n      ZHJ5MQwwCgYDVQQLEwNVQUExIDAeBgNVBAMTF3VhYS5zZXJ2aWNlLmNmLmludGVy\n      bmFsMB4XDTE2MDIyNjE4NDcwM1oXDTI2MDIyMzE4NDcwM1owajELMAkGA1UEBhMC\n      VVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAoTDUNsb3VkIEZvdW5kcnkx\n      DDAKBgNVBAsTA1VBQTEgMB4GA1UEAxMXdWFhLnNlcnZpY2UuY2YuaW50ZXJuYWww\n      ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC1ePY4cEfqPCX8IObvlCtv\n      mWQW00hzJ2GiGRT\/4cuCCppn7O04Io2GWR8HiIEtqNqMmPfglzT4tuNeUzsgTBfF\n      \/w3sdF4HwlRXHoAHXbFpZlfe057q5IKdzDy6yqY4mDVwzLUtof9PwcZ8U7Jm3j3A\n      yXozeRiXE4pevprMLCjq+AXmOHSMxUC6K3haR3pAsmgPioanViLC1TsLdOQ1E9z+\n      lirjiYYFUBep\/y6mNuVdEbHdmMRFmmVIldtB9R8vlUa04b7ghnWX1wyZRD1WpucB\n      cV9hoeIwgTVBrHRro4jnobOmK36pmlc2HpFaLtb0didZveO2oxN4i3oW\/rwOP0of\n      AgMBAAGjgc8wgcwwHQYDVR0OBBYEFCavF5V4kxQ\/8g3H29qWkVUbQ\/u6MIGcBgNV\n      HSMEgZQwgZGAFCavF5V4kxQ\/8g3H29qWkVUbQ\/u6oW6kbDBqMQswCQYDVQQGEwJV\n      UzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEChMNQ2xvdWQgRm91bmRyeTEM\n      MAoGA1UECxMDVUFBMSAwHgYDVQQDExd1YWEuc2VydmljZS5jZi5pbnRlcm5hbIIJ\n      AKcbTg\/7imgFMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBALJQDlKt\n      j0BZEYsuS7RSFMWRQjol0Z4tQnUoOquiBD3bL4RVxBHYFZZ6rufwxKPsRHbduUO8\n      d7y3ar8iOU\/3IeXWFTFgjjTU3gqD15rUckeH4NTNExxbRLWStbEaxn6uL35To6zx\n      surB3v0bMY3w1fwHbWwAQ+Fw8y\/izLxcv61uTJXlQjjBcNnXlqKBnfB8HjjfWppb\n      O6k1jA9cUA69vIxN0KqxunSCrNmJWCwDPx22bX1oCyhaqUtLyOHuEA4Q8VNEj6Nh\n      a\/V0gzk7kVKnBRwgY50xrEQhw0r6CCeydy2hthmrcWpujaEapymfv0lHvDiyA8sL\n      m99p7wzkO1EuAz8=\n      -----END CERTIFICATE-----\n    sslPrivateKey: |\n      -----BEGIN RSA PRIVATE KEY-----\n      MIIEogIBAAKCAQEAtXj2OHBH6jwl\/CDm75Qrb5lkFtNIcydhohkU\/+HLggqaZ+zt\n      OCKNhlkfB4iBLajajJj34Jc0+LbjXlM7IEwXxf8N7HReB8JUVx6AB12xaWZX3tOe\n      6uSCncw8usqmOJg1cMy1LaH\/T8HGfFOyZt49wMl6M3kYlxOKXr6azCwo6vgF5jh0\n      jMVAuit4Wkd6QLJoD4qGp1YiwtU7C3TkNRPc\/pYq44mGBVAXqf8upjblXRGx3ZjE\n      RZplSJXbQfUfL5VGtOG+4IZ1l9cMmUQ9VqbnAXFfYaHiMIE1Qax0a6OI56Gzpit+\n      qZpXNh6RWi7W9HYnWb3jtqMTeIt6Fv68Dj9KHwIDAQABAoIBAF3lptDxF+TVFnps\n      s9FHA2qNHcLJs\/URbW0oOTtlI523ysj3SI8BIeVf+7Q0J1LuyZZyF9\/3nQsL5n2J\n      51AAz1Q9coDkfTrajDU\/rNMi4Yc90z2SlenILuVjJhEohfVGnHAvG5fu+GHWS9NM\n      o0SivaUhGr\/DarvQ+omnagU23D0nFKfrS1FC78cxoJKgKJbOVOWMZvAKlFHTv4z1\n      3oozzOobJRE9qWmtBoWiWCLVmiXchpj8nOu8R\/ybmJksBsmbERZPXnFIpUQVV3Ll\n      TGaeIviboJXQx7MmolbH+61k9rgdpNvUgR\/MP\/jxtcKUOJVxnTCjITW5YAHR\/az+\n      8UAC8SECgYEA5o0xoWVQG9yb\/lrO7txCHotILsZjk9BTucCIdh7nJutSVaNikRcy\n      M6\/TwCjRUeFghgspWrvY01L2cP38LU0lqjiwzs0Jhxs+lFkpihU3KivgrWtUY5Vx\n      OHmy2TW+kodIZJUyY+mHYgI3fKiIByR5rM9LHp6vvw9MQ9GICB2u0UkCgYEAyYDr\n      BMO6aM8diveRlY\/HwbgRgpb\/TI4JuyVY19aH2qzo6hGkc\/YV6rit\/hnDB7uZpM\/z\n      Kj3I+H0Xm4MQyUGmaiaEZfKMoVONb6CQmM2cDkGjSbGu+duP3Ol6EDc7u\/svKSg+\n      v32snrU2Cs1T7PxgDOgWrvuD232w0bDbUcKaKCcCgYBl5T9rKqDWP5F+QFo2\/YgH\n      gd18NthpyuhGL47gTdYxwE2aZeS5ZXwdlfdLdX7V5ntHowU7AczZ0U\/0LnzW9MLR\n      0c5rB\/nPCb6FyEZwreG8tLnPS6F3heQNZtQh5fv9POdE9R\/ZQqxAJ+SoJsBAD+Hq\n      +48i0FWyZqt5SdEKbTwHaQKBgDyOKJKq+2cp7vfnRHIM3nwiA+kZ1ak8+kGqjJN4\n      niUiV3CYUrKinp2GWIuHVGwLfbXg5HOqU64RcbnDXpUMzKUT5C\/6\/zYwNM36E9pH\n      2AEUyqyH4EyoJgi+hXdAEgyBBQA6XvkPHIQpcw81+2W5xme6i66UWWDp2ex6WL6u\n      W8N7AoGAWuxpDX9MawvJ5j62u19o9giJ9bSq\/KwJ\/cAEJql+V9c3d9RZenS90OTV\n      HzneT3ZbOcsEIvK14FecXzV7OqRvOePXSJ2cS8lNqd1k2pxCjliYW4pfQm7e58ma\n      \/6wtWeX8QMBcZ6ufxs0VgxPv4P8jczrzqxgszLUK8hdnZEL7+xk=\n      -----END RSA PRIVATE KEY-----\n/" \
         $cf_deployment_file
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deployment $cf_deployment_file
@@ -74,21 +81,13 @@ run:
       ####
 
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
-    popd
 
-
-    cat<<EOF > cf-release-repo/property-overrides.yml
-    properties:
-      cc:
-        default_to_diego_backend: true
-      router:
-        enable_routing_api: true
-      domain: $LITE_HOSTNAME
-    EOF
-
-    pushd cf-release-repo
-      ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
+      ####
+      # Redeploy CF with new routing stuff enabled
+      spiff merge $cf_deployment_file post-routing-release-deploy-overrides.yml > cf-warden-plus-plus.yml
+      bosh deployment cf-warden-plus-plus.yml
       bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
+      ####
     popd
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD cleanup
