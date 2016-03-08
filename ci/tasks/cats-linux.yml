@@ -5,7 +5,6 @@ image: docker:///cloudfoundry/cli-ci
 inputs:
 - name: cf-acceptance-tests
 - name: cf-cli-binaries
-- name: ci
 - name: bosh-lite-lock
 
 run:
@@ -69,7 +68,7 @@ run:
 
     export CONFIG=$PWD/config.json
 
-    GOPATH=$PWD/Godeps/_workspace:$GOPATH ginkgo \
+    ginkgo \
       -r \
       -slowSpecThreshold=120  \
       -skipPackage="logging,services,v3,routing_api,routing,backend_compatibility,ssh" \

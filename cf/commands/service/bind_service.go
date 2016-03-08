@@ -117,7 +117,7 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 
 	err = cmd.BindApplication(app, serviceInstance, paramsMap)
 	if err != nil {
-		if httperr, ok := err.(errors.HttpError); ok && httperr.ErrorCode() == errors.APP_ALREADY_BOUND {
+		if httperr, ok := err.(errors.HttpError); ok && httperr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("App {{.AppName}} is already bound to {{.ServiceName}}.",
 				map[string]interface{}{

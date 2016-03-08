@@ -1,7 +1,7 @@
 [
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
-    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n"
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
+    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
     "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
@@ -778,10 +778,6 @@
   {
     "id": "No app files found in '{{.Path}}'",
     "translation": "No app files found in '{{.Path}}'"
-  },
-  {
-    "id": "No save path has been set",
-    "translation": "No save path has been set"
   },
   {
     "id": "Path for the HTTP route",

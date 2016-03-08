@@ -11,7 +11,7 @@ import (
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms686033(v=vs.85).aspx
 const ENABLE_ECHO_INPUT = 0x0004
 
-func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd string) {
+func (ui terminalUI) AskForPassword(prompt string) (passwd string) {
 	hStdin := syscall.Handle(os.Stdin.Fd())
 	var originalMode uint32
 
@@ -30,7 +30,7 @@ func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd 
 		return
 	}
 
-	return ui.Ask(prompt, args...)
+	return ui.Ask(prompt)
 }
 
 func setConsoleMode(console syscall.Handle, mode uint32) (err error) {

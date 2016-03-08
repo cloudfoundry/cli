@@ -210,7 +210,7 @@ var _ = Describe("App", func() {
 				getAppSummaryModel.RunningInstances = 0
 				getAppSummaryModel.InstanceCount = 1
 				getAppSummaryModel.State = "stopped"
-				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.APP_STOPPED, "error"))
+				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.InstancesError, "error"))
 			})
 
 			It("prints appropriate output", func() {
@@ -230,7 +230,7 @@ var _ = Describe("App", func() {
 				getAppSummaryModel.RunningInstances = 0
 				getAppSummaryModel.InstanceCount = 1
 				getAppSummaryModel.State = "stopped"
-				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.APP_NOT_STAGED, "error"))
+				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.NotStaged, "error"))
 			})
 
 			It("prints appropriate output", func() {

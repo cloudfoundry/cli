@@ -81,12 +81,14 @@ func (cmd *UnmapRoute) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
+	var port int
+
 	hostName := c.String("n")
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, err := cmd.routeRepo.Find(hostName, domain, path)
+	route, err := cmd.routeRepo.Find(hostName, domain, path, port)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

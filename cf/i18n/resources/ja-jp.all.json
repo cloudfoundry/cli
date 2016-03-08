@@ -52,7 +52,7 @@
     "translation": "\nTIP: このエラーを抑制するには、'cf login -a API --skip-ssl-validation' または 'cf api API --skip-ssl-validation' を使用します"
   },
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
     "translation": ""
   },
   {
@@ -3004,10 +3004,6 @@
     "translation": "実行セキュリティー・グループが設定されていません"
   },
   {
-    "id": "No save path has been set",
-    "translation": ""
-  },
-  {
     "id": "No security groups",
     "translation": "セキュリティー・グループがありません"
   },
@@ -3308,8 +3304,8 @@
     "translation": "新しく作成された組織に割り当てる割り当て量 (このオプションを除外するとデフォルトの割り当て量が割り当てられます)"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "新しく作成されたスペースに割り当てる割り当て量 (このオプションを除外するとデフォルトの割り当て量が割り当てられます)"
+    "id": "Quota to assign to the newly created space",
+    "translation": "新しく作成されたスペースに割り当てる割り当て量"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
@@ -4282,10 +4278,6 @@
   {
     "id": "Updating %s health_check_type to '%s'",
     "translation": "%s health_check_type を '%s' に更新しています"
-  },
-  {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "プランの更新には API v{{.RequiredCCAPIVersion}} 以降が必要です。現在のターゲットは v{{.CurrentCCAPIVersion}} です。"
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

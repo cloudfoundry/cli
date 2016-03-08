@@ -31,11 +31,11 @@ type CliRpcCmd struct {
 	terminalOutputSwitch terminal.TerminalOutputSwitch
 	cliConfig            core_config.Repository
 	repoLocator          api.RepositoryLocator
-	newCmdRunner         NonCodegangstaRunner
+	newCmdRunner         CommandRunner
 	outputBucket         *[]string
 }
 
-func NewRpcService(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner NonCodegangstaRunner) (*CliRpcService, error) {
+func NewRpcService(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch, cliConfig core_config.Repository, repoLocator api.RepositoryLocator, newCmdRunner CommandRunner) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
@@ -140,7 +140,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	if cmdRegistry.CommandExists(args[0]) {
 		deps := command_registry.NewDependency()
 
-		//set deps objs to be the one used by all other codegangsta commands
+		//set deps objs to be the one used by all other commands
 		//once all commands are converted, we can make fresh deps for each command run
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
@@ -271,7 +271,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -289,7 +289,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -307,7 +307,7 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -325,7 +325,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -343,7 +343,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -361,7 +361,7 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -379,7 +379,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -397,7 +397,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -415,7 +415,7 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator
@@ -433,7 +433,7 @@ func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.G
 
 	deps := command_registry.NewDependency()
 
-	//set deps objs to be the one used by all other codegangsta commands
+	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
 	deps.Config = cmd.cliConfig
 	deps.RepoLocator = cmd.repoLocator

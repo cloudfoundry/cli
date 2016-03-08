@@ -153,10 +153,11 @@ var _ = Describe("BindRouteService", func() {
 		It("tries to find the route", func() {
 			cmd.Execute(flagContext)
 			Expect(routeRepo.FindCallCount()).To(Equal(1))
-			host, domain, path := routeRepo.FindArgsForCall(0)
+			host, domain, path, port := routeRepo.FindArgsForCall(0)
 			Expect(host).To(Equal(""))
 			Expect(domain).To(Equal(fakeDomain))
 			Expect(path).To(Equal(""))
+			Expect(port).To(Equal(0))
 		})
 
 		Context("when given a hostname", func() {
@@ -169,7 +170,7 @@ var _ = Describe("BindRouteService", func() {
 			It("tries to find the route with the given hostname", func() {
 				cmd.Execute(flagContext)
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("the-hostname"))
 			})
 		})
@@ -231,7 +232,7 @@ var _ = Describe("BindRouteService", func() {
 
 					Context("when binding the route service fails because it is already bound", func() {
 						BeforeEach(func() {
-							routeServiceBindingRepo.BindReturns(errors.NewHttpError(http.StatusOK, errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE, "http-err"))
+							routeServiceBindingRepo.BindReturns(errors.NewHttpError(http.StatusOK, errors.ServiceInstanceAlreadyBoundToSameRoute, "http-err"))
 						})
 
 						It("says OK", func() {
@@ -331,7 +332,7 @@ var _ = Describe("BindRouteService", func() {
 
 				Context("when binding the route service fails because it is already bound", func() {
 					BeforeEach(func() {
-						routeServiceBindingRepo.BindReturns(errors.NewHttpError(http.StatusOK, errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE, "http-err"))
+						routeServiceBindingRepo.BindReturns(errors.NewHttpError(http.StatusOK, errors.ServiceInstanceAlreadyBoundToSameRoute, "http-err"))
 					})
 
 					It("says OK", func() {
@@ -435,7 +436,7 @@ var _ = Describe("BindRouteService", func() {
 
 				Context("when binding the route service fails because it is already bound", func() {
 					BeforeEach(func() {
-						routeServiceBindingRepo.BindReturns(errors.NewHttpError(http.StatusOK, errors.ROUTE_ALREADY_BOUND_TO_SAME_SERVICE, "http-err"))
+						routeServiceBindingRepo.BindReturns(errors.NewHttpError(http.StatusOK, errors.ServiceInstanceAlreadyBoundToSameRoute, "http-err"))
 					})
 
 					It("says OK", func() {

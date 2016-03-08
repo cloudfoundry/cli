@@ -3,7 +3,6 @@ platform: windows
 
 inputs:
 - name: cf-cli-binaries
-- name: ci
 - name: cli
 
 outputs:

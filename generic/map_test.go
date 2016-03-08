@@ -47,5 +47,30 @@ func init() {
 			mergedMap := DeepMerge(map1, map2)
 			Expect(mergedMap).To(Equal(expectedMap))
 		})
+
+		Describe("IsMappable", func() {
+			It("returns true for generic.Map", func() {
+				m := NewMap()
+				Expect(IsMappable(m)).To(BeTrue())
+			})
+
+			It("returns true for maps", func() {
+				var m map[string]interface{}
+				Expect(IsMappable(m)).To(BeTrue())
+
+				var n map[interface{}]interface{}
+				Expect(IsMappable(n)).To(BeTrue())
+
+				var o map[int]interface{}
+				Expect(IsMappable(o)).To(BeTrue())
+			})
+
+			It("returns false for other things", func() {
+				Expect(IsMappable(2)).To(BeFalse())
+				Expect(IsMappable("2")).To(BeFalse())
+				Expect(IsMappable(true)).To(BeFalse())
+				Expect(IsMappable([]string{"hello"})).To(BeFalse())
+			})
+		})
 	})
 }

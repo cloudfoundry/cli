@@ -104,6 +104,9 @@ type AppParams struct {
 }
 
 func (app *AppParams) Merge(other *AppParams) {
+	if other.AppPorts != nil {
+		app.AppPorts = other.AppPorts
+	}
 	if other.BuildpackUrl != nil {
 		app.BuildpackUrl = other.BuildpackUrl
 	}
@@ -113,8 +116,14 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.DiskQuota != nil {
 		app.DiskQuota = other.DiskQuota
 	}
+	if other.DockerImage != nil {
+		app.DockerImage = other.DockerImage
+	}
 	if other.Domains != nil {
 		app.Domains = other.Domains
+	}
+	if other.EnableSsh != nil {
+		app.EnableSsh = other.EnableSsh
 	}
 	if other.EnvironmentVars != nil {
 		app.EnvironmentVars = other.EnvironmentVars
@@ -131,26 +140,20 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.Hosts != nil {
 		app.Hosts = other.Hosts
 	}
-	if other.RoutePath != nil {
-		app.RoutePath = other.RoutePath
-	}
 	if other.InstanceCount != nil {
 		app.InstanceCount = other.InstanceCount
 	}
-	if other.DiskQuota != nil {
-		app.DiskQuota = other.DiskQuota
-	}
 	if other.Memory != nil {
 		app.Memory = other.Memory
-	}
-	if other.DockerImage != nil {
-		app.DockerImage = other.DockerImage
 	}
 	if other.Name != nil {
 		app.Name = other.Name
 	}
 	if other.Path != nil {
 		app.Path = other.Path
+	}
+	if other.RoutePath != nil {
+		app.RoutePath = other.RoutePath
 	}
 	if other.ServicesToBind != nil {
 		app.ServicesToBind = other.ServicesToBind
@@ -166,12 +169,6 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 	if other.State != nil {
 		app.State = other.State
-	}
-	if other.EnableSsh != nil {
-		app.EnableSsh = other.EnableSsh
-	}
-	if other.AppPorts != nil {
-		app.AppPorts = other.AppPorts
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute

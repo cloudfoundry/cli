@@ -52,7 +52,7 @@
     "translation": "\n提示：使用 'cf login -a API --skip-ssl-validation' 或 'cf api API --skip-ssl-validation'，以抑制此錯誤"
   },
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
     "translation": ""
   },
   {
@@ -3004,10 +3004,6 @@
     "translation": "未設定任何執行安全群組"
   },
   {
-    "id": "No save path has been set",
-    "translation": ""
-  },
-  {
     "id": "No security groups",
     "translation": "沒有安全群組"
   },
@@ -3308,8 +3304,8 @@
     "translation": "要指派給新建立組織的配額（排除這個選項會導致指派預設配額）"
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "要指派給新建立空間的配額（排除這個選項會導致指派預設配額）"
+    "id": "Quota to assign to the newly created space",
+    "translation": "要指派給新建立空間的配額"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
@@ -4282,10 +4278,6 @@
   {
     "id": "Updating %s health_check_type to '%s'",
     "translation": "正在將 %s health_check_type 更新為 '%s'"
-  },
-  {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "更新方案時需要 API {{.RequiredCCAPIVersion}} 版或更新版本。您的現行目標是 {{.CurrentCCAPIVersion}} 版。"
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

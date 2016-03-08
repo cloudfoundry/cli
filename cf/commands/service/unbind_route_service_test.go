@@ -152,10 +152,11 @@ var _ = Describe("UnbindRouteService", func() {
 			ui.Inputs = []string{"n"}
 			cmd.Execute(flagContext)
 			Expect(routeRepo.FindCallCount()).To(Equal(1))
-			host, domain, path := routeRepo.FindArgsForCall(0)
+			host, domain, path, port := routeRepo.FindArgsForCall(0)
 			Expect(host).To(Equal(""))
 			Expect(domain).To(Equal(fakeDomain))
 			Expect(path).To(Equal(""))
+			Expect(port).To(Equal(0))
 		})
 
 		Context("when given a hostname", func() {
@@ -169,7 +170,7 @@ var _ = Describe("UnbindRouteService", func() {
 				ui.Inputs = []string{"n"}
 				cmd.Execute(flagContext)
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
-				host, _, _ := routeRepo.FindArgsForCall(0)
+				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("the-hostname"))
 			})
 		})
@@ -224,7 +225,7 @@ var _ = Describe("UnbindRouteService", func() {
 
 				Context("when unbinding the route service fails because it was not bound", func() {
 					BeforeEach(func() {
-						routeServiceBindingRepo.UnbindReturns(errors.NewHttpError(http.StatusOK, errors.ROUTE_WAS_NOT_BOUND, "http-err"))
+						routeServiceBindingRepo.UnbindReturns(errors.NewHttpError(http.StatusOK, errors.InvalidRelation, "http-err"))
 					})
 
 					It("says OK", func() {

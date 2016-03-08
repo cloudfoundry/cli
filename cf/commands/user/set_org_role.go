@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -53,7 +54,7 @@ func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc
 	}
 
 	var wantGuid bool
-	if cmd.config.IsMinApiVersion("2.37.0") {
+	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
 		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {

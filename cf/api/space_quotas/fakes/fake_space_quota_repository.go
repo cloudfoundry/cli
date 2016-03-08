@@ -4,7 +4,7 @@ package fakes
 import (
 	"sync"
 
-	. "github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -12,7 +12,7 @@ type FakeSpaceQuotaRepository struct {
 	FindByNameStub        func(name string) (quota models.SpaceQuota, apiErr error)
 	findByNameMutex       sync.RWMutex
 	findByNameArgsForCall []struct {
-		arg1 string
+		name string
 	}
 	findByNameReturns struct {
 		result1 models.SpaceQuota
@@ -21,7 +21,7 @@ type FakeSpaceQuotaRepository struct {
 	FindByOrgStub        func(guid string) (quota []models.SpaceQuota, apiErr error)
 	findByOrgMutex       sync.RWMutex
 	findByOrgArgsForCall []struct {
-		arg1 string
+		guid string
 	}
 	findByOrgReturns struct {
 		result1 []models.SpaceQuota
@@ -30,17 +30,27 @@ type FakeSpaceQuotaRepository struct {
 	FindByGuidStub        func(guid string) (quota models.SpaceQuota, apiErr error)
 	findByGuidMutex       sync.RWMutex
 	findByGuidArgsForCall []struct {
-		arg1 string
+		guid string
 	}
 	findByGuidReturns struct {
+		result1 models.SpaceQuota
+		result2 error
+	}
+	FindByNameAndOrgGuidStub        func(spaceName string, orgGuid string) (quota models.SpaceQuota, apiErr error)
+	findByNameAndOrgGuidMutex       sync.RWMutex
+	findByNameAndOrgGuidArgsForCall []struct {
+		spaceName string
+		orgGuid   string
+	}
+	findByNameAndOrgGuidReturns struct {
 		result1 models.SpaceQuota
 		result2 error
 	}
 	AssociateSpaceWithQuotaStub        func(spaceGuid string, quotaGuid string) error
 	associateSpaceWithQuotaMutex       sync.RWMutex
 	associateSpaceWithQuotaArgsForCall []struct {
-		arg1 string
-		arg2 string
+		spaceGuid string
+		quotaGuid string
 	}
 	associateSpaceWithQuotaReturns struct {
 		result1 error
@@ -48,8 +58,8 @@ type FakeSpaceQuotaRepository struct {
 	UnassignQuotaFromSpaceStub        func(spaceGuid string, quotaGuid string) error
 	unassignQuotaFromSpaceMutex       sync.RWMutex
 	unassignQuotaFromSpaceArgsForCall []struct {
-		arg1 string
-		arg2 string
+		spaceGuid string
+		quotaGuid string
 	}
 	unassignQuotaFromSpaceReturns struct {
 		result1 error
@@ -57,7 +67,7 @@ type FakeSpaceQuotaRepository struct {
 	CreateStub        func(quota models.SpaceQuota) error
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		arg1 models.SpaceQuota
+		quota models.SpaceQuota
 	}
 	createReturns struct {
 		result1 error
@@ -65,7 +75,7 @@ type FakeSpaceQuotaRepository struct {
 	UpdateStub        func(quota models.SpaceQuota) error
 	updateMutex       sync.RWMutex
 	updateArgsForCall []struct {
-		arg1 models.SpaceQuota
+		quota models.SpaceQuota
 	}
 	updateReturns struct {
 		result1 error
@@ -73,21 +83,21 @@ type FakeSpaceQuotaRepository struct {
 	DeleteStub        func(quotaGuid string) error
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		arg1 string
+		quotaGuid string
 	}
 	deleteReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeSpaceQuotaRepository) FindByName(arg1 string) (quota models.SpaceQuota, apiErr error) {
+func (fake *FakeSpaceQuotaRepository) FindByName(name string) (quota models.SpaceQuota, apiErr error) {
 	fake.findByNameMutex.Lock()
-	defer fake.findByNameMutex.Unlock()
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
-		arg1 string
-	}{arg1})
+		name string
+	}{name})
+	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
-		return fake.FindByNameStub(arg1)
+		return fake.FindByNameStub(name)
 	} else {
 		return fake.findByNameReturns.result1, fake.findByNameReturns.result2
 	}
@@ -102,24 +112,25 @@ func (fake *FakeSpaceQuotaRepository) FindByNameCallCount() int {
 func (fake *FakeSpaceQuotaRepository) FindByNameArgsForCall(i int) string {
 	fake.findByNameMutex.RLock()
 	defer fake.findByNameMutex.RUnlock()
-	return fake.findByNameArgsForCall[i].arg1
+	return fake.findByNameArgsForCall[i].name
 }
 
 func (fake *FakeSpaceQuotaRepository) FindByNameReturns(result1 models.SpaceQuota, result2 error) {
+	fake.FindByNameStub = nil
 	fake.findByNameReturns = struct {
 		result1 models.SpaceQuota
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceQuotaRepository) FindByOrg(arg1 string) (quota []models.SpaceQuota, apiErr error) {
+func (fake *FakeSpaceQuotaRepository) FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error) {
 	fake.findByOrgMutex.Lock()
-	defer fake.findByOrgMutex.Unlock()
 	fake.findByOrgArgsForCall = append(fake.findByOrgArgsForCall, struct {
-		arg1 string
-	}{arg1})
+		guid string
+	}{guid})
+	fake.findByOrgMutex.Unlock()
 	if fake.FindByOrgStub != nil {
-		return fake.FindByOrgStub(arg1)
+		return fake.FindByOrgStub(guid)
 	} else {
 		return fake.findByOrgReturns.result1, fake.findByOrgReturns.result2
 	}
@@ -134,24 +145,25 @@ func (fake *FakeSpaceQuotaRepository) FindByOrgCallCount() int {
 func (fake *FakeSpaceQuotaRepository) FindByOrgArgsForCall(i int) string {
 	fake.findByOrgMutex.RLock()
 	defer fake.findByOrgMutex.RUnlock()
-	return fake.findByOrgArgsForCall[i].arg1
+	return fake.findByOrgArgsForCall[i].guid
 }
 
 func (fake *FakeSpaceQuotaRepository) FindByOrgReturns(result1 []models.SpaceQuota, result2 error) {
+	fake.FindByOrgStub = nil
 	fake.findByOrgReturns = struct {
 		result1 []models.SpaceQuota
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceQuotaRepository) FindByGuid(arg1 string) (quota models.SpaceQuota, apiErr error) {
+func (fake *FakeSpaceQuotaRepository) FindByGuid(guid string) (quota models.SpaceQuota, apiErr error) {
 	fake.findByGuidMutex.Lock()
-	defer fake.findByGuidMutex.Unlock()
 	fake.findByGuidArgsForCall = append(fake.findByGuidArgsForCall, struct {
-		arg1 string
-	}{arg1})
+		guid string
+	}{guid})
+	fake.findByGuidMutex.Unlock()
 	if fake.FindByGuidStub != nil {
-		return fake.FindByGuidStub(arg1)
+		return fake.FindByGuidStub(guid)
 	} else {
 		return fake.findByGuidReturns.result1, fake.findByGuidReturns.result2
 	}
@@ -166,25 +178,60 @@ func (fake *FakeSpaceQuotaRepository) FindByGuidCallCount() int {
 func (fake *FakeSpaceQuotaRepository) FindByGuidArgsForCall(i int) string {
 	fake.findByGuidMutex.RLock()
 	defer fake.findByGuidMutex.RUnlock()
-	return fake.findByGuidArgsForCall[i].arg1
+	return fake.findByGuidArgsForCall[i].guid
 }
 
 func (fake *FakeSpaceQuotaRepository) FindByGuidReturns(result1 models.SpaceQuota, result2 error) {
+	fake.FindByGuidStub = nil
 	fake.findByGuidReturns = struct {
 		result1 models.SpaceQuota
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuota(arg1 string, arg2 string) error {
+func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuid(spaceName string, orgGuid string) (quota models.SpaceQuota, apiErr error) {
+	fake.findByNameAndOrgGuidMutex.Lock()
+	fake.findByNameAndOrgGuidArgsForCall = append(fake.findByNameAndOrgGuidArgsForCall, struct {
+		spaceName string
+		orgGuid   string
+	}{spaceName, orgGuid})
+	fake.findByNameAndOrgGuidMutex.Unlock()
+	if fake.FindByNameAndOrgGuidStub != nil {
+		return fake.FindByNameAndOrgGuidStub(spaceName, orgGuid)
+	} else {
+		return fake.findByNameAndOrgGuidReturns.result1, fake.findByNameAndOrgGuidReturns.result2
+	}
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuidCallCount() int {
+	fake.findByNameAndOrgGuidMutex.RLock()
+	defer fake.findByNameAndOrgGuidMutex.RUnlock()
+	return len(fake.findByNameAndOrgGuidArgsForCall)
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuidArgsForCall(i int) (string, string) {
+	fake.findByNameAndOrgGuidMutex.RLock()
+	defer fake.findByNameAndOrgGuidMutex.RUnlock()
+	return fake.findByNameAndOrgGuidArgsForCall[i].spaceName, fake.findByNameAndOrgGuidArgsForCall[i].orgGuid
+}
+
+func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuidReturns(result1 models.SpaceQuota, result2 error) {
+	fake.FindByNameAndOrgGuidStub = nil
+	fake.findByNameAndOrgGuidReturns = struct {
+		result1 models.SpaceQuota
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error {
 	fake.associateSpaceWithQuotaMutex.Lock()
-	defer fake.associateSpaceWithQuotaMutex.Unlock()
 	fake.associateSpaceWithQuotaArgsForCall = append(fake.associateSpaceWithQuotaArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
+		spaceGuid string
+		quotaGuid string
+	}{spaceGuid, quotaGuid})
+	fake.associateSpaceWithQuotaMutex.Unlock()
 	if fake.AssociateSpaceWithQuotaStub != nil {
-		return fake.AssociateSpaceWithQuotaStub(arg1, arg2)
+		return fake.AssociateSpaceWithQuotaStub(spaceGuid, quotaGuid)
 	} else {
 		return fake.associateSpaceWithQuotaReturns.result1
 	}
@@ -199,24 +246,25 @@ func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuotaCallCount() int {
 func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuotaArgsForCall(i int) (string, string) {
 	fake.associateSpaceWithQuotaMutex.RLock()
 	defer fake.associateSpaceWithQuotaMutex.RUnlock()
-	return fake.associateSpaceWithQuotaArgsForCall[i].arg1, fake.associateSpaceWithQuotaArgsForCall[i].arg2
+	return fake.associateSpaceWithQuotaArgsForCall[i].spaceGuid, fake.associateSpaceWithQuotaArgsForCall[i].quotaGuid
 }
 
 func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuotaReturns(result1 error) {
+	fake.AssociateSpaceWithQuotaStub = nil
 	fake.associateSpaceWithQuotaReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpace(arg1 string, arg2 string) error {
+func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error {
 	fake.unassignQuotaFromSpaceMutex.Lock()
-	defer fake.unassignQuotaFromSpaceMutex.Unlock()
 	fake.unassignQuotaFromSpaceArgsForCall = append(fake.unassignQuotaFromSpaceArgsForCall, struct {
-		arg1 string
-		arg2 string
-	}{arg1, arg2})
+		spaceGuid string
+		quotaGuid string
+	}{spaceGuid, quotaGuid})
+	fake.unassignQuotaFromSpaceMutex.Unlock()
 	if fake.UnassignQuotaFromSpaceStub != nil {
-		return fake.UnassignQuotaFromSpaceStub(arg1, arg2)
+		return fake.UnassignQuotaFromSpaceStub(spaceGuid, quotaGuid)
 	} else {
 		return fake.unassignQuotaFromSpaceReturns.result1
 	}
@@ -231,23 +279,24 @@ func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpaceCallCount() int {
 func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpaceArgsForCall(i int) (string, string) {
 	fake.unassignQuotaFromSpaceMutex.RLock()
 	defer fake.unassignQuotaFromSpaceMutex.RUnlock()
-	return fake.unassignQuotaFromSpaceArgsForCall[i].arg1, fake.unassignQuotaFromSpaceArgsForCall[i].arg2
+	return fake.unassignQuotaFromSpaceArgsForCall[i].spaceGuid, fake.unassignQuotaFromSpaceArgsForCall[i].quotaGuid
 }
 
 func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpaceReturns(result1 error) {
+	fake.UnassignQuotaFromSpaceStub = nil
 	fake.unassignQuotaFromSpaceReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeSpaceQuotaRepository) Create(arg1 models.SpaceQuota) error {
+func (fake *FakeSpaceQuotaRepository) Create(quota models.SpaceQuota) error {
 	fake.createMutex.Lock()
-	defer fake.createMutex.Unlock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		arg1 models.SpaceQuota
-	}{arg1})
+		quota models.SpaceQuota
+	}{quota})
+	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(arg1)
+		return fake.CreateStub(quota)
 	} else {
 		return fake.createReturns.result1
 	}
@@ -262,23 +311,24 @@ func (fake *FakeSpaceQuotaRepository) CreateCallCount() int {
 func (fake *FakeSpaceQuotaRepository) CreateArgsForCall(i int) models.SpaceQuota {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].arg1
+	return fake.createArgsForCall[i].quota
 }
 
 func (fake *FakeSpaceQuotaRepository) CreateReturns(result1 error) {
+	fake.CreateStub = nil
 	fake.createReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeSpaceQuotaRepository) Update(arg1 models.SpaceQuota) error {
+func (fake *FakeSpaceQuotaRepository) Update(quota models.SpaceQuota) error {
 	fake.updateMutex.Lock()
-	defer fake.updateMutex.Unlock()
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
-		arg1 models.SpaceQuota
-	}{arg1})
+		quota models.SpaceQuota
+	}{quota})
+	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
-		return fake.UpdateStub(arg1)
+		return fake.UpdateStub(quota)
 	} else {
 		return fake.updateReturns.result1
 	}
@@ -293,23 +343,24 @@ func (fake *FakeSpaceQuotaRepository) UpdateCallCount() int {
 func (fake *FakeSpaceQuotaRepository) UpdateArgsForCall(i int) models.SpaceQuota {
 	fake.updateMutex.RLock()
 	defer fake.updateMutex.RUnlock()
-	return fake.updateArgsForCall[i].arg1
+	return fake.updateArgsForCall[i].quota
 }
 
 func (fake *FakeSpaceQuotaRepository) UpdateReturns(result1 error) {
+	fake.UpdateStub = nil
 	fake.updateReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeSpaceQuotaRepository) Delete(arg1 string) error {
+func (fake *FakeSpaceQuotaRepository) Delete(quotaGuid string) error {
 	fake.deleteMutex.Lock()
-	defer fake.deleteMutex.Unlock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		arg1 string
-	}{arg1})
+		quotaGuid string
+	}{quotaGuid})
+	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(arg1)
+		return fake.DeleteStub(quotaGuid)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -324,13 +375,14 @@ func (fake *FakeSpaceQuotaRepository) DeleteCallCount() int {
 func (fake *FakeSpaceQuotaRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].arg1
+	return fake.deleteArgsForCall[i].quotaGuid
 }
 
 func (fake *FakeSpaceQuotaRepository) DeleteReturns(result1 error) {
+	fake.DeleteStub = nil
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ SpaceQuotaRepository = new(FakeSpaceQuotaRepository)
+var _ space_quotas.SpaceQuotaRepository = new(FakeSpaceQuotaRepository)

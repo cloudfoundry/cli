@@ -5,7 +5,6 @@ image: docker:///cloudfoundry/cli-ci
 inputs:
 - name: cli-acceptance-tests
 - name: cf-cli-binaries
-- name: ci
 - name: bosh-lite-lock
 
 run:
@@ -32,7 +31,7 @@ run:
 
     # Put cli-acceptance-tests within a GOPATH-like directory, because it makes
     # references to itself
-    GOPATH=$PWD/gopath
+    export GOPATH=$PWD/gopath
     mkdir -p $GOPATH/src/github.com/cloudfoundry
     ln -s $PWD/cli-acceptance-tests $GOPATH/src/github.com/cloudfoundry/cli-acceptance-tests
 
@@ -44,9 +43,9 @@ run:
       ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
 
-    PATH=$GOPATH/bin:$PATH
+    export PATH=$GOPATH/bin:$PATH
 
-    cd cli-acceptance-tests
+    cd $GOPATH/src/github.com/cloudfoundry/cli-acceptance-tests
 
     cat<<EOF > config.json
     {
@@ -67,6 +66,6 @@ run:
     }
     EOF
 
-    export CONFIG=`pwd`/config.json
+    export CONFIG=$PWD/config.json
 
-    GOPATH=$PWD/Godeps/_workspace:$GOPATH ginkgo -r -slowSpecThreshold=120 ./gats
+    ginkgo -r -slowSpecThreshold=120 ./gats

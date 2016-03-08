@@ -68,7 +68,7 @@ type Reader interface {
 	UserEmail() string
 	IsLoggedIn() bool
 	IsSSLDisabled() bool
-	IsMinApiVersion(string) bool
+	IsMinApiVersion(semver.Version) bool
 	IsMinCliVersion(string) bool
 	MinCliVersion() string
 	MinRecommendedCliVersion() string
@@ -304,16 +304,12 @@ func (c *ConfigRepository) IsSSLDisabled() (isSSLDisabled bool) {
 	return
 }
 
-func (c *ConfigRepository) IsMinApiVersion(version string) bool {
+func (c *ConfigRepository) IsMinApiVersion(requiredVersion semver.Version) bool {
 	var apiVersion string
 	c.read(func() {
 		apiVersion = c.data.ApiVersion
 	})
 
-	requiredVersion, err := semver.Make(version)
-	if err != nil {
-		return false
-	}
 	actualVersion, err := semver.Make(apiVersion)
 	if err != nil {
 		return false

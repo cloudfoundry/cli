@@ -98,6 +98,85 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
+	Describe("FindByNameAndOrgGuid", func() {
+		Context("when the org exists", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/organizations/other-org-guid/space_quota_definitions"),
+						ghttp.RespondWith(http.StatusOK, `{
+						"next_url": "/v2/organizations/other-org-guid/space_quota_definitions?page=2",
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid" },
+								"entity": {
+									"name": "my-remote-quota",
+									"memory_limit": 1024,
+									"total_routes": 123,
+									"total_services": 321,
+									"non_basic_services_allowed": true,
+									"organization_guid": "other-org-guid"
+								}
+							}
+						]
+					}`),
+					),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/organizations/other-org-guid/space_quota_definitions", "page=2"),
+						ghttp.RespondWith(http.StatusOK, `{
+						"resources": [
+							{
+								"metadata": { "guid": "my-quota-guid2" },
+								"entity": { "name": "my-remote-quota2", "memory_limit": 1024, "organization_guid": "other-org-guid" }
+							},
+							{
+								"metadata": { "guid": "my-quota-guid3" },
+								"entity": { "name": "my-remote-quota3", "memory_limit": 1024, "organization_guid": "other-org-guid" }
+							}
+						]
+				  }`),
+					),
+				)
+			})
+
+			It("Finds Quota definitions by name and org guid", func() {
+				quota, err := repo.FindByNameAndOrgGuid("my-remote-quota", "other-org-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
+				Expect(quota).To(Equal(models.SpaceQuota{
+					Guid:                    "my-quota-guid",
+					Name:                    "my-remote-quota",
+					MemoryLimit:             1024,
+					RoutesLimit:             123,
+					ServicesLimit:           321,
+					NonBasicServicesAllowed: true,
+					OrgGuid:                 "other-org-guid",
+				}))
+			})
+
+			It("Returns an error if the quota cannot be found", func() {
+				_, err := repo.FindByNameAndOrgGuid("totally-not-a-quota", "other-org-guid")
+				Expect(err.(*errors.ModelNotFoundError)).To(HaveOccurred())
+			})
+		})
+
+		Context("when the org does not exist", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/organizations/totally-not-an-org/space_quota_definitions"),
+						ghttp.RespondWith(http.StatusNotFound, ""),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				_, err := repo.FindByNameAndOrgGuid("my-remote-quota", "totally-not-an-org")
+				Expect(err.(*errors.HttpNotFoundError)).To(HaveOccurred())
+			})
+		})
+	})
+
 	Describe("FindByOrg", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(

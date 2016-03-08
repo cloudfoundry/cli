@@ -1,0 +1,45 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-vagrant-ci
+
+params:
+  LITE_PRIVATE_IP_ADDRESS:
+
+inputs:
+- name: bosh-lite-lock
+- name: etcd-release
+- name: garden-linux-release
+- name: diego-release
+- name: diego-repo
+- name: cf-release # needed for diego-repo/generate-bosh-lite-manifests
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -eux
+
+    export DOMAIN=`cat bosh-lite-lock/name`
+
+    export ADMIN_USER=admin
+    export ADMIN_PASSWORD=admin
+    export API_ENDPOINT="https://api.${DOMAIN}"
+
+    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n -u admin -p admin upload release etcd-release/release.tgz --skip-if-exists
+    bosh -n -u admin -p admin upload release garden-linux-release/release.tgz --skip-if-exists
+    bosh -n -u admin -p admin upload release diego-release/release.tgz --skip-if-exists
+
+    pushd diego-repo
+      ./scripts/generate-bosh-lite-manifests
+      bosh deployment bosh-lite/deployments/diego.yml
+      bosh -n -u admin -p admin deploy
+    popd
+
+    curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
+    ./cf api $API_ENDPOINT --skip-ssl-validation
+    ./cf auth $ADMIN_USER $ADMIN_PASSWORD
+    ./cf enable-feature-flag diego_docker
+

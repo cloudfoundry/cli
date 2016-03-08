@@ -21,7 +21,7 @@ func init() {
 
 func (cmd FakeCommand2) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{
-		Name:        "fake-non-codegangsta-command2",
+		Name:        "fake-command2",
 		Description: "Description for fake-command2 with bad requirement",
 		Usage: []string{
 			"Usage of fake-command",

@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
@@ -49,7 +50,7 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 	}
 
 	var wantGuid bool
-	if cmd.config.IsMinApiVersion("2.37.0") {
+	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		unsetRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
 		wantGuid = (err != nil || !unsetRolesByUsernameFlag.Enabled)
 	} else {

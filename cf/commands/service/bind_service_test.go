@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -86,7 +87,7 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service-guid"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo = &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
+			serviceBindingRepo = &testapi.FakeServiceBindingRepo{CreateErrorCode: errors.ServiceBindingAppServiceTaken}
 			callBindService([]string{"my-app", "my-service"})
 
 			Expect(ui.Outputs).To(ContainSubstrings(

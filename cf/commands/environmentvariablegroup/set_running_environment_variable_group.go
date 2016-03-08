@@ -59,7 +59,7 @@ func (cmd *SetRunningEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 		suggestionText := ""
 
 		httpError, ok := err.(cf_errors.HttpError)
-		if ok && httpError.ErrorCode() == cf_errors.PARSE_ERROR {
+		if ok && httpError.ErrorCode() == cf_errors.MessageParseError {
 			suggestionText = T(`
 
 Your JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{"name":"value","name":"value"}'`)

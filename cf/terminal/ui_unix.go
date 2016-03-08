@@ -28,12 +28,11 @@ var sttyArgvEOn []string = []string{"stty", "echo"}
 
 var ws syscall.WaitStatus
 
-func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd string) {
+func (ui terminalUI) AskForPassword(prompt string) (passwd string) {
 	sig := make(chan os.Signal, 10)
 
 	// Display the prompt.
-	fmt.Println("")
-	fmt.Printf(prompt+PromptColor(">")+" ", args...)
+	fmt.Printf("\n%s%s ", prompt, PromptColor(">"))
 
 	// File descriptors for stdin, stdout, and stderr.
 	fd := []uintptr{os.Stdin.Fd(), os.Stdout.Fd(), os.Stderr.Fd()}

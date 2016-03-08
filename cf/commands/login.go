@@ -143,7 +143,7 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) {
 	passcode := prompts["passcode"]
 
 	for i := 0; i < maxLoginTries; i++ {
-		credentials["passcode"] = cmd.ui.AskForPassword("%s", passcode.DisplayName)
+		credentials["passcode"] = cmd.ui.AskForPassword(passcode.DisplayName)
 
 		cmd.ui.Say(T("Authenticating..."))
 		err = cmd.authenticator.Authenticate(credentials)
@@ -177,7 +177,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 		if prompts["username"].Type == core_config.AuthPromptTypeText && usernameFlagValue != "" {
 			credentials["username"] = usernameFlagValue
 		} else {
-			credentials["username"] = cmd.ui.Ask("%s", value.DisplayName)
+			credentials["username"] = cmd.ui.Ask(value.DisplayName)
 		}
 	}
 
@@ -191,7 +191,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 		} else if key == "username" {
 			continue
 		} else {
-			credentials[key] = cmd.ui.Ask("%s", prompt.DisplayName)
+			credentials[key] = cmd.ui.Ask(prompt.DisplayName)
 		}
 	}
 
@@ -201,7 +201,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 				credentials[key] = passwordFlagValue
 				passwordFlagValue = ""
 			} else {
-				credentials[key] = cmd.ui.AskForPassword("%s", prompts[key].DisplayName)
+				credentials[key] = cmd.ui.AskForPassword(prompts[key].DisplayName)
 			}
 		}
 
@@ -347,7 +347,7 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 			cmd.ui.Say(T("There are too many options to display, please type in the name."))
 		}
 
-		nameString = cmd.ui.Ask("%s", itemPrompt)
+		nameString = cmd.ui.Ask(itemPrompt)
 		if nameString == "" {
 			return ""
 		}

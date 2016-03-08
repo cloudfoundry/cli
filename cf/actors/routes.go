@@ -18,7 +18,8 @@ func NewRouteActor(ui terminal.UI, routeRepo api.RouteRepository) RouteActor {
 }
 
 func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string) (route models.Route) {
-	route, apiErr := routeActor.routeRepo.Find(hostname, domain, path)
+	var port int
+	route, apiErr := routeActor.routeRepo.Find(hostname, domain, path, port)
 
 	switch apiErr.(type) {
 	case nil:
@@ -51,7 +52,7 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 			routeActor.ui.Say("")
 			return
 		case errors.HttpError:
-			if apiErr.ErrorCode() == errors.INVALID_RELATION {
+			if apiErr.ErrorCode() == errors.InvalidRelation {
 				routeActor.ui.Failed(T("The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", map[string]interface{}{"URL": route.URL()}))
 			}
 		}

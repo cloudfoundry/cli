@@ -25,12 +25,13 @@ type FakeRouteRepository struct {
 	listAllRoutesReturns struct {
 		result1 error
 	}
-	FindStub        func(host string, domain models.DomainFields, path string) (route models.Route, apiErr error)
+	FindStub        func(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error)
 	findMutex       sync.RWMutex
 	findArgsForCall []struct {
 		host   string
 		domain models.DomainFields
 		path   string
+		port   int
 	}
 	findReturns struct {
 		result1 models.Route
@@ -164,16 +165,17 @@ func (fake *FakeRouteRepository) ListAllRoutesReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeRouteRepository) Find(host string, domain models.DomainFields, path string) (route models.Route, apiErr error) {
+func (fake *FakeRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error) {
 	fake.findMutex.Lock()
 	fake.findArgsForCall = append(fake.findArgsForCall, struct {
 		host   string
 		domain models.DomainFields
 		path   string
-	}{host, domain, path})
+		port   int
+	}{host, domain, path, port})
 	fake.findMutex.Unlock()
 	if fake.FindStub != nil {
-		return fake.FindStub(host, domain, path)
+		return fake.FindStub(host, domain, path, port)
 	} else {
 		return fake.findReturns.result1, fake.findReturns.result2
 	}
@@ -185,10 +187,10 @@ func (fake *FakeRouteRepository) FindCallCount() int {
 	return len(fake.findArgsForCall)
 }
 
-func (fake *FakeRouteRepository) FindArgsForCall(i int) (string, models.DomainFields, string) {
+func (fake *FakeRouteRepository) FindArgsForCall(i int) (string, models.DomainFields, string, int) {
 	fake.findMutex.RLock()
 	defer fake.findMutex.RUnlock()
-	return fake.findArgsForCall[i].host, fake.findArgsForCall[i].domain, fake.findArgsForCall[i].path
+	return fake.findArgsForCall[i].host, fake.findArgsForCall[i].domain, fake.findArgsForCall[i].path, fake.findArgsForCall[i].port
 }
 
 func (fake *FakeRouteRepository) FindReturns(result1 models.Route, result2 error) {

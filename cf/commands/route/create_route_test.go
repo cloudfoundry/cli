@@ -219,7 +219,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 		})
 
-		Context("when --port and --random-port are given", func() {
+		Context("when both --port and --random-port are given", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("space-name", "domain-name", "--port", "9090", "--random-port")
 				Expect(err).NotTo(HaveOccurred())
@@ -234,7 +234,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 		})
 
-		Context("when --random-port and --hostname are given", func() {
+		Context("when both --random-port and --hostname are given", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("space-name", "domain-name", "--hostname", "host", "--random-port")
 				Expect(err).NotTo(HaveOccurred())
@@ -349,11 +349,20 @@ var _ = Describe("CreateRoute", func() {
 		Context("when creating the route fails", func() {
 			BeforeEach(func() {
 				routeRepo.CreateInSpaceReturns(models.Route{}, errors.New("create-error"))
+
+				err := flagContext.Parse("space-name", "domain-name", "--port", "9090", "--hostname", "hostname", "--path", "/path")
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("attempts to find the route", func() {
 				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
+
+				host, domain, path, port := routeRepo.FindArgsForCall(0)
+				Expect(host).To(Equal("hostname"))
+				Expect(domain.Name).To(Equal("domain-name"))
+				Expect(path).To(Equal("/path"))
+				Expect(port).To(Equal(9090))
 			})
 
 			Context("when finding the route fails", func() {

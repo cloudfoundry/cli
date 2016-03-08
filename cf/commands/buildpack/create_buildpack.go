@@ -72,7 +72,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
 
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BUILDPACK_EXISTS {
+		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BuildpackNameTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
 			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name + " " + "update-buildpack")}))

@@ -52,8 +52,8 @@
     "translation": "\nASTUCE : utilisez 'cf login -a API --skip-ssl-validation' ou 'cf api API --skip-ssl-validation' pour éliminer cette erreur "
   },
   {
-    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-o TARGET-ORG] [-s TARGET-SPACE] [--no-restart]\n",
-    "translation": "   CF_NAME copy-source APP_SOURCE APP_CIBLE [-o ORG_CIBLE] [-s ESPACE_CIBLE] [--no-restart]\n"
+    "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
+    "translation": "   CF_NAME copy-source APP_SOURCE APP_CIBLE [-s ESPACE_CIBLE [-o ORG_CIBLE]] [--no-restart]\n"
   },
   {
     "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
@@ -3004,10 +3004,6 @@
     "translation": "Aucun groupe de sécurité d'exécution défini "
   },
   {
-    "id": "No save path has been set",
-    "translation": ""
-  },
-  {
     "id": "No security groups",
     "translation": "Aucun groupe de sécurité"
   },
@@ -3308,8 +3304,8 @@
     "translation": "Quota à affecter à l'organisation nouvellement créée (si vous excluez cette option, le quota par défaut est affecté) "
   },
   {
-    "id": "Quota to assign to the newly created space (excluding this option results in assignment of default quota)",
-    "translation": "Quota à affecter à l'espace nouvellement créé (si vous excluez cette option, le quota par défaut est affecté) "
+    "id": "Quota to assign to the newly created space",
+    "translation": "Quota à affecter à l'espace nouvellement créé"
   },
   {
     "id": "Quota {{.QuotaName}} does not exist",
@@ -4282,10 +4278,6 @@
   {
     "id": "Updating %s health_check_type to '%s'",
     "translation": "Mise à jour du type de diagnostic d'intégrité %s avec '%s'"
-  },
-  {
-    "id": "Updating a plan requires API v{{.RequiredCCAPIVersion}} or newer. Your current target is v{{.CurrentCCAPIVersion}}.",
-    "translation": "La mise à jour d'un plan requiert une API de version {{.RequiredCCAPIVersion}} ou plus récente. Votre cible en cours est la version {{.CurrentCCAPIVersion}}."
   },
   {
     "id": "Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
