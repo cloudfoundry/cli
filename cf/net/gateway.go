@@ -20,6 +20,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 )
 
 const (
@@ -417,9 +418,9 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 		makeHttpTransport(&gateway)
 	}
 
-	httpClient := NewHttpClient(gateway.transport)
+	httpClient := NewHttpClient(gateway.transport, RequestDumper{printer: trace.Logger})
 
-	dumpRequest(request)
+	httpClient.DumpRequest(request)
 
 	for i := 0; i < 3; i++ {
 		response, err = httpClient.Do(request)
@@ -434,7 +435,7 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 		return
 	}
 
-	dumpResponse(response)
+	httpClient.DumpResponse(response)
 
 	header := http.CanonicalHeaderKey("X-Cf-Warnings")
 	raw_warnings := response.Header[header]

@@ -61,13 +61,13 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("Connection errors", func() {
-		var oldNewHttpClient func(tr *http.Transport) HttpClientInterface
+		var oldNewHttpClient func(tr *http.Transport, dumper RequestDumper) HttpClientInterface
 
 		BeforeEach(func() {
 			client = &fakes.FakeHttpClientInterface{}
 
 			oldNewHttpClient = NewHttpClient
-			NewHttpClient = func(tr *http.Transport) HttpClientInterface {
+			NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
 				return client
 			}
 		})

@@ -9,14 +9,26 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/trace/fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/websocket"
 )
 
 var _ = Describe("HTTP Client", func() {
+	var (
+		client      HttpClientInterface
+		dumper      RequestDumper
+		fakePrinter fakes.FakePrinter
+	)
 
-	Describe("PrepareRedirect", func() {
+	BeforeEach(func() {
+		fakePrinter = *new(fakes.FakePrinter)
+		dumper = NewRequestDumper(&fakePrinter)
+		client = NewHttpClient(&http.Transport{}, dumper)
+	})
+
+	Describe("ExecuteCheckRedirect", func() {
 		It("transfers original headers", func() {
 			originalReq, err := http.NewRequest("GET", "http://local.com/foo", nil)
 			Expect(err).NotTo(HaveOccurred())
@@ -28,7 +40,7 @@ var _ = Describe("HTTP Client", func() {
 
 			via := []*http.Request{originalReq}
 
-			err = PrepareRedirect(redirectReq, via)
+			err = client.ExecuteCheckRedirect(redirectReq, via)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(redirectReq.Header.Get("Authorization")).To(Equal("my-auth-token"))
@@ -46,7 +58,7 @@ var _ = Describe("HTTP Client", func() {
 
 			via := []*http.Request{originalReq}
 
-			err = PrepareRedirect(redirectReq, via)
+			err = client.ExecuteCheckRedirect(redirectReq, via)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(redirectReq.Header.Get("Authorization")).To(Equal(""))
@@ -64,7 +76,7 @@ var _ = Describe("HTTP Client", func() {
 
 			via := []*http.Request{originalReq}
 
-			err = PrepareRedirect(redirectReq, via)
+			err = client.ExecuteCheckRedirect(redirectReq, via)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(redirectReq.Header.Get("Content-Type")).To(Equal(""))
@@ -84,7 +96,7 @@ var _ = Describe("HTTP Client", func() {
 
 			via := []*http.Request{firstReq, secondReq}
 
-			err = PrepareRedirect(redirectReq, via)
+			err = client.ExecuteCheckRedirect(redirectReq, via)
 
 			Expect(err).To(HaveOccurred())
 		})
