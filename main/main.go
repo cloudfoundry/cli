@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/panic_printer"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/commands_loader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
@@ -48,6 +49,8 @@ func main() {
 			}))
 		os.Exit(0)
 	}
+
+	os.Args = handleVerbose(os.Args)
 
 	//handles `cf [COMMAND] -h ...`
 	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
@@ -150,6 +153,28 @@ func requestHelp(args []string) bool {
 	}
 
 	return false
+}
+
+func handleVerbose(args []string) []string {
+	idx := -1
+
+	for i, arg := range args {
+		if arg == "-v" {
+			idx = i
+			break
+		}
+	}
+
+	var verbose bool
+
+	if idx != -1 {
+		verbose = true
+		args = append(args[:idx], args[idx+1:]...)
+	}
+
+	trace.Logger = trace.NewLogger(verbose, os.Getenv("CF_TRACE"), deps.Config.Trace())
+
+	return args
 }
 
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {

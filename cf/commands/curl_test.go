@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,7 +8,6 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/trace"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -17,6 +15,7 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/trace"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -43,6 +42,8 @@ var _ = Describe("curl command", func() {
 		config = testconfig.NewRepository()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		curlRepo = &testapi.FakeCurlRepository{}
+
+		trace.LoggingToStdout = false
 	})
 
 	runCurlWithInputs := func(args []string) bool {
@@ -173,14 +174,17 @@ var _ = Describe("curl command", func() {
 			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
-		It("prints verbose output given the -v flag", func() {
-			output := bytes.NewBuffer(make([]byte, 1024))
-			trace.SetStdout(output)
+		It("does not print the response when verbose output is enabled", func() {
+			// This is to prevent the response from being printed twice
 
-			runCurlWithInputs([]string{"-v", "/foo"})
-			trace.Logger.Print("logging enabled")
+			trace.LoggingToStdout = true
 
-			Expect([]string{output.String()}).To(ContainSubstrings([]string{"logging enabled"}))
+			curlRepo.ResponseHeader = "Content-Size:1024"
+			curlRepo.ResponseBody = "response for get"
+
+			runCurlWithInputs([]string{"/foo"})
+
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"response for get"}))
 		})
 
 		It("prints a failure message when the response is not success", func() {

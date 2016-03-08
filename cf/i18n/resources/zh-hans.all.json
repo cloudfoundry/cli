@@ -1652,10 +1652,6 @@
     "translation": ""
   },
   {
-    "id": "Enable CF_TRACE output for all requests and responses",
-    "translation": "对所有请求和响应启用 CF_TRACE 输出"
-  },
-  {
     "id": "Enable HTTP proxying for API requests",
     "translation": "对 API 请求启用 HTTP 代理"
   },

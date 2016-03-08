@@ -33,7 +33,6 @@ func init() {
 func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.BoolFlag{ShortName: "i", Usage: T("Include response headers in the output")}
-	fs["v"] = &flags.BoolFlag{ShortName: "v", Usage: T("Enable CF_TRACE output for all requests and responses")}
 	fs["X"] = &flags.StringFlag{ShortName: "X", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
 	fs["H"] = &flags.StringSliceFlag{ShortName: "H", Usage: T("Custom headers to include in the request, flag can be specified multiple times")}
 	fs["d"] = &flags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body, or '@' followed by a file name to read the data from")}
@@ -90,20 +89,15 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 		}
 		body = string(jsonBytes)
 	}
-	verbose := c.Bool("v")
 
 	reqHeader := strings.Join(headers, "\n")
-
-	if verbose {
-		trace.EnableTrace()
-	}
 
 	responseHeader, responseBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 	}
 
-	if verbose {
+	if trace.LoggingToStdout {
 		return
 	}
 
