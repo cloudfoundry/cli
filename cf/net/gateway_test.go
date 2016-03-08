@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -681,7 +682,9 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	authGateway := NewUAAGateway(config, &testterm.FakeUI{})
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
-	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config)
+	fakePrinter := *new(traceFakes.FakePrinter)
+	dumper := NewRequestDumper(&fakePrinter)
+	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config, dumper)
 
 	return config, authenticator
 }

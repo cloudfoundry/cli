@@ -5,17 +5,13 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 	"time"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/trace"
-
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
@@ -25,6 +21,8 @@ type TokenRefresher interface {
 
 //go:generate counterfeiter -o fakes/fake_authentication_repository.go . AuthenticationRepository
 type AuthenticationRepository interface {
+	net.RequestDumperInterface
+
 	RefreshAuthToken() (updatedToken string, apiErr error)
 	Authenticate(credentials map[string]string) (apiErr error)
 	Authorize(token string) (string, error)
@@ -34,20 +32,23 @@ type AuthenticationRepository interface {
 type UAAAuthenticationRepository struct {
 	config  core_config.ReadWriter
 	gateway net.Gateway
+	dumper  net.RequestDumper
 }
 
 var ErrPreventRedirect = errors.New("prevent-redirect")
 
-func NewUAAAuthenticationRepository(gateway net.Gateway, config core_config.ReadWriter) (uaa UAAAuthenticationRepository) {
-	uaa.gateway = gateway
-	uaa.config = config
-	return
+func NewUAAAuthenticationRepository(gateway net.Gateway, config core_config.ReadWriter, dumper net.RequestDumper) UAAAuthenticationRepository {
+	return UAAAuthenticationRepository{
+		config:  config,
+		gateway: gateway,
+		dumper:  dumper,
+	}
 }
 
 func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
 	httpClient := &http.Client{
 		CheckRedirect: func(req *http.Request, _ []*http.Request) error {
-			dumpRequest(req)
+			uaa.DumpRequest(req)
 			return ErrPreventRedirect
 		},
 		Timeout: 30 * time.Second,
@@ -83,7 +84,7 @@ func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
 
 	resp, err := httpClient.Do(authorizeReq)
 	if resp != nil {
-		dumpResponse(resp)
+		uaa.DumpResponse(resp)
 	}
 	if err == nil {
 		return "", errors.New(T("Authorization server did not redirect with one time code"))
@@ -131,6 +132,14 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	}
 
 	return nil
+}
+
+func (uaa UAAAuthenticationRepository) DumpRequest(req *http.Request) {
+	uaa.dumper.DumpRequest(req)
+}
+
+func (uaa UAAAuthenticationRepository) DumpResponse(res *http.Response) {
+	uaa.dumper.DumpResponse(res)
 }
 
 type LoginResource struct {
@@ -225,24 +234,3 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	return nil
 }
 
-func dumpRequest(req *http.Request) {
-	shouldDisplayBody := !strings.Contains(req.Header.Get("Content-Type"), "multipart/form-data")
-	dumpedRequest, err := httputil.DumpRequestOut(req, shouldDisplayBody)
-	if err != nil {
-		trace.Logger.Printf(T("Error dumping request\n{{.Err}}\n", map[string]interface{}{"Err": err}))
-	} else {
-		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("REQUEST:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedRequest)))
-		if !shouldDisplayBody {
-			trace.Logger.Println(T("[MULTIPART/FORM-DATA CONTENT HIDDEN]"))
-		}
-	}
-}
-
-func dumpResponse(res *http.Response) {
-	dumpedResponse, err := httputil.DumpResponse(res, false)
-	if err != nil {
-		trace.Logger.Printf(T("Error dumping response\n{{.Err}}\n", map[string]interface{}{"Err": err}))
-	} else {
-		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor(T("RESPONSE:")), time.Now().Format(time.RFC3339), trace.Sanitize(string(dumpedResponse)))
-	}
-}

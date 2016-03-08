@@ -2,6 +2,7 @@
 package fakes
 
 import (
+	"net/http"
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -9,6 +10,16 @@ import (
 )
 
 type FakeAuthenticationRepository struct {
+	DumpRequestStub        func(*http.Request)
+	dumpRequestMutex       sync.RWMutex
+	dumpRequestArgsForCall []struct {
+		arg1 *http.Request
+	}
+	DumpResponseStub        func(*http.Response)
+	dumpResponseMutex       sync.RWMutex
+	dumpResponseArgsForCall []struct {
+		arg1 *http.Response
+	}
 	RefreshAuthTokenStub        func() (updatedToken string, apiErr error)
 	refreshAuthTokenMutex       sync.RWMutex
 	refreshAuthTokenArgsForCall []struct{}
@@ -40,6 +51,52 @@ type FakeAuthenticationRepository struct {
 		result1 map[string]core_config.AuthPrompt
 		result2 error
 	}
+}
+
+func (fake *FakeAuthenticationRepository) DumpRequest(arg1 *http.Request) {
+	fake.dumpRequestMutex.Lock()
+	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
+		arg1 *http.Request
+	}{arg1})
+	fake.dumpRequestMutex.Unlock()
+	if fake.DumpRequestStub != nil {
+		fake.DumpRequestStub(arg1)
+	}
+}
+
+func (fake *FakeAuthenticationRepository) DumpRequestCallCount() int {
+	fake.dumpRequestMutex.RLock()
+	defer fake.dumpRequestMutex.RUnlock()
+	return len(fake.dumpRequestArgsForCall)
+}
+
+func (fake *FakeAuthenticationRepository) DumpRequestArgsForCall(i int) *http.Request {
+	fake.dumpRequestMutex.RLock()
+	defer fake.dumpRequestMutex.RUnlock()
+	return fake.dumpRequestArgsForCall[i].arg1
+}
+
+func (fake *FakeAuthenticationRepository) DumpResponse(arg1 *http.Response) {
+	fake.dumpResponseMutex.Lock()
+	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
+		arg1 *http.Response
+	}{arg1})
+	fake.dumpResponseMutex.Unlock()
+	if fake.DumpResponseStub != nil {
+		fake.DumpResponseStub(arg1)
+	}
+}
+
+func (fake *FakeAuthenticationRepository) DumpResponseCallCount() int {
+	fake.dumpResponseMutex.RLock()
+	defer fake.dumpResponseMutex.RUnlock()
+	return len(fake.dumpResponseArgsForCall)
+}
+
+func (fake *FakeAuthenticationRepository) DumpResponseArgsForCall(i int) *http.Response {
+	fake.dumpResponseMutex.RLock()
+	defer fake.dumpResponseMutex.RUnlock()
+	return fake.dumpResponseArgsForCall[i].arg1
 }
 
 func (fake *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
