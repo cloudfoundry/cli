@@ -27,9 +27,8 @@ func main() {
 	defer handlePanics(deps.TeePrinter)
 	defer deps.Config.Close()
 
-	//handles `cf` | `cf -h` || `cf -help`
-	if len(os.Args) == 1 || os.Args[1] == "--help" || os.Args[1] == "-help" ||
-		os.Args[1] == "--h" || os.Args[1] == "-h" {
+	//handles `cf`
+	if len(os.Args) == 1 {
 		help.ShowHelp(help.GetHelpTemplate())
 		os.Exit(0)
 	}
@@ -51,10 +50,7 @@ func main() {
 
 	//handles `cf [COMMAND] -h ...`
 	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
-	if requestHelp(os.Args[2:]) {
-		os.Args[2] = os.Args[1]
-		os.Args[1] = "help"
-	}
+	os.Args = append([]string{os.Args[0]}, handleHelp(os.Args[1:])...)
 
 	warningProducers := []net.WarningProducer{}
 	for _, warningProducer := range deps.Gateways {
@@ -142,14 +138,27 @@ func generateBacktrace() string {
 	return stackTrace
 }
 
-func requestHelp(args []string) bool {
-	for _, v := range args {
+func handleHelp(args []string) []string {
+	hIndex := -1
+
+	for i, v := range args {
 		if v == "-h" || v == "--help" || v == "--h" {
-			return true
+			hIndex = i
+			break
 		}
 	}
 
-	return false
+	if hIndex == -1 {
+		return args
+	} else if len(args) > 1 {
+		if hIndex == 0 {
+			return []string{"help", args[1]}
+		} else {
+			return []string{"help", args[0]}
+		}
+	} else {
+		return []string{"help"}
+	}
 }
 
 func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
