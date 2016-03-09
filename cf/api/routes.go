@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/google/go-querystring/query"
 )
 
 //go:generate counterfeiter -o fakes/fake_route_repository.go . RouteRepository
@@ -141,23 +142,30 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid,
 	path = normalizedPath(path)
 
 	body := struct {
-		Host         string `json:"host,omitempty"`
-		Path         string `json:"path,omitempty"`
-		Port         int    `json:"port,omitempty"`
-		DomainGuid   string `json:"domain_guid"`
-		SpaceGuid    string `json:"space_guid"`
-		GeneratePort bool   `json:"generate_port"`
-	}{host, path, port, domainGuid, spaceGuid, randomPort}
+		Host       string `json:"host,omitempty"`
+		Path       string `json:"path,omitempty"`
+		Port       int    `json:"port,omitempty"`
+		DomainGuid string `json:"domain_guid"`
+		SpaceGuid  string `json:"space_guid"`
+	}{host, path, port, domainGuid, spaceGuid}
 
 	data, err := json.Marshal(body)
 	if err != nil {
 		return models.Route{}, err
 	}
 
+	q := struct {
+		GeneratePort         bool `url:"generate_port,omitempty"`
+		InlineRelationsDepth int  `url:"inline-relations-depth"`
+	}{randomPort, 1}
+
+	opt, _ := query.Values(q)
+	uriFragment := "/v2/routes?" + opt.Encode()
+
 	resource := new(resources.RouteResource)
 	err = repo.gateway.CreateResource(
 		repo.config.ApiEndpoint(),
-		"/v2/routes?inline-relations-depth=1",
+		uriFragment,
 		bytes.NewReader(data),
 		resource,
 	)

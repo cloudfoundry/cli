@@ -175,6 +175,10 @@
 			"Rev": "0c959e80d8acfedb1ecd50c9f14a58cee287dc95"
 		},
 		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "6bb77fe6f42b85397288d4f6f67ac72f8f400ee7"
+		},
+		{
 			"ImportPath": "github.com/gorilla/websocket",
 			"Rev": "f761cdb666383d5db7a8bea9ff8c9db35332b4a0"
 		},
