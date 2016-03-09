@@ -107,6 +107,8 @@ jobs:
 
 - name: deploy-diego-release-1
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-boshlite-1]
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
@@ -131,6 +133,8 @@ jobs:
 
 - name: deploy-routing-release-1
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-diego-release-1]
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
@@ -193,6 +197,8 @@ jobs:
 
 - name: deploy-diego-release-2
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-boshlite-2]
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
@@ -217,6 +223,8 @@ jobs:
 
 - name: deploy-routing-release-2
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-diego-release-2]
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
@@ -280,6 +288,8 @@ jobs:
 
 - name: deploy-diego-release-3
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-boshlite-3]
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
@@ -304,6 +314,8 @@ jobs:
 
 - name: deploy-routing-release-3
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-diego-release-3]
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
@@ -366,6 +378,8 @@ jobs:
 
 - name: deploy-diego-release-4
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-boshlite-4]
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
@@ -390,6 +404,8 @@ jobs:
 
 - name: deploy-routing-release-4
   plan:
+  - get: bosh-lite-lock
+    passed: [deploy-diego-release-4]
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
