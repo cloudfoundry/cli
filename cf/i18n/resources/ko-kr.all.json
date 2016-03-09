@@ -4472,10 +4472,6 @@
     "translation": "[개인용 데이터 숨겨짐]"
   },
   {
-    "id": "[environment variables]",
-    "translation": "[환경 변수]"
-  },
-  {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[글로벌 옵션] 명령 [인수...] [명령 옵션]"
   },

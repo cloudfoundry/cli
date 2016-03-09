@@ -4472,10 +4472,6 @@
     "translation": ""
   },
   {
-    "id": "[environment variables]",
-    "translation": ""
-  },
-  {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[global options] mandato [arguments...] [command options]"
   },
