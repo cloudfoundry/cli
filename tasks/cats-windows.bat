@@ -1,5 +1,6 @@
 SET GOPATH=%CD%\cf-release-repo
 SET GATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
+SET GOPATH=%GOPATH%;%GATSPATH%\Godeps\_workspace
 
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%

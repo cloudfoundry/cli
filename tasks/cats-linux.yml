@@ -66,6 +66,7 @@ run:
     EOF
 
     export CONFIG=$PWD/config.json
+    GOPATH=$GOPATH:$cf_acceptance_tests_path/Godeps/_workspace/
 
     ginkgo \
       -r \
