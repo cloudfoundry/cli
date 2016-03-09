@@ -81,16 +81,23 @@ func queryStringForRouteSearch(host, guid, path string, port int) string {
 		args = append(args, fmt.Sprintf("port:%d", port))
 	}
 
-	return url.QueryEscape(strings.Join(args, ";"))
+	return strings.Join(args, ";")
 }
 
 func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error) {
 	queryString := queryStringForRouteSearch(host, domain.Guid, path, port)
 
+	q := struct {
+		Query                string `url:"q"`
+		InlineRelationsDepth int    `url:"inline-relations-depth"`
+	}{queryString, 1}
+
+	opt, _ := query.Values(q)
+
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", queryString),
+		fmt.Sprintf("/v2/routes?%s", opt.Encode()),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			route = resource.(resources.RouteResource).ToModel()
