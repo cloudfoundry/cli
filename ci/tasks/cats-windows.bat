@@ -1,6 +1,4 @@
-xcopy %CD%\cf-release-repo\src\github.com\cloudfoundry\cf-acceptance-tests %CD%\gopath\src\github.com\cloudfoundry\cf-acceptance-tests
-
-SET GOPATH=%CD%\gopath
+SET GOPATH=%CD%\cf-release-repo
 SET GATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
 
 SET PATH=C:\Go\bin;%PATH%
