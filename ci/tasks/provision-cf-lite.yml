@@ -37,6 +37,7 @@ run:
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
     export BOSH_LITE_NAME="${LITE_NAME}"
     export BOSH_LITE_INSTANCE_TYPE="${LITE_INSTANCE_TYPE}"
+    export BOSH_LITE_ROOT="$PWD/bosh-lite"
 
     mkdir scratch
 
@@ -57,6 +58,6 @@ run:
         bosh-lite/stubs/property_overrides.yml
     popd
 
-    cd bosh-lite
-
-    ./bin/provision_cf
+    pushd scratch
+      $BOSH_LITE_ROOT/bin/provision_cf
+    popd

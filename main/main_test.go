@@ -60,11 +60,21 @@ var _ = Describe("main", func() {
 			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
 			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
 
+			result = Cf("push", "--no-route", "-h")
+			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
+
 			result = Cf("target", "--h")
 			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
 			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
 		})
 
+		It("accepts -h before the command name", func() {
+			result := Cf("-h", "push", "--no-route")
+			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
+			Consistently(result.Out).ShouldNot(Say("Start an app"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
+		})
 	})
 
 	Describe("Shows version with -v or --version", func() {
