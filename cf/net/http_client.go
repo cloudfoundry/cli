@@ -28,15 +28,15 @@ type client struct {
 }
 
 var NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
-	client := client{
+	c := client{
 		&http.Client{
 			Transport: tr,
 		},
 		dumper,
 	}
-	client.CheckRedirect = client.checkRedirect
+	c.CheckRedirect = c.checkRedirect
 
-	return &client
+	return &c
 }
 
 func (cl *client) ExecuteCheckRedirect(req *http.Request, via []*http.Request) error {
