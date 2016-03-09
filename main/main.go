@@ -7,8 +7,9 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/help"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/panic_printer"
@@ -20,25 +21,52 @@ import (
 	"github.com/cloudfoundry/cli/plugin/rpc"
 )
 
-var deps = command_registry.NewDependency()
-
 var cmdRegistry = command_registry.Commands
 
 func main() {
-	defer handlePanics(deps.TeePrinter)
-	defer deps.Config.Close()
-
-	//handles `cf` | `cf -h` || `cf -help`
-	if len(os.Args) == 1 || os.Args[1] == "--help" || os.Args[1] == "-help" ||
-		os.Args[1] == "--h" || os.Args[1] == "-h" {
-		help.ShowHelp(help.GetHelpTemplate())
-		os.Exit(0)
-	}
+	traceEnv := os.Getenv("CF_TRACE")
+	traceLogger := trace.NewLogger(false, traceEnv, "")
 
 	//handle `cf -v` for cf version
 	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
 		os.Args[1] = "version"
 	}
+
+	//handles `cf` | `cf -h` || `cf -help`
+	if len(os.Args) == 1 || os.Args[1] == "--help" || os.Args[1] == "-help" ||
+		os.Args[1] == "--h" || os.Args[1] == "-h" {
+		os.Args = []string{os.Args[0], "help"}
+	}
+
+	//handles `cf [COMMAND] -h ...`
+	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
+	if requestHelp(os.Args[2:]) {
+		os.Args[2] = os.Args[1]
+		os.Args[1] = "help"
+	}
+
+	newArgs, isVerbose := handleVerbose(os.Args)
+	os.Args = newArgs
+	traceLogger = trace.NewLogger(isVerbose, traceEnv, "")
+
+	errFunc := func(err error) {
+		if err != nil {
+			ui := terminal.NewUI(os.Stdin, terminal.NewTeePrinter(), traceLogger)
+			ui.Failed(fmt.Sprintf("Config error: %s", err))
+		}
+	}
+
+	// Only used to get Trace, so our errorHandler doesn't matter, since it's not used
+	config := core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errFunc)
+	defer config.Close()
+
+	traceConfigVal := config.Trace()
+
+	traceLogger = trace.NewLogger(isVerbose, traceEnv, traceConfigVal)
+
+	deps := command_registry.NewDependency(traceLogger)
+	defer handlePanics(deps.TeePrinter, deps.Logger)
+	defer deps.Config.Close()
 
 	//handle `cf --build`
 	if len(os.Args) == 2 && (os.Args[1] == "--build" || os.Args[1] == "-b") {
@@ -48,15 +76,6 @@ func main() {
 				"GoVersion": runtime.Version(),
 			}))
 		os.Exit(0)
-	}
-
-	os.Args = handleVerbose(os.Args)
-
-	//handles `cf [COMMAND] -h ...`
-	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
-	if requestHelp(os.Args[2:]) {
-		os.Args[2] = os.Args[1]
-		os.Args[1] = "help"
 	}
 
 	warningProducers := []net.WarningProducer{}
@@ -104,7 +123,11 @@ func main() {
 	}
 
 	//non core command, try plugin command
-	rpcService := newCliRpcServer(deps.TeePrinter, deps.TeePrinter)
+	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger)
+	if err != nil {
+		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
+		os.Exit(1)
+	}
 
 	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
 		deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
@@ -119,8 +142,8 @@ func main() {
 
 }
 
-func handlePanics(printer terminal.Printer) {
-	panic_printer.UI = terminal.NewUI(os.Stdin, printer, trace.Logger)
+func handlePanics(printer terminal.Printer, logger trace.Printer) {
+	panic_printer.UI = terminal.NewUI(os.Stdin, printer, logger)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()
@@ -155,7 +178,7 @@ func requestHelp(args []string) bool {
 	return false
 }
 
-func handleVerbose(args []string) []string {
+func handleVerbose(args []string) ([]string, bool) {
 	idx := -1
 
 	for i, arg := range args {
@@ -167,22 +190,10 @@ func handleVerbose(args []string) []string {
 
 	var verbose bool
 
-	if idx != -1 {
+	if idx != -1 && len(args) > 1 {
 		verbose = true
 		args = append(args[:idx], args[idx+1:]...)
 	}
 
-	trace.Logger = trace.NewLogger(verbose, os.Getenv("CF_TRACE"), deps.Config.Trace())
-
-	return args
-}
-
-func newCliRpcServer(outputCapture terminal.OutputCapture, terminalOutputSwitch terminal.TerminalOutputSwitch) *rpc.CliRpcService {
-	cliServer, err := rpc.NewRpcService(outputCapture, terminalOutputSwitch, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), trace.Logger)
-	if err != nil {
-		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
-		os.Exit(1)
-	}
-
-	return cliServer
+	return args, verbose
 }

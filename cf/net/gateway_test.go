@@ -13,13 +13,14 @@ import (
 	"strings"
 	"time"
 
-	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/net/fakes"
+	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -46,16 +47,16 @@ var _ = Describe("Gateway", func() {
 		clock = func() time.Time { return currentTime }
 		config = testconfig.NewRepository()
 
-		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{})
+		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
 		ccGateway.PollingThrottle = 3 * time.Millisecond
-		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{})
+		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
 	})
 
 	Describe("async timeout", func() {
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = NewCloudControllerGateway((config), time.Now, &testterm.FakeUI{})
+				ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(config)
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})
@@ -679,7 +680,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")
 
-	authGateway := NewUAAGateway(config, &testterm.FakeUI{})
+	authGateway := NewUAAGateway(config, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
 	fakePrinter := *new(traceFakes.FakePrinter)

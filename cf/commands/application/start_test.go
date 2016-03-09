@@ -5,6 +5,7 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/cf/trace/fakes"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -83,7 +84,7 @@ var _ = Describe("start command", func() {
 	})
 
 	BeforeEach(func() {
-		deps = command_registry.NewDependency()
+		deps = command_registry.NewDependency(new(fakes.FakePrinter))
 		ui = new(testterm.FakeUI)
 		requirementsFactory = &testreq.FakeReqFactory{}
 

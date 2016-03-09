@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/trace/fakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -42,7 +43,7 @@ var _ = Describe("org command", func() {
 		orgRepo = &test_org.FakeOrganizationRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 
-		deps = command_registry.NewDependency()
+		deps = command_registry.NewDependency(new(fakes.FakePrinter))
 	})
 
 	Describe("requirements", func() {

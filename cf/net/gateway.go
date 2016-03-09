@@ -66,17 +66,19 @@ type Gateway struct {
 	Clock           func() time.Time
 	transport       *http.Transport
 	ui              terminal.UI
+	logger          trace.Printer
 }
 
-func newGateway(errHandler apiErrorHandler, config core_config.Reader, ui terminal.UI) (gateway Gateway) {
-	gateway.errHandler = errHandler
-	gateway.config = config
-	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
-	gateway.warnings = &[]string{}
-	gateway.Clock = time.Now
-	gateway.ui = ui
-
-	return
+func newGateway(errHandler apiErrorHandler, config core_config.Reader, ui terminal.UI, logger trace.Printer) Gateway {
+	return Gateway{
+		errHandler:      errHandler,
+		config:          config,
+		PollingThrottle: DEFAULT_POLLING_THROTTLE,
+		warnings:        &[]string{},
+		Clock:           time.Now,
+		ui:              ui,
+		logger:          logger,
+	}
 }
 
 func (gateway *Gateway) AsyncTimeout() time.Duration {
@@ -418,7 +420,7 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 		makeHttpTransport(&gateway)
 	}
 
-	httpClient := NewHttpClient(gateway.transport, NewRequestDumper(trace.Logger))
+	httpClient := NewHttpClient(gateway.transport, NewRequestDumper(gateway.logger))
 
 	httpClient.DumpRequest(request)
 

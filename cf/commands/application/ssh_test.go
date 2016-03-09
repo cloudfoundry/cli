@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -13,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	testssh "github.com/cloudfoundry/cli/cf/ssh/fakes"
+	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -187,7 +187,7 @@ var _ = Describe("SSH command", func() {
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
 					configRepo.SetApiEndpoint(testServer.URL)
-					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+					ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -216,7 +216,7 @@ var _ = Describe("SSH command", func() {
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
 					configRepo.SetApiEndpoint(testServer.URL)
-					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+					ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -254,7 +254,7 @@ var _ = Describe("SSH command", func() {
 
 				testServer, _ = testnet.NewServer([]testnet.TestRequest{getRequest})
 				configRepo.SetApiEndpoint(testServer.URL)
-				ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+				ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 				deps.Gateways["cloud-controller"] = ccGateway
 			})
 

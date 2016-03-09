@@ -82,16 +82,20 @@ var _ = Describe("main", func() {
 	})
 
 	Describe("Enables verbose output with -v", func() {
+		// We use cf buildpacks command here, which will hit the API even if you aren't logged in
+		// We currently don't have a `Requirement` set up to be logged in, even though you *do*
+		// need to be logged in. If this changes, find another command for this test.
+
 		It("enables verbose output when -v is provided before a command", func() {
-			output := Cf("-v", "curl", "/v2/info").Wait(5 * time.Second)
+			output := Cf("-v", "buildpacks").Wait(5 * time.Second)
 			Eventually(output.Out.Contents).ShouldNot(ContainSubstring("Invalid flag: -v"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/info HTTP/1.1"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/buildpacks HTTP/1.1"))
 		})
 
 		It("enables verbose output when -v is provided after a command", func() {
-			output := Cf("-v", "curl", "/v2/info").Wait(5 * time.Second)
+			output := Cf("buildpacks", "-v").Wait(5 * time.Second)
 			Eventually(output.Out.Contents).ShouldNot(ContainSubstring("Invalid flag: -v"))
-			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/info HTTP/1.1"))
+			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/buildpacks HTTP/1.1"))
 		})
 	})
 

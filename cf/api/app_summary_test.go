@@ -1,20 +1,16 @@
 package api_test
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"time"
-
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/net"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-
 	. "github.com/cloudfoundry/cli/cf/api"
+	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"net/http"
+	"net/http/httptest"
 )
 
 var _ = Describe("AppSummaryRepository", func() {
@@ -38,7 +34,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummariesRequest})
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(testServer.URL)
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
 		})
 
@@ -102,7 +98,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummaryRequest})
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(testServer.URL)
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
 		})
 

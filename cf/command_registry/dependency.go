@@ -46,6 +46,7 @@ type Dependency struct {
 	PushActor          actors.PushActor
 	ChecksumUtil       utils.Sha1Checksum
 	WildcardDependency interface{} //use for injecting fakes
+	Logger             trace.Printer
 }
 
 type PluginModels struct {
@@ -62,12 +63,10 @@ type PluginModels struct {
 	OauthToken    *plugin_models.GetOauthToken_Model
 }
 
-func NewDependency() Dependency {
+func NewDependency(logger trace.Printer) Dependency {
 	deps := Dependency{}
 	deps.TeePrinter = terminal.NewTeePrinter()
-	deps.Ui = terminal.NewUI(os.Stdin, deps.TeePrinter, trace.Logger)
-	deps.ManifestRepo = manifest.NewManifestDiskRepository()
-	deps.AppManifest = manifest.NewGenerator()
+	deps.Ui = terminal.NewUI(os.Stdin, deps.TeePrinter, logger)
 
 	errorHandler := func(err error) {
 		if err != nil {
@@ -75,17 +74,20 @@ func NewDependency() Dependency {
 		}
 	}
 	deps.Config = core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler)
+
+	deps.ManifestRepo = manifest.NewManifestDiskRepository()
+	deps.AppManifest = manifest.NewGenerator()
 	deps.PluginConfig = plugin_config.NewPluginConfig(errorHandler)
 
 	terminal.UserAskedForColors = deps.Config.ColorEnabled()
 	terminal.InitColorSupport()
 
 	deps.Gateways = map[string]net.Gateway{
-		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.Ui),
-		"uaa":              net.NewUAAGateway(deps.Config, deps.Ui),
-		"routing-api":      net.NewRoutingApiGateway(deps.Config, time.Now, deps.Ui),
+		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.Ui, logger),
+		"uaa":              net.NewUAAGateway(deps.Config, deps.Ui, logger),
+		"routing-api":      net.NewRoutingApiGateway(deps.Config, time.Now, deps.Ui, logger),
 	}
-	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways)
+	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways, logger)
 
 	deps.PluginModels = &PluginModels{Application: nil}
 
@@ -129,6 +131,8 @@ func NewDependency() Dependency {
 	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
 
 	deps.ChecksumUtil = utils.NewSha1Checksum("")
+
+	deps.Logger = logger
 
 	return deps
 }

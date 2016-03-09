@@ -8,7 +8,7 @@ import (
 	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
-	applications "github.com/cloudfoundry/cli/cf/api/applications"
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
@@ -22,16 +22,16 @@ import (
 	securitygroupspaces "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	stacks "github.com/cloudfoundry/cli/cf/api/stacks"
+	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/cf/v3/repository"
 	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
-	"github.com/cloudfoundry/cli/cf/trace"
 )
 
 type RepositoryLocator struct {
@@ -78,13 +78,13 @@ type RepositoryLocator struct {
 	v3Repository repository.Repository
 }
 
-func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
+func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer) (loc RepositoryLocator) {
 	strategy := strategy.NewEndpointStrategy(config.ApiVersion())
 
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	routingApiGateway := gatewaysByName["routing-api"]
 	uaaGateway := gatewaysByName["uaa"]
-	loc.authRepo = authentication.NewUAAAuthenticationRepository(uaaGateway, config, net.NewRequestDumper(trace.Logger))
+	loc.authRepo = authentication.NewUAAAuthenticationRepository(uaaGateway, config, net.NewRequestDumper(logger))
 
 	// ensure gateway refreshers are set before passing them by value to repositories
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
@@ -92,7 +92,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
 	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{})
+	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
 
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)

@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 )
 
 type errorResponse struct {
@@ -25,8 +26,8 @@ func errorHandler(statusCode int, body []byte) error {
 	return errors.NewHttpError(statusCode, response.Name, response.Message)
 }
 
-func NewRoutingApiGateway(config core_config.Reader, clock func() time.Time, ui terminal.UI) Gateway {
-	gateway := newGateway(errorHandler, config, ui)
+func NewRoutingApiGateway(config core_config.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
+	gateway := newGateway(errorHandler, config, ui, logger)
 	gateway.Clock = clock
 	gateway.PollingEnabled = true
 	return gateway
