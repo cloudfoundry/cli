@@ -246,8 +246,7 @@ var _ = Describe("route repository", func() {
 						ghttp.VerifyJSON(`
 							{
 								"domain_guid":"my-domain-guid",
-								"space_guid":"my-space-guid",
-								"generate_port":false
+								"space_guid":"my-space-guid"
 							}
 						`),
 						ghttp.VerifyHeader(http.Header{
@@ -293,8 +292,7 @@ var _ = Describe("route repository", func() {
 							{
 								"host":"the-host",
 								"domain_guid":"my-domain-guid",
-								"space_guid":"my-space-guid",
-								"generate_port":false
+								"space_guid":"my-space-guid"
 							}
 						`),
 						ghttp.VerifyHeader(http.Header{
@@ -340,8 +338,7 @@ var _ = Describe("route repository", func() {
 							{
 								"domain_guid":"my-domain-guid",
 								"space_guid":"my-space-guid",
-								"path":"/the-path",
-								"generate_port":false
+								"path":"/the-path"
 							}
 						`),
 						ghttp.VerifyHeader(http.Header{
@@ -399,8 +396,7 @@ var _ = Describe("route repository", func() {
 							{
 								"port":9090,
 								"domain_guid":"my-domain-guid",
-								"space_guid":"my-space-guid",
-								"generate_port":false
+								"space_guid":"my-space-guid"
 							}
 						`),
 						ghttp.VerifyHeader(http.Header{
@@ -441,12 +437,11 @@ var _ = Describe("route repository", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("POST", "/v2/routes", "inline-relations-depth=1&async=true"),
+						ghttp.VerifyRequest("POST", "/v2/routes", "inline-relations-depth=1&async=true&generate_port=true"),
 						ghttp.VerifyJSON(`
 							{
 								"domain_guid":"my-domain-guid",
-								"space_guid":"my-space-guid",
-								"generate_port":true
+								"space_guid":"my-space-guid"
 							}
 						`),
 						ghttp.VerifyHeader(http.Header{
