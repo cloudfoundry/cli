@@ -2,17 +2,15 @@ package space_quotas_test
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/onsi/gomega/ghttp"
 
+	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,7 +27,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(ccServer.URL())
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 		repo = space_quotas.NewCloudControllerSpaceQuotaRepository(configRepo, gateway)
 	})
 

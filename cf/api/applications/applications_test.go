@@ -4,15 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"time"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/applications"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -99,7 +97,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(ccServer.URL())
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 
 			name := "my-cool-app"
@@ -590,7 +588,7 @@ func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{})
+	gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 	return
 }

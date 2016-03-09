@@ -34,7 +34,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
-			gateway = net.NewUAAGateway(config, &testterm.FakeUI{})
+			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, &fakePrinter)
 			fakePrinter = *new(fakes.FakePrinter)
 			dumper = net.NewRequestDumper(&fakePrinter)
 			auth = NewUAAAuthenticationRepository(gateway, config, dumper)
@@ -225,10 +225,10 @@ var _ = Describe("AuthenticationRepository", func() {
 
 	Describe("Authorize", func() {
 		var (
-			uaaServer *ghttp.Server
-			gateway   net.Gateway
-			config    core_config.ReadWriter
-			authRepo  AuthenticationRepository
+			uaaServer   *ghttp.Server
+			gateway     net.Gateway
+			config      core_config.ReadWriter
+			authRepo    AuthenticationRepository
 			dumper      net.RequestDumper
 			fakePrinter fakes.FakePrinter
 		)
@@ -239,7 +239,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			config.SetUaaEndpoint(uaaServer.URL())
 			config.SetSSHOAuthClient("ssh-oauth-client")
 
-			gateway = net.NewUAAGateway(config, &testterm.FakeUI{})
+			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, &fakePrinter)
 			fakePrinter = *new(fakes.FakePrinter)
 			dumper = net.NewRequestDumper(&fakePrinter)
 			authRepo = NewUAAAuthenticationRepository(gateway, config, dumper)

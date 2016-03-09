@@ -12,12 +12,7 @@ import (
 
 var stdout io.Writer = os.Stdout
 
-var Logger Printer
 var LoggingToStdout bool
-
-func init() {
-	Logger = NewLogger(false, "", "")
-}
 
 func SetStdout(s io.Writer) {
 	stdout = s

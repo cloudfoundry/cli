@@ -5,6 +5,7 @@ import (
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
 
+	"github.com/cloudfoundry/cli/cf/trace/fakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -16,12 +17,14 @@ var _ = Describe("calling commands in command_registry", func() {
 	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
 
 	var (
-		ui   *testterm.FakeUI
-		deps command_registry.Dependency
+		ui         *testterm.FakeUI
+		deps       command_registry.Dependency
+		fakeLogger *fakes.FakePrinter
 	)
 
 	BeforeEach(func() {
-		deps = command_registry.NewDependency()
+		fakeLogger = new(fakes.FakePrinter)
+		deps = command_registry.NewDependency(fakeLogger)
 		ui = &testterm.FakeUI{}
 		deps.Ui = ui
 

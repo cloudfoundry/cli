@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -45,7 +46,7 @@ var _ = Describe("restart command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		deps = command_registry.NewDependency()
+		deps = command_registry.NewDependency(new(traceFakes.FakePrinter))
 		requirementsFactory = &testreq.FakeReqFactory{}
 		starter = &appCmdFakes.FakeApplicationStarter{}
 		stopper = &appCmdFakes.FakeApplicationStopper{}

@@ -233,4 +233,3 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 
 	return nil
 }
-

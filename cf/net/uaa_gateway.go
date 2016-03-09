@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 )
 
 type uaaErrorResponse struct {
@@ -24,6 +25,6 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 	return errors.NewHttpError(statusCode, response.Code, response.Description)
 }
 
-func NewUAAGateway(config core_config.Reader, ui terminal.UI) Gateway {
-	return newGateway(uaaErrorHandler, config, ui)
+func NewUAAGateway(config core_config.Reader, ui terminal.UI, logger trace.Printer) Gateway {
+	return newGateway(uaaErrorHandler, config, ui, logger)
 }

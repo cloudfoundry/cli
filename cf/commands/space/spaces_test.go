@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/trace/fakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -34,7 +35,7 @@ var _ = Describe("spaces command", func() {
 	}
 
 	BeforeEach(func() {
-		deps = command_registry.NewDependency()
+		deps = command_registry.NewDependency(new(fakes.FakePrinter))
 		ui = &testterm.FakeUI{}
 		spaceRepo = &testapi.FakeSpaceRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
