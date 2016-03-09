@@ -32,18 +32,14 @@ func main() {
 		os.Args[1] = "version"
 	}
 
-	//handles `cf` | `cf -h` || `cf -help`
-	if len(os.Args) == 1 || os.Args[1] == "--help" || os.Args[1] == "-help" ||
-		os.Args[1] == "--h" || os.Args[1] == "-h" {
+	//handles `cf`
+	if len(os.Args) == 1 {
 		os.Args = []string{os.Args[0], "help"}
 	}
 
 	//handles `cf [COMMAND] -h ...`
 	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
-	if requestHelp(os.Args[2:]) {
-		os.Args[2] = os.Args[1]
-		os.Args[1] = "help"
-	}
+	os.Args = append([]string{os.Args[0]}, handleHelp(os.Args[1:])...)
 
 	newArgs, isVerbose := handleVerbose(os.Args)
 	os.Args = newArgs
@@ -168,17 +164,31 @@ func generateBacktrace() string {
 	return stackTrace
 }
 
-func requestHelp(args []string) bool {
-	for _, v := range args {
+func handleHelp(args []string) []string {
+	hIndex := -1
+
+	for i, v := range args {
 		if v == "-h" || v == "--help" || v == "--h" {
-			return true
+			hIndex = i
+			break
 		}
 	}
 
-	return false
+	if hIndex == -1 {
+		return args
+	} else if len(args) > 1 {
+		if hIndex == 0 {
+			return []string{"help", args[1]}
+		} else {
+			return []string{"help", args[0]}
+		}
+	} else {
+		return []string{"help"}
+	}
 }
 
 func handleVerbose(args []string) ([]string, bool) {
+	var verbose bool
 	idx := -1
 
 	for i, arg := range args {
@@ -187,8 +197,6 @@ func handleVerbose(args []string) ([]string, bool) {
 			break
 		}
 	}
-
-	var verbose bool
 
 	if idx != -1 && len(args) > 1 {
 		verbose = true

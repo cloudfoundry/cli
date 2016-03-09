@@ -4468,10 +4468,6 @@
     "translation": "[DATI PRIVATI NASCOSTI]"
   },
   {
-    "id": "[environment variables]",
-    "translation": "[variabili di ambiente]"
-  },
-  {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[opzioni globali] comando [argomenti...] [opzioni comando]"
   },

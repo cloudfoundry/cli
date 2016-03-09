@@ -4468,10 +4468,6 @@
     "translation": ""
   },
   {
-    "id": "[environment variables]",
-    "translation": "[環境変数]"
-  },
-  {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[グローバル・オプション] コマンド [引数...] [コマンド・オプション]"
   },

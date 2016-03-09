@@ -24,7 +24,9 @@ run:
       jq -r ".Reservations | map(.Instances[0]) | \
         map(.InstanceId) | join(\" \")")"
 
-    aws ec2 terminate-instances \
-      --region "${AWS_REGION}" \
-      --instance-ids ${INSTANCE_IDS}
-    sleep 60
+    if [[ ! -z $INSTANCE_IDS ]]; then
+      aws ec2 terminate-instances \
+        --region "${AWS_REGION}" \
+        --instance-ids ${INSTANCE_IDS}
+      sleep 60
+    fi

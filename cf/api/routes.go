@@ -12,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/google/go-querystring/query"
 )
 
 //go:generate counterfeiter -o fakes/fake_route_repository.go . RouteRepository
@@ -80,16 +81,23 @@ func queryStringForRouteSearch(host, guid, path string, port int) string {
 		args = append(args, fmt.Sprintf("port:%d", port))
 	}
 
-	return url.QueryEscape(strings.Join(args, ";"))
+	return strings.Join(args, ";")
 }
 
 func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error) {
 	queryString := queryStringForRouteSearch(host, domain.Guid, path, port)
 
+	q := struct {
+		Query                string `url:"q"`
+		InlineRelationsDepth int    `url:"inline-relations-depth"`
+	}{queryString, 1}
+
+	opt, _ := query.Values(q)
+
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", queryString),
+		fmt.Sprintf("/v2/routes?%s", opt.Encode()),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			route = resource.(resources.RouteResource).ToModel()
@@ -141,23 +149,30 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid,
 	path = normalizedPath(path)
 
 	body := struct {
-		Host         string `json:"host,omitempty"`
-		Path         string `json:"path,omitempty"`
-		Port         int    `json:"port,omitempty"`
-		DomainGuid   string `json:"domain_guid"`
-		SpaceGuid    string `json:"space_guid"`
-		GeneratePort bool   `json:"generate_port"`
-	}{host, path, port, domainGuid, spaceGuid, randomPort}
+		Host       string `json:"host,omitempty"`
+		Path       string `json:"path,omitempty"`
+		Port       int    `json:"port,omitempty"`
+		DomainGuid string `json:"domain_guid"`
+		SpaceGuid  string `json:"space_guid"`
+	}{host, path, port, domainGuid, spaceGuid}
 
 	data, err := json.Marshal(body)
 	if err != nil {
 		return models.Route{}, err
 	}
 
+	q := struct {
+		GeneratePort         bool `url:"generate_port,omitempty"`
+		InlineRelationsDepth int  `url:"inline-relations-depth"`
+	}{randomPort, 1}
+
+	opt, _ := query.Values(q)
+	uriFragment := "/v2/routes?" + opt.Encode()
+
 	resource := new(resources.RouteResource)
 	err = repo.gateway.CreateResource(
 		repo.config.ApiEndpoint(),
-		"/v2/routes?inline-relations-depth=1",
+		uriFragment,
 		bytes.NewReader(data),
 		resource,
 	)
