@@ -31,11 +31,8 @@ run:
 
     # Put cf-acceptance-tests within a GOPATH-like directory, because it makes
     # references to itself
-    GOPATH=$PWD/gopath
+    GOPATH=$PWD/cf-release-repo
     cf_acceptance_tests_path=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
-
-    mkdir -p $GOPATH/src/github.com/cloudfoundry
-    ln -s $PWD/cf-release-repo/src/github.com/cloudfoundry/cf-acceptance-tests $cf_acceptance_tests_path
 
     go get github.com/onsi/ginkgo/ginkgo
 
