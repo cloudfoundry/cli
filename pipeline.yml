@@ -40,10 +40,10 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
-- name: cf-acceptance-tests
+- name: cf-release-repo
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cf-acceptance-tests
+    uri: git@github.com:cloudfoundry/cf-release
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
@@ -154,7 +154,7 @@ jobs:
       passed: [gats-windows]
     - get: cli
       passed: [gats-windows]
-    - get: cf-acceptance-tests
+    - get: cf-release-repo
     - get: cli-ci
     - put: bosh-lite-lock
       params:
@@ -205,7 +205,7 @@ jobs:
       passed: [gats-linux]
     - get: cli
       passed: [gats-linux]
-    - get: cf-acceptance-tests
+    - get: cf-release-repo
     - get: cf-cli-binaries
       trigger: true
       passed: [gats-linux]

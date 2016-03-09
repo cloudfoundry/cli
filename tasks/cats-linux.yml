@@ -3,7 +3,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
-- name: cf-acceptance-tests
+- name: cf-release-repo
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 
@@ -32,8 +32,10 @@ run:
     # Put cf-acceptance-tests within a GOPATH-like directory, because it makes
     # references to itself
     GOPATH=$PWD/gopath
+    cf_acceptance_tests_path=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
+
     mkdir -p $GOPATH/src/github.com/cloudfoundry
-    ln -s $PWD/cf-acceptance-tests $GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
+    ln -s $PWD/cf-release-repo/src/github.com/cloudfoundry/cf-acceptance-tests $cf_acceptance_tests_path
 
     go get github.com/onsi/ginkgo/ginkgo
 
@@ -45,7 +47,7 @@ run:
 
     PATH=$GOPATH/bin:$PATH
 
-    cd cf-acceptance-tests
+    cd $cf_acceptance_tests_path
 
     cat<<EOF > config.json
     {
