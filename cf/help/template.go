@@ -7,7 +7,7 @@ func GetHelpTemplate() string {
    {{.Name}} - {{.Usage}}
 
 {{.Title "` + T("USAGE:") + `"}}
-   ` + T("[environment variables]") + ` {{.Name}} ` + T("[global options] command [arguments...] [command options]") + `
+   ` + `{{.Name}} ` + T("[global options] command [arguments...] [command options]") + `
 
 {{.Title "` + T("VERSION:") + `"}}
    {{.Version}}

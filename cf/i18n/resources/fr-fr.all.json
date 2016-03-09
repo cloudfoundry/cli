@@ -4472,10 +4472,6 @@
     "translation": "[DONNEES PRIVEES MASQUEES]"
   },
   {
-    "id": "[environment variables]",
-    "translation": "[variables d'environnement]"
-  },
-  {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[options globales] commande [arguments...] [options de commande]"
   },

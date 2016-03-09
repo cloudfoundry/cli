@@ -4472,10 +4472,6 @@
     "translation": "[PRIVATE DATEN AUSGEBLENDET]"
   },
   {
-    "id": "[environment variables]",
-    "translation": "[Umgebungsvariablen]"
-  },
-  {
     "id": "[global options] command [arguments...] [command options]",
     "translation": "[globale Optionen] Befehl [Argumente...] [Befehlsoptionen]"
   },
