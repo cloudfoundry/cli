@@ -1,6 +1,8 @@
 package requirements
 
 import (
+	"errors"
+
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -134,8 +136,12 @@ type FakeRequirement struct {
 	success bool
 }
 
-func (r FakeRequirement) Execute() (success bool) {
-	return r.success
+func (r FakeRequirement) Execute() error {
+	if !r.success {
+		return errors.New("Generic error")
+	}
+
+	return nil
 }
 
 func (r FakeRequirement) GetApplication() models.Application {

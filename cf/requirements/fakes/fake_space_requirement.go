@@ -9,11 +9,11 @@ import (
 )
 
 type FakeSpaceRequirement struct {
-	ExecuteStub        func() (success bool)
+	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
 	executeReturns     struct {
-		result1 bool
+		result1 error
 	}
 	SetSpaceNameStub        func(string)
 	setSpaceNameMutex       sync.RWMutex
@@ -28,7 +28,7 @@ type FakeSpaceRequirement struct {
 	}
 }
 
-func (fake *FakeSpaceRequirement) Execute() (success bool) {
+func (fake *FakeSpaceRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
 	fake.executeMutex.Unlock()
@@ -45,10 +45,10 @@ func (fake *FakeSpaceRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeSpaceRequirement) ExecuteReturns(result1 bool) {
+func (fake *FakeSpaceRequirement) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
-		result1 bool
+		result1 error
 	}{result1}
 }
 

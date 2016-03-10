@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
@@ -17,22 +18,20 @@ type TargetedOrgRequirement interface {
 }
 
 type targetedOrgApiRequirement struct {
-	ui     terminal.UI
 	config core_config.Reader
 }
 
-func NewTargetedOrgRequirement(ui terminal.UI, config core_config.Reader) TargetedOrgRequirement {
-	return targetedOrgApiRequirement{ui, config}
+func NewTargetedOrgRequirement(config core_config.Reader) TargetedOrgRequirement {
+	return targetedOrgApiRequirement{config}
 }
 
-func (req targetedOrgApiRequirement) Execute() (success bool) {
+func (req targetedOrgApiRequirement) Execute() error {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf(T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG")}))
-		req.ui.Failed(message)
-		return false
+		return errors.New(message)
 	}
 
-	return true
+	return nil
 }
 
 func (req targetedOrgApiRequirement) GetOrganizationFields() (org models.OrganizationFields) {

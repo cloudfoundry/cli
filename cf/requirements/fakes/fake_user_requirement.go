@@ -9,11 +9,11 @@ import (
 )
 
 type FakeUserRequirement struct {
-	ExecuteStub        func() (success bool)
+	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
 	executeReturns     struct {
-		result1 bool
+		result1 error
 	}
 	GetUserStub        func() models.UserFields
 	getUserMutex       sync.RWMutex
@@ -23,7 +23,7 @@ type FakeUserRequirement struct {
 	}
 }
 
-func (fake *FakeUserRequirement) Execute() (success bool) {
+func (fake *FakeUserRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
 	fake.executeMutex.Unlock()
@@ -40,10 +40,10 @@ func (fake *FakeUserRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeUserRequirement) ExecuteReturns(result1 bool) {
+func (fake *FakeUserRequirement) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
-		result1 bool
+		result1 error
 	}{result1}
 }
 

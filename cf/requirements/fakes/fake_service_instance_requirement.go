@@ -9,11 +9,11 @@ import (
 )
 
 type FakeServiceInstanceRequirement struct {
-	ExecuteStub        func() (success bool)
+	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
 	executeReturns     struct {
-		result1 bool
+		result1 error
 	}
 	GetServiceInstanceStub        func() models.ServiceInstance
 	getServiceInstanceMutex       sync.RWMutex
@@ -23,7 +23,7 @@ type FakeServiceInstanceRequirement struct {
 	}
 }
 
-func (fake *FakeServiceInstanceRequirement) Execute() (success bool) {
+func (fake *FakeServiceInstanceRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
 	fake.executeMutex.Unlock()
@@ -40,10 +40,10 @@ func (fake *FakeServiceInstanceRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeServiceInstanceRequirement) ExecuteReturns(result1 bool) {
+func (fake *FakeServiceInstanceRequirement) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
-		result1 bool
+		result1 error
 	}{result1}
 }
 

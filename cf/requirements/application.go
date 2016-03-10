@@ -3,7 +3,6 @@ package requirements
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 //go:generate counterfeiter -o fakes/fake_application_requirement.go . ApplicationRequirement
@@ -14,29 +13,26 @@ type ApplicationRequirement interface {
 
 type applicationApiRequirement struct {
 	name        string
-	ui          terminal.UI
 	appRepo     applications.ApplicationRepository
 	application models.Application
 }
 
-func NewApplicationRequirement(name string, ui terminal.UI, aR applications.ApplicationRepository) *applicationApiRequirement {
+func NewApplicationRequirement(name string, aR applications.ApplicationRepository) *applicationApiRequirement {
 	req := &applicationApiRequirement{}
 	req.name = name
-	req.ui = ui
 	req.appRepo = aR
 	return req
 }
 
-func (req *applicationApiRequirement) Execute() (success bool) {
+func (req *applicationApiRequirement) Execute() error {
 	var apiErr error
 	req.application, apiErr = req.appRepo.Read(req.name)
 
 	if apiErr != nil {
-		req.ui.Failed(apiErr.Error())
-		return false
+		return apiErr
 	}
 
-	return true
+	return nil
 }
 
 func (req *applicationApiRequirement) GetApplication() models.Application {

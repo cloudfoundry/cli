@@ -54,7 +54,7 @@ var _ = Describe("calling commands in command_registry", func() {
 		err := NewCommandRunner().Command([]string{"fake-command2"}, deps, false)
 
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(ContainSubstring("Error in requirement"))
+		Expect(err.Error()).To(ContainSubstring("Requirement executed and failed"))
 	})
 
 	It("returns an error if invalid flag is provided", func() {

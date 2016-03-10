@@ -63,11 +63,11 @@ var _ = Describe("UnsetOrgRole", func() {
 		factory.NewLoginRequirementReturns(loginRequirement)
 
 		userRequirement = &fakerequirements.FakeUserRequirement{}
-		userRequirement.ExecuteReturns(true)
+		userRequirement.ExecuteReturns(nil)
 		factory.NewUserRequirementReturns(userRequirement)
 
 		organizationRequirement = &fakerequirements.FakeOrganizationRequirement{}
-		organizationRequirement.ExecuteReturns(true)
+		organizationRequirement.ExecuteReturns(nil)
 		factory.NewOrganizationRequirementReturns(organizationRequirement)
 	})
 

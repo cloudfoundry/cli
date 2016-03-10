@@ -9,11 +9,11 @@ import (
 )
 
 type FakeDomainRequirement struct {
-	ExecuteStub        func() (success bool)
+	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
 	executeReturns     struct {
-		result1 bool
+		result1 error
 	}
 	GetDomainStub        func() models.DomainFields
 	getDomainMutex       sync.RWMutex
@@ -23,7 +23,7 @@ type FakeDomainRequirement struct {
 	}
 }
 
-func (fake *FakeDomainRequirement) Execute() (success bool) {
+func (fake *FakeDomainRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
 	fake.executeMutex.Unlock()
@@ -40,10 +40,10 @@ func (fake *FakeDomainRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeDomainRequirement) ExecuteReturns(result1 bool) {
+func (fake *FakeDomainRequirement) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
-		result1 bool
+		result1 error
 	}{result1}
 }
 

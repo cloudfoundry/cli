@@ -108,7 +108,10 @@ func main() {
 		}
 
 		for _, req := range reqs {
-			req.Execute()
+			err = req.Execute()
+			if err != nil {
+				deps.Ui.Failed(err.Error())
+			}
 		}
 
 		cmd.Execute(flagContext)

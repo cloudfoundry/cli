@@ -9,11 +9,11 @@ import (
 )
 
 type FakeOrganizationRequirement struct {
-	ExecuteStub        func() (success bool)
+	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
 	executeReturns     struct {
-		result1 bool
+		result1 error
 	}
 	SetOrganizationNameStub        func(string)
 	setOrganizationNameMutex       sync.RWMutex
@@ -28,7 +28,7 @@ type FakeOrganizationRequirement struct {
 	}
 }
 
-func (fake *FakeOrganizationRequirement) Execute() (success bool) {
+func (fake *FakeOrganizationRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
 	fake.executeMutex.Unlock()
@@ -45,10 +45,10 @@ func (fake *FakeOrganizationRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeOrganizationRequirement) ExecuteReturns(result1 bool) {
+func (fake *FakeOrganizationRequirement) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
-		result1 bool
+		result1 error
 	}{result1}
 }
 
