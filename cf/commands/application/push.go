@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/blang/semver"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -102,12 +101,7 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 	var reqs []requirements.Requirement
 
 	if fc.String("route-path") != "" {
-		requiredVersion, err := semver.Make("2.36.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", requiredVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumApiVersion))
 	}
 
 	if fc.String("app-ports") != "" {

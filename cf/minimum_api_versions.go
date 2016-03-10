@@ -8,4 +8,5 @@ var (
 	UpdateServicePlanMinimumApiVersion, _               = semver.Make("2.16.0")
 	SetRolesByUsernameMinimumApiVersion, _              = semver.Make("2.37.0")
 	ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion, _ = semver.Make("2.21.0")
+	RoutePathMinimumApiVersion, _                       = semver.Make("2.36.0")
 )
