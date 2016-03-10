@@ -4,7 +4,6 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 //go:generate counterfeiter -o fakes/fake_factory.go . Factory
@@ -27,13 +26,12 @@ type Factory interface {
 }
 
 type apiRequirementFactory struct {
-	ui          terminal.UI
 	config      core_config.Reader
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(ui terminal.UI, config core_config.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
-	return apiRequirementFactory{ui, config, repoLocator}
+func NewFactory(config core_config.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
+	return apiRequirementFactory{config, repoLocator}
 }
 
 func (f apiRequirementFactory) NewApplicationRequirement(name string) ApplicationRequirement {

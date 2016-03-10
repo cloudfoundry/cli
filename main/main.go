@@ -101,7 +101,7 @@ func main() {
 		cmd = cmd.SetDependency(deps, false)
 		cmdRegistry.SetCommand(cmd)
 
-		requirementsFactory := requirements.NewFactory(deps.Ui, deps.Config, deps.RepoLocator)
+		requirementsFactory := requirements.NewFactory(deps.Config, deps.RepoLocator)
 		reqs, err := cmd.Requirements(requirementsFactory, flagContext)
 		if err != nil {
 			deps.Ui.Failed(err.Error())
