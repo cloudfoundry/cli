@@ -1992,6 +1992,10 @@
     "translation": "{{.PropertyName}}이(가) 부울일 것으로 예상했습니다."
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": ""
+  },
+  {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
     "translation": "{{.PropertyName}}이(가) 문자열의 목록일 것으로 예상했습니다."
   },

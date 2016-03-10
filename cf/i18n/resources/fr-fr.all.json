@@ -1992,6 +1992,10 @@
     "translation": "{{.PropertyName}} doit être associé à une valeur booléenne. "
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": ""
+  },
+  {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
     "translation": "{{.PropertyName}} doit être associé à une liste de chaînes. "
   },

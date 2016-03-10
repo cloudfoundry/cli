@@ -1992,6 +1992,10 @@
     "translation": "{{.PropertyName}} 应该为布尔值。"
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": ""
+  },
+  {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
     "translation": "{{.PropertyName}} 应该为字符串列表。"
   },

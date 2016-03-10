@@ -1992,6 +1992,10 @@
     "translation": "{{.PropertyName}} deve essere un valore booleano."
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": ""
+  },
+  {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
     "translation": "{{.PropertyName}} deve essere un elenco di stringhe."
   },

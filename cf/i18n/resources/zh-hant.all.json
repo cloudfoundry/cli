@@ -1992,6 +1992,10 @@
     "translation": "預期 {{.PropertyName}} 為布林。"
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": ""
+  },
+  {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
     "translation": "預期 {{.PropertyName}} 為字串清單。"
   },

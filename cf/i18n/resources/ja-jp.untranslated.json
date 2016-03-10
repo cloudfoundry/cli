@@ -664,6 +664,10 @@
     "translation": "Error saving manifest: {{.Error}}"
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": "Expected {{.PropertyName}} to be a list of integers."
+  },
+  {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
   },

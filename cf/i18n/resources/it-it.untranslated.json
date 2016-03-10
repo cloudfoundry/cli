@@ -688,6 +688,10 @@
     "translation": "Executes a request to the targeted API endpoint"
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": "Expected {{.PropertyName}} to be a list of integers."
+  },
+  {
     "id": "Force binding without confirmation",
     "translation": "Force binding without confirmation"
   },
