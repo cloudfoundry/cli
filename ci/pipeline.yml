@@ -155,6 +155,9 @@ jobs:
     - get: cli
       passed: [gats-windows]
     - get: cf-release-repo
+      params:
+        submodules:
+        - src/github.com/cloudfoundry/cf-acceptance-tests
     - get: cli-ci
     - put: bosh-lite-lock
       params:
@@ -206,6 +209,9 @@ jobs:
     - get: cli
       passed: [gats-linux]
     - get: cf-release-repo
+      params:
+        submodules:
+        - src/github.com/cloudfoundry/cf-acceptance-tests
     - get: cf-cli-binaries
       trigger: true
       passed: [gats-linux]
