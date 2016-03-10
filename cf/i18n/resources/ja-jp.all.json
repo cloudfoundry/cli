@@ -1992,6 +1992,10 @@
     "translation": "{{.PropertyName}} はブール値であると予期されていました。"
   },
   {
+    "id": "Expected {{.PropertyName}} to be a list of integers.",
+    "translation": ""
+  },
+  {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
     "translation": "{{.PropertyName}} はストリングのリストであると予期されていました。"
   },

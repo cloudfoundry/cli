@@ -200,6 +200,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.ServicesToBind = sliceOrEmptyVal(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 	appParams.HealthCheckType = stringVal(yamlMap, "health-check-type", &errs)
+	appParams.AppPorts = intSliceVal(yamlMap, "app-ports", &errs)
 
 	if appParams.Path != nil {
 		path := *appParams.Path
@@ -391,6 +392,36 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
 	}
 
 	return &stringSlice
+}
+
+func intSliceVal(yamlMap generic.Map, key string, errs *[]error) *[]int {
+	if !yamlMap.Has(key) {
+		return nil
+	}
+
+	err := fmt.Errorf(T("Expected {{.PropertyName}} to be a list of integers.", map[string]interface{}{"PropertyName": key}))
+
+	s, ok := yamlMap.Get(key).([]interface{})
+
+	if !ok {
+		*errs = append(*errs, err)
+		return nil
+	}
+
+	var intSlice []int
+
+	for _, el := range s {
+		intValue, ok := el.(int)
+
+		if !ok {
+			*errs = append(*errs, err)
+			return nil
+		}
+
+		intSlice = append(intSlice, intValue)
+	}
+
+	return &intSlice
 }
 
 func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{} {
