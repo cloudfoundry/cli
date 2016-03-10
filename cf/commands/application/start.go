@@ -72,15 +72,20 @@ func (cmd *Start) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("start"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), requirementsFactory.NewTargetedSpaceRequirement(), cmd.appReq}
-	return
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		requirementsFactory.NewTargetedSpaceRequirement(),
+		cmd.appReq,
+	}
+
+	return reqs, nil
 }
 
 func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

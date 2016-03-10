@@ -46,17 +46,20 @@ func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space"))
 	}
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}
+
 	if fc.String("o") == "" {
 		reqs = append(reqs, requirementsFactory.NewTargetedOrgRequirement())
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

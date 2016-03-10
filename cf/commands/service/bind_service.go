@@ -74,7 +74,7 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *BindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *BindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("bind-service"))
 	}
@@ -84,9 +84,13 @@ func (cmd *BindService) Requirements(requirementsFactory requirements.Factory, f
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement(), cmd.appReq, cmd.serviceInstanceReq}
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+		cmd.appReq,
+		cmd.serviceInstanceReq,
+	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *BindService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

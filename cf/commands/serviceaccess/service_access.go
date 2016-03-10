@@ -42,15 +42,16 @@ func (cmd *ServiceAccess) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *ServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 0 {
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("service-access"))
 	}
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *ServiceAccess) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

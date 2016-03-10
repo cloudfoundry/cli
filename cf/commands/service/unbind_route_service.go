@@ -70,12 +70,13 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 		minAPIVersion,
 	)
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		minAPIVersionRequirement,
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
-	}, nil
+	}
+	return reqs, nil
 }
 
 func (cmd *UnbindRouteService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

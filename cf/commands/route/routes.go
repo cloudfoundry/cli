@@ -45,10 +45,12 @@ func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("routes"))
 	}
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
-	}, nil
+	}
+
+	return reqs, nil
 }
 
 func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

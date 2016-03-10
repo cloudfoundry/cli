@@ -42,12 +42,12 @@ func (cmd *Target) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 0 {
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("target"))
 	}
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewApiEndpointRequirement(),
 	}
 
@@ -55,7 +55,7 @@ func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc fla
 		reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *Target) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {

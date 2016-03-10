@@ -30,14 +30,15 @@ func (cmd *ShowFeatureFlag) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ShowFeatureFlag) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *ShowFeatureFlag) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("feature-flag"))
 	}
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
+
 	return reqs, nil
 }
 

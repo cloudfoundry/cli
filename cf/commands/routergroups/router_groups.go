@@ -36,10 +36,11 @@ func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, 
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("router-groups"))
 	}
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewRoutingAPIRequirement(),
-	}, nil
+	}
+	return reqs, nil
 }
 
 func (cmd *RouterGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

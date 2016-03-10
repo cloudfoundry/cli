@@ -30,13 +30,16 @@ func (cmd *RenameServiceBroker) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *RenameServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n") + command_registry.Commands.CommandUsage("rename-service-broker"))
 	}
 
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-	return
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *RenameServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

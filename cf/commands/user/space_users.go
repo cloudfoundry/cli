@@ -39,18 +39,19 @@ func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + command_registry.Commands.CommandUsage("space-users"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.orgReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *SpaceUsers) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

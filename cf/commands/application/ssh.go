@@ -60,7 +60,7 @@ func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument") + "\n\n" + command_registry.Commands.CommandUsage("ssh"))
 	}
@@ -69,19 +69,22 @@ func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.
 		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("Value for flag 'app-instance-index' cannot be negative"), command_registry.Commands.CommandUsage("ssh")))
 	}
 
+	var err error
 	cmd.opts, err = options.NewSSHOptions(fc)
+
 	if err != nil {
 		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", err.Error(), command_registry.Commands.CommandUsage("ssh")))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(cmd.opts.AppName)
-	reqs = []requirements.Requirement{
+
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *SSH) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

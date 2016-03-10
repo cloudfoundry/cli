@@ -55,11 +55,13 @@ func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Fact
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
-	}, nil
+	}
+
+	return reqs, nil
 }
 
 func (cmd *CreateAppManifest) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

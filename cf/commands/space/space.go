@@ -44,18 +44,20 @@ func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ShowSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *ShowSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("space"))
 	}
 
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
-	reqs = []requirements.Requirement{
+
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *ShowSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

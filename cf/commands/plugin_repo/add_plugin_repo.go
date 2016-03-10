@@ -43,12 +43,13 @@ func (cmd *AddPluginRepo) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n") + command_registry.Commands.CommandUsage("add-plugin-repo"))
 	}
 
-	return
+	reqs := []requirements.Requirement{}
+	return reqs, nil
 }
 
 func (cmd *AddPluginRepo) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

@@ -46,10 +46,11 @@ func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.F
 		panic(err.Error())
 	}
 
-	return []requirements.Requirement{
+	[]requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewMinAPIVersionRequirement("purge-service-instance", minRequiredAPIVersion),
-	}, nil
+	}
+	return reqs, nil
 }
 
 func (cmd *PurgeServiceInstance) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

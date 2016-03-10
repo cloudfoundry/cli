@@ -40,7 +40,7 @@ func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Fa
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + command_registry.Commands.CommandUsage("create-service-broker"))
 	}
 
-	var reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 

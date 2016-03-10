@@ -34,20 +34,20 @@ func (cmd *EnableSSH) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + command_registry.Commands.CommandUsage("enable-ssh"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *EnableSSH) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

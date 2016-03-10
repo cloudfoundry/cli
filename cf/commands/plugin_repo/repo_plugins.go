@@ -43,8 +43,9 @@ func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RepoPlugins) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return
+func (cmd *RepoPlugins) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	reqs := []requirements.Requirement{}
+	return reqs, nil
 }
 
 func (cmd *RepoPlugins) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

@@ -32,9 +32,12 @@ func (cmd *Password) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Password) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return
+func (cmd *Password) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *Password) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

@@ -44,7 +44,7 @@ func (cmd *UnsetSpaceRole) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 4 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-space-role"))
 	}
@@ -60,13 +60,13 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.userReq,
 		cmd.orgReq,
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *UnsetSpaceRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

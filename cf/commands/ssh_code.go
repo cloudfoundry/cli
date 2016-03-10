@@ -46,7 +46,10 @@ func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("ssh-code"))
 	}
 
-	reqs := append([]requirements.Requirement{}, requirementsFactory.NewApiEndpointRequirement())
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewApiEndpointRequirement(),
+	}
+
 	return reqs, nil
 }
 

@@ -48,16 +48,17 @@ func (cmd *CopySource) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n") + command_registry.Commands.CommandUsage("copy-source"))
 	}
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *CopySource) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
