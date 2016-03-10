@@ -24,6 +24,6 @@ type passingRequirement struct {
 	Name string
 }
 
-func (r passingRequirement) Execute() bool {
-	return true
+func (r passingRequirement) Execute() error {
+	return nil
 }

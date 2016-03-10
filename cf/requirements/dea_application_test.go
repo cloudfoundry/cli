@@ -7,9 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -17,16 +15,14 @@ import (
 var _ = Describe("DeaApplication", func() {
 	var (
 		req     requirements.DEAApplicationRequirement
-		ui      *testterm.FakeUI
 		appRepo *testApplication.FakeApplicationRepository
 		appName string
 	)
 
 	BeforeEach(func() {
 		appName = "fake-app-name"
-		ui = &testterm.FakeUI{}
 		appRepo = &testApplication.FakeApplicationRepository{}
-		req = requirements.NewDEAApplicationRequirement(appName, ui, appRepo)
+		req = requirements.NewDEAApplicationRequirement(appName, appRepo)
 	})
 
 	Describe("GetApplication", func() {
@@ -58,8 +54,9 @@ var _ = Describe("DeaApplication", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { req.Execute() }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"The app is running on the Diego backend, which does not support this command."}))
+				err := req.Execute()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("The app is running on the Diego backend, which does not support this command."))
 			})
 		})
 
@@ -71,8 +68,8 @@ var _ = Describe("DeaApplication", func() {
 			})
 
 			It("succeeds", func() {
-				req.Execute()
-				Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"The app is running on the Diego backend, which does not support this command."}))
+				err := req.Execute()
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
@@ -82,8 +79,8 @@ var _ = Describe("DeaApplication", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { req.Execute() }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"find-err"}))
+				err := req.Execute()
+				Expect(err.Error()).To(ContainSubstring("find-err"))
 			})
 		})
 	})

@@ -1,6 +1,7 @@
 package fake_command
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -49,7 +50,7 @@ type fakeReq2 struct {
 	ui terminal.UI
 }
 
-func (f fakeReq2) Execute() bool {
+func (f fakeReq2) Execute() error {
 	f.ui.Say("Requirement executed and failed")
-	return false
+	return errors.New("Requirement executed and failed")
 }

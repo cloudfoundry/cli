@@ -1,8 +1,6 @@
 package rpc
 
 import (
-	"errors"
-
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -40,8 +38,8 @@ func (c *commandRunner) Command(args []string, deps command_registry.Dependency,
 		}
 
 		for _, r := range reqs {
-			if !r.Execute() {
-				return errors.New("Error in requirement")
+			if err = r.Execute(); err != nil {
+				return err
 			}
 		}
 

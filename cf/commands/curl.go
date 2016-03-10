@@ -59,15 +59,12 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. An argument is missing or not correctly enclosed.\n\n") + command_registry.Commands.CommandUsage("curl"))
 	}
 
-	reqs = []requirements.Requirement{
-		requirementsFactory.NewLoginRequirement(),
-	}
-	return
+	return []requirements.Requirement{}, nil
 }
 
 func (cmd *Curl) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

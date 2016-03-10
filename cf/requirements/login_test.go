@@ -7,43 +7,37 @@ import (
 	. "github.com/onsi/gomega"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
 var _ = Describe("LoginRequirement", func() {
-	var ui *testterm.FakeUI
-
 	BeforeEach(func() {
-		ui = new(testterm.FakeUI)
 	})
 
 	It("succeeds when given a config with an API endpoint and authentication", func() {
 		config := testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
 		config.SetApiEndpoint("api.example.com")
-		req := NewLoginRequirement(ui, config)
-		success := req.Execute()
-		Expect(success).To(BeTrue())
+		req := NewLoginRequirement(config)
+		err := req.Execute()
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("fails when given a config with only an API endpoint", func() {
 		config := testconfig.NewRepository()
 		config.SetApiEndpoint("api.example.com")
-		req := NewLoginRequirement(ui, config)
-		success := req.Execute()
-		Expect(success).To(BeFalse())
+		req := NewLoginRequirement(config)
+		err := req.Execute()
+		Expect(err).To(HaveOccurred())
 
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"Not logged in."}))
+		Expect(err.Error()).To(ContainSubstring("Not logged in."))
 	})
 
 	It("fails when given a config with neither an API endpoint nor authentication", func() {
 		config := testconfig.NewRepository()
-		req := NewLoginRequirement(ui, config)
-		success := req.Execute()
-		Expect(success).To(BeFalse())
+		req := NewLoginRequirement(config)
+		err := req.Execute()
+		Expect(err).To(HaveOccurred())
 
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"No API endpoint"}))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Not logged in."}))
+		Expect(err.Error()).To(ContainSubstring("No API endpoint"))
+		Expect(err.Error()).ToNot(ContainSubstring("Not logged in."))
 	})
 })

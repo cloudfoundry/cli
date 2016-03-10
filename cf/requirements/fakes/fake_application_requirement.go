@@ -9,11 +9,11 @@ import (
 )
 
 type FakeApplicationRequirement struct {
-	ExecuteStub        func() (success bool)
+	ExecuteStub        func() error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct{}
 	executeReturns     struct {
-		result1 bool
+		result1 error
 	}
 	GetApplicationStub        func() models.Application
 	getApplicationMutex       sync.RWMutex
@@ -23,7 +23,7 @@ type FakeApplicationRequirement struct {
 	}
 }
 
-func (fake *FakeApplicationRequirement) Execute() (success bool) {
+func (fake *FakeApplicationRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
 	fake.executeMutex.Unlock()
@@ -40,10 +40,10 @@ func (fake *FakeApplicationRequirement) ExecuteCallCount() int {
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeApplicationRequirement) ExecuteReturns(result1 bool) {
+func (fake *FakeApplicationRequirement) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
-		result1 bool
+		result1 error
 	}{result1}
 }
 

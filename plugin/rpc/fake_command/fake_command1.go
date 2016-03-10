@@ -52,7 +52,7 @@ type fakeReq struct {
 	ui terminal.UI
 }
 
-func (f fakeReq) Execute() bool {
+func (f fakeReq) Execute() error {
 	f.ui.Say("Requirement executed")
-	return true
+	return nil
 }

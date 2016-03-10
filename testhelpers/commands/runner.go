@@ -42,7 +42,7 @@ func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.F
 	}
 
 	for _, requirement := range requirements {
-		if !requirement.Execute() {
+		if err = requirement.Execute(); err != nil {
 			return false
 		}
 	}
@@ -79,7 +79,7 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 	}
 
 	for _, requirement := range requirements {
-		if !requirement.Execute() {
+		if err = requirement.Execute(); err != nil {
 			return false
 		}
 	}

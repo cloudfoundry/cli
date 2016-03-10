@@ -3,7 +3,6 @@ package requirements
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 //go:generate counterfeiter -o fakes/fake_organization_requirement.go . OrganizationRequirement
@@ -15,29 +14,26 @@ type OrganizationRequirement interface {
 
 type organizationApiRequirement struct {
 	name    string
-	ui      terminal.UI
 	orgRepo organizations.OrganizationRepository
 	org     models.Organization
 }
 
-func NewOrganizationRequirement(name string, ui terminal.UI, sR organizations.OrganizationRepository) *organizationApiRequirement {
+func NewOrganizationRequirement(name string, sR organizations.OrganizationRepository) *organizationApiRequirement {
 	req := &organizationApiRequirement{}
 	req.name = name
-	req.ui = ui
 	req.orgRepo = sR
 	return req
 }
 
-func (req *organizationApiRequirement) Execute() (success bool) {
+func (req *organizationApiRequirement) Execute() error {
 	var apiErr error
 	req.org, apiErr = req.orgRepo.FindByName(req.name)
 
 	if apiErr != nil {
-		req.ui.Failed(apiErr.Error())
-		return false
+		return apiErr
 	}
 
-	return true
+	return nil
 }
 
 func (req *organizationApiRequirement) SetOrganizationName(name string) {
