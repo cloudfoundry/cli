@@ -84,7 +84,8 @@ func queryStringForRouteSearch(host, guid, path string, port int) string {
 	return strings.Join(args, ";")
 }
 
-func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error) {
+func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (models.Route, error) {
+	var route models.Route
 	queryString := queryStringForRouteSearch(host, domain.Guid, path, port)
 
 	q := struct {
@@ -95,21 +96,30 @@ func (repo CloudControllerRouteRepository) Find(host string, domain models.Domai
 	opt, _ := query.Values(q)
 
 	found := false
-	apiErr = repo.gateway.ListPaginatedResources(
+	apiErr := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		fmt.Sprintf("/v2/routes?%s", opt.Encode()),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
+			keepSearching := true
 			route = resource.(resources.RouteResource).ToModel()
+			if doesNotMatchVersionSpecificAttributes(route, path, port) {
+				return keepSearching
+			}
+
 			found = true
-			return false
+			return !keepSearching
 		})
 
 	if apiErr == nil && !found {
 		apiErr = errors.NewModelNotFoundError("Route", host)
 	}
 
-	return
+	return route, apiErr
+}
+
+func doesNotMatchVersionSpecificAttributes(route models.Route, path string, port int) bool {
+	return normalizedPath(route.Path) != normalizedPath(path) || route.Port != port
 }
 
 func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {

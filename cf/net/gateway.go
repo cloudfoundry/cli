@@ -144,13 +144,13 @@ func (gateway Gateway) DeleteResource(endpoint, apiUrl string) error {
 func (gateway Gateway) ListPaginatedResources(target string,
 	path string,
 	resource interface{},
-	cb func(interface{}) bool) (apiErr error) {
+	cb func(interface{}) bool) error {
 	for path != "" {
 		pagination := NewPaginatedResources(resource)
 
-		apiErr = gateway.GetResource(fmt.Sprintf("%s%s", target, path), &pagination)
+		apiErr := gateway.GetResource(fmt.Sprintf("%s%s", target, path), &pagination)
 		if apiErr != nil {
-			return
+			return apiErr
 		}
 
 		resources, err := pagination.Resources()
@@ -160,14 +160,14 @@ func (gateway Gateway) ListPaginatedResources(target string,
 
 		for _, resource := range resources {
 			if !cb(resource) {
-				return
+				return nil
 			}
 		}
 
 		path = pagination.NextURL
 	}
 
-	return
+	return nil
 }
 
 func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiUrl string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
