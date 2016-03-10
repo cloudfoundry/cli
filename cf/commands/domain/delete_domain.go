@@ -36,7 +36,7 @@ func (cmd *DeleteDomain) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-domain"))
 	}
@@ -44,12 +44,12 @@ func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, 
 	loginReq := requirementsFactory.NewLoginRequirement()
 	cmd.orgReq = requirementsFactory.NewTargetedOrgRequirement()
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		loginReq,
 		cmd.orgReq,
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *DeleteDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

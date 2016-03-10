@@ -30,13 +30,16 @@ func (cmd *UpdateServiceBroker) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UpdateServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *UpdateServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 4 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + command_registry.Commands.CommandUsage("update-service-broker"))
 	}
 
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-	return
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *UpdateServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

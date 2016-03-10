@@ -64,7 +64,8 @@ func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags
 		cmd.ui.Failed(T("Incorrect Usage. An argument is missing or not correctly enclosed.\n\n") + command_registry.Commands.CommandUsage("curl"))
 	}
 
-	return []requirements.Requirement{}, nil
+	reqs := []requirements.Requirement{}
+	return reqs, nil
 }
 
 func (cmd *Curl) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

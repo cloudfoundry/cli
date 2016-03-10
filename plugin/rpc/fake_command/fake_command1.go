@@ -29,8 +29,9 @@ func (cmd FakeCommand1) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd FakeCommand1) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return []requirements.Requirement{cmd.req}, nil
+func (cmd FakeCommand1) Requirements(_ requirements.Factory, _ flags.FlagContext) ([]requirements.Requirement, error) {
+	reqs := []requirements.Requirement{cmd.req}
+	return reqs, nil
 }
 
 func (cmd FakeCommand1) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

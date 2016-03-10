@@ -44,10 +44,12 @@ func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags
 		}))
 	}
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
-	}, nil
+	}
+
+	return reqs, nil
 }
 
 func (c *V3Apps) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {

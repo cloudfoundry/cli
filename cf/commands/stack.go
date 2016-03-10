@@ -35,13 +35,16 @@ func (cmd *ListStack) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires stack name as argument\n\n") + command_registry.Commands.CommandUsage("stack"))
 	}
 
-	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-	return
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewLoginRequirement(),
+	}
+
+	return reqs, nil
 }
 
 func (cmd *ListStack) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {

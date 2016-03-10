@@ -32,19 +32,20 @@ func (cmd *RenameApp) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameApp) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *RenameApp) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(c.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires old app name and new app name as arguments\n\n") + command_registry.Commands.CommandUsage("rename"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *RenameApp) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

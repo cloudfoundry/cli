@@ -36,14 +36,16 @@ func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-space-quota"))
 	}
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-	}, nil
+	}
+
+	return reqs, nil
 }
 
 func (cmd *DeleteSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

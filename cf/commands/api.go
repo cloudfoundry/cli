@@ -40,8 +40,9 @@ func (cmd Api) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd Api) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return
+func (cmd Api) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	reqs := []requirements.Requirement{}
+	return reqs, nil
 }
 
 func (cmd Api) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {

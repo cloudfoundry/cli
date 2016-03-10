@@ -33,18 +33,19 @@ func (cmd *SetQuota) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n") + command_registry.Commands.CommandUsage("set-quota"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.orgReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *SetQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

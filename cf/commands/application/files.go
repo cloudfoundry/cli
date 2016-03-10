@@ -39,19 +39,20 @@ TIP:
 	}
 }
 
-func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(c.Args()) < 1 || len(c.Args()) > 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("files"))
 	}
 
 	cmd.appReq = requirementsFactory.NewDEAApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *Files) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

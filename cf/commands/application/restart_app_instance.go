@@ -33,7 +33,7 @@ func (cmd *RestartAppInstance) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		usage := command_registry.Commands.CommandUsage("restart-app-instance")
 		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + usage)
@@ -43,13 +43,13 @@ func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Fac
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(appName)
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 
-	return
+	return reqs, nil
 }
 
 func (cmd *RestartAppInstance) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

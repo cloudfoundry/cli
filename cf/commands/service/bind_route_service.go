@@ -79,12 +79,13 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 		minAPIVersion,
 	)
 
-	return []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
 		minAPIVersionRequirement,
-	}, nil
+	}
+	return reqs, nil
 }
 
 func (cmd *BindRouteService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

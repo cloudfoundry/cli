@@ -32,16 +32,17 @@ func (cmd *UnsetSpaceQuota) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (cmd *UnsetSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n") + command_registry.Commands.CommandUsage("unset-space-quota"))
 	}
 
-	reqs = []requirements.Requirement{
+	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}
-	return
+
+	return reqs, nil
 }
 
 func (cmd *UnsetSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
