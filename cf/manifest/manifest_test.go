@@ -424,7 +424,7 @@ var _ = Describe("Manifests", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(apps[0].AppPorts).NotTo(BeNil())
-			Expect(*(apps[0].AppPorts)).To(Equal([]int{8080,9090}))
+			Expect(*(apps[0].AppPorts)).To(Equal([]int{8080, 9090}))
 		})
 
 		It("handles omitted field", func() {
