@@ -109,116 +109,149 @@ var _ = Describe("route repository", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
+	})
 
-		Describe("Find", func() {
-			var ccServer *ghttp.Server
+	Describe("Find", func() {
+		var ccServer *ghttp.Server
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+			configRepo.SetApiEndpoint(ccServer.URL())
+		})
+
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
+		Context("when the port is not specified", func() {
 			BeforeEach(func() {
-				ccServer = ghttp.NewServer()
-				configRepo.SetApiEndpoint(ccServer.URL())
-			})
+				v := url.Values{}
+				v.Set("inline-relations-depth", "1")
+				v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath")
 
-			AfterEach(func() {
-				ccServer.Close()
-			})
-
-			Context("when the path is empty", func() {
-				BeforeEach(func() {
-					v := url.Values{}
-					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid")
-
-					ccServer.AppendHandlers(
-						ghttp.CombineHandlers(
-							ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
-							ghttp.VerifyHeader(http.Header{
-								"accept": []string{"application/json"},
-							}),
-							ghttp.RespondWith(http.StatusCreated, findResponseBodyWithoutPath),
-						),
-					)
-				})
-
-				It("returns the route", func() {
-					domain := models.DomainFields{}
-					domain.Guid = "my-domain-guid"
-
-					route, apiErr := repo.Find("my-cool-app", domain, "", 0)
-
-					Expect(apiErr).NotTo(HaveOccurred())
-					Expect(route.Host).To(Equal("my-cool-app"))
-					Expect(route.Guid).To(Equal("my-route-guid"))
-					Expect(route.Path).To(Equal(""))
-					Expect(route.Domain.Guid).To(Equal(domain.Guid))
-				})
-			})
-
-			Context("when the route is found", func() {
-				BeforeEach(func() {
-					v := url.Values{}
-					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:8148")
-
-					ccServer.AppendHandlers(
-						ghttp.CombineHandlers(
-							ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
-							ghttp.VerifyHeader(http.Header{
-								"accept": []string{"application/json"},
-							}),
-							ghttp.RespondWith(http.StatusCreated, findResponseBody),
-						),
-					)
-				})
-
-				It("returns the route", func() {
-					domain := models.DomainFields{}
-					domain.Guid = "my-domain-guid"
-
-					route, apiErr := repo.Find("my-cool-app", domain, "somepath", 8148)
-
-					Expect(apiErr).NotTo(HaveOccurred())
-					Expect(route.Host).To(Equal("my-cool-app"))
-					Expect(route.Guid).To(Equal("my-route-guid"))
-					Expect(route.Path).To(Equal("/somepath"))
-					Expect(route.Domain.Guid).To(Equal(domain.Guid))
-				})
-			})
-
-			Context("when the route is not found", func() {
-				BeforeEach(func() {
-					v := url.Values{}
-					v.Set("inline-relations-depth", "1")
-					v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:1478")
-
-					ccServer.AppendHandlers(
-						ghttp.CombineHandlers(
-							ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
-							ghttp.VerifyHeader(http.Header{
-								"accept": []string{"application/json"},
-							}),
-							ghttp.RespondWith(http.StatusOK, `{ "resources": [] }`),
-						),
-					)
-				})
-
-				It("returns 'not found'", func() {
-					ts, handler = testnet.NewServer([]testnet.TestRequest{
-						testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-							Method:   "GET",
-							Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
-							Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
 						}),
-					})
-					configRepo.SetApiEndpoint(ts.URL)
+						ghttp.RespondWith(http.StatusCreated, findResponseBodyForHostAndDomainAndPath),
+					),
+				)
+			})
 
-					domain := models.DomainFields{}
-					domain.Guid = "my-domain-guid"
+			It("returns the route", func() {
+				domain := models.DomainFields{}
+				domain.Guid = "my-domain-guid"
 
-					_, apiErr := repo.Find("my-cool-app", domain, "somepath", 1478)
+				route, apiErr := repo.Find("my-cool-app", domain, "somepath", 0)
 
-					Expect(handler).To(HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(route.Host).To(Equal("my-cool-app"))
+				Expect(route.Guid).To(Equal("my-route-guid"))
+				Expect(route.Path).To(Equal("/somepath"))
+				Expect(route.Port).To(Equal(0))
+				Expect(route.Domain.Guid).To(Equal(domain.Guid))
+			})
+		})
 
-					Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+		Context("when the path is empty", func() {
+			BeforeEach(func() {
+				v := url.Values{}
+				v.Set("inline-relations-depth", "1")
+				v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid")
+
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusCreated, findResponseBodyForHostAndDomain),
+					),
+				)
+			})
+
+			It("returns the route", func() {
+				domain := models.DomainFields{}
+				domain.Guid = "my-domain-guid"
+
+				route, apiErr := repo.Find("my-cool-app", domain, "", 0)
+
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(route.Host).To(Equal("my-cool-app"))
+				Expect(route.Guid).To(Equal("my-route-guid"))
+				Expect(route.Path).To(Equal(""))
+				Expect(route.Domain.Guid).To(Equal(domain.Guid))
+			})
+		})
+
+		Context("when the route is found", func() {
+			BeforeEach(func() {
+				v := url.Values{}
+				v.Set("inline-relations-depth", "1")
+				v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:8148")
+
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusCreated, findResponseBody),
+					),
+				)
+			})
+
+			It("returns the route", func() {
+				domain := models.DomainFields{}
+				domain.Guid = "my-domain-guid"
+
+				route, apiErr := repo.Find("my-cool-app", domain, "somepath", 8148)
+
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(route.Host).To(Equal("my-cool-app"))
+				Expect(route.Guid).To(Equal("my-route-guid"))
+				Expect(route.Path).To(Equal("/somepath"))
+				Expect(route.Port).To(Equal(8148))
+				Expect(route.Domain.Guid).To(Equal(domain.Guid))
+			})
+		})
+
+		Context("when the route is not found", func() {
+			BeforeEach(func() {
+				v := url.Values{}
+				v.Set("inline-relations-depth", "1")
+				v.Set("q", "host:my-cool-app;domain_guid:my-domain-guid;path:/somepath;port:1478")
+
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/routes", v.Encode()),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusOK, `{ "resources": [] }`),
+					),
+				)
+			})
+
+			It("returns 'not found'", func() {
+				ts, handler = testnet.NewServer([]testnet.TestRequest{
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:   "GET",
+						Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
+						Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+					}),
 				})
+				configRepo.SetApiEndpoint(ts.URL)
+
+				domain := models.DomainFields{}
+				domain.Guid = "my-domain-guid"
+
+				_, apiErr := repo.Find("my-cool-app", domain, "somepath", 1478)
+
+				Expect(handler).To(HaveAllRequestsCalled())
+
+				Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 			})
 		})
 	})
@@ -748,13 +781,28 @@ var findResponseBody = `
 					"guid": "my-domain-guid"
 				}
 			},
+			"port": 8148,
 			"path": "/somepath"
 		}
 	}
 ]}`
 
-var findResponseBodyWithoutPath = `
+var findResponseBodyForHostAndDomain = `
 { "resources": [
+	{
+		"metadata": {
+			"guid": "my-second-route-guid"
+		},
+		"entity": {
+			"host": "my-cool-app",
+			"domain": {
+				"metadata": {
+					"guid": "my-domain-guid"
+				}
+			},
+			"path": "/somepath"
+		}
+	},
 	{
 		"metadata": {
 			"guid": "my-route-guid"
@@ -766,6 +814,39 @@ var findResponseBodyWithoutPath = `
 					"guid": "my-domain-guid"
 				}
 			}
+		}
+	}
+]}`
+
+var findResponseBodyForHostAndDomainAndPath = `
+{ "resources": [
+	{
+		"metadata": {
+			"guid": "my-second-route-guid"
+		},
+		"entity": {
+			"host": "my-cool-app",
+			"domain": {
+				"metadata": {
+					"guid": "my-domain-guid"
+				}
+			},
+			"port": 8148,
+			"path": "/somepath"
+		}
+	},
+	{
+		"metadata": {
+			"guid": "my-route-guid"
+		},
+		"entity": {
+			"host": "my-cool-app",
+			"domain": {
+				"metadata": {
+					"guid": "my-domain-guid"
+				}
+			},
+			"path": "/somepath"
 		}
 	}
 ]}`
