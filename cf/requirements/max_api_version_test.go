@@ -31,8 +31,9 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 				config.SetApiVersion("1.2.2")
 			})
 
-			It("returns true", func() {
-				Expect(requirement.Execute()).NotTo(HaveOccurred())
+			It("succeeds", func() {
+				err := requirement.Execute()
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
@@ -41,8 +42,9 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 				config.SetApiVersion("1.2.3")
 			})
 
-			It("returns true", func() {
-				Expect(requirement.Execute()).NotTo(HaveOccurred())
+			It("succeeds", func() {
+				err := requirement.Execute()
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
@@ -51,7 +53,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 				config.SetApiVersion("1.2.4")
 			})
 
-			It("panics and prints a message", func() {
+			It("returns an error", func() {
 				err := requirement.Execute()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("version-restricted-feature only works up to CF API version 1.2.3. Your target is 1.2.4."))
@@ -63,7 +65,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 				config.SetApiVersion("-")
 			})
 
-			It("panics and prints a message", func() {
+			It("returns an error", func() {
 				err := requirement.Execute()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("Unable to parse CC API Version '-'"))
@@ -75,7 +77,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 				config.SetApiVersion("")
 			})
 
-			It("panics and prints a message", func() {
+			It("returns an error", func() {
 				err := requirement.Execute()
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("Unable to determine CC API Version. Please log in again."))

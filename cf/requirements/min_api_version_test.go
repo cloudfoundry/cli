@@ -31,7 +31,7 @@ var _ = Describe("MinAPIVersionRequirement", func() {
 				config.SetApiVersion("1.2.4")
 			})
 
-			It("returns true", func() {
+			It("succeeds", func() {
 				err := requirement.Execute()
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -42,7 +42,7 @@ var _ = Describe("MinAPIVersionRequirement", func() {
 				config.SetApiVersion("1.2.3")
 			})
 
-			It("returns true", func() {
+			It("succeeds", func() {
 				err := requirement.Execute()
 				Expect(err).NotTo(HaveOccurred())
 			})
