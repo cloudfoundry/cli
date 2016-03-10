@@ -26,7 +26,7 @@ var _ = Describe("RoutingApi", func() {
 			config.SetRoutingApiEndpoint("")
 		})
 
-		It("panics and prints a failure message", func() {
+		It("errors", func() {
 			err := requirement.Execute()
 			Expect(err.Error()).To(ContainSubstring("Routing API URI missing. Please log in again to set the URI automatically."))
 		})
