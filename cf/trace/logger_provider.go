@@ -8,10 +8,6 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
-func NewEmptyLogger() Printer {
-	return NewLogger(false, "", "")
-}
-
 func NewLogger(verbose bool, cf_trace, config_trace string) Printer {
 	LoggingToStdout = verbose
 

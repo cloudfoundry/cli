@@ -14,8 +14,10 @@ import (
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
+	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 
 	. "github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -347,17 +349,53 @@ var _ = Describe("UI", func() {
 			})
 		})
 
-		It("does not use 'T' func to translate when it is not initialized", func() {
-			t := i18n.T
-			i18n.T = nil
+		Context("when 'T' func is not initialized", func() {
+			var t go_i18n.TranslateFunc
+			BeforeEach(func() {
+				t = i18n.T
+				i18n.T = nil
+			})
 
-			io_helpers.CaptureOutput(func() {
-				testassert.AssertPanic(QuietPanic, func() {
-					NewUI(os.Stdin, NewTeePrinter(), fakeLogger).Failed("uh oh")
+			AfterEach(func() {
+				i18n.T = t
+			})
+
+			It("does not use 'T' func to translate", func() {
+				io_helpers.CaptureOutput(func() {
+					testassert.AssertPanic(QuietPanic, func() {
+						NewUI(os.Stdin, NewTeePrinter(), fakeLogger).Failed("uh oh")
+					})
 				})
 			})
 
-			i18n.T = t
+			It("does not duplicate output if logger is set to stdout", func() {
+				output := io_helpers.CaptureOutput(func() {
+					testassert.AssertPanic(QuietPanic, func() {
+						logger := trace.NewWriterPrinter(os.Stdout)
+						NewUI(os.Stdin, NewTeePrinter(), logger).Failed("this should print only once")
+					})
+				})
+				Expect(output).To(HaveLen(3))
+				Expect(output[0]).To(Equal("FAILED"))
+				Expect(output[1]).To(Equal("this should print only once"))
+				Expect(output[2]).To(Equal(""))
+
+			})
+		})
+
+		Context("when 'T' func is initialized", func() {
+			It("does not duplicate output if logger is set to stdout", func() {
+				output := io_helpers.CaptureOutput(func() {
+					testassert.AssertPanic(QuietPanic, func() {
+						logger := trace.NewWriterPrinter(os.Stdout)
+						NewUI(os.Stdin, NewTeePrinter(), logger).Failed("this should print only once")
+					})
+				})
+				Expect(output).To(HaveLen(3))
+				Expect(output[0]).To(Equal("FAILED"))
+				Expect(output[1]).To(Equal("this should print only once"))
+				Expect(output[2]).To(Equal(""))
+			})
 		})
 	})
 
@@ -382,7 +420,7 @@ var _ = Describe("UI", func() {
 				ui.NotifyUpdateIfNeeded(config)
 			})
 
-			Ω(output).To(ContainSubstrings([]string{"Cloud Foundry API version",
+			Expect(output).To(ContainSubstrings([]string{"Cloud Foundry API version",
 				"requires CLI version 6.0.0",
 				"You are currently on version 5.0.0",
 				"To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
@@ -399,7 +437,7 @@ var _ = Describe("UI", func() {
 				ui.NotifyUpdateIfNeeded(config)
 			})
 
-			Ω(output[0]).To(Equal(""))
+			Expect(output[0]).To(Equal(""))
 		})
 	})
 })

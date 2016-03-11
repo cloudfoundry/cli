@@ -23,3 +23,12 @@ func (p combinedPrinter) Println(v ...interface{}) {
 		printer.Println(v...)
 	}
 }
+
+func (p combinedPrinter) IsEnabled() bool {
+	for _, printer := range p {
+		if printer.IsEnabled() {
+			return true
+		}
+	}
+	return false
+}
