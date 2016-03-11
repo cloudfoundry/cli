@@ -95,7 +95,7 @@ func main() {
 		err := flagContext.Parse(cmdArgs...)
 		if err != nil {
 			usage := cmdRegistry.CommandUsage(cmdName)
-			deps.Ui.Failed("Incorrect Usage\n\n" + err.Error() + "\n\n" + usage)
+			deps.Ui.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
 		}
 
 		cmd = cmd.SetDependency(deps, false)
