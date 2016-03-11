@@ -2380,10 +2380,6 @@
     "translation": "Syntaxe incorrecte. Le type de diagnostic d'intégrité doit avoir pour valeur \"port\" ou \"none\"\\n\\n"
   },
   {
-    "id": "Incorrect Usage. No argument required\n\n",
-    "translation": "Syntaxe incorrecte. Aucun argument requis\n\n"
-  },
-  {
     "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
     "translation": ""
   },
@@ -2946,6 +2942,10 @@
   {
     "id": "No apps found",
     "translation": "Aucune application trouvée"
+  },
+  {
+    "id": "No argument required",
+    "translation": "Aucun argument requis"
   },
   {
     "id": "No buildpacks found",

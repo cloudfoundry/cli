@@ -2380,10 +2380,6 @@
     "translation": "誤った使用法。HEALTH_CHECK_TYPE は \"port\" または \"none\" でなければなりません\\n\\n"
   },
   {
-    "id": "Incorrect Usage. No argument required\n\n",
-    "translation": "誤った使用法。必要な引数がありません\n\n"
-  },
-  {
     "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
     "translation": ""
   },
@@ -2946,6 +2942,10 @@
   {
     "id": "No apps found",
     "translation": "アプリが見つかりませんでした"
+  },
+  {
+    "id": "No argument required",
+    "translation": "必要な引数がありません"
   },
   {
     "id": "No buildpacks found",

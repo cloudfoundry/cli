@@ -32,7 +32,7 @@ func (cmd *listRunningSecurityGroups) MetaData() command_registry.CommandMetadat
 
 func (cmd *listRunningSecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 0 {
-		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("running-security-groups"))
+		cmd.ui.Failed(T("Incorrect Usage")+ ". " + T("No argument required") + "\n\n" + command_registry.Commands.CommandUsage("running-security-groups"))
 	}
 
 	reqs := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}

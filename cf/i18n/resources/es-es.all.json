@@ -2380,10 +2380,6 @@
     "translation": "Uso incorrecto. HEALTH_CHECK_TYPE debe ser \"port\" o \"none\"\\n\\n"
   },
   {
-    "id": "Incorrect Usage. No argument required\n\n",
-    "translation": "Uso incorrecto. No es necesario ningún argumento\n\n"
-  },
-  {
     "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
     "translation": ""
   },
@@ -2946,6 +2942,10 @@
   {
     "id": "No apps found",
     "translation": "No encontrado aplicaciones"
+  },
+  {
+    "id": "No argument required",
+    "translation": "No es necesario ningún argumento"
   },
   {
     "id": "No buildpacks found",
