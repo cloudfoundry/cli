@@ -5,11 +5,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -46,12 +48,27 @@ var _ = Describe("service-auth-tokens command", func() {
 		It("fails when not logged in", func() {
 			Expect(runCommand()).To(BeFalse())
 		})
-		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
-			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument"},
-			))
+
+		Context("when arguments are provided", func() {
+			var cmd command_registry.Command
+			var flagContext flags.FlagContext
+
+			BeforeEach(func() {
+				cmd = &serviceauthtoken.ListServiceAuthTokens{}
+				cmd.SetDependency(deps, false)
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+			})
+
+			It("should fail with usage", func() {
+				flagContext.Parse("blahblah")
+
+				reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+				err := testcmd.RunRequirements(reqs)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+				Expect(err.Error()).To(ContainSubstring("No argument required"))
+			})
 		})
 
 		It("requires CC API version 2.47 or greater", func() {

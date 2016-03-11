@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -16,6 +17,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/cloudfoundry/cli/cf/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -63,11 +65,27 @@ var _ = Describe("target command", func() {
 		return testcmd.RunCliCommand("target", args, requirementsFactory, updateCommandDependency, false)
 	}
 
-	It("fails with usage when called with an argument but no flags", func() {
-		callTarget([]string{"some-argument"})
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Incorrect Usage", "No argument required"},
-		))
+	Context("when there are too many arguments given", func() {
+		var cmd command_registry.Command
+		var flagContext flags.FlagContext
+
+		BeforeEach(func() {
+			cmd = &commands.Target{}
+			cmd.SetDependency(deps, false)
+			flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		})
+
+		It("fails with usage", func() {
+			flagContext.Parse("blahblah")
+
+			reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+			err := testcmd.RunRequirements(reqs)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+			Expect(err.Error()).To(ContainSubstring("No argument required"))
+		})
 	})
 
 	Describe("when there is no api endpoint set", func() {

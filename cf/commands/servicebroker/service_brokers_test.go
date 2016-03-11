@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -16,6 +17,7 @@ import (
 
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -47,12 +49,27 @@ var _ = Describe("service-brokers command", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
-		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
-			Expect(testcmd.RunCliCommand("service-brokers", []string{"blahblah"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument"},
-			))
+
+		Context("when arguments are provided", func() {
+			var cmd command_registry.Command
+			var flagContext flags.FlagContext
+
+			BeforeEach(func() {
+				cmd = &servicebroker.ListServiceBrokers{}
+				cmd.SetDependency(deps, false)
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+			})
+
+			It("should fail with usage", func() {
+				flagContext.Parse("blahblah")
+
+				reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+				err := testcmd.RunRequirements(reqs)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+				Expect(err.Error()).To(ContainSubstring("No argument required"))
+			})
 		})
 	})
 

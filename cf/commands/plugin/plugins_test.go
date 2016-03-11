@@ -4,8 +4,10 @@ import (
 	"net/rpc"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	plugincmd "github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -62,12 +64,26 @@ var _ = Describe("Plugins", func() {
 		})
 	})
 
-	It("should fail with usage when provided any arguments", func() {
-		requirementsFactory.LoginSuccess = true
-		Expect(runCommand("blahblah")).To(BeFalse())
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Incorrect Usage", "No argument"},
-		))
+	Context("when arguments are provided", func() {
+		var cmd command_registry.Command
+		var flagContext flags.FlagContext
+
+		BeforeEach(func() {
+			cmd = &plugincmd.Plugins{}
+			cmd.SetDependency(deps, false)
+			flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+		})
+
+		It("should fail with usage", func() {
+			flagContext.Parse("blahblah")
+
+			reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+			err := testcmd.RunRequirements(reqs)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+			Expect(err.Error()).To(ContainSubstring("No argument required"))
+		})
 	})
 
 	It("returns a list of available methods of a plugin", func() {

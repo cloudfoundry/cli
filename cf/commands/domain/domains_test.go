@@ -11,6 +11,7 @@ import (
 
 	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -94,18 +95,25 @@ var _ = Describe("ListDomains", func() {
 	})
 
 	Describe("Requirements", func() {
-		Context("when provided one arg", func() {
+		Context("when arguments are provided", func() {
+			var cmd command_registry.Command
+			var flagContext flags.FlagContext
+
 			BeforeEach(func() {
-				flagContext.Parse("arg-1")
+				cmd = &domain.ListDomains{}
+				cmd.SetDependency(deps, false)
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 			})
 
-			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Incorrect Usage. No argument required"},
-					[]string{"NAME"},
-					[]string{"USAGE"},
-				))
+			It("should fail with usage", func() {
+				flagContext.Parse("blahblah")
+
+				reqs := cmd.Requirements(factory, flagContext)
+
+				err := testcmd.RunRequirements(reqs)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+				Expect(err.Error()).To(ContainSubstring("No argument required"))
 			})
 		})
 

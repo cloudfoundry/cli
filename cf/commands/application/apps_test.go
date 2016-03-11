@@ -14,6 +14,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -96,24 +98,51 @@ var _ = Describe("list-apps command", func() {
 	}
 
 	Describe("requirements", func() {
+		var cmd command_registry.Command
+		var flagContext flags.FlagContext
+
+		BeforeEach(func() {
+			cmd = &application.ListApps{}
+			cmd.SetDependency(deps, false)
+			flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		})
+
 		It("requires the user to be logged in", func() {
 			requirementsFactory.LoginSuccess = false
+			reqs := cmd.Requirements(requirementsFactory, flagContext)
 
-			Expect(runCommand()).To(BeFalse())
+			Expect(testcmd.RunRequirements(reqs)).To(HaveOccurred())
 		})
 
 		It("requires the user to have a space targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
+			reqs := cmd.Requirements(requirementsFactory, flagContext)
 
-			Expect(runCommand()).To(BeFalse())
+			Expect(testcmd.RunRequirements(reqs)).To(HaveOccurred())
 		})
+
 		It("should fail with usage when provided any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
-			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument required"},
-			))
+
+			flagContext.Parse("blahblah")
+
+			reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+			err := testcmd.RunRequirements(reqs)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+			Expect(err.Error()).To(ContainSubstring("No argument required"))
+		})
+
+		It("succeeds with all", func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.TargetedSpaceSuccess = true
+
+			reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+			Expect(testcmd.RunRequirements(reqs)).NotTo(HaveOccurred())
 		})
 	})
 

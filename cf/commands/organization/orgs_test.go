@@ -6,6 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -14,10 +15,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf/commands/organization"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
-var _ = Describe("org command", func() {
+var _ = Describe("orgs command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		orgRepo             *test_org.FakeOrganizationRepository
@@ -52,12 +54,27 @@ var _ = Describe("org command", func() {
 
 			Expect(runCommand()).To(BeFalse())
 		})
-		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
-			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument required"},
-			))
+
+		Context("when arguments are provided", func() {
+			var cmd command_registry.Command
+			var flagContext flags.FlagContext
+
+			BeforeEach(func() {
+				cmd = &organization.ListOrgs{}
+				cmd.SetDependency(deps, false)
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+			})
+
+			It("should fail with usage", func() {
+				flagContext.Parse("blahblah")
+
+				reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+				err := testcmd.RunRequirements(reqs)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+				Expect(err.Error()).To(ContainSubstring("No argument required"))
+			})
 		})
 	})
 

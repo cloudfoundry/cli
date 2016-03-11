@@ -3,8 +3,10 @@ package environmentvariablegroup_test
 import (
 	test_environmentVariableGroups "github.com/cloudfoundry/cli/cf/api/environment_variable_groups/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -46,12 +48,27 @@ var _ = Describe("staging-environment-variable-group command", func() {
 			requirementsFactory.LoginSuccess = false
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
-		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
-			Expect(runCommand("blahblah")).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument"},
-			))
+
+		Context("when arguments are provided", func() {
+			var cmd command_registry.Command
+			var flagContext flags.FlagContext
+
+			BeforeEach(func() {
+				cmd = &environmentvariablegroup.StagingEnvironmentVariableGroup{}
+				cmd.SetDependency(deps, false)
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+			})
+
+			It("should fail with usage", func() {
+				flagContext.Parse("blahblah")
+
+				reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+				err := testcmd.RunRequirements(reqs)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+				Expect(err.Error()).To(ContainSubstring("No argument required"))
+			})
 		})
 	})
 

@@ -6,11 +6,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/cloudfoundry/cli/cf/commands/securitygroup"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -48,12 +50,26 @@ var _ = Describe("list-security-groups command", func() {
 			Expect(runCommand()).To(BeFalse())
 		})
 
-		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
-			runCommand("why am I typing here")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "No argument"},
-			))
+		Context("when arguments are provided", func() {
+			var cmd command_registry.Command
+			var flagContext flags.FlagContext
+
+			BeforeEach(func() {
+				cmd = &securitygroup.SecurityGroups{}
+				cmd.SetDependency(deps, false)
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+			})
+
+			It("should fail with usage", func() {
+				flagContext.Parse("blahblah")
+
+				reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+				err := testcmd.RunRequirements(reqs)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+				Expect(err.Error()).To(ContainSubstring("No argument required"))
+			})
 		})
 	})
 
