@@ -80,8 +80,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
@@ -93,8 +92,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("returns a MaxAPIVersion requirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).To(ContainElement(maxAPIVersionRequirement))
 			})
 		})
@@ -104,8 +102,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("service-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("tries to find the service offering by label", func() {
@@ -225,8 +222,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 				err := flagContext.Parse("service-name", "-p", "provider-name")
 				Expect(err).NotTo(HaveOccurred())
-				_, err = cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
 			})
 
 			AfterEach(func() {

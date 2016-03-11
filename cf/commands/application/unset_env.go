@@ -40,7 +40,7 @@ func (cmd *UnsetEnv) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *UnsetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name' as arguments\n\n") + command_registry.Commands.CommandUsage("unset-env"))
 	}
@@ -53,7 +53,7 @@ func (cmd *UnsetEnv) Requirements(requirementsFactory requirements.Factory, fc f
 		cmd.appReq,
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *UnsetEnv) Execute(c flags.FlagContext) {

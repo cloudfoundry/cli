@@ -117,16 +117,14 @@ var _ = Describe("MapRoute", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns an ApplicationRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
 
 				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
@@ -134,8 +132,7 @@ var _ = Describe("MapRoute", func() {
 			})
 
 			It("returns a DomainRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
 
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
@@ -148,8 +145,7 @@ var _ = Describe("MapRoute", func() {
 				})
 
 				It("returns a MinAPIVersionRequirement as the first requirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 
 					expectedVersion, err := semver.Make("2.36.0")
 					Expect(err).NotTo(HaveOccurred())
@@ -168,8 +164,7 @@ var _ = Describe("MapRoute", func() {
 				})
 
 				It("does not return a MinAPIVersionRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
@@ -181,8 +176,7 @@ var _ = Describe("MapRoute", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("app-name", "domain-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("tries to create the route", func() {
@@ -273,8 +267,7 @@ var _ = Describe("MapRoute", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("app-name", "domain-name", "-n", "the-hostname")
 				Expect(err).NotTo(HaveOccurred())
-				_, err = cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
 			})
 
 			It("tries to create the route with the hostname", func() {
@@ -291,8 +284,7 @@ var _ = Describe("MapRoute", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("app-name", "domain-name")
 				Expect(err).NotTo(HaveOccurred())
-				_, err = cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
 			})
 
 			It("tries to create the route without a hostname", func() {
@@ -309,8 +301,7 @@ var _ = Describe("MapRoute", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("app-name", "domain-name", "--path", "the-path")
 				Expect(err).NotTo(HaveOccurred())
-				_, err = cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
 			})
 
 			It("tries to create the route with the path", func() {

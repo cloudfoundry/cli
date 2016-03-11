@@ -28,7 +28,7 @@ func (cmd *RenameBuildpack) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("rename-buildpack"))
 	}
@@ -37,7 +37,7 @@ func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factor
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *RenameBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

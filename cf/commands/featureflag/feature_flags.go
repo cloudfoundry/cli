@@ -30,7 +30,7 @@ func (cmd *ListFeatureFlags) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 0 {
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("feature-flags"))
 	}
@@ -39,7 +39,7 @@ func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Facto
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *ListFeatureFlags) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

@@ -38,9 +38,9 @@ func (cmd *Version) SetDependency(deps command_registry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd *Version) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *Version) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
 	reqs := []requirements.Requirement{}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *Version) Execute(context flags.FlagContext) {

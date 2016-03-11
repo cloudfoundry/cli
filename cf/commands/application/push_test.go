@@ -235,8 +235,7 @@ var _ = Describe("Push Command", func() {
 
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
 
-				reqs, err := cmd.Requirements(requirementsFactory, fc)
-				Expect(err).NotTo(HaveOccurred())
+				reqs := cmd.Requirements(requirementsFactory, fc)
 				Expect(reqs).NotTo(BeEmpty())
 
 				var s semver.Version
@@ -250,8 +249,7 @@ var _ = Describe("Push Command", func() {
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
 				fc.Parse("--app-ports", "8080,9090")
 
-				reqs, err := cmd.Requirements(requirementsFactory, fc)
-				Expect(err).NotTo(HaveOccurred())
+				reqs := cmd.Requirements(requirementsFactory, fc)
 				Expect(reqs).NotTo(BeEmpty())
 
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '--app-ports'"))

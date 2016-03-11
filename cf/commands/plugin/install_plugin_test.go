@@ -615,11 +615,14 @@ func (t testOrgsCmd) MetaData() command_registry.CommandMetadata {
 		ShortName: "o",
 	}
 }
-func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return
+
+func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+	return []requirements.Requirement{}
 }
+
 func (cmd testOrgsCmd) SetDependency(deps command_registry.Dependency, pluginCall bool) (c command_registry.Command) {
 	return
 }
+
 func (cmd testOrgsCmd) Execute(c flags.FlagContext) {
 }

@@ -36,13 +36,13 @@ func (cmd *PluginUninstall) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *PluginUninstall) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *PluginUninstall) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("uninstall-plugin"))
 	}
 
 	reqs := []requirements.Requirement{}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *PluginUninstall) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

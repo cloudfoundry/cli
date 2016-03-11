@@ -93,16 +93,14 @@ var _ = Describe("SetOrgRole", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns an OrgRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewOrganizationRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewOrganizationRequirementArgsForCall(0)).To(Equal("the-org-name"))
 
@@ -126,8 +124,7 @@ var _ = Describe("SetOrgRole", func() {
 					})
 
 					It("returns a UserRequirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
+						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
@@ -143,8 +140,7 @@ var _ = Describe("SetOrgRole", func() {
 					})
 
 					It("returns a UserRequirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
+						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
@@ -160,8 +156,7 @@ var _ = Describe("SetOrgRole", func() {
 					})
 
 					It("returns a UserRequirement", func() {
-						actualRequirements, err := cmd.Requirements(factory, flagContext)
-						Expect(err).NotTo(HaveOccurred())
+						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
@@ -178,8 +173,7 @@ var _ = Describe("SetOrgRole", func() {
 				})
 
 				It("returns a UserRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 					actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
 					Expect(actualUsername).To(Equal("the-user-name"))
@@ -194,8 +188,7 @@ var _ = Describe("SetOrgRole", func() {
 	Describe("Execute", func() {
 		BeforeEach(func() {
 			flagContext.Parse("the-user-name", "the-org-name", "OrgManager")
-			_, err := cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 
 			org := models.Organization{}
 			org.Guid = "the-org-guid"

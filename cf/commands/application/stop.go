@@ -42,7 +42,7 @@ func (cmd *Stop) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Stop) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *Stop) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("stop"))
 	}
@@ -55,7 +55,7 @@ func (cmd *Stop) Requirements(requirementsFactory requirements.Factory, fc flags
 		cmd.appReq,
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *Stop) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

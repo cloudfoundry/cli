@@ -43,7 +43,7 @@ func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires app_name, domain_name as arguments\n\n") + command_registry.Commands.CommandUsage("unmap-route"))
 	}
@@ -70,7 +70,7 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 		cmd.domainReq,
 	}...)
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *UnmapRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

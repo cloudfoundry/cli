@@ -31,7 +31,7 @@ func (cmd *RenameOrg) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires old org name, new org name as arguments\n\n") + command_registry.Commands.CommandUsage("rename-org"))
 	}
@@ -43,7 +43,7 @@ func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc 
 		cmd.orgReq,
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *RenameOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

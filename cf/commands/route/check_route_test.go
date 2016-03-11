@@ -93,15 +93,13 @@ var _ = Describe("CheckRoute", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a TargetedOrgRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedOrgRequirement))
 			})
@@ -112,8 +110,7 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("returns a MinAPIVersionRequirement as the first requirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 
 					expectedVersion, err := semver.Make("2.36.0")
 					Expect(err).NotTo(HaveOccurred())
@@ -132,8 +129,7 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("does not return a MinAPIVersionRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
@@ -145,8 +141,7 @@ var _ = Describe("CheckRoute", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("host-name", "domain-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 			configRepo.SetOrganizationFields(models.OrganizationFields{
 				Guid: "fake-org-guid",
 				Name: "fake-org-name",
@@ -194,8 +189,7 @@ var _ = Describe("CheckRoute", func() {
 					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 					err := flagContext.Parse("hostname", "domain-name", "--path", "the-path")
 					Expect(err).NotTo(HaveOccurred())
-					_, err = cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					cmd.Requirements(factory, flagContext)
 				})
 
 				It("checks if the route exists", func() {

@@ -35,13 +35,13 @@ func (cmd *DeleteSecurityGroup) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *DeleteSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-security-group"))
 	}
 
-	requirements := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return requirements, nil
+	reqs := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
+	return reqs
 }
 
 func (cmd *DeleteSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

@@ -74,8 +74,8 @@ func (cmd *FakeRouteCreator) SetDependency(_ command_registry.Dependency, _ bool
 	return cmd
 }
 
-func (cmd *FakeRouteCreator) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return
+func (cmd *FakeRouteCreator) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
+	return []requirements.Requirement{}
 }
 
 func (cmd *FakeRouteCreator) Execute(_ flags.FlagContext) {}

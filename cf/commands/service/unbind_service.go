@@ -33,7 +33,7 @@ func (cmd *UnbindService) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-service"))
 	}
@@ -48,7 +48,7 @@ func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory,
 		cmd.appReq,
 		cmd.serviceInstanceReq,
 	}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *UnbindService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

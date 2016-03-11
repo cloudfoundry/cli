@@ -87,16 +87,14 @@ var _ = Describe("PurgeServiceInstance", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 
 				expectedVersion, err := semver.Make("2.36.0")
@@ -115,8 +113,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("service-instance-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("finds the instance by name in the service repo", func() {

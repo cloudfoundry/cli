@@ -43,7 +43,7 @@ func (cmd *CreateSpaceQuota) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space-quota"))
 	}
@@ -53,7 +53,7 @@ func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *CreateSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

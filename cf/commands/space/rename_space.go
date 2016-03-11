@@ -31,7 +31,7 @@ func (cmd *RenameSpace) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *RenameSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("rename-space"))
 	}
@@ -44,7 +44,7 @@ func (cmd *RenameSpace) Requirements(requirementsFactory requirements.Factory, f
 		cmd.spaceReq,
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *RenameSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

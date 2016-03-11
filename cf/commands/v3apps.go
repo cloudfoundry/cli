@@ -37,7 +37,7 @@ func (c *V3Apps) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 0 {
 		c.ui.Failed(T("Incorrect Usage. No argument required\n\n{{.Usage}}", map[string]interface{}{
 			"Usage": command_registry.Commands.CommandUsage("v3apps"),
@@ -49,7 +49,7 @@ func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (c *V3Apps) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {

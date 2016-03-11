@@ -99,20 +99,17 @@ var _ = Describe("CreateAppManifest", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns an ApplicationRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).To(ContainElement(applicationRequirement))
 			})
 
 			It("returns a TargetedSpaceRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 			})
 		})
@@ -124,8 +121,7 @@ var _ = Describe("CreateAppManifest", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("app-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 
 			application = models.Application{}
 			application.Name = "app-name"

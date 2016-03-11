@@ -34,7 +34,7 @@ func (cmd *Restage) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Restage) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *Restage) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("restage"))
 	}
@@ -44,7 +44,7 @@ func (cmd *Restage) Requirements(requirementsFactory requirements.Factory, fc fl
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *Restage) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

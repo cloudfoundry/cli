@@ -121,22 +121,19 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("does not return a RoutingApiRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(0))
 				Expect(actualRequirements).ToNot(ContainElement(routingApiRequirement))
 			})
 
 			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
 
@@ -146,15 +143,13 @@ var _ = Describe("CreateSharedDomain", func() {
 				})
 
 				It("returns a LoginRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(loginRequirement))
 				})
 
 				It("returns a RoutingApiRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 
 					Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(routingApiRequirement))
@@ -164,8 +159,7 @@ var _ = Describe("CreateSharedDomain", func() {
 					expectedVersion, err := semver.Make("2.36.0")
 					Expect(err).NotTo(HaveOccurred())
 
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 
 					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)

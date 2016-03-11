@@ -40,14 +40,14 @@ func (cmd *UnbindSecurityGroup) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *UnbindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *UnbindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	argLength := len(fc.Args())
 	if argLength == 0 || argLength == 2 || argLength >= 4 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-security-group"))
 	}
 
-	requirements := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return requirements, nil
+	reqs := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
+	return reqs
 }
 
 func (cmd *UnbindSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

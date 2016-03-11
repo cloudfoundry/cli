@@ -58,7 +58,7 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("create-route"))
 	}
@@ -100,7 +100,7 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", cf.TcpRoutingMinimumApiVersion))
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *CreateRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

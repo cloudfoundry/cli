@@ -32,7 +32,7 @@ func (cmd *bindToStagingGroup) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *bindToStagingGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *bindToStagingGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("bind-staging-security-group"))
 	}
@@ -40,7 +40,7 @@ func (cmd *bindToStagingGroup) Requirements(requirementsFactory requirements.Fac
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *bindToStagingGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

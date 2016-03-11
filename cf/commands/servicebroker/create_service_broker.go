@@ -35,7 +35,7 @@ func (cmd *CreateServiceBroker) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 4 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + command_registry.Commands.CommandUsage("create-service-broker"))
 	}
@@ -57,7 +57,7 @@ func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Fa
 		)
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *CreateServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

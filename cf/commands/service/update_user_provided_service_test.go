@@ -88,8 +88,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
@@ -101,8 +100,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 
@@ -119,8 +117,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("service-instance")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		Context("when the service instance is not user-provided", func() {

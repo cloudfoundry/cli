@@ -33,8 +33,8 @@ func (binder *FakeAppBinder) SetDependency(_ command_registry.Dependency, _ bool
 	return binder
 }
 
-func (binder *FakeAppBinder) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return
+func (binder *FakeAppBinder) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
+	return []requirements.Requirement{}
 }
 
 func (binder *FakeAppBinder) Execute(_ flags.FlagContext) {}
