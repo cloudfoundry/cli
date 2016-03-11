@@ -2368,10 +2368,6 @@
     "translation": "올바르지 않은 사용법"
   },
   {
-    "id": "Incorrect Usage.\n\n",
-    "translation": "올바르지 않은 사용법입니다.\n\n"
-  },
-  {
     "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
     "translation": "올바르지 않은 사용법입니다. 인수가 누락되었거나 올바로 괄호로 묶이지 않았습니다.\n\n"
   },

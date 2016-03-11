@@ -2368,10 +2368,6 @@
     "translation": "誤った使用法"
   },
   {
-    "id": "Incorrect Usage.\n\n",
-    "translation": "誤った使用法。\n\n"
-  },
-  {
     "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
     "translation": "誤った使用法。欠落している引数または正しく囲まれていない引数があります。\n\n"
   },
