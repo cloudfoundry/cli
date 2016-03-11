@@ -15,7 +15,7 @@ func (f RequirementFunction) Execute() error {
 
 func NewUsageRequirement(cmd usable, errorMessage string, pred func() bool) Requirement {
 	return RequirementFunction(func() error {
-		if !pred() {
+		if pred() {
 			m := fmt.Sprintf("%s. %s\n\n%s", T("Incorrect Usage"), errorMessage, cmd.Usage())
 
 			return errors.New(m)
