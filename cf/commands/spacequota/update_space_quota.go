@@ -95,7 +95,7 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 		} else {
 			memory, formatError = formatters.ToMegabytes(memFlag)
 			if formatError != nil {
-				cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("update-space-quota"))
+				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("update-space-quota"))
 			}
 		}
 
@@ -106,7 +106,7 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {
-			cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("update-space-quota"))
+			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("update-space-quota"))
 		}
 
 		spaceQuota.MemoryLimit = memory

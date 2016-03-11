@@ -51,14 +51,14 @@ func (cmd *ConfigCommands) SetDependency(deps command_registry.Dependency, plugi
 
 func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 	if !context.IsSet("trace") && !context.IsSet("async-timeout") && !context.IsSet("color") && !context.IsSet("locale") {
-		cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("config"))
+		cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("config"))
 		return
 	}
 
 	if context.IsSet("async-timeout") {
 		asyncTimeout := context.Int("async-timeout")
 		if asyncTimeout < 0 {
-			cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("config"))
+			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("config"))
 		}
 
 		cmd.config.SetAsyncTimeout(uint(asyncTimeout))
@@ -76,7 +76,7 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 		case "false":
 			cmd.config.SetColorEnabled("false")
 		default:
-			cmd.ui.Failed(T("Incorrect Usage\n\n") + command_registry.Commands.CommandUsage("config"))
+			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("config"))
 		}
 	}
 
