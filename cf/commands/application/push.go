@@ -95,7 +95,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) > 1 {
-		cmd.ui.Failed(T("Incorrect Usage.\n\n") + command_registry.Commands.CommandUsage("push"))
+		cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("push"))
 	}
 
 	var reqs []requirements.Requirement
