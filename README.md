@@ -141,7 +141,7 @@ A command is a struct that implements this interface:
 type Command interface {
 	MetaData() CommandMetadata
 	SetDependency(deps Dependency, pluginCall bool) Command
-	Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error)
+	Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
 	Execute(context flags.FlagContext)
 }
 ```
