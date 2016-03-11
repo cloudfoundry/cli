@@ -75,11 +75,19 @@ var _ = Describe("OneTimeSSHCode", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Incorrect Usage. No argument required"},
-				))
+				var firstErr error
+
+				reqs := cmd.Requirements(factory, flagContext)
+
+				for _, req := range reqs {
+					err := req.Execute()
+					if err != nil {
+						firstErr = err
+						break
+					}
+				}
+
+				Expect(firstErr.Error()).To(ContainSubstring("Incorrect Usage. No argument required"))
 			})
 		})
 	})

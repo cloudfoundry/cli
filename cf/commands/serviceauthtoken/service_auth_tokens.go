@@ -32,9 +32,12 @@ func (cmd *ListServiceAuthTokens) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 0 {
-		cmd.ui.Failed(T("Incorrect Usage")+ ". " + T("No argument required") + "\n\n" + command_registry.Commands.CommandUsage("service-auth-tokens"))
-	}
+	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+		T("No argument required"),
+		func() bool {
+			return len(fc.Args()) != 0
+		},
+	)
 
 	maximumVersion, err := semver.Make("2.46.0")
 	if err != nil {
@@ -42,6 +45,7 @@ func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.
 	}
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewMaxAPIVersionRequirement("service-auth-tokens", maximumVersion),
 	}

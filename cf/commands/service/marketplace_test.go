@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -12,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf/commands/service"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -67,13 +69,27 @@ var _ = Describe("marketplace command", func() {
 
 				Expect(testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 			})
-			It("should fail with usage when provided any arguments", func() {
-				config = testconfig.NewRepository()
-				requirementsFactory.ApiEndpointSuccess = true
-				Expect(testcmd.RunCliCommand("marketplace", []string{"blahblah"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Incorrect Usage", "No argument"},
-				))
+
+			Context("when arguments are provided", func() {
+				var cmd command_registry.Command
+				var flagContext flags.FlagContext
+
+				BeforeEach(func() {
+					cmd = &service.MarketplaceServices{}
+					cmd.SetDependency(deps, false)
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				})
+
+				It("should fail with usage", func() {
+					flagContext.Parse("blahblah")
+
+					reqs := cmd.Requirements(requirementsFactory, flagContext)
+
+					err := testcmd.RunRequirements(reqs)
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+					Expect(err.Error()).To(ContainSubstring("No argument required"))
+				})
 			})
 		})
 	})

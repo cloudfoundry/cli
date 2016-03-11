@@ -37,11 +37,15 @@ func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 0 {
-		cmd.ui.Failed(T("Incorrect Usage")+ ". " + T("No argument required") + "\n\n" + command_registry.Commands.CommandUsage("spaces"))
-	}
+	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+		T("No argument required"),
+		func() bool {
+			return len(fc.Args()) != 0
+		},
+	)
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}

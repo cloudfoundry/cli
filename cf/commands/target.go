@@ -43,11 +43,15 @@ func (cmd *Target) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 0 {
-		cmd.ui.Failed(T("Incorrect Usage")+ ". " + T("No argument required") + "\n\n" + command_registry.Commands.CommandUsage("target"))
-	}
+	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+		T("No argument required"),
+		func() bool {
+			return len(fc.Args()) != 0
+		},
+	)
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		requirementsFactory.NewApiEndpointRequirement(),
 	}
 
