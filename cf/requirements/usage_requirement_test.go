@@ -7,15 +7,15 @@ import (
 )
 
 var _ = Describe("UsageRequirement", func() {
-	It("doesn't return an error when the predicate returns true", func() {
-		err := NewUsageRequirement(nil, "Some error message", func() bool { return true }).Execute()
+	It("doesn't return an error when the predicate returns false", func() {
+		err := NewUsageRequirement(nil, "Some error message", func() bool { return false }).Execute()
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("errors when the predicate returns false", func() {
+	It("errors when the predicate returns true", func() {
 		usableCmd := usableFunc(func() string { return "Usage text!" })
 
-		err := NewUsageRequirement(usableCmd, "Some error message", func() bool { return false }).Execute()
+		err := NewUsageRequirement(usableCmd, "Some error message", func() bool { return true }).Execute()
 
 		Expect(err).To(HaveOccurred())
 		Expect(err.Error()).To(ContainSubstring("Some error message"))

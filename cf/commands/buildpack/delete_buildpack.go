@@ -40,13 +40,16 @@ func (cmd *DeleteBuildpack) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("delete-buildpack"))
-	}
+	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd), "",
+		func() bool {
+			return len(fc.Args()) != 1
+		},
+	)
 
 	loginReq := requirementsFactory.NewLoginRequirement()
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		loginReq,
 	}
 
