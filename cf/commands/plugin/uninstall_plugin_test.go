@@ -100,7 +100,7 @@ var _ = Describe("Uninstall", func() {
 				path2file = filepath.Join(os.TempDir(), "uninstall-test-file-for-test_1.exe")
 
 				f, err := os.Create(path2file)
-				Ω(err).ToNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 				defer f.Close()
 			})
 
@@ -110,13 +110,13 @@ var _ = Describe("Uninstall", func() {
 
 			It("notifies the plugin upon uninstalling", func() {
 				_, err := os.Stat(path2file)
-				Ω(err).ToNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				runCommand("test_1.exe")
 
 				_, err = os.Stat(path2file)
-				Ω(err).To(HaveOccurred())
-				Ω(os.IsNotExist(err)).To(BeTrue())
+				Expect(err).To(HaveOccurred())
+				Expect(os.IsNotExist(err)).To(BeTrue())
 			})
 		})
 

@@ -95,7 +95,7 @@ var _ = Describe("set-health-check command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app", "none")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"my-app", "already set to 'none'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "already set to 'none'"}))
 			})
 		})
 
@@ -115,10 +115,10 @@ var _ = Describe("set-health-check command", func() {
 
 					Expect(appRepo.UpdateCallCount()).To(Equal(1))
 					appGUID, params := appRepo.UpdateArgsForCall(0)
-					Ω(appGUID).To(Equal("my-app-guid"))
-					Ω(*params.HealthCheckType).To(Equal("port"))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Updating", "my-app", "port"}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(appGUID).To(Equal("my-app-guid"))
+					Expect(*params.HealthCheckType).To(Equal("port"))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Updating", "my-app", "port"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 			})
 
@@ -127,11 +127,12 @@ var _ = Describe("set-health-check command", func() {
 					appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 					runCommand("my-app", "port")
 
-					Ω(appRepo.UpdateCallCount()).To(Equal(1))
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error updating app"},
 					))
+
 				})
 
 				It("notifies user when updated result is not in the desired state", func() {
@@ -143,11 +144,12 @@ var _ = Describe("set-health-check command", func() {
 
 					runCommand("my-app", "port")
 
-					Ω(appRepo.UpdateCallCount()).To(Equal(1))
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"health_check_type", "not set"},
 					))
+
 				})
 			})
 		})

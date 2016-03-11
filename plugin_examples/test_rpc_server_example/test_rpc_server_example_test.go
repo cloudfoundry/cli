@@ -29,10 +29,10 @@ var _ = Describe("App-Lister", func() {
 	BeforeEach(func() {
 		rpcHandlers = &fake_rpc_handlers.FakeHandlers{}
 		ts, err = test_rpc_server.NewTestRpcServer(rpcHandlers)
-		Ω(err).NotTo(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		err = ts.Start()
-		Ω(err).NotTo(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		//set rpc.CallCoreCommand to a successful call
 		//rpc.CallCoreCommand is used in both cliConnection.CliCommand() and
@@ -59,21 +59,21 @@ var _ = Describe("App-Lister", func() {
 				args := []string{ts.Port(), "list-apps", "--started"}
 				session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 				session.Wait()
-				Ω(err).NotTo(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				args = []string{ts.Port(), "list-apps", "--stopped"}
 				session, err = gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 				session.Wait()
-				Ω(err).NotTo(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("raises error when invalid flag is provided", func() {
 				args := []string{ts.Port(), "list-apps", "--invalid_flag"}
 				session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 				session.Wait()
-				Ω(err).NotTo(HaveOccurred())
-				Ω(session).To(gbytes.Say("FAILED"))
-				Ω(session).To(gbytes.Say("invalid_flag"))
+				Expect(err).NotTo(HaveOccurred())
+				Expect(session).To(gbytes.Say("FAILED"))
+				Expect(session).To(gbytes.Say("invalid_flag"))
 			})
 		})
 
@@ -88,8 +88,8 @@ var _ = Describe("App-Lister", func() {
 					args := []string{ts.Port(), "list-apps"}
 					session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 					session.Wait()
-					Ω(err).NotTo(HaveOccurred())
-					Ω(session).To(gbytes.Say("api.example.com/v2/apps"))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(session).To(gbytes.Say("api.example.com/v2/apps"))
 				})
 
 				It("raises an error when ApiEndpoint() returns an error", func() {
@@ -101,10 +101,10 @@ var _ = Describe("App-Lister", func() {
 					args := []string{ts.Port(), "list-apps"}
 					session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 					session.Wait()
-					Ω(err).NotTo(HaveOccurred())
-					Ω(session).To(gbytes.Say("FAILED"))
-					Ω(session).To(gbytes.Say("Bad bad error"))
-					Ω(session.ExitCode()).To(Equal(1))
+					Expect(err).NotTo(HaveOccurred())
+					Expect(session).To(gbytes.Say("FAILED"))
+					Expect(session).To(gbytes.Say("Bad bad error"))
+					Expect(session.ExitCode()).To(Equal(1))
 				})
 
 				Context("when getting a list of apps", func() {
@@ -118,10 +118,10 @@ var _ = Describe("App-Lister", func() {
 							args := []string{ts.Port(), "list-apps"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
-							Ω(err).NotTo(HaveOccurred())
-							Ω(session).To(gbytes.Say("app1"))
-							Ω(session).To(gbytes.Say("app2"))
-							Ω(session).To(gbytes.Say("app3"))
+							Expect(err).NotTo(HaveOccurred())
+							Expect(session).To(gbytes.Say("app1"))
+							Expect(session).To(gbytes.Say("app2"))
+							Expect(session).To(gbytes.Say("app3"))
 						})
 					})
 
@@ -135,10 +135,10 @@ var _ = Describe("App-Lister", func() {
 							args := []string{ts.Port(), "list-apps", "--started"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
-							Ω(err).NotTo(HaveOccurred())
-							Ω(session).To(gbytes.Say("app1"))
-							Ω(session).To(gbytes.Say("app2"))
-							Ω(session).ToNot(gbytes.Say("app3"))
+							Expect(err).NotTo(HaveOccurred())
+							Expect(session).To(gbytes.Say("app1"))
+							Expect(session).To(gbytes.Say("app2"))
+							Expect(session).NotTo(gbytes.Say("app3"))
 						})
 					})
 
@@ -152,10 +152,10 @@ var _ = Describe("App-Lister", func() {
 							args := []string{ts.Port(), "list-apps", "--stopped"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
-							Ω(err).NotTo(HaveOccurred())
-							Ω(session).ToNot(gbytes.Say("app1"))
-							Ω(session).ToNot(gbytes.Say("app2"))
-							Ω(session).To(gbytes.Say("app3"))
+							Expect(err).NotTo(HaveOccurred())
+							Expect(session).NotTo(gbytes.Say("app1"))
+							Expect(session).NotTo(gbytes.Say("app2"))
+							Expect(session).To(gbytes.Say("app3"))
 						})
 					})
 
@@ -168,9 +168,9 @@ var _ = Describe("App-Lister", func() {
 							args := []string{ts.Port(), "list-apps", "--stopped"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
-							Ω(err).NotTo(HaveOccurred())
-							Ω(session).To(gbytes.Say("FAILED"))
-							Ω(session).To(gbytes.Say("something went wrong"))
+							Expect(err).NotTo(HaveOccurred())
+							Expect(session).To(gbytes.Say("FAILED"))
+							Expect(session).To(gbytes.Say("something went wrong"))
 						})
 					})
 
@@ -195,25 +195,25 @@ var _ = Describe("App-Lister", func() {
 							args := []string{ts.Port(), "list-apps"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
-							Ω(err).NotTo(HaveOccurred())
-							Ω(rpcHandlers.CallCoreCommandCallCount()).To(Equal(2))
+							Expect(err).NotTo(HaveOccurred())
+							Expect(rpcHandlers.CallCoreCommandCallCount()).To(Equal(2))
 
 							params, _ := rpcHandlers.CallCoreCommandArgsForCall(0)
-							Ω(params[1]).To(Equal("v2/apps"))
+							Expect(params[1]).To(Equal("v2/apps"))
 
 							params, _ = rpcHandlers.CallCoreCommandArgsForCall(1)
-							Ω(params[1]).To(Equal("v2/apps?page=2"))
+							Expect(params[1]).To(Equal("v2/apps?page=2"))
 						})
 
 						It("traverses through all pages and list all the apps", func() {
 							args := []string{ts.Port(), "list-apps"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
-							Ω(err).NotTo(HaveOccurred())
-							Ω(session).To(gbytes.Say("app1"))
-							Ω(session).To(gbytes.Say("app2"))
-							Ω(session).To(gbytes.Say("app3"))
-							Ω(session).To(gbytes.Say("app4"))
+							Expect(err).NotTo(HaveOccurred())
+							Expect(session).To(gbytes.Say("app1"))
+							Expect(session).To(gbytes.Say("app2"))
+							Expect(session).To(gbytes.Say("app3"))
+							Expect(session).To(gbytes.Say("app4"))
 						})
 					})
 				})
@@ -242,7 +242,7 @@ func sampleApps() AppsModel {
 
 func marshal(apps AppsModel) string {
 	b, err := json.Marshal(apps)
-	Ω(err).ToNot(HaveOccurred())
+	Expect(err).NotTo(HaveOccurred())
 
 	return string(b)
 }

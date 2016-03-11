@@ -616,13 +616,13 @@ var _ = Describe("Push Command", func() {
 				It("shows error if value is not 'port' or none'", func() {
 					callPush("app-name", "-u", "bad-value")
 
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
 				})
 
 				It("does not show error if value is 'port' or none'", func() {
 					callPush("app-name", "--health-check-type", "port")
 
-					Ω(ui.Outputs).ToNot(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
+					Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
 				})
 			})
 

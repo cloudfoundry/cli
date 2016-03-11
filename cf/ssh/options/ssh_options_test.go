@@ -34,7 +34,7 @@ var _ = Describe("SSHOptions", func() {
 
 		JustBeforeEach(func() {
 			err := fc.Parse(args...)
-			Ω(err).ToNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			opts, parseError = options.NewSSHOptions(fc)
 		})

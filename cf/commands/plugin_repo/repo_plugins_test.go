@@ -60,10 +60,10 @@ var _ = Describe("repo-plugins", func() {
 		It("list plugins from just the named repo", func() {
 			callRepoPlugins("-r", "repo2")
 
-			Ω(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo2"))
-			Ω(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(1))
+			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo2"))
+			Expect(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(1))
 
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from repository 'repo2'"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from repository 'repo2'"}))
 		})
 	})
 
@@ -71,11 +71,11 @@ var _ = Describe("repo-plugins", func() {
 		It("list plugins from just the named repo", func() {
 			callRepoPlugins()
 
-			Ω(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo1"))
-			Ω(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(2))
-			Ω(fakePluginRepo.GetPluginsArgsForCall(0)[1].Name).To(Equal("repo2"))
+			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo1"))
+			Expect(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(2))
+			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[1].Name).To(Equal("repo2"))
 
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from all repositories"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from all repositories"}))
 		})
 	})
 
@@ -98,11 +98,11 @@ var _ = Describe("repo-plugins", func() {
 
 			callRepoPlugins()
 
-			Ω(ui.Outputs).ToNot(ContainSubstrings([]string{"Logged errors:"}))
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"repo1"}))
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin1"}))
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"repo2"}))
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin2"}))
+			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"Logged errors:"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"repo1"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"plugin1"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"repo2"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"plugin2"}))
 		})
 	})
 
@@ -115,9 +115,9 @@ var _ = Describe("repo-plugins", func() {
 
 			callRepoPlugins()
 
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"Logged errors:"}))
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"error from repo1"}))
-			Ω(ui.Outputs).To(ContainSubstrings([]string{"error from repo2"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"Logged errors:"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"error from repo1"}))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"error from repo2"}))
 		})
 	})
 

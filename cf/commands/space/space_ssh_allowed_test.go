@@ -42,13 +42,14 @@ var _ = Describe("space-ssh-allowed command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
-			Ω(ui.Outputs).Should(ContainSubstrings(
+			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
+
 		})
 
 		It("fails requirements when not logged in", func() {
-			Ω(runCommand("my-space")).To(BeFalse())
+			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("does not pass requirements if org is not targeted", func() {
@@ -86,7 +87,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 				runCommand("the-space-name")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is enabled in space 'the-space-name'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is enabled in space 'the-space-name'"}))
 			})
 		})
 
@@ -96,7 +97,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 				runCommand("the-space-name")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is disabled in space 'the-space-name'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is disabled in space 'the-space-name'"}))
 			})
 		})
 	})

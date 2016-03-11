@@ -49,13 +49,14 @@ var _ = Describe("allow-space-ssh command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
-			Ω(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
+
 		})
 
 		It("fails requirements when not logged in", func() {
-			Ω(runCommand("my-space")).To(BeFalse())
+			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("does not pass requirements if org is not targeted", func() {
@@ -95,7 +96,7 @@ var _ = Describe("allow-space-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("the-space-name")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already enabled in space 'the-space-name'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already enabled in space 'the-space-name'"}))
 			})
 		})
 
@@ -109,12 +110,12 @@ var _ = Describe("allow-space-ssh command", func() {
 				It("updates the space's allow_ssh", func() {
 					runCommand("the-space-name")
 
-					Ω(spaceRepo.SetAllowSSHCallCount()).To(Equal(1))
+					Expect(spaceRepo.SetAllowSSHCallCount()).To(Equal(1))
 					spaceGUID, allow := spaceRepo.SetAllowSSHArgsForCall(0)
-					Ω(spaceGUID).To(Equal("the-space-guid"))
-					Ω(allow).To(Equal(true))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Enabling ssh support for space 'the-space-name'"}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(spaceGUID).To(Equal("the-space-guid"))
+					Expect(allow).To(Equal(true))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Enabling ssh support for space 'the-space-name'"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 			})
 
@@ -123,10 +124,11 @@ var _ = Describe("allow-space-ssh command", func() {
 					spaceRepo.SetAllowSSHReturns(errors.New("api error"))
 					runCommand("the-space-name")
 
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error", "api error"},
 					))
+
 				})
 			})
 

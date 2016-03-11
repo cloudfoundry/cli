@@ -142,8 +142,8 @@ var _ = Describe("Install", func() {
 				Context("when repo is not found in config", func() {
 					It("informs user repo is not found", func() {
 						runCommand("plugin1", "-r", "repo1", "-f")
-						Ω(ui.Outputs).To(ContainSubstrings([]string{"Looking up 'plugin1' from repository 'repo1'"}))
-						Ω(ui.Outputs).To(ContainSubstrings([]string{"repo1 not found"}))
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"Looking up 'plugin1' from repository 'repo1'"}))
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"repo1 not found"}))
 					})
 				})
 
@@ -154,8 +154,8 @@ var _ = Describe("Install", func() {
 							fakePluginRepo.GetPluginsReturns(nil, []string{"repo error1"})
 							runCommand("plugin1", "-r", "repo1", "-f")
 
-							Ω(ui.Outputs).To(ContainSubstrings([]string{"Error getting plugin metadata from repo"}))
-							Ω(ui.Outputs).To(ContainSubstrings([]string{"repo error1"}))
+							Expect(ui.Outputs).To(ContainSubstrings([]string{"Error getting plugin metadata from repo"}))
+							Expect(ui.Outputs).To(ContainSubstrings([]string{"repo error1"}))
 						})
 					})
 
@@ -165,7 +165,7 @@ var _ = Describe("Install", func() {
 							fakePluginRepo.GetPluginsReturns(nil, nil)
 							runCommand("plugin1", "-r", "repo1", "-f")
 
-							Ω(ui.Outputs).To(ContainSubstrings([]string{"plugin1 is not available in repo 'repo1'"}))
+							Expect(ui.Outputs).To(ContainSubstrings([]string{"plugin1 is not available in repo 'repo1'"}))
 						})
 					})
 
@@ -174,7 +174,7 @@ var _ = Describe("Install", func() {
 						fakePluginRepo.GetPluginsReturns(nil, nil)
 						runCommand("plugin1", "-r", "REPO1", "-f")
 
-						Ω(ui.Outputs).NotTo(ContainSubstrings([]string{"REPO1 not found"}))
+						Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"REPO1 not found"}))
 					})
 				})
 			})
@@ -192,7 +192,7 @@ var _ = Describe("Install", func() {
 						fakePluginRepo.GetPluginsReturns(result, nil)
 						runCommand("plugin1", "-r", "repo1", "-f")
 
-						Ω(ui.Outputs).To(ContainSubstrings([]string{"Plugin requested has no binary available"}))
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"Plugin requested has no binary available"}))
 					})
 				})
 
@@ -248,25 +248,26 @@ var _ = Describe("Install", func() {
 
 					It("performs sha1 checksum validation on the downloaded binary", func() {
 						runCommand("plugin1", "-r", "repo1", "-f")
-						Ω(fakeChecksum.CheckSha1CallCount()).To(Equal(1))
+						Expect(fakeChecksum.CheckSha1CallCount()).To(Equal(1))
 					})
 
 					It("reports error downloaded file's sha1 does not match the sha1 in metadata", func() {
 						fakeChecksum.CheckSha1Returns(false)
 
 						runCommand("plugin1", "-r", "repo1", "-f")
-						Ω(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
 							[]string{"checksum does not match"},
 						))
+
 					})
 
 					It("downloads and installs binary when it is available and checksum matches", func() {
 						runCommand("plugin1", "-r", "repo1", "-f")
 
-						Ω(ui.Outputs).To(ContainSubstrings([]string{"4 bytes downloaded..."}))
-						Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-						Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"4 bytes downloaded..."}))
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+						Expect(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
 					})
 				})
 			})
@@ -305,9 +306,9 @@ var _ = Describe("Install", func() {
 
 					runCommand(testServer.URL+"/testfile.exe", "-f")
 
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"3 bytes downloaded..."}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Installing plugin"}))
 				})
 			})
 

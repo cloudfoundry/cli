@@ -54,9 +54,9 @@ var _ = Describe("delte-plugin-repo", func() {
 
 		It("deletes the repo from the config", func() {
 			callRemovePluginRepo("repo1")
-			Ω(len(config.PluginRepos())).To(Equal(1))
-			Ω(config.PluginRepos()[0].Name).To(Equal("repo2"))
-			Ω(config.PluginRepos()[0].Url).To(Equal("http://server2.org:8080"))
+			Expect(len(config.PluginRepos())).To(Equal(1))
+			Expect(config.PluginRepos()[0].Name).To(Equal("repo2"))
+			Expect(config.PluginRepos()[0].Url).To(Equal("http://server2.org:8080"))
 		})
 	})
 
@@ -76,10 +76,10 @@ var _ = Describe("delte-plugin-repo", func() {
 		It("doesn't change the config the config", func() {
 			callRemovePluginRepo("fake-repo")
 
-			Ω(len(config.PluginRepos())).To(Equal(2))
-			Ω(config.PluginRepos()[0].Name).To(Equal("repo1"))
-			Ω(config.PluginRepos()[0].Url).To(Equal("http://someserver1.com:1234"))
-			Ω(ui.Outputs).Should(ContainSubstrings([]string{"fake-repo", "does not exist as a repo"}))
+			Expect(len(config.PluginRepos())).To(Equal(2))
+			Expect(config.PluginRepos()[0].Name).To(Equal("repo1"))
+			Expect(config.PluginRepos()[0].Url).To(Equal("http://someserver1.com:1234"))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"fake-repo", "does not exist as a repo"}))
 		})
 	})
 })

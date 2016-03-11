@@ -43,19 +43,20 @@ var _ = Describe("disable-ssh command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
-			Ω(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
+
 		})
 
 		It("fails requirements when not logged in", func() {
-			Ω(runCommand("my-app", "none")).To(BeFalse())
+			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 
 		It("fails if a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = false
-			Ω(runCommand("my-app", "none")).To(BeFalse())
+			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 	})
 
@@ -82,7 +83,7 @@ var _ = Describe("disable-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is enabled for 'my-app'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is enabled for 'my-app'"}))
 			})
 		})
 
@@ -95,7 +96,7 @@ var _ = Describe("disable-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is disabled for 'my-app'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is disabled for 'my-app'"}))
 			})
 		})
 

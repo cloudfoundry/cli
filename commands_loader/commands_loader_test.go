@@ -17,7 +17,7 @@ var _ = Describe("CommandsLoader", func() {
 		commands_loader.Load()
 
 		count := walkDirAndCountCommand("../cf/commands")
-		Ω(command_registry.Commands.TotalCommands()).To(Equal(count))
+		Expect(command_registry.Commands.TotalCommands()).To(Equal(count))
 	})
 })
 

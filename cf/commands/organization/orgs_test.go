@@ -102,10 +102,10 @@ var _ = Describe("orgs command", func() {
 
 		It("populates the plugin models upon execution", func() {
 			testcmd.RunCliCommand("orgs", []string{}, requirementsFactory, updateCommandDependency, true)
-			Ω(pluginOrgsModel[0].Name).To(Equal("Organization-1"))
-			Ω(pluginOrgsModel[0].Guid).To(Equal("org-1-guid"))
-			Ω(pluginOrgsModel[1].Name).To(Equal("Organization-2"))
-			Ω(pluginOrgsModel[2].Name).To(Equal("Organization-3"))
+			Expect(pluginOrgsModel[0].Name).To(Equal("Organization-1"))
+			Expect(pluginOrgsModel[0].Guid).To(Equal("org-1-guid"))
+			Expect(pluginOrgsModel[1].Name).To(Equal("Organization-2"))
+			Expect(pluginOrgsModel[2].Name).To(Equal("Organization-3"))
 		})
 	})
 
