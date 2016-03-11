@@ -676,10 +676,6 @@
     "translation": "Hostname for the HTTP route (required for shared domains)"
   },
   {
-    "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
-    "translation": "Incorrect Usage. No argument required\n\n{{.Usage}}"
-  },
-  {
     "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
     "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n"
   },

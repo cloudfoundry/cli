@@ -38,13 +38,15 @@ func (c *V3Apps) MetaData() command_registry.CommandMetadata {
 }
 
 func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 0 {
-		c.ui.Failed(T("Incorrect Usage. No argument required\n\n{{.Usage}}", map[string]interface{}{
-			"Usage": command_registry.Commands.CommandUsage("v3apps"),
-		}))
-	}
+	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(c),
+		T("No argument required"),
+		func() bool {
+			return len(fc.Args()) != 0
+		},
+	)
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}

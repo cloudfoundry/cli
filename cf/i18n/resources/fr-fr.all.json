@@ -2380,10 +2380,6 @@
     "translation": "Syntaxe incorrecte. Le type de diagnostic d'intégrité doit avoir pour valeur \"port\" ou \"none\"\\n\\n"
   },
   {
-    "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
-    "translation": ""
-  },
-  {
     "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
     "translation": "Syntaxe incorrecte. Requiert 'app-name env-name env-value' comme arguments\n\n"
   },
