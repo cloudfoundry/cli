@@ -2364,6 +2364,10 @@
     "translation": "在输出中包含响应头"
   },
   {
+    "id": "Incorrect Usage",
+    "translation": "用法不正确"
+  },
+  {
     "id": "Incorrect Usage\n\n",
     "translation": "用法不正确\n\n"
   },

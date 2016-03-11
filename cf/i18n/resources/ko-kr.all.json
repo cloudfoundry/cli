@@ -2364,6 +2364,10 @@
     "translation": "출력에 응답 헤더 포함"
   },
   {
+    "id": "Incorrect Usage",
+    "translation": "올바르지 않은 사용법"
+  },
+  {
     "id": "Incorrect Usage\n\n",
     "translation": "올바르지 않은 사용법\n\n"
   },

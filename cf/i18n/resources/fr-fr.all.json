@@ -2364,6 +2364,10 @@
     "translation": "Inclure les en-têtes de réponse dans la sortie "
   },
   {
+    "id": "Incorrect Usage",
+    "translation": "Syntaxe incorrecte"
+  },
+  {
     "id": "Incorrect Usage\n\n",
     "translation": "Syntaxe incorrecte\n\n"
   },

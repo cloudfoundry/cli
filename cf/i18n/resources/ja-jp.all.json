@@ -2364,6 +2364,10 @@
     "translation": "応答ヘッダーを出力に組み込みます"
   },
   {
+    "id": "Incorrect Usage",
+    "translation": "誤った使用法"
+  },
+  {
     "id": "Incorrect Usage\n\n",
     "translation": "誤った使用法\n\n"
   },
