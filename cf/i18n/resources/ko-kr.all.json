@@ -2380,10 +2380,6 @@
     "translation": "올바르지 않은 사용법입니다. HEALTH_CHECK_TYPE은 \"port\" 또는 \"none\"이어야 합니다.\\n\\n"
   },
   {
-    "id": "Incorrect Usage. No argument required\n\n{{.Usage}}",
-    "translation": ""
-  },
-  {
     "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
     "translation": "올바르지 않은 사용법입니다. 인수로 'app-name env-name env-value'가 필요합니다.\n\n"
   },

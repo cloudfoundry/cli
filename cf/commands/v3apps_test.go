@@ -14,6 +14,7 @@ import (
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	"github.com/cloudfoundry/cli/cf/v3/models"
 	fakerepository "github.com/cloudfoundry/cli/cf/v3/repository/fakes"
+	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -82,19 +83,15 @@ var _ = Describe("V3Apps", func() {
 			Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 		})
 
-		Context("when not provided exactly zero args", func() {
-			BeforeEach(func() {
-				flagContext.Parse("extra-arg")
-			})
+		It("should fail with usage", func() {
+			flagContext.Parse("blahblah")
 
-			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Incorrect Usage. No argument required"},
-					[]string{"NAME"},
-					[]string{"USAGE"},
-				))
-			})
+			reqs := cmd.Requirements(factory, flagContext)
+
+			err := testcmd.RunRequirements(reqs)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
+			Expect(err.Error()).To(ContainSubstring("No argument required"))
 		})
 	})
 
