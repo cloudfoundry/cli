@@ -2364,6 +2364,10 @@
     "translation": "Incluir cabeceras de respuesta en la salida"
   },
   {
+    "id": "Incorrect Usage",
+    "translation": "Uso incorrecto"
+  },
+  {
     "id": "Incorrect Usage\n\n",
     "translation": "Uso incorrecto\n\n"
   },

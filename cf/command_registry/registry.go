@@ -112,31 +112,46 @@ func (r *registry) Metadatas() []CommandMetadata {
 }
 
 func (r *registry) CommandUsage(cmdName string) string {
-	output := ""
 	cmd := r.FindCommand(cmdName)
 
-	output = T("NAME") + ":" + "\n"
-	output += "   " + cmd.MetaData().Name + " - " + cmd.MetaData().Description + "\n\n"
+	return CliCommandUsagePresenter(cmd).Usage()
+}
+
+type usagePresenter struct {
+	cmd Command
+}
+
+func CliCommandUsagePresenter(cmd Command) *usagePresenter {
+	return &usagePresenter{
+		cmd: cmd,
+	}
+}
+
+func (u *usagePresenter) Usage() string {
+	metadata := u.cmd.MetaData()
+
+	output := T("NAME") + ":" + "\n"
+	output += "   " + metadata.Name + " - " + metadata.Description + "\n\n"
 
 	output += T("USAGE") + ":" + "\n"
-	output += "   " + strings.Replace(strings.Join(cmd.MetaData().Usage, ""), "CF_NAME", cf.Name, -1) + "\n"
+	output += "   " + strings.Replace(strings.Join(metadata.Usage, ""), "CF_NAME", cf.Name, -1) + "\n"
 
-	if len(cmd.MetaData().Examples) > 0 {
+	if len(metadata.Examples) > 0 {
 		output += "\n"
 		output += fmt.Sprintf("%s:\n", T("EXAMPLES"))
-		for _, e := range cmd.MetaData().Examples {
+		for _, e := range metadata.Examples {
 			output += fmt.Sprintf("   %s\n", strings.Replace(e, "CF_NAME", cf.Name, -1))
 		}
 	}
 
-	if cmd.MetaData().ShortName != "" {
+	if metadata.ShortName != "" {
 		output += "\n" + T("ALIAS") + ":" + "\n"
-		output += "   " + cmd.MetaData().ShortName + "\n"
+		output += "   " + metadata.ShortName + "\n"
 	}
 
-	if cmd.MetaData().Flags != nil {
+	if metadata.Flags != nil {
 		output += "\n" + T("OPTIONS") + ":" + "\n"
-		output += flags.NewFlagContext(cmd.MetaData().Flags).ShowUsage(3)
+		output += flags.NewFlagContext(metadata.Flags).ShowUsage(3)
 	}
 
 	return output
