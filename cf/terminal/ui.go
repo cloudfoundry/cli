@@ -142,20 +142,23 @@ func (ui *terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 
 	if T == nil {
-		ui.Say(FailureColor("FAILED"))
-		ui.Say(message)
-
-		ui.logger.Print("FAILED")
-		ui.logger.Print(message)
-		ui.PanicQuietly()
+		if ui.logger.IsEnabled() {
+			ui.logger.Print("FAILED")
+			ui.logger.Print(message)
+		} else {
+			ui.Say(FailureColor("FAILED"))
+			ui.Say(message)
+		}
 	} else {
-		ui.Say(FailureColor(T("FAILED")))
-		ui.Say(message)
-
-		ui.logger.Print(T("FAILED"))
-		ui.logger.Print(message)
-		ui.PanicQuietly()
+		if ui.logger.IsEnabled() {
+			ui.logger.Print(T("FAILED"))
+			ui.logger.Print(message)
+		} else {
+			ui.Say(FailureColor(T("FAILED")))
+			ui.Say(message)
+		}
 	}
+	ui.PanicQuietly()
 }
 
 func (ui *terminalUI) PanicQuietly() {
