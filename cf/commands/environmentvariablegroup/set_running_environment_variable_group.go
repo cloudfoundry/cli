@@ -32,7 +32,7 @@ func (cmd *SetRunningEnvironmentVariableGroup) MetaData() command_registry.Comma
 	}
 }
 
-func (cmd *SetRunningEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *SetRunningEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("set-running-environment-variable-group"))
 	}
@@ -40,7 +40,7 @@ func (cmd *SetRunningEnvironmentVariableGroup) Requirements(requirementsFactory 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *SetRunningEnvironmentVariableGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

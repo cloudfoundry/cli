@@ -87,15 +87,13 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a TargetedSpaceRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 			})
@@ -107,8 +105,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 
@@ -125,8 +122,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("service-instance")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("tells the user it will create the user provided service", func() {

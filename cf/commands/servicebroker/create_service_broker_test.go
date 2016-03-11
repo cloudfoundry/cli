@@ -84,8 +84,7 @@ var _ = Describe("CreateServiceBroker", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
@@ -97,15 +96,13 @@ var _ = Describe("CreateServiceBroker", func() {
 			})
 
 			It("returns a TargetedSpaceRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
 		})
@@ -115,8 +112,7 @@ var _ = Describe("CreateServiceBroker", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("service-broker", "username", "password", "url")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("tells the user it is creating the service broker", func() {

@@ -31,7 +31,7 @@ func (cmd *UpdateServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 	}
 }
 
-func (cmd *UpdateServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *UpdateServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + command_registry.Commands.CommandUsage("update-service-auth-token"))
 	}
@@ -46,7 +46,7 @@ func (cmd *UpdateServiceAuthTokenFields) Requirements(requirementsFactory requir
 		requirementsFactory.NewMaxAPIVersionRequirement("update-service-auth-token", maximumVersion),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *UpdateServiceAuthTokenFields) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

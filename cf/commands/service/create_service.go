@@ -81,7 +81,7 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *CreateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires service, service plan, service instance as arguments\n\n") + command_registry.Commands.CommandUsage("create-service"))
 	}
@@ -91,7 +91,7 @@ func (cmd *CreateService) Requirements(requirementsFactory requirements.Factory,
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *CreateService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

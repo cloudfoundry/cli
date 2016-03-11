@@ -44,7 +44,7 @@ func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("map-route"))
 	}
@@ -72,7 +72,7 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 		cmd.domainReq,
 	}...)
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *MapRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

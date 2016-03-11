@@ -96,15 +96,13 @@ var _ = Describe("DeleteRoute", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a DomainRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
 
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
@@ -118,8 +116,7 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("returns a MinAPIVersionRequirement as the first requirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 
 					expectedVersion, err := semver.Make("2.36.0")
 					Expect(err).NotTo(HaveOccurred())
@@ -138,8 +135,7 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("does not return a MinAPIVersionRequirement", func() {
-					actualRequirements, err := cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
@@ -151,8 +147,7 @@ var _ = Describe("DeleteRoute", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("domain-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("asks the user if they would like to proceed", func() {
@@ -182,8 +177,7 @@ var _ = Describe("DeleteRoute", func() {
 				BeforeEach(func() {
 					err := flagContext.Parse("domain-name", "-f", "--path", "the-path")
 					Expect(err).NotTo(HaveOccurred())
-					_, err = cmd.Requirements(factory, flagContext)
-					Expect(err).NotTo(HaveOccurred())
+					cmd.Requirements(factory, flagContext)
 				})
 
 				It("tries to find the route with the path", func() {

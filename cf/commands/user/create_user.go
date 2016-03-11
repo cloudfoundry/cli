@@ -32,7 +32,7 @@ func (cmd *CreateUser) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *CreateUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		usage := command_registry.Commands.CommandUsage("create-user")
 		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + usage)
@@ -42,7 +42,7 @@ func (cmd *CreateUser) Requirements(requirementsFactory requirements.Factory, fc
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *CreateUser) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

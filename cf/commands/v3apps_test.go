@@ -69,16 +69,14 @@ var _ = Describe("V3Apps", func() {
 
 	Describe("Requirements", func() {
 		It("returns a LoginRequirement", func() {
-			actualRequirements, err := cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			actualRequirements := cmd.Requirements(factory, flagContext)
 			Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 			Expect(actualRequirements).To(ContainElement(loginRequirement))
 		})
 
 		It("returns a TargetedSpaceRequirement", func() {
-			actualRequirements, err := cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			actualRequirements := cmd.Requirements(factory, flagContext)
 			Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 
 			Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
@@ -102,8 +100,7 @@ var _ = Describe("V3Apps", func() {
 
 	Describe("Execute", func() {
 		BeforeEach(func() {
-			_, err := cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 			repository.GetProcessesReturns([]models.V3Process{{Type: "web"}, {Type: "web"}}, nil)
 			repository.GetRoutesReturns([]models.V3Route{{}, {}}, nil)
 		})

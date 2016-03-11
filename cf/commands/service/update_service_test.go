@@ -100,8 +100,7 @@ var _ = Describe("update-service command", func() {
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
 				fc.Parse("potato", "-p", "plan-name")
 
-				reqs, err := cmd.Requirements(requirementsFactory, fc)
-				Expect(err).NotTo(HaveOccurred())
+				reqs := cmd.Requirements(requirementsFactory, fc)
 				Expect(reqs).NotTo(BeEmpty())
 
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Updating a plan"))
@@ -114,8 +113,7 @@ var _ = Describe("update-service command", func() {
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
 				fc.Parse("potato")
 
-				reqs, err := cmd.Requirements(requirementsFactory, fc)
-				Expect(err).NotTo(HaveOccurred())
+				reqs := cmd.Requirements(requirementsFactory, fc)
 				Expect(reqs).NotTo(BeEmpty())
 
 				var s semver.Version

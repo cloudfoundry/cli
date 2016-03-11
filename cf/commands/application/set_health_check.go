@@ -35,7 +35,7 @@ func (cmd *SetHealthCheck) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n") + command_registry.Commands.CommandUsage("set-health-check"))
 	}
@@ -52,7 +52,7 @@ func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory
 		cmd.appReq,
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *SetHealthCheck) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

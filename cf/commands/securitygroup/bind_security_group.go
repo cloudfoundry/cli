@@ -40,14 +40,14 @@ func (cmd *BindSecurityGroup) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + command_registry.Commands.CommandUsage("bind-security-group"))
 	}
 
 	reqs := []requirements.Requirement{}
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *BindSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

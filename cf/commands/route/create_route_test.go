@@ -101,8 +101,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a SpaceRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewSpaceRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewSpaceRequirementArgsForCall(0)).To(Equal("space-name"))
 
@@ -110,8 +109,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a DomainRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 
@@ -129,8 +127,7 @@ var _ = Describe("CreateRoute", func() {
 				expectedVersion, err := semver.Make("2.36.0")
 				Expect(err).NotTo(HaveOccurred())
 
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
@@ -147,8 +144,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
@@ -165,8 +161,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
@@ -183,8 +178,7 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements, err := cmd.Requirements(factory, flagContext)
-				Expect(err).NotTo(HaveOccurred())
+				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
 		})
@@ -269,8 +263,7 @@ var _ = Describe("CreateRoute", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("space-name", "domain-name")
 			Expect(err).NotTo(HaveOccurred())
-			_, err = cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("attempts to create a route in the space", func() {

@@ -102,10 +102,7 @@ func main() {
 		cmdRegistry.SetCommand(cmd)
 
 		requirementsFactory := requirements.NewFactory(deps.Config, deps.RepoLocator)
-		reqs, err := cmd.Requirements(requirementsFactory, flagContext)
-		if err != nil {
-			deps.Ui.Failed(err.Error())
-		}
+		reqs := cmd.Requirements(requirementsFactory, flagContext)
 
 		for _, req := range reqs {
 			err = req.Execute()

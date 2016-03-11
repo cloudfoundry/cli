@@ -43,7 +43,7 @@ func (cmd *ServiceKey) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *ServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *ServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n") + command_registry.Commands.CommandUsage("service-key"))
 	}
@@ -53,7 +53,7 @@ func (cmd *ServiceKey) Requirements(requirementsFactory requirements.Factory, fc
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
 	reqs := []requirements.Requirement{loginRequirement, cmd.serviceInstanceRequirement, targetSpaceRequirement}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *ServiceKey) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

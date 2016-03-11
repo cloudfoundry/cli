@@ -62,9 +62,9 @@ func (cmd *Login) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Login) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *Login) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	reqs := []requirements.Requirement{}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *Login) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

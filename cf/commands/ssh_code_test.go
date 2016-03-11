@@ -64,8 +64,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 	Describe("Requirements", func() {
 		It("returns an EndpointRequirement", func() {
-			actualRequirements, err := cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			actualRequirements := cmd.Requirements(factory, flagContext)
 			Expect(factory.NewApiEndpointRequirementCallCount()).To(Equal(1))
 			Expect(actualRequirements).To(ContainElement(endpointRequirement))
 		})
@@ -87,8 +86,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 	Describe("Execute", func() {
 		BeforeEach(func() {
-			_, err := cmd.Requirements(factory, flagContext)
-			Expect(err).NotTo(HaveOccurred())
+			cmd.Requirements(factory, flagContext)
 		})
 
 		It("tries to update the endpoint", func() {

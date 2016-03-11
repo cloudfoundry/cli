@@ -31,7 +31,7 @@ func (cmd *StagingEnvironmentVariableGroup) MetaData() command_registry.CommandM
 	}
 }
 
-func (cmd *StagingEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *StagingEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 0 {
 		cmd.ui.Failed(T("Incorrect Usage. No argument required\n\n") + command_registry.Commands.CommandUsage("staging-environment-variable-group"))
 	}
@@ -39,7 +39,7 @@ func (cmd *StagingEnvironmentVariableGroup) Requirements(requirementsFactory req
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *StagingEnvironmentVariableGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

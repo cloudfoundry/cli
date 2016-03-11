@@ -36,7 +36,7 @@ func (cmd *bindToRunningGroup) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *bindToRunningGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *bindToRunningGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("bind-running-security-group"))
 	}
@@ -44,7 +44,7 @@ func (cmd *bindToRunningGroup) Requirements(requirementsFactory requirements.Fac
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *bindToRunningGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

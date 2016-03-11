@@ -36,10 +36,7 @@ func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.F
 			panic(errMsg)
 		}
 	}()
-	requirements, err := cmd.Requirements(requirementsFactory, context)
-	if err != nil {
-		return false
-	}
+	requirements := cmd.Requirements(requirementsFactory, context)
 
 	for _, requirement := range requirements {
 		if err = requirement.Execute(); err != nil {
@@ -72,11 +69,7 @@ func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsF
 		}
 	}()
 
-	requirements, err := cmd.Requirements(requirementsFactory, context)
-
-	if err != nil {
-		return false
-	}
+	requirements := cmd.Requirements(requirementsFactory, context)
 
 	for _, requirement := range requirements {
 		if err = requirement.Execute(); err != nil {

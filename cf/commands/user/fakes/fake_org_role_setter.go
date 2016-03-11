@@ -26,7 +26,7 @@ type FakeOrgRoleSetter struct {
 	setDependencyReturns struct {
 		result1 command_registry.Command
 	}
-	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error)
+	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
 	requirementsMutex       sync.RWMutex
 	requirementsArgsForCall []struct {
 		requirementsFactory requirements.Factory
@@ -34,7 +34,6 @@ type FakeOrgRoleSetter struct {
 	}
 	requirementsReturns struct {
 		result1 []requirements.Requirement
-		result2 error
 	}
 	ExecuteStub        func(context flags.FlagContext)
 	executeMutex       sync.RWMutex
@@ -111,7 +110,7 @@ func (fake *FakeOrgRoleSetter) SetDependencyReturns(result1 command_registry.Com
 	}{result1}
 }
 
-func (fake *FakeOrgRoleSetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) (reqs []requirements.Requirement, err error) {
+func (fake *FakeOrgRoleSetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
@@ -121,7 +120,7 @@ func (fake *FakeOrgRoleSetter) Requirements(requirementsFactory requirements.Fac
 	if fake.RequirementsStub != nil {
 		return fake.RequirementsStub(requirementsFactory, context)
 	} else {
-		return fake.requirementsReturns.result1, fake.requirementsReturns.result2
+		return fake.requirementsReturns.result1
 	}
 }
 
@@ -137,12 +136,11 @@ func (fake *FakeOrgRoleSetter) RequirementsArgsForCall(i int) (requirements.Fact
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeOrgRoleSetter) RequirementsReturns(result1 []requirements.Requirement, result2 error) {
+func (fake *FakeOrgRoleSetter) RequirementsReturns(result1 []requirements.Requirement) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
 func (fake *FakeOrgRoleSetter) Execute(context flags.FlagContext) {

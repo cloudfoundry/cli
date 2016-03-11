@@ -41,7 +41,7 @@ func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata 
 	}
 }
 
-func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 5 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n") + command_registry.Commands.CommandUsage("migrate-service-instances"))
 	}
@@ -56,7 +56,7 @@ func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirement
 		requirementsFactory.NewMaxAPIVersionRequirement("migrate-service-instances", maximumVersion),
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *MigrateServiceInstances) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

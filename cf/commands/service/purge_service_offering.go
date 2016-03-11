@@ -38,7 +38,7 @@ func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-offering"))
 	}
@@ -55,7 +55,7 @@ func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.F
 		reqs = append(reqs, requirementsFactory.NewMaxAPIVersionRequirement("Option '-p'", maximumVersion))
 	}
 
-	return reqs, nil
+	return reqs
 }
 
 func (cmd *PurgeServiceOffering) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {

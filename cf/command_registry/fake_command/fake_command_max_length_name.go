@@ -19,8 +19,8 @@ func (cmd FakeCommand3) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd FakeCommand3) Requirements(_ requirements.Factory, _ flags.FlagContext) (reqs []requirements.Requirement, err error) {
-	return
+func (cmd FakeCommand3) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
+	return []requirements.Requirement{}
 }
 
 func (cmd FakeCommand3) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
