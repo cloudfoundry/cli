@@ -61,8 +61,8 @@ var _ = Describe("PluginRepo", func() {
 				},
 			})
 
-			Ω(testServer1CallCount).To(Equal(1))
-			Ω(testServer2CallCount).To(Equal(1))
+			Expect(testServer1CallCount).To(Equal(1))
+			Expect(testServer2CallCount).To(Equal(1))
 		})
 
 		It("lists each of the repos in config.json", func() {
@@ -77,8 +77,8 @@ var _ = Describe("PluginRepo", func() {
 				},
 			})
 
-			Ω(list["repo1"]).ToNot(BeNil())
-			Ω(list["repo2"]).ToNot(BeNil())
+			Expect(list["repo1"]).NotTo(BeNil())
+			Expect(list["repo2"]).NotTo(BeNil())
 		})
 
 	})
@@ -128,15 +128,15 @@ var _ = Describe("PluginRepo", func() {
 					},
 				})
 
-				Ω(list["repo1"]).ToNot(BeNil())
-				Ω(len(list["repo1"])).To(Equal(2))
+				Expect(list["repo1"]).NotTo(BeNil())
+				Expect(len(list["repo1"])).To(Equal(2))
 
-				Ω(list["repo1"][0].Name).To(Equal("plugin1"))
-				Ω(list["repo1"][0].Description).To(Equal("none"))
-				Ω(list["repo1"][0].Version).To(Equal("1.3.4"))
-				Ω(list["repo1"][0].Binaries[0].Platform).To(Equal("osx"))
-				Ω(list["repo1"][1].Name).To(Equal("plugin2"))
-				Ω(list["repo1"][1].Binaries[0].Platform).To(Equal("windows"))
+				Expect(list["repo1"][0].Name).To(Equal("plugin1"))
+				Expect(list["repo1"][0].Description).To(Equal("none"))
+				Expect(list["repo1"][0].Version).To(Equal("1.3.4"))
+				Expect(list["repo1"][0].Binaries[0].Platform).To(Equal("osx"))
+				Expect(list["repo1"][1].Name).To(Equal("plugin2"))
+				Expect(list["repo1"][1].Binaries[0].Platform).To(Equal("windows"))
 			})
 
 		})
@@ -163,9 +163,10 @@ var _ = Describe("PluginRepo", func() {
 					},
 				})
 
-				Ω(err).To(ContainSubstrings(
+				Expect(err).To(ContainSubstrings(
 					[]string{"Invalid json data"},
 				))
+
 			})
 
 		})
@@ -190,9 +191,10 @@ var _ = Describe("PluginRepo", func() {
 					},
 				})
 
-				Ω(err).To(ContainSubstrings(
+				Expect(err).To(ContainSubstrings(
 					[]string{"Invalid data", "plugin data does not exist"},
 				))
+
 			})
 
 		})

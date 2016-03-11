@@ -81,19 +81,20 @@ var _ = Describe("SSH command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
-			Ω(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
+
 		})
 
 		It("fails requirements when not logged in", func() {
-			Ω(runCommand("my-app")).To(BeFalse())
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
 		It("fails if a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = false
-			Ω(runCommand("my-app")).To(BeFalse())
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
 		It("fails if a application is not found", func() {
@@ -101,7 +102,7 @@ var _ = Describe("SSH command", func() {
 			requirementsFactory.TargetedSpaceSuccess = true
 			requirementsFactory.ApplicationFails = true
 
-			Ω(runCommand("my-app")).To(BeFalse())
+			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
 		Describe("Flag options", func() {
@@ -123,10 +124,11 @@ var _ = Describe("SSH command", func() {
 					})
 
 					It("returns an error", func() {
-						Ω(runCommand(args...)).To(BeFalse())
-						Ω(ui.Outputs).To(ContainSubstrings(
+						Expect(runCommand(args...)).To(BeFalse())
+						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Incorrect Usage", "cannot be negative"},
 						))
+
 					})
 				})
 			})
@@ -135,11 +137,12 @@ var _ = Describe("SSH command", func() {
 		Describe("SSHOptions", func() {
 			Context("when an error is returned during initialization", func() {
 				It("shows error and prints command usage", func() {
-					Ω(runCommand("app_name", "-L", "[9999:localhost...")).To(BeFalse())
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(runCommand("app_name", "-L", "[9999:localhost...")).To(BeFalse())
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Incorrect Usage"},
 						[]string{"USAGE:"},
 					))
+
 				})
 			})
 		})
@@ -195,9 +198,10 @@ var _ = Describe("SSH command", func() {
 					runCommand("my-app")
 
 					Expect(handler).To(HaveAllRequestsCalled())
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Error getting SSH info", "404"},
 					))
+
 				})
 			})
 
@@ -224,9 +228,10 @@ var _ = Describe("SSH command", func() {
 					runCommand("my-app")
 
 					Expect(handler).To(HaveAllRequestsCalled())
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Error getting one time auth code", "auth api error"},
 					))
+
 				})
 			})
 		})
@@ -264,9 +269,10 @@ var _ = Describe("SSH command", func() {
 
 					runCommand("my-app")
 
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Error opening SSH connection", "dial error"},
 					))
+
 				})
 			})
 
@@ -276,9 +282,10 @@ var _ = Describe("SSH command", func() {
 
 					runCommand("my-app", "-L", "8000:localhost:8000")
 
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Error forwarding port", "listen error"},
 					))
+
 				})
 			})
 
@@ -289,7 +296,7 @@ var _ = Describe("SSH command", func() {
 
 					runCommand("my-app", "-N")
 
-					Ω(fakeSecureShell.WaitCallCount()).To(Equal(1))
+					Expect(fakeSecureShell.WaitCallCount()).To(Equal(1))
 				})
 			})
 
@@ -300,7 +307,7 @@ var _ = Describe("SSH command", func() {
 
 					runCommand("my-app", "-k")
 
-					Ω(fakeSecureShell.InteractiveSessionCallCount()).To(Equal(1))
+					Expect(fakeSecureShell.InteractiveSessionCallCount()).To(Equal(1))
 				})
 			})
 
@@ -313,9 +320,10 @@ var _ = Describe("SSH command", func() {
 					fakeSecureShell.InteractiveSessionReturns(errors.New("ssh exit error"))
 					runCommand("my-app", "-k")
 
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"ssh exit error"},
 					))
+
 				})
 			})
 		})

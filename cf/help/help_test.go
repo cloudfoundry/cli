@@ -76,7 +76,7 @@ var _ = Describe("Help", func() {
 			}
 
 			expectedLen := len(strings.Split(line, "%%%")[0])
-			Ω(cmdNameLen).To(Equal(expectedLen))
+			Expect(cmdNameLen).To(Equal(expectedLen))
 		}
 
 	})

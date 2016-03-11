@@ -49,19 +49,20 @@ var _ = Describe("disable-ssh command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
-			Ω(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
+
 		})
 
 		It("fails requirements when not logged in", func() {
-			Ω(runCommand("my-app", "none")).To(BeFalse())
+			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 
 		It("fails if a space is not targeted", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = false
-			Ω(runCommand("my-app", "none")).To(BeFalse())
+			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 	})
 
@@ -91,7 +92,7 @@ var _ = Describe("disable-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already disabled for 'my-app'"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already disabled for 'my-app'"}))
 			})
 		})
 
@@ -109,12 +110,12 @@ var _ = Describe("disable-ssh command", func() {
 				It("updates the app's enable_ssh", func() {
 					runCommand("my-app")
 
-					Ω(appRepo.UpdateCallCount()).To(Equal(1))
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
 					appGUID, params := appRepo.UpdateArgsForCall(0)
 					Expect(appGUID).To(Equal("my-app-guid"))
-					Ω(*params.EnableSsh).To(BeFalse())
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"Disabling ssh support for 'my-app'"}))
-					Ω(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(*params.EnableSsh).To(BeFalse())
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"Disabling ssh support for 'my-app'"}))
+					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 			})
 
@@ -123,11 +124,12 @@ var _ = Describe("disable-ssh command", func() {
 					appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 					runCommand("my-app")
 
-					Ω(appRepo.UpdateCallCount()).To(Equal(1))
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error disabling ssh support"},
 					))
+
 				})
 
 				It("notifies user when updated result is not in the desired state", func() {
@@ -139,11 +141,12 @@ var _ = Describe("disable-ssh command", func() {
 
 					runCommand("my-app")
 
-					Ω(appRepo.UpdateCallCount()).To(Equal(1))
-					Ω(ui.Outputs).To(ContainSubstrings(
+					Expect(appRepo.UpdateCallCount()).To(Equal(1))
+					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"ssh support is not disabled for my-app"},
 					))
+
 				})
 			})
 		})

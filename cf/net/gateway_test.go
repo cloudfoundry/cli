@@ -180,15 +180,15 @@ var _ = Describe("Gateway", func() {
 				request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
 				_, apiErr := ccGateway.PerformRequestForJSONResponse(request, errResponse)
 
-				Ω(apiErr).To(HaveOccurred())
-				Ω(errResponse.Code).To(Equal(10003))
+				Expect(apiErr).To(HaveOccurred())
+				Expect(errResponse.Code).To(Equal(10003))
 			})
 
 			It("ignores any unmarshal error and does not alter the api err response", func() {
 				request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
 				_, apiErr := ccGateway.PerformRequestForJSONResponse(request, nil)
 
-				Ω(apiErr.Error()).To(Equal("Server error, status code: 401, error code: 10003, message: You are not authorized to perform the requested action"))
+				Expect(apiErr.Error()).To(Equal("Server error, status code: 401, error code: 10003, message: You are not authorized to perform the requested action"))
 			})
 
 		})

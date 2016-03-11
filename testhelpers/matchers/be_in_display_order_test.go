@@ -31,8 +31,8 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
-		Ω(success).To(Equal(true))
-		Ω(err).To(BeNil())
+		Expect(success).To(Equal(true))
+		Expect(err).To(BeNil())
 
 		matcher = BeInDisplayOrder(
 			[]string{"1st"},
@@ -42,10 +42,10 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err = matcher.Match(actual)
-		Ω(success).To(Equal(false))
-		Ω(err).To(BeNil())
+		Expect(success).To(Equal(false))
+		Expect(err).To(BeNil())
 		msg := matcher.FailureMessage([]string{})
-		Ω(strings.Contains(msg, "2nd")).To(Equal(true))
+		Expect(strings.Contains(msg, "2nd")).To(Equal(true))
 	})
 
 	It("asserts actual contains the expected string", func() {
@@ -54,11 +54,11 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
-		Ω(success).To(Equal(false))
-		Ω(err).To(BeNil())
+		Expect(success).To(Equal(false))
+		Expect(err).To(BeNil())
 
 		msg := matcher.FailureMessage([]string{})
-		Ω(strings.Contains(msg, "Not in the actual")).To(Equal(true))
+		Expect(strings.Contains(msg, "Not in the actual")).To(Equal(true))
 	})
 
 	It("asserts actual contains 2 substrings in the same display line ", func() {
@@ -68,18 +68,18 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
-		Ω(success).To(Equal(true))
-		Ω(err).To(BeNil())
+		Expect(success).To(Equal(true))
+		Expect(err).To(BeNil())
 
 		matcher = BeInDisplayOrder(
 			[]string{"1st", "line 2"},
 		)
 
 		success, err = matcher.Match(actual)
-		Ω(success).To(Equal(false))
+		Expect(success).To(Equal(false))
 
 		msg := matcher.FailureMessage([]string{})
-		Ω(strings.Contains(msg, "line 2")).To(Equal(true))
+		Expect(strings.Contains(msg, "line 2")).To(Equal(true))
 
 		matcher = BeInDisplayOrder(
 			[]string{"1st"},
@@ -88,10 +88,10 @@ var _ = Describe("BeInDisplayOrder()", func() {
 
 		success, err = matcher.Match(actual)
 		Expect(err).ToNot(HaveOccurred())
-		Ω(success).To(Equal(false))
+		Expect(success).To(Equal(false))
 
 		msg = matcher.FailureMessage([]string{})
-		Ω(strings.Contains(msg, "line 1")).To(Equal(true))
+		Expect(strings.Contains(msg, "line 1")).To(Equal(true))
 	})
 
 	It("asserts actual contains 2 substrings displaying in order on a single line ", func() {
@@ -100,8 +100,8 @@ var _ = Describe("BeInDisplayOrder()", func() {
 		)
 
 		success, err := matcher.Match(actual)
-		Ω(success).To(Equal(true))
-		Ω(err).To(BeNil())
+		Expect(success).To(Equal(true))
+		Expect(err).To(BeNil())
 
 		matcher = BeInDisplayOrder(
 			[]string{"line 1", "1st"},
@@ -109,10 +109,10 @@ var _ = Describe("BeInDisplayOrder()", func() {
 
 		success, err = matcher.Match(actual)
 		Expect(err).ToNot(HaveOccurred())
-		Ω(success).To(Equal(false))
+		Expect(success).To(Equal(false))
 
 		msg := matcher.FailureMessage([]string{})
-		Ω(strings.Contains(msg, "1st")).To(Equal(true))
+		Expect(strings.Contains(msg, "1st")).To(Equal(true))
 	})
 
 })

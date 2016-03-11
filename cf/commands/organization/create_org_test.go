@@ -135,11 +135,11 @@ var _ = Describe("create-org command", func() {
 
 				orgGuid, role, userGuid, userName := orgRoleSetter.SetOrgRoleArgsForCall(0)
 
-				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
-				Ω(orgGuid).To(Equal("my-org-guid"))
-				Ω(role).To(Equal("OrgManager"))
-				Ω(userGuid).To(Equal(""))
-				Ω(userName).To(Equal("my-user"))
+				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
+				Expect(orgGuid).To(Equal("my-org-guid"))
+				Expect(role).To(Equal("OrgManager"))
+				Expect(userGuid).To(Equal(""))
+				Expect(userName).To(Equal("my-user"))
 			})
 
 			It("warns user about problem accessing feature-flag", func() {
@@ -147,10 +147,11 @@ var _ = Describe("create-org command", func() {
 
 				runCommand("my-org")
 
-				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
-				Ω(ui.Outputs).To(ContainSubstrings(
+				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
+				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Warning", "error error error"},
 				))
+
 			})
 
 			It("fails on failing getting the guid of the newly created org", func() {
@@ -158,11 +159,12 @@ var _ = Describe("create-org command", func() {
 
 				runCommand("my-org")
 
-				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
-				Ω(ui.Outputs).To(ContainSubstrings(
+				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
+				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"cannot get org guid"},
 				))
+
 			})
 
 			It("fails on failing assigning org role to user", func() {
@@ -170,12 +172,13 @@ var _ = Describe("create-org command", func() {
 
 				runCommand("my-org")
 
-				Ω(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
-				Ω(ui.Outputs).To(ContainSubstrings(
+				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
+				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Assigning role OrgManager to user my-user in org my-org ..."},
 					[]string{"FAILED"},
 					[]string{"failed to assign role"},
 				))
+
 			})
 		})
 

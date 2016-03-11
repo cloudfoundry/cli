@@ -73,7 +73,7 @@ var _ = Describe("set-health-check command", func() {
 		Context("when application is not found", func() {
 			It("Fails", func() {
 				requirementsFactory.ApplicationFails = true
-				Ω(runCommand("non-exist-app")).To(BeFalse())
+				Expect(runCommand("non-exist-app")).To(BeFalse())
 			})
 		})
 
@@ -90,8 +90,8 @@ var _ = Describe("set-health-check command", func() {
 			It("shows the health_check_type", func() {
 				runCommand("my-app")
 
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"Getting", "my-app", "health_check_type"}))
-				Ω(ui.Outputs).To(ContainSubstrings([]string{"port"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"Getting", "my-app", "health_check_type"}))
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"port"}))
 			})
 		})
 	})

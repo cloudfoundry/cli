@@ -266,21 +266,21 @@ var _ = Describe("space-users command", func() {
 			It("populates the plugin model with users with single roles", func() {
 				testcmd.RunCliCommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
 
-				Ω(pluginUserModel).To(HaveLen(4))
+				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Ω(u.Guid).To(Equal("1111"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
+						Expect(u.Guid).To(Equal("1111"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
 					case "user2":
-						Ω(u.Guid).To(Equal("2222"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
+						Expect(u.Guid).To(Equal("2222"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
 					case "user3":
-						Ω(u.Guid).To(Equal("3333"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_AUDITOR}))
+						Expect(u.Guid).To(Equal("3333"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_AUDITOR}))
 					case "user4":
-						Ω(u.Guid).To(Equal("4444"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_DEVELOPER}))
+						Expect(u.Guid).To(Equal("4444"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_DEVELOPER}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}
@@ -336,21 +336,21 @@ var _ = Describe("space-users command", func() {
 			It("populates the plugin model with users with multiple roles", func() {
 				testcmd.RunCliCommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
 
-				Ω(pluginUserModel).To(HaveLen(4))
+				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Ω(u.Guid).To(Equal("1111"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
+						Expect(u.Guid).To(Equal("1111"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
 					case "user2":
-						Ω(u.Guid).To(Equal("2222"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
+						Expect(u.Guid).To(Equal("2222"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
 					case "user3":
-						Ω(u.Guid).To(Equal("3333"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
+						Expect(u.Guid).To(Equal("3333"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
 					case "user4":
-						Ω(u.Guid).To(Equal("4444"))
-						Ω(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
+						Expect(u.Guid).To(Equal("4444"))
+						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}
