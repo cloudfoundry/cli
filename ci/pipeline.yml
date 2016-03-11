@@ -87,6 +87,13 @@ resources:
     branch: locks
     pool: bosh-lites
 
+- name: cf-cli-tracker
+  type: tracker
+  source:
+    token: {{cf-cli-public-tracker-token}}
+    project_id: {{cf-cli-public-tracker-project-id}}
+    tracker_url: https://www.pivotaltracker.com
+
 jobs:
 - name: units
   serial: true
@@ -277,6 +284,10 @@ jobs:
       params:
         AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+  - put: cf-cli-tracker
+    params:
+      repos:
+      - cli
 
 - name: publish-final-release
   serial: true
