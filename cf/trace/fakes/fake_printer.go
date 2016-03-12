@@ -24,10 +24,10 @@ type FakePrinter struct {
 	printlnArgsForCall []struct {
 		v []interface{}
 	}
-	IsEnabledStub        func() bool
-	isEnabledMutex       sync.RWMutex
-	isEnabledArgsForCall []struct{}
-	isEnabledReturns     struct {
+	WritesToConsoleStub        func() bool
+	writesToConsoleMutex       sync.RWMutex
+	writesToConsoleArgsForCall []struct{}
+	writesToConsoleReturns     struct {
 		result1 bool
 	}
 }
@@ -102,26 +102,26 @@ func (fake *FakePrinter) PrintlnArgsForCall(i int) []interface{} {
 	return fake.printlnArgsForCall[i].v
 }
 
-func (fake *FakePrinter) IsEnabled() bool {
-	fake.isEnabledMutex.Lock()
-	fake.isEnabledArgsForCall = append(fake.isEnabledArgsForCall, struct{}{})
-	fake.isEnabledMutex.Unlock()
-	if fake.IsEnabledStub != nil {
-		return fake.IsEnabledStub()
+func (fake *FakePrinter) WritesToConsole() bool {
+	fake.writesToConsoleMutex.Lock()
+	fake.writesToConsoleArgsForCall = append(fake.writesToConsoleArgsForCall, struct{}{})
+	fake.writesToConsoleMutex.Unlock()
+	if fake.WritesToConsoleStub != nil {
+		return fake.WritesToConsoleStub()
 	} else {
-		return fake.isEnabledReturns.result1
+		return fake.writesToConsoleReturns.result1
 	}
 }
 
-func (fake *FakePrinter) IsEnabledCallCount() int {
-	fake.isEnabledMutex.RLock()
-	defer fake.isEnabledMutex.RUnlock()
-	return len(fake.isEnabledArgsForCall)
+func (fake *FakePrinter) WritesToConsoleCallCount() int {
+	fake.writesToConsoleMutex.RLock()
+	defer fake.writesToConsoleMutex.RUnlock()
+	return len(fake.writesToConsoleArgsForCall)
 }
 
-func (fake *FakePrinter) IsEnabledReturns(result1 bool) {
-	fake.IsEnabledStub = nil
-	fake.isEnabledReturns = struct {
+func (fake *FakePrinter) WritesToConsoleReturns(result1 bool) {
+	fake.WritesToConsoleStub = nil
+	fake.writesToConsoleReturns = struct {
 		result1 bool
 	}{result1}
 }

@@ -371,15 +371,15 @@ var _ = Describe("UI", func() {
 			It("does not duplicate output if logger is set to stdout", func() {
 				output := io_helpers.CaptureOutput(func() {
 					testassert.AssertPanic(QuietPanic, func() {
-						logger := trace.NewWriterPrinter(os.Stdout)
+						logger := trace.NewWriterPrinter(os.Stdout, true)
 						NewUI(os.Stdin, NewTeePrinter(), logger).Failed("this should print only once")
 					})
 				})
+
 				Expect(output).To(HaveLen(3))
 				Expect(output[0]).To(Equal("FAILED"))
 				Expect(output[1]).To(Equal("this should print only once"))
 				Expect(output[2]).To(Equal(""))
-
 			})
 		})
 
@@ -387,10 +387,11 @@ var _ = Describe("UI", func() {
 			It("does not duplicate output if logger is set to stdout", func() {
 				output := io_helpers.CaptureOutput(func() {
 					testassert.AssertPanic(QuietPanic, func() {
-						logger := trace.NewWriterPrinter(os.Stdout)
+						logger := trace.NewWriterPrinter(os.Stdout, true)
 						NewUI(os.Stdin, NewTeePrinter(), logger).Failed("this should print only once")
 					})
 				})
+
 				Expect(output).To(HaveLen(3))
 				Expect(output[0]).To(Equal("FAILED"))
 				Expect(output[1]).To(Equal("this should print only once"))

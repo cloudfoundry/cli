@@ -141,23 +141,19 @@ const QuietPanic = "This shouldn't print anything"
 func (ui *terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 
-	if T == nil {
-		if ui.logger.IsEnabled() {
-			ui.logger.Print("FAILED")
-			ui.logger.Print(message)
-		} else {
-			ui.Say(FailureColor("FAILED"))
-			ui.Say(message)
-		}
-	} else {
-		if ui.logger.IsEnabled() {
-			ui.logger.Print(T("FAILED"))
-			ui.logger.Print(message)
-		} else {
-			ui.Say(FailureColor(T("FAILED")))
-			ui.Say(message)
-		}
+	failed := "FAILED"
+	if T != nil {
+		failed = T("FAILED")
 	}
+
+	ui.logger.Print(failed)
+	ui.logger.Print(message)
+
+	if !ui.logger.WritesToConsole() {
+		ui.Say(FailureColor(failed))
+		ui.Say(message)
+	}
+
 	ui.PanicQuietly()
 }
 
