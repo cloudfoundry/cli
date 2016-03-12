@@ -13,7 +13,7 @@ func NewLogger(verbose bool, cf_trace, config_trace string) Printer {
 
 	var printers []Printer
 
-	stdoutLogger := NewWriterPrinter(stdout)
+	stdoutLogger := NewWriterPrinter(stdout, true)
 
 	for _, path := range []string{cf_trace, config_trace} {
 		b, err := strconv.ParseBool(path)
@@ -23,7 +23,7 @@ func NewLogger(verbose bool, cf_trace, config_trace string) Printer {
 			file, err := fileutils.Open(path)
 
 			if err == nil {
-				printers = append(printers, NewWriterPrinter(file))
+				printers = append(printers, NewWriterPrinter(file, false))
 			} else {
 				stdoutLogger.Printf(T("CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
 					map[string]interface{}{"Path": path, "Err": err}))
