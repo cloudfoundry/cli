@@ -63,6 +63,12 @@ var _ = Describe("CreateServiceBroker", func() {
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 	})
 
+	It("has an alias of `csb`", func() {
+		cmd := &servicebroker.CreateServiceBroker{}
+
+		Expect(cmd.MetaData().ShortName).To(Equal("csb"))
+	})
+
 	Describe("Requirements", func() {
 		Context("when not provided exactly four args", func() {
 			BeforeEach(func() {
