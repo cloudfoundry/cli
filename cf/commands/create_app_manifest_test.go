@@ -156,6 +156,7 @@ var _ = Describe("CreateAppManifest", func() {
 				application.Memory = 1024
 				application.InstanceCount = 2
 				application.StackGuid = "the-stack-guid"
+				application.AppPorts = []int{1111, 2222}
 			})
 
 			JustBeforeEach(func() {
@@ -176,6 +177,14 @@ var _ = Describe("CreateAppManifest", func() {
 				name, instances := fakeManifest.InstancesArgsForCall(0)
 				Expect(name).To(Equal("app-name"))
 				Expect(instances).To(Equal(2))
+			})
+
+			It("sets app ports", func() {
+				cmd.Execute(flagContext)
+				Expect(fakeManifest.AppPortsCallCount()).To(Equal(1))
+				name, appPorts := fakeManifest.AppPortsArgsForCall(0)
+				Expect(name).To(Equal("app-name"))
+				Expect(appPorts).To(Equal([]int{1111, 2222}))
 			})
 
 			It("tries to get stacks", func() {

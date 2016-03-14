@@ -72,17 +72,17 @@ type FakeAppManifest struct {
 	getContentsReturns     struct {
 		result1 []models.Application
 	}
-	FileSavePathStub        func() string
-	fileSavePathMutex       sync.RWMutex
-	fileSavePathArgsForCall []struct{}
-	fileSavePathReturns     struct {
-		result1 string
-	}
 	StackStub        func(string, string)
 	stackMutex       sync.RWMutex
 	stackArgsForCall []struct {
 		arg1 string
 		arg2 string
+	}
+	AppPortsStub        func(string, []int)
+	appPortsMutex       sync.RWMutex
+	appPortsArgsForCall []struct {
+		arg1 string
+		arg2 []int
 	}
 	SaveStub        func(f io.Writer) error
 	saveMutex       sync.RWMutex
@@ -336,30 +336,6 @@ func (fake *FakeAppManifest) GetContentsReturns(result1 []models.Application) {
 	}{result1}
 }
 
-func (fake *FakeAppManifest) FileSavePath() string {
-	fake.fileSavePathMutex.Lock()
-	fake.fileSavePathArgsForCall = append(fake.fileSavePathArgsForCall, struct{}{})
-	fake.fileSavePathMutex.Unlock()
-	if fake.FileSavePathStub != nil {
-		return fake.FileSavePathStub()
-	} else {
-		return fake.fileSavePathReturns.result1
-	}
-}
-
-func (fake *FakeAppManifest) FileSavePathCallCount() int {
-	fake.fileSavePathMutex.RLock()
-	defer fake.fileSavePathMutex.RUnlock()
-	return len(fake.fileSavePathArgsForCall)
-}
-
-func (fake *FakeAppManifest) FileSavePathReturns(result1 string) {
-	fake.FileSavePathStub = nil
-	fake.fileSavePathReturns = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *FakeAppManifest) Stack(arg1 string, arg2 string) {
 	fake.stackMutex.Lock()
 	fake.stackArgsForCall = append(fake.stackArgsForCall, struct {
@@ -382,6 +358,30 @@ func (fake *FakeAppManifest) StackArgsForCall(i int) (string, string) {
 	fake.stackMutex.RLock()
 	defer fake.stackMutex.RUnlock()
 	return fake.stackArgsForCall[i].arg1, fake.stackArgsForCall[i].arg2
+}
+
+func (fake *FakeAppManifest) AppPorts(arg1 string, arg2 []int) {
+	fake.appPortsMutex.Lock()
+	fake.appPortsArgsForCall = append(fake.appPortsArgsForCall, struct {
+		arg1 string
+		arg2 []int
+	}{arg1, arg2})
+	fake.appPortsMutex.Unlock()
+	if fake.AppPortsStub != nil {
+		fake.AppPortsStub(arg1, arg2)
+	}
+}
+
+func (fake *FakeAppManifest) AppPortsCallCount() int {
+	fake.appPortsMutex.RLock()
+	defer fake.appPortsMutex.RUnlock()
+	return len(fake.appPortsArgsForCall)
+}
+
+func (fake *FakeAppManifest) AppPortsArgsForCall(i int) (string, []int) {
+	fake.appPortsMutex.RLock()
+	defer fake.appPortsMutex.RUnlock()
+	return fake.appPortsArgsForCall[i].arg1, fake.appPortsArgsForCall[i].arg2
 }
 
 func (fake *FakeAppManifest) Save(f io.Writer) error {

@@ -27,6 +27,7 @@ type AppManifest interface {
 	Domain(string, string, string)
 	GetContents() []models.Application
 	Stack(string, string)
+	AppPorts(string, []int)
 	Save(f io.Writer) error
 }
 
@@ -98,6 +99,11 @@ func (m *appManifest) EnvironmentVars(appName string, key, value string) {
 	m.contents[i].EnvironmentVars[key] = value
 }
 
+func (m *appManifest) AppPorts(appName string, appPorts []int) {
+	i := m.findOrCreateApplication(appName)
+	m.contents[i].AppPorts = appPorts
+}
+
 func (m *appManifest) GetContents() []models.Application {
 	return m.contents
 }
@@ -126,6 +132,7 @@ func generateAppMap(app models.Application) (generic.Map, error) {
 	m.Set("instances", app.InstanceCount)
 	m.Set("disk_quota", fmt.Sprintf("%dM", app.DiskQuota))
 	m.Set("stack", app.Stack.Name)
+	m.Set("app-ports", app.AppPorts)
 
 	if app.BuildpackUrl != "" {
 		m.Set("buildpack", app.BuildpackUrl)
