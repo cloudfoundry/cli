@@ -1,0 +1,51 @@
+resources:
+- name: cli-ci
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-ci
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: concourse-release
+  type: github-release
+  source:
+    repository: concourse
+    user: concourse
+
+- name: concourse-deployment
+  type: bosh-deployment
+  source:
+    target: {{concourse-bosh-target}}
+    username: {{concourse-bosh-username}}
+    password: {{concourse-bosh-password}}
+    deployment: {{concourse-bosh-deployment}}
+
+- name: stemcell
+  type: bosh-io-stemcell
+  source:
+    name: {{bosh-io-stemcell}}
+
+jobs:
+- name: deploy-concourse
+  serial: true
+  plan:
+  - aggregate:
+    - get: concourse-release
+      trigger: false
+      params:
+        globs:
+        - concourse-*.tgz
+        - garden-linux-*.tgz
+    - get: cli-ci
+      trigger: false
+    - get: stemcell
+      trigger: false
+  - put: concourse-deployment
+    params:
+      manifest: {{concourse-config-manifest-location}}
+      releases:
+        - concourse-release/concourse-*.tgz
+        - concourse-release/garden-linux-*.tgz
+      stemcells:
+        - stemcell/*.tgz
+
