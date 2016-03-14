@@ -27,6 +27,7 @@ func (cmd *CreateServiceBroker) MetaData() command_registry.CommandMetadata {
 
 	return command_registry.CommandMetadata{
 		Name:        "create-service-broker",
+		ShortName:   "csb",
 		Description: T("Create a service broker"),
 		Usage: []string{
 			T("CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"),
