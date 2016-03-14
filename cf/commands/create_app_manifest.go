@@ -112,6 +112,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, f io.Writer
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 	cmd.manifest.Stack(app.Name, app.Stack.Name)
+	cmd.manifest.AppPorts(app.Name, app.AppPorts)
 
 	if app.Command != "" {
 		cmd.manifest.StartCommand(app.Name, app.Command)
