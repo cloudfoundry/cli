@@ -139,30 +139,41 @@ var _ = Describe("curl command", func() {
 		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
-	It("sets the request body given -d", func() {
-		runCurlWithInputs([]string{"-d", "body content to upload", "/foo"})
+	Context("when -d is provided", func() {
+		It("sets the request body", func() {
+			runCurlWithInputs([]string{"-d", "body content to upload", "/foo"})
 
-		Expect(curlRepo.Body).To(Equal("body content to upload"))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
-	})
+			Expect(curlRepo.Body).To(Equal("body content to upload"))
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		})
 
-	It("does not fail when given -d with empty string", func() {
-		runCurlWithInputs([]string{"/foo", "-d", "\"\""})
+		It("does not fail with empty string", func() {
+			runCurlWithInputs([]string{"/foo", "-d", "''"})
 
-		Expect(curlRepo.Body).To(Equal(""))
-		Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"FAILED"}))
-	})
+			Expect(curlRepo.Body).To(Equal(""))
+			Expect(curlRepo.Method).To(Equal("POST"))
+			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"FAILED"}))
+		})
 
-	It("sets the request body when the -d flag is given with an @-prefixed file", func() {
-		tempfile, err := ioutil.TempFile("", "get-data-test")
-		Expect(err).NotTo(HaveOccurred())
-		jsonData := `{"some":"json"}`
-		ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+		It("uses given http verb if -X is also provided", func() {
+			runCurlWithInputs([]string{"/foo", "-d", "some body", "-X", "PUT"})
 
-		runCurlWithInputs([]string{"-d", "@" + tempfile.Name(), "/foo"})
+			Expect(curlRepo.Body).To(Equal("some body"))
+			Expect(curlRepo.Method).To(Equal("PUT"))
+			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"FAILED"}))
+		})
 
-		Expect(curlRepo.Body).To(Equal(`{"some":"json"}`))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		It("sets the request body with an @-prefixed file", func() {
+			tempfile, err := ioutil.TempFile("", "get-data-test")
+			Expect(err).NotTo(HaveOccurred())
+			jsonData := `{"some":"json"}`
+			ioutil.WriteFile(tempfile.Name(), []byte(jsonData), os.ModePerm)
+
+			runCurlWithInputs([]string{"-d", "@" + tempfile.Name(), "/foo"})
+
+			Expect(curlRepo.Body).To(Equal(`{"some":"json"}`))
+			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		})
 	})
 
 	It("does not print the response when verbose output is enabled", func() {

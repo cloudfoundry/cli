@@ -77,15 +77,23 @@ func (cmd *Curl) SetDependency(deps command_registry.Dependency, pluginCall bool
 
 func (cmd *Curl) Execute(c flags.FlagContext) {
 	path := c.Args()[0]
-	method := c.String("X")
 	headers := c.StringSlice("H")
+
+	var method string
 	var body string
-	if c.String("d") != "" {
+
+	if c.IsSet("d") {
+		method = "POST"
+
 		jsonBytes, err := util.GetContentsFromFlagValue(c.String("d"))
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
 		body = string(jsonBytes)
+	}
+
+	if c.IsSet("X") {
+		method = c.String("X")
 	}
 
 	reqHeader := strings.Join(headers, "\n")
