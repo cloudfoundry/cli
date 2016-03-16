@@ -17,7 +17,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
 
-var _ = Describe("create-quota command", func() {
+var _ = Describe("create-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
