@@ -82,7 +82,7 @@ func (cmd *updateQuota) Execute(c flags.FlagContext) {
 		quota.NonBasicServicesAllowed = false
 	}
 
-	if c.String("i") != "" {
+	if c.IsSet("i") {
 		var memory int64
 
 		if c.String("i") == "-1" {
@@ -110,7 +110,7 @@ func (cmd *updateQuota) Execute(c flags.FlagContext) {
 		quota.MemoryLimit = memory
 	}
 
-	if c.String("n") != "" {
+	if c.IsSet("n") {
 		quota.Name = c.String("n")
 	}
 
