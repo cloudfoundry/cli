@@ -2,8 +2,10 @@ package organization
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -94,14 +96,21 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 		}
 
 		quota := org.QuotaDefinition
-		orgQuota := fmt.Sprintf(T("{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
-			map[string]interface{}{
-				"QuotaName":               quota.Name,
-				"MemoryLimit":             quota.MemoryLimit,
-				"InstanceMemoryLimit":     formatters.InstanceMemoryLimit(quota.InstanceMemoryLimit),
-				"RoutesLimit":             quota.RoutesLimit,
-				"ServicesLimit":           quota.ServicesLimit,
-				"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
+
+		appInstanceLimit := strconv.Itoa(quota.AppInstanceLimit)
+		if quota.AppInstanceLimit == resources.UnlimitedAppInstances {
+			appInstanceLimit = T("unlimited")
+		}
+
+		orgQuotaFields := []string{
+			T("{{.MemoryLimit}}M memory limit", map[string]interface{}{"MemoryLimit": quota.MemoryLimit}),
+			T("{{.InstanceMemoryLimit}} instance memory limit", map[string]interface{}{"InstanceMemoryLimit": formatters.InstanceMemoryLimit(quota.InstanceMemoryLimit)}),
+			T("{{.RoutesLimit}} routes", map[string]interface{}{"RoutesLimit": quota.RoutesLimit}),
+			T("{{.ServicesLimit}} services", map[string]interface{}{"ServicesLimit": quota.ServicesLimit}),
+			T("paid services {{.NonBasicServicesAllowed}}", map[string]interface{}{"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}),
+			T("{{.AppInstanceLimit}} app instance limit", map[string]interface{}{"AppInstanceLimit": appInstanceLimit}),
+		}
+		orgQuota := fmt.Sprintf("%s (%s)", quota.Name, strings.Join(orgQuotaFields, ", "))
 
 		if cmd.pluginCall {
 			cmd.populatePluginModel(org, quota)

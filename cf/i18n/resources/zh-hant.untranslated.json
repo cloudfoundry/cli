@@ -944,6 +944,10 @@
     "translation": "service-broker"
   },
   {
+    "id": "{{.AppInstanceLimit}} app instance limit",
+    "translation": "{{.AppInstanceLimit}} app instance limit"
+  },
+  {
     "id": "{{.CFName}} api",
     "translation": "{{.CFName}} api"
   },

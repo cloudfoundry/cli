@@ -4724,6 +4724,10 @@
     "translation": "planos de serviço pagos"
   },
   {
+    "id": "paid services {{.NonBasicServicesAllowed}}",
+    "translation": "serviços pagos {{.NonBasicServicesAllowed}}"
+  },
+  {
     "id": "path",
     "translation": ""
   },
@@ -4964,6 +4968,10 @@
     "translation": "{{.ApiEndpoint}} (versão da API: {{.ApiVersionString}})"
   },
   {
+    "id": "{{.AppInstanceLimit}} app instance limit",
+    "translation": ""
+  },
+  {
     "id": "{{.CFName}} api",
     "translation": "API {{.CFName}}"
   },
@@ -5016,8 +5024,16 @@
     "translation": "{{.FlappingCount}} falhando"
   },
   {
+    "id": "{{.InstanceMemoryLimit}} instance memory limit",
+    "translation": "limite de memória da instância {{.InstanceMemoryLimit}}"
+  },
+  {
     "id": "{{.MemUsage}} of {{.MemQuota}}",
     "translation": "{{.MemUsage}} de {{.MemQuota}}"
+  },
+  {
+    "id": "{{.MemoryLimit}}M memory limit",
+    "translation": "limite de memória {{.MemoryLimit}}M"
   },
   {
     "id": "{{.ModelType}} {{.ModelName}} already exists",
@@ -5048,12 +5064,16 @@
     "translation": "{{.PropertyName}} não deve ser nulo"
   },
   {
-    "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
-    "translation": "{{.QuotaName}} (limite de memória {{.MemoryLimit}}M, limite de memória da instância {{.InstanceMemoryLimit}}, rotas {{.RoutesLimit}}, serviços, serviços pagos {{.ServicesLimit}} {{.NonBasicServicesAllowed}})"
+    "id": "{{.RoutesLimit}} routes",
+    "translation": "rotas {{.RoutesLimit}}"
   },
   {
     "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
     "translation": "{{.RunningCount}} de {{.TotalCount}} instâncias em execução"
+  },
+  {
+    "id": "{{.ServicesLimit}} services",
+    "translation": "serviços {{.ServicesLimit}}"
   },
   {
     "id": "{{.StartingCount}} starting",

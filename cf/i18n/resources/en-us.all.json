@@ -4724,6 +4724,10 @@
     "translation": "paid service plans"
   },
   {
+    "id": "paid services {{.NonBasicServicesAllowed}}",
+    "translation": "paid services {{.NonBasicServicesAllowed}}"
+  },
+  {
     "id": "path",
     "translation": "path"
   },
@@ -4964,6 +4968,10 @@
     "translation": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})"
   },
   {
+    "id": "{{.AppInstanceLimit}} app instance limit",
+    "translation": "{{.AppInstanceLimit}} app instance limit"
+  },
+  {
     "id": "{{.CFName}} api",
     "translation": "{{.CFName}} api"
   },
@@ -5016,8 +5024,16 @@
     "translation": "{{.FlappingCount}} failing"
   },
   {
+    "id": "{{.InstanceMemoryLimit}} instance memory limit",
+    "translation": "{{.InstanceMemoryLimit}} instance memory limit"
+  },
+  {
     "id": "{{.MemUsage}} of {{.MemQuota}}",
     "translation": "{{.MemUsage}} of {{.MemQuota}}"
+  },
+  {
+    "id": "{{.MemoryLimit}}M memory limit",
+    "translation": "{{.MemoryLimit}}M memory limit"
   },
   {
     "id": "{{.ModelType}} {{.ModelName}} already exists",
@@ -5048,12 +5064,16 @@
     "translation": "{{.PropertyName}} should not be null"
   },
   {
-    "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
-    "translation": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})"
+    "id": "{{.RoutesLimit}} routes",
+    "translation": "{{.RoutesLimit}} routes"
   },
   {
     "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
     "translation": "{{.RunningCount}} of {{.TotalCount}} instances running"
+  },
+  {
+    "id": "{{.ServicesLimit}} services",
+    "translation": "{{.ServicesLimit}} services"
   },
   {
     "id": "{{.StartingCount}} starting",

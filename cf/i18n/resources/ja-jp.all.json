@@ -4724,6 +4724,10 @@
     "translation": "有料サービス・プラン"
   },
   {
+    "id": "paid services {{.NonBasicServicesAllowed}}",
+    "translation": "有料サービス {{.NonBasicServicesAllowed}}"
+  },
+  {
     "id": "path",
     "translation": ""
   },
@@ -4964,6 +4968,10 @@
     "translation": "{{.ApiEndpoint}} (API バージョン: {{.ApiVersionString}})"
   },
   {
+    "id": "{{.AppInstanceLimit}} app instance limit",
+    "translation": ""
+  },
+  {
     "id": "{{.CFName}} api",
     "translation": ""
   },
@@ -5016,8 +5024,16 @@
     "translation": "{{.FlappingCount}} は失敗しました"
   },
   {
+    "id": "{{.InstanceMemoryLimit}} instance memory limit",
+    "translation": "{{.InstanceMemoryLimit}} インスタンス・メモリー制限"
+  },
+  {
     "id": "{{.MemUsage}} of {{.MemQuota}}",
     "translation": "{{.MemQuota}} の中の {{.MemUsage}}"
+  },
+  {
+    "id": "{{.MemoryLimit}}M memory limit",
+    "translation": "{{.MemoryLimit}}M メモリー制限"
   },
   {
     "id": "{{.ModelType}} {{.ModelName}} already exists",
@@ -5048,12 +5064,16 @@
     "translation": "{{.PropertyName}} をヌルにすることはできません"
   },
   {
-    "id": "{{.QuotaName}} ({{.MemoryLimit}}M memory limit, {{.InstanceMemoryLimit}} instance memory limit, {{.RoutesLimit}} routes, {{.ServicesLimit}} services, paid services {{.NonBasicServicesAllowed}})",
-    "translation": "{{.QuotaName}} ({{.MemoryLimit}}M メモリー制限、{{.InstanceMemoryLimit}} インスタンス・メモリー制限、{{.RoutesLimit}} 個の経路、{{.ServicesLimit}} 個のサービス、有料サービス {{.NonBasicServicesAllowed}})"
+    "id": "{{.RoutesLimit}} routes",
+    "translation": "{{.RoutesLimit}} 個の経路"
   },
   {
     "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
     "translation": "{{.TotalCount}} 個の中の {{.RunningCount}} 個のインスタンスが実行中です"
+  },
+  {
+    "id": "{{.ServicesLimit}} services",
+    "translation": "{{.ServicesLimit}} 個のサービス"
   },
   {
     "id": "{{.StartingCount}} starting",
