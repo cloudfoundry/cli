@@ -1000,10 +1000,6 @@
     "translation": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"
   },
   {
-    "id": "CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY][-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": "CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY][-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
-  },
-  {
     "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
@@ -2894,6 +2890,10 @@
   {
     "id": "NAME:",
     "translation": "NAME:"
+  },
+  {
+    "id": "NEW_NAME",
+    "translation": "NEW_NAME"
   },
   {
     "id": "Name",

@@ -1000,10 +1000,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY][-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": ""
   },
@@ -2894,6 +2890,10 @@
   {
     "id": "NAME:",
     "translation": "이름:"
+  },
+  {
+    "id": "NEW_NAME",
+    "translation": ""
   },
   {
     "id": "Name",
