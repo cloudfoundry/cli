@@ -2,16 +2,6 @@ package models
 
 import "encoding/json"
 
-func NewQuotaFields(name string, memory int64, InstanceMemoryLimit int64, routes int, services int, nonbasicservices bool) (q QuotaFields) {
-	q.Name = name
-	q.MemoryLimit = memory
-	q.InstanceMemoryLimit = InstanceMemoryLimit
-	q.RoutesLimit = routes
-	q.ServicesLimit = services
-	q.NonBasicServicesAllowed = nonbasicservices
-	return
-}
-
 type QuotaFields struct {
 	Guid                    string `json:"guid,omitempty"`
 	Name                    string `json:"name"`

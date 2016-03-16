@@ -976,6 +976,10 @@
     "translation": "url"
   },
   {
+    "id": "{{.AppInstanceLimit}} app instance limit",
+    "translation": "{{.AppInstanceLimit}} app instance limit"
+  },
+  {
     "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
     "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
   }

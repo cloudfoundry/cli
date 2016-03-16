@@ -78,7 +78,15 @@ var _ = Describe("org command", func() {
 			org := models.Organization{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
-			org.QuotaDefinition = models.NewQuotaFields("cantina-quota", 512, 256, 2, 5, true)
+			org.QuotaDefinition = models.QuotaFields{
+				Name:                    "cantina-quota",
+				MemoryLimit:             512,
+				InstanceMemoryLimit:     256,
+				RoutesLimit:             2,
+				ServicesLimit:           5,
+				NonBasicServicesAllowed: true,
+				AppInstanceLimit:        7,
+			}
 			org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 			org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 			org.SpaceQuotas = []models.SpaceQuota{
@@ -99,7 +107,7 @@ var _ = Describe("org command", func() {
 				[]string{"OK"},
 				[]string{"my-org"},
 				[]string{"domains:", "cfapps.io", "cf-app.com"},
-				[]string{"quota: ", "cantina-quota", "512M", "256M instance memory limit", "2 routes", "5 services", "paid services allowed"},
+				[]string{"quota: ", "cantina-quota", "512M", "256M instance memory limit", "2 routes", "5 services", "paid services allowed", "7 app instance limit"},
 				[]string{"spaces:", "development", "staging"},
 				[]string{"space quotas:", "space-quota-1", "space-quota-2"},
 			))

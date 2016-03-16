@@ -154,11 +154,11 @@ var _ = Describe("app security group api", func() {
 				Spaces: []models.Space{
 					{
 						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org"},
+						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 					{
 						SpaceFields:  models.SpaceFields{Guid: "my-space-guid2", Name: "my-space2"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid2", Name: "my-org2"},
+						Organization: models.OrganizationFields{Guid: "my-org-guid2", Name: "my-org2", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 				},
 			}))
@@ -249,7 +249,7 @@ var _ = Describe("app security group api", func() {
 				Spaces: []models.Space{
 					{
 						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org"},
+						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 				},
 			}))
@@ -263,7 +263,7 @@ var _ = Describe("app security group api", func() {
 				Spaces: []models.Space{
 					{
 						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org"},
+						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 				},
 			}))

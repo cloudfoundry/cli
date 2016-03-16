@@ -8,12 +8,12 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/api/resources"
 )
 
 type ListQuotas struct {
