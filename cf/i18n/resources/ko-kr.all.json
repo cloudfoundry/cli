@@ -216,6 +216,10 @@
     "translation": "앱"
   },
   {
+    "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
     "id": "Access for plans of a particular broker",
     "translation": "특정 브로커의 플랜에 액세스"
   },

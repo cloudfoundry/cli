@@ -16,6 +16,10 @@
     "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
   },
   {
+    "id": "APP_INSTANCES",
+    "translation": "APP_INSTANCES"
+  },
+  {
     "id": "App instance limit",
     "translation": "App instance limit"
   },

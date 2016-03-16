@@ -216,6 +216,10 @@
     "translation": "应用程序"
   },
   {
+    "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
     "id": "Access for plans of a particular broker",
     "translation": "对特定代理程序的套餐的访问权"
   },

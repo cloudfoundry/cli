@@ -20,6 +20,10 @@
     "translation": "ALIAS"
   },
   {
+    "id": "APP_INSTANCES",
+    "translation": "APP_INSTANCES"
+  },
+  {
     "id": "App instance limit",
     "translation": "App instance limit"
   },

@@ -216,6 +216,10 @@
     "translation": "APPLICATIONS"
   },
   {
+    "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
     "id": "Access for plans of a particular broker",
     "translation": "Accès aux plans d'un courtier particulier "
   },
