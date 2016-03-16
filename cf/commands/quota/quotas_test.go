@@ -84,6 +84,7 @@ var _ = Describe("quotas command", func() {
 					RoutesLimit:             111,
 					ServicesLimit:           222,
 					NonBasicServicesAllowed: true,
+					AppInstanceLimit:        -1,
 				},
 				models.QuotaFields{
 					Name:                    "quota-non-basic-not-allowed",
@@ -92,6 +93,7 @@ var _ = Describe("quotas command", func() {
 					RoutesLimit:             1,
 					ServicesLimit:           2,
 					NonBasicServicesAllowed: false,
+					AppInstanceLimit:        10,
 				},
 			}, nil)
 		})
@@ -101,9 +103,9 @@ var _ = Describe("quotas command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans"},
-				[]string{"quota-name", "1G", "512M", "111", "222", "allowed"},
-				[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed"},
+				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans", "app instance limit"},
+				[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "unlimited"},
+				[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "10"},
 			))
 		})
 
@@ -116,11 +118,28 @@ var _ = Describe("quotas command", func() {
 					RoutesLimit:             2,
 					ServicesLimit:           -1,
 					NonBasicServicesAllowed: false,
+					AppInstanceLimit:        7,
 				},
 			}, nil)
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"quota-with-no-limit-to-services", "434M", "1", "2", "unlimited", "disallowed"},
+				[]string{"quota-with-no-limit-to-services", "434M", "1M", "2", "unlimited", "disallowed", "7"},
+			))
+
+			quotaRepo.FindAllReturns([]models.QuotaFields{
+				models.QuotaFields{
+					Name:                    "quota-with-no-limit-to-app-instance",
+					MemoryLimit:             434,
+					InstanceMemoryLimit:     1,
+					RoutesLimit:             2,
+					ServicesLimit:           7,
+					NonBasicServicesAllowed: false,
+					AppInstanceLimit:        -1,
+				},
+			}, nil)
+			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"quota-with-no-limit-to-app-instance", "434M", "1M", "2", "7", "disallowed", "unlimited"},
 			))
 		})
 	})
