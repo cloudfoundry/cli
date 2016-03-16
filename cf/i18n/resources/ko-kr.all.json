@@ -284,6 +284,10 @@
     "translation": "앱 "
   },
   {
+    "id": "App instance limit",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "앱 이름은 필수 필드임"
   },
@@ -4498,6 +4502,10 @@
   {
     "id": "app crashed",
     "translation": "앱 충돌"
+  },
+  {
+    "id": "app instance limit",
+    "translation": ""
   },
   {
     "id": "app ports",

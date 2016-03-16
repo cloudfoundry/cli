@@ -28,6 +28,10 @@
     "translation": "App "
   },
   {
+    "id": "App instance limit",
+    "translation": "App instance limit"
+  },
+  {
     "id": "Apps:",
     "translation": "Apps:"
   },
@@ -938,6 +942,10 @@
   {
     "id": "Windows PowerShell",
     "translation": "Windows PowerShell"
+  },
+  {
+    "id": "app instance limit",
+    "translation": "app instance limit"
   },
   {
     "id": "app ports",

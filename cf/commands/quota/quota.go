@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -76,11 +77,18 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 	if servicesLimit == "-1" {
 		servicesLimit = T("unlimited")
 	}
+
+	appInstanceLimit := strconv.Itoa(quota.AppInstanceLimit)
+	if quota.AppInstanceLimit == resources.UnlimitedAppInstances {
+		appInstanceLimit = T("unlimited")
+	}
+
 	table := terminal.NewTable(cmd.ui, []string{"", ""})
 	table.Add(T("Total Memory"), formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE))
 	table.Add(T("Instance Memory"), megabytes)
-	table.Add(T("Routes"), fmt.Sprintf("%d", quota.RoutesLimit))
+	table.Add(T("Routes"), fmt.Sprint(quota.RoutesLimit))
 	table.Add(T("Services"), servicesLimit)
 	table.Add(T("Paid service plans"), formatters.Allowed(quota.NonBasicServicesAllowed))
+	table.Add(T("App instance limit"), appInstanceLimit)
 	table.Print()
 }

@@ -28,6 +28,10 @@
     "translation": "App "
   },
   {
+    "id": "App instance limit",
+    "translation": "App instance limit"
+  },
+  {
     "id": "Apps:",
     "translation": "Apps:"
   },
@@ -918,6 +922,10 @@
   {
     "id": "app",
     "translation": "app"
+  },
+  {
+    "id": "app instance limit",
+    "translation": "app instance limit"
   },
   {
     "id": "app ports",

@@ -20,6 +20,10 @@
     "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
   },
   {
+    "id": "App instance limit",
+    "translation": "App instance limit"
+  },
+  {
     "id": "Bind a service instance to an HTTP route",
     "translation": "Bind a service instance to an HTTP route"
   },
@@ -794,6 +798,10 @@
   {
     "id": "[PRIVATE DATA HIDDEN]",
     "translation": "[PRIVATE DATA HIDDEN]"
+  },
+  {
+    "id": "app instance limit",
+    "translation": "app instance limit"
   },
   {
     "id": "app ports",
