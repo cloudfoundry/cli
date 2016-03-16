@@ -1,6 +1,7 @@
 package quota
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,6 +31,7 @@ func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
 	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Total amount of memory (e.g. 1024M, 1G, 10G)")}
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
+	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-quota",
@@ -48,6 +50,10 @@ func (cmd *CreateQuota) Requirements(requirementsFactory requirements.Factory, f
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+	}
+
+	if fc.IsSet("a") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.AppInstanceLimitMinimumApiVersion))
 	}
 
 	return reqs
@@ -99,6 +105,12 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 
 	if context.IsSet("s") {
 		quota.ServicesLimit = context.Int("s")
+	}
+
+	if context.IsSet("a") {
+		quota.AppInstanceLimit = context.Int("a")
+	} else {
+		quota.AppInstanceLimit = -1
 	}
 
 	if context.IsSet("allow-paid-service-plans") {

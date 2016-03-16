@@ -852,6 +852,10 @@
     "translation": "The targeted API endpoint could not be reached."
   },
   {
+    "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
+    "translation": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)"
+  },
+  {
     "id": "URL to which logs for bound applications will be streamed",
     "translation": "URL to which logs for bound applications will be streamed"
   },

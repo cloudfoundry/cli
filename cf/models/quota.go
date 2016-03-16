@@ -18,4 +18,5 @@ type QuotaFields struct {
 	RoutesLimit             int    `json:"total_routes"`
 	ServicesLimit           int    `json:"total_services"`
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
+	AppInstanceLimit        int    `json:"app_instance_limit"`
 }

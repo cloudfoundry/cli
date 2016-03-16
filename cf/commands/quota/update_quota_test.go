@@ -1,6 +1,7 @@
 package quota_test
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -36,7 +37,10 @@ var _ = Describe("app Command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{
+			LoginSuccess:         true,
+			MinAPIVersionSuccess: true,
+		}
 		quotaRepo = &fakes.FakeQuotaRepository{}
 	})
 
@@ -45,18 +49,40 @@ var _ = Describe("app Command", func() {
 	}
 
 	Describe("requirements", func() {
-		It("fails if not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+		Context("login requirement", func() {
+			It("fails if not logged in", func() {
+				requirementsFactory.LoginSuccess = false
 
-			Expect(runCommand("cf-plays-dwarf-fortress")).To(BeFalse())
+				Expect(runCommand("cf-plays-dwarf-fortress")).To(BeFalse())
+			})
 		})
 
-		It("fails with usage when no arguments are given", func() {
-			passed := runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
-			))
-			Expect(passed).To(BeFalse())
+		Context("usage requirement", func() {
+			It("fails with usage when no arguments are given", func() {
+				passed := runCommand()
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage", "Requires an argument"},
+				))
+				Expect(passed).To(BeFalse())
+			})
+		})
+
+		Context("the minimum API version requirement", func() {
+			BeforeEach(func() {
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.MinAPIVersionSuccess = false
+			})
+
+			It("fails when the -a option is provided", func() {
+				Expect(runCommand("quota-name", "-a", "10")).To(BeFalse())
+
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.AppInstanceLimitMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+			})
+
+			It("does not fail when the -a option is not provided", func() {
+				Expect(runCommand("quota-name", "-m", "10G")).To(BeTrue())
+			})
 		})
 	})
 
@@ -93,6 +119,20 @@ var _ = Describe("app Command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Incorrect Usage"},
 				))
+			})
+		})
+
+		Context("when the -a flag is provided", func() {
+			It("updated the total number of application instances limit", func() {
+				runCommand("-a", "2", "quota-name")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(2))
+			})
+
+			It("totally accepts -1 as a value because it means unlimited", func() {
+				runCommand("-a", "-1", "quota-name")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(-1))
 			})
 		})
 
@@ -165,12 +205,24 @@ var _ = Describe("app Command", func() {
 				})
 			})
 		})
-	})
 
-	It("shows an error when updating fails", func() {
-		quotaRepo.UpdateReturns(errors.New("I accidentally a quota"))
-		runCommand("-m", "1M", "dead-serious")
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+		It("shows an error when updating fails", func() {
+			quotaRepo.UpdateReturns(errors.New("I accidentally a quota"))
+			runCommand("-m", "1M", "dead-serious")
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+		})
+
+		It("shows a message explaining the update", func() {
+			quota.Name = "i-love-ui"
+			quotaRepo.FindByNameReturns(quota, nil)
+
+			runCommand("-m", "50G", "i-love-ui")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating quota", "i-love-ui", "as", "my-user"},
+				[]string{"OK"},
+			))
+		})
+
 	})
 
 	It("shows the user an error when finding the quota fails", func() {
@@ -178,16 +230,5 @@ var _ = Describe("app Command", func() {
 
 		runCommand("-m", "50Somethings", "what-could-possibly-go-wrong?")
 		Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-	})
-
-	It("shows a message explaining the update", func() {
-		quota.Name = "i-love-ui"
-		quotaRepo.FindByNameReturns(quota, nil)
-
-		runCommand("-m", "50G", "i-love-ui")
-		Expect(ui.Outputs).To(ContainSubstrings(
-			[]string{"Updating quota", "i-love-ui", "as", "my-user"},
-			[]string{"OK"},
-		))
 	})
 })

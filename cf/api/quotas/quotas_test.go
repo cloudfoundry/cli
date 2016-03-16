@@ -151,9 +151,11 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("AssignQuotaToOrg", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("PUT", "/v2/organizations/my-org-guid"),
-				ghttp.VerifyJSON(`{"quota_definition_guid":"my-quota-guid"}`),
-				ghttp.RespondWith(http.StatusCreated, nil),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/v2/organizations/my-org-guid"),
+					ghttp.VerifyJSON(`{"quota_definition_guid":"my-quota-guid"}`),
+					ghttp.RespondWith(http.StatusCreated, nil),
+				),
 			)
 		})
 
@@ -167,26 +169,31 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("Create", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("POST", "/v2/quota_definitions"),
-				ghttp.VerifyJSON(`{
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/v2/quota_definitions"),
+					ghttp.VerifyJSON(`{
 					"name": "not-so-strict",
 					"non_basic_services_allowed": false,
 					"total_services": 1,
 					"total_routes": 12,
 					"memory_limit": 123,
+					"app_instance_limit": 42,
 					"instance_memory_limit": 0
 				}`),
-				ghttp.RespondWith(http.StatusCreated, nil),
+					ghttp.RespondWith(http.StatusCreated, nil),
+				),
 			)
 		})
 
 		It("creates a new quota with the given name", func() {
 			quota := models.QuotaFields{
-				Name:          "not-so-strict",
-				ServicesLimit: 1,
-				RoutesLimit:   12,
-				MemoryLimit:   123,
+				Name:             "not-so-strict",
+				ServicesLimit:    1,
+				RoutesLimit:      12,
+				MemoryLimit:      123,
+				AppInstanceLimit: 42,
 			}
+
 			err := repo.Create(quota)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
@@ -196,27 +203,32 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("Update", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("PUT", "/v2/quota_definitions/my-quota-guid"),
-				ghttp.VerifyJSON(`{
+				ghttp.CombineHandlers(
+
+					ghttp.VerifyRequest("PUT", "/v2/quota_definitions/my-quota-guid"),
+					ghttp.VerifyJSON(`{
 					"guid": "my-quota-guid",
 					"non_basic_services_allowed": false,
 					"name": "amazing-quota",
 					"total_services": 1,
 					"total_routes": 12,
 					"memory_limit": 123,
+					"app_instance_limit": 42,
 					"instance_memory_limit": 0
 				}`),
-				ghttp.RespondWith(http.StatusOK, nil),
+					ghttp.RespondWith(http.StatusOK, nil),
+				),
 			)
 		})
 
 		It("updates an existing quota", func() {
 			quota := models.QuotaFields{
-				Guid:          "my-quota-guid",
-				Name:          "amazing-quota",
-				ServicesLimit: 1,
-				RoutesLimit:   12,
-				MemoryLimit:   123,
+				Guid:             "my-quota-guid",
+				Name:             "amazing-quota",
+				ServicesLimit:    1,
+				RoutesLimit:      12,
+				MemoryLimit:      123,
+				AppInstanceLimit: 42,
 			}
 
 			err := repo.Update(quota)
@@ -228,8 +240,10 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("Delete", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("DELETE", "/v2/quota_definitions/my-quota-guid"),
-				ghttp.RespondWith(http.StatusNoContent, nil),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("DELETE", "/v2/quota_definitions/my-quota-guid"),
+					ghttp.RespondWith(http.StatusNoContent, nil),
+				),
 			)
 		})
 

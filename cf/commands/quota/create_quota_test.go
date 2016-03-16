@@ -1,6 +1,7 @@
 package quota_test
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -52,9 +53,28 @@ var _ = Describe("create-quota command", func() {
 		})
 	})
 
+	Context("the minimum API version requirement", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.MinAPIVersionSuccess = false
+		})
+
+		It("fails when the -a option is provided", func() {
+			Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
+
+			Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.AppInstanceLimitMinimumApiVersion))
+			Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+		})
+
+		It("does not fail when the -a option is not provided", func() {
+			Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
+		})
+	})
+
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+			requirementsFactory.MinAPIVersionSuccess = true
 		})
 
 		It("fails requirements when called without a quota name", func() {
@@ -113,6 +133,21 @@ var _ = Describe("create-quota command", func() {
 				})
 			})
 		})
+
+		Context("when the -a flag is provided", func() {
+			It("sets the app limit", func() {
+				runCommand("my-quota", "-a", "10")
+
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(10))
+			})
+
+			It("defaults to unlimited", func() {
+				runCommand("my-quota")
+
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(-1))
+			})
+		})
+
 		It("sets the route limit", func() {
 			runCommand("-r", "12", "ecstatic")
 
@@ -124,15 +159,15 @@ var _ = Describe("create-quota command", func() {
 			Expect(quotaRepo.CreateArgsForCall(0).ServicesLimit).To(Equal(42))
 		})
 
-		It("defaults to not allowing paid service plans", func() {
-			runCommand("my-pro-bono-quota")
-			Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
-		})
-
 		Context("when requesting to allow paid service plans", func() {
 			It("creates the quota with paid service plans allowed", func() {
 				runCommand("--allow-paid-service-plans", "my-for-profit-quota")
 				Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeTrue())
+			})
+
+			It("defaults to not allowing paid service plans", func() {
+				runCommand("my-pro-bono-quota")
+				Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
 			})
 		})
 
