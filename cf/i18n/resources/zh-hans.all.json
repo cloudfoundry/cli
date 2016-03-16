@@ -284,6 +284,10 @@
     "translation": "应用程序"
   },
   {
+    "id": "App instance limit",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "应用程序名称是必填字段"
   },
@@ -4498,6 +4502,10 @@
   {
     "id": "app crashed",
     "translation": "应用程序已崩溃"
+  },
+  {
+    "id": "app instance limit",
+    "translation": ""
   },
   {
     "id": "app ports",

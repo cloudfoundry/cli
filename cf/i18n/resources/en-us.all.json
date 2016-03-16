@@ -284,6 +284,10 @@
     "translation": "App "
   },
   {
+    "id": "App instance limit",
+    "translation": "App instance limit"
+  },
+  {
     "id": "App name is a required field",
     "translation": "App name is a required field"
   },
@@ -4498,6 +4502,10 @@
   {
     "id": "app crashed",
     "translation": "app crashed"
+  },
+  {
+    "id": "app instance limit",
+    "translation": "app instance limit"
   },
   {
     "id": "app ports",
