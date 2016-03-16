@@ -540,10 +540,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": ""
   },
@@ -2352,6 +2348,10 @@
     "translation": "INSTALLIERTE PLUG-IN-BEFEHLE"
   },
   {
+    "id": "INSTANCE_MEMORY",
+    "translation": ""
+  },
+  {
     "id": "Ignore manifest file",
     "translation": "Manifestdatei ignorieren"
   },
@@ -3296,6 +3296,10 @@
     "translation": "Eine einzelne App mit einer Push-Operation übertragen (mit oder ohne Manifest):\n"
   },
   {
+    "id": "QUOTA",
+    "translation": ""
+  },
+  {
     "id": "Quota Definition {{.QuotaName}} already exists",
     "translation": "Größenbeschränkungsdefinition {{.QuotaName}} ist bereits vorhanden"
   },
@@ -3617,6 +3621,10 @@
   },
   {
     "id": "SERVICES",
+    "translation": ""
+  },
+  {
+    "id": "SERVICE_INSTANCES",
     "translation": ""
   },
   {
@@ -3982,6 +3990,10 @@
   {
     "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
     "translation": "TIPP: Verwenden Sie '{{.CfUpdateBuildpackCommand}}', um dieses Buildpack zu aktualisieren."
+  },
+  {
+    "id": "TOTAL_MEMORY",
+    "translation": ""
   },
   {
     "id": "Tags: {{.Tags}}",

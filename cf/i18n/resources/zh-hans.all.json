@@ -540,10 +540,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": ""
   },
@@ -2352,6 +2348,10 @@
     "translation": "已安装插件命令"
   },
   {
+    "id": "INSTANCE_MEMORY",
+    "translation": ""
+  },
+  {
     "id": "Ignore manifest file",
     "translation": "忽略清单文件"
   },
@@ -3296,6 +3296,10 @@
     "translation": "推送单个应用程序（使用或不使用清单）：\n"
   },
   {
+    "id": "QUOTA",
+    "translation": ""
+  },
+  {
     "id": "Quota Definition {{.QuotaName}} already exists",
     "translation": "配额定义 {{.QuotaName}} 已存在"
   },
@@ -3618,6 +3622,10 @@
   {
     "id": "SERVICES",
     "translation": "服务"
+  },
+  {
+    "id": "SERVICE_INSTANCES",
+    "translation": ""
   },
   {
     "id": "SPACE ADMIN",
@@ -3982,6 +3990,10 @@
   {
     "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
     "translation": "提示：使用“{{.CfUpdateBuildpackCommand}}”可更新此 buildpack"
+  },
+  {
+    "id": "TOTAL_MEMORY",
+    "translation": ""
   },
   {
     "id": "Tags: {{.Tags}}",

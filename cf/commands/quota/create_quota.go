@@ -1,6 +1,8 @@
 package quota
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -37,7 +39,14 @@ func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
 		Name:        "create-quota",
 		Description: T("Define a new resource quota"),
 		Usage: []string{
-			T("CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
+			"CF_NAME create-quota ",
+			T("QUOTA"),
+			" ",
+			fmt.Sprintf("[-m %s] ", T("TOTAL_MEMORY")),
+			fmt.Sprintf("[-i %s] ", T("INSTANCE_MEMORY")),
+			fmt.Sprintf("[-r %s] ", T("ROUTES")),
+			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
+			"[--allow-paid-service-plans]",
 		},
 		Flags: fs,
 	}
