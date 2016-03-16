@@ -4084,6 +4084,10 @@
     "translation": "空間可以具有的總記憶體數量（例如 1024M、1G、10G）"
   },
   {
+    "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
+    "translation": ""
+  },
+  {
     "id": "Total number of routes",
     "translation": "路徑總數"
   },

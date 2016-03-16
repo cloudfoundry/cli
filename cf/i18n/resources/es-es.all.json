@@ -4084,6 +4084,10 @@
     "translation": "Cantidad total de memoria que puede tener un espacio (p. ej. 1024M, 1G, 10G)"
   },
   {
+    "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
+    "translation": ""
+  },
+  {
     "id": "Total number of routes",
     "translation": "Número total de rutas"
   },

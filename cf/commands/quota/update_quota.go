@@ -1,6 +1,7 @@
 package quota
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,6 +31,7 @@ func (cmd *updateQuota) MetaData() command_registry.CommandMetadata {
 	fs["n"] = &flags.StringFlag{ShortName: "n", Usage: T("New name")}
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
+	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-quota",
@@ -48,6 +50,10 @@ func (cmd *updateQuota) Requirements(requirementsFactory requirements.Factory, f
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
+	}
+
+	if fc.IsSet("a") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.AppInstanceLimitMinimumApiVersion))
 	}
 
 	return reqs
@@ -100,7 +106,13 @@ func (cmd *updateQuota) Execute(c flags.FlagContext) {
 		quota.InstanceMemoryLimit = memory
 	}
 
-	if c.String("m") != "" {
+	if c.IsSet("a") {
+		quota.AppInstanceLimit = c.Int("a")
+	} else {
+		quota.AppInstanceLimit = -1
+	}
+
+	if c.IsSet("m") {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {

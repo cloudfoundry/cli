@@ -756,6 +756,10 @@
     "translation": "The targeted API endpoint could not be reached."
   },
   {
+    "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
+    "translation": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)"
+  },
+  {
     "id": "Unable to determine CC API Version. Please log in again.",
     "translation": "Unable to determine CC API Version. Please log in again."
   },
