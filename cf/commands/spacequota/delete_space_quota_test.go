@@ -17,7 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("delete-quota command", func() {
+var _ = Describe("delete-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *fakes.FakeSpaceQuotaRepository
