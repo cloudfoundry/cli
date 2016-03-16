@@ -47,6 +47,7 @@ func (cmd *updateQuota) MetaData() command_registry.CommandMetadata {
 			fmt.Sprintf("[-n %s] ", T("NEW_NAME")),
 			fmt.Sprintf("[-r %s] ", T("ROUTES")),
 			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
+			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
 			"[--allow-paid-service-plans | --disallow-paid-service-plans]",
 		},
 		Flags: fs,

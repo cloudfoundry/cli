@@ -46,6 +46,7 @@ func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
 			fmt.Sprintf("[-i %s] ", T("INSTANCE_MEMORY")),
 			fmt.Sprintf("[-r %s] ", T("ROUTES")),
 			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
+			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
 			"[--allow-paid-service-plans]",
 		},
 		Flags: fs,
