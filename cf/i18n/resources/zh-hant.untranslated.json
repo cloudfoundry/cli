@@ -108,10 +108,6 @@
     "translation": "CF_NAME create-org ORG"
   },
   {
-    "id": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": "CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
-  },
-  {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
     "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
@@ -720,6 +716,10 @@
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
   },
   {
+    "id": "INSTANCE_MEMORY",
+    "translation": "INSTANCE_MEMORY"
+  },
+  {
     "id": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
     "translation": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'"
   },
@@ -792,6 +792,10 @@
     "translation": "Port for the TCP route"
   },
   {
+    "id": "QUOTA",
+    "translation": "QUOTA"
+  },
+  {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
     "translation": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}"
   },
@@ -816,6 +820,10 @@
     "translation": "Routes for this domain will be configured only on the specified router group"
   },
   {
+    "id": "SERVICE_INSTANCES",
+    "translation": "SERVICE_INSTANCES"
+  },
+  {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
     "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org"
   },
@@ -826,6 +834,10 @@
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
     "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
+  },
+  {
+    "id": "TOTAL_MEMORY",
+    "translation": "TOTAL_MEMORY"
   },
   {
     "id": "Tags: {{.Tags}}",
