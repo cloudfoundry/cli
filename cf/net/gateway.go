@@ -141,10 +141,12 @@ func (gateway Gateway) DeleteResource(endpoint, apiUrl string) error {
 	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, false, &AsyncResource{})
 }
 
-func (gateway Gateway) ListPaginatedResources(target string,
+func (gateway Gateway) ListPaginatedResources(
+	target string,
 	path string,
 	resource interface{},
-	cb func(interface{}) bool) error {
+	cb func(interface{}) bool,
+) error {
 	for path != "" {
 		pagination := NewPaginatedResources(resource)
 

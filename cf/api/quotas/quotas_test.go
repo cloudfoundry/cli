@@ -51,7 +51,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"instance_memory_limit": -1,
 									"total_routes": 123,
 									"total_services": 321,
-									"non_basic_services_allowed": true
+									"non_basic_services_allowed": true,
+									"app_instance_limit": 7
 								}
 							}
 						]
@@ -87,11 +88,17 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				RoutesLimit:             123,
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
+				AppInstanceLimit:        7,
 			}))
 		})
 	})
 
 	Describe("FindAll", func() {
+		var (
+			quotas []models.QuotaFields
+			err    error
+		)
+
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -107,7 +114,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"instance_memory_limit": -1,
 									"total_routes": 123,
 									"total_services": 321,
-									"non_basic_services_allowed": true
+									"non_basic_services_allowed": true,
+									"app_instance_limit": 7
 								}
 							}
 						]
@@ -131,10 +139,12 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			)
 		})
 
-		It("finds all Quota definitions", func() {
-			quotas, err := repo.FindAll()
+		JustBeforeEach(func() {
+			quotas, err = repo.FindAll()
 			Expect(err).NotTo(HaveOccurred())
+		})
 
+		It("finds all Quota definitions", func() {
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			Expect(quotas).To(HaveLen(3))
 			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
@@ -142,9 +152,14 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(quotas[0].MemoryLimit).To(Equal(int64(1024)))
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
+			Expect(quotas[0].AppInstanceLimit).To(Equal(7))
 
 			Expect(quotas[1].Guid).To(Equal("my-quota-guid2"))
 			Expect(quotas[2].Guid).To(Equal("my-quota-guid3"))
+		})
+
+		It("defaults missing app instance limit to -1 (unlimited)", func() {
+			Expect(quotas[1].AppInstanceLimit).To(Equal(-1))
 		})
 	})
 
