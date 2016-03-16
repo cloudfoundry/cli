@@ -109,6 +109,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-1]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
@@ -199,6 +200,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-2]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
@@ -290,6 +292,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-3]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
@@ -380,6 +383,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-4]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
