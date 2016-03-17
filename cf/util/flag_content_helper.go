@@ -11,6 +11,10 @@ func GetContentsFromFlagValue(input string) ([]byte, error) {
 		return []byte{}, fmt.Errorf("invalid input: %s", input)
 	}
 
+	return GetContentsFromOptionalFlagValue(input)
+}
+
+func GetContentsFromOptionalFlagValue(input string) ([]byte, error) {
 	trimmedInput := strings.Trim(input, `"'`)
 	if strings.HasPrefix(trimmedInput, `@`) {
 		trimmedInput = strings.Trim(trimmedInput[1:], `"'`)

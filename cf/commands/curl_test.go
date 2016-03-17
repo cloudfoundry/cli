@@ -148,7 +148,7 @@ var _ = Describe("curl command", func() {
 		})
 
 		It("does not fail with empty string", func() {
-			runCurlWithInputs([]string{"/foo", "-d", "''"})
+			runCurlWithInputs([]string{"/foo", "-d", ""})
 
 			Expect(curlRepo.Body).To(Equal(""))
 			Expect(curlRepo.Method).To(Equal("POST"))

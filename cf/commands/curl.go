@@ -85,7 +85,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 	if c.IsSet("d") {
 		method = "POST"
 
-		jsonBytes, err := util.GetContentsFromFlagValue(c.String("d"))
+		jsonBytes, err := util.GetContentsFromOptionalFlagValue(c.String("d"))
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
