@@ -153,6 +153,9 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, rand
 	}
 
 	cmd.ui.Ok()
+	if randomPort {
+		cmd.ui.Say("Route %s:%d has been created", route.Domain.Name, route.Port)
+	}
 
 	return route, nil
 }
