@@ -132,7 +132,10 @@ func generateAppMap(app models.Application) (generic.Map, error) {
 	m.Set("instances", app.InstanceCount)
 	m.Set("disk_quota", fmt.Sprintf("%dM", app.DiskQuota))
 	m.Set("stack", app.Stack.Name)
-	m.Set("app-ports", app.AppPorts)
+
+	if len(app.AppPorts) > 0 {
+		m.Set("app-ports", app.AppPorts)
+	}
 
 	if app.BuildpackUrl != "" {
 		m.Set("buildpack", app.BuildpackUrl)

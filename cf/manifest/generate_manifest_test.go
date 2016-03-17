@@ -28,7 +28,6 @@ var _ = Describe("generate_manifest", func() {
 				m.Memory("app1", 1024)
 				m.Instances("app1", 2)
 				m.DiskQuota("app1", 1024)
-				m.AppPorts("app1", []int{1111, 2222})
 			})
 
 			It("creates a top-level applications key", func() {
@@ -48,7 +47,6 @@ var _ = Describe("generate_manifest", func() {
 				Expect(applications[0].DiskQuota).To(Equal("1024M"))
 				Expect(applications[0].Stack).To(Equal("stack-name"))
 				Expect(applications[0].Instances).To(Equal(2))
-				Expect(applications[0].AppPorts).To(Equal([]int{1111, 2222}))
 			})
 
 			It("creates entries under the given app name", func() {
@@ -56,7 +54,6 @@ var _ = Describe("generate_manifest", func() {
 				m.Memory("app2", 2048)
 				m.Instances("app2", 3)
 				m.DiskQuota("app2", 2048)
-				m.AppPorts("app2", []int{8888, 9999})
 				m.Save(f)
 
 				applications := getYaml(f).Applications
@@ -66,7 +63,20 @@ var _ = Describe("generate_manifest", func() {
 				Expect(applications[1].DiskQuota).To(Equal("2048M"))
 				Expect(applications[1].Stack).To(Equal("stack-name"))
 				Expect(applications[1].Instances).To(Equal(3))
-				Expect(applications[1].AppPorts).To(Equal([]int{8888, 9999}))
+			})
+
+			Context("when an application has app-ports", func() {
+				BeforeEach(func() {
+					m.AppPorts("app1", []int{1111, 2222})
+				})
+
+				It("includes app-ports for that app", func() {
+					err := m.Save(f)
+					Expect(err).NotTo(HaveOccurred())
+					applications := getYaml(f).Applications
+
+					Expect(applications[0].AppPorts).To(Equal([]int{1111, 2222}))
+				})
 			})
 
 			Context("when an application has services", func() {
