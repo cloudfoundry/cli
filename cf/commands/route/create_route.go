@@ -2,9 +2,7 @@ package route
 
 import (
 	"fmt"
-	"html/template"
 
-	"bytes"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
