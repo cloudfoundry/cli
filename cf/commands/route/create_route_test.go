@@ -85,7 +85,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires SPACE and DOMAIN as arguments"},
 					[]string{"NAME"},
@@ -190,7 +192,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify port together with hostname and/or path."},
@@ -205,7 +209,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify port together with hostname and/or path."},
@@ -220,7 +226,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
@@ -235,7 +243,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
@@ -250,7 +260,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Requirements(factory, flagContext)
+				}).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
@@ -348,7 +360,9 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("attempts to find the route", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+				Expect(func() {
+					cmd.Execute(flagContext)
+				}).To(Panic())
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 
 				host, domain, path, port := routeRepo.FindArgsForCall(0)
@@ -364,21 +378,27 @@ var _ = Describe("CreateRoute", func() {
 				})
 
 				It("fails with the original error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(func() {
+						cmd.Execute(flagContext)
+					}).To(Panic())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}, []string{"create-error"}))
 				})
 			})
 
 			Context("when a route with the same space guid, but different domain guid is found", func() {
 				It("fails with the original error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(func() {
+						cmd.Execute(flagContext)
+					}).To(Panic())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}, []string{"create-error"}))
 				})
 			})
 
 			Context("when a route with the same domain guid, but different space guid is found", func() {
 				It("fails with the original error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(func() {
+						cmd.Execute(flagContext)
+					}).To(Panic())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}, []string{"create-error"}))
 				})
 			})
@@ -503,13 +523,33 @@ var _ = Describe("CreateRoute", func() {
 		})
 
 		Context("when creating the route succeeds", func() {
-			BeforeEach(func() {
-				routeRepo.CreateInSpaceReturns(models.Route{}, nil)
+			var route models.Route
+
+			JustBeforeEach(func() {
+				routeRepo.CreateInSpaceReturns(route, nil)
 			})
 
 			It("prints a success message", func() {
 				rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+			})
+
+			Context("when --random-port is specified", func() {
+				BeforeEach(func() {
+					route = models.Route{
+						Host:   "some-host",
+						Domain: domainFields,
+						Port:   9090,
+					}
+				})
+
+				It("print a success message with created route", func() {
+					rc.CreateRoute("hostname", "path", 0, true, domainFields, spaceFields)
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"OK"},
+						[]string{"Route domain-name:9090 has been created"},
+					))
+				})
 			})
 		})
 	})
