@@ -1384,6 +1384,10 @@
     "translation": "Angepasste Header, die in die Anforderung einbezogen werden sollen. Das Flag kann mehrfach angegeben werden. "
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "DOMÄNEN"
   },
@@ -2312,6 +2316,10 @@
     "translation": "Abrufen von Benutzern in Organisation {{.TargetOrg}} als {{.CurrentUser}}..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "Neustart der Anwendung in der Zielumgebung überschreiben, nachdem das Kopieren der Quelle abgeschlossen ist"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "Bezahlte Servicepläne"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

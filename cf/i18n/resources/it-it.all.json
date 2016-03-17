@@ -1384,6 +1384,10 @@
     "translation": "Intestazioni personalizzate da includere nella richiesta, l'indicatore può essere specificato più volte"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "DOMINI"
   },
@@ -2312,6 +2316,10 @@
     "translation": "Richiamo degli utenti nell'organizzazione {{.TargetOrg}} come {{.CurrentUser}}..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "Sovrascrivi il riavvio dell'applicazione nell'ambiente di destinazione al completamento del comando copy-source"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "Piani di servizio a pagamento"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

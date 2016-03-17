@@ -640,6 +640,10 @@
     "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
   },
   {
+    "id": "DOMAIN",
+    "translation": "DOMAIN"
+  },
+  {
     "id": "EXAMPLES",
     "translation": "EXAMPLES"
   },
@@ -698,6 +702,10 @@
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
+  },
+  {
+    "id": "HOSTNAME",
+    "translation": "HOSTNAME"
   },
   {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
@@ -780,6 +788,14 @@
     "translation": "No app files found in '{{.Path}}'"
   },
   {
+    "id": "PATH",
+    "translation": "PATH"
+  },
+  {
+    "id": "PORT",
+    "translation": "PORT"
+  },
+  {
     "id": "Path for the HTTP route",
     "translation": "Path for the HTTP route"
   },
@@ -826,6 +842,10 @@
   {
     "id": "SERVICE_INSTANCES",
     "translation": "SERVICE_INSTANCES"
+  },
+  {
+    "id": "SPACE",
+    "translation": "SPACE"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",

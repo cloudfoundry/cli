@@ -1384,6 +1384,10 @@
     "translation": "Cabeceras personalizadas para incluir en la solicitud, el distintivo puede especificarse varias veces"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": ""
   },
@@ -2312,6 +2316,10 @@
     "translation": "Obteniendo usuarios en la organización {{.TargetOrg}} como {{.CurrentUser}}..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "Alterar temporalmente el reinicio de la aplicación en el entorno de destino una vez que finalice copy-source"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "Planes de servicio de pago"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

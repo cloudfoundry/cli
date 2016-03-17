@@ -1384,6 +1384,10 @@
     "translation": "要包含在请求中的定制头，标志可以指定多次"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "域"
   },
@@ -2312,6 +2316,10 @@
     "translation": "正在以 {{.CurrentUser}} 身份获取组织 {{.TargetOrg}} 中的用户..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "覆盖在 copy-source 完成后重新启动目标环境中应用程序的操作"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "已付费服务套餐"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

@@ -1384,6 +1384,10 @@
     "translation": "Cabeçalhos customizados para incluir na solicitação, a sinalização pode ser especificada várias vezes"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": ""
   },
@@ -2312,6 +2316,10 @@
     "translation": "Obtendo usuários na organização {{.TargetOrg}} como {{.CurrentUser}}..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "Substituir a reinicialização do aplicativo no ambiente de destino após a conclusão de copy-source"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "Planos de serviços pagos"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

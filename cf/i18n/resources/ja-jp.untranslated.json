@@ -632,6 +632,10 @@
     "translation": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}..."
   },
   {
+    "id": "DOMAIN",
+    "translation": "DOMAIN"
+  },
+  {
     "id": "Error getting SSH code: ",
     "translation": "Error getting SSH code: "
   },
@@ -670,6 +674,10 @@
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
+  },
+  {
+    "id": "HOSTNAME",
+    "translation": "HOSTNAME"
   },
   {
     "id": "Hostname for the HTTP route (required for shared domains)",
@@ -714,6 +722,14 @@
   {
     "id": "OK",
     "translation": "OK"
+  },
+  {
+    "id": "PATH",
+    "translation": "PATH"
+  },
+  {
+    "id": "PORT",
+    "translation": "PORT"
   },
   {
     "id": "Path for the HTTP route",
@@ -762,6 +778,10 @@
   {
     "id": "SERVICE_INSTANCES",
     "translation": "SERVICE_INSTANCES"
+  },
+  {
+    "id": "SPACE",
+    "translation": "SPACE"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",

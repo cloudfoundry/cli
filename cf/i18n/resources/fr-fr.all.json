@@ -1384,6 +1384,10 @@
     "translation": "En-têtes personnalisés à inclure dans la demande ; l'indicateur peut être spécifié plusieurs fois "
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "DOMAINES"
   },
@@ -2312,6 +2316,10 @@
     "translation": "Obtention des utilisateurs dans l'organisation {{.TargetOrg}} en tant que {{.CurrentUser}}..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "Substituer le démarrage de l'application dans l'environnement cible une fois la commande copy-source terminée "
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "Plans de service payants "
   },
@@ -3630,6 +3646,10 @@
   {
     "id": "SERVICE_INSTANCES",
     "translation": "INSTANCES_SERVICE"
+  },
+  {
+    "id": "SPACE",
+    "translation": ""
   },
   {
     "id": "SPACE ADMIN",
