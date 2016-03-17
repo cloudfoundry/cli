@@ -1384,6 +1384,10 @@
     "translation": "要併入要求中的自訂標頭，旗標可以指定多次"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "網域"
   },
@@ -2312,6 +2316,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分取得組織 {{.TargetOrg}} 中的使用者..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "在 copy-source 完成之後，置換目標環境中應用程式的重新啟動"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "付費服務方案"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

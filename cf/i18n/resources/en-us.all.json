@@ -1384,6 +1384,10 @@
     "translation": "Custom headers to include in the request, flag can be specified multiple times"
   },
   {
+    "id": "DOMAIN",
+    "translation": "DOMAIN"
+  },
+  {
     "id": "DOMAINS",
     "translation": "DOMAINS"
   },
@@ -2312,6 +2316,10 @@
     "translation": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": "HOSTNAME"
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": "HTTP data to include in the request body, or '@' followed by a file name to read the data from"
   },
@@ -3140,6 +3148,14 @@
     "translation": "Override restart of the application in target environment after copy-source completes"
   },
   {
+    "id": "PATH",
+    "translation": "PATH"
+  },
+  {
+    "id": "PORT",
+    "translation": "PORT"
+  },
+  {
     "id": "Paid service plans",
     "translation": "Paid service plans"
   },
@@ -3630,6 +3646,10 @@
   {
     "id": "SERVICE_INSTANCES",
     "translation": "SERVICE_INSTANCES"
+  },
+  {
+    "id": "SPACE",
+    "translation": "SPACE"
   },
   {
     "id": "SPACE ADMIN",

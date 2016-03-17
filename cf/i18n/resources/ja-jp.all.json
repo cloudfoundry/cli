@@ -1384,6 +1384,10 @@
     "translation": "要求に組み込むカスタム・ヘッダー、フラグは何度でも指定できます"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "ドメイン"
   },
@@ -2312,6 +2316,10 @@
     "translation": "{{.CurrentUser}} として組織 {{.TargetOrg}} 内のユーザーを取得しています..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": "リクエストボディに含まれるHTTPデータ、もしくは'@'に続けたファイル名からデータを読み取ります"
   },
@@ -3140,6 +3148,14 @@
     "translation": "copy-source が完了した後、ターゲット環境内でこのアプリケーションの再始動をオーバーライドします"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "有料サービス・プラン"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

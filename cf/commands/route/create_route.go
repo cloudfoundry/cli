@@ -2,6 +2,9 @@ package route
 
 import (
 	"fmt"
+	"html/template"
+
+	"bytes"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -43,10 +46,16 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 		Description: T("Create a url route in a space for later use"),
 		Usage: []string{
 			fmt.Sprintf("%s:\n", T("Create an HTTP route")),
-			"      CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n",
-			"\n",
+			"      CF_NAME create-route ",
+			fmt.Sprintf("%s ", T("SPACE")),
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
+			fmt.Sprintf("[--path %s]\n\n", T("PATH")),
 			fmt.Sprintf("   %s:\n", T("Create a TCP route")),
-			"      CF_NAME create-route SPACE DOMAIN (--port PORT | --random-port)",
+			"      CF_NAME create-route ",
+			fmt.Sprintf("%s ", T("SPACE")),
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("(--port %s | --random-port)", T("PORT")),
 		},
 		Examples: []string{
 			"CF_NAME create-route my-space example.com                             # example.com",

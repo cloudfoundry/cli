@@ -1384,6 +1384,10 @@
     "translation": "요청에 포함할 사용자 정의 헤더, 플래그를 여러 번 지정할 수 있음"
   },
   {
+    "id": "DOMAIN",
+    "translation": ""
+  },
+  {
     "id": "DOMAINS",
     "translation": "도메인"
   },
@@ -2312,6 +2316,10 @@
     "translation": "{{.CurrentUser}}(으)로 {{.TargetOrg}} 조직의 사용자를 가져오는 중..."
   },
   {
+    "id": "HOSTNAME",
+    "translation": ""
+  },
+  {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
     "translation": ""
   },
@@ -3140,6 +3148,14 @@
     "translation": "copy-source 완료 후 대상 환경에서 애플리케이션의 다시 시작 대체"
   },
   {
+    "id": "PATH",
+    "translation": ""
+  },
+  {
+    "id": "PORT",
+    "translation": ""
+  },
+  {
     "id": "Paid service plans",
     "translation": "유료 서비스 플랜"
   },
@@ -3629,6 +3645,10 @@
   },
   {
     "id": "SERVICE_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "SPACE",
     "translation": ""
   },
   {

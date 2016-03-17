@@ -648,6 +648,10 @@
     "translation": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications"
   },
   {
+    "id": "DOMAIN",
+    "translation": "DOMAIN"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "Dashboard: {{.URL}}"
   },
@@ -710,6 +714,10 @@
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
+  },
+  {
+    "id": "HOSTNAME",
+    "translation": "HOSTNAME"
   },
   {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
@@ -804,6 +812,14 @@
     "translation": "OK"
   },
   {
+    "id": "PATH",
+    "translation": "PATH"
+  },
+  {
+    "id": "PORT",
+    "translation": "PORT"
+  },
+  {
     "id": "Path for the HTTP route",
     "translation": "Path for the HTTP route"
   },
@@ -862,6 +878,10 @@
   {
     "id": "SERVICE_INSTANCES",
     "translation": "SERVICE_INSTANCES"
+  },
+  {
+    "id": "SPACE",
+    "translation": "SPACE"
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
