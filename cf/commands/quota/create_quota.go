@@ -5,6 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -120,7 +121,7 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 	if context.IsSet("a") {
 		quota.AppInstanceLimit = context.Int("a")
 	} else {
-		quota.AppInstanceLimit = -1
+		quota.AppInstanceLimit = resources.UnlimitedAppInstances
 	}
 
 	if context.IsSet("allow-paid-service-plans") {
