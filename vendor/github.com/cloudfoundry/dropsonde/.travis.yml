@@ -1,0 +1,33 @@
+language: go
+notifications:
+  email:
+  - cf-lamb@pivotallabs.com
+before_install:
+- 'if [[ "${TRAVIS_GO_VERSION}" =~ 1.[2-3] ]]; then go get code.google.com/p/go.tools/cmd/cover code.google.com/p/go.tools/cmd/vet; else go get golang.org/x/tools/cmd/cover golang.org/x/tools/cmd/vet; fi'
+
+- go get github.com/mattn/goveralls
+- go get github.com/onsi/ginkgo/ginkgo
+
+after_success:
+- 'echo "mode: atomic" > all.coverprofile'
+- 'find . -name "*.coverprofile" -exec grep -v mode: {} >> all.coverprofile \;'
+- PATH=$HOME/gopath/bin:$PATH goveralls -coverprofile=all.coverprofile -repotoken=$COVERALLS_TOKEN
+
+install:
+- go get -d -v -t ./...
+
+script: PATH=$HOME/gopath/bin:$PATH ./bin/test
+
+go:
+- 1.4
+- 1.5
+- tip
+
+matrix:
+  allow_failures:
+  - go: 1.5
+  - go: tip
+
+env:
+  global:
+    secure: "FjElKYv/qn9DFPYbp/rl41fapRsSvPh7OB0x6T4GZnmDheY6T/oYadHnwp+y5ccDg4nne/IN9+zf46CUpx7RGbjIvy4AeL7L9VS/NlehgWG/tbYFVedXwkruKylqhbbMVrKwsYNBoELnG8SmP1wsvg6mbi1lzf8l1aeufUKQ7nM="

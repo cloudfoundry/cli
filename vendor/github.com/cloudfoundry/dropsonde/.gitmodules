@@ -1,0 +1,3 @@
+[submodule "dropsonde-protocol"]
+	path = dropsonde-protocol
+	url = https://github.com/cloudfoundry/dropsonde-protocol

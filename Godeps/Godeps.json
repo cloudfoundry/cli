@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/cloudfoundry/cli",
 	"GoVersion": "go1.6",
+	"GodepVersion": "v58",
 	"Packages": [
 		"./..."
 	],
@@ -109,6 +110,98 @@
 			"Rev": "fc5f5493005fa72ff7cc67596263d079a978994b"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/dropsonde_marshaller",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/dropsonde_unmarshaller",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/emitter",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/emitter/fake",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/envelope_extensions",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/envelope_sender",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/envelope_sender/fake",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/envelopes",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/factories",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/instrumented_handler",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/instrumented_round_tripper",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/integration_test",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/log_sender",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/log_sender/fake",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/logging",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/logs",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/metric_sender",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/metric_sender/fake",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/metricbatcher",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/metrics",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/runtime_stats",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/dropsonde/signature",
+			"Rev": "9b2cd8f8f9e99dca1f764ca4511d6011b4f44d0c"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/go-ccapi/v3/client",
 			"Rev": "fb58b1b516bba4daa255b3f504df95d6ddfde045"
 		},
@@ -123,6 +216,21 @@
 		{
 			"ImportPath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"Rev": "b9aba8bc5b91f0764131fcac8ea0ff2dd202c8c4"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/gosteno",
+			"Comment": "scotty_09012012-43-g9a57f5d",
+			"Rev": "9a57f5d10a3337d5b566d2494a300052e711d04e"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/gosteno/gosteno-prettify",
+			"Comment": "scotty_09012012-43-g9a57f5d",
+			"Rev": "9a57f5d10a3337d5b566d2494a300052e711d04e"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/gosteno/syslog",
+			"Comment": "scotty_09012012-43-g9a57f5d",
+			"Rev": "9a57f5d10a3337d5b566d2494a300052e711d04e"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/loggregator_consumer",
@@ -145,8 +253,32 @@
 			"Rev": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089"
 		},
 		{
+			"ImportPath": "github.com/cloudfoundry/noaa",
+			"Rev": "87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/container_metrics_sample/consumer",
+			"Rev": "87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/container_metrics_sample/emitter",
+			"Rev": "87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f"
+		},
+		{
 			"ImportPath": "github.com/cloudfoundry/noaa/errors",
-			"Rev": "3c78d4555842c8a7396fa4fc3ef18376c08a3e31"
+			"Rev": "87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/firehose_sample",
+			"Rev": "87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/sample",
+			"Rev": "87a5a9673cf6b87f2d2167a1e1a4fecb7e32986f"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
+			"Rev": "ae27095c3a1b9977a0ef1928b0147d5689f2e921"
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",
@@ -163,8 +295,24 @@
 			"Rev": "6d9a84bcd04cd178033309859eb7bf386a8db85d"
 		},
 		{
+			"ImportPath": "github.com/gogo/protobuf/gogoproto",
+			"Comment": "v0.1-125-g82d16f7",
+			"Rev": "82d16f734d6d871204a3feb1a73cb220cc92574c"
+		},
+		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
-			"Rev": "b9e369e8ffb6773efc654ea13594566404314ee1"
+			"Comment": "v0.1-125-g82d16f7",
+			"Rev": "82d16f734d6d871204a3feb1a73cb220cc92574c"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/proto/proto3_proto",
+			"Comment": "v0.1-125-g82d16f7",
+			"Rev": "82d16f734d6d871204a3feb1a73cb220cc92574c"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
+			"Comment": "v0.1-125-g82d16f7",
+			"Rev": "82d16f734d6d871204a3feb1a73cb220cc92574c"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
