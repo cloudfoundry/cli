@@ -7,7 +7,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/trace/fakes"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -16,7 +15,8 @@ import (
 
 	testAppInstances "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/logs"
+	testapilogs "github.com/cloudfoundry/cli/cf/api/logs/fakes"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -38,8 +38,8 @@ var _ = Describe("start command", func() {
 		defaultInstanceResponses  [][]models.AppInstanceFields
 		defaultInstanceErrorCodes []string
 		requirementsFactory       *testreq.FakeReqFactory
-		logMessages               []*logmessage.LogMessage
-		logRepo                   *testapi.FakeLogsRepository
+		logMessages               []logs.Loggable
+		logRepo                   *testapilogs.FakeLogsRepository
 		appInstancesRepo          *testAppInstances.FakeAppInstancesRepository
 		appRepo                   *testApplication.FakeApplicationRepository
 		originalAppCommand        command_registry.Command
@@ -47,7 +47,7 @@ var _ = Describe("start command", func() {
 		displayApp                *appCmdFakes.FakeAppDisplayer
 	)
 
-	updateCommandDependency := func(logsRepo api.LogsRepository) {
+	updateCommandDependency := func(logsRepo logs.LogsRepository) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
@@ -140,21 +140,15 @@ var _ = Describe("start command", func() {
 			[]models.AppInstanceFields{instance3, instance4},
 		}
 
-		logRepo = &testapi.FakeLogsRepository{}
-		logMessages = []*logmessage.LogMessage{}
-		logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
-			c := make(chan *logmessage.LogMessage)
-
+		logRepo = &testapilogs.FakeLogsRepository{}
+		logMessages = []logs.Loggable{}
+		logRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 			onConnect()
 			go func() {
 				for _, log := range logMessages {
-					c <- log
+					logChan <- log
 				}
-
-				close(c)
 			}()
-
-			return c, nil
 		}
 
 	})
@@ -171,7 +165,7 @@ var _ = Describe("start command", func() {
 
 	callStartWithLoggingTimeout := func(args []string) (ui *testterm.FakeUI) {
 
-		logRepoWithTimeout := &testapi.FakeLogsRepositoryWithTimeout{}
+		logRepoWithTimeout := &testapilogs.FakeLogsRepositoryWithTimeout{}
 
 		updateCommandDependency(logRepoWithTimeout)
 
@@ -367,7 +361,7 @@ var _ = Describe("start command", func() {
 			wrongSourceName := "DEA"
 			correctSourceName := "STG"
 
-			logMessages = []*logmessage.LogMessage{
+			logMessages = []logs.Loggable{
 				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
 				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
 				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
@@ -389,23 +383,18 @@ var _ = Describe("start command", func() {
 		It("gracefully handles starting an app that is still staging", func() {
 			logRepoClosed := make(chan struct{})
 
-			logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
-				c := make(chan *logmessage.LogMessage)
+			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 				onConnect()
 
 				go func() {
-					c <- testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					logChan <- testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
 
 					<-logRepoClosed
 
 					time.Sleep(50 * time.Millisecond)
-					c <- testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
-					c <- testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
-
-					close(c)
+					logChan <- testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					logChan <- testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
 				}()
-
-				return c, nil
 			}
 
 			logRepo.CloseStub = func() {
@@ -658,7 +647,9 @@ var _ = Describe("start command", func() {
 		It("tells the user when connecting to the log server fails", func() {
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
-			logRepo.TailLogsForReturns(nil, errors.New("Ooops"))
+			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
+				errChan <- errors.New("Ooops")
+			}
 
 			requirementsFactory.Application = defaultAppForStart
 

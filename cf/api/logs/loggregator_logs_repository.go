@@ -1,4 +1,4 @@
-package api
+package logs
 
 import (
 	"errors"
@@ -13,18 +13,11 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 )
 
-//go:generate counterfeiter -o fakes/fake_logs_repository.go . LogsRepository
-type LogsRepository interface {
-	RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error)
-	TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error)
-	Close()
-}
-
 type LoggregatorLogsRepository struct {
 	consumer       consumer.LoggregatorConsumer
 	config         core_config.Reader
 	tokenRefresher authentication.TokenRefresher
-	messageQueue   *Loggregator_SortedMessageQueue
+	messageQueue   *LoggregatorMessageQueue
 }
 
 const bufferTime time.Duration = 25 * time.Millisecond
@@ -34,7 +27,7 @@ func NewLoggregatorLogsRepository(config core_config.Reader, consumer consumer.L
 		config:         config,
 		consumer:       consumer,
 		tokenRefresher: refresher,
-		messageQueue:   NewLoggregator_SortedMessageQueue(),
+		messageQueue:   NewLoggregatorMessageQueue(),
 	}
 }
 
@@ -42,26 +35,37 @@ func (repo *LoggregatorLogsRepository) Close() {
 	repo.consumer.Close()
 }
 
-func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
+func loggableMessagesFromLoggregatorMessages(messages []*logmessage.LogMessage) []Loggable {
+	loggableMessages := make([]Loggable, len(messages))
+
+	for i, m := range messages {
+		loggableMessages[i] = NewLoggregatorLogMessage(m)
+	}
+
+	return loggableMessages
+}
+
+func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error) {
 	messages, err := repo.consumer.Recent(appGuid, repo.config.AccessToken())
 
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
-		messages, err = repo.consumer.Recent(appGuid, repo.config.AccessToken())
+		return repo.RecentLogsFor(appGuid)
 	default:
-		return messages, err
+		return loggableMessagesFromLoggregatorMessages(messages), err
 	}
 
 	consumer.SortRecent(messages)
-	return messages, err
+
+	return loggableMessagesFromLoggregatorMessages(messages), nil
 }
 
-func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan Loggable, error) {
 	ticker := time.NewTicker(bufferTime)
 
-	c := make(chan *logmessage.LogMessage)
+	c := make(chan Loggable)
 
 	endpoint := repo.config.LoggregatorEndpoint()
 	if endpoint == "" {
@@ -101,8 +105,8 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect fun
 	return c, nil
 }
 
-func (repo *LoggregatorLogsRepository) flushMessageQueue(c chan *logmessage.LogMessage) {
+func (repo *LoggregatorLogsRepository) flushMessageQueue(c chan Loggable) {
 	repo.messageQueue.EnumerateAndClear(func(m *logmessage.LogMessage) {
-		c <- m
+		c <- NewLoggregatorLogMessage(m)
 	})
 }

@@ -1,10 +1,9 @@
 package application
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -12,15 +11,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 type Logs struct {
 	ui       terminal.UI
 	config   core_config.Reader
-	logsRepo api.LogsRepository
+	logsRepo logs.LogsRepository
 	appReq   requirements.ApplicationRequirement
 }
 
@@ -89,7 +86,7 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 	}
 
 	for _, msg := range messages {
-		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
+		cmd.ui.Say("%s", msg.ToLog(time.Local))
 	}
 }
 
@@ -109,7 +106,7 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 	}
 
 	for msg := range c {
-		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
+		cmd.ui.Say("%s", msg.ToLog(time.Local))
 	}
 }
 
@@ -121,11 +118,4 @@ func (cmd *Logs) handleError(err error) {
 	default:
 		cmd.ui.Failed(err.Error())
 	}
-}
-
-func LogMessageOutput(msg *logmessage.LogMessage, loc *time.Location) string {
-	logHeader, coloredLogHeader := ui_helpers.ExtractLogHeader(msg, loc)
-	logContent := ui_helpers.ExtractLogContent(msg, logHeader)
-
-	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }

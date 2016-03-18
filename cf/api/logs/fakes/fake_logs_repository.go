@@ -4,28 +4,27 @@ package fakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"github.com/cloudfoundry/cli/cf/api/logs"
 )
 
 type FakeLogsRepository struct {
-	RecentLogsForStub        func(appGuid string) ([]*logmessage.LogMessage, error)
+	RecentLogsForStub        func(appGuid string) ([]logs.Loggable, error)
 	recentLogsForMutex       sync.RWMutex
 	recentLogsForArgsForCall []struct {
 		appGuid string
 	}
 	recentLogsForReturns struct {
-		result1 []*logmessage.LogMessage
+		result1 []logs.Loggable
 		result2 error
 	}
-	TailLogsForStub        func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error)
+	TailLogsForStub        func(appGuid string, onConnect func()) (<-chan logs.Loggable, error)
 	tailLogsForMutex       sync.RWMutex
 	tailLogsForArgsForCall []struct {
 		appGuid   string
 		onConnect func()
 	}
 	tailLogsForReturns struct {
-		result1 <-chan *logmessage.LogMessage
+		result1 <-chan logs.Loggable
 		result2 error
 	}
 	CloseStub        func()
@@ -33,7 +32,7 @@ type FakeLogsRepository struct {
 	closeArgsForCall []struct{}
 }
 
-func (fake *FakeLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
+func (fake *FakeLogsRepository) RecentLogsFor(appGuid string) ([]logs.Loggable, error) {
 	fake.recentLogsForMutex.Lock()
 	fake.recentLogsForArgsForCall = append(fake.recentLogsForArgsForCall, struct {
 		appGuid string
@@ -58,15 +57,15 @@ func (fake *FakeLogsRepository) RecentLogsForArgsForCall(i int) string {
 	return fake.recentLogsForArgsForCall[i].appGuid
 }
 
-func (fake *FakeLogsRepository) RecentLogsForReturns(result1 []*logmessage.LogMessage, result2 error) {
+func (fake *FakeLogsRepository) RecentLogsForReturns(result1 []logs.Loggable, result2 error) {
 	fake.RecentLogsForStub = nil
 	fake.recentLogsForReturns = struct {
-		result1 []*logmessage.LogMessage
+		result1 []logs.Loggable
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+func (fake *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan logs.Loggable, error) {
 	fake.tailLogsForMutex.Lock()
 	fake.tailLogsForArgsForCall = append(fake.tailLogsForArgsForCall, struct {
 		appGuid   string
@@ -92,10 +91,10 @@ func (fake *FakeLogsRepository) TailLogsForArgsForCall(i int) (string, func()) {
 	return fake.tailLogsForArgsForCall[i].appGuid, fake.tailLogsForArgsForCall[i].onConnect
 }
 
-func (fake *FakeLogsRepository) TailLogsForReturns(result1 <-chan *logmessage.LogMessage, result2 error) {
+func (fake *FakeLogsRepository) TailLogsForReturns(result1 <-chan logs.Loggable, result2 error) {
 	fake.TailLogsForStub = nil
 	fake.tailLogsForReturns = struct {
-		result1 <-chan *logmessage.LogMessage
+		result1 <-chan logs.Loggable
 		result2 error
 	}{result1, result2}
 }
@@ -115,4 +114,4 @@ func (fake *FakeLogsRepository) CloseCallCount() int {
 	return len(fake.closeArgsForCall)
 }
 
-var _ api.LogsRepository = new(FakeLogsRepository)
+var _ logs.LogsRepository = new(FakeLogsRepository)
