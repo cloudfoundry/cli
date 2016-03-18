@@ -8,7 +8,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf"
 	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -65,12 +67,32 @@ var _ = Describe("create-space-quota command", func() {
 
 			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
 		})
+
+		Context("the minimum API version requirement", func() {
+			BeforeEach(func() {
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.TargetedOrgSuccess = true
+				requirementsFactory.MinAPIVersionSuccess = false
+			})
+
+			It("fails when the -a option is provided", func() {
+				Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
+
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+			})
+
+			It("does not fail when the -a option is not provided", func() {
+				Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
+			})
+		})
 	})
 
 	Context("when requirements have been met", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.MinAPIVersionSuccess = true
 		})
 
 		It("fails requirements when called without a quota name", func() {
@@ -127,6 +149,18 @@ var _ = Describe("create-space-quota command", func() {
 				runCommand("-i", "whoops", "yo", "12")
 
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
+		})
+
+		Context("when the -a flag is provided", func() {
+			It("sets the instance limit", func() {
+				runCommand("-a", "50", "my special quota")
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(50))
+			})
+
+			It("defaults to unlimited", func() {
+				runCommand("my special quota")
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
 			})
 		})
 

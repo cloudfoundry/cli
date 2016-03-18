@@ -1,7 +1,11 @@
 package spacequota
 
 import (
+	"fmt"
+
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -32,12 +36,21 @@ func (cmd *CreateSpaceQuota) MetaData() command_registry.CommandMetadata {
 	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Total amount of memory a space can have (e.g. 1024M, 1G, 10G)")}
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
+	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "create-space-quota",
 		Description: T("Define a new space resource quota"),
 		Usage: []string{
-			T("CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
+			"CF_NAME create-space-quota ",
+			T("QUOTA"),
+			" ",
+			fmt.Sprintf("[-i %s] ", T("INSTANCE_MEMORY")),
+			fmt.Sprintf("[-m %s] ", T("MEMORY")),
+			fmt.Sprintf("[-r %s] ", T("ROUTES")),
+			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
+			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
+			"[--allow-paid-service-plans]",
 		},
 		Flags: fs,
 	}
@@ -51,6 +64,10 @@ func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
+	}
+
+	if fc.IsSet("a") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumApiVersion))
 	}
 
 	return reqs
@@ -113,6 +130,12 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 
 	if context.IsSet("allow-paid-service-plans") {
 		quota.NonBasicServicesAllowed = true
+	}
+
+	if context.IsSet("a") {
+		quota.AppInstanceLimit = context.Int("a")
+	} else {
+		quota.AppInstanceLimit = resources.UnlimitedAppInstances
 	}
 
 	err = cmd.quotaRepo.Create(quota)

@@ -572,10 +572,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": ""
   },
@@ -1017,10 +1013,6 @@
   },
   {
     "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
     "translation": ""
   },
   {
@@ -2834,6 +2826,10 @@
   {
     "id": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
     "translation": "Ricerca di '{{.filePath}}' dal repository '{{.repoName}}'"
+  },
+  {
+    "id": "MEMORY",
+    "translation": ""
   },
   {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
