@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -144,7 +145,7 @@ var _ = Describe("create-quota command", func() {
 			It("defaults to unlimited", func() {
 				runCommand("my-quota")
 
-				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(-1))
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
 			})
 		})
 

@@ -3,6 +3,7 @@ package quota_test
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -132,7 +133,7 @@ var _ = Describe("app Command", func() {
 			It("totally accepts -1 as a value because it means unlimited", func() {
 				runCommand("-a", "-1", "quota-name")
 				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
-				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(-1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
 			})
 		})
 

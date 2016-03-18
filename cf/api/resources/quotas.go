@@ -31,5 +31,3 @@ func (resource QuotaResource) ToFields() models.QuotaFields {
 		AppInstanceLimit:        appInstanceLimit,
 	}
 }
-
-const UnlimitedAppInstances int = -1
