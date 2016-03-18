@@ -13,6 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/password"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
@@ -58,7 +59,7 @@ type RepositoryLocator struct {
 	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
 	passwordRepo                    password.PasswordRepository
-	logsRepo                        LogsRepository
+	logsRepo                        logs.LogsRepository
 	authTokenRepo                   ServiceAuthTokenRepository
 	serviceBrokerRepo               ServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
@@ -104,7 +105,11 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
-	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
+
+	consumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+	consumer.SetDebugPrinter(terminal.DebugPrinter{})
+	loc.logsRepo = logs.NewLoggregatorLogsRepository(config, consumer, loc.authRepo)
+
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
@@ -340,12 +345,12 @@ func (locator RepositoryLocator) GetPasswordRepository() password.PasswordReposi
 	return locator.passwordRepo
 }
 
-func (locator RepositoryLocator) SetLogsRepository(repo LogsRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetLogsRepository(repo logs.LogsRepository) RepositoryLocator {
 	locator.logsRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetLogsRepository() LogsRepository {
+func (locator RepositoryLocator) GetLogsRepository() logs.LogsRepository {
 	return locator.logsRepo
 }
 

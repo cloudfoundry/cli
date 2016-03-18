@@ -3,16 +3,15 @@ package application
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	"github.com/cloudfoundry/cli/cf/api/applications"
+	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -20,7 +19,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 const (
@@ -49,7 +47,7 @@ type Start struct {
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
 	appInstancesRepo app_instances.AppInstancesRepository
-	logRepo          api.LogsRepository
+	logRepo          logs.LogsRepository
 
 	LogServerConnectionTimeout time.Duration
 	StartupTimeout             time.Duration
@@ -220,16 +218,6 @@ func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
-func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
-	msgText = string(logMsg.GetMessage())
-	reg, err := regexp.Compile("[\n\r]+$")
-	if err != nil {
-		return
-	}
-	msgText = reg.ReplaceAllString(msgText, "")
-	return
-}
-
 func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan chan bool) {
 	onConnect := func() {
 		startChan <- true
@@ -247,7 +235,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan ch
 
 	for msg := range c {
 		if msg.GetSourceName() == LogMessageTypeStaging {
-			cmd.ui.Say(simpleLogMessageOutput(msg))
+			cmd.ui.Say(msg.ToSimpleLog())
 		}
 	}
 

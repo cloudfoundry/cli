@@ -1,24 +1,25 @@
-package api_test
+package logs_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/gogo/protobuf/proto"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Loggregator_SortedMessageQueue", func() {
+var _ = Describe("LoggregatorMessageQueue", func() {
 	It("sorts messages based on their timestamp, clearing after it's enumerated over", func() {
-		pq := NewLoggregator_SortedMessageQueue()
+		pq := NewLoggregatorMessageQueue()
 
 		msg3 := logLoggregatorMessageWithTime("message 3", 130)
-		pq.PushMessage(msg3)
 		msg2 := logLoggregatorMessageWithTime("message 2", 120)
-		pq.PushMessage(msg2)
 		msg4 := logLoggregatorMessageWithTime("message 4", 140)
-		pq.PushMessage(msg4)
 		msg1 := logLoggregatorMessageWithTime("message 1", 110)
+
+		pq.PushMessage(msg3)
+		pq.PushMessage(msg2)
+		pq.PushMessage(msg4)
 		pq.PushMessage(msg1)
 
 		var messages []*logmessage.LogMessage

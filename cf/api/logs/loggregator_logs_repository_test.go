@@ -1,4 +1,4 @@
-package api_test
+package logs_test
 
 import (
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
@@ -10,7 +10,7 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/gogo/protobuf/proto"
 
-	. "github.com/cloudfoundry/cli/cf/api"
+	. "github.com/cloudfoundry/cli/cf/api/logs"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -63,10 +63,15 @@ var _ = Describe("loggregator logs repository", func() {
 		})
 
 		Context("when an error does not occur", func() {
+			var msg1, msg2 *logmessage.LogMessage
+
 			BeforeEach(func() {
+				msg1 = makeLogMessage("My message 2", int64(2000))
+				msg2 = makeLogMessage("My message 1", int64(1000))
+
 				fakeConsumer.RecentReturns.Messages = []*logmessage.LogMessage{
-					makeLogMessage("My message 2", int64(2000)),
-					makeLogMessage("My message 1", int64(1000)),
+					msg1,
+					msg2,
 				}
 			})
 
@@ -79,8 +84,10 @@ var _ = Describe("loggregator logs repository", func() {
 				messages, err := logsRepo.RecentLogsFor("app-guid")
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(string(messages[0].Message)).To(Equal("My message 1"))
-				Expect(string(messages[1].Message)).To(Equal("My message 2"))
+				Expect(messages).To(Equal([]Loggable{
+					NewLoggregatorLogMessage(msg2),
+					NewLoggregatorLogMessage(msg1),
+				}))
 			})
 		})
 	})
@@ -156,7 +163,7 @@ var _ = Describe("loggregator logs repository", func() {
 			})
 
 			It("sorts the messages before yielding them", func(done Done) {
-				var receivedMessages []*logmessage.LogMessage
+				var receivedMessages []Loggable
 				msg3 := makeLogMessage("hello3", 300)
 				msg2 := makeLogMessage("hello2", 200)
 				msg1 := makeLogMessage("hello1", 100)
@@ -185,10 +192,10 @@ var _ = Describe("loggregator logs repository", func() {
 
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
-					msg1,
-					msg2,
-					msg3,
+				Expect(receivedMessages).To(Equal([]Loggable{
+					NewLoggregatorLogMessage(msg1),
+					NewLoggregatorLogMessage(msg2),
+					NewLoggregatorLogMessage(msg3),
 				}))
 
 				close(done)
@@ -196,7 +203,7 @@ var _ = Describe("loggregator logs repository", func() {
 
 			It("flushes remaining log messages and closes the returned channel when Close is called", func() {
 				synchronizationChannel := make(chan (bool))
-				var receivedMessages []*logmessage.LogMessage
+				var receivedMessages []Loggable
 				msg3 := makeLogMessage("hello3", 300)
 				msg2 := makeLogMessage("hello2", 200)
 				msg1 := makeLogMessage("hello1", 100)
@@ -236,10 +243,10 @@ var _ = Describe("loggregator logs repository", func() {
 
 				Expect(channel).To(BeClosed())
 
-				Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
-					msg1,
-					msg2,
-					msg3,
+				Expect(receivedMessages).To(Equal([]Loggable{
+					NewLoggregatorLogMessage(msg1),
+					NewLoggregatorLogMessage(msg2),
+					NewLoggregatorLogMessage(msg3),
 				}))
 			})
 		})
