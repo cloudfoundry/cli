@@ -17,15 +17,13 @@ type FakeLogsRepository struct {
 		result1 []logs.Loggable
 		result2 error
 	}
-	TailLogsForStub        func(appGuid string, onConnect func()) (<-chan logs.Loggable, error)
+	TailLogsForStub        func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error)
 	tailLogsForMutex       sync.RWMutex
 	tailLogsForArgsForCall []struct {
 		appGuid   string
 		onConnect func()
-	}
-	tailLogsForReturns struct {
-		result1 <-chan logs.Loggable
-		result2 error
+		logChan   chan<- logs.Loggable
+		errChan   chan<- error
 	}
 	CloseStub        func()
 	closeMutex       sync.RWMutex
@@ -65,17 +63,17 @@ func (fake *FakeLogsRepository) RecentLogsForReturns(result1 []logs.Loggable, re
 	}{result1, result2}
 }
 
-func (fake *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan logs.Loggable, error) {
+func (fake *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 	fake.tailLogsForMutex.Lock()
 	fake.tailLogsForArgsForCall = append(fake.tailLogsForArgsForCall, struct {
 		appGuid   string
 		onConnect func()
-	}{appGuid, onConnect})
+		logChan   chan<- logs.Loggable
+		errChan   chan<- error
+	}{appGuid, onConnect, logChan, errChan})
 	fake.tailLogsForMutex.Unlock()
 	if fake.TailLogsForStub != nil {
-		return fake.TailLogsForStub(appGuid, onConnect)
-	} else {
-		return fake.tailLogsForReturns.result1, fake.tailLogsForReturns.result2
+		fake.TailLogsForStub(appGuid, onConnect, logChan, errChan)
 	}
 }
 
@@ -85,18 +83,10 @@ func (fake *FakeLogsRepository) TailLogsForCallCount() int {
 	return len(fake.tailLogsForArgsForCall)
 }
 
-func (fake *FakeLogsRepository) TailLogsForArgsForCall(i int) (string, func()) {
+func (fake *FakeLogsRepository) TailLogsForArgsForCall(i int) (string, func(), chan<- logs.Loggable, chan<- error) {
 	fake.tailLogsForMutex.RLock()
 	defer fake.tailLogsForMutex.RUnlock()
-	return fake.tailLogsForArgsForCall[i].appGuid, fake.tailLogsForArgsForCall[i].onConnect
-}
-
-func (fake *FakeLogsRepository) TailLogsForReturns(result1 <-chan logs.Loggable, result2 error) {
-	fake.TailLogsForStub = nil
-	fake.tailLogsForReturns = struct {
-		result1 <-chan logs.Loggable
-		result2 error
-	}{result1, result2}
+	return fake.tailLogsForArgsForCall[i].appGuid, fake.tailLogsForArgsForCall[i].onConnect, fake.tailLogsForArgsForCall[i].logChan, fake.tailLogsForArgsForCall[i].errChan
 }
 
 func (fake *FakeLogsRepository) Close() {

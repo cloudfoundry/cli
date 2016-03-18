@@ -13,9 +13,11 @@ func (fake *FakeLogsRepositoryWithTimeout) RecentLogsFor(appGuid string) ([]logs
 	return nil, nil
 }
 
-func (fake *FakeLogsRepositoryWithTimeout) TailLogsFor(appGuid string, onConnect func()) (<-chan logs.Loggable, error) {
+func (fake *FakeLogsRepositoryWithTimeout) TailLogsFor(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 	time.Sleep(150 * time.Millisecond)
-	return nil, errors.New("Fake http timeout error")
+	errChan <- errors.New("Fake http timeout error")
 }
 
 func (fake *FakeLogsRepositoryWithTimeout) Close() {}
+
+func (fake *FakeLogsRepositoryWithTimeout) FlushMessages(c chan<- logs.Loggable) {}

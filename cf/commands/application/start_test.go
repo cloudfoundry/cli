@@ -28,6 +28,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"sync"
 )
 
 var _ = Describe("start command", func() {
@@ -142,15 +143,26 @@ var _ = Describe("start command", func() {
 
 		logRepo = &testapilogs.FakeLogsRepository{}
 		logMessages = []logs.Loggable{}
+
+		closeWait := sync.WaitGroup{}
+		closeWait.Add(1)
+
 		logRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 			onConnect()
+
 			go func() {
 				for _, log := range logMessages {
 					logChan <- log
 				}
+
+				closeWait.Wait()
+				close(logChan)
 			}()
 		}
 
+		logRepo.CloseStub = func() {
+			closeWait.Done()
+		}
 	})
 
 	callStart := func(args []string) bool {
@@ -381,7 +393,8 @@ var _ = Describe("start command", func() {
 		})
 
 		It("gracefully handles starting an app that is still staging", func() {
-			logRepoClosed := make(chan struct{})
+			closeWait := sync.WaitGroup{}
+			closeWait.Add(1)
 
 			logRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 				onConnect()
@@ -389,16 +402,17 @@ var _ = Describe("start command", func() {
 				go func() {
 					logChan <- testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
 
-					<-logRepoClosed
+					closeWait.Wait()
 
-					time.Sleep(50 * time.Millisecond)
-					logChan <- testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
-					logChan <- testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					logChan <- testlogs.NewLogMessage("After close 1", "", LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					logChan <- testlogs.NewLogMessage("After close 2", "", LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+
+					close(logChan)
 				}()
 			}
 
 			logRepo.CloseStub = func() {
-				close(logRepoClosed)
+				closeWait.Done()
 			}
 
 			defaultInstanceResponses = [][]models.AppInstanceFields{
