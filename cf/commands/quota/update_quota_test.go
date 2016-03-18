@@ -90,11 +90,12 @@ var _ = Describe("app Command", func() {
 	Describe("updating quota fields", func() {
 		BeforeEach(func() {
 			quota = models.QuotaFields{
-				Guid:          "quota-guid",
-				Name:          "quota-name",
-				MemoryLimit:   1024,
-				RoutesLimit:   111,
-				ServicesLimit: 222,
+				Guid:             "quota-guid",
+				Name:             "quota-name",
+				MemoryLimit:      1024,
+				RoutesLimit:      111,
+				ServicesLimit:    222,
+				AppInstanceLimit: 333,
 			}
 		})
 
@@ -134,6 +135,12 @@ var _ = Describe("app Command", func() {
 				runCommand("-a", "-1", "quota-name")
 				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
+			})
+
+			It("does not override the value if it's not provided", func() {
+				runCommand("-s", "5", "quota-name")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(333))
 			})
 		})
 
