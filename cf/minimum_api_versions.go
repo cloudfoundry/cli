@@ -10,4 +10,5 @@ var (
 	ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion, _ = semver.Make("2.21.0")
 	RoutePathMinimumApiVersion, _                       = semver.Make("2.36.0")
 	AppInstanceLimitMinimumApiVersion, _                = semver.Make("2.33.0")
+	NoaaMinimumApiVersion, _                            = semver.Make("2.29.0")
 )
