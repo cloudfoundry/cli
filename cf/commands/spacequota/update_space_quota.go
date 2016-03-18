@@ -1,6 +1,8 @@
 package spacequota
 
 import (
+	"fmt"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,12 +32,22 @@ func (cmd *UpdateSpaceQuota) MetaData() command_registry.CommandMetadata {
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
 	fs["disallow-paid-service-plans"] = &flags.BoolFlag{Name: "disallow-paid-service-plans", Usage: T("Can not provision instances of paid service plans")}
+	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
 	return command_registry.CommandMetadata{
 		Name:        "update-space-quota",
 		Description: T("Update an existing space quota"),
 		Usage: []string{
-			T("CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"),
+			"CF_NAME update-space-quota ",
+			T("QUOTA"),
+			" ",
+			fmt.Sprintf("[-i %s] ", T("INSTANCE_MEMORY")),
+			fmt.Sprintf("[-m %s] ", T("MEMORY")),
+			fmt.Sprintf("[-n %s] ", T("NAME")),
+			fmt.Sprintf("[-r %s] ", T("ROUTES")),
+			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
+			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
+			"[--allow-paid-service-plans | --disallow-paid-service-plans]",
 		},
 		Flags: fs,
 	}
@@ -49,6 +61,10 @@ func (cmd *UpdateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedOrgRequirement(),
+	}
+
+	if fc.IsSet("a") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumApiVersion))
 	}
 
 	return reqs
@@ -122,6 +138,10 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 
 	if c.IsSet("r") {
 		spaceQuota.RoutesLimit = c.Int("r")
+	}
+
+	if c.IsSet("a") {
+		spaceQuota.AppInstanceLimit = c.Int("a")
 	}
 
 	cmd.ui.Say(T("Updating space quota {{.Quota}} as {{.Username}}...",

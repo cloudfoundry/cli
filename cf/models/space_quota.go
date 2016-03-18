@@ -9,4 +9,5 @@ type SpaceQuota struct {
 	ServicesLimit           int    `json:"total_services"`
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
 	OrgGuid                 string `json:"organization_guid"`
+	AppInstanceLimit        int    `json:"app_instance_limit"`
 }

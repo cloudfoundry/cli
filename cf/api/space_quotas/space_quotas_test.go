@@ -313,8 +313,10 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("UnassignQuotaFromSpace", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("DELETE", "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid"),
-				ghttp.RespondWith(http.StatusNoContent, nil),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("DELETE", "/v2/space_quota_definitions/my-quota-guid/spaces/my-space-guid"),
+					ghttp.RespondWith(http.StatusNoContent, nil),
+				),
 			)
 		})
 
@@ -328,27 +330,31 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("Create", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("POST", "/v2/space_quota_definitions"),
-				ghttp.VerifyJSON(`{
-					"name": "not-so-strict",
-					"non_basic_services_allowed": false,
-					"total_services": 1,
-					"total_routes": 12,
-					"memory_limit": 123,
-					"instance_memory_limit": 0,
-					"organization_guid": "my-org-guid"
-				}`),
-				ghttp.RespondWith(http.StatusNoContent, nil),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/v2/space_quota_definitions"),
+					ghttp.VerifyJSON(`{
+						"name": "not-so-strict",
+						"non_basic_services_allowed": false,
+						"total_services": 1,
+						"total_routes": 12,
+						"memory_limit": 123,
+						"instance_memory_limit": 0,
+						"organization_guid": "my-org-guid",
+						"app_instance_limit": 10
+					}`),
+					ghttp.RespondWith(http.StatusNoContent, nil),
+				),
 			)
 		})
 
 		It("creates a new quota with the given name", func() {
 			quota := models.SpaceQuota{
-				Name:          "not-so-strict",
-				ServicesLimit: 1,
-				RoutesLimit:   12,
-				MemoryLimit:   123,
-				OrgGuid:       "my-org-guid",
+				Name:             "not-so-strict",
+				ServicesLimit:    1,
+				RoutesLimit:      12,
+				MemoryLimit:      123,
+				OrgGuid:          "my-org-guid",
+				AppInstanceLimit: 10,
 			}
 			err := repo.Create(quota)
 			Expect(err).NotTo(HaveOccurred())
@@ -359,18 +365,21 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	Describe("Update", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
-				ghttp.VerifyRequest("PUT", "/v2/space_quota_definitions/my-quota-guid"),
-				ghttp.VerifyJSON(`{
-					"guid": "my-quota-guid",
-					"non_basic_services_allowed": false,
-					"name": "amazing-quota",
-					"total_services": 1,
-					"total_routes": 12,
-					"memory_limit": 123,
-					"instance_memory_limit": 1234,
-					"organization_guid": "myorgguid"
-				}`),
-				ghttp.RespondWith(http.StatusOK, nil),
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/v2/space_quota_definitions/my-quota-guid"),
+					ghttp.VerifyJSON(`{
+						"guid": "my-quota-guid",
+						"non_basic_services_allowed": false,
+						"name": "amazing-quota",
+						"total_services": 1,
+						"total_routes": 12,
+						"memory_limit": 123,
+						"instance_memory_limit": 1234,
+						"organization_guid": "myorgguid",
+						"app_instance_limit": 23
+					}`),
+					ghttp.RespondWith(http.StatusOK, nil),
+				),
 			)
 		})
 
@@ -383,6 +392,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				RoutesLimit:             12,
 				MemoryLimit:             123,
 				InstanceMemoryLimit:     1234,
+				AppInstanceLimit:        23,
 				OrgGuid:                 "myorgguid",
 			}
 
