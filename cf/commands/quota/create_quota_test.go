@@ -63,7 +63,7 @@ var _ = Describe("create-quota command", func() {
 		It("fails when the -a option is provided", func() {
 			Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
 
-			Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.AppInstanceLimitMinimumApiVersion))
+			Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.OrgAppInstanceLimitMinimumApiVersion))
 			Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
 		})
 

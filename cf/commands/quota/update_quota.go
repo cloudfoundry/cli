@@ -65,7 +65,7 @@ func (cmd *updateQuota) Requirements(requirementsFactory requirements.Factory, f
 	}
 
 	if fc.IsSet("a") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.AppInstanceLimitMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.OrgAppInstanceLimitMinimumApiVersion))
 	}
 
 	return reqs
