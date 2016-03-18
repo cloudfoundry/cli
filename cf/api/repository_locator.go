@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"net/http"
 
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/app_events"
 	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
@@ -32,7 +34,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/cf/v3/repository"
 	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
-	consumer "github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/noaa"
 )
 
 type RepositoryLocator struct {
@@ -91,10 +94,6 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
-	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
-	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = api_app_files.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
@@ -106,9 +105,19 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
 
-	consumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	consumer.SetDebugPrinter(terminal.DebugPrinter{})
-	loc.logsRepo = logs.NewLoggregatorLogsRepository(config, consumer, loc.authRepo)
+	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
+
+	apiVersion, _ := semver.Make(config.ApiVersion())
+
+	if apiVersion.GTE(cf.NoaaMinimumApiVersion) {
+		consumer := noaa.NewConsumer(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
+		loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo)
+	} else {
+		consumer := loggregator_consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
+		loc.logsRepo = logs.NewLoggregatorLogsRepository(config, consumer, loc.authRepo)
+	}
 
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
