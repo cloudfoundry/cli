@@ -94,19 +94,15 @@ var _ = Describe("logs command", func() {
 
 			requirementsFactory.Application = app
 			logsRepo.RecentLogsForReturns(recentLogs, nil)
-			logsRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan logs.Loggable, error) {
-				c := make(chan logs.Loggable)
-
+			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 				onConnect()
 				go func() {
 					for _, log := range appLogs {
-						c <- log
+						logChan <- log
 					}
-
-					close(c)
+					close(logChan)
+					close(errChan)
 				}()
-
-				return c, nil
 			}
 		})
 
@@ -139,7 +135,7 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			appGuid, _ := logsRepo.TailLogsForArgsForCall(0)
+			appGuid, _, _, _ := logsRepo.TailLogsForArgsForCall(0)
 			Expect(app.Guid).To(Equal(appGuid))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
@@ -150,7 +146,9 @@ var _ = Describe("logs command", func() {
 		Context("when the loggregator server has an invalid cert", func() {
 			Context("when the skip-ssl-validation flag is not set", func() {
 				It("fails and informs the user about the skip-ssl-validation flag", func() {
-					logsRepo.TailLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "it don't work good"))
+					logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
+						errChan <- errors.NewInvalidSSLCert("https://example.com", "it don't work good")
+					}
 					runCommand("my-app")
 
 					Expect(ui.Outputs).To(ContainSubstrings(

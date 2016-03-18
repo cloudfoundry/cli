@@ -80,10 +80,3 @@ func (m *loggregatorLogMessage) ToSimpleLog() string {
 
 	return strings.TrimRight(msgText, "\r\n")
 }
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
