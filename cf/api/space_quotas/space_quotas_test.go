@@ -51,7 +51,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_routes": 123,
 									"total_services": 321,
 									"non_basic_services_allowed": true,
-									"organization_guid": "my-org-guid"
+									"organization_guid": "my-org-guid",
+									"app_instance_limit": 333
 								}
 							}
 						]
@@ -87,6 +88,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
 				OrgGuid:                 "my-org-guid",
+				AppInstanceLimit:        333,
 			}))
 		})
 
@@ -113,7 +115,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_routes": 123,
 									"total_services": 321,
 									"non_basic_services_allowed": true,
-									"organization_guid": "other-org-guid"
+									"organization_guid": "other-org-guid",
+									"app_instance_limit": 333
 								}
 							}
 						]
@@ -149,6 +152,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					ServicesLimit:           321,
 					NonBasicServicesAllowed: true,
 					OrgGuid:                 "other-org-guid",
+					AppInstanceLimit:        333,
 				}))
 			})
 
