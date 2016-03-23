@@ -138,8 +138,6 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 }
 
 func (cmd *ShowSpace) quotaString(space models.Space) string {
-	var instance_memory string
-
 	if space.SpaceQuotaGuid == "" {
 		return ""
 	}
@@ -150,18 +148,11 @@ func (cmd *ShowSpace) quotaString(space models.Space) string {
 		return ""
 	}
 
-	if quota.InstanceMemoryLimit == -1 {
-		instance_memory = "-1"
-	} else {
-		instance_memory = formatters.ByteSize(quota.InstanceMemoryLimit * formatters.MEGABYTE)
-	}
-	memory := formatters.ByteSize(quota.MemoryLimit * formatters.MEGABYTE)
-
 	spaceQuota := fmt.Sprintf(
 		"%s (%s memory limit, %s instance memory limit, %d routes, %d services, paid services %s, %s app instance limit)",
 		quota.Name,
-		memory,
-		instance_memory,
+		quota.FormattedMemoryLimit(),
+		quota.FormattedInstanceMemoryLimit(),
 		quota.RoutesLimit,
 		quota.ServicesLimit,
 		formatters.Allowed(quota.NonBasicServicesAllowed),

@@ -6,7 +6,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 	"github.com/nicksnyder/go-i18n/i18n/language"
@@ -26,7 +25,11 @@ const (
 
 var T go_i18n.TranslateFunc
 
-func Init(config core_config.Reader) go_i18n.TranslateFunc {
+type LocalReader interface {
+	Locale() string
+}
+
+func Init(config LocalReader) go_i18n.TranslateFunc {
 	loadAsset("cf/i18n/resources/" + defaultLocale + resourceSuffix)
 	defaultTfunc := go_i18n.MustTfunc(defaultLocale)
 
