@@ -79,6 +79,7 @@ var _ = Describe("quotas command", func() {
 						ServicesLimit:           222,
 						NonBasicServicesAllowed: true,
 						OrgGuid:                 "my-org-guid",
+						AppInstanceLimit:        5,
 					}, nil)
 			})
 
@@ -92,6 +93,7 @@ var _ = Describe("quotas command", func() {
 					[]string{"routes", "111"},
 					[]string{"service", "222"},
 					[]string{"non basic services", "allowed"},
+					[]string{"app instance limit", "5"},
 				))
 			})
 
@@ -120,6 +122,66 @@ var _ = Describe("quotas command", func() {
 						[]string{"routes", "111"},
 						[]string{"service", "unlimited"},
 						[]string{"non basic services", "allowed"},
+					))
+				})
+			})
+
+			Context("when the app instances are unlimitied", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByNameReturns(
+						models.SpaceQuota{
+							Name:                    "quota-name",
+							MemoryLimit:             1024,
+							InstanceMemoryLimit:     -1,
+							RoutesLimit:             111,
+							ServicesLimit:           222,
+							NonBasicServicesAllowed: true,
+							OrgGuid:                 "my-org-guid",
+							AppInstanceLimit:        -1,
+						}, nil)
+				})
+
+				It("replaces -1 with unlimited", func() {
+					Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("quota-name"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting space quota quota-name info as", "my-user"},
+						[]string{"OK"},
+						[]string{"total memory limit", "1G"},
+						[]string{"instance memory limit", "unlimited"},
+						[]string{"routes", "111"},
+						[]string{"service", "222"},
+						[]string{"non basic services", "allowed"},
+						[]string{"app instance limit", "unlimited"},
+					))
+				})
+			})
+
+			Context("when the app instances are not defined", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByNameReturns(
+						models.SpaceQuota{
+							Name:                    "quota-name",
+							MemoryLimit:             1024,
+							InstanceMemoryLimit:     -1,
+							RoutesLimit:             111,
+							ServicesLimit:           222,
+							NonBasicServicesAllowed: true,
+							OrgGuid:                 "my-org-guid",
+							AppInstanceLimit:        -1,
+						}, nil)
+				})
+
+				It("replaces -1 with unlimited", func() {
+					Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("quota-name"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting space quota quota-name info as", "my-user"},
+						[]string{"OK"},
+						[]string{"total memory limit", "1G"},
+						[]string{"instance memory limit", "unlimited"},
+						[]string{"routes", "111"},
+						[]string{"service", "222"},
+						[]string{"non basic services", "allowed"},
+						[]string{"app instance limit", "unlimited"},
 					))
 				})
 			})

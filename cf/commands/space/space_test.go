@@ -71,23 +71,29 @@ var _ = Describe("space command", func() {
 
 	Context("when logged in and an org is targeted", func() {
 		BeforeEach(func() {
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+			org := models.OrganizationFields{
+				Name: "my-org",
+				Guid: "my-org-guid",
+			}
 
-			app := models.ApplicationFields{}
-			app.Name = "app1"
-			app.Guid = "app1-guid"
+			app := models.ApplicationFields{
+				Name: "app1",
+				Guid: "app1-guid",
+			}
+
 			apps := []models.ApplicationFields{app}
 
-			domain := models.DomainFields{}
-			domain.Name = "domain1"
-			domain.Guid = "domain1-guid"
+			domain := models.DomainFields{
+				Name: "domain1",
+				Guid: "domain1-guid",
+			}
+
 			domains := []models.DomainFields{domain}
 
-			serviceInstance := models.ServiceInstanceFields{}
-			serviceInstance.Name = "service1"
-			serviceInstance.Guid = "service1-guid"
+			serviceInstance := models.ServiceInstanceFields{
+				Name: "service1",
+				Guid: "service1-guid",
+			}
 			services := []models.ServiceInstanceFields{serviceInstance}
 
 			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
@@ -98,24 +104,29 @@ var _ = Describe("space command", func() {
 			}}
 			securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
 
-			space := models.Space{}
-			space.Name = "whose-space-is-it-anyway"
-			space.Guid = "whose-space-is-it-anyway-guid"
-			space.Organization = org
-			space.Applications = apps
-			space.Domains = domains
-			space.ServiceInstances = services
-			space.SecurityGroups = securityGroups
-			space.SpaceQuotaGuid = "runaway-guid"
+			space := models.Space{
+				SpaceFields: models.SpaceFields{
+					Name: "whose-space-is-it-anyway",
+					Guid: "whose-space-is-it-anyway-guid",
+				},
+				Organization:     org,
+				Applications:     apps,
+				Domains:          domains,
+				ServiceInstances: services,
+				SecurityGroups:   securityGroups,
+				SpaceQuotaGuid:   "runaway-guid",
+			}
 
-			quota := models.SpaceQuota{}
-			quota.Guid = "runaway-guid"
-			quota.Name = "runaway"
-			quota.MemoryLimit = 102400
-			quota.InstanceMemoryLimit = -1
-			quota.RoutesLimit = 111
-			quota.ServicesLimit = 222
-			quota.NonBasicServicesAllowed = false
+			quota := models.SpaceQuota{
+				Name:                    "runaway",
+				Guid:                    "runaway-guid",
+				MemoryLimit:             102400,
+				InstanceMemoryLimit:     -1,
+				RoutesLimit:             111,
+				ServicesLimit:           222,
+				NonBasicServicesAllowed: false,
+				AppInstanceLimit:        7,
+			}
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
@@ -168,8 +179,72 @@ var _ = Describe("space command", func() {
 					[]string{"Domains", "domain1"},
 					[]string{"Services", "service1"},
 					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-					[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed)"},
+					[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
 				))
+			})
+
+			Context("when the app instance limit is -1", func() {
+				BeforeEach(func() {
+					quota := models.SpaceQuota{
+						Name:                    "runaway",
+						Guid:                    "runaway-guid",
+						MemoryLimit:             102400,
+						InstanceMemoryLimit:     -1,
+						RoutesLimit:             111,
+						ServicesLimit:           222,
+						NonBasicServicesAllowed: false,
+						AppInstanceLimit:        -1,
+					}
+
+					quotaRepo.FindByGuidReturns(quota, nil)
+				})
+
+				It("displays unlimited as the app instance limit", func() {
+					runCommand("whose-space-is-it-anyway")
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+						[]string{"OK"},
+						[]string{"whose-space-is-it-anyway"},
+						[]string{"Org", "my-org"},
+						[]string{"Apps", "app1"},
+						[]string{"Domains", "domain1"},
+						[]string{"Services", "service1"},
+						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+						[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+					))
+				})
+			})
+
+			Context("when the app instance limit is not provided", func() {
+				BeforeEach(func() {
+					quota := models.SpaceQuota{
+						Name:                    "runaway",
+						Guid:                    "runaway-guid",
+						MemoryLimit:             102400,
+						InstanceMemoryLimit:     -1,
+						RoutesLimit:             111,
+						ServicesLimit:           222,
+						NonBasicServicesAllowed: false,
+						AppInstanceLimit:        -1,
+					}
+
+					quotaRepo.FindByGuidReturns(quota, nil)
+				})
+
+				It("displays unlimited as the app instance limit", func() {
+					runCommand("whose-space-is-it-anyway")
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+						[]string{"OK"},
+						[]string{"whose-space-is-it-anyway"},
+						[]string{"Org", "my-org"},
+						[]string{"Apps", "app1"},
+						[]string{"Domains", "domain1"},
+						[]string{"Services", "service1"},
+						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+						[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+					))
+				})
 			})
 
 		})

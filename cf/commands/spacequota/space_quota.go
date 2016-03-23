@@ -91,6 +91,7 @@ func (cmd *SpaceQuota) Execute(c flags.FlagContext) {
 	table.Add(T("routes"), fmt.Sprintf("%d", spaceQuota.RoutesLimit))
 	table.Add(T("services"), servicesLimit)
 	table.Add(T("non basic services"), formatters.Allowed(spaceQuota.NonBasicServicesAllowed))
+	table.Add(T("app instance limit"), T(spaceQuota.FormattedAppInstanceLimit()))
 
 	table.Print()
 
