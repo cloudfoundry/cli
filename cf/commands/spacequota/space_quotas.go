@@ -71,7 +71,16 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans")})
+	table := terminal.NewTable(cmd.ui, []string{
+		T("name"),
+		T("total memory limit"),
+		T("instance memory limit"),
+		T("routes"),
+		T("service instances"),
+		T("paid service plans"),
+		T("app instance limit"),
+	})
+
 	var megabytes string
 
 	for _, quota := range quotas {
@@ -93,9 +102,9 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) {
 			fmt.Sprintf("%d", quota.RoutesLimit),
 			fmt.Sprintf(servicesLimit),
 			formatters.Allowed(quota.NonBasicServicesAllowed),
+			T(quota.FormattedAppInstanceLimit()),
 		)
 	}
 
 	table.Print()
-
 }
