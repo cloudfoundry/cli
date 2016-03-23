@@ -171,10 +171,9 @@ jobs:
         acquire: true
   - task: cats
     file: cli-ci/ci/tasks/cats-windows.yml
-    config:
-      params:
-        ADMIN_USER: {{bosh-lite-admin-username}}
-        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+    params:
+      ADMIN_USER: {{bosh-lite-admin-username}}
+      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -198,10 +197,9 @@ jobs:
         acquire: true
   - task: gats
     file: cli-ci/ci/tasks/gats-windows.yml
-    config:
-      params:
-        ADMIN_USER: {{bosh-lite-admin-username}}
-        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+    params:
+      ADMIN_USER: {{bosh-lite-admin-username}}
+      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -280,10 +278,9 @@ jobs:
     - get: cli-ci
   - task: publish
     file: cli-ci/ci/tasks/publish-edge-archives.yml
-    config:
-      params:
-        AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+    params:
+      AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
   - put: cf-cli-tracker
     params:
       repos:
@@ -307,7 +304,6 @@ jobs:
     - get: cli-ci
   - task: publish
     file: cli-ci/ci/tasks/publish-final-release.yml
-    config:
-      params:
-        AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+    params:
+      AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
