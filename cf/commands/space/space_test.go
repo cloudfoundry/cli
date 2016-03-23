@@ -179,7 +179,7 @@ var _ = Describe("space command", func() {
 					[]string{"Domains", "domain1"},
 					[]string{"Services", "service1"},
 					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-					[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
+					[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
 				))
 			})
 
@@ -210,7 +210,7 @@ var _ = Describe("space command", func() {
 						[]string{"Domains", "domain1"},
 						[]string{"Services", "service1"},
 						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-						[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
 					))
 				})
 			})
@@ -242,7 +242,7 @@ var _ = Describe("space command", func() {
 						[]string{"Domains", "domain1"},
 						[]string{"Services", "service1"},
 						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-						[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
 					))
 				})
 			})

@@ -3,6 +3,8 @@ package models
 import (
 	"encoding/json"
 	"strconv"
+
+	"github.com/cloudfoundry/cli/cf/formatters"
 )
 
 type SpaceQuota struct {
@@ -15,6 +17,17 @@ type SpaceQuota struct {
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
 	OrgGuid                 string `json:"organization_guid"`
 	AppInstanceLimit        int    `json:"app_instance_limit"`
+}
+
+func (q SpaceQuota) FormattedMemoryLimit() string {
+	return formatters.ByteSize(q.MemoryLimit * formatters.MEGABYTE)
+}
+
+func (q SpaceQuota) FormattedInstanceMemoryLimit() string {
+	if q.InstanceMemoryLimit == -1 {
+		return "unlimited"
+	}
+	return formatters.ByteSize(q.InstanceMemoryLimit * formatters.MEGABYTE)
 }
 
 func (q SpaceQuota) FormattedAppInstanceLimit() string {
