@@ -21,15 +21,15 @@ run:
     mkdir combined
 
     pushd cross-compiled
-      tar -xzf *.tar
-      rm *.tar
-      mv * $cwd/combined
+      tar -xzf *.tgz
+      rm *.tgz
+      mv * $cwd/compiled
     popd
 
     pushd osx-compiled
-      tar -xzf *.tar
-      rm *.tar
-      mv * $cwd/combined
+      tar -xzf *.tgz
+      rm *.tgz
+      mv * $cwd/compiled
     popd
 
-    tar -cvzf $cwd/compiled/cf-cli-binaries.tgz -C combined .
+    tar -cvzf $cwd/compiled/cf-cli-binaries.tgz -C compiled .
