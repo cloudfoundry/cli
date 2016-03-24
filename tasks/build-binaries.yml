@@ -6,7 +6,7 @@ inputs:
   path: gopath/src/github.com/cloudfoundry/cli
 
 outputs:
-- name: compiled
+- name: cross-compiled
 
 run:
   path: bash
@@ -39,5 +39,5 @@ run:
       GOARCH=amd64 GOOS=windows go build -o out/cf-cli_winx64.exe ./main
 
       echo "Creating tarball"
-      tar -cvzf $cwd/compiled/cf-cli-binaries.tgz -C out .
+      tar -cvzf $cwd/cross-compiled/cf-cli-binaries.tgz -C out .
     popd
