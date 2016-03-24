@@ -29,9 +29,6 @@ run:
       echo "Building 32-bit Windows"
       GOARCH=386 GOOS=windows go build -o out/cf-cli_win32.exe ./main
 
-      echo "Building 64-bit Darwin"
-      GOARCH=amd64 GOOS=darwin go build -o out/cf-cli_osx ./main
-
       echo "Building 64-bit Linux"
       GOARCH=amd64 GOOS=linux go build -o out/cf-cli_linux_x86-64 ./main
 
