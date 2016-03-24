@@ -133,6 +133,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-1]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
@@ -224,6 +225,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-2]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
@@ -316,6 +318,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-3]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
@@ -407,6 +410,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-4]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
