@@ -146,6 +146,10 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -233,6 +237,10 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -321,6 +329,10 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -408,6 +420,10 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
         LITE_HOSTNAME: {{lite-4-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
