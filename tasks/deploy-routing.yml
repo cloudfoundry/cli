@@ -34,8 +34,6 @@ run:
 
     cat<<EOF > cf-routing-release-repo/post-routing-release-deploy-overrides.yml
     properties:
-      cc:
-        default_to_diego_backend: true
       router:
         enable_routing_api: true
     EOF
