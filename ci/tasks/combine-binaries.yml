@@ -1,0 +1,35 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: build
+- name: build-osx
+
+outputs:
+- name: compiled
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    cwd=$PWD
+
+    mkdir combined
+
+    pushd build/cross-compiled
+      tar -xzf *.tar
+      rm *.tar
+      mv * $cwd/combined
+    popd
+
+    pushd build-osx/osx-compiled
+      tar -xzf *.tar
+      rm *.tar
+      mv * $cwd/combined
+    popd
+
+    tar -cvzf $cwd/compiled/cf-cli-binaries.tgz -C combined .

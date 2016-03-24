@@ -1,0 +1,32 @@
+---
+platform: darwin
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: cli
+  path: gopath/src/github.com/cloudfoundry/cli
+
+outputs:
+- name: osx-compiled
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    cwd=$PWD
+
+    export GOPATH=$PWD/gopath
+    export PATH=$GOPATH/bin:$PATH
+
+    pushd $GOPATH/src/github.com/cloudfoundry/cli
+      bin/replace-sha
+
+      echo "Building 64-bit Darwin"
+      GOARCH=amd64 GOOS=darwin go build -o out/cf-cli_osx ./main
+
+      echo "Creating tarball"
+      tar -cvzf $cwd/osx-compiled/cf-cli-osx-binary.tgz -C out .
+    popd
