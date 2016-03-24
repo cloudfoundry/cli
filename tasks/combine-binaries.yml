@@ -3,8 +3,8 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
-- name: build
-- name: build-osx
+- name: cross-compiled
+- name: osx-compiled
 
 outputs:
 - name: compiled
