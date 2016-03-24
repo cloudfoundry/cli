@@ -121,8 +121,13 @@ jobs:
     - get: final-cli
       passed: [units]
     - get: cli-ci
-  - task: build
-    file: cli-ci/ci/tasks/build-binaries.yml
+  - aggregate:
+    - task: build
+      file: cli-ci/ci/tasks/build-binaries.yml
+    - task: build-osx
+      file: cli-ci/ci/tasks/build-osx-binary.yml
+  - task: combine-binaries
+    file: cli-ci/ci/tasks/combine-binaries.yml
   - put: cf-cli-binaries
     params:
       file: compiled/cf-cli-binaries.tgz
