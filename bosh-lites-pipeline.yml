@@ -61,7 +61,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
-    branch: release_candidate
+    branch: release-candidate
 
 jobs:
 - name: deploy-boshlite-1
