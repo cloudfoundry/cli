@@ -229,8 +229,9 @@ jobs:
     - put: bosh-lite-lock
       params:
         acquire: true
-  - task: cats
-    file: cli-ci/ci/tasks/cats-linux.yml
+  - aggregate:
+    - task: cats-dea
+      file: cli-ci/ci/tasks/cats-linux.yml
     ensure:
       put: bosh-lite-lock
       params:
