@@ -1,8 +1,8 @@
 resources:
-- name: cli-ci
+- name: cli-private
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli-ci
+    uri: git@github.com:cloudfoundry/cli-private
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
@@ -36,7 +36,7 @@ jobs:
         globs:
         - concourse-*.tgz
         - garden-linux-*.tgz
-    - get: cli-ci
+    - get: cli-private
       trigger: false
     - get: stemcell
       trigger: false
