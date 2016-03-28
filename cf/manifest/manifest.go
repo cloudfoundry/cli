@@ -201,6 +201,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 	appParams.HealthCheckType = stringVal(yamlMap, "health-check-type", &errs)
 	appParams.AppPorts = intSliceVal(yamlMap, "app-ports", &errs)
+	appParams.RoutePath = stringVal(yamlMap, "route-path", &errs)
 
 	if appParams.Path != nil {
 		path := *appParams.Path
