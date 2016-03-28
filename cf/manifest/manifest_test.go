@@ -256,6 +256,7 @@ var _ = Describe("Manifests", func() {
 					"no-route":          true,
 					"no-hostname":       true,
 					"random-route":      true,
+					"route-path":        "my/route/path",
 				},
 			},
 		}))
@@ -277,6 +278,7 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].NoRoute).To(BeTrue())
 		Expect(apps[0].NoHostname).To(BeTrue())
 		Expect(apps[0].UseRandomHostname).To(BeTrue())
+		Expect(*apps[0].RoutePath).To(Equal("my/route/path"))
 	})
 
 	It("removes duplicated values in 'hosts' and 'domains'", func() {
