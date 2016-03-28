@@ -82,7 +82,7 @@ resources:
 - name: bosh-lite-lock
   type: pool
   source:
-    uri: git@github.com:cloudfoundry/cli-ci
+    uri: git@github.com:cloudfoundry/cli-private
     private_key: {{cf-cli-eng-github-private-key}}
     branch: locks
     pool: bosh-lites
