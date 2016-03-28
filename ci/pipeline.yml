@@ -17,10 +17,10 @@ resources:
     branch: master
     paths: VERSION
 
-- name: ci
+- name: cli-private
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli-ci
+    uri: git@github.com:cloudfoundry/cli-private
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
@@ -248,7 +248,7 @@ jobs:
     - get: cf-cli-binaries
       trigger: true
       passed: [cats-linux, cats-windows]
-    - get: ci
+    - get: cli-private
     - get: cli-ci
   - aggregate:
     - task: windows
