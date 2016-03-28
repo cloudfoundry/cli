@@ -17,7 +17,7 @@ params:
   LITE_KEYPAIR:
 
 inputs:
-  - name: cli-ci
+  - name: cli-private
   - name: bosh-lite
   - name: cf-release
 
@@ -51,7 +51,7 @@ run:
     popd
 
     sed -i -e "s/bosh-lite-ip-${LITE_NAME}: \(.*\)/bosh-lite-ip-${LITE_NAME}: ${DIRECTOR_IP}/" \
-      cli-ci/concourse/credentials.yml
+      cli-private/concourse/credentials.yml
 
     pushd cf-release
       sed -i -e "s/^properties:/properties:\n  domain: ${LITE_HOSTNAME}/" \
