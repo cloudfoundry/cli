@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-go get github.com/krishicks/i18n4go/...
-go get github.com/jteeuwen/go-bindata
