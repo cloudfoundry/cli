@@ -51,6 +51,7 @@ type TestServer struct {
 	listener net.Listener
 	Handlers Handlers
 	stopCh   chan struct{}
+	server   *rpc.Server
 }
 
 func NewTestRpcServer(handlers Handlers) (*TestServer, error) {
@@ -62,12 +63,13 @@ func NewTestRpcServer(handlers Handlers) (*TestServer, error) {
 	log.SetOutput(ioutil.Discard)
 	defer log.SetOutput(os.Stdout)
 
-	rpc.DefaultServer = rpc.NewServer()
-	err := rpc.RegisterName("CliRpcCmd", ts.Handlers)
+	server := rpc.NewServer()
+	err := server.RegisterName("CliRpcCmd", ts.Handlers)
 	if err != nil {
 		return nil, err
 	}
 
+	ts.server = server
 	return ts, nil
 }
 
@@ -101,7 +103,7 @@ func (ts *TestServer) Start() error {
 					fmt.Println(err)
 				}
 			} else {
-				go rpc.ServeConn(conn)
+				go ts.server.ServeConn(conn)
 			}
 		}
 	}()
