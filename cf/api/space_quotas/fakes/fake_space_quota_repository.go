@@ -36,11 +36,11 @@ type FakeSpaceQuotaRepository struct {
 		result1 models.SpaceQuota
 		result2 error
 	}
-	FindByNameAndOrgGuidStub        func(spaceName string, orgGuid string) (quota models.SpaceQuota, apiErr error)
+	FindByNameAndOrgGuidStub        func(spaceQuotaName string, orgGuid string) (quota models.SpaceQuota, apiErr error)
 	findByNameAndOrgGuidMutex       sync.RWMutex
 	findByNameAndOrgGuidArgsForCall []struct {
-		spaceName string
-		orgGuid   string
+		spaceQuotaName string
+		orgGuid        string
 	}
 	findByNameAndOrgGuidReturns struct {
 		result1 models.SpaceQuota
@@ -189,15 +189,15 @@ func (fake *FakeSpaceQuotaRepository) FindByGuidReturns(result1 models.SpaceQuot
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuid(spaceName string, orgGuid string) (quota models.SpaceQuota, apiErr error) {
+func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuid(spaceQuotaName string, orgGuid string) (quota models.SpaceQuota, apiErr error) {
 	fake.findByNameAndOrgGuidMutex.Lock()
 	fake.findByNameAndOrgGuidArgsForCall = append(fake.findByNameAndOrgGuidArgsForCall, struct {
-		spaceName string
-		orgGuid   string
-	}{spaceName, orgGuid})
+		spaceQuotaName string
+		orgGuid        string
+	}{spaceQuotaName, orgGuid})
 	fake.findByNameAndOrgGuidMutex.Unlock()
 	if fake.FindByNameAndOrgGuidStub != nil {
-		return fake.FindByNameAndOrgGuidStub(spaceName, orgGuid)
+		return fake.FindByNameAndOrgGuidStub(spaceQuotaName, orgGuid)
 	} else {
 		return fake.findByNameAndOrgGuidReturns.result1, fake.findByNameAndOrgGuidReturns.result2
 	}
@@ -212,7 +212,7 @@ func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuidCallCount() int {
 func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuidArgsForCall(i int) (string, string) {
 	fake.findByNameAndOrgGuidMutex.RLock()
 	defer fake.findByNameAndOrgGuidMutex.RUnlock()
-	return fake.findByNameAndOrgGuidArgsForCall[i].spaceName, fake.findByNameAndOrgGuidArgsForCall[i].orgGuid
+	return fake.findByNameAndOrgGuidArgsForCall[i].spaceQuotaName, fake.findByNameAndOrgGuidArgsForCall[i].orgGuid
 }
 
 func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGuidReturns(result1 models.SpaceQuota, result2 error) {
