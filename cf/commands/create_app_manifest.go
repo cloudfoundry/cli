@@ -17,7 +17,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"io"
 )
 
 type CreateAppManifest struct {
@@ -101,14 +100,18 @@ func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 	}
 	defer f.Close()
 
-	cmd.createManifest(application, f)
+	cmd.createManifest(application)
+	err = cmd.manifest.Save(f)
+	if err != nil {
+		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())
+	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("Manifest file created successfully at ") + savePath)
 	cmd.ui.Say("")
 }
 
-func (cmd *CreateAppManifest) createManifest(app models.Application, f io.Writer) {
+func (cmd *CreateAppManifest) createManifest(app models.Application) {
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 	cmd.manifest.Stack(app.Name, app.Stack.Name)
@@ -148,7 +151,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, f io.Writer
 			case bool:
 				cmd.manifest.EnvironmentVars(app.Name, envVarKey, fmt.Sprintf("%t", app.EnvironmentVars[envVarKey].(bool)))
 			case string:
-				cmd.manifest.EnvironmentVars(app.Name, envVarKey, "\""+app.EnvironmentVars[envVarKey].(string)+"\"")
+				cmd.manifest.EnvironmentVars(app.Name, envVarKey, app.EnvironmentVars[envVarKey].(string))
 			}
 		}
 	}
@@ -163,10 +166,6 @@ func (cmd *CreateAppManifest) createManifest(app models.Application, f io.Writer
 		cmd.manifest.DiskQuota(app.Name, app.DiskQuota)
 	}
 
-	err := cmd.manifest.Save(f)
-	if err != nil {
-		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())
-	}
 }
 
 func sortEnvVar(vars map[string]interface{}) []string {
