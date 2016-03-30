@@ -51,34 +51,9 @@ func (builder Builder) GetAllServicesWithPlans() ([]models.ServiceOffering, erro
 		return []models.ServiceOffering{}, err
 	}
     
-    type planResponse struct {
-        index int
-        plans []models.ServicePlanFields
-        err error
-    }
     
-    resChan := make(chan *planResponse, len(services));
     
-	for index, service := range services {
-        go func(resChan chan *planResponse, guid string, index int) {
-            res := &planResponse{
-                index: index,
-            }
-            res.plans, res.err = builder.planBuilder.GetPlansForService(guid)
-            resChan <- res                
-        }(resChan, service.Guid, index)
-	}
-    
-    for responseCount := 0; responseCount < len(services); {
-        res := <- resChan
-        if res.err != nil {
-            return []models.ServiceOffering{}, err
-        }
-        services[res.index].Plans = res.plans
-        responseCount++
-    }
-    
-	return services, nil
+	return builder.getPlansForServices(services)
 }
 
 func (builder Builder) GetServicesForSpace(spaceGuid string) ([]models.ServiceOffering, error) {
@@ -92,34 +67,7 @@ func (builder Builder) GetServicesForSpaceWithPlans(spaceGuid string) ([]models.
 		return []models.ServiceOffering{}, err
 	}
 
-    type planResponse struct {
-        index int
-        plans []models.ServicePlanFields
-        err error
-    }
-    
-    resChan := make(chan *planResponse, len(services));
-    
-	for index, service := range services {
-        go func(resChan chan *planResponse, guid string, index int) {
-            res := &planResponse{
-                index: index,
-            }
-            res.plans, res.err = builder.planBuilder.GetPlansForService(guid)
-            resChan <- res                
-        }(resChan, service.Guid, index)
-	}
-    
-    for responseCount := 0; responseCount < len(services); {
-        res := <- resChan
-        if res.err != nil {
-            return []models.ServiceOffering{}, err
-        }
-        services[res.index].Plans = res.plans
-        responseCount++
-    }
-    
-	return services, nil
+    return builder.getPlansForServices(services)
 }
 
 func (builder Builder) GetServiceByNameWithPlans(serviceLabel string) (models.ServiceOffering, error) {
@@ -349,3 +297,34 @@ func returnV2Service(services models.ServiceOfferings) models.ServiceOffering {
 
 	return models.ServiceOffering{}
 }
+
+func (builder Builder) getPlansForServices(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
+    type planResponse struct {
+        index int
+        plans []models.ServicePlanFields
+        err error
+    }
+    
+    resChan := make(chan *planResponse);
+    
+	for index, service := range services {
+        go func(resChan chan *planResponse, guid string, index int) {
+            res := &planResponse{
+                index: index,
+            }
+            res.plans, res.err = builder.planBuilder.GetPlansForService(guid)
+            resChan <- res                
+        }(resChan, service.Guid, index)
+	}
+    
+    for responseCount := 0; responseCount < len(services); {
+        res := <- resChan
+        if res.err != nil {
+            return services, res.err
+        }
+        services[res.index].Plans = res.plans
+        responseCount++
+    }
+    
+	return services, nil
+} 
