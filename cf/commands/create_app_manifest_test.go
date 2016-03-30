@@ -359,7 +359,7 @@ var _ = Describe("CreateAppManifest", func() {
 
 					Expect(actuals["float64-key"]).To(Equal("5"))
 					Expect(actuals["bool-key"]).To(Equal("true"))
-					Expect(actuals["string-key"]).To(Equal(`"string"`))
+					Expect(actuals["string-key"]).To(Equal("string"))
 				})
 			})
 
