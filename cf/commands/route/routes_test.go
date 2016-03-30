@@ -23,6 +23,7 @@ var _ = Describe("routes command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		routeRepo           *testapi.FakeRouteRepository
+		domainRepo          *testapi.FakeDomainRepository
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -30,7 +31,7 @@ var _ = Describe("routes command", func() {
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo).SetDomainRepository(domainRepo)
 		deps.Config = configRepo
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("routes").SetDependency(deps, pluginCall))
 	}
@@ -42,7 +43,8 @@ var _ = Describe("routes command", func() {
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 		}
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(testapi.FakeRouteRepository)
+		domainRepo = new(testapi.FakeDomainRepository)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -86,6 +88,20 @@ var _ = Describe("routes command", func() {
 
 	Context("when there are routes", func() {
 		BeforeEach(func() {
+			cookieClickerGuid := "cookie-clicker-guid"
+
+			domainRepo.ListDomainsForOrgStub = func(_ string, cb func(models.DomainFields) bool) error {
+				tcpDomain := models.DomainFields{
+					Guid: cookieClickerGuid,
+					RouterGroupTypes: []string{
+						"tcp",
+						"bar",
+					},
+				}
+				cb(tcpDomain)
+				return nil
+			}
+
 			routeRepo.ListRoutesStub = func(cb func(models.Route) bool) error {
 				app1 := models.ApplicationFields{Name: "dora"}
 				app2 := models.ApplicationFields{Name: "bora"}
@@ -118,9 +134,8 @@ var _ = Describe("routes command", func() {
 						Name: "my-space",
 					},
 					Domain: models.DomainFields{
+						Guid: cookieClickerGuid,
 						Name: "cookieclicker.co",
-						RouterGroupTypes: []string{
-							"tcp", "bar"},
 					},
 					Apps: []models.ApplicationFields{app1, app2},
 					Port: 9090,

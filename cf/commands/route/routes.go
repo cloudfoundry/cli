@@ -16,9 +16,10 @@ import (
 )
 
 type ListRoutes struct {
-	ui        terminal.UI
-	routeRepo api.RouteRepository
-	config    core_config.Reader
+	ui         terminal.UI
+	routeRepo  api.RouteRepository
+	domainRepo api.DomainRepository
+	config     core_config.Reader
 }
 
 func init() {
@@ -61,6 +62,7 @@ func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCal
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
 	return cmd
 }
 
@@ -84,6 +86,12 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service")})
 
+	d := make(map[string]models.DomainFields)
+	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().Guid, func(domain models.DomainFields) bool {
+		d[domain.Guid] = domain
+		return true
+	})
+
 	var routesFound bool
 	cb := func(route models.Route) bool {
 		routesFound = true
@@ -97,13 +105,15 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			port = fmt.Sprintf("%d", route.Port)
 		}
 
+		domain := d[route.Domain.Guid]
+
 		table.Add(
 			route.Space.Name,
 			route.Host,
 			route.Domain.Name,
 			port,
 			route.Path,
-			strings.Join(route.Domain.RouterGroupTypes, ","),
+			strings.Join(domain.RouterGroupTypes, ","),
 			strings.Join(appNames, ","),
 			route.ServiceInstance.Name,
 		)
