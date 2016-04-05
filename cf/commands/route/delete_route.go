@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"fmt"
 )
 
 type DeleteRoute struct {
@@ -28,17 +29,27 @@ func (cmd *DeleteRoute) MetaData() command_registry.CommandMetadata {
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
+	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port used to identify the TCP route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "delete-route",
 		Description: T("Delete a route"),
 		Usage: []string{
-			T("CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"),
+			fmt.Sprintf("%s:\n", T("Delete an HTTP route")),
+			"      CF_NAME delete-route ",
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
+			fmt.Sprintf("[--path %s] [-f]\n\n", T("PATH")),
+			fmt.Sprintf("   %s:\n", T("Delete a TCP route")),
+			"      CF_NAME delete-route ",
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("--port %s [-f]", T("PORT")),
 		},
 		Examples: []string{
 			"CF_NAME delete-route example.com                              # example.com",
 			"CF_NAME delete-route example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo",
+			"CF_NAME delete-route example.com --port 50000                 # example.com:50000",
 		},
 		Flags: fs,
 	}

@@ -1,6 +1,8 @@
 package route_test
 
 import (
+	"strings"
+
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
@@ -73,6 +75,34 @@ var _ = Describe("DeleteRoute", func() {
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
+	})
+
+	Describe("Help text", func() {
+		var usage []string
+
+		BeforeEach(func() {
+			dr := &route.DeleteRoute{}
+			up := command_registry.CliCommandUsagePresenter(dr)
+			usage = strings.Split(up.Usage(), "\n")
+		})
+
+		It("has a HTTP route usage", func() {
+			Expect(usage).To(ContainElement("   Delete an HTTP route:"))
+			Expect(usage).To(ContainElement("      cf delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"))
+		})
+
+		It("has a TCP route usage", func() {
+			Expect(usage).To(ContainElement("   Delete a TCP route:"))
+			Expect(usage).To(ContainElement("      cf delete-route DOMAIN --port PORT [-f]"))
+		})
+
+		It("has a TCP route example", func() {
+			Expect(usage).To(ContainElement("   cf delete-route example.com --port 50000                 # example.com:50000"))
+		})
+
+		It("has a TCP option", func() {
+			Expect(usage).To(ContainElement("   --port              Port used to identify the TCP route"))
+		})
 	})
 
 	Describe("Requirements", func() {
