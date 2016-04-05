@@ -99,11 +99,10 @@ func (cmd *DeleteRoute) SetDependency(deps command_registry.Dependency, pluginCa
 }
 
 func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
-	var port int
-
 	host := c.String("n")
 	path := c.String("path")
 	domainName := c.Args()[0]
+	port := c.Int("port")
 
 	url := domainName
 	if host != "" {
