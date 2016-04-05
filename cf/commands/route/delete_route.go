@@ -1,6 +1,7 @@
 package route
 
 import (
+	"fmt"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -10,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"fmt"
 )
 
 type DeleteRoute struct {
@@ -58,6 +58,10 @@ func (cmd *DeleteRoute) MetaData() command_registry.CommandMetadata {
 func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-route"))
+	}
+
+	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
+		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
 	}
 
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(fc.Args()[0])
