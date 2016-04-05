@@ -2,7 +2,9 @@ package route
 
 import (
 	"fmt"
+
 	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -75,6 +77,10 @@ func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, f
 
 	if fc.String("path") != "" {
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+	}
+
+	if fc.IsSet("port") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumApiVersion))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{
