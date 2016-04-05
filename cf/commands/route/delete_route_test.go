@@ -170,6 +170,37 @@ var _ = Describe("DeleteRoute", func() {
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
 			})
+
+			Describe("deleting a tcp route", func() {
+				Context("when passing port with a hostname", func() {
+					BeforeEach(func() {
+						flagContext.Parse("example.com", "--port", "8080", "--hostname", "something-else")
+					})
+
+					It("fails", func() {
+						Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Cannot specify port together with hostname and/or path."},
+						))
+					})
+				})
+
+				Context("when passing port with a path", func() {
+					BeforeEach(func() {
+						flagContext.Parse("example.com", "--port", "8080", "--path", "something-else")
+					})
+
+					It("fails", func() {
+						Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Cannot specify port together with hostname and/or path."},
+						))
+					})
+				})
+
+			})
 		})
 	})
 
