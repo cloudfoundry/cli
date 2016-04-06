@@ -92,10 +92,6 @@
     "translation": "CF_NAME delete-quota QUOTA [-f]"
   },
   {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
-  },
-  {
     "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]",
     "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"
   },
@@ -280,6 +276,14 @@
     "translation": "DOMAIN"
   },
   {
+    "id": "Delete a TCP route",
+    "translation": "Delete a TCP route"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": "Delete an HTTP route"
+  },
+  {
     "id": "EXAMPLES",
     "translation": "EXAMPLES"
   },
@@ -446,6 +450,10 @@
   {
     "id": "Port for the TCP route",
     "translation": "Port for the TCP route"
+  },
+  {
+    "id": "Port used to identify the TCP route",
+    "translation": "Port used to identify the TCP route"
   },
   {
     "id": "ROUTES",
