@@ -17,6 +17,9 @@ import (
 	"net/rpc"
 	"strconv"
 
+	"bytes"
+	"io"
+
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
@@ -34,7 +37,7 @@ type CliRpcCmd struct {
 	cliConfig            core_config.Repository
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         CommandRunner
-	outputBucket         *[]string
+	outputBucket         *bytes.Buffer
 	logger               trace.Printer
 }
 
@@ -44,7 +47,7 @@ type TerminalOutputSwitch interface {
 }
 
 type OutputCapture interface {
-	SetOutputBucket(*[]string)
+	SetOutputBucket(io.Writer)
 }
 
 func NewRpcService(
@@ -64,6 +67,7 @@ func NewRpcService(
 			repoLocator:          repoLocator,
 			newCmdRunner:         newCmdRunner,
 			logger:               logger,
+			outputBucket:         &bytes.Buffer{},
 		},
 	}
 
@@ -154,7 +158,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	var err error
 	cmdRegistry := command_registry.Commands
 
-	cmd.outputBucket = &[]string{}
+	cmd.outputBucket = &bytes.Buffer{}
 	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
 
 	if cmdRegistry.CommandExists(args[0]) {
@@ -184,7 +188,8 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
-	*retVal = *cmd.outputBucket
+	v := &[]string{cmd.outputBucket.String()}
+	*retVal = *v
 	return nil
 }
 
