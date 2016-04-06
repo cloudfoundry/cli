@@ -77,6 +77,99 @@ var _ = Describe("Table", func() {
 		})
 	})
 
+	It("prints nothing without headers, nor rows", func() {
+		table = NewTable(ui, []string{})
+		table.Print()
+
+		Expect(ui.Outputs).To(BeEmpty())
+	})
+
+	It("prints nothing with suppressed headers and no rows", func() {
+		table.NoHeaders()
+		table.Print()
+
+		Expect(ui.Outputs).To(BeEmpty())
+	})
+
+	It("does not print the header when suppressed", func() {
+		table.NoHeaders()
+		table.Add("cloak", "and", "dagger")
+		table.Print()
+
+		Expect(ui.Outputs).To(Not(ContainSubstrings(
+			[]string{"watashi", "no", "atama!"},
+		)))
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"cloak", "and", "dagger"},
+		))
+	})
+
+	It("prints cell strings as specified by column transformers", func() {
+		table.Add("cloak", "and", "dagger")
+		table.SetTransformer(0, func(s string) string {
+			return "<<" + s + ">>"
+		})
+		table.Print()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"<<cloak>>", "and", "dagger"},
+		))
+		Expect(ui.Outputs).To(Not(ContainSubstrings(
+			[]string{"<<watashi>>"},
+		)))
+	})
+
+	It("prints no more columns than headers", func() {
+		table.Add("something", "and", "nothing", "ignored")
+		table.Print()
+
+		Expect(ui.Outputs).To(Not(ContainSubstrings(
+			[]string{"ignored"},
+		)))
+	})
+
+	It("avoids printing trailing whitespace for empty columns", func() {
+		table.Add("something", "and")
+		table.Print()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"watashi     no    atama!"},
+			[]string{"something   and"},
+		))
+	})
+
+	It("avoids printing trailing whitespace for whitespace columns", func() {
+		table.Add("something", "    ")
+		table.Print()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"watashi     no   atama!"},
+			[]string{"something"},
+		))
+	})
+
+	It("even avoids printing trailing whitespace for multi-line cells", func() {
+		table.Add("a", "b\nd", "\nc")
+		table.Print()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"watashi   no   atama!"},
+			[]string{"a         b"},
+			[]string{"          d    c"},
+		))
+	})
+
+	It("prints multi-line cells on separate physical lines", func() {
+		table.Add("a", "b\nd", "c")
+		table.Print()
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"watashi   no   atama!"},
+			[]string{"a         b    c"},
+			[]string{"          d"},
+		))
+	})
+
 	Describe("aligning columns", func() {
 		It("aligns rows to the header when the header is longest", func() {
 			table.Add("a", "b", "c")
