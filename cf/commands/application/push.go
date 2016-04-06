@@ -298,32 +298,79 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 
 	if routeDefined || defaultRouteAcceptable {
 		if appParams.Domains == nil {
-			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, cmd.findDomain(nil))
+			domain := cmd.findDomain(nil)
+			appParams.UseRandomPort = isTcp(domain)
+			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 		} else {
 			for _, d := range *(appParams.Domains) {
-				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, cmd.findDomain(&d))
+				domain := cmd.findDomain(&d)
+				appParams.UseRandomPort = isTcp(domain)
+				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 			}
 		}
 	}
 }
 
-func (cmd *Push) processDomainsAndBindRoutes(appParams models.AppParams, routeActor actors.RouteActor, app models.Application, domain models.DomainFields) {
+func isTcp(domain models.DomainFields) bool {
+	for _, typ := range domain.RouterGroupTypes {
+		if strings.Compare(typ, "tcp") == 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (cmd *Push) processDomainsAndBindRoutes(
+	appParams models.AppParams,
+	routeActor actors.RouteActor,
+	app models.Application,
+	domain models.DomainFields,
+) {
 	if appParams.IsHostEmpty() {
-		cmd.createAndBindRoute(nil, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain, appParams.RoutePath)
+		cmd.createAndBindRoute(
+			nil,
+			appParams.UseRandomRoute,
+			appParams.UseRandomPort,
+			routeActor,
+			app,
+			appParams.NoHostname,
+			domain,
+			appParams.RoutePath,
+		)
 	} else {
 		for _, host := range *(appParams.Hosts) {
-			cmd.createAndBindRoute(&host, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain, appParams.RoutePath)
+			cmd.createAndBindRoute(
+				&host,
+				appParams.UseRandomRoute,
+				appParams.UseRandomPort,
+				routeActor,
+				app,
+				appParams.NoHostname,
+				domain,
+				appParams.RoutePath,
+			)
 		}
 	}
 }
 
-func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeActor actors.RouteActor, app models.Application, noHostName bool, domain models.DomainFields, routePath *string) {
+func (cmd *Push) createAndBindRoute(
+	host *string,
+	UseRandomRoute bool,
+	UseRandomPort bool,
+	routeActor actors.RouteActor,
+	app models.Application,
+	noHostName bool,
+	domain models.DomainFields,
+	routePath *string,
+) {
 	var hostname string
 	if !noHostName {
 		switch {
 		case host != nil:
 			hostname = *host
-		case UseRandomHostname:
+		case UseRandomPort:
+			//do nothing
+		case UseRandomRoute:
 			hostname = hostNameForString(app.Name) + "-" + cmd.wordGenerator.Babble()
 		default:
 			hostname = hostNameForString(app.Name)
@@ -332,9 +379,9 @@ func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeA
 
 	var route models.Route
 	if routePath != nil {
-		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath)
+		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath, UseRandomPort)
 	} else {
-		route = routeActor.FindOrCreateRoute(hostname, domain, "")
+		route = routeActor.FindOrCreateRoute(hostname, domain, "", UseRandomPort)
 	}
 	routeActor.BindRoute(app, route)
 }
@@ -349,13 +396,13 @@ func hostNameForString(name string) string {
 	return name
 }
 
-func (cmd *Push) findDomain(domainName *string) (domain models.DomainFields) {
+func (cmd *Push) findDomain(domainName *string) models.DomainFields {
 	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().Guid, domainName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	return
+	return domain
 }
 
 func (cmd *Push) bindAppToServices(services []string, app models.Application) {
@@ -539,9 +586,9 @@ func addApp(apps *[]models.AppParams, app models.AppParams) error {
 
 func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	appParams := models.AppParams{
-		NoRoute:           c.Bool("no-route"),
-		UseRandomHostname: c.Bool("random-route"),
-		NoHostname:        c.Bool("no-hostname"),
+		NoRoute:        c.Bool("no-route"),
+		UseRandomRoute: c.Bool("random-route"),
+		NoHostname:     c.Bool("no-hostname"),
 	}
 
 	if len(c.Args()) > 0 {
