@@ -13,14 +13,6 @@ type Printer interface {
 	ForcePrintln(a ...interface{}) (n int, err error)
 }
 
-type OutputCapture interface {
-	SetOutputBucket(*[]string)
-}
-
-type TerminalOutputSwitch interface {
-	DisableTerminalOutput(bool)
-}
-
 type TeePrinter struct {
 	disableTerminalOutput bool
 	outputBucket          *[]string

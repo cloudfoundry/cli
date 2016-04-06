@@ -1,7 +1,7 @@
 package main_test
 
 import (
-	"github.com/cloudfoundry/cli/plugin/fakes"
+	"github.com/cloudfoundry/cli/plugin/pluginfakes"
 	. "github.com/cloudfoundry/cli/plugin_examples/call_cli_cmd/main"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
 	. "github.com/onsi/ginkgo"
@@ -10,11 +10,11 @@ import (
 
 var _ = Describe("CallCliCmd", func() {
 	Describe(".Run", func() {
-		var fakeCliConnection *fakes.FakeCliConnection
+		var fakeCliConnection *pluginfakes.FakeCliConnection
 		var callCliCommandPlugin *CliCmd
 
 		BeforeEach(func() {
-			fakeCliConnection = &fakes.FakeCliConnection{}
+			fakeCliConnection = &pluginfakes.FakeCliConnection{}
 			callCliCommandPlugin = &CliCmd{}
 		})
 

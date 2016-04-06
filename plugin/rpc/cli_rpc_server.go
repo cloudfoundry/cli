@@ -29,8 +29,8 @@ type CliRpcService struct {
 
 type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
-	outputCapture        terminal.OutputCapture
-	terminalOutputSwitch terminal.TerminalOutputSwitch
+	outputCapture        OutputCapture
+	terminalOutputSwitch TerminalOutputSwitch
 	cliConfig            core_config.Repository
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         CommandRunner
@@ -38,9 +38,18 @@ type CliRpcCmd struct {
 	logger               trace.Printer
 }
 
+//go:generate counterfeiter . TerminalOutputSwitch
+type TerminalOutputSwitch interface {
+	DisableTerminalOutput(bool)
+}
+
+type OutputCapture interface {
+	SetOutputBucket(*[]string)
+}
+
 func NewRpcService(
-	outputCapture terminal.OutputCapture,
-	terminalOutputSwitch terminal.TerminalOutputSwitch,
+	outputCapture OutputCapture,
+	terminalOutputSwitch TerminalOutputSwitch,
 	cliConfig core_config.Repository,
 	repoLocator api.RepositoryLocator,
 	newCmdRunner CommandRunner,

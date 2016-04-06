@@ -13,13 +13,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/terminal/fakes"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	cmdRunner "github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
-	fakeRunner "github.com/cloudfoundry/cli/plugin/rpc/fakes"
+	"github.com/cloudfoundry/cli/plugin/rpc/rpcfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -249,10 +248,10 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe("disabling terminal output", func() {
-		var terminalOutputSwitch *fakes.FakeTerminalOutputSwitch
+		var terminalOutputSwitch *rpcfakes.FakeTerminalOutputSwitch
 
 		BeforeEach(func() {
-			terminalOutputSwitch = &fakes.FakeTerminalOutputSwitch{}
+			terminalOutputSwitch = &rpcfakes.FakeTerminalOutputSwitch{}
 			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, api.RepositoryLocator{}, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -278,13 +277,13 @@ var _ = Describe("Server", func() {
 
 	Describe("Plugin API", func() {
 
-		var runner *fakeRunner.FakeCommandRunner
+		var runner *rpcfakes.FakeCommandRunner
 
 		BeforeEach(func() {
 			outputCapture := terminal.NewTeePrinter()
 			terminalOutputSwitch := terminal.NewTeePrinter()
 
-			runner = &fakeRunner.FakeCommandRunner{}
+			runner = &rpcfakes.FakeCommandRunner{}
 			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner, nil)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -423,13 +422,13 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe(".CallCoreCommand", func() {
-		var runner *fakeRunner.FakeCommandRunner
+		var runner *rpcfakes.FakeCommandRunner
 
 		Context("success", func() {
 			BeforeEach(func() {
 
 				outputCapture := terminal.NewTeePrinter()
-				runner = &fakeRunner.FakeCommandRunner{}
+				runner = &rpcfakes.FakeCommandRunner{}
 
 				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, runner, nil)
 				Expect(err).ToNot(HaveOccurred())
