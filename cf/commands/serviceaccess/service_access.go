@@ -126,7 +126,7 @@ func (cmd ServiceAccess) printTable(brokers []models.ServiceBroker) {
 	for _, serviceBroker := range brokers {
 		cmd.ui.Say(fmt.Sprintf(T("broker: {{.Name}}", map[string]interface{}{"Name": serviceBroker.Name})))
 
-		table := terminal.NewTable(cmd.ui, []string{"", T("service"), T("plan"), T("access"), T("orgs")})
+		table := cmd.ui.Table([]string{"", T("service"), T("plan"), T("access"), T("orgs")})
 		for _, service := range serviceBroker.Services {
 			if len(service.Plans) > 0 {
 				for _, plan := range service.Plans {

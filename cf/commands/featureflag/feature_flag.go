@@ -65,7 +65,7 @@ func (cmd *ShowFeatureFlag) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{T("Features"), T("State")})
+	table := cmd.ui.Table([]string{T("Features"), T("State")})
 	table.Add(flag.Name, cmd.flagBoolToString(flag.Enabled))
 
 	table.Print()

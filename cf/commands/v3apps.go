@@ -85,7 +85,7 @@ func (c *V3Apps) Execute(fc flags.FlagContext) {
 		routes[i] = rs
 	}
 
-	table := terminal.NewTable(c.ui, []string{T("name"), T("requested state"), T("instances"), T("memory"), T("disk"), T("urls")})
+	table := c.ui.Table([]string{T("name"), T("requested state"), T("instances"), T("memory"), T("disk"), T("urls")})
 
 	for i := range applications {
 		c.addRow(table, applications[i], processes[i], routes[i])
@@ -94,8 +94,13 @@ func (c *V3Apps) Execute(fc flags.FlagContext) {
 	table.Print()
 }
 
+type table interface {
+	Add(row ...string)
+	Print()
+}
+
 func (c *V3Apps) addRow(
-	table terminal.Table,
+	table table,
 	application models.V3Application,
 	processes []models.V3Process,
 	routes []models.V3Route,

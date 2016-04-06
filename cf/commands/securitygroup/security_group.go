@@ -73,7 +73,7 @@ func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
-	table := terminal.NewTable(cmd.ui, []string{"", ""})
+	table := cmd.ui.Table([]string{"", ""})
 	table.Add(T("Name"), securityGroup.Name)
 	table.Add(T("Rules"), "")
 	table.Print()
@@ -82,7 +82,7 @@ func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) {
 	cmd.ui.Say("")
 
 	if len(securityGroup.Spaces) > 0 {
-		table = terminal.NewTable(cmd.ui, []string{"", T("Organization"), T("Space")})
+		table = cmd.ui.Table([]string{"", T("Organization"), T("Space")})
 
 		for index, space := range securityGroup.Spaces {
 			table.Add(fmt.Sprintf("#%d", index), space.Organization.Name, space.Name)

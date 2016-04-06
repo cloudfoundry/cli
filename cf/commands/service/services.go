@@ -86,7 +86,7 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{T("name"), T("service"), T("plan"), T("bound apps"), T("last operation")})
+	table := cmd.ui.Table([]string{T("name"), T("service"), T("plan"), T("bound apps"), T("last operation")})
 
 	for _, instance := range serviceInstances {
 		var serviceColumn string

@@ -62,12 +62,12 @@ func (cmd *Plugins) Execute(c flags.FlagContext) {
 
 	plugins := cmd.config.Plugins()
 
-	var table terminal.Table
+	var table *terminal.UITable
 	if c.Bool("checksum") {
 		cmd.ui.Say(T("Computing sha1 for installed plugins, this may take a while ..."))
-		table = terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), "sha1", T("Command Help")})
+		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), "sha1", T("Command Help")})
 	} else {
-		table = terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
+		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
 	}
 
 	for pluginName, metadata := range plugins {

@@ -83,7 +83,7 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 		appInstanceLimit = T("unlimited")
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", ""})
+	table := cmd.ui.Table([]string{"", ""})
 	table.Add(T("Total Memory"), formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE))
 	table.Add(T("Instance Memory"), megabytes)
 	table.Add(T("Routes"), fmt.Sprint(quota.RoutesLimit))

@@ -90,7 +90,7 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{
+	table := cmd.ui.Table([]string{
 		T("name"),
 		T("requested state"),
 		T("instances"),

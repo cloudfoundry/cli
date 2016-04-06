@@ -7,19 +7,10 @@ import (
 	"strings"
 )
 
-// Table is the face of tables to the world. It publishes methods to
-// add rows and to print the accumulated table.
-type Table interface {
-	Add(row ...string)
-	Print()
-	NoHeaders()
-	SetTransformer(columnIndex int, tr Transformer)
-}
-
 // PrintableTable is an implementation of the Table interface. It
 // remembers the headers, the added rows, the column widths, and a
 // number of other things.
-type PrintableTable struct {
+type Table struct {
 	ui            UI
 	headers       []string
 	headerPrinted bool
@@ -38,9 +29,8 @@ type Transformer func(s string) string
 // NewTable is the constructor function creating a new printable table
 // from a list of headers. The table is also connected to a UI, which
 // is where it will print itself to on demand.
-func NewTable(ui UI, headers []string) *PrintableTable {
-	pt := &PrintableTable{
-		ui:          ui,
+func NewTable(headers []string) *Table {
+	pt := &Table{
 		headers:     headers,
 		columnWidth: make([]int, len(headers)),
 		colSpacing:  "   ",
@@ -60,7 +50,7 @@ func NewTable(ui UI, headers []string) *PrintableTable {
 
 // NoHeaders disables the printing of the header row for the specified
 // table.
-func (t *PrintableTable) NoHeaders() {
+func (t *Table) NoHeaders() {
 	// Fake the Print() code into the belief that the headers have
 	// been printed already.
 	t.headerPrinted = true
@@ -68,48 +58,20 @@ func (t *PrintableTable) NoHeaders() {
 
 // SetTransformer specifies a string transformer to apply to the
 // content of the given column in the specified table.
-func (t *PrintableTable) SetTransformer(columnIndex int, tr Transformer) {
+func (t *Table) SetTransformer(columnIndex int, tr Transformer) {
 	t.transformer[columnIndex] = tr
 }
 
 // Add extends the table by another row.
-func (t *PrintableTable) Add(row ...string) {
+func (t *Table) Add(row ...string) {
 	t.rows = append(t.rows, row)
-}
-
-// Print formats the table and then prints it to the UI specified at
-// the time of the construction. Afterwards the table is cleared,
-// becoming ready for another round of rows and printing.
-func (t *PrintableTable) Print() {
-	result := &bytes.Buffer{}
-
-	t.PrintTo(result)
-
-	// DevNote. With the change to printing into a buffer all
-	// lines now come with a terminating \n. The t.ui.Say() below
-	// will then add another \n to that. To avoid this additional
-	// line we chop off the last \n from the output (if there is
-	// any). Operating on the slice avoids string copying.
-	//
-	// WIBNI if the terminal API had a variant of Say not assuming
-	// that each output is a single line.
-
-	r := result.Bytes()
-	if len(r) > 0 {
-		r = r[0 : len(r)-1]
-	}
-
-	// Only generate output for a non-empty table.
-	if len(r) > 0 {
-		t.ui.Say("%s", string(r))
-	}
 }
 
 // PrintTo is the core functionality for printing the table, placing
 // the formatted table into the writer given to it as argument. The
 // exported Print() is just a wrapper around this which redirects the
 // result into CF datastructures.
-func (t *PrintableTable) PrintTo(result io.Writer) {
+func (t *Table) PrintTo(result io.Writer) {
 
 	t.rowHeight = make([]int, len(t.rows)+1)
 
@@ -146,7 +108,7 @@ func (t *PrintableTable) PrintTo(result io.Writer) {
 // table, and their strings, determining the height of each row (in
 // lines), and the width of each column (in characters). The results
 // are stored in the table for use by Print.
-func (t *PrintableTable) calculateMaxSize(transformer rowTransformer, rowIndex int, row []string) {
+func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row []string) {
 
 	// Iterate columns
 	for columnIndex := range row {
@@ -181,7 +143,7 @@ func (t *PrintableTable) calculateMaxSize(transformer rowTransformer, rowIndex i
 
 // printRow is responsible for the layouting, transforming and
 // printing of the string in a single row
-func (t *PrintableTable) printRow(result io.Writer, transformer rowTransformer, rowIndex int, row []string) {
+func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex int, row []string) {
 
 	height := t.rowHeight[rowIndex]
 
@@ -256,7 +218,7 @@ func (t *PrintableTable) printRow(result io.Writer, transformer rowTransformer, 
 
 // printCellValue pads the specified string to the width of the given
 // column, adds the spacing bewtween columns, and returns the result.
-func (t *PrintableTable) printCellValue(result io.Writer, col, last int, value string) {
+func (t *Table) printCellValue(result io.Writer, col, last int, value string) {
 	fmt.Fprint(result, value)
 
 	// Pad all columns, but the last in this row (with the size of
@@ -302,7 +264,7 @@ func (th *transformHeader) Transform(column int, s string) string {
 // rowTransformer. It performs the per-column transformation for table
 // content, as specified during construction and/or overridden by the
 // user of the table, see SetTransformer.
-func (t *PrintableTable) Transform(column int, s string) string {
+func (t *Table) Transform(column int, s string) string {
 	return t.transformer[column](s)
 }
 

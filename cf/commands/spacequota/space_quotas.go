@@ -71,7 +71,7 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{
+	table := cmd.ui.Table([]string{
 		T("name"),
 		T("total memory limit"),
 		T("instance memory limit"),

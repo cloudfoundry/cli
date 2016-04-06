@@ -75,7 +75,7 @@ func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", T("Name"), T("Organization"), T("Space")})
+	table := cmd.ui.Table([]string{"", T("Name"), T("Organization"), T("Space")})
 
 	for index, securityGroup := range securityGroups {
 		if len(securityGroup.Spaces) > 0 {
@@ -87,7 +87,12 @@ func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
 	table.Print()
 }
 
-func (cmd SecurityGroups) printSpaces(table terminal.Table, securityGroup models.SecurityGroup, index int) {
+type table interface {
+	Add(row ...string)
+	Print()
+}
+
+func (cmd SecurityGroups) printSpaces(table table, securityGroup models.SecurityGroup, index int) {
 	outputted_index := false
 
 	for _, space := range securityGroup.Spaces {

@@ -180,7 +180,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk"), T("details")})
+	table := cmd.ui.Table([]string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk"), T("details")})
 
 	for index, instance := range instances {
 		table.Add(

@@ -107,7 +107,7 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{T("service plan"), T("description"), T("free or paid")})
+	table := cmd.ui.Table([]string{T("service plan"), T("description"), T("free or paid")})
 	for _, plan := range serviceOffering.Plans {
 		var freeOrPaid string
 		if plan.Free {
@@ -155,7 +155,7 @@ func (cmd MarketplaceServices) marketplace() {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{T("service"), T("plans"), T("description")})
+	table := cmd.ui.Table([]string{T("service"), T("plans"), T("description")})
 
 	sort.Sort(serviceOfferings)
 	var paidPlanExists bool

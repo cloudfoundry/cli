@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
@@ -96,13 +95,13 @@ type FakeUI struct {
 	LoadingIndicationStub        func()
 	loadingIndicationMutex       sync.RWMutex
 	loadingIndicationArgsForCall []struct{}
-	TableStub                    func(headers []string) terminal.Table
+	TableStub                    func(headers []string) *terminal.UITable
 	tableMutex                   sync.RWMutex
 	tableArgsForCall             []struct {
 		headers []string
 	}
 	tableReturns struct {
-		result1 terminal.Table
+		result1 *terminal.UITable
 	}
 	NotifyUpdateIfNeededStub        func(core_config.Reader)
 	notifyUpdateIfNeededMutex       sync.RWMutex
@@ -461,7 +460,7 @@ func (fake *FakeUI) LoadingIndicationCallCount() int {
 	return len(fake.loadingIndicationArgsForCall)
 }
 
-func (fake *FakeUI) Table(headers []string) terminal.Table {
+func (fake *FakeUI) Table(headers []string) *terminal.UITable {
 	fake.tableMutex.Lock()
 	fake.tableArgsForCall = append(fake.tableArgsForCall, struct {
 		headers []string
@@ -486,10 +485,10 @@ func (fake *FakeUI) TableArgsForCall(i int) []string {
 	return fake.tableArgsForCall[i].headers
 }
 
-func (fake *FakeUI) TableReturns(result1 terminal.Table) {
+func (fake *FakeUI) TableReturns(result1 *terminal.UITable) {
 	fake.TableStub = nil
 	fake.tableReturns = struct {
-		result1 terminal.Table
+		result1 *terminal.UITable
 	}{result1}
 }
 
