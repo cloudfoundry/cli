@@ -19,20 +19,36 @@ type Route struct {
 }
 
 func (r Route) URL() string {
-	return urlStringFromParts(r.Host, r.Domain.Name, r.Path)
+	return (&RoutePresenter{
+		Host:   r.Host,
+		Domain: r.Domain.Name,
+		Path:   r.Path,
+		Port:   r.Port,
+	}).URL()
 }
 
-func urlStringFromParts(hostName, domainName, path string) string {
+type RoutePresenter struct {
+	Host   string
+	Domain string
+	Path   string
+	Port   int
+}
+
+func (r *RoutePresenter) URL() string {
 	var host string
-	if hostName != "" {
-		host = fmt.Sprintf("%s.%s", hostName, domainName)
+	if r.Host != "" {
+		host = r.Host + "." + r.Domain
 	} else {
-		host = domainName
+		host = r.Domain
+	}
+
+	if r.Port != 0 {
+		host = fmt.Sprintf("%s:%d", host, r.Port)
 	}
 
 	u := url.URL{
 		Host: host,
-		Path: path,
+		Path: r.Path,
 	}
 
 	return strings.TrimPrefix(u.String(), "//") // remove the empty scheme
