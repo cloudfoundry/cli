@@ -37,12 +37,13 @@ type FakeRouteRepository struct {
 		result1 models.Route
 		result2 error
 	}
-	CreateStub        func(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
+	CreateStub        func(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		host   string
-		domain models.DomainFields
-		path   string
+		host          string
+		domain        models.DomainFields
+		path          string
+		useRandomPort bool
 	}
 	createReturns struct {
 		result1 models.Route
@@ -201,16 +202,17 @@ func (fake *FakeRouteRepository) FindReturns(result1 models.Route, result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
+func (fake *FakeRouteRepository) Create(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error) {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		host   string
-		domain models.DomainFields
-		path   string
-	}{host, domain, path})
+		host          string
+		domain        models.DomainFields
+		path          string
+		useRandomPort bool
+	}{host, domain, path, useRandomPort})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(host, domain, path)
+		return fake.CreateStub(host, domain, path, useRandomPort)
 	} else {
 		return fake.createReturns.result1, fake.createReturns.result2
 	}
@@ -222,10 +224,10 @@ func (fake *FakeRouteRepository) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string) {
+func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, bool) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].host, fake.createArgsForCall[i].domain, fake.createArgsForCall[i].path
+	return fake.createArgsForCall[i].host, fake.createArgsForCall[i].domain, fake.createArgsForCall[i].path, fake.createArgsForCall[i].useRandomPort
 }
 
 func (fake *FakeRouteRepository) CreateReturns(result1 models.Route, result2 error) {

@@ -276,7 +276,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
 		Expect(apps[0].NoRoute).To(BeTrue())
 		Expect(apps[0].NoHostname).To(BeTrue())
-		Expect(apps[0].UseRandomHostname).To(BeTrue())
+		Expect(apps[0].UseRandomRoute).To(BeTrue())
 	})
 
 	It("removes duplicated values in 'hosts' and 'domains'", func() {

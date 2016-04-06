@@ -15,12 +15,12 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-//go:generate counterfeiter -o fakes/fake_route_repository.go . RouteRepository
+//go:generate counterfeiter . RouteRepository
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
 	Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error)
-	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
+	Create(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
 	CreateInSpace(host, path, domainGuid, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
 	Bind(routeGuid, appGuid string) (apiErr error)
@@ -122,10 +122,9 @@ func doesNotMatchVersionSpecificAttributes(route models.Route, path string, port
 	return normalizedPath(route.Path) != normalizedPath(path) || route.Port != port
 }
 
-func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
+func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error) {
 	var port int
-	var randomRoute bool
-	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid, port, randomRoute)
+	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid, port, useRandomPort)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {

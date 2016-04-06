@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -136,7 +137,7 @@ var _ = Describe("Push Command", func() {
 		OriginalCommandServiceBind = command_registry.Commands.FindCommand("bind-service")
 
 		routeRepo = &testapi.FakeRouteRepository{}
-		routeRepo.CreateStub = func(host string, domain models.DomainFields, path string) (models.Route, error) {
+		routeRepo.CreateStub = func(host string, domain models.DomainFields, path string, _ bool) (models.Route, error) {
 			// This never returns an error, which means it isn't tested.
 			// This is copied from the old route repo fake.
 			route := models.Route{}
@@ -455,10 +456,11 @@ var _ = Describe("Push Command", func() {
 				Expect(host).To(Equal("app-name"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
+				createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("app-name"))
 				Expect(createdDomainFields.Guid).To(Equal("foo-domain-guid"))
 				Expect(createdPath).To(BeEmpty())
+				Expect(randomPort).To(BeFalse())
 
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
 				boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
@@ -496,7 +498,7 @@ var _ = Describe("Push Command", func() {
 				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("appname"))
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, _, _ := routeRepo.CreateArgsForCall(0)
+				createdHost, _, _, _ := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("appname"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -564,10 +566,11 @@ var _ = Describe("Push Command", func() {
 				Expect(owningOrgGuid).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
+				createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("my-hostname"))
 				Expect(createdDomainFields.Guid).To(Equal("bar-domain-guid"))
 				Expect(createdPath).To(Equal("my-route-path"))
+				Expect(randomPort).To(BeFalse())
 
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
 				boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
@@ -652,10 +655,11 @@ var _ = Describe("Push Command", func() {
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
-					createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
+					createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 					Expect(createdHost).To(Equal("app-name"))
 					Expect(createdDomainFields.Guid).To(Equal("shared-domain-guid"))
 					Expect(createdPath).To(Equal("the-route-path"))
+					Expect(randomPort).To(BeFalse())
 
 					Expect(routeRepo.BindCallCount()).To(Equal(1))
 					boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
@@ -697,10 +701,11 @@ var _ = Describe("Push Command", func() {
 					Expect(host).To(Equal("app-name"))
 
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
-					createdHost, createdDomainFields, createdPath := routeRepo.CreateArgsForCall(0)
+					createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 					Expect(createdHost).To(Equal("app-name"))
 					Expect(createdDomainFields.Guid).To(Equal("private-domain-guid"))
 					Expect(createdPath).To(BeEmpty())
+					Expect(randomPort).To(BeFalse())
 
 					Expect(routeRepo.BindCallCount()).To(Equal(1))
 					boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
@@ -720,7 +725,7 @@ var _ = Describe("Push Command", func() {
 				})
 			})
 
-			Describe("randomized hostnames", func() {
+			Describe("with random-route option set", func() {
 				var manifestApp generic.Map
 
 				BeforeEach(func() {
@@ -730,21 +735,98 @@ var _ = Describe("Push Command", func() {
 					manifestRepo.ReadManifestReturns.Manifest = manifest
 				})
 
-				It("provides a random hostname when the --random-route flag is passed", func() {
-					callPush("--random-route", "app-name")
-					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _, _ := routeRepo.FindArgsForCall(0)
-					Expect(host).To(Equal("app-name-random-host"))
+				Context("for http routes", func() {
+					It("provides a random hostname when passed as a flag", func() {
+						callPush("--random-route", "app-name")
+						Expect(routeRepo.FindCallCount()).To(Equal(1))
+						host, _, _, _ := routeRepo.FindArgsForCall(0)
+						Expect(host).To(Equal("app-name-random-host"))
+					})
+
+					It("provides a random hostname when set in the manifest", func() {
+						manifestApp.Set("random-route", true)
+
+						callPush("app-name")
+
+						Expect(routeRepo.FindCallCount()).To(Equal(1))
+						host, _, _, _ := routeRepo.FindArgsForCall(0)
+						Expect(host).To(Equal("app-name-random-host"))
+					})
 				})
 
-				It("provides a random hostname when the random-route option is set in the manifest", func() {
-					manifestApp.Set("random-route", true)
+				Context("for tcp routes", func() {
+					var expectedDomain models.DomainFields
+					var expectedPort int
 
-					callPush("app-name")
+					BeforeEach(func() {
+						expectedPort = 7777
 
-					Expect(routeRepo.FindCallCount()).To(Equal(1))
-					host, _, _, _ := routeRepo.FindArgsForCall(0)
-					Expect(host).To(Equal("app-name-random-host"))
+						expectedDomain = models.DomainFields{
+							Guid: "some-guid",
+							Name: "some-name",
+							OwningOrganizationGuid: "some-organization-guid",
+							RouterGroupGuid:        "some-router-group-guid",
+							RouterGroupTypes:       []string{"tcp"},
+							Shared:                 true,
+						}
+
+						domainRepo.FindByNameInOrgReturns(
+							expectedDomain,
+							nil,
+						)
+
+						route := models.Route{
+							Domain: expectedDomain,
+							Port:   expectedPort,
+						}
+						routeRepo.CreateReturns(route, nil)
+					})
+
+					It("provides a random port and hostname when passed as a flag", func() {
+						callPush("--random-route", "app-name")
+
+						Expect(routeRepo.FindCallCount()).To(Equal(1))
+						host, domain, path, port := routeRepo.FindArgsForCall(0)
+						Expect(host).To(Equal(""))
+						Expect(domain).To(Equal(expectedDomain))
+						Expect(path).To(Equal(""))
+						Expect(port).To(Equal(0))
+
+						Expect(routeRepo.CreateCallCount()).To(Equal(1))
+						host, domain, path, useRandomPort := routeRepo.CreateArgsForCall(0)
+						Expect(host).To(Equal(""))
+						Expect(domain).To(Equal(expectedDomain))
+						Expect(path).To(Equal(""))
+						Expect(useRandomPort).To(BeTrue())
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{fmt.Sprintf("No bananas in the monkey cage. Expected Port: %d, Expected Domain: %s", expectedPort, expectedDomain.Name)},
+						))
+					})
+
+					It("provides a random port and hostname when set in the manifest", func() {
+						manifestApp.Set("random-route", true)
+
+						callPush("app-name")
+
+						Expect(routeRepo.FindCallCount()).To(Equal(1))
+						host, domain, path, port := routeRepo.FindArgsForCall(0)
+						Expect(host).To(Equal(""))
+						Expect(domain).To(Equal(expectedDomain))
+						Expect(path).To(Equal(""))
+						Expect(port).To(Equal(0))
+
+						Expect(routeRepo.CreateCallCount()).To(Equal(1))
+						host, domain, path, useRandomPort := routeRepo.CreateArgsForCall(0)
+						Expect(host).To(Equal(""))
+						Expect(domain).To(Equal(expectedDomain))
+						Expect(path).To(Equal(""))
+						Expect(useRandomPort).To(BeTrue())
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{fmt.Sprintf("No bananas in the monkey cage. Expected Port: %d, Expected Domain: %s", expectedPort, expectedDomain.Name)},
+						))
+					})
 				})
 			})
 
@@ -947,7 +1029,7 @@ var _ = Describe("Push Command", func() {
 				params := appRepo.CreateArgsForCall(0)
 				Expect(*params.Name).To(Equal("app-name"))
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, createdDomainFields, _ := routeRepo.CreateArgsForCall(0)
+				createdHost, createdDomainFields, _, _ := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal(""))
 				Expect(createdDomainFields.Guid).To(Equal("bar-domain-guid"))
 			})
@@ -1196,7 +1278,7 @@ var _ = Describe("Push Command", func() {
 					It("adds the route", func() {
 						callPush("existing-app")
 						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, _, _ := routeRepo.CreateArgsForCall(0)
+						createdHost, _, _, _ := routeRepo.CreateArgsForCall(0)
 						Expect(createdHost).To(Equal("new-manifest-host"))
 					})
 				})
@@ -1217,9 +1299,10 @@ var _ = Describe("Push Command", func() {
 				Expect(domain.Name).To(Equal("newdomain.com"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, createdDomainFields, _ := routeRepo.CreateArgsForCall(0)
+				createdHost, createdDomainFields, _, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("existing-app"))
 				Expect(createdDomainFields.Guid).To(Equal("domain-guid"))
+				Expect(randomPort).To(BeFalse())
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating route", "existing-app.newdomain.com"},
@@ -1239,7 +1322,7 @@ var _ = Describe("Push Command", func() {
 				Expect(domain.Name).To(Equal("example.com"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, createdDomainFields, _ := routeRepo.CreateArgsForCall(0)
+				createdHost, createdDomainFields, _, _ := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("new-host"))
 				Expect(createdDomainFields.Guid).To(Equal("domain-guid"))
 
@@ -1277,9 +1360,10 @@ var _ = Describe("Push Command", func() {
 				Expect(domain.Name).To(Equal("example.com"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
-				createdHost, createdDomainFields, _ := routeRepo.CreateArgsForCall(0)
+				createdHost, createdDomainFields, _, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal(""))
 				Expect(createdDomainFields.Guid).To(Equal("domain-guid"))
+				Expect(randomPort).To(BeFalse())
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating route", "example.com"},
