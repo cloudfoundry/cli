@@ -64,7 +64,7 @@ func (cmd *RunningEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 
-	table := terminal.NewTable(cmd.ui, []string{T("Variable Name"), T("Assigned Value")})
+	table := cmd.ui.Table([]string{T("Variable Name"), T("Assigned Value")})
 	for _, envVar := range runningEnvVars {
 		table.Add(envVar.Name, envVar.Value)
 	}

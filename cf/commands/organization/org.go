@@ -78,7 +78,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 
-		table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(org.Name) + ":", "", ""})
+		table := cmd.ui.Table([]string{terminal.EntityNameColor(org.Name) + ":", "", ""})
 
 		domains := []string{}
 		for _, domain := range org.Domains {

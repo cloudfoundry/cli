@@ -66,7 +66,7 @@ func (cmd *ListFeatureFlags) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := terminal.NewTable(cmd.ui, []string{T("Features"), T("State")})
+	table := cmd.ui.Table([]string{T("Features"), T("State")})
 
 	for _, flag := range flags {
 		table.Add(

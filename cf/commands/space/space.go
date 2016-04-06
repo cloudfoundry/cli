@@ -88,7 +88,7 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 		quotaString := cmd.quotaString(space)
 		cmd.ui.Ok()
 		cmd.ui.Say("")
-		table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(space.Name), "", ""})
+		table := cmd.ui.Table([]string{terminal.EntityNameColor(space.Name), "", ""})
 		table.Add("", T("Org:"), terminal.EntityNameColor(space.Organization.Name))
 
 		apps := []string{}
@@ -124,7 +124,7 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 		for _, group := range space.SecurityGroups {
 			cmd.ui.Say(T("Getting rules for the security group  : {{.SecurityGroupName}}...",
 				map[string]interface{}{"SecurityGroupName": terminal.EntityNameColor(group.Name)}))
-			table := terminal.NewTable(cmd.ui, []string{"", "", "", ""})
+			table := cmd.ui.Table([]string{"", "", "", ""})
 			for _, rules := range group.Rules {
 				for ruleName, ruleValue := range rules {
 					table.Add("", ruleName, ":", fmt.Sprintf("%v", ruleValue))

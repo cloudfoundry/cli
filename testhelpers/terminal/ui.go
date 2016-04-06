@@ -150,8 +150,11 @@ func (ui *FakeUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui *FakeUI) Table(headers []string) term.Table {
-	return term.NewTable(ui, headers)
+func (ui *FakeUI) Table(headers []string) *term.UITable {
+	return &term.UITable{
+		UI:    ui,
+		Table: term.NewTable(headers),
+	}
 }
 
 func (ui *FakeUI) NotifyUpdateIfNeeded(config core_config.Reader) {

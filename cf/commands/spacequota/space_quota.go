@@ -74,7 +74,7 @@ func (cmd *SpaceQuota) Execute(c flags.FlagContext) {
 	cmd.ui.Say("")
 	var megabytes string
 
-	table := terminal.NewTable(cmd.ui, []string{"", ""})
+	table := cmd.ui.Table([]string{"", ""})
 	table.Add(T("total memory limit"), formatters.ByteSize(spaceQuota.MemoryLimit*formatters.MEGABYTE))
 	if spaceQuota.InstanceMemoryLimit == -1 {
 		megabytes = T("unlimited")

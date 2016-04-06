@@ -8,6 +8,7 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
+	"bytes"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -35,7 +36,7 @@ type UI interface {
 	PanicQuietly()
 	ShowConfiguration(core_config.Reader)
 	LoadingIndication()
-	Table(headers []string) Table
+	Table(headers []string) *UITable
 	NotifyUpdateIfNeeded(core_config.Reader)
 }
 
@@ -162,7 +163,7 @@ func (ui *terminalUI) PanicQuietly() {
 }
 
 func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
-	table := NewTable(ui, []string{"", ""})
+	table := ui.Table([]string{"", ""})
 
 	if config.HasAPIEndpoint() {
 		table.Add(
@@ -229,8 +230,49 @@ func (ui *terminalUI) LoadingIndication() {
 	ui.printer.Print(".")
 }
 
-func (ui *terminalUI) Table(headers []string) Table {
-	return NewTable(ui, headers)
+func (ui *terminalUI) Table(headers []string) *UITable {
+	return &UITable{
+		UI:    ui,
+		Table: NewTable(headers),
+	}
+}
+
+type UITable struct {
+	UI    UI
+	Table *Table
+}
+
+func (u *UITable) Add(row ...string) {
+	u.Table.Add(row...)
+}
+
+// Print formats the table and then prints it to the UI specified at
+// the time of the construction. Afterwards the table is cleared,
+// becoming ready for another round of rows and printing.
+func (u *UITable) Print() {
+	result := &bytes.Buffer{}
+	t := u.Table
+
+	t.PrintTo(result)
+
+	// DevNote. With the change to printing into a buffer all
+	// lines now come with a terminating \n. The t.ui.Say() below
+	// will then add another \n to that. To avoid this additional
+	// line we chop off the last \n from the output (if there is
+	// any). Operating on the slice avoids string copying.
+	//
+	// WIBNI if the terminal API had a variant of Say not assuming
+	// that each output is a single line.
+
+	r := result.Bytes()
+	if len(r) > 0 {
+		r = r[0 : len(r)-1]
+	}
+
+	// Only generate output for a non-empty table.
+	if len(r) > 0 {
+		u.UI.Say("%s", string(r))
+	}
 }
 
 func (ui *terminalUI) NotifyUpdateIfNeeded(config core_config.Reader) {

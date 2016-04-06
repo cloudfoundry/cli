@@ -75,8 +75,7 @@ func (cmd *ListStack) Execute(c flags.FlagContext) {
 
 		cmd.ui.Ok()
 		cmd.ui.Say("")
-
-		table := terminal.NewTable(cmd.ui, []string{T("name"), T("description")})
+		table := cmd.ui.Table([]string{T("name"), T("description")})
 		table.Add(stack.Name, stack.Description)
 		table.Print()
 	}
