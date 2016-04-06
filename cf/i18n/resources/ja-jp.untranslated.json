@@ -180,10 +180,6 @@
     "translation": "CF_NAME delete-quota QUOTA [-f]"
   },
   {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
-  },
-  {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
     "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
   },
@@ -628,6 +624,14 @@
     "translation": "DOMAIN"
   },
   {
+    "id": "Delete a TCP route",
+    "translation": "Delete a TCP route"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": "Delete an HTTP route"
+  },
+  {
     "id": "Error getting SSH code: ",
     "translation": "Error getting SSH code: "
   },
@@ -742,6 +746,10 @@
   {
     "id": "Port for the TCP route",
     "translation": "Port for the TCP route"
+  },
+  {
+    "id": "Port used to identify the TCP route",
+    "translation": "Port used to identify the TCP route"
   },
   {
     "id": "QUOTA",

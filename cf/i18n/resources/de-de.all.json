@@ -608,10 +608,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
     "translation": ""
   },
@@ -1396,6 +1392,10 @@
     "translation": "Neue Bereichsressourcengrößenbeschränkung definieren"
   },
   {
+    "id": "Delete a TCP route",
+    "translation": ""
+  },
+  {
     "id": "Delete a buildpack",
     "translation": "Buildpack löschen"
   },
@@ -1446,6 +1446,10 @@
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "Alle verwaisten Routen (z.B.:  die keiner Map zugeordnet sind) löschen"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": ""
   },
   {
     "id": "Delete an app",
@@ -3265,6 +3269,10 @@
   },
   {
     "id": "Port for the TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Port used to identify the TCP route",
     "translation": ""
   },
   {
