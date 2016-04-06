@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_command_runner.go . CommandRunner
+//go:generate counterfeiter . CommandRunner
 type CommandRunner interface {
 	Command([]string, command_registry.Dependency, bool) error
 }
