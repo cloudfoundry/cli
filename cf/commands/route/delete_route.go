@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -104,10 +105,13 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 	domainName := c.Args()[0]
 	port := c.Int("port")
 
-	url := domainName
-	if host != "" {
-		url = host + "." + domainName
-	}
+	url := (&models.RoutePresenter{
+		Host:   host,
+		Domain: domainName,
+		Path:   path,
+		Port:   port,
+	}).URL()
+
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDelete("route", url) {
 			return

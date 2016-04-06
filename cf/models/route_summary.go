@@ -8,5 +8,9 @@ type RouteSummary struct {
 }
 
 func (r RouteSummary) URL() string {
-	return urlStringFromParts(r.Host, r.Domain.Name, r.Path)
+	return (&RoutePresenter{
+		Host:   r.Host,
+		Domain: r.Domain.Name,
+		Path:   r.Path,
+	}).URL()
 }
