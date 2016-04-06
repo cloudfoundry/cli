@@ -2,27 +2,32 @@ package terminal
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 )
 
 type Printer interface {
 	Print(a ...interface{}) (n int, err error)
 	Printf(format string, a ...interface{}) (n int, err error)
 	Println(a ...interface{}) (n int, err error)
-	ForcePrint(a ...interface{}) (n int, err error)
-	ForcePrintf(format string, a ...interface{}) (n int, err error)
-	ForcePrintln(a ...interface{}) (n int, err error)
 }
 
 type TeePrinter struct {
 	disableTerminalOutput bool
-	outputBucket          *[]string
+	outputBucket          io.Writer
 }
 
 func NewTeePrinter() *TeePrinter {
-	return &TeePrinter{}
+	return &TeePrinter{
+		outputBucket: ioutil.Discard,
+	}
 }
 
-func (t *TeePrinter) SetOutputBucket(bucket *[]string) {
+func (t *TeePrinter) SetOutputBucket(bucket io.Writer) {
+	if bucket == nil {
+		bucket = ioutil.Discard
+	}
+
 	t.outputBucket = bucket
 }
 
@@ -53,32 +58,10 @@ func (t *TeePrinter) Println(values ...interface{}) (n int, err error) {
 	return
 }
 
-func (t *TeePrinter) ForcePrint(values ...interface{}) (n int, err error) {
-	str := fmt.Sprint(values...)
-	t.saveOutputToBucket(str)
-	return fmt.Print(str)
-}
-
-func (t *TeePrinter) ForcePrintf(format string, a ...interface{}) (n int, err error) {
-	str := fmt.Sprintf(format, a...)
-	t.saveOutputToBucket(str)
-	return fmt.Print(str)
-}
-
-func (t *TeePrinter) ForcePrintln(values ...interface{}) (n int, err error) {
-	str := fmt.Sprint(values...)
-	t.saveOutputToBucket(str)
-	return fmt.Println(str)
-}
-
 func (t *TeePrinter) DisableTerminalOutput(disable bool) {
 	t.disableTerminalOutput = disable
 }
 
 func (t *TeePrinter) saveOutputToBucket(output string) {
-	if t.outputBucket == nil {
-		return
-	}
-
-	*t.outputBucket = append(*t.outputBucket, Decolorize(output))
+	t.outputBucket.Write([]byte(Decolorize(output)))
 }

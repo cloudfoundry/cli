@@ -21,6 +21,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("UI", func() {
@@ -31,7 +32,7 @@ var _ = Describe("UI", func() {
 
 	Describe("Printing message to stdout with PrintCapturingNoOutput", func() {
 		It("prints strings without using the TeePrinter", func() {
-			bucket := &[]string{}
+			bucket := gbytes.NewBuffer()
 
 			printer := NewTeePrinter()
 			printer.SetOutputBucket(bucket)
@@ -43,7 +44,7 @@ var _ = Describe("UI", func() {
 				})
 
 				Expect("Hello").To(Equal(strings.Join(output, "")))
-				Expect(len(*bucket)).To(Equal(0))
+				Expect(bucket.Contents()).To(HaveLen(0))
 			})
 		})
 	})
