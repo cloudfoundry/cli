@@ -6,12 +6,6 @@ import (
 	"io/ioutil"
 )
 
-type Printer interface {
-	Print(a ...interface{}) (n int, err error)
-	Printf(format string, a ...interface{}) (n int, err error)
-	Println(a ...interface{}) (n int, err error)
-}
-
 type TeePrinter struct {
 	disableTerminalOutput bool
 	outputBucket          io.Writer

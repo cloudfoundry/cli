@@ -24,6 +24,8 @@ func NotLoggedInText() string {
 type UI interface {
 	PrintPaginator(rows []string, err error)
 	Say(message string, args ...interface{})
+
+	// ProgressReader
 	PrintCapturingNoOutput(message string, args ...interface{})
 	Warn(message string, args ...interface{})
 	Ask(prompt string) (answer string)
@@ -38,6 +40,12 @@ type UI interface {
 	LoadingIndication()
 	Table(headers []string) *UITable
 	NotifyUpdateIfNeeded(core_config.Reader)
+}
+
+type Printer interface {
+	Print(a ...interface{}) (n int, err error)
+	Printf(format string, a ...interface{}) (n int, err error)
+	Println(a ...interface{}) (n int, err error)
 }
 
 type terminalUI struct {
