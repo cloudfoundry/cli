@@ -3,7 +3,7 @@ package application_test
 import (
 	"errors"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,7 +21,7 @@ var _ = Describe("set-health-check command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		appRepo             *testApplication.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
 	)
@@ -30,7 +30,7 @@ var _ = Describe("set-health-check command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {

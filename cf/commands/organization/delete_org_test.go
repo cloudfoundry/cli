@@ -3,7 +3,7 @@ package organization_test
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ var _ = Describe("delete-org command", func() {
 		config              core_config.Repository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *test_org.FakeOrganizationRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		org                 models.Organization
 		deps                command_registry.Dependency
 	)
@@ -44,7 +44,7 @@ var _ = Describe("delete-org command", func() {
 		org = models.Organization{}
 		org.Name = "org-to-delete"
 		org.Guid = "org-to-delete-guid"
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 		orgRepo.FindByNameReturns(org, nil)

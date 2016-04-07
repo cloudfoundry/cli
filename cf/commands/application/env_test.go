@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -20,7 +20,7 @@ var _ = Describe("env command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *testApplication.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("env command", func() {
 
 		app = models.Application{}
 		app.Name = "my-app"
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()

@@ -1,7 +1,7 @@
 package organization_test
 
 import (
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("orgs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		orgRepo             *test_org.FakeOrganizationRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -42,7 +42,7 @@ var _ = Describe("orgs command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 
 		deps = command_registry.NewDependency(new(fakes.FakePrinter))

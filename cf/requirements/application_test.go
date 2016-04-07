@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
@@ -10,10 +10,10 @@ import (
 )
 
 var _ = Describe("ApplicationRequirement", func() {
-	var appRepo *testApplication.FakeApplicationRepository
+	var appRepo *applicationsfakes.FakeApplicationRepository
 
 	BeforeEach(func() {
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 	})
 
 	It("succeeds when an app with the given name exists", func() {

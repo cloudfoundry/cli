@@ -1,7 +1,7 @@
 package organization_test
 
 import (
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("rename-org command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *test_org.FakeOrganizationRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -33,7 +33,7 @@ var _ = Describe("rename-org command", func() {
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})

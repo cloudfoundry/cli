@@ -3,7 +3,7 @@ package commands_test
 import (
 	"errors"
 
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/trace/fakes"
@@ -37,7 +37,7 @@ var _ = Describe("OauthToken", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		fakeLogger := new(fakes.FakePrinter)
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		deps = command_registry.NewDependency(fakeLogger)

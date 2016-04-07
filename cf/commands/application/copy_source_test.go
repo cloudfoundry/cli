@@ -1,11 +1,11 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	testCopyApplication "github.com/cloudfoundry/cli/cf/api/copy_application_source/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
+	"github.com/cloudfoundry/cli/cf/api/copy_application_source/copy_application_sourcefakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	testorg "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -29,10 +29,10 @@ var _ = Describe("CopySource", func() {
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
-		appRepo             *testApplication.FakeApplicationRepository
-		copyAppSourceRepo   *testCopyApplication.FakeCopyApplicationSourceRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
+		copyAppSourceRepo   *copy_application_sourcefakes.FakeCopyApplicationSourceRepository
 		spaceRepo           *testapi.FakeSpaceRepository
-		orgRepo             *testorg.FakeOrganizationRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		appRestarter        *appCmdFakes.FakeApplicationRestarter
 		OriginalCommand     command_registry.Command
 		deps                command_registry.Dependency
@@ -56,11 +56,11 @@ var _ = Describe("CopySource", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
-		appRepo = &testApplication.FakeApplicationRepository{}
-		copyAppSourceRepo = &testCopyApplication.FakeCopyApplicationSourceRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		copyAppSourceRepo = new(copy_application_sourcefakes.FakeCopyApplicationSourceRepository)
 		spaceRepo = &testapi.FakeSpaceRepository{}
-		orgRepo = &testorg.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 
 		//save original command and restore later

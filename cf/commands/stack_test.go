@@ -3,7 +3,7 @@ package commands_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
+	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,7 +22,7 @@ var _ = Describe("stack command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		repo                *testapi.FakeStackRepository
+		repo                *stacksfakes.FakeStackRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -38,7 +38,7 @@ var _ = Describe("stack command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		repo = &testapi.FakeStackRepository{}
+		repo = new(stacksfakes.FakeStackRepository)
 	})
 
 	Describe("login requirements", func() {

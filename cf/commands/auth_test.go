@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -40,7 +40,7 @@ var _ = Describe("auth command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			config.SetAccessToken("my-access-token")
 			config.SetRefreshToken("my-refresh-token")

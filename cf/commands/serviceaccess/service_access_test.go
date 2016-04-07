@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -45,7 +45,7 @@ var _ = Describe("service-access command", func() {
 		ui = &testterm.FakeUI{}
 		actor = new(actorsfakes.FakeServiceActor)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 

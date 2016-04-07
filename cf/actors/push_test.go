@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
+	"github.com/cloudfoundry/cli/cf/api/application_bits/application_bitsfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/app_files/fakes"
@@ -20,7 +20,7 @@ import (
 
 var _ = Describe("Push Actor", func() {
 	var (
-		appBitsRepo  *fakeBits.FakeApplicationBitsRepository
+		appBitsRepo  *application_bitsfakes.FakeApplicationBitsRepository
 		appFiles     *fakes.FakeAppFiles
 		fakezipper   *fakes.FakeZipper
 		actor        actors.PushActor
@@ -31,7 +31,7 @@ var _ = Describe("Push Actor", func() {
 	)
 
 	BeforeEach(func() {
-		appBitsRepo = &fakeBits.FakeApplicationBitsRepository{}
+		appBitsRepo = new(application_bitsfakes.FakeApplicationBitsRepository)
 		appFiles = &fakes.FakeAppFiles{}
 		fakezipper = &fakes.FakeZipper{}
 		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)

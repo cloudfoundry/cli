@@ -12,6 +12,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . QuotaRepository
+
 type QuotaRepository interface {
 	FindAll() (quotas []models.QuotaFields, apiErr error)
 	FindByName(name string) (quota models.QuotaFields, apiErr error)

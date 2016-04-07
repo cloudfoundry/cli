@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -698,7 +698,7 @@ var _ = Describe("Server", func() {
 				var authRepo *authenticationfakes.FakeAuthenticationRepository
 
 				BeforeEach(func() {
-					authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+					authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 					locator := api.RepositoryLocator{}
 					locator = locator.SetAuthenticationRepository(authRepo)
 

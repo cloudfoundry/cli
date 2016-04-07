@@ -1,7 +1,7 @@
 package api_test
 
 import (
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -28,7 +28,7 @@ var _ = Describe("loggregator logs repository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 	})
 
 	JustBeforeEach(func() {

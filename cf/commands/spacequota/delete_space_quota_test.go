@@ -1,8 +1,8 @@
 package spacequota_test
 
 import (
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -20,8 +20,8 @@ import (
 var _ = Describe("delete-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		orgRepo             *test_org.FakeOrganizationRepository
+		quotaRepo           *space_quotasfakes.FakeSpaceQuotaRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -37,8 +37,8 @@ var _ = Describe("delete-space-quota command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		quotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 

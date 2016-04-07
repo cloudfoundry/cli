@@ -11,7 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter -o fakes/fake_space_quota_repository.go . SpaceQuotaRepository
+//go:generate counterfeiter . SpaceQuotaRepository
+
 type SpaceQuotaRepository interface {
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
 	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)

@@ -2,9 +2,9 @@ package space_test
 
 import (
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
-	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -28,11 +28,11 @@ var _ = Describe("create-space command", func() {
 		configOrg           models.OrganizationFields
 		configRepo          core_config.Repository
 		spaceRepo           *testapi.FakeSpaceRepository
-		orgRepo             *fake_org.FakeOrganizationRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		userRepo            *testapi.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
-		flagRepo            *fakeflag.FakeFeatureFlagRepository
-		spaceQuotaRepo      *fakes.FakeSpaceQuotaRepository
+		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
+		spaceQuotaRepo      *space_quotasfakes.FakeSpaceQuotaRepository
 		OriginalCommand     command_registry.Command
 		deps                command_registry.Dependency
 	)
@@ -60,11 +60,11 @@ var _ = Describe("create-space command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		orgRepo = &fake_org.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		userRepo = &testapi.FakeUserRepository{}
 		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
-		spaceQuotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
+		spaceQuotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
+		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		configOrg = models.OrganizationFields{

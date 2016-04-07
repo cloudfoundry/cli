@@ -3,7 +3,7 @@ package application_test
 import (
 	"errors"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,7 +22,7 @@ var _ = Describe("stop command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *testApplication.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
 		deps                command_registry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("stop command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

@@ -9,9 +9,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/cli/cf"
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,8 +22,8 @@ import (
 var _ = Describe("create-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		orgRepo             *test_org.FakeOrganizationRepository
+		quotaRepo           *space_quotasfakes.FakeSpaceQuotaRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -40,8 +40,8 @@ var _ = Describe("create-space-quota command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		quotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		org := models.Organization{}

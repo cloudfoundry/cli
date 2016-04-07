@@ -14,8 +14,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
-	testAppInstances "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -40,8 +40,8 @@ var _ = Describe("start command", func() {
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []*logmessage.LogMessage
 		logRepo                   *testapi.FakeLogsRepository
-		appInstancesRepo          *testAppInstances.FakeAppInstancesRepository
-		appRepo                   *testApplication.FakeApplicationRepository
+		appInstancesRepo          *app_instancesfakes.FakeAppInstancesRepository
+		appRepo                   *applicationsfakes.FakeApplicationRepository
 		originalAppCommand        command_registry.Command
 		deps                      command_registry.Dependency
 		displayApp                *appCmdFakes.FakeAppDisplayer
@@ -90,8 +90,8 @@ var _ = Describe("start command", func() {
 
 		configRepo = testconfig.NewRepository()
 
-		appInstancesRepo = &testAppInstances.FakeAppInstancesRepository{}
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appInstancesRepo = new(app_instancesfakes.FakeAppInstancesRepository)
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 
 		displayApp = &appCmdFakes.FakeAppDisplayer{}
 
@@ -186,7 +186,7 @@ var _ = Describe("start command", func() {
 		return
 	}
 
-	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *testApplication.FakeApplicationRepository, *testAppInstances.FakeAppInstancesRepository) {
+	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *applicationsfakes.FakeApplicationRepository, *app_instancesfakes.FakeAppInstancesRepository) {
 		appRepo.UpdateReturns(app, nil)
 		appRepo.ReadReturns(app, nil)
 		appRepo.GetAppReturns(app, nil)
@@ -642,7 +642,7 @@ var _ = Describe("start command", func() {
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.State = "started"
-			appRepo := &testApplication.FakeApplicationRepository{}
+			appRepo := new(applicationsfakes.FakeApplicationRepository)
 			appRepo.ReadReturns(app, nil)
 
 			requirementsFactory.Application = app
