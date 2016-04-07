@@ -56,14 +56,6 @@
     "translation": ""
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": ""
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": ""
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   선택적으로 바인딩된 애플리케이션의 VCAP_SERVICES 환경 변수에 기록할 쉼표로 구분된 태그의 목록을 제공하십시오."
   },
@@ -84,10 +76,6 @@
     "translation": "   경로는 zip 파일, zip 파일의 URL 또는 로컬 디렉토리여야 합니다. 위치는 양의 정수이며 우선순위를 설정하고 낮은 순위에서 높은 순위순으로 정렬됩니다."
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   Manifest로 여러 앱 푸시:\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   제공된 경로는 파일의 절대 또는 상대 경로입니다.\n   파일에는 규칙을 설명하는 JSON 오브젝트가 포함된 하나의 배열이 있어야 합니다."
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   'CF_NAME 할당량'에서 허용 가능한 할당량 보기"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -217,6 +201,14 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "APP_PORTS",
     "translation": ""
   },
   {
@@ -398,6 +390,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "빌드팩"
+  },
+  {
+    "id": "BUILDPACK_NAME",
+    "translation": ""
   },
   {
     "id": "Bind a security group to a space",
@@ -1020,6 +1016,10 @@
     "translation": ""
   },
   {
+    "id": "COMMAND",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "유료 서비스 플랜의 인스턴스를 프로비저닝할 수 없음"
   },
@@ -1370,6 +1370,14 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "요청에 포함할 사용자 정의 헤더, 플래그를 여러 번 지정할 수 있음"
+  },
+  {
+    "id": "DISK",
+    "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": ""
   },
   {
     "id": "DOMAIN",
@@ -2312,6 +2320,14 @@
     "translation": "{{.CurrentUser}}(으)로 {{.TargetOrg}} 조직의 사용자를 가져오는 중..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2832,6 +2848,10 @@
     "translation": "'{{.repoName}}' 저장소에서 '{{.filePath}}' 검색"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": ""
+  },
+  {
     "id": "MEMORY",
     "translation": ""
   },
@@ -2905,6 +2925,10 @@
   },
   {
     "id": "NEW_NAME",
+    "translation": ""
+  },
+  {
+    "id": "NUM_INSTANCES",
     "translation": ""
   },
   {
@@ -3320,8 +3344,12 @@
     "translation": "새 앱 또는 동기화 변경사항을 기존 앱에 푸시"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "단일 앱(Manifest 포함 또는 포함 안 함) 푸시:\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "단일 앱(Manifest 포함 또는 포함 안 함) 푸시"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "Manifest로 여러 앱 푸시"
   },
   {
     "id": "QUOTA",
@@ -3362,6 +3390,10 @@
   {
     "id": "ROUTES",
     "translation": "라우트"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3684,6 +3716,10 @@
     "translation": "애플리케이션 컨테이너 인스턴스에 대한 SSH"
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱 스케일링 중..."
   },
@@ -3982,6 +4018,10 @@
   {
     "id": "System-Provided:",
     "translation": "시스템 제공:"
+  },
+  {
+    "id": "TIMEOUT",
+    "translation": ""
   },
   {
     "id": "TIP:\n",

@@ -56,14 +56,6 @@
     "translation": ""
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": ""
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": ""
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   （可选）提供逗号分隔的标记列表，此列表将写入任何绑定应用程序的 VCAP_SERVICES 环境变量。"
   },
@@ -84,10 +76,6 @@
     "translation": "   Path 应该为 zip 文件、zip 文件的 URL 或本地目录。Position 应该为正整数，用于设置优先级，并按从低到高的顺序排序。"
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   通过清单推送多个应用程序：\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   提供的路径可以为文件的绝对路径或相对路径。\n   它应该具有一个数组，其中包含用于描述规则的 JSON 对象。"
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   通过“CF_NAME quotas”查看允许的配额"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -217,6 +201,14 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "APP_PORTS",
     "translation": ""
   },
   {
@@ -398,6 +390,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "BUILDPACK"
+  },
+  {
+    "id": "BUILDPACK_NAME",
+    "translation": ""
   },
   {
     "id": "Bind a security group to a space",
@@ -1020,6 +1016,10 @@
     "translation": ""
   },
   {
+    "id": "COMMAND",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "无法供应已付费服务套餐的实例"
   },
@@ -1370,6 +1370,14 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "要包含在请求中的定制头，标志可以指定多次"
+  },
+  {
+    "id": "DISK",
+    "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": ""
   },
   {
     "id": "DOMAIN",
@@ -2312,6 +2320,14 @@
     "translation": "正在以 {{.CurrentUser}} 身份获取组织 {{.TargetOrg}} 中的用户..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2832,6 +2848,10 @@
     "translation": "正在存储库“{{.repoName}}”中查找“{{.filePath}}”"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": ""
+  },
+  {
     "id": "MEMORY",
     "translation": ""
   },
@@ -2905,6 +2925,10 @@
   },
   {
     "id": "NEW_NAME",
+    "translation": ""
+  },
+  {
+    "id": "NUM_INSTANCES",
     "translation": ""
   },
   {
@@ -3320,8 +3344,12 @@
     "translation": "推送新应用程序，或将更改同步到现有应用程序"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "推送单个应用程序（使用或不使用清单）：\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "推送单个应用程序（使用或不使用清单）"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "通过清单推送多个应用程序"
   },
   {
     "id": "QUOTA",
@@ -3362,6 +3390,10 @@
   {
     "id": "ROUTES",
     "translation": "路径"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3684,6 +3716,10 @@
     "translation": "通过 SSH 连接到应用程序容器实例"
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身份扩展组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
   },
@@ -3982,6 +4018,10 @@
   {
     "id": "System-Provided:",
     "translation": "系统提供的项："
+  },
+  {
+    "id": "TIMEOUT",
+    "translation": ""
   },
   {
     "id": "TIP:\n",
