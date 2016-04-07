@@ -2,7 +2,6 @@ language: go
 go:
   - 1.6
 install:
-  # - go get -v golang.org/x/tools/cmd/vet
   - go get -v github.com/tools/godep
   - go get -v github.com/onsi/ginkgo/ginkgo
 script:  bin/test -nodes=2 -compilers=2
