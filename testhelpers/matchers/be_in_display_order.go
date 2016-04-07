@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/onsi/gomega"
 )
 
@@ -56,7 +57,7 @@ func (matcher *OrderMatcher) Match(actualStr interface{}) (success bool, err err
 func matchSingleLine(actual string, expected []string) (bool, string) {
 	matched := false
 	for i, target := range expected {
-		if index := strings.Index(actual, target); index != -1 {
+		if index := strings.Index(terminal.Decolorize(actual), target); index != -1 {
 			if i == len(expected)-1 {
 				return true, ""
 			}

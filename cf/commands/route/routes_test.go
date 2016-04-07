@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -157,9 +158,9 @@ var _ = Describe("routes command", func() {
 				[]string{"space", "host", "domain", "port", "path", "type", "apps", "service"},
 			))
 
-			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`)))
-			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`)))
-			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp,bar\s+dora,bora\s*$`)))
+			Expect(terminal.Decolorize(ui.Outputs[3])).To(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs[4])).To(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp,bar\s+dora,bora\s*$`))
 		})
 	})
 
