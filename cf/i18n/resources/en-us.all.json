@@ -56,14 +56,6 @@
     "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications."
   },
@@ -84,10 +76,6 @@
     "translation": "   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   Push multiple apps with a manifest:\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules."
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   View allowable quotas with 'CF_NAME quotas'"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n"
   },
   {
     "id": " added as '",
@@ -218,6 +202,14 @@
   {
     "id": "APP_INSTANCES",
     "translation": "APP_INSTANCES"
+  },
+  {
+    "id": "APP_NAME",
+    "translation": "APP_NAME"
+  },
+  {
+    "id": "APP_PORTS",
+    "translation": "APP_PORTS"
   },
   {
     "id": "Access for plans of a particular broker",
@@ -398,6 +390,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "BUILDPACKS"
+  },
+  {
+    "id": "BUILDPACK_NAME",
+    "translation": "BUILDPACK_NAME"
   },
   {
     "id": "Bind a security group to a space",
@@ -1020,6 +1016,10 @@
     "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
   },
   {
+    "id": "COMMAND",
+    "translation": "COMMAND"
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "Can not provision instances of paid service plans"
   },
@@ -1370,6 +1370,14 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "Custom headers to include in the request, flag can be specified multiple times"
+  },
+  {
+    "id": "DISK",
+    "translation": "DISK"
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": "DOCKER_IMAGE"
   },
   {
     "id": "DOMAIN",
@@ -2312,6 +2320,14 @@
     "translation": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": "HEALTH_CHECK_TYPE"
+  },
+  {
+    "id": "HOST",
+    "translation": "HOST"
+  },
+  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -2832,6 +2848,10 @@
     "translation": "Looking up '{{.filePath}}' from repository '{{.repoName}}'"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": "MANIFEST_PATH"
+  },
+  {
     "id": "MEMORY",
     "translation": "MEMORY"
   },
@@ -2906,6 +2926,10 @@
   {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
+  },
+  {
+    "id": "NUM_INSTANCES",
+    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name",
@@ -3320,8 +3344,12 @@
     "translation": "Push a new app or sync changes to an existing app"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "Push a single app (with or without a manifest):\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "Push a single app (with or without a manifest)"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "Push multiple apps with a manifest"
   },
   {
     "id": "QUOTA",
@@ -3362,6 +3390,10 @@
   {
     "id": "ROUTES",
     "translation": "ROUTES"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": "ROUTE_PATH"
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3684,6 +3716,10 @@
     "translation": "SSH to an application container instance"
   },
   {
+    "id": "STACK",
+    "translation": "STACK"
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
@@ -3982,6 +4018,10 @@
   {
     "id": "System-Provided:",
     "translation": "System-Provided:"
+  },
+  {
+    "id": "TIMEOUT",
+    "translation": "TIMEOUT"
   },
   {
     "id": "TIP:\n",

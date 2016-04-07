@@ -56,14 +56,6 @@
     "translation": ""
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": ""
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": ""
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   選擇性地提供逗點定界標籤清單，以針對任何連結的應用程式寫入 VCAP_SERVICES 環境變數。"
   },
@@ -84,10 +76,6 @@
     "translation": "   Path 應該是 zip 檔案、zip 檔案的 URL，或本端目錄。Position 是正整數、設定優先順序，並且從最低到最高進行排序。"
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   使用資訊清單推送多個應用程式：\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   提供的路徑可以是某個檔案的絕對或相對路徑。\n   它應該有單一陣列，而其內含的 JSON 物件說明規則。"
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   使用 'CF_NAME quotas' 檢視容許的配額"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -217,6 +201,14 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "APP_PORTS",
     "translation": ""
   },
   {
@@ -398,6 +390,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "建置套件"
+  },
+  {
+    "id": "BUILDPACK_NAME",
+    "translation": ""
   },
   {
     "id": "Bind a security group to a space",
@@ -1020,6 +1016,10 @@
     "translation": ""
   },
   {
+    "id": "COMMAND",
+    "translation": ""
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "無法佈建付費服務方案的實例"
   },
@@ -1370,6 +1370,14 @@
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
     "translation": "要併入要求中的自訂標頭，旗標可以指定多次"
+  },
+  {
+    "id": "DISK",
+    "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": ""
   },
   {
     "id": "DOMAIN",
@@ -2312,6 +2320,14 @@
     "translation": "正在以 {{.CurrentUser}} 身分取得組織 {{.TargetOrg}} 中的使用者..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2832,6 +2848,10 @@
     "translation": "正在從儲存庫 '{{.repoName}}' 中尋找 '{{.filePath}}'"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": ""
+  },
+  {
     "id": "MEMORY",
     "translation": ""
   },
@@ -2905,6 +2925,10 @@
   },
   {
     "id": "NEW_NAME",
+    "translation": ""
+  },
+  {
+    "id": "NUM_INSTANCES",
     "translation": ""
   },
   {
@@ -3320,8 +3344,12 @@
     "translation": "將新的應用程式推送或將變更同步到現有的應用程式"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "推送單一應用程式（不一定使用資訊清單）：\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "推送單一應用程式（不一定使用資訊清單）"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "使用資訊清單推送多個應用程式"
   },
   {
     "id": "QUOTA",
@@ -3362,6 +3390,10 @@
   {
     "id": "ROUTES",
     "translation": "路徑"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3684,6 +3716,10 @@
     "translation": "應用程式儲存器實例的 SSH"
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分擴充組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}}..."
   },
@@ -3982,6 +4018,10 @@
   {
     "id": "System-Provided:",
     "translation": "由系統提供："
+  },
+  {
+    "id": "TIMEOUT",
+    "translation": ""
   },
   {
     "id": "TIP:\n",

@@ -56,14 +56,6 @@
     "translation": "   CF_NAME copy-source APP_SOURCE APP_CIBLE [-s ESPACE_CIBLE [-o ORG_CIBLE]] [--no-restart]\n"
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": "   CF_NAME push NOM_APP [-b NOM_PACK_CONSTRUCTION] [-c COMMANDE] [-d DOMAINE] [-f CHEMIN_MANIFESTE] [--docker-image IMAGE_DOCKER]\n"
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": "   CF_NAME push [-f CHEMIN_MANIFESTE]\n"
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   Si vous le souhaitez, fournissez une liste d'étiquettes séparées par une virgule qui seront écrites dans la variable d'environnement VCAP_SERVICES pour toute application liée. "
   },
@@ -84,10 +76,6 @@
     "translation": "   Le chemin doit désigner un fichier zip, une adresse URL vers un fichier zip ou un répertoire local. La position est un entier positif et définit la priorité. Les positions sont triées par ordre croissant. "
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   Envoyez plusieurs applications par commande push avec un manifeste :\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   Le chemin fourni peut être absolu ou relatif.\n   Le fichier doit comporter un tableau unique contenant des objets JSON qui décrivent les règles. "
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   Affichez les quotas pouvant être alloués avec 'CF_NAME quotas'"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -217,6 +201,14 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
+    "translation": ""
+  },
+  {
+    "id": "APP_PORTS",
     "translation": ""
   },
   {
@@ -398,6 +390,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "PACKS DE CONSTRUCTION "
+  },
+  {
+    "id": "BUILDPACK_NAME",
+    "translation": "NOM_PACK_CONSTRUCTION"
   },
   {
     "id": "Bind a security group to a space",
@@ -1020,6 +1016,10 @@
     "translation": "ERREUR CF_TRACE LORS DE LA CREATION DU FICHIER JOURNAL {{.Path}} :\n{{.Err}}"
   },
   {
+    "id": "COMMAND",
+    "translation": "COMMANDE"
+  },
+  {
     "id": "Can not provision instances of paid service plans",
     "translation": "Impossible de mettre à disposition les instances des plans de service payants "
   },
@@ -1372,8 +1372,16 @@
     "translation": "En-têtes personnalisés à inclure dans la demande ; l'indicateur peut être spécifié plusieurs fois "
   },
   {
-    "id": "DOMAIN",
+    "id": "DISK",
     "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": "IMAGE_DOCKER"
+  },
+  {
+    "id": "DOMAIN",
+    "translation": "DOMAINE"
   },
   {
     "id": "DOMAINS",
@@ -2312,6 +2320,14 @@
     "translation": "Obtention des utilisateurs dans l'organisation {{.TargetOrg}} en tant que {{.CurrentUser}}..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2832,6 +2848,10 @@
     "translation": "Recherche de '{{.filePath}}' dans le référentiel '{{.repoName}}'"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": "CHEMIN_MANIFESTE"
+  },
+  {
     "id": "MEMORY",
     "translation": "MEMOIRE"
   },
@@ -2906,6 +2926,10 @@
   {
     "id": "NEW_NAME",
     "translation": "NOUVEAU_NOM"
+  },
+  {
+    "id": "NUM_INSTANCES",
+    "translation": ""
   },
   {
     "id": "Name",
@@ -3320,8 +3344,12 @@
     "translation": "Envoyer par commande push une nouvelle application ou synchroniser les modifications dans une application existante "
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "Envoyer par commande push une application unique (avec ou sans manifeste) :\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "Envoyer par commande push une application unique (avec ou sans manifeste)"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "Envoyez plusieurs applications par commande push avec un manifeste"
   },
   {
     "id": "QUOTA",
@@ -3361,6 +3389,10 @@
   },
   {
     "id": "ROUTES",
+    "translation": ""
+  },
+  {
+    "id": "ROUTE_PATH",
     "translation": ""
   },
   {
@@ -3684,6 +3716,10 @@
     "translation": "Utilisation de SSH pour une instance de conteneur d'applications "
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Mise à l'échelle de l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.CurrentUser}}..."
   },
@@ -3982,6 +4018,10 @@
   {
     "id": "System-Provided:",
     "translation": "Fourni par le système : "
+  },
+  {
+    "id": "TIMEOUT",
+    "translation": ""
   },
   {
     "id": "TIP:\n",
