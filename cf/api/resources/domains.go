@@ -8,12 +8,12 @@ type DomainResource struct {
 }
 
 type DomainEntity struct {
-	Name                   string   `json:"name"`
-	OwningOrganizationGuid string   `json:"owning_organization_guid,omitempty"`
-	SharedOrganizationsUrl string   `json:"shared_organizations_url,omitempty"`
-	RouterGroupGuid        string   `json:"router_group_guid,omitempty"`
-	RouterGroupTypes       []string `json:"router_group_types,omitempty"`
-	Wildcard               bool     `json:"wildcard"`
+	Name                   string `json:"name"`
+	OwningOrganizationGuid string `json:"owning_organization_guid,omitempty"`
+	SharedOrganizationsUrl string `json:"shared_organizations_url,omitempty"`
+	RouterGroupGuid        string `json:"router_group_guid,omitempty"`
+	RouterGroupType        string `json:"router_group_type,omitempty"`
+	Wildcard               bool   `json:"wildcard"`
 }
 
 func (resource DomainResource) ToFields() models.DomainFields {
@@ -24,6 +24,6 @@ func (resource DomainResource) ToFields() models.DomainFields {
 		OwningOrganizationGuid: resource.Entity.OwningOrganizationGuid,
 		Shared:                 !privateDomain,
 		RouterGroupGuid:        resource.Entity.RouterGroupGuid,
-		RouterGroupTypes:       resource.Entity.RouterGroupTypes,
+		RouterGroupType:        resource.Entity.RouterGroupType,
 	}
 }

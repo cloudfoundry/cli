@@ -311,13 +311,10 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 	}
 }
 
+const TCP = "tcp"
+
 func isTcp(domain models.DomainFields) bool {
-	for _, typ := range domain.RouterGroupTypes {
-		if strings.Compare(typ, "tcp") == 0 {
-			return true
-		}
-	}
-	return false
+	return domain.RouterGroupType == TCP
 }
 
 func (cmd *Push) processDomainsAndBindRoutes(

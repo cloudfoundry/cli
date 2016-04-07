@@ -187,9 +187,9 @@ var _ = Describe("ListDomains", func() {
 			BeforeEach(func() {
 				domainFields = []models.DomainFields{
 					models.DomainFields{Shared: false, Name: "Private-domain1"},
-					models.DomainFields{Shared: false, Name: "Private-domain2", RouterGroupTypes: []string{"tcp", "bazquux"}},
+					models.DomainFields{Shared: false, Name: "Private-domain2", RouterGroupType: "tcp"},
 					models.DomainFields{Shared: true, Name: "Shared-domain1"},
-					models.DomainFields{Shared: true, Name: "Shared-domain2", RouterGroupTypes: []string{"tcp", "foobar"}},
+					models.DomainFields{Shared: true, Name: "Shared-domain2", RouterGroupType: "foobar"},
 				}
 			})
 
@@ -209,9 +209,9 @@ var _ = Describe("ListDomains", func() {
 				Expect(ui.Outputs).To(BeInDisplayOrder(
 					[]string{"name", "status", "type"},
 					[]string{"Shared-domain1", "shared"},
-					[]string{"Shared-domain2", "shared", "tcp, foobar"},
+					[]string{"Shared-domain2", "shared", "foobar"},
 					[]string{"Private-domain1", "owned"},
-					[]string{"Private-domain2", "owned", "tcp, bazquux"},
+					[]string{"Private-domain2", "owned", "tcp"},
 				))
 			})
 		})
