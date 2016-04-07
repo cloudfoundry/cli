@@ -16,7 +16,8 @@ import (
 
 const windowsPathPrefix = `\\?\`
 
-//go:generate counterfeiter -o fakes/fake_push_actor.go . PushActor
+//go:generate counterfeiter . PushActor
+
 type PushActor interface {
 	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	ProcessPath(dirOrZipFile string, f func(string)) error

@@ -3,7 +3,7 @@ package service_builder_test
 import (
 	"errors"
 
-	plan_builder_fakes "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 
@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("Service Builder", func() {
 	var (
-		planBuilder     *plan_builder_fakes.FakePlanBuilder
+		planBuilder     *plan_builderfakes.FakePlanBuilder
 		serviceBuilder  service_builder.ServiceBuilder
 		serviceRepo     *testapi.FakeServiceRepository
 		service1        models.ServiceOffering
@@ -29,7 +29,7 @@ var _ = Describe("Service Builder", func() {
 
 	BeforeEach(func() {
 		serviceRepo = &testapi.FakeServiceRepository{}
-		planBuilder = &plan_builder_fakes.FakePlanBuilder{}
+		planBuilder = new(plan_builderfakes.FakePlanBuilder)
 
 		serviceBuilder = service_builder.NewBuilder(serviceRepo, planBuilder)
 		service1 = models.ServiceOffering{

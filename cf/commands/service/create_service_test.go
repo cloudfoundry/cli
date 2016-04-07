@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -30,7 +30,7 @@ var _ = Describe("create-service command", func() {
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepository
-		serviceBuilder      *fakes.FakeServiceBuilder
+		serviceBuilder      *service_builderfakes.FakeServiceBuilder
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
@@ -50,7 +50,7 @@ var _ = Describe("create-service command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		serviceRepo = &testapi.FakeServiceRepository{}
-		serviceBuilder = &fakes.FakeServiceBuilder{}
+		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"

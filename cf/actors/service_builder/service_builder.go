@@ -8,6 +8,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
+//go:generate counterfeiter . ServiceBuilder
+
 type ServiceBuilder interface {
 	GetAllServices() ([]models.ServiceOffering, error)
 	GetAllServicesWithPlans() ([]models.ServiceOffering, error)

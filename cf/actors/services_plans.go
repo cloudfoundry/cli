@@ -11,6 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
+//go:generate counterfeiter . ServicePlanActor
+
 type ServicePlanActor interface {
 	FindServiceAccess(string, string) (ServiceAccess, error)
 	UpdateAllPlansForService(string, bool) (bool, error)

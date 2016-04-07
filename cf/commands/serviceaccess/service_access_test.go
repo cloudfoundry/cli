@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -24,7 +24,7 @@ import (
 var _ = Describe("service-access command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		actor               *testactor.FakeServiceActor
+		actor               *actorsfakes.FakeServiceActor
 		requirementsFactory *testreq.FakeReqFactory
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
@@ -43,7 +43,7 @@ var _ = Describe("service-access command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		actor = &testactor.FakeServiceActor{}
+		actor = new(actorsfakes.FakeServiceActor)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
 		configRepo = testconfig.NewRepositoryWithDefaults()

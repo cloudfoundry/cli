@@ -4,8 +4,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	fake_plan_builder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
-	fake_service_builder "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fake_orgs "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,8 +22,8 @@ var _ = Describe("Service Plans", func() {
 		servicePlanVisibilityRepo *testapi.FakeServicePlanVisibilityRepository
 		orgRepo                   *fake_orgs.FakeOrganizationRepository
 
-		planBuilder    *fake_plan_builder.FakePlanBuilder
-		serviceBuilder *fake_service_builder.FakeServiceBuilder
+		planBuilder    *plan_builderfakes.FakePlanBuilder
+		serviceBuilder *service_builderfakes.FakeServiceBuilder
 
 		privateServicePlanVisibilityFields models.ServicePlanVisibilityFields
 		publicServicePlanVisibilityFields  models.ServicePlanVisibilityFields
@@ -48,8 +48,8 @@ var _ = Describe("Service Plans", func() {
 		servicePlanRepo = &testapi.FakeServicePlanRepo{}
 		servicePlanVisibilityRepo = &testapi.FakeServicePlanVisibilityRepository{}
 		orgRepo = &fake_orgs.FakeOrganizationRepository{}
-		planBuilder = &fake_plan_builder.FakePlanBuilder{}
-		serviceBuilder = &fake_service_builder.FakeServiceBuilder{}
+		planBuilder = new(plan_builderfakes.FakePlanBuilder)
+		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 
 		actor = actors.NewServicePlanHandler(servicePlanRepo, servicePlanVisibilityRepo, orgRepo, planBuilder, serviceBuilder)
 

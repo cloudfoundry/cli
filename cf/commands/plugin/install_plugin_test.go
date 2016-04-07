@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/plugin_repofakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	registryCmdFakes "github.com/cloudfoundry/cli/cf/command_registry/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -38,7 +38,7 @@ var _ = Describe("Install", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
 		pluginConfig        *testPluginConfig.FakePluginConfiguration
-		fakePluginRepo      *fakes.FakePluginRepo
+		fakePluginRepo      *plugin_repofakes.FakePluginRepo
 		fakeChecksum        *testChecksum.FakeSha1Checksum
 
 		pluginFile *os.File
@@ -70,7 +70,7 @@ var _ = Describe("Install", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		pluginConfig = &testPluginConfig.FakePluginConfiguration{}
 		config = testconfig.NewRepositoryWithDefaults()
-		fakePluginRepo = &fakes.FakePluginRepo{}
+		fakePluginRepo = new(plugin_repofakes.FakePluginRepo)
 		fakeChecksum = &testChecksum.FakeSha1Checksum{}
 
 		dir, err := os.Getwd()

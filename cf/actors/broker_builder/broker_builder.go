@@ -6,6 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
+//go:generate counterfeiter . BrokerBuilder
+
 type BrokerBuilder interface {
 	AttachBrokersToServices([]models.ServiceOffering) ([]models.ServiceBroker, error)
 	AttachSpecificBrokerToServices(string, []models.ServiceOffering) (models.ServiceBroker, error)

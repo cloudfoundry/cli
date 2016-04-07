@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	testplanbuilder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
+	plan_builderfakes "github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -30,7 +30,7 @@ var _ = Describe("update-service command", func() {
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepository
-		planBuilder         *testplanbuilder.FakePlanBuilder
+		planBuilder         *plan_builderfakes.FakePlanBuilder
 		offering1           models.ServiceOffering
 		deps                command_registry.Dependency
 	)
@@ -55,7 +55,7 @@ var _ = Describe("update-service command", func() {
 		}
 
 		serviceRepo = &testapi.FakeServiceRepository{}
-		planBuilder = &testplanbuilder.FakePlanBuilder{}
+		planBuilder = new(plan_builderfakes.FakePlanBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"

@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,7 +21,7 @@ var _ = Describe("marketplace command", func() {
 	var ui *testterm.FakeUI
 	var requirementsFactory *testreq.FakeReqFactory
 	var config core_config.Repository
-	var serviceBuilder *testapi.FakeServiceBuilder
+	var serviceBuilder *service_builderfakes.FakeServiceBuilder
 	var fakeServiceOfferings []models.ServiceOffering
 	var serviceWithAPaidPlan models.ServiceOffering
 	var service2 models.ServiceOffering
@@ -35,7 +35,7 @@ var _ = Describe("marketplace command", func() {
 	}
 
 	BeforeEach(func() {
-		serviceBuilder = &testapi.FakeServiceBuilder{}
+		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{ApiEndpointSuccess: true}
 
@@ -194,7 +194,7 @@ var _ = Describe("marketplace command", func() {
 		})
 
 		It("lists all public service offerings if any are available", func() {
-			serviceBuilder = &testapi.FakeServiceBuilder{}
+			serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 			serviceBuilder.GetAllServicesWithPlansReturns(fakeServiceOfferings, nil)
 
 			testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)
@@ -209,7 +209,7 @@ var _ = Describe("marketplace command", func() {
 		})
 
 		It("does not display a table if no service offerings exist", func() {
-			serviceBuilder := &testapi.FakeServiceBuilder{}
+			serviceBuilder := new(service_builderfakes.FakeServiceBuilder)
 			serviceBuilder.GetAllServicesWithPlansReturns([]models.ServiceOffering{}, nil)
 
 			testcmd.RunCliCommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)

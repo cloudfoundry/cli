@@ -7,6 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
+//go:generate counterfeiter . ServiceActor
+
 type ServiceActor interface {
 	FilterBrokers(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error)
 }
