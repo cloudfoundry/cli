@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"strings"
-
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -77,13 +75,13 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 
 	for _, domain := range domains {
 		if domain.Shared {
-			table.Add(domain.Name, T("shared"), strings.Join(domain.RouterGroupTypes, ", "))
+			table.Add(domain.Name, T("shared"), domain.RouterGroupType)
 		}
 	}
 
 	for _, domain := range domains {
 		if !domain.Shared {
-			table.Add(domain.Name, T("owned"), strings.Join(domain.RouterGroupTypes, ", "))
+			table.Add(domain.Name, T("owned"), domain.RouterGroupType)
 		}
 	}
 

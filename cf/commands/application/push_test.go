@@ -766,7 +766,7 @@ var _ = Describe("Push Command", func() {
 							Name: "some-name",
 							OwningOrganizationGuid: "some-organization-guid",
 							RouterGroupGuid:        "some-router-group-guid",
-							RouterGroupTypes:       []string{"tcp"},
+							RouterGroupType:        "tcp",
 							Shared:                 true,
 						}
 

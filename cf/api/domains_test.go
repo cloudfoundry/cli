@@ -146,10 +146,7 @@ var _ = Describe("DomainRepository", func() {
 							"entity": {
 								"name": "domain2.cf-app.com",
 								"router_group_guid": "my-random-guid",
-								"router_group_types": [
-									"tcp",
-									"bar"
-								]
+								"router_group_type": "tcp"
 							}
 						}
 					]
@@ -162,7 +159,7 @@ var _ = Describe("DomainRepository", func() {
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
 		Expect(domain.Guid).To(Equal("domain2-guid"))
-		Expect(domain.RouterGroupTypes).To(Equal([]string{"tcp", "bar"}))
+		Expect(domain.RouterGroupType).To(Equal("tcp"))
 	})
 
 	Describe("finding a domain by name in an org", func() {

@@ -93,11 +93,8 @@ var _ = Describe("routes command", func() {
 
 			domainRepo.ListDomainsForOrgStub = func(_ string, cb func(models.DomainFields) bool) error {
 				tcpDomain := models.DomainFields{
-					Guid: cookieClickerGuid,
-					RouterGroupTypes: []string{
-						"tcp",
-						"bar",
-					},
+					Guid:            cookieClickerGuid,
+					RouterGroupType: "tcp",
 				}
 				cb(tcpDomain)
 				return nil
@@ -160,7 +157,8 @@ var _ = Describe("routes command", func() {
 
 			Expect(terminal.Decolorize(ui.Outputs[3])).To(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`))
 			Expect(terminal.Decolorize(ui.Outputs[4])).To(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`))
-			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp,bar\s+dora,bora\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp\s+dora,bora\s*$`))
+
 		})
 	})
 

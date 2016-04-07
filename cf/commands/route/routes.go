@@ -113,7 +113,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			route.Domain.Name,
 			port,
 			route.Path,
-			strings.Join(domain.RouterGroupTypes, ","),
+			domain.RouterGroupType,
 			strings.Join(appNames, ","),
 			route.ServiceInstance.Name,
 		)
