@@ -12,14 +12,13 @@ import (
 type Color uint
 
 const (
-	red    Color = 31
-	green        = 32
-	yellow       = 33
-	//	blue          = 34
-	magenta = 35
-	cyan    = 36
-	grey    = 37
-	white   = 38
+	red     Color = 31
+	green         = 32
+	yellow        = 33
+	magenta       = 35
+	cyan          = 36
+	grey          = 37
+	white         = 38
 )
 
 var (
