@@ -13,6 +13,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . SpaceRepository
+
 type SpaceRepository interface {
 	ListSpaces(func(models.Space) bool) error
 	FindByName(name string) (space models.Space, apiErr error)

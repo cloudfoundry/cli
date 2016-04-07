@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
+	"github.com/cloudfoundry/cli/cf/api/app_files/app_filesfakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -24,7 +24,7 @@ var _ = Describe("Files", func() {
 	var (
 		ui           *testterm.FakeUI
 		configRepo   core_config.Repository
-		appFilesRepo *fakeappfiles.FakeAppFilesRepository
+		appFilesRepo *app_filesfakes.FakeAppFilesRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -40,7 +40,7 @@ var _ = Describe("Files", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		appFilesRepo = &fakeappfiles.FakeAppFilesRepository{}
+		appFilesRepo = new(app_filesfakes.FakeAppFilesRepository)
 		repoLocator := deps.RepoLocator.SetAppFileRepository(appFilesRepo)
 
 		deps = command_registry.Dependency{

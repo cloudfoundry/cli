@@ -3,7 +3,7 @@ package application_test
 import (
 	"time"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/app_events/fakes"
+	"github.com/cloudfoundry/cli/cf/api/app_events/app_eventsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("events command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		eventsRepo          *testapi.FakeAppEventsRepository
+		eventsRepo          *app_eventsfakes.FakeAppEventsRepository
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -37,7 +37,7 @@ var _ = Describe("events command", func() {
 	}
 
 	BeforeEach(func() {
-		eventsRepo = new(testapi.FakeAppEventsRepository)
+		eventsRepo = new(app_eventsfakes.FakeAppEventsRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()

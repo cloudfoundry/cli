@@ -1,7 +1,7 @@
 package environmentvariablegroup_test
 
 import (
-	test_environmentVariableGroups "github.com/cloudfoundry/cli/cf/api/environment_variable_groups/fakes"
+	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups/environment_variable_groupsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
@@ -19,7 +19,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
 		configRepo                   core_config.Repository
-		environmentVariableGroupRepo *test_environmentVariableGroups.FakeEnvironmentVariableGroupsRepository
+		environmentVariableGroupRepo *environment_variable_groupsfakes.FakeEnvironmentVariableGroupsRepository
 		deps                         command_registry.Dependency
 	)
 
@@ -34,7 +34,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		environmentVariableGroupRepo = &test_environmentVariableGroups.FakeEnvironmentVariableGroupsRepository{}
+		environmentVariableGroupRepo = new(environment_variable_groupsfakes.FakeEnvironmentVariableGroupsRepository)
 	})
 
 	runCommand := func(args ...string) bool {

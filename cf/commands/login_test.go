@@ -4,9 +4,9 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fake_organizations "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -27,7 +27,7 @@ var _ = Describe("Login Command", func() {
 		ui           *testterm.FakeUI
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
 		endpointRepo *testapi.FakeEndpointRepository
-		orgRepo      *fake_organizations.FakeOrganizationRepository
+		orgRepo      *organizationsfakes.FakeOrganizationRepository
 		spaceRepo    *testapi.FakeSpaceRepository
 
 		org  models.Organization
@@ -61,7 +61,7 @@ var _ = Describe("Login Command", func() {
 		Flags = []string{}
 		Config = testconfig.NewRepository()
 		ui = &testterm.FakeUI{}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			Config.SetAccessToken("my_access_token")
 			Config.SetRefreshToken("my_refresh_token")
@@ -73,7 +73,7 @@ var _ = Describe("Login Command", func() {
 		org.Name = "my-new-org"
 		org.Guid = "my-new-org-guid"
 
-		orgRepo = &fake_organizations.FakeOrganizationRepository{}
+		orgRepo = &organizationsfakes.FakeOrganizationRepository{}
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 		space := models.Space{}

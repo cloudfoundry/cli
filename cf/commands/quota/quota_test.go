@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -22,7 +22,7 @@ var _ = Describe("quota", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
-		quotaRepo           *fakes.FakeQuotaRepository
+		quotaRepo           *quotasfakes.FakeQuotaRepository
 		deps                command_registry.Dependency
 	)
 
@@ -36,7 +36,7 @@ var _ = Describe("quota", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		quotaRepo = &fakes.FakeQuotaRepository{}
+		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 

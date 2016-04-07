@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +20,7 @@ var _ = Describe("Rename command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		appRepo             *testApplication.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("Rename command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 	})
 
 	runCommand := func(args ...string) bool {

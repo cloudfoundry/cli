@@ -12,7 +12,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter -o fakes/fake_organization_repository.go . OrganizationRepository
+//go:generate counterfeiter . OrganizationRepository
+
 type OrganizationRepository interface {
 	ListOrgs(limit int) ([]models.Organization, error)
 	GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, apiErr error)

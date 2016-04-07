@@ -13,6 +13,8 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
+//go:generate counterfeiter . StackRepository
+
 type StackRepository interface {
 	FindByName(name string) (stack models.Stack, apiErr error)
 	FindByGUID(guid string) (models.Stack, error)

@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/api/fakes"
-	testorg "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +17,7 @@ var _ = Describe("Plan builder", func() {
 
 		planRepo       *fakes.FakeServicePlanRepo
 		visibilityRepo *fakes.FakeServicePlanVisibilityRepository
-		orgRepo        *testorg.FakeOrganizationRepository
+		orgRepo        *organizationsfakes.FakeOrganizationRepository
 
 		plan1 models.ServicePlanFields
 		plan2 models.ServicePlanFields
@@ -31,7 +31,7 @@ var _ = Describe("Plan builder", func() {
 		plan_builder.OrgToPlansVisibilityMap = nil
 		planRepo = &fakes.FakeServicePlanRepo{}
 		visibilityRepo = &fakes.FakeServicePlanVisibilityRepository{}
-		orgRepo = &testorg.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		builder = plan_builder.NewBuilder(planRepo, visibilityRepo, orgRepo)
 
 		plan1 = models.ServicePlanFields{

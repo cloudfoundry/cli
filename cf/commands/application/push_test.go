@@ -7,11 +7,11 @@ import (
 	"syscall"
 
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	testStacks "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
+	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
@@ -46,10 +46,10 @@ var _ = Describe("Push Command", func() {
 		starter                    *appCmdFakes.FakeApplicationStarter
 		stopper                    *appCmdFakes.FakeApplicationStopper
 		serviceBinder              *serviceCmdFakes.FakeAppBinder
-		appRepo                    *testApplication.FakeApplicationRepository
+		appRepo                    *applicationsfakes.FakeApplicationRepository
 		domainRepo                 *testapi.FakeDomainRepository
 		routeRepo                  *testapi.FakeRouteRepository
-		stackRepo                  *testStacks.FakeStackRepository
+		stackRepo                  *stacksfakes.FakeStackRepository
 		serviceRepo                *testapi.FakeServiceRepository
 		wordGenerator              *testwords.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
@@ -104,7 +104,7 @@ var _ = Describe("Push Command", func() {
 		}
 		stopper.MetaDataReturns(command_registry.CommandMetadata{Name: "stop"})
 
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 
 		domainRepo = &testapi.FakeDomainRepository{}
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
@@ -149,9 +149,9 @@ var _ = Describe("Push Command", func() {
 			return route, nil
 		}
 
-		stackRepo = &testStacks.FakeStackRepository{}
+		stackRepo = new(stacksfakes.FakeStackRepository)
 		serviceRepo = &testapi.FakeServiceRepository{}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		wordGenerator = new(testwords.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
 

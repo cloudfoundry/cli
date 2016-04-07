@@ -15,11 +15,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . TokenRefresher
+
 type TokenRefresher interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 }
 
-//go:generate counterfeiter -o fakes/fake_authentication_repository.go . AuthenticationRepository
+//go:generate counterfeiter . AuthenticationRepository
+
 type AuthenticationRepository interface {
 	net.RequestDumperInterface
 

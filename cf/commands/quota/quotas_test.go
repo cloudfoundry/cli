@@ -1,7 +1,7 @@
 package quota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ var _ = Describe("quotas command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		quotaRepo           *fakes.FakeQuotaRepository
+		quotaRepo           *quotasfakes.FakeQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -36,7 +36,7 @@ var _ = Describe("quotas command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		quotaRepo = &fakes.FakeQuotaRepository{}
+		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		config = testconfig.NewRepositoryWithDefaults()
 	})

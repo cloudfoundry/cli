@@ -21,6 +21,8 @@ const (
 	DefaultAppUploadBitsTimeout = 15 * time.Minute
 )
 
+//go:generate counterfeiter . ApplicationBitsRepository
+
 type ApplicationBitsRepository interface {
 	GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error)
 	UploadBits(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error)

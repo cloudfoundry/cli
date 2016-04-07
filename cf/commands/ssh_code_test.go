@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -42,7 +42,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 		configRepo.SetApiEndpoint("fake-api-endpoint")
 		endpointRepo = &testapi.FakeEndpointRepository{}
 		repoLocator := deps.RepoLocator.SetEndpointRepository(endpointRepo)
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		repoLocator = repoLocator.SetAuthenticationRepository(authRepo)
 
 		deps = command_registry.Dependency{

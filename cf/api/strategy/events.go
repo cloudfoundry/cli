@@ -2,6 +2,8 @@ package strategy
 
 import "github.com/cloudfoundry/cli/cf/api/resources"
 
+//go:generate counterfeiter . EventsEndpointStrategy
+
 type EventsEndpointStrategy interface {
 	EventsURL(appGuid string, limit int64) string
 	EventsResource() resources.EventResource

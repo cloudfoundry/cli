@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -21,7 +21,7 @@ var _ = Describe("scale command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		restarter           *appCmdFakes.FakeApplicationRestarter
-		appRepo             *testApplication.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		app                 models.Application
@@ -53,7 +53,7 @@ var _ = Describe("scale command", func() {
 		}
 		restarter.MetaDataReturns(command_registry.CommandMetadata{Name: "restart"})
 
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		ui = new(testterm.FakeUI)
 		config = testconfig.NewRepositoryWithDefaults()
 	})

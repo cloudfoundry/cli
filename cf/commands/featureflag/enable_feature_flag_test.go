@@ -3,7 +3,7 @@ package featureflag_test
 import (
 	"errors"
 
-	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +20,7 @@ var _ = Describe("enable-feature-flag command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		flagRepo            *fakeflag.FakeFeatureFlagRepository
+		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("enable-feature-flag command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
+		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
 	})
 
 	runCommand := func(args ...string) bool {

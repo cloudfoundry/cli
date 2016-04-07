@@ -9,6 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . EnvironmentVariableGroupsRepository
+
 type EnvironmentVariableGroupsRepository interface {
 	ListRunning() (variables []models.EnvironmentVariable, apiErr error)
 	ListStaging() (variables []models.EnvironmentVariable, apiErr error)

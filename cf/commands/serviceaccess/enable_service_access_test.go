@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -41,7 +41,7 @@ var _ = Describe("enable-service-access command", func() {
 		actor = new(actorsfakes.FakeServicePlanActor)
 		configRepo = configuration.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		tokenRefresher = &authenticationfakes.FakeAuthenticationRepository{}
+		tokenRefresher = new(authenticationfakes.FakeAuthenticationRepository)
 	})
 
 	runCommand := func(args []string) bool {

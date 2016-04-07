@@ -11,16 +11,17 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	teststacksapi "github.com/cloudfoundry/cli/cf/api/stacks/fakes"
+	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	testManifest "github.com/cloudfoundry/cli/cf/manifest/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"os"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
 )
 
 var _ = Describe("CreateAppManifest", func() {
@@ -28,7 +29,7 @@ var _ = Describe("CreateAppManifest", func() {
 		ui             *testterm.FakeUI
 		configRepo     core_config.Repository
 		appSummaryRepo *testapi.FakeAppSummaryRepository
-		stackRepo      *teststacksapi.FakeStackRepository
+		stackRepo      *stacksfakes.FakeStackRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -47,7 +48,7 @@ var _ = Describe("CreateAppManifest", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		appSummaryRepo = &testapi.FakeAppSummaryRepository{}
 		repoLocator := deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
-		stackRepo = &teststacksapi.FakeStackRepository{}
+		stackRepo = new(stacksfakes.FakeStackRepository)
 		repoLocator = repoLocator.SetStackRepository(stackRepo)
 
 		fakeManifest = &testManifest.FakeAppManifest{}

@@ -10,6 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . PasswordRepository
+
 type PasswordRepository interface {
 	UpdatePassword(old string, new string) error
 }

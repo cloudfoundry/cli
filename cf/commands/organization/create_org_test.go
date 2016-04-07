@@ -4,9 +4,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	test_quota "github.com/cloudfoundry/cli/cf/api/quotas/fakes"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	userCmdFakes "github.com/cloudfoundry/cli/cf/commands/user/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -25,11 +25,11 @@ var _ = Describe("create-org command", func() {
 		config              core_config.Repository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *test_org.FakeOrganizationRepository
-		quotaRepo           *test_quota.FakeQuotaRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
+		quotaRepo           *quotasfakes.FakeQuotaRepository
 		deps                command_registry.Dependency
 		orgRoleSetter       *userCmdFakes.FakeOrgRoleSetter
-		flagRepo            *fakeflag.FakeFeatureFlagRepository
+		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
 		OriginalCommand     command_registry.Command
 	)
 
@@ -50,9 +50,9 @@ var _ = Describe("create-org command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		orgRepo = &test_org.FakeOrganizationRepository{}
-		quotaRepo = &test_quota.FakeQuotaRepository{}
-		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
+		quotaRepo = new(quotasfakes.FakeQuotaRepository)
+		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
 		config.SetApiVersion("2.36.9")
 
 		orgRoleSetter = &userCmdFakes.FakeOrgRoleSetter{}

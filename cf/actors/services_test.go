@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/broker_builder/broker_builderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
-	organization_fakes "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -17,13 +17,13 @@ var _ = Describe("Services", func() {
 		actor          actors.ServiceActor
 		brokerBuilder  *broker_builderfakes.FakeBrokerBuilder
 		serviceBuilder *service_builderfakes.FakeServiceBuilder
-		orgRepo        *organization_fakes.FakeOrganizationRepository
+		orgRepo        *organizationsfakes.FakeOrganizationRepository
 		serviceBroker1 models.ServiceBroker
 		service1       models.ServiceOffering
 	)
 
 	BeforeEach(func() {
-		orgRepo = &organization_fakes.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		brokerBuilder = new(broker_builderfakes.FakeBrokerBuilder)
 		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 
