@@ -2,8 +2,8 @@ package actors_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
-	broker_builder "github.com/cloudfoundry/cli/cf/actors/broker_builder/fakes"
-	service_builder "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/broker_builder/broker_builderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	organization_fakes "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -15,8 +15,8 @@ import (
 var _ = Describe("Services", func() {
 	var (
 		actor          actors.ServiceActor
-		brokerBuilder  *broker_builder.FakeBrokerBuilder
-		serviceBuilder *service_builder.FakeServiceBuilder
+		brokerBuilder  *broker_builderfakes.FakeBrokerBuilder
+		serviceBuilder *service_builderfakes.FakeServiceBuilder
 		orgRepo        *organization_fakes.FakeOrganizationRepository
 		serviceBroker1 models.ServiceBroker
 		service1       models.ServiceOffering
@@ -24,8 +24,8 @@ var _ = Describe("Services", func() {
 
 	BeforeEach(func() {
 		orgRepo = &organization_fakes.FakeOrganizationRepository{}
-		brokerBuilder = &broker_builder.FakeBrokerBuilder{}
-		serviceBuilder = &service_builder.FakeServiceBuilder{}
+		brokerBuilder = new(broker_builderfakes.FakeBrokerBuilder)
+		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 
 		actor = actors.NewServiceHandler(orgRepo, brokerBuilder, serviceBuilder)
 

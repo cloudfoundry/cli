@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("enable-service-access command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		actor               *testactor.FakeServicePlanActor
+		actor               *actorsfakes.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
@@ -38,7 +38,7 @@ var _ = Describe("enable-service-access command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		actor = &testactor.FakeServicePlanActor{}
+		actor = new(actorsfakes.FakeServicePlanActor)
 		configRepo = configuration.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		tokenRefresher = &authenticationfakes.FakeAuthenticationRepository{}

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	fakeactors "github.com/cloudfoundry/cli/cf/actors/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
@@ -54,7 +54,7 @@ var _ = Describe("Push Command", func() {
 		wordGenerator              *testwords.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *authenticationfakes.FakeAuthenticationRepository
-		actor                      *fakeactors.FakePushActor
+		actor                      *actorsfakes.FakePushActor
 		appfiles                   *fakeappfiles.FakeAppFiles
 		zipper                     *fakeappfiles.FakeZipper
 		OriginalCommandStart       command_registry.Command
@@ -171,7 +171,7 @@ var _ = Describe("Push Command", func() {
 				Path: "some-path",
 			},
 		}, nil)
-		actor = &fakeactors.FakePushActor{}
+		actor = new(actorsfakes.FakePushActor)
 		actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
 			f(dirOrZipFile)
 			return nil

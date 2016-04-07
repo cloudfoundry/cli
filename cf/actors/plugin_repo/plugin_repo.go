@@ -13,6 +13,8 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
+//go:generate counterfeiter . PluginRepo
+
 type PluginRepo interface {
 	GetPlugins([]models.PluginRepo) (map[string][]clipr.Plugin, []string)
 }

@@ -6,6 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
+//go:generate counterfeiter . PlanBuilder
+
 type PlanBuilder interface {
 	AttachOrgsToPlans([]models.ServicePlanFields) ([]models.ServicePlanFields, error)
 	AttachOrgToPlans([]models.ServicePlanFields, string) ([]models.ServicePlanFields, error)

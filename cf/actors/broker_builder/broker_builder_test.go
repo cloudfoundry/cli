@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	fake_service_builder "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +17,7 @@ var _ = Describe("Broker Builder", func() {
 	var (
 		brokerBuilder broker_builder.BrokerBuilder
 
-		serviceBuilder *fake_service_builder.FakeServiceBuilder
+		serviceBuilder *service_builderfakes.FakeServiceBuilder
 		brokerRepo     *fakes.FakeServiceBrokerRepository
 
 		serviceBroker1 models.ServiceBroker
@@ -32,7 +32,7 @@ var _ = Describe("Broker Builder", func() {
 
 	BeforeEach(func() {
 		brokerRepo = &fakes.FakeServiceBrokerRepository{}
-		serviceBuilder = &fake_service_builder.FakeServiceBuilder{}
+		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 		brokerBuilder = broker_builder.NewBuilder(brokerRepo, serviceBuilder)
 
 		serviceBroker1 = models.ServiceBroker{Guid: "my-service-broker-guid", Name: "my-service-broker"}

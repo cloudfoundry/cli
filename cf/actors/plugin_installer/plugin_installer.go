@@ -8,6 +8,8 @@ import (
 	"github.com/cloudfoundry/cli/utils"
 )
 
+//go:generate counterfeiter . PluginInstaller
+
 type PluginInstaller interface {
 	Install(inputSourceFilepath string) string
 }
