@@ -816,6 +816,10 @@
     "translation": "Path for the route"
   },
   {
+    "id": "Path used to identify the HTTP route",
+    "translation": "Path used to identify the HTTP route"
+  },
+  {
     "id": "Path used to identify the route",
     "translation": "Path used to identify the route"
   },

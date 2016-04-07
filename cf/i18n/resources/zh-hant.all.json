@@ -3196,6 +3196,10 @@
     "translation": "資訊清單的路徑"
   },
   {
+    "id": "Path used to identify the HTTP route",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the route",
     "translation": ""
   },
