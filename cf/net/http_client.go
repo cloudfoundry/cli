@@ -15,6 +15,7 @@ import (
 )
 
 //go:generate counterfeiter . HttpClientInterface
+
 type HttpClientInterface interface {
 	RequestDumperInterface
 

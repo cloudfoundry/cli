@@ -18,7 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/net/fakes"
+	"github.com/cloudfoundry/cli/cf/net/netfakes"
 	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -39,7 +39,7 @@ var _ = Describe("Gateway", func() {
 		currentTime time.Time
 		clock       func() time.Time
 
-		client *fakes.FakeHttpClientInterface
+		client *netfakes.FakeHttpClientInterface
 	)
 
 	BeforeEach(func() {
@@ -66,7 +66,7 @@ var _ = Describe("Gateway", func() {
 		var oldNewHttpClient func(tr *http.Transport, dumper RequestDumper) HttpClientInterface
 
 		BeforeEach(func() {
-			client = &fakes.FakeHttpClientInterface{}
+			client = new(netfakes.FakeHttpClientInterface)
 
 			oldNewHttpClient = NewHttpClient
 			NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {

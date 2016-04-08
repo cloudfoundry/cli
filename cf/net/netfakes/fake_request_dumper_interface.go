@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sync"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
