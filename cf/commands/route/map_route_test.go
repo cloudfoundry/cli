@@ -6,13 +6,13 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
+	"github.com/cloudfoundry/cli/cf/commands/route/routefakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	fakeroute "github.com/cloudfoundry/cli/cf/commands/route/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -58,7 +58,7 @@ var _ = Describe("MapRoute", func() {
 		}
 
 		originalCreateRouteCmd = command_registry.Commands.FindCommand("create-route")
-		fakeCreateRouteCmd = &fakeroute.FakeRouteCreator{}
+		fakeCreateRouteCmd = new(routefakes.OldFakeRouteCreator)
 		command_registry.Register(fakeCreateRouteCmd)
 
 		cmd = &route.MapRoute{}
@@ -181,7 +181,7 @@ var _ = Describe("MapRoute", func() {
 
 		It("tries to create the route", func() {
 			cmd.Execute(flagContext)
-			fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+			fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 			Expect(ok).To(BeTrue())
 
 			Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
@@ -199,7 +199,7 @@ var _ = Describe("MapRoute", func() {
 
 		Context("when creating the route fails", func() {
 			BeforeEach(func() {
-				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				fakeRouteCreator.CreateRouteReturns(models.Route{}, errors.New("create-route-err"))
 			})
@@ -215,7 +215,7 @@ var _ = Describe("MapRoute", func() {
 
 		Context("when creating the route succeeds", func() {
 			BeforeEach(func() {
-				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				fakeRouteCreator.CreateRouteReturns(models.Route{Guid: "fake-route-guid"}, nil)
 			})
@@ -272,7 +272,7 @@ var _ = Describe("MapRoute", func() {
 
 			It("tries to create the route with the hostname", func() {
 				cmd.Execute(flagContext)
-				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				hostName, _, _, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
@@ -289,7 +289,7 @@ var _ = Describe("MapRoute", func() {
 
 			It("tries to create the route without a hostname", func() {
 				cmd.Execute(flagContext)
-				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				hostName, _, _, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
@@ -306,7 +306,7 @@ var _ = Describe("MapRoute", func() {
 
 			It("tries to create the route with the path", func() {
 				cmd.Execute(flagContext)
-				fakeRouteCreator, ok := fakeCreateRouteCmd.(*fakeroute.FakeRouteCreator)
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				_, path, _, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)

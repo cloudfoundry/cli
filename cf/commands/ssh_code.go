@@ -14,7 +14,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter -o fakes/fake_ssh_code_getter.go . SSHCodeGetter
+//go:generate counterfeiter . SSHCodeGetter
+
 type SSHCodeGetter interface {
 	command_registry.Command
 	Get() (string, error)

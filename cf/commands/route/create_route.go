@@ -15,7 +15,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_route_creator.go . RouteCreator
+//go:generate counterfeiter . RouteCreator
+
 type RouteCreator interface {
 	CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 }
