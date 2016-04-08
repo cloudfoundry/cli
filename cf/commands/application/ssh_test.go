@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	cmdFakes "github.com/cloudfoundry/cli/cf/commands/fakes"
+	"github.com/cloudfoundry/cli/cf/commands/commandsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -28,7 +28,7 @@ var _ = Describe("SSH command", func() {
 	var (
 		ui *testterm.FakeUI
 
-		sshCodeGetter         *cmdFakes.FakeSSHCodeGetter
+		sshCodeGetter         *commandsfakes.FakeSSHCodeGetter
 		originalSSHCodeGetter command_registry.Command
 
 		requirementsFactory *testreq.FakeReqFactory
@@ -48,7 +48,7 @@ var _ = Describe("SSH command", func() {
 		//save original command and restore later
 		originalSSHCodeGetter = command_registry.Commands.FindCommand("ssh-code")
 
-		sshCodeGetter = &cmdFakes.FakeSSHCodeGetter{}
+		sshCodeGetter = new(commandsfakes.FakeSSHCodeGetter)
 
 		//setup fakes to correctly interact with command_registry
 		sshCodeGetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
