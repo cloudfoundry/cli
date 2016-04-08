@@ -8,6 +8,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 )
 
+//go:generate counterfeiter . PluginConfiguration
+
 type PluginConfiguration interface {
 	Plugins() map[string]PluginMetadata
 	SetPlugin(string, PluginMetadata)
