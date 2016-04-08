@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry/command_registryfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	testPluginConfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/plugin_configfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -37,7 +37,7 @@ var _ = Describe("Install", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
-		pluginConfig        *testPluginConfig.FakePluginConfiguration
+		pluginConfig        *plugin_configfakes.FakePluginConfiguration
 		fakePluginRepo      *plugin_repofakes.FakePluginRepo
 		fakeChecksum        *testChecksum.FakeSha1Checksum
 
@@ -68,7 +68,7 @@ var _ = Describe("Install", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		pluginConfig = &testPluginConfig.FakePluginConfiguration{}
+		pluginConfig = new(plugin_configfakes.FakePluginConfiguration)
 		config = testconfig.NewRepositoryWithDefaults()
 		fakePluginRepo = new(plugin_repofakes.FakePluginRepo)
 		fakeChecksum = &testChecksum.FakeSha1Checksum{}

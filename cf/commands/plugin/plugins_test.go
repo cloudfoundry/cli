@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	plugincmd "github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/plugin_configfakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,7 +22,7 @@ var _ = Describe("Plugins", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              *testconfig.FakePluginConfiguration
+		config              *plugin_configfakes.FakePluginConfiguration
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("Plugins", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		config = &testconfig.FakePluginConfiguration{}
+		config = new(plugin_configfakes.FakePluginConfiguration)
 
 		rpc.DefaultServer = rpc.NewServer()
 	})
