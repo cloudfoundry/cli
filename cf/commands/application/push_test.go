@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
-	serviceCmdFakes "github.com/cloudfoundry/cli/cf/commands/service/fakes"
+	"github.com/cloudfoundry/cli/cf/commands/service/servicefakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -45,7 +45,7 @@ var _ = Describe("Push Command", func() {
 		manifestRepo               *testmanifest.FakeManifestRepository
 		starter                    *applicationfakes.FakeApplicationStarter
 		stopper                    *applicationfakes.FakeApplicationStopper
-		serviceBinder              *serviceCmdFakes.FakeAppBinder
+		serviceBinder              *servicefakes.OldFakeAppBinder
 		appRepo                    *applicationsfakes.FakeApplicationRepository
 		domainRepo                 *apifakes.FakeDomainRepository
 		routeRepo                  *apifakes.FakeRouteRepository
@@ -91,7 +91,7 @@ var _ = Describe("Push Command", func() {
 
 		starter = new(applicationfakes.FakeApplicationStarter)
 		stopper = new(applicationfakes.FakeApplicationStopper)
-		serviceBinder = &serviceCmdFakes.FakeAppBinder{}
+		serviceBinder = new(servicefakes.OldFakeAppBinder)
 
 		//setup fake commands (counterfeiter) to correctly interact with command_registry
 		starter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {

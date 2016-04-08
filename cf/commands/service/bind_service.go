@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -14,6 +15,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/json"
 )
+
+//go:generate counterfeiter . ServiceBinder
 
 type ServiceBinder interface {
 	BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error)
