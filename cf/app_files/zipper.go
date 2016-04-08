@@ -13,6 +13,8 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
+//go:generate counterfeiter . Zipper
+
 type Zipper interface {
 	Zip(dirToZip string, targetFile *os.File) (err error)
 	IsZipFile(path string) bool

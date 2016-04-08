@@ -15,6 +15,8 @@ import (
 
 const windowsPathPrefix = `\\?\`
 
+//go:generate counterfeiter . AppFiles
+
 type AppFiles interface {
 	AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error)
 	CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error)
