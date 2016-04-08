@@ -7,11 +7,10 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/configurationfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
-
-	fakeconfig "github.com/cloudfoundry/cli/cf/configuration/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,11 +19,11 @@ import (
 var _ = Describe("Configuration Repository", func() {
 	var (
 		config    core_config.Repository
-		persistor *fakeconfig.FakePersistor
+		persistor *configurationfakes.FakePersistor
 	)
 
 	BeforeEach(func() {
-		persistor = &fakeconfig.FakePersistor{}
+		persistor = new(configurationfakes.FakePersistor)
 		persistor.ExistsReturns(true)
 		config = core_config.NewRepositoryFromPersistor(persistor, func(err error) { panic(err) })
 	})
