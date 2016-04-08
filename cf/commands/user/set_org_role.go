@@ -15,7 +15,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_org_role_setter.go . OrgRoleSetter
+//go:generate counterfeiter . OrgRoleSetter
+
 type OrgRoleSetter interface {
 	command_registry.Command
 	SetOrgRole(orgGuid string, role, userGuid, userName string) error
