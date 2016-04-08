@@ -14,7 +14,8 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
-//go:generate counterfeiter -o fakes/fake_app_manifest.go . AppManifest
+//go:generate counterfeiter . AppManifest
+
 type AppManifest interface {
 	BuildpackUrl(string, string)
 	DiskQuota(string, int64)
