@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
-	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
+	"github.com/cloudfoundry/cli/cf/app_files/app_filesfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
@@ -55,8 +55,8 @@ var _ = Describe("Push Command", func() {
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *authenticationfakes.FakeAuthenticationRepository
 		actor                      *actorsfakes.FakePushActor
-		appfiles                   *fakeappfiles.FakeAppFiles
-		zipper                     *fakeappfiles.FakeZipper
+		appfiles                   *app_filesfakes.FakeAppFiles
+		zipper                     *app_filesfakes.FakeZipper
 		OriginalCommandStart       command_registry.Command
 		OriginalCommandStop        command_registry.Command
 		OriginalCommandServiceBind command_registry.Command
@@ -164,8 +164,8 @@ var _ = Describe("Push Command", func() {
 			MinAPIVersionSuccess: true,
 		}
 
-		zipper = &fakeappfiles.FakeZipper{}
-		appfiles = &fakeappfiles.FakeAppFiles{}
+		zipper = new(app_filesfakes.FakeZipper)
+		appfiles = new(app_filesfakes.FakeAppFiles)
 		appfiles.AppFilesInDirReturns([]models.AppFileFields{
 			{
 				Path: "some-path",
