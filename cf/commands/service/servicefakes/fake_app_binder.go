@@ -1,4 +1,4 @@
-package commands
+package servicefakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type FakeAppBinder struct {
+type OldFakeAppBinder struct {
 	AppsToBind        []models.Application
 	InstancesToBindTo []models.ServiceInstance
 	Params            map[string]interface{}
@@ -17,7 +17,7 @@ type FakeAppBinder struct {
 	}
 }
 
-func (binder *FakeAppBinder) BindApplication(app models.Application, service models.ServiceInstance, paramsMap map[string]interface{}) error {
+func (binder *OldFakeAppBinder) BindApplication(app models.Application, service models.ServiceInstance, paramsMap map[string]interface{}) error {
 	binder.AppsToBind = append(binder.AppsToBind, app)
 	binder.InstancesToBindTo = append(binder.InstancesToBindTo, service)
 	binder.Params = paramsMap
@@ -25,16 +25,16 @@ func (binder *FakeAppBinder) BindApplication(app models.Application, service mod
 	return binder.BindApplicationReturns.Error
 }
 
-func (binder *FakeAppBinder) MetaData() command_registry.CommandMetadata {
+func (binder *OldFakeAppBinder) MetaData() command_registry.CommandMetadata {
 	return command_registry.CommandMetadata{Name: "bind-service"}
 }
 
-func (binder *FakeAppBinder) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+func (binder *OldFakeAppBinder) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
 	return binder
 }
 
-func (binder *FakeAppBinder) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
+func (binder *OldFakeAppBinder) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
 	return []requirements.Requirement{}
 }
 
-func (binder *FakeAppBinder) Execute(_ flags.FlagContext) {}
+func (binder *OldFakeAppBinder) Execute(_ flags.FlagContext) {}

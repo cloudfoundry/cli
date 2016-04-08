@@ -13,6 +13,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
+//go:generate counterfeiter . RouteServiceUnbinder
+
 type RouteServiceUnbinder interface {
 	UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error
 }
