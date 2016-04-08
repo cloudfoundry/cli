@@ -15,7 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/app_files/app_filesfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
+	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	serviceCmdFakes "github.com/cloudfoundry/cli/cf/commands/service/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -43,8 +43,8 @@ var _ = Describe("Push Command", func() {
 		ui                         *testterm.FakeUI
 		configRepo                 core_config.Repository
 		manifestRepo               *testmanifest.FakeManifestRepository
-		starter                    *appCmdFakes.FakeApplicationStarter
-		stopper                    *appCmdFakes.FakeApplicationStopper
+		starter                    *applicationfakes.FakeApplicationStarter
+		stopper                    *applicationfakes.FakeApplicationStopper
 		serviceBinder              *serviceCmdFakes.FakeAppBinder
 		appRepo                    *applicationsfakes.FakeApplicationRepository
 		domainRepo                 *apifakes.FakeDomainRepository
@@ -89,8 +89,8 @@ var _ = Describe("Push Command", func() {
 	BeforeEach(func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
 
-		starter = &appCmdFakes.FakeApplicationStarter{}
-		stopper = &appCmdFakes.FakeApplicationStopper{}
+		starter = new(applicationfakes.FakeApplicationStarter)
+		stopper = new(applicationfakes.FakeApplicationStopper)
 		serviceBinder = &serviceCmdFakes.FakeAppBinder{}
 
 		//setup fake commands (counterfeiter) to correctly interact with command_registry

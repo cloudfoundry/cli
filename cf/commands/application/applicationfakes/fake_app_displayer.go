@@ -1,4 +1,4 @@
-package fakes
+package applicationfakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"

@@ -10,7 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_application_restarter.go . ApplicationRestarter
+//go:generate counterfeiter . ApplicationRestarter
+
 type ApplicationRestarter interface {
 	command_registry.Command
 	ApplicationRestart(app models.Application, orgName string, spaceName string)

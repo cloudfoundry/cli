@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/copy_application_source/copy_application_sourcefakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
+	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -33,7 +33,7 @@ var _ = Describe("CopySource", func() {
 		copyAppSourceRepo   *copy_application_sourcefakes.FakeCopyApplicationSourceRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		appRestarter        *appCmdFakes.FakeApplicationRestarter
+		appRestarter        *applicationfakes.FakeApplicationRestarter
 		OriginalCommand     command_registry.Command
 		deps                command_registry.Dependency
 	)
@@ -66,7 +66,7 @@ var _ = Describe("CopySource", func() {
 		//save original command and restore later
 		OriginalCommand = command_registry.Commands.FindCommand("restart")
 
-		appRestarter = &appCmdFakes.FakeApplicationRestarter{}
+		appRestarter = new(applicationfakes.FakeApplicationRestarter)
 		//setup fakes to correctly interact with command_registry
 		appRestarter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
 			return appRestarter
