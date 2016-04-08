@@ -17,6 +17,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
+//go:generate counterfeiter . SpaceRoleSetter
+
 type SpaceRoleSetter interface {
 	command_registry.Command
 	SetSpaceRole(space models.Space, role, userGuid, userName string) (err error)

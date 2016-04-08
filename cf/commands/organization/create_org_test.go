@@ -1,13 +1,13 @@
 package organization_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/commands/user/userfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
-	userCmdFakes "github.com/cloudfoundry/cli/cf/commands/user/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -28,7 +28,7 @@ var _ = Describe("create-org command", func() {
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		quotaRepo           *quotasfakes.FakeQuotaRepository
 		deps                command_registry.Dependency
-		orgRoleSetter       *userCmdFakes.FakeOrgRoleSetter
+		orgRoleSetter       *userfakes.FakeOrgRoleSetter
 		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
 		OriginalCommand     command_registry.Command
 	)
@@ -55,7 +55,7 @@ var _ = Describe("create-org command", func() {
 		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
 		config.SetApiVersion("2.36.9")
 
-		orgRoleSetter = &userCmdFakes.FakeOrgRoleSetter{}
+		orgRoleSetter = new(userfakes.FakeOrgRoleSetter)
 		//setup fakes to correctly interact with command_registry
 		orgRoleSetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
 			return orgRoleSetter
