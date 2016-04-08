@@ -21,6 +21,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/ui_helpers"
 )
 
+//go:generate counterfeiter . ApplicationDisplayer
+
 type ApplicationDisplayer interface {
 	ShowApp(app models.Application, orgName string, spaceName string)
 }

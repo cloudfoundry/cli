@@ -5,6 +5,7 @@ import (
 	"time"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
+	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/trace/fakes"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -17,7 +18,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testlogs "github.com/cloudfoundry/cli/testhelpers/logs"
@@ -44,7 +44,7 @@ var _ = Describe("start command", func() {
 		appRepo                   *applicationsfakes.FakeApplicationRepository
 		originalAppCommand        command_registry.Command
 		deps                      command_registry.Dependency
-		displayApp                *appCmdFakes.FakeAppDisplayer
+		displayApp                *applicationfakes.FakeAppDisplayer
 	)
 
 	updateCommandDependency := func(logsRepo api.LogsRepository) {
@@ -93,7 +93,7 @@ var _ = Describe("start command", func() {
 		appInstancesRepo = new(app_instancesfakes.FakeAppInstancesRepository)
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
 
-		displayApp = &appCmdFakes.FakeAppDisplayer{}
+		displayApp = new(applicationfakes.FakeAppDisplayer)
 
 		//save original command dependency and restore later
 		originalAppCommand = command_registry.Commands.FindCommand("app")
