@@ -6,13 +6,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/manifest/manifestfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
-	testManifest "github.com/cloudfoundry/cli/cf/manifest/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -40,7 +40,7 @@ var _ = Describe("CreateAppManifest", func() {
 		targetedSpaceRequirement requirements.Requirement
 		applicationRequirement   *fakerequirements.FakeApplicationRequirement
 
-		fakeManifest *testManifest.FakeAppManifest
+		fakeManifest *manifestfakes.FakeAppManifest
 	)
 
 	BeforeEach(func() {
@@ -51,7 +51,7 @@ var _ = Describe("CreateAppManifest", func() {
 		stackRepo = new(stacksfakes.FakeStackRepository)
 		repoLocator = repoLocator.SetStackRepository(stackRepo)
 
-		fakeManifest = &testManifest.FakeAppManifest{}
+		fakeManifest = new(manifestfakes.FakeAppManifest)
 
 		deps = command_registry.Dependency{
 			Ui:          ui,
