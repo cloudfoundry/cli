@@ -10,13 +10,16 @@ const (
 	dirPermissions  = 0700
 )
 
-//go:generate counterfeiter -o fakes/fake_persistor.go . Persistor
+//go:generate counterfeiter . Persistor
+
 type Persistor interface {
 	Delete()
 	Exists() bool
 	Load(DataInterface) error
 	Save(DataInterface) error
 }
+
+//go:generate counterfeiter . DataInterface
 
 type DataInterface interface {
 	JsonMarshalV3() ([]byte, error)
