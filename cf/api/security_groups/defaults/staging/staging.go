@@ -10,6 +10,8 @@ import (
 
 const urlPath = "/v2/config/staging_security_groups"
 
+//go:generate counterfeiter . StagingSecurityGroupsRepo
+
 type StagingSecurityGroupsRepo interface {
 	BindToStagingSet(string) error
 	List() ([]models.SecurityGroupFields, error)

@@ -9,8 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	fakeBinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/spaces/spacesfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -23,10 +23,10 @@ import (
 var _ = Describe("unbind-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
+		securityGroupRepo   *security_groupsfakes.FakeSecurityGroupRepo
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		spaceRepo           *fakes.FakeSpaceRepository
-		secBinder           *fakeBinder.FakeSecurityGroupSpaceBinder
+		secBinder           *spacesfakes.FakeSecurityGroupSpaceBinder
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -45,10 +45,10 @@ var _ = Describe("unbind-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
+		securityGroupRepo = new(security_groupsfakes.FakeSecurityGroupRepo)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		spaceRepo = &fakes.FakeSpaceRepository{}
-		secBinder = &fakeBinder.FakeSecurityGroupSpaceBinder{}
+		secBinder = new(spacesfakes.FakeSecurityGroupSpaceBinder)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 

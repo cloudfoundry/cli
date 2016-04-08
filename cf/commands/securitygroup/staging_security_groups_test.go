@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/fakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/stagingfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -21,7 +21,7 @@ var _ = Describe("staging-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   core_config.Repository
-		fakeStagingSecurityGroupRepo *testapi.FakeStagingSecurityGroupsRepo
+		fakeStagingSecurityGroupRepo *stagingfakes.FakeStagingSecurityGroupsRepo
 		requirementsFactory          *testreq.FakeReqFactory
 		deps                         command_registry.Dependency
 	)
@@ -36,7 +36,7 @@ var _ = Describe("staging-security-groups command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		fakeStagingSecurityGroupRepo = &testapi.FakeStagingSecurityGroupsRepo{}
+		fakeStagingSecurityGroupRepo = new(stagingfakes.FakeStagingSecurityGroupsRepo)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
