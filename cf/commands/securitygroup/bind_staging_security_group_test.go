@@ -3,8 +3,8 @@ package securitygroup_test
 import (
 	"errors"
 
-	fakeStaging "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/fakes"
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/stagingfakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,8 +23,8 @@ var _ = Describe("bind-staging-security-group command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   core_config.Repository
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
-		fakeStagingSecurityGroupRepo *fakeStaging.FakeStagingSecurityGroupsRepo
+		fakeSecurityGroupRepo        *security_groupsfakes.FakeSecurityGroupRepo
+		fakeStagingSecurityGroupRepo *stagingfakes.FakeStagingSecurityGroupsRepo
 		deps                         command_registry.Dependency
 	)
 
@@ -40,8 +40,8 @@ var _ = Describe("bind-staging-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		fakeStagingSecurityGroupRepo = &fakeStaging.FakeStagingSecurityGroupsRepo{}
+		fakeSecurityGroupRepo = new(security_groupsfakes.FakeSecurityGroupRepo)
+		fakeStagingSecurityGroupRepo = new(stagingfakes.FakeStagingSecurityGroupsRepo)
 	})
 
 	runCommand := func(args ...string) bool {

@@ -10,6 +10,8 @@ import (
 
 const urlPath = "/v2/config/running_security_groups"
 
+//go:generate counterfeiter . RunningSecurityGroupsRepo
+
 type RunningSecurityGroupsRepo interface {
 	BindToRunningSet(string) error
 	List() ([]models.SecurityGroupFields, error)

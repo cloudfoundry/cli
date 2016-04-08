@@ -3,8 +3,8 @@ package securitygroup_test
 import (
 	"errors"
 
-	fakeRunning "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/runningfakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,8 +23,8 @@ var _ = Describe("bind-running-security-group command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   core_config.Repository
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
-		fakeRunningSecurityGroupRepo *fakeRunning.FakeRunningSecurityGroupsRepo
+		fakeSecurityGroupRepo        *security_groupsfakes.FakeSecurityGroupRepo
+		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo
 		deps                         command_registry.Dependency
 	)
 
@@ -40,8 +40,8 @@ var _ = Describe("bind-running-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		fakeRunningSecurityGroupRepo = &fakeRunning.FakeRunningSecurityGroupsRepo{}
+		fakeSecurityGroupRepo = new(security_groupsfakes.FakeSecurityGroupRepo)
+		fakeRunningSecurityGroupRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
 	})
 
 	runCommand := func(args ...string) bool {

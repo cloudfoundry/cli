@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("update-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
+		securityGroupRepo   *security_groupsfakes.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("update-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
+		securityGroupRepo = new(security_groupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
