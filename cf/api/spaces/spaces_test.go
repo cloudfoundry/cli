@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
@@ -20,7 +20,7 @@ import (
 
 var _ = Describe("Space Repository", func() {
 	It("lists all the spaces", func() {
-		firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		firstPageSpacesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1",
 			Response: testnet.TestResponse{
@@ -51,7 +51,7 @@ var _ = Describe("Space Repository", func() {
 					]
 				}`}})
 
-		secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		secondPageSpacesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1&page=2",
 			Response: testnet.TestResponse{
@@ -124,7 +124,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("creates spaces without a space-quota", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/spaces",
 			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid"}`),
@@ -150,7 +150,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("creates spaces with a space-quota", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/spaces",
 			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid","space_quota_definition_guid":"space-quota-guid"}`),
@@ -177,7 +177,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("sets allow_ssh field", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/spaces/my-space-guid",
 			Matcher:  testnet.RequestBodyMatcher(`{"allow_ssh":true}`),
@@ -193,7 +193,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("renames spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/spaces/my-space-guid",
 			Matcher:  testnet.RequestBodyMatcher(`{"name":"new-space-name"}`),
@@ -209,7 +209,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("deletes spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "DELETE",
 			Path:     "/v2/spaces/my-space-guid?recursive=true",
 			Response: testnet.TestResponse{Status: http.StatusOK},
@@ -287,7 +287,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
     }
   ]
 }`}
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
 		Response: findSpaceByNameResponse,
@@ -319,7 +319,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 }
 
 func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
 		Response: testnet.TestResponse{

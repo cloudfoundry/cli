@@ -1,7 +1,7 @@
 package route_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +20,7 @@ import (
 var _ = Describe("delete-orphaned-routes command", func() {
 	var (
 		ui         *testterm.FakeUI
-		routeRepo  *testapi.FakeRouteRepository
+		routeRepo  *apifakes.FakeRouteRepository
 		configRepo core_config.Repository
 		reqFactory *testreq.FakeReqFactory
 		deps       command_registry.Dependency
@@ -33,7 +33,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-orphaned-routes").SetDependency(deps, pluginCall))
 	}
 
-	callDeleteOrphanedRoutes := func(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (*testterm.FakeUI, bool) {
+	callDeleteOrphanedRoutes := func(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *apifakes.FakeRouteRepository) (*testterm.FakeUI, bool) {
 		ui = &testterm.FakeUI{Inputs: []string{confirmation}}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		passed := testcmd.RunCliCommand("delete-orphaned-routes", args, reqFactory, updateCommandDependency, false)
@@ -42,7 +42,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 	}
 
 	BeforeEach(func() {
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		reqFactory = &testreq.FakeReqFactory{}
 	})
 

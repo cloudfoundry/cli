@@ -3,7 +3,7 @@ package application_test
 import (
 	"time"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,7 +25,7 @@ import (
 var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		logsRepo            *testapi.FakeLogsRepository
+		logsRepo            *apifakes.FakeLogsRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -41,7 +41,7 @@ var _ = Describe("logs command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		logsRepo = &testapi.FakeLogsRepository{}
+		logsRepo = new(apifakes.FakeLogsRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -24,7 +24,7 @@ var _ = Describe("bind-service command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
-		serviceBindingRepo  *testapi.FakeServiceBindingRepo
+		serviceBindingRepo  *apifakes.OldFakeServiceBindingRepo
 		deps                command_registry.Dependency
 	)
 
@@ -39,7 +39,7 @@ var _ = Describe("bind-service command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		serviceBindingRepo = &testapi.FakeServiceBindingRepo{}
+		serviceBindingRepo = new(apifakes.OldFakeServiceBindingRepo)
 	})
 
 	var callBindService = func(args []string) bool {
@@ -87,7 +87,7 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service-guid"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo = &testapi.FakeServiceBindingRepo{CreateErrorCode: errors.ServiceBindingAppServiceTaken}
+			serviceBindingRepo = &apifakes.OldFakeServiceBindingRepo{CreateErrorCode: errors.ServiceBindingAppServiceTaken}
 			callBindService([]string{"my-app", "my-service"})
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -106,7 +106,7 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service1-guid1"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo = &testapi.FakeServiceBindingRepo{CreateNonHttpErrCode: "1001"}
+			serviceBindingRepo = &apifakes.OldFakeServiceBindingRepo{CreateNonHttpErrCode: "1001"}
 			callBindService([]string{"my-app1", "my-service1"})
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},

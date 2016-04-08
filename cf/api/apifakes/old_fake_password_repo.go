@@ -1,8 +1,8 @@
-package fakes
+package apifakes
 
 import "github.com/cloudfoundry/cli/cf/errors"
 
-type FakePasswordRepo struct {
+type OldFakePasswordRepo struct {
 	Score          string
 	ScoredPassword string
 
@@ -11,7 +11,7 @@ type FakePasswordRepo struct {
 	UpdateOldPassword  string
 }
 
-func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr error) {
+func (repo *OldFakePasswordRepo) UpdatePassword(old string, new string) (apiErr error) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
 

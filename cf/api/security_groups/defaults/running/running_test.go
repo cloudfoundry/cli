@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
@@ -43,7 +43,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 	Describe(".BindToRunningSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "PUT",
 					Path:   "/v2/config/running_security_groups/a-real-guid",
 					Response: testnet.TestResponse{
@@ -63,7 +63,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 	Describe(".UnbindFromRunningSet", func() {
 		It("makes a correct request", func() {
 			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "DELETE",
 					Path:   "/v2/config/running_security_groups/my-guid",
 					Response: testnet.TestResponse{
@@ -83,7 +83,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 	Describe(".List", func() {
 		It("returns a list of security groups that are the defaults for running", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/config/running_security_groups",
 					Response: testnet.TestResponse{
@@ -91,7 +91,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 						Body:   firstRunningListItem,
 					},
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/config/running_security_groups",
 					Response: testnet.TestResponse{

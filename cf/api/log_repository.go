@@ -13,7 +13,8 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 )
 
-//go:generate counterfeiter -o fakes/fake_logs_repository.go . LogsRepository
+//go:generate counterfeiter . LogsRepository
+
 type LogsRepository interface {
 	RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error)
 	TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error)

@@ -1,11 +1,11 @@
-package fakes
+package apifakes
 
 import (
 	"github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
-type FakeLoggregatorConsumer struct {
+type OldFakeLoggregatorConsumer struct {
 	RecentCalledWith struct {
 		AppGuid   string
 		AuthToken string
@@ -26,13 +26,13 @@ type FakeLoggregatorConsumer struct {
 	closeChan chan bool
 }
 
-func NewFakeLoggregatorConsumer() *FakeLoggregatorConsumer {
-	return &FakeLoggregatorConsumer{
+func NewFakeLoggregatorConsumer() *OldFakeLoggregatorConsumer {
+	return &OldFakeLoggregatorConsumer{
 		closeChan: make(chan bool, 1),
 	}
 }
 
-func (c *FakeLoggregatorConsumer) Recent(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
+func (c *OldFakeLoggregatorConsumer) Recent(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
 	c.RecentCalledWith.AppGuid = appGuid
 	c.RecentCalledWith.AuthToken = authToken
 
@@ -45,24 +45,24 @@ func (c *FakeLoggregatorConsumer) Recent(appGuid string, authToken string) ([]*l
 	return c.RecentReturns.Messages, err
 }
 
-func (c *FakeLoggregatorConsumer) Close() error {
+func (c *OldFakeLoggregatorConsumer) Close() error {
 	c.IsClosed = true
 	c.closeChan <- true
 	return nil
 }
 
-func (c *FakeLoggregatorConsumer) SetOnConnectCallback(cb func()) {
+func (c *OldFakeLoggregatorConsumer) SetOnConnectCallback(cb func()) {
 	c.OnConnectCallback = cb
 }
 
-func (c *FakeLoggregatorConsumer) Tail(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error) {
+func (c *OldFakeLoggregatorConsumer) Tail(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error) {
 	return c.TailFunc(appGuid, authToken)
 }
 
-func (c *FakeLoggregatorConsumer) WaitForClose() {
+func (c *OldFakeLoggregatorConsumer) WaitForClose() {
 	<-c.closeChan
 }
 
-func (c *FakeLoggregatorConsumer) SetDebugPrinter(debugPrinter loggregator_consumer.DebugPrinter) {
+func (c *OldFakeLoggregatorConsumer) SetDebugPrinter(debugPrinter loggregator_consumer.DebugPrinter) {
 	<-c.closeChan
 }

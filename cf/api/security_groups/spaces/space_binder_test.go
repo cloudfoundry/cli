@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
@@ -42,7 +42,7 @@ var _ = Describe("SecurityGroupSpaceBinder", func() {
 	Describe(".BindSpace", func() {
 		It("associates the security group with the space", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "PUT",
 					Path:   "/v2/security_groups/this-is-a-security-group-guid/spaces/yes-its-a-space-guid",
 					Response: testnet.TestResponse{
@@ -65,7 +65,7 @@ var _ = Describe("SecurityGroupSpaceBinder", func() {
 	Describe(".UnbindSpace", func() {
 		It("removes the associated security group from the space", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "DELETE",
 					Path:   "/v2/security_groups/this-is-a-security-group-guid/spaces/yes-its-a-space-guid",
 					Response: testnet.TestResponse{

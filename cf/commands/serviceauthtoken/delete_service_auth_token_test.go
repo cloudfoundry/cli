@@ -1,7 +1,7 @@
 package serviceauthtoken_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -21,7 +21,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		authTokenRepo       *testapi.FakeAuthTokenRepo
+		authTokenRepo       *apifakes.OldFakeAuthTokenRepo
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -35,7 +35,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
-		authTokenRepo = &testapi.FakeAuthTokenRepo{}
+		authTokenRepo = new(apifakes.OldFakeAuthTokenRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, MaxAPIVersionSuccess: true}
 	})

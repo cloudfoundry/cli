@@ -11,6 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServicePlanRepository
+
 type ServicePlanRepository interface {
 	Search(searchParameters map[string]string) ([]models.ServicePlanFields, error)
 	Update(models.ServicePlanFields, string, bool) error

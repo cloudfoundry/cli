@@ -1,11 +1,11 @@
-package fakes
+package apifakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeServiceBindingRepo struct {
+type OldFakeServiceBindingRepo struct {
 	CreateServiceInstanceGuid string
 	CreateApplicationGuid     string
 	CreateErrorCode           string
@@ -17,7 +17,7 @@ type FakeServiceBindingRepo struct {
 	CreateNonHttpErrCode  string
 }
 
-func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
+func (repo *OldFakeServiceBindingRepo) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
 	repo.CreateServiceInstanceGuid = instanceGuid
 	repo.CreateApplicationGuid = appGuid
 	repo.CreateParams = paramsMap
@@ -34,7 +34,7 @@ func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string, paramsM
 	return
 }
 
-func (repo *FakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error) {
+func (repo *OldFakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error) {
 	repo.DeleteServiceInstance = instance
 	repo.DeleteApplicationGuid = appGuid
 	found = !repo.DeleteBindingNotFound

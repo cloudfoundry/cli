@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -20,7 +20,7 @@ var _ = Describe("delete-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
+		serviceRepo         *apifakes.FakeServiceRepository
 		serviceInstance     models.ServiceInstance
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -39,7 +39,7 @@ var _ = Describe("delete-service command", func() {
 		}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess: true,
 		}

@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -23,7 +23,7 @@ var _ = Describe("CreateServiceBroker", func() {
 	var (
 		ui                *testterm.FakeUI
 		configRepo        core_config.Repository
-		serviceBrokerRepo *testapi.FakeServiceBrokerRepository
+		serviceBrokerRepo *apifakes.FakeServiceBrokerRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("CreateServiceBroker", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceBrokerRepo = &testapi.FakeServiceBrokerRepository{}
+		serviceBrokerRepo = new(apifakes.FakeServiceBrokerRepository)
 		repoLocator := deps.RepoLocator.SetServiceBrokerRepository(serviceBrokerRepo)
 
 		deps = command_registry.Dependency{

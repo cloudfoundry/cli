@@ -3,7 +3,7 @@ package requirements_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
@@ -11,12 +11,16 @@ import (
 )
 
 var _ = Describe("SpaceRequirement", func() {
+	var spaceRepo *apifakes.FakeSpaceRepository
+	BeforeEach(func() {
+		spaceRepo = new(apifakes.FakeSpaceRepository)
+	})
+
 	Context("when a space with the given name exists", func() {
 		It("succeeds", func() {
 			space := models.Space{}
 			space.Name = "awesome-sauce-space"
 			space.Guid = "my-space-guid"
-			spaceRepo := &testapi.FakeSpaceRepository{}
 			spaceRepo.FindByNameReturns(space, nil)
 
 			spaceReq := NewSpaceRequirement("awesome-sauce-space", spaceRepo)
@@ -30,7 +34,6 @@ var _ = Describe("SpaceRequirement", func() {
 
 	Context("when a space with the given name does not exist", func() {
 		It("errors", func() {
-			spaceRepo := &testapi.FakeSpaceRepository{}
 			spaceError := errors.New("space-repo-err")
 			spaceRepo.FindByNameReturns(models.Space{}, spaceError)
 

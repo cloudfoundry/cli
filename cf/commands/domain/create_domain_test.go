@@ -1,7 +1,7 @@
 package domain_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +20,7 @@ var _ = Describe("create domain command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		domainRepo          *testapi.FakeDomainRepository
+		domainRepo          *apifakes.FakeDomainRepository
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
 	)
@@ -34,7 +34,7 @@ var _ = Describe("create domain command", func() {
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		domainRepo = &testapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		configRepo = testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
 	})
 

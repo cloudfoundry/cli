@@ -1,7 +1,7 @@
 package user_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,7 +19,7 @@ var _ = Describe("Create user command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		userRepo            *testapi.FakeUserRepository
+		userRepo            *apifakes.FakeUserRepository
 		config              core_config.Repository
 		deps                command_registry.Dependency
 	)
@@ -27,7 +27,7 @@ var _ = Describe("Create user command", func() {
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		ui = new(testterm.FakeUI)
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 		accessToken, _ := testconfig.EncodeAccessToken(core_config.TokenInfo{
 			Username: "current-user",

@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -28,7 +28,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 	var (
 		ui          *testterm.FakeUI
 		configRepo  core_config.Repository
-		serviceRepo *fakeapi.FakeServiceRepository
+		serviceRepo *apifakes.FakeServiceRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -42,7 +42,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &fakeapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		repoLocator := deps.RepoLocator.SetServiceRepository(serviceRepo)
 
 		deps = command_registry.Dependency{

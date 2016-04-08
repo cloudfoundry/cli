@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -43,7 +43,7 @@ var _ = Describe("app security group api", func() {
 
 	Describe(".Create", func() {
 		It("can create an app security group, given some attributes", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "POST",
 				Path:   "/v2/security_groups",
 				// FIXME: this matcher depend on the order of the key/value pairs in the map
@@ -138,7 +138,7 @@ var _ = Describe("app security group api", func() {
 				},
 			}
 
-			setupTestServer(testapi.NewCloudControllerTestRequest(req1), testapi.NewCloudControllerTestRequest(req2))
+			setupTestServer(apifakes.NewCloudControllerTestRequest(req1), apifakes.NewCloudControllerTestRequest(req2))
 
 			group, err := repo.Read("the-name")
 
@@ -165,7 +165,7 @@ var _ = Describe("app security group api", func() {
 		})
 
 		It("returns a ModelNotFound error if the security group cannot be found", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/security_groups?q=name:the-name",
 				Response: testnet.TestResponse{
@@ -184,7 +184,7 @@ var _ = Describe("app security group api", func() {
 	Describe(".Delete", func() {
 		It("deletes the security group", func() {
 			securityGroupGuid := "the-security-group-guid"
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "DELETE",
 				Path:   "/v2/security_groups/" + securityGroupGuid,
 				Response: testnet.TestResponse{
@@ -201,7 +201,7 @@ var _ = Describe("app security group api", func() {
 	Describe(".FindAll", func() {
 		It("returns all the security groups", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/security_groups",
 					Response: testnet.TestResponse{
@@ -209,7 +209,7 @@ var _ = Describe("app security group api", func() {
 						Body:   firstListItem(),
 					},
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/security_groups?page=2",
 					Response: testnet.TestResponse{
@@ -217,7 +217,7 @@ var _ = Describe("app security group api", func() {
 						Body:   secondListItem(),
 					},
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502/spaces?inline-relations-depth=1",
 					Response: testnet.TestResponse{
@@ -225,7 +225,7 @@ var _ = Describe("app security group api", func() {
 						Body:   spacesItems(),
 					},
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces?inline-relations-depth=1",
 					Response: testnet.TestResponse{

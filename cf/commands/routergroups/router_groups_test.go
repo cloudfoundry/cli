@@ -3,7 +3,7 @@ package routergroups_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -23,7 +23,7 @@ var _ = Describe("RouterGroups", func() {
 
 	var (
 		ui                  *testterm.FakeUI
-		routingApiRepo      *testapi.FakeRoutingApiRepository
+		routingApiRepo      *apifakes.FakeRoutingApiRepository
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -43,7 +43,7 @@ var _ = Describe("RouterGroups", func() {
 			LoginSuccess:              true,
 			RoutingAPIEndpointSuccess: true,
 		}
-		routingApiRepo = &testapi.FakeRoutingApiRepository{}
+		routingApiRepo = new(apifakes.FakeRoutingApiRepository)
 	})
 
 	runCommand := func(args ...string) bool {

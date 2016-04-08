@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,12 +14,12 @@ import (
 
 var _ = Describe("UserRequirement", func() {
 	var (
-		userRepo        *fakeapi.FakeUserRepository
+		userRepo        *apifakes.FakeUserRepository
 		userRequirement requirements.UserRequirement
 	)
 
 	BeforeEach(func() {
-		userRepo = &fakeapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 	})
 
 	Describe("Execute", func() {

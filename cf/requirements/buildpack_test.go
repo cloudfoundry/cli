@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
@@ -11,7 +11,7 @@ import (
 var _ = Describe("BuildpackRequirement", func() {
 	It("succeeds when a buildpack with the given name exists", func() {
 		buildpack := models.Buildpack{Name: "my-buildpack"}
-		buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameBuildpack: buildpack}
+		buildpackRepo := &apifakes.OldFakeBuildpackRepository{FindByNameBuildpack: buildpack}
 
 		buildpackReq := NewBuildpackRequirement("my-buildpack", buildpackRepo)
 
@@ -21,7 +21,7 @@ var _ = Describe("BuildpackRequirement", func() {
 	})
 
 	It("fails when the buildpack cannot be found", func() {
-		buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameNotFound: true}
+		buildpackRepo := &apifakes.OldFakeBuildpackRepository{FindByNameNotFound: true}
 
 		err := NewBuildpackRequirement("foo", buildpackRepo).Execute()
 		Expect(err).To(HaveOccurred())

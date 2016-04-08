@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -18,8 +18,8 @@ var _ = Describe("Service Plans", func() {
 	var (
 		actor actors.ServicePlanActor
 
-		servicePlanRepo           *testapi.FakeServicePlanRepo
-		servicePlanVisibilityRepo *testapi.FakeServicePlanVisibilityRepository
+		servicePlanRepo           *apifakes.OldFakeServicePlanRepo
+		servicePlanVisibilityRepo *apifakes.FakeServicePlanVisibilityRepository
 		orgRepo                   *organizationsfakes.FakeOrganizationRepository
 
 		planBuilder    *plan_builderfakes.FakePlanBuilder
@@ -45,8 +45,8 @@ var _ = Describe("Service Plans", func() {
 	)
 
 	BeforeEach(func() {
-		servicePlanRepo = &testapi.FakeServicePlanRepo{}
-		servicePlanVisibilityRepo = &testapi.FakeServicePlanVisibilityRepository{}
+		servicePlanRepo = new(apifakes.OldFakeServicePlanRepo)
+		servicePlanVisibilityRepo = new(apifakes.FakeServicePlanVisibilityRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		planBuilder = new(plan_builderfakes.FakePlanBuilder)
 		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)

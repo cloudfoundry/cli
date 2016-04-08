@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
@@ -91,7 +91,7 @@ var _ = Describe("Service Plan Repository", func() {
 
 	Describe(".Update", func() {
 		BeforeEach(func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_plans/my-service-plan-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"public":true}`),
@@ -137,7 +137,7 @@ var _ = Describe("Service Plan Repository", func() {
 	})
 })
 
-var firstPlanRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPlanRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plans",
 	Response: testnet.TestResponse{
@@ -163,7 +163,7 @@ var firstPlanRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest
 	},
 })
 
-var secondPlanRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPlanRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plans?page=2",
 	Response: testnet.TestResponse{
@@ -188,7 +188,7 @@ var secondPlanRequest = testapi.NewCloudControllerTestRequest(testnet.TestReques
 	},
 })
 
-var firstPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPlanRequestWithParams = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plans?q=service_guid%3AFoo",
 	Response: testnet.TestResponse{
@@ -214,7 +214,7 @@ var firstPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.T
 	},
 })
 
-var secondPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPlanRequestWithParams = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plans?q=service_guid%3AFoo&page=2",
 	Response: testnet.TestResponse{
@@ -239,7 +239,7 @@ var secondPlanRequestWithParams = testapi.NewCloudControllerTestRequest(testnet.
 	},
 })
 
-var manyServiceRequest1 = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var manyServiceRequest1 = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plans?q=service_guid+IN+service-guid1,service-guid2",
 	Response: testnet.TestResponse{
@@ -265,7 +265,7 @@ var manyServiceRequest1 = testapi.NewCloudControllerTestRequest(testnet.TestRequ
 	},
 })
 
-var manyServiceRequest2 = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var manyServiceRequest2 = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plans?q=service_guid+IN+service-guid1,service-guid2&page=2",
 	Response: testnet.TestResponse{

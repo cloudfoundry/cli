@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -61,7 +61,7 @@ var _ = Describe("ServiceSummaryRepository", func() {
 	})
 
 	It("gets a summary of services in the given space", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "GET",
 			Path:     "/v2/spaces/my-space-guid/summary",
 			Response: serviceInstanceSummariesResponse,

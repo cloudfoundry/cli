@@ -1,11 +1,11 @@
-package fakes
+package apifakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeAppSummaryRepo struct {
+type OldFakeAppSummaryRepo struct {
 	GetSummariesInCurrentSpaceApps []models.Application
 
 	GetSummaryErrorCode string
@@ -13,12 +13,12 @@ type FakeAppSummaryRepo struct {
 	GetSummarySummary   models.Application
 }
 
-func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
+func (repo *OldFakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
 	apps = repo.GetSummariesInCurrentSpaceApps
 	return
 }
 
-func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.Application, apiErr error) {
+func (repo *OldFakeAppSummaryRepo) GetSummary(appGuid string) (summary models.Application, apiErr error) {
 	repo.GetSummaryAppGuid = appGuid
 	summary = repo.GetSummarySummary
 

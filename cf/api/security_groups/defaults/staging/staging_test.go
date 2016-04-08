@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	. "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -42,7 +42,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 	Describe("BindToStagingSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "PUT",
 					Path:   "/v2/config/staging_security_groups/a-real-guid",
 					Response: testnet.TestResponse{
@@ -62,7 +62,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 	Describe(".List", func() {
 		It("returns a list of security groups that are the defaults for staging", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/config/staging_security_groups",
 					Response: testnet.TestResponse{
@@ -70,7 +70,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 						Body:   firstStagingListItem,
 					},
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/config/staging_security_groups",
 					Response: testnet.TestResponse{
@@ -108,7 +108,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 	Describe("UnbindFromStagingSet", func() {
 		It("makes a correct request", func() {
 			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "DELETE",
 					Path:   "/v2/config/staging_security_groups/my-guid",
 					Response: testnet.TestResponse{

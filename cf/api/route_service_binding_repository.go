@@ -11,7 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter -o fakes/fake_route_service_binding_repository.go . RouteServiceBindingRepository
+//go:generate counterfeiter . RouteServiceBindingRepository
+
 type RouteServiceBindingRepository interface {
 	Bind(instanceGuid, routeGuid string, userProvided bool, parameters string) error
 	Unbind(instanceGuid, routeGuid string, userProvided bool) error

@@ -1,6 +1,6 @@
-package fakes
+package apifakes
 
-type FakeCurlRepository struct {
+type OldFakeCurlRepository struct {
 	Method         string
 	Path           string
 	Header         string
@@ -10,7 +10,7 @@ type FakeCurlRepository struct {
 	Error          error
 }
 
-func (repo *FakeCurlRepository) Request(method, path, header, body string) (resHeaders, resBody string, apiErr error) {
+func (repo *OldFakeCurlRepository) Request(method, path, header, body string) (resHeaders, resBody string, apiErr error) {
 	repo.Method = method
 	repo.Path = path
 	repo.Header = header

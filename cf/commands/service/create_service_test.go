@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -29,7 +29,7 @@ var _ = Describe("create-service command", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
+		serviceRepo         *apifakes.FakeServiceRepository
 		serviceBuilder      *service_builderfakes.FakeServiceBuilder
 
 		offering1 models.ServiceOffering
@@ -49,7 +49,7 @@ var _ = Describe("create-service command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 
 		offering1 = models.ServiceOffering{}

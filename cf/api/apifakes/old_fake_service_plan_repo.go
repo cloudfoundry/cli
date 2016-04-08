@@ -1,4 +1,4 @@
-package fakes
+package apifakes
 
 import (
 	"sort"
@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeServicePlanRepo struct {
+type OldFakeServicePlanRepo struct {
 	SearchReturns map[string][]models.ServicePlanFields
 	SearchErr     error
 
@@ -27,7 +27,7 @@ type FakeServicePlanRepo struct {
 	ListPlansFromManyServicesError   error
 }
 
-func (fake *FakeServicePlanRepo) ListPlansFromManyServices(serviceGuids []string) (plans []models.ServicePlanFields, err error) {
+func (fake *OldFakeServicePlanRepo) ListPlansFromManyServices(serviceGuids []string) (plans []models.ServicePlanFields, err error) {
 	if fake.ListPlansFromManyServicesError != nil {
 		return nil, fake.ListPlansFromManyServicesError
 	}
@@ -38,7 +38,7 @@ func (fake *FakeServicePlanRepo) ListPlansFromManyServices(serviceGuids []string
 	return []models.ServicePlanFields{}, nil
 }
 
-func (fake *FakeServicePlanRepo) Search(queryParams map[string]string) ([]models.ServicePlanFields, error) {
+func (fake *OldFakeServicePlanRepo) Search(queryParams map[string]string) ([]models.ServicePlanFields, error) {
 	if fake.SearchErr != nil {
 		return nil, fake.SearchErr
 	}
@@ -75,7 +75,7 @@ func combineKeys(mapToCombine map[string]string) string {
 	return strings.Join(values, ":")
 }
 
-func (fake *FakeServicePlanRepo) Update(arg1 models.ServicePlanFields, arg2 string, arg3 bool) error {
+func (fake *OldFakeServicePlanRepo) Update(arg1 models.ServicePlanFields, arg2 string, arg3 bool) error {
 	fake.updateMutex.Lock()
 	defer fake.updateMutex.Unlock()
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
@@ -90,19 +90,19 @@ func (fake *FakeServicePlanRepo) Update(arg1 models.ServicePlanFields, arg2 stri
 	}
 }
 
-func (fake *FakeServicePlanRepo) UpdateCallCount() int {
+func (fake *OldFakeServicePlanRepo) UpdateCallCount() int {
 	fake.updateMutex.RLock()
 	defer fake.updateMutex.RUnlock()
 	return len(fake.updateArgsForCall)
 }
 
-func (fake *FakeServicePlanRepo) UpdateArgsForCall(i int) (models.ServicePlanFields, string, bool) {
+func (fake *OldFakeServicePlanRepo) UpdateArgsForCall(i int) (models.ServicePlanFields, string, bool) {
 	fake.updateMutex.RLock()
 	defer fake.updateMutex.RUnlock()
 	return fake.updateArgsForCall[i].arg1, fake.updateArgsForCall[i].arg2, fake.updateArgsForCall[i].arg3
 }
 
-func (fake *FakeServicePlanRepo) UpdateReturns(result1 error) {
+func (fake *OldFakeServicePlanRepo) UpdateReturns(result1 error) {
 	fake.UpdateStub = nil
 	fake.updateReturns = struct {
 		result1 error

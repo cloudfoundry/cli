@@ -84,6 +84,8 @@ type ServiceOfferingSummary struct {
 	Version  string
 }
 
+//go:generate counterfeiter . ServiceSummaryRepository
+
 type ServiceSummaryRepository interface {
 	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error)
 }

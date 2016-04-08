@@ -10,6 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServicePlanVisibilityRepository
+
 type ServicePlanVisibilityRepository interface {
 	Create(string, string) error
 	List() ([]models.ServicePlanVisibilityFields, error)

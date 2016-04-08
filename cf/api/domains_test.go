@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -87,7 +87,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("finds a shared domain by name", func() {
-		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -111,7 +111,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("finds a private domain by name", func() {
-		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -135,7 +135,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("returns domains with router group types", func() {
-		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -164,7 +164,7 @@ var _ = Describe("DomainRepository", func() {
 
 	Describe("finding a domain by name in an org", func() {
 		It("looks in the org's domains first", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -192,13 +192,13 @@ var _ = Describe("DomainRepository", func() {
 
 		It("looks for shared domains if no there are no org-specific domains", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 				}),
 
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -226,13 +226,13 @@ var _ = Describe("DomainRepository", func() {
 
 		It("returns not found when neither endpoint returns a domain", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 				}),
 
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
@@ -245,13 +245,13 @@ var _ = Describe("DomainRepository", func() {
 
 		It("returns not found when the global endpoint returns a non-shared domain", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 				}),
 
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -277,7 +277,7 @@ var _ = Describe("DomainRepository", func() {
 		Context("when the private domains endpoint is not available", func() {
 			BeforeEach(func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/domains",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid", "wildcard": true}`),
@@ -306,7 +306,7 @@ var _ = Describe("DomainRepository", func() {
 
 			It("uses that endpoint", func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/private_domains",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid", "wildcard": true}`),
@@ -334,7 +334,7 @@ var _ = Describe("DomainRepository", func() {
 
 			It("uses the shared domains endpoint", func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/shared_domains",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
@@ -353,7 +353,7 @@ var _ = Describe("DomainRepository", func() {
 
 			It("creates a shared domain with a router_group_guid", func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/shared_domains",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "router_group_guid": "tcp-group", "wildcard": true}`),
@@ -374,7 +374,7 @@ var _ = Describe("DomainRepository", func() {
 		Context("when targeting an older cloud controller", func() {
 			It("uses the general domains endpoint", func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/domains",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
@@ -412,7 +412,7 @@ var _ = Describe("DomainRepository", func() {
 		Context("when the private domains endpoint is NOT available", func() {
 			BeforeEach(func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:   "DELETE",
 						Path:     "/v2/domains/my-domain-guid?recursive=true",
 						Response: testnet.TestResponse{Status: http.StatusOK},
@@ -455,7 +455,7 @@ var _ = Describe("DomainRepository", func() {
 		Context("when the shared domains endpoint is not available", func() {
 			It("uses the old domains endpoint", func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:   "DELETE",
 						Path:     "/v2/domains/my-domain-guid?recursive=true",
 						Response: testnet.TestResponse{Status: http.StatusOK},
@@ -471,7 +471,7 @@ var _ = Describe("DomainRepository", func() {
 
 })
 
-var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var oldEndpointDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
@@ -488,7 +488,7 @@ var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Te
 	]
 }`}})
 
-var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPageDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/private_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -517,7 +517,7 @@ var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Test
 }`},
 })
 
-var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPageDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/domains?page=2",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -536,7 +536,7 @@ var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 }`},
 })
 
-var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPageSharedDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/shared_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -563,7 +563,7 @@ var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testne
 }`},
 })
 
-var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPageSharedDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/shared_domains?page=2",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -581,7 +581,7 @@ var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testn
 }`},
 })
 
-var firstPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPagePrivateDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/private_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -610,7 +610,7 @@ var firstPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testn
 }`},
 })
 
-var secondPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPagePrivateDomainsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/private_domains?page=2",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -631,7 +631,7 @@ var secondPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(test
 })
 
 func deleteDomainReq(statusCode int) testnet.TestRequest {
-	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	return apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "DELETE",
 		Path:     "/v2/private_domains/my-domain-guid?recursive=true",
 		Response: testnet.TestResponse{Status: statusCode},
@@ -639,7 +639,7 @@ func deleteDomainReq(statusCode int) testnet.TestRequest {
 }
 
 func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
-	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	return apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "DELETE",
 		Path:     "/v2/shared_domains/my-domain-guid?recursive=true",
 		Response: testnet.TestResponse{Status: statusCode},

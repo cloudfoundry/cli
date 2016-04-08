@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ var _ = Describe("unbind-service command", func() {
 		config              core_config.Repository
 		serviceInstance     models.ServiceInstance
 		requirementsFactory *testreq.FakeReqFactory
-		serviceBindingRepo  *testapi.FakeServiceBindingRepo
+		serviceBindingRepo  *apifakes.OldFakeServiceBindingRepo
 		deps                command_registry.Dependency
 	)
 
@@ -46,7 +46,7 @@ var _ = Describe("unbind-service command", func() {
 		requirementsFactory.Application = app
 		requirementsFactory.ServiceInstance = serviceInstance
 
-		serviceBindingRepo = &testapi.FakeServiceBindingRepo{}
+		serviceBindingRepo = new(apifakes.OldFakeServiceBindingRepo)
 	})
 
 	callUnbindService := func(args []string) bool {

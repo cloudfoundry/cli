@@ -24,6 +24,8 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
+//go:generate counterfeiter . BuildpackBitsRepository
+
 type BuildpackBitsRepository interface {
 	UploadBuildpack(buildpack models.Buildpack, dir string) (apiErr error)
 }

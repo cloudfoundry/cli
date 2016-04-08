@@ -15,8 +15,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . CurlRepository
+
 type CurlRepository interface {
-	Request(method, path, header, body string) (resHeaders, resBody string, apiErr error)
+	Request(method, path, header, body string) (resHeaders string, resBody string, apiErr error)
 }
 
 type CloudControllerCurlRepository struct {

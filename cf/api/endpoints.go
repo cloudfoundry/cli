@@ -10,7 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter -o fakes/fake_endpoint_repository.go . EndpointRepository
+//go:generate counterfeiter . EndpointRepository
+
 type EndpointRepository interface {
 	UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr error)
 }

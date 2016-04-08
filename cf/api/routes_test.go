@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -47,12 +47,12 @@ var _ = Describe("route repository", func() {
 	Describe("List routes", func() {
 		It("lists routes in the current space", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/spaces/the-space-guid/routes?inline-relations-depth=1",
 					Response: firstPageRoutesResponse,
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/spaces/the-space-guid/routes?inline-relations-depth=1&page=2",
 					Response: secondPageRoutesResponse,
@@ -79,12 +79,12 @@ var _ = Describe("route repository", func() {
 
 		It("lists routes from all the spaces of current org", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/routes?q=organization_guid:my-org-guid&inline-relations-depth=1",
 					Response: firstPageRoutesOrgLvlResponse,
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/routes?q=organization_guid:my-org-guid&inline-relations-depth=1&page=2",
 					Response: secondPageRoutesResponse,
@@ -236,7 +236,7 @@ var _ = Describe("route repository", func() {
 
 			It("returns 'not found'", func() {
 				ts, handler = testnet.NewServer([]testnet.TestRequest{
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:   "GET",
 						Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
 						Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
@@ -611,7 +611,7 @@ var _ = Describe("route repository", func() {
 	Describe("Bind routes", func() {
 		It("binds routes", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
@@ -626,7 +626,7 @@ var _ = Describe("route repository", func() {
 
 		It("unbinds routes", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "DELETE",
 					Path:     "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
@@ -644,7 +644,7 @@ var _ = Describe("route repository", func() {
 	Describe("Delete routes", func() {
 		It("deletes routes", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "DELETE",
 					Path:     "/v2/routes/my-cool-route-guid",
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},

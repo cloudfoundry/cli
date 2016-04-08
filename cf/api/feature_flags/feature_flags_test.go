@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -102,7 +102,7 @@ var _ = Describe("Feature Flags Repository", func() {
 	})
 })
 
-var featureFlagsGetAllRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var featureFlagsGetAllRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/config/feature_flags",
 	Response: testnet.TestResponse{
@@ -142,7 +142,7 @@ var featureFlagsGetAllRequest = testapi.NewCloudControllerTestRequest(testnet.Te
 	},
 })
 
-var featureFlagRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var featureFlagRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/config/feature_flags/user_org_creation",
 	Response: testnet.TestResponse{
@@ -156,7 +156,7 @@ var featureFlagRequest = testapi.NewCloudControllerTestRequest(testnet.TestReque
 	},
 })
 
-var featureFlagsUpdateErrorRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var featureFlagsUpdateErrorRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "PUT",
 	Path:   "/v2/config/feature_flags/i_dont_exist",
 	Response: testnet.TestResponse{
@@ -169,7 +169,7 @@ var featureFlagsUpdateErrorRequest = testapi.NewCloudControllerTestRequest(testn
 	},
 })
 
-var featureFlagsUpdateRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var featureFlagsUpdateRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "PUT",
 	Path:   "/v2/config/feature_flags/app_scaling",
 	Response: testnet.TestResponse{

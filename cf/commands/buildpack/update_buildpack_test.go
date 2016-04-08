@@ -3,7 +3,7 @@ package buildpack_test
 import (
 	"strings"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -32,8 +32,8 @@ var _ = Describe("Updating buildpack command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		repo                *testapi.FakeBuildpackRepository
-		bitsRepo            *testapi.FakeBuildpackBitsRepository
+		repo                *apifakes.OldFakeBuildpackRepository
+		bitsRepo            *apifakes.OldFakeBuildpackBitsRepository
 		deps                command_registry.Dependency
 	)
 
@@ -47,8 +47,8 @@ var _ = Describe("Updating buildpack command", func() {
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		ui = new(testterm.FakeUI)
-		repo = &testapi.FakeBuildpackRepository{}
-		bitsRepo = &testapi.FakeBuildpackBitsRepository{}
+		repo = new(apifakes.OldFakeBuildpackRepository)
+		bitsRepo = new(apifakes.OldFakeBuildpackBitsRepository)
 	})
 
 	runCommand := func(args ...string) bool {

@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
@@ -10,12 +10,17 @@ import (
 )
 
 var _ = Describe("ServiceInstanceRequirement", func() {
+	var repo *apifakes.FakeServiceRepository
+
+	BeforeEach(func() {
+		repo = new(apifakes.FakeServiceRepository)
+	})
+
 	Context("when a service instance with the given name can be found", func() {
 		It("succeeds", func() {
 			instance := models.ServiceInstance{}
 			instance.Name = "my-service"
 			instance.Guid = "my-service-guid"
-			repo := &testapi.FakeServiceRepository{}
 			repo.FindInstanceByNameReturns(instance, nil)
 
 			req := NewServiceInstanceRequirement("my-service", repo)
@@ -29,7 +34,6 @@ var _ = Describe("ServiceInstanceRequirement", func() {
 
 	Context("when a service instance with the given name can't be found", func() {
 		It("errors", func() {
-			repo := &testapi.FakeServiceRepository{}
 			repo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.NewModelNotFoundError("Service instance", "my-service"))
 			err := NewServiceInstanceRequirement("foo", repo).Execute()
 			Expect(err).To(HaveOccurred())

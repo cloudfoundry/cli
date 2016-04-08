@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/trace/fakes"
 	"github.com/cloudfoundry/cli/flags"
@@ -26,7 +26,7 @@ var _ = Describe("services", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceSummaryRepo  *testapi.FakeServiceSummaryRepo
+		serviceSummaryRepo  *apifakes.OldFakeServiceSummaryRepo
 		deps                command_registry.Dependency
 	)
 
@@ -44,7 +44,7 @@ var _ = Describe("services", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceSummaryRepo = &testapi.FakeServiceSummaryRepo{}
+		serviceSummaryRepo = new(apifakes.OldFakeServiceSummaryRepo)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,

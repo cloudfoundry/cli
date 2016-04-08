@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,7 +19,7 @@ import (
 
 var _ = Describe("Service Brokers Repo", func() {
 	It("lists services brokers", func() {
-		firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		firstRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/service_brokers",
 			Response: testnet.TestResponse{
@@ -43,7 +43,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			},
 		})
 
-		secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		secondRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/service_brokers?page=2",
 			Response: testnet.TestResponse{
@@ -96,7 +96,7 @@ var _ = Describe("Service Brokers Repo", func() {
   }
 }]}`
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/service_brokers?q=name%3Amy-broker",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: responseBody},
@@ -119,7 +119,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 
 		It("returns an error when the service broker cannot be found", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/service_brokers?q=name%3Amy-broker",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
@@ -136,7 +136,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 
 		It("returns an error when listing service brokers returns an api error", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/service_brokers?q=name%3Amy-broker",
 				Response: testnet.TestResponse{Status: http.StatusForbidden, Body: `{
@@ -175,7 +175,7 @@ var _ = Describe("Service Brokers Repo", func() {
 }
 `
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/service_brokers/found-guid",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: responseBody},
@@ -197,7 +197,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 
 		It("returns an error when the service broker cannot be found", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/service_brokers/bogus-guid",
 				//This error code may not reflect reality.  Check it, change the code to match, and remove this comment.
@@ -282,7 +282,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		It("updates the service broker with the given guid", func() {
 			expectedReqBody := `{"broker_url":"http://update.example.com","auth_username":"update-foouser","auth_password":"update-password"}`
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_brokers/my-guid",
 				Matcher:  testnet.RequestBodyMatcher(expectedReqBody),
@@ -307,7 +307,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 	Describe("Rename", func() {
 		It("renames the service broker with the given guid", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_brokers/my-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"update-foobroker"}`),
@@ -326,7 +326,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 	Describe("Delete", func() {
 		It("deletes the service broker with the given guid", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/service_brokers/my-guid",
 				Response: testnet.TestResponse{Status: http.StatusNoContent},

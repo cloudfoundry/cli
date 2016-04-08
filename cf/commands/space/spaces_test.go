@@ -1,7 +1,7 @@
 package space_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -24,7 +24,7 @@ var _ = Describe("spaces command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		spaceRepo           *testapi.FakeSpaceRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
 
 		deps command_registry.Dependency
 	)
@@ -39,7 +39,7 @@ var _ = Describe("spaces command", func() {
 	BeforeEach(func() {
 		deps = command_registry.NewDependency(new(fakes.FakePrinter))
 		ui = &testterm.FakeUI{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
