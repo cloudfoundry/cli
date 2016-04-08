@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -41,7 +41,7 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 
 	Describe(".Create", func() {
 		BeforeEach(func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/service_plan_visibilities",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"service_plan_guid", "organization_guid":"org_guid"}`),
@@ -80,7 +80,7 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 	Describe(".Delete", func() {
 		It("deletes a service plan visibility", func() {
 			servicePlanVisibilityGuid := "the-service-plan-visibility-guid"
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "DELETE",
 				Path:    "/v2/service_plan_visibilities/" + servicePlanVisibilityGuid,
 				Matcher: testnet.EmptyQueryParamMatcher(),
@@ -109,7 +109,7 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 	})
 })
 
-var firstPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPlanVisibilityRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plan_visibilities",
 	Response: testnet.TestResponse{
@@ -133,7 +133,7 @@ var firstPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.T
 	},
 })
 
-var secondPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPlanVisibilityRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plan_visibilities?page=2",
 	Response: testnet.TestResponse{
@@ -156,7 +156,7 @@ var secondPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.
 	},
 })
 
-var searchPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var searchPlanVisibilityRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plan_visibilities?q=service_plan_guid%3Aservice-plan-guid-1%3Borganization_guid%3Aorg-guid-1",
 	Response: testnet.TestResponse{

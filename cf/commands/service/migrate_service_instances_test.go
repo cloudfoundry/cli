@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -19,7 +19,7 @@ import (
 var _ = Describe("migrating service instances from v1 to v2", func() {
 	var (
 		ui                  *testterm.FakeUI
-		serviceRepo         *testapi.FakeServiceRepository
+		serviceRepo         *apifakes.FakeServiceRepository
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		args                []string
@@ -36,7 +36,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepository()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 		args = []string{}
 	})

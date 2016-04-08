@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -43,7 +43,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	It("lists buildpacks", func() {
 		setupTestServer(
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/buildpacks",
 				Response: testnet.TestResponse{
@@ -63,7 +63,7 @@ var _ = Describe("Buildpacks repo", func() {
 						}
 					  ]
 					}`}}),
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/buildpacks?page=2",
 				Response: testnet.TestResponse{
@@ -110,7 +110,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	Describe("finding buildpacks by name", func() {
 		It("returns the buildpack with that name", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/buildpacks?q=name%3ABuildpack1",
 				Response: testnet.TestResponse{
@@ -139,7 +139,7 @@ var _ = Describe("Buildpacks repo", func() {
 		})
 
 		It("returns a ModelNotFoundError when the buildpack is not found", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/buildpacks?q=name%3ABuildpack1",
 				Response: testnet.TestResponse{
@@ -177,7 +177,7 @@ var _ = Describe("Buildpacks repo", func() {
 		})
 
 		It("sets the position flag when creating a buildpack", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/buildpacks",
 				Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":999}`),
@@ -206,7 +206,7 @@ var _ = Describe("Buildpacks repo", func() {
 		})
 
 		It("sets the enabled flag when creating a buildpack", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/buildpacks",
 				Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":999, "enabled":true}`),
@@ -238,7 +238,7 @@ var _ = Describe("Buildpacks repo", func() {
 	})
 
 	It("deletes buildpacks", func() {
-		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "DELETE",
 			Path:   "/v2/buildpacks/my-cool-buildpack-guid",
 			Response: testnet.TestResponse{
@@ -253,7 +253,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	Describe("updating buildpacks", func() {
 		It("updates a buildpack's name, position and enabled flag", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "PUT",
 				Path:    "/v2/buildpacks/my-cool-buildpack-guid",
 				Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":555,"enabled":false}`),
@@ -288,7 +288,7 @@ var _ = Describe("Buildpacks repo", func() {
 		})
 
 		It("sets the locked attribute on the buildpack", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "PUT",
 				Path:    "/v2/buildpacks/my-cool-buildpack-guid",
 				Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","locked":true}`),

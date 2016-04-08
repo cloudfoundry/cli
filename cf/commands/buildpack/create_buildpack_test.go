@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -18,8 +18,8 @@ import (
 var _ = Describe("create-buildpack command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		repo                *testapi.FakeBuildpackRepository
-		bitsRepo            *testapi.FakeBuildpackBitsRepository
+		repo                *apifakes.OldFakeBuildpackRepository
+		bitsRepo            *apifakes.OldFakeBuildpackBitsRepository
 		ui                  *testterm.FakeUI
 		deps                command_registry.Dependency
 	)
@@ -33,8 +33,8 @@ var _ = Describe("create-buildpack command", func() {
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		repo = &testapi.FakeBuildpackRepository{}
-		bitsRepo = &testapi.FakeBuildpackBitsRepository{}
+		repo = new(apifakes.OldFakeBuildpackRepository)
+		bitsRepo = new(apifakes.OldFakeBuildpackBitsRepository)
 		ui = &testterm.FakeUI{}
 	})
 

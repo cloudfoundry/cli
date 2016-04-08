@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -26,9 +26,9 @@ var _ = Describe("Login Command", func() {
 		Config       core_config.Repository
 		ui           *testterm.FakeUI
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
-		endpointRepo *testapi.FakeEndpointRepository
+		endpointRepo *apifakes.FakeEndpointRepository
 		orgRepo      *organizationsfakes.FakeOrganizationRepository
-		spaceRepo    *testapi.FakeSpaceRepository
+		spaceRepo    *apifakes.FakeSpaceRepository
 
 		org  models.Organization
 		deps command_registry.Dependency
@@ -67,7 +67,7 @@ var _ = Describe("Login Command", func() {
 			Config.SetRefreshToken("my_refresh_token")
 			return nil
 		}
-		endpointRepo = &testapi.FakeEndpointRepository{}
+		endpointRepo = new(apifakes.FakeEndpointRepository)
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
@@ -80,7 +80,7 @@ var _ = Describe("Login Command", func() {
 		space.Guid = "my-space-guid"
 		space.Name = "my-space"
 
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
 		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{

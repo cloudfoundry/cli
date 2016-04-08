@@ -1,16 +1,17 @@
 package api_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+
 	. "github.com/cloudfoundry/cli/cf/api"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"net/http/httptest"
 )
 
 var _ = Describe("AppSummaryRepository", func() {
@@ -22,7 +23,7 @@ var _ = Describe("AppSummaryRepository", func() {
 
 	Describe("GetSummariesInCurrentSpace()", func() {
 		BeforeEach(func() {
-			getAppSummariesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			getAppSummariesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/spaces/my-space-guid/summary",
 				Response: testnet.TestResponse{
@@ -86,7 +87,7 @@ var _ = Describe("AppSummaryRepository", func() {
 
 	Describe("GetSummary()", func() {
 		BeforeEach(func() {
-			getAppSummaryRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			getAppSummaryRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/apps/app1-guid/summary",
 				Response: testnet.TestResponse{

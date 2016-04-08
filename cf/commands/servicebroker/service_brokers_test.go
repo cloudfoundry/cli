@@ -3,7 +3,7 @@ package servicebroker_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,7 +25,7 @@ var _ = Describe("service-brokers command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		repo                *testapi.FakeServiceBrokerRepository
+		repo                *apifakes.FakeServiceBrokerRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -40,7 +40,7 @@ var _ = Describe("service-brokers command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		repo = &testapi.FakeServiceBrokerRepository{}
+		repo = new(apifakes.FakeServiceBrokerRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 

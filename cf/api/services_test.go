@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -52,12 +52,12 @@ var _ = Describe("Services Repo", func() {
 	Describe("GetAllServiceOfferings", func() {
 		BeforeEach(func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/services",
 					Response: firstOfferingsResponse,
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/services",
 					Response: multipleOfferingsResponse,
@@ -84,12 +84,12 @@ var _ = Describe("Services Repo", func() {
 	Describe("GetServiceOfferingsForSpace", func() {
 		It("gets all service offerings in a given space", func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/spaces/my-space-guid/services",
 					Response: firstOfferingsForSpaceResponse,
 				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     "/v2/spaces/my-space-guid/services",
 					Response: multipleOfferingsResponse,
@@ -163,13 +163,13 @@ var _ = Describe("Services Repo", func() {
 }`
 
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(
+				apifakes.NewCloudControllerTestRequest(
 					testnet.TestRequest{
 						Method:   "GET",
 						Path:     "/v2/services?q=service_broker_guid%3Amy-service-broker-guid",
 						Response: testnet.TestResponse{Status: http.StatusOK, Body: body1},
 					}),
-				testapi.NewCloudControllerTestRequest(
+				apifakes.NewCloudControllerTestRequest(
 					testnet.TestRequest{
 						Method:   "GET",
 						Path:     "/v2/services?q=service_broker_guid%3Amy-service-broker-guid",
@@ -235,13 +235,13 @@ var _ = Describe("Services Repo", func() {
 }`
 		BeforeEach(func() {
 			setupTestServer(
-				testapi.NewCloudControllerTestRequest(
+				apifakes.NewCloudControllerTestRequest(
 					testnet.TestRequest{
 						Method:   "GET",
 						Path:     path1,
 						Response: testnet.TestResponse{Status: http.StatusOK, Body: body1},
 					}),
-				testapi.NewCloudControllerTestRequest(
+				apifakes.NewCloudControllerTestRequest(
 					testnet.TestRequest{
 						Method:   "GET",
 						Path:     path2,
@@ -265,7 +265,7 @@ var _ = Describe("Services Repo", func() {
 
 	Describe("creating a service instance", func() {
 		It("makes the right request", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/service_instances?accepts_incomplete=true",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
@@ -279,7 +279,7 @@ var _ = Describe("Services Repo", func() {
 
 		Context("when there are parameters", func() {
 			It("sends the parameters as part of the request body", func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "POST",
 					Path:     "/v2/service_instances?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","parameters": {"data": "hello"}}`),
@@ -307,7 +307,7 @@ var _ = Describe("Services Repo", func() {
 
 		Context("when there are tags", func() {
 			It("sends the tags as part of the request body", func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "POST",
 					Path:     "/v2/service_instances?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","tags": ["foo", "bar"]}`),
@@ -325,7 +325,7 @@ var _ = Describe("Services Repo", func() {
 		Context("when the name is taken but an identical service exists", func() {
 			BeforeEach(func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/service_instances?accepts_incomplete=true",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
@@ -347,7 +347,7 @@ var _ = Describe("Services Repo", func() {
 		Context("when the name is taken and no identical service instance exists", func() {
 			BeforeEach(func() {
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/service_instances?accepts_incomplete=true",
 						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
@@ -371,7 +371,7 @@ var _ = Describe("Services Repo", func() {
 
 	Describe("UpdateServiceInstance", func() {
 		It("makes the right request", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "tags": null}`),
@@ -385,7 +385,7 @@ var _ = Describe("Services Repo", func() {
 
 		Context("When the instance or plan is not found", func() {
 			It("fails", func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"plan-guid", "tags": null}`),
@@ -400,7 +400,7 @@ var _ = Describe("Services Repo", func() {
 
 		Context("when the user passes arbitrary params", func() {
 			It("passes the parameters in the correct field for the request", func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"parameters": {"foo": "bar"}, "tags": null}`),
@@ -427,7 +427,7 @@ var _ = Describe("Services Repo", func() {
 
 		Context("when there are tags", func() {
 			It("sends the tags as part of the request body", func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"tags": ["foo", "bar"]}`),
@@ -442,7 +442,7 @@ var _ = Describe("Services Repo", func() {
 			})
 
 			It("sends empty tags", func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"tags": []}`),
@@ -484,7 +484,7 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns user provided services", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -540,7 +540,7 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns a failure response when the instance doesn't exist", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
@@ -564,7 +564,7 @@ var _ = Describe("Services Repo", func() {
 
 	Describe("DeleteService", func() {
 		It("deletes the service when no apps and keys are bound", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/service_instances/my-service-instance-guid?accepts_incomplete=true&async=true",
 				Response: testnet.TestResponse{Status: http.StatusOK},
@@ -627,7 +627,7 @@ var _ = Describe("Services Repo", func() {
 		Context("when the service is not user provided", func() {
 
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/service_instances/my-service-instance-guid?accepts_incomplete=true",
 					Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
@@ -650,7 +650,7 @@ var _ = Describe("Services Repo", func() {
 
 		Context("when the service is user provided", func() {
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "PUT",
 					Path:     "/v2/user_provided_service_instances/my-service-instance-guid",
 					Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
@@ -930,7 +930,7 @@ var _ = Describe("Services Repo", func() {
 		var planGuid = "abc123"
 
 		It("returns the number of service instances", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -970,7 +970,7 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns the API error when one occurs", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
 				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
@@ -992,7 +992,7 @@ var _ = Describe("Services Repo", func() {
 					ServiceProvider: "v1-elephantsql",
 				}
 
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v1-elephantsql;provider:v1-elephantsql")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -1038,7 +1038,7 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-panda",
 				}
 
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-elephantsql;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -1083,7 +1083,7 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-plan-name",
 				}
 
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
@@ -1105,7 +1105,7 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-plan-name",
 				}
 
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -1152,7 +1152,7 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-plan-name",
 				}
 
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{
@@ -1184,7 +1184,7 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns an error when migrating fails", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_plans/v1-guid/service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"v2-guid"}`),
@@ -1416,7 +1416,7 @@ var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body
 	]}`,
 }
 
-var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var serviceOfferingReq = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/services/the-service-guid",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -1434,7 +1434,7 @@ var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestReque
 		}`,
 	}})
 
-var serviceOfferingNullExtraReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var serviceOfferingNullExtraReq = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/services/the-service-guid",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -1451,7 +1451,7 @@ var serviceOfferingNullExtraReq = testapi.NewCloudControllerTestRequest(testnet.
 		}`,
 	}})
 
-var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var findServiceInstanceReq = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `

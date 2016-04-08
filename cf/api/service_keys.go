@@ -13,6 +13,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServiceKeyRepository
+
 type ServiceKeyRepository interface {
 	CreateServiceKey(serviceKeyGuid string, keyName string, params map[string]interface{}) error
 	ListServiceKeys(serviceKeyGuid string) ([]models.ServiceKey, error)

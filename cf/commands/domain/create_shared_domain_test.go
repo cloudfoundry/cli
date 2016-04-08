@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -33,8 +33,8 @@ func (r passingRequirement) Execute() error {
 var _ = Describe("CreateSharedDomain", func() {
 	var (
 		ui             *testterm.FakeUI
-		routingApiRepo *fakeapi.FakeRoutingApiRepository
-		domainRepo     *fakeapi.FakeDomainRepository
+		routingApiRepo *apifakes.FakeRoutingApiRepository
+		domainRepo     *apifakes.FakeDomainRepository
 		configRepo     core_config.Repository
 
 		cmd         domain.CreateSharedDomain
@@ -52,10 +52,10 @@ var _ = Describe("CreateSharedDomain", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routingApiRepo = &fakeapi.FakeRoutingApiRepository{}
+		routingApiRepo = new(apifakes.FakeRoutingApiRepository)
 		repoLocator := deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
 
-		domainRepo = &fakeapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
 		deps = command_registry.Dependency{

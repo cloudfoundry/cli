@@ -14,9 +14,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -39,7 +39,7 @@ var _ = Describe("start command", func() {
 		defaultInstanceErrorCodes []string
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []*logmessage.LogMessage
-		logRepo                   *testapi.FakeLogsRepository
+		logRepo                   *apifakes.FakeLogsRepository
 		appInstancesRepo          *app_instancesfakes.FakeAppInstancesRepository
 		appRepo                   *applicationsfakes.FakeApplicationRepository
 		originalAppCommand        command_registry.Command
@@ -140,7 +140,7 @@ var _ = Describe("start command", func() {
 			[]models.AppInstanceFields{instance3, instance4},
 		}
 
-		logRepo = &testapi.FakeLogsRepository{}
+		logRepo = new(apifakes.FakeLogsRepository)
 		logMessages = []*logmessage.LogMessage{}
 		logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 			c := make(chan *logmessage.LogMessage)
@@ -171,9 +171,7 @@ var _ = Describe("start command", func() {
 
 	callStartWithLoggingTimeout := func(args []string) (ui *testterm.FakeUI) {
 
-		logRepoWithTimeout := &testapi.FakeLogsRepositoryWithTimeout{}
-
-		updateCommandDependency(logRepoWithTimeout)
+		updateCommandDependency(new(apifakes.OldFakeLogsRepositoryWithTimeout))
 
 		cmd := command_registry.Commands.FindCommand("start").(*Start)
 		cmd.LogServerConnectionTimeout = 100 * time.Millisecond

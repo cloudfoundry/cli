@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("api command", func() {
 	var (
 		config              core_config.Repository
-		endpointRepo        *testapi.FakeEndpointRepository
+		endpointRepo        *apifakes.FakeEndpointRepository
 		deps                command_registry.Dependency
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
@@ -36,7 +36,7 @@ var _ = Describe("api command", func() {
 		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("api").SetDependency(deps, pluginCall))
 	}
 
-	callApi := func(args []string, config core_config.Repository, endpointRepo *testapi.FakeEndpointRepository) {
+	callApi := func(args []string, config core_config.Repository, endpointRepo *apifakes.FakeEndpointRepository) {
 		testcmd.RunCliCommand("api", args, requirementsFactory, updateCommandDependency, false)
 	}
 
@@ -45,7 +45,7 @@ var _ = Describe("api command", func() {
 		ui = new(testterm.FakeUI)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		config = testconfig.NewRepository()
-		endpointRepo = &testapi.FakeEndpointRepository{}
+		endpointRepo = new(apifakes.FakeEndpointRepository)
 		deps = command_registry.NewDependency(fakeLogger)
 	})
 

@@ -1,10 +1,10 @@
-package fakes
+package apifakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeServiceKeyRepo struct {
+type OldFakeServiceKeyRepo struct {
 	CreateServiceKeyMethod CreateServiceKeyType
 	ListServiceKeysMethod  ListServiceKeysType
 	GetServiceKeyMethod    GetServiceKeyType
@@ -40,8 +40,8 @@ type DeleteServiceKeyType struct {
 	Error error
 }
 
-func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
-	return &FakeServiceKeyRepo{
+func NewFakeServiceKeyRepo() *OldFakeServiceKeyRepo {
+	return &OldFakeServiceKeyRepo{
 		CreateServiceKeyMethod: CreateServiceKeyType{},
 		ListServiceKeysMethod:  ListServiceKeysType{},
 		GetServiceKeyMethod:    GetServiceKeyType{},
@@ -49,7 +49,7 @@ func NewFakeServiceKeyRepo() *FakeServiceKeyRepo {
 	}
 }
 
-func (f *FakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyName string, params map[string]interface{}) error {
+func (f *OldFakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyName string, params map[string]interface{}) error {
 	f.CreateServiceKeyMethod.InstanceGuid = instanceGuid
 	f.CreateServiceKeyMethod.KeyName = serviceKeyName
 	f.CreateServiceKeyMethod.Params = params
@@ -57,19 +57,19 @@ func (f *FakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyNam
 	return f.CreateServiceKeyMethod.Error
 }
 
-func (f *FakeServiceKeyRepo) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
+func (f *OldFakeServiceKeyRepo) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
 	f.ListServiceKeysMethod.InstanceGuid = instanceGuid
 
 	return f.ListServiceKeysMethod.ServiceKeys, f.ListServiceKeysMethod.Error
 }
 
-func (f *FakeServiceKeyRepo) GetServiceKey(instanceGuid string, serviceKeyName string) (models.ServiceKey, error) {
+func (f *OldFakeServiceKeyRepo) GetServiceKey(instanceGuid string, serviceKeyName string) (models.ServiceKey, error) {
 	f.GetServiceKeyMethod.InstanceGuid = instanceGuid
 
 	return f.GetServiceKeyMethod.ServiceKey, f.GetServiceKeyMethod.Error
 }
 
-func (f *FakeServiceKeyRepo) DeleteServiceKey(serviceKeyGuid string) error {
+func (f *OldFakeServiceKeyRepo) DeleteServiceKey(serviceKeyGuid string) error {
 	f.DeleteServiceKeyMethod.Guid = serviceKeyGuid
 
 	return f.DeleteServiceKeyMethod.Error

@@ -1,12 +1,12 @@
-package fakes
+package apifakes
 
 import "github.com/cloudfoundry/cli/cf/models"
 
-type FakeServiceSummaryRepo struct {
+type OldFakeServiceSummaryRepo struct {
 	GetSummariesInCurrentSpaceInstances []models.ServiceInstance
 }
 
-func (repo *FakeServiceSummaryRepo) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error) {
+func (repo *OldFakeServiceSummaryRepo) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error) {
 	instances = repo.GetSummariesInCurrentSpaceInstances
 	return
 }

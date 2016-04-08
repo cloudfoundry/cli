@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -26,8 +26,8 @@ var _ = Describe("create-service-key command", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
-		serviceKeyRepo      *testapi.FakeServiceKeyRepo
+		serviceRepo         *apifakes.FakeServiceRepository
+		serviceKeyRepo      *apifakes.OldFakeServiceKeyRepo
 		deps                command_registry.Dependency
 	)
 
@@ -42,12 +42,12 @@ var _ = Describe("create-service-key command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = &apifakes.FakeServiceRepository{}
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "fake-instance-guid"
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
-		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
+		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
 		requirementsFactory.ServiceInstance = serviceInstance
 	})

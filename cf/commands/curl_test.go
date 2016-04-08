@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -26,7 +26,7 @@ var _ = Describe("curl command", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		curlRepo            *testapi.FakeCurlRepository
+		curlRepo            *apifakes.OldFakeCurlRepository
 		deps                command_registry.Dependency
 	)
 
@@ -41,7 +41,7 @@ var _ = Describe("curl command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepository()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		curlRepo = &testapi.FakeCurlRepository{}
+		curlRepo = new(apifakes.OldFakeCurlRepository)
 
 		trace.LoggingToStdout = false
 	})

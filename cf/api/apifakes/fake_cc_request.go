@@ -1,4 +1,4 @@
-package fakes
+package apifakes
 
 import (
 	"net/http"

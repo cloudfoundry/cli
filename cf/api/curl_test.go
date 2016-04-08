@@ -3,7 +3,7 @@ package api_test
 import (
 	"net/http"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/net"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
@@ -27,7 +27,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 	Describe("GET requests", func() {
 		BeforeEach(func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/endpoint",
 				Response: testnet.TestResponse{
@@ -63,7 +63,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 	Describe("POST requests", func() {
 		BeforeEach(func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/endpoint",
 				Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
@@ -89,7 +89,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 		Context("when the server returns a 400 Bad Request header", func() {
 			BeforeEach(func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/endpoint",
 					Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
@@ -130,7 +130,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 
 		Context("when provided with valid headers", func() {
 			It("sends them along with the POST body", func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "POST",
 					Path:   "/v2/endpoint",
 					Matcher: func(req *http.Request) {

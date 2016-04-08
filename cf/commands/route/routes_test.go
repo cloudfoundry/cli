@@ -3,7 +3,7 @@ package route_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -23,8 +23,8 @@ import (
 var _ = Describe("routes command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		routeRepo           *testapi.FakeRouteRepository
-		domainRepo          *testapi.FakeDomainRepository
+		routeRepo           *apifakes.FakeRouteRepository
+		domainRepo          *apifakes.FakeDomainRepository
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -44,8 +44,8 @@ var _ = Describe("routes command", func() {
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 		}
-		routeRepo = new(testapi.FakeRouteRepository)
-		domainRepo = new(testapi.FakeDomainRepository)
+		routeRepo = new(apifakes.FakeRouteRepository)
+		domainRepo = new(apifakes.FakeDomainRepository)
 	})
 
 	runCommand := func(args ...string) bool {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -39,7 +39,7 @@ var _ = Describe("AppFilesRepository", func() {
 		listFilesServer := httptest.NewServer(http.HandlerFunc(listFilesEndpoint))
 		defer listFilesServer.Close()
 
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/apps/my-app-guid/instances/1/files/some/path",
 			Response: testnet.TestResponse{

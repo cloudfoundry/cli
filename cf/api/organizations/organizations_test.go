@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("Organization Repository", func() {
 	Describe("listing organizations", func() {
 		It("lists the orgs from the the /v2/orgs endpoint", func() {
-			firstPageOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			firstPageOrgsRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
@@ -38,7 +38,7 @@ var _ = Describe("Organization Repository", func() {
 	]}`},
 			})
 
-			secondPageOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			secondPageOrgsRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations?page=2",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
@@ -64,7 +64,7 @@ var _ = Describe("Organization Repository", func() {
 		})
 
 		It("does not call the provided function when there are no orgs found", func() {
-			emptyOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			emptyOrgsRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/organizations",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
@@ -168,7 +168,7 @@ var _ = Describe("Organization Repository", func() {
 
 	Describe(".GetManyOrgsByGuid", func() {
 		It("requests each org", func() {
-			firstOrgRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			firstOrgRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations/org1-guid",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
@@ -176,7 +176,7 @@ var _ = Describe("Organization Repository", func() {
 		  "entity": { "name": "Org1" }
 		}`},
 			})
-			secondOrgRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			secondOrgRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations/org2-guid",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
@@ -200,7 +200,7 @@ var _ = Describe("Organization Repository", func() {
 
 	Describe("finding organizations by name", func() {
 		It("returns the org with that name", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [{
@@ -255,7 +255,7 @@ var _ = Describe("Organization Repository", func() {
 		})
 
 		It("returns a ModelNotFoundError when the org cannot be found", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
@@ -270,7 +270,7 @@ var _ = Describe("Organization Repository", func() {
 		})
 
 		It("returns an api error when the response is not successful", func() {
-			requestHandler := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			requestHandler := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
 				Response: testnet.TestResponse{Status: http.StatusBadGateway, Body: `{"resources": []}`},
@@ -293,7 +293,7 @@ var _ = Describe("Organization Repository", func() {
 					Name: "my-org",
 				}}
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/organizations",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org"}`),
@@ -317,7 +317,7 @@ var _ = Describe("Organization Repository", func() {
 					},
 				}}
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/organizations",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org", "quota_definition_guid":"my-quota-guid"}`),
@@ -335,7 +335,7 @@ var _ = Describe("Organization Repository", func() {
 
 	Describe("renaming orgs", func() {
 		It("renames the org with the given guid", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/organizations/my-org-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-new-org"}`),
@@ -353,7 +353,7 @@ var _ = Describe("Organization Repository", func() {
 
 	Describe("deleting orgs", func() {
 		It("deletes the org with the given guid", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/organizations/my-org-guid?recursive=true",
 				Response: testnet.TestResponse{Status: http.StatusOK},
@@ -370,7 +370,7 @@ var _ = Describe("Organization Repository", func() {
 
 	Describe("SharePrivateDomain", func() {
 		It("shares the private domain with the given org", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/organizations/my-org-guid/private_domains/domain-guid",
 				Response: testnet.TestResponse{Status: http.StatusOK},
@@ -387,7 +387,7 @@ var _ = Describe("Organization Repository", func() {
 
 	Describe("UnsharePrivateDomain", func() {
 		It("unshares the private domain with the given org", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/organizations/my-org-guid/private_domains/domain-guid",
 				Response: testnet.TestResponse{Status: http.StatusOK},

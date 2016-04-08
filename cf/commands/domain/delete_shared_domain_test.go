@@ -1,7 +1,7 @@
 package domain_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -19,7 +19,7 @@ import (
 var _ = Describe("delete-shared-domain command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		domainRepo          *testapi.FakeDomainRepository
+		domainRepo          *apifakes.FakeDomainRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -34,7 +34,7 @@ var _ = Describe("delete-shared-domain command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		domainRepo = &testapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})

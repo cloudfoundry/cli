@@ -1,7 +1,7 @@
 package user_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -20,7 +20,7 @@ var _ = Describe("delete-user command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		userRepo            *testapi.FakeUserRepository
+		userRepo            *apifakes.FakeUserRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -34,7 +34,7 @@ var _ = Describe("delete-user command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 

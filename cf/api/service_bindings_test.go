@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -50,7 +50,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			})
 
 			JustBeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "POST",
 					Path:     "/v2/service_bindings",
 					Matcher:  requestMatcher,
@@ -92,7 +92,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 		Context("when an API error occurs", func() {
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/service_bindings",
 					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
@@ -118,7 +118,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			var serviceInstance models.ServiceInstance
 
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "DELETE",
 					Path:     "/v2/service_bindings/service-binding-2-guid",
 					Response: testnet.TestResponse{Status: http.StatusOK},

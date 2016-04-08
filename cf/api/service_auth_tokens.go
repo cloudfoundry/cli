@@ -12,6 +12,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServiceAuthTokenRepository
+
 type ServiceAuthTokenRepository interface {
 	FindAll() (authTokens []models.ServiceAuthTokenFields, apiErr error)
 	FindByLabelAndProvider(label, provider string) (authToken models.ServiceAuthTokenFields, apiErr error)

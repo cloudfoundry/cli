@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	cmdFakes "github.com/cloudfoundry/cli/cf/commands/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -179,7 +179,7 @@ var _ = Describe("SSH command", func() {
 
 			Context("error when getting SSH info from /v2/info", func() {
 				BeforeEach(func() {
-					getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					getRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/info",
 						Response: testnet.TestResponse{
@@ -209,7 +209,7 @@ var _ = Describe("SSH command", func() {
 				BeforeEach(func() {
 					sshCodeGetter.GetReturns("", errors.New("auth api error"))
 
-					getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					getRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/info",
 						Response: testnet.TestResponse{
@@ -248,7 +248,7 @@ var _ = Describe("SSH command", func() {
 
 				deps.WildcardDependency = fakeSecureShell
 
-				getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				getRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/info",
 					Response: testnet.TestResponse{

@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -25,8 +25,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 	var (
 		ui         *testterm.FakeUI
 		configRepo core_config.Repository
-		userRepo   *testapi.FakeUserRepository
-		spaceRepo  *testapi.FakeSpaceRepository
+		userRepo   *apifakes.FakeUserRepository
+		spaceRepo  *apifakes.FakeSpaceRepository
 		flagRepo   *feature_flagsfakes.FakeFeatureFlagRepository
 
 		cmd         command_registry.Command
@@ -42,9 +42,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		repoLocator := deps.RepoLocator.SetUserRepository(userRepo)
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		repoLocator = repoLocator.SetSpaceRepository(spaceRepo)
 		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
 		repoLocator = repoLocator.SetFeatureFlagRepository(flagRepo)

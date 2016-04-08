@@ -1,7 +1,7 @@
 package space_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +20,7 @@ var _ = Describe("rename-space command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		spaceRepo           *testapi.FakeSpaceRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("rename-space command", func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 	})
 
 	var callRenameSpace = func(args []string) bool {

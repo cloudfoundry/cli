@@ -1,7 +1,7 @@
 package buildpack_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("rename-buildpack command", func() {
 	var (
-		fakeRepo            *testapi.FakeBuildpackRepository
+		fakeRepo            *apifakes.OldFakeBuildpackRepository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
@@ -31,7 +31,7 @@ var _ = Describe("rename-buildpack command", func() {
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		ui = new(testterm.FakeUI)
-		fakeRepo = &testapi.FakeBuildpackRepository{}
+		fakeRepo = new(apifakes.OldFakeBuildpackRepository)
 	})
 
 	runCommand := func(args ...string) bool {

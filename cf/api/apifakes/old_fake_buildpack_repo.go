@@ -1,11 +1,11 @@
-package fakes
+package apifakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeBuildpackRepository struct {
+type OldFakeBuildpackRepository struct {
 	Buildpacks []models.Buildpack
 
 	FindByNameNotFound    bool
@@ -29,14 +29,14 @@ type FakeBuildpackRepository struct {
 	}
 }
 
-func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
+func (repo *OldFakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	for _, b := range repo.Buildpacks {
 		cb(b)
 	}
 	return nil
 }
 
-func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
+func (repo *OldFakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
 	repo.FindByNameName = name
 	buildpack = repo.FindByNameBuildpack
 
@@ -47,7 +47,7 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.B
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
+func (repo *OldFakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, errors.NewHttpError(400, errors.BuildpackNameTaken, "Buildpack already exists")
 	}
@@ -56,13 +56,13 @@ func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled 
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
-func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
+func (repo *OldFakeBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
 	repo.DeleteBuildpackGuid = buildpackGuid
 	apiErr = repo.DeleteApiResponse
 	return
 }
 
-func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
+func (repo *OldFakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
 	repo.UpdateBuildpackArgs.Buildpack = buildpack
 	apiErr = repo.UpdateBuildpackReturns.Error
 	return

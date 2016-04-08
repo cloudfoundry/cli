@@ -1,7 +1,7 @@
 package buildpack_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("ListBuildpacks", func() {
 	var (
 		ui                  *testterm.FakeUI
-		buildpackRepo       *testapi.FakeBuildpackRepository
+		buildpackRepo       *apifakes.OldFakeBuildpackRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -31,7 +31,7 @@ var _ = Describe("ListBuildpacks", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		buildpackRepo = &testapi.FakeBuildpackRepository{}
+		buildpackRepo = new(apifakes.OldFakeBuildpackRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

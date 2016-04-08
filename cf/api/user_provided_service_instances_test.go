@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,7 +20,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 
 	Context("Create()", func() {
 		It("creates a user provided service with a name and credentials", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/user_provided_service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"","route_service_url":""}`),
@@ -40,7 +40,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 		})
 
 		It("creates user provided service instances with syslog drains", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/user_provided_service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"syslog://example.com","route_service_url":""}`),
@@ -60,7 +60,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 		})
 
 		It("creates user provided service instances with route service url", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/user_provided_service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"","route_service_url":"https://example.com"}`),
@@ -82,7 +82,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 
 	Context("Update()", func() {
 		It("can update a user provided service, given a service instance with a guid", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/user_provided_service_instances/my-instance-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com","route_service_url":""}`),
@@ -158,7 +158,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
    ]
 }`}
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/user_provided_service_instances",
 				Response: responseStr,

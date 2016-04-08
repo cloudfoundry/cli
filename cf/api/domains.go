@@ -14,7 +14,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter -o fakes/fake_domain_repository.go . DomainRepository
+//go:generate counterfeiter . DomainRepository
+
 type DomainRepository interface {
 	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error
 	FindSharedByName(name string) (domain models.DomainFields, apiErr error)

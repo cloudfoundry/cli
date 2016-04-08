@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	testManifest "github.com/cloudfoundry/cli/cf/manifest/fakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
@@ -28,7 +28,7 @@ var _ = Describe("CreateAppManifest", func() {
 	var (
 		ui             *testterm.FakeUI
 		configRepo     core_config.Repository
-		appSummaryRepo *testapi.FakeAppSummaryRepository
+		appSummaryRepo *apifakes.FakeAppSummaryRepository
 		stackRepo      *stacksfakes.FakeStackRepository
 
 		cmd         command_registry.Command
@@ -46,7 +46,7 @@ var _ = Describe("CreateAppManifest", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		appSummaryRepo = &testapi.FakeAppSummaryRepository{}
+		appSummaryRepo = new(apifakes.FakeAppSummaryRepository)
 		repoLocator := deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
 		stackRepo = new(stacksfakes.FakeStackRepository)
 		repoLocator = repoLocator.SetStackRepository(stackRepo)

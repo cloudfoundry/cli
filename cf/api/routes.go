@@ -16,6 +16,7 @@ import (
 )
 
 //go:generate counterfeiter . RouteRepository
+
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)

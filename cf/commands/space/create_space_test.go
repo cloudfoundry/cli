@@ -1,7 +1,7 @@
 package space_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
@@ -27,9 +27,9 @@ var _ = Describe("create-space command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		configOrg           models.OrganizationFields
 		configRepo          core_config.Repository
-		spaceRepo           *testapi.FakeSpaceRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		userRepo            *testapi.FakeUserRepository
+		userRepo            *apifakes.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
 		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
 		spaceQuotaRepo      *space_quotasfakes.FakeSpaceQuotaRepository
@@ -61,7 +61,7 @@ var _ = Describe("create-space command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
 		spaceQuotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
 		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
@@ -75,7 +75,7 @@ var _ = Describe("create-space command", func() {
 		//save original command and restore later
 		OriginalCommand = command_registry.Commands.FindCommand("set-space-role")
 
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		space := maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid", "organization": configOrg})
 		spaceRepo.CreateReturns(space, nil)
 	})

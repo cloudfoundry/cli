@@ -10,6 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . UserProvidedServiceInstanceRepository
+
 type UserProvidedServiceInstanceRepository interface {
 	Create(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error)
 	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)

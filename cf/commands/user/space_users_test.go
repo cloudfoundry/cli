@@ -3,7 +3,7 @@ package user_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -23,8 +23,8 @@ var _ = Describe("space-users command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		spaceRepo           *testapi.FakeSpaceRepository
-		userRepo            *testapi.FakeUserRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
+		userRepo            *apifakes.FakeUserRepository
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
 	)
@@ -42,8 +42,8 @@ var _ = Describe("space-users command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
-		userRepo = &testapi.FakeUserRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
+		userRepo = new(apifakes.FakeUserRepository)
 		deps = command_registry.NewDependency(new(fakes.FakePrinter))
 	})
 

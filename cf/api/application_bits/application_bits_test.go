@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"

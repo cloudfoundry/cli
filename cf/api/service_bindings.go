@@ -9,6 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServiceBindingRepository
+
 type ServiceBindingRepository interface {
 	Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error)
 	Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error)

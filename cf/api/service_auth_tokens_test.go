@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -44,7 +44,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 
 	Describe("Create", func() {
 		It("creates a service auth token", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/service_auth_tokens",
 				Matcher:  testnet.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
@@ -63,7 +63,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 	})
 
 	Describe("FindAll", func() {
-		var firstServiceAuthTokenRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		var firstServiceAuthTokenRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/service_auth_tokens",
 			Response: testnet.TestResponse{
@@ -86,7 +86,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 			},
 		})
 
-		var secondServiceAuthTokenRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		var secondServiceAuthTokenRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/service_auth_tokens",
 			Response: testnet.TestResponse{
@@ -142,7 +142,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 	Describe("FindByLabelAndProvider", func() {
 		Context("when the auth token exists", func() {
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/service_auth_tokens?q=label%3Aa-label%3Bprovider%3Aa-provider",
 					Response: testnet.TestResponse{
@@ -174,7 +174,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 
 		Context("when the auth token does not exist", func() {
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/service_auth_tokens?q=label%3Aa-label%3Bprovider%3Aa-provider",
 					Response: testnet.TestResponse{
@@ -194,7 +194,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 
 	Describe("Update", func() {
 		It("updates the service auth token", func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_auth_tokens/mysql-core-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"token":"a value"}`),
@@ -214,7 +214,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 	Describe("Delete", func() {
 		It("deletes the service auth token", func() {
 
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/service_auth_tokens/mysql-core-guid",
 				Response: testnet.TestResponse{Status: http.StatusOK},

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -75,7 +75,7 @@ var _ = Describe("AppInstancesRepo", func() {
 	})
 })
 
-var appStatsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var appStatsRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-cool-app-guid/stats",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -104,7 +104,7 @@ var appStatsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
   }
 }`}})
 
-var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var appInstancesRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-cool-app-guid/instances",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -120,13 +120,13 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
   }
 }`}})
 
-var deleteInstanceRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var deleteInstanceRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "DELETE",
 	Path:     "/v2/apps/my-cool-app-guid/instances/0",
 	Response: testnet.TestResponse{Status: http.StatusNoContent, Body: `{}`},
 })
 
-var deleteInstanceFromUnkownApp = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var deleteInstanceFromUnkownApp = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "DELETE",
 	Path:     "/v2/apps/some-wrong-app-guid/instances/0",
 	Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{}`},

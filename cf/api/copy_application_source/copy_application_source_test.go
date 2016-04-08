@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	. "github.com/cloudfoundry/cli/cf/api/copy_application_source"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -39,7 +39,7 @@ var _ = Describe("CopyApplicationSource", func() {
 
 	Describe(".CopyApplication", func() {
 		BeforeEach(func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "POST",
 				Path:   "/v2/apps/target-app-guid/copy_bits",
 				Matcher: testnet.RequestBodyMatcher(`{

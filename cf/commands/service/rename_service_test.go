@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,7 +19,7 @@ var _ = Describe("rename-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		serviceRepo         *testapi.FakeServiceRepository
+		serviceRepo         *apifakes.FakeServiceRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -34,7 +34,7 @@ var _ = Describe("rename-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

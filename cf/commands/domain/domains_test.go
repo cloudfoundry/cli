@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -25,8 +25,8 @@ import (
 var _ = Describe("ListDomains", func() {
 	var (
 		ui             *testterm.FakeUI
-		routingApiRepo *fakeapi.FakeRoutingApiRepository
-		domainRepo     *fakeapi.FakeDomainRepository
+		routingApiRepo *apifakes.FakeRoutingApiRepository
+		domainRepo     *apifakes.FakeDomainRepository
 		configRepo     core_config.Repository
 
 		cmd         domain.ListDomains
@@ -44,10 +44,10 @@ var _ = Describe("ListDomains", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routingApiRepo = &fakeapi.FakeRoutingApiRepository{}
+		routingApiRepo = new(apifakes.FakeRoutingApiRepository)
 		repoLocator := deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
 
-		domainRepo = &fakeapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
 		deps = command_registry.Dependency{

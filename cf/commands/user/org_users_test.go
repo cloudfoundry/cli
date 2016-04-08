@@ -1,7 +1,7 @@
 package user_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ var _ = Describe("org-users command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		userRepo            *testapi.FakeUserRepository
+		userRepo            *apifakes.FakeUserRepository
 		deps                command_registry.Dependency
 	)
 
@@ -36,7 +36,7 @@ var _ = Describe("org-users command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		deps = command_registry.NewDependency(new(fakes.FakePrinter))

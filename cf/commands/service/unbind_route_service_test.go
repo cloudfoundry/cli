@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -26,8 +26,8 @@ var _ = Describe("UnbindRouteService", func() {
 	var (
 		ui                      *testterm.FakeUI
 		configRepo              core_config.Repository
-		routeRepo               *testapi.FakeRouteRepository
-		routeServiceBindingRepo *testapi.FakeRouteServiceBindingRepository
+		routeRepo               *apifakes.FakeRouteRepository
+		routeServiceBindingRepo *apifakes.FakeRouteServiceBindingRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -46,10 +46,10 @@ var _ = Describe("UnbindRouteService", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		routeServiceBindingRepo = &testapi.FakeRouteServiceBindingRepository{}
+		routeServiceBindingRepo = new(apifakes.FakeRouteServiceBindingRepository)
 		repoLocator = repoLocator.SetRouteServiceBindingRepository(routeServiceBindingRepo)
 
 		deps = command_registry.Dependency{

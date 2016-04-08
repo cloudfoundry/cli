@@ -2,7 +2,7 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -24,7 +24,7 @@ import (
 var _ = Describe("target command", func() {
 	var (
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		spaceRepo           *testapi.FakeSpaceRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
 		ui                  *testterm.FakeUI
@@ -55,7 +55,7 @@ var _ = Describe("target command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory.ApiEndpointSuccess = true

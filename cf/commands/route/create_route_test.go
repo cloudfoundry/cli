@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
@@ -27,7 +27,7 @@ import (
 var _ = Describe("CreateRoute", func() {
 	var (
 		ui         *testterm.FakeUI
-		routeRepo  *fakeapi.FakeRouteRepository
+		routeRepo  *apifakes.FakeRouteRepository
 		configRepo core_config.Repository
 
 		cmd         command_registry.Command
@@ -43,7 +43,7 @@ var _ = Describe("CreateRoute", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = &fakeapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
 		deps = command_registry.Dependency{

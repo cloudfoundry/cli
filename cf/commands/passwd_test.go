@@ -1,7 +1,7 @@
 package commands_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -121,14 +121,14 @@ var _ = Describe("password command", func() {
 
 type passwordDeps struct {
 	ReqFactory *testreq.FakeReqFactory
-	PwdRepo    *testapi.FakePasswordRepo
+	PwdRepo    *apifakes.OldFakePasswordRepo
 	Config     core_config.Repository
 }
 
 func getPasswordDeps() passwordDeps {
 	return passwordDeps{
 		ReqFactory: &testreq.FakeReqFactory{LoginSuccess: true},
-		PwdRepo:    &testapi.FakePasswordRepo{UpdateUnauthorized: true},
+		PwdRepo:    &apifakes.OldFakePasswordRepo{UpdateUnauthorized: true},
 		Config:     testconfig.NewRepository(),
 	}
 }

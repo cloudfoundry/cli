@@ -7,7 +7,7 @@ import (
 
 	"github.com/blang/semver"
 	plan_builderfakes "github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -29,7 +29,7 @@ var _ = Describe("update-service command", func() {
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
+		serviceRepo         *apifakes.FakeServiceRepository
 		planBuilder         *plan_builderfakes.FakePlanBuilder
 		offering1           models.ServiceOffering
 		deps                command_registry.Dependency
@@ -54,7 +54,7 @@ var _ = Describe("update-service command", func() {
 			MinAPIVersionSuccess: true,
 		}
 
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		planBuilder = new(plan_builderfakes.FakePlanBuilder)
 
 		offering1 = models.ServiceOffering{}

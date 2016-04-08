@@ -1,17 +1,17 @@
-package fakes
+package apifakes
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeBuildpackBitsRepository struct {
+type OldFakeBuildpackBitsRepository struct {
 	UploadBuildpackErr         bool
 	UploadBuildpackApiResponse error
 	UploadBuildpackPath        string
 }
 
-func (repo *FakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) error {
+func (repo *OldFakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) error {
 	if repo.UploadBuildpackErr {
 		return errors.New("Invalid buildpack")
 	}

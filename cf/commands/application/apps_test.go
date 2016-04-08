@@ -1,7 +1,7 @@
 package application_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -23,7 +23,7 @@ var _ = Describe("list-apps command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		appSummaryRepo      *testapi.FakeAppSummaryRepo
+		appSummaryRepo      *apifakes.OldFakeAppSummaryRepo
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -37,7 +37,7 @@ var _ = Describe("list-apps command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
+		appSummaryRepo = new(apifakes.OldFakeAppSummaryRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,

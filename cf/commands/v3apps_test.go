@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	"github.com/cloudfoundry/cli/cf/v3/models"
 	fakerepository "github.com/cloudfoundry/cli/cf/v3/repository/fakes"
@@ -26,7 +26,7 @@ import (
 var _ = Describe("V3Apps", func() {
 	var (
 		ui         *testterm.FakeUI
-		routeRepo  *fakeapi.FakeRouteRepository
+		routeRepo  *apifakes.FakeRouteRepository
 		configRepo core_config.Repository
 		repository *fakerepository.FakeRepository
 
@@ -42,7 +42,7 @@ var _ = Describe("V3Apps", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 
-		routeRepo = &fakeapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 		repository = &fakerepository.FakeRepository{}
 		repoLocator = repoLocator.SetV3Repository(repository)

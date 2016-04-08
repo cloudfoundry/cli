@@ -1,7 +1,7 @@
 package servicebroker_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +20,7 @@ var _ = Describe("update-service-broker command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
-		serviceBrokerRepo   *testapi.FakeServiceBrokerRepository
+		serviceBrokerRepo   *apifakes.FakeServiceBrokerRepository
 		deps                command_registry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("update-service-broker command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		serviceBrokerRepo = &testapi.FakeServiceBrokerRepository{}
+		serviceBrokerRepo = new(apifakes.FakeServiceBrokerRepository)
 	})
 
 	runCommand := func(args ...string) bool {

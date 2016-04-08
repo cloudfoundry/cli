@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
@@ -40,7 +40,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 
 		It("returns a failure response when the app is not found", func() {
-			request := testapi.NewCloudControllerTestRequest(findAppRequest)
+			request := apifakes.NewCloudControllerTestRequest(findAppRequest)
 			request.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
@@ -54,7 +54,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 	Describe(".GetApp", func() {
 		It("returns an application using the given app guid", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/apps/app-guid",
 				Response: appModelResponse,
@@ -71,7 +71,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 	Describe(".ReadFromSpace", func() {
 		It("returns an application using the given space guid", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/another-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
 				Response: singleAppResponse,
@@ -210,7 +210,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			Context("when there are system provided env vars", func() {
 				BeforeEach(func() {
 
-					var appEnvRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					var appEnvRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/apps/some-cool-app-guid/env",
 						Response: testnet.TestResponse{
@@ -271,7 +271,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			Context("when there are no environment variables", func() {
 				BeforeEach(func() {
-					var emptyEnvRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					var emptyEnvRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/apps/some-cool-app-guid/env",
 						Response: testnet.TestResponse{
@@ -295,7 +295,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 	Describe("restaging applications", func() {
 		It("POSTs to the right URL", func() {
-			appRestageRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			appRestageRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "POST",
 				Path:   "/v2/apps/some-cool-app-guid/restage",
 				Response: testnet.TestResponse{
@@ -342,7 +342,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 
 		It("sets environment variables", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/apps/app1-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
@@ -362,7 +362,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 
 		It("can remove environment variables", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/apps/app1-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"environment_json":{}}`),
@@ -383,7 +383,7 @@ var _ = Describe("ApplicationsRepository", func() {
 	})
 
 	It("deletes applications", func() {
-		deleteApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		deleteApplicationRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "DELETE",
 			Path:     "/v2/apps/my-cool-app-guid?recursive=true",
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: ""},
@@ -495,7 +495,7 @@ var singleAppResponse = testnet.TestResponse{
   ]
 }`}
 
-var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var findAppRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "GET",
 	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
 	Response: singleAppResponse,
@@ -511,7 +511,7 @@ var createApplicationResponse = `
     }
 }`
 
-var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var createApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "POST",
 	Path:   "/v2/apps",
 	Matcher: testnet.RequestBodyMatcher(`{
@@ -563,7 +563,7 @@ var updateApplicationResponse = `
     }
 }`
 
-var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var updateApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "PUT",
 	Path:   "/v2/apps/my-app-guid?inline-relations-depth=1",
 	Matcher: testnet.RequestBodyMatcher(`{

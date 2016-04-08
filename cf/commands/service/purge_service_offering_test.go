@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -23,7 +23,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 	var (
 		ui          *testterm.FakeUI
 		configRepo  core_config.Repository
-		serviceRepo *testapi.FakeServiceRepository
+		serviceRepo *apifakes.FakeServiceRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -37,7 +37,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		repoLocator := deps.RepoLocator.SetServiceRepository(serviceRepo)
 
 		deps = command_registry.Dependency{

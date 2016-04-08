@@ -7,9 +7,9 @@ import (
 	"syscall"
 
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	fakeappfiles "github.com/cloudfoundry/cli/cf/app_files/fakes"
@@ -47,10 +47,10 @@ var _ = Describe("Push Command", func() {
 		stopper                    *appCmdFakes.FakeApplicationStopper
 		serviceBinder              *serviceCmdFakes.FakeAppBinder
 		appRepo                    *applicationsfakes.FakeApplicationRepository
-		domainRepo                 *testapi.FakeDomainRepository
-		routeRepo                  *testapi.FakeRouteRepository
+		domainRepo                 *apifakes.FakeDomainRepository
+		routeRepo                  *apifakes.FakeRouteRepository
 		stackRepo                  *stacksfakes.FakeStackRepository
-		serviceRepo                *testapi.FakeServiceRepository
+		serviceRepo                *apifakes.FakeServiceRepository
 		wordGenerator              *testwords.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *authenticationfakes.FakeAuthenticationRepository
@@ -106,7 +106,7 @@ var _ = Describe("Push Command", func() {
 
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
 
-		domainRepo = &testapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
 		domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
 			cb(sharedDomain)
@@ -136,7 +136,7 @@ var _ = Describe("Push Command", func() {
 		OriginalCommandStop = command_registry.Commands.FindCommand("stop")
 		OriginalCommandServiceBind = command_registry.Commands.FindCommand("bind-service")
 
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		routeRepo.CreateStub = func(host string, domain models.DomainFields, path string, _ bool) (models.Route, error) {
 			// This never returns an error, which means it isn't tested.
 			// This is copied from the old route repo fake.
@@ -150,7 +150,7 @@ var _ = Describe("Push Command", func() {
 		}
 
 		stackRepo = new(stacksfakes.FakeStackRepository)
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		wordGenerator = new(testwords.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")

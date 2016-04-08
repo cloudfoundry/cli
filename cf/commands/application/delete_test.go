@@ -1,8 +1,8 @@
 package application_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -23,7 +23,7 @@ var _ = Describe("delete app command", func() {
 		app                 models.Application
 		configRepo          core_config.Repository
 		appRepo             *applicationsfakes.FakeApplicationRepository
-		routeRepo           *testapi.FakeRouteRepository
+		routeRepo           *apifakes.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -43,7 +43,7 @@ var _ = Describe("delete app command", func() {
 
 		ui = &testterm.FakeUI{}
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()

@@ -1,7 +1,7 @@
 package domain_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -20,7 +20,7 @@ var _ = Describe("delete-domain command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          core_config.Repository
-		domainRepo          *testapi.FakeDomainRepository
+		domainRepo          *apifakes.FakeDomainRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)
@@ -37,7 +37,7 @@ var _ = Describe("delete-domain command", func() {
 			Inputs: []string{"yes"},
 		}
 
-		domainRepo = &testapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:       true,
 			TargetedOrgSuccess: true,
