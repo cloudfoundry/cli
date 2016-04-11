@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	testssh "github.com/cloudfoundry/cli/cf/ssh/fakes"
+	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -36,7 +36,7 @@ var _ = Describe("SSH command", func() {
 		deps                command_registry.Dependency
 		ccGateway           net.Gateway
 
-		fakeSecureShell *testssh.FakeSecureShell
+		fakeSecureShell *sshfakes.FakeSecureShell
 	)
 
 	BeforeEach(func() {
@@ -244,7 +244,7 @@ var _ = Describe("SSH command", func() {
 			})
 
 			BeforeEach(func() {
-				fakeSecureShell = &testssh.FakeSecureShell{}
+				fakeSecureShell = new(sshfakes.FakeSecureShell)
 
 				deps.WildcardDependency = fakeSecureShell
 
