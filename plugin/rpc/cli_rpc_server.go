@@ -42,9 +42,12 @@ type CliRpcCmd struct {
 }
 
 //go:generate counterfeiter . TerminalOutputSwitch
+
 type TerminalOutputSwitch interface {
 	DisableTerminalOutput(bool)
 }
+
+//go:generate counterfeiter . OutputCapture
 
 type OutputCapture interface {
 	SetOutputBucket(io.Writer)
