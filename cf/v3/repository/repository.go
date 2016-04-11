@@ -9,7 +9,8 @@ import (
 	"github.com/cloudfoundry/go-ccapi/v3/client"
 )
 
-//go:generate counterfeiter -o fakes/fake_repository.go . Repository
+//go:generate counterfeiter . Repository
+
 type Repository interface {
 	GetApplications() ([]models.V3Application, error)
 	GetProcesses(path string) ([]models.V3Process, error)

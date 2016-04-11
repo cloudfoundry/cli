@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	"github.com/cloudfoundry/cli/cf/v3/models"
-	fakerepository "github.com/cloudfoundry/cli/cf/v3/repository/fakes"
+	"github.com/cloudfoundry/cli/cf/v3/repository/repositoryfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -28,7 +28,7 @@ var _ = Describe("V3Apps", func() {
 		ui         *testterm.FakeUI
 		routeRepo  *apifakes.FakeRouteRepository
 		configRepo core_config.Repository
-		repository *fakerepository.FakeRepository
+		repository *repositoryfakes.FakeRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -44,7 +44,7 @@ var _ = Describe("V3Apps", func() {
 
 		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
-		repository = &fakerepository.FakeRepository{}
+		repository = new(repositoryfakes.FakeRepository)
 		repoLocator = repoLocator.SetV3Repository(repository)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
