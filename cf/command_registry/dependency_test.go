@@ -2,7 +2,7 @@ package command_registry_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,7 +12,7 @@ var _ = Describe("Dependency", func() {
 	var dependency command_registry.Dependency
 
 	It("populates all fields by calling all the dependency contructors", func() {
-		fakeLogger := new(fakes.FakePrinter)
+		fakeLogger := new(tracefakes.FakePrinter)
 		dependency = command_registry.NewDependency(fakeLogger)
 
 		Expect(dependency.Ui).ToNot(BeNil())

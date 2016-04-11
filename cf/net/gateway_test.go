@@ -19,7 +19,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/net/netfakes"
-	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -47,9 +47,9 @@ var _ = Describe("Gateway", func() {
 		clock = func() time.Time { return currentTime }
 		config = testconfig.NewRepository()
 
-		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
+		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		ccGateway.PollingThrottle = 3 * time.Millisecond
-		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
+		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	})
 
 	Describe("async timeout", func() {
@@ -680,11 +680,11 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")
 
-	authGateway := NewUAAGateway(config, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
+	authGateway := NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
-	fakePrinter := *new(traceFakes.FakePrinter)
-	dumper := NewRequestDumper(&fakePrinter)
+	fakePrinter := new(tracefakes.FakePrinter)
+	dumper := NewRequestDumper(fakePrinter)
 	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config, dumper)
 
 	return config, authenticator

@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -31,10 +31,10 @@ var invalidTokenRoutingApiRequest = func(writer http.ResponseWriter, request *ht
 var _ = Describe("Routing Api Gateway", func() {
 	var gateway Gateway
 	var config core_config.Reader
-	var fakeLogger *fakes.FakePrinter
+	var fakeLogger *tracefakes.FakePrinter
 
 	BeforeEach(func() {
-		fakeLogger = new(fakes.FakePrinter)
+		fakeLogger = new(tracefakes.FakePrinter)
 		config = testconfig.NewRepository()
 		gateway = NewRoutingApiGateway(config, time.Now, &testterm.FakeUI{}, fakeLogger)
 	})
