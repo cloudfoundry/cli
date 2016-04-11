@@ -17,6 +17,8 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"strings"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -81,6 +83,35 @@ var _ = Describe("UnmapRoute", func() {
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
+	})
+
+	Describe("Help text", func() {
+		var usage []string
+
+		BeforeEach(func() {
+			cmd := &route.UnmapRoute{}
+			up := command_registry.CliCommandUsagePresenter(cmd)
+
+			usage = strings.Split(up.Usage(), "\n")
+		})
+
+		It("contains an example", func() {
+			Expect(usage).To(ContainElement("   cf unmap-route my-app example.com --port 5000                  # example.com:5000"))
+		})
+
+		It("contains the options", func() {
+			Expect(usage).To(ContainElement("   --hostname, -n      Hostname used to identify the HTTP route"))
+			Expect(usage).To(ContainElement("   --path              Path used to identify the HTTP route"))
+			Expect(usage).To(ContainElement("   --port              Port used to identify the TCP route"))
+		})
+
+		It("shows the usage", func() {
+			Expect(usage).To(ContainElement("   Unmap an HTTP route:"))
+			Expect(usage).To(ContainElement("      cf unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"))
+
+			Expect(usage).To(ContainElement("   Unmap a TCP route:"))
+			Expect(usage).To(ContainElement("      cf unmap-route APP_NAME DOMAIN --port PORT"))
+		})
 	})
 
 	Describe("Requirements", func() {

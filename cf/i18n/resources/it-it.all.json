@@ -964,10 +964,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": ""
   },
@@ -2364,8 +2360,8 @@
     "translation": ""
   },
   {
-    "id": "Hostname used to identify the route",
-    "translation": "Hostname for the route"
+    "id": "Hostname used to identify the HTTP route",
+    "translation": ""
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -3225,10 +3221,6 @@
   },
   {
     "id": "Path used to identify the HTTP route",
-    "translation": ""
-  },
-  {
-    "id": "Path used to identify the route",
     "translation": ""
   },
   {
@@ -4318,6 +4310,14 @@
   {
     "id": "Unlock the buildpack to enable updates",
     "translation": "Sblocca il pacchetto di build per abilitare gli aggiornamenti"
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": ""
   },
   {
     "id": "Unsetting api endpoint...",
