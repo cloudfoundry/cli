@@ -5,6 +5,7 @@ type RouteSummary struct {
 	Host   string
 	Domain DomainFields
 	Path   string
+	Port   int
 }
 
 func (r RouteSummary) URL() string {
@@ -12,5 +13,6 @@ func (r RouteSummary) URL() string {
 		Host:   r.Host,
 		Domain: r.Domain.Name,
 		Path:   r.Path,
+		Port:   r.Port,
 	}).URL()
 }
