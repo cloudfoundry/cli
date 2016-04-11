@@ -9,11 +9,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -32,11 +32,11 @@ var _ = Describe("CreateRoute", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
-		spaceRequirement         *fakerequirements.FakeSpaceRequirement
-		domainRequirement        *fakerequirements.FakeDomainRequirement
+		spaceRequirement         *requirementsfakes.FakeSpaceRequirement
+		domainRequirement        *requirementsfakes.FakeDomainRequirement
 		minAPIVersionRequirement requirements.Requirement
 	)
 
@@ -57,16 +57,16 @@ var _ = Describe("CreateRoute", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
-		spaceRequirement = &fakerequirements.FakeSpaceRequirement{}
+		spaceRequirement = new(requirementsfakes.FakeSpaceRequirement)
 		space := models.Space{}
 		space.Guid = "space-guid"
 		space.Name = "space-name"
 		spaceRequirement.GetSpaceReturns(space)
 		factory.NewSpaceRequirementReturns(spaceRequirement)
 
-		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		domainRequirement.GetDomainReturns(models.DomainFields{
 			Guid: "domain-guid",
 			Name: "domain-name",

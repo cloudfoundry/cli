@@ -7,11 +7,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -29,7 +29,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		endpointRequirement requirements.Requirement
@@ -56,7 +56,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		endpointRequirement = &passingRequirement{Name: "endpoint-requirement"}
 		factory.NewApiEndpointRequirementReturns(endpointRequirement)

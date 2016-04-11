@@ -9,10 +9,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -30,12 +30,12 @@ var _ = Describe("UnmapRoute", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
-		applicationRequirement   *fakerequirements.FakeApplicationRequirement
-		domainRequirement        *fakerequirements.FakeDomainRequirement
+		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
+		domainRequirement        *requirementsfakes.FakeDomainRequirement
 		minAPIVersionRequirement requirements.Requirement
 
 		fakeDomain models.DomainFields
@@ -58,19 +58,19 @@ var _ = Describe("UnmapRoute", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
+		applicationRequirement = new(requirementsfakes.FakeApplicationRequirement)
 		factory.NewApplicationRequirementReturns(applicationRequirement)
 
 		fakeApplication := models.Application{}
 		fakeApplication.Guid = "fake-app-guid"
 		applicationRequirement.GetApplicationReturns(fakeApplication)
 
-		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{

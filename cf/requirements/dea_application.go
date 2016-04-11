@@ -7,7 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter -o fakes/fake_dea_application_requirement.go . DEAApplicationRequirement
+//go:generate counterfeiter . DEAApplicationRequirement
+
 type DEAApplicationRequirement interface {
 	Requirement
 	GetApplication() models.Application

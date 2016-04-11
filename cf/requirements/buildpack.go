@@ -5,6 +5,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
+//go:generate counterfeiter . BuildpackRequirement
+
 type BuildpackRequirement interface {
 	Requirement
 	GetBuildpack() models.Buildpack

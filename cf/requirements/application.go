@@ -5,7 +5,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-//go:generate counterfeiter -o fakes/fake_application_requirement.go . ApplicationRequirement
+//go:generate counterfeiter . ApplicationRequirement
+
 type ApplicationRequirement interface {
 	Requirement
 	GetApplication() models.Application

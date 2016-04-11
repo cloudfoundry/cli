@@ -11,10 +11,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -31,12 +31,12 @@ var _ = Describe("UpdateUserProvidedService", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement           requirements.Requirement
 		minAPIVersionRequirement   requirements.Requirement
-		serviceInstanceRequirement *fakerequirements.FakeServiceInstanceRequirement
+		serviceInstanceRequirement *requirementsfakes.FakeServiceInstanceRequirement
 	)
 
 	BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 		cmd.SetDependency(deps, false)
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
@@ -63,7 +63,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 
-		serviceInstanceRequirement = &fakerequirements.FakeServiceInstanceRequirement{}
+		serviceInstanceRequirement = new(requirementsfakes.FakeServiceInstanceRequirement)
 		factory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
 	})
 
