@@ -94,6 +94,8 @@ func (resource ApplicationFromSummary) ToModel() models.Application {
 type RouteSummary struct {
 	Guid   string
 	Host   string
+	Path   string
+	Port   int
 	Domain DomainSummary
 }
 
@@ -105,6 +107,8 @@ func (resource RouteSummary) ToModel() (route models.RouteSummary) {
 
 	route.Guid = resource.Guid
 	route.Host = resource.Host
+	route.Path = resource.Path
+	route.Port = resource.Port
 	route.Domain = domain
 	return
 }
