@@ -251,7 +251,7 @@ var _ = Describe("Server", func() {
 		var terminalOutputSwitch *rpcfakes.FakeTerminalOutputSwitch
 
 		BeforeEach(func() {
-			terminalOutputSwitch = &rpcfakes.FakeTerminalOutputSwitch{}
+			terminalOutputSwitch = new(rpcfakes.FakeTerminalOutputSwitch)
 			rpcService, err = NewRpcService(nil, terminalOutputSwitch, nil, api.RepositoryLocator{}, nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -283,7 +283,7 @@ var _ = Describe("Server", func() {
 			outputCapture := terminal.NewTeePrinter()
 			terminalOutputSwitch := terminal.NewTeePrinter()
 
-			runner = &rpcfakes.FakeCommandRunner{}
+			runner = new(rpcfakes.FakeCommandRunner)
 			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner, nil)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -428,7 +428,7 @@ var _ = Describe("Server", func() {
 			BeforeEach(func() {
 
 				outputCapture := terminal.NewTeePrinter()
-				runner = &rpcfakes.FakeCommandRunner{}
+				runner = new(rpcfakes.FakeCommandRunner)
 
 				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, runner, nil)
 				Expect(err).ToNot(HaveOccurred())

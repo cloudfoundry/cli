@@ -7,6 +7,7 @@ import (
 )
 
 //go:generate counterfeiter . CommandRunner
+
 type CommandRunner interface {
 	Command([]string, command_registry.Dependency, bool) error
 }
