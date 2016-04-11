@@ -28,7 +28,7 @@ import (
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	testwords "github.com/cloudfoundry/cli/words/generator/fakes"
+	"github.com/cloudfoundry/cli/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -51,7 +51,7 @@ var _ = Describe("Push Command", func() {
 		routeRepo                  *apifakes.FakeRouteRepository
 		stackRepo                  *stacksfakes.FakeStackRepository
 		serviceRepo                *apifakes.FakeServiceRepository
-		wordGenerator              *testwords.FakeWordGenerator
+		wordGenerator              *generatorfakes.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *authenticationfakes.FakeAuthenticationRepository
 		actor                      *actorsfakes.FakePushActor
@@ -152,7 +152,7 @@ var _ = Describe("Push Command", func() {
 		stackRepo = new(stacksfakes.FakeStackRepository)
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
-		wordGenerator = new(testwords.FakeWordGenerator)
+		wordGenerator = new(generatorfakes.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
 
 		ui = new(testterm.FakeUI)
