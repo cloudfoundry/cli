@@ -800,7 +800,7 @@ var _ = Describe("Push Command", func() {
 						Expect(useRandomPort).To(BeTrue())
 
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{fmt.Sprintf("No bananas in the monkey cage. Expected Port: %d, Expected Domain: %s", expectedPort, expectedDomain.Name)},
+							[]string{fmt.Sprintf("Creating random route for %s...", expectedDomain.Name)},
 						))
 					})
 
@@ -824,7 +824,7 @@ var _ = Describe("Push Command", func() {
 						Expect(useRandomPort).To(BeTrue())
 
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{fmt.Sprintf("No bananas in the monkey cage. Expected Port: %d, Expected Domain: %s", expectedPort, expectedDomain.Name)},
+							[]string{fmt.Sprintf("Creating random route for %s...", expectedDomain.Name)},
 						))
 					})
 				})

@@ -1296,6 +1296,10 @@
     "translation": "{{.Username}} として割り当て量 {{.QuotaName}} を作成しています..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "経路 {{.Hostname}} を作成しています..."
   },

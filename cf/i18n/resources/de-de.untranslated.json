@@ -636,6 +636,10 @@
     "translation": "Create an HTTP route"
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": "Creating random route for {{.Domain}}"
+  },
+  {
     "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
     "translation": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}..."
   },
