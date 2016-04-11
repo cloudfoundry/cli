@@ -13,7 +13,8 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 )
 
-//go:generate counterfeiter -o fakes/fake_handlers.go . Handlers
+//go:generate counterfeiter . Handlers
+
 type Handlers interface {
 	IsMinCliVersion(args string, retVal *bool) error
 	SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error

@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/testhelpers/rpc_server"
-	fake_rpc_handlers "github.com/cloudfoundry/cli/testhelpers/rpc_server/fakes"
+	"github.com/cloudfoundry/cli/testhelpers/rpc_server/rpc_serverfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
@@ -28,13 +28,13 @@ var _ = Describe("Command", func() {
 
 		Context("Executing plugins with '.Start()'", func() {
 			var (
-				rpcHandlers *fake_rpc_handlers.FakeHandlers
+				rpcHandlers *rpc_serverfakes.FakeHandlers
 				ts          *test_rpc_server.TestServer
 				err         error
 			)
 
 			BeforeEach(func() {
-				rpcHandlers = &fake_rpc_handlers.FakeHandlers{}
+				rpcHandlers = new(rpc_serverfakes.FakeHandlers)
 				ts, err = test_rpc_server.NewTestRpcServer(rpcHandlers)
 				Expect(err).NotTo(HaveOccurred())
 
