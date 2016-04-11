@@ -536,10 +536,6 @@
     "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
@@ -748,6 +744,10 @@
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
   },
   {
+    "id": "Hostname used to identify the HTTP route",
+    "translation": "Hostname used to identify the HTTP route"
+  },
+  {
     "id": "INSTANCE_MEMORY",
     "translation": "INSTANCE_MEMORY"
   },
@@ -842,10 +842,6 @@
   {
     "id": "Path used to identify the HTTP route",
     "translation": "Path used to identify the HTTP route"
-  },
-  {
-    "id": "Path used to identify the route",
-    "translation": "Path used to identify the route"
   },
   {
     "id": "Port for the TCP route",
@@ -958,6 +954,14 @@
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": "Unmap a TCP route"
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": "Unmap an HTTP route"
   },
   {
     "id": "Update user-provided service instance",

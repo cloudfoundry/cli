@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"fmt"
 )
 
 type UnmapRoute struct {
@@ -25,19 +26,31 @@ func init() {
 
 func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the route")}
-	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path used to identify the route")}
+	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the HTTP route")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path used to identify the HTTP route")}
+	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port used to identify the TCP route")}
 
 	return command_registry.CommandMetadata{
 		Name:        "unmap-route",
 		Description: T("Remove a url route from an app"),
 		Usage: []string{
-			T("CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"),
+			fmt.Sprintf("%s:\n", T("Unmap an HTTP route")),
+			"      CF_NAME unmap-route ",
+			fmt.Sprintf("%s ", T("APP_NAME")),
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
+			fmt.Sprintf("[--path %s]\n\n", T("PATH")),
+			fmt.Sprintf("   %s:\n", T("Unmap a TCP route")),
+			"      CF_NAME unmap-route ",
+			fmt.Sprintf("%s ", T("APP_NAME")),
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("--port %s", T("PORT")),
 		},
 		Examples: []string{
 			"CF_NAME unmap-route my-app example.com                              # example.com",
 			"CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
+		  "CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000",
 		},
 		Flags: fs,
 	}

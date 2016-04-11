@@ -964,10 +964,6 @@
     "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
@@ -2364,8 +2360,8 @@
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
   },
   {
-    "id": "Hostname used to identify the route",
-    "translation": "Hostname used to identify the route"
+    "id": "Hostname used to identify the HTTP route",
+    "translation": "Hostname used to identify the HTTP route"
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -3226,10 +3222,6 @@
   {
     "id": "Path used to identify the HTTP route",
     "translation": "Path used to identify the HTTP route"
-  },
-  {
-    "id": "Path used to identify the route",
-    "translation": "Path used to identify the route"
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
@@ -4318,6 +4310,14 @@
   {
     "id": "Unlock the buildpack to enable updates",
     "translation": "Unlock the buildpack to enable updates"
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": "Unmap a TCP route"
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": "Unmap an HTTP route"
   },
   {
     "id": "Unsetting api endpoint...",
