@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 
 	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -40,7 +40,7 @@ var _ = Describe("UserRepository", func() {
 		config.SetApiEndpoint(ccServer.URL())
 		config.SetUaaEndpoint(uaaServer.URL())
 		ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(config)
-		uaaGateway = net.NewUAAGateway(config, &testterm.FakeUI{}, new(fakes.FakePrinter))
+		uaaGateway = net.NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		client = api.NewCloudControllerUserRepository(config, uaaGateway, ccGateway)
 	})
 

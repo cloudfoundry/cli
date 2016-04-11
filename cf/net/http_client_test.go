@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/websocket"
@@ -19,12 +19,12 @@ var _ = Describe("HTTP Client", func() {
 	var (
 		client      HttpClientInterface
 		dumper      RequestDumper
-		fakePrinter fakes.FakePrinter
+		fakePrinter *tracefakes.FakePrinter
 	)
 
 	BeforeEach(func() {
-		fakePrinter = *new(fakes.FakePrinter)
-		dumper = NewRequestDumper(&fakePrinter)
+		fakePrinter = new(tracefakes.FakePrinter)
+		dumper = NewRequestDumper(fakePrinter)
 		client = NewHttpClient(&http.Transport{}, dumper)
 	})
 

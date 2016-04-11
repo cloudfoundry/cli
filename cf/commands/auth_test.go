@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -26,7 +26,7 @@ var _ = Describe("auth command", func() {
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
-		fakeLogger          *fakes.FakePrinter
+		fakeLogger          *tracefakes.FakePrinter
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -47,7 +47,7 @@ var _ = Describe("auth command", func() {
 			return nil
 		}
 
-		fakeLogger = new(fakes.FakePrinter)
+		fakeLogger = new(tracefakes.FakePrinter)
 		deps = command_registry.NewDependency(fakeLogger)
 	})
 

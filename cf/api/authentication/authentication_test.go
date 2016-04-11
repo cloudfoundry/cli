@@ -13,7 +13,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -29,14 +29,14 @@ var _ = Describe("AuthenticationRepository", func() {
 			config      core_config.ReadWriter
 			auth        AuthenticationRepository
 			dumper      net.RequestDumper
-			fakePrinter fakes.FakePrinter
+			fakePrinter *tracefakes.FakePrinter
 		)
 
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
-			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, &fakePrinter)
-			fakePrinter = *new(fakes.FakePrinter)
-			dumper = net.NewRequestDumper(&fakePrinter)
+			fakePrinter = new(tracefakes.FakePrinter)
+			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, fakePrinter)
+			dumper = net.NewRequestDumper(fakePrinter)
 			auth = NewUAAAuthenticationRepository(gateway, config, dumper)
 		})
 
@@ -230,7 +230,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			config      core_config.ReadWriter
 			authRepo    AuthenticationRepository
 			dumper      net.RequestDumper
-			fakePrinter fakes.FakePrinter
+			fakePrinter *tracefakes.FakePrinter
 		)
 
 		BeforeEach(func() {
@@ -239,9 +239,9 @@ var _ = Describe("AuthenticationRepository", func() {
 			config.SetUaaEndpoint(uaaServer.URL())
 			config.SetSSHOAuthClient("ssh-oauth-client")
 
-			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, &fakePrinter)
-			fakePrinter = *new(fakes.FakePrinter)
-			dumper = net.NewRequestDumper(&fakePrinter)
+			fakePrinter = new(tracefakes.FakePrinter)
+			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, fakePrinter)
+			dumper = net.NewRequestDumper(fakePrinter)
 			authRepo = NewUAAAuthenticationRepository(gateway, config, dumper)
 
 			uaaServer.AppendHandlers(

@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -26,7 +26,7 @@ var _ = Describe("api command", func() {
 		deps                command_registry.Dependency
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		fakeLogger          *fakes.FakePrinter
+		fakeLogger          *tracefakes.FakePrinter
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -41,7 +41,7 @@ var _ = Describe("api command", func() {
 	}
 
 	BeforeEach(func() {
-		fakeLogger = new(fakes.FakePrinter)
+		fakeLogger = new(tracefakes.FakePrinter)
 		ui = new(testterm.FakeUI)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		config = testconfig.NewRepository()

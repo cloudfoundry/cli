@@ -3,7 +3,7 @@ package service_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -51,7 +51,7 @@ var _ = Describe("services", func() {
 			TargetedOrgSuccess:   true,
 		}
 
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	Describe("services requirements", func() {

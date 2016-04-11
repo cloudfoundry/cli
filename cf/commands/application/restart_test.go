@@ -3,6 +3,7 @@ package application_test
 import (
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -46,7 +46,7 @@ var _ = Describe("restart command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		deps = command_registry.NewDependency(new(traceFakes.FakePrinter))
+		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
 		requirementsFactory = &testreq.FakeReqFactory{}
 		starter = new(applicationfakes.FakeApplicationStarter)
 		stopper = new(applicationfakes.FakeApplicationStopper)

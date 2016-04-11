@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -27,7 +27,7 @@ var _ = Describe("UAA Gateway", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		gateway = NewUAAGateway(config, &testterm.FakeUI{}, new(fakes.FakePrinter))
+		gateway = NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	})
 
 	It("parses error responses", func() {

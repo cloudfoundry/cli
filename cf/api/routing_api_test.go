@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -29,7 +29,7 @@ var _ = Describe("RoutingApi", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewRoutingApiGateway(configRepo, time.Now, &testterm.FakeUI{}, new(fakes.FakePrinter))
+		gateway := net.NewRoutingApiGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 
 		repo = api.NewRoutingApiRepository(configRepo, gateway)
 	})

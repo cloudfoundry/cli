@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -25,9 +25,9 @@ import (
 )
 
 var _ = Describe("UI", func() {
-	var fakeLogger *fakes.FakePrinter
+	var fakeLogger *tracefakes.FakePrinter
 	BeforeEach(func() {
-		fakeLogger = new(fakes.FakePrinter)
+		fakeLogger = new(tracefakes.FakePrinter)
 	})
 
 	Describe("Printing message to stdout with PrintCapturingNoOutput", func() {
