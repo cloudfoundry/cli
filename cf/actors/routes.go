@@ -17,6 +17,20 @@ func NewRouteActor(ui terminal.UI, routeRepo api.RouteRepository) RouteActor {
 	return RouteActor{ui: ui, routeRepo: routeRepo}
 }
 
+func (routeActor RouteActor) CreateRandomTCPRoute(domain models.DomainFields) models.Route {
+	routeActor.ui.Say(T("Creating random route for {{.Domain}}", map[string]interface{}{
+		"Domain": terminal.EntityNameColor(domain.Name),
+	}) + "...")
+
+	route, err := routeActor.routeRepo.Create("", domain, "", true)
+	if err != nil {
+		routeActor.ui.Failed(err.Error())
+		return models.Route{}
+	}
+
+	return route
+}
+
 func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (route models.Route) {
 	var port int
 	route, apiErr := routeActor.routeRepo.Find(hostname, domain, path, port)
@@ -26,12 +40,7 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 		routeActor.ui.Say(T("Using route {{.RouteURL}}", map[string]interface{}{"RouteURL": terminal.EntityNameColor(route.URL())}))
 	case *errors.ModelNotFoundError:
 		if useRandomPort {
-			route, apiErr = routeActor.routeRepo.Create(hostname, domain, path, useRandomPort)
-			if apiErr != nil {
-				routeActor.ui.Failed(apiErr.Error())
-			}
-
-			routeActor.ui.Say("No bananas in the monkey cage. Expected Port: %d, Expected Domain: %s", route.Port, route.Domain.Name)
+			route = routeActor.CreateRandomTCPRoute(domain)
 		} else {
 			routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.UrlForHostAndPath(hostname, path, port))}))
 

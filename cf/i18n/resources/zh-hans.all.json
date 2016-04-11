@@ -1296,6 +1296,10 @@
     "translation": "正在以 {{.Username}} 身份创建配额 {{.QuotaName}}..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "正在创建路径 {{.Hostname}}..."
   },

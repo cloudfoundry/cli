@@ -1296,6 +1296,10 @@
     "translation": "Creating quota {{.QuotaName}} as {{.Username}}..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": "Creating random route for {{.Domain}}"
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "Creating route {{.Hostname}}..."
   },

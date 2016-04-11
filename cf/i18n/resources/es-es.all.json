@@ -1296,6 +1296,10 @@
     "translation": "Creando la cuota {{.QuotaName}} como {{.Username}}..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "Creando la ruta {{.Hostname}}..."
   },
