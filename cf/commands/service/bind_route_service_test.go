@@ -12,10 +12,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -33,14 +33,14 @@ var _ = Describe("BindRouteService", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		fakeDomain models.DomainFields
 
 		loginRequirement           requirements.Requirement
-		domainRequirement          *fakerequirements.FakeDomainRequirement
-		serviceInstanceRequirement *fakerequirements.FakeServiceInstanceRequirement
+		domainRequirement          *requirementsfakes.FakeDomainRequirement
+		serviceInstanceRequirement *requirementsfakes.FakeServiceInstanceRequirement
 		minAPIVersionRequirement   requirements.Requirement
 	)
 
@@ -65,12 +65,12 @@ var _ = Describe("BindRouteService", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{
@@ -79,7 +79,7 @@ var _ = Describe("BindRouteService", func() {
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
 
-		serviceInstanceRequirement = &fakerequirements.FakeServiceInstanceRequirement{}
+		serviceInstanceRequirement = new(requirementsfakes.FakeServiceInstanceRequirement)
 		factory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}

@@ -5,7 +5,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-//go:generate counterfeiter -o fakes/fake_user_requirement.go . UserRequirement
+//go:generate counterfeiter . UserRequirement
+
 type UserRequirement interface {
 	Requirement
 	GetUser() models.UserFields

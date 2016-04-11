@@ -9,11 +9,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/manifest/manifestfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -33,12 +33,12 @@ var _ = Describe("CreateAppManifest", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
 		targetedSpaceRequirement requirements.Requirement
-		applicationRequirement   *fakerequirements.FakeApplicationRequirement
+		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
 
 		fakeManifest *manifestfakes.FakeAppManifest
 	)
@@ -64,7 +64,7 @@ var _ = Describe("CreateAppManifest", func() {
 		cmd.SetDependency(deps, false)
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
@@ -72,7 +72,7 @@ var _ = Describe("CreateAppManifest", func() {
 		targetedSpaceRequirement = &passingRequirement{Name: "targeted-space-requirement"}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 
-		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
+		applicationRequirement = new(requirementsfakes.FakeApplicationRequirement)
 		application := models.Application{}
 		application.Guid = "app-guid"
 		applicationRequirement.GetApplicationReturns(application)

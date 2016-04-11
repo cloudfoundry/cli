@@ -6,7 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-//go:generate counterfeiter -o fakes/fake_domain_requirement.go . DomainRequirement
+//go:generate counterfeiter . DomainRequirement
+
 type DomainRequirement interface {
 	Requirement
 	GetDomain() models.DomainFields

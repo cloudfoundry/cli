@@ -8,10 +8,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/app_files/app_filesfakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -28,12 +28,12 @@ var _ = Describe("Files", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement          requirements.Requirement
 		targetedSpaceRequirement  requirements.Requirement
-		deaApplicationRequirement *fakerequirements.FakeDEAApplicationRequirement
+		deaApplicationRequirement *requirementsfakes.FakeDEAApplicationRequirement
 	)
 
 	BeforeEach(func() {
@@ -54,7 +54,7 @@ var _ = Describe("Files", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
@@ -62,7 +62,7 @@ var _ = Describe("Files", func() {
 		targetedSpaceRequirement = &passingRequirement{}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 
-		deaApplicationRequirement = &fakerequirements.FakeDEAApplicationRequirement{}
+		deaApplicationRequirement = new(requirementsfakes.FakeDEAApplicationRequirement)
 		factory.NewDEAApplicationRequirementReturns(deaApplicationRequirement)
 		app := models.Application{}
 		app.InstanceCount = 1

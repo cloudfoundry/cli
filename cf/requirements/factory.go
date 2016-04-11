@@ -6,7 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 )
 
-//go:generate counterfeiter -o fakes/fake_factory.go . Factory
+//go:generate counterfeiter . Factory
+
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
 	NewDEAApplicationRequirement(name string) DEAApplicationRequirement

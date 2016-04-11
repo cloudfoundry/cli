@@ -8,11 +8,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -30,12 +30,12 @@ var _ = Describe("SetOrgRole", func() {
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement        requirements.Requirement
-		userRequirement         *fakerequirements.FakeUserRequirement
-		organizationRequirement *fakerequirements.FakeOrganizationRequirement
+		userRequirement         *requirementsfakes.FakeUserRequirement
+		organizationRequirement *requirementsfakes.FakeOrganizationRequirement
 	)
 
 	BeforeEach(func() {
@@ -57,16 +57,16 @@ var _ = Describe("SetOrgRole", func() {
 
 		flagContext = flags.NewFlagContext(map[string]flags.FlagSet{})
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		userRequirement = &fakerequirements.FakeUserRequirement{}
+		userRequirement = new(requirementsfakes.FakeUserRequirement)
 		userRequirement.ExecuteReturns(nil)
 		factory.NewUserRequirementReturns(userRequirement)
 
-		organizationRequirement = &fakerequirements.FakeOrganizationRequirement{}
+		organizationRequirement = new(requirementsfakes.FakeOrganizationRequirement)
 		organizationRequirement.ExecuteReturns(nil)
 		factory.NewOrganizationRequirementReturns(organizationRequirement)
 	})
