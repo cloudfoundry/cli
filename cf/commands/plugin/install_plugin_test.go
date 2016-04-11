@@ -23,7 +23,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	testChecksum "github.com/cloudfoundry/cli/utils/fakes"
+	"github.com/cloudfoundry/cli/utils/utilsfakes"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
@@ -39,7 +39,7 @@ var _ = Describe("Install", func() {
 		config              core_config.Repository
 		pluginConfig        *plugin_configfakes.FakePluginConfiguration
 		fakePluginRepo      *plugin_repofakes.FakePluginRepo
-		fakeChecksum        *testChecksum.FakeSha1Checksum
+		fakeChecksum        *utilsfakes.FakeSha1Checksum
 
 		pluginFile *os.File
 		homeDir    string
@@ -71,7 +71,7 @@ var _ = Describe("Install", func() {
 		pluginConfig = new(plugin_configfakes.FakePluginConfiguration)
 		config = testconfig.NewRepositoryWithDefaults()
 		fakePluginRepo = new(plugin_repofakes.FakePluginRepo)
-		fakeChecksum = &testChecksum.FakeSha1Checksum{}
+		fakeChecksum = new(utilsfakes.FakeSha1Checksum)
 
 		dir, err := os.Getwd()
 		if err != nil {
