@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/generic"
 
 	"gopkg.in/yaml.v2"
 
@@ -30,6 +29,30 @@ type AppManifest interface {
 	Stack(string, string)
 	AppPorts(string, []int)
 	Save(f io.Writer) error
+}
+
+type ManifestApplication struct {
+	Name       string                 `yaml:"name"`
+	Instances  int                    `yaml:"instances,omitempty"`
+	Memory     string                 `yaml:"memory,omitempty"`
+	DiskQuota  string                 `yaml:"disk_quota,omitempty"`
+	AppPorts   []int                  `yaml:"app-ports,omitempty"`
+	Host       string                 `yaml:"host,omitempty"`
+	Hosts      []string               `yaml:"hosts,omitempty"`
+	Domain     string                 `yaml:"domain,omitempty"`
+	Domains    []string               `yaml:"domains,omitempty"`
+	NoHostname bool                   `yaml:"no-hostname,omitempty"`
+	NoRoute    bool                   `yaml:"no-route,omitempty"`
+	Buildpack  string                 `yaml:"buildpack,omitempty"`
+	Command    string                 `yaml:"command,omitempty"`
+	Env        map[string]interface{} `yaml:"env,omitempty"`
+	Services   []string               `yaml:"services,omitempty"`
+	Stack      string                 `yaml:"stack,omitempty"`
+	Timeout    int                    `yaml:"timeout,omitempty"`
+}
+
+type ManifestApplications struct {
+	Applications []ManifestApplication `yaml:"applications"`
 }
 
 type appManifest struct {
@@ -109,102 +132,81 @@ func (m *appManifest) GetContents() []models.Application {
 	return m.contents
 }
 
-func generateAppMap(app models.Application) (generic.Map, error) {
+func generateAppMap(app models.Application) (ManifestApplication, error) {
 	if app.Stack == nil {
-		return generic.NewMap(), errors.New(T("required attribute 'stack' missing"))
+		return ManifestApplication{}, errors.New(T("required attribute 'stack' missing"))
 	}
 
 	if app.Memory == 0 {
-		return generic.NewMap(), errors.New(T("required attribute 'memory' missing"))
+		return ManifestApplication{}, errors.New(T("required attribute 'memory' missing"))
 	}
 
 	if app.DiskQuota == 0 {
-		return generic.NewMap(), errors.New(T("required attribute 'disk_quota' missing"))
+		return ManifestApplication{}, errors.New(T("required attribute 'disk_quota' missing"))
 	}
 
 	if app.InstanceCount == 0 {
-		return generic.NewMap(), errors.New(T("required attribute 'instances' missing"))
+		return ManifestApplication{}, errors.New(T("required attribute 'instances' missing"))
 	}
 
-	m := generic.NewMap()
-
-	m.Set("name", app.Name)
-	m.Set("memory", fmt.Sprintf("%dM", app.Memory))
-	m.Set("instances", app.InstanceCount)
-	m.Set("disk_quota", fmt.Sprintf("%dM", app.DiskQuota))
-	m.Set("stack", app.Stack.Name)
-
-	if len(app.AppPorts) > 0 {
-		m.Set("app-ports", app.AppPorts)
+	var services []string
+	for _, s := range app.Services {
+		services = append(services, s.Name)
 	}
 
-	if app.BuildpackUrl != "" {
-		m.Set("buildpack", app.BuildpackUrl)
-	}
-
-	if app.HealthCheckTimeout > 0 {
-		m.Set("timeout", app.HealthCheckTimeout)
-	}
-
-	if app.Command != "" {
-		m.Set("command", app.Command)
+	m := ManifestApplication{
+		Name:      app.Name,
+		Services:  services,
+		Buildpack: app.BuildpackUrl,
+		Memory:    fmt.Sprintf("%dM", app.Memory),
+		Command:   app.Command,
+		Env:       app.EnvironmentVars,
+		Timeout:   app.HealthCheckTimeout,
+		Instances: app.InstanceCount,
+		DiskQuota: fmt.Sprintf("%dM", app.DiskQuota),
+		Stack:     app.Stack.Name,
+		AppPorts:  app.AppPorts,
 	}
 
 	switch len(app.Routes) {
 	case 0:
-		m.Set("no-route", true)
+		m.NoRoute = true
 	case 1:
 		const noHostname = ""
 
-		m.Set("domain", app.Routes[0].Domain.Name)
+		m.Domain = app.Routes[0].Domain.Name
 		host := app.Routes[0].Host
 
 		if host == noHostname {
-			m.Set("no-hostname", true)
+			m.NoHostname = true
 		} else {
-			m.Set("host", host)
+			m.Host = host
 		}
 	default:
 		hosts, domains := separateHostsAndDomains(app.Routes)
 
 		switch len(hosts) {
 		case 0:
-			m.Set("no-hostname", true)
+			m.NoHostname = true
 		case 1:
-			m.Set("host", hosts[0])
+			m.Host = hosts[0]
 		default:
-			m.Set("hosts", hosts)
+			m.Hosts = hosts
 		}
 
 		switch len(domains) {
 		case 1:
-			m.Set("domain", domains[0])
+			m.Domain = domains[0]
 		default:
-			m.Set("domains", domains)
+			m.Domains = domains
 		}
-	}
-
-	if len(app.Services) > 0 {
-		var services []string
-
-		for _, s := range app.Services {
-			services = append(services, s.Name)
-		}
-
-		m.Set("services", services)
-	}
-
-	if len(app.EnvironmentVars) > 0 {
-		m.Set("env", app.EnvironmentVars)
 	}
 
 	return m, nil
 }
 
 func (m *appManifest) Save(f io.Writer) error {
-	y := generic.NewMap()
-
-	apps := []generic.Map{}
+	apps := ManifestApplications{}
 
 	for _, app := range m.contents {
 		appMap, mapErr := generateAppMap(app)
@@ -213,12 +215,10 @@ func (m *appManifest) Save(f io.Writer) error {
 				"Error": mapErr.Error(),
 			}))
 		}
-		apps = append(apps, appMap)
+		apps.Applications = append(apps.Applications, appMap)
 	}
 
-	y.Set("applications", apps)
-
-	contents, err := yaml.Marshal(y)
+	contents, err := yaml.Marshal(apps)
 	if err != nil {
 		return err
 	}
