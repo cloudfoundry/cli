@@ -4,7 +4,7 @@ package appeventsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/app_events"
+	"github.com/cloudfoundry/cli/cf/api/appevents"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -55,4 +55,4 @@ func (fake *FakeAppEventsRepository) RecentEventsReturns(result1 []models.EventF
 	}{result1, result2}
 }
 
-var _ app_events.AppEventsRepository = new(FakeAppEventsRepository)
+var _ appevents.AppEventsRepository = new(FakeAppEventsRepository)

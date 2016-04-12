@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"net/http"
 
-	"github.com/cloudfoundry/cli/cf/api/app_events"
+	"github.com/cloudfoundry/cli/cf/api/appevents"
 	api_appfiles "github.com/cloudfoundry/cli/cf/api/appfiles"
 	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/api/applicationbits"
@@ -45,7 +45,7 @@ type RepositoryLocator struct {
 	appBitsRepo                     applicationbits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
 	appInstancesRepo                appinstances.AppInstancesRepository
-	appEventsRepo                   app_events.AppEventsRepository
+	appEventsRepo                   appevents.AppEventsRepository
 	appFilesRepo                    api_appfiles.AppFilesRepository
 	domainRepo                      DomainRepository
 	routeRepo                       RouteRepository
@@ -95,7 +95,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
 
 	loc.appBitsRepo = applicationbits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
-	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
+	loc.appEventsRepo = appevents.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = api_appfiles.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = applications.NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
@@ -229,12 +229,12 @@ func (locator RepositoryLocator) GetAppInstancesRepository() appinstances.AppIns
 	return locator.appInstancesRepo
 }
 
-func (locator RepositoryLocator) SetAppEventsRepository(repo app_events.AppEventsRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetAppEventsRepository(repo appevents.AppEventsRepository) RepositoryLocator {
 	locator.appEventsRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetAppEventsRepository() app_events.AppEventsRepository {
+func (locator RepositoryLocator) GetAppEventsRepository() appevents.AppEventsRepository {
 	return locator.appEventsRepo
 }
 

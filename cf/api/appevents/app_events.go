@@ -1,4 +1,4 @@
-package app_events
+package appevents
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/resources"

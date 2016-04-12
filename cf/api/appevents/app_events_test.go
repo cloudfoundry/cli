@@ -1,10 +1,10 @@
-package app_events_test
+package appevents_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 
-	. "github.com/cloudfoundry/cli/cf/api/app_events"
+	. "github.com/cloudfoundry/cli/cf/api/appevents"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"

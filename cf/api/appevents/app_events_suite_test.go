@@ -1,4 +1,4 @@
-package app_events_test
+package appevents_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
