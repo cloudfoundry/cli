@@ -1,4 +1,4 @@
-package plugin_installer
+package plugininstaller
 
 import (
 	"fmt"

@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_installer"
+	"github.com/cloudfoundry/cli/cf/actors/plugininstaller"
 	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -108,7 +108,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	}
 	defer removeTmpFile()
 
-	deps := &plugin_installer.PluginInstallerContext{
+	deps := &plugininstaller.PluginInstallerContext{
 		Checksummer:    cmd.checksum,
 		GetPluginRepos: cmd.config.PluginRepos,
 		FileDownloader: fileDownloader,
@@ -116,7 +116,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		RepoName:       c.String("r"),
 		Ui:             cmd.ui,
 	}
-	installer := plugin_installer.NewPluginInstaller(deps)
+	installer := plugininstaller.NewPluginInstaller(deps)
 	pluginSourceFilepath := installer.Install(c.Args()[0])
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
