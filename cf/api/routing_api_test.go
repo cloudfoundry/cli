@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -23,7 +23,7 @@ var _ = Describe("RoutingApi", func() {
 
 	var (
 		repo             api.RoutingApiRepository
-		configRepo       core_config.Repository
+		configRepo       coreconfig.Repository
 		routingApiServer *ghttp.Server
 	)
 

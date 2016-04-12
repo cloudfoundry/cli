@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -23,11 +23,11 @@ type ServiceKeyRepository interface {
 }
 
 type CloudControllerServiceKeyRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceKeyRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerServiceKeyRepository) {
+func NewCloudControllerServiceKeyRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerServiceKeyRepository) {
 	return CloudControllerServiceKeyRepository{
 		config:  config,
 		gateway: gateway,

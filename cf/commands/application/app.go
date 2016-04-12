@@ -10,15 +10,15 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 )
 
 //go:generate counterfeiter . ApplicationDisplayer
@@ -29,23 +29,23 @@ type ApplicationDisplayer interface {
 
 type ShowApp struct {
 	ui               terminal.UI
-	config           core_config.Reader
+	config           coreconfig.Reader
 	appSummaryRepo   api.AppSummaryRepository
-	appInstancesRepo app_instances.AppInstancesRepository
+	appInstancesRepo appinstances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
 	pluginAppModel   *plugin_models.GetAppModel
 	pluginCall       bool
 }
 
 func init() {
-	command_registry.Register(&ShowApp{})
+	commandregistry.Register(&ShowApp{})
 }
 
-func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
+func (cmd *ShowApp) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "app",
 		Description: T("Display health and status for app"),
 		Usage: []string{
@@ -57,7 +57,7 @@ func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("app"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("app"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -71,7 +71,7 @@ func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc fl
 	return reqs
 }
 
-func (cmd *ShowApp) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ShowApp) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
@@ -132,8 +132,8 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), ui_helpers.ColoredAppState(application.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), ui_helpers.ColoredAppInstances(application.ApplicationFields))
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), uihelpers.ColoredAppState(application.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), uihelpers.ColoredAppInstances(application.ApplicationFields))
 
 	if len(application.AppPorts) > 0 {
 		appPorts := make([]string, len(application.AppPorts))
@@ -187,7 +187,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	for index, instance := range instances {
 		table.Add(
 			fmt.Sprintf("#%d", index),
-			ui_helpers.ColoredInstanceState(instance),
+			uihelpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
 			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",

@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,15 +16,15 @@ import (
 
 type UpdateSpaceQuota struct {
 	ui             terminal.UI
-	config         core_config.Reader
-	spaceQuotaRepo space_quotas.SpaceQuotaRepository
+	config         coreconfig.Reader
+	spaceQuotaRepo spacequotas.SpaceQuotaRepository
 }
 
 func init() {
-	command_registry.Register(&UpdateSpaceQuota{})
+	commandregistry.Register(&UpdateSpaceQuota{})
 }
 
-func (cmd *UpdateSpaceQuota) MetaData() command_registry.CommandMetadata {
+func (cmd *UpdateSpaceQuota) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.StringFlag{ShortName: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")}
 	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Total amount of memory a space can have (e.g. 1024M, 1G, 10G)")}
@@ -35,7 +35,7 @@ func (cmd *UpdateSpaceQuota) MetaData() command_registry.CommandMetadata {
 	fs["disallow-paid-service-plans"] = &flags.BoolFlag{Name: "disallow-paid-service-plans", Usage: T("Can not provision instances of paid service plans")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "update-space-quota",
 		Description: T("Update an existing space quota"),
 		Usage: []string{
@@ -56,7 +56,7 @@ func (cmd *UpdateSpaceQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UpdateSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-space-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-space-quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -71,7 +71,7 @@ func (cmd *UpdateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 	return reqs
 }
 
-func (cmd *UpdateSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UpdateSpaceQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
@@ -112,7 +112,7 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 		} else {
 			memory, formatError = formatters.ToMegabytes(memFlag)
 			if formatError != nil {
-				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("update-space-quota"))
+				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-space-quota"))
 			}
 		}
 
@@ -123,7 +123,7 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {
-			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("update-space-quota"))
+			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-space-quota"))
 		}
 
 		spaceQuota.MemoryLimit = memory

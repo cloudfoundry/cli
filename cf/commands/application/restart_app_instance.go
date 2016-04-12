@@ -3,9 +3,9 @@ package application
 import (
 	"strconv"
 
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -14,17 +14,17 @@ import (
 
 type RestartAppInstance struct {
 	ui               terminal.UI
-	config           core_config.Reader
+	config           coreconfig.Reader
 	appReq           requirements.ApplicationRequirement
-	appInstancesRepo app_instances.AppInstancesRepository
+	appInstancesRepo appinstances.AppInstancesRepository
 }
 
 func init() {
-	command_registry.Register(&RestartAppInstance{})
+	commandregistry.Register(&RestartAppInstance{})
 }
 
-func (cmd *RestartAppInstance) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RestartAppInstance) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "restart-app-instance",
 		Description: T("Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *RestartAppInstance) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		usage := command_registry.Commands.CommandUsage("restart-app-instance")
+		usage := commandregistry.Commands.CommandUsage("restart-app-instance")
 		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + usage)
 	}
 
@@ -52,7 +52,7 @@ func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Fac
 	return reqs
 }
 
-func (cmd *RestartAppInstance) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RestartAppInstance) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()

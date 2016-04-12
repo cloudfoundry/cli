@@ -6,8 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -23,8 +23,8 @@ var _ = Describe("disable-service-access command", func() {
 		actor               *actorsfakes.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -32,7 +32,7 @@ var _ = Describe("disable-service-access command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
 		deps.ServicePlanHandler = actor
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("disable-service-access").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("disable-service-access").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

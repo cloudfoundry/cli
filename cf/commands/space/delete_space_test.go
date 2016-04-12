@@ -2,8 +2,8 @@ package space_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,17 +20,17 @@ var _ = Describe("delete-space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		space               models.Space
-		config              core_config.Repository
+		config              coreconfig.Repository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-space").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-space").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

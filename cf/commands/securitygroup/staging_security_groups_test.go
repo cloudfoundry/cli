@@ -1,12 +1,12 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/stagingfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging/stagingfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -20,17 +20,17 @@ import (
 var _ = Describe("staging-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   core_config.Repository
+		configRepo                   coreconfig.Repository
 		fakeStagingSecurityGroupRepo *stagingfakes.FakeStagingSecurityGroupsRepo
 		requirementsFactory          *testreq.FakeReqFactory
-		deps                         command_registry.Dependency
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetStagingSecurityGroupRepository(fakeStagingSecurityGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("staging-security-groups").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("staging-security-groups").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

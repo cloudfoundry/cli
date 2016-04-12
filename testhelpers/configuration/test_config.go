@@ -1,17 +1,17 @@
 package configuration
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-func NewRepository() core_config.Repository {
-	return core_config.NewRepositoryFromPersistor(NewFakePersistor(), func(err error) {
+func NewRepository() coreconfig.Repository {
+	return coreconfig.NewRepositoryFromPersistor(NewFakePersistor(), func(err error) {
 		panic(err)
 	})
 }
 
-func NewRepositoryWithAccessToken(tokenInfo core_config.TokenInfo) core_config.Repository {
+func NewRepositoryWithAccessToken(tokenInfo coreconfig.TokenInfo) coreconfig.Repository {
 	accessToken, err := EncodeAccessToken(tokenInfo)
 	if err != nil {
 		panic(err)
@@ -22,8 +22,8 @@ func NewRepositoryWithAccessToken(tokenInfo core_config.TokenInfo) core_config.R
 	return config
 }
 
-func NewRepositoryWithDefaults() core_config.Repository {
-	configRepo := NewRepositoryWithAccessToken(core_config.TokenInfo{
+func NewRepositoryWithDefaults() coreconfig.Repository {
+	configRepo := NewRepositoryWithAccessToken(coreconfig.TokenInfo{
 		UserGuid: "my-user-guid",
 		Username: "my-user",
 		Email:    "my-user-email",

@@ -3,8 +3,8 @@ package domain_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
@@ -27,10 +27,10 @@ var _ = Describe("ListDomains", func() {
 		ui             *testterm.FakeUI
 		routingApiRepo *apifakes.FakeRoutingApiRepository
 		domainRepo     *apifakes.FakeDomainRepository
-		configRepo     core_config.Repository
+		configRepo     coreconfig.Repository
 
 		cmd         domain.ListDomains
-		deps        command_registry.Dependency
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -50,7 +50,7 @@ var _ = Describe("ListDomains", func() {
 		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
@@ -96,7 +96,7 @@ var _ = Describe("ListDomains", func() {
 
 	Describe("Requirements", func() {
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

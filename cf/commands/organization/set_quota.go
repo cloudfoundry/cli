@@ -2,8 +2,8 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,17 +12,17 @@ import (
 
 type SetQuota struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	quotaRepo quotas.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
 func init() {
-	command_registry.Register(&SetQuota{})
+	commandregistry.Register(&SetQuota{})
 }
 
-func (cmd *SetQuota) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SetQuota) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "set-quota",
 		Description: T("Assign a quota to an org"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *SetQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n") + command_registry.Commands.CommandUsage("set-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n") + commandregistry.Commands.CommandUsage("set-quota"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -48,7 +48,7 @@ func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc f
 	return reqs
 }
 
-func (cmd *SetQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SetQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()

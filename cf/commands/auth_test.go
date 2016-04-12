@@ -5,8 +5,8 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,10 +22,10 @@ import (
 var _ = Describe("auth command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 		fakeLogger          *tracefakes.FakePrinter
 	)
 
@@ -33,7 +33,7 @@ var _ = Describe("auth command", func() {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("auth").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("auth").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -48,7 +48,7 @@ var _ = Describe("auth command", func() {
 		}
 
 		fakeLogger = new(tracefakes.FakePrinter)
-		deps = command_registry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(fakeLogger)
 	})
 
 	Describe("requirements", func() {

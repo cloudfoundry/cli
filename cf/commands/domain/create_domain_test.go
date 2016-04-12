@@ -2,8 +2,8 @@ package domain_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,21 +21,21 @@ var _ = Describe("create domain command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
 		domainRepo          *apifakes.FakeDomainRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-domain").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-domain").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		domainRepo = new(apifakes.FakeDomainRepository)
-		configRepo = testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
+		configRepo = testconfig.NewRepositoryWithAccessToken(coreconfig.TokenInfo{Username: "my-user"})
 	})
 
 	runCommand := func(args ...string) bool {

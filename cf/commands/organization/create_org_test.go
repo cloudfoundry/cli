@@ -5,16 +5,16 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,15 +22,15 @@ import (
 
 var _ = Describe("create-org command", func() {
 	var (
-		config              core_config.Repository
+		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		quotaRepo           *quotasfakes.FakeQuotaRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 		orgRoleSetter       *userfakes.FakeOrgRoleSetter
-		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
-		OriginalCommand     command_registry.Command
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
+		OriginalCommand     commandregistry.Command
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -41,9 +41,9 @@ var _ = Describe("create-org command", func() {
 		deps.Config = config
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(orgRoleSetter)
+		commandregistry.Register(orgRoleSetter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-org").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-org").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -52,22 +52,22 @@ var _ = Describe("create-org command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		quotaRepo = new(quotasfakes.FakeQuotaRepository)
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 		config.SetApiVersion("2.36.9")
 
 		orgRoleSetter = new(userfakes.FakeOrgRoleSetter)
-		//setup fakes to correctly interact with command_registry
-		orgRoleSetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fakes to correctly interact with commandregistry
+		orgRoleSetter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return orgRoleSetter
 		}
-		orgRoleSetter.MetaDataReturns(command_registry.CommandMetadata{Name: "set-org-role"})
+		orgRoleSetter.MetaDataReturns(commandregistry.CommandMetadata{Name: "set-org-role"})
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("set-org-role")
+		OriginalCommand = commandregistry.Commands.FindCommand("set-org-role")
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	runCommand := func(args ...string) bool {

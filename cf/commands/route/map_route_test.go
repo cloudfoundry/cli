@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/route/routefakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
@@ -26,11 +26,11 @@ import (
 var _ = Describe("MapRoute", func() {
 	var (
 		ui         *testterm.FakeUI
-		configRepo core_config.Repository
+		configRepo coreconfig.Repository
 		routeRepo  *apifakes.FakeRouteRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -39,8 +39,8 @@ var _ = Describe("MapRoute", func() {
 		domainRequirement        *requirementsfakes.FakeDomainRequirement
 		minAPIVersionRequirement requirements.Requirement
 
-		originalCreateRouteCmd command_registry.Command
-		fakeCreateRouteCmd     command_registry.Command
+		originalCreateRouteCmd commandregistry.Command
+		fakeCreateRouteCmd     commandregistry.Command
 
 		fakeDomain models.DomainFields
 	)
@@ -51,15 +51,15 @@ var _ = Describe("MapRoute", func() {
 		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
 
-		originalCreateRouteCmd = command_registry.Commands.FindCommand("create-route")
+		originalCreateRouteCmd = commandregistry.Commands.FindCommand("create-route")
 		fakeCreateRouteCmd = new(routefakes.OldFakeRouteCreator)
-		command_registry.Register(fakeCreateRouteCmd)
+		commandregistry.Register(fakeCreateRouteCmd)
 
 		cmd = &route.MapRoute{}
 		cmd.SetDependency(deps, false)
@@ -92,7 +92,7 @@ var _ = Describe("MapRoute", func() {
 	})
 
 	AfterEach(func() {
-		command_registry.Register(originalCreateRouteCmd)
+		commandregistry.Register(originalCreateRouteCmd)
 	})
 
 	Describe("Requirements", func() {

@@ -3,16 +3,16 @@ package user_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -24,12 +24,12 @@ import (
 var _ = Describe("SetOrgRole", func() {
 	var (
 		ui         *testterm.FakeUI
-		configRepo core_config.Repository
+		configRepo coreconfig.Repository
 		userRepo   *apifakes.FakeUserRepository
-		flagRepo   *feature_flagsfakes.FakeFeatureFlagRepository
+		flagRepo   *featureflagsfakes.FakeFeatureFlagRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -43,10 +43,10 @@ var _ = Describe("SetOrgRole", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		userRepo = new(apifakes.FakeUserRepository)
 		repoLocator := deps.RepoLocator.SetUserRepository(userRepo)
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 		repoLocator = repoLocator.SetFeatureFlagRepository(flagRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

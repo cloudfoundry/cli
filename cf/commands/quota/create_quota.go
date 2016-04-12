@@ -6,8 +6,8 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -19,15 +19,15 @@ import (
 
 type CreateQuota struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	quotaRepo quotas.QuotaRepository
 }
 
 func init() {
-	command_registry.Register(&CreateQuota{})
+	commandregistry.Register(&CreateQuota{})
 }
 
-func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateQuota) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
 	fs["i"] = &flags.StringFlag{ShortName: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.")}
@@ -36,7 +36,7 @@ func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-quota",
 		Description: T("Define a new resource quota"),
 		Usage: []string{
@@ -56,7 +56,7 @@ func (cmd *CreateQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -70,7 +70,7 @@ func (cmd *CreateQuota) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *CreateQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()

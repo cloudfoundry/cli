@@ -4,19 +4,19 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type MaxAPIVersionRequirement struct {
-	config         core_config.Reader
+	config         coreconfig.Reader
 	feature        string
 	maximumVersion semver.Version
 }
 
 func NewMaxAPIVersionRequirement(
-	config core_config.Reader,
+	config coreconfig.Reader,
 	feature string,
 	maximumVersion semver.Version,
 ) MaxAPIVersionRequirement {

@@ -3,15 +3,15 @@ package application_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/api/app_files/app_filesfakes"
+	"github.com/cloudfoundry/cli/cf/api/appfiles/appfilesfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -23,11 +23,11 @@ import (
 var _ = Describe("Files", func() {
 	var (
 		ui           *testterm.FakeUI
-		configRepo   core_config.Repository
-		appFilesRepo *app_filesfakes.FakeAppFilesRepository
+		configRepo   coreconfig.Repository
+		appFilesRepo *appfilesfakes.FakeAppFilesRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -40,10 +40,10 @@ var _ = Describe("Files", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		appFilesRepo = new(app_filesfakes.FakeAppFilesRepository)
+		appFilesRepo = new(appfilesfakes.FakeAppFilesRepository)
 		repoLocator := deps.RepoLocator.SetAppFileRepository(appFilesRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

@@ -9,12 +9,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/plugin_repofakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/command_registry/command_registryfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/plugin_configfakes"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo/pluginrepofakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/commandregistry/commandregistryfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -36,9 +36,9 @@ var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
-		pluginConfig        *plugin_configfakes.FakePluginConfiguration
-		fakePluginRepo      *plugin_repofakes.FakePluginRepo
+		config              coreconfig.Repository
+		pluginConfig        *pluginconfigfakes.FakePluginConfiguration
+		fakePluginRepo      *pluginrepofakes.FakePluginRepo
 		fakeChecksum        *utilsfakes.FakeSha1Checksum
 
 		pluginFile *os.File
@@ -53,7 +53,7 @@ var _ = Describe("Install", func() {
 		test_with_orgs            string
 		test_with_orgs_short_name string
 		aliasConflicts            string
-		deps                      command_registry.Dependency
+		deps                      commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -62,15 +62,15 @@ var _ = Describe("Install", func() {
 		deps.PluginConfig = pluginConfig
 		deps.PluginRepo = fakePluginRepo
 		deps.ChecksumUtil = fakeChecksum
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("install-plugin").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("install-plugin").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		pluginConfig = new(plugin_configfakes.FakePluginConfiguration)
+		pluginConfig = new(pluginconfigfakes.FakePluginConfiguration)
 		config = testconfig.NewRepositoryWithDefaults()
-		fakePluginRepo = new(plugin_repofakes.FakePluginRepo)
+		fakePluginRepo = new(pluginrepofakes.FakePluginRepo)
 		fakeChecksum = new(utilsfakes.FakeSha1Checksum)
 
 		dir, err := os.Getwd()
@@ -351,17 +351,17 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin's command conflicts with a core command/alias", func() {
-			var originalCommand command_registry.Command
+			var originalCommand commandregistry.Command
 
 			BeforeEach(func() {
-				originalCommand = command_registry.Commands.FindCommand("org")
+				originalCommand = commandregistry.Commands.FindCommand("org")
 
-				command_registry.Register(testOrgsCmd{})
+				commandregistry.Register(testOrgsCmd{})
 			})
 
 			AfterEach(func() {
 				if originalCommand != nil {
-					command_registry.Register(originalCommand)
+					commandregistry.Register(originalCommand)
 				}
 			})
 
@@ -385,19 +385,19 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin's alias conflicts with a core command/alias", func() {
-			var fakeCmd *command_registryfakes.FakeCommand
+			var fakeCmd *commandregistryfakes.FakeCommand
 			BeforeEach(func() {
-				fakeCmd = new(command_registryfakes.FakeCommand)
+				fakeCmd = new(commandregistryfakes.FakeCommand)
 			})
 
 			AfterEach(func() {
-				command_registry.Commands.RemoveCommand("non-conflict-cmd")
-				command_registry.Commands.RemoveCommand("conflict-alias")
+				commandregistry.Commands.RemoveCommand("non-conflict-cmd")
+				commandregistry.Commands.RemoveCommand("conflict-alias")
 			})
 
 			It("fails if it shares a command name", func() {
-				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "conflict-alias"})
-				command_registry.Register(fakeCmd)
+				fakeCmd.MetaDataReturns(commandregistry.CommandMetadata{Name: "conflict-alias"})
+				commandregistry.Register(fakeCmd)
 
 				runCommand(aliasConflicts, "-f")
 
@@ -408,8 +408,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command short name", func() {
-				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
-				command_registry.Register(fakeCmd)
+				fakeCmd.MetaDataReturns(commandregistry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
+				commandregistry.Register(fakeCmd)
 
 				runCommand(aliasConflicts, "-f")
 
@@ -422,8 +422,8 @@ var _ = Describe("Install", func() {
 
 		Context("when the plugin's alias conflicts with other installed plugin", func() {
 			It("fails if it shares a command name", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["AliasCollision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/config.exe",
 					Commands: []plugin.Command{
 						{
@@ -443,8 +443,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command alias", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["AliasCollision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/alias.exe",
 					Commands: []plugin.Command{
 						{
@@ -467,8 +467,8 @@ var _ = Describe("Install", func() {
 
 		Context("when the plugin's command conflicts with other installed plugin", func() {
 			It("fails if it shares a command name", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["Test1Collision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["Test1Collision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/config.exe",
 					Commands: []plugin.Command{
 						{
@@ -488,8 +488,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command alias", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["AliasCollision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/alias.exe",
 					Commands: []plugin.Command{
 						{
@@ -511,7 +511,7 @@ var _ = Describe("Install", func() {
 		})
 
 		It("if plugin name is already taken", func() {
-			pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"Test1": plugin_config.PluginMetadata{}})
+			pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"Test1": pluginconfig.PluginMetadata{}})
 			runCommand(test_1, "-f")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -527,7 +527,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
-				pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"useless": plugin_config.PluginMetadata{}})
+				pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"useless": pluginconfig.PluginMetadata{}})
 				pluginConfig.GetPluginPathReturns(curDir)
 
 				runCommand(filepath.Join(curDir, pluginFile.Name()), "-f")
@@ -611,8 +611,8 @@ var _ = Describe("Install", func() {
 
 type testOrgsCmd struct{}
 
-func (t testOrgsCmd) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (t testOrgsCmd) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:      "orgs",
 		ShortName: "o",
 	}
@@ -622,7 +622,7 @@ func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc
 	return []requirements.Requirement{}
 }
 
-func (cmd testOrgsCmd) SetDependency(deps command_registry.Dependency, pluginCall bool) (c command_registry.Command) {
+func (cmd testOrgsCmd) SetDependency(deps commandregistry.Dependency, pluginCall bool) (c commandregistry.Command) {
 	return
 }
 

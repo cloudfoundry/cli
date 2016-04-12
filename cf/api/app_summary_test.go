@@ -6,7 +6,7 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -35,7 +35,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummariesRequest})
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(testServer.URL)
-			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
 		})
 
@@ -99,7 +99,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummaryRequest})
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(testServer.URL)
-			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
 		})
 

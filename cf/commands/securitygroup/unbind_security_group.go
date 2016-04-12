@@ -2,11 +2,11 @@ package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
+	sgbinder "github.com/cloudfoundry/cli/cf/api/securitygroups/spaces"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,7 +15,7 @@ import (
 
 type UnbindSecurityGroup struct {
 	ui                terminal.UI
-	configRepo        core_config.Reader
+	configRepo        coreconfig.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
@@ -23,13 +23,13 @@ type UnbindSecurityGroup struct {
 }
 
 func init() {
-	command_registry.Register(&UnbindSecurityGroup{})
+	commandregistry.Register(&UnbindSecurityGroup{})
 }
 
-func (cmd *UnbindSecurityGroup) MetaData() command_registry.CommandMetadata {
+func (cmd *UnbindSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	primaryUsage := T("CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE")
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "unbind-security-group",
 		Description: T("Unbind a security group from a space"),
 		Usage: []string{
@@ -43,14 +43,14 @@ func (cmd *UnbindSecurityGroup) MetaData() command_registry.CommandMetadata {
 func (cmd *UnbindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	argLength := len(fc.Args())
 	if argLength == 0 || argLength == 2 || argLength >= 4 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-security-group"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + commandregistry.Commands.CommandUsage("unbind-security-group"))
 	}
 
 	reqs := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return reqs
 }
 
-func (cmd *UnbindSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UnbindSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()

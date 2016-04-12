@@ -3,8 +3,8 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,24 +14,24 @@ import (
 
 type UnsetEnv struct {
 	ui      terminal.UI
-	config  core_config.Reader
+	config  coreconfig.Reader
 	appRepo applications.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
 func init() {
-	command_registry.Register(&UnsetEnv{})
+	commandregistry.Register(&UnsetEnv{})
 }
 
-func (cmd *UnsetEnv) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UnsetEnv) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	return cmd
 }
 
-func (cmd *UnsetEnv) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *UnsetEnv) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "unset-env",
 		Description: T("Remove an env variable"),
 		Usage: []string{
@@ -42,7 +42,7 @@ func (cmd *UnsetEnv) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnsetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name' as arguments\n\n") + command_registry.Commands.CommandUsage("unset-env"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name' as arguments\n\n") + commandregistry.Commands.CommandUsage("unset-env"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])

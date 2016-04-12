@@ -11,10 +11,10 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -40,18 +40,18 @@ type ApplicationStagingWatcher interface {
 //go:generate counterfeiter . ApplicationStarter
 
 type ApplicationStarter interface {
-	command_registry.Command
+	commandregistry.Command
 	SetStartTimeoutInSeconds(timeout int)
 	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
 type Start struct {
 	ui               terminal.UI
-	config           core_config.Reader
+	config           coreconfig.Reader
 	appDisplayer     ApplicationDisplayer
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
-	appInstancesRepo app_instances.AppInstancesRepository
+	appInstancesRepo appinstances.AppInstancesRepository
 	logRepo          api.LogsRepository
 
 	LogServerConnectionTimeout time.Duration
@@ -61,11 +61,11 @@ type Start struct {
 }
 
 func init() {
-	command_registry.Register(&Start{})
+	commandregistry.Register(&Start{})
 }
 
-func (cmd *Start) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Start) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "start",
 		ShortName:   "st",
 		Description: T("Start an app"),
@@ -77,7 +77,7 @@ func (cmd *Start) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("start"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("start"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -91,7 +91,7 @@ func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flag
 	return reqs
 }
 
-func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Start) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
@@ -122,7 +122,7 @@ func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall boo
 		cmd.StartupTimeout = DefaultStartupTimeout
 	}
 
-	appCommand := command_registry.Commands.FindCommand("app")
+	appCommand := commandregistry.Commands.FindCommand("app")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appDisplayer = appCommand.(ApplicationDisplayer)
 

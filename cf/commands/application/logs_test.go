@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,15 +27,15 @@ var _ = Describe("logs command", func() {
 		ui                  *testterm.FakeUI
 		logsRepo            *apifakes.FakeLogsRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

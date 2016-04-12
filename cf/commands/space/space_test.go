@@ -1,9 +1,9 @@
 package space_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -21,25 +21,25 @@ var _ = Describe("space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *space_quotasfakes.FakeSpaceQuotaRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

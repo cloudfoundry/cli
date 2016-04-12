@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -25,8 +25,8 @@ var _ = Describe("space-users command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		spaceRepo           *apifakes.FakeSpaceRepository
 		userRepo            *apifakes.FakeUserRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -35,7 +35,7 @@ var _ = Describe("space-users command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space-users").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space-users").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -44,7 +44,7 @@ var _ = Describe("space-users command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		userRepo = new(apifakes.FakeUserRepository)
-		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

@@ -8,25 +8,25 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type SetHealthCheck struct {
 	ui      terminal.UI
-	config  core_config.Reader
+	config  coreconfig.Reader
 	appReq  requirements.ApplicationRequirement
 	appRepo applications.ApplicationRepository
 }
 
 func init() {
-	command_registry.Register(&SetHealthCheck{})
+	commandregistry.Register(&SetHealthCheck{})
 }
 
-func (cmd *SetHealthCheck) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SetHealthCheck) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "set-health-check",
 		Description: T("Set health_check_type flag to either 'port' or 'none'"),
 		Usage: []string{
@@ -37,11 +37,11 @@ func (cmd *SetHealthCheck) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n") + command_registry.Commands.CommandUsage("set-health-check"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n") + commandregistry.Commands.CommandUsage("set-health-check"))
 	}
 
 	if fc.Args()[1] != "port" && fc.Args()[1] != "none" {
-		cmd.ui.Failed(T(`Incorrect Usage. HEALTH_CHECK_TYPE must be "port" or "none"\n\n`) + command_registry.Commands.CommandUsage("set-health-check"))
+		cmd.ui.Failed(T(`Incorrect Usage. HEALTH_CHECK_TYPE must be "port" or "none"\n\n`) + commandregistry.Commands.CommandUsage("set-health-check"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -55,7 +55,7 @@ func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory
 	return reqs
 }
 
-func (cmd *SetHealthCheck) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SetHealthCheck) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()

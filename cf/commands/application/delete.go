@@ -3,8 +3,8 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,22 +14,22 @@ import (
 
 type DeleteApp struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	appRepo   applications.ApplicationRepository
 	routeRepo api.RouteRepository
 	appReq    requirements.ApplicationRequirement
 }
 
 func init() {
-	command_registry.Register(&DeleteApp{})
+	commandregistry.Register(&DeleteApp{})
 }
 
-func (cmd *DeleteApp) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteApp) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 	fs["r"] = &flags.BoolFlag{ShortName: "r", Usage: T("Also delete any mapped routes")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete",
 		ShortName:   "d",
 		Description: T("Delete an app"),
@@ -42,7 +42,7 @@ func (cmd *DeleteApp) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + command_registry.Commands.CommandUsage("delete"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + commandregistry.Commands.CommandUsage("delete"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -53,7 +53,7 @@ func (cmd *DeleteApp) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *DeleteApp) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteApp) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()

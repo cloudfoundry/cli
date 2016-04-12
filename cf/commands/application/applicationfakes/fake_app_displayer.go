@@ -1,7 +1,7 @@
 package applicationfakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -17,11 +17,11 @@ func (displayer *FakeAppDisplayer) ShowApp(app models.Application, orgName, spac
 	displayer.AppToDisplay = app
 }
 
-func (displayer *FakeAppDisplayer) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{Name: "app"}
+func (displayer *FakeAppDisplayer) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{Name: "app"}
 }
 
-func (displayer *FakeAppDisplayer) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+func (displayer *FakeAppDisplayer) SetDependency(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 	return displayer
 }
 

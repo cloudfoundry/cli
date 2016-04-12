@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	plan_builderfakes "github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
+	planbuilderfakes "github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -27,12 +27,12 @@ import (
 var _ = Describe("update-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *apifakes.FakeServiceRepository
-		planBuilder         *plan_builderfakes.FakePlanBuilder
+		planBuilder         *planbuilderfakes.FakePlanBuilder
 		offering1           models.ServiceOffering
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -40,7 +40,7 @@ var _ = Describe("update-service command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
 		deps.PlanBuilder = planBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -55,7 +55,7 @@ var _ = Describe("update-service command", func() {
 		}
 
 		serviceRepo = new(apifakes.FakeServiceRepository)
-		planBuilder = new(plan_builderfakes.FakePlanBuilder)
+		planBuilder = new(planbuilderfakes.FakePlanBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"

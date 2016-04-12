@@ -3,32 +3,32 @@ package service
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/json"
 )
 
 type CreateService struct {
 	ui             terminal.UI
-	config         core_config.Reader
+	config         coreconfig.Reader
 	serviceRepo    api.ServiceRepository
-	serviceBuilder service_builder.ServiceBuilder
+	serviceBuilder servicebuilder.ServiceBuilder
 }
 
 func init() {
-	command_registry.Register(&CreateService{})
+	commandregistry.Register(&CreateService{})
 }
 
-func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("User provided tags")}
@@ -52,7 +52,7 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
    }`)
 	tipsUsage := T(`TIP:
    Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps`)
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-service",
 		ShortName:   "cs",
 		Description: T("Create a service instance"),
@@ -83,7 +83,7 @@ func (cmd *CreateService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires service, service plan, service instance as arguments\n\n") + command_registry.Commands.CommandUsage("create-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires service, service plan, service instance as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -94,7 +94,7 @@ func (cmd *CreateService) Requirements(requirementsFactory requirements.Factory,
 	return reqs
 }
 
-func (cmd *CreateService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
@@ -109,7 +109,7 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 	params := c.String("c")
 	tags := c.String("t")
 
-	tagsList := ui_helpers.ParseTags(tags)
+	tagsList := uihelpers.ParseTags(tags)
 
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {

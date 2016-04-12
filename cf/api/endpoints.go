@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -17,7 +17,7 @@ type EndpointRepository interface {
 }
 
 type RemoteEndpointRepository struct {
-	config  core_config.ReadWriter
+	config  coreconfig.ReadWriter
 	gateway net.Gateway
 }
 
@@ -31,7 +31,7 @@ type endpointResource struct {
 	RoutingApiEndpoint       string `json:"routing_endpoint"`
 }
 
-func NewEndpointRepository(config core_config.ReadWriter, gateway net.Gateway) EndpointRepository {
+func NewEndpointRepository(config coreconfig.ReadWriter, gateway net.Gateway) EndpointRepository {
 	r := &RemoteEndpointRepository{
 		config:  config,
 		gateway: gateway,

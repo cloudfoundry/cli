@@ -5,8 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,16 +21,16 @@ var _ = Describe("quota", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
+		config              coreconfig.Repository
 		quotaRepo           *quotasfakes.FakeQuotaRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

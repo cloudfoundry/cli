@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
@@ -35,10 +35,10 @@ var _ = Describe("CreateSharedDomain", func() {
 		ui             *testterm.FakeUI
 		routingApiRepo *apifakes.FakeRoutingApiRepository
 		domainRepo     *apifakes.FakeDomainRepository
-		configRepo     core_config.Repository
+		configRepo     coreconfig.Repository
 
 		cmd         domain.CreateSharedDomain
-		deps        command_registry.Dependency
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -58,7 +58,7 @@ var _ = Describe("CreateSharedDomain", func() {
 		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

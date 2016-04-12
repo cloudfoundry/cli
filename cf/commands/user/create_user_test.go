@@ -2,7 +2,7 @@ package user_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -20,8 +20,8 @@ var _ = Describe("Create user command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
 		userRepo            *apifakes.FakeUserRepository
-		config              core_config.Repository
-		deps                command_registry.Dependency
+		config              coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -29,7 +29,7 @@ var _ = Describe("Create user command", func() {
 		ui = new(testterm.FakeUI)
 		userRepo = new(apifakes.FakeUserRepository)
 		config = testconfig.NewRepositoryWithDefaults()
-		accessToken, _ := testconfig.EncodeAccessToken(core_config.TokenInfo{
+		accessToken, _ := testconfig.EncodeAccessToken(coreconfig.TokenInfo{
 			Username: "current-user",
 		})
 		config.SetAccessToken(accessToken)
@@ -39,7 +39,7 @@ var _ = Describe("Create user command", func() {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-user").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-user").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

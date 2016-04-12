@@ -1,9 +1,9 @@
 package featureflag
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,16 +12,16 @@ import (
 
 type EnableFeatureFlag struct {
 	ui       terminal.UI
-	config   core_config.ReadWriter
-	flagRepo feature_flags.FeatureFlagRepository
+	config   coreconfig.ReadWriter
+	flagRepo featureflags.FeatureFlagRepository
 }
 
 func init() {
-	command_registry.Register(&EnableFeatureFlag{})
+	commandregistry.Register(&EnableFeatureFlag{})
 }
 
-func (cmd *EnableFeatureFlag) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *EnableFeatureFlag) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "enable-feature-flag",
 		Description: T("Enable the use of a feature so that users have access to and can use the feature"),
 		Usage: []string{
@@ -32,7 +32,7 @@ func (cmd *EnableFeatureFlag) MetaData() command_registry.CommandMetadata {
 
 func (cmd *EnableFeatureFlag) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("enable-feature-flag"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("enable-feature-flag"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -42,7 +42,7 @@ func (cmd *EnableFeatureFlag) Requirements(requirementsFactory requirements.Fact
 	return reqs
 }
 
-func (cmd *EnableFeatureFlag) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *EnableFeatureFlag) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()

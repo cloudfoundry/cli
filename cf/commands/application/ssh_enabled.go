@@ -3,8 +3,8 @@ package application
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,16 +13,16 @@ import (
 
 type SSHEnabled struct {
 	ui     terminal.UI
-	config core_config.Reader
+	config coreconfig.Reader
 	appReq requirements.ApplicationRequirement
 }
 
 func init() {
-	command_registry.Register(&SSHEnabled{})
+	commandregistry.Register(&SSHEnabled{})
 }
 
-func (cmd *SSHEnabled) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SSHEnabled) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "ssh-enabled",
 		Description: T("Reports whether SSH is enabled on an application container instance"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *SSHEnabled) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SSHEnabled) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + command_registry.Commands.CommandUsage("ssh-enabled"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + commandregistry.Commands.CommandUsage("ssh-enabled"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -47,7 +47,7 @@ func (cmd *SSHEnabled) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *SSHEnabled) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SSHEnabled) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	return cmd

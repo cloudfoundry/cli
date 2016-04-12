@@ -1,9 +1,9 @@
 package spacequota
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -14,19 +14,19 @@ import (
 
 type DeleteSpaceQuota struct {
 	ui             terminal.UI
-	config         core_config.Reader
-	spaceQuotaRepo space_quotas.SpaceQuotaRepository
+	config         coreconfig.Reader
+	spaceQuotaRepo spacequotas.SpaceQuotaRepository
 }
 
 func init() {
-	command_registry.Register(&DeleteSpaceQuota{})
+	commandregistry.Register(&DeleteSpaceQuota{})
 }
 
-func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteSpaceQuota) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force delete (do not prompt for confirmation)")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-space-quota",
 		Description: T("Delete a space quota definition and unassign the space quota from all spaces"),
 		Usage: []string{
@@ -38,7 +38,7 @@ func (cmd *DeleteSpaceQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-space-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-space-quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -48,7 +48,7 @@ func (cmd *DeleteSpaceQuota) Requirements(requirementsFactory requirements.Facto
 	return reqs
 }
 
-func (cmd *DeleteSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteSpaceQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()

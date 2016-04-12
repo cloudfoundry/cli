@@ -8,8 +8,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -17,19 +17,19 @@ import (
 
 type DeleteServiceAuthTokenFields struct {
 	ui            terminal.UI
-	config        core_config.Reader
+	config        coreconfig.Reader
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
 func init() {
-	command_registry.Register(&DeleteServiceAuthTokenFields{})
+	commandregistry.Register(&DeleteServiceAuthTokenFields{})
 }
 
-func (cmd *DeleteServiceAuthTokenFields) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteServiceAuthTokenFields) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-service-auth-token",
 		Description: T("Delete a service auth token"),
 		Usage: []string{
@@ -41,7 +41,7 @@ func (cmd *DeleteServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 
 func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n") + command_registry.Commands.CommandUsage("delete-service-auth-token"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n") + commandregistry.Commands.CommandUsage("delete-service-auth-token"))
 	}
 
 	maximumVersion, err := semver.Make("2.46.0")
@@ -57,7 +57,7 @@ func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requir
 	return reqs
 }
 
-func (cmd *DeleteServiceAuthTokenFields) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteServiceAuthTokenFields) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authTokenRepo = deps.RepoLocator.GetServiceAuthTokenRepository()

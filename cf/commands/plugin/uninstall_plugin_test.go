@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -25,14 +25,14 @@ var _ = Describe("Uninstall", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		fakePluginRepoDir   string
 		pluginDir           string
-		pluginConfig        *plugin_config.PluginConfig
-		deps                command_registry.Dependency
+		pluginConfig        *pluginconfig.PluginConfig
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.PluginConfig = pluginConfig
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("uninstall-plugin").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("uninstall-plugin").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -52,13 +52,13 @@ var _ = Describe("Uninstall", func() {
 		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_1.exe"), filepath.Join(pluginDir, "test_1.exe"))
 		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_2.exe"), filepath.Join(pluginDir, "test_2.exe"))
 
-		config_helpers.PluginRepoDir = func() string {
+		confighelpers.PluginRepoDir = func() string {
 			return fakePluginRepoDir
 		}
 
-		pluginConfig = plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
-		pluginConfig.SetPlugin("test_1.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
-		pluginConfig.SetPlugin("test_2.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
+		pluginConfig = pluginconfig.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
+		pluginConfig.SetPlugin("test_1.exe", pluginconfig.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
+		pluginConfig.SetPlugin("test_2.exe", pluginconfig.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
 	})
 
 	AfterEach(func() {

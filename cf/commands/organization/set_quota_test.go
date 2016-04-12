@@ -2,8 +2,8 @@ package organization_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,15 +20,15 @@ var _ = Describe("set-quota command", func() {
 		ui                  *testterm.FakeUI
 		quotaRepo           *quotasfakes.FakeQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("set-quota").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

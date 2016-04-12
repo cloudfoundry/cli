@@ -1,10 +1,10 @@
 package environmentvariablegroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups/environment_variable_groupsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups/environmentvariablegroupsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,23 +20,23 @@ var _ = Describe("running-environment-variable-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
-		configRepo                   core_config.Repository
-		environmentVariableGroupRepo *environment_variable_groupsfakes.FakeEnvironmentVariableGroupsRepository
-		deps                         command_registry.Dependency
+		configRepo                   coreconfig.Repository
+		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetEnvironmentVariableGroupsRepository(environmentVariableGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("running-environment-variable-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("running-environment-variable-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		environmentVariableGroupRepo = new(environment_variable_groupsfakes.FakeEnvironmentVariableGroupsRepository)
+		environmentVariableGroupRepo = new(environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -50,7 +50,7 @@ var _ = Describe("running-environment-variable-group command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

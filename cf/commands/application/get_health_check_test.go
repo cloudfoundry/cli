@@ -2,8 +2,8 @@ package application_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,8 +20,8 @@ var _ = Describe("set-health-check command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		appRepo             *applicationsfakes.FakeApplicationRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -35,7 +35,7 @@ var _ = Describe("set-health-check command", func() {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("get-health-check").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("get-health-check").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

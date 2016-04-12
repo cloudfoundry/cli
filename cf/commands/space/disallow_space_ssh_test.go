@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,8 +22,8 @@ var _ = Describe("disallow-space-ssh command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		spaceRepo           *apifakes.FakeSpaceRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -37,7 +37,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("disallow-space-ssh").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("disallow-space-ssh").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

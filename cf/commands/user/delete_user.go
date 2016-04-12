@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,19 +13,19 @@ import (
 
 type DeleteUser struct {
 	ui       terminal.UI
-	config   core_config.Reader
+	config   coreconfig.Reader
 	userRepo api.UserRepository
 }
 
 func init() {
-	command_registry.Register(&DeleteUser{})
+	commandregistry.Register(&DeleteUser{})
 }
 
-func (cmd *DeleteUser) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteUser) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-user",
 		Description: T("Delete a user"),
 		Usage: []string{
@@ -37,7 +37,7 @@ func (cmd *DeleteUser) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-user"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-user"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -47,7 +47,7 @@ func (cmd *DeleteUser) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *DeleteUser) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteUser) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()

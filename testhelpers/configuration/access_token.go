@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 )
 
-func EncodeAccessToken(tokenInfo core_config.TokenInfo) (accessToken string, err error) {
+func EncodeAccessToken(tokenInfo coreconfig.TokenInfo) (accessToken string, err error) {
 	tokenInfoBytes, err := json.Marshal(tokenInfo)
 	if err != nil {
 		return

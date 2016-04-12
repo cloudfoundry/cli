@@ -2,8 +2,8 @@ package servicebroker_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,17 +18,17 @@ import (
 var _ = Describe("delete-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		brokerRepo          *apifakes.FakeServiceBrokerRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(brokerRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service-broker").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-service-broker").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

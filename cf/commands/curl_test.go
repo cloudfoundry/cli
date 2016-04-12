@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -14,7 +14,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/trace"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
@@ -24,17 +24,17 @@ import (
 var _ = Describe("curl command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		curlRepo            *apifakes.OldFakeCurlRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetCurlRepository(curlRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("curl").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("curl").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

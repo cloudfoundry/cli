@@ -5,9 +5,9 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
@@ -28,10 +28,10 @@ var _ = Describe("CreateRoute", func() {
 	var (
 		ui         *testterm.FakeUI
 		routeRepo  *apifakes.FakeRouteRepository
-		configRepo core_config.Repository
+		configRepo coreconfig.Repository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -46,7 +46,7 @@ var _ = Describe("CreateRoute", func() {
 		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

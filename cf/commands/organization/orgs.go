@@ -2,8 +2,8 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,18 +16,18 @@ const orgLimit = 0
 
 type ListOrgs struct {
 	ui              terminal.UI
-	config          core_config.Reader
+	config          coreconfig.Reader
 	orgRepo         organizations.OrganizationRepository
 	pluginOrgsModel *[]plugin_models.GetOrgs_Model
 	pluginCall      bool
 }
 
 func init() {
-	command_registry.Register(&ListOrgs{})
+	commandregistry.Register(&ListOrgs{})
 }
 
-func (cmd *ListOrgs) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListOrgs) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "orgs",
 		ShortName:   "o",
 		Description: T("List all orgs"),
@@ -38,7 +38,7 @@ func (cmd *ListOrgs) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListOrgs) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -53,7 +53,7 @@ func (cmd *ListOrgs) Requirements(requirementsFactory requirements.Factory, fc f
 	return reqs
 }
 
-func (cmd *ListOrgs) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListOrgs) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()

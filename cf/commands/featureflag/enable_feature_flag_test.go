@@ -3,9 +3,9 @@ package featureflag_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -19,23 +19,23 @@ var _ = Describe("enable-feature-flag command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("enable-feature-flag").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("enable-feature-flag").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 	})
 
 	runCommand := func(args ...string) bool {

@@ -2,7 +2,7 @@ package requirements_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
@@ -12,7 +12,7 @@ import (
 )
 
 var _ = Describe("DomainRequirement", func() {
-	var config core_config.ReadWriter
+	var config coreconfig.ReadWriter
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()

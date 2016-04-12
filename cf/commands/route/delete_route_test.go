@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -26,11 +26,11 @@ import (
 var _ = Describe("DeleteRoute", func() {
 	var (
 		ui         *testterm.FakeUI
-		configRepo core_config.Repository
+		configRepo coreconfig.Repository
 		routeRepo  *apifakes.FakeRouteRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -48,7 +48,7 @@ var _ = Describe("DeleteRoute", func() {
 		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
@@ -82,7 +82,7 @@ var _ = Describe("DeleteRoute", func() {
 
 		BeforeEach(func() {
 			dr := &route.DeleteRoute{}
-			up := command_registry.CliCommandUsagePresenter(dr)
+			up := commandregistry.CliCommandUsagePresenter(dr)
 			usage = strings.Split(up.Usage(), "\n")
 		})
 

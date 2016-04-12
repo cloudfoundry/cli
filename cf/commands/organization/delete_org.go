@@ -2,8 +2,8 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -14,20 +14,20 @@ import (
 
 type DeleteOrg struct {
 	ui      terminal.UI
-	config  core_config.ReadWriter
+	config  coreconfig.ReadWriter
 	orgRepo organizations.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
 func init() {
-	command_registry.Register(&DeleteOrg{})
+	commandregistry.Register(&DeleteOrg{})
 }
 
-func (cmd *DeleteOrg) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteOrg) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-org",
 		Description: T("Delete an org"),
 		Usage: []string{
@@ -39,7 +39,7 @@ func (cmd *DeleteOrg) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-org"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-org"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -49,7 +49,7 @@ func (cmd *DeleteOrg) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *DeleteOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()

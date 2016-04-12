@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -19,22 +19,22 @@ import (
 
 type ShowSpace struct {
 	ui          terminal.UI
-	config      core_config.Reader
+	config      coreconfig.Reader
 	spaceReq    requirements.SpaceRequirement
-	quotaRepo   space_quotas.SpaceQuotaRepository
+	quotaRepo   spacequotas.SpaceQuotaRepository
 	pluginModel *plugin_models.GetSpace_Model
 	pluginCall  bool
 }
 
 func init() {
-	command_registry.Register(&ShowSpace{})
+	commandregistry.Register(&ShowSpace{})
 }
 
-func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
+func (cmd *ShowSpace) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given space's guid.  All other output for the space is suppressed.")}
 	fs["security-group-rules"] = &flags.BoolFlag{Name: "security-group-rules", Usage: T("Retrieve the rules for all the security groups associated with the space")}
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "space",
 		Description: T("Show space info"),
 		Usage: []string{
@@ -46,7 +46,7 @@ func (cmd *ShowSpace) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("space"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("space"))
 	}
 
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
@@ -60,7 +60,7 @@ func (cmd *ShowSpace) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *ShowSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ShowSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()

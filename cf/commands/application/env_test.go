@@ -2,8 +2,8 @@ package application_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,16 +21,16 @@ var _ = Describe("env command", func() {
 		ui                  *testterm.FakeUI
 		app                 models.Application
 		appRepo             *applicationsfakes.FakeApplicationRepository
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("env").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("env").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

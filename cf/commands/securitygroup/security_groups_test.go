@@ -1,9 +1,9 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -21,23 +21,23 @@ import (
 var _ = Describe("list-security-groups command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		repo                *security_groupsfakes.FakeSecurityGroupRepo
+		repo                *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(repo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("security-groups").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("security-groups").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		repo = new(security_groupsfakes.FakeSecurityGroupRepo)
+		repo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -51,7 +51,7 @@ var _ = Describe("list-security-groups command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

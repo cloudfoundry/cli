@@ -10,7 +10,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -30,11 +30,11 @@ type ApplicationRepository interface {
 }
 
 type CloudControllerApplicationRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerApplicationRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
+func NewCloudControllerApplicationRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

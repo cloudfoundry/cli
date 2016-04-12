@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -199,13 +199,13 @@ const expectedJSONResponse = `
 `
 
 type curlDependencies struct {
-	config  core_config.ReadWriter
+	config  coreconfig.ReadWriter
 	gateway net.Gateway
 }
 
 func newCurlDependencies() (deps curlDependencies) {
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAccessToken("BEARER my_access_token")
-	deps.gateway = cloud_controller_gateway.NewTestCloudControllerGateway(deps.config)
+	deps.gateway = cloudcontrollergateway.NewTestCloudControllerGateway(deps.config)
 	return
 }

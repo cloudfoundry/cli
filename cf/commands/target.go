@@ -5,8 +5,8 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -17,21 +17,21 @@ import (
 
 type Target struct {
 	ui        terminal.UI
-	config    core_config.ReadWriter
+	config    coreconfig.ReadWriter
 	orgRepo   organizations.OrganizationRepository
 	spaceRepo spaces.SpaceRepository
 }
 
 func init() {
-	command_registry.Register(&Target{})
+	commandregistry.Register(&Target{})
 }
 
-func (cmd *Target) MetaData() command_registry.CommandMetadata {
+func (cmd *Target) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Organization")}
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Space")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "target",
 		ShortName:   "t",
 		Description: T("Set or view the targeted org or space"),
@@ -43,7 +43,7 @@ func (cmd *Target) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -62,7 +62,7 @@ func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc fla
 	return reqs
 }
 
-func (cmd *Target) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *Target) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
