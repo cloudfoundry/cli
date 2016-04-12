@@ -3,7 +3,7 @@ package service_builder_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder/planbuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 

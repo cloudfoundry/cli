@@ -1,4 +1,4 @@
-package plan_builder_test
+package planbuilder_test
 
 import (
 	. "github.com/onsi/ginkgo"

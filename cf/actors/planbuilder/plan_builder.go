@@ -1,4 +1,4 @@
-package plan_builder
+package planbuilder
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"

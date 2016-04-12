@@ -3,7 +3,7 @@ package service_builder
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -33,10 +33,10 @@ type ServiceBuilder interface {
 
 type Builder struct {
 	serviceRepo api.ServiceRepository
-	planBuilder plan_builder.PlanBuilder
+	planBuilder planbuilder.PlanBuilder
 }
 
-func NewBuilder(service api.ServiceRepository, planBuilder plan_builder.PlanBuilder) Builder {
+func NewBuilder(service api.ServiceRepository, planBuilder planbuilder.PlanBuilder) Builder {
 	return Builder{
 		serviceRepo: service,
 		planBuilder: planBuilder,

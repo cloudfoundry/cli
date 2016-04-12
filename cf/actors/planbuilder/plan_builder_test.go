@@ -1,9 +1,9 @@
-package plan_builder_test
+package planbuilder_test
 
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("Plan builder", func() {
 	var (
-		builder plan_builder.PlanBuilder
+		builder planbuilder.PlanBuilder
 
 		planRepo       *apifakes.OldFakeServicePlanRepo
 		visibilityRepo *apifakes.FakeServicePlanVisibilityRepository
@@ -27,12 +27,12 @@ var _ = Describe("Plan builder", func() {
 	)
 
 	BeforeEach(func() {
-		plan_builder.PlanToOrgsVisibilityMap = nil
-		plan_builder.OrgToPlansVisibilityMap = nil
+		planbuilder.PlanToOrgsVisibilityMap = nil
+		planbuilder.OrgToPlansVisibilityMap = nil
 		planRepo = new(apifakes.OldFakeServicePlanRepo)
 		visibilityRepo = new(apifakes.FakeServicePlanVisibilityRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		builder = plan_builder.NewBuilder(planRepo, visibilityRepo, orgRepo)
+		builder = planbuilder.NewBuilder(planRepo, visibilityRepo, orgRepo)
 
 		plan1 = models.ServicePlanFields{
 			Name:                "service-plan1",
