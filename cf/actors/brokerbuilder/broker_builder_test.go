@@ -1,9 +1,9 @@
-package broker_builder_test
+package brokerbuilder_test
 
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
+	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("Broker Builder", func() {
 	var (
-		brokerBuilder broker_builder.BrokerBuilder
+		brokerBuilder brokerbuilder.BrokerBuilder
 
 		serviceBuilder *service_builderfakes.FakeServiceBuilder
 		brokerRepo     *apifakes.FakeServiceBrokerRepository
@@ -33,7 +33,7 @@ var _ = Describe("Broker Builder", func() {
 	BeforeEach(func() {
 		brokerRepo = new(apifakes.FakeServiceBrokerRepository)
 		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
-		brokerBuilder = broker_builder.NewBuilder(brokerRepo, serviceBuilder)
+		brokerBuilder = brokerbuilder.NewBuilder(brokerRepo, serviceBuilder)
 
 		serviceBroker1 = models.ServiceBroker{Guid: "my-service-broker-guid", Name: "my-service-broker"}
 

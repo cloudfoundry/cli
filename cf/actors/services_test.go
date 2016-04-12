@@ -2,7 +2,7 @@ package actors_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/actors/broker_builder/brokerbuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder/brokerbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
