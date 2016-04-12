@@ -1,4 +1,4 @@
-package test_rpc_server
+package rpcserver
 
 import (
 	"fmt"
