@@ -4,7 +4,7 @@ package appinstancesfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -95,4 +95,4 @@ func (fake *FakeAppInstancesRepository) DeleteInstanceReturns(result1 error) {
 	}{result1}
 }
 
-var _ app_instances.AppInstancesRepository = new(FakeAppInstancesRepository)
+var _ appinstances.AppInstancesRepository = new(FakeAppInstancesRepository)

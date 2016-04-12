@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/app_events"
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	api_appfiles "github.com/cloudfoundry/cli/cf/api/appfiles"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/api/applicationbits"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -44,7 +44,7 @@ type RepositoryLocator struct {
 	appRepo                         applications.ApplicationRepository
 	appBitsRepo                     applicationbits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
-	appInstancesRepo                app_instances.AppInstancesRepository
+	appInstancesRepo                appinstances.AppInstancesRepository
 	appEventsRepo                   app_events.AppEventsRepository
 	appFilesRepo                    api_appfiles.AppFilesRepository
 	domainRepo                      DomainRepository
@@ -99,7 +99,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.appFilesRepo = api_appfiles.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = applications.NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
-	loc.appInstancesRepo = app_instances.NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
+	loc.appInstancesRepo = appinstances.NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
@@ -220,12 +220,12 @@ func (locator RepositoryLocator) GetAppSummaryRepository() AppSummaryRepository 
 	return locator.appSummaryRepo
 }
 
-func (locator RepositoryLocator) SetAppInstancesRepository(repo app_instances.AppInstancesRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetAppInstancesRepository(repo appinstances.AppInstancesRepository) RepositoryLocator {
 	locator.appInstancesRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetAppInstancesRepository() app_instances.AppInstancesRepository {
+func (locator RepositoryLocator) GetAppInstancesRepository() appinstances.AppInstancesRepository {
 	return locator.appInstancesRepo
 }
 
