@@ -1,4 +1,4 @@
-package plugin_repo
+package pluginrepo
 
 import (
 	"strings"

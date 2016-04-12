@@ -1,4 +1,4 @@
-package plugin_repo
+package pluginrepo
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
