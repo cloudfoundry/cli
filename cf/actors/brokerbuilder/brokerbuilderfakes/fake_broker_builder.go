@@ -4,7 +4,7 @@ package brokerbuilderfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
+	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -213,4 +213,4 @@ func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedServiceReturns(result1 mode
 	}{result1, result2}
 }
 
-var _ broker_builder.BrokerBuilder = new(FakeBrokerBuilder)
+var _ brokerbuilder.BrokerBuilder = new(FakeBrokerBuilder)

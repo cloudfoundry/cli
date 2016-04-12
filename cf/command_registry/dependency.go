@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/actors/broker_builder"
+	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
 	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
@@ -36,7 +36,7 @@ type Dependency struct {
 	PluginRepo         plugin_repo.PluginRepo
 	PluginModels       *PluginModels
 	ServiceBuilder     service_builder.ServiceBuilder
-	BrokerBuilder      broker_builder.Builder
+	BrokerBuilder      brokerbuilder.Builder
 	PlanBuilder        plan_builder.PlanBuilder
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
@@ -102,7 +102,7 @@ func NewDependency(logger trace.Printer) Dependency {
 		deps.PlanBuilder,
 	)
 
-	deps.BrokerBuilder = broker_builder.NewBuilder(
+	deps.BrokerBuilder = brokerbuilder.NewBuilder(
 		deps.RepoLocator.GetServiceBrokerRepository(),
 		deps.ServiceBuilder,
 	)

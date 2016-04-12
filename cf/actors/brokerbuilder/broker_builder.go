@@ -1,4 +1,4 @@
-package broker_builder
+package brokerbuilder
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
