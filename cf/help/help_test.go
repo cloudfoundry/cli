@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/help"
 
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
@@ -35,7 +35,7 @@ var _ = Describe("Help", func() {
 	})
 
 	It("shows help for all installed plugin's commands", func() {
-		config_helpers.PluginRepoDir = func() string {
+		confighelpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "fixtures", "config", "help-plugin-test-config")
 		}
 
@@ -55,7 +55,7 @@ var _ = Describe("Help", func() {
 	})
 
 	It("adjusts the output format to the longest length of plugin command name", func() {
-		config_helpers.PluginRepoDir = func() string {
+		confighelpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "fixtures", "config", "help-plugin-test-config")
 		}
 
@@ -82,7 +82,7 @@ var _ = Describe("Help", func() {
 	})
 
 	It("does not show command's alias in help for installed plugin", func() {
-		config_helpers.PluginRepoDir = func() string {
+		confighelpers.PluginRepoDir = func() string {
 			return filepath.Join("..", "..", "fixtures", "config", "help-plugin-test-config")
 		}
 

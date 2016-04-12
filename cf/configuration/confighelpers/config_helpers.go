@@ -1,4 +1,4 @@
-package config_helpers
+package confighelpers
 
 import (
 	"os"

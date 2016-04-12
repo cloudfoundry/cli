@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
@@ -52,7 +52,7 @@ var _ = Describe("Uninstall", func() {
 		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_1.exe"), filepath.Join(pluginDir, "test_1.exe"))
 		fileutils.CopyPathToPath(filepath.Join(fixtureDir, "test_2.exe"), filepath.Join(pluginDir, "test_2.exe"))
 
-		config_helpers.PluginRepoDir = func() string {
+		confighelpers.PluginRepoDir = func() string {
 			return fakePluginRepoDir
 		}
 

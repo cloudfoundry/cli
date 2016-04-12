@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	. "github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/plugin"
 
@@ -52,7 +52,7 @@ var _ = Describe("PluginConfig", func() {
 	Describe("Reading configuration data", func() {
 		BeforeEach(func() {
 
-			config_helpers.PluginRepoDir = func() string {
+			confighelpers.PluginRepoDir = func() string {
 				return filepath.Join("..", "..", "..", "fixtures", "config", "plugin-config")
 			}
 		})
@@ -74,7 +74,7 @@ var _ = Describe("PluginConfig", func() {
 
 	Describe("Writing configuration data", func() {
 		BeforeEach(func() {
-			config_helpers.PluginRepoDir = func() string { return os.TempDir() }
+			confighelpers.PluginRepoDir = func() string { return os.TempDir() }
 		})
 
 		AfterEach(func() {
@@ -100,7 +100,7 @@ var _ = Describe("PluginConfig", func() {
 		)
 
 		BeforeEach(func() {
-			config_helpers.PluginRepoDir = func() string { return os.TempDir() }
+			confighelpers.PluginRepoDir = func() string { return os.TempDir() }
 			pluginConfig = NewPluginConfig(func(err error) {
 				if err != nil {
 					panic(fmt.Sprintf("Config error: %s", err))
