@@ -1,4 +1,4 @@
-package panic_printer
+package panicprinter
 
 import (
 	"fmt"

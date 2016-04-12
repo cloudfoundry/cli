@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/panic_printer"
+	"github.com/cloudfoundry/cli/cf/panicprinter"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -139,13 +139,13 @@ func main() {
 }
 
 func handlePanics(printer terminal.Printer, logger trace.Printer) {
-	panic_printer.UI = terminal.NewUI(os.Stdin, printer, logger)
+	panicprinter.UI = terminal.NewUI(os.Stdin, printer, logger)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()
 
 	err := recover()
-	panic_printer.DisplayCrashDialog(err, commandArgs, stackTrace)
+	panicprinter.DisplayCrashDialog(err, commandArgs, stackTrace)
 
 	if err != nil {
 		os.Exit(1)
