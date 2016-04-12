@@ -2,8 +2,8 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/pluginconfigfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -72,8 +72,8 @@ var _ = Describe("Help", func() {
 
 	Context("when a command provided is a plugin command", func() {
 		BeforeEach(func() {
-			m := make(map[string]plugin_config.PluginMetadata)
-			m["fakePlugin"] = plugin_config.PluginMetadata{
+			m := make(map[string]pluginconfig.PluginMetadata)
+			m["fakePlugin"] = pluginconfig.PluginMetadata{
 				Commands: []plugin.Command{
 					plugin.Command{
 						Name:     "fakePluginCmd1",

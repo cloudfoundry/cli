@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -27,7 +27,7 @@ import (
 type PluginInstall struct {
 	ui           terminal.UI
 	config       core_config.Reader
-	pluginConfig plugin_config.PluginConfiguration
+	pluginConfig pluginconfig.PluginConfiguration
 	pluginRepo   plugin_repo.PluginRepo
 	checksum     utils.Sha1Checksum
 	rpcService   *rpcService.CliRpcService
@@ -207,7 +207,7 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	configMetadata := plugin_config.PluginMetadata{
+	configMetadata := pluginconfig.PluginMetadata{
 		Location: pluginDestinationFilepath,
 		Version:  pluginMetadata.Version,
 		Commands: pluginMetadata.Commands,

@@ -1,4 +1,4 @@
-package plugin_config_test
+package pluginconfig_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	. "github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	. "github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/plugin"
 
 	. "github.com/onsi/ginkgo"

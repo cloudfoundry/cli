@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -28,7 +28,7 @@ type Dependency struct {
 	Ui                 terminal.UI
 	Config             core_config.Repository
 	RepoLocator        api.RepositoryLocator
-	PluginConfig       plugin_config.PluginConfiguration
+	PluginConfig       pluginconfig.PluginConfiguration
 	ManifestRepo       manifest.ManifestRepository
 	AppManifest        manifest.AppManifest
 	Gateways           map[string]net.Gateway
@@ -77,7 +77,7 @@ func NewDependency(logger trace.Printer) Dependency {
 
 	deps.ManifestRepo = manifest.NewManifestDiskRepository()
 	deps.AppManifest = manifest.NewGenerator()
-	deps.PluginConfig = plugin_config.NewPluginConfig(errorHandler)
+	deps.PluginConfig = pluginconfig.NewPluginConfig(errorHandler)
 
 	terminal.UserAskedForColors = deps.Config.ColorEnabled()
 	terminal.InitColorSupport()

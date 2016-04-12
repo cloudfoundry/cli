@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -25,7 +25,7 @@ var _ = Describe("Uninstall", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		fakePluginRepoDir   string
 		pluginDir           string
-		pluginConfig        *plugin_config.PluginConfig
+		pluginConfig        *pluginconfig.PluginConfig
 		deps                command_registry.Dependency
 	)
 
@@ -56,9 +56,9 @@ var _ = Describe("Uninstall", func() {
 			return fakePluginRepoDir
 		}
 
-		pluginConfig = plugin_config.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
-		pluginConfig.SetPlugin("test_1.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
-		pluginConfig.SetPlugin("test_2.exe", plugin_config.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
+		pluginConfig = pluginconfig.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
+		pluginConfig.SetPlugin("test_1.exe", pluginconfig.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
+		pluginConfig.SetPlugin("test_2.exe", pluginconfig.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
 	})
 
 	AfterEach(func() {

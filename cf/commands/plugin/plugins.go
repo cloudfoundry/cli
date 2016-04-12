@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -14,7 +14,7 @@ import (
 
 type Plugins struct {
 	ui     terminal.UI
-	config plugin_config.PluginConfiguration
+	config pluginconfig.PluginConfiguration
 }
 
 func init() {

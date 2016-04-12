@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -18,7 +18,7 @@ import (
 
 type PluginUninstall struct {
 	ui         terminal.UI
-	config     plugin_config.PluginConfiguration
+	config     pluginconfig.PluginConfiguration
 	rpcService *rpcService.CliRpcService
 }
 
@@ -95,7 +95,7 @@ func (cmd *PluginUninstall) Execute(c flags.FlagContext) {
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully uninstalled.", pluginNameMap)))
 }
 
-func (cmd *PluginUninstall) notifyPluginUninstalling(meta plugin_config.PluginMetadata) error {
+func (cmd *PluginUninstall) notifyPluginUninstalling(meta pluginconfig.PluginMetadata) error {
 	err := cmd.rpcService.Start()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
