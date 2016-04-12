@@ -270,6 +270,21 @@ var _ = Describe("UnmapRoute", func() {
 			})
 		})
 
+		Context("when a port is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name", "--port", "60000")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to find the route with the port", func() {
+				cmd.Execute(flagContext)
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				_, _, _, port := routeRepo.FindArgsForCall(0)
+				Expect(port).To(Equal(60000))
+			})
+		})
+
 		Context("when the route can be found", func() {
 			BeforeEach(func() {
 				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, nil)
