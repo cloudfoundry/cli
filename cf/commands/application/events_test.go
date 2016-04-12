@@ -3,7 +3,7 @@ package application_test
 import (
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/api/app_events/appeventsfakes"
+	"github.com/cloudfoundry/cli/cf/api/appevents/appeventsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"

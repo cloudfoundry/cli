@@ -1,7 +1,7 @@
 package application
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/app_events"
+	"github.com/cloudfoundry/cli/cf/api/appevents"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -14,7 +14,7 @@ type Events struct {
 	ui         terminal.UI
 	config     coreconfig.Reader
 	appReq     requirements.ApplicationRequirement
-	eventsRepo app_events.AppEventsRepository
+	eventsRepo appevents.AppEventsRepository
 }
 
 func init() {
