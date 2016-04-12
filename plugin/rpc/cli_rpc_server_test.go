@@ -17,7 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	cmdRunner "github.com/cloudfoundry/cli/plugin/rpc"
-	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
+	. "github.com/cloudfoundry/cli/plugin/rpc/fakecommand"
 	"github.com/cloudfoundry/cli/plugin/rpc/rpcfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
