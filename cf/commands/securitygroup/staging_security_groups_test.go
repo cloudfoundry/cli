@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/stagingfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging/stagingfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"

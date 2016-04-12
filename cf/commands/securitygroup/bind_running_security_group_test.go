@@ -3,8 +3,8 @@ package securitygroup_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/runningfakes"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running/runningfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"

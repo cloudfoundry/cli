@@ -1,8 +1,8 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging/stagingfakes"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging/stagingfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"

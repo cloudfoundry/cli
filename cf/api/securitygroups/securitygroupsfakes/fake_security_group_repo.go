@@ -4,7 +4,7 @@ package securitygroupsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 

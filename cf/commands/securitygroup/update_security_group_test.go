@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
