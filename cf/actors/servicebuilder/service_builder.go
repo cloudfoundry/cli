@@ -1,4 +1,4 @@
-package service_builder
+package servicebuilder
 
 import (
 	"errors"

@@ -1,10 +1,10 @@
-package service_builder_test
+package servicebuilder_test
 
 import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 
 	"github.com/cloudfoundry/cli/cf/models"
@@ -16,7 +16,7 @@ import (
 var _ = Describe("Service Builder", func() {
 	var (
 		planBuilder     *planbuilderfakes.FakePlanBuilder
-		serviceBuilder  service_builder.ServiceBuilder
+		serviceBuilder  servicebuilder.ServiceBuilder
 		serviceRepo     *apifakes.FakeServiceRepository
 		service1        models.ServiceOffering
 		service2        models.ServiceOffering
@@ -31,7 +31,7 @@ var _ = Describe("Service Builder", func() {
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		planBuilder = new(planbuilderfakes.FakePlanBuilder)
 
-		serviceBuilder = service_builder.NewBuilder(serviceRepo, planBuilder)
+		serviceBuilder = servicebuilder.NewBuilder(serviceRepo, planBuilder)
 		service1 = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "my-service1",

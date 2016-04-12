@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder/servicebuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder/servicebuilderfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"

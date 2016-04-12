@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/service_builder/servicebuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder/servicebuilderfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"

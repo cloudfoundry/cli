@@ -1,4 +1,4 @@
-package service_builder_test
+package servicebuilder_test
 
 import (
 	. "github.com/onsi/ginkgo"

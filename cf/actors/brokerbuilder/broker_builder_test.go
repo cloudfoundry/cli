@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder/servicebuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder/servicebuilderfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
