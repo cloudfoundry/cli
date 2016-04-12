@@ -52,17 +52,10 @@ func (builder Builder) GetAllServicesWithPlans() ([]models.ServiceOffering, erro
 	if err != nil {
 		return []models.ServiceOffering{}, err
 	}
-
-	var plans []models.ServicePlanFields
-	for index, service := range services {
-		plans, err = builder.planBuilder.GetPlansForService(service.Guid)
-		if err != nil {
-			return []models.ServiceOffering{}, err
-		}
-		services[index].Plans = plans
-	}
-
-	return services, err
+    
+    
+    
+	return builder.getPlansForServices(services)
 }
 
 func (builder Builder) GetServicesForSpace(spaceGuid string) ([]models.ServiceOffering, error) {
@@ -70,19 +63,13 @@ func (builder Builder) GetServicesForSpace(spaceGuid string) ([]models.ServiceOf
 }
 
 func (builder Builder) GetServicesForSpaceWithPlans(spaceGuid string) ([]models.ServiceOffering, error) {
+    
 	services, err := builder.GetServicesForSpace(spaceGuid)
 	if err != nil {
 		return []models.ServiceOffering{}, err
 	}
 
-	for index, service := range services {
-		services[index].Plans, err = builder.planBuilder.GetPlansForService(service.Guid)
-		if err != nil {
-			return []models.ServiceOffering{}, err
-		}
-	}
-
-	return services, nil
+    return builder.getPlansForServices(services)
 }
 
 func (builder Builder) GetServiceByNameWithPlans(serviceLabel string) (models.ServiceOffering, error) {
@@ -312,3 +299,34 @@ func returnV2Service(services models.ServiceOfferings) models.ServiceOffering {
 
 	return models.ServiceOffering{}
 }
+
+func (builder Builder) getPlansForServices(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
+    type planResponse struct {
+        index int
+        plans []models.ServicePlanFields
+        err error
+    }
+    
+    resChan := make(chan *planResponse);
+    
+	for index, service := range services {
+        go func(resChan chan *planResponse, guid string, index int) {
+            res := &planResponse{
+                index: index,
+            }
+            res.plans, res.err = builder.planBuilder.GetPlansForService(guid)
+            resChan <- res                
+        }(resChan, service.Guid, index)
+	}
+    
+    for responseCount := 0; responseCount < len(services); {
+        res := <- resChan
+        if res.err != nil {
+            return services, res.err
+        }
+        services[res.index].Plans = res.plans
+        responseCount++
+    }
+    
+	return services, nil
+} 
