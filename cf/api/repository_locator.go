@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/app_events"
-	api_app_files "github.com/cloudfoundry/cli/cf/api/app_files"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	api_appfiles "github.com/cloudfoundry/cli/cf/api/appfiles"
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
@@ -24,7 +24,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -46,7 +46,7 @@ type RepositoryLocator struct {
 	appSummaryRepo                  AppSummaryRepository
 	appInstancesRepo                app_instances.AppInstancesRepository
 	appEventsRepo                   app_events.AppEventsRepository
-	appFilesRepo                    api_app_files.AppFilesRepository
+	appFilesRepo                    api_appfiles.AppFilesRepository
 	domainRepo                      DomainRepository
 	routeRepo                       RouteRepository
 	routingApiRepo                  RoutingApiRepository
@@ -96,7 +96,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 
 	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
-	loc.appFilesRepo = api_app_files.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
+	loc.appFilesRepo = api_appfiles.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = applications.NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = app_instances.NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
@@ -123,7 +123,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
-	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
+	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, appfiles.ApplicationZipper{})
 	loc.securityGroupRepo = security_groups.NewSecurityGroupRepo(config, cloudControllerGateway)
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.runningSecurityGroupRepo = running.NewRunningSecurityGroupsRepo(config, cloudControllerGateway)
@@ -238,12 +238,12 @@ func (locator RepositoryLocator) GetAppEventsRepository() app_events.AppEventsRe
 	return locator.appEventsRepo
 }
 
-func (locator RepositoryLocator) SetAppFileRepository(repo api_app_files.AppFilesRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetAppFileRepository(repo api_appfiles.AppFilesRepository) RepositoryLocator {
 	locator.appFilesRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetAppFilesRepository() api_app_files.AppFilesRepository {
+func (locator RepositoryLocator) GetAppFilesRepository() api_appfiles.AppFilesRepository {
 	return locator.appFilesRepo
 }
 

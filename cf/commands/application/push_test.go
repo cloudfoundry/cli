@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
-	"github.com/cloudfoundry/cli/cf/app_files/appfilesfakes"
+	"github.com/cloudfoundry/cli/cf/appfiles/appfilesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"

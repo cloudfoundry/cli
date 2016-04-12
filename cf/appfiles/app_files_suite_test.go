@@ -1,12 +1,12 @@
-package app_files_test
+package appfiles_test
 
 import (
+	"testing"
+
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"testing"
 )
 
 func TestAppFiles(t *testing.T) {
@@ -14,5 +14,5 @@ func TestAppFiles(t *testing.T) {
 	i18n.T = i18n.Init(config)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "AppFiles Suite")
+	RunSpecs(t, "App Files Suite")
 }

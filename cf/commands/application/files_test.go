@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/api/app_files/appfilesfakes"
+	"github.com/cloudfoundry/cli/cf/api/appfiles/appfilesfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 

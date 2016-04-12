@@ -4,7 +4,7 @@ package appfilesfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/app_files"
+	"github.com/cloudfoundry/cli/cf/api/appfiles"
 )
 
 type FakeAppFilesRepository struct {
@@ -56,4 +56,4 @@ func (fake *FakeAppFilesRepository) ListFilesReturns(result1 string, result2 err
 	}{result1, result2}
 }
 
-var _ app_files.AppFilesRepository = new(FakeAppFilesRepository)
+var _ appfiles.AppFilesRepository = new(FakeAppFilesRepository)

@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
@@ -41,8 +41,8 @@ type Dependency struct {
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
 	WordGenerator      generator.WordGenerator
-	AppZipper          app_files.Zipper
-	AppFiles           app_files.AppFiles
+	AppZipper          appfiles.Zipper
+	AppFiles           appfiles.AppFiles
 	PushActor          actors.PushActor
 	ChecksumUtil       utils.Sha1Checksum
 	WildcardDependency interface{} //use for injecting fakes
@@ -125,8 +125,8 @@ func NewDependency(logger trace.Printer) Dependency {
 
 	deps.WordGenerator = generator.NewWordGenerator()
 
-	deps.AppZipper = app_files.ApplicationZipper{}
-	deps.AppFiles = app_files.ApplicationFiles{}
+	deps.AppZipper = appfiles.ApplicationZipper{}
+	deps.AppFiles = appfiles.ApplicationFiles{}
 
 	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
 

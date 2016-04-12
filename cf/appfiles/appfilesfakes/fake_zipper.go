@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 )
 
 type FakeZipper struct {
@@ -177,4 +177,4 @@ func (fake *FakeZipper) GetZipSizeReturns(result1 int64, result2 error) {
 	}{result1, result2}
 }
 
-var _ app_files.Zipper = new(FakeZipper)
+var _ appfiles.Zipper = new(FakeZipper)
