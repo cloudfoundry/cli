@@ -3,7 +3,7 @@ package application
 import (
 	"strconv"
 
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -16,7 +16,7 @@ type RestartAppInstance struct {
 	ui               terminal.UI
 	config           coreconfig.Reader
 	appReq           requirements.ApplicationRequirement
-	appInstancesRepo app_instances.AppInstancesRepository
+	appInstancesRepo appinstances.AppInstancesRepository
 }
 
 func init() {

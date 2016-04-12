@@ -1,4 +1,4 @@
-package app_instances
+package appinstances
 
 import (
 	"fmt"

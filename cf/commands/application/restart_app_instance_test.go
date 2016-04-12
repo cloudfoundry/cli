@@ -3,7 +3,7 @@ package application_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/app_instances/appinstancesfakes"
+	"github.com/cloudfoundry/cli/cf/api/appinstances/appinstancesfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"

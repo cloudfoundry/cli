@@ -1,4 +1,4 @@
-package app_instances_test
+package appinstances_test
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api/app_instances"
+	. "github.com/cloudfoundry/cli/cf/api/appinstances"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

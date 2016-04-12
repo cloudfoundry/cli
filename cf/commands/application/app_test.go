@@ -20,7 +20,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/app_instances/appinstancesfakes"
+	"github.com/cloudfoundry/cli/cf/api/appinstances/appinstancesfakes"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 

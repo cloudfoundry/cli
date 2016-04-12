@@ -1,4 +1,4 @@
-package app_instances_test
+package appinstances_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
