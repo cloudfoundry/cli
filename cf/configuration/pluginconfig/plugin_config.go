@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 )
 
 //go:generate counterfeiter . PluginConfiguration
@@ -27,7 +27,7 @@ type PluginConfig struct {
 }
 
 func NewPluginConfig(errorHandler func(error)) *PluginConfig {
-	pluginPath := filepath.Join(config_helpers.PluginRepoDir(), ".cf", "plugins")
+	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
 	return &PluginConfig{
 		data:       NewData(),
 		mutex:      new(sync.RWMutex),

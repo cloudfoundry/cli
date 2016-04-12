@@ -7,7 +7,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
@@ -26,7 +26,7 @@ func initI18nFunc() bool {
 			os.Exit(1)
 		}
 	}
-	T = Init(core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errorHandler))
+	T = Init(core_config.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errorHandler))
 	return true
 }
 

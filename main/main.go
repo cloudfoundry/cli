@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -53,7 +53,7 @@ func main() {
 	}
 
 	// Only used to get Trace, so our errorHandler doesn't matter, since it's not used
-	config := core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errFunc)
+	config := core_config.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errFunc)
 	defer config.Close()
 
 	traceConfigVal := config.Trace()
