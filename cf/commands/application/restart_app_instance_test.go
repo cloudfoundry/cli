@@ -3,7 +3,7 @@ package application_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
+	"github.com/cloudfoundry/cli/cf/api/app_instances/appinstancesfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,7 +21,7 @@ var _ = Describe("restart-app-instance", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              core_config.Repository
-		appInstancesRepo    *app_instancesfakes.FakeAppInstancesRepository
+		appInstancesRepo    *appinstancesfakes.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 		application         models.Application
 		deps                command_registry.Dependency
@@ -34,7 +34,7 @@ var _ = Describe("restart-app-instance", func() {
 		application.InstanceCount = 1
 
 		ui = &testterm.FakeUI{}
-		appInstancesRepo = new(app_instancesfakes.FakeAppInstancesRepository)
+		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,

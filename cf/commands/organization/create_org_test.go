@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -29,7 +29,7 @@ var _ = Describe("create-org command", func() {
 		quotaRepo           *quotasfakes.FakeQuotaRepository
 		deps                command_registry.Dependency
 		orgRoleSetter       *userfakes.FakeOrgRoleSetter
-		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
 		OriginalCommand     command_registry.Command
 	)
 
@@ -52,7 +52,7 @@ var _ = Describe("create-org command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		quotaRepo = new(quotasfakes.FakeQuotaRepository)
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 		config.SetApiVersion("2.36.9")
 
 		orgRoleSetter = new(userfakes.FakeOrgRoleSetter)

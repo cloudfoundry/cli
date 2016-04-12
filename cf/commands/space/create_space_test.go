@@ -2,9 +2,9 @@ package space_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -31,8 +31,8 @@ var _ = Describe("create-space command", func() {
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		userRepo            *apifakes.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
-		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
-		spaceQuotaRepo      *space_quotasfakes.FakeSpaceQuotaRepository
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
+		spaceQuotaRepo      *spacequotasfakes.FakeSpaceQuotaRepository
 		OriginalCommand     command_registry.Command
 		deps                command_registry.Dependency
 	)
@@ -63,8 +63,8 @@ var _ = Describe("create-space command", func() {
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		userRepo = new(apifakes.FakeUserRepository)
 		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
-		spaceQuotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		spaceQuotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		configOrg = models.OrganizationFields{

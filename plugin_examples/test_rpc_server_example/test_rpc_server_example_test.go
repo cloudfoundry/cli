@@ -8,7 +8,7 @@ import (
 	. "github.com/cloudfoundry/cli/plugin_examples/test_rpc_server_example"
 
 	"github.com/cloudfoundry/cli/testhelpers/rpc_server"
-	"github.com/cloudfoundry/cli/testhelpers/rpc_server/rpc_serverfakes"
+	"github.com/cloudfoundry/cli/testhelpers/rpc_server/rpcserverfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,13 +21,13 @@ const validPluginPath = "./test_rpc_server_example.exe"
 var _ = Describe("App-Lister", func() {
 
 	var (
-		rpcHandlers *rpc_serverfakes.FakeHandlers
+		rpcHandlers *rpcserverfakes.FakeHandlers
 		ts          *test_rpc_server.TestServer
 		err         error
 	)
 
 	BeforeEach(func() {
-		rpcHandlers = new(rpc_serverfakes.FakeHandlers)
+		rpcHandlers = new(rpcserverfakes.FakeHandlers)
 		ts, err = test_rpc_server.NewTestRpcServer(rpcHandlers)
 		Expect(err).NotTo(HaveOccurred())
 

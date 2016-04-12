@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/feature_flags/featureflagsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -26,7 +26,7 @@ var _ = Describe("SetOrgRole", func() {
 		ui         *testterm.FakeUI
 		configRepo core_config.Repository
 		userRepo   *apifakes.FakeUserRepository
-		flagRepo   *feature_flagsfakes.FakeFeatureFlagRepository
+		flagRepo   *featureflagsfakes.FakeFeatureFlagRepository
 
 		cmd         command_registry.Command
 		deps        command_registry.Dependency
@@ -43,7 +43,7 @@ var _ = Describe("SetOrgRole", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		userRepo = new(apifakes.FakeUserRepository)
 		repoLocator := deps.RepoLocator.SetUserRepository(userRepo)
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 		repoLocator = repoLocator.SetFeatureFlagRepository(flagRepo)
 
 		deps = command_registry.Dependency{

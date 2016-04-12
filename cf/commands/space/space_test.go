@@ -1,7 +1,7 @@
 package space_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
+	"github.com/cloudfoundry/cli/cf/api/space_quotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,7 +21,7 @@ var _ = Describe("space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *space_quotasfakes.FakeSpaceQuotaRepository
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
 	)
@@ -35,7 +35,7 @@ var _ = Describe("space command", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
