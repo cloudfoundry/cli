@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
+	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -24,7 +24,7 @@ type CopySource struct {
 	appRepo           applications.ApplicationRepository
 	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
-	copyAppSourceRepo copy_application_source.CopyApplicationSourceRepository
+	copyAppSourceRepo copyapplicationsource.CopyApplicationSourceRepository
 	appRestart        ApplicationRestarter
 }
 

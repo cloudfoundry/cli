@@ -1,4 +1,4 @@
-package copy_application_source
+package copyapplicationsource
 
 import (
 	"fmt"
