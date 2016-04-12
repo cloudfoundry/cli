@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -37,7 +37,7 @@ type Dependency struct {
 	PluginModels       *PluginModels
 	ServiceBuilder     service_builder.ServiceBuilder
 	BrokerBuilder      brokerbuilder.Builder
-	PlanBuilder        plan_builder.PlanBuilder
+	PlanBuilder        planbuilder.PlanBuilder
 	ServiceHandler     actors.ServiceActor
 	ServicePlanHandler actors.ServicePlanActor
 	WordGenerator      generator.WordGenerator
@@ -91,7 +91,7 @@ func NewDependency(logger trace.Printer) Dependency {
 
 	deps.PluginModels = &PluginModels{Application: nil}
 
-	deps.PlanBuilder = plan_builder.NewBuilder(
+	deps.PlanBuilder = planbuilder.NewBuilder(
 		deps.RepoLocator.GetServicePlanRepository(),
 		deps.RepoLocator.GetServicePlanVisibilityRepository(),
 		deps.RepoLocator.GetOrganizationRepository(),

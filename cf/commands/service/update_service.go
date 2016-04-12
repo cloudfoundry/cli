@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
@@ -23,7 +23,7 @@ type UpdateService struct {
 	ui          terminal.UI
 	config      core_config.Reader
 	serviceRepo api.ServiceRepository
-	planBuilder plan_builder.PlanBuilder
+	planBuilder planbuilder.PlanBuilder
 }
 
 func init() {

@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder/planbuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"

@@ -4,7 +4,7 @@ package planbuilderfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -309,4 +309,4 @@ func (fake *FakePlanBuilder) GetPlansVisibleToOrgReturns(result1 []models.Servic
 	}{result1, result2}
 }
 
-var _ plan_builder.PlanBuilder = new(FakePlanBuilder)
+var _ planbuilder.PlanBuilder = new(FakePlanBuilder)
