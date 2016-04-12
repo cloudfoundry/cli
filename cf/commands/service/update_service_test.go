@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	plan_builderfakes "github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
+	plan_builderfakes "github.com/cloudfoundry/cli/cf/actors/plan_builder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
