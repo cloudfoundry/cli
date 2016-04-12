@@ -9,12 +9,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/plugin_repofakes"
+	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/pluginrepofakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/command_registry/command_registryfakes"
+	"github.com/cloudfoundry/cli/cf/command_registry/commandregistryfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/plugin_configfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -37,8 +37,8 @@ var _ = Describe("Install", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              core_config.Repository
-		pluginConfig        *plugin_configfakes.FakePluginConfiguration
-		fakePluginRepo      *plugin_repofakes.FakePluginRepo
+		pluginConfig        *pluginconfigfakes.FakePluginConfiguration
+		fakePluginRepo      *pluginrepofakes.FakePluginRepo
 		fakeChecksum        *utilsfakes.FakeSha1Checksum
 
 		pluginFile *os.File
@@ -68,9 +68,9 @@ var _ = Describe("Install", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		pluginConfig = new(plugin_configfakes.FakePluginConfiguration)
+		pluginConfig = new(pluginconfigfakes.FakePluginConfiguration)
 		config = testconfig.NewRepositoryWithDefaults()
-		fakePluginRepo = new(plugin_repofakes.FakePluginRepo)
+		fakePluginRepo = new(pluginrepofakes.FakePluginRepo)
 		fakeChecksum = new(utilsfakes.FakeSha1Checksum)
 
 		dir, err := os.Getwd()
@@ -385,9 +385,9 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin's alias conflicts with a core command/alias", func() {
-			var fakeCmd *command_registryfakes.FakeCommand
+			var fakeCmd *commandregistryfakes.FakeCommand
 			BeforeEach(func() {
-				fakeCmd = new(command_registryfakes.FakeCommand)
+				fakeCmd = new(commandregistryfakes.FakeCommand)
 			})
 
 			AfterEach(func() {

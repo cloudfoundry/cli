@@ -1,7 +1,7 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("list-security-groups command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		repo                *security_groupsfakes.FakeSecurityGroupRepo
+		repo                *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -37,7 +37,7 @@ var _ = Describe("list-security-groups command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		repo = new(security_groupsfakes.FakeSecurityGroupRepo)
+		repo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 

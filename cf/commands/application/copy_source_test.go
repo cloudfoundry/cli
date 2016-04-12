@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/api/copy_application_source/copy_application_sourcefakes"
+	"github.com/cloudfoundry/cli/cf/api/copy_application_source/copyapplicationsourcefakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -30,7 +30,7 @@ var _ = Describe("CopySource", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		appRepo             *applicationsfakes.FakeApplicationRepository
-		copyAppSourceRepo   *copy_application_sourcefakes.FakeCopyApplicationSourceRepository
+		copyAppSourceRepo   *copyapplicationsourcefakes.FakeCopyApplicationSourceRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		appRestarter        *applicationfakes.FakeApplicationRestarter
@@ -58,7 +58,7 @@ var _ = Describe("CopySource", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
-		copyAppSourceRepo = new(copy_application_sourcefakes.FakeCopyApplicationSourceRepository)
+		copyAppSourceRepo = new(copyapplicationsourcefakes.FakeCopyApplicationSourceRepository)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		config = testconfig.NewRepositoryWithDefaults()

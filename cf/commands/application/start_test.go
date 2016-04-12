@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
+	"github.com/cloudfoundry/cli/cf/api/app_instances/appinstancesfakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -40,7 +40,7 @@ var _ = Describe("start command", func() {
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []*logmessage.LogMessage
 		logRepo                   *apifakes.FakeLogsRepository
-		appInstancesRepo          *app_instancesfakes.FakeAppInstancesRepository
+		appInstancesRepo          *appinstancesfakes.FakeAppInstancesRepository
 		appRepo                   *applicationsfakes.FakeApplicationRepository
 		originalAppCommand        command_registry.Command
 		deps                      command_registry.Dependency
@@ -90,7 +90,7 @@ var _ = Describe("start command", func() {
 
 		configRepo = testconfig.NewRepository()
 
-		appInstancesRepo = new(app_instancesfakes.FakeAppInstancesRepository)
+		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
 
 		displayApp = new(applicationfakes.FakeAppDisplayer)
@@ -184,7 +184,7 @@ var _ = Describe("start command", func() {
 		return
 	}
 
-	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *applicationsfakes.FakeApplicationRepository, *app_instancesfakes.FakeAppInstancesRepository) {
+	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *applicationsfakes.FakeApplicationRepository, *appinstancesfakes.FakeAppInstancesRepository) {
 		appRepo.UpdateReturns(app, nil)
 		appRepo.ReadReturns(app, nil)
 		appRepo.GetAppReturns(app, nil)

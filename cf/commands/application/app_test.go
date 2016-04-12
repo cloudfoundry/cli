@@ -20,7 +20,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
+	"github.com/cloudfoundry/cli/cf/api/app_instances/appinstancesfakes"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
@@ -32,7 +32,7 @@ var _ = Describe("App", func() {
 	var (
 		ui               *testterm.FakeUI
 		appSummaryRepo   *apifakes.FakeAppSummaryRepository
-		appInstancesRepo *app_instancesfakes.FakeAppInstancesRepository
+		appInstancesRepo *appinstancesfakes.FakeAppInstancesRepository
 		getAppModel      *plugin_models.GetAppModel
 
 		cmd         command_registry.Command
@@ -56,7 +56,7 @@ var _ = Describe("App", func() {
 		repoLocator := api.RepositoryLocator{}
 		appSummaryRepo = new(apifakes.FakeAppSummaryRepository)
 		repoLocator = repoLocator.SetAppSummaryRepository(appSummaryRepo)
-		appInstancesRepo = new(app_instancesfakes.FakeAppInstancesRepository)
+		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		repoLocator = repoLocator.SetAppInstancesRepository(appInstancesRepo)
 
 		deps = command_registry.Dependency{

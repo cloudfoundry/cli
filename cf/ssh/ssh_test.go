@@ -26,7 +26,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/ssh"
 	"github.com/cloudfoundry/cli/cf/ssh/options"
 	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
-	"github.com/cloudfoundry/cli/cf/ssh/terminal/terminal_helper_fakes"
+	"github.com/cloudfoundry/cli/cf/ssh/terminal/terminalhelperfakes"
 	"github.com/docker/docker/pkg/term"
 	"github.com/kr/pty"
 	"github.com/pivotal-golang/lager/lagertest"
@@ -38,7 +38,7 @@ import (
 
 var _ = Describe("SSH", func() {
 	var (
-		fakeTerminalHelper  *terminal_helper_fakes.FakeTerminalHelper
+		fakeTerminalHelper  *terminalhelperfakes.FakeTerminalHelper
 		fakeListenerFactory *sshfakes.FakeListenerFactory
 
 		fakeConnection    *fake_ssh.FakeConn
@@ -59,7 +59,7 @@ var _ = Describe("SSH", func() {
 	)
 
 	BeforeEach(func() {
-		fakeTerminalHelper = &terminal_helper_fakes.FakeTerminalHelper{}
+		fakeTerminalHelper = &terminalhelperfakes.FakeTerminalHelper{}
 		terminalHelper = terminal.DefaultHelper()
 
 		fakeListenerFactory = new(sshfakes.FakeListenerFactory)

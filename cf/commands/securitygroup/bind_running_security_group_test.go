@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/runningfakes"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,7 +23,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   core_config.Repository
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *security_groupsfakes.FakeSecurityGroupRepo
+		fakeSecurityGroupRepo        *securitygroupsfakes.FakeSecurityGroupRepo
 		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo
 		deps                         command_registry.Dependency
 	)
@@ -40,7 +40,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = new(security_groupsfakes.FakeSecurityGroupRepo)
+		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		fakeRunningSecurityGroupRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
 	})
 

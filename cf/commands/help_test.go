@@ -3,7 +3,7 @@ package commands_test
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/plugin_configfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/commands_loader"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,7 +23,7 @@ var _ = Describe("Help", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              *plugin_configfakes.FakePluginConfiguration
+		config              *pluginconfigfakes.FakePluginConfiguration
 		deps                command_registry.Dependency
 	)
 
@@ -36,7 +36,7 @@ var _ = Describe("Help", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		config = new(plugin_configfakes.FakePluginConfiguration)
+		config = new(pluginconfigfakes.FakePluginConfiguration)
 	})
 
 	runCommand := func(args ...string) bool {
