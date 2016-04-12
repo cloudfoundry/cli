@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
-	"github.com/cloudfoundry/cli/testhelpers/rpc_server"
+	"github.com/cloudfoundry/cli/testhelpers/rpcserver"
 )
 
 type FakeHandlers struct {
@@ -1272,4 +1272,4 @@ func (fake *FakeHandlers) GetServiceReturns(result1 error) {
 	}{result1}
 }
 
-var _ test_rpc_server.Handlers = new(FakeHandlers)
+var _ rpcserver.Handlers = new(FakeHandlers)
