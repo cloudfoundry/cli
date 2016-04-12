@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -226,7 +226,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(ccServer.URL())
-			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
 		})
 
@@ -347,7 +347,7 @@ func createServiceBrokerRepo(requests ...testnet.TestRequest) (ts *httptest.Serv
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
 	return
 }

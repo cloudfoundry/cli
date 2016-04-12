@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	. "github.com/onsi/ginkgo"
@@ -74,7 +74,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		gateway = cloud_controller_gateway.NewTestCloudControllerGateway(config)
+		gateway = cloudcontrollergateway.NewTestCloudControllerGateway(config)
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(config, gateway)
 	})

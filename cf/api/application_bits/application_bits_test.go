@@ -16,7 +16,7 @@ import (
 	testapi "github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -44,7 +44,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		gateway.PollingThrottle = time.Duration(0)
 
 		repo = NewCloudControllerApplicationBitsRepository(configRepo, gateway)

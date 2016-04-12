@@ -8,7 +8,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -26,7 +26,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewStagingSecurityGroupsRepo(configRepo, gateway)
 	})
 

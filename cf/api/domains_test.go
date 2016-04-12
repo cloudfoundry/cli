@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -32,7 +32,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	JustBeforeEach(func() {
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(config)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
 		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
 		repo = NewCloudControllerDomainRepository(config, gateway, strategy)
 	})

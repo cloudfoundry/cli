@@ -1,4 +1,4 @@
-package cloud_controller_gateway
+package cloudcontrollergateway
 
 import (
 	"time"
