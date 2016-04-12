@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder/plan_builderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/plan_builder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
@@ -22,7 +22,7 @@ var _ = Describe("Service Plans", func() {
 		servicePlanVisibilityRepo *apifakes.FakeServicePlanVisibilityRepository
 		orgRepo                   *organizationsfakes.FakeOrganizationRepository
 
-		planBuilder    *plan_builderfakes.FakePlanBuilder
+		planBuilder    *planbuilderfakes.FakePlanBuilder
 		serviceBuilder *service_builderfakes.FakeServiceBuilder
 
 		privateServicePlanVisibilityFields models.ServicePlanVisibilityFields
@@ -48,7 +48,7 @@ var _ = Describe("Service Plans", func() {
 		servicePlanRepo = new(apifakes.OldFakeServicePlanRepo)
 		servicePlanVisibilityRepo = new(apifakes.FakeServicePlanVisibilityRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		planBuilder = new(plan_builderfakes.FakePlanBuilder)
+		planBuilder = new(planbuilderfakes.FakePlanBuilder)
 		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
 
 		actor = actors.NewServicePlanHandler(servicePlanRepo, servicePlanVisibilityRepo, orgRepo, planBuilder, serviceBuilder)
