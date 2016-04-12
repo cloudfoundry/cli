@@ -1,9 +1,9 @@
-package environment_variable_groups_test
+package environmentvariablegroups_test
 
 import (
 	"net/http"
 
-	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -20,7 +20,7 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 	var (
 		ccServer   *ghttp.Server
 		configRepo coreconfig.ReadWriter
-		repo       environment_variable_groups.CloudControllerEnvironmentVariableGroupsRepository
+		repo       environmentvariablegroups.CloudControllerEnvironmentVariableGroupsRepository
 	)
 
 	BeforeEach(func() {
@@ -28,7 +28,7 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(ccServer.URL())
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-		repo = environment_variable_groups.NewCloudControllerEnvironmentVariableGroupsRepository(configRepo, gateway)
+		repo = environmentvariablegroups.NewCloudControllerEnvironmentVariableGroupsRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {

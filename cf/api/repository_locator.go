@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
-	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/password"
@@ -72,10 +72,10 @@ type RepositoryLocator struct {
 	securityGroupSpaceBinder        securitygroupspaces.SecurityGroupSpaceBinder
 	spaceQuotaRepo                  spacequotas.SpaceQuotaRepository
 	featureFlagRepo                 featureflags.FeatureFlagRepository
-	environmentVariableGroupRepo    environment_variable_groups.EnvironmentVariableGroupsRepository
+	environmentVariableGroupRepo    environmentvariablegroups.EnvironmentVariableGroupsRepository
 	copyAppSourceRepo               copy_application_source.CopyApplicationSourceRepository
 
-	v3Repository                    repository.Repository
+	v3Repository repository.Repository
 }
 
 func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer) (loc RepositoryLocator) {
@@ -130,7 +130,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
 	loc.spaceQuotaRepo = spacequotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
 	loc.featureFlagRepo = featureflags.NewCloudControllerFeatureFlagRepository(config, cloudControllerGateway)
-	loc.environmentVariableGroupRepo = environment_variable_groups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
+	loc.environmentVariableGroupRepo = environmentvariablegroups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
 	loc.copyAppSourceRepo = copy_application_source.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
 
 	client := v3client.NewClient(config.ApiEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken())
@@ -456,12 +456,12 @@ func (locator RepositoryLocator) GetFeatureFlagRepository() featureflags.Feature
 	return locator.featureFlagRepo
 }
 
-func (locator RepositoryLocator) SetEnvironmentVariableGroupsRepository(repo environment_variable_groups.EnvironmentVariableGroupsRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetEnvironmentVariableGroupsRepository(repo environmentvariablegroups.EnvironmentVariableGroupsRepository) RepositoryLocator {
 	locator.environmentVariableGroupRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() environment_variable_groups.EnvironmentVariableGroupsRepository {
+func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() environmentvariablegroups.EnvironmentVariableGroupsRepository {
 	return locator.environmentVariableGroupRepo
 }
 

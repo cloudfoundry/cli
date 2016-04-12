@@ -1,4 +1,4 @@
-package environment_variable_groups
+package environmentvariablegroups
 
 import (
 	"fmt"
