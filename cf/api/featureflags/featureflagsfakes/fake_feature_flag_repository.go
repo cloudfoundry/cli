@@ -4,7 +4,7 @@ package featureflagsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -127,4 +127,4 @@ func (fake *FakeFeatureFlagRepository) UpdateReturns(result1 error) {
 	}{result1}
 }
 
-var _ feature_flags.FeatureFlagRepository = new(FakeFeatureFlagRepository)
+var _ featureflags.FeatureFlagRepository = new(FakeFeatureFlagRepository)

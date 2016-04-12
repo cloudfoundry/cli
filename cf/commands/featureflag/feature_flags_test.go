@@ -3,7 +3,7 @@ package featureflag_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/featureflagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"

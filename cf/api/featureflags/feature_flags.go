@@ -1,4 +1,4 @@
-package feature_flags
+package featureflags
 
 import (
 	"fmt"

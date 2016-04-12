@@ -1,7 +1,7 @@
 package featureflag
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -13,7 +13,7 @@ import (
 type ShowFeatureFlag struct {
 	ui       terminal.UI
 	config   coreconfig.ReadWriter
-	flagRepo feature_flags.FeatureFlagRepository
+	flagRepo featureflags.FeatureFlagRepository
 }
 
 func init() {

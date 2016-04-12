@@ -1,4 +1,4 @@
-package feature_flags_test
+package featureflags_test
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api/feature_flags"
+	. "github.com/cloudfoundry/cli/cf/api/featureflags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
