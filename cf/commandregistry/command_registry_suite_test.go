@@ -1,4 +1,4 @@
-package command_registry_test
+package commandregistry_test
 
 import (
 	. "github.com/onsi/ginkgo"

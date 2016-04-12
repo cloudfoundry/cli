@@ -2,7 +2,7 @@ package application_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,8 +25,8 @@ var _ = Describe("scale command", func() {
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		app                 models.Application
-		OriginalCommand     command_registry.Command
-		deps                command_registry.Dependency
+		OriginalCommand     commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -35,23 +35,23 @@ var _ = Describe("scale command", func() {
 		deps.Config = config
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(restarter)
+		commandregistry.Register(restarter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("scale").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("scale").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("restart")
+		OriginalCommand = commandregistry.Commands.FindCommand("restart")
 
 		restarter = new(applicationfakes.FakeApplicationRestarter)
-		//setup fakes to correctly interact with command_registry
-		restarter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fakes to correctly interact with commandregistry
+		restarter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return restarter
 		}
-		restarter.MetaDataReturns(command_registry.CommandMetadata{Name: "restart"})
+		restarter.MetaDataReturns(commandregistry.CommandMetadata{Name: "restart"})
 
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		ui = new(testterm.FakeUI)
@@ -59,7 +59,7 @@ var _ = Describe("scale command", func() {
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	Describe("requirements", func() {

@@ -12,7 +12,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -25,7 +25,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 		requirementsFactory          *testreq.FakeReqFactory
 		fakeSecurityGroupRepo        *securitygroupsfakes.FakeSecurityGroupRepo
 		fakeStagingSecurityGroupRepo *stagingfakes.FakeStagingSecurityGroupsRepo
-		deps                         command_registry.Dependency
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -33,7 +33,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(fakeSecurityGroupRepo)
 		deps.RepoLocator = deps.RepoLocator.SetStagingSecurityGroupRepository(fakeStagingSecurityGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("bind-staging-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("bind-staging-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

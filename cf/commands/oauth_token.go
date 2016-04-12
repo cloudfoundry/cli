@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -20,11 +20,11 @@ type OAuthToken struct {
 }
 
 func init() {
-	command_registry.Register(&OAuthToken{})
+	commandregistry.Register(&OAuthToken{})
 }
 
-func (cmd *OAuthToken) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *OAuthToken) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "oauth-token",
 		Description: T("Retrieve and display the OAuth token for the current session"),
 		Usage: []string{
@@ -41,7 +41,7 @@ func (cmd *OAuthToken) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *OAuthToken) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *OAuthToken) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()

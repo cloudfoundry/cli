@@ -4,26 +4,26 @@ package commandregistryfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeCommand struct {
-	MetaDataStub        func() command_registry.CommandMetadata
+	MetaDataStub        func() commandregistry.CommandMetadata
 	metaDataMutex       sync.RWMutex
 	metaDataArgsForCall []struct{}
 	metaDataReturns     struct {
-		result1 command_registry.CommandMetadata
+		result1 commandregistry.CommandMetadata
 	}
-	SetDependencyStub        func(deps command_registry.Dependency, pluginCall bool) command_registry.Command
+	SetDependencyStub        func(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command
 	setDependencyMutex       sync.RWMutex
 	setDependencyArgsForCall []struct {
-		deps       command_registry.Dependency
+		deps       commandregistry.Dependency
 		pluginCall bool
 	}
 	setDependencyReturns struct {
-		result1 command_registry.Command
+		result1 commandregistry.Command
 	}
 	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
 	requirementsMutex       sync.RWMutex
@@ -41,7 +41,7 @@ type FakeCommand struct {
 	}
 }
 
-func (fake *FakeCommand) MetaData() command_registry.CommandMetadata {
+func (fake *FakeCommand) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
 	fake.metaDataMutex.Unlock()
@@ -58,17 +58,17 @@ func (fake *FakeCommand) MetaDataCallCount() int {
 	return len(fake.metaDataArgsForCall)
 }
 
-func (fake *FakeCommand) MetaDataReturns(result1 command_registry.CommandMetadata) {
+func (fake *FakeCommand) MetaDataReturns(result1 commandregistry.CommandMetadata) {
 	fake.MetaDataStub = nil
 	fake.metaDataReturns = struct {
-		result1 command_registry.CommandMetadata
+		result1 commandregistry.CommandMetadata
 	}{result1}
 }
 
-func (fake *FakeCommand) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (fake *FakeCommand) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	fake.setDependencyMutex.Lock()
 	fake.setDependencyArgsForCall = append(fake.setDependencyArgsForCall, struct {
-		deps       command_registry.Dependency
+		deps       commandregistry.Dependency
 		pluginCall bool
 	}{deps, pluginCall})
 	fake.setDependencyMutex.Unlock()
@@ -85,16 +85,16 @@ func (fake *FakeCommand) SetDependencyCallCount() int {
 	return len(fake.setDependencyArgsForCall)
 }
 
-func (fake *FakeCommand) SetDependencyArgsForCall(i int) (command_registry.Dependency, bool) {
+func (fake *FakeCommand) SetDependencyArgsForCall(i int) (commandregistry.Dependency, bool) {
 	fake.setDependencyMutex.RLock()
 	defer fake.setDependencyMutex.RUnlock()
 	return fake.setDependencyArgsForCall[i].deps, fake.setDependencyArgsForCall[i].pluginCall
 }
 
-func (fake *FakeCommand) SetDependencyReturns(result1 command_registry.Command) {
+func (fake *FakeCommand) SetDependencyReturns(result1 commandregistry.Command) {
 	fake.SetDependencyStub = nil
 	fake.setDependencyReturns = struct {
-		result1 command_registry.Command
+		result1 commandregistry.Command
 	}{result1}
 }
 
@@ -154,4 +154,4 @@ func (fake *FakeCommand) ExecuteArgsForCall(i int) flags.FlagContext {
 	return fake.executeArgsForCall[i].context
 }
 
-var _ command_registry.Command = new(FakeCommand)
+var _ commandregistry.Command = new(FakeCommand)

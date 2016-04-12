@@ -4,7 +4,7 @@ package routefakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -66,11 +66,11 @@ func (fake *OldFakeRouteCreator) CreateRouteReturns(result1 models.Route, result
 	}{result1, result2}
 }
 
-func (cmd *OldFakeRouteCreator) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{Name: "create-route"}
+func (cmd *OldFakeRouteCreator) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{Name: "create-route"}
 }
 
-func (cmd *OldFakeRouteCreator) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *OldFakeRouteCreator) SetDependency(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 	return cmd
 }
 

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -25,14 +25,14 @@ type Logs struct {
 }
 
 func init() {
-	command_registry.Register(&Logs{})
+	commandregistry.Register(&Logs{})
 }
 
-func (cmd *Logs) MetaData() command_registry.CommandMetadata {
+func (cmd *Logs) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["recent"] = &flags.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "logs",
 		Description: T("Tail or show recent logs for an app"),
 		Usage: []string{
@@ -44,7 +44,7 @@ func (cmd *Logs) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Logs) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("logs"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("logs"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -58,7 +58,7 @@ func (cmd *Logs) Requirements(requirementsFactory requirements.Factory, fc flags
 	return reqs
 }
 
-func (cmd *Logs) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Logs) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.logsRepo = deps.RepoLocator.GetLogsRepository()

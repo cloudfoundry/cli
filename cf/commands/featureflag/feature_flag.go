@@ -2,7 +2,7 @@ package featureflag
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,11 +17,11 @@ type ShowFeatureFlag struct {
 }
 
 func init() {
-	command_registry.Register(&ShowFeatureFlag{})
+	commandregistry.Register(&ShowFeatureFlag{})
 }
 
-func (cmd *ShowFeatureFlag) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ShowFeatureFlag) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "feature-flag",
 		Description: T("Retrieve an individual feature flag with status"),
 		Usage: []string{
@@ -32,7 +32,7 @@ func (cmd *ShowFeatureFlag) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowFeatureFlag) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("feature-flag"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("feature-flag"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -42,7 +42,7 @@ func (cmd *ShowFeatureFlag) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *ShowFeatureFlag) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ShowFeatureFlag) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()

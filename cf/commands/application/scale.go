@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -21,17 +21,17 @@ type Scale struct {
 }
 
 func init() {
-	command_registry.Register(&Scale{})
+	commandregistry.Register(&Scale{})
 }
 
-func (cmd *Scale) MetaData() command_registry.CommandMetadata {
+func (cmd *Scale) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.IntFlag{ShortName: "i", Usage: T("Number of instances")}
 	fs["k"] = &flags.StringFlag{ShortName: "k", Usage: T("Disk limit (e.g. 256M, 1024M, 1G)")}
 	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Memory limit (e.g. 256M, 1024M, 1G)")}
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force restart of app without prompt")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "scale",
 		Description: T("Change or view the instance count, disk space limit, and memory limit for an app"),
 		Usage: []string{
@@ -43,7 +43,7 @@ func (cmd *Scale) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Scale) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("scale"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("scale"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -57,13 +57,13 @@ func (cmd *Scale) Requirements(requirementsFactory requirements.Factory, fc flag
 	return reqs
 }
 
-func (cmd *Scale) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Scale) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 
 	//get command from registry for dependency
-	commandDep := command_registry.Commands.FindCommand("restart")
+	commandDep := commandregistry.Commands.FindCommand("restart")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.restarter = commandDep.(ApplicationRestarter)
 

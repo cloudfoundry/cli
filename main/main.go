@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
@@ -21,7 +21,7 @@ import (
 	"github.com/cloudfoundry/cli/plugin/rpc"
 )
 
-var cmdRegistry = command_registry.Commands
+var cmdRegistry = commandregistry.Commands
 
 func main() {
 	traceEnv := os.Getenv("CF_TRACE")
@@ -60,7 +60,7 @@ func main() {
 
 	traceLogger = trace.NewLogger(isVerbose, traceEnv, traceConfigVal)
 
-	deps := command_registry.NewDependency(traceLogger)
+	deps := commandregistry.NewDependency(traceLogger)
 	defer handlePanics(deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 

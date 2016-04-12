@@ -2,7 +2,7 @@ package featureflag
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/feature_flags"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,11 +17,11 @@ type ListFeatureFlags struct {
 }
 
 func init() {
-	command_registry.Register(&ListFeatureFlags{})
+	commandregistry.Register(&ListFeatureFlags{})
 }
 
-func (cmd *ListFeatureFlags) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListFeatureFlags) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "feature-flags",
 		Description: T("Retrieve list of feature flags with status of each flag-able feature"),
 		Usage: []string{
@@ -31,7 +31,7 @@ func (cmd *ListFeatureFlags) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -46,7 +46,7 @@ func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Facto
 	return reqs
 }
 
-func (cmd *ListFeatureFlags) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListFeatureFlags) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()

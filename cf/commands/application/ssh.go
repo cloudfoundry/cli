@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -36,10 +36,10 @@ type sshInfo struct {
 }
 
 func init() {
-	command_registry.Register(&SSH{})
+	commandregistry.Register(&SSH{})
 }
 
-func (cmd *SSH) MetaData() command_registry.CommandMetadata {
+func (cmd *SSH) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["L"] = &flags.StringSliceFlag{ShortName: "L", Usage: T("Local port forward specification. This flag can be defined more than once.")}
 	fs["command"] = &flags.StringSliceFlag{Name: "command", ShortName: "c", Usage: T("Command to run. This flag can be defined more than once.")}
@@ -50,7 +50,7 @@ func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 	fs["force-pseudo-tty"] = &flags.BoolFlag{Name: "force-pseudo-tty", ShortName: "tt", Usage: T("Force pseudo-tty allocation")}
 	fs["disable-pseudo-tty"] = &flags.BoolFlag{Name: "disable-pseudo-tty", ShortName: "T", Usage: T("Disable pseudo-tty allocation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "ssh",
 		Description: T("SSH to an application container instance"),
 		Usage: []string{
@@ -62,18 +62,18 @@ func (cmd *SSH) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument") + "\n\n" + command_registry.Commands.CommandUsage("ssh"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument") + "\n\n" + commandregistry.Commands.CommandUsage("ssh"))
 	}
 
 	if fc.IsSet("i") && fc.Int("i") < 0 {
-		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("Value for flag 'app-instance-index' cannot be negative"), command_registry.Commands.CommandUsage("ssh")))
+		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", T("Value for flag 'app-instance-index' cannot be negative"), commandregistry.Commands.CommandUsage("ssh")))
 	}
 
 	var err error
 	cmd.opts, err = options.NewSSHOptions(fc)
 
 	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", err.Error(), command_registry.Commands.CommandUsage("ssh")))
+		cmd.ui.Failed(fmt.Sprintf(T("Incorrect Usage:")+" %s\n\n%s", err.Error(), commandregistry.Commands.CommandUsage("ssh")))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(cmd.opts.AppName)
@@ -87,7 +87,7 @@ func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.
 	return reqs
 }
 
-func (cmd *SSH) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.gateway = deps.Gateways["cloud-controller"]
@@ -97,7 +97,7 @@ func (cmd *SSH) SetDependency(deps command_registry.Dependency, pluginCall bool)
 	}
 
 	//get ssh-code for dependency
-	sshCodeGetter := command_registry.Commands.FindCommand("ssh-code")
+	sshCodeGetter := commandregistry.Commands.FindCommand("ssh-code")
 	sshCodeGetter = sshCodeGetter.SetDependency(deps, false)
 	cmd.sshCodeGetter = sshCodeGetter.(commands.SSHCodeGetter)
 

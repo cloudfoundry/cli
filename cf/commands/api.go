@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -22,15 +22,15 @@ type Api struct {
 }
 
 func init() {
-	command_registry.Register(Api{})
+	commandregistry.Register(Api{})
 }
 
-func (cmd Api) MetaData() command_registry.CommandMetadata {
+func (cmd Api) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["unset"] = &flags.BoolFlag{Name: "unset", Usage: T("Remove all api endpoint targeting")}
 	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "api",
 		Description: T("Set or view target api url"),
 		Usage: []string{
@@ -45,7 +45,7 @@ func (cmd Api) Requirements(requirementsFactory requirements.Factory, fc flags.F
 	return reqs
 }
 
-func (cmd Api) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd Api) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()

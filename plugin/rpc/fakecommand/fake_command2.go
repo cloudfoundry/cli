@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -17,11 +17,11 @@ type FakeCommand2 struct {
 }
 
 func init() {
-	command_registry.Register(FakeCommand2{Data: "FakeCommand2 data", req: fakeReq2{}})
+	commandregistry.Register(FakeCommand2{Data: "FakeCommand2 data", req: fakeReq2{}})
 }
 
-func (cmd FakeCommand2) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd FakeCommand2) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "fake-command2",
 		Description: "Description for fake-command2 with bad requirement",
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd FakeCommand2) Requirements(_ requirements.Factory, _ flags.FlagContext
 	return reqs
 }
 
-func (cmd FakeCommand2) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd FakeCommand2) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.req.ui = deps.Ui
 	cmd.ui = deps.Ui
 	cmd.ui.Say("SetDependency() called, pluginCall " + fmt.Sprintf("%t", pluginCall))

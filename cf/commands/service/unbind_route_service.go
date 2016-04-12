@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -29,15 +29,15 @@ type UnbindRouteService struct {
 }
 
 func init() {
-	command_registry.Register(&UnbindRouteService{})
+	commandregistry.Register(&UnbindRouteService{})
 }
 
-func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
+func (cmd *UnbindRouteService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force unbinding without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "unbind-route-service",
 		ShortName:   "urs",
 		Description: T("Unbind a service instance from an HTTP route"),
@@ -53,7 +53,7 @@ func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-route-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("unbind-route-service"))
 	}
 
 	serviceName := fc.Args()[1]
@@ -81,7 +81,7 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 	return reqs
 }
 
-func (cmd *UnbindRouteService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UnbindRouteService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()

@@ -12,7 +12,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -25,16 +25,16 @@ type CreateUserProvidedService struct {
 }
 
 func init() {
-	command_registry.Register(&CreateUserProvidedService{})
+	commandregistry.Register(&CreateUserProvidedService{})
 }
 
-func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateUserProvidedService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications")}
 	fs["l"] = &flags.StringFlag{ShortName: "l", Usage: T("URL to which logs for bound applications will be streamed")}
 	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("URL to which requests for bound routes will be forwarded. Scheme for this URL must be https")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-user-provided-service",
 		ShortName:   "cups",
 		Description: T("Make a user-provided service instance available to CF apps"),
@@ -71,7 +71,7 @@ func (cmd *CreateUserProvidedService) MetaData() command_registry.CommandMetadat
 
 func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-user-provided-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-user-provided-service"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -91,7 +91,7 @@ func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requireme
 	return reqs
 }
 
-func (cmd *CreateUserProvidedService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateUserProvidedService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userProvidedServiceInstanceRepo = deps.RepoLocator.GetUserProvidedServiceInstanceRepository()

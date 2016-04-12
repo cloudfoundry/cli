@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/app_events"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,11 +18,11 @@ type Events struct {
 }
 
 func init() {
-	command_registry.Register(&Events{})
+	commandregistry.Register(&Events{})
 }
 
-func (cmd *Events) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Events) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "events",
 		Description: T("Show recent app events"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *Events) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Events) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) []requirements.Requirement {
 	if len(c.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("events"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("events"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
@@ -47,7 +47,7 @@ func (cmd *Events) Requirements(requirementsFactory requirements.Factory, c flag
 	return reqs
 }
 
-func (cmd *Events) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Events) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.eventsRepo = deps.RepoLocator.GetAppEventsRepository()

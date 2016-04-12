@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/commandsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -29,11 +29,11 @@ var _ = Describe("SSH command", func() {
 		ui *testterm.FakeUI
 
 		sshCodeGetter         *commandsfakes.FakeSSHCodeGetter
-		originalSSHCodeGetter command_registry.Command
+		originalSSHCodeGetter commandregistry.Command
 
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 		ccGateway           net.Gateway
 
 		fakeSecureShell *sshfakes.FakeSecureShell
@@ -46,20 +46,20 @@ var _ = Describe("SSH command", func() {
 		deps.Gateways = make(map[string]net.Gateway)
 
 		//save original command and restore later
-		originalSSHCodeGetter = command_registry.Commands.FindCommand("ssh-code")
+		originalSSHCodeGetter = commandregistry.Commands.FindCommand("ssh-code")
 
 		sshCodeGetter = new(commandsfakes.FakeSSHCodeGetter)
 
-		//setup fakes to correctly interact with command_registry
-		sshCodeGetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fakes to correctly interact with commandregistry
+		sshCodeGetter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return sshCodeGetter
 		}
-		sshCodeGetter.MetaDataReturns(command_registry.CommandMetadata{Name: "ssh-code"})
+		sshCodeGetter.MetaDataReturns(commandregistry.CommandMetadata{Name: "ssh-code"})
 	})
 
 	AfterEach(func() {
 		//restore original command
-		command_registry.Register(originalSSHCodeGetter)
+		commandregistry.Register(originalSSHCodeGetter)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -67,9 +67,9 @@ var _ = Describe("SSH command", func() {
 		deps.Config = configRepo
 
 		//inject fake 'sshCodeGetter' into registry
-		command_registry.Register(sshCodeGetter)
+		commandregistry.Register(sshCodeGetter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("ssh").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("ssh").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

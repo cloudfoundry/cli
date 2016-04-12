@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -27,10 +27,10 @@ type UpdateService struct {
 }
 
 func init() {
-	command_registry.Register(&UpdateService{})
+	commandregistry.Register(&UpdateService{})
 }
 
-func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
+func (cmd *UpdateService) MetaData() commandregistry.CommandMetadata {
 	baseUsage := T("CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]")
 	paramsUsage := T(`   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
    CF_NAME update-service -c '{"name":"value","name":"value"}'
@@ -53,7 +53,7 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("User provided tags")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
 		Usage: []string{
@@ -75,7 +75,7 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-service"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -90,7 +90,7 @@ func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory,
 	return reqs
 }
 
-func (cmd *UpdateService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UpdateService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()

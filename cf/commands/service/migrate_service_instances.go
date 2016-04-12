@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -23,14 +23,14 @@ type MigrateServiceInstances struct {
 }
 
 func init() {
-	command_registry.Register(&MigrateServiceInstances{})
+	commandregistry.Register(&MigrateServiceInstances{})
 }
 
-func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata {
+func (cmd *MigrateServiceInstances) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force migration without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "migrate-service-instances",
 		Description: T("Migrate service instances from one service plan to another"),
 		Usage: []string{
@@ -43,7 +43,7 @@ func (cmd *MigrateServiceInstances) MetaData() command_registry.CommandMetadata 
 
 func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 5 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n") + command_registry.Commands.CommandUsage("migrate-service-instances"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n") + commandregistry.Commands.CommandUsage("migrate-service-instances"))
 	}
 
 	maximumVersion, err := semver.Make("2.46.0")
@@ -59,7 +59,7 @@ func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirement
 	return reqs
 }
 
-func (cmd *MigrateServiceInstances) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *MigrateServiceInstances) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()

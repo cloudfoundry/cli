@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -23,14 +23,14 @@ type ServiceKey struct {
 }
 
 func init() {
-	command_registry.Register(&ServiceKey{})
+	commandregistry.Register(&ServiceKey{})
 }
 
-func (cmd *ServiceKey) MetaData() command_registry.CommandMetadata {
+func (cmd *ServiceKey) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service-key's guid.  All other output for the service is suppressed.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "service-key",
 		Description: T("Show service key info"),
 		Usage: []string{
@@ -45,7 +45,7 @@ func (cmd *ServiceKey) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n") + command_registry.Commands.CommandUsage("service-key"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n") + commandregistry.Commands.CommandUsage("service-key"))
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
@@ -56,7 +56,7 @@ func (cmd *ServiceKey) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *ServiceKey) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ServiceKey) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()

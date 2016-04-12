@@ -3,7 +3,7 @@ package spacequota
 import (
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -19,11 +19,11 @@ type SetSpaceQuota struct {
 }
 
 func init() {
-	command_registry.Register(&SetSpaceQuota{})
+	commandregistry.Register(&SetSpaceQuota{})
 }
 
-func (cmd *SetSpaceQuota) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SetSpaceQuota) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "set-space-quota",
 		Description: T("Assign a space quota definition to a space"),
 		Usage: []string{
@@ -34,7 +34,7 @@ func (cmd *SetSpaceQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SetSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n") + command_registry.Commands.CommandUsage("set-space-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n") + commandregistry.Commands.CommandUsage("set-space-quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -45,7 +45,7 @@ func (cmd *SetSpaceQuota) Requirements(requirementsFactory requirements.Factory,
 	return reqs
 }
 
-func (cmd *SetSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SetSpaceQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()

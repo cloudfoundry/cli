@@ -2,7 +2,7 @@ package application_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,8 +25,8 @@ var _ = Describe("restage command", func() {
 		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		stagingWatcher      *fakeStagingWatcher
-		OriginalCommand     command_registry.Command
-		deps                command_registry.Dependency
+		OriginalCommand     commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -35,9 +35,9 @@ var _ = Describe("restage command", func() {
 		deps.Config = configRepo
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(stagingWatcher)
+		commandregistry.Register(stagingWatcher)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restage").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restage").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -53,13 +53,13 @@ var _ = Describe("restage command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("start")
+		OriginalCommand = commandregistry.Commands.FindCommand("start")
 
 		stagingWatcher = &fakeStagingWatcher{}
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -139,11 +139,11 @@ func (f *fakeStagingWatcher) ApplicationWatchStaging(app models.Application, org
 	f.spaceName = spaceName
 	return start(app)
 }
-func (cmd *fakeStagingWatcher) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{Name: "start"}
+func (cmd *fakeStagingWatcher) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{Name: "start"}
 }
 
-func (cmd *fakeStagingWatcher) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *fakeStagingWatcher) SetDependency(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 	return cmd
 }
 

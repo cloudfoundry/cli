@@ -9,7 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -58,11 +58,11 @@ func newAppPresenter() (presenter appPresenter) {
 	})
 	plugins := pluginConfig.Plugins()
 
-	maxNameLen := command_registry.Commands.MaxCommandNameLength()
+	maxNameLen := commandregistry.Commands.MaxCommandNameLength()
 	maxNameLen = maxPluginCommandNameLength(plugins, maxNameLen)
 
 	presentCommand := func(commandName string) (presenter cmdPresenter) {
-		cmd := command_registry.Commands.FindCommand(commandName)
+		cmd := commandregistry.Commands.FindCommand(commandName)
 		presenter.Name = cmd.MetaData().Name
 		padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
 		presenter.Name = presenter.Name + padding

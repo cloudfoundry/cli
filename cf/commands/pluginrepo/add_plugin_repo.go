@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -26,11 +26,11 @@ type AddPluginRepo struct {
 }
 
 func init() {
-	command_registry.Register(&AddPluginRepo{})
+	commandregistry.Register(&AddPluginRepo{})
 }
 
-func (cmd *AddPluginRepo) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *AddPluginRepo) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "add-plugin-repo",
 		Description: T("Add a new plugin repository"),
 		Usage: []string{
@@ -45,14 +45,14 @@ func (cmd *AddPluginRepo) MetaData() command_registry.CommandMetadata {
 
 func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n") + command_registry.Commands.CommandUsage("add-plugin-repo"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n") + commandregistry.Commands.CommandUsage("add-plugin-repo"))
 	}
 
 	reqs := []requirements.Requirement{}
 	return reqs
 }
 
-func (cmd *AddPluginRepo) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *AddPluginRepo) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	return cmd

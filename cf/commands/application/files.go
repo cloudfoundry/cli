@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/app_files"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,14 +18,14 @@ type Files struct {
 }
 
 func init() {
-	command_registry.Register(&Files{})
+	commandregistry.Register(&Files{})
 }
 
-func (cmd *Files) MetaData() command_registry.CommandMetadata {
+func (cmd *Files) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.IntFlag{ShortName: "i", Usage: T("Instance")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "files",
 		ShortName:   "f",
 		Description: T("Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"),
@@ -41,7 +41,7 @@ TIP:
 
 func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) []requirements.Requirement {
 	if len(c.Args()) < 1 || len(c.Args()) > 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("files"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("files"))
 	}
 
 	cmd.appReq = requirementsFactory.NewDEAApplicationRequirement(c.Args()[0])
@@ -55,7 +55,7 @@ func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags
 	return reqs
 }
 
-func (cmd *Files) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Files) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appFilesRepo = deps.RepoLocator.GetAppFilesRepository()

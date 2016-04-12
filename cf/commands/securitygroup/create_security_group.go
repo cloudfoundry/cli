@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -20,10 +20,10 @@ type CreateSecurityGroup struct {
 }
 
 func init() {
-	command_registry.Register(&CreateSecurityGroup{})
+	commandregistry.Register(&CreateSecurityGroup{})
 }
 
-func (cmd *CreateSecurityGroup) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	primaryUsage := T("CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE")
 	secondaryUsage := T(`   The provided path can be an absolute or relative path to a file.  The file should have
    a single array with JSON objects inside describing the rules.  The JSON Base Object is 
@@ -38,7 +38,7 @@ func (cmd *CreateSecurityGroup) MetaData() command_registry.CommandMetadata {
      }
    ]`)
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-security-group",
 		Description: T("Create a security group"),
 		Usage: []string{
@@ -51,7 +51,7 @@ func (cmd *CreateSecurityGroup) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n") + command_registry.Commands.CommandUsage("create-security-group"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n") + commandregistry.Commands.CommandUsage("create-security-group"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -61,7 +61,7 @@ func (cmd *CreateSecurityGroup) Requirements(requirementsFactory requirements.Fa
 	return reqs
 }
 
-func (cmd *CreateSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()

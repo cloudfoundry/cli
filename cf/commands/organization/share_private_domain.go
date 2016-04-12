@@ -3,7 +3,7 @@ package organization
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -20,11 +20,11 @@ type SharePrivateDomain struct {
 }
 
 func init() {
-	command_registry.Register(&SharePrivateDomain{})
+	commandregistry.Register(&SharePrivateDomain{})
 }
 
-func (cmd *SharePrivateDomain) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SharePrivateDomain) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "share-private-domain",
 		Description: T("Share a private domain with an org"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *SharePrivateDomain) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SharePrivateDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("share-private-domain"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n") + commandregistry.Commands.CommandUsage("share-private-domain"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -48,7 +48,7 @@ func (cmd *SharePrivateDomain) Requirements(requirementsFactory requirements.Fac
 	return reqs
 }
 
-func (cmd *SharePrivateDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SharePrivateDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()

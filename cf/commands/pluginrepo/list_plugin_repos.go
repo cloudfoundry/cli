@@ -1,7 +1,7 @@
 package pluginrepo
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -16,11 +16,11 @@ type ListPluginRepos struct {
 }
 
 func init() {
-	command_registry.Register(&ListPluginRepos{})
+	commandregistry.Register(&ListPluginRepos{})
 }
 
-func (cmd *ListPluginRepos) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListPluginRepos) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "list-plugin-repos",
 		Description: T("List all the added plugin repositories"),
 		Usage: []string{
@@ -30,7 +30,7 @@ func (cmd *ListPluginRepos) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListPluginRepos) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -43,7 +43,7 @@ func (cmd *ListPluginRepos) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *ListPluginRepos) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListPluginRepos) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	return cmd

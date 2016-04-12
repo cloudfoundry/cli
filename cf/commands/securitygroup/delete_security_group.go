@@ -2,7 +2,7 @@ package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -18,14 +18,14 @@ type DeleteSecurityGroup struct {
 }
 
 func init() {
-	command_registry.Register(&DeleteSecurityGroup{})
+	commandregistry.Register(&DeleteSecurityGroup{})
 }
 
-func (cmd *DeleteSecurityGroup) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-security-group",
 		Description: T("Deletes a security group"),
 		Usage: []string{
@@ -37,14 +37,14 @@ func (cmd *DeleteSecurityGroup) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-security-group"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-security-group"))
 	}
 
 	reqs := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return reqs
 }
 
-func (cmd *DeleteSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()

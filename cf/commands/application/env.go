@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -22,11 +22,11 @@ type Env struct {
 }
 
 func init() {
-	command_registry.Register(&Env{})
+	commandregistry.Register(&Env{})
 }
 
-func (cmd *Env) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Env) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "env",
 		ShortName:   "e",
 		Description: T("Show all env variables for an app"),
@@ -38,7 +38,7 @@ func (cmd *Env) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Env) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("env"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("env"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -49,7 +49,7 @@ func (cmd *Env) Requirements(requirementsFactory requirements.Factory, fc flags.
 	return reqs
 }
 
-func (cmd *Env) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Env) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()

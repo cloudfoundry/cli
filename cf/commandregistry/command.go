@@ -1,4 +1,4 @@
-package command_registry
+package commandregistry
 
 import (
 	"github.com/cloudfoundry/cli/cf/requirements"

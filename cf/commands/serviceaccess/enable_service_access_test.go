@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -25,7 +25,7 @@ var _ = Describe("enable-service-access command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
 		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -33,7 +33,7 @@ var _ = Describe("enable-service-access command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
 		deps.ServicePlanHandler = actor
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("enable-service-access").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("enable-service-access").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

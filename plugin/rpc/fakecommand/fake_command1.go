@@ -3,7 +3,7 @@ package fakecommand
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -16,11 +16,11 @@ type FakeCommand1 struct {
 }
 
 func init() {
-	command_registry.Register(FakeCommand1{Data: "FakeCommand1 data", req: fakeReq{ui: nil}})
+	commandregistry.Register(FakeCommand1{Data: "FakeCommand1 data", req: fakeReq{ui: nil}})
 }
 
-func (cmd FakeCommand1) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd FakeCommand1) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "fake-command",
 		Description: "Description for fake-command",
 		Usage: []string{
@@ -34,7 +34,7 @@ func (cmd FakeCommand1) Requirements(_ requirements.Factory, _ flags.FlagContext
 	return reqs
 }
 
-func (cmd FakeCommand1) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd FakeCommand1) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	if cmd.ui != nil {
 		cmd.ui.Say("SetDependency() called, pluginCall " + fmt.Sprintf("%t", pluginCall))
 	}

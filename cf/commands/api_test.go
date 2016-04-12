@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,7 +23,7 @@ var _ = Describe("api command", func() {
 	var (
 		config              coreconfig.Repository
 		endpointRepo        *apifakes.FakeEndpointRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
 		fakeLogger          *tracefakes.FakePrinter
@@ -33,7 +33,7 @@ var _ = Describe("api command", func() {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetEndpointRepository(endpointRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("api").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("api").SetDependency(deps, pluginCall))
 	}
 
 	callApi := func(args []string, config coreconfig.Repository, endpointRepo *apifakes.FakeEndpointRepository) {
@@ -46,7 +46,7 @@ var _ = Describe("api command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		config = testconfig.NewRepository()
 		endpointRepo = new(apifakes.FakeEndpointRepository)
-		deps = command_registry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(fakeLogger)
 	})
 
 	Context("when the api endpoint's ssl certificate is invalid", func() {

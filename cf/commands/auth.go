@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,11 +18,11 @@ type Authenticate struct {
 }
 
 func init() {
-	command_registry.Register(&Authenticate{})
+	commandregistry.Register(&Authenticate{})
 }
 
-func (cmd *Authenticate) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Authenticate) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "auth",
 		Description: T("Authenticate user non-interactively"),
 		Usage: []string{
@@ -38,7 +38,7 @@ func (cmd *Authenticate) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Authenticate) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires 'username password' as arguments\n\n") + command_registry.Commands.CommandUsage("auth"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires 'username password' as arguments\n\n") + commandregistry.Commands.CommandUsage("auth"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -48,7 +48,7 @@ func (cmd *Authenticate) Requirements(requirementsFactory requirements.Factory, 
 	return reqs
 }
 
-func (cmd *Authenticate) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Authenticate) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authenticator = deps.RepoLocator.GetAuthenticationRepository()

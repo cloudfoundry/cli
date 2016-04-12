@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -21,11 +21,11 @@ type SecurityGroups struct {
 }
 
 func init() {
-	command_registry.Register(&SecurityGroups{})
+	commandregistry.Register(&SecurityGroups{})
 }
 
-func (cmd *SecurityGroups) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SecurityGroups) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "security-groups",
 		Description: T("List all security groups"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *SecurityGroups) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -49,7 +49,7 @@ func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory
 	return reqs
 }
 
-func (cmd *SecurityGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SecurityGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()

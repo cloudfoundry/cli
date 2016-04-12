@@ -1,7 +1,7 @@
 package rpc_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	. "github.com/cloudfoundry/cli/plugin/rpc/fakecommand"
 
@@ -12,27 +12,27 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("calling commands in command_registry", func() {
+var _ = Describe("calling commands in commandregistry", func() {
 
 	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
 
 	var (
 		ui         *testterm.FakeUI
-		deps       command_registry.Dependency
+		deps       commandregistry.Dependency
 		fakeLogger *tracefakes.FakePrinter
 	)
 
 	BeforeEach(func() {
 		fakeLogger = new(tracefakes.FakePrinter)
-		deps = command_registry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(fakeLogger)
 		ui = &testterm.FakeUI{}
 		deps.Ui = ui
 
-		cmd := command_registry.Commands.FindCommand("fake-command")
-		command_registry.Commands.SetCommand(cmd.SetDependency(deps, true))
+		cmd := commandregistry.Commands.FindCommand("fake-command")
+		commandregistry.Commands.SetCommand(cmd.SetDependency(deps, true))
 
-		cmd2 := command_registry.Commands.FindCommand("fake-command2")
-		command_registry.Commands.SetCommand(cmd2.SetDependency(deps, true))
+		cmd2 := commandregistry.Commands.FindCommand("fake-command2")
+		commandregistry.Commands.SetCommand(cmd2.SetDependency(deps, true))
 	})
 
 	It("runs the command requirements", func() {

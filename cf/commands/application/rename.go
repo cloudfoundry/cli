@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,11 +19,11 @@ type RenameApp struct {
 }
 
 func init() {
-	command_registry.Register(&RenameApp{})
+	commandregistry.Register(&RenameApp{})
 }
 
-func (cmd *RenameApp) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RenameApp) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "rename",
 		Description: T("Rename an app"),
 		Usage: []string{
@@ -34,7 +34,7 @@ func (cmd *RenameApp) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RenameApp) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) []requirements.Requirement {
 	if len(c.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires old app name and new app name as arguments\n\n") + command_registry.Commands.CommandUsage("rename"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires old app name and new app name as arguments\n\n") + commandregistry.Commands.CommandUsage("rename"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(c.Args()[0])
@@ -48,7 +48,7 @@ func (cmd *RenameApp) Requirements(requirementsFactory requirements.Factory, c f
 	return reqs
 }
 
-func (cmd *RenameApp) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RenameApp) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()

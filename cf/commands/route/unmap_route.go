@@ -5,7 +5,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -22,16 +22,16 @@ type UnmapRoute struct {
 }
 
 func init() {
-	command_registry.Register(&UnmapRoute{})
+	commandregistry.Register(&UnmapRoute{})
 }
 
-func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
+func (cmd *UnmapRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used to identify the HTTP route")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path used to identify the HTTP route")}
 	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port used to identify the TCP route")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "unmap-route",
 		Description: T("Remove a url route from an app"),
 		Usage: []string{
@@ -59,7 +59,7 @@ func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires app_name, domain_name as arguments\n\n") + command_registry.Commands.CommandUsage("unmap-route"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires app_name, domain_name as arguments\n\n") + commandregistry.Commands.CommandUsage("unmap-route"))
 	}
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
@@ -95,7 +95,7 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *UnmapRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UnmapRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()

@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -25,8 +25,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 		configRepo  coreconfig.Repository
 		serviceRepo *apifakes.FakeServiceRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -40,7 +40,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		repoLocator := deps.RepoLocator.SetServiceRepository(serviceRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

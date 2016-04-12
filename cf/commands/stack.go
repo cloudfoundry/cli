@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/stacks"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,14 +17,14 @@ type ListStack struct {
 }
 
 func init() {
-	command_registry.Register(&ListStack{})
+	commandregistry.Register(&ListStack{})
 }
 
-func (cmd *ListStack) MetaData() command_registry.CommandMetadata {
+func (cmd *ListStack) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given stack's guid. All other output for the stack is suppressed.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "stack",
 		Description: T("Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps)"),
 		Usage: []string{
@@ -37,7 +37,7 @@ func (cmd *ListStack) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires stack name as argument\n\n") + command_registry.Commands.CommandUsage("stack"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires stack name as argument\n\n") + commandregistry.Commands.CommandUsage("stack"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -47,7 +47,7 @@ func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *ListStack) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *ListStack) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.stacksRepo = deps.RepoLocator.GetStackRepository()

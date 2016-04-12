@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -23,14 +23,14 @@ type RepoPlugins struct {
 }
 
 func init() {
-	command_registry.Register(&RepoPlugins{})
+	commandregistry.Register(&RepoPlugins{})
 }
 
-func (cmd *RepoPlugins) MetaData() command_registry.CommandMetadata {
+func (cmd *RepoPlugins) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        T("repo-plugins"),
 		Description: T("List all available plugins in specified repository or in all added repositories"),
 		Usage: []string{
@@ -48,7 +48,7 @@ func (cmd *RepoPlugins) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *RepoPlugins) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RepoPlugins) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.pluginRepo = deps.PluginRepo

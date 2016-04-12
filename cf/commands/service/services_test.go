@@ -2,7 +2,7 @@ package service_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -27,14 +27,14 @@ var _ = Describe("services", func() {
 		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceSummaryRepo  *apifakes.OldFakeServiceSummaryRepo
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetServiceSummaryRepository(serviceSummaryRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("services").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("services").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
@@ -51,7 +51,7 @@ var _ = Describe("services", func() {
 			TargetedOrgSuccess:   true,
 		}
 
-		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	Describe("services requirements", func() {
@@ -77,7 +77,7 @@ var _ = Describe("services", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

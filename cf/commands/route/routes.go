@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -23,14 +23,14 @@ type ListRoutes struct {
 }
 
 func init() {
-	command_registry.Register(&ListRoutes{})
+	commandregistry.Register(&ListRoutes{})
 }
 
-func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
+func (cmd *ListRoutes) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["orglevel"] = &flags.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "routes",
 		ShortName:   "r",
 		Description: T("List all routes in the current space or the current organization"),
@@ -42,7 +42,7 @@ func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -58,7 +58,7 @@ func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListRoutes) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()

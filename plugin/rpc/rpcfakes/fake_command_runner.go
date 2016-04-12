@@ -4,16 +4,16 @@ package rpcfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 )
 
 type FakeCommandRunner struct {
-	CommandStub        func([]string, command_registry.Dependency, bool) error
+	CommandStub        func([]string, commandregistry.Dependency, bool) error
 	commandMutex       sync.RWMutex
 	commandArgsForCall []struct {
 		arg1 []string
-		arg2 command_registry.Dependency
+		arg2 commandregistry.Dependency
 		arg3 bool
 	}
 	commandReturns struct {
@@ -21,11 +21,11 @@ type FakeCommandRunner struct {
 	}
 }
 
-func (fake *FakeCommandRunner) Command(arg1 []string, arg2 command_registry.Dependency, arg3 bool) error {
+func (fake *FakeCommandRunner) Command(arg1 []string, arg2 commandregistry.Dependency, arg3 bool) error {
 	fake.commandMutex.Lock()
 	fake.commandArgsForCall = append(fake.commandArgsForCall, struct {
 		arg1 []string
-		arg2 command_registry.Dependency
+		arg2 commandregistry.Dependency
 		arg3 bool
 	}{arg1, arg2, arg3})
 	fake.commandMutex.Unlock()
@@ -42,7 +42,7 @@ func (fake *FakeCommandRunner) CommandCallCount() int {
 	return len(fake.commandArgsForCall)
 }
 
-func (fake *FakeCommandRunner) CommandArgsForCall(i int) ([]string, command_registry.Dependency, bool) {
+func (fake *FakeCommandRunner) CommandArgsForCall(i int) ([]string, commandregistry.Dependency, bool) {
 	fake.commandMutex.RLock()
 	defer fake.commandMutex.RUnlock()
 	return fake.commandArgsForCall[i].arg1, fake.commandArgsForCall[i].arg2, fake.commandArgsForCall[i].arg3

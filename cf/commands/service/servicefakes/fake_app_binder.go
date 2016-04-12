@@ -1,7 +1,7 @@
 package servicefakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -25,11 +25,11 @@ func (binder *OldFakeAppBinder) BindApplication(app models.Application, service 
 	return binder.BindApplicationReturns.Error
 }
 
-func (binder *OldFakeAppBinder) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{Name: "bind-service"}
+func (binder *OldFakeAppBinder) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{Name: "bind-service"}
 }
 
-func (binder *OldFakeAppBinder) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+func (binder *OldFakeAppBinder) SetDependency(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 	return binder
 }
 

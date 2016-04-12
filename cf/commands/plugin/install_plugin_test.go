@@ -10,8 +10,8 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/pluginrepofakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/command_registry/commandregistryfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/commandregistry/commandregistryfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
@@ -53,7 +53,7 @@ var _ = Describe("Install", func() {
 		test_with_orgs            string
 		test_with_orgs_short_name string
 		aliasConflicts            string
-		deps                      command_registry.Dependency
+		deps                      commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -62,7 +62,7 @@ var _ = Describe("Install", func() {
 		deps.PluginConfig = pluginConfig
 		deps.PluginRepo = fakePluginRepo
 		deps.ChecksumUtil = fakeChecksum
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("install-plugin").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("install-plugin").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -351,17 +351,17 @@ var _ = Describe("Install", func() {
 		})
 
 		Context("when the plugin's command conflicts with a core command/alias", func() {
-			var originalCommand command_registry.Command
+			var originalCommand commandregistry.Command
 
 			BeforeEach(func() {
-				originalCommand = command_registry.Commands.FindCommand("org")
+				originalCommand = commandregistry.Commands.FindCommand("org")
 
-				command_registry.Register(testOrgsCmd{})
+				commandregistry.Register(testOrgsCmd{})
 			})
 
 			AfterEach(func() {
 				if originalCommand != nil {
-					command_registry.Register(originalCommand)
+					commandregistry.Register(originalCommand)
 				}
 			})
 
@@ -391,13 +391,13 @@ var _ = Describe("Install", func() {
 			})
 
 			AfterEach(func() {
-				command_registry.Commands.RemoveCommand("non-conflict-cmd")
-				command_registry.Commands.RemoveCommand("conflict-alias")
+				commandregistry.Commands.RemoveCommand("non-conflict-cmd")
+				commandregistry.Commands.RemoveCommand("conflict-alias")
 			})
 
 			It("fails if it shares a command name", func() {
-				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "conflict-alias"})
-				command_registry.Register(fakeCmd)
+				fakeCmd.MetaDataReturns(commandregistry.CommandMetadata{Name: "conflict-alias"})
+				commandregistry.Register(fakeCmd)
 
 				runCommand(aliasConflicts, "-f")
 
@@ -408,8 +408,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command short name", func() {
-				fakeCmd.MetaDataReturns(command_registry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
-				command_registry.Register(fakeCmd)
+				fakeCmd.MetaDataReturns(commandregistry.CommandMetadata{Name: "non-conflict-cmd", ShortName: "conflict-alias"})
+				commandregistry.Register(fakeCmd)
 
 				runCommand(aliasConflicts, "-f")
 
@@ -611,8 +611,8 @@ var _ = Describe("Install", func() {
 
 type testOrgsCmd struct{}
 
-func (t testOrgsCmd) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (t testOrgsCmd) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:      "orgs",
 		ShortName: "o",
 	}
@@ -622,7 +622,7 @@ func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc
 	return []requirements.Requirement{}
 }
 
-func (cmd testOrgsCmd) SetDependency(deps command_registry.Dependency, pluginCall bool) (c command_registry.Command) {
+func (cmd testOrgsCmd) SetDependency(deps commandregistry.Dependency, pluginCall bool) (c commandregistry.Command) {
 	return
 }
 
