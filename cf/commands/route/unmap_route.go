@@ -62,6 +62,10 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 		cmd.ui.Failed(T("Incorrect Usage. Requires app_name, domain_name as arguments\n\n") + command_registry.Commands.CommandUsage("unmap-route"))
 	}
 
+	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
+		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+	}
+
 	domainName := fc.Args()[1]
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
