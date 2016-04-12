@@ -1,11 +1,11 @@
-package plugin_repo_test
+package pluginrepo_test
 
 import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 
-	. "github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	. "github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 

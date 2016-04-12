@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/actors/plugin_installer"
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
@@ -28,7 +28,7 @@ type PluginInstall struct {
 	ui           terminal.UI
 	config       coreconfig.Reader
 	pluginConfig pluginconfig.PluginConfiguration
-	pluginRepo   plugin_repo.PluginRepo
+	pluginRepo   pluginrepo.PluginRepo
 	checksum     utils.Sha1Checksum
 	rpcService   *rpcService.CliRpcService
 }

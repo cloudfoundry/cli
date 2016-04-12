@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
 	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/appfiles"
@@ -33,7 +33,7 @@ type Dependency struct {
 	AppManifest        manifest.AppManifest
 	Gateways           map[string]net.Gateway
 	TeePrinter         *terminal.TeePrinter
-	PluginRepo         plugin_repo.PluginRepo
+	PluginRepo         pluginrepo.PluginRepo
 	PluginModels       *PluginModels
 	ServiceBuilder     servicebuilder.ServiceBuilder
 	BrokerBuilder      brokerbuilder.Builder
@@ -107,7 +107,7 @@ func NewDependency(logger trace.Printer) Dependency {
 		deps.ServiceBuilder,
 	)
 
-	deps.PluginRepo = plugin_repo.NewPluginRepo()
+	deps.PluginRepo = pluginrepo.NewPluginRepo()
 
 	deps.ServiceHandler = actors.NewServiceHandler(
 		deps.RepoLocator.GetOrganizationRepository(),
