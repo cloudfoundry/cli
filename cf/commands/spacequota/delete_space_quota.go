@@ -1,7 +1,7 @@
 package spacequota
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -15,7 +15,7 @@ import (
 type DeleteSpaceQuota struct {
 	ui             terminal.UI
 	config         coreconfig.Reader
-	spaceQuotaRepo space_quotas.SpaceQuotaRepository
+	spaceQuotaRepo spacequotas.SpaceQuotaRepository
 }
 
 func init() {

@@ -1,4 +1,4 @@
-package space_quotas
+package spacequotas
 
 import (
 	"fmt"

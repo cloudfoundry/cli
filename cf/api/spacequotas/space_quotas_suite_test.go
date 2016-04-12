@@ -1,4 +1,4 @@
-package space_quotas_test
+package spacequotas_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"

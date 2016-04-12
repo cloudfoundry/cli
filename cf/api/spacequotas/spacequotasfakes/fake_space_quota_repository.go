@@ -4,7 +4,7 @@ package spacequotasfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -385,4 +385,4 @@ func (fake *FakeSpaceQuotaRepository) DeleteReturns(result1 error) {
 	}{result1}
 }
 
-var _ space_quotas.SpaceQuotaRepository = new(FakeSpaceQuotaRepository)
+var _ spacequotas.SpaceQuotaRepository = new(FakeSpaceQuotaRepository)

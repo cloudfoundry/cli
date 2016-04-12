@@ -1,9 +1,9 @@
-package space_quotas_test
+package spacequotas_test
 
 import (
 	"net/http"
 
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -20,7 +20,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 	var (
 		ccServer   *ghttp.Server
 		configRepo coreconfig.ReadWriter
-		repo       space_quotas.CloudControllerSpaceQuotaRepository
+		repo       spacequotas.CloudControllerSpaceQuotaRepository
 	)
 
 	BeforeEach(func() {
@@ -28,7 +28,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(ccServer.URL())
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-		repo = space_quotas.NewCloudControllerSpaceQuotaRepository(configRepo, gateway)
+		repo = spacequotas.NewCloudControllerSpaceQuotaRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {
