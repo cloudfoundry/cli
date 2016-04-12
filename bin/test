@@ -39,7 +39,7 @@ do
 done
 
 echo -e "\n Verifying total commands registered..."
-ginkgo commands_loader
+ginkgo commandsloader
 
 echo -e "\n Testing packages..."
 CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs $@

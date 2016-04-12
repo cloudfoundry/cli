@@ -1,4 +1,4 @@
-package commands_loader
+package commandsloader
 
 import (
 	"github.com/cloudfoundry/cli/cf/commands"

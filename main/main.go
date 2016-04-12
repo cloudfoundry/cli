@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/cloudfoundry/cli/commands_loader"
+	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 )
@@ -81,7 +81,7 @@ func main() {
 
 	warningsCollector := net.NewWarningsCollector(deps.Ui, warningProducers...)
 
-	commands_loader.Load()
+	commandsloader.Load()
 
 	//run core command
 	cmdName := os.Args[1]
