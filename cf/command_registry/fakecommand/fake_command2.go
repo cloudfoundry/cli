@@ -1,4 +1,4 @@
-package fake_command
+package fakecommand
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"

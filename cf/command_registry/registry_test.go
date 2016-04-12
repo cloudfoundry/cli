@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 
-	. "github.com/cloudfoundry/cli/cf/command_registry/fake_command"
+	. "github.com/cloudfoundry/cli/cf/command_registry/fakecommand"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
