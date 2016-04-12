@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -54,4 +54,4 @@ func (fake *FakePluginRepo) GetPluginsReturns(result1 map[string][]clipr.Plugin,
 	}{result1, result2}
 }
 
-var _ plugin_repo.PluginRepo = new(FakePluginRepo)
+var _ pluginrepo.PluginRepo = new(FakePluginRepo)

@@ -3,7 +3,7 @@ package pluginrepo
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,7 +19,7 @@ import (
 type RepoPlugins struct {
 	ui         terminal.UI
 	config     coreconfig.Reader
-	pluginRepo plugin_repo.PluginRepo
+	pluginRepo pluginrepo.PluginRepo
 }
 
 func init() {

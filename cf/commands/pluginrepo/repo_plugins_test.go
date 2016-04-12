@@ -1,7 +1,7 @@
 package pluginrepo_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/pluginrepofakes"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo/pluginrepofakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 

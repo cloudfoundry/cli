@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/pluginrepofakes"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo/pluginrepofakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commandregistry/commandregistryfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"

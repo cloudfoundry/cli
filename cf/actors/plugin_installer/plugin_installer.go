@@ -1,7 +1,7 @@
 package plugin_installer
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/downloader"
@@ -18,7 +18,7 @@ type PluginInstallerContext struct {
 	Checksummer    utils.Sha1Checksum
 	FileDownloader downloader.Downloader
 	GetPluginRepos pluginReposFetcher
-	PluginRepo     plugin_repo.PluginRepo
+	PluginRepo     pluginrepo.PluginRepo
 	RepoName       string
 	Ui             terminal.UI
 }
