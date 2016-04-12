@@ -1,7 +1,7 @@
 package main_test
 
 import (
-	"github.com/cloudfoundry/cli/testhelpers/plugin_builder"
+	"github.com/cloudfoundry/cli/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -11,7 +11,7 @@ import (
 func TestTestRpcServerExample(t *testing.T) {
 	RegisterFailHandler(Fail)
 
-	plugin_builder.BuildTestBinary("", "test_rpc_server_example")
+	pluginbuilder.BuildTestBinary("", "test_rpc_server_example")
 
 	RunSpecs(t, "TestRpcServerExample Suite")
 }
