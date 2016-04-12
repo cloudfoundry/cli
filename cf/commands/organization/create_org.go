@@ -2,7 +2,7 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -22,7 +22,7 @@ type CreateOrg struct {
 	orgRepo       organizations.OrganizationRepository
 	quotaRepo     quotas.QuotaRepository
 	orgRoleSetter user.OrgRoleSetter
-	flagRepo      feature_flags.FeatureFlagRepository
+	flagRepo      featureflags.FeatureFlagRepository
 }
 
 func init() {

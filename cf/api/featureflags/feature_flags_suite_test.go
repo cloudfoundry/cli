@@ -1,4 +1,4 @@
-package feature_flags_test
+package featureflags_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"

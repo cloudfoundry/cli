@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -19,7 +19,7 @@ type UnsetOrgRole struct {
 	ui       terminal.UI
 	config   coreconfig.Reader
 	userRepo api.UserRepository
-	flagRepo feature_flags.FeatureFlagRepository
+	flagRepo featureflags.FeatureFlagRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -21,7 +21,7 @@ type UnsetSpaceRole struct {
 	config    coreconfig.Reader
 	spaceRepo spaces.SpaceRepository
 	userRepo  api.UserRepository
-	flagRepo  feature_flags.FeatureFlagRepository
+	flagRepo  featureflags.FeatureFlagRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
