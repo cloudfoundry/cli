@@ -1,4 +1,4 @@
-package app_files
+package appfiles
 
 import (
 	"crypto/sha1"

@@ -1,4 +1,4 @@
-package app_files_test
+package appfiles_test
 
 import (
 	"archive/zip"
@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	. "github.com/cloudfoundry/cli/cf/app_files"
+	. "github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	. "github.com/onsi/ginkgo"

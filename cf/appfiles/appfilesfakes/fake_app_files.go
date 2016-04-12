@@ -4,7 +4,7 @@ package appfilesfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -179,4 +179,4 @@ func (fake *FakeAppFiles) WalkAppFilesReturns(result1 error) {
 	}{result1}
 }
 
-var _ app_files.AppFiles = new(FakeAppFiles)
+var _ appfiles.AppFiles = new(FakeAppFiles)

@@ -17,7 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -45,8 +45,8 @@ type Push struct {
 	authRepo      authentication.AuthenticationRepository
 	wordGenerator generator.WordGenerator
 	actor         actors.PushActor
-	zipper        app_files.Zipper
-	appfiles      app_files.AppFiles
+	zipper        appfiles.Zipper
+	appfiles      appfiles.AppFiles
 }
 
 func init() {

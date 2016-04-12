@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"sort"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -41,7 +41,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		pwd, _ := os.Getwd()
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")
-		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, app_files.ApplicationZipper{})
+		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, appfiles.ApplicationZipper{})
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 
 		testServer, testServerHandler = testnet.NewServer([]testnet.TestRequest{uploadBuildpackRequest()})

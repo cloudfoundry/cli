@@ -11,8 +11,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/application_bits/applicationbitsfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/app_files/appfilesfakes"
+	"github.com/cloudfoundry/cli/cf/appfiles"
+	"github.com/cloudfoundry/cli/cf/appfiles/appfilesfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -272,7 +272,7 @@ var _ = Describe("Push Actor", func() {
 		)
 
 		BeforeEach(func() {
-			zipper := &app_files.ApplicationZipper{}
+			zipper := &appfiles.ApplicationZipper{}
 			actor = actors.NewPushActor(appBitsRepo, zipper, appFiles)
 		})
 

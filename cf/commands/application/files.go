@@ -1,7 +1,7 @@
 package application
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/app_files"
+	"github.com/cloudfoundry/cli/cf/api/appfiles"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -13,7 +13,7 @@ import (
 type Files struct {
 	ui           terminal.UI
 	config       coreconfig.Reader
-	appFilesRepo app_files.AppFilesRepository
+	appFilesRepo appfiles.AppFilesRepository
 	appReq       requirements.DEAApplicationRequirement
 }
 

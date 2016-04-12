@@ -4,7 +4,7 @@ package appfilesfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 )
 
 type FakeCfIgnore struct {
@@ -50,4 +50,4 @@ func (fake *FakeCfIgnore) FileShouldBeIgnoredReturns(result1 bool) {
 	}{result1}
 }
 
-var _ app_files.CfIgnore = new(FakeCfIgnore)
+var _ appfiles.CfIgnore = new(FakeCfIgnore)

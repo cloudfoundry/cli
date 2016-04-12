@@ -1,4 +1,4 @@
-package app_files_test
+package appfiles_test
 
 import (
 	"io/ioutil"
@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/nu7hatch/gouuid"
 
 	"github.com/cloudfoundry/cli/cf/models"
@@ -36,11 +36,11 @@ func (a WalkAppFileArgs) Equal(other WalkAppFileArgs) bool {
 }
 
 var _ = Describe("AppFiles", func() {
-	var appFiles app_files.ApplicationFiles
+	var appFiles appfiles.ApplicationFiles
 	var fixturePath string
 
 	BeforeEach(func() {
-		appFiles = app_files.ApplicationFiles{}
+		appFiles = appfiles.ApplicationFiles{}
 		fixturePath = filepath.Join("..", "..", "fixtures", "applications")
 	})
 
