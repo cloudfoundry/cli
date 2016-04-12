@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/application_bits"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
+	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
 	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
@@ -73,7 +73,7 @@ type RepositoryLocator struct {
 	spaceQuotaRepo                  spacequotas.SpaceQuotaRepository
 	featureFlagRepo                 featureflags.FeatureFlagRepository
 	environmentVariableGroupRepo    environmentvariablegroups.EnvironmentVariableGroupsRepository
-	copyAppSourceRepo               copy_application_source.CopyApplicationSourceRepository
+	copyAppSourceRepo               copyapplicationsource.CopyApplicationSourceRepository
 
 	v3Repository repository.Repository
 }
@@ -131,7 +131,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.spaceQuotaRepo = spacequotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
 	loc.featureFlagRepo = featureflags.NewCloudControllerFeatureFlagRepository(config, cloudControllerGateway)
 	loc.environmentVariableGroupRepo = environmentvariablegroups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
-	loc.copyAppSourceRepo = copy_application_source.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
+	loc.copyAppSourceRepo = copyapplicationsource.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
 
 	client := v3client.NewClient(config.ApiEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken())
 	loc.v3Repository = repository.NewRepository(config, client)
@@ -465,12 +465,12 @@ func (locator RepositoryLocator) GetEnvironmentVariableGroupsRepository() enviro
 	return locator.environmentVariableGroupRepo
 }
 
-func (locator RepositoryLocator) SetCopyApplicationSourceRepository(repo copy_application_source.CopyApplicationSourceRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetCopyApplicationSourceRepository(repo copyapplicationsource.CopyApplicationSourceRepository) RepositoryLocator {
 	locator.copyAppSourceRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetCopyApplicationSourceRepository() copy_application_source.CopyApplicationSourceRepository {
+func (locator RepositoryLocator) GetCopyApplicationSourceRepository() copyapplicationsource.CopyApplicationSourceRepository {
 	return locator.copyAppSourceRepo
 }
 

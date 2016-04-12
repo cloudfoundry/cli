@@ -1,11 +1,11 @@
-package copy_application_source_test
+package copyapplicationsource_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	. "github.com/cloudfoundry/cli/cf/api/copy_application_source"
+	. "github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"

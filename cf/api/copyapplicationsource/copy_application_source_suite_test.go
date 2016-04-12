@@ -1,4 +1,4 @@
-package copy_application_source_test
+package copyapplicationsource_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"

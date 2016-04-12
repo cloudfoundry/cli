@@ -4,7 +4,7 @@ package copyapplicationsourcefakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/copy_application_source"
+	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
 )
 
 type FakeCopyApplicationSourceRepository struct {
@@ -52,4 +52,4 @@ func (fake *FakeCopyApplicationSourceRepository) CopyApplicationReturns(result1 
 	}{result1}
 }
 
-var _ copy_application_source.CopyApplicationSourceRepository = new(FakeCopyApplicationSourceRepository)
+var _ copyapplicationsource.CopyApplicationSourceRepository = new(FakeCopyApplicationSourceRepository)
