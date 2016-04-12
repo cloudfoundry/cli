@@ -18,7 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 )
 
 //go:generate counterfeiter . ApplicationDisplayer
@@ -132,8 +132,8 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), ui_helpers.ColoredAppState(application.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), ui_helpers.ColoredAppInstances(application.ApplicationFields))
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), uihelpers.ColoredAppState(application.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), uihelpers.ColoredAppInstances(application.ApplicationFields))
 
 	if len(application.AppPorts) > 0 {
 		appPorts := make([]string, len(application.AppPorts))
@@ -187,7 +187,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	for index, instance := range instances {
 		table.Add(
 			fmt.Sprintf("#%d", index),
-			ui_helpers.ColoredInstanceState(instance),
+			uihelpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
 			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",

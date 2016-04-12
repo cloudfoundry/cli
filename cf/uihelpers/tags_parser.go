@@ -1,4 +1,4 @@
-package ui_helpers
+package uihelpers
 
 import "strings"
 

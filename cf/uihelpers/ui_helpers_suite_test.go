@@ -1,4 +1,4 @@
-package ui_helpers_test
+package uihelpers_test
 
 import (
 	. "github.com/onsi/ginkgo"
