@@ -1,7 +1,7 @@
 package brokerbuilder
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -18,10 +18,10 @@ type BrokerBuilder interface {
 
 type Builder struct {
 	brokerRepo     api.ServiceBrokerRepository
-	serviceBuilder service_builder.ServiceBuilder
+	serviceBuilder servicebuilder.ServiceBuilder
 }
 
-func NewBuilder(broker api.ServiceBrokerRepository, serviceBuilder service_builder.ServiceBuilder) Builder {
+func NewBuilder(broker api.ServiceBrokerRepository, serviceBuilder servicebuilder.ServiceBuilder) Builder {
 	return Builder{
 		brokerRepo:     broker,
 		serviceBuilder: serviceBuilder,

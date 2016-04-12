@@ -2,7 +2,7 @@ package actors
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -16,10 +16,10 @@ type ServiceActor interface {
 type ServiceHandler struct {
 	orgRepo        organizations.OrganizationRepository
 	brokerBuilder  brokerbuilder.BrokerBuilder
-	serviceBuilder service_builder.ServiceBuilder
+	serviceBuilder servicebuilder.ServiceBuilder
 }
 
-func NewServiceHandler(org organizations.OrganizationRepository, brokerBuilder brokerbuilder.BrokerBuilder, serviceBuilder service_builder.ServiceBuilder) ServiceHandler {
+func NewServiceHandler(org organizations.OrganizationRepository, brokerBuilder brokerbuilder.BrokerBuilder, serviceBuilder servicebuilder.ServiceBuilder) ServiceHandler {
 	return ServiceHandler{
 		orgRepo:        org,
 		brokerBuilder:  brokerBuilder,

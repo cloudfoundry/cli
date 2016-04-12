@@ -4,7 +4,7 @@ package servicebuilderfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -589,4 +589,4 @@ func (fake *FakeServiceBuilder) GetServicesVisibleToOrgReturns(result1 []models.
 	}{result1, result2}
 }
 
-var _ service_builder.ServiceBuilder = new(FakeServiceBuilder)
+var _ servicebuilder.ServiceBuilder = new(FakeServiceBuilder)

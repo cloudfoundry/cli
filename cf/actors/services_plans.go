@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 
 	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/models"
 )
@@ -47,11 +47,11 @@ type ServicePlanHandler struct {
 	servicePlanRepo           api.ServicePlanRepository
 	servicePlanVisibilityRepo api.ServicePlanVisibilityRepository
 	orgRepo                   organizations.OrganizationRepository
-	serviceBuilder            service_builder.ServiceBuilder
+	serviceBuilder            servicebuilder.ServiceBuilder
 	planBuilder               planbuilder.PlanBuilder
 }
 
-func NewServicePlanHandler(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org organizations.OrganizationRepository, planBuilder planbuilder.PlanBuilder, serviceBuilder service_builder.ServiceBuilder) ServicePlanHandler {
+func NewServicePlanHandler(plan api.ServicePlanRepository, vis api.ServicePlanVisibilityRepository, org organizations.OrganizationRepository, planBuilder planbuilder.PlanBuilder, serviceBuilder servicebuilder.ServiceBuilder) ServicePlanHandler {
 	return ServicePlanHandler{
 		servicePlanRepo:           plan,
 		servicePlanVisibilityRepo: vis,

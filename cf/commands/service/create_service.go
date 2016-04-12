@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -21,7 +21,7 @@ type CreateService struct {
 	ui             terminal.UI
 	config         coreconfig.Reader
 	serviceRepo    api.ServiceRepository
-	serviceBuilder service_builder.ServiceBuilder
+	serviceBuilder servicebuilder.ServiceBuilder
 }
 
 func init() {

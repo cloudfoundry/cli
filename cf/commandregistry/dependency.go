@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
 	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
@@ -35,7 +35,7 @@ type Dependency struct {
 	TeePrinter         *terminal.TeePrinter
 	PluginRepo         plugin_repo.PluginRepo
 	PluginModels       *PluginModels
-	ServiceBuilder     service_builder.ServiceBuilder
+	ServiceBuilder     servicebuilder.ServiceBuilder
 	BrokerBuilder      brokerbuilder.Builder
 	PlanBuilder        planbuilder.PlanBuilder
 	ServiceHandler     actors.ServiceActor
@@ -97,7 +97,7 @@ func NewDependency(logger trace.Printer) Dependency {
 		deps.RepoLocator.GetOrganizationRepository(),
 	)
 
-	deps.ServiceBuilder = service_builder.NewBuilder(
+	deps.ServiceBuilder = servicebuilder.NewBuilder(
 		deps.RepoLocator.GetServiceRepository(),
 		deps.PlanBuilder,
 	)

@@ -7,7 +7,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,7 +18,7 @@ import (
 type MarketplaceServices struct {
 	ui             terminal.UI
 	config         coreconfig.Reader
-	serviceBuilder service_builder.ServiceBuilder
+	serviceBuilder servicebuilder.ServiceBuilder
 }
 
 func init() {
