@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 
 	"github.com/onsi/gomega/ghttp"
@@ -27,7 +27,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(ccServer.URL())
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = quotas.NewCloudControllerQuotaRepository(configRepo, gateway)
 	})
 

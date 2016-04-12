@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	. "github.com/cloudfoundry/cli/cf/api/copy_application_source"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -29,7 +29,7 @@ var _ = Describe("CopyApplicationSource", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerCopyApplicationSourceRepository(configRepo, gateway)
 	})
 

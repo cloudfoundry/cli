@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testtime "github.com/cloudfoundry/cli/testhelpers/time"
@@ -32,7 +32,7 @@ var _ = Describe("App Events Repo", func() {
 
 	JustBeforeEach(func() {
 		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(config)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
 		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
 	})
 

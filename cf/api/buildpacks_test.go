@@ -12,7 +12,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,7 +28,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(config)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
 		repo = NewCloudControllerBuildpackRepository(config, gateway)
 	})
 

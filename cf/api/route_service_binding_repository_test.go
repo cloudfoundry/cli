@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 
 	"github.com/onsi/gomega/ghttp"
@@ -29,7 +29,7 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint(ccServer.URL())
 
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		routeServiceBindingRepo = api.NewCloudControllerRouteServiceBindingRepository(configRepo, gateway)
 	})
 
