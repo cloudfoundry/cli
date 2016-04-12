@@ -1,7 +1,7 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"

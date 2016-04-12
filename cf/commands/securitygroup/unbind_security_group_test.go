@@ -9,8 +9,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/spaces/spacesfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/spaces/spacesfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"

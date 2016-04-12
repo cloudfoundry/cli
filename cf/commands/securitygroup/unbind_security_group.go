@@ -2,8 +2,8 @@ package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
+	sgbinder "github.com/cloudfoundry/cli/cf/api/securitygroups/spaces"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"

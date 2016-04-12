@@ -1,33 +1,34 @@
-package staging_test
+package running_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	. "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+
+	. "github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("StagingSecurityGroupsRepo", func() {
+var _ = Describe("RunningSecurityGroupsRepo", func() {
 	var (
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
 		configRepo  coreconfig.ReadWriter
-		repo        StagingSecurityGroupsRepo
+		repo        RunningSecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-		repo = NewStagingSecurityGroupsRepo(configRepo, gateway)
+		repo = NewRunningSecurityGroupsRepo(configRepo, gateway)
 	})
 
 	AfterEach(func() {
@@ -39,20 +40,40 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		configRepo.SetApiEndpoint(testServer.URL)
 	}
 
-	Describe("BindToStagingSet", func() {
+	Describe(".BindToRunningSet", func() {
 		It("makes a correct request", func() {
 			setupTestServer(
 				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "PUT",
-					Path:   "/v2/config/staging_security_groups/a-real-guid",
+					Path:   "/v2/config/running_security_groups/a-real-guid",
 					Response: testnet.TestResponse{
 						Status: http.StatusCreated,
-						Body:   bindStagingResponse,
+						Body:   bindRunningResponse,
 					},
 				}),
 			)
 
-			err := repo.BindToStagingSet("a-real-guid")
+			err := repo.BindToRunningSet("a-real-guid")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testHandler).To(HaveAllRequestsCalled())
+		})
+	})
+
+	Describe(".UnbindFromRunningSet", func() {
+		It("makes a correct request", func() {
+			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
+				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "DELETE",
+					Path:   "/v2/config/running_security_groups/my-guid",
+					Response: testnet.TestResponse{
+						Status: http.StatusNoContent,
+					},
+				}),
+			})
+
+			configRepo.SetApiEndpoint(testServer.URL)
+			err := repo.UnbindFromRunningSet("my-guid")
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
@@ -60,22 +81,22 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 	})
 
 	Describe(".List", func() {
-		It("returns a list of security groups that are the defaults for staging", func() {
+		It("returns a list of security groups that are the defaults for running", func() {
 			setupTestServer(
 				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/config/staging_security_groups",
+					Path:   "/v2/config/running_security_groups",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
-						Body:   firstStagingListItem,
+						Body:   firstRunningListItem,
 					},
 				}),
 				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/config/staging_security_groups",
+					Path:   "/v2/config/running_security_groups",
 					Response: testnet.TestResponse{
 						Status: http.StatusOK,
-						Body:   secondStagingListItem,
+						Body:   secondRunningListItem,
 					},
 				}),
 			)
@@ -104,32 +125,12 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 			}))
 		})
 	})
-
-	Describe("UnbindFromStagingSet", func() {
-		It("makes a correct request", func() {
-			testServer, testHandler = testnet.NewServer([]testnet.TestRequest{
-				apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method: "DELETE",
-					Path:   "/v2/config/staging_security_groups/my-guid",
-					Response: testnet.TestResponse{
-						Status: http.StatusNoContent,
-					},
-				}),
-			})
-
-			configRepo.SetApiEndpoint(testServer.URL)
-			err := repo.UnbindFromStagingSet("my-guid")
-
-			Expect(err).ToNot(HaveOccurred())
-			Expect(testHandler).To(HaveAllRequestsCalled())
-		})
-	})
 })
 
-var bindStagingResponse string = `{
+var bindRunningResponse string = `{
   "metadata": {
     "guid": "897341eb-ef31-406f-b57b-414f51583a3a",
-    "url": "/v2/config/staging_security_groups/897341eb-ef31-406f-b57b-414f51583a3a",
+    "url": "/v2/config/running_security_groups/897341eb-ef31-406f-b57b-414f51583a3a",
     "created_at": "2014-06-23T21:43:30+00:00",
     "updated_at": "2014-06-23T21:43:30+00:00"
   },
@@ -145,8 +146,8 @@ var bindStagingResponse string = `{
   }
 }`
 
-var firstStagingListItem string = `{
-  "next_url": "/v2/config/staging_security_groups?page=2",
+var firstRunningListItem string = `{
+  "next_url": "/v2/config/running_security_groups?page=2",
   "resources": [
     {
       "metadata": {
@@ -168,13 +169,13 @@ var firstStagingListItem string = `{
   ]
 }`
 
-var secondStagingListItem string = `{
+var secondRunningListItem string = `{
   "next_url": null,
   "resources": [
     {
       "metadata": {
         "guid": "d3374b62-7eac-4823-afbd-460d2bf44c67",
-        "url": "/v2/config/staging_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67",
+        "url": "/v2/config/running_security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67",
         "created_at": "2014-06-23T22:55:30+00:00",
         "updated_at": null
       },
