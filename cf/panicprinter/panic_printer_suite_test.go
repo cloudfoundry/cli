@@ -1,4 +1,4 @@
-package panic_printer_test
+package panicprinter_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
