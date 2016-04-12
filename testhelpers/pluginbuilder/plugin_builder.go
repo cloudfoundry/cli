@@ -1,4 +1,4 @@
-package plugin_builder
+package pluginbuilder
 
 import (
 	"os"
