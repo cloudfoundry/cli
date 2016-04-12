@@ -2,9 +2,9 @@ package spacequota_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/space_quotasfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,11 +19,11 @@ import (
 var _ = Describe("unset-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *space_quotasfakes.FakeSpaceQuotaRepository
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -31,13 +31,13 @@ var _ = Describe("unset-space-quota command", func() {
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unset-space-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("unset-space-quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = new(space_quotasfakes.FakeSpaceQuotaRepository)
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})

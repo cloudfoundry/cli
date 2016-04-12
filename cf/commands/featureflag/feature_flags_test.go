@@ -3,10 +3,10 @@ package featureflag_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/feature_flags/feature_flagsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,23 +22,23 @@ var _ = Describe("feature-flags command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		flagRepo            *feature_flagsfakes.FakeFeatureFlagRepository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("feature-flags").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("feature-flags").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		flagRepo = new(feature_flagsfakes.FakeFeatureFlagRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -52,7 +52,7 @@ var _ = Describe("feature-flags command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

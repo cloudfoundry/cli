@@ -2,8 +2,8 @@ package domain
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,20 +13,20 @@ import (
 
 type DeleteDomain struct {
 	ui         terminal.UI
-	config     core_config.Reader
+	config     coreconfig.Reader
 	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
 func init() {
-	command_registry.Register(&DeleteDomain{})
+	commandregistry.Register(&DeleteDomain{})
 }
 
-func (cmd *DeleteDomain) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteDomain) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-domain",
 		Description: T("Delete a domain"),
 		Usage: []string{
@@ -38,7 +38,7 @@ func (cmd *DeleteDomain) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-domain"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-domain"))
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
@@ -52,7 +52,7 @@ func (cmd *DeleteDomain) Requirements(requirementsFactory requirements.Factory, 
 	return reqs
 }
 
-func (cmd *DeleteDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()

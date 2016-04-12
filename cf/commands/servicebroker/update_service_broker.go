@@ -2,8 +2,8 @@ package servicebroker
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,16 +12,16 @@ import (
 
 type UpdateServiceBroker struct {
 	ui     terminal.UI
-	config core_config.Reader
+	config coreconfig.Reader
 	repo   api.ServiceBrokerRepository
 }
 
 func init() {
-	command_registry.Register(&UpdateServiceBroker{})
+	commandregistry.Register(&UpdateServiceBroker{})
 }
 
-func (cmd *UpdateServiceBroker) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *UpdateServiceBroker) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "update-service-broker",
 		Description: T("Update a service broker"),
 		Usage: []string{
@@ -32,7 +32,7 @@ func (cmd *UpdateServiceBroker) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UpdateServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 4 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + command_registry.Commands.CommandUsage("update-service-broker"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + commandregistry.Commands.CommandUsage("update-service-broker"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -42,7 +42,7 @@ func (cmd *UpdateServiceBroker) Requirements(requirementsFactory requirements.Fa
 	return reqs
 }
 
-func (cmd *UpdateServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UpdateServiceBroker) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.repo = deps.RepoLocator.GetServiceBrokerRepository()

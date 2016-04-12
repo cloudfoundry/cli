@@ -1,10 +1,10 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/runningfakes"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/security_groupsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running/runningfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,11 +20,11 @@ import (
 var _ = Describe("unbind-running-security-group command", func() {
 	var (
 		ui                            *testterm.FakeUI
-		configRepo                    core_config.Repository
+		configRepo                    coreconfig.Repository
 		requirementsFactory           *testreq.FakeReqFactory
-		fakeSecurityGroupRepo         *security_groupsfakes.FakeSecurityGroupRepo
+		fakeSecurityGroupRepo         *securitygroupsfakes.FakeSecurityGroupRepo
 		fakeRunningSecurityGroupsRepo *runningfakes.FakeRunningSecurityGroupsRepo
-		deps                          command_registry.Dependency
+		deps                          commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -32,14 +32,14 @@ var _ = Describe("unbind-running-security-group command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(fakeSecurityGroupRepo)
 		deps.RepoLocator = deps.RepoLocator.SetRunningSecurityGroupRepository(fakeRunningSecurityGroupsRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-running-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("unbind-running-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = new(security_groupsfakes.FakeSecurityGroupRepo)
+		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		fakeRunningSecurityGroupsRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
 	})
 

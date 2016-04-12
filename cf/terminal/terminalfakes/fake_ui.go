@@ -4,7 +4,7 @@ package terminalfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
@@ -87,10 +87,10 @@ type FakeUI struct {
 	PanicQuietlyStub             func()
 	panicQuietlyMutex            sync.RWMutex
 	panicQuietlyArgsForCall      []struct{}
-	ShowConfigurationStub        func(core_config.Reader)
+	ShowConfigurationStub        func(coreconfig.Reader)
 	showConfigurationMutex       sync.RWMutex
 	showConfigurationArgsForCall []struct {
-		arg1 core_config.Reader
+		arg1 coreconfig.Reader
 	}
 	LoadingIndicationStub        func()
 	loadingIndicationMutex       sync.RWMutex
@@ -103,10 +103,10 @@ type FakeUI struct {
 	tableReturns struct {
 		result1 *terminal.UITable
 	}
-	NotifyUpdateIfNeededStub        func(core_config.Reader)
+	NotifyUpdateIfNeededStub        func(coreconfig.Reader)
 	notifyUpdateIfNeededMutex       sync.RWMutex
 	notifyUpdateIfNeededArgsForCall []struct {
-		arg1 core_config.Reader
+		arg1 coreconfig.Reader
 	}
 }
 
@@ -422,10 +422,10 @@ func (fake *FakeUI) PanicQuietlyCallCount() int {
 	return len(fake.panicQuietlyArgsForCall)
 }
 
-func (fake *FakeUI) ShowConfiguration(arg1 core_config.Reader) {
+func (fake *FakeUI) ShowConfiguration(arg1 coreconfig.Reader) {
 	fake.showConfigurationMutex.Lock()
 	fake.showConfigurationArgsForCall = append(fake.showConfigurationArgsForCall, struct {
-		arg1 core_config.Reader
+		arg1 coreconfig.Reader
 	}{arg1})
 	fake.showConfigurationMutex.Unlock()
 	if fake.ShowConfigurationStub != nil {
@@ -439,7 +439,7 @@ func (fake *FakeUI) ShowConfigurationCallCount() int {
 	return len(fake.showConfigurationArgsForCall)
 }
 
-func (fake *FakeUI) ShowConfigurationArgsForCall(i int) core_config.Reader {
+func (fake *FakeUI) ShowConfigurationArgsForCall(i int) coreconfig.Reader {
 	fake.showConfigurationMutex.RLock()
 	defer fake.showConfigurationMutex.RUnlock()
 	return fake.showConfigurationArgsForCall[i].arg1
@@ -492,10 +492,10 @@ func (fake *FakeUI) TableReturns(result1 *terminal.UITable) {
 	}{result1}
 }
 
-func (fake *FakeUI) NotifyUpdateIfNeeded(arg1 core_config.Reader) {
+func (fake *FakeUI) NotifyUpdateIfNeeded(arg1 coreconfig.Reader) {
 	fake.notifyUpdateIfNeededMutex.Lock()
 	fake.notifyUpdateIfNeededArgsForCall = append(fake.notifyUpdateIfNeededArgsForCall, struct {
-		arg1 core_config.Reader
+		arg1 coreconfig.Reader
 	}{arg1})
 	fake.notifyUpdateIfNeededMutex.Unlock()
 	if fake.NotifyUpdateIfNeededStub != nil {
@@ -509,7 +509,7 @@ func (fake *FakeUI) NotifyUpdateIfNeededCallCount() int {
 	return len(fake.notifyUpdateIfNeededArgsForCall)
 }
 
-func (fake *FakeUI) NotifyUpdateIfNeededArgsForCall(i int) core_config.Reader {
+func (fake *FakeUI) NotifyUpdateIfNeededArgsForCall(i int) coreconfig.Reader {
 	fake.notifyUpdateIfNeededMutex.RLock()
 	defer fake.notifyUpdateIfNeededMutex.RUnlock()
 	return fake.notifyUpdateIfNeededArgsForCall[i].arg1

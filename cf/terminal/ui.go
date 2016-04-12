@@ -10,7 +10,7 @@ import (
 
 	"bytes"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
@@ -36,10 +36,10 @@ type UI interface {
 	Ok()
 	Failed(message string, args ...interface{})
 	PanicQuietly()
-	ShowConfiguration(core_config.Reader)
+	ShowConfiguration(coreconfig.Reader)
 	LoadingIndication()
 	Table(headers []string) *UITable
-	NotifyUpdateIfNeeded(core_config.Reader)
+	NotifyUpdateIfNeeded(coreconfig.Reader)
 }
 
 type Printer interface {
@@ -170,7 +170,7 @@ func (ui *terminalUI) PanicQuietly() {
 	panic(QuietPanic)
 }
 
-func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
+func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) {
 	table := ui.Table([]string{"", ""})
 
 	if config.HasAPIEndpoint() {
@@ -283,7 +283,7 @@ func (u *UITable) Print() {
 	}
 }
 
-func (ui *terminalUI) NotifyUpdateIfNeeded(config core_config.Reader) {
+func (ui *terminalUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
 	if !config.IsMinCliVersion(cf.Version) {
 		ui.Say("")
 		ui.Say(T("Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",

@@ -5,16 +5,16 @@ import (
 
 	"errors"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type ApiEndpointRequirement struct {
-	config core_config.Reader
+	config coreconfig.Reader
 }
 
-func NewApiEndpointRequirement(config core_config.Reader) ApiEndpointRequirement {
+func NewApiEndpointRequirement(config coreconfig.Reader) ApiEndpointRequirement {
 	return ApiEndpointRequirement{config}
 }
 

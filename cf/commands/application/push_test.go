@@ -12,12 +12,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
-	"github.com/cloudfoundry/cli/cf/app_files/app_filesfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/appfiles/appfilesfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/commands/service/servicefakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -41,7 +41,7 @@ import (
 var _ = Describe("Push Command", func() {
 	var (
 		ui                         *testterm.FakeUI
-		configRepo                 core_config.Repository
+		configRepo                 coreconfig.Repository
 		manifestRepo               *testmanifest.FakeManifestRepository
 		starter                    *applicationfakes.FakeApplicationStarter
 		stopper                    *applicationfakes.FakeApplicationStopper
@@ -55,12 +55,12 @@ var _ = Describe("Push Command", func() {
 		requirementsFactory        *testreq.FakeReqFactory
 		authRepo                   *authenticationfakes.FakeAuthenticationRepository
 		actor                      *actorsfakes.FakePushActor
-		appfiles                   *app_filesfakes.FakeAppFiles
-		zipper                     *app_filesfakes.FakeZipper
-		OriginalCommandStart       command_registry.Command
-		OriginalCommandStop        command_registry.Command
-		OriginalCommandServiceBind command_registry.Command
-		deps                       command_registry.Dependency
+		appfiles                   *appfilesfakes.FakeAppFiles
+		zipper                     *appfilesfakes.FakeZipper
+		OriginalCommandStart       commandregistry.Command
+		OriginalCommandStop        commandregistry.Command
+		OriginalCommandServiceBind commandregistry.Command
+		deps                       commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -79,11 +79,11 @@ var _ = Describe("Push Command", func() {
 		deps.AppFiles = appfiles
 
 		//inject fake commands dependencies into registry
-		command_registry.Register(starter)
-		command_registry.Register(stopper)
-		command_registry.Register(serviceBinder)
+		commandregistry.Register(starter)
+		commandregistry.Register(stopper)
+		commandregistry.Register(serviceBinder)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("push").SetDependency(deps, false))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("push").SetDependency(deps, false))
 	}
 
 	BeforeEach(func() {
@@ -93,16 +93,16 @@ var _ = Describe("Push Command", func() {
 		stopper = new(applicationfakes.FakeApplicationStopper)
 		serviceBinder = new(servicefakes.OldFakeAppBinder)
 
-		//setup fake commands (counterfeiter) to correctly interact with command_registry
-		starter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fake commands (counterfeiter) to correctly interact with commandregistry
+		starter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return starter
 		}
-		starter.MetaDataReturns(command_registry.CommandMetadata{Name: "start"})
+		starter.MetaDataReturns(commandregistry.CommandMetadata{Name: "start"})
 
-		stopper.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		stopper.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return stopper
 		}
-		stopper.MetaDataReturns(command_registry.CommandMetadata{Name: "stop"})
+		stopper.MetaDataReturns(commandregistry.CommandMetadata{Name: "stop"})
 
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
 
@@ -132,9 +132,9 @@ var _ = Describe("Push Command", func() {
 		}
 
 		//save original command dependences and restore later
-		OriginalCommandStart = command_registry.Commands.FindCommand("start")
-		OriginalCommandStop = command_registry.Commands.FindCommand("stop")
-		OriginalCommandServiceBind = command_registry.Commands.FindCommand("bind-service")
+		OriginalCommandStart = commandregistry.Commands.FindCommand("start")
+		OriginalCommandStop = commandregistry.Commands.FindCommand("stop")
+		OriginalCommandServiceBind = commandregistry.Commands.FindCommand("bind-service")
 
 		routeRepo = new(apifakes.FakeRouteRepository)
 		routeRepo.CreateStub = func(host string, domain models.DomainFields, path string, _ bool) (models.Route, error) {
@@ -164,8 +164,8 @@ var _ = Describe("Push Command", func() {
 			MinAPIVersionSuccess: true,
 		}
 
-		zipper = new(app_filesfakes.FakeZipper)
-		appfiles = new(app_filesfakes.FakeAppFiles)
+		zipper = new(appfilesfakes.FakeZipper)
+		appfiles = new(appfilesfakes.FakeAppFiles)
 		appfiles.AppFilesInDirReturns([]models.AppFileFields{
 			{
 				Path: "some-path",
@@ -179,9 +179,9 @@ var _ = Describe("Push Command", func() {
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommandStart)
-		command_registry.Register(OriginalCommandStop)
-		command_registry.Register(OriginalCommandServiceBind)
+		commandregistry.Register(OriginalCommandStart)
+		commandregistry.Register(OriginalCommandStop)
+		commandregistry.Register(OriginalCommandServiceBind)
 	})
 
 	callPush := func(args ...string) bool {

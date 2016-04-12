@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -25,16 +25,16 @@ var _ = Describe("routes command", func() {
 		ui                  *testterm.FakeUI
 		routeRepo           *apifakes.FakeRouteRepository
 		domainRepo          *apifakes.FakeDomainRepository
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo).SetDomainRepository(domainRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("routes").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("routes").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -65,7 +65,7 @@ var _ = Describe("routes command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

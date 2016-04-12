@@ -1,9 +1,9 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,15 +13,15 @@ import (
 type listRunningSecurityGroups struct {
 	ui                       terminal.UI
 	runningSecurityGroupRepo running.RunningSecurityGroupsRepo
-	configRepo               core_config.Reader
+	configRepo               coreconfig.Reader
 }
 
 func init() {
-	command_registry.Register(&listRunningSecurityGroups{})
+	commandregistry.Register(&listRunningSecurityGroups{})
 }
 
-func (cmd *listRunningSecurityGroups) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *listRunningSecurityGroups) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "running-security-groups",
 		Description: T("List security groups in the set of security groups for running applications"),
 		Usage: []string{
@@ -31,7 +31,7 @@ func (cmd *listRunningSecurityGroups) MetaData() command_registry.CommandMetadat
 }
 
 func (cmd *listRunningSecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -45,7 +45,7 @@ func (cmd *listRunningSecurityGroups) Requirements(requirementsFactory requireme
 	return reqs
 }
 
-func (cmd *listRunningSecurityGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *listRunningSecurityGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.runningSecurityGroupRepo = deps.RepoLocator.GetRunningSecurityGroupsRepository()

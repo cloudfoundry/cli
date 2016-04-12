@@ -3,15 +3,15 @@ package application_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/app_instances/app_instancesfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/appinstances/appinstancesfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,11 +20,11 @@ import (
 var _ = Describe("restart-app-instance", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
-		appInstancesRepo    *app_instancesfakes.FakeAppInstancesRepository
+		config              coreconfig.Repository
+		appInstancesRepo    *appinstancesfakes.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 		application         models.Application
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -34,7 +34,7 @@ var _ = Describe("restart-app-instance", func() {
 		application.InstanceCount = 1
 
 		ui = &testterm.FakeUI{}
-		appInstancesRepo = new(app_instancesfakes.FakeAppInstancesRepository)
+		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
@@ -47,7 +47,7 @@ var _ = Describe("restart-app-instance", func() {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

@@ -6,8 +6,8 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -34,7 +34,7 @@ type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
-	cliConfig            core_config.Repository
+	cliConfig            coreconfig.Repository
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         CommandRunner
 	outputBucket         *bytes.Buffer
@@ -56,7 +56,7 @@ type OutputCapture interface {
 func NewRpcService(
 	outputCapture OutputCapture,
 	terminalOutputSwitch TerminalOutputSwitch,
-	cliConfig core_config.Repository,
+	cliConfig coreconfig.Repository,
 	repoLocator api.RepositoryLocator,
 	newCmdRunner CommandRunner,
 	logger trace.Printer,
@@ -159,13 +159,13 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	}()
 
 	var err error
-	cmdRegistry := command_registry.Commands
+	cmdRegistry := commandregistry.Commands
 
 	cmd.outputBucket = &bytes.Buffer{}
 	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
 
 	if cmdRegistry.CommandExists(args[0]) {
-		deps := command_registry.NewDependency(cmd.logger)
+		deps := commandregistry.NewDependency(cmd.logger)
 
 		//set deps objs to be the one used by all other commands
 		//once all commands are converted, we can make fresh deps for each command run
@@ -297,7 +297,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -315,7 +315,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -333,7 +333,7 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -351,7 +351,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -369,7 +369,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -388,7 +388,7 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -406,7 +406,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -424,7 +424,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -442,7 +442,7 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -460,7 +460,7 @@ func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.G
 		recover()
 	}()
 
-	deps := command_registry.NewDependency(cmd.logger)
+	deps := commandregistry.NewDependency(cmd.logger)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run

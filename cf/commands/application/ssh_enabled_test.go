@@ -1,8 +1,8 @@
 package application_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,8 +18,8 @@ var _ = Describe("disable-ssh command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -31,7 +31,7 @@ var _ = Describe("disable-ssh command", func() {
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("ssh-enabled").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("ssh-enabled").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

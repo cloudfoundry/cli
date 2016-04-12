@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -20,11 +20,11 @@ type ServicePlanVisibilityRepository interface {
 }
 
 type CloudControllerServicePlanVisibilityRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServicePlanVisibilityRepository(config core_config.Reader, gateway net.Gateway) CloudControllerServicePlanVisibilityRepository {
+func NewCloudControllerServicePlanVisibilityRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerServicePlanVisibilityRepository {
 	return CloudControllerServicePlanVisibilityRepository{
 		config:  config,
 		gateway: gateway,

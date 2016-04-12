@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder/service_builderfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder/servicebuilderfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -16,7 +16,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,14 +27,14 @@ import (
 var _ = Describe("create-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *apifakes.FakeServiceRepository
-		serviceBuilder      *service_builderfakes.FakeServiceBuilder
+		serviceBuilder      *servicebuilderfakes.FakeServiceBuilder
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
-		deps      command_registry.Dependency
+		deps      commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -42,7 +42,7 @@ var _ = Describe("create-service command", func() {
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.ServiceBuilder = serviceBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -50,7 +50,7 @@ var _ = Describe("create-service command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		serviceRepo = new(apifakes.FakeServiceRepository)
-		serviceBuilder = new(service_builderfakes.FakeServiceBuilder)
+		serviceBuilder = new(servicebuilderfakes.FakeServiceBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"

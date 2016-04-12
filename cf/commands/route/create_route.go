@@ -6,8 +6,8 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -23,24 +23,24 @@ type RouteCreator interface {
 
 type CreateRoute struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	routeRepo api.RouteRepository
 	spaceReq  requirements.SpaceRequirement
 	domainReq requirements.DomainRequirement
 }
 
 func init() {
-	command_registry.Register(&CreateRoute{})
+	commandregistry.Register(&CreateRoute{})
 }
 
-func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
 	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port for the TCP route")}
 	fs["random-port"] = &flags.BoolFlag{Name: "random-port", Usage: T("Create a random port for the TCP route")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-route",
 		Description: T("Create a url route in a space for later use"),
 		Usage: []string{
@@ -68,7 +68,7 @@ func (cmd *CreateRoute) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("create-route"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n") + commandregistry.Commands.CommandUsage("create-route"))
 	}
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
@@ -111,7 +111,7 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *CreateRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()

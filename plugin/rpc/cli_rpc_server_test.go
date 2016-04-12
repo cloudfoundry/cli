@@ -10,14 +10,14 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
 	cmdRunner "github.com/cloudfoundry/cli/plugin/rpc"
-	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
+	. "github.com/cloudfoundry/cli/plugin/rpc/fakecommand"
 	"github.com/cloudfoundry/cli/plugin/rpc/rpcfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
@@ -463,7 +463,7 @@ var _ = Describe("Server", func() {
 
 		Describe("CLI Config object methods", func() {
 			var (
-				config core_config.Repository
+				config coreconfig.Repository
 			)
 
 			BeforeEach(func() {

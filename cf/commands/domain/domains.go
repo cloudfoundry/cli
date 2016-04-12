@@ -2,8 +2,8 @@ package domain
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,17 +13,17 @@ import (
 
 type ListDomains struct {
 	ui             terminal.UI
-	config         core_config.Reader
+	config         coreconfig.Reader
 	domainRepo     api.DomainRepository
 	routingApiRepo api.RoutingApiRepository
 }
 
 func init() {
-	command_registry.Register(&ListDomains{})
+	commandregistry.Register(&ListDomains{})
 }
 
-func (cmd *ListDomains) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListDomains) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "domains",
 		Description: T("List domains in the target org"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *ListDomains) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListDomains) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -49,7 +49,7 @@ func (cmd *ListDomains) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *ListDomains) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListDomains) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()

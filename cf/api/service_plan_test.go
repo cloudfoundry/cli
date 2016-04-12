@@ -5,9 +5,9 @@ import (
 	"net/http/httptest"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -21,13 +21,13 @@ var _ = Describe("Service Plan Repository", func() {
 	var (
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
-		configRepo  core_config.ReadWriter
+		configRepo  coreconfig.ReadWriter
 		repo        CloudControllerServicePlanRepository
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerServicePlanRepository(configRepo, gateway)
 	})
 

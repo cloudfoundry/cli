@@ -7,8 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,7 +23,7 @@ import (
 var _ = Describe("Login Command", func() {
 	var (
 		Flags        []string
-		Config       core_config.Repository
+		Config       coreconfig.Repository
 		ui           *testterm.FakeUI
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
 		endpointRepo *apifakes.FakeEndpointRepository
@@ -31,7 +31,7 @@ var _ = Describe("Login Command", func() {
 		spaceRepo    *apifakes.FakeSpaceRepository
 
 		org  models.Organization
-		deps command_registry.Dependency
+		deps commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -41,7 +41,7 @@ var _ = Describe("Login Command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("login").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("login").SetDependency(deps, pluginCall))
 	}
 
 	listSpacesStub := func(spaces []models.Space) func(func(models.Space) bool) error {
@@ -83,14 +83,14 @@ var _ = Describe("Login Command", func() {
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
-		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{
-			"username": core_config.AuthPrompt{
+		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
+			"username": coreconfig.AuthPrompt{
 				DisplayName: "Username",
-				Type:        core_config.AuthPromptTypeText,
+				Type:        coreconfig.AuthPromptTypeText,
 			},
-			"password": core_config.AuthPrompt{
+			"password": coreconfig.AuthPrompt{
 				DisplayName: "Password",
-				Type:        core_config.AuthPromptTypePassword,
+				Type:        coreconfig.AuthPromptTypePassword,
 			},
 		}, nil)
 	})
@@ -368,22 +368,22 @@ var _ = Describe("Login Command", func() {
 
 		Describe("login prompts", func() {
 			BeforeEach(func() {
-				authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{
-					"account_number": core_config.AuthPrompt{
+				authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
+					"account_number": coreconfig.AuthPrompt{
 						DisplayName: "Account Number",
-						Type:        core_config.AuthPromptTypeText,
+						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"username": core_config.AuthPrompt{
+					"username": coreconfig.AuthPrompt{
 						DisplayName: "Username",
-						Type:        core_config.AuthPromptTypeText,
+						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"passcode": core_config.AuthPrompt{
+					"passcode": coreconfig.AuthPrompt{
 						DisplayName: "It's a passcode, what you want it to be???",
-						Type:        core_config.AuthPromptTypePassword,
+						Type:        coreconfig.AuthPromptTypePassword,
 					},
-					"password": core_config.AuthPrompt{
+					"password": coreconfig.AuthPrompt{
 						DisplayName: "Your Password",
-						Type:        core_config.AuthPromptTypePassword,
+						Type:        coreconfig.AuthPromptTypePassword,
 					},
 				}, nil)
 			})

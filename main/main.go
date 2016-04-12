@@ -6,22 +6,22 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/panic_printer"
+	"github.com/cloudfoundry/cli/cf/panicprinter"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/cloudfoundry/cli/commands_loader"
+	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 )
 
-var cmdRegistry = command_registry.Commands
+var cmdRegistry = commandregistry.Commands
 
 func main() {
 	traceEnv := os.Getenv("CF_TRACE")
@@ -53,14 +53,14 @@ func main() {
 	}
 
 	// Only used to get Trace, so our errorHandler doesn't matter, since it's not used
-	config := core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errFunc)
+	config := coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errFunc)
 	defer config.Close()
 
 	traceConfigVal := config.Trace()
 
 	traceLogger = trace.NewLogger(isVerbose, traceEnv, traceConfigVal)
 
-	deps := command_registry.NewDependency(traceLogger)
+	deps := commandregistry.NewDependency(traceLogger)
 	defer handlePanics(deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 
@@ -81,7 +81,7 @@ func main() {
 
 	warningsCollector := net.NewWarningsCollector(deps.Ui, warningProducers...)
 
-	commands_loader.Load()
+	commandsloader.Load()
 
 	//run core command
 	cmdName := os.Args[1]
@@ -125,7 +125,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
+	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
 		deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
 	})
 	pluginList := pluginConfig.Plugins()
@@ -139,13 +139,13 @@ func main() {
 }
 
 func handlePanics(printer terminal.Printer, logger trace.Printer) {
-	panic_printer.UI = terminal.NewUI(os.Stdin, printer, logger)
+	panicprinter.UI = terminal.NewUI(os.Stdin, printer, logger)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()
 
 	err := recover()
-	panic_printer.DisplayCrashDialog(err, commandArgs, stackTrace)
+	panicprinter.DisplayCrashDialog(err, commandArgs, stackTrace)
 
 	if err != nil {
 		os.Exit(1)

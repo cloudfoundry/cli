@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -30,7 +30,7 @@ var invalidTokenRoutingApiRequest = func(writer http.ResponseWriter, request *ht
 
 var _ = Describe("Routing Api Gateway", func() {
 	var gateway Gateway
-	var config core_config.Reader
+	var config coreconfig.Reader
 	var fakeLogger *tracefakes.FakePrinter
 
 	BeforeEach(func() {

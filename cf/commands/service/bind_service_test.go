@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -23,16 +23,16 @@ var _ = Describe("bind-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
+		config              coreconfig.Repository
 		serviceBindingRepo  *apifakes.OldFakeServiceBindingRepo
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetServiceBindingRepository(serviceBindingRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("bind-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("bind-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

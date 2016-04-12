@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -23,7 +23,7 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 
 var _ = Describe("UAA Gateway", func() {
 	var gateway Gateway
-	var config core_config.Reader
+	var config coreconfig.Reader
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()

@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,18 +12,18 @@ import (
 
 type UnbindService struct {
 	ui                 terminal.UI
-	config             core_config.Reader
+	config             coreconfig.Reader
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
 func init() {
-	command_registry.Register(&UnbindService{})
+	commandregistry.Register(&UnbindService{})
 }
 
-func (cmd *UnbindService) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *UnbindService) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "unbind-service",
 		ShortName:   "us",
 		Description: T("Unbind a service instance from an app"),
@@ -35,7 +35,7 @@ func (cmd *UnbindService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("unbind-service"))
 	}
 
 	serviceName := fc.Args()[1]
@@ -51,7 +51,7 @@ func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory,
 	return reqs
 }
 
-func (cmd *UnbindService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UnbindService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceBindingRepo = deps.RepoLocator.GetServiceBindingRepository()

@@ -4,8 +4,8 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors/userprint"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,7 +16,7 @@ import (
 
 type OrgUsers struct {
 	ui          terminal.UI
-	config      core_config.Reader
+	config      coreconfig.Reader
 	orgReq      requirements.OrganizationRequirement
 	userRepo    api.UserRepository
 	pluginModel *[]plugin_models.GetOrgUsers_Model
@@ -24,14 +24,14 @@ type OrgUsers struct {
 }
 
 func init() {
-	command_registry.Register(&OrgUsers{})
+	commandregistry.Register(&OrgUsers{})
 }
 
-func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
+func (cmd *OrgUsers) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["a"] = &flags.BoolFlag{ShortName: "a", Usage: T("List all users in the org")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "org-users",
 		Description: T("Show org users by role"),
 		Usage: []string{
@@ -43,7 +43,7 @@ func (cmd *OrgUsers) MetaData() command_registry.CommandMetadata {
 
 func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("org-users"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("org-users"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -56,7 +56,7 @@ func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc f
 	return reqs
 }
 
-func (cmd *OrgUsers) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *OrgUsers) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()

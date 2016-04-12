@@ -3,12 +3,12 @@ package api_test
 import (
 	"net/http"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	"github.com/onsi/gomega/ghttp"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -21,7 +21,7 @@ import (
 var _ = Describe("Service Keys Repo", func() {
 	var (
 		ccServer   *ghttp.Server
-		configRepo core_config.ReadWriter
+		configRepo coreconfig.ReadWriter
 		repo       ServiceKeyRepository
 	)
 
@@ -32,7 +32,7 @@ var _ = Describe("Service Keys Repo", func() {
 		ccServer = ghttp.NewServer()
 		configRepo.SetApiEndpoint(ccServer.URL())
 
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)
 	})
 

@@ -4,7 +4,7 @@ package applicationfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -12,20 +12,20 @@ import (
 )
 
 type FakeApplicationStarter struct {
-	MetaDataStub        func() command_registry.CommandMetadata
+	MetaDataStub        func() commandregistry.CommandMetadata
 	metaDataMutex       sync.RWMutex
 	metaDataArgsForCall []struct{}
 	metaDataReturns     struct {
-		result1 command_registry.CommandMetadata
+		result1 commandregistry.CommandMetadata
 	}
-	SetDependencyStub        func(deps command_registry.Dependency, pluginCall bool) command_registry.Command
+	SetDependencyStub        func(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command
 	setDependencyMutex       sync.RWMutex
 	setDependencyArgsForCall []struct {
-		deps       command_registry.Dependency
+		deps       commandregistry.Dependency
 		pluginCall bool
 	}
 	setDependencyReturns struct {
-		result1 command_registry.Command
+		result1 commandregistry.Command
 	}
 	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
 	requirementsMutex       sync.RWMutex
@@ -59,7 +59,7 @@ type FakeApplicationStarter struct {
 	}
 }
 
-func (fake *FakeApplicationStarter) MetaData() command_registry.CommandMetadata {
+func (fake *FakeApplicationStarter) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
 	fake.metaDataMutex.Unlock()
@@ -76,17 +76,17 @@ func (fake *FakeApplicationStarter) MetaDataCallCount() int {
 	return len(fake.metaDataArgsForCall)
 }
 
-func (fake *FakeApplicationStarter) MetaDataReturns(result1 command_registry.CommandMetadata) {
+func (fake *FakeApplicationStarter) MetaDataReturns(result1 commandregistry.CommandMetadata) {
 	fake.MetaDataStub = nil
 	fake.metaDataReturns = struct {
-		result1 command_registry.CommandMetadata
+		result1 commandregistry.CommandMetadata
 	}{result1}
 }
 
-func (fake *FakeApplicationStarter) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (fake *FakeApplicationStarter) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	fake.setDependencyMutex.Lock()
 	fake.setDependencyArgsForCall = append(fake.setDependencyArgsForCall, struct {
-		deps       command_registry.Dependency
+		deps       commandregistry.Dependency
 		pluginCall bool
 	}{deps, pluginCall})
 	fake.setDependencyMutex.Unlock()
@@ -103,16 +103,16 @@ func (fake *FakeApplicationStarter) SetDependencyCallCount() int {
 	return len(fake.setDependencyArgsForCall)
 }
 
-func (fake *FakeApplicationStarter) SetDependencyArgsForCall(i int) (command_registry.Dependency, bool) {
+func (fake *FakeApplicationStarter) SetDependencyArgsForCall(i int) (commandregistry.Dependency, bool) {
 	fake.setDependencyMutex.RLock()
 	defer fake.setDependencyMutex.RUnlock()
 	return fake.setDependencyArgsForCall[i].deps, fake.setDependencyArgsForCall[i].pluginCall
 }
 
-func (fake *FakeApplicationStarter) SetDependencyReturns(result1 command_registry.Command) {
+func (fake *FakeApplicationStarter) SetDependencyReturns(result1 commandregistry.Command) {
 	fake.SetDependencyStub = nil
 	fake.setDependencyReturns = struct {
-		result1 command_registry.Command
+		result1 commandregistry.Command
 	}{result1}
 }
 

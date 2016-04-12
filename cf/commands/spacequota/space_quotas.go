@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,16 +16,16 @@ import (
 
 type ListSpaceQuotas struct {
 	ui             terminal.UI
-	config         core_config.Reader
-	spaceQuotaRepo space_quotas.SpaceQuotaRepository
+	config         coreconfig.Reader
+	spaceQuotaRepo spacequotas.SpaceQuotaRepository
 }
 
 func init() {
-	command_registry.Register(&ListSpaceQuotas{})
+	commandregistry.Register(&ListSpaceQuotas{})
 }
 
-func (cmd *ListSpaceQuotas) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListSpaceQuotas) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "space-quotas",
 		Description: T("List available space resource quotas"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *ListSpaceQuotas) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListSpaceQuotas) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -51,7 +51,7 @@ func (cmd *ListSpaceQuotas) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *ListSpaceQuotas) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListSpaceQuotas) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()

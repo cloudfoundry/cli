@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -225,7 +225,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Context("when user is not logged in", func() {
-		var config core_config.Reader
+		var config coreconfig.Reader
 
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
@@ -243,10 +243,10 @@ var _ = Describe("UI", func() {
 	})
 
 	Context("when an api endpoint is set and the user logged in", func() {
-		var config core_config.ReadWriter
+		var config coreconfig.ReadWriter
 
 		BeforeEach(func() {
-			accessToken := core_config.TokenInfo{
+			accessToken := coreconfig.TokenInfo{
 				UserGuid: "my-user-guid",
 				Username: "my-user",
 				Email:    "my-user-email",
@@ -405,7 +405,7 @@ var _ = Describe("UI", func() {
 
 		var (
 			output []string
-			config core_config.ReadWriter
+			config coreconfig.ReadWriter
 		)
 
 		BeforeEach(func() {

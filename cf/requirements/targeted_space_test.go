@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("TargetedSpaceRequirement", func() {
 	var (
-		config core_config.ReadWriter
+		config coreconfig.ReadWriter
 	)
 
 	BeforeEach(func() {

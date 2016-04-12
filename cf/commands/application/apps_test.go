@@ -2,8 +2,8 @@ package application_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -22,17 +22,17 @@ import (
 var _ = Describe("list-apps command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		appSummaryRepo      *apifakes.OldFakeAppSummaryRepo
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("apps").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("apps").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("list-apps command", func() {
 
 		appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app, app2}
 
-		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
@@ -98,7 +98,7 @@ var _ = Describe("list-apps command", func() {
 	}
 
 	Describe("requirements", func() {
-		var cmd command_registry.Command
+		var cmd commandregistry.Command
 		var flagContext flags.FlagContext
 
 		BeforeEach(func() {

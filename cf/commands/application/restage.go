@@ -2,8 +2,8 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -14,17 +14,17 @@ import (
 
 type Restage struct {
 	ui                terminal.UI
-	config            core_config.Reader
+	config            coreconfig.Reader
 	appRepo           applications.ApplicationRepository
 	appStagingWatcher ApplicationStagingWatcher
 }
 
 func init() {
-	command_registry.Register(&Restage{})
+	commandregistry.Register(&Restage{})
 }
 
-func (cmd *Restage) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Restage) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "restage",
 		ShortName:   "rg",
 		Description: T("Restage an app"),
@@ -36,7 +36,7 @@ func (cmd *Restage) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Restage) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("restage"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("restage"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -47,13 +47,13 @@ func (cmd *Restage) Requirements(requirementsFactory requirements.Factory, fc fl
 	return reqs
 }
 
-func (cmd *Restage) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Restage) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 
 	//get command from registry for dependency
-	commandDep := command_registry.Commands.FindCommand("start")
+	commandDep := commandregistry.Commands.FindCommand("start")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.appStagingWatcher = commandDep.(ApplicationStagingWatcher)
 

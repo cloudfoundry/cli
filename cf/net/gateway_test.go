@@ -15,12 +15,12 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/net/netfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -34,7 +34,7 @@ var _ = Describe("Gateway", func() {
 		ccServer    *ghttp.Server
 		ccGateway   Gateway
 		uaaGateway  Gateway
-		config      core_config.ReadWriter
+		config      coreconfig.ReadWriter
 		authRepo    authentication.AuthenticationRepository
 		currentTime time.Time
 		clock       func() time.Time
@@ -56,7 +56,7 @@ var _ = Describe("Gateway", func() {
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(config)
+				ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(config)
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})
@@ -673,7 +673,7 @@ func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.Test
 	}
 }
 
-func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (core_config.ReadWriter, authentication.AuthenticationRepository) {
+func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (coreconfig.ReadWriter, authentication.AuthenticationRepository) {
 	config := testconfig.NewRepository()
 	config.SetAuthenticationEndpoint(authServer.URL)
 	config.SetApiEndpoint(apiServer.URL)

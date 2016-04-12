@@ -12,14 +12,14 @@ import (
 	"runtime"
 	"sort"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/appfiles"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,7 +28,7 @@ import (
 var _ = Describe("BuildpackBitsRepository", func() {
 	var (
 		buildpacksDir     string
-		configRepo        core_config.Repository
+		configRepo        coreconfig.Repository
 		repo              CloudControllerBuildpackBitsRepository
 		buildpack         models.Buildpack
 		testServer        *httptest.Server
@@ -37,11 +37,11 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		pwd, _ := os.Getwd()
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")
-		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, app_files.ApplicationZipper{})
+		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, appfiles.ApplicationZipper{})
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 
 		testServer, testServerHandler = testnet.NewServer([]testnet.TestRequest{uploadBuildpackRequest()})

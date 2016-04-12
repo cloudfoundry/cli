@@ -5,8 +5,8 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,15 +16,15 @@ import (
 
 type updateQuota struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	quotaRepo quotas.QuotaRepository
 }
 
 func init() {
-	command_registry.Register(&updateQuota{})
+	commandregistry.Register(&updateQuota{})
 }
 
-func (cmd *updateQuota) MetaData() command_registry.CommandMetadata {
+func (cmd *updateQuota) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
 	fs["disallow-paid-service-plans"] = &flags.BoolFlag{Name: "disallow-paid-service-plans", Usage: T("Cannot provision instances of paid service plans")}
@@ -35,7 +35,7 @@ func (cmd *updateQuota) MetaData() command_registry.CommandMetadata {
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "update-quota",
 		Description: T("Update an existing resource quota"),
 		Usage: []string{
@@ -56,7 +56,7 @@ func (cmd *updateQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *updateQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -70,7 +70,7 @@ func (cmd *updateQuota) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *updateQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *updateQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
@@ -110,7 +110,7 @@ func (cmd *updateQuota) Execute(c flags.FlagContext) {
 			memory, formatError = formatters.ToMegabytes(c.String("i"))
 
 			if formatError != nil {
-				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("update-quota"))
+				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-quota"))
 			}
 		}
 
@@ -125,7 +125,7 @@ func (cmd *updateQuota) Execute(c flags.FlagContext) {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {
-			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + command_registry.Commands.CommandUsage("update-quota"))
+			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-quota"))
 		}
 
 		quota.MemoryLimit = memory

@@ -3,7 +3,7 @@ package repository_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/v3/models"
 	"github.com/cloudfoundry/cli/cf/v3/repository"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,7 +18,7 @@ var _ = Describe("Repository", func() {
 	var (
 		r        repository.Repository
 		ccClient *ccClientFakes.FakeClient
-		config   core_config.ReadWriter
+		config   coreconfig.ReadWriter
 	)
 
 	BeforeEach(func() {

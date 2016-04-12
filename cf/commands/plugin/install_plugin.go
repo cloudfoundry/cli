@@ -7,11 +7,11 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_installer"
-	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/actors/plugininstaller"
+	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -26,23 +26,23 @@ import (
 
 type PluginInstall struct {
 	ui           terminal.UI
-	config       core_config.Reader
-	pluginConfig plugin_config.PluginConfiguration
-	pluginRepo   plugin_repo.PluginRepo
+	config       coreconfig.Reader
+	pluginConfig pluginconfig.PluginConfiguration
+	pluginRepo   pluginrepo.PluginRepo
 	checksum     utils.Sha1Checksum
 	rpcService   *rpcService.CliRpcService
 }
 
 func init() {
-	command_registry.Register(&PluginInstall{})
+	commandregistry.Register(&PluginInstall{})
 }
 
-func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
+func (cmd *PluginInstall) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["r"] = &flags.StringFlag{ShortName: "r", Usage: T("Name of a registered repository where the specified plugin is located")}
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force install of plugin without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "install-plugin",
 		Description: T("Install CLI plugin"),
 		Usage: []string{
@@ -62,14 +62,14 @@ func (cmd *PluginInstall) MetaData() command_registry.CommandMetadata {
 
 func (cmd *PluginInstall) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("install-plugin"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("install-plugin"))
 	}
 
 	reqs := []requirements.Requirement{}
 	return reqs
 }
 
-func (cmd *PluginInstall) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.pluginConfig = deps.PluginConfig
@@ -108,7 +108,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	}
 	defer removeTmpFile()
 
-	deps := &plugin_installer.PluginInstallerContext{
+	deps := &plugininstaller.PluginInstallerContext{
 		Checksummer:    cmd.checksum,
 		GetPluginRepos: cmd.config.PluginRepos,
 		FileDownloader: fileDownloader,
@@ -116,7 +116,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		RepoName:       c.String("r"),
 		Ui:             cmd.ui,
 	}
-	installer := plugin_installer.NewPluginInstaller(deps)
+	installer := plugininstaller.NewPluginInstaller(deps)
 	pluginSourceFilepath := installer.Install(c.Args()[0])
 
 	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
@@ -170,13 +170,13 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 	for _, pluginCmd := range pluginMetadata.Commands {
 
 		//check for command conflicting core commands/alias
-		if pluginCmd.Name == "help" || command_registry.Commands.CommandExists(pluginCmd.Name) {
+		if pluginCmd.Name == "help" || commandregistry.Commands.CommandExists(pluginCmd.Name) {
 			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Name})))
 		}
 
 		//check for alias conflicting core command/alias
-		if pluginCmd.Alias == "help" || command_registry.Commands.CommandExists(pluginCmd.Alias) {
+		if pluginCmd.Alias == "help" || commandregistry.Commands.CommandExists(pluginCmd.Alias) {
 			cmd.ui.Failed(fmt.Sprintf(T("Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Alias})))
 		}
@@ -207,7 +207,7 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	configMetadata := plugin_config.PluginMetadata{
+	configMetadata := pluginconfig.PluginMetadata{
 		Location: pluginDestinationFilepath,
 		Version:  pluginMetadata.Version,
 		Commands: pluginMetadata.Commands,

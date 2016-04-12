@@ -3,8 +3,8 @@ package service_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,17 +20,17 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 	var (
 		ui                  *testterm.FakeUI
 		serviceRepo         *apifakes.FakeServiceRepository
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		args                []string
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("migrate-service-instances").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("migrate-service-instances").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

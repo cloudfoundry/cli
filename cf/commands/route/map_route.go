@@ -3,8 +3,8 @@ package route
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,7 +13,7 @@ import (
 
 type MapRoute struct {
 	ui           terminal.UI
-	config       core_config.Reader
+	config       coreconfig.Reader
 	routeRepo    api.RouteRepository
 	appReq       requirements.ApplicationRequirement
 	domainReq    requirements.DomainRequirement
@@ -21,15 +21,15 @@ type MapRoute struct {
 }
 
 func init() {
-	command_registry.Register(&MapRoute{})
+	commandregistry.Register(&MapRoute{})
 }
 
-func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
+func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route (required for shared domains)")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "map-route",
 		Description: T("Add a url route to an app"),
 		Usage: []string{
@@ -46,7 +46,7 @@ func (cmd *MapRoute) MetaData() command_registry.CommandMetadata {
 
 func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n") + command_registry.Commands.CommandUsage("map-route"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n") + commandregistry.Commands.CommandUsage("map-route"))
 	}
 
 	domainName := fc.Args()[1]
@@ -75,13 +75,13 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 	return reqs
 }
 
-func (cmd *MapRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 
 	//get create-route for dependency
-	createRoute := command_registry.Commands.FindCommand("create-route")
+	createRoute := commandregistry.Commands.FindCommand("create-route")
 	createRoute = createRoute.SetDependency(deps, false)
 	cmd.routeCreator = createRoute.(RouteCreator)
 

@@ -3,16 +3,16 @@ package requirements
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type LoginRequirement struct {
-	config                 core_config.Reader
+	config                 coreconfig.Reader
 	apiEndpointRequirement ApiEndpointRequirement
 }
 
-func NewLoginRequirement(config core_config.Reader) LoginRequirement {
+func NewLoginRequirement(config coreconfig.Reader) LoginRequirement {
 	return LoginRequirement{config, ApiEndpointRequirement{config}}
 }
 

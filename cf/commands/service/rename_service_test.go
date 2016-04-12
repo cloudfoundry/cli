@@ -2,8 +2,8 @@ package service_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,17 +18,17 @@ import (
 var _ = Describe("rename-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		serviceRepo         *apifakes.FakeServiceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("rename-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

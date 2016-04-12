@@ -1,8 +1,8 @@
 package commands_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -14,15 +14,15 @@ import (
 var _ = Describe("logout command", func() {
 
 	var (
-		config core_config.Repository
+		config coreconfig.Repository
 		ui     *testterm.FakeUI
-		deps   command_registry.Dependency
+		deps   commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("logout").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("logout").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

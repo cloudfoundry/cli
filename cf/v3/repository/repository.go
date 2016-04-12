@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/url"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/v3/models"
 	"github.com/cloudfoundry/go-ccapi/v3/client"
 )
@@ -19,10 +19,10 @@ type Repository interface {
 
 type repository struct {
 	client client.Client
-	config core_config.ReadWriter
+	config coreconfig.ReadWriter
 }
 
-func NewRepository(config core_config.ReadWriter, client client.Client) Repository {
+func NewRepository(config coreconfig.ReadWriter, client client.Client) Repository {
 	return &repository{
 		client: client,
 		config: config,

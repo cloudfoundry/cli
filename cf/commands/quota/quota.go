@@ -9,8 +9,8 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -18,16 +18,16 @@ import (
 
 type showQuota struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	quotaRepo quotas.QuotaRepository
 }
 
 func init() {
-	command_registry.Register(&showQuota{})
+	commandregistry.Register(&showQuota{})
 }
 
-func (cmd *showQuota) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *showQuota) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name: "quota",
 		Usage: []string{
 			T("CF_NAME quota QUOTA"),
@@ -38,7 +38,7 @@ func (cmd *showQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *showQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -48,7 +48,7 @@ func (cmd *showQuota) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *showQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *showQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()

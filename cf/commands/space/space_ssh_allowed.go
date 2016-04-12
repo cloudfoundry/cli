@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -14,17 +14,17 @@ import (
 
 type SpaceSSHAllowed struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	spaceReq  requirements.SpaceRequirement
 	spaceRepo spaces.SpaceRepository
 }
 
 func init() {
-	command_registry.Register(&SpaceSSHAllowed{})
+	commandregistry.Register(&SpaceSSHAllowed{})
 }
 
-func (cmd *SpaceSSHAllowed) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SpaceSSHAllowed) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "space-ssh-allowed",
 		Description: T("Reports whether SSH is allowed in a space"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *SpaceSSHAllowed) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SpaceSSHAllowed) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME as argument\n\n") + command_registry.Commands.CommandUsage("space-ssh-allowed"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME as argument\n\n") + commandregistry.Commands.CommandUsage("space-ssh-allowed"))
 	}
 
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
@@ -48,7 +48,7 @@ func (cmd *SpaceSSHAllowed) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *SpaceSSHAllowed) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SpaceSSHAllowed) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	return cmd
 }

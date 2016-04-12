@@ -2,12 +2,12 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,22 +18,22 @@ import (
 
 type CreateOrg struct {
 	ui            terminal.UI
-	config        core_config.Reader
+	config        coreconfig.Reader
 	orgRepo       organizations.OrganizationRepository
 	quotaRepo     quotas.QuotaRepository
 	orgRoleSetter user.OrgRoleSetter
-	flagRepo      feature_flags.FeatureFlagRepository
+	flagRepo      featureflags.FeatureFlagRepository
 }
 
 func init() {
-	command_registry.Register(&CreateOrg{})
+	commandregistry.Register(&CreateOrg{})
 }
 
-func (cmd *CreateOrg) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateOrg) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["q"] = &flags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created org (excluding this option results in assignment of default quota)")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-org",
 		ShortName:   "co",
 		Description: T("Create an org"),
@@ -46,7 +46,7 @@ func (cmd *CreateOrg) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-org"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-org"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -56,7 +56,7 @@ func (cmd *CreateOrg) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *CreateOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
@@ -64,7 +64,7 @@ func (cmd *CreateOrg) SetDependency(deps command_registry.Dependency, pluginCall
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
 
 	//get command from registry for dependency
-	commandDep := command_registry.Commands.FindCommand("set-org-role")
+	commandDep := commandregistry.Commands.FindCommand("set-org-role")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.orgRoleSetter = commandDep.(user.OrgRoleSetter)
 

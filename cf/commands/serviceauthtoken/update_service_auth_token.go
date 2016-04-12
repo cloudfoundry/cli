@@ -3,8 +3,8 @@ package serviceauthtoken
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,16 +13,16 @@ import (
 
 type UpdateServiceAuthTokenFields struct {
 	ui            terminal.UI
-	config        core_config.Reader
+	config        coreconfig.Reader
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
 func init() {
-	command_registry.Register(&UpdateServiceAuthTokenFields{})
+	commandregistry.Register(&UpdateServiceAuthTokenFields{})
 }
 
-func (cmd *UpdateServiceAuthTokenFields) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *UpdateServiceAuthTokenFields) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "update-service-auth-token",
 		Description: T("Update a service auth token"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *UpdateServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 
 func (cmd *UpdateServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + command_registry.Commands.CommandUsage("update-service-auth-token"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + commandregistry.Commands.CommandUsage("update-service-auth-token"))
 	}
 
 	maximumVersion, err := semver.Make("2.46.0")
@@ -49,7 +49,7 @@ func (cmd *UpdateServiceAuthTokenFields) Requirements(requirementsFactory requir
 	return reqs
 }
 
-func (cmd *UpdateServiceAuthTokenFields) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *UpdateServiceAuthTokenFields) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authTokenRepo = deps.RepoLocator.GetServiceAuthTokenRepository()

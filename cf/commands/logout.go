@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -11,15 +11,15 @@ import (
 
 type Logout struct {
 	ui     terminal.UI
-	config core_config.ReadWriter
+	config coreconfig.ReadWriter
 }
 
 func init() {
-	command_registry.Register(&Logout{})
+	commandregistry.Register(&Logout{})
 }
 
-func (cmd *Logout) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Logout) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "logout",
 		ShortName:   "lo",
 		Description: T("Log user out"),
@@ -34,7 +34,7 @@ func (cmd *Logout) Requirements(requirementsFactory requirements.Factory, fc fla
 	return reqs
 }
 
-func (cmd *Logout) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *Logout) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	return cmd

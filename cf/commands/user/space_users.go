@@ -5,8 +5,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/userprint"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,7 +17,7 @@ import (
 
 type SpaceUsers struct {
 	ui          terminal.UI
-	config      core_config.Reader
+	config      coreconfig.Reader
 	spaceRepo   spaces.SpaceRepository
 	userRepo    api.UserRepository
 	orgReq      requirements.OrganizationRequirement
@@ -26,11 +26,11 @@ type SpaceUsers struct {
 }
 
 func init() {
-	command_registry.Register(&SpaceUsers{})
+	commandregistry.Register(&SpaceUsers{})
 }
 
-func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SpaceUsers) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "space-users",
 		Description: T("Show space users by role"),
 		Usage: []string{
@@ -41,7 +41,7 @@ func (cmd *SpaceUsers) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + command_registry.Commands.CommandUsage("space-users"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + commandregistry.Commands.CommandUsage("space-users"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -54,7 +54,7 @@ func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *SpaceUsers) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *SpaceUsers) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()

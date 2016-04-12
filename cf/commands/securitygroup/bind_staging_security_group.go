@@ -1,10 +1,10 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,17 +13,17 @@ import (
 
 type bindToStagingGroup struct {
 	ui                terminal.UI
-	configRepo        core_config.Reader
+	configRepo        coreconfig.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	stagingGroupRepo  staging.StagingSecurityGroupsRepo
 }
 
 func init() {
-	command_registry.Register(&bindToStagingGroup{})
+	commandregistry.Register(&bindToStagingGroup{})
 }
 
-func (cmd *bindToStagingGroup) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *bindToStagingGroup) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "bind-staging-security-group",
 		Description: T("Bind a security group to the list of security groups to be used for staging applications"),
 		Usage: []string{
@@ -34,7 +34,7 @@ func (cmd *bindToStagingGroup) MetaData() command_registry.CommandMetadata {
 
 func (cmd *bindToStagingGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("bind-staging-security-group"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("bind-staging-security-group"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -43,7 +43,7 @@ func (cmd *bindToStagingGroup) Requirements(requirementsFactory requirements.Fac
 	return reqs
 }
 
-func (cmd *bindToStagingGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *bindToStagingGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()

@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,17 +14,17 @@ import (
 
 type RenameService struct {
 	ui                 terminal.UI
-	config             core_config.Reader
+	config             coreconfig.Reader
 	serviceRepo        api.ServiceRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
 func init() {
-	command_registry.Register(&RenameService{})
+	commandregistry.Register(&RenameService{})
 }
 
-func (cmd *RenameService) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RenameService) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "rename-service",
 		Description: T("Rename a service instance"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *RenameService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RenameService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("rename-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-service"))
 	}
 
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
@@ -49,7 +49,7 @@ func (cmd *RenameService) Requirements(requirementsFactory requirements.Factory,
 	return reqs
 }
 
-func (cmd *RenameService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RenameService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
