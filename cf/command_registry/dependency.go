@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/app_files"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -26,7 +26,7 @@ import (
 
 type Dependency struct {
 	Ui                 terminal.UI
-	Config             core_config.Repository
+	Config             coreconfig.Repository
 	RepoLocator        api.RepositoryLocator
 	PluginConfig       pluginconfig.PluginConfiguration
 	ManifestRepo       manifest.ManifestRepository
@@ -73,7 +73,7 @@ func NewDependency(logger trace.Printer) Dependency {
 			deps.Ui.Failed(fmt.Sprintf("Config error: %s", err))
 		}
 	}
-	deps.Config = core_config.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errorHandler)
+	deps.Config = coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errorHandler)
 
 	deps.ManifestRepo = manifest.NewManifestDiskRepository()
 	deps.AppManifest = manifest.NewGenerator()

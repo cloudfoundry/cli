@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -19,7 +19,7 @@ import (
 
 type CopySource struct {
 	ui                terminal.UI
-	config            core_config.Reader
+	config            coreconfig.Reader
 	authRepo          authentication.AuthenticationRepository
 	appRepo           applications.ApplicationRepository
 	orgRepo           organizations.OrganizationRepository

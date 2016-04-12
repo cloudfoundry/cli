@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -24,7 +24,7 @@ var _ = Describe("DomainRepository", func() {
 		ts      *httptest.Server
 		handler *testnet.TestHandler
 		repo    DomainRepository
-		config  core_config.ReadWriter
+		config  coreconfig.ReadWriter
 	)
 
 	BeforeEach(func() {

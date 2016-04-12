@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -19,10 +19,10 @@ type TargetedOrgRequirement interface {
 }
 
 type targetedOrgApiRequirement struct {
-	config core_config.Reader
+	config coreconfig.Reader
 }
 
-func NewTargetedOrgRequirement(config core_config.Reader) TargetedOrgRequirement {
+func NewTargetedOrgRequirement(config coreconfig.Reader) TargetedOrgRequirement {
 	return targetedOrgApiRequirement{config}
 }
 

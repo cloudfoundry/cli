@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -25,7 +25,7 @@ var _ = Describe("UserRepository", func() {
 	var (
 		client api.UserRepository
 
-		config     core_config.ReadWriter
+		config     coreconfig.ReadWriter
 		ccServer   *ghttp.Server
 		uaaServer  *ghttp.Server
 		ccGateway  net.Gateway

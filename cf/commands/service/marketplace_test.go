@@ -3,7 +3,7 @@ package service_test
 import (
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/servicebuilderfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +20,7 @@ import (
 var _ = Describe("marketplace command", func() {
 	var ui *testterm.FakeUI
 	var requirementsFactory *testreq.FakeReqFactory
-	var config core_config.Repository
+	var config coreconfig.Repository
 	var serviceBuilder *servicebuilderfakes.FakeServiceBuilder
 	var fakeServiceOfferings []models.ServiceOffering
 	var serviceWithAPaidPlan models.ServiceOffering

@@ -4,7 +4,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,7 +21,7 @@ type RouteServiceUnbinder interface {
 
 type UnbindRouteService struct {
 	ui                      terminal.UI
-	config                  core_config.Reader
+	config                  coreconfig.Reader
 	routeRepo               api.RouteRepository
 	routeServiceBindingRepo api.RouteServiceBindingRepository
 	domainReq               requirements.DomainRequirement

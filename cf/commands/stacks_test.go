@@ -3,7 +3,7 @@ package commands_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,7 +21,7 @@ var _ = Describe("stacks command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		repo                *stacksfakes.FakeStackRepository
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)

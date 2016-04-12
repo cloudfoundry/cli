@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	term "github.com/cloudfoundry/cli/cf/terminal"
 )
 
@@ -139,7 +139,7 @@ func (ui *FakeUI) ClearOutputs() {
 	ui.Outputs = []string{}
 }
 
-func (ui *FakeUI) ShowConfiguration(config core_config.Reader) {
+func (ui *FakeUI) ShowConfiguration(config coreconfig.Reader) {
 	ui.ShowConfigurationCalled = true
 }
 
@@ -157,7 +157,7 @@ func (ui *FakeUI) Table(headers []string) *term.UITable {
 	}
 }
 
-func (ui *FakeUI) NotifyUpdateIfNeeded(config core_config.Reader) {
+func (ui *FakeUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
 	if !config.IsMinCliVersion(cf.Version) {
 		ui.Say("Cloud Foundry API version {{.ApiVer}} requires CLI version " + config.MinCliVersion() + "  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads")
 	}

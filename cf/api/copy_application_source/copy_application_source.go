@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
@@ -15,11 +15,11 @@ type CopyApplicationSourceRepository interface {
 }
 
 type CloudControllerApplicationSourceRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerCopyApplicationSourceRepository(config core_config.Reader, gateway net.Gateway) *CloudControllerApplicationSourceRepository {
+func NewCloudControllerCopyApplicationSourceRepository(config coreconfig.Reader, gateway net.Gateway) *CloudControllerApplicationSourceRepository {
 	return &CloudControllerApplicationSourceRepository{
 		config:  config,
 		gateway: gateway,

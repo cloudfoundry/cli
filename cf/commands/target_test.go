@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -26,7 +26,7 @@ var _ = Describe("target command", func() {
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
+		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
 		deps                command_registry.Dependency
 	)

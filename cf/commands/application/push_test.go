@@ -17,7 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/commands/service/servicefakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -41,7 +41,7 @@ import (
 var _ = Describe("Push Command", func() {
 	var (
 		ui                         *testterm.FakeUI
-		configRepo                 core_config.Repository
+		configRepo                 coreconfig.Repository
 		manifestRepo               *testmanifest.FakeManifestRepository
 		starter                    *applicationfakes.FakeApplicationStarter
 		stopper                    *applicationfakes.FakeApplicationStopper

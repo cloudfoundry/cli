@@ -3,7 +3,7 @@ package requirements
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 )
 
 //go:generate counterfeiter . Factory
@@ -27,11 +27,11 @@ type Factory interface {
 }
 
 type apiRequirementFactory struct {
-	config      core_config.Reader
+	config      coreconfig.Reader
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(config core_config.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
+func NewFactory(config coreconfig.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
 	return apiRequirementFactory{config, repoLocator}
 }
 

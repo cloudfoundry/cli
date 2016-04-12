@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -19,7 +19,7 @@ import (
 var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 	var (
 		ccServer   *ghttp.Server
-		configRepo core_config.ReadWriter
+		configRepo coreconfig.ReadWriter
 		repo       environment_variable_groups.CloudControllerEnvironmentVariableGroupsRepository
 	)
 

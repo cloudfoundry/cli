@@ -1,9 +1,9 @@
-package core_config_test
+package coreconfig_test
 
 import (
 	"regexp"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/onsi/ginkgo"
@@ -105,7 +105,7 @@ var _ = Describe("V3 Config files", func() {
 
 	Describe("JsonMarshalV3", func() {
 		It("creates a JSON string from the config object", func() {
-			data := &core_config.Data{
+			data := &coreconfig.Data{
 				Target:                   "api.example.com",
 				ApiVersion:               "3",
 				AuthorizationEndpoint:    "auth.example.com",
@@ -151,13 +151,13 @@ var _ = Describe("V3 Config files", func() {
 
 	Describe("JsonUnmarshalV3", func() {
 		It("returns an error when the JSON is invalid", func() {
-			configData := core_config.NewData()
+			configData := coreconfig.NewData()
 			err := configData.JsonUnmarshalV3([]byte(`{ "not_valid": ### }`))
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("creates a config object from valid V3 JSON", func() {
-			expectedData := &core_config.Data{
+			expectedData := &coreconfig.Data{
 				ConfigVersion:            3,
 				Target:                   "api.example.com",
 				ApiVersion:               "3",
@@ -192,7 +192,7 @@ var _ = Describe("V3 Config files", func() {
 				},
 			}
 
-			actualData := core_config.NewData()
+			actualData := coreconfig.NewData()
 			err := actualData.JsonUnmarshalV3([]byte(exampleV3JSON))
 			Expect(err).NotTo(HaveOccurred())
 
@@ -200,11 +200,11 @@ var _ = Describe("V3 Config files", func() {
 		})
 
 		It("returns an empty Data object for non-V3 JSON", func() {
-			actualData := core_config.NewData()
+			actualData := coreconfig.NewData()
 			err := actualData.JsonUnmarshalV3([]byte(exampleV2JSON))
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(*actualData).To(Equal(core_config.Data{}))
+			Expect(*actualData).To(Equal(coreconfig.Data{}))
 		})
 	})
 })

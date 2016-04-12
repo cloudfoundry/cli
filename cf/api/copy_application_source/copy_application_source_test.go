@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	. "github.com/cloudfoundry/cli/cf/api/copy_application_source"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -19,7 +19,7 @@ var _ = Describe("CopyApplicationSource", func() {
 	var (
 		repo       CopyApplicationSourceRepository
 		testServer *httptest.Server
-		configRepo core_config.ReadWriter
+		configRepo coreconfig.ReadWriter
 	)
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {

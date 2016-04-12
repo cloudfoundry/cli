@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -24,7 +24,7 @@ var _ = Describe("stop command", func() {
 		app                 models.Application
 		appRepo             *applicationsfakes.FakeApplicationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
+		config              coreconfig.Repository
 		deps                command_registry.Dependency
 	)
 

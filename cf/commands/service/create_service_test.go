@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/servicebuilderfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -27,7 +27,7 @@ import (
 var _ = Describe("create-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *apifakes.FakeServiceRepository
 		serviceBuilder      *servicebuilderfakes.FakeServiceBuilder

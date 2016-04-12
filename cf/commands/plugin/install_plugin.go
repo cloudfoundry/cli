@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_installer"
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -26,7 +26,7 @@ import (
 
 type PluginInstall struct {
 	ui           terminal.UI
-	config       core_config.Reader
+	config       coreconfig.Reader
 	pluginConfig pluginconfig.PluginConfiguration
 	pluginRepo   plugin_repo.PluginRepo
 	checksum     utils.Sha1Checksum

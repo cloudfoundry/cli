@@ -3,7 +3,7 @@ package organization_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
@@ -23,7 +23,7 @@ var _ = Describe("orgs command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency
 	)

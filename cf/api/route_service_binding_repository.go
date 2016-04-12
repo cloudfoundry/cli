@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
@@ -19,11 +19,11 @@ type RouteServiceBindingRepository interface {
 }
 
 type CloudControllerRouteServiceBindingRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerRouteServiceBindingRepository(config core_config.Reader, gateway net.Gateway) CloudControllerRouteServiceBindingRepository {
+func NewCloudControllerRouteServiceBindingRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerRouteServiceBindingRepository {
 	return CloudControllerRouteServiceBindingRepository{
 		config:  config,
 		gateway: gateway,

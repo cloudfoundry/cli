@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -28,7 +28,7 @@ var invalidTokenCloudControllerRequest = func(writer http.ResponseWriter, reques
 
 var _ = Describe("Cloud Controller Gateway", func() {
 	var gateway Gateway
-	var config core_config.Reader
+	var config coreconfig.Reader
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()

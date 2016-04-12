@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -20,7 +20,7 @@ import (
 var _ = Describe("RouteServiceBindingsRepository", func() {
 	var (
 		ccServer                *ghttp.Server
-		configRepo              core_config.ReadWriter
+		configRepo              coreconfig.ReadWriter
 		routeServiceBindingRepo api.CloudControllerRouteServiceBindingRepository
 	)
 

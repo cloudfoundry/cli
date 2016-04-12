@@ -6,7 +6,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -25,7 +25,7 @@ import (
 var _ = Describe("UnbindRouteService", func() {
 	var (
 		ui                      *testterm.FakeUI
-		configRepo              core_config.Repository
+		configRepo              coreconfig.Repository
 		routeRepo               *apifakes.FakeRouteRepository
 		routeServiceBindingRepo *apifakes.FakeRouteServiceBindingRepository
 

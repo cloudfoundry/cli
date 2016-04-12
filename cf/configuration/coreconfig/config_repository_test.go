@@ -1,4 +1,4 @@
-package core_config_test
+package coreconfig_test
 
 import (
 	"io/ioutil"
@@ -8,7 +8,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/configurationfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
 
@@ -18,14 +18,14 @@ import (
 
 var _ = Describe("Configuration Repository", func() {
 	var (
-		config    core_config.Repository
+		config    coreconfig.Repository
 		persistor *configurationfakes.FakePersistor
 	)
 
 	BeforeEach(func() {
 		persistor = new(configurationfakes.FakePersistor)
 		persistor.ExistsReturns(true)
-		config = core_config.NewRepositoryFromPersistor(persistor, func(err error) { panic(err) })
+		config = coreconfig.NewRepositoryFromPersistor(persistor, func(err error) { panic(err) })
 	})
 
 	It("is threadsafe", func() {
@@ -198,7 +198,7 @@ var _ = Describe("Configuration Repository", func() {
 		var configPath string
 
 		It("returns nil repository if no error handler provided", func() {
-			config = core_config.NewRepositoryFromFilepath(configPath, nil)
+			config = coreconfig.NewRepositoryFromFilepath(configPath, nil)
 			Expect(config).To(BeNil())
 		})
 
@@ -221,7 +221,7 @@ var _ = Describe("Configuration Repository", func() {
 			})
 
 			It("has sane defaults when there is no config to read", func() {
-				config = core_config.NewRepositoryFromFilepath(configPath, func(err error) {
+				config = coreconfig.NewRepositoryFromFilepath(configPath, func(err error) {
 					panic(err)
 				})
 
@@ -240,7 +240,7 @@ var _ = Describe("Configuration Repository", func() {
 			})
 
 			It("returns a new empty config", func() {
-				config = core_config.NewRepositoryFromFilepath(configPath, func(err error) {
+				config = coreconfig.NewRepositoryFromFilepath(configPath, func(err error) {
 					panic(err)
 				})
 

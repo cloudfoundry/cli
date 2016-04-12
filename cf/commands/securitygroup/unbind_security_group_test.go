@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
@@ -28,7 +28,7 @@ var _ = Describe("unbind-security-group command", func() {
 		spaceRepo           *apifakes.FakeSpaceRepository
 		secBinder           *spacesfakes.FakeSecurityGroupSpaceBinder
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		deps                command_registry.Dependency
 	)
 

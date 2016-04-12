@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 )
 
 type FakeAuthenticationRepository struct {
@@ -44,11 +44,11 @@ type FakeAuthenticationRepository struct {
 		result1 string
 		result2 error
 	}
-	GetLoginPromptsAndSaveUAAServerURLStub        func() (map[string]core_config.AuthPrompt, error)
+	GetLoginPromptsAndSaveUAAServerURLStub        func() (map[string]coreconfig.AuthPrompt, error)
 	getLoginPromptsAndSaveUAAServerURLMutex       sync.RWMutex
 	getLoginPromptsAndSaveUAAServerURLArgsForCall []struct{}
 	getLoginPromptsAndSaveUAAServerURLReturns     struct {
-		result1 map[string]core_config.AuthPrompt
+		result1 map[string]coreconfig.AuthPrompt
 		result2 error
 	}
 }
@@ -189,7 +189,7 @@ func (fake *FakeAuthenticationRepository) AuthorizeReturns(result1 string, resul
 	}{result1, result2}
 }
 
-func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]core_config.AuthPrompt, error) {
+func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error) {
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Lock()
 	fake.getLoginPromptsAndSaveUAAServerURLArgsForCall = append(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall, struct{}{})
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Unlock()
@@ -206,10 +206,10 @@ func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURLCall
 	return len(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURLReturns(result1 map[string]core_config.AuthPrompt, result2 error) {
+func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURLReturns(result1 map[string]coreconfig.AuthPrompt, result2 error) {
 	fake.GetLoginPromptsAndSaveUAAServerURLStub = nil
 	fake.getLoginPromptsAndSaveUAAServerURLReturns = struct {
-		result1 map[string]core_config.AuthPrompt
+		result1 map[string]coreconfig.AuthPrompt
 		result2 error
 	}{result1, result2}
 }

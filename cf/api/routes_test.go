@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -24,7 +24,7 @@ var _ = Describe("route repository", func() {
 	var (
 		ts         *httptest.Server
 		handler    *testnet.TestHandler
-		configRepo core_config.Repository
+		configRepo coreconfig.Repository
 		repo       CloudControllerRouteRepository
 	)
 

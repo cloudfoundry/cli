@@ -3,7 +3,7 @@ package servicebroker_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,7 +18,7 @@ import (
 var _ = Describe("delete-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		brokerRepo          *apifakes.FakeServiceBrokerRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                command_registry.Dependency

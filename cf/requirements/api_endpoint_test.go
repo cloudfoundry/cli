@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("ApiEndpointRequirement", func() {
 	var (
-		config core_config.Repository
+		config coreconfig.Repository
 	)
 
 	BeforeEach(func() {

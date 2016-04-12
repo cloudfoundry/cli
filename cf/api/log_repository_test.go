@@ -3,7 +3,7 @@ package api_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -19,7 +19,7 @@ var _ = Describe("loggregator logs repository", func() {
 	var (
 		fakeConsumer *apifakes.OldFakeLoggregatorConsumer
 		logsRepo     LogsRepository
-		configRepo   core_config.ReadWriter
+		configRepo   coreconfig.ReadWriter
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
 	)
 

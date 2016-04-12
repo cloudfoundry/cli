@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("CreateServiceBroker", func() {
 	var (
 		ui                *testterm.FakeUI
-		configRepo        core_config.Repository
+		configRepo        coreconfig.Repository
 		serviceBrokerRepo *apifakes.FakeServiceBrokerRepository
 
 		cmd         command_registry.Command

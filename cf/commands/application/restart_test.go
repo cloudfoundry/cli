@@ -10,7 +10,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +22,7 @@ var _ = Describe("restart command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		starter             *applicationfakes.FakeApplicationStarter
 		stopper             *applicationfakes.FakeApplicationStopper
-		config              core_config.Repository
+		config              coreconfig.Repository
 		app                 models.Application
 		originalStop        command_registry.Command
 		originalStart       command_registry.Command

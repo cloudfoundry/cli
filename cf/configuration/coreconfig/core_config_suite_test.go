@@ -1,4 +1,4 @@
-package core_config_test
+package coreconfig_test
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -8,7 +8,7 @@ import (
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	"github.com/onsi/gomega/ghttp"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -21,7 +21,7 @@ import (
 var _ = Describe("Service Keys Repo", func() {
 	var (
 		ccServer   *ghttp.Server
-		configRepo core_config.ReadWriter
+		configRepo coreconfig.ReadWriter
 		repo       ServiceKeyRepository
 	)
 

@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups/environmentvariablegroupsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,7 +20,7 @@ var _ = Describe("running-environment-variable-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
-		configRepo                   core_config.Repository
+		configRepo                   coreconfig.Repository
 		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository
 		deps                         command_registry.Dependency
 	)

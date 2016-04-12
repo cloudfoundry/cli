@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -29,11 +29,11 @@ type ApplicationBitsRepository interface {
 }
 
 type CloudControllerApplicationBitsRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerApplicationBitsRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerApplicationBitsRepository) {
+func NewCloudControllerApplicationBitsRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerApplicationBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

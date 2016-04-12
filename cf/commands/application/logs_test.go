@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,7 +27,7 @@ var _ = Describe("logs command", func() {
 		ui                  *testterm.FakeUI
 		logsRepo            *apifakes.FakeLogsRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		deps                command_registry.Dependency
 	)
 

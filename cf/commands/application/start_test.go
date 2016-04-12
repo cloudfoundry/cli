@@ -10,7 +10,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -33,7 +33,7 @@ import (
 var _ = Describe("start command", func() {
 	var (
 		ui                        *testterm.FakeUI
-		configRepo                core_config.Repository
+		configRepo                coreconfig.Repository
 		defaultAppForStart        models.Application
 		defaultInstanceResponses  [][]models.AppInstanceFields
 		defaultInstanceErrorCodes []string

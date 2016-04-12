@@ -13,7 +13,7 @@ import (
 	"sort"
 
 	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -28,7 +28,7 @@ import (
 var _ = Describe("BuildpackBitsRepository", func() {
 	var (
 		buildpacksDir     string
-		configRepo        core_config.Repository
+		configRepo        coreconfig.Repository
 		repo              CloudControllerBuildpackBitsRepository
 		buildpack         models.Buildpack
 		testServer        *httptest.Server

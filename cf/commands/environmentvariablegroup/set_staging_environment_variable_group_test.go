@@ -3,7 +3,7 @@ package environmentvariablegroup_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups/environmentvariablegroupsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,7 +19,7 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
 		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository
-		configRepo                   core_config.Repository
+		configRepo                   coreconfig.Repository
 		deps                         command_registry.Dependency
 	)
 

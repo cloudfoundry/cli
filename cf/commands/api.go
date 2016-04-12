@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,7 +18,7 @@ import (
 type Api struct {
 	ui           terminal.UI
 	endpointRepo api.EndpointRepository
-	config       core_config.ReadWriter
+	config       coreconfig.ReadWriter
 }
 
 func init() {

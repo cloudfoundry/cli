@@ -14,7 +14,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -26,7 +26,7 @@ var _ = Describe("CopySource", func() {
 
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		appRepo             *applicationsfakes.FakeApplicationRepository

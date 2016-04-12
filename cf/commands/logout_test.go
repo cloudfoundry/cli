@@ -2,7 +2,7 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -14,7 +14,7 @@ import (
 var _ = Describe("logout command", func() {
 
 	var (
-		config core_config.Repository
+		config coreconfig.Repository
 		ui     *testterm.FakeUI
 		deps   command_registry.Dependency
 	)

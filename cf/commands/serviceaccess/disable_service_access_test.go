@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -23,7 +23,7 @@ var _ = Describe("disable-service-access command", func() {
 		actor               *actorsfakes.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		deps                command_registry.Dependency
 	)
 
