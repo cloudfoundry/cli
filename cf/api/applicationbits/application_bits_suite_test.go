@@ -1,4 +1,4 @@
-package application_bits_test
+package applicationbits_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
