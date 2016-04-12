@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -21,7 +21,7 @@ import (
 type CreateSpaceQuota struct {
 	ui        terminal.UI
 	config    coreconfig.Reader
-	quotaRepo space_quotas.SpaceQuotaRepository
+	quotaRepo spacequotas.SpaceQuotaRepository
 	orgRepo   organizations.OrganizationRepository
 }
 

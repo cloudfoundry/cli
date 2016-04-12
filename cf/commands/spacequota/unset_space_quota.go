@@ -1,7 +1,7 @@
 package spacequota
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -14,7 +14,7 @@ import (
 type UnsetSpaceQuota struct {
 	ui        terminal.UI
 	config    coreconfig.Reader
-	quotaRepo space_quotas.SpaceQuotaRepository
+	quotaRepo spacequotas.SpaceQuotaRepository
 	spaceRepo spaces.SpaceRepository
 }
 

@@ -20,7 +20,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
 	securitygroupspaces "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
@@ -70,7 +70,7 @@ type RepositoryLocator struct {
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 	runningSecurityGroupRepo        running.RunningSecurityGroupsRepo
 	securityGroupSpaceBinder        securitygroupspaces.SecurityGroupSpaceBinder
-	spaceQuotaRepo                  space_quotas.SpaceQuotaRepository
+	spaceQuotaRepo                  spacequotas.SpaceQuotaRepository
 	featureFlagRepo                 feature_flags.FeatureFlagRepository
 	environmentVariableGroupRepo    environment_variable_groups.EnvironmentVariableGroupsRepository
 	copyAppSourceRepo               copy_application_source.CopyApplicationSourceRepository
@@ -128,7 +128,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.runningSecurityGroupRepo = running.NewRunningSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
-	loc.spaceQuotaRepo = space_quotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
+	loc.spaceQuotaRepo = spacequotas.NewCloudControllerSpaceQuotaRepository(config, cloudControllerGateway)
 	loc.featureFlagRepo = feature_flags.NewCloudControllerFeatureFlagRepository(config, cloudControllerGateway)
 	loc.environmentVariableGroupRepo = environment_variable_groups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
 	loc.copyAppSourceRepo = copy_application_source.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
@@ -438,11 +438,11 @@ func (locator RepositoryLocator) GetServicePlanVisibilityRepository() ServicePla
 	return locator.servicePlanVisibilityRepo
 }
 
-func (locator RepositoryLocator) GetSpaceQuotaRepository() space_quotas.SpaceQuotaRepository {
+func (locator RepositoryLocator) GetSpaceQuotaRepository() spacequotas.SpaceQuotaRepository {
 	return locator.spaceQuotaRepo
 }
 
-func (locator RepositoryLocator) SetSpaceQuotaRepository(repo space_quotas.SpaceQuotaRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetSpaceQuotaRepository(repo spacequotas.SpaceQuotaRepository) RepositoryLocator {
 	locator.spaceQuotaRepo = repo
 	return locator
 }

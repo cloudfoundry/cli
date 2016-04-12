@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -21,7 +21,7 @@ type ShowSpace struct {
 	ui          terminal.UI
 	config      coreconfig.Reader
 	spaceReq    requirements.SpaceRequirement
-	quotaRepo   space_quotas.SpaceQuotaRepository
+	quotaRepo   spacequotas.SpaceQuotaRepository
 	pluginModel *plugin_models.GetSpace_Model
 	pluginCall  bool
 }
