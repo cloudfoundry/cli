@@ -13,8 +13,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/command_registry/commandregistryfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config/pluginconfigfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -422,8 +422,8 @@ var _ = Describe("Install", func() {
 
 		Context("when the plugin's alias conflicts with other installed plugin", func() {
 			It("fails if it shares a command name", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["AliasCollision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/config.exe",
 					Commands: []plugin.Command{
 						{
@@ -443,8 +443,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command alias", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["AliasCollision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/alias.exe",
 					Commands: []plugin.Command{
 						{
@@ -467,8 +467,8 @@ var _ = Describe("Install", func() {
 
 		Context("when the plugin's command conflicts with other installed plugin", func() {
 			It("fails if it shares a command name", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["Test1Collision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["Test1Collision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/config.exe",
 					Commands: []plugin.Command{
 						{
@@ -488,8 +488,8 @@ var _ = Describe("Install", func() {
 			})
 
 			It("fails if it shares a command alias", func() {
-				pluginsMap := make(map[string]plugin_config.PluginMetadata)
-				pluginsMap["AliasCollision"] = plugin_config.PluginMetadata{
+				pluginsMap := make(map[string]pluginconfig.PluginMetadata)
+				pluginsMap["AliasCollision"] = pluginconfig.PluginMetadata{
 					Location: "location/to/alias.exe",
 					Commands: []plugin.Command{
 						{
@@ -511,7 +511,7 @@ var _ = Describe("Install", func() {
 		})
 
 		It("if plugin name is already taken", func() {
-			pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"Test1": plugin_config.PluginMetadata{}})
+			pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"Test1": pluginconfig.PluginMetadata{}})
 			runCommand(test_1, "-f")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -527,7 +527,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
-				pluginConfig.PluginsReturns(map[string]plugin_config.PluginMetadata{"useless": plugin_config.PluginMetadata{}})
+				pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"useless": pluginconfig.PluginMetadata{}})
 				pluginConfig.GetPluginPathReturns(curDir)
 
 				runCommand(filepath.Join(curDir, pluginFile.Name()), "-f")

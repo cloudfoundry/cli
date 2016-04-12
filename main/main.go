@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/panicprinter"
@@ -125,7 +125,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
+	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
 		deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
 	})
 	pluginList := pluginConfig.Plugins()

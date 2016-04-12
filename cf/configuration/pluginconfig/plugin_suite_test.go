@@ -1,4 +1,4 @@
-package plugin_config_test
+package pluginconfig_test
 
 import (
 	. "github.com/onsi/ginkgo"
