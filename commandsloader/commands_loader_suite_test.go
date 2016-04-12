@@ -1,4 +1,4 @@
-package commands_loader_test
+package commandsloader_test
 
 import (
 	. "github.com/onsi/ginkgo"
