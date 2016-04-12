@@ -4,7 +4,7 @@ package plugininstallerfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors/plugin_installer"
+	"github.com/cloudfoundry/cli/cf/actors/plugininstaller"
 )
 
 type FakePluginInstaller struct {
@@ -50,4 +50,4 @@ func (fake *FakePluginInstaller) InstallReturns(result1 string) {
 	}{result1}
 }
 
-var _ plugin_installer.PluginInstaller = new(FakePluginInstaller)
+var _ plugininstaller.PluginInstaller = new(FakePluginInstaller)
