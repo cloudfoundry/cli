@@ -1,6 +1,7 @@
 package route
 
 import (
+	"fmt"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -10,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"fmt"
 )
 
 type UnmapRoute struct {
@@ -51,7 +51,7 @@ func (cmd *UnmapRoute) MetaData() command_registry.CommandMetadata {
 			"CF_NAME unmap-route my-app example.com                              # example.com",
 			"CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
-		  "CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000",
+			"CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000",
 		},
 		Flags: fs,
 	}
@@ -103,10 +103,9 @@ func (cmd *UnmapRoute) SetDependency(deps command_registry.Dependency, pluginCal
 }
 
 func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
-	var port int
-
 	hostName := c.String("n")
 	path := c.String("path")
+	port := c.Int("port")
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
