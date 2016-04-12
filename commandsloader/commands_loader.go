@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/commands/organization"
 	"github.com/cloudfoundry/cli/cf/commands/plugin"
-	"github.com/cloudfoundry/cli/cf/commands/plugin_repo"
+	"github.com/cloudfoundry/cli/cf/commands/pluginrepo"
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/routergroups"
@@ -41,7 +41,7 @@ func Load() {
 	_ = featureflag.ShowFeatureFlag{}
 	_ = organization.ListOrgs{}
 	_ = plugin.Plugins{}
-	_ = plugin_repo.RepoPlugins{}
+	_ = pluginrepo.RepoPlugins{}
 	_ = quota.CreateQuota{}
 	_ = route.CreateRoute{}
 	_ = routergroups.RouterGroups{}
