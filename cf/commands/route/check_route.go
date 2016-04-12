@@ -5,7 +5,7 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -21,14 +21,14 @@ type CheckRoute struct {
 }
 
 func init() {
-	command_registry.Register(&CheckRoute{})
+	commandregistry.Register(&CheckRoute{})
 }
 
-func (cmd *CheckRoute) MetaData() command_registry.CommandMetadata {
+func (cmd *CheckRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the route")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "check-route",
 		Description: T("Perform a simple check to determine whether a route currently exists or not"),
 		Usage: []string{
@@ -44,7 +44,7 @@ func (cmd *CheckRoute) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CheckRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires host and domain as arguments\n\n") + command_registry.Commands.CommandUsage("check-route"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires host and domain as arguments\n\n") + commandregistry.Commands.CommandUsage("check-route"))
 	}
 
 	var reqs []requirements.Requirement
@@ -65,7 +65,7 @@ func (cmd *CheckRoute) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *CheckRoute) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CheckRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()

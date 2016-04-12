@@ -2,7 +2,7 @@ package space
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,11 +18,11 @@ type RenameSpace struct {
 }
 
 func init() {
-	command_registry.Register(&RenameSpace{})
+	commandregistry.Register(&RenameSpace{})
 }
 
-func (cmd *RenameSpace) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RenameSpace) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "rename-space",
 		Description: T("Rename a space"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *RenameSpace) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RenameSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("rename-space"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-space"))
 	}
 
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
@@ -47,7 +47,7 @@ func (cmd *RenameSpace) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *RenameSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RenameSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()

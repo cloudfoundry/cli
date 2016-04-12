@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -31,8 +31,8 @@ var _ = Describe("BindRouteService", func() {
 		routeRepo               *apifakes.FakeRouteRepository
 		routeServiceBindingRepo *apifakes.FakeRouteServiceBindingRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -54,7 +54,7 @@ var _ = Describe("BindRouteService", func() {
 		routeServiceBindingRepo = new(apifakes.FakeRouteServiceBindingRepository)
 		repoLocator = repoLocator.SetRouteServiceBindingRepository(routeServiceBindingRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

@@ -2,7 +2,7 @@ package domain
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,11 +18,11 @@ type CreateDomain struct {
 }
 
 func init() {
-	command_registry.Register(&CreateDomain{})
+	commandregistry.Register(&CreateDomain{})
 }
 
-func (cmd *CreateDomain) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *CreateDomain) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "create-domain",
 		Description: T("Create a domain in an org for later use"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *CreateDomain) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires org_name, domain_name as arguments\n\n") + command_registry.Commands.CommandUsage("create-domain"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires org_name, domain_name as arguments\n\n") + commandregistry.Commands.CommandUsage("create-domain"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -46,7 +46,7 @@ func (cmd *CreateDomain) Requirements(requirementsFactory requirements.Factory, 
 	return reqs
 }
 
-func (cmd *CreateDomain) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()

@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -27,10 +27,10 @@ type Curl struct {
 }
 
 func init() {
-	command_registry.Register(&Curl{})
+	commandregistry.Register(&Curl{})
 }
 
-func (cmd *Curl) MetaData() command_registry.CommandMetadata {
+func (cmd *Curl) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.BoolFlag{ShortName: "i", Usage: T("Include response headers in the output")}
 	fs["X"] = &flags.StringFlag{ShortName: "X", Usage: T("HTTP method (GET,POST,PUT,DELETE,etc)")}
@@ -38,7 +38,7 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 	fs["d"] = &flags.StringFlag{ShortName: "d", Usage: T("HTTP data to include in the request body, or '@' followed by a file name to read the data from")}
 	fs["output"] = &flags.StringFlag{Name: "output", Usage: T("Write curl body to FILE instead of stdout")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "curl",
 		Description: T("Executes a request to the targeted API endpoint"),
 		Usage: []string{
@@ -61,14 +61,14 @@ func (cmd *Curl) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. An argument is missing or not correctly enclosed.\n\n") + command_registry.Commands.CommandUsage("curl"))
+		cmd.ui.Failed(T("Incorrect Usage. An argument is missing or not correctly enclosed.\n\n") + commandregistry.Commands.CommandUsage("curl"))
 	}
 
 	reqs := []requirements.Requirement{}
 	return reqs
 }
 
-func (cmd *Curl) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Curl) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.curlRepo = deps.RepoLocator.GetCurlRepository()

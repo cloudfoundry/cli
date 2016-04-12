@@ -3,7 +3,7 @@ package commands_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/manifest/manifestfakes"
@@ -31,8 +31,8 @@ var _ = Describe("CreateAppManifest", func() {
 		appSummaryRepo *apifakes.FakeAppSummaryRepository
 		stackRepo      *stacksfakes.FakeStackRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -53,7 +53,7 @@ var _ = Describe("CreateAppManifest", func() {
 
 		fakeManifest = new(manifestfakes.FakeAppManifest)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,

@@ -3,7 +3,7 @@ package service
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -20,14 +20,14 @@ type ShowService struct {
 }
 
 func init() {
-	command_registry.Register(&ShowService{})
+	commandregistry.Register(&ShowService{})
 }
 
-func (cmd *ShowService) MetaData() command_registry.CommandMetadata {
+func (cmd *ShowService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service's guid.  All other output for the service is suppressed.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "service",
 		Description: T("Show service instance info"),
 		Usage: []string{
@@ -39,7 +39,7 @@ func (cmd *ShowService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("service"))
 	}
 
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
@@ -53,7 +53,7 @@ func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *ShowService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ShowService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 
 	cmd.pluginCall = pluginCall

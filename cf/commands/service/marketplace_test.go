@@ -2,7 +2,7 @@ package service_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors/service_builder/servicebuilderfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -25,13 +25,13 @@ var _ = Describe("marketplace command", func() {
 	var fakeServiceOfferings []models.ServiceOffering
 	var serviceWithAPaidPlan models.ServiceOffering
 	var service2 models.ServiceOffering
-	var deps command_registry.Dependency
+	var deps commandregistry.Dependency
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
 		deps.ServiceBuilder = serviceBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("marketplace").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("marketplace").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -71,7 +71,7 @@ var _ = Describe("marketplace command", func() {
 			})
 
 			Context("when arguments are provided", func() {
-				var cmd command_registry.Command
+				var cmd commandregistry.Command
 				var flagContext flags.FlagContext
 
 				BeforeEach(func() {

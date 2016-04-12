@@ -10,7 +10,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -25,13 +25,13 @@ var _ = Describe("add-plugin-repo", func() {
 		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		testServer          *httptest.Server
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("add-plugin-repo").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("add-plugin-repo").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

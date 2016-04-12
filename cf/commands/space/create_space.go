@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -28,15 +28,15 @@ type CreateSpace struct {
 }
 
 func init() {
-	command_registry.Register(&CreateSpace{})
+	commandregistry.Register(&CreateSpace{})
 }
 
-func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateSpace) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Organization")}
 	fs["q"] = &flags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created space")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-space",
 		Description: T("Create a space"),
 		Usage: []string{
@@ -48,7 +48,7 @@ func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-space"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -62,7 +62,7 @@ func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
@@ -71,7 +71,7 @@ func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCa
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 
 	//get command from registry for dependency
-	commandDep := command_registry.Commands.FindCommand("set-space-role")
+	commandDep := commandregistry.Commands.FindCommand("set-space-role")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.spaceRoleSetter = commandDep.(user.SpaceRoleSetter)
 

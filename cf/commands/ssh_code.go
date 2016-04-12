@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -17,7 +17,7 @@ import (
 //go:generate counterfeiter . SSHCodeGetter
 
 type SSHCodeGetter interface {
-	command_registry.Command
+	commandregistry.Command
 	Get() (string, error)
 }
 
@@ -29,11 +29,11 @@ type OneTimeSSHCode struct {
 }
 
 func init() {
-	command_registry.Register(&OneTimeSSHCode{})
+	commandregistry.Register(&OneTimeSSHCode{})
 }
 
-func (cmd *OneTimeSSHCode) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *OneTimeSSHCode) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "ssh-code",
 		Description: T("Get a one time password for ssh clients"),
 		Usage: []string{
@@ -43,7 +43,7 @@ func (cmd *OneTimeSSHCode) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -58,7 +58,7 @@ func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory
 	return reqs
 }
 
-func (cmd *OneTimeSSHCode) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *OneTimeSSHCode) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()

@@ -8,7 +8,7 @@ import (
 	"github.com/blang/semver"
 	planbuilderfakes "github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -32,7 +32,7 @@ var _ = Describe("update-service command", func() {
 		serviceRepo         *apifakes.FakeServiceRepository
 		planBuilder         *planbuilderfakes.FakePlanBuilder
 		offering1           models.ServiceOffering
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -40,7 +40,7 @@ var _ = Describe("update-service command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
 		deps.PlanBuilder = planBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

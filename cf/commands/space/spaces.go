@@ -2,7 +2,7 @@ package space
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,11 +22,11 @@ type ListSpaces struct {
 }
 
 func init() {
-	command_registry.Register(&ListSpaces{})
+	commandregistry.Register(&ListSpaces{})
 }
 
-func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListSpaces) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "spaces",
 		Description: T("List all spaces in an org"),
 		Usage: []string{
@@ -37,7 +37,7 @@ func (cmd *ListSpaces) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -53,7 +53,7 @@ func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *ListSpaces) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListSpaces) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()

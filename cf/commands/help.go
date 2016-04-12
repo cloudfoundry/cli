@@ -3,7 +3,7 @@ package commands
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/help"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -19,11 +19,11 @@ type Help struct {
 }
 
 func init() {
-	command_registry.Register(&Help{})
+	commandregistry.Register(&Help{})
 }
 
-func (cmd *Help) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Help) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "help",
 		ShortName:   "h",
 		Description: T("Show help"),
@@ -38,7 +38,7 @@ func (cmd *Help) Requirements(requirementsFactory requirements.Factory, fc flags
 	return reqs
 }
 
-func (cmd *Help) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Help) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.PluginConfig
 	return cmd
@@ -49,8 +49,8 @@ func (cmd *Help) Execute(c flags.FlagContext) {
 		help.ShowHelp(help.GetHelpTemplate())
 	} else {
 		cmdName := c.Args()[0]
-		if command_registry.Commands.CommandExists(cmdName) {
-			cmd.ui.Say(command_registry.Commands.CommandUsage(cmdName))
+		if commandregistry.Commands.CommandExists(cmdName) {
+			cmd.ui.Say(commandregistry.Commands.CommandUsage(cmdName))
 		} else {
 			//check plugin commands
 			found := false

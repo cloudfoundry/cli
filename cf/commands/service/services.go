@@ -3,7 +3,7 @@ package service
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -23,11 +23,11 @@ type ListServices struct {
 }
 
 func init() {
-	command_registry.Register(&ListServices{})
+	commandregistry.Register(&ListServices{})
 }
 
-func (cmd *ListServices) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListServices) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "services",
 		ShortName:   "s",
 		Description: T("List all service instances in the target space"),
@@ -38,7 +38,7 @@ func (cmd *ListServices) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListServices) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -54,7 +54,7 @@ func (cmd *ListServices) Requirements(requirementsFactory requirements.Factory, 
 	return reqs
 }
 
-func (cmd *ListServices) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListServices) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceSummaryRepo = deps.RepoLocator.GetServiceSummaryRepository()

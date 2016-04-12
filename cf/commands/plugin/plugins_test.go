@@ -3,7 +3,7 @@ package plugin_test
 import (
 	"net/rpc"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	plugincmd "github.com/cloudfoundry/cli/cf/commands/plugin"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
@@ -23,13 +23,13 @@ var _ = Describe("Plugins", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              *pluginconfigfakes.FakePluginConfiguration
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.PluginConfig = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("plugins").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("plugins").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -65,7 +65,7 @@ var _ = Describe("Plugins", func() {
 	})
 
 	Context("when arguments are provided", func() {
-		var cmd command_registry.Command
+		var cmd commandregistry.Command
 		var flagContext flags.FlagContext
 
 		BeforeEach(func() {

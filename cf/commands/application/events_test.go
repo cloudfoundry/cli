@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/app_events/appeventsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -24,7 +24,7 @@ var _ = Describe("events command", func() {
 		eventsRepo          *appeventsfakes.FakeAppEventsRepository
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	const TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
@@ -33,7 +33,7 @@ var _ = Describe("events command", func() {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppEventsRepository(eventsRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("events").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("events").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

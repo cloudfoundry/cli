@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/actors/service_builder"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -22,14 +22,14 @@ type MarketplaceServices struct {
 }
 
 func init() {
-	command_registry.Register(&MarketplaceServices{})
+	commandregistry.Register(&MarketplaceServices{})
 }
 
-func (cmd *MarketplaceServices) MetaData() command_registry.CommandMetadata {
+func (cmd *MarketplaceServices) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["s"] = &flags.StringFlag{ShortName: "s", Usage: T("Show plan details for a particular service offering")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "marketplace",
 		ShortName:   "m",
 		Description: T("List available offerings in the marketplace"),
@@ -41,7 +41,7 @@ func (cmd *MarketplaceServices) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *MarketplaceServices) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -56,7 +56,7 @@ func (cmd *MarketplaceServices) Requirements(requirementsFactory requirements.Fa
 	return reqs
 }
 
-func (cmd *MarketplaceServices) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *MarketplaceServices) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.serviceBuilder = deps.ServiceBuilder

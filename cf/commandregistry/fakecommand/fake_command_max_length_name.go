@@ -1,7 +1,7 @@
 package fakecommand
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 )
@@ -10,11 +10,11 @@ type FakeCommand3 struct {
 }
 
 func init() {
-	command_registry.Register(FakeCommand3{})
+	commandregistry.Register(FakeCommand3{})
 }
 
-func (cmd FakeCommand3) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd FakeCommand3) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name: "this-is-a-really-long-command-name-123123123123123123123",
 	}
 }
@@ -23,7 +23,7 @@ func (cmd FakeCommand3) Requirements(_ requirements.Factory, _ flags.FlagContext
 	return []requirements.Requirement{}
 }
 
-func (cmd FakeCommand3) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd FakeCommand3) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	return cmd
 }
 

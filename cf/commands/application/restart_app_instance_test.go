@@ -11,7 +11,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +24,7 @@ var _ = Describe("restart-app-instance", func() {
 		appInstancesRepo    *appinstancesfakes.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 		application         models.Application
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -47,7 +47,7 @@ var _ = Describe("restart-app-instance", func() {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

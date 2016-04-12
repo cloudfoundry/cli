@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -21,11 +21,11 @@ type EnableSSH struct {
 }
 
 func init() {
-	command_registry.Register(&EnableSSH{})
+	commandregistry.Register(&EnableSSH{})
 }
 
-func (cmd *EnableSSH) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *EnableSSH) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "enable-ssh",
 		Description: T("Enable ssh for the application"),
 		Usage: []string{
@@ -36,7 +36,7 @@ func (cmd *EnableSSH) MetaData() command_registry.CommandMetadata {
 
 func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + command_registry.Commands.CommandUsage("enable-ssh"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + commandregistry.Commands.CommandUsage("enable-ssh"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -50,7 +50,7 @@ func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *EnableSSH) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *EnableSSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()

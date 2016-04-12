@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/help"
 
@@ -26,7 +26,7 @@ var _ = Describe("Help", func() {
 		})
 
 		Expect(strings.Count(strings.Join(output, ""), "login")).To(Equal(1))
-		for _, metadata := range command_registry.Commands.Metadatas() {
+		for _, metadata := range commandregistry.Commands.Metadatas() {
 			if metadata.Hidden {
 				continue
 			}

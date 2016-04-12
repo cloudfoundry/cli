@@ -1,7 +1,7 @@
 package commands_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/commandsloader"
@@ -24,13 +24,13 @@ var _ = Describe("Help", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              *pluginconfigfakes.FakePluginConfiguration
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.PluginConfig = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("help").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("help").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

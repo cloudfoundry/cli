@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/feature_flags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/spacequotasfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -33,8 +33,8 @@ var _ = Describe("create-space command", func() {
 		spaceRoleSetter     user.SpaceRoleSetter
 		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
 		spaceQuotaRepo      *spacequotasfakes.FakeSpaceQuotaRepository
-		OriginalCommand     command_registry.Command
-		deps                command_registry.Dependency
+		OriginalCommand     commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -47,9 +47,9 @@ var _ = Describe("create-space command", func() {
 		deps.Config = configRepo
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(spaceRoleSetter)
+		commandregistry.Register(spaceRoleSetter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-space").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-space").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
@@ -62,7 +62,7 @@ var _ = Describe("create-space command", func() {
 
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		userRepo = new(apifakes.FakeUserRepository)
-		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
+		spaceRoleSetter = commandregistry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
 		spaceQuotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 
@@ -73,7 +73,7 @@ var _ = Describe("create-space command", func() {
 		}
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("set-space-role")
+		OriginalCommand = commandregistry.Commands.FindCommand("set-space-role")
 
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		space := maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid", "organization": configOrg})
@@ -81,7 +81,7 @@ var _ = Describe("create-space command", func() {
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	Describe("Requirements", func() {

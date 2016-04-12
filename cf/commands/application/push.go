@@ -18,7 +18,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -50,10 +50,10 @@ type Push struct {
 }
 
 func init() {
-	command_registry.Register(&Push{})
+	commandregistry.Register(&Push{})
 }
 
-func (cmd *Push) MetaData() command_registry.CommandMetadata {
+func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["b"] = &flags.StringFlag{ShortName: "b", Usage: T("Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'")}
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Startup command, set to null to reset to default start command")}
@@ -76,7 +76,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["route-path"] = &flags.StringFlag{Name: "route-path", Usage: T("Path for the route")}
 	fs["app-ports"] = &flags.StringFlag{Name: "app-ports", Usage: T("Comma delimited list of ports the application may listen on")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
@@ -116,7 +116,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	var reqs []requirements.Requirement
 
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd), "",
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd), "",
 		func() bool {
 			return len(fc.Args()) > 1
 		},
@@ -140,23 +140,23 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 	return reqs
 }
 
-func (cmd *Push) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.manifestRepo = deps.ManifestRepo
 
 	//set appStarter
-	appCommand := command_registry.Commands.FindCommand("start")
+	appCommand := commandregistry.Commands.FindCommand("start")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appStarter = appCommand.(ApplicationStarter)
 
 	//set appStopper
-	appCommand = command_registry.Commands.FindCommand("stop")
+	appCommand = commandregistry.Commands.FindCommand("stop")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appStopper = appCommand.(ApplicationStopper)
 
 	//set serviceBinder
-	appCommand = command_registry.Commands.FindCommand("bind-service")
+	appCommand = commandregistry.Commands.FindCommand("bind-service")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.serviceBinder = appCommand.(service.ServiceBinder)
 
@@ -541,7 +541,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 			cmd.ui.Failed(
 				T("Manifest file is not found in the current directory, please provide either an app name or manifest") +
 					"\n\n" +
-					command_registry.Commands.CommandUsage("push"),
+					commandregistry.Commands.CommandUsage("push"),
 			)
 		} else {
 			err = addApp(&apps, contextApp)

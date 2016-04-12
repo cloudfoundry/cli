@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/stacks"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,11 +17,11 @@ type ListStacks struct {
 }
 
 func init() {
-	command_registry.Register(&ListStacks{})
+	commandregistry.Register(&ListStacks{})
 }
 
-func (cmd *ListStacks) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListStacks) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "stacks",
 		Description: T("List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"),
 		Usage: []string{
@@ -31,7 +31,7 @@ func (cmd *ListStacks) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -46,7 +46,7 @@ func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *ListStacks) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *ListStacks) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.stacksRepo = deps.RepoLocator.GetStackRepository()

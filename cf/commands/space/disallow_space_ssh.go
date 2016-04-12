@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -20,11 +20,11 @@ type DisallowSpaceSSH struct {
 }
 
 func init() {
-	command_registry.Register(&DisallowSpaceSSH{})
+	commandregistry.Register(&DisallowSpaceSSH{})
 }
 
-func (cmd *DisallowSpaceSSH) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *DisallowSpaceSSH) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "disallow-space-ssh",
 		Description: T("Disallow SSH access for the space"),
 		Usage: []string{
@@ -35,7 +35,7 @@ func (cmd *DisallowSpaceSSH) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DisallowSpaceSSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME as argument\n\n") + command_registry.Commands.CommandUsage("disallow-space-ssh"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE_NAME as argument\n\n") + commandregistry.Commands.CommandUsage("disallow-space-ssh"))
 	}
 
 	cmd.spaceReq = requirementsFactory.NewSpaceRequirement(fc.Args()[0])
@@ -49,7 +49,7 @@ func (cmd *DisallowSpaceSSH) Requirements(requirementsFactory requirements.Facto
 	return reqs
 }
 
-func (cmd *DisallowSpaceSSH) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DisallowSpaceSSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()

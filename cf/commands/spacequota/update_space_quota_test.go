@@ -3,7 +3,7 @@ package spacequota_test
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/space_quotas/spacequotasfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,14 +25,14 @@ var _ = Describe("update-space-quota command", func() {
 		quota            models.SpaceQuota
 		quotaPaidService models.SpaceQuota
 		configRepo       coreconfig.Repository
-		deps             command_registry.Dependency
+		deps             commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-space-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-space-quota").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

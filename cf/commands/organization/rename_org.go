@@ -2,7 +2,7 @@ package organization
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,11 +18,11 @@ type RenameOrg struct {
 }
 
 func init() {
-	command_registry.Register(&RenameOrg{})
+	commandregistry.Register(&RenameOrg{})
 }
 
-func (cmd *RenameOrg) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RenameOrg) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "rename-org",
 		Description: T("Rename an org"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *RenameOrg) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires old org name, new org name as arguments\n\n") + command_registry.Commands.CommandUsage("rename-org"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires old org name, new org name as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-org"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -46,7 +46,7 @@ func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc 
 	return reqs
 }
 
-func (cmd *RenameOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RenameOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()

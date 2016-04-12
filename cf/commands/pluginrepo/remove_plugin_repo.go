@@ -3,7 +3,7 @@ package pluginrepo
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -18,11 +18,11 @@ type RemovePluginRepo struct {
 }
 
 func init() {
-	command_registry.Register(&RemovePluginRepo{})
+	commandregistry.Register(&RemovePluginRepo{})
 }
 
-func (cmd *RemovePluginRepo) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RemovePluginRepo) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "remove-plugin-repo",
 		Description: T("Remove a plugin repository"),
 		Usage: []string{
@@ -37,14 +37,14 @@ func (cmd *RemovePluginRepo) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RemovePluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("remove-plugin-repo"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("remove-plugin-repo"))
 	}
 
 	reqs := []requirements.Requirement{}
 	return reqs
 }
 
-func (cmd *RemovePluginRepo) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *RemovePluginRepo) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	return cmd

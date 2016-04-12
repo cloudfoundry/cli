@@ -2,7 +2,7 @@ package servicebroker
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -18,14 +18,14 @@ type DeleteServiceBroker struct {
 }
 
 func init() {
-	command_registry.Register(&DeleteServiceBroker{})
+	commandregistry.Register(&DeleteServiceBroker{})
 }
 
-func (cmd *DeleteServiceBroker) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteServiceBroker) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-service-broker",
 		Description: T("Delete a service broker"),
 		Usage: []string{
@@ -37,7 +37,7 @@ func (cmd *DeleteServiceBroker) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DeleteServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("delete-service-broker"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-service-broker"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -47,7 +47,7 @@ func (cmd *DeleteServiceBroker) Requirements(requirementsFactory requirements.Fa
 	return reqs
 }
 
-func (cmd *DeleteServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *DeleteServiceBroker) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.repo = deps.RepoLocator.GetServiceBrokerRepository()

@@ -13,7 +13,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 
@@ -34,8 +34,8 @@ var _ = Describe("CopySource", func() {
 		spaceRepo           *apifakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		appRestarter        *applicationfakes.FakeApplicationRestarter
-		OriginalCommand     command_registry.Command
-		deps                command_registry.Dependency
+		OriginalCommand     commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -48,9 +48,9 @@ var _ = Describe("CopySource", func() {
 		deps.Config = config
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(appRestarter)
+		commandregistry.Register(appRestarter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("copy-source").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("copy-source").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -64,18 +64,18 @@ var _ = Describe("CopySource", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("restart")
+		OriginalCommand = commandregistry.Commands.FindCommand("restart")
 
 		appRestarter = new(applicationfakes.FakeApplicationRestarter)
-		//setup fakes to correctly interact with command_registry
-		appRestarter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fakes to correctly interact with commandregistry
+		appRestarter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return appRestarter
 		}
-		appRestarter.MetaDataReturns(command_registry.CommandMetadata{Name: "restart"})
+		appRestarter.MetaDataReturns(commandregistry.CommandMetadata{Name: "restart"})
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	runCommand := func(args ...string) bool {

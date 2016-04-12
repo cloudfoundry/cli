@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -25,14 +25,14 @@ var _ = Describe("repo-plugins", func() {
 		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		fakePluginRepo      *pluginrepofakes.FakePluginRepo
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.Config = config
 		deps.PluginRepo = fakePluginRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("repo-plugins").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("repo-plugins").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -30,8 +30,8 @@ var _ = Describe("UnmapRoute", func() {
 		configRepo coreconfig.Repository
 		routeRepo  *apifakes.FakeRouteRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -49,7 +49,7 @@ var _ = Describe("UnmapRoute", func() {
 		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
@@ -90,7 +90,7 @@ var _ = Describe("UnmapRoute", func() {
 
 		BeforeEach(func() {
 			cmd := &route.UnmapRoute{}
-			up := command_registry.CliCommandUsagePresenter(cmd)
+			up := commandregistry.CliCommandUsagePresenter(cmd)
 
 			usage = strings.Split(up.Usage(), "\n")
 		})

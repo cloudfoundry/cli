@@ -1,7 +1,7 @@
 package spacequota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -26,7 +26,7 @@ var _ = Describe("create-space-quota command", func() {
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -34,7 +34,7 @@ var _ = Describe("create-space-quota command", func() {
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-space-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-space-quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -26,13 +26,13 @@ var _ = Describe("Uninstall", func() {
 		fakePluginRepoDir   string
 		pluginDir           string
 		pluginConfig        *pluginconfig.PluginConfig
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.PluginConfig = pluginConfig
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("uninstall-plugin").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("uninstall-plugin").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

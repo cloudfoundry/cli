@@ -2,7 +2,7 @@ package environmentvariablegroup_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups/environmentvariablegroupsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/environmentvariablegroup"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,14 +22,14 @@ var _ = Describe("running-environment-variable-group command", func() {
 		requirementsFactory          *testreq.FakeReqFactory
 		configRepo                   coreconfig.Repository
 		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository
-		deps                         command_registry.Dependency
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
 		deps.RepoLocator = deps.RepoLocator.SetEnvironmentVariableGroupsRepository(environmentVariableGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("running-environment-variable-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("running-environment-variable-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -50,7 +50,7 @@ var _ = Describe("running-environment-variable-group command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {

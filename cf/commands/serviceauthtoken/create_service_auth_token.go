@@ -3,7 +3,7 @@ package serviceauthtoken
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,11 +19,11 @@ type CreateServiceAuthTokenFields struct {
 }
 
 func init() {
-	command_registry.Register(&CreateServiceAuthTokenFields{})
+	commandregistry.Register(&CreateServiceAuthTokenFields{})
 }
 
-func (cmd *CreateServiceAuthTokenFields) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *CreateServiceAuthTokenFields) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "create-service-auth-token",
 		Description: T("Create a service auth token"),
 		Usage: []string{
@@ -34,7 +34,7 @@ func (cmd *CreateServiceAuthTokenFields) MetaData() command_registry.CommandMeta
 
 func (cmd *CreateServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + command_registry.Commands.CommandUsage("create-service-auth-token"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service-auth-token"))
 	}
 
 	maximumVersion, err := semver.Make("2.46.0")
@@ -50,7 +50,7 @@ func (cmd *CreateServiceAuthTokenFields) Requirements(requirementsFactory requir
 	return reqs
 }
 
-func (cmd *CreateServiceAuthTokenFields) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
+func (cmd *CreateServiceAuthTokenFields) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.authTokenRepo = deps.RepoLocator.GetServiceAuthTokenRepository()

@@ -16,7 +16,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,7 +34,7 @@ var _ = Describe("create-service command", func() {
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
-		deps      command_registry.Dependency
+		deps      commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -42,7 +42,7 @@ var _ = Describe("create-service command", func() {
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.ServiceBuilder = serviceBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {

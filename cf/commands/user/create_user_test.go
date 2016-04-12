@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -21,7 +21,7 @@ var _ = Describe("Create user command", func() {
 		ui                  *testterm.FakeUI
 		userRepo            *apifakes.FakeUserRepository
 		config              coreconfig.Repository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
@@ -39,7 +39,7 @@ var _ = Describe("Create user command", func() {
 		deps.Ui = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-user").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-user").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {

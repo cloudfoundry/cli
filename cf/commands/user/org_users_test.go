@@ -2,7 +2,7 @@ package user_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -23,7 +23,7 @@ var _ = Describe("org-users command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
 		userRepo            *apifakes.FakeUserRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -31,7 +31,7 @@ var _ = Describe("org-users command", func() {
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("org-users").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("org-users").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -39,7 +39,7 @@ var _ = Describe("org-users command", func() {
 		userRepo = new(apifakes.FakeUserRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		deps = command_registry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

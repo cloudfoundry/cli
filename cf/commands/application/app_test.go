@@ -6,7 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
@@ -35,8 +35,8 @@ var _ = Describe("App", func() {
 		appInstancesRepo *appinstancesfakes.FakeAppInstancesRepository
 		getAppModel      *plugin_models.GetAppModel
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
@@ -59,10 +59,10 @@ var _ = Describe("App", func() {
 		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		repoLocator = repoLocator.SetAppInstancesRepository(appInstancesRepo)
 
-		deps = command_registry.Dependency{
+		deps = commandregistry.Dependency{
 			Ui:     ui,
 			Config: testconfig.NewRepositoryWithDefaults(),
-			PluginModels: &command_registry.PluginModels{
+			PluginModels: &commandregistry.PluginModels{
 				Application: getAppModel,
 			},
 			RepoLocator: repoLocator,

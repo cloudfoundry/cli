@@ -3,7 +3,7 @@ package securitygroup_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/runningfakes"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -24,7 +24,7 @@ var _ = Describe("unbind-running-security-group command", func() {
 		requirementsFactory           *testreq.FakeReqFactory
 		fakeSecurityGroupRepo         *securitygroupsfakes.FakeSecurityGroupRepo
 		fakeRunningSecurityGroupsRepo *runningfakes.FakeRunningSecurityGroupsRepo
-		deps                          command_registry.Dependency
+		deps                          commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -32,7 +32,7 @@ var _ = Describe("unbind-running-security-group command", func() {
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(fakeSecurityGroupRepo)
 		deps.RepoLocator = deps.RepoLocator.SetRunningSecurityGroupRepository(fakeRunningSecurityGroupsRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-running-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("unbind-running-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
