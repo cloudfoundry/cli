@@ -1,4 +1,4 @@
-package application_bits
+package applicationbits
 
 import (
 	"bytes"

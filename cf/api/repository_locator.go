@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/app_events"
 	"github.com/cloudfoundry/cli/cf/api/app_instances"
 	api_appfiles "github.com/cloudfoundry/cli/cf/api/appfiles"
-	"github.com/cloudfoundry/cli/cf/api/application_bits"
+	"github.com/cloudfoundry/cli/cf/api/applicationbits"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
@@ -42,7 +42,7 @@ type RepositoryLocator struct {
 	quotaRepo                       quotas.QuotaRepository
 	spaceRepo                       spaces.SpaceRepository
 	appRepo                         applications.ApplicationRepository
-	appBitsRepo                     application_bits.CloudControllerApplicationBitsRepository
+	appBitsRepo                     applicationbits.CloudControllerApplicationBitsRepository
 	appSummaryRepo                  AppSummaryRepository
 	appInstancesRepo                app_instances.AppInstancesRepository
 	appEventsRepo                   app_events.AppEventsRepository
@@ -94,7 +94,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
 
-	loc.appBitsRepo = application_bits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
+	loc.appBitsRepo = applicationbits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = app_events.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = api_appfiles.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = applications.NewCloudControllerApplicationRepository(config, cloudControllerGateway)
@@ -202,7 +202,7 @@ func (locator RepositoryLocator) GetApplicationRepository() applications.Applica
 	return locator.appRepo
 }
 
-func (locator RepositoryLocator) GetApplicationBitsRepository() application_bits.ApplicationBitsRepository {
+func (locator RepositoryLocator) GetApplicationBitsRepository() applicationbits.ApplicationBitsRepository {
 	return locator.appBitsRepo
 }
 

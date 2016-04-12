@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cloudfoundry/cli/cf/api/application_bits"
+	"github.com/cloudfoundry/cli/cf/api/applicationbits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,12 +25,12 @@ type PushActor interface {
 }
 
 type PushActorImpl struct {
-	appBitsRepo application_bits.ApplicationBitsRepository
+	appBitsRepo applicationbits.ApplicationBitsRepository
 	appfiles    appfiles.AppFiles
 	zipper      appfiles.Zipper
 }
 
-func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper appfiles.Zipper, appfiles appfiles.AppFiles) PushActor {
+func NewPushActor(appBitsRepo applicationbits.ApplicationBitsRepository, zipper appfiles.Zipper, appfiles appfiles.AppFiles) PushActor {
 	return PushActorImpl{
 		appBitsRepo: appBitsRepo,
 		appfiles:    appfiles,

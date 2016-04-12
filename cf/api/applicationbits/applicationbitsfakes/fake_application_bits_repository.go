@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/application_bits"
+	"github.com/cloudfoundry/cli/cf/api/applicationbits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 )
 
@@ -98,4 +98,4 @@ func (fake *FakeApplicationBitsRepository) UploadBitsReturns(result1 error) {
 	}{result1}
 }
 
-var _ application_bits.ApplicationBitsRepository = new(FakeApplicationBitsRepository)
+var _ applicationbits.ApplicationBitsRepository = new(FakeApplicationBitsRepository)

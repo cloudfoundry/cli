@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/api/application_bits/applicationbitsfakes"
+	"github.com/cloudfoundry/cli/cf/api/applicationbits/applicationbitsfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/appfiles/appfilesfakes"

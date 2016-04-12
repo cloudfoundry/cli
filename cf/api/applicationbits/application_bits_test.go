@@ -1,4 +1,4 @@
-package application_bits_test
+package applicationbits_test
 
 import (
 	"archive/zip"
@@ -20,7 +20,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
-	. "github.com/cloudfoundry/cli/cf/api/application_bits"
+	. "github.com/cloudfoundry/cli/cf/api/applicationbits"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
