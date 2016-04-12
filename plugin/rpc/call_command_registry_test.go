@@ -3,7 +3,7 @@ package rpc_test
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	. "github.com/cloudfoundry/cli/plugin/rpc"
-	. "github.com/cloudfoundry/cli/plugin/rpc/fake_command"
+	. "github.com/cloudfoundry/cli/plugin/rpc/fakecommand"
 
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
