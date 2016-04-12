@@ -4,7 +4,7 @@ package environmentvariablegroupsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
@@ -155,4 +155,4 @@ func (fake *FakeEnvironmentVariableGroupsRepository) SetRunningReturns(result1 e
 	}{result1}
 }
 
-var _ environment_variable_groups.EnvironmentVariableGroupsRepository = new(FakeEnvironmentVariableGroupsRepository)
+var _ environmentvariablegroups.EnvironmentVariableGroupsRepository = new(FakeEnvironmentVariableGroupsRepository)

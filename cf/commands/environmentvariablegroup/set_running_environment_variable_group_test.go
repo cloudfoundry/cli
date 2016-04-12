@@ -1,7 +1,7 @@
 package environmentvariablegroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups/environmentvariablegroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups/environmentvariablegroupsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"

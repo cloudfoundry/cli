@@ -1,7 +1,7 @@
 package environmentvariablegroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
@@ -14,7 +14,7 @@ import (
 type SetStagingEnvironmentVariableGroup struct {
 	ui                           terminal.UI
 	config                       coreconfig.ReadWriter
-	environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository
+	environmentVariableGroupRepo environmentvariablegroups.EnvironmentVariableGroupsRepository
 }
 
 func init() {

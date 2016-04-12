@@ -1,4 +1,4 @@
-package environment_variable_groups_test
+package environmentvariablegroups_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"
