@@ -15,7 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 )
 
 type ListApps struct {
@@ -113,8 +113,8 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 
 		table.Add(
 			application.Name,
-			ui_helpers.ColoredAppState(application.ApplicationFields),
-			ui_helpers.ColoredAppInstances(application.ApplicationFields),
+			uihelpers.ColoredAppState(application.ApplicationFields),
+			uihelpers.ColoredAppInstances(application.ApplicationFields),
 			formatters.ByteSize(application.Memory*formatters.MEGABYTE),
 			formatters.ByteSize(application.DiskQuota*formatters.MEGABYTE),
 			strings.Join(appPorts, ", "),

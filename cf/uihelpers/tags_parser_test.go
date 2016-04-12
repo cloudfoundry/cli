@@ -1,7 +1,7 @@
-package ui_helpers_test
+package uihelpers_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/ui_helpers"
+	. "github.com/cloudfoundry/cli/cf/uihelpers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
@@ -124,8 +124,8 @@ func (cmd *Logs) handleError(err error) {
 }
 
 func LogMessageOutput(msg *logmessage.LogMessage, loc *time.Location) string {
-	logHeader, coloredLogHeader := ui_helpers.ExtractLogHeader(msg, loc)
-	logContent := ui_helpers.ExtractLogContent(msg, logHeader)
+	logHeader, coloredLogHeader := uihelpers.ExtractLogHeader(msg, loc)
+	logContent := uihelpers.ExtractLogContent(msg, logHeader)
 
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }

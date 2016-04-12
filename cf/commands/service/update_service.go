@@ -14,7 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/json"
 )
@@ -122,7 +122,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
-	tags := ui_helpers.ParseTags(tagsList)
+	tags := uihelpers.ParseTags(tagsList)
 
 	var plan models.ServicePlanFields
 	if planName != "" {

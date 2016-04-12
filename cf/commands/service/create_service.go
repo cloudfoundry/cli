@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/json"
 )
@@ -109,7 +109,7 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 	params := c.String("c")
 	tags := c.String("t")
 
-	tagsList := ui_helpers.ParseTags(tags)
+	tagsList := uihelpers.ParseTags(tags)
 
 	paramsMap, err := json.ParseJsonFromFileOrString(params)
 	if err != nil {
