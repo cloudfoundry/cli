@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -17,7 +17,7 @@ import (
 type ShowSecurityGroup struct {
 	ui                terminal.UI
 	securityGroupRepo security_groups.SecurityGroupRepo
-	configRepo        core_config.Reader
+	configRepo        coreconfig.Reader
 }
 
 func init() {

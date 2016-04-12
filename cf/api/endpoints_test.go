@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -62,7 +62,7 @@ func apiInfoEndpointWithoutLogURL(w http.ResponseWriter, r *http.Request) {
 
 var _ = Describe("Endpoints Repository", func() {
 	var (
-		config       core_config.ReadWriter
+		config       coreconfig.ReadWriter
 		gateway      net.Gateway
 		testServer   *httptest.Server
 		repo         EndpointRepository

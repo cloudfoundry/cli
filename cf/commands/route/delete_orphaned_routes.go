@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,7 +14,7 @@ import (
 type DeleteOrphanedRoutes struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
-	config    core_config.Reader
+	config    coreconfig.Reader
 }
 
 func init() {

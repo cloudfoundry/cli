@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -20,7 +20,7 @@ import (
 
 type ListApps struct {
 	ui             terminal.UI
-	config         core_config.Reader
+	config         coreconfig.Reader
 	appSummaryRepo api.AppSummaryRepository
 
 	pluginAppModels *[]plugin_models.GetAppsModel

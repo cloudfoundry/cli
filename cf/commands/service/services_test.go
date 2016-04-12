@@ -11,7 +11,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -24,7 +24,7 @@ import (
 var _ = Describe("services", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		serviceSummaryRepo  *apifakes.OldFakeServiceSummaryRepo
 		deps                command_registry.Dependency

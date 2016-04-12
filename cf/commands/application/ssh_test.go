@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/commandsfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
@@ -32,7 +32,7 @@ var _ = Describe("SSH command", func() {
 		originalSSHCodeGetter command_registry.Command
 
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		deps                command_registry.Dependency
 		ccGateway           net.Gateway
 

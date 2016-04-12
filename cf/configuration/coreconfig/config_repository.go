@@ -1,4 +1,4 @@
-package core_config
+package coreconfig
 
 import (
 	"strings"

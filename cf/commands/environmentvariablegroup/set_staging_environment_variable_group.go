@@ -3,7 +3,7 @@ package environmentvariablegroup
 import (
 	"github.com/cloudfoundry/cli/cf/api/environment_variable_groups"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,7 +13,7 @@ import (
 
 type SetStagingEnvironmentVariableGroup struct {
 	ui                           terminal.UI
-	config                       core_config.ReadWriter
+	config                       coreconfig.ReadWriter
 	environmentVariableGroupRepo environment_variable_groups.EnvironmentVariableGroupsRepository
 }
 

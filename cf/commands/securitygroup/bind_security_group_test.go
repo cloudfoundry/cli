@@ -5,7 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/spaces/spacesfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("bind-security-group command", func() {
 	var (
 		ui                    *testterm.FakeUI
-		configRepo            core_config.Repository
+		configRepo            coreconfig.Repository
 		fakeSecurityGroupRepo *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
 		fakeSpaceRepo         *apifakes.FakeSpaceRepository

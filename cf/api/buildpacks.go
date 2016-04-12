@@ -7,7 +7,7 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -25,11 +25,11 @@ type BuildpackRepository interface {
 }
 
 type CloudControllerBuildpackRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerBuildpackRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerBuildpackRepository) {
+func NewCloudControllerBuildpackRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerBuildpackRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

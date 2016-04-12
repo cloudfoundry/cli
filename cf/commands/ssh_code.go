@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -23,7 +23,7 @@ type SSHCodeGetter interface {
 
 type OneTimeSSHCode struct {
 	ui           terminal.UI
-	config       core_config.ReadWriter
+	config       coreconfig.ReadWriter
 	authRepo     authentication.AuthenticationRepository
 	endpointRepo api.EndpointRepository
 }

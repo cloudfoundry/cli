@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
@@ -23,7 +23,7 @@ import (
 var _ = Describe("Files", func() {
 	var (
 		ui           *testterm.FakeUI
-		configRepo   core_config.Repository
+		configRepo   coreconfig.Repository
 		appFilesRepo *appfilesfakes.FakeAppFilesRepository
 
 		cmd         command_registry.Command

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -133,11 +133,11 @@ type AppSummaryRepository interface {
 }
 
 type CloudControllerAppSummaryRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerAppSummaryRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerAppSummaryRepository) {
+func NewCloudControllerAppSummaryRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerAppSummaryRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

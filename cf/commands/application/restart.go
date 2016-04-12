@@ -2,7 +2,7 @@ package application
 
 import (
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -19,7 +19,7 @@ type ApplicationRestarter interface {
 
 type Restart struct {
 	ui      terminal.UI
-	config  core_config.Reader
+	config  coreconfig.Reader
 	starter ApplicationStarter
 	stopper ApplicationStopper
 	appReq  requirements.ApplicationRequirement

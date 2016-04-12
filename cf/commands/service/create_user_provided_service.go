@@ -13,14 +13,14 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type CreateUserProvidedService struct {
 	ui                              terminal.UI
-	config                          core_config.Reader
+	config                          coreconfig.Reader
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 }
 

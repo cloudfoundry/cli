@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -17,11 +17,11 @@ type PasswordRepository interface {
 }
 
 type CloudControllerPasswordRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerPasswordRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerPasswordRepository) {
+func NewCloudControllerPasswordRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerPasswordRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

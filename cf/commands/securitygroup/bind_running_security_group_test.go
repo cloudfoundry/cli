@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/runningfakes"
 	"github.com/cloudfoundry/cli/cf/api/security_groups/securitygroupsfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("bind-running-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   core_config.Repository
+		configRepo                   coreconfig.Repository
 		requirementsFactory          *testreq.FakeReqFactory
 		fakeSecurityGroupRepo        *securitygroupsfakes.FakeSecurityGroupRepo
 		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo

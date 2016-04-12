@@ -2,7 +2,7 @@ package pluginrepo_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/pluginrepofakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
@@ -22,7 +22,7 @@ import (
 var _ = Describe("repo-plugins", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		fakePluginRepo      *pluginrepofakes.FakePluginRepo
 		deps                command_registry.Dependency

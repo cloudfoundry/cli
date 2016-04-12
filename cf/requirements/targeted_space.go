@@ -6,16 +6,16 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type TargetedSpaceRequirement struct {
-	config core_config.Reader
+	config coreconfig.Reader
 }
 
-func NewTargetedSpaceRequirement(config core_config.Reader) TargetedSpaceRequirement {
+func NewTargetedSpaceRequirement(config coreconfig.Reader) TargetedSpaceRequirement {
 	return TargetedSpaceRequirement{config}
 }
 

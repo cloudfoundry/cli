@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
@@ -19,7 +19,7 @@ import (
 var _ = Describe("CloudControllerQuotaRepository", func() {
 	var (
 		ccServer   *ghttp.Server
-		configRepo core_config.ReadWriter
+		configRepo coreconfig.ReadWriter
 		repo       quotas.CloudControllerQuotaRepository
 	)
 

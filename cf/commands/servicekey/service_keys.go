@@ -3,7 +3,7 @@ package servicekey
 import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -13,7 +13,7 @@ import (
 
 type ServiceKeys struct {
 	ui                         terminal.UI
-	config                     core_config.Reader
+	config                     coreconfig.Reader
 	serviceRepo                api.ServiceRepository
 	serviceKeyRepo             api.ServiceKeyRepository
 	serviceInstanceRequirement requirements.ServiceInstanceRequirement

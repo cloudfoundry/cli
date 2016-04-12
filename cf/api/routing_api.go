@@ -3,13 +3,13 @@ package api
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type routingApiRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
@@ -19,7 +19,7 @@ type RoutingApiRepository interface {
 	ListRouterGroups(cb func(models.RouterGroup) bool) (apiErr error)
 }
 
-func NewRoutingApiRepository(config core_config.Reader, gateway net.Gateway) RoutingApiRepository {
+func NewRoutingApiRepository(config coreconfig.Reader, gateway net.Gateway) RoutingApiRepository {
 	return routingApiRepository{
 		config:  config,
 		gateway: gateway,

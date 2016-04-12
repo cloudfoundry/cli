@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +14,7 @@ var _ = Describe("LoginRequirement", func() {
 	})
 
 	It("succeeds when given a config with an API endpoint and authentication", func() {
-		config := testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
+		config := testconfig.NewRepositoryWithAccessToken(coreconfig.TokenInfo{Username: "my-user"})
 		config.SetApiEndpoint("api.example.com")
 		req := NewLoginRequirement(config)
 		err := req.Execute()

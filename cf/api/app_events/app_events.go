@@ -3,7 +3,7 @@ package app_events
 import (
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -15,12 +15,12 @@ type AppEventsRepository interface {
 }
 
 type CloudControllerAppEventsRepository struct {
-	config   core_config.Reader
+	config   coreconfig.Reader
 	gateway  net.Gateway
 	strategy strategy.EndpointStrategy
 }
 
-func NewCloudControllerAppEventsRepository(config core_config.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerAppEventsRepository {
+func NewCloudControllerAppEventsRepository(config coreconfig.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerAppEventsRepository {
 	return CloudControllerAppEventsRepository{
 		config:   config,
 		gateway:  gateway,

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -26,7 +26,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			gateway     net.Gateway
 			testServer  *httptest.Server
 			handler     *testnet.TestHandler
-			config      core_config.ReadWriter
+			config      coreconfig.ReadWriter
 			auth        AuthenticationRepository
 			dumper      net.RequestDumper
 			fakePrinter *tracefakes.FakePrinter
@@ -139,7 +139,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		Describe("getting login info", func() {
 			var (
 				apiErr  error
-				prompts map[string]core_config.AuthPrompt
+				prompts map[string]coreconfig.AuthPrompt
 			)
 
 			JustBeforeEach(func() {
@@ -156,14 +156,14 @@ var _ = Describe("AuthenticationRepository", func() {
 				})
 
 				It("gets the login prompts", func() {
-					Expect(prompts).To(Equal(map[string]core_config.AuthPrompt{
-						"username": core_config.AuthPrompt{
+					Expect(prompts).To(Equal(map[string]coreconfig.AuthPrompt{
+						"username": coreconfig.AuthPrompt{
 							DisplayName: "Email",
-							Type:        core_config.AuthPromptTypeText,
+							Type:        coreconfig.AuthPromptTypeText,
 						},
-						"pin": core_config.AuthPrompt{
+						"pin": coreconfig.AuthPrompt{
 							DisplayName: "PIN Number",
-							Type:        core_config.AuthPromptTypePassword,
+							Type:        coreconfig.AuthPromptTypePassword,
 						},
 					}))
 				})
@@ -227,7 +227,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		var (
 			uaaServer   *ghttp.Server
 			gateway     net.Gateway
-			config      core_config.ReadWriter
+			config      coreconfig.ReadWriter
 			authRepo    AuthenticationRepository
 			dumper      net.RequestDumper
 			fakePrinter *tracefakes.FakePrinter

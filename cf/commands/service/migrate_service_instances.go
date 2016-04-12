@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -18,7 +18,7 @@ import (
 
 type MigrateServiceInstances struct {
 	ui          terminal.UI
-	configRepo  core_config.Reader
+	configRepo  coreconfig.Reader
 	serviceRepo api.ServiceRepository
 }
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -29,18 +29,18 @@ type AuthenticationRepository interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 	Authenticate(credentials map[string]string) (apiErr error)
 	Authorize(token string) (string, error)
-	GetLoginPromptsAndSaveUAAServerURL() (map[string]core_config.AuthPrompt, error)
+	GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error)
 }
 
 type UAAAuthenticationRepository struct {
-	config  core_config.ReadWriter
+	config  coreconfig.ReadWriter
 	gateway net.Gateway
 	dumper  net.RequestDumper
 }
 
 var ErrPreventRedirect = errors.New("prevent-redirect")
 
-func NewUAAAuthenticationRepository(gateway net.Gateway, config core_config.ReadWriter, dumper net.RequestDumper) UAAAuthenticationRepository {
+func NewUAAAuthenticationRepository(gateway net.Gateway, config coreconfig.ReadWriter, dumper net.RequestDumper) UAAAuthenticationRepository {
 	return UAAAuthenticationRepository{
 		config:  config,
 		gateway: gateway,
@@ -150,15 +150,15 @@ type LoginResource struct {
 	Links   map[string]string
 }
 
-var knownAuthPromptTypes = map[string]core_config.AuthPromptType{
-	"text":     core_config.AuthPromptTypeText,
-	"password": core_config.AuthPromptTypePassword,
+var knownAuthPromptTypes = map[string]coreconfig.AuthPromptType{
+	"text":     coreconfig.AuthPromptTypeText,
+	"password": coreconfig.AuthPromptTypePassword,
 }
 
-func (r *LoginResource) parsePrompts() (prompts map[string]core_config.AuthPrompt) {
-	prompts = make(map[string]core_config.AuthPrompt)
+func (r *LoginResource) parsePrompts() (prompts map[string]coreconfig.AuthPrompt) {
+	prompts = make(map[string]coreconfig.AuthPrompt)
 	for key, val := range r.Prompts {
-		prompts[key] = core_config.AuthPrompt{
+		prompts[key] = coreconfig.AuthPrompt{
 			Type:        knownAuthPromptTypes[val[0]],
 			DisplayName: val[1],
 		}
@@ -166,7 +166,7 @@ func (r *LoginResource) parsePrompts() (prompts map[string]core_config.AuthPromp
 	return
 }
 
-func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]core_config.AuthPrompt, apiErr error) {
+func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]coreconfig.AuthPrompt, apiErr error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthenticationEndpoint())
 	resource := &LoginResource{}
 	apiErr = uaa.gateway.GetResource(url, resource)

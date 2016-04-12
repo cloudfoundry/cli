@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin"
@@ -463,7 +463,7 @@ var _ = Describe("Server", func() {
 
 		Describe("CLI Config object methods", func() {
 			var (
-				config core_config.Repository
+				config coreconfig.Repository
 			)
 
 			BeforeEach(func() {

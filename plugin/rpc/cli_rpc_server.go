@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/plugin/models"
@@ -34,7 +34,7 @@ type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
-	cliConfig            core_config.Repository
+	cliConfig            coreconfig.Repository
 	repoLocator          api.RepositoryLocator
 	newCmdRunner         CommandRunner
 	outputBucket         *bytes.Buffer
@@ -56,7 +56,7 @@ type OutputCapture interface {
 func NewRpcService(
 	outputCapture OutputCapture,
 	terminalOutputSwitch TerminalOutputSwitch,
-	cliConfig core_config.Repository,
+	cliConfig coreconfig.Repository,
 	repoLocator api.RepositoryLocator,
 	newCmdRunner CommandRunner,
 	logger trace.Printer,

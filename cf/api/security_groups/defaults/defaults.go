@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
 type DefaultSecurityGroupsRepoBase struct {
-	ConfigRepo core_config.Reader
+	ConfigRepo coreconfig.Reader
 	Gateway    net.Gateway
 }
 

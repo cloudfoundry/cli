@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -57,12 +57,12 @@ type UserRepository interface {
 }
 
 type CloudControllerUserRepository struct {
-	config     core_config.Reader
+	config     coreconfig.Reader
 	uaaGateway net.Gateway
 	ccGateway  net.Gateway
 }
 
-func NewCloudControllerUserRepository(config core_config.Reader, uaaGateway net.Gateway, ccGateway net.Gateway) (repo CloudControllerUserRepository) {
+func NewCloudControllerUserRepository(config coreconfig.Reader, uaaGateway net.Gateway, ccGateway net.Gateway) (repo CloudControllerUserRepository) {
 	repo.config = config
 	repo.uaaGateway = uaaGateway
 	repo.ccGateway = ccGateway

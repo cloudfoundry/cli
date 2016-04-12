@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/feature_flags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -22,7 +22,7 @@ import (
 
 var _ = Describe("create-org command", func() {
 	var (
-		config              core_config.Repository
+		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		orgRepo             *organizationsfakes.FakeOrganizationRepository

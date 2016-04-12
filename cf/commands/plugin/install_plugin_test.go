@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/plugin_repo/pluginrepofakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/command_registry/commandregistryfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -36,7 +36,7 @@ var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
+		config              coreconfig.Repository
 		pluginConfig        *pluginconfigfakes.FakePluginConfiguration
 		fakePluginRepo      *pluginrepofakes.FakePluginRepo
 		fakeChecksum        *utilsfakes.FakeSha1Checksum

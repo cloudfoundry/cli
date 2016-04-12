@@ -4,7 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -23,7 +23,7 @@ var _ = Describe("scale command", func() {
 		restarter           *applicationfakes.FakeApplicationRestarter
 		appRepo             *applicationsfakes.FakeApplicationRepository
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		app                 models.Application
 		OriginalCommand     command_registry.Command
 		deps                command_registry.Dependency

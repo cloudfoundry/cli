@@ -4,19 +4,19 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type MinAPIVersionRequirement struct {
-	config          core_config.Reader
+	config          coreconfig.Reader
 	feature         string
 	requiredVersion semver.Version
 }
 
 func NewMinAPIVersionRequirement(
-	config core_config.Reader,
+	config coreconfig.Reader,
 	feature string,
 	requiredVersion semver.Version,
 ) MinAPIVersionRequirement {

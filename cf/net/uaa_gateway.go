@@ -3,7 +3,7 @@ package net
 import (
 	"encoding/json"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -25,6 +25,6 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 	return errors.NewHttpError(statusCode, response.Code, response.Description)
 }
 
-func NewUAAGateway(config core_config.Reader, ui terminal.UI, logger trace.Printer) Gateway {
+func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printer) Gateway {
 	return newGateway(uaaErrorHandler, config, ui, logger)
 }

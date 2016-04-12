@@ -2,7 +2,7 @@ package user_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,7 +20,7 @@ var _ = Describe("Create user command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
 		userRepo            *apifakes.FakeUserRepository
-		config              core_config.Repository
+		config              coreconfig.Repository
 		deps                command_registry.Dependency
 	)
 
@@ -29,7 +29,7 @@ var _ = Describe("Create user command", func() {
 		ui = new(testterm.FakeUI)
 		userRepo = new(apifakes.FakeUserRepository)
 		config = testconfig.NewRepositoryWithDefaults()
-		accessToken, _ := testconfig.EncodeAccessToken(core_config.TokenInfo{
+		accessToken, _ := testconfig.EncodeAccessToken(coreconfig.TokenInfo{
 			Username: "current-user",
 		})
 		config.SetAccessToken(accessToken)

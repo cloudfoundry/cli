@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/manifest/manifestfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -27,7 +27,7 @@ import (
 var _ = Describe("CreateAppManifest", func() {
 	var (
 		ui             *testterm.FakeUI
-		configRepo     core_config.Repository
+		configRepo     coreconfig.Repository
 		appSummaryRepo *apifakes.FakeAppSummaryRepository
 		stackRepo      *stacksfakes.FakeStackRepository
 
