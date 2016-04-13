@@ -27,11 +27,11 @@ type Factory interface {
 }
 
 type apiRequirementFactory struct {
-	config      core_config.Reader
+	config      core_config.ReadWriter
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(config core_config.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
+func NewFactory(config core_config.ReadWriter, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
 	return apiRequirementFactory{config, repoLocator}
 }
 
@@ -124,11 +124,19 @@ func (f apiRequirementFactory) NewApiEndpointRequirement() Requirement {
 }
 
 func (f apiRequirementFactory) NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement {
-	return NewMinAPIVersionRequirement(
+	r := NewMinAPIVersionRequirement(
 		f.config,
 		commandName,
 		requiredVersion,
 	)
+
+	refresher := core_config.APIConfigRefresher{
+		Endpoint:     f.config.ApiEndpoint(),
+		EndpointRepo: f.repoLocator.GetEndpointRepository(),
+		Config:       f.config,
+	}
+
+	return NewConfigRefreshingRequirement(r, refresher)
 }
 
 func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement {

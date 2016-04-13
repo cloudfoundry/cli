@@ -37,7 +37,7 @@ import (
 type RepositoryLocator struct {
 	authRepo                        authentication.AuthenticationRepository
 	curlRepo                        CurlRepository
-	endpointRepo                    EndpointRepository
+	endpointRepo                    core_config.EndpointRepository
 	organizationRepo                organizations.OrganizationRepository
 	quotaRepo                       quotas.QuotaRepository
 	spaceRepo                       spaces.SpaceRepository
@@ -103,7 +103,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
-	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
+	loc.endpointRepo = NewEndpointRepository(cloudControllerGateway)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
@@ -157,11 +157,11 @@ func (locator RepositoryLocator) GetCurlRepository() CurlRepository {
 	return locator.curlRepo
 }
 
-func (locator RepositoryLocator) GetEndpointRepository() EndpointRepository {
+func (locator RepositoryLocator) GetEndpointRepository() core_config.EndpointRepository {
 	return locator.endpointRepo
 }
 
-func (locator RepositoryLocator) SetEndpointRepository(e EndpointRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetEndpointRepository(e core_config.EndpointRepository) RepositoryLocator {
 	locator.endpointRepo = e
 	return locator
 }

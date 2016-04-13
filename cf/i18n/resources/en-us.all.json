@@ -1832,10 +1832,6 @@
     "translation": "Error getting file info"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "Error getting info from v2/info: "
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "Error getting one time auth code: "
   },

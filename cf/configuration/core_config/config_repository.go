@@ -17,6 +17,16 @@ type ConfigRepository struct {
 	onError   func(error)
 }
 
+type CCInfo struct {
+	ApiVersion               string `json:"api_version"`
+	AuthorizationEndpoint    string `json:"authorization_endpoint"`
+	LoggregatorEndpoint      string `json:"logging_endpoint"`
+	MinCliVersion            string `json:"min_cli_version"`
+	MinRecommendedCliVersion string `json:"min_recommended_cli_version"`
+	SSHOAuthClient           string `json:"app_ssh_oauth_client"`
+	RoutingApiEndpoint       string `json:"routing_endpoint"`
+}
+
 func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Repository {
 	if errorHandler == nil {
 		return nil
@@ -83,7 +93,7 @@ type Reader interface {
 	PluginRepos() []models.PluginRepo
 }
 
-//go:generate counterfeiter -o ../fakes/fake_repository.go . ReadWriter
+//go:generate counterfeiter . ReadWriter
 type ReadWriter interface {
 	Reader
 	ClearSession()

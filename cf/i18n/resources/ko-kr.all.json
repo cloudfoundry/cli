@@ -1832,10 +1832,6 @@
     "translation": "파일 정보를 가져오는 중에 오류 발생"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "v2/정보에서 정보를 가져오는 중에 오류 발생: "
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "일회성 인증 코드를 가져오는 중에 오류 발생: "
   },

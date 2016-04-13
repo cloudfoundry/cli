@@ -1832,10 +1832,6 @@
     "translation": "取得檔案資訊時發生錯誤"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "從 v2/info 取得資訊時發生錯誤："
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "取得一次性鑑別碼時發生錯誤："
   },
