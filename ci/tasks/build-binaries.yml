@@ -20,6 +20,8 @@ run:
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
 
+    go version
+
     pushd $GOPATH/src/github.com/cloudfoundry/cli
       bin/replace-sha
 
