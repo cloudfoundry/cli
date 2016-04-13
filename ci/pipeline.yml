@@ -94,6 +94,44 @@ resources:
     project_id: {{cf-cli-public-tracker-project-id}}
     tracker_url: https://www.pivotaltracker.com
 
+- name: golang
+  type: docker-image
+  source:
+    repository: golang
+    tag: latest
+
+- name: cli-ci-dockerfile
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths: [ci/Dockerfile]
+
+- name: cf-cli-image
+  type: docker-image
+  source:
+    repository: cloudfoundry/cli-ci
+    username: {{dockerhub-username}}
+    email: {{dockerhub-email}}
+    password: {{dockerhub-password}}
+
+groups:
+- name: cli
+  jobs:
+  - units
+  - build-binaries
+  - gats-linux
+  - gats-windows
+  - cats-linux
+  - cats-windows
+  - create-installers
+  - publish-edge-archives
+  - publish-final-release
+- name: images
+  jobs:
+  - create-cli-ci-image
+
 jobs:
 - name: units
   serial: true
@@ -313,3 +351,17 @@ jobs:
     params:
       AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+
+- name: create-cli-ci-image
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli-ci-dockerfile
+      trigger: true
+    - get: golang
+      trigger: true
+      params: {save: true}
+  - put: cf-cli-image
+    params:
+      load_base: golang
+      build: cli-ci-dockerfile/ci
