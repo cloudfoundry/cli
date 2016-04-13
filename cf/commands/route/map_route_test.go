@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/commands/route/routefakes"
@@ -119,6 +120,7 @@ var _ = Describe("MapRoute", func() {
 			Expect(usage).To(ContainElement("   --hostname, -n      Hostname for the HTTP route (required for shared domains)"))
 			Expect(usage).To(ContainElement("   --path              Path for the HTTP route"))
 			Expect(usage).To(ContainElement("   --port              Port for the TCP route"))
+			Expect(usage).To(ContainElement("   --random-port       Create a random port for the TCP route"))
 		})
 
 		It("shows the usage", func() {
@@ -126,7 +128,7 @@ var _ = Describe("MapRoute", func() {
 			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"))
 
 			Expect(usage).To(ContainElement("   Map a TCP route:"))
-			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN --port PORT"))
+			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN (--port PORT | --random-port)"))
 		})
 	})
 
@@ -235,6 +237,34 @@ var _ = Describe("MapRoute", func() {
 				})
 			})
 
+			Context("when the --random-port option is given", func() {
+				appName := "app-name"
+
+				BeforeEach(func() {
+					err := flagContext.Parse(appName, "domain-name", "--random-port")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("returns a MinAPIVersionRequirement", func() {
+					actualRequirements := cmd.Requirements(factory, flagContext)
+
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--random-port'"))
+					Expect(requiredVersion).To(Equal(cf.TcpRoutingMinimumApiVersion))
+					Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
+				})
+
+				It("returns a DiegoApplicationRequirement", func() {
+					actualRequirements := cmd.Requirements(factory, flagContext)
+
+					Expect(factory.NewDiegoApplicationRequirementCallCount()).To(Equal(1))
+					actualAppName := factory.NewDiegoApplicationRequirementArgsForCall(0)
+					Expect(appName).To(Equal(actualAppName))
+					Expect(actualRequirements).NotTo(BeEmpty())
+				})
+			})
+
 			Context("when passing port with a hostname", func() {
 				BeforeEach(func() {
 					flagContext.Parse("app-name", "example.com", "--port", "8080", "--hostname", "something-else")
@@ -259,6 +289,57 @@ var _ = Describe("MapRoute", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify port together with hostname and/or path."},
+					))
+				})
+			})
+
+			Context("when both --port and --random-port are given", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("app-name", "domain-name", "--port", "9090", "--random-port")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("fails with error", func() {
+					Expect(func() {
+						cmd.Requirements(factory, flagContext)
+					}).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Cannot specify random-port together with port, hostname and/or path."},
+					))
+				})
+			})
+
+			Context("when both --random-port and --hostname are given", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("app-name", "domain-name", "--hostname", "host", "--random-port")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("fails with error", func() {
+					Expect(func() {
+						cmd.Requirements(factory, flagContext)
+					}).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Cannot specify random-port together with port, hostname and/or path."},
+					))
+				})
+			})
+
+			Context("when --random-port and --path are given", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("app-name", "domain-name", "--path", "path", "--random-port")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("fails with error", func() {
+					Expect(func() {
+						cmd.Requirements(factory, flagContext)
+					}).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Cannot specify random-port together with port, hostname and/or path."},
 					))
 				})
 			})
@@ -305,6 +386,24 @@ var _ = Describe("MapRoute", func() {
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				_, _, port, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(port).To(Equal(60000))
+			})
+		})
+
+		Context("when a random-port is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name", "--random-port")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to create the route with a random port", func() {
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
+				Expect(ok).To(BeTrue())
+
+				cmd.Execute(flagContext)
+				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
+				_, _, _, randomPort, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				Expect(randomPort).To(BeTrue())
 			})
 		})
 
