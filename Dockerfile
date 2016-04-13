@@ -1,6 +1,5 @@
 FROM golang
 
-RUN go get golang.org/x/tools/cmd/vet
 RUN go get golang.org/x/tools/cmd/cover
 
 RUN sed -i -e 's/httpredir.debian.org/ftp.us.debian.org/' /etc/apt/sources.list
