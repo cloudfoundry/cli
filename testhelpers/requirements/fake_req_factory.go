@@ -64,6 +64,10 @@ func (f *FakeReqFactory) NewDEAApplicationRequirement(name string) requirements.
 	return FakeRequirement{f, false}
 }
 
+func (f *FakeReqFactory) NewDiegoApplicationRequirement(name string) requirements.DiegoApplicationRequirement {
+	return FakeRequirement{f, false}
+}
+
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
 	f.ApplicationName = name
 	return FakeRequirement{f, !f.ApplicationFails}

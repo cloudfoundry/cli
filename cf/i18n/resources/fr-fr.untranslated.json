@@ -144,10 +144,6 @@
     "translation": "CF_NAME logout"
   },
   {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME oauth-token",
     "translation": "CF_NAME oauth-token"
   },
@@ -426,6 +422,14 @@
   {
     "id": "Make the broker's service plans only visible within the targeted space",
     "translation": "Make the broker's service plans only visible within the targeted space"
+  },
+  {
+    "id": "Map a TCP route",
+    "translation": "Map a TCP route"
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": "Map an HTTP route"
   },
   {
     "id": "NUM_INSTANCES",

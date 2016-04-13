@@ -25,6 +25,14 @@ type FakeFactory struct {
 	newDEAApplicationRequirementReturns struct {
 		result1 requirements.DEAApplicationRequirement
 	}
+	NewDiegoApplicationRequirementStub        func(name string) requirements.DiegoApplicationRequirement
+	newDiegoApplicationRequirementMutex       sync.RWMutex
+	newDiegoApplicationRequirementArgsForCall []struct {
+		name string
+	}
+	newDiegoApplicationRequirementReturns struct {
+		result1 requirements.DiegoApplicationRequirement
+	}
 	NewServiceInstanceRequirementStub        func(name string) requirements.ServiceInstanceRequirement
 	newServiceInstanceRequirementMutex       sync.RWMutex
 	newServiceInstanceRequirementArgsForCall []struct {
@@ -185,6 +193,38 @@ func (fake *FakeFactory) NewDEAApplicationRequirementReturns(result1 requirement
 	fake.NewDEAApplicationRequirementStub = nil
 	fake.newDEAApplicationRequirementReturns = struct {
 		result1 requirements.DEAApplicationRequirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewDiegoApplicationRequirement(name string) requirements.DiegoApplicationRequirement {
+	fake.newDiegoApplicationRequirementMutex.Lock()
+	fake.newDiegoApplicationRequirementArgsForCall = append(fake.newDiegoApplicationRequirementArgsForCall, struct {
+		name string
+	}{name})
+	fake.newDiegoApplicationRequirementMutex.Unlock()
+	if fake.NewDiegoApplicationRequirementStub != nil {
+		return fake.NewDiegoApplicationRequirementStub(name)
+	} else {
+		return fake.newDiegoApplicationRequirementReturns.result1
+	}
+}
+
+func (fake *FakeFactory) NewDiegoApplicationRequirementCallCount() int {
+	fake.newDiegoApplicationRequirementMutex.RLock()
+	defer fake.newDiegoApplicationRequirementMutex.RUnlock()
+	return len(fake.newDiegoApplicationRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewDiegoApplicationRequirementArgsForCall(i int) string {
+	fake.newDiegoApplicationRequirementMutex.RLock()
+	defer fake.newDiegoApplicationRequirementMutex.RUnlock()
+	return fake.newDiegoApplicationRequirementArgsForCall[i].name
+}
+
+func (fake *FakeFactory) NewDiegoApplicationRequirementReturns(result1 requirements.DiegoApplicationRequirement) {
+	fake.NewDiegoApplicationRequirementStub = nil
+	fake.newDiegoApplicationRequirementReturns = struct {
+		result1 requirements.DiegoApplicationRequirement
 	}{result1}
 }
 

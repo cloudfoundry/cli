@@ -728,10 +728,6 @@
     "translation": "CF_NAME logs APP_NAME"
   },
   {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
     "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"
   },
@@ -2348,10 +2344,6 @@
     "translation": "Hostname for the HTTP route (required for shared domains)"
   },
   {
-    "id": "Hostname for the route (required for shared domains)",
-    "translation": "Hostname for the route (required for shared domains)"
-  },
-  {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
     "translation": "Hostname used in combination with DOMAIN to specify the route to bind"
   },
@@ -2874,6 +2866,14 @@
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
     "translation": "Manifest file is not found in the current directory, please provide either an app name or manifest"
+  },
+  {
+    "id": "Map a TCP route",
+    "translation": "Map a TCP route"
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": "Map an HTTP route"
   },
   {
     "id": "Map the root domain to this app",

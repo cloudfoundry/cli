@@ -18,6 +18,8 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"strings"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,10 +36,11 @@ var _ = Describe("MapRoute", func() {
 		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
-		loginRequirement         requirements.Requirement
-		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
-		domainRequirement        *requirementsfakes.FakeDomainRequirement
-		minAPIVersionRequirement requirements.Requirement
+		loginRequirement            requirements.Requirement
+		applicationRequirement      *requirementsfakes.FakeApplicationRequirement
+		domainRequirement           *requirementsfakes.FakeDomainRequirement
+		minAPIVersionRequirement    requirements.Requirement
+		diegoApplicationRequirement *requirementsfakes.FakeDiegoApplicationRequirement
 
 		originalCreateRouteCmd commandregistry.Command
 		fakeCreateRouteCmd     commandregistry.Command
@@ -89,10 +92,42 @@ var _ = Describe("MapRoute", func() {
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
+
+		diegoApplicationRequirement = new(requirementsfakes.FakeDiegoApplicationRequirement)
+		factory.NewDiegoApplicationRequirementReturns(diegoApplicationRequirement)
 	})
 
 	AfterEach(func() {
 		commandregistry.Register(originalCreateRouteCmd)
+	})
+
+	Describe("Help text", func() {
+		var usage []string
+
+		BeforeEach(func() {
+			cmd := &route.MapRoute{}
+			up := commandregistry.CliCommandUsagePresenter(cmd)
+
+			usage = strings.Split(up.Usage(), "\n")
+		})
+
+		It("contains an example", func() {
+			Expect(usage).To(ContainElement("   cf map-route my-app example.com --port 50000                 # example.com:50000"))
+		})
+
+		It("contains the options", func() {
+			Expect(usage).To(ContainElement("   --hostname, -n      Hostname for the HTTP route (required for shared domains)"))
+			Expect(usage).To(ContainElement("   --path              Path for the HTTP route"))
+			Expect(usage).To(ContainElement("   --port              Port for the TCP route"))
+		})
+
+		It("shows the usage", func() {
+			Expect(usage).To(ContainElement("   Map an HTTP route:"))
+			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"))
+
+			Expect(usage).To(ContainElement("   Map a TCP route:"))
+			Expect(usage).To(ContainElement("      cf map-route APP_NAME DOMAIN --port PORT"))
+		})
 	})
 
 	Describe("Requirements", func() {
@@ -169,6 +204,64 @@ var _ = Describe("MapRoute", func() {
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
 			})
+
+			Context("when a port is passed", func() {
+				appName := "app-name"
+
+				BeforeEach(func() {
+					flagContext.Parse(appName, "domain-name", "--port", "1234")
+				})
+
+				It("returns a MinAPIVersionRequirement as the first requirement", func() {
+					actualRequirements := cmd.Requirements(factory, flagContext)
+
+					expectedVersion, err := semver.Make("2.51.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--port'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
+				})
+
+				It("returns a DiegoApplicationRequirement", func() {
+					actualRequirements := cmd.Requirements(factory, flagContext)
+
+					Expect(factory.NewDiegoApplicationRequirementCallCount()).To(Equal(1))
+					actualAppName := factory.NewDiegoApplicationRequirementArgsForCall(0)
+					Expect(appName).To(Equal(actualAppName))
+					Expect(actualRequirements).NotTo(BeEmpty())
+				})
+			})
+
+			Context("when passing port with a hostname", func() {
+				BeforeEach(func() {
+					flagContext.Parse("app-name", "example.com", "--port", "8080", "--hostname", "something-else")
+				})
+
+				It("fails", func() {
+					Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Cannot specify port together with hostname and/or path."},
+					))
+				})
+			})
+
+			Context("when passing port with a path", func() {
+				BeforeEach(func() {
+					flagContext.Parse("app-name", "example.com", "--port", "8080", "--path", "something-else")
+				})
+
+				It("fails", func() {
+					Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Cannot specify port together with hostname and/or path."},
+					))
+				})
+			})
 		})
 	})
 
@@ -195,6 +288,24 @@ var _ = Describe("MapRoute", func() {
 				Name: "my-space",
 				Guid: "my-space-guid",
 			}))
+		})
+
+		Context("when a port is passed", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse("app-name", "domain-name", "--port", "60000")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(factory, flagContext)
+			})
+
+			It("tries to create the route with the port", func() {
+				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
+				Expect(ok).To(BeTrue())
+
+				cmd.Execute(flagContext)
+				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
+				_, _, port, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
+				Expect(port).To(Equal(60000))
+			})
 		})
 
 		Context("when creating the route fails", func() {
