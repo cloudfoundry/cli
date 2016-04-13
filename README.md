@@ -145,7 +145,7 @@ type Command interface {
 	Execute(context flags.FlagContext)
 }
 ```
-[Source code](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/command.go#L9)
+[Source code](https://github.com/cloudfoundry/cli/blob/master/cf/commandregistry/command.go#L9)
 
 `Metadata()` is just a description of the command name, usage and flags:
 ```Go
@@ -160,7 +160,7 @@ type CommandMetadata struct {
 	Examples        []string
 }
 ```
-[Source code](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/command.go#L16)
+[Source code](https://github.com/cloudfoundry/cli/blob/master/cf/commandregistry/command.go#L16)
 
 The `Examples` field represents the set of lines to be printed when printing examples in the help text.
 
@@ -175,7 +175,7 @@ When the command is run, it communicates with api using repositories (they are i
 The bool argument `pluginCall` indicates whether the command is invoked by one of the CLI's plugin API methods.
 
 Dependencies are injected into each command, so tests can inject a fake. This means that dependencies are
-typically declared as an interface type, and not a concrete type. (see [`cf/command_registry/dependency.go`](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/dependency.go))
+typically declared as an interface type, and not a concrete type. (see [`cf/commandregistry/dependency.go`](https://github.com/cloudfoundry/cli/blob/master/cf/commandregistry/dependency.go))
 
 Some dependencies are managed by a repository locator in [`cf/api/repository_locator.go`](https://github.com/cloudfoundry/cli/blob/master/cf/api/repository_locator.go).
 
@@ -188,9 +188,9 @@ apps, buildpacks, domains, etc.
 Managing dependencies
 ---------------------
 
-Command dependencies are managed by the command registry package. The app uses the package (in [`cf/command_registry/dependency.go`](https://github.com/cloudfoundry/cli/blob/master/cf/command_registry/dependency.go))to instantiate them, this allows not sharing the knowledge of their dependencies with the app itself.
+Command dependencies are managed by the command registry package. The app uses the package (in [`cf/commandregistry/dependency.go`](https://github.com/cloudfoundry/cli/blob/master/cf/commandregistry/dependency.go)) to instantiate them, this allows not sharing the knowledge of their dependencies with the app itself.
 
-For commands that use another command as dependency, `command_registry` is used for retrieving the command dependency. For example, the command `restart` has a dependency on command `start` and `stop`, and this is how the command dependency is retrieved: [`restart.go`](https://github.com/cloudfoundry/cli/blob/master/cf/commands/application/restart.go#L59)
+For commands that use another command as dependency, `commandregistry` is used for retrieving the command dependency. For example, the command `restart` has a dependency on command `start` and `stop`, and this is how the command dependency is retrieved: [`restart.go`](https://github.com/cloudfoundry/cli/blob/master/cf/commands/application/restart.go#L59)
 
 As for repositories, we use the repository locator to handle their dependencies. You can find it in [`cf/api/repository_locator.go`](https://github.com/cloudfoundry/cli/blob/master/cf/api/repository_locator.go).
 
