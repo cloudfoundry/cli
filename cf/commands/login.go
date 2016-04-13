@@ -7,7 +7,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
@@ -24,7 +23,7 @@ type Login struct {
 	ui            terminal.UI
 	config        core_config.ReadWriter
 	authenticator authentication.AuthenticationRepository
-	endpointRepo  api.EndpointRepository
+	endpointRepo  core_config.EndpointRepository
 	orgRepo       organizations.OrganizationRepository
 	spaceRepo     spaces.SpaceRepository
 }
