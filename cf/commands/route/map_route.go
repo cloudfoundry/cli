@@ -32,6 +32,7 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
 	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
 	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port for the TCP route")}
+	fs["random-port"] = &flags.BoolFlag{Name: "random-port", Usage: T("Create a random port for the TCP route")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "map-route",
@@ -47,7 +48,7 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 			"      CF_NAME map-route ",
 			fmt.Sprintf("%s ", T("APP_NAME")),
 			fmt.Sprintf("%s ", T("DOMAIN")),
-			fmt.Sprintf("--port %s", T("PORT")),
+			fmt.Sprintf("(--port %s | --random-port)", T("PORT")),
 		},
 		Examples: []string{
 			"CF_NAME map-route my-app example.com                              # example.com",
@@ -66,6 +67,10 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+	}
+
+	if fc.IsSet("random-port") && (fc.IsSet("port") || fc.IsSet("hostname") || fc.IsSet("path")) {
+		cmd.ui.Failed(T("Cannot specify random-port together with port, hostname and/or path."))
 	}
 
 	appName := fc.Args()[0]
@@ -87,8 +92,16 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
 	}
 
-	if fc.IsSet("port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumApiVersion))
+	var flag string
+	switch {
+	case fc.IsSet("port"):
+		flag = "port"
+	case fc.IsSet("random-port"):
+		flag = "random-port"
+	}
+
+	if flag != "" {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement(fmt.Sprintf("Option '--%s'", flag), cf.TcpRoutingMinimumApiVersion))
 		reqs = append(reqs, requirementsFactory.NewDiegoApplicationRequirement(appName))
 	}
 
@@ -121,7 +134,7 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	port := c.Int("port")
-	var randomPort bool // randomPort isn't supported yet
+	randomPort := c.Bool("random-port")
 	route, apiErr := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields())
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error resolving route:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
