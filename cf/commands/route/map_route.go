@@ -1,7 +1,10 @@
 package route
 
 import (
+	"fmt"
+
 	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -26,19 +29,31 @@ func init() {
 
 func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the route (required for shared domains)")}
-	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the route")}
+	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname for the HTTP route (required for shared domains)")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for the HTTP route")}
+	fs["port"] = &flags.IntFlag{Name: "port", Usage: T("Port for the TCP route")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "map-route",
 		Description: T("Add a url route to an app"),
 		Usage: []string{
-			T("CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"),
+			fmt.Sprintf("%s:\n", T("Map an HTTP route")),
+			"      CF_NAME map-route ",
+			fmt.Sprintf("%s ", T("APP_NAME")),
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("[--hostname %s] ", T("HOSTNAME")),
+			fmt.Sprintf("[--path %s]\n\n", T("PATH")),
+			fmt.Sprintf("   %s:\n", T("Map a TCP route")),
+			"      CF_NAME map-route ",
+			fmt.Sprintf("%s ", T("APP_NAME")),
+			fmt.Sprintf("%s ", T("DOMAIN")),
+			fmt.Sprintf("--port %s", T("PORT")),
 		},
 		Examples: []string{
 			"CF_NAME map-route my-app example.com                              # example.com",
 			"CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com",
 			"CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo",
+			"CF_NAME map-route my-app example.com --port 50000                 # example.com:50000",
 		},
 		Flags: fs,
 	}
@@ -49,21 +64,32 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n") + commandregistry.Commands.CommandUsage("map-route"))
 	}
 
+	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
+		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+	}
+
+	appName := fc.Args()[0]
 	domainName := fc.Args()[1]
 
-	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
+	requirement := requirementsFactory.NewApplicationRequirement(appName)
+	cmd.appReq = requirement
 
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(domainName)
-
-	requiredVersion, err := semver.Make("2.36.0")
-	if err != nil {
-		panic(err.Error())
-	}
 
 	var reqs []requirements.Requirement
 
 	if fc.String("path") != "" {
+		requiredVersion, err := semver.Make("2.36.0")
+		if err != nil {
+			panic(err.Error())
+		}
+
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+	}
+
+	if fc.IsSet("port") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewDiegoApplicationRequirement(appName))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{
@@ -94,7 +120,7 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) {
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	var port int        // port isn't supported yet
+	port := c.Int("port")
 	var randomPort bool // randomPort isn't supported yet
 	route, apiErr := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields())
 	if apiErr != nil {

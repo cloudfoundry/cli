@@ -11,6 +11,7 @@ import (
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
 	NewDEAApplicationRequirement(name string) DEAApplicationRequirement
+	NewDiegoApplicationRequirement(name string) DiegoApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement
 	NewLoginRequirement() Requirement
 	NewRoutingAPIRequirement() Requirement
@@ -44,6 +45,13 @@ func (f apiRequirementFactory) NewApplicationRequirement(name string) Applicatio
 
 func (f apiRequirementFactory) NewDEAApplicationRequirement(name string) DEAApplicationRequirement {
 	return NewDEAApplicationRequirement(
+		name,
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
+func (f apiRequirementFactory) NewDiegoApplicationRequirement(name string) DiegoApplicationRequirement {
+	return NewDiegoApplicationRequirement(
 		name,
 		f.repoLocator.GetApplicationRepository(),
 	)
