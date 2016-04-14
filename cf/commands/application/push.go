@@ -74,7 +74,8 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs["no-start"] = &flags.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")}
 	fs["random-route"] = &flags.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")}
 	fs["route-path"] = &flags.StringFlag{Name: "route-path", Usage: T("Path for the route")}
-	fs["app-ports"] = &flags.StringFlag{Name: "app-ports", Usage: T("Comma delimited list of ports the application may listen on")}
+	// Hidden:true to hide app-ports for release #117189491
+	fs["app-ports"] = &flags.StringFlag{Name: "app-ports", Usage: T("Comma delimited list of ports the application may listen on"), Hidden: true}
 
 	return commandregistry.CommandMetadata{
 		Name:        "push",
@@ -100,7 +101,8 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[-u %s] ", T("HEALTH_CHECK_TYPE")),
 			fmt.Sprintf("[--route-path %s] ", T("ROUTE_PATH")),
 			"\n   ",
-			fmt.Sprintf("[--app-ports %s] ", T("APP_PORTS")),
+			// Commented to hide app-ports for release #117189491
+			// fmt.Sprintf("[--app-ports %s] ", T("APP_PORTS")),
 			"[--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
 			"\n   ",
 			T("Push multiple apps with a manifest"),
