@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -26,12 +27,15 @@ var _ = Describe("Login Command", func() {
 		Config       coreconfig.Repository
 		ui           *testterm.FakeUI
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
-		endpointRepo *apifakes.FakeEndpointRepository
+		endpointRepo *coreconfigfakes.FakeEndpointRepository
 		orgRepo      *organizationsfakes.FakeOrganizationRepository
 		spaceRepo    *apifakes.FakeSpaceRepository
 
 		org  models.Organization
 		deps commandregistry.Dependency
+
+		minCliVersion            string
+		minRecommendedCliVersion string
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -67,7 +71,9 @@ var _ = Describe("Login Command", func() {
 			Config.SetRefreshToken("my_refresh_token")
 			return nil
 		}
-		endpointRepo = new(apifakes.FakeEndpointRepository)
+		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
+		minCliVersion = "1.0.0"
+		minRecommendedCliVersion = "1.0.0"
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
@@ -96,6 +102,20 @@ var _ = Describe("Login Command", func() {
 	})
 
 	Context("interactive usage", func() {
+		JustBeforeEach(func() {
+			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
+				return &coreconfig.CCInfo{
+					ApiVersion:               "some-version",
+					AuthorizationEndpoint:    "auth/endpoint",
+					LoggregatorEndpoint:      "loggregator/endpoint",
+					MinCliVersion:            minCliVersion,
+					MinRecommendedCliVersion: minRecommendedCliVersion,
+					SSHOAuthClient:           "some-client",
+					RoutingApiEndpoint:       "routing/endpoint",
+				}, endpoint, nil
+			}
+		})
+
 		Describe("when there are a small number of organizations and spaces", func() {
 			var org2 models.Organization
 			var space2 models.Space
@@ -149,8 +169,18 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
+				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+				Expect(Config.ApiVersion()).To(Equal("some-version"))
+				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
+				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
+				Expect(Config.MinCliVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinRecommendedCliVersion()).To(Equal("1.0.0"))
+				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
+				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
+				Expect(Config.RoutingApiEndpoint()).To(Equal("routing/endpoint"))
+
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
@@ -178,8 +208,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
@@ -198,8 +228,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -224,16 +254,16 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
 
 		Describe("when the CLI version is below the minimum required", func() {
 			BeforeEach(func() {
-				Config.SetMinCliVersion("5.0.0")
-				Config.SetMinRecommendedCliVersion("5.5.0")
+				minCliVersion = "5.0.0"
+				minRecommendedCliVersion = "5.5.0"
 			})
 
 			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
@@ -303,8 +333,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -329,8 +359,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -355,8 +385,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -508,6 +538,18 @@ var _ = Describe("Login Command", func() {
 			Config.SetApiEndpoint("api.the-old-endpoint.com")
 			Config.SetAccessToken("the-old-access-token")
 			Config.SetRefreshToken("the-old-refresh-token")
+			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
+				return &coreconfig.CCInfo{
+					ApiVersion:               "some-version",
+					AuthorizationEndpoint:    "auth/endpoint",
+					LoggregatorEndpoint:      "loggregator/endpoint",
+					MinCliVersion:            minCliVersion,
+					MinRecommendedCliVersion: minRecommendedCliVersion,
+					SSHOAuthClient:           "some-client",
+					RoutingApiEndpoint:       "routing/endpoint",
+				}, endpoint, nil
+			}
+
 		})
 
 		JustBeforeEach(func() {
@@ -558,8 +600,8 @@ var _ = Describe("Login Command", func() {
 					ItShowsTheTarget()
 
 					It("stores the API endpoint and the skip-ssl flag", func() {
-						Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-						Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://api.the-server.com"))
+						Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+						Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeTrue())
 					})
 				})
@@ -567,7 +609,7 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointReturns("", errors.New("API endpoint not found"))
+						endpointRepo.GetCCInfoReturns(nil, "", errors.New("API endpoint not found"))
 					})
 
 					ItFails()
@@ -594,8 +636,8 @@ var _ = Describe("Login Command", func() {
 					ItShowsTheTarget()
 
 					It("updates the API endpoint and enables SSL validation", func() {
-						Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-						Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://api.the-server.com"))
+						Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+						Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 					})
 				})
@@ -603,7 +645,7 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointReturns("", errors.New("API endpoint not found"))
+						endpointRepo.GetCCInfoReturns(nil, "", errors.New("API endpoint not found"))
 					})
 
 					ItFails()
@@ -622,7 +664,7 @@ var _ = Describe("Login Command", func() {
 
 			Describe("when there is an invalid SSL cert", func() {
 				BeforeEach(func() {
-					endpointRepo.UpdateEndpointReturns("", errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS"))
+					endpointRepo.GetCCInfoReturns(nil, "", errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS"))
 					ui.Inputs = []string{"bobs-burgers.com"}
 				})
 
@@ -773,11 +815,21 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
-			It("updates Access Token, Refresh Token, Org, and Space in the config", func() {
+			It("updates the config", func() {
 				Expect(Config.AccessToken()).To(Equal("new_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
+
+				Expect(Config.ApiVersion()).To(Equal("some-version"))
+				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
+				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
+				Expect(Config.MinCliVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinRecommendedCliVersion()).To(Equal("1.0.0"))
+				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
+				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
+				Expect(Config.RoutingApiEndpoint()).To(Equal("routing/endpoint"))
+
 			})
 		})
 	})

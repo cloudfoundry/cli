@@ -3,7 +3,6 @@ package commands
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -25,7 +24,7 @@ type OneTimeSSHCode struct {
 	ui           terminal.UI
 	config       coreconfig.ReadWriter
 	authRepo     authentication.AuthenticationRepository
-	endpointRepo api.EndpointRepository
+	endpointRepo coreconfig.EndpointRepository
 }
 
 func init() {
@@ -77,9 +76,15 @@ func (cmd *OneTimeSSHCode) Execute(c flags.FlagContext) {
 }
 
 func (cmd *OneTimeSSHCode) Get() (string, error) {
-	_, err := cmd.endpointRepo.UpdateEndpoint(cmd.config.ApiEndpoint())
+	refresher := coreconfig.APIConfigRefresher{
+		Endpoint:     cmd.config.ApiEndpoint(),
+		EndpointRepo: cmd.endpointRepo,
+		Config:       cmd.config,
+	}
+
+	err := refresher.Refresh()
 	if err != nil {
-		return "", errors.New(T("Error getting info from v2/info: ") + err.Error())
+		return "", errors.New("Error refreshing config: " + err.Error())
 	}
 
 	token, err := cmd.authRepo.RefreshAuthToken()

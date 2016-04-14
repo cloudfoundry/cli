@@ -1828,10 +1828,6 @@
     "translation": "获取文件信息时出错"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "从 V2/信息获取信息时出错："
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "获取一次性时间授权代码时出错："
   },

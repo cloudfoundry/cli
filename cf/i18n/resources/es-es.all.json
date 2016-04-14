@@ -1828,10 +1828,6 @@
     "translation": "Error al obtener la información del archivo"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "Error al obtener información desde v2/info: "
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "Error al obtener un código de automatización de un solo uso: "
   },

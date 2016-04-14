@@ -1828,10 +1828,6 @@
     "translation": "ファイル情報の取得時にエラーが発生しました"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "v2/info から情報を取得しようとしたときエラーが発生しました: "
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "ワンタイム認証コードの取得時にエラーが発生しました: "
   },

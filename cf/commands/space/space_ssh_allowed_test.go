@@ -15,14 +15,11 @@ var _ = Describe("space-ssh-allowed command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		// configRepo          core_config.Repository
-		deps commandregistry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.Ui = ui
-		// deps.Config = configRepo
-		// deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space-ssh-allowed").SetDependency(deps, pluginCall))
 	}
 
@@ -32,9 +29,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		// configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		// spaceRepo = &testapi.FakeSpaceRepository{}
 	})
 
 	Describe("requirements", func() {
