@@ -233,7 +233,7 @@ func (t *Table) printCellValue(result io.Writer, col, last int, value string) {
 	//  that last column.
 
 	if col < last {
-		padlen := t.columnWidth[col] - visibleSize(Decolorize(value))
+		padlen := t.columnWidth[col] - visibleSize(trim(Decolorize(value)))
 		padding := strings.Repeat(" ", padlen)
 		fmt.Fprint(result, padding)
 		fmt.Fprint(result, t.colSpacing)
