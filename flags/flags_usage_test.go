@@ -142,5 +142,24 @@ var _ = Describe("ShowUsage", func() {
 				}))
 			}
 		})
+
+		Context("hidden flag", func() {
+			BeforeEach(func() {
+				fs := make(map[string]flags.FlagSet)
+				fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: "Hostname used to identify the HTTP route", Hidden: true}
+				fs["path"] = &flags.StringFlag{Name: "path", Usage: "Path used to identify the HTTP route"}
+				fc = flags.NewFlagContext(fs)
+			})
+
+			It("prints the flags in order", func() {
+				output := fc.ShowUsage(0)
+
+				outputLines := strings.Split(output, "\n")
+
+				Expect(outputLines).To(Equal([]string{
+					"--path      Path used to identify the HTTP route",
+				}))
+			})
+		})
 	})
 })

@@ -7,6 +7,7 @@ type BoolFlag struct {
 	Value     bool
 	Usage     string
 	ShortName string
+	Hidden    bool
 }
 
 func (f *BoolFlag) Set(v string) {
@@ -28,4 +29,8 @@ func (f *BoolFlag) GetShortName() string {
 
 func (f *BoolFlag) GetValue() interface{} {
 	return f.Value
+}
+
+func (f *BoolFlag) Visible() bool {
+	return !f.Hidden
 }
