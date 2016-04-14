@@ -214,6 +214,9 @@ func newAppPresenter() (presenter appPresenter) {
 					presentCommand("create-shared-domain"),
 					presentCommand("delete-shared-domain"),
 				},
+				{
+					presentCommand("router-groups"),
+				},
 			},
 		}, {
 			Name: T("ROUTES"),
@@ -226,13 +229,6 @@ func newAppPresenter() (presenter appPresenter) {
 					presentCommand("unmap-route"),
 					presentCommand("delete-route"),
 					presentCommand("delete-orphaned-routes"),
-				},
-			},
-		}, {
-			Name: T("ROUTER GROUPS"),
-			CommandSubGroups: [][]cmdPresenter{
-				{
-					presentCommand("router-groups"),
 				},
 			},
 		}, {
