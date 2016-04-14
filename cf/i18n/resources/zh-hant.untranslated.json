@@ -16,10 +16,6 @@
     "translation": "APP_NAME"
   },
   {
-    "id": "APP_PORTS",
-    "translation": "APP_PORTS"
-  },
-  {
     "id": "App instance limit",
     "translation": "App instance limit"
   },
@@ -1002,10 +998,6 @@
   {
     "id": "app ports",
     "translation": "app ports"
-  },
-  {
-    "id": "app ports:",
-    "translation": "app ports:"
   },
   {
     "id": "cpu",
