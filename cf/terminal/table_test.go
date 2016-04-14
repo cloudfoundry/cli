@@ -29,6 +29,35 @@ var _ = Describe("Table", func() {
 		))
 	})
 
+	Describe("REGRESSION: #117404629, having a space in one of the middle headers", func() {
+		BeforeEach(func() {
+			outputs = &bytes.Buffer{}
+			table = NewTable([]string{"watashi", "no ", "atama!"})
+		})
+
+		It("prints the table without panicking", func() {
+			Expect(func() {
+				table.PrintTo(outputs)
+			}).NotTo(Panic())
+
+			s := strings.Split(outputs.String(), "\n")
+			Expect(s).To(ContainSubstrings(
+				[]string{"watashi", "no", "atama!"},
+			))
+		})
+
+		XIt("prints the table with the extra whitespace from the header stripped", func() {
+			Expect(func() {
+				table.PrintTo(outputs)
+			}).NotTo(Panic())
+
+			s := strings.Split(outputs.String(), "\n")
+			Expect(s).To(ContainSubstrings(
+				[]string{"watashi   no   atama!"},
+			))
+		})
+	})
+
 	It("prints format string literals as strings", func() {
 		table.Add("cloak %s", "and", "dagger")
 		table.PrintTo(outputs)
