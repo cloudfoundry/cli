@@ -82,6 +82,10 @@ func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.LoginSuccess}
 }
 
+func (f *FakeReqFactory) NewUsageRequirement(requirements.Usable, string, func() bool) requirements.Requirement {
+	return FakeRequirement{f, f.LoginSuccess}
+}
+
 func (f *FakeReqFactory) NewRoutingAPIRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.RoutingAPIEndpointSuccess}
 }

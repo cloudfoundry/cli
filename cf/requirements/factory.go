@@ -26,6 +26,7 @@ type Factory interface {
 	NewApiEndpointRequirement() Requirement
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
+	NewUsageRequirement(Usable, string, func() bool) Requirement
 }
 
 type apiRequirementFactory struct {
@@ -159,4 +160,8 @@ func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, m
 		commandName,
 		maximumVersion,
 	)
+}
+
+func (f apiRequirementFactory) NewUsageRequirement(cmd Usable, errorMessage string, pred func() bool) Requirement {
+	return NewUsageRequirement(cmd, errorMessage, pred)
 }
