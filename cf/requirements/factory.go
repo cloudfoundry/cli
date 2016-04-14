@@ -2,9 +2,9 @@ package requirements
 
 import (
 	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf"
 )
 
 //go:generate counterfeiter . Factory

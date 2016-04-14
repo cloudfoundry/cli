@@ -28,7 +28,7 @@ var _ = Describe("RoutingApi", func() {
 
 		It("errors", func() {
 			err := requirement.Execute()
-			Expect(err.Error()).To(ContainSubstring("Routing API URI missing. Please log in again to set the URI automatically."))
+			Expect(err.Error()).To(ContainSubstring("This command requires the Routing API. Your targeted endpoint reports it is not enabled."))
 		})
 	})
 
