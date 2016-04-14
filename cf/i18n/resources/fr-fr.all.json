@@ -1828,10 +1828,6 @@
     "translation": "Erreur lors de l'obtention des informations du fichier "
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "Erreur lors de l'obtention des informations depuis v2/info :"
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "Erreur lors de l'obtention d'un code d'authentification à utilisation unique : "
   },

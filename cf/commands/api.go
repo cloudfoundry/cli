@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -17,7 +16,7 @@ import (
 
 type Api struct {
 	ui           terminal.UI
-	endpointRepo api.EndpointRepository
+	endpointRepo coreconfig.EndpointRepository
 	config       coreconfig.ReadWriter
 }
 
@@ -88,8 +87,14 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 	}
 
 	cmd.config.SetSSLDisabled(skipSSL)
-	endpoint, err := cmd.endpointRepo.UpdateEndpoint(endpoint)
 
+	refresher := coreconfig.APIConfigRefresher{
+		Endpoint:     endpoint,
+		EndpointRepo: cmd.endpointRepo,
+		Config:       cmd.config,
+	}
+
+	err := refresher.Refresh()
 	if err != nil {
 		cmd.config.SetApiEndpoint("")
 		cmd.config.SetSSLDisabled(false)
@@ -101,8 +106,10 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 				map[string]interface{}{"ApiCommand": cfApiCommand}))
 			cmd.ui.Failed(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
 				map[string]interface{}{"URL": typedErr.URL, "TipMessage": tipMessage}))
+			return
 		default:
 			cmd.ui.Failed(typedErr.Error())
+			return
 		}
 	}
 

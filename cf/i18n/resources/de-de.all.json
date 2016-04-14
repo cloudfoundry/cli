@@ -1828,10 +1828,6 @@
     "translation": "Fehler beim Abrufen der Datei-Info"
   },
   {
-    "id": "Error getting info from v2/info: ",
-    "translation": "Fehler beim Abrufen der Info von v2/info: "
-  },
-  {
     "id": "Error getting one time auth code: ",
     "translation": "Fehler beim Abrufen des Einmalauthentifizeriungscodes: "
   },

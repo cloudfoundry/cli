@@ -6,11 +6,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -25,7 +25,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 		ui           *testterm.FakeUI
 		configRepo   coreconfig.Repository
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
-		endpointRepo *apifakes.FakeEndpointRepository
+		endpointRepo *coreconfigfakes.FakeEndpointRepository
 
 		cmd         commandregistry.Command
 		deps        commandregistry.Dependency
@@ -40,7 +40,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetApiEndpoint("fake-api-endpoint")
-		endpointRepo = new(apifakes.FakeEndpointRepository)
+		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 		repoLocator := deps.RepoLocator.SetEndpointRepository(endpointRepo)
 		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		repoLocator = repoLocator.SetAuthenticationRepository(authRepo)
@@ -95,17 +95,38 @@ var _ = Describe("OneTimeSSHCode", func() {
 	Describe("Execute", func() {
 		BeforeEach(func() {
 			cmd.Requirements(factory, flagContext)
+
+			endpointRepo.GetCCInfoReturns(
+				&coreconfig.CCInfo{
+					LoggregatorEndpoint: "loggregator/endpoint",
+				},
+				"some-endpoint",
+				nil,
+			)
 		})
 
 		It("tries to update the endpoint", func() {
 			cmd.Execute(flagContext)
-			Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-			Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("fake-api-endpoint"))
+			Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+			Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("fake-api-endpoint"))
 		})
 
 		Context("when updating the endpoint succeeds", func() {
+			ccInfo := &coreconfig.CCInfo{
+				ApiVersion:               "some-version",
+				AuthorizationEndpoint:    "auth/endpoint",
+				LoggregatorEndpoint:      "loggregator/endpoint",
+				MinCliVersion:            "min-cli-version",
+				MinRecommendedCliVersion: "min-rec-cli-version",
+				SSHOAuthClient:           "some-client",
+				RoutingApiEndpoint:       "routing/endpoint",
+			}
 			BeforeEach(func() {
-				endpointRepo.UpdateEndpointReturns("updated-endpoint", nil)
+				endpointRepo.GetCCInfoReturns(
+					ccInfo,
+					"updated-endpoint",
+					nil,
+				)
 			})
 
 			It("tries to refresh the auth token", func() {
