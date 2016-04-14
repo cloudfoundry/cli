@@ -7,17 +7,18 @@ import (
 )
 
 func (c *flagContext) ShowUsage(leadingSpace int) string {
-	displayFlags := make(flags, len(c.cmdFlags))
+	displayFlags := flags{}
 
-	var i int
 	for _, f := range c.cmdFlags {
+		if !f.Visible() {
+			continue
+		}
+
 		d := flagPresenter{
 			flagSet: f,
 		}
 
-		displayFlags[i] = d
-
-		i++
+		displayFlags = append(displayFlags, d)
 	}
 
 	return displayFlags.toString(strings.Repeat(" ", leadingSpace))

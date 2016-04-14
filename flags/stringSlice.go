@@ -6,6 +6,7 @@ type StringSliceFlag struct {
 	Value     []string
 	Usage     string
 	ShortName string
+	Hidden    bool
 }
 
 func (f *StringSliceFlag) Set(v string) {
@@ -26,4 +27,8 @@ func (f *StringSliceFlag) GetShortName() string {
 
 func (f *StringSliceFlag) GetValue() interface{} {
 	return f.Value
+}
+
+func (f *StringSliceFlag) Visible() bool {
+	return !f.Hidden
 }
