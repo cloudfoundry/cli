@@ -3648,10 +3648,6 @@
     "translation": ""
   },
   {
-    "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-    "translation": "라우팅 API URI가 누락되었습니다. URI를 자동으로 설정하려면 다시 로그인하십시오."
-  },
-  {
     "id": "Rules",
     "translation": "규칙"
   },
@@ -4122,6 +4118,10 @@
   {
     "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
     "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": ""
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",

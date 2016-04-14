@@ -944,6 +944,10 @@
     "translation": "The targeted API endpoint could not be reached."
   },
   {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
+  },
+  {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
     "translation": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)"
   },
