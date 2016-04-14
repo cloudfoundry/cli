@@ -3,14 +3,14 @@ package routergroups_test
 import (
 	"errors"
 
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commands/routergroups"
@@ -22,65 +22,79 @@ import (
 var _ = Describe("RouterGroups", func() {
 
 	var (
-		ui                  *testterm.FakeUI
-		routingApiRepo      *apifakes.FakeRoutingApiRepository
-		configRepo          coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
-		deps                commandregistry.Dependency
+		ui             *testterm.FakeUI
+		routingApiRepo *apifakes.FakeRoutingApiRepository
+		deps           commandregistry.Dependency
+		cmd            *routergroups.RouterGroups
+		flagContext    flags.FlagContext
+		repoLocator    api.RepositoryLocator
+		config         coreconfig.Repository
+
+		requirementsFactory           *requirementsfakes.FakeFactory
+		minAPIVersionRequirement      *requirementsfakes.FakeRequirement
+		loginRequirement              *requirementsfakes.FakeRequirement
+		routingApiEndpoingRequirement *requirementsfakes.FakeRequirement
 	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
-		deps.Config = configRepo
-		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("router-groups").SetDependency(deps, pluginCall))
-	}
-
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
-		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:              true,
-			RoutingAPIEndpointSuccess: true,
-		}
+		ui = new(testterm.FakeUI)
 		routingApiRepo = new(apifakes.FakeRoutingApiRepository)
+		config = testconfig.NewRepositoryWithDefaults()
+		repoLocator = api.RepositoryLocator{}.SetRoutingApiRepository(routingApiRepo)
+		deps = commandregistry.Dependency{
+			Ui:          ui,
+			Config:      config,
+			RepoLocator: repoLocator,
+		}
+
+		minAPIVersionRequirement = new(requirementsfakes.FakeRequirement)
+		loginRequirement = new(requirementsfakes.FakeRequirement)
+		routingApiEndpoingRequirement = new(requirementsfakes.FakeRequirement)
+
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
+		requirementsFactory.NewLoginRequirementReturns(loginRequirement)
+		requirementsFactory.NewRoutingAPIRequirementReturns(routingApiEndpoingRequirement)
+
+		cmd = new(routergroups.RouterGroups)
+		cmd = cmd.SetDependency(deps, false).(*routergroups.RouterGroups)
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("router-groups", args, requirementsFactory, updateCommandDependency, false)
+	runCommand := func(args ...string) error {
+		err := flagContext.Parse(args...)
+		if err != nil {
+			return err
+		}
+
+		cmd.Execute(flagContext)
+		return nil
 	}
 
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
-			requirementsFactory.LoginSuccess = false
-			Expect(runCommand()).To(BeFalse())
+			cmd.Requirements(requirementsFactory, flagContext)
+
+			Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
 		})
 
 		It("fails when the routing API endpoint is not set", func() {
-			requirementsFactory.RoutingAPIEndpointSuccess = false
-			Expect(runCommand()).To(BeFalse())
+			cmd.Requirements(requirementsFactory, flagContext)
+
+			Expect(requirementsFactory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
 		})
 
-		Context("when arguments are provided", func() {
-			var cmd commandregistry.Command
-			var flagContext flags.FlagContext
+		It("should fail with usage", func() {
+			flagContext.Parse("blahblah")
+			cmd.Requirements(requirementsFactory, flagContext)
 
-			BeforeEach(func() {
-				cmd = &routergroups.RouterGroups{}
-				cmd.SetDependency(deps, false)
-				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-			})
+			Expect(requirementsFactory.NewUsageRequirementCallCount()).To(Equal(1))
+		})
 
-			It("should fail with usage", func() {
-				flagContext.Parse("blahblah")
+		It("fails if the user is not logged in", func() {
+			cmd.Requirements(requirementsFactory, flagContext)
 
-				reqs := cmd.Requirements(requirementsFactory, flagContext)
-
-				err := testcmd.RunRequirements(reqs)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
-				Expect(err.Error()).To(ContainSubstring("No argument required"))
-			})
+			Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 		})
 	})
 
@@ -131,7 +145,9 @@ var _ = Describe("RouterGroups", func() {
 		})
 
 		It("returns an error to the user", func() {
-			runCommand()
+			Expect(func() {
+				runCommand()
+			}).To(Panic())
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting router groups"},

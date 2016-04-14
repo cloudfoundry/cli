@@ -130,6 +130,16 @@ type FakeFactory struct {
 	newMaxAPIVersionRequirementReturns struct {
 		result1 requirements.Requirement
 	}
+	NewUsageRequirementStub        func(requirements.Usable, string, func() bool) requirements.Requirement
+	newUsageRequirementMutex       sync.RWMutex
+	newUsageRequirementArgsForCall []struct {
+		arg1 requirements.Usable
+		arg2 string
+		arg3 func() bool
+	}
+	newUsageRequirementReturns struct {
+		result1 requirements.Requirement
+	}
 }
 
 func (fake *FakeFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -603,6 +613,40 @@ func (fake *FakeFactory) NewMaxAPIVersionRequirementArgsForCall(i int) (string, 
 func (fake *FakeFactory) NewMaxAPIVersionRequirementReturns(result1 requirements.Requirement) {
 	fake.NewMaxAPIVersionRequirementStub = nil
 	fake.newMaxAPIVersionRequirementReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewUsageRequirement(arg1 requirements.Usable, arg2 string, arg3 func() bool) requirements.Requirement {
+	fake.newUsageRequirementMutex.Lock()
+	fake.newUsageRequirementArgsForCall = append(fake.newUsageRequirementArgsForCall, struct {
+		arg1 requirements.Usable
+		arg2 string
+		arg3 func() bool
+	}{arg1, arg2, arg3})
+	fake.newUsageRequirementMutex.Unlock()
+	if fake.NewUsageRequirementStub != nil {
+		return fake.NewUsageRequirementStub(arg1, arg2, arg3)
+	} else {
+		return fake.newUsageRequirementReturns.result1
+	}
+}
+
+func (fake *FakeFactory) NewUsageRequirementCallCount() int {
+	fake.newUsageRequirementMutex.RLock()
+	defer fake.newUsageRequirementMutex.RUnlock()
+	return len(fake.newUsageRequirementArgsForCall)
+}
+
+func (fake *FakeFactory) NewUsageRequirementArgsForCall(i int) (requirements.Usable, string, func() bool) {
+	fake.newUsageRequirementMutex.RLock()
+	defer fake.newUsageRequirementMutex.RUnlock()
+	return fake.newUsageRequirementArgsForCall[i].arg1, fake.newUsageRequirementArgsForCall[i].arg2, fake.newUsageRequirementArgsForCall[i].arg3
+}
+
+func (fake *FakeFactory) NewUsageRequirementReturns(result1 requirements.Requirement) {
+	fake.NewUsageRequirementStub = nil
+	fake.newUsageRequirementReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
 }

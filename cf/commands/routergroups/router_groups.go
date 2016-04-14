@@ -1,6 +1,7 @@
 package routergroups
 
 import (
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -32,19 +33,18 @@ func (cmd *RouterGroups) MetaData() commandregistry.CommandMetadata {
 }
 
 func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
-		T("No argument required"),
-		func() bool {
-			return len(fc.Args()) != 0
-		},
-	)
 
-	reqs := []requirements.Requirement{
-		usageReq,
+	return []requirements.Requirement{
+		requirementsFactory.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
+			T("No argument required"),
+			func() bool {
+				return len(fc.Args()) != 0
+			},
+		),
+		requirementsFactory.NewMinAPIVersionRequirement(cmd.MetaData().Name, cf.TcpRoutingMinimumApiVersion),
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewRoutingAPIRequirement(),
 	}
-	return reqs
 }
 
 func (cmd *RouterGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
