@@ -24,10 +24,6 @@
     "translation": "APP_NAME"
   },
   {
-    "id": "APP_PORTS",
-    "translation": "APP_PORTS"
-  },
-  {
     "id": "App ",
     "translation": "App "
   },
@@ -1046,10 +1042,6 @@
   {
     "id": "app ports",
     "translation": "app ports"
-  },
-  {
-    "id": "app ports:",
-    "translation": "app ports:"
   },
   {
     "id": "apps",

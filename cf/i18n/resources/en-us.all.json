@@ -208,10 +208,6 @@
     "translation": "APP_NAME"
   },
   {
-    "id": "APP_PORTS",
-    "translation": "APP_PORTS"
-  },
-  {
     "id": "Access for plans of a particular broker",
     "translation": "Access for plans of a particular broker"
   },
@@ -4594,10 +4590,6 @@
   {
     "id": "app ports",
     "translation": "app ports"
-  },
-  {
-    "id": "app ports:",
-    "translation": "app ports:"
   },
   {
     "id": "apps",

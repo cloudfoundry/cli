@@ -191,7 +191,8 @@ var _ = Describe("App", func() {
 				[]string{"Showing health and status for app fake-app-name"},
 				[]string{"requested state: started"},
 				[]string{"instances: 1/1"},
-				[]string{"app ports: 8080, 9090"},
+				// Commented to hide app-ports for release #117189491
+				// []string{"app ports: 8080, 9090"},
 				[]string{"usage: 1G x 1 instances"},
 				[]string{"urls: fake-route-host.fake-route-domain-name"},
 				[]string{"last uploaded: Thu Nov 19 01:00:15 UTC 2015"},
