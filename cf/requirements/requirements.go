@@ -6,7 +6,7 @@ func (r Requirements) Execute() error {
 	var err error
 
 	for _, req := range r {
-	  err = req.Execute()
+		err = req.Execute()
 		if err != nil {
 			return err
 		}

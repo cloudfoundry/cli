@@ -3,14 +3,14 @@ package requirements_test
 import (
 	. "github.com/cloudfoundry/cli/cf/requirements"
 
+	"errors"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
-	"errors"
 )
 
 var _ = Describe("Requirements", func() {
-  Context("When there are multiple requirements", func() {
+	Context("When there are multiple requirements", func() {
 		It("executes all the requirements", func() {
 			r1 := new(requirementsfakes.FakeRequirement)
 			r1.ExecuteReturns(nil)
@@ -19,7 +19,7 @@ var _ = Describe("Requirements", func() {
 
 			// SETUP
 			requirements := Requirements{
-        r1,
+				r1,
 				r2,
 			}
 
@@ -28,8 +28,8 @@ var _ = Describe("Requirements", func() {
 
 			// ASSERT
 			Expect(err).NotTo(HaveOccurred())
-      Expect(r1.ExecuteCallCount()).To(Equal(1))
-      Expect(r2.ExecuteCallCount()).To(Equal(1))
+			Expect(r1.ExecuteCallCount()).To(Equal(1))
+			Expect(r2.ExecuteCallCount()).To(Equal(1))
 		})
 
 		It("returns the first error that occurs", func() {
