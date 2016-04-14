@@ -3648,10 +3648,6 @@
     "translation": ""
   },
   {
-    "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-    "translation": "URI API di instradamento mancante. Accedi di nuovo per impostare l'URI automaticamente."
-  },
-  {
     "id": "Rules",
     "translation": "Regole"
   },
@@ -4122,6 +4118,10 @@
   {
     "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
     "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": ""
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",

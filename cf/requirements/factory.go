@@ -4,6 +4,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf"
 )
 
 //go:generate counterfeiter . Factory
@@ -71,9 +72,14 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 }
 
 func (f apiRequirementFactory) NewRoutingAPIRequirement() Requirement {
-	return NewRoutingAPIRequirement(
-		f.config,
-	)
+	req := Requirements{
+		f.NewMinAPIVersionRequirement("RoutingAPI", cf.TcpRoutingMinimumApiVersion),
+		NewRoutingAPIRequirement(
+			f.config,
+		),
+	}
+
+	return req
 }
 
 func (f apiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement {
