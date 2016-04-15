@@ -90,14 +90,12 @@ jobs:
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        AWS_REGION: {{lite-aws-region}}
-        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: {{lite-1-name}}
         LITE_KEYPAIR: {{lite-keypair}}
-        LITE_HOSTNAME: {{lite-1-hostname}}
-        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
         LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-1-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -182,14 +180,12 @@ jobs:
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        AWS_REGION: {{lite-aws-region}}
-        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: {{lite-2-name}}
         LITE_KEYPAIR: {{lite-keypair}}
-        LITE_HOSTNAME: {{lite-2-hostname}}
-        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
         LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-2-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -275,14 +271,12 @@ jobs:
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        AWS_REGION: {{lite-aws-region}}
-        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: {{lite-3-name}}
         LITE_KEYPAIR: {{lite-keypair}}
-        LITE_HOSTNAME: {{lite-3-hostname}}
-        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
         LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-3-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -367,14 +361,12 @@ jobs:
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        AWS_REGION: {{lite-aws-region}}
-        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: {{lite-4-name}}
         LITE_KEYPAIR: {{lite-keypair}}
-        LITE_HOSTNAME: {{lite-4-hostname}}
-        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
         LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-4-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
