@@ -1012,10 +1012,6 @@
     "translation": "app instance limit"
   },
   {
-    "id": "app ports",
-    "translation": "app ports"
-  },
-  {
     "id": "broker: {{.Name}}",
     "translation": "broker: {{.Name}}"
   },

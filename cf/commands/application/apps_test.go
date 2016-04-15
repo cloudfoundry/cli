@@ -168,7 +168,8 @@ var _ = Describe("list-apps command", func() {
 			Expect(pluginAppModels[0].RunningInstances).To(Equal(1))
 			Expect(pluginAppModels[0].Memory).To(Equal(int64(512)))
 			Expect(pluginAppModels[0].DiskQuota).To(Equal(int64(1024)))
-			Expect(pluginAppModels[0].AppPorts).To(Equal([]int{8080, 9090}))
+			// Commented to hide app-ports for release #117189491
+			// Expect(pluginAppModels[0].AppPorts).To(Equal([]int{8080, 9090}))
 			Expect(pluginAppModels[0].Routes[0].Host).To(Equal("app1"))
 			Expect(pluginAppModels[0].Routes[1].Host).To(Equal("app1"))
 			Expect(pluginAppModels[0].Routes[0].Domain.Name).To(Equal("cfapps.io"))
@@ -185,8 +186,8 @@ var _ = Describe("list-apps command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "requested state", "instances", "memory", "disk", "app ports", "urls"},
-				[]string{"Application-1", "started", "1/1", "512M", "1G", "8080, 9090", "app1.cfapps.io", "app1.example.com"},
+				[]string{"name", "requested state", "instances", "memory", "disk", "urls"},
+				[]string{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
 				[]string{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
 			))
 		})

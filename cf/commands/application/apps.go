@@ -96,7 +96,8 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 		T("instances"),
 		T("memory"),
 		T("disk"),
-		T("app ports"),
+		// Hide this column #117189491
+		// T("app ports"),
 		T("urls"),
 	})
 
@@ -117,7 +118,8 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 			uihelpers.ColoredAppInstances(application.ApplicationFields),
 			formatters.ByteSize(application.Memory*formatters.MEGABYTE),
 			formatters.ByteSize(application.DiskQuota*formatters.MEGABYTE),
-			strings.Join(appPorts, ", "),
+			// Hide this column #117189491
+			// strings.Join(appPorts, ", "),
 			strings.Join(urls, ", "),
 		)
 	}
