@@ -15,7 +15,8 @@ resources:
     uri: git@github.com:cloudfoundry/cli
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
-    paths: VERSION
+    paths:
+    - VERSION
 
 - name: cli-private
   type: git
