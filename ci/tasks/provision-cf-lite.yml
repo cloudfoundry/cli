@@ -6,15 +6,12 @@ image: docker:///cloudfoundry/cli-vagrant-ci
 params:
   AWS_ACCESS_KEY_ID:
   AWS_SECRET_ACCESS_KEY:
-  AWS_REGION: us-east-1
-  AWS_SUBNET_ID:
+  LITE_KEYPAIR:
+  LITE_PRIVATE_KEY_PATH:
   AWS_SECURITY_GROUP:
+  AWS_SUBNET_ID:
   LITE_NAME:
   LITE_PRIVATE_IP_ADDRESS:
-  LITE_HOSTNAME:
-  LITE_PRIVATE_KEY_PATH:
-  LITE_INSTANCE_TYPE: m3.2xlarge
-  LITE_KEYPAIR:
 
 inputs:
   - name: cli-private
@@ -28,15 +25,13 @@ run:
   - |
     set -ex
 
-    export AWS_DEFAULT_REGION="${AWS_REGION}"
     export BOSH_AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
     export BOSH_AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
-    export BOSH_LITE_SUBNET_ID="${AWS_SUBNET_ID}"
-    export BOSH_LITE_SECURITY_GROUP="${AWS_SECURITY_GROUP}"
     export BOSH_LITE_KEYPAIR="${LITE_KEYPAIR}"
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
+    export BOSH_LITE_SECURITY_GROUP="${AWS_SECURITY_GROUP}"
+    export BOSH_LITE_SUBNET_ID="${AWS_SUBNET_ID}"
     export BOSH_LITE_NAME="${LITE_NAME}"
-    export BOSH_LITE_INSTANCE_TYPE="${LITE_INSTANCE_TYPE}"
     export BOSH_LITE_ROOT="$PWD/bosh-lite"
 
     mkdir scratch
@@ -48,11 +43,6 @@ run:
         Vagrantfile
 
       vagrant up --provider aws
-    popd
-
-    pushd cf-release
-      sed -i -e "s/^properties:/properties:\n  domain: ${LITE_HOSTNAME}/" \
-        bosh-lite/stubs/property_overrides.yml
     popd
 
     pushd scratch
