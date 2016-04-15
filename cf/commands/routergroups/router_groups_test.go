@@ -90,12 +90,6 @@ var _ = Describe("RouterGroups", func() {
 
 			Expect(requirementsFactory.NewUsageRequirementCallCount()).To(Equal(1))
 		})
-
-		It("fails if the user is not logged in", func() {
-			cmd.Requirements(requirementsFactory, flagContext)
-
-			Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
-		})
 	})
 
 	Context("when there are router groups", func() {

@@ -1,7 +1,6 @@
 package routergroups
 
 import (
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -41,7 +40,6 @@ func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, 
 				return len(fc.Args()) != 0
 			},
 		),
-		requirementsFactory.NewMinAPIVersionRequirement(cmd.MetaData().Name, cf.TcpRoutingMinimumApiVersion),
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewRoutingAPIRequirement(),
 	}
