@@ -50,9 +50,6 @@ run:
       vagrant up --provider aws
     popd
 
-    sed -i -e "s/bosh-lite-ip-${LITE_NAME}: \(.*\)/bosh-lite-ip-${LITE_NAME}: ${DIRECTOR_IP}/" \
-      cli-private/concourse/credentials.yml
-
     pushd cf-release
       sed -i -e "s/^properties:/properties:\n  domain: ${LITE_HOSTNAME}/" \
         bosh-lite/stubs/property_overrides.yml
