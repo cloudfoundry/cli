@@ -426,9 +426,10 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 
 	httpClient.DumpRequest(request)
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 10; i++ {
 		response, err = httpClient.Do(request)
 		if response == nil && err != nil {
+			fmt.Printf("request timeout, retry %d\n", i)
 			continue
 		} else {
 			break

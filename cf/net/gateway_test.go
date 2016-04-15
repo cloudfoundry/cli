@@ -88,14 +88,14 @@ var _ = Describe("Gateway", func() {
 			Expect(apiErr).To(HaveOccurred())
 		})
 
-		It("Retries 3 times if we cannot contact the server", func() {
+		It("Retries 10 times if we cannot contact the server", func() {
 			client.DoReturns(nil, errors.New("Connection refused"))
 			request, apiErr := ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 			Expect(apiErr).ToNot(HaveOccurred())
 
 			_, apiErr = ccGateway.PerformRequest(request)
 			Expect(apiErr).To(HaveOccurred())
-			Expect(client.DoCallCount()).To(Equal(3))
+			Expect(client.DoCallCount()).To(Equal(10))
 		})
 	})
 
