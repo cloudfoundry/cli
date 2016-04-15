@@ -208,7 +208,7 @@ var _ = Describe("DeleteRoute", func() {
 					It("returns a MinAPIVersionRequirement as the first requirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 
-						expectedVersion, err := semver.Make("2.51.0")
+						expectedVersion, err := semver.Make("2.53.0")
 						Expect(err).NotTo(HaveOccurred())
 
 						Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))

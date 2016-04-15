@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -146,12 +145,15 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
+				expectedVersion, err := semver.Make("2.53.0")
+				Expect(err).NotTo(HaveOccurred())
+
 				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
 				Expect(feature).To(Equal("Option '--port'"))
-				Expect(requiredVersion).To(Equal(cf.TcpRoutingMinimumApiVersion))
+				Expect(requiredVersion).To(Equal(expectedVersion))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
 		})
@@ -163,12 +165,15 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
+				expectedVersion, err := semver.Make("2.53.0")
+				Expect(err).NotTo(HaveOccurred())
+
 				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
 				Expect(feature).To(Equal("Option '--random-port'"))
-				Expect(requiredVersion).To(Equal(cf.TcpRoutingMinimumApiVersion))
+				Expect(requiredVersion).To(Equal(expectedVersion))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
 		})
