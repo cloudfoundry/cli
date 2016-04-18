@@ -60,6 +60,11 @@ func (cmd *RepoPlugins) Execute(c flags.FlagContext) {
 	repoName := c.String("r")
 
 	repos = cmd.config.PluginRepos()
+	for i, _ := range repos {
+		if repos[i].Url == "http://plugins.cloudfoundry.org" {
+			repos[i].Url = "https://plugins.cloudfoundry.org"
+		}
+	}
 
 	if repoName == "" {
 		cmd.ui.Say(T("Getting plugins from all repositories ... "))

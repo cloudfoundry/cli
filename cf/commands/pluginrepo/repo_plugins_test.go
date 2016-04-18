@@ -79,6 +79,30 @@ var _ = Describe("repo-plugins", func() {
 		})
 	})
 
+	Context("when using the default CF-Community repo", func() {
+
+		BeforeEach(func() {
+			fakePluginRepo = new(pluginrepofakes.FakePluginRepo)
+			ui = &testterm.FakeUI{}
+			requirementsFactory = &testreq.FakeReqFactory{}
+			config = testconfig.NewRepositoryWithDefaults()
+
+			config.SetPluginRepo(models.PluginRepo{
+				Name: "cf",
+				Url:  "http://plugins.cloudfoundry.org",
+			})
+		})
+
+		It("uses https when pointing to plugins.cloudfoundry.org", func() {
+			callRepoPlugins()
+
+			Expect(fakePluginRepo.GetPluginsCallCount()).To(Equal(1))
+			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("cf"))
+			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Url).To(Equal("https://plugins.cloudfoundry.org"))
+			Expect(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(1))
+		})
+	})
+
 	Context("when GetPlugins returns a list of plugin meta data", func() {
 		It("lists all plugin data", func() {
 			result := make(map[string][]clipr.Plugin)
