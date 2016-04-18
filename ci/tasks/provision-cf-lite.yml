@@ -48,12 +48,11 @@ run:
 
     pushd cf-release
       cat<<EOF > property-overrides.yml
-properties:
-  domain: ${LITE_HOSTNAME}
-EOF
+    properties:
+      domain: ${LITE_HOSTNAME}
+    EOF
     popd
 
     pushd scratch
       $BOSH_LITE_ROOT/bin/provision_cf cf-release/property-overrides.yml
     popd
-
