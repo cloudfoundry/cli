@@ -700,6 +700,10 @@
     "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
   },
   {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com"
+  },
+  {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
     "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances"
   }
