@@ -40,7 +40,7 @@ func NewRepositoryFromPersistor(persistor configuration.Persistor, errorHandler 
 		//set default plugin repo
 		data.PluginRepos = append(data.PluginRepos, models.PluginRepo{
 			Name: "CF-Community",
-			Url:  "http://plugins.cloudfoundry.org",
+			Url:  "https://plugins.cloudfoundry.org",
 		})
 	}
 
