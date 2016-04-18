@@ -112,10 +112,6 @@
     "translation": " è vuoto"
   },
   {
-    "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
-    "translation": " non è un url valido; fornisci un url, ad esempio http://your_repo.com"
-  },
-  {
     "id": " is not available in repo '",
     "translation": " non è disponibile nel repository '"
   },
@@ -5154,6 +5150,10 @@
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
     "translation": "{{.State}} in corso. Utilizza  '{{.ServicesCommand}}' o '{{.ServiceCommand}}' per controllare lo stato dell'operazione."
+  },
+  {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": ""
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

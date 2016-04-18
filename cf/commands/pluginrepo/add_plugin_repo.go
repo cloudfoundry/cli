@@ -37,7 +37,7 @@ func (cmd *AddPluginRepo) MetaData() commandregistry.CommandMetadata {
 			T(`CF_NAME add-plugin-repo REPO_NAME URL`),
 		},
 		Examples: []string{
-			"CF_NAME add-plugin-repo PrivateRepo http://myprivaterepo.com/repo/",
+			"CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
 		},
 		TotalArgs: 2,
 	}
@@ -127,16 +127,16 @@ func (cmd AddPluginRepo) checkIfRepoExists(repoName, repoUrl string) {
 	}
 }
 
-func (cmd AddPluginRepo) verifyUrl(repoUrl string) string {
-	if !strings.HasPrefix(repoUrl, "http://") && !strings.HasPrefix(repoUrl, "https://") {
-		cmd.ui.Failed(repoUrl + T(" is not a valid url, please provide a url, e.g. http://your_repo.com"))
+func (cmd AddPluginRepo) verifyUrl(repoURL string) string {
+	if !strings.HasPrefix(repoURL, "http://") && !strings.HasPrefix(repoURL, "https://") {
+		cmd.ui.Failed(T("{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com", map[string]interface{}{"URL": repoURL}))
 	}
 
-	if strings.HasSuffix(repoUrl, "/") {
-		repoUrl = repoUrl + "list"
+	if strings.HasSuffix(repoURL, "/") {
+		repoURL = repoURL + "list"
 	} else {
-		repoUrl = repoUrl + "/list"
+		repoURL = repoURL + "/list"
 	}
 
-	return repoUrl
+	return repoURL
 }

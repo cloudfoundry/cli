@@ -112,10 +112,6 @@
     "translation": " is empty"
   },
   {
-    "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
-    "translation": " is not a valid url, please provide a url, e.g. http://your_repo.com"
-  },
-  {
     "id": " is not available in repo '",
     "translation": " is not available in repo '"
   },
@@ -5154,6 +5150,10 @@
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
     "translation": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status."
+  },
+  {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
