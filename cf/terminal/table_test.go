@@ -46,7 +46,7 @@ var _ = Describe("Table", func() {
 			))
 		})
 
-		XIt("prints the table with the extra whitespace from the header stripped", func() {
+		It("prints the table with the extra whitespace from the header stripped", func() {
 			Expect(func() {
 				table.PrintTo(outputs)
 			}).NotTo(Panic())
