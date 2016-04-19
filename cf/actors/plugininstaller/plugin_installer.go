@@ -25,7 +25,9 @@ type PluginInstallerContext struct {
 
 type pluginReposFetcher func() []models.PluginRepo
 
-func NewPluginInstaller(context *PluginInstallerContext) (installer PluginInstaller) {
+func NewPluginInstaller(context *PluginInstallerContext) PluginInstaller {
+	var installer PluginInstaller
+
 	pluginDownloader := &PluginDownloader{Ui: context.Ui, FileDownloader: context.FileDownloader}
 	if context.RepoName == "" {
 		installer = &PluginInstallerWithoutRepo{

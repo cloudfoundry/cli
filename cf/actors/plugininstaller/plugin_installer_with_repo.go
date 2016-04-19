@@ -22,7 +22,9 @@ type PluginInstallerWithRepo struct {
 	GetPluginRepos   pluginReposFetcher
 }
 
-func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
+func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) string {
+	var outputSourceFilepath string
+
 	targetPluginName := strings.ToLower(inputSourceFilepath)
 
 	installer.Ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": inputSourceFilepath, "repoName": installer.RepoName}))
