@@ -33,9 +33,8 @@ run:
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
 
     cat<<EOF > cf-routing-release-repo/post-routing-release-deploy-overrides.yml
-    properties:
-      router:
-        enable_routing_api: true
+    routing_api:
+      enabled: true
     EOF
 
     pushd cf-routing-release-repo
