@@ -40,9 +40,11 @@ This Go project is designed to be imported into `$GOPATH`, rather than being clo
 
 ### Prerequisites
 
-In order to use the sample applications below, you will have to export the following environment variables:
+In order to use the sample applications below, you will have to export the
+following environment variables:
 
-* `CF_ACCESS_TOKEN` - You can get this value by executing (`$ cf oauth-token`). Example: 
+* `CF_ACCESS_TOKEN` - You can get this value by executing (`$ cf oauth-token`).
+  Example:
 
 ```bash
 export CF_ACCESS_TOKEN="bearer eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiI3YmM2MzllOC0wZGM0LTQ4YzItYTAzYS0xYjkyYzRhMWFlZTIiLCJzdWIiOiI5YTc5MTVkOS04MDc1LTQ3OTUtOTBmOS02MGM0MTU0YTJlMDkiLCJzY29wZSI6WyJzY2ltLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLmFkbWluIiwicGFzc3dvcmQud3JpdGUiLCJzY2ltLndyaXRlIiwib3BlbmlkIiwiY2xvdWRfY29udHJvbGxlci53cml0ZSIsImNsb3VkX2NvbnRyb2xsZXIucmVhZCJdLCJjbGllbnRfaWQiOiJjZiIsImNpZCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjlhNzkxNWQ5LTgwNzUtNDc5NS05MGY5LTYwYzQxNTRhMmUwOSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsImlhdCI6MTQwNDg0NzU3NywiZXhwIjoxNDA0ODQ4MTc3LCJpc3MiOiJodHRwczovL3VhYS4xMC4yNDQuMC4zNC54aXAuaW8vb2F1dGgvdG9rZW4iLCJhdWQiOlsic2NpbSIsIm9wZW5pZCIsImNsb3VkX2NvbnRyb2xsZXIiLCJwYXNzd29yZCJdfQ.mAaOJthCotW763lf9fysygqdES_Mz1KFQ3HneKbwY4VJx-ARuxxiLh8l_8Srx7NJBwGlyEtfYOCBcIdvyeDCiQ0wT78Zw7ZJYFjnJ5-ZkDy5NbMqHbImDFkHRnPzKFjJHip39jyjAZpkFcrZ8_pUD8XxZraqJ4zEf6LFdAHKFBM"
@@ -55,11 +57,13 @@ export DOPPLER_ADDR="wss://doppler.10.244.0.34.xip.io:4443"
 ```
 
 
-###Application logs
+### Application logs
 
-The `sample/main.go` application streams logs for a particular app. The following environment variable needs to be set:
+The `samples/app_logs/main.go` application streams logs for a particular app.
+The following environment variable needs to be set:
 
-* `APP_GUID` - You can get this value from running `$ cf app APP --guid`. Example:
+* `APP_GUID` - You can get this value from running `$ cf app APP --guid`.
+  Example:
 
 ```
 export APP_GUID=55fdb274-d6c9-4b8c-9b1f-9b7e7f3a346c
@@ -68,36 +72,42 @@ export APP_GUID=55fdb274-d6c9-4b8c-9b1f-9b7e7f3a346c
 Then you can run the sample app like this:
 
 ```
-go build -o bin/sample sample/main.go
-bin/sample
+go build -o bin/app_logs samples/app_logs/main.go
+bin/app_logs
 ```
 
-###Logs and metrics firehose
+### Logs and metrics firehose
 
-The `firehose_sample/main.go` application streams metrics data and logs for all apps. 
+The `samples/firehose/main.go` application streams metrics data and logs for
+all apps.
 
 You can run the firehose sample app like this:
 
 ```
-go build -o bin/firehose_sample firehose_sample/main.go
-bin/firehose_sample
+go build -o bin/firehose samples/firehose/main.go
+bin/firehose
 ```
 
-Multiple subscribers may connect to the firehose endpoint, each with a unique subscription_id (configurable in `main.go`). Each subscriber (in practice, a pool of clients with a common subscription_id) receives the entire stream. For each subscription_id, all data will be distributed evenly among that subscriber's client pool.
+Multiple subscribers may connect to the firehose endpoint, each with a unique
+subscription_id (configurable in `main.go`). Each subscriber (in practice, a
+pool of clients with a common subscription_id) receives the entire stream. For
+each subscription_id, all data will be distributed evenly among that
+subscriber's client pool.
 
+### Container metrics
 
-###Container metrics
-
-The `container_metrics_sample/main.go` application streams container metrics for the specified appId.
+The `samples/container_metrics/consumer/main.go` application streams container
+metrics for the specified appId.
 
 You can run the container metrics sample app like this:
 
 ```
-go build -o bin/containermetrics_sample container_metrics_sample/main.go
-bin/containermetrics_sample
+go build -o bin/container_metrics samples/container_metrics/consumer/main.go
+bin/container_metrics
 ```
 
-For more information to setup a test environment in order to pull container metrics look at the README.md in the container_metrics_sample.
+For more information to setup a test environment in order to pull container
+metrics look at the README.md in the container_metrics sample.
 
 ##Development
 

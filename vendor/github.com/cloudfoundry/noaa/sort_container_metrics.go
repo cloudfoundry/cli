@@ -1,8 +1,9 @@
 package noaa
 
 import (
-	"github.com/cloudfoundry/sonde-go/events"
 	"sort"
+
+	"github.com/cloudfoundry/sonde-go/events"
 )
 
 // SortContainerMetrics sorts a slice of containerMetrics by InstanceIndex.
