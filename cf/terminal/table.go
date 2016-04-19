@@ -132,7 +132,23 @@ func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row [
 		}
 
 		for i := range lines {
-			value := trim(Decolorize(transformer.Transform(columnIndex, lines[i])))
+			// (**) See also 'printCellValue' (pCV). Here
+			// and there we have to apply identical
+			// transformations to the cell value to get
+			// matching cell width information. If they do
+			// not match then pCV may compute a cell width
+			// larger than the max width found here, a
+			// negative padding length from that, and
+			// subsequently panic the Go runtime.  What
+			// was further missing is trimming before
+			// entering the user-transform. Especially
+			// with color transforms any trailing space
+			// going in will not be removable for print.
+			//
+			// This happened for
+			// https://www.pivotaltracker.com/n/projects/892938/stories/117404629
+
+			value := trim(Decolorize(transformer.Transform(columnIndex, trim(lines[i]))))
 			width := visibleSize(value)
 			if t.columnWidth[columnIndex] < width {
 				t.columnWidth[columnIndex] = width
@@ -171,8 +187,7 @@ func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex 
 				break
 			}
 
-			value := trim(transformer.Transform(columnIndex, row[columnIndex]))
-			t.printCellValue(line, columnIndex, last, value)
+			t.printCellValue(line, transformer, columnIndex, last, row[columnIndex])
 		}
 
 		fmt.Fprintf(result, "%s\n", trim(string(line.Bytes())))
@@ -208,8 +223,7 @@ func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex 
 		line := &bytes.Buffer{}
 
 		for columnIndex := range sub {
-			value := trim(transformer.Transform(columnIndex, sub[columnIndex][rowIndex]))
-			t.printCellValue(line, columnIndex, last, value)
+			t.printCellValue(line, transformer, columnIndex, last, sub[columnIndex][rowIndex])
 		}
 
 		fmt.Fprintf(result, "%s\n", trim(string(line.Bytes())))
@@ -218,7 +232,8 @@ func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex 
 
 // printCellValue pads the specified string to the width of the given
 // column, adds the spacing bewtween columns, and returns the result.
-func (t *Table) printCellValue(result io.Writer, col, last int, value string) {
+func (t *Table) printCellValue(result io.Writer, transformer rowTransformer, col, last int, value string) {
+	value = trim(transformer.Transform(col, trim(value)))
 	fmt.Fprint(result, value)
 
 	// Pad all columns, but the last in this row (with the size of
@@ -233,6 +248,22 @@ func (t *Table) printCellValue(result io.Writer, col, last int, value string) {
 	//  that last column.
 
 	if col < last {
+		// (**) See also 'calculateMaxSize' (cMS). Here and
+		// there we have to apply identical transformations to
+		// the cell value to get matching cell width
+		// information. If they do not match then we may here
+		// compute a cell width larger than the max width
+		// found by cMS, derive a negative padding length from
+		// that, and subsequently panic the Go runtime in
+		// "strings.Repeat". What was further missing is
+		// trimming before entering the
+		// user-transform. Especially with color transforms
+		// any trailing space going in will not be removable
+		// for print.
+		//
+		// This happened for
+		// https://www.pivotaltracker.com/n/projects/892938/stories/117404629
+
 		padlen := t.columnWidth[col] - visibleSize(trim(Decolorize(value)))
 		padding := strings.Repeat(" ", padlen)
 		fmt.Fprint(result, padding)
