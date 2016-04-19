@@ -4,8 +4,8 @@ type DebugPrinter interface {
 	Print(title, dump string)
 }
 
-type nullDebugPrinter struct {
+type NullDebugPrinter struct {
 }
 
-func (nullDebugPrinter) Print(title, body string) {
+func (NullDebugPrinter) Print(title, body string) {
 }
