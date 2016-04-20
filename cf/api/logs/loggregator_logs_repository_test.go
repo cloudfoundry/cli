@@ -2,7 +2,7 @@ package logs_test
 
 import (
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/logs/fakes"
+	"github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -10,22 +10,23 @@ import (
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/gogo/protobuf/proto"
 
+	"time"
+
 	. "github.com/cloudfoundry/cli/cf/api/logs"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 var _ = Describe("loggregator logs repository", func() {
 	var (
-		fakeConsumer *testapi.FakeLoggregatorConsumer
+		fakeConsumer *logsfakes.FakeLoggregatorConsumer
 		logsRepo     *LoggregatorLogsRepository
 		configRepo   core_config.ReadWriter
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
 	)
 
 	BeforeEach(func() {
-		fakeConsumer = testapi.NewFakeLoggregatorConsumer()
+		fakeConsumer = new(logsfakes.FakeLoggregatorConsumer)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
@@ -38,10 +39,14 @@ var _ = Describe("loggregator logs repository", func() {
 
 	Describe("RecentLogsFor", func() {
 		Context("when a noaa_errors.UnauthorizedError occurs", func() {
+			var recentCalled bool
 			BeforeEach(func() {
-				fakeConsumer.RecentReturns.Err = []error{
-					noaa_errors.NewUnauthorizedError("i'm sorry dave"),
-					nil,
+				fakeConsumer.RecentStub = func(string, string) ([]*logmessage.LogMessage, error) {
+					if recentCalled {
+						return nil, nil
+					}
+					recentCalled = true
+					return nil, noaa_errors.NewUnauthorizedError("i'm sorry dave")
 				}
 			})
 
@@ -54,7 +59,7 @@ var _ = Describe("loggregator logs repository", func() {
 
 		Context("when an error occurs", func() {
 			BeforeEach(func() {
-				fakeConsumer.RecentReturns.Err = []error{errors.New("oops")}
+				fakeConsumer.RecentReturns(nil, errors.New("oops"))
 			})
 
 			It("returns the error", func() {
@@ -70,15 +75,16 @@ var _ = Describe("loggregator logs repository", func() {
 				msg1 = makeLogMessage("My message 2", int64(2000))
 				msg2 = makeLogMessage("My message 1", int64(1000))
 
-				fakeConsumer.RecentReturns.Messages = []*logmessage.LogMessage{
+				fakeConsumer.RecentReturns([]*logmessage.LogMessage{
 					msg1,
 					msg2,
-				}
+				}, nil)
 			})
 
 			It("gets the logs for the requested app", func() {
 				logsRepo.RecentLogsFor("app-guid")
-				Expect(fakeConsumer.RecentCalledWith.AppGuid).To(Equal("app-guid"))
+				appGuid, _ := fakeConsumer.RecentArgsForCall(0)
+				Expect(appGuid).To(Equal("app-guid"))
 			})
 
 			It("writes the sorted log messages onto the provided channel", func() {
@@ -106,7 +112,7 @@ var _ = Describe("loggregator logs repository", func() {
 			e := errors.New("oops")
 
 			BeforeEach(func() {
-				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+				fakeConsumer.TailStub = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					return nil, e
 				}
 			})
@@ -126,7 +132,7 @@ var _ = Describe("loggregator logs repository", func() {
 			It("refreshes the access token", func(done Done) {
 				calledOnce := false
 
-				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+				fakeConsumer.TailStub = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					if !calledOnce {
 						calledOnce = true
 						return nil, noaa_errors.NewUnauthorizedError("i'm sorry dave")
@@ -151,7 +157,7 @@ var _ = Describe("loggregator logs repository", func() {
 				It("returns an error", func(done Done) {
 					err := noaa_errors.NewUnauthorizedError("All the errors")
 
-					fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					fakeConsumer.TailStub = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 						return nil, err
 					}
 
@@ -171,7 +177,7 @@ var _ = Describe("loggregator logs repository", func() {
 
 		Context("when no error occurs", func() {
 			It("asks for the logs for the given app", func() {
-				fakeConsumer.TailFunc = func(appGuid, token string) (<-chan *logmessage.LogMessage, error) {
+				fakeConsumer.TailStub = func(appGuid, token string) (<-chan *logmessage.LogMessage, error) {
 					Expect(appGuid).To(Equal("app-guid"))
 					Expect(token).To(Equal("the-access-token"))
 					return nil, nil
@@ -181,14 +187,18 @@ var _ = Describe("loggregator logs repository", func() {
 			})
 
 			It("sets the on connect callback", func() {
-				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+				fakeConsumer.TailStub = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					return nil, nil
 				}
 
 				called := false
 				logsRepo.TailLogsFor("app-guid", func() { called = true }, logChan, errChan)
-				fakeConsumer.OnConnectCallback()
-				Expect(called).To(BeTrue())
+
+				Expect(fakeConsumer.SetOnConnectCallbackCallCount()).To(Equal(1))
+				// best way we could come up with to match on a callback function
+				callbackFunc := fakeConsumer.SetOnConnectCallbackArgsForCall(0)
+				callbackFunc()
+				Expect(called).To(Equal(true))
 			})
 
 			It("sorts the messages before yielding them", func() {
@@ -197,14 +207,12 @@ var _ = Describe("loggregator logs repository", func() {
 				msg2 := makeLogMessage("hello2", 200)
 				msg1 := makeLogMessage("hello1", 100)
 
-				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+				fakeConsumer.TailStub = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					consumerLogChan := make(chan *logmessage.LogMessage)
 					go func() {
 						consumerLogChan <- msg3
 						consumerLogChan <- msg2
 						consumerLogChan <- msg1
-
-						fakeConsumer.WaitForClose()
 
 						close(consumerLogChan)
 					}()
@@ -239,20 +247,19 @@ var _ = Describe("loggregator logs repository", func() {
 				msg2 := makeLogMessage("hello2", 200)
 				msg1 := makeLogMessage("hello1", 100)
 
-				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+				fakeConsumer.TailStub = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					messageChan := make(chan *logmessage.LogMessage)
 					go func() {
 						messageChan <- msg3
 						messageChan <- msg2
 						messageChan <- msg1
-						fakeConsumer.WaitForClose()
 						close(messageChan)
 					}()
 
 					return messageChan, nil
 				}
 
-				Expect(fakeConsumer.IsClosed).To(BeFalse())
+				Expect(fakeConsumer.CloseCallCount()).To(Equal(0))
 
 				go func() {
 					for msg := range logChan {
@@ -265,7 +272,7 @@ var _ = Describe("loggregator logs repository", func() {
 
 				logsRepo.Close()
 
-				Expect(fakeConsumer.IsClosed).To(BeTrue())
+				Expect(fakeConsumer.CloseCallCount()).To(Equal(1))
 
 				getReceivedMessages := func() []Loggable {
 					return receivedMessages

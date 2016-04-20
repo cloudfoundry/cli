@@ -35,7 +35,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/v3/repository"
 	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
 	"github.com/cloudfoundry/loggregator_consumer"
-	"github.com/cloudfoundry/noaa"
+	"github.com/cloudfoundry/noaa/consumer"
 )
 
 type RepositoryLocator struct {
@@ -110,7 +110,7 @@ func NewRepositoryLocator(config core_config.ReadWriter, gatewaysByName map[stri
 	apiVersion, _ := semver.Make(config.ApiVersion())
 
 	if apiVersion.GTE(cf.NoaaMinimumApiVersion) {
-		consumer := noaa.NewConsumer(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+		consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
 		loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo)
 	} else {

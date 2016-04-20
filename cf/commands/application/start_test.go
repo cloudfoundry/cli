@@ -16,7 +16,7 @@ import (
 	testAppInstances "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
 	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
 	"github.com/cloudfoundry/cli/cf/api/logs"
-	testapilogs "github.com/cloudfoundry/cli/cf/api/logs/fakes"
+	testapilogs "github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"

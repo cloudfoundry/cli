@@ -62,9 +62,6 @@ func (repo *NoaaLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error
 }
 
 func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
-	ticker := time.NewTicker(repo.BufferTime)
-	c := make(chan *events.LogMessage)
-	e := make(chan error)
 
 	endpoint := repo.config.DopplerEndpoint()
 	if endpoint == "" {
@@ -73,6 +70,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
+	c, e := repo.consumer.TailingLogs(appGuid, repo.config.AccessToken())
 
 	go func() {
 		for {
@@ -99,15 +97,6 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 		}
 	}()
 
-	go func() {
-		for _ = range ticker.C {
-			repo.flushMessages(logChan)
-		}
-	}()
-
-	go func() {
-		repo.consumer.TailingLogs(appGuid, repo.config.AccessToken(), c, e)
-	}()
 }
 
 func (repo *NoaaLogsRepository) flushMessages(c chan<- Loggable) {

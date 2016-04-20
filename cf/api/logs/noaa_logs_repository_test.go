@@ -11,7 +11,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 
 	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/logs/fakes"
+	testapi "github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 
 	"sync"
@@ -115,8 +115,12 @@ var _ = Describe("logs with noaa repository", func() {
 			It("returns an error when it occurs", func(done Done) {
 				err := errors.New("oops")
 
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error) {
-					errorChan <- err
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					errorChan := make(chan error)
+					go func() {
+						errorChan <- err
+					}()
+					return nil, errorChan
 				}
 
 				go func() {
@@ -141,16 +145,23 @@ var _ = Describe("logs with noaa repository", func() {
 					return nil
 				}
 
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error) {
-					if !calledOnce {
-						calledOnce = true
-						errorChan <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
-					} else {
-						errorChan <- err
-						<-synchronization
-						close(errorChan)
-						close(logChan)
-					}
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					errorChan := make(chan error)
+					logChan := make(chan *events.LogMessage)
+
+					go func() {
+						if !calledOnce {
+							calledOnce = true
+							errorChan <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
+						} else {
+							errorChan <- err
+							<-synchronization
+							close(errorChan)
+							close(logChan)
+						}
+					}()
+
+					return logChan, errorChan
 				}
 
 				go func() {
@@ -168,15 +179,19 @@ var _ = Describe("logs with noaa repository", func() {
 
 		Context("when no error occurs", func() {
 			It("asks for the logs for the given app", func(done Done) {
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error) {
-					errorChan <- errors.New("quit Tailing")
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					errorChan := make(chan error)
+					go func() {
+						errorChan <- errors.New("quit Tailing")
+					}()
+					return nil, errorChan
 				}
 
 				go func() {
 					defer GinkgoRecover()
 
 					Eventually(fakeNoaaConsumer.TailingLogsCallCount()).Should(Equal(1))
-					appGuid, token, _, _ := fakeNoaaConsumer.TailingLogsArgsForCall(0)
+					appGuid, token := fakeNoaaConsumer.TailingLogsArgsForCall(0)
 					Expect(appGuid).To(Equal("app-guid"))
 					Expect(token).To(Equal("the-access-token"))
 
@@ -187,8 +202,12 @@ var _ = Describe("logs with noaa repository", func() {
 			})
 
 			It("sets the on connect callback", func() {
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error) {
-					errorChan <- errors.New("quit Tailing")
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					errorChan := make(chan error)
+					go func() {
+						errorChan <- errors.New("quit Tailing")
+					}()
+					return nil, errorChan
 				}
 
 				var cb = func() { return }
@@ -212,7 +231,9 @@ var _ = Describe("logs with noaa repository", func() {
 				msg2 = makeNoaaLogMessage("hello2", 200)
 				msg3 = makeNoaaLogMessage("hello3", 300)
 
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string, outputChan chan<- *events.LogMessage, errorChan chan<- error) {
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					errorChan := make(chan error)
+					outputChan := make(chan *events.LogMessage)
 					closeWait.Add(1)
 
 					go func() {
@@ -223,6 +244,7 @@ var _ = Describe("logs with noaa repository", func() {
 						close(errorChan)
 						close(outputChan)
 					}()
+					return outputChan, errorChan
 				}
 
 				fakeNoaaConsumer.CloseStub = func() error {
