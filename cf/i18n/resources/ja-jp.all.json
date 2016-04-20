@@ -5153,7 +5153,7 @@
   },
   {
     "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
-    "translation": ""
+    "translation": "{{.URL}} は有効な URL ではないので、有効な URL (例: https://your_repo.com) を提供してください"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

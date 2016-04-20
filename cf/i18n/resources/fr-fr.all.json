@@ -5153,7 +5153,7 @@
   },
   {
     "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
-    "translation": ""
+    "translation": "{{.URL}} n'est pas une adresse URL valide. Indiquez une adresse URL valide, telle que https://votre_référentiel.com"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
