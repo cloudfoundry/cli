@@ -45,6 +45,7 @@ type UserRepository interface {
 	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, error)
 	ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, role string) ([]models.UserFields, error)
 	Create(username, password string) (apiErr error)
+	CreateLDAP(username, externalID string) (apiErr error)
 	Delete(userGuid string) (apiErr error)
 	SetOrgRoleByGuid(userGuid, orgGuid, role string) (apiErr error)
 	SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
@@ -194,6 +195,45 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 
 	path := "/Users"
 	body, err := json.Marshal(resources.NewUAAUserResource(username, password))
+
+	if err != nil {
+		return
+	}
+
+	createUserResponse := &resources.UAAUserFields{}
+	err = repo.uaaGateway.CreateResource(uaaEndpoint, path, bytes.NewReader(body), createUserResponse)
+	switch httpErr := err.(type) {
+	case nil:
+	case errors.HttpError:
+		if httpErr.StatusCode() == http.StatusConflict {
+			err = errors.NewModelAlreadyExistsError("user", username)
+			return
+		}
+		return
+	default:
+		return
+	}
+
+	path = "/v2/users"
+	body, err = json.Marshal(resources.Metadata{
+		Guid: createUserResponse.Id,
+	})
+
+	if err != nil {
+		return
+	}
+
+	return repo.ccGateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body))
+}
+
+func (repo CloudControllerUserRepository) CreateLDAP(username, externalID string) (err error) {
+	uaaEndpoint, err := repo.getAuthEndpoint()
+	if err != nil {
+		return
+	}
+
+	path := "/Users"
+	body, err := json.Marshal(resources.NewLDAPUserResource(username, externalID))
 
 	if err != nil {
 		return

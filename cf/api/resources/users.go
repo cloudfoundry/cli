@@ -43,6 +43,13 @@ type UAAUserResource struct {
 	Name     UAAUserResourceName    `json:"name"`
 }
 
+type UAALDAPUserResource struct {
+	Username   string                 `json:"userName"`
+	Emails     []UAAUserResourceEmail `json:"emails"`
+	Origin     string                 `json:"origin"`
+	ExternalID string                 `json:"externalid"`
+}
+
 func NewUAAUserResource(username, password string) UAAUserResource {
 	return UAAUserResource{
 		Username: username,
@@ -52,6 +59,15 @@ func NewUAAUserResource(username, password string) UAAUserResource {
 			GivenName:  username,
 			FamilyName: username,
 		},
+	}
+}
+
+func NewLDAPUserResource(username, externalID string) UAALDAPUserResource {
+	return UAALDAPUserResource{
+		Username:   username,
+		Emails:     []UAAUserResourceEmail{{Value: username}},
+		Origin:     "ldap",
+		ExternalID: externalID,
 	}
 }
 

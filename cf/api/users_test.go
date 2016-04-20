@@ -766,7 +766,7 @@ var _ = Describe("UserRepository", func() {
 							"name":{
 								"givenName":"my-user",
 								"familyName":"my-user"}
-							}`),
+						  }`),
 						ghttp.RespondWith(http.StatusOK, `{"id":"my-user-guid"}`),
 					),
 				)
@@ -864,6 +864,127 @@ var _ = Describe("UserRepository", func() {
 
 			It("returns an error", func() {
 				err := client.Create("my-user", "my-password")
+				Expect(err.Error()).To(ContainSubstring("Forbidden"))
+			})
+		})
+	})
+
+	Describe("CreateLDAP", func() {
+		Context("when the user does not exist", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/users"),
+						ghttp.VerifyJSON(`{"guid":"my-user-guid"}`),
+					),
+				)
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/Users"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.VerifyJSON(`{
+							"userName":"my-user",
+							"emails":[{"value":"my-user"}],
+							"externalid":"my-external-id",
+							"origin":"ldap"
+							}`),
+						ghttp.RespondWith(http.StatusOK, `{"id":"my-user-guid"}`),
+					),
+				)
+			})
+
+			It("makes a call to CC", func() {
+				err := client.CreateLDAP("my-user", "my-external-id")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("makes a call to UAA", func() {
+				err := client.CreateLDAP("my-user", "my-external-id")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+
+		Context("when the user already exists", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/users"),
+						ghttp.VerifyJSON(`{"guid":"my-user-guid"}`),
+					),
+				)
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/Users"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.VerifyJSON(`{
+								"userName":"my-user",
+								"emails":[{"value":"my-user"}],
+								"externalid":"my-external-id",
+								"origin":"ldap"
+								}`),
+						ghttp.RespondWith(http.StatusConflict, `
+								{
+									"message":"Username already in use: my-user",
+									"error":"scim_resource_already_exists"
+								}`),
+					),
+				)
+			})
+
+			It("does not make a call to CC", func() {
+				client.CreateLDAP("my-user", "my-external-id")
+				Expect(ccServer.ReceivedRequests()).To(BeZero())
+			})
+
+			It("makes a call to UAA", func() {
+				client.CreateLDAP("my-user", "my-external-id")
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("returns an error", func() {
+				err := client.CreateLDAP("my-user", "my-external-id")
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
+			})
+		})
+
+		Context("when UAA returns an error", func() {
+			BeforeEach(func() {
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/users"),
+						ghttp.VerifyJSON(`{"guid":"my-user-guid"}`),
+					),
+				)
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/Users"),
+						ghttp.RespondWith(http.StatusForbidden, `
+								{
+									"message":"Access Denied",
+									"error":"Forbidden"
+								}`),
+					),
+				)
+			})
+
+			It("makes a call to UAA", func() {
+				client.CreateLDAP("my-user", "my-external-id")
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("does not make a call to CC", func() {
+				client.CreateLDAP("my-user", "my-external-id")
+				Expect(ccServer.ReceivedRequests()).To(BeZero())
+			})
+
+			It("returns an error", func() {
+				err := client.CreateLDAP("my-user", "my-external-id")
 				Expect(err.Error()).To(ContainSubstring("Forbidden"))
 			})
 		})

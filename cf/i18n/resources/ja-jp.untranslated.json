@@ -112,6 +112,10 @@
     "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
+    "id": "CF_NAME create-ldap-user USERNAME EXTERNALID",
+    "translation": "CF_NAME create-ldap-user USERNAME EXTERNALID"
+  },
+  {
     "id": "CF_NAME create-org ORG",
     "translation": "CF_NAME create-org ORG"
   },
@@ -598,6 +602,10 @@
   {
     "id": "Create a TCP route",
     "translation": "Create a TCP route"
+  },
+  {
+    "id": "Create a new user authenticated by LDAP",
+    "translation": "Create a new user authenticated by LDAP"
   },
   {
     "id": "Create a random port for the TCP route",
