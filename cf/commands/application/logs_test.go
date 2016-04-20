@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
-	"github.com/cloudfoundry/cli/cf/api/logs/fakes"
+	"github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	"github.com/cloudfoundry/cli/cf/command_registry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -24,7 +24,7 @@ import (
 var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		logsRepo            *fakes.FakeLogsRepository
+		logsRepo            *logsfakes.FakeLogsRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          core_config.Repository
 		deps                command_registry.Dependency
@@ -40,7 +40,7 @@ var _ = Describe("logs command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		logsRepo = &fakes.FakeLogsRepository{}
+		logsRepo = &logsfakes.FakeLogsRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
