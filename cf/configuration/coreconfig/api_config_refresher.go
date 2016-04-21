@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 //go:generate counterfeiter . EndpointRepository
@@ -18,10 +20,10 @@ type APIConfigRefresher struct {
 	Endpoint     string
 }
 
-func (a APIConfigRefresher) Refresh() error {
+func (a APIConfigRefresher) Refresh() (Warning, error) {
 	ccInfo, endpoint, err := a.EndpointRepo.GetCCInfo(a.Endpoint)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if endpoint != a.Config.ApiEndpoint() {
@@ -41,7 +43,10 @@ func (a APIConfigRefresher) Refresh() error {
 	a.Config.SetDopplerEndpoint(strings.Replace(a.Config.LoggregatorEndpoint(), "loggregator", "doppler", 1))
 	a.Config.SetRoutingApiEndpoint(ccInfo.RoutingApiEndpoint)
 
-	return nil
+	if !strings.HasPrefix(endpoint, "https://") {
+		return new(insecureWarning), nil
+	}
+	return nil, nil
 }
 
 func (a APIConfigRefresher) LoggregatorEndpoint(ccInfo *CCInfo, endpoint string) string {
@@ -56,4 +61,14 @@ func (a APIConfigRefresher) LoggregatorEndpoint(ccInfo *CCInfo, endpoint string)
 		return url + ":80"
 	}
 	return ccInfo.LoggregatorEndpoint
+}
+
+type Warning interface {
+	Warn() string
+}
+
+type insecureWarning struct{}
+
+func (w insecureWarning) Warn() string {
+	return T("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n")
 }

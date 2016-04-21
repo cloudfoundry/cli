@@ -65,7 +65,7 @@ var _ = Describe("ConfigRefreshingRequirement", func() {
 				It("returns the error", func() {
 					underlyingRequirement.ExecuteReturns(errors.New("TERRIBLE THINGS"))
 					oops := errors.New("Can't get things")
-					configRefresher.RefreshReturns(oops)
+					configRefresher.RefreshReturns(nil, oops)
 
 					err := r.Execute()
 					Expect(err).To(Equal(oops))
