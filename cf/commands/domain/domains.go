@@ -15,7 +15,7 @@ type ListDomains struct {
 	ui             terminal.UI
 	config         coreconfig.Reader
 	domainRepo     api.DomainRepository
-	routingApiRepo api.RoutingApiRepository
+	routingAPIRepo api.RoutingAPIRepository
 }
 
 func init() {
@@ -53,7 +53,7 @@ func (cmd *ListDomains) SetDependency(deps commandregistry.Dependency, pluginCal
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
-	cmd.routingApiRepo = deps.RepoLocator.GetRoutingApiRepository()
+	cmd.routingAPIRepo = deps.RepoLocator.GetRoutingAPIRepository()
 
 	return cmd
 }

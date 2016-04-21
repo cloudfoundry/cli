@@ -23,7 +23,7 @@ var _ = Describe("RouterGroups", func() {
 
 	var (
 		ui             *testterm.FakeUI
-		routingApiRepo *apifakes.FakeRoutingApiRepository
+		routingAPIRepo *apifakes.FakeRoutingAPIRepository
 		deps           commandregistry.Dependency
 		cmd            *routergroups.RouterGroups
 		flagContext    flags.FlagContext
@@ -33,14 +33,14 @@ var _ = Describe("RouterGroups", func() {
 		requirementsFactory           *requirementsfakes.FakeFactory
 		minAPIVersionRequirement      *requirementsfakes.FakeRequirement
 		loginRequirement              *requirementsfakes.FakeRequirement
-		routingApiEndpoingRequirement *requirementsfakes.FakeRequirement
+		routingAPIEndpoingRequirement *requirementsfakes.FakeRequirement
 	)
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		routingApiRepo = new(apifakes.FakeRoutingApiRepository)
+		routingAPIRepo = new(apifakes.FakeRoutingAPIRepository)
 		config = testconfig.NewRepositoryWithDefaults()
-		repoLocator = api.RepositoryLocator{}.SetRoutingApiRepository(routingApiRepo)
+		repoLocator = api.RepositoryLocator{}.SetRoutingAPIRepository(routingAPIRepo)
 		deps = commandregistry.Dependency{
 			Ui:          ui,
 			Config:      config,
@@ -49,12 +49,12 @@ var _ = Describe("RouterGroups", func() {
 
 		minAPIVersionRequirement = new(requirementsfakes.FakeRequirement)
 		loginRequirement = new(requirementsfakes.FakeRequirement)
-		routingApiEndpoingRequirement = new(requirementsfakes.FakeRequirement)
+		routingAPIEndpoingRequirement = new(requirementsfakes.FakeRequirement)
 
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 		requirementsFactory.NewLoginRequirementReturns(loginRequirement)
-		requirementsFactory.NewRoutingAPIRequirementReturns(routingApiEndpoingRequirement)
+		requirementsFactory.NewRoutingAPIRequirementReturns(routingAPIEndpoingRequirement)
 
 		cmd = new(routergroups.RouterGroups)
 		cmd = cmd.SetDependency(deps, false).(*routergroups.RouterGroups)
@@ -101,7 +101,7 @@ var _ = Describe("RouterGroups", func() {
 					Type: "tcp",
 				},
 			}
-			routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
+			routingAPIRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
 				for _, r := range routerGroups {
 					if !cb(r) {
 						break
@@ -135,7 +135,7 @@ var _ = Describe("RouterGroups", func() {
 
 	Context("when there is an error listing router groups", func() {
 		BeforeEach(func() {
-			routingApiRepo.ListRouterGroupsReturns(errors.New("BOOM"))
+			routingAPIRepo.ListRouterGroupsReturns(errors.New("BOOM"))
 		})
 
 		It("returns an error to the user", func() {

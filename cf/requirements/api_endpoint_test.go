@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ApiEndpointRequirement", func() {
+var _ = Describe("APIEndpointRequirement", func() {
 	var (
 		config coreconfig.Repository
 	)
@@ -18,14 +18,14 @@ var _ = Describe("ApiEndpointRequirement", func() {
 	})
 
 	It("succeeds when given a config with an API endpoint", func() {
-		config.SetApiEndpoint("api.example.com")
-		req := NewApiEndpointRequirement(config)
+		config.SetAPIEndpoint("api.example.com")
+		req := NewAPIEndpointRequirement(config)
 		err := req.Execute()
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("fails when given a config without an API endpoint", func() {
-		req := NewApiEndpointRequirement(config)
+		req := NewAPIEndpointRequirement(config)
 		err := req.Execute()
 		Expect(err).To(HaveOccurred())
 

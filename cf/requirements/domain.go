@@ -13,22 +13,22 @@ type DomainRequirement interface {
 	GetDomain() models.DomainFields
 }
 
-type domainApiRequirement struct {
+type domainAPIRequirement struct {
 	name       string
 	config     coreconfig.Reader
 	domainRepo api.DomainRepository
 	domain     models.DomainFields
 }
 
-func NewDomainRequirement(name string, config coreconfig.Reader, domainRepo api.DomainRepository) (req *domainApiRequirement) {
-	req = new(domainApiRequirement)
+func NewDomainRequirement(name string, config coreconfig.Reader, domainRepo api.DomainRepository) (req *domainAPIRequirement) {
+	req = new(domainAPIRequirement)
 	req.name = name
 	req.config = config
 	req.domainRepo = domainRepo
 	return
 }
 
-func (req *domainApiRequirement) Execute() error {
+func (req *domainAPIRequirement) Execute() error {
 	var apiErr error
 	req.domain, apiErr = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields().GUID)
 
@@ -39,6 +39,6 @@ func (req *domainApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *domainApiRequirement) GetDomain() models.DomainFields {
+func (req *domainAPIRequirement) GetDomain() models.DomainFields {
 	return req.domain
 }

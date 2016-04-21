@@ -58,7 +58,7 @@ func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, 
 	}
 
 	var wantGUID bool
-	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
+	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
 		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {

@@ -33,7 +33,7 @@ var _ = Describe("DomainRepository", func() {
 
 	JustBeforeEach(func() {
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
-		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
+		strategy := strategy.NewEndpointStrategy(config.APIVersion())
 		repo = NewCloudControllerDomainRepository(config, gateway, strategy)
 	})
 
@@ -43,12 +43,12 @@ var _ = Describe("DomainRepository", func() {
 
 	var setupTestServer = func(reqs ...testnet.TestRequest) {
 		ts, handler = testnet.NewServer(reqs)
-		config.SetApiEndpoint(ts.URL)
+		config.SetAPIEndpoint(ts.URL)
 	}
 
 	Describe("listing domains", func() {
 		BeforeEach(func() {
-			config.SetApiVersion("2.2.0")
+			config.SetAPIVersion("2.2.0")
 			setupTestServer(firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest, firstPageSharedDomainsRequest, secondPageSharedDomainsRequest)
 		})
 
@@ -74,7 +74,7 @@ var _ = Describe("DomainRepository", func() {
 
 	Describe("getting default domain", func() {
 		BeforeEach(func() {
-			config.SetApiVersion("2.2.0")
+			config.SetAPIVersion("2.2.0")
 			setupTestServer(firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest, firstPageSharedDomainsRequest, secondPageSharedDomainsRequest)
 		})
 
@@ -301,7 +301,7 @@ var _ = Describe("DomainRepository", func() {
 
 		Context("when the private domains endpoint is available", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.2.1")
+				config.SetAPIVersion("2.2.1")
 			})
 
 			It("uses that endpoint", func() {
@@ -329,7 +329,7 @@ var _ = Describe("DomainRepository", func() {
 	Describe("creating shared domains", func() {
 		Context("targeting a newer cloud controller", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.2.0")
+				config.SetAPIVersion("2.2.0")
 			})
 
 			It("uses the shared domains endpoint", func() {
@@ -397,7 +397,7 @@ var _ = Describe("DomainRepository", func() {
 	Describe("deleting domains", func() {
 		Context("when the private domains endpoint is available", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.2.0")
+				config.SetAPIVersion("2.2.0")
 				setupTestServer(deleteDomainReq(http.StatusOK))
 			})
 
@@ -431,7 +431,7 @@ var _ = Describe("DomainRepository", func() {
 	Describe("deleting shared domains", func() {
 		Context("when the shared domains endpoint is available", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.2.0")
+				config.SetAPIVersion("2.2.0")
 				setupTestServer(deleteSharedDomainReq(http.StatusOK))
 			})
 

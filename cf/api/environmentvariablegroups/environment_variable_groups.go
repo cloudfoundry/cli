@@ -31,7 +31,7 @@ func NewCloudControllerEnvironmentVariableGroupsRepository(config coreconfig.Rea
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
 	var raw_response interface{}
-	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/running", repo.config.ApiEndpoint())
+	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/running", repo.config.APIEndpoint())
 	apiErr = repo.gateway.GetResource(url, &raw_response)
 	if apiErr != nil {
 		return
@@ -47,7 +47,7 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListRunning() (va
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
 	var raw_response interface{}
-	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/staging", repo.config.ApiEndpoint())
+	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/staging", repo.config.APIEndpoint())
 	apiErr = repo.gateway.GetResource(url, &raw_response)
 	if apiErr != nil {
 		return
@@ -62,11 +62,11 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (va
 }
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) SetStaging(staging_vars string) error {
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), "/v2/config/environment_variable_groups/staging", strings.NewReader(staging_vars))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/staging", strings.NewReader(staging_vars))
 }
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) SetRunning(running_vars string) error {
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), "/v2/config/environment_variable_groups/running", strings.NewReader(running_vars))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/running", strings.NewReader(running_vars))
 }
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironmentVariables(raw_response interface{}) ([]models.EnvironmentVariable, error) {

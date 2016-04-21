@@ -34,7 +34,7 @@ var _ = Describe("StacksRepo", func() {
 
 	BeforeEach(func() {
 		testServer = ghttp.NewServer()
-		configRepo.SetApiEndpoint(testServer.URL())
+		configRepo.SetAPIEndpoint(testServer.URL())
 	})
 
 	AfterEach(func() {

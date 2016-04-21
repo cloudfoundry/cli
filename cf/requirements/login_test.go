@@ -15,7 +15,7 @@ var _ = Describe("LoginRequirement", func() {
 
 	It("succeeds when given a config with an API endpoint and authentication", func() {
 		config := testconfig.NewRepositoryWithAccessToken(coreconfig.TokenInfo{Username: "my-user"})
-		config.SetApiEndpoint("api.example.com")
+		config.SetAPIEndpoint("api.example.com")
 		req := NewLoginRequirement(config)
 		err := req.Execute()
 		Expect(err).NotTo(HaveOccurred())
@@ -23,7 +23,7 @@ var _ = Describe("LoginRequirement", func() {
 
 	It("fails when given a config with only an API endpoint", func() {
 		config := testconfig.NewRepository()
-		config.SetApiEndpoint("api.example.com")
+		config.SetAPIEndpoint("api.example.com")
 		req := NewLoginRequirement(config)
 		err := req.Execute()
 		Expect(err).To(HaveOccurred())

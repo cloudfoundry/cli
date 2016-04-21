@@ -38,7 +38,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			defer ts.Close()
 
 			deps := newCurlDependencies()
-			deps.config.SetApiEndpoint(ts.URL)
+			deps.config.SetAPIEndpoint(ts.URL)
 
 			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 			headers, body, apiErr = repo.Request("GET", "/v2/endpoint", "", "")
@@ -76,7 +76,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			defer ts.Close()
 
 			deps := newCurlDependencies()
-			deps.config.SetApiEndpoint(ts.URL)
+			deps.config.SetAPIEndpoint(ts.URL)
 
 			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 			headers, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
@@ -102,7 +102,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 				defer ts.Close()
 
 				deps := newCurlDependencies()
-				deps.config.SetApiEndpoint(ts.URL)
+				deps.config.SetAPIEndpoint(ts.URL)
 
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 				_, body, apiErr = repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
@@ -145,7 +145,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 				defer ts.Close()
 
 				deps := newCurlDependencies()
-				deps.config.SetApiEndpoint(ts.URL)
+				deps.config.SetAPIEndpoint(ts.URL)
 
 				headers := "content-type: ascii/cats\nx-something-else:5"
 				repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
@@ -163,7 +163,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 		)
 
 		deps := newCurlDependencies()
-		deps.config.SetApiEndpoint(ccServer.URL())
+		deps.config.SetAPIEndpoint(ccServer.URL())
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, err := repo.Request("", "/v2/endpoint", "", "body")
@@ -179,7 +179,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 		)
 
 		deps := newCurlDependencies()
-		deps.config.SetApiEndpoint(ccServer.URL())
+		deps.config.SetAPIEndpoint(ccServer.URL())
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, err := repo.Request("", "/v2/endpoint", "", "")

@@ -106,10 +106,10 @@ type FakeFactory struct {
 	newBuildpackRequirementReturns struct {
 		result1 requirements.BuildpackRequirement
 	}
-	NewApiEndpointRequirementStub        func() requirements.Requirement
-	newApiEndpointRequirementMutex       sync.RWMutex
-	newApiEndpointRequirementArgsForCall []struct{}
-	newApiEndpointRequirementReturns     struct {
+	NewAPIEndpointRequirementStub        func() requirements.Requirement
+	newAPIEndpointRequirementMutex       sync.RWMutex
+	newAPIEndpointRequirementArgsForCall []struct{}
+	newAPIEndpointRequirementReturns     struct {
 		result1 requirements.Requirement
 	}
 	NewMinAPIVersionRequirementStub        func(commandName string, requiredVersion semver.Version) requirements.Requirement
@@ -527,26 +527,26 @@ func (fake *FakeFactory) NewBuildpackRequirementReturns(result1 requirements.Bui
 	}{result1}
 }
 
-func (fake *FakeFactory) NewApiEndpointRequirement() requirements.Requirement {
-	fake.newApiEndpointRequirementMutex.Lock()
-	fake.newApiEndpointRequirementArgsForCall = append(fake.newApiEndpointRequirementArgsForCall, struct{}{})
-	fake.newApiEndpointRequirementMutex.Unlock()
-	if fake.NewApiEndpointRequirementStub != nil {
-		return fake.NewApiEndpointRequirementStub()
+func (fake *FakeFactory) NewAPIEndpointRequirement() requirements.Requirement {
+	fake.newAPIEndpointRequirementMutex.Lock()
+	fake.newAPIEndpointRequirementArgsForCall = append(fake.newAPIEndpointRequirementArgsForCall, struct{}{})
+	fake.newAPIEndpointRequirementMutex.Unlock()
+	if fake.NewAPIEndpointRequirementStub != nil {
+		return fake.NewAPIEndpointRequirementStub()
 	} else {
-		return fake.newApiEndpointRequirementReturns.result1
+		return fake.newAPIEndpointRequirementReturns.result1
 	}
 }
 
-func (fake *FakeFactory) NewApiEndpointRequirementCallCount() int {
-	fake.newApiEndpointRequirementMutex.RLock()
-	defer fake.newApiEndpointRequirementMutex.RUnlock()
-	return len(fake.newApiEndpointRequirementArgsForCall)
+func (fake *FakeFactory) NewAPIEndpointRequirementCallCount() int {
+	fake.newAPIEndpointRequirementMutex.RLock()
+	defer fake.newAPIEndpointRequirementMutex.RUnlock()
+	return len(fake.newAPIEndpointRequirementArgsForCall)
 }
 
-func (fake *FakeFactory) NewApiEndpointRequirementReturns(result1 requirements.Requirement) {
-	fake.NewApiEndpointRequirementStub = nil
-	fake.newApiEndpointRequirementReturns = struct {
+func (fake *FakeFactory) NewAPIEndpointRequirementReturns(result1 requirements.Requirement) {
+	fake.NewAPIEndpointRequirementStub = nil
+	fake.newAPIEndpointRequirementReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
 }

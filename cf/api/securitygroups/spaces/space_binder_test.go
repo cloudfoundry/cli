@@ -36,7 +36,7 @@ var _ = Describe("SecurityGroupSpaceBinder", func() {
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
 		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	}
 
 	Describe(".BindSpace", func() {

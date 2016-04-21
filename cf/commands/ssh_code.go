@@ -51,7 +51,7 @@ func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory
 
 	reqs := []requirements.Requirement{
 		usageReq,
-		requirementsFactory.NewApiEndpointRequirement(),
+		requirementsFactory.NewAPIEndpointRequirement(),
 	}
 
 	return reqs
@@ -77,7 +77,7 @@ func (cmd *OneTimeSSHCode) Execute(c flags.FlagContext) {
 
 func (cmd *OneTimeSSHCode) Get() (string, error) {
 	refresher := coreconfig.APIConfigRefresher{
-		Endpoint:     cmd.config.ApiEndpoint(),
+		Endpoint:     cmd.config.APIEndpoint(),
 		EndpointRepo: cmd.endpointRepo,
 		Config:       cmd.config,
 	}

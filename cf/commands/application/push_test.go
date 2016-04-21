@@ -231,7 +231,7 @@ var _ = Describe("Push Command", func() {
 		})
 
 		Describe("--app-ports flag", func() {
-			It("does not require a MinApiVersion if you don't provide it", func() {
+			It("does not require a MinAPIVersion if you don't provide it", func() {
 				cmd := &application.Push{}
 
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -244,7 +244,7 @@ var _ = Describe("Push Command", func() {
 				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(s))
 			})
 
-			It("requires cf.MultipleAppPortsMinimumApiVersion when provided", func() {
+			It("requires cf.MultipleAppPortsMinimumAPIVersion when provided", func() {
 				cmd := &application.Push{}
 
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -254,7 +254,7 @@ var _ = Describe("Push Command", func() {
 				Expect(reqs).NotTo(BeEmpty())
 
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '--app-ports'"))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.MultipleAppPortsMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.MultipleAppPortsMinimumAPIVersion))
 			})
 		})
 	})

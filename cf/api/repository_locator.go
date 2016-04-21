@@ -49,7 +49,7 @@ type RepositoryLocator struct {
 	appFilesRepo                    api_appfiles.AppFilesRepository
 	domainRepo                      DomainRepository
 	routeRepo                       RouteRepository
-	routingApiRepo                  RoutingApiRepository
+	routingAPIRepo                  RoutingAPIRepository
 	stackRepo                       stacks.StackRepository
 	serviceRepo                     ServiceRepository
 	serviceKeyRepo                  ServiceKeyRepository
@@ -79,10 +79,10 @@ type RepositoryLocator struct {
 }
 
 func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer) (loc RepositoryLocator) {
-	strategy := strategy.NewEndpointStrategy(config.ApiVersion())
+	strategy := strategy.NewEndpointStrategy(config.APIVersion())
 
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
-	routingApiGateway := gatewaysByName["routing-api"]
+	routingAPIGateway := gatewaysByName["routing-api"]
 	uaaGateway := gatewaysByName["uaa"]
 	loc.authRepo = authentication.NewUAAAuthenticationRepository(uaaGateway, config, net.NewRequestDumper(logger))
 
@@ -110,7 +110,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway)
 	loc.routeServiceBindingRepo = NewCloudControllerRouteServiceBindingRepository(config, cloudControllerGateway)
-	loc.routingApiRepo = NewRoutingApiRepository(config, routingApiGateway)
+	loc.routingAPIRepo = NewRoutingAPIRepository(config, routingAPIGateway)
 	loc.stackRepo = stacks.NewCloudControllerStackRepository(config, cloudControllerGateway)
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
 	loc.serviceKeyRepo = NewCloudControllerServiceKeyRepository(config, cloudControllerGateway)
@@ -133,7 +133,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.environmentVariableGroupRepo = environmentvariablegroups.NewCloudControllerEnvironmentVariableGroupsRepository(config, cloudControllerGateway)
 	loc.copyAppSourceRepo = copyapplicationsource.NewCloudControllerCopyApplicationSourceRepository(config, cloudControllerGateway)
 
-	client := v3client.NewClient(config.ApiEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken())
+	client := v3client.NewClient(config.APIEndpoint(), config.AuthenticationEndpoint(), config.AccessToken(), config.RefreshToken())
 	loc.v3Repository = repository.NewRepository(config, client)
 
 	return
@@ -261,12 +261,12 @@ func (locator RepositoryLocator) SetRouteRepository(repo RouteRepository) Reposi
 	return locator
 }
 
-func (locator RepositoryLocator) GetRoutingApiRepository() RoutingApiRepository {
-	return locator.routingApiRepo
+func (locator RepositoryLocator) GetRoutingAPIRepository() RoutingAPIRepository {
+	return locator.routingAPIRepo
 }
 
-func (locator RepositoryLocator) SetRoutingApiRepository(repo RoutingApiRepository) RepositoryLocator {
-	locator.routingApiRepo = repo
+func (locator RepositoryLocator) SetRoutingAPIRepository(repo RoutingAPIRepository) RepositoryLocator {
+	locator.routingAPIRepo = repo
 	return locator
 }
 

@@ -180,12 +180,12 @@
     "translation": "API-Endpunkt: "
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API-Endpunkt: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API-Endpunkt: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API-Endpunkt: {{.ApiEndpoint}} (API-Version: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API-Endpunkt: {{.APIEndpoint}} (API-Version: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -1072,8 +1072,8 @@
     "translation": "Suchen nach Route..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry-API-Version {{.ApiVer}} erfordert CLI-Version {{.CLIMin}}.  Sie verwenden aktuell die Version {{.CLIVer}}. Um eine Aktualisierung Ihrer CLI auszuführen, gehen Sie auf folgende Seite: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry-API-Version {{.APIVer}} erfordert CLI-Version {{.CLIMin}}.  Sie verwenden aktuell die Version {{.CLIVer}}. Um eine Aktualisierung Ihrer CLI auszuführen, gehen Sie auf folgende Seite: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1164,8 +1164,8 @@
     "translation": "Konnte die Aktualisierungen nicht serialisieren"
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "Konnte die Organisation nicht als Ziel auswählen \n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "Konnte die Organisation nicht als Ziel auswählen \n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1740,8 +1740,8 @@
     "translation": "Fehler beim Löschen des Buildpacks {{.Name}}\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Fehler beim Löschen der Domäne {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Fehler beim Löschen der Domäne {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1768,16 +1768,16 @@
     "translation": "Fehler beim Aktivieren der SSH-Unterstützung für Bereich "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "Fehler beim Suchen verfügbarer Organisationen\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "Fehler beim Suchen verfügbarer Organisationen\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "Fehler beim Suchen verfügbarer Bereiche\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Fehler beim Suchen von Domänen {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Fehler beim Suchen von Domänen {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1928,8 +1928,8 @@
     "translation": "Fehler bei der Aktualisierung von health_check_type für "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "Fehler beim Hochladen der Anwendung \n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "Fehler beim Hochladen der Anwendung \n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2016,16 +2016,16 @@
     "translation": "Abrufen von Domänen ist fehlgeschlagen. \n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "Abrufen von Ereignissen ist fehlgeschlagen.\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "Abrufen von Ereignissen ist fehlgeschlagen.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "Abrufen von Organisationsbenutzern für Rolle {{.OrgRoleToDisplayName}} ist fehlgeschlagen.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "Abrufen von Organisationen ist fehlgeschlagen.\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "Abrufen von Organisationen ist fehlgeschlagen.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -3732,8 +3732,8 @@
     "translation": "Serverfehler, Statuscode: 403: Zugriff verweigert. Sie haben nicht die Berechtigung zum Ausführen dieses Befehls. "
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "Serverfehler, Statuscode: {{.ErrStatusCode}}, Fehlercode: {{.ErrApiErrorCode}}, Nachricht: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "Serverfehler, Statuscode: {{.ErrStatusCode}}, Fehlercode: {{.ErrAPIErrorCode}}, Nachricht: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -4020,8 +4020,8 @@
     "translation": "TIPP: Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.CfTargetCommand}}', um einen Bereich als Ziel auszuwählen."
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "TIPP: Verwenden Sie '{{.ApiCommand}}', um mit einem unsicheren API-Endpunkt fortzufahren."
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "TIPP: Verwenden Sie '{{.APICommand}}', um mit einem unsicheren API-Endpunkt fortzufahren."
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4200,8 +4200,8 @@
     "translation": "BENUTZER"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "Auf Bereich {{.SpaceName}} konnte nicht zugegriffen werden.\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "Auf Bereich {{.SpaceName}} konnte nicht zugegriffen werden.\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -5028,8 +5028,8 @@
     "translation": "Ja"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}} (API-Version: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}} (API-Version: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5076,12 +5076,12 @@
     "translation": "{{.Err}}\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten."
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "Aktuelle CF CLI Version {{.Version}}\n\tAktuelle CF API Version {{.ApiVersion}}\n\tUm die Funktion {{.CommandName}} zu verwenden, müssen Sie die CF API mindestens auf {{.RequiredVersion}} aktualisieren."
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "Aktuelle CF CLI Version {{.Version}}\n\tAktuelle CF API Version {{.APIVersion}}\n\tUm die Funktion {{.CommandName}} zu verwenden, müssen Sie die CF API mindestens auf {{.RequiredVersion}} aktualisieren."
   },
   {
     "id": "{{.FlappingCount}} failing",

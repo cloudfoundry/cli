@@ -244,7 +244,7 @@ var _ = Describe("org-users command", func() {
 
 		Context("when cc api verson is >= 2.21.0", func() {
 			It("calls ListUsersInOrgForRoleWithNoUAA()", func() {
-				configRepo.SetApiVersion("2.22.0")
+				configRepo.SetAPIVersion("2.22.0")
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleWithNoUAACallCount()).To(BeNumerically(">=", 1))
@@ -254,7 +254,7 @@ var _ = Describe("org-users command", func() {
 
 		Context("when cc api verson is < 2.21.0", func() {
 			It("calls ListUsersInOrgForRole()", func() {
-				configRepo.SetApiVersion("2.20.0")
+				configRepo.SetAPIVersion("2.20.0")
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleWithNoUAACallCount()).To(Equal(0))
@@ -269,7 +269,7 @@ var _ = Describe("org-users command", func() {
 		)
 
 		BeforeEach(func() {
-			configRepo.SetApiVersion("2.22.0")
+			configRepo.SetAPIVersion("2.22.0")
 		})
 
 		Context("single roles", func() {

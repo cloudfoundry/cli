@@ -33,7 +33,7 @@ func (repo securityGroupSpaceBinder) BindSpace(securityGroupGUID string, spaceGU
 		spaceGUID,
 	)
 
-	return repo.gateway.UpdateResourceFromStruct(repo.configRepo.ApiEndpoint(), url, models.SecurityGroupParams{})
+	return repo.gateway.UpdateResourceFromStruct(repo.configRepo.APIEndpoint(), url, models.SecurityGroupParams{})
 }
 
 func (repo securityGroupSpaceBinder) UnbindSpace(securityGroupGUID string, spaceGUID string) error {
@@ -42,5 +42,5 @@ func (repo securityGroupSpaceBinder) UnbindSpace(securityGroupGUID string, space
 		spaceGUID,
 	)
 
-	return repo.gateway.DeleteResource(repo.configRepo.ApiEndpoint(), url)
+	return repo.gateway.DeleteResource(repo.configRepo.APIEndpoint(), url)
 }

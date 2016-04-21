@@ -216,8 +216,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 		Context("when the -p flag is passed", func() {
 			var origAPIVersion string
 			BeforeEach(func() {
-				origAPIVersion = configRepo.ApiVersion()
-				configRepo.SetApiVersion("2.46.0")
+				origAPIVersion = configRepo.APIVersion()
+				configRepo.SetAPIVersion("2.46.0")
 
 				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 				err := flagContext.Parse("service-name", "-p", "provider-name")
@@ -226,7 +226,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			AfterEach(func() {
-				configRepo.SetApiVersion(origAPIVersion)
+				configRepo.SetAPIVersion(origAPIVersion)
 			})
 
 			It("tries to find the service offering by label and provider", func() {

@@ -30,7 +30,7 @@ var _ = Describe("Service Keys Repo", func() {
 		configRepo.SetAccessToken("BEARER my_access_token")
 
 		ccServer = ghttp.NewServer()
-		configRepo.SetApiEndpoint(ccServer.URL())
+		configRepo.SetAPIEndpoint(ccServer.URL())
 
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)

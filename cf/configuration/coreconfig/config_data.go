@@ -21,12 +21,12 @@ type AuthPrompt struct {
 type Data struct {
 	ConfigVersion            int
 	Target                   string
-	ApiVersion               string
+	APIVersion               string
 	AuthorizationEndpoint    string
 	LoggregatorEndPoint      string
 	DopplerEndPoint          string
 	UaaEndpoint              string
-	RoutingApiEndpoint       string
+	RoutingAPIEndpoint       string
 	AccessToken              string
 	SSHOAuthClient           string
 	RefreshToken             string

@@ -47,7 +47,7 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGUID strin
 		return err
 	}
 
-	err = c.gateway.CreateResource(c.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	err = c.gateway.CreateResource(c.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 
 	if httpErr, ok := err.(errors.HTTPError); ok {
 		switch httpErr.ErrorCode() {
@@ -83,7 +83,7 @@ func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceGUID string, 
 func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]models.ServiceKey, error) {
 	serviceKeys := []models.ServiceKey{}
 	err := c.gateway.ListPaginatedResources(
-		c.config.ApiEndpoint(),
+		c.config.APIEndpoint(),
 		path,
 		resources.ServiceKeyResource{},
 		func(resource interface{}) bool {
@@ -104,5 +104,5 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 
 func (c CloudControllerServiceKeyRepository) DeleteServiceKey(serviceKeyGUID string) error {
 	path := fmt.Sprintf("/v2/service_keys/%s", serviceKeyGUID)
-	return c.gateway.DeleteResource(c.config.ApiEndpoint(), path)
+	return c.gateway.DeleteResource(c.config.APIEndpoint(), path)
 }

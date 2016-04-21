@@ -65,7 +65,7 @@ func (cmd *UpdateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 	}
 
 	if fc.IsSet("a") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumAPIVersion))
 	}
 
 	return reqs

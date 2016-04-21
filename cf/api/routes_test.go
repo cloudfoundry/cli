@@ -58,7 +58,7 @@ var _ = Describe("route repository", func() {
 					Response: secondPageRoutesResponse,
 				}),
 			})
-			configRepo.SetApiEndpoint(ts.URL)
+			configRepo.SetAPIEndpoint(ts.URL)
 
 			routes := []models.Route{}
 			apiErr := repo.ListRoutes(func(route models.Route) bool {
@@ -90,7 +90,7 @@ var _ = Describe("route repository", func() {
 					Response: secondPageRoutesResponse,
 				}),
 			})
-			configRepo.SetApiEndpoint(ts.URL)
+			configRepo.SetAPIEndpoint(ts.URL)
 
 			routes := []models.Route{}
 			apiErr := repo.ListAllRoutes(func(route models.Route) bool {
@@ -115,7 +115,7 @@ var _ = Describe("route repository", func() {
 		var ccServer *ghttp.Server
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
-			configRepo.SetApiEndpoint(ccServer.URL())
+			configRepo.SetAPIEndpoint(ccServer.URL())
 		})
 
 		AfterEach(func() {
@@ -242,7 +242,7 @@ var _ = Describe("route repository", func() {
 						Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 					}),
 				})
-				configRepo.SetApiEndpoint(ts.URL)
+				configRepo.SetAPIEndpoint(ts.URL)
 
 				domain := models.DomainFields{}
 				domain.GUID = "my-domain-guid"
@@ -260,7 +260,7 @@ var _ = Describe("route repository", func() {
 		var ccServer *ghttp.Server
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
-			configRepo.SetApiEndpoint(ccServer.URL())
+			configRepo.SetAPIEndpoint(ccServer.URL())
 		})
 
 		AfterEach(func() {
@@ -521,7 +521,7 @@ var _ = Describe("route repository", func() {
 				GUID: "domain-guid",
 			}
 			ccServer = ghttp.NewServer()
-			configRepo.SetApiEndpoint(ccServer.URL())
+			configRepo.SetAPIEndpoint(ccServer.URL())
 		})
 
 		AfterEach(func() {
@@ -617,7 +617,7 @@ var _ = Describe("route repository", func() {
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
 				}),
 			})
-			configRepo.SetApiEndpoint(ts.URL)
+			configRepo.SetAPIEndpoint(ts.URL)
 
 			apiErr := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
 			Expect(handler).To(HaveAllRequestsCalled())
@@ -632,7 +632,7 @@ var _ = Describe("route repository", func() {
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
 				}),
 			})
-			configRepo.SetApiEndpoint(ts.URL)
+			configRepo.SetAPIEndpoint(ts.URL)
 
 			apiErr := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
 			Expect(handler).To(HaveAllRequestsCalled())
@@ -650,7 +650,7 @@ var _ = Describe("route repository", func() {
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
 				}),
 			})
-			configRepo.SetApiEndpoint(ts.URL)
+			configRepo.SetAPIEndpoint(ts.URL)
 
 			apiErr := repo.Delete("my-cool-route-guid")
 			Expect(handler).To(HaveAllRequestsCalled())

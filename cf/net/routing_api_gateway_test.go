@@ -16,13 +16,13 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var failingRoutingApiRequest = func(writer http.ResponseWriter, request *http.Request) {
+var failingRoutingAPIRequest = func(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusBadRequest)
 	jsonResponse := `{ "name": "some-error", "message": "The host is taken: test1" }`
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-var invalidTokenRoutingApiRequest = func(writer http.ResponseWriter, request *http.Request) {
+var invalidTokenRoutingAPIRequest = func(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusUnauthorized)
 	jsonResponse := `{ "name": "UnauthorizedError", "message": "bad token!" }`
 	fmt.Fprintln(writer, jsonResponse)
@@ -36,11 +36,11 @@ var _ = Describe("Routing Api Gateway", func() {
 	BeforeEach(func() {
 		fakeLogger = new(tracefakes.FakePrinter)
 		config = testconfig.NewRepository()
-		gateway = NewRoutingApiGateway(config, time.Now, &testterm.FakeUI{}, fakeLogger)
+		gateway = NewRoutingAPIGateway(config, time.Now, &testterm.FakeUI{}, fakeLogger)
 	})
 
 	It("parses error responses", func() {
-		ts := httptest.NewTLSServer(http.HandlerFunc(failingRoutingApiRequest))
+		ts := httptest.NewTLSServer(http.HandlerFunc(failingRoutingAPIRequest))
 		defer ts.Close()
 		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
@@ -53,7 +53,7 @@ var _ = Describe("Routing Api Gateway", func() {
 	})
 
 	It("parses invalid token responses", func() {
-		ts := httptest.NewTLSServer(http.HandlerFunc(invalidTokenRoutingApiRequest))
+		ts := httptest.NewTLSServer(http.HandlerFunc(invalidTokenRoutingAPIRequest))
 		defer ts.Close()
 		gateway.SetTrustedCerts(ts.TLS.Certificates)
 

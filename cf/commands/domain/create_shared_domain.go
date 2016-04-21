@@ -16,7 +16,7 @@ type CreateSharedDomain struct {
 	ui             terminal.UI
 	config         coreconfig.Reader
 	domainRepo     api.DomainRepository
-	routingApiRepo api.RoutingApiRepository
+	routingAPIRepo api.RoutingAPIRepository
 }
 
 func init() {
@@ -64,7 +64,7 @@ func (cmd *CreateSharedDomain) SetDependency(deps commandregistry.Dependency, pl
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
-	cmd.routingApiRepo = deps.RepoLocator.GetRoutingApiRepository()
+	cmd.routingAPIRepo = deps.RepoLocator.GetRoutingAPIRepository()
 	return cmd
 }
 
@@ -75,7 +75,7 @@ func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) {
 
 	if routerGroupName != "" {
 		var routerGroupFound bool
-		err := cmd.routingApiRepo.ListRouterGroups(func(group models.RouterGroup) bool {
+		err := cmd.routingAPIRepo.ListRouterGroups(func(group models.RouterGroup) bool {
 			if group.Name == routerGroupName {
 				routerGroup = group
 				routerGroupFound = true

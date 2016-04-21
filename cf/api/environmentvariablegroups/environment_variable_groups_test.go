@@ -26,7 +26,7 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 	BeforeEach(func() {
 		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		configRepo.SetApiEndpoint(ccServer.URL())
+		configRepo.SetAPIEndpoint(ccServer.URL())
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = environmentvariablegroups.NewCloudControllerEnvironmentVariableGroupsRepository(configRepo, gateway)
 	})

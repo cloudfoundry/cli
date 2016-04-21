@@ -84,7 +84,7 @@ func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory,
 	}
 
 	if fc.String("p") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumAPIVersion))
 	}
 
 	return reqs

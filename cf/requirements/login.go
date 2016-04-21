@@ -9,11 +9,11 @@ import (
 
 type LoginRequirement struct {
 	config                 coreconfig.Reader
-	apiEndpointRequirement ApiEndpointRequirement
+	apiEndpointRequirement APIEndpointRequirement
 }
 
 func NewLoginRequirement(config coreconfig.Reader) LoginRequirement {
-	return LoginRequirement{config, ApiEndpointRequirement{config}}
+	return LoginRequirement{config, APIEndpointRequirement{config}}
 }
 
 func (req LoginRequirement) Execute() error {

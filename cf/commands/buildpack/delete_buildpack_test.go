@@ -119,7 +119,7 @@ var _ = Describe("delete-buildpack command", func() {
 					Name: "my-buildpack",
 					GUID: "my-buildpack-guid",
 				}
-				buildpackRepo.DeleteApiResponse = errors.New("failed badly")
+				buildpackRepo.DeleteAPIResponse = errors.New("failed badly")
 			})
 
 			It("fails with the error", func() {

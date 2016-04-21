@@ -36,7 +36,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
 		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	}
 
 	Describe("BindToStagingSet", func() {
@@ -117,7 +117,7 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 				}),
 			})
 
-			configRepo.SetApiEndpoint(testServer.URL)
+			configRepo.SetAPIEndpoint(testServer.URL)
 			err := repo.UnbindFromStagingSet("my-guid")
 
 			Expect(err).ToNot(HaveOccurred())

@@ -41,9 +41,9 @@ func (err *baseHTTPError) StatusCode() int {
 }
 
 func (err *baseHTTPError) Error() string {
-	return fmt.Sprintf(T("Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
+	return fmt.Sprintf(T("Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
 		map[string]interface{}{"ErrStatusCode": err.statusCode,
-			"ErrApiErrorCode": err.apiErrorCode,
+			"ErrAPIErrorCode": err.apiErrorCode,
 			"ErrDescription":  err.description}),
 	)
 }

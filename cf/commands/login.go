@@ -85,7 +85,7 @@ func (cmd *Login) Execute(c flags.FlagContext) {
 		ui:           cmd.ui,
 		config:       cmd.config,
 		endpointRepo: cmd.endpointRepo,
-	}.setApiEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
+	}.setAPIEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
 
 	defer func() {
 		cmd.ui.Say("")
@@ -120,7 +120,7 @@ func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
 	endpoint := c.String("a")
 	skipSSL := c.Bool("skip-ssl-validation")
 	if endpoint == "" {
-		endpoint = cmd.config.ApiEndpoint()
+		endpoint = cmd.config.APIEndpoint()
 		skipSSL = cmd.config.IsSSLDisabled() || skipSSL
 	}
 
@@ -233,8 +233,8 @@ func (cmd Login) setOrganization(c flags.FlagContext) (isOrgSet bool) {
 	if orgName == "" {
 		orgs, err := cmd.orgRepo.ListOrgs(maxChoices)
 		if err != nil {
-			cmd.ui.Failed(T("Error finding available orgs\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": err.Error()}))
+			cmd.ui.Failed(T("Error finding available orgs\n{{.APIErr}}",
+				map[string]interface{}{"APIErr": err.Error()}))
 		}
 
 		switch len(orgs) {

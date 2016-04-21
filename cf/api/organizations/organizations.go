@@ -39,7 +39,7 @@ func NewCloudControllerOrganizationRepository(config coreconfig.Reader, gateway 
 func (repo CloudControllerOrganizationRepository) ListOrgs(limit int) ([]models.Organization, error) {
 	orgs := []models.Organization{}
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		"/v2/organizations",
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
@@ -55,7 +55,7 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(limit int) ([]models.
 
 func (repo CloudControllerOrganizationRepository) GetManyOrgsByGUID(orgGUIDs []string) (orgs []models.Organization, err error) {
 	for _, orgGUID := range orgGUIDs {
-		url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGUID)
+		url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.APIEndpoint(), orgGUID)
 		orgResource := resources.OrganizationResource{}
 		err = repo.gateway.GetResource(url, &orgResource)
 		if err != nil {
@@ -69,7 +69,7 @@ func (repo CloudControllerOrganizationRepository) GetManyOrgsByGUID(orgGUIDs []s
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiErr error) {
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name))),
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
@@ -91,26 +91,26 @@ func (repo CloudControllerOrganizationRepository) Create(org models.Organization
 		data = data + fmt.Sprintf(`, "quota_definition_guid":"%s"`, org.QuotaDefinition.GUID)
 	}
 	data = data + "}"
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/organizations", strings.NewReader(data))
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), "/v2/organizations", strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Rename(orgGUID string, name string) (apiErr error) {
 	url := fmt.Sprintf("/v2/organizations/%s", orgGUID)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), url, strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(orgGUID string) (apiErr error) {
 	url := fmt.Sprintf("/v2/organizations/%s?recursive=true", orgGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), url)
 }
 
 func (repo CloudControllerOrganizationRepository) SharePrivateDomain(orgGUID string, domainGUID string) error {
 	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGUID, domainGUID)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, nil)
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), url, nil)
 }
 
 func (repo CloudControllerOrganizationRepository) UnsharePrivateDomain(orgGUID string, domainGUID string) error {
 	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGUID, domainGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), url)
 }

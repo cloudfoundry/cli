@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeRoutingApiRepository struct {
+type FakeRoutingAPIRepository struct {
 	ListRouterGroupsStub        func(cb func(models.RouterGroup) bool) (apiErr error)
 	listRouterGroupsMutex       sync.RWMutex
 	listRouterGroupsArgsForCall []struct {
@@ -19,7 +19,7 @@ type FakeRoutingApiRepository struct {
 	}
 }
 
-func (fake *FakeRoutingApiRepository) ListRouterGroups(cb func(models.RouterGroup) bool) (apiErr error) {
+func (fake *FakeRoutingAPIRepository) ListRouterGroups(cb func(models.RouterGroup) bool) (apiErr error) {
 	fake.listRouterGroupsMutex.Lock()
 	fake.listRouterGroupsArgsForCall = append(fake.listRouterGroupsArgsForCall, struct {
 		cb func(models.RouterGroup) bool
@@ -32,23 +32,23 @@ func (fake *FakeRoutingApiRepository) ListRouterGroups(cb func(models.RouterGrou
 	}
 }
 
-func (fake *FakeRoutingApiRepository) ListRouterGroupsCallCount() int {
+func (fake *FakeRoutingAPIRepository) ListRouterGroupsCallCount() int {
 	fake.listRouterGroupsMutex.RLock()
 	defer fake.listRouterGroupsMutex.RUnlock()
 	return len(fake.listRouterGroupsArgsForCall)
 }
 
-func (fake *FakeRoutingApiRepository) ListRouterGroupsArgsForCall(i int) func(models.RouterGroup) bool {
+func (fake *FakeRoutingAPIRepository) ListRouterGroupsArgsForCall(i int) func(models.RouterGroup) bool {
 	fake.listRouterGroupsMutex.RLock()
 	defer fake.listRouterGroupsMutex.RUnlock()
 	return fake.listRouterGroupsArgsForCall[i].cb
 }
 
-func (fake *FakeRoutingApiRepository) ListRouterGroupsReturns(result1 error) {
+func (fake *FakeRoutingAPIRepository) ListRouterGroupsReturns(result1 error) {
 	fake.ListRouterGroupsStub = nil
 	fake.listRouterGroupsReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ api.RoutingApiRepository = new(FakeRoutingApiRepository)
+var _ api.RoutingAPIRepository = new(FakeRoutingAPIRepository)

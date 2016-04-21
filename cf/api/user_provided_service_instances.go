@@ -45,7 +45,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainURL string
 		return
 	}
 
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
@@ -62,11 +62,11 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		return
 	}
 
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) GetSummaries() (models.UserProvidedServiceSummary, error) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.APIEndpoint())
 
 	model := models.UserProvidedServiceSummary{}
 

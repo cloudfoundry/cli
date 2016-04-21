@@ -52,7 +52,7 @@ func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc fla
 
 	reqs := []requirements.Requirement{
 		usageReq,
-		requirementsFactory.NewApiEndpointRequirement(),
+		requirementsFactory.NewAPIEndpointRequirement(),
 	}
 
 	if fc.IsSet("o") || fc.IsSet("s") {
@@ -108,8 +108,8 @@ func (cmd Target) setOrganization(orgName string) error {
 
 	org, apiErr := cmd.orgRepo.FindByName(orgName)
 	if apiErr != nil {
-		return fmt.Errorf(T("Could not target org.\n{{.ApiErr}}",
-			map[string]interface{}{"ApiErr": apiErr.Error()}))
+		return fmt.Errorf(T("Could not target org.\n{{.APIErr}}",
+			map[string]interface{}{"APIErr": apiErr.Error()}))
 	}
 
 	cmd.config.SetOrganizationFields(org.OrganizationFields)
@@ -125,8 +125,8 @@ func (cmd Target) setSpace(spaceName string) error {
 
 	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 	if apiErr != nil {
-		return fmt.Errorf(T("Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-			map[string]interface{}{"SpaceName": spaceName, "ApiErr": apiErr.Error()}))
+		return fmt.Errorf(T("Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+			map[string]interface{}{"SpaceName": spaceName, "APIErr": apiErr.Error()}))
 	}
 
 	cmd.config.SetSpaceFields(space.SpaceFields)

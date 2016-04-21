@@ -137,7 +137,7 @@ func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server
 	space := models.SpaceFields{}
 	space.GUID = "my-space-guid"
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
+	configRepo.SetAPIEndpoint(ts.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerAppInstancesRepository(configRepo, gateway)
 	return

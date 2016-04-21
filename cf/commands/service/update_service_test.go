@@ -94,7 +94,7 @@ var _ = Describe("update-service command", func() {
 		})
 
 		Context("-p", func() {
-			It("when provided, requires a CC API version > cf.UpdateServicePlanMinimumApiVersion", func() {
+			It("when provided, requires a CC API version > cf.UpdateServicePlanMinimumAPIVersion", func() {
 				cmd := &service.UpdateService{}
 
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -104,7 +104,7 @@ var _ = Describe("update-service command", func() {
 				Expect(reqs).NotTo(BeEmpty())
 
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Updating a plan"))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.UpdateServicePlanMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.UpdateServicePlanMinimumAPIVersion))
 			})
 
 			It("does not requirue a CC Api Version if not provided", func() {

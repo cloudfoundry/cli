@@ -105,13 +105,13 @@ var _ = Describe("Login Command", func() {
 		JustBeforeEach(func() {
 			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
 				return &coreconfig.CCInfo{
-					ApiVersion:               "some-version",
+					APIVersion:               "some-version",
 					AuthorizationEndpoint:    "auth/endpoint",
 					LoggregatorEndpoint:      "loggregator/endpoint",
 					MinCLIVersion:            minCLIVersion,
 					MinRecommendedCLIVersion: minRecommendedCLIVersion,
 					SSHOAuthClient:           "some-client",
-					RoutingApiEndpoint:       "routing/endpoint",
+					RoutingAPIEndpoint:       "routing/endpoint",
 				}, endpoint, nil
 			}
 		})
@@ -169,15 +169,15 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
-				Expect(Config.ApiVersion()).To(Equal("some-version"))
+				Expect(Config.APIEndpoint()).To(Equal("api.example.com"))
+				Expect(Config.APIVersion()).To(Equal("some-version"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
 				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
 				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
-				Expect(Config.RoutingApiEndpoint()).To(Equal("routing/endpoint"))
+				Expect(Config.RoutingAPIEndpoint()).To(Equal("routing/endpoint"))
 
 				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
 				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
@@ -241,14 +241,14 @@ var _ = Describe("Login Command", func() {
 
 			It("doesn't ask the user for the API url if they have it in their config", func() {
 				orgRepo.FindByNameReturns(org, nil)
-				Config.SetApiEndpoint("http://api.example.com")
+				Config.SetAPIEndpoint("http://api.example.com")
 
 				Flags = []string{"-o", "my-new-org", "-s", "my-space"}
 				ui.Inputs = []string{"user@example.com", "password"}
 
 				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
+				Expect(Config.APIEndpoint()).To(Equal("http://api.example.com"))
 				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
@@ -535,18 +535,18 @@ var _ = Describe("Login Command", func() {
 
 	Describe("updates to the config", func() {
 		BeforeEach(func() {
-			Config.SetApiEndpoint("api.the-old-endpoint.com")
+			Config.SetAPIEndpoint("api.the-old-endpoint.com")
 			Config.SetAccessToken("the-old-access-token")
 			Config.SetRefreshToken("the-old-refresh-token")
 			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
 				return &coreconfig.CCInfo{
-					ApiVersion:               "some-version",
+					APIVersion:               "some-version",
 					AuthorizationEndpoint:    "auth/endpoint",
 					LoggregatorEndpoint:      "loggregator/endpoint",
 					MinCLIVersion:            minCLIVersion,
 					MinRecommendedCLIVersion: minRecommendedCLIVersion,
 					SSHOAuthClient:           "some-client",
-					RoutingApiEndpoint:       "routing/endpoint",
+					RoutingAPIEndpoint:       "routing/endpoint",
 				}, endpoint, nil
 			}
 
@@ -616,7 +616,7 @@ var _ = Describe("Login Command", func() {
 					ItDoesntShowTheTarget()
 
 					It("clears the entire config", func() {
-						Expect(Config.ApiEndpoint()).To(BeEmpty())
+						Expect(Config.APIEndpoint()).To(BeEmpty())
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 						Expect(Config.AccessToken()).To(BeEmpty())
 						Expect(Config.RefreshToken()).To(BeEmpty())
@@ -652,7 +652,7 @@ var _ = Describe("Login Command", func() {
 					ItDoesntShowTheTarget()
 
 					It("clears the entire config", func() {
-						Expect(Config.ApiEndpoint()).To(BeEmpty())
+						Expect(Config.APIEndpoint()).To(BeEmpty())
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 						Expect(Config.AccessToken()).To(BeEmpty())
 						Expect(Config.RefreshToken()).To(BeEmpty())
@@ -720,7 +720,7 @@ var _ = Describe("Login Command", func() {
 				ItShowsTheTarget()
 
 				It("does not change the api endpoint or SSL setting in the config", func() {
-					Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+					Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 					Expect(Config.IsSSLDisabled()).To(BeTrue())
 				})
 
@@ -744,7 +744,7 @@ var _ = Describe("Login Command", func() {
 			ItShowsTheTarget()
 
 			It("does not update the api endpoint or ssl setting in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
@@ -767,7 +767,7 @@ var _ = Describe("Login Command", func() {
 			ItShowsTheTarget()
 
 			It("does not update the api endpoint or ssl setting in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
@@ -803,7 +803,7 @@ var _ = Describe("Login Command", func() {
 
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "new-org", "-s", "new-space"}
 
-				Config.SetApiEndpoint("api.the-old-endpoint.com")
+				Config.SetAPIEndpoint("api.the-old-endpoint.com")
 				Config.SetSSLDisabled(true)
 			})
 
@@ -811,7 +811,7 @@ var _ = Describe("Login Command", func() {
 			ItShowsTheTarget()
 
 			It("does not update the api endpoint or SSL setting", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
@@ -821,14 +821,14 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.OrganizationFields().GUID).To(Equal("new-org-guid"))
 				Expect(Config.SpaceFields().GUID).To(Equal("new-space-guid"))
 
-				Expect(Config.ApiVersion()).To(Equal("some-version"))
+				Expect(Config.APIVersion()).To(Equal("some-version"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
 				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
 				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
-				Expect(Config.RoutingApiEndpoint()).To(Equal("routing/endpoint"))
+				Expect(Config.RoutingAPIEndpoint()).To(Equal("routing/endpoint"))
 
 			})
 		})

@@ -25,7 +25,7 @@ import (
 var _ = Describe("ListDomains", func() {
 	var (
 		ui             *testterm.FakeUI
-		routingApiRepo *apifakes.FakeRoutingApiRepository
+		routingAPIRepo *apifakes.FakeRoutingAPIRepository
 		domainRepo     *apifakes.FakeDomainRepository
 		configRepo     coreconfig.Repository
 
@@ -44,8 +44,8 @@ var _ = Describe("ListDomains", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routingApiRepo = new(apifakes.FakeRoutingApiRepository)
-		repoLocator := deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
+		routingAPIRepo = new(apifakes.FakeRoutingAPIRepository)
+		repoLocator := deps.RepoLocator.SetRoutingAPIRepository(routingAPIRepo)
 
 		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
@@ -84,7 +84,7 @@ var _ = Describe("ListDomains", func() {
 				Type: "tcp",
 			},
 		}
-		routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
+		routingAPIRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
 			for _, routerGroup := range routerGroups {
 				if !cb(routerGroup) {
 					break

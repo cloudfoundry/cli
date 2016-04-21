@@ -65,7 +65,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGUID string, 
 		}
 
 		var request *net.Request
-		request, apiErr = repo.gateway.NewRequestForFile("PUT", repo.config.ApiEndpoint()+apiURL, repo.config.AccessToken(), requestFile)
+		request, apiErr = repo.gateway.NewRequestForFile("PUT", repo.config.APIEndpoint()+apiURL, repo.config.AccessToken(), requestFile)
 		if apiErr != nil {
 			return
 		}
@@ -74,7 +74,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGUID string, 
 		request.HTTPReq.Header.Set("Content-Type", contentType)
 
 		response := &resources.Resource{}
-		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(repo.config.ApiEndpoint(), request, response, DefaultAppUploadBitsTimeout)
+		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(repo.config.APIEndpoint(), request, response, DefaultAppUploadBitsTimeout)
 		if apiErr != nil {
 			return
 		}
@@ -92,7 +92,7 @@ func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFile
 
 	responseFieldsColl := []resources.IntegrityFields{}
 	apiErr := repo.gateway.UpdateResourceSync(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		"/v2/resource_match",
 		bytes.NewReader(integrityFieldsJSON),
 		&responseFieldsColl)

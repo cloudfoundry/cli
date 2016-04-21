@@ -132,7 +132,7 @@ var _ = Describe("space-users command", func() {
 
 		Context("when cc api verson is >= 2.21.0", func() {
 			BeforeEach(func() {
-				configRepo.SetApiVersion("2.22.0")
+				configRepo.SetAPIVersion("2.22.0")
 			})
 
 			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
@@ -159,7 +159,7 @@ var _ = Describe("space-users command", func() {
 
 		Context("when cc api verson is < 2.21.0", func() {
 			It("calls ListUsersInSpaceForRole()", func() {
-				configRepo.SetApiVersion("2.20.0")
+				configRepo.SetAPIVersion("2.20.0")
 				runCommand("my-org", "my-space")
 
 				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAACallCount()).To(Equal(0))
@@ -215,7 +215,7 @@ var _ = Describe("space-users command", func() {
 		)
 
 		BeforeEach(func() {
-			configRepo.SetApiVersion("2.22.0")
+			configRepo.SetAPIVersion("2.22.0")
 		})
 
 		Context("single roles", func() {

@@ -252,7 +252,7 @@ func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.ApiEndpoint()
+	*retVal = cmd.cliConfig.APIEndpoint()
 
 	return nil
 }
@@ -264,7 +264,7 @@ func (cmd *CliRpcCmd) HasAPIEndpoint(args string, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) ApiVersion(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.ApiVersion()
+	*retVal = cmd.cliConfig.APIVersion()
 
 	return nil
 }

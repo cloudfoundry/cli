@@ -7,7 +7,7 @@ import (
 
 type OldFakeBuildpackBitsRepository struct {
 	UploadBuildpackErr         bool
-	UploadBuildpackApiResponse error
+	UploadBuildpackAPIResponse error
 	UploadBuildpackPath        string
 }
 
@@ -17,5 +17,5 @@ func (repo *OldFakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Bui
 	}
 
 	repo.UploadBuildpackPath = dir
-	return repo.UploadBuildpackApiResponse
+	return repo.UploadBuildpackAPIResponse
 }

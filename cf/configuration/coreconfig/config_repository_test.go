@@ -43,13 +43,13 @@ var _ = Describe("Configuration Repository", func() {
 		}
 
 		go func() {
-			config.SetApiEndpoint("foo")
+			config.SetAPIEndpoint("foo")
 		}()
 
 		<-beginSaveCh
 
 		go func() {
-			config.ApiEndpoint()
+			config.APIEndpoint()
 			close(finishReadCh)
 		}()
 
@@ -62,11 +62,11 @@ var _ = Describe("Configuration Repository", func() {
 	})
 
 	It("has acccessor methods for all config fields", func() {
-		config.SetApiEndpoint("http://api.the-endpoint")
-		Expect(config.ApiEndpoint()).To(Equal("http://api.the-endpoint"))
+		config.SetAPIEndpoint("http://api.the-endpoint")
+		Expect(config.APIEndpoint()).To(Equal("http://api.the-endpoint"))
 
-		config.SetApiVersion("3")
-		Expect(config.ApiVersion()).To(Equal("3"))
+		config.SetAPIVersion("3")
+		Expect(config.APIVersion()).To(Equal("3"))
 
 		config.SetAuthenticationEndpoint("http://auth.the-endpoint")
 		Expect(config.AuthenticationEndpoint()).To(Equal("http://auth.the-endpoint"))
@@ -108,7 +108,7 @@ var _ = Describe("Configuration Repository", func() {
 		Expect(config.PluginRepos()[0].URL).To(Equal("nowhere.com"))
 
 		s, _ := semver.Make("3.1")
-		Expect(config.IsMinApiVersion(s)).To(Equal(false))
+		Expect(config.IsMinAPIVersion(s)).To(Equal(false))
 
 		config.SetMinCLIVersion("6.5.0")
 		Expect(config.MinCLIVersion()).To(Equal("6.5.0"))
@@ -120,8 +120,8 @@ var _ = Describe("Configuration Repository", func() {
 	Describe("HasAPIEndpoint", func() {
 		Context("when both endpoint and version are set", func() {
 			BeforeEach(func() {
-				config.SetApiEndpoint("http://example.org")
-				config.SetApiVersion("42.1.2.3")
+				config.SetAPIEndpoint("http://example.org")
+				config.SetAPIVersion("42.1.2.3")
 			})
 
 			It("returns true", func() {
@@ -131,7 +131,7 @@ var _ = Describe("Configuration Repository", func() {
 
 		Context("when endpoint is not set", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("42.1.2.3")
+				config.SetAPIVersion("42.1.2.3")
 			})
 
 			It("returns false", func() {
@@ -141,7 +141,7 @@ var _ = Describe("Configuration Repository", func() {
 
 		Context("when version is not set", func() {
 			BeforeEach(func() {
-				config.SetApiEndpoint("http://example.org")
+				config.SetAPIEndpoint("http://example.org")
 			})
 
 			It("returns false", func() {
@@ -225,8 +225,8 @@ var _ = Describe("Configuration Repository", func() {
 					panic(err)
 				})
 
-				Expect(config.ApiEndpoint()).To(Equal(""))
-				Expect(config.ApiVersion()).To(Equal(""))
+				Expect(config.APIEndpoint()).To(Equal(""))
+				Expect(config.APIVersion()).To(Equal(""))
 				Expect(config.AuthenticationEndpoint()).To(Equal(""))
 				Expect(config.AccessToken()).To(Equal(""))
 			})
@@ -244,7 +244,7 @@ var _ = Describe("Configuration Repository", func() {
 					panic(err)
 				})
 
-				Expect(config.ApiEndpoint()).To(Equal(""))
+				Expect(config.APIEndpoint()).To(Equal(""))
 			})
 		})
 	})

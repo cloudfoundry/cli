@@ -113,7 +113,7 @@ func (repo CloudControllerUserRepository) ListUsersInSpaceForRoleWithNoUAA(space
 
 func (repo CloudControllerUserRepository) listUsersWithPathWithNoUAA(path string) (users []models.UserFields, apiErr error) {
 	apiErr = repo.ccGateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.UserResource{},
 		func(resource interface{}) bool {
@@ -132,7 +132,7 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 	guidFilters := []string{}
 
 	apiErr = repo.ccGateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.UserResource{},
 		func(resource interface{}) bool {
@@ -222,13 +222,13 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 		return
 	}
 
-	return repo.ccGateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body))
+	return repo.ccGateway.CreateResource(repo.config.APIEndpoint(), path, bytes.NewReader(body))
 }
 
 func (repo CloudControllerUserRepository) Delete(userGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/users/%s", userGUID)
 
-	apiErr = repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	apiErr = repo.ccGateway.DeleteResource(repo.config.APIEndpoint(), path)
 
 	if httpErr, ok := apiErr.(errors.HTTPError); ok && httpErr.ErrorCode() != errors.UserNotFound {
 		return
@@ -243,7 +243,7 @@ func (repo CloudControllerUserRepository) Delete(userGUID string) (apiErr error)
 }
 
 func (repo CloudControllerUserRepository) SetOrgRoleByGUID(userGUID string, orgGUID string, role string) (err error) {
-	path, err := userGUIDPath(repo.config.ApiEndpoint(), userGUID, orgGUID, role)
+	path, err := userGUIDPath(repo.config.APIEndpoint(), userGUID, orgGUID, role)
 	if err != nil {
 		return
 	}
@@ -255,7 +255,7 @@ func (repo CloudControllerUserRepository) SetOrgRoleByGUID(userGUID string, orgG
 }
 
 func (repo CloudControllerUserRepository) UnsetOrgRoleByGUID(userGUID, orgGUID, role string) (err error) {
-	path, err := userGUIDPath(repo.config.ApiEndpoint(), userGUID, orgGUID, role)
+	path, err := userGUIDPath(repo.config.APIEndpoint(), userGUID, orgGUID, role)
 	if err != nil {
 		return
 	}
@@ -268,14 +268,14 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGU
 		return err
 	}
 
-	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGUID, rolePath)
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.APIEndpoint(), orgGUID, rolePath)
 
 	return repo.callApi("DELETE", path, usernamePayload(username))
 }
 
 func (repo CloudControllerUserRepository) UnsetSpaceRoleByUsername(username, spaceGUID, role string) error {
 	rolePath := spaceRoleToPathMap[role]
-	path := fmt.Sprintf("%s/v2/spaces/%s/%s", repo.config.ApiEndpoint(), spaceGUID, rolePath)
+	path := fmt.Sprintf("%s/v2/spaces/%s/%s", repo.config.APIEndpoint(), spaceGUID, rolePath)
 
 	return repo.callApi("DELETE", path, usernamePayload(username))
 }
@@ -286,7 +286,7 @@ func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, 
 		return err
 	}
 
-	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.ApiEndpoint(), orgGUID, rolePath)
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.APIEndpoint(), orgGUID, rolePath)
 	err = repo.callApi("PUT", path, usernamePayload(username))
 	if err != nil {
 		return err
@@ -328,7 +328,7 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByGUID(userGUID, spaceGUID
 
 	path := fmt.Sprintf("/v2/spaces/%s/%s/%s", spaceGUID, rolePath, userGUID)
 
-	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
+	return repo.ccGateway.UpdateResource(repo.config.APIEndpoint(), path, nil)
 }
 
 func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, spaceGUID, orgGUID, role string) (apiErr error) {
@@ -347,7 +347,7 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, space
 	}
 
 	setSpaceRoleErr := apiErrResponse{}
-	apiErr = repo.ccGateway.UpdateResourceSync(repo.config.ApiEndpoint(), rolePath, usernamePayload(username), &setSpaceRoleErr)
+	apiErr = repo.ccGateway.UpdateResourceSync(repo.config.APIEndpoint(), rolePath, usernamePayload(username), &setSpaceRoleErr)
 	if setSpaceRoleErr.Code == 1002 {
 		return errors.New(T("Server error, error code: 1002, message: cannot set space role because user is not part of the org"))
 	}
@@ -361,7 +361,7 @@ func (repo CloudControllerUserRepository) UnsetSpaceRoleByGUID(userGUID, spaceGU
 		return fmt.Errorf(T("Invalid Role {{.Role}}", map[string]interface{}{"Role": role}))
 	}
 
-	return repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), rolePath)
+	return repo.ccGateway.DeleteResource(repo.config.APIEndpoint(), rolePath)
 }
 
 func (repo CloudControllerUserRepository) checkSpaceRole(spaceGUID, role string) (string, error) {
@@ -380,12 +380,12 @@ func (repo CloudControllerUserRepository) checkSpaceRole(spaceGUID, role string)
 
 func (repo CloudControllerUserRepository) assocUserWithOrgByUsername(username, orgGUID string, resource interface{}) (apiErr error) {
 	path := fmt.Sprintf("/v2/organizations/%s/users", orgGUID)
-	return repo.ccGateway.UpdateResourceSync(repo.config.ApiEndpoint(), path, usernamePayload(username), resource)
+	return repo.ccGateway.UpdateResourceSync(repo.config.APIEndpoint(), path, usernamePayload(username), resource)
 }
 
 func (repo CloudControllerUserRepository) assocUserWithOrgByUserGUID(userGUID, orgGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/organizations/%s/users/%s", orgGUID, userGUID)
-	return repo.ccGateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
+	return repo.ccGateway.UpdateResource(repo.config.APIEndpoint(), path, nil)
 }
 
 func (repo CloudControllerUserRepository) getAuthEndpoint() (string, error) {

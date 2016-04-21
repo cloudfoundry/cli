@@ -16,14 +16,14 @@ type DefaultSecurityGroupsRepoBase struct {
 
 func (repo *DefaultSecurityGroupsRepoBase) Bind(groupGUID string, path string) error {
 	updatedPath := fmt.Sprintf("%s/%s", path, groupGUID)
-	return repo.Gateway.UpdateResourceFromStruct(repo.ConfigRepo.ApiEndpoint(), updatedPath, "")
+	return repo.Gateway.UpdateResourceFromStruct(repo.ConfigRepo.APIEndpoint(), updatedPath, "")
 }
 
 func (repo *DefaultSecurityGroupsRepoBase) List(path string) ([]models.SecurityGroupFields, error) {
 	groups := []models.SecurityGroupFields{}
 
 	err := repo.Gateway.ListPaginatedResources(
-		repo.ConfigRepo.ApiEndpoint(),
+		repo.ConfigRepo.APIEndpoint(),
 		path,
 		resources.SecurityGroupResource{},
 		func(resource interface{}) bool {
@@ -40,5 +40,5 @@ func (repo *DefaultSecurityGroupsRepoBase) List(path string) ([]models.SecurityG
 
 func (repo *DefaultSecurityGroupsRepoBase) Delete(groupGUID string, path string) error {
 	updatedPath := fmt.Sprintf("%s/%s", path, groupGUID)
-	return repo.Gateway.DeleteResource(repo.ConfigRepo.ApiEndpoint(), updatedPath)
+	return repo.Gateway.DeleteResource(repo.ConfigRepo.APIEndpoint(), updatedPath)
 }

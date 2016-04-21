@@ -13,24 +13,24 @@ type SpaceRequirement interface {
 	GetSpace() models.Space
 }
 
-type spaceApiRequirement struct {
+type spaceAPIRequirement struct {
 	name      string
 	spaceRepo spaces.SpaceRepository
 	space     models.Space
 }
 
-func NewSpaceRequirement(name string, sR spaces.SpaceRepository) *spaceApiRequirement {
-	req := &spaceApiRequirement{}
+func NewSpaceRequirement(name string, sR spaces.SpaceRepository) *spaceAPIRequirement {
+	req := &spaceAPIRequirement{}
 	req.name = name
 	req.spaceRepo = sR
 	return req
 }
 
-func (req *spaceApiRequirement) SetSpaceName(name string) {
+func (req *spaceAPIRequirement) SetSpaceName(name string) {
 	req.name = name
 }
 
-func (req *spaceApiRequirement) Execute() error {
+func (req *spaceAPIRequirement) Execute() error {
 	var apiErr error
 	req.space, apiErr = req.spaceRepo.FindByName(req.name)
 
@@ -41,6 +41,6 @@ func (req *spaceApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *spaceApiRequirement) GetSpace() models.Space {
+func (req *spaceAPIRequirement) GetSpace() models.Space {
 	return req.space
 }

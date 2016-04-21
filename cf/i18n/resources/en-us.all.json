@@ -180,12 +180,12 @@
     "translation": "API endpoint:"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API endpoint: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API endpoint: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -1072,8 +1072,8 @@
     "translation": "Checking for route..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1164,8 +1164,8 @@
     "translation": "Could not serialize updates."
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "Could not target org.\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "Could not target org.\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1740,8 +1740,8 @@
     "translation": "Error deleting buildpack {{.Name}}\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Error deleting domain {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1768,16 +1768,16 @@
     "translation": "Error enabling ssh support for space "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "Error finding available orgs\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "Error finding available orgs\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "Error finding available spaces\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Error finding domain {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1928,8 +1928,8 @@
     "translation": "Error updating health_check_type for "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "Error uploading application.\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "Error uploading application.\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2016,16 +2016,16 @@
     "translation": "Failed fetching domains.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "Failed fetching events.\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "Failed fetching events.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "Failed fetching orgs.\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "Failed fetching orgs.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -3732,8 +3732,8 @@
     "translation": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command."
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -4020,8 +4020,8 @@
     "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space"
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint"
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4200,8 +4200,8 @@
     "translation": "USERS"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -5028,8 +5028,8 @@
     "translation": "yes"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}} (API version: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5076,12 +5076,12 @@
     "translation": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
-    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}."
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}."
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}."
   },
   {
     "id": "{{.FlappingCount}} failing",

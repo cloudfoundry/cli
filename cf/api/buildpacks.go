@@ -37,7 +37,7 @@ func NewCloudControllerBuildpackRepository(config coreconfig.Reader, gateway net
 
 func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		buildpacks_path,
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
@@ -48,7 +48,7 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
 	foundIt := false
 	apiErr = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:"+name)),
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
@@ -72,7 +72,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), buildpacks_path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.APIEndpoint(), buildpacks_path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
@@ -83,7 +83,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 
 func (repo CloudControllerBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
 	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGUID)
-	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	apiErr = repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 	return
 }
 
@@ -106,7 +106,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

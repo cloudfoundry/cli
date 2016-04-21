@@ -27,7 +27,7 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 	BeforeEach(func() {
 		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		configRepo.SetApiEndpoint(ccServer.URL())
+		configRepo.SetAPIEndpoint(ccServer.URL())
 
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		routeServiceBindingRepo = api.NewCloudControllerRouteServiceBindingRepository(configRepo, gateway)

@@ -28,7 +28,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 	Context("Execute", func() {
 		Context("when the config's api version is less than the maximum version", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("1.2.2")
+				config.SetAPIVersion("1.2.2")
 			})
 
 			It("succeeds", func() {
@@ -39,7 +39,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 
 		Context("when the config's api version is equal to the maximum version", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("1.2.3")
+				config.SetAPIVersion("1.2.3")
 			})
 
 			It("succeeds", func() {
@@ -50,7 +50,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 
 		Context("when the config's api version is greater than the maximum version", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("1.2.4")
+				config.SetAPIVersion("1.2.4")
 			})
 
 			It("returns an error", func() {
@@ -62,7 +62,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 
 		Context("when the config's api version can not be parsed", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("-")
+				config.SetAPIVersion("-")
 			})
 
 			It("returns an error", func() {
@@ -74,7 +74,7 @@ var _ = Describe("MaxAPIVersionRequirement", func() {
 
 		Context("when the config's api version is empty", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("")
+				config.SetAPIVersion("")
 			})
 
 			It("returns an error", func() {

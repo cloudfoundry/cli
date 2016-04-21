@@ -18,7 +18,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
+func validAPIInfoEndpoint(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/v2/info" {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -98,7 +98,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 				coreConfig.SetOrganizationFields(org)
 				coreConfig.SetSpaceFields(space)
-				testServerFn = validApiInfoEndpoint
+				testServerFn = validAPIInfoEndpoint
 			})
 
 			It("returns the configuration info from /info", func() {
@@ -109,16 +109,16 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.LoggregatorEndpoint).To(Equal("wss://loggregator.foo.example.org:4443"))
 				Expect(endpoint).To(Equal(testServer.URL))
 				Expect(config.SSHOAuthClient).To(Equal("ssh-client-id"))
-				Expect(config.ApiVersion).To(Equal("42.0.0"))
+				Expect(config.APIVersion).To(Equal("42.0.0"))
 				Expect(config.MinCLIVersion).To(Equal("6.5.0"))
 				Expect(config.MinRecommendedCLIVersion).To(Equal("6.7.0"))
-				Expect(config.RoutingApiEndpoint).To(Equal("http://api.example.com/routing"))
+				Expect(config.RoutingAPIEndpoint).To(Equal("http://api.example.com/routing"))
 			})
 		})
 
 		Context("when the API request fails", func() {
 			BeforeEach(func() {
-				coreConfig.SetApiEndpoint("example.com")
+				coreConfig.SetAPIEndpoint("example.com")
 			})
 
 			It("returns a failure response when the server has a bad certificate", func() {
@@ -151,7 +151,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 		Describe("when the specified API url doesn't have a scheme", func() {
 			It("uses https if possible", func() {
-				testServerFn = validApiInfoEndpoint
+				testServerFn = validAPIInfoEndpoint
 
 				schemelessURL := strings.Replace(testServer.URL, "https://", "", 1)
 				config, endpoint, apiErr := repo.GetCCInfo(schemelessURL)
@@ -160,12 +160,12 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(apiErr).NotTo(HaveOccurred())
 
 				Expect(config.AuthorizationEndpoint).To(Equal("https://login.example.com"))
-				Expect(config.ApiVersion).To(Equal("42.0.0"))
+				Expect(config.APIVersion).To(Equal("42.0.0"))
 			})
 
 			It("uses http when the server doesn't respond over https", func() {
 				testServer.Close()
-				testServer = httptest.NewServer(http.HandlerFunc(validApiInfoEndpoint))
+				testServer = httptest.NewServer(http.HandlerFunc(validAPIInfoEndpoint))
 				schemelessURL := strings.Replace(testServer.URL, "http://", "", 1)
 
 				config, endpoint, apiErr := repo.GetCCInfo(schemelessURL)
@@ -174,7 +174,7 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(apiErr).NotTo(HaveOccurred())
 
 				Expect(config.AuthorizationEndpoint).To(Equal("https://login.example.com"))
-				Expect(config.ApiVersion).To(Equal("42.0.0"))
+				Expect(config.APIVersion).To(Equal("42.0.0"))
 			})
 		})
 	})

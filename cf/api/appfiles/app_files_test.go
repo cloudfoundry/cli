@@ -54,7 +54,7 @@ var _ = Describe("AppFilesRepository", func() {
 		defer listFilesRedirectServer.Close()
 
 		configRepo := testconfig.NewRepositoryWithDefaults()
-		configRepo.SetApiEndpoint(listFilesRedirectServer.URL)
+		configRepo.SetAPIEndpoint(listFilesRedirectServer.URL)
 
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo := NewCloudControllerAppFilesRepository(configRepo, gateway)

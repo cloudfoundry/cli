@@ -48,7 +48,7 @@ func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, 
 	}
 
 	var wantGUID bool
-	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
+	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
 		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {

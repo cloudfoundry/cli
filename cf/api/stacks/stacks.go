@@ -34,7 +34,7 @@ func NewCloudControllerStackRepository(config coreconfig.Reader, gateway net.Gat
 
 func (repo CloudControllerStackRepository) FindByGUID(guid string) (models.Stack, error) {
 	stackRequest := resources.StackResource{}
-	path := fmt.Sprintf("%s/v2/stacks/%s", repo.config.ApiEndpoint(), guid)
+	path := fmt.Sprintf("%s/v2/stacks/%s", repo.config.APIEndpoint(), guid)
 	err := repo.gateway.GetResource(path, &stackRequest)
 	if err != nil {
 		if errNotFound, ok := err.(*errors.HTTPNotFoundError); ok {
@@ -72,7 +72,7 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, api
 func (repo CloudControllerStackRepository) findAllWithPath(path string) ([]models.Stack, error) {
 	var stacks []models.Stack
 	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.StackResource{},
 		func(resource interface{}) bool {

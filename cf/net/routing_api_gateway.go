@@ -26,7 +26,7 @@ func errorHandler(statusCode int, body []byte) error {
 	return errors.NewHTTPError(statusCode, response.Name, response.Message)
 }
 
-func NewRoutingApiGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
+func NewRoutingAPIGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
 	gateway := newGateway(errorHandler, config, ui, logger)
 	gateway.Clock = clock
 	gateway.PollingEnabled = true

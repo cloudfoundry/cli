@@ -13,7 +13,7 @@ import (
 
 type RouterGroups struct {
 	ui             terminal.UI
-	routingApiRepo api.RoutingApiRepository
+	routingAPIRepo api.RoutingAPIRepository
 	config         coreconfig.Reader
 }
 
@@ -48,7 +48,7 @@ func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, 
 func (cmd *RouterGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
-	cmd.routingApiRepo = deps.RepoLocator.GetRoutingApiRepository()
+	cmd.routingAPIRepo = deps.RepoLocator.GetRoutingAPIRepository()
 	return cmd
 }
 
@@ -65,7 +65,7 @@ func (cmd *RouterGroups) Execute(c flags.FlagContext) {
 		return true
 	}
 
-	apiErr := cmd.routingApiRepo.ListRouterGroups(cb)
+	apiErr := cmd.routingAPIRepo.ListRouterGroups(cb)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 		return

@@ -50,7 +50,7 @@ func (cmd *MarketplaceServices) Requirements(requirementsFactory requirements.Fa
 
 	reqs := []requirements.Requirement{
 		usageReq,
-		requirementsFactory.NewApiEndpointRequirement(),
+		requirementsFactory.NewAPIEndpointRequirement(),
 	}
 
 	return reqs

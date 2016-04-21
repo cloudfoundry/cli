@@ -40,7 +40,7 @@ func (repo CloudControllerServiceBindingRepository) Create(instanceGUID, appGUID
 		return err
 	}
 
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error) {
@@ -59,6 +59,6 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 
 	found = true
 
-	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	apiErr = repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 	return
 }

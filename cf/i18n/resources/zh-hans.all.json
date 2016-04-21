@@ -180,12 +180,12 @@
     "translation": "API 端点："
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API 端点：{{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API 端点：{{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API 端点：{{.ApiEndpoint}}（API 版本：{{.ApiVersion}}）"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API 端点：{{.APIEndpoint}}（API 版本：{{.APIVersion}}）"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -1072,8 +1072,8 @@
     "translation": "正在检查路径..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API V{{.ApiVer}} 需要 CLI V{{.CLIMin}}。您目前的版本是 {{.CLIVer}}。要升级 CLI，请访问：https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API V{{.APIVer}} 需要 CLI V{{.CLIMin}}。您目前的版本是 {{.CLIVer}}。要升级 CLI，请访问：https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1164,8 +1164,8 @@
     "translation": "无法序列化更新。"
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "无法确定目标组织。\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "无法确定目标组织。\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1740,8 +1740,8 @@
     "translation": "删除 buildpack {{.Name}} 时出错\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "删除域 {{.DomainName}} 时出错\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "删除域 {{.DomainName}} 时出错\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1768,16 +1768,16 @@
     "translation": "启用对空间的 SSH 支持时出错"
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "查找可用组织时出错\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "查找可用组织时出错\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "查找可用空间时出错\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "查找域 {{.DomainName}} 时出错\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "查找域 {{.DomainName}} 时出错\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1928,8 +1928,8 @@
     "translation": "更新以下项的 health_check_type 时出错："
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "上传应用程序时出错。\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "上传应用程序时出错。\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2016,16 +2016,16 @@
     "translation": "访存域失败。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "访存事件失败。\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "访存事件失败。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "访存角色 {{.OrgRoleToDisplayName}} 的组织用户失败。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "访存组织失败。\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "访存组织失败。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -3732,8 +3732,8 @@
     "translation": "服务器错误，状态码：403：访问已拒绝。您无权执行此命令。"
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "服务器错误，状态码：{{.ErrStatusCode}}，错误代码：{{.ErrApiErrorCode}}，消息：{{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "服务器错误，状态码：{{.ErrStatusCode}}，错误代码：{{.ErrAPIErrorCode}}，消息：{{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -4020,8 +4020,8 @@
     "translation": "提示：无目标空间，请使用“{{.CfTargetCommand}}”来确定目标空间"
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "提示：使用“{{.ApiCommand}}”可继续使用不安全的 API 端点"
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "提示：使用“{{.APICommand}}”可继续使用不安全的 API 端点"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4200,8 +4200,8 @@
     "translation": "用户"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "无法访问空间 {{.SpaceName}}。\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "无法访问空间 {{.SpaceName}}。\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -5028,8 +5028,8 @@
     "translation": "是"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}}（API 版本：{{.ApiVersionString}}）"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}}（API 版本：{{.APIVersionString}}）"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5076,12 +5076,12 @@
     "translation": "{{.Err}}\n\n提示：使用“{{.Command}}”可获取更多信息"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "当前 CF CLI V{{.Version}}\n\t当前 CF API V{{.ApiVersion}}\n\t要使用 {{.CommandName}} 功能，需要至少将 CF API 升级到 {{.RequiredVersion}}"
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "当前 CF CLI V{{.Version}}\n\t当前 CF API V{{.APIVersion}}\n\t要使用 {{.CommandName}} 功能，需要至少将 CF API 升级到 {{.RequiredVersion}}"
   },
   {
     "id": "{{.FlappingCount}} failing",

@@ -10,13 +10,13 @@ import (
 )
 
 type FakeReadWriter struct {
-	ApiEndpointStub        func() string
+	APIEndpointStub        func() string
 	apiEndpointMutex       sync.RWMutex
 	apiEndpointArgsForCall []struct{}
 	apiEndpointReturns     struct {
 		result1 string
 	}
-	ApiVersionStub        func() string
+	APIVersionStub        func() string
 	apiVersionMutex       sync.RWMutex
 	apiVersionArgsForCall []struct{}
 	apiVersionReturns     struct {
@@ -52,10 +52,10 @@ type FakeReadWriter struct {
 	uaaEndpointReturns     struct {
 		result1 string
 	}
-	RoutingApiEndpointStub        func() string
-	routingApiEndpointMutex       sync.RWMutex
-	routingApiEndpointArgsForCall []struct{}
-	routingApiEndpointReturns     struct {
+	RoutingAPIEndpointStub        func() string
+	routingAPIEndpointMutex       sync.RWMutex
+	routingAPIEndpointArgsForCall []struct{}
+	routingAPIEndpointReturns     struct {
 		result1 string
 	}
 	AccessTokenStub        func() string
@@ -130,12 +130,12 @@ type FakeReadWriter struct {
 	isSSLDisabledReturns     struct {
 		result1 bool
 	}
-	IsMinApiVersionStub        func(semver.Version) bool
-	isMinApiVersionMutex       sync.RWMutex
-	isMinApiVersionArgsForCall []struct {
+	IsMinAPIVersionStub        func(semver.Version) bool
+	isMinAPIVersionMutex       sync.RWMutex
+	isMinAPIVersionArgsForCall []struct {
 		arg1 semver.Version
 	}
-	isMinApiVersionReturns struct {
+	isMinAPIVersionReturns struct {
 		result1 bool
 	}
 	IsMinCLIVersionStub        func(string) bool
@@ -191,14 +191,14 @@ type FakeReadWriter struct {
 	ClearSessionStub          func()
 	clearSessionMutex         sync.RWMutex
 	clearSessionArgsForCall   []struct{}
-	SetApiEndpointStub        func(string)
-	setApiEndpointMutex       sync.RWMutex
-	setApiEndpointArgsForCall []struct {
+	SetAPIEndpointStub        func(string)
+	setAPIEndpointMutex       sync.RWMutex
+	setAPIEndpointArgsForCall []struct {
 		arg1 string
 	}
-	SetApiVersionStub        func(string)
-	setApiVersionMutex       sync.RWMutex
-	setApiVersionArgsForCall []struct {
+	SetAPIVersionStub        func(string)
+	setAPIVersionMutex       sync.RWMutex
+	setAPIVersionArgsForCall []struct {
 		arg1 string
 	}
 	SetMinCLIVersionStub        func(string)
@@ -231,9 +231,9 @@ type FakeReadWriter struct {
 	setUaaEndpointArgsForCall []struct {
 		arg1 string
 	}
-	SetRoutingApiEndpointStub        func(string)
-	setRoutingApiEndpointMutex       sync.RWMutex
-	setRoutingApiEndpointArgsForCall []struct {
+	SetRoutingAPIEndpointStub        func(string)
+	setRoutingAPIEndpointMutex       sync.RWMutex
+	setRoutingAPIEndpointArgsForCall []struct {
 		arg1 string
 	}
 	SetAccessTokenStub        func(string)
@@ -298,49 +298,49 @@ type FakeReadWriter struct {
 	}
 }
 
-func (fake *FakeReadWriter) ApiEndpoint() string {
+func (fake *FakeReadWriter) APIEndpoint() string {
 	fake.apiEndpointMutex.Lock()
 	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct{}{})
 	fake.apiEndpointMutex.Unlock()
-	if fake.ApiEndpointStub != nil {
-		return fake.ApiEndpointStub()
+	if fake.APIEndpointStub != nil {
+		return fake.APIEndpointStub()
 	} else {
 		return fake.apiEndpointReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) ApiEndpointCallCount() int {
+func (fake *FakeReadWriter) APIEndpointCallCount() int {
 	fake.apiEndpointMutex.RLock()
 	defer fake.apiEndpointMutex.RUnlock()
 	return len(fake.apiEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) ApiEndpointReturns(result1 string) {
-	fake.ApiEndpointStub = nil
+func (fake *FakeReadWriter) APIEndpointReturns(result1 string) {
+	fake.APIEndpointStub = nil
 	fake.apiEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) ApiVersion() string {
+func (fake *FakeReadWriter) APIVersion() string {
 	fake.apiVersionMutex.Lock()
 	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct{}{})
 	fake.apiVersionMutex.Unlock()
-	if fake.ApiVersionStub != nil {
-		return fake.ApiVersionStub()
+	if fake.APIVersionStub != nil {
+		return fake.APIVersionStub()
 	} else {
 		return fake.apiVersionReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) ApiVersionCallCount() int {
+func (fake *FakeReadWriter) APIVersionCallCount() int {
 	fake.apiVersionMutex.RLock()
 	defer fake.apiVersionMutex.RUnlock()
 	return len(fake.apiVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) ApiVersionReturns(result1 string) {
-	fake.ApiVersionStub = nil
+func (fake *FakeReadWriter) APIVersionReturns(result1 string) {
+	fake.APIVersionStub = nil
 	fake.apiVersionReturns = struct {
 		result1 string
 	}{result1}
@@ -466,26 +466,26 @@ func (fake *FakeReadWriter) UaaEndpointReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeReadWriter) RoutingApiEndpoint() string {
-	fake.routingApiEndpointMutex.Lock()
-	fake.routingApiEndpointArgsForCall = append(fake.routingApiEndpointArgsForCall, struct{}{})
-	fake.routingApiEndpointMutex.Unlock()
-	if fake.RoutingApiEndpointStub != nil {
-		return fake.RoutingApiEndpointStub()
+func (fake *FakeReadWriter) RoutingAPIEndpoint() string {
+	fake.routingAPIEndpointMutex.Lock()
+	fake.routingAPIEndpointArgsForCall = append(fake.routingAPIEndpointArgsForCall, struct{}{})
+	fake.routingAPIEndpointMutex.Unlock()
+	if fake.RoutingAPIEndpointStub != nil {
+		return fake.RoutingAPIEndpointStub()
 	} else {
-		return fake.routingApiEndpointReturns.result1
+		return fake.routingAPIEndpointReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) RoutingApiEndpointCallCount() int {
-	fake.routingApiEndpointMutex.RLock()
-	defer fake.routingApiEndpointMutex.RUnlock()
-	return len(fake.routingApiEndpointArgsForCall)
+func (fake *FakeReadWriter) RoutingAPIEndpointCallCount() int {
+	fake.routingAPIEndpointMutex.RLock()
+	defer fake.routingAPIEndpointMutex.RUnlock()
+	return len(fake.routingAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) RoutingApiEndpointReturns(result1 string) {
-	fake.RoutingApiEndpointStub = nil
-	fake.routingApiEndpointReturns = struct {
+func (fake *FakeReadWriter) RoutingAPIEndpointReturns(result1 string) {
+	fake.RoutingAPIEndpointStub = nil
+	fake.routingAPIEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -778,34 +778,34 @@ func (fake *FakeReadWriter) IsSSLDisabledReturns(result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsMinApiVersion(arg1 semver.Version) bool {
-	fake.isMinApiVersionMutex.Lock()
-	fake.isMinApiVersionArgsForCall = append(fake.isMinApiVersionArgsForCall, struct {
+func (fake *FakeReadWriter) IsMinAPIVersion(arg1 semver.Version) bool {
+	fake.isMinAPIVersionMutex.Lock()
+	fake.isMinAPIVersionArgsForCall = append(fake.isMinAPIVersionArgsForCall, struct {
 		arg1 semver.Version
 	}{arg1})
-	fake.isMinApiVersionMutex.Unlock()
-	if fake.IsMinApiVersionStub != nil {
-		return fake.IsMinApiVersionStub(arg1)
+	fake.isMinAPIVersionMutex.Unlock()
+	if fake.IsMinAPIVersionStub != nil {
+		return fake.IsMinAPIVersionStub(arg1)
 	} else {
-		return fake.isMinApiVersionReturns.result1
+		return fake.isMinAPIVersionReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) IsMinApiVersionCallCount() int {
-	fake.isMinApiVersionMutex.RLock()
-	defer fake.isMinApiVersionMutex.RUnlock()
-	return len(fake.isMinApiVersionArgsForCall)
+func (fake *FakeReadWriter) IsMinAPIVersionCallCount() int {
+	fake.isMinAPIVersionMutex.RLock()
+	defer fake.isMinAPIVersionMutex.RUnlock()
+	return len(fake.isMinAPIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsMinApiVersionArgsForCall(i int) semver.Version {
-	fake.isMinApiVersionMutex.RLock()
-	defer fake.isMinApiVersionMutex.RUnlock()
-	return fake.isMinApiVersionArgsForCall[i].arg1
+func (fake *FakeReadWriter) IsMinAPIVersionArgsForCall(i int) semver.Version {
+	fake.isMinAPIVersionMutex.RLock()
+	defer fake.isMinAPIVersionMutex.RUnlock()
+	return fake.isMinAPIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) IsMinApiVersionReturns(result1 bool) {
-	fake.IsMinApiVersionStub = nil
-	fake.isMinApiVersionReturns = struct {
+func (fake *FakeReadWriter) IsMinAPIVersionReturns(result1 bool) {
+	fake.IsMinAPIVersionStub = nil
+	fake.isMinAPIVersionReturns = struct {
 		result1 bool
 	}{result1}
 }
@@ -1025,50 +1025,50 @@ func (fake *FakeReadWriter) ClearSessionCallCount() int {
 	return len(fake.clearSessionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetApiEndpoint(arg1 string) {
-	fake.setApiEndpointMutex.Lock()
-	fake.setApiEndpointArgsForCall = append(fake.setApiEndpointArgsForCall, struct {
+func (fake *FakeReadWriter) SetAPIEndpoint(arg1 string) {
+	fake.setAPIEndpointMutex.Lock()
+	fake.setAPIEndpointArgsForCall = append(fake.setAPIEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.setApiEndpointMutex.Unlock()
-	if fake.SetApiEndpointStub != nil {
-		fake.SetApiEndpointStub(arg1)
+	fake.setAPIEndpointMutex.Unlock()
+	if fake.SetAPIEndpointStub != nil {
+		fake.SetAPIEndpointStub(arg1)
 	}
 }
 
-func (fake *FakeReadWriter) SetApiEndpointCallCount() int {
-	fake.setApiEndpointMutex.RLock()
-	defer fake.setApiEndpointMutex.RUnlock()
-	return len(fake.setApiEndpointArgsForCall)
+func (fake *FakeReadWriter) SetAPIEndpointCallCount() int {
+	fake.setAPIEndpointMutex.RLock()
+	defer fake.setAPIEndpointMutex.RUnlock()
+	return len(fake.setAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetApiEndpointArgsForCall(i int) string {
-	fake.setApiEndpointMutex.RLock()
-	defer fake.setApiEndpointMutex.RUnlock()
-	return fake.setApiEndpointArgsForCall[i].arg1
+func (fake *FakeReadWriter) SetAPIEndpointArgsForCall(i int) string {
+	fake.setAPIEndpointMutex.RLock()
+	defer fake.setAPIEndpointMutex.RUnlock()
+	return fake.setAPIEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetApiVersion(arg1 string) {
-	fake.setApiVersionMutex.Lock()
-	fake.setApiVersionArgsForCall = append(fake.setApiVersionArgsForCall, struct {
+func (fake *FakeReadWriter) SetAPIVersion(arg1 string) {
+	fake.setAPIVersionMutex.Lock()
+	fake.setAPIVersionArgsForCall = append(fake.setAPIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.setApiVersionMutex.Unlock()
-	if fake.SetApiVersionStub != nil {
-		fake.SetApiVersionStub(arg1)
+	fake.setAPIVersionMutex.Unlock()
+	if fake.SetAPIVersionStub != nil {
+		fake.SetAPIVersionStub(arg1)
 	}
 }
 
-func (fake *FakeReadWriter) SetApiVersionCallCount() int {
-	fake.setApiVersionMutex.RLock()
-	defer fake.setApiVersionMutex.RUnlock()
-	return len(fake.setApiVersionArgsForCall)
+func (fake *FakeReadWriter) SetAPIVersionCallCount() int {
+	fake.setAPIVersionMutex.RLock()
+	defer fake.setAPIVersionMutex.RUnlock()
+	return len(fake.setAPIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetApiVersionArgsForCall(i int) string {
-	fake.setApiVersionMutex.RLock()
-	defer fake.setApiVersionMutex.RUnlock()
-	return fake.setApiVersionArgsForCall[i].arg1
+func (fake *FakeReadWriter) SetAPIVersionArgsForCall(i int) string {
+	fake.setAPIVersionMutex.RLock()
+	defer fake.setAPIVersionMutex.RUnlock()
+	return fake.setAPIVersionArgsForCall[i].arg1
 }
 
 func (fake *FakeReadWriter) SetMinCLIVersion(arg1 string) {
@@ -1209,27 +1209,27 @@ func (fake *FakeReadWriter) SetUaaEndpointArgsForCall(i int) string {
 	return fake.setUaaEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetRoutingApiEndpoint(arg1 string) {
-	fake.setRoutingApiEndpointMutex.Lock()
-	fake.setRoutingApiEndpointArgsForCall = append(fake.setRoutingApiEndpointArgsForCall, struct {
+func (fake *FakeReadWriter) SetRoutingAPIEndpoint(arg1 string) {
+	fake.setRoutingAPIEndpointMutex.Lock()
+	fake.setRoutingAPIEndpointArgsForCall = append(fake.setRoutingAPIEndpointArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.setRoutingApiEndpointMutex.Unlock()
-	if fake.SetRoutingApiEndpointStub != nil {
-		fake.SetRoutingApiEndpointStub(arg1)
+	fake.setRoutingAPIEndpointMutex.Unlock()
+	if fake.SetRoutingAPIEndpointStub != nil {
+		fake.SetRoutingAPIEndpointStub(arg1)
 	}
 }
 
-func (fake *FakeReadWriter) SetRoutingApiEndpointCallCount() int {
-	fake.setRoutingApiEndpointMutex.RLock()
-	defer fake.setRoutingApiEndpointMutex.RUnlock()
-	return len(fake.setRoutingApiEndpointArgsForCall)
+func (fake *FakeReadWriter) SetRoutingAPIEndpointCallCount() int {
+	fake.setRoutingAPIEndpointMutex.RLock()
+	defer fake.setRoutingAPIEndpointMutex.RUnlock()
+	return len(fake.setRoutingAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetRoutingApiEndpointArgsForCall(i int) string {
-	fake.setRoutingApiEndpointMutex.RLock()
-	defer fake.setRoutingApiEndpointMutex.RUnlock()
-	return fake.setRoutingApiEndpointArgsForCall[i].arg1
+func (fake *FakeReadWriter) SetRoutingAPIEndpointArgsForCall(i int) string {
+	fake.setRoutingAPIEndpointMutex.RLock()
+	defer fake.setRoutingAPIEndpointMutex.RUnlock()
+	return fake.setRoutingAPIEndpointArgsForCall[i].arg1
 }
 
 func (fake *FakeReadWriter) SetAccessToken(arg1 string) {

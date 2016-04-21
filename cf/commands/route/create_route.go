@@ -101,11 +101,11 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	}
 
 	if fc.IsSet("port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumAPIVersion))
 	}
 
 	if fc.IsSet("random-port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", cf.TcpRoutingMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", cf.TcpRoutingMinimumAPIVersion))
 	}
 
 	return reqs

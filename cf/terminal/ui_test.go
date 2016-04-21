@@ -252,8 +252,8 @@ var _ = Describe("UI", func() {
 				Email:    "my-user-email",
 			}
 			config = testconfig.NewRepositoryWithAccessToken(accessToken)
-			config.SetApiEndpoint("https://test.example.org")
-			config.SetApiVersion("☃☃☃")
+			config.SetAPIEndpoint("https://test.example.org")
+			config.SetAPIVersion("☃☃☃")
 		})
 
 		Describe("tells the user what is set in the config", func() {
@@ -415,7 +415,7 @@ var _ = Describe("UI", func() {
 		It("Prints a notification to user if current version < min cli version", func() {
 			config.SetMinCLIVersion("6.0.0")
 			config.SetMinRecommendedCLIVersion("6.5.0")
-			config.SetApiVersion("2.15.1")
+			config.SetAPIVersion("2.15.1")
 			cf.Version = "5.0.0"
 			output = io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
@@ -432,7 +432,7 @@ var _ = Describe("UI", func() {
 		It("Doesn't print a notification to user if current version >= min cli version", func() {
 			config.SetMinCLIVersion("6.0.0")
 			config.SetMinRecommendedCLIVersion("6.5.0")
-			config.SetApiVersion("2.15.1")
+			config.SetAPIVersion("2.15.1")
 			cf.Version = "6.0.0"
 			output = io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)

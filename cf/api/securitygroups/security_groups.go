@@ -39,7 +39,7 @@ func (repo cloudControllerSecurityGroupRepo) Create(name string, rules []map[str
 		Name:  name,
 		Rules: rules,
 	}
-	return repo.gateway.CreateResourceFromStruct(repo.config.ApiEndpoint(), path, params)
+	return repo.gateway.CreateResourceFromStruct(repo.config.APIEndpoint(), path, params)
 }
 
 func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityGroup, error) {
@@ -48,7 +48,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 	foundGroup := false
 
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.SecurityGroupResource{},
 		func(resource interface{}) bool {
@@ -69,7 +69,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 	}
 
 	err = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		group.SpaceURL+"?inline-relations-depth=1",
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
@@ -86,7 +86,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 
 func (repo cloudControllerSecurityGroupRepo) Update(guid string, rules []map[string]interface{}) error {
 	url := fmt.Sprintf("/v2/security_groups/%s", guid)
-	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), url, models.SecurityGroupParams{Rules: rules})
+	return repo.gateway.UpdateResourceFromStruct(repo.config.APIEndpoint(), url, models.SecurityGroupParams{Rules: rules})
 }
 
 func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
@@ -94,7 +94,7 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 	securityGroups := []models.SecurityGroup{}
 
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.SecurityGroupResource{},
 		func(resource interface{}) bool {
@@ -112,7 +112,7 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 
 	for i := range securityGroups {
 		err = repo.gateway.ListPaginatedResources(
-			repo.config.ApiEndpoint(),
+			repo.config.APIEndpoint(),
 			securityGroups[i].SpaceURL+"?inline-relations-depth=1",
 			resources.SpaceResource{},
 			func(resource interface{}) bool {
@@ -130,5 +130,5 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 
 func (repo cloudControllerSecurityGroupRepo) Delete(securityGroupGUID string) error {
 	path := fmt.Sprintf("/v2/security_groups/%s", securityGroupGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }

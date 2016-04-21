@@ -57,7 +57,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
 		testServer, _ = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	}
 
 	Describe(".UploadBits", func() {

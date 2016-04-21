@@ -34,12 +34,12 @@ func NewCloudControllerServicePlanVisibilityRepository(config coreconfig.Reader,
 func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGUID, orgGUID string) error {
 	url := "/v2/service_plan_visibilities"
 	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGUID, orgGUID)
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), url, strings.NewReader(data))
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) List() (visibilities []models.ServicePlanVisibilityFields, err error) {
 	err = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		"/v2/service_plan_visibilities",
 		resources.ServicePlanVisibilityResource{},
 		func(resource interface{}) bool {
@@ -53,13 +53,13 @@ func (repo CloudControllerServicePlanVisibilityRepository) List() (visibilities 
 
 func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGUID string) error {
 	path := fmt.Sprintf("/v2/service_plan_visibilities/%s", servicePlanGUID)
-	return repo.gateway.DeleteResourceSynchronously(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResourceSynchronously(repo.config.APIEndpoint(), path)
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) Search(queryParams map[string]string) ([]models.ServicePlanVisibilityFields, error) {
 	var visibilities []models.ServicePlanVisibilityFields
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		combineQueryParametersWithURI("/v2/service_plan_visibilities", queryParams),
 		resources.ServicePlanVisibilityResource{},
 		func(resource interface{}) bool {

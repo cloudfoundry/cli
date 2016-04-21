@@ -11,17 +11,17 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-type InstancesApiResponse map[string]InstanceApiResponse
+type InstancesAPIResponse map[string]InstanceAPIResponse
 
-type InstanceApiResponse struct {
+type InstanceAPIResponse struct {
 	State   string
 	Since   float64
 	Details string
 }
 
-type StatsApiResponse map[string]InstanceStatsApiResponse
+type StatsAPIResponse map[string]InstanceStatsAPIResponse
 
-type InstanceStatsApiResponse struct {
+type InstanceStatsAPIResponse struct {
 	Stats struct {
 		DiskQuota int64 `json:"disk_quota"`
 		MemQuota  int64 `json:"mem_quota"`
@@ -52,9 +52,9 @@ func NewCloudControllerAppInstancesRepository(config coreconfig.Reader, gateway 
 }
 
 func (repo CloudControllerAppInstancesRepository) GetInstances(appGUID string) (instances []models.AppInstanceFields, err error) {
-	instancesResponse := InstancesApiResponse{}
+	instancesResponse := InstancesAPIResponse{}
 	err = repo.gateway.GetResource(
-		fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGUID),
+		fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.APIEndpoint(), appGUID),
 		&instancesResponse)
 	if err != nil {
 		return
@@ -78,7 +78,7 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGUID string) (
 }
 
 func (repo CloudControllerAppInstancesRepository) DeleteInstance(appGUID string, instance int) error {
-	err := repo.gateway.DeleteResource(repo.config.ApiEndpoint(), fmt.Sprintf("/v2/apps/%s/instances/%d", appGUID, instance))
+	err := repo.gateway.DeleteResource(repo.config.APIEndpoint(), fmt.Sprintf("/v2/apps/%s/instances/%d", appGUID, instance))
 	if err != nil {
 		return err
 	}
@@ -86,8 +86,8 @@ func (repo CloudControllerAppInstancesRepository) DeleteInstance(appGUID string,
 }
 
 func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.ApiEndpoint(), guid)
-	statsResponse := StatsApiResponse{}
+	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.APIEndpoint(), guid)
+	statsResponse := StatsAPIResponse{}
 	apiErr = repo.gateway.GetResource(path, &statsResponse)
 	if apiErr != nil {
 		return

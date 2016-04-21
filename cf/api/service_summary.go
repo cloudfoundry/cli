@@ -102,7 +102,7 @@ func NewCloudControllerServiceSummaryRepository(config coreconfig.Reader, gatewa
 }
 
 func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().GUID)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.APIEndpoint(), repo.config.SpaceFields().GUID)
 	resource := new(ServiceInstancesSummaries)
 
 	apiErr = repo.gateway.GetResource(path, resource)

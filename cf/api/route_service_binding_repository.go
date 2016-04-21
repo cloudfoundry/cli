@@ -56,7 +56,7 @@ func (repo CloudControllerRouteServiceBindingRepository) Bind(
 	}
 
 	return repo.gateway.UpdateResourceSync(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		getPath(instanceGUID, routeGUID, userProvided),
 		rs,
 	)
@@ -64,7 +64,7 @@ func (repo CloudControllerRouteServiceBindingRepository) Bind(
 
 func (repo CloudControllerRouteServiceBindingRepository) Unbind(instanceGUID, routeGUID string, userProvided bool) error {
 	path := getPath(instanceGUID, routeGUID, userProvided)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
 
 func getPath(instanceGUID, routeGUID string, userProvided bool) string {

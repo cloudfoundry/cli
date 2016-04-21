@@ -42,7 +42,7 @@ func (cmd *Authenticate) Requirements(requirementsFactory requirements.Factory, 
 	}
 
 	reqs := []requirements.Requirement{
-		requirementsFactory.NewApiEndpointRequirement(),
+		requirementsFactory.NewAPIEndpointRequirement(),
 	}
 
 	return reqs
@@ -59,8 +59,8 @@ func (cmd *Authenticate) Execute(c flags.FlagContext) {
 	cmd.config.ClearSession()
 	cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 
-	cmd.ui.Say(T("API endpoint: {{.ApiEndpoint}}",
-		map[string]interface{}{"ApiEndpoint": terminal.EntityNameColor(cmd.config.ApiEndpoint())}))
+	cmd.ui.Say(T("API endpoint: {{.APIEndpoint}}",
+		map[string]interface{}{"APIEndpoint": terminal.EntityNameColor(cmd.config.APIEndpoint())}))
 	cmd.ui.Say(T("Authenticating..."))
 
 	apiErr := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]})
