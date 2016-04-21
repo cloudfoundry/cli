@@ -96,18 +96,6 @@
 			"Rev": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089"
 		},
 		{
-			"ImportPath": "github.com/cloudfoundry/noaa",
-			"Rev": "068d5df086112eb2d81ffb6a7de79ace8966deef"
-		},
-		{
-			"ImportPath": "github.com/cloudfoundry/noaa/consumer",
-			"Rev": "068d5df086112eb2d81ffb6a7de79ace8966deef"
-		},
-		{
-			"ImportPath": "github.com/cloudfoundry/noaa/errors",
-			"Rev": "068d5df086112eb2d81ffb6a7de79ace8966deef"
-		},
-		{
 			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
 			"Rev": "ae27095c3a1b9977a0ef1928b0147d5689f2e921"
 		},
@@ -146,7 +134,7 @@
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "f761cdb666383d5db7a8bea9ff8c9db35332b4a0"
+			"Rev": "e2e3d8414d0fbae04004f151979f4e27c6747fe7"
 		},
 		{
 			"ImportPath": "github.com/kr/pty",
