@@ -39,7 +39,7 @@ var _ = Describe("Rename command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("rename", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

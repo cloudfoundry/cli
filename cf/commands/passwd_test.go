@@ -31,7 +31,7 @@ var _ = Describe("password command", func() {
 
 	callPassword := func(inputs []string, pwDeps passwordDeps) (*testterm.FakeUI, bool) {
 		ui = &testterm.FakeUI{Inputs: inputs}
-		passed := testcmd.RunCliCommand("passwd", []string{}, pwDeps.ReqFactory, updateCommandDependency, false)
+		passed := testcmd.RunCLICommand("passwd", []string{}, pwDeps.ReqFactory, updateCommandDependency, false)
 		return ui, passed
 	}
 

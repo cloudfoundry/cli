@@ -32,7 +32,7 @@ var _ = Describe("set-quota command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("set-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {

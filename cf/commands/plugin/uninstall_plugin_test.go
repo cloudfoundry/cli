@@ -67,7 +67,7 @@ var _ = Describe("Uninstall", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("uninstall-plugin", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("uninstall-plugin", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

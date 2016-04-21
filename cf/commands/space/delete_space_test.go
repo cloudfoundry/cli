@@ -34,7 +34,7 @@ var _ = Describe("delete-space command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-space", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {

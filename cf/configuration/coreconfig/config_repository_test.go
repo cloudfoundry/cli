@@ -110,11 +110,11 @@ var _ = Describe("Configuration Repository", func() {
 		s, _ := semver.Make("3.1")
 		Expect(config.IsMinApiVersion(s)).To(Equal(false))
 
-		config.SetMinCliVersion("6.5.0")
-		Expect(config.MinCliVersion()).To(Equal("6.5.0"))
+		config.SetMinCLIVersion("6.5.0")
+		Expect(config.MinCLIVersion()).To(Equal("6.5.0"))
 
-		config.SetMinRecommendedCliVersion("6.9.0")
-		Expect(config.MinRecommendedCliVersion()).To(Equal("6.9.0"))
+		config.SetMinRecommendedCLIVersion("6.9.0")
+		Expect(config.MinRecommendedCLIVersion()).To(Equal("6.9.0"))
 	})
 
 	Describe("HasAPIEndpoint", func() {
@@ -251,33 +251,33 @@ var _ = Describe("Configuration Repository", func() {
 
 	Describe("IsMinCLIVersion", func() {
 		It("returns true when the actual version is BUILT_FROM_SOURCE", func() {
-			Expect(config.IsMinCliVersion("BUILT_FROM_SOURCE")).To(BeTrue())
+			Expect(config.IsMinCLIVersion("BUILT_FROM_SOURCE")).To(BeTrue())
 		})
 
-		It("returns true when the MinCliVersion is empty", func() {
-			config.SetMinCliVersion("")
-			Expect(config.IsMinCliVersion("1.2.3")).To(BeTrue())
+		It("returns true when the MinCLIVersion is empty", func() {
+			config.SetMinCLIVersion("")
+			Expect(config.IsMinCLIVersion("1.2.3")).To(BeTrue())
 		})
 
-		It("returns false when the actual version is less than the MinCliVersion", func() {
+		It("returns false when the actual version is less than the MinCLIVersion", func() {
 			actualVersion := "1.2.3+abc123"
-			minCliVersion := "1.2.4"
-			config.SetMinCliVersion(minCliVersion)
-			Expect(config.IsMinCliVersion(actualVersion)).To(BeFalse())
+			minCLIVersion := "1.2.4"
+			config.SetMinCLIVersion(minCLIVersion)
+			Expect(config.IsMinCLIVersion(actualVersion)).To(BeFalse())
 		})
 
-		It("returns true when the actual version is equal to the MinCliVersion", func() {
+		It("returns true when the actual version is equal to the MinCLIVersion", func() {
 			actualVersion := "1.2.3+abc123"
-			minCliVersion := "1.2.3"
-			config.SetMinCliVersion(minCliVersion)
-			Expect(config.IsMinCliVersion(actualVersion)).To(BeTrue())
+			minCLIVersion := "1.2.3"
+			config.SetMinCLIVersion(minCLIVersion)
+			Expect(config.IsMinCLIVersion(actualVersion)).To(BeTrue())
 		})
 
-		It("returns true when the actual version is greater than the MinCliVersion", func() {
+		It("returns true when the actual version is greater than the MinCLIVersion", func() {
 			actualVersion := "1.2.3+abc123"
-			minCliVersion := "1.2.2"
-			config.SetMinCliVersion(minCliVersion)
-			Expect(config.IsMinCliVersion(actualVersion)).To(BeTrue())
+			minCLIVersion := "1.2.2"
+			config.SetMinCLIVersion(minCLIVersion)
+			Expect(config.IsMinCLIVersion(actualVersion)).To(BeTrue())
 		})
 	})
 })

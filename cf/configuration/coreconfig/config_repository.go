@@ -21,8 +21,8 @@ type CCInfo struct {
 	ApiVersion               string `json:"api_version"`
 	AuthorizationEndpoint    string `json:"authorization_endpoint"`
 	LoggregatorEndpoint      string `json:"logging_endpoint"`
-	MinCliVersion            string `json:"min_cli_version"`
-	MinRecommendedCliVersion string `json:"min_recommended_cli_version"`
+	MinCLIVersion            string `json:"min_cli_version"`
+	MinRecommendedCLIVersion string `json:"min_recommended_cli_version"`
 	SSHOAuthClient           string `json:"app_ssh_oauth_client"`
 	RoutingApiEndpoint       string `json:"routing_endpoint"`
 }
@@ -79,9 +79,9 @@ type Reader interface {
 	IsLoggedIn() bool
 	IsSSLDisabled() bool
 	IsMinApiVersion(semver.Version) bool
-	IsMinCliVersion(string) bool
-	MinCliVersion() string
-	MinRecommendedCliVersion() string
+	IsMinCLIVersion(string) bool
+	MinCLIVersion() string
+	MinRecommendedCLIVersion() string
 
 	AsyncTimeout() uint
 	Trace() string
@@ -99,8 +99,8 @@ type ReadWriter interface {
 	ClearSession()
 	SetApiEndpoint(string)
 	SetApiVersion(string)
-	SetMinCliVersion(string)
-	SetMinRecommendedCliVersion(string)
+	SetMinCLIVersion(string)
+	SetMinRecommendedCLIVersion(string)
 	SetAuthenticationEndpoint(string)
 	SetLoggregatorEndpoint(string)
 	SetDopplerEndpoint(string)
@@ -327,15 +327,15 @@ func (c *ConfigRepository) IsMinApiVersion(requiredVersion semver.Version) bool 
 	return actualVersion.GTE(requiredVersion)
 }
 
-func (c *ConfigRepository) IsMinCliVersion(version string) bool {
+func (c *ConfigRepository) IsMinCLIVersion(version string) bool {
 	if version == "BUILT_FROM_SOURCE" {
 		return true
 	}
-	var minCliVersion string
+	var minCLIVersion string
 	c.read(func() {
-		minCliVersion = c.data.MinCliVersion
+		minCLIVersion = c.data.MinCLIVersion
 	})
-	if minCliVersion == "" {
+	if minCLIVersion == "" {
 		return true
 	}
 
@@ -343,23 +343,23 @@ func (c *ConfigRepository) IsMinCliVersion(version string) bool {
 	if err != nil {
 		return false
 	}
-	requiredVersion, err := semver.Make(minCliVersion)
+	requiredVersion, err := semver.Make(minCLIVersion)
 	if err != nil {
 		return false
 	}
 	return actualVersion.GTE(requiredVersion)
 }
 
-func (c *ConfigRepository) MinCliVersion() (minCliVersion string) {
+func (c *ConfigRepository) MinCLIVersion() (minCLIVersion string) {
 	c.read(func() {
-		minCliVersion = c.data.MinCliVersion
+		minCLIVersion = c.data.MinCLIVersion
 	})
 	return
 }
 
-func (c *ConfigRepository) MinRecommendedCliVersion() (minRecommendedCliVersion string) {
+func (c *ConfigRepository) MinRecommendedCLIVersion() (minRecommendedCLIVersion string) {
 	c.read(func() {
-		minRecommendedCliVersion = c.data.MinRecommendedCliVersion
+		minRecommendedCLIVersion = c.data.MinRecommendedCLIVersion
 	})
 	return
 }
@@ -422,15 +422,15 @@ func (c *ConfigRepository) SetApiVersion(version string) {
 	})
 }
 
-func (c *ConfigRepository) SetMinCliVersion(version string) {
+func (c *ConfigRepository) SetMinCLIVersion(version string) {
 	c.write(func() {
-		c.data.MinCliVersion = version
+		c.data.MinCLIVersion = version
 	})
 }
 
-func (c *ConfigRepository) SetMinRecommendedCliVersion(version string) {
+func (c *ConfigRepository) SetMinRecommendedCLIVersion(version string) {
 	c.write(func() {
-		c.data.MinRecommendedCliVersion = version
+		c.data.MinRecommendedCLIVersion = version
 	})
 }
 

@@ -42,7 +42,7 @@ var _ = Describe("quotas command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("quotas", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("quotas", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

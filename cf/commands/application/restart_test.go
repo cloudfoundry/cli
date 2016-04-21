@@ -41,7 +41,7 @@ var _ = Describe("restart command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("restart", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restart", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {

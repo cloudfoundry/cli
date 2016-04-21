@@ -32,7 +32,7 @@ func (cmd *RunningEnvironmentVariableGroup) MetaData() commandregistry.CommandMe
 }
 
 func (cmd *RunningEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0

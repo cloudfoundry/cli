@@ -90,7 +90,7 @@ var _ = Describe("UnmapRoute", func() {
 
 		BeforeEach(func() {
 			cmd := &route.UnmapRoute{}
-			up := commandregistry.CliCommandUsagePresenter(cmd)
+			up := commandregistry.CLICommandUsagePresenter(cmd)
 
 			usage = strings.Split(up.Usage(), "\n")
 		})

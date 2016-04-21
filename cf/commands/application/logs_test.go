@@ -46,7 +46,7 @@ var _ = Describe("logs command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("logs", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("logs", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

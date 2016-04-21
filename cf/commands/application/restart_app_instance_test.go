@@ -51,7 +51,7 @@ var _ = Describe("restart-app-instance", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("restart-app-instance", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restart-app-instance", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

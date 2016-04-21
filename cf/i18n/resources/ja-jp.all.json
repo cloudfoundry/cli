@@ -1072,8 +1072,8 @@
     "translation": "経路を確認しています..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API バージョン {{.ApiVer}} には CLI バージョン {{.CliMin}} が必要です。現在のバージョンは {{.CliVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API バージョン {{.ApiVer}} には CLI バージョン {{.CLIMin}} が必要です。現在のバージョンは {{.CLIVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",

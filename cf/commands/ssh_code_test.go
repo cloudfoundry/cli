@@ -116,8 +116,8 @@ var _ = Describe("OneTimeSSHCode", func() {
 				ApiVersion:               "some-version",
 				AuthorizationEndpoint:    "auth/endpoint",
 				LoggregatorEndpoint:      "loggregator/endpoint",
-				MinCliVersion:            "min-cli-version",
-				MinRecommendedCliVersion: "min-rec-cli-version",
+				MinCLIVersion:            "min-cli-version",
+				MinRecommendedCLIVersion: "min-rec-cli-version",
 				SSHOAuthClient:           "some-client",
 				RoutingApiEndpoint:       "routing/endpoint",
 			}

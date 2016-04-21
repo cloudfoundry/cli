@@ -36,7 +36,7 @@ var _ = Describe("delte-plugin-repo", func() {
 	})
 
 	var callRemovePluginRepo = func(args ...string) bool {
-		return testcmd.RunCliCommand("remove-plugin-repo", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("remove-plugin-repo", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("When repo name is valid", func() {

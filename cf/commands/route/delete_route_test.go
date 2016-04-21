@@ -82,7 +82,7 @@ var _ = Describe("DeleteRoute", func() {
 
 		BeforeEach(func() {
 			dr := &route.DeleteRoute{}
-			up := commandregistry.CliCommandUsagePresenter(dr)
+			up := commandregistry.CLICommandUsagePresenter(dr)
 			usage = strings.Split(up.Usage(), "\n")
 		})
 

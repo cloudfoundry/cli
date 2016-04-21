@@ -43,7 +43,7 @@ var _ = Describe("org-users command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("org-users", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("org-users", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -315,7 +315,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles", func() {
-				testcmd.RunCliCommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginUserModel).To(HaveLen(4))
 
 				for _, u := range pluginUserModel {
@@ -340,7 +340,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles -a flag", func() {
-				testcmd.RunCliCommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginUserModel).To(HaveLen(1))
 				Expect(pluginUserModel[0].Username).To(Equal("user3"))
 				Expect(pluginUserModel[0].Guid).To(Equal("3333"))
@@ -393,7 +393,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles", func() {
-				testcmd.RunCliCommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
@@ -419,7 +419,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles -a flag", func() {
-				testcmd.RunCliCommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {

@@ -49,7 +49,7 @@ var _ = Describe("routes command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("routes", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("routes", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("login requirements", func() {

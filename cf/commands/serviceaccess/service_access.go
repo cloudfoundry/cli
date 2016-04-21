@@ -43,7 +43,7 @@ func (cmd *ServiceAccess) MetaData() commandregistry.CommandMetadata {
 }
 
 func (cmd *ServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0

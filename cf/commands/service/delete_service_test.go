@@ -46,7 +46,7 @@ var _ = Describe("delete-service command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when not logged in", func() {

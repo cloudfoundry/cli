@@ -38,7 +38,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("set-running-environment-variable-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-running-environment-variable-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

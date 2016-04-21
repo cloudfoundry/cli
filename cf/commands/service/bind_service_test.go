@@ -43,7 +43,7 @@ var _ = Describe("bind-service command", func() {
 	})
 
 	var callBindService = func(args []string) bool {
-		return testcmd.RunCliCommand("bind-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("bind-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when not logged in", func() {

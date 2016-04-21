@@ -50,7 +50,7 @@ var _ = Describe("service-access command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("service-access", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("service-access", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

@@ -46,7 +46,7 @@ var _ = Describe("app Command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("update-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

@@ -35,7 +35,7 @@ var _ = Describe("rename-buildpack command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("rename-buildpack", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when called without the current name and the new name to use", func() {

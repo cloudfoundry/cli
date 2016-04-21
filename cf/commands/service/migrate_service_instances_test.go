@@ -43,13 +43,13 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 
 	Describe("requirements", func() {
 		It("requires you to be logged in", func() {
-			Expect(testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 
 		It("requires five arguments to run", func() {
 			args = []string{"one", "two", "three"}
 
-			Expect(testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 
 		It("requires CC API version 2.47 or greater", func() {
@@ -58,7 +58,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 			args = []string{"one", "two", "three", "four", "five"}
 			ui.Inputs = append(ui.Inputs, "no")
 
-			Expect(testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 
 		It("passes requirements if user is logged in and provided five args to run", func() {
@@ -67,7 +67,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 			args = []string{"one", "two", "three", "four", "five"}
 			ui.Inputs = append(ui.Inputs, "no")
 
-			Expect(testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeTrue())
+			Expect(testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)).To(BeTrue())
 		})
 	})
 
@@ -81,7 +81,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 
 		It("displays the warning and the prompt including info about the instances and plan to migrate", func() {
 			ui.Inputs = []string{""}
-			testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING:", "this operation is to replace a service broker"}))
 			Expect(ui.Prompts).To(ContainSubstrings(
@@ -111,7 +111,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("makes a request to migrate the v1 service instance", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					v1PlanGUID, v2PlanGUID := serviceRepo.MigrateServicePlanFromV1ToV2ArgsForCall(0)
 					Expect(v1PlanGUID).To(Equal("v1-guid"))
@@ -119,7 +119,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("finds the v1 service plan by its name, provider and service label", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					expectedV1 := resources.ServicePlanDescription{
 						ServicePlanName: "v1-plan-name",
@@ -130,7 +130,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("finds the v2 service plan by its name and service label", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					expectedV2 := resources.ServicePlanDescription{
 						ServicePlanName: "v2-plan-name",
@@ -141,7 +141,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 
 				It("notifies the user that the migration was successful", func() {
 					serviceRepo.GetServiceInstanceCountForServicePlanReturns(2, nil)
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Attempting to migrate", "2", "service instances"},
@@ -158,7 +158,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("notifies the user of the failure", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
@@ -167,7 +167,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("does not display the warning", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING:", "this operation is to replace a service broker"}))
 					})
@@ -179,7 +179,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("notifies the user of the failure", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
@@ -188,7 +188,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("does not display the warning", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING:", "this operation is to replace a service broker"}))
 					})
@@ -209,7 +209,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("notifies the user of the failure", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
@@ -218,7 +218,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("does not display the warning", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING:", "this operation is to replace a service broker"}))
 					})
@@ -230,7 +230,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("notifies the user of the failure", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"FAILED"},
@@ -239,7 +239,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 					})
 
 					It("does not display the warning", func() {
-						testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+						testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 						Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING:", "this operation is to replace a service broker"}))
 					})
@@ -252,7 +252,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("notifies the user of the failure", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
@@ -275,7 +275,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("returns a meaningful error", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
@@ -284,7 +284,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("does not show the user the warning", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"WARNING:", "this operation is to replace a service broker"}))
 				})
@@ -296,7 +296,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 				})
 
 				It("notifies the user of the failure", func() {
-					testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+					testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"FAILED"},
@@ -312,7 +312,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 			})
 
 			It("does not continue the migration", func() {
-				testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Migrating"}))
 				Expect(serviceRepo.MigrateServicePlanFromV1ToV2CallCount()).To(BeZero())
@@ -323,7 +323,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 			It("does not prompt the user for confirmation", func() {
 				args = []string{"-f", "v1-service-label", "v1-provider-name", "v1-plan-name", "v2-service-label", "v2-plan-name"}
 
-				testcmd.RunCliCommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false)
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Really migrate"}))
 				Expect(serviceRepo.MigrateServicePlanFromV1ToV2CallCount()).To(Equal(1))

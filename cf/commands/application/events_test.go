@@ -44,7 +44,7 @@ var _ = Describe("events command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("events", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("events", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage when called without an app name", func() {

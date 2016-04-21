@@ -53,7 +53,7 @@ var _ = Describe("auth command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when given too few arguments", func() {
-			testcmd.RunCliCommand("auth", []string{}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -61,7 +61,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
-			Expect(testcmd.RunCliCommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 	})
 
@@ -73,7 +73,7 @@ var _ = Describe("auth command", func() {
 
 		It("authenticates successfully", func() {
 			requirementsFactory.ApiEndpointSuccess = true
-			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -88,11 +88,11 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-			config.SetMinCliVersion("5.0.0")
-			config.SetMinRecommendedCliVersion("5.5.0")
+			config.SetMinCLIVersion("5.0.0")
+			config.SetMinRecommendedCLIVersion("5.5.0")
 			cf.Version = "4.5.0"
 
-			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"To upgrade your CLI"},
@@ -102,14 +102,14 @@ var _ = Describe("auth command", func() {
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
 			requirementsFactory.ApiEndpointSuccess = true
-			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 			Expect(authRepo.GetLoginPromptsAndSaveUAAServerURLCallCount()).To(Equal(1))
 		})
 
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
 				authRepo.AuthenticateReturns(errors.New("Error authenticating."))
-				testcmd.RunCliCommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
 			})
 
 			It("does not prompt the user when provided username and password", func() {

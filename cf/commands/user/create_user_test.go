@@ -43,7 +43,7 @@ var _ = Describe("Create user command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-user", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-user", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("creates a user", func() {
