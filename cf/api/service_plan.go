@@ -59,7 +59,7 @@ func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(servi
 func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]string) (plans []models.ServicePlanFields, err error) {
 	err = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		combineQueryParametersWithUri("/v2/service_plans", queryParams),
+		combineQueryParametersWithURI("/v2/service_plans", queryParams),
 		resources.ServicePlanResource{},
 		func(resource interface{}) bool {
 			if sp, ok := resource.(resources.ServicePlanResource); ok {
@@ -70,7 +70,7 @@ func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]s
 	return
 }
 
-func combineQueryParametersWithUri(uri string, queryParams map[string]string) string {
+func combineQueryParametersWithURI(uri string, queryParams map[string]string) string {
 	if len(queryParams) == 0 {
 		return uri
 	}
