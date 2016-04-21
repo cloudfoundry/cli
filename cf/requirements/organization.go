@@ -13,20 +13,20 @@ type OrganizationRequirement interface {
 	GetOrganization() models.Organization
 }
 
-type organizationApiRequirement struct {
+type organizationAPIRequirement struct {
 	name    string
 	orgRepo organizations.OrganizationRepository
 	org     models.Organization
 }
 
-func NewOrganizationRequirement(name string, sR organizations.OrganizationRepository) *organizationApiRequirement {
-	req := &organizationApiRequirement{}
+func NewOrganizationRequirement(name string, sR organizations.OrganizationRepository) *organizationAPIRequirement {
+	req := &organizationAPIRequirement{}
 	req.name = name
 	req.orgRepo = sR
 	return req
 }
 
-func (req *organizationApiRequirement) Execute() error {
+func (req *organizationAPIRequirement) Execute() error {
 	var apiErr error
 	req.org, apiErr = req.orgRepo.FindByName(req.name)
 
@@ -37,10 +37,10 @@ func (req *organizationApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *organizationApiRequirement) SetOrganizationName(name string) {
+func (req *organizationAPIRequirement) SetOrganizationName(name string) {
 	req.name = name
 }
 
-func (req *organizationApiRequirement) GetOrganization() models.Organization {
+func (req *organizationAPIRequirement) GetOrganization() models.Organization {
 	return req.org
 }

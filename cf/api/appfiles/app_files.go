@@ -25,7 +25,7 @@ func NewCloudControllerAppFilesRepository(config coreconfig.Reader, gateway net.
 }
 
 func (repo CloudControllerAppFilesRepository) ListFiles(appGUID string, instance int, path string) (files string, apiErr error) {
-	url := fmt.Sprintf("%s/v2/apps/%s/instances/%d/files/%s", repo.config.ApiEndpoint(), appGUID, instance, path)
+	url := fmt.Sprintf("%s/v2/apps/%s/instances/%d/files/%s", repo.config.APIEndpoint(), appGUID, instance, path)
 	request, apiErr := repo.gateway.NewRequest("GET", url, repo.config.AccessToken(), nil)
 	if apiErr != nil {
 		return

@@ -81,8 +81,8 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching orgs.\n{{.ApiErr}}",
-			map[string]interface{}{"ApiErr": apiErr}))
+		cmd.ui.Failed(T("Failed fetching orgs.\n{{.APIErr}}",
+			map[string]interface{}{"APIErr": apiErr}))
 		return
 	}
 

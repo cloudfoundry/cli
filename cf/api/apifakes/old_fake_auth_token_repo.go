@@ -10,7 +10,7 @@ type OldFakeAuthTokenRepo struct {
 	FindByLabelAndProviderLabel                  string
 	FindByLabelAndProviderProvider               string
 	FindByLabelAndProviderServiceAuthTokenFields models.ServiceAuthTokenFields
-	FindByLabelAndProviderApiResponse            error
+	FindByLabelAndProviderAPIResponse            error
 
 	UpdatedServiceAuthTokenFields models.ServiceAuthTokenFields
 
@@ -31,7 +31,7 @@ func (repo *OldFakeAuthTokenRepo) FindByLabelAndProvider(label, provider string)
 	repo.FindByLabelAndProviderProvider = provider
 
 	authToken = repo.FindByLabelAndProviderServiceAuthTokenFields
-	apiErr = repo.FindByLabelAndProviderApiResponse
+	apiErr = repo.FindByLabelAndProviderAPIResponse
 	return
 }
 

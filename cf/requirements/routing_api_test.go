@@ -21,9 +21,9 @@ var _ = Describe("RoutingApi", func() {
 		requirement = requirements.NewRoutingAPIRequirement(config)
 	})
 
-	Context("when the config has a zero-length RoutingApiEndpoint", func() {
+	Context("when the config has a zero-length RoutingAPIEndpoint", func() {
 		BeforeEach(func() {
-			config.SetRoutingApiEndpoint("")
+			config.SetRoutingAPIEndpoint("")
 		})
 
 		It("errors", func() {
@@ -32,9 +32,9 @@ var _ = Describe("RoutingApi", func() {
 		})
 	})
 
-	Context("when the config has a RoutingApiEndpoint", func() {
+	Context("when the config has a RoutingAPIEndpoint", func() {
 		BeforeEach(func() {
-			config.SetRoutingApiEndpoint("api.example.com")
+			config.SetRoutingAPIEndpoint("api.example.com")
 		})
 
 		It("does not error", func() {

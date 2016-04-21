@@ -671,8 +671,8 @@ var _ = Describe("Server", func() {
 				})
 
 				It("returns the ApiEndpoint(), ApiVersion() and HasAPIEndpoint() setting in config", func() {
-					config.SetApiVersion("v1.1.1")
-					config.SetApiEndpoint("www.fake-domain.com")
+					config.SetAPIVersion("v1.1.1")
+					config.SetAPIEndpoint("www.fake-domain.com")
 
 					client, err = rpc.Dial("tcp", "127.0.0.1:"+rpcService.Port())
 					Expect(err).ToNot(HaveOccurred())

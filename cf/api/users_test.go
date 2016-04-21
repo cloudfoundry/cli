@@ -37,7 +37,7 @@ var _ = Describe("UserRepository", func() {
 		uaaServer = ghttp.NewServer()
 
 		config = testconfig.NewRepositoryWithDefaults()
-		config.SetApiEndpoint(ccServer.URL())
+		config.SetAPIEndpoint(ccServer.URL())
 		config.SetUaaEndpoint(uaaServer.URL())
 		ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(config)
 		uaaGateway = net.NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))

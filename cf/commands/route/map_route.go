@@ -101,7 +101,7 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 	}
 
 	if flag != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement(fmt.Sprintf("Option '--%s'", flag), cf.TcpRoutingMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement(fmt.Sprintf("Option '--%s'", flag), cf.TcpRoutingMinimumAPIVersion))
 		reqs = append(reqs, requirementsFactory.NewDiegoApplicationRequirement(appName))
 	}
 

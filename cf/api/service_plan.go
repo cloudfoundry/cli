@@ -33,7 +33,7 @@ func NewCloudControllerServicePlanRepository(config coreconfig.Reader, gateway n
 
 func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGUID string, public bool) error {
 	return repo.gateway.UpdateResource(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/service_plans/%s", servicePlan.GUID),
 		strings.NewReader(fmt.Sprintf(`{"public":%t}`, public)),
 	)
@@ -44,7 +44,7 @@ func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(servi
 	plans := []models.ServicePlanFields{}
 
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/service_plans?q=%s", url.QueryEscape("service_guid IN "+serviceGUIDsString)),
 		resources.ServicePlanResource{},
 		func(resource interface{}) bool {
@@ -58,7 +58,7 @@ func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(servi
 
 func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]string) (plans []models.ServicePlanFields, err error) {
 	err = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		combineQueryParametersWithURI("/v2/service_plans", queryParams),
 		resources.ServicePlanResource{},
 		func(resource interface{}) bool {

@@ -58,7 +58,7 @@ var _ = Describe("target command", func() {
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory.ApiEndpointSuccess = true
+		requirementsFactory.APIEndpointSuccess = true
 	})
 
 	var callTarget = func(args []string) bool {
@@ -90,7 +90,7 @@ var _ = Describe("target command", func() {
 
 	Describe("when there is no api endpoint set", func() {
 		BeforeEach(func() {
-			requirementsFactory.ApiEndpointSuccess = false
+			requirementsFactory.APIEndpointSuccess = false
 		})
 
 		It("fails requirements", func() {

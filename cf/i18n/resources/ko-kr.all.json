@@ -180,12 +180,12 @@
     "translation": "API 엔드포인트:"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API 엔드포인트: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API 엔드포인트: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API 엔드포인트: {{.ApiEndpoint}}(API 버전: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API 엔드포인트: {{.APIEndpoint}}(API 버전: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -1072,8 +1072,8 @@
     "translation": "라우트 확인 중..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API 버전 {{.ApiVer}}에는 CLI 버전 {{.CLIMin}}이(가) 필요합니다. 현재 버전 {{.CLIVer}}에 있습니다. CLI를 업그레이드하려면 https://github.com/cloudfoundry/cli#downloads를 방문하십시오."
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API 버전 {{.APIVer}}에는 CLI 버전 {{.CLIMin}}이(가) 필요합니다. 현재 버전 {{.CLIVer}}에 있습니다. CLI를 업그레이드하려면 https://github.com/cloudfoundry/cli#downloads를 방문하십시오."
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1164,8 +1164,8 @@
     "translation": "업데이트를 직렬화할 수 없습니다."
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "조직을 대상으로 지정할 수 없습니다.\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "조직을 대상으로 지정할 수 없습니다.\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1740,8 +1740,8 @@
     "translation": "{{.Name}} 빌드팩 삭제 중에 오류 발생\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "{{.DomainName}} 도메인 삭제 중에 오류 발생\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "{{.DomainName}} 도메인 삭제 중에 오류 발생\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1768,16 +1768,16 @@
     "translation": "영역에 대한 SSH 지원 사용 설정 중에 오류 발생 "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "사용 가능한 조직을 찾는 중에 오류 발생\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "사용 가능한 조직을 찾는 중에 오류 발생\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "사용 가능한 영역을 찾는 중에 오류 발생\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "{{.DomainName}} 도메인을 찾는 중에 오류 발생\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "{{.DomainName}} 도메인을 찾는 중에 오류 발생\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1928,8 +1928,8 @@
     "translation": "health_check_type 업데이트 중에 오류가 발생한 대상 "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "애플리케이션 업로드 중에 오류가 발생했습니다.\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "애플리케이션 업로드 중에 오류가 발생했습니다.\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2016,16 +2016,16 @@
     "translation": "도메인 페치에 실패했습니다.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "이벤트 페치에 실패했습니다.\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "이벤트 페치에 실패했습니다.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "{{.OrgRoleToDisplayName}} 역할의 조직-사용자 페치에 실패했습니다.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "조직 페치에 실패했습니다.\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "조직 페치에 실패했습니다.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -3732,8 +3732,8 @@
     "translation": "서버 오류, 상태 코드: 403: 액세스가 거부되었습니다. 이 명령을 실행할 권한이 없습니다."
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "서버 오류, 상태 코드: {{.ErrStatusCode}}, 오류 코드: {{.ErrApiErrorCode}}, 메시지: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "서버 오류, 상태 코드: {{.ErrStatusCode}}, 오류 코드: {{.ErrAPIErrorCode}}, 메시지: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -4020,8 +4020,8 @@
     "translation": "팁: 대상 지정된 영역이 없습니다. 영역을 대상 지정하려면 '{{.CfTargetCommand}}'을(를) 사용하십시오."
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "팁: 비보안 API 엔드포인트를 사용하여 계속하려면 '{{.ApiCommand}}'을(를) 사용하십시오."
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "팁: 비보안 API 엔드포인트를 사용하여 계속하려면 '{{.APICommand}}'을(를) 사용하십시오."
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4200,8 +4200,8 @@
     "translation": "사용자"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "{{.SpaceName}} 영역에 액세스할 수 없습니다.\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "{{.SpaceName}} 영역에 액세스할 수 없습니다.\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -5028,8 +5028,8 @@
     "translation": "예"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}}(API 버전: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}}(API 버전: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5076,12 +5076,12 @@
     "translation": "{{.Err}}\n\n팁: 자세한 정보는 '{{.Command}}'을(를) 사용하십시오."
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "현재 CF CLI 버전 {{.Version}}\n\tCurrent CF API version {{.ApiVersion}}\n\t{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.RequiredVersion}}(으)로 업그레이드해야 합니다."
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "현재 CF CLI 버전 {{.Version}}\n\tCurrent CF API version {{.APIVersion}}\n\t{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.RequiredVersion}}(으)로 업그레이드해야 합니다."
   },
   {
     "id": "{{.FlappingCount}} failing",

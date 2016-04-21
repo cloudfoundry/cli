@@ -184,7 +184,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 func createUserProvidedServiceInstanceRepo(req []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo UserProvidedServiceInstanceRepository) {
 	ts, handler = testnet.NewServer(req)
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
+	configRepo.SetAPIEndpoint(ts.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCCUserProvidedServiceInstanceRepository(configRepo, gateway)
 	return

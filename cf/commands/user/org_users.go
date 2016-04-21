@@ -107,7 +107,7 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 }
 
 func (cmd *OrgUsers) userLister() func(orgGUID string, role string) ([]models.UserFields, error) {
-	if cmd.config.IsMinApiVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion) {
+	if cmd.config.IsMinAPIVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion) {
 		return cmd.userRepo.ListUsersInOrgForRoleWithNoUAA
 	}
 	return cmd.userRepo.ListUsersInOrgForRole

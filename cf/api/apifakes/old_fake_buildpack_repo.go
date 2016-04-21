@@ -11,14 +11,14 @@ type OldFakeBuildpackRepository struct {
 	FindByNameNotFound    bool
 	FindByNameName        string
 	FindByNameBuildpack   models.Buildpack
-	FindByNameApiResponse error
+	FindByNameAPIResponse error
 
 	CreateBuildpackExists bool
 	CreateBuildpack       models.Buildpack
-	CreateApiResponse     error
+	CreateAPIResponse     error
 
 	DeleteBuildpackGUID string
-	DeleteApiResponse   error
+	DeleteAPIResponse   error
 
 	UpdateBuildpackArgs struct {
 		Buildpack models.Buildpack
@@ -53,12 +53,12 @@ func (repo *OldFakeBuildpackRepository) Create(name string, position *int, enabl
 	}
 
 	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}
-	return repo.CreateBuildpack, repo.CreateApiResponse
+	return repo.CreateBuildpack, repo.CreateAPIResponse
 }
 
 func (repo *OldFakeBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
 	repo.DeleteBuildpackGUID = buildpackGUID
-	apiErr = repo.DeleteApiResponse
+	apiErr = repo.DeleteAPIResponse
 	return
 }
 

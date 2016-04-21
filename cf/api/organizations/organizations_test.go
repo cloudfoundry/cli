@@ -89,7 +89,7 @@ var _ = Describe("Organization Repository", func() {
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
-			configRepo.SetApiEndpoint(ccServer.URL())
+			configRepo.SetAPIEndpoint(ccServer.URL())
 			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 			ccServer.AppendHandlers(
@@ -407,7 +407,7 @@ func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.S
 	testserver, handler = testnet.NewServer(reqs)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(testserver.URL)
+	configRepo.SetAPIEndpoint(testserver.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return

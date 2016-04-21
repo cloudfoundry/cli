@@ -78,7 +78,7 @@ var _ = Describe("create-space-quota command", func() {
 			It("fails when the -a option is provided", func() {
 				Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
 
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumAPIVersion))
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
 			})
 

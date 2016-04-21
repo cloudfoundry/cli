@@ -340,7 +340,7 @@ func testSpacesDidNotFindByNameWithOrg(orgGUID string, findByName func(SpaceRepo
 func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
+	configRepo.SetAPIEndpoint(ts.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return

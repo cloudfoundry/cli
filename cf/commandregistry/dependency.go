@@ -85,7 +85,7 @@ func NewDependency(logger trace.Printer) Dependency {
 	deps.Gateways = map[string]net.Gateway{
 		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.Ui, logger),
 		"uaa":              net.NewUAAGateway(deps.Config, deps.Ui, logger),
-		"routing-api":      net.NewRoutingApiGateway(deps.Config, time.Now, deps.Ui, logger),
+		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.Ui, logger),
 	}
 	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways, logger)
 

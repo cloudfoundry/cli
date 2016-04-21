@@ -180,12 +180,12 @@
     "translation": "API エンドポイント:"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API エンドポイント: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API エンドポイント: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API エンドポイント: {{.ApiEndpoint}} (API バージョン: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API エンドポイント: {{.APIEndpoint}} (API バージョン: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -1072,8 +1072,8 @@
     "translation": "経路を確認しています..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API バージョン {{.ApiVer}} には CLI バージョン {{.CLIMin}} が必要です。現在のバージョンは {{.CLIVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API バージョン {{.APIVer}} には CLI バージョン {{.CLIMin}} が必要です。現在のバージョンは {{.CLIVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1164,8 +1164,8 @@
     "translation": "更新を直列化できませんでした。 "
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "組織をターゲットにすることができませんでした。\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "組織をターゲットにすることができませんでした。\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1740,8 +1740,8 @@
     "translation": "ビルドパック {{.Name}} の削除時にエラーが発生しました\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1768,16 +1768,16 @@
     "translation": "次のスペースに対する SSH サポートを有効にしようとしたときエラーが発生しました: "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "使用可能な組織の検索時にエラーが発生しました\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "使用可能な組織の検索時にエラーが発生しました\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "使用可能なスペースの検索時にエラーが発生しました\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "ドメイン {{.DomainName}} の検索時にエラーが発生しました\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "ドメイン {{.DomainName}} の検索時にエラーが発生しました\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1928,8 +1928,8 @@
     "translation": "次のものの health_check_type を更新しているときエラーが発生しました: "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "アプリケーションのアップロード時にエラーが発生しました。\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "アプリケーションのアップロード時にエラーが発生しました。\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2016,16 +2016,16 @@
     "translation": "ドメインを取り出せませんでした。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "イベントを取り出せませんでした。\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "イベントを取り出せませんでした。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "役割 {{.OrgRoleToDisplayName}} の組織ユーザーを取り出せませんでした。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "組織を取り出せませんでした。\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "組織を取り出せませんでした。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -3732,8 +3732,8 @@
     "translation": "サーバー・エラー、状況コード: 403: アクセスは拒否されました。このコマンドを実行する特権がありません。"
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "サーバー・エラー、状況コード: {{.ErrStatusCode}}、エラー・コード: {{.ErrApiErrorCode}}、メッセージ: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "サーバー・エラー、状況コード: {{.ErrStatusCode}}、エラー・コード: {{.ErrAPIErrorCode}}、メッセージ: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -4020,8 +4020,8 @@
     "translation": "ヒント: スペースがターゲットになっていません、'{{.CfTargetCommand}}' を使用してスペースをターゲットにしてください"
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "ヒント: 非セキュアな API エンドポイントから継続するには、'{{.ApiCommand}}' を使用します"
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "ヒント: 非セキュアな API エンドポイントから継続するには、'{{.APICommand}}' を使用します"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4200,8 +4200,8 @@
     "translation": "ユーザー"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "スペース {{.SpaceName}} にアクセスできません。\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "スペース {{.SpaceName}} にアクセスできません。\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -5028,8 +5028,8 @@
     "translation": "はい"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}} (API バージョン: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}} (API バージョン: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5076,12 +5076,12 @@
     "translation": "{{.Err}}\n\nヒント: 詳しくは '{{.Command}}' を使用してください"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "現在の CF CLI バージョン {{.Version}}\n\t現在の CF API バージョン {{.ApiVersion}}\n\t{{.CommandName}} フィーチャーを使用するには、CF API を少なくとも {{.RequiredVersion}} にアップグレードする必要があります"
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "現在の CF CLI バージョン {{.Version}}\n\t現在の CF API バージョン {{.APIVersion}}\n\t{{.CommandName}} フィーチャーを使用するには、CF API を少なくとも {{.RequiredVersion}} にアップグレードする必要があります"
   },
   {
     "id": "{{.FlappingCount}} failing",

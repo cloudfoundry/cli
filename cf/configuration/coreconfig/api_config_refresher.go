@@ -26,12 +26,12 @@ func (a APIConfigRefresher) Refresh() (Warning, error) {
 		return nil, err
 	}
 
-	if endpoint != a.Config.ApiEndpoint() {
+	if endpoint != a.Config.APIEndpoint() {
 		a.Config.ClearSession()
 	}
 
-	a.Config.SetApiEndpoint(endpoint)
-	a.Config.SetApiVersion(ccInfo.ApiVersion)
+	a.Config.SetAPIEndpoint(endpoint)
+	a.Config.SetAPIVersion(ccInfo.APIVersion)
 	a.Config.SetAuthenticationEndpoint(ccInfo.AuthorizationEndpoint)
 	a.Config.SetSSHOAuthClient(ccInfo.SSHOAuthClient)
 	a.Config.SetMinCLIVersion(ccInfo.MinCLIVersion)
@@ -41,7 +41,7 @@ func (a APIConfigRefresher) Refresh() (Warning, error) {
 	//* 3/5/15: loggregator endpoint will be renamed to doppler eventually,
 	//          we just have to use the loggregator endpoint as doppler for now
 	a.Config.SetDopplerEndpoint(strings.Replace(a.Config.LoggregatorEndpoint(), "loggregator", "doppler", 1))
-	a.Config.SetRoutingApiEndpoint(ccInfo.RoutingApiEndpoint)
+	a.Config.SetRoutingAPIEndpoint(ccInfo.RoutingAPIEndpoint)
 
 	if !strings.HasPrefix(endpoint, "https://") {
 		return new(insecureWarning), nil

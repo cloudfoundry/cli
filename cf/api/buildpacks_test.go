@@ -38,7 +38,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	var setupTestServer = func(requests ...testnet.TestRequest) {
 		ts, handler = testnet.NewServer(requests)
-		config.SetApiEndpoint(ts.URL)
+		config.SetAPIEndpoint(ts.URL)
 	}
 
 	It("lists buildpacks", func() {

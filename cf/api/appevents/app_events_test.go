@@ -27,11 +27,11 @@ var _ = Describe("App Events Repo", func() {
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
-		config.SetApiVersion("2.2.0")
+		config.SetAPIVersion("2.2.0")
 	})
 
 	JustBeforeEach(func() {
-		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
+		strategy := strategy.NewEndpointStrategy(config.APIVersion())
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
 		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
 	})
@@ -42,7 +42,7 @@ var _ = Describe("App Events Repo", func() {
 
 	setupTestServer := func(requests ...testnet.TestRequest) {
 		server, handler = testnet.NewServer(requests)
-		config.SetApiEndpoint(server.URL)
+		config.SetAPIEndpoint(server.URL)
 	}
 
 	Describe("list recent events", func() {

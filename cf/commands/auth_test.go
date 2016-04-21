@@ -67,12 +67,12 @@ var _ = Describe("auth command", func() {
 
 	Context("when an api endpoint is targeted", func() {
 		BeforeEach(func() {
-			requirementsFactory.ApiEndpointSuccess = true
-			config.SetApiEndpoint("foo.example.org/authenticate")
+			requirementsFactory.APIEndpointSuccess = true
+			config.SetAPIEndpoint("foo.example.org/authenticate")
 		})
 
 		It("authenticates successfully", func() {
-			requirementsFactory.ApiEndpointSuccess = true
+			requirementsFactory.APIEndpointSuccess = true
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
@@ -101,7 +101,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
-			requirementsFactory.ApiEndpointSuccess = true
+			requirementsFactory.APIEndpointSuccess = true
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 			Expect(authRepo.GetLoginPromptsAndSaveUAAServerURLCallCount()).To(Equal(1))
 		})
@@ -114,7 +114,7 @@ var _ = Describe("auth command", func() {
 
 			It("does not prompt the user when provided username and password", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{config.ApiEndpoint()},
+					[]string{config.APIEndpoint()},
 					[]string{"Authenticating..."},
 					[]string{"FAILED"},
 					[]string{"Error authenticating"},

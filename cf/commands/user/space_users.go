@@ -109,7 +109,7 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 }
 
 func (cmd *SpaceUsers) userLister() func(spaceGUID string, role string) ([]models.UserFields, error) {
-	if cmd.config.IsMinApiVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion) {
+	if cmd.config.IsMinAPIVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion) {
 		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
 	}
 	return cmd.userRepo.ListUsersInSpaceForRole

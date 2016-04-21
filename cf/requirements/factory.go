@@ -23,7 +23,7 @@ type Factory interface {
 	NewDomainRequirement(name string) DomainRequirement
 	NewUserRequirement(username string, wantGUID bool) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
-	NewApiEndpointRequirement() Requirement
+	NewAPIEndpointRequirement() Requirement
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
 	NewUsageRequirement(Usable, string, func() bool) Requirement
@@ -74,7 +74,7 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 
 func (f apiRequirementFactory) NewRoutingAPIRequirement() Requirement {
 	req := Requirements{
-		f.NewMinAPIVersionRequirement("RoutingAPI", cf.TcpRoutingMinimumApiVersion),
+		f.NewMinAPIVersionRequirement("RoutingAPI", cf.TcpRoutingMinimumAPIVersion),
 		NewRoutingAPIRequirement(
 			f.config,
 		),
@@ -132,8 +132,8 @@ func (f apiRequirementFactory) NewBuildpackRequirement(buildpack string) Buildpa
 	)
 }
 
-func (f apiRequirementFactory) NewApiEndpointRequirement() Requirement {
-	return NewApiEndpointRequirement(
+func (f apiRequirementFactory) NewAPIEndpointRequirement() Requirement {
+	return NewAPIEndpointRequirement(
 		f.config,
 	)
 }
@@ -146,7 +146,7 @@ func (f apiRequirementFactory) NewMinAPIVersionRequirement(commandName string, r
 	)
 
 	refresher := coreconfig.APIConfigRefresher{
-		Endpoint:     f.config.ApiEndpoint(),
+		Endpoint:     f.config.APIEndpoint(),
 		EndpointRepo: f.repoLocator.GetEndpointRepository(),
 		Config:       f.config,
 	}

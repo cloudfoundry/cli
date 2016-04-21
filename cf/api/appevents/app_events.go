@@ -42,7 +42,7 @@ func (repo CloudControllerAppEventsRepository) RecentEvents(appGUID string, limi
 
 func (repo CloudControllerAppEventsRepository) listEvents(appGUID string, limit int64, cb func(models.EventFields) bool) error {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		repo.strategy.EventsURL(appGUID, limit),
 		repo.strategy.EventsResource(),
 

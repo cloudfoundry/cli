@@ -12,20 +12,20 @@ type BuildpackRequirement interface {
 	GetBuildpack() models.Buildpack
 }
 
-type buildpackApiRequirement struct {
+type buildpackAPIRequirement struct {
 	name          string
 	buildpackRepo api.BuildpackRepository
 	buildpack     models.Buildpack
 }
 
-func NewBuildpackRequirement(name string, bR api.BuildpackRepository) (req *buildpackApiRequirement) {
-	req = new(buildpackApiRequirement)
+func NewBuildpackRequirement(name string, bR api.BuildpackRepository) (req *buildpackAPIRequirement) {
+	req = new(buildpackAPIRequirement)
 	req.name = name
 	req.buildpackRepo = bR
 	return
 }
 
-func (req *buildpackApiRequirement) Execute() error {
+func (req *buildpackAPIRequirement) Execute() error {
 	var apiErr error
 	req.buildpack, apiErr = req.buildpackRepo.FindByName(req.name)
 
@@ -36,6 +36,6 @@ func (req *buildpackApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *buildpackApiRequirement) GetBuildpack() models.Buildpack {
+func (req *buildpackAPIRequirement) GetBuildpack() models.Buildpack {
 	return req.buildpack
 }

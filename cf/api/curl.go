@@ -33,7 +33,7 @@ func NewCloudControllerCurlRepository(config coreconfig.Reader, gateway net.Gate
 }
 
 func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, err error) {
-	url := fmt.Sprintf("%s/%s", repo.config.ApiEndpoint(), strings.TrimLeft(path, "/"))
+	url := fmt.Sprintf("%s/%s", repo.config.APIEndpoint(), strings.TrimLeft(path, "/"))
 
 	if method == "" && body != "" {
 		method = "POST"

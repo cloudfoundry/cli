@@ -42,7 +42,7 @@ func NewCloudControllerSpaceQuotaRepository(config coreconfig.Reader, gateway ne
 func (repo CloudControllerSpaceQuotaRepository) findAllWithPath(path string) ([]models.SpaceQuota, error) {
 	var quotas []models.SpaceQuota
 	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.SpaceQuotaResource{},
 		func(resource interface{}) bool {
@@ -101,25 +101,25 @@ func (repo CloudControllerSpaceQuotaRepository) FindByGUID(guid string) (quota m
 
 func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) error {
 	path := "/v2/space_quota_definitions"
-	return repo.gateway.CreateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
+	return repo.gateway.CreateResourceFromStruct(repo.config.APIEndpoint(), path, quota)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) error {
 	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quota.GUID)
-	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
+	return repo.gateway.UpdateResourceFromStruct(repo.config.APIEndpoint(), path, quota)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGUID string, quotaGUID string) error {
 	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGUID, spaceGUID)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(""))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, strings.NewReader(""))
 }
 
 func (repo CloudControllerSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGUID string, quotaGUID string) error {
 	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGUID, spaceGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quotaGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }

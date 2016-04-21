@@ -32,7 +32,7 @@ func NewCloudControllerFeatureFlagRepository(config coreconfig.Reader, gateway n
 func (repo CloudControllerFeatureFlagRepository) List() ([]models.FeatureFlag, error) {
 	flags := []models.FeatureFlag{}
 	apiError := repo.gateway.GetResource(
-		fmt.Sprintf("%s/v2/config/feature_flags", repo.config.ApiEndpoint()),
+		fmt.Sprintf("%s/v2/config/feature_flags", repo.config.APIEndpoint()),
 		&flags)
 
 	if apiError != nil {
@@ -45,7 +45,7 @@ func (repo CloudControllerFeatureFlagRepository) List() ([]models.FeatureFlag, e
 func (repo CloudControllerFeatureFlagRepository) FindByName(name string) (models.FeatureFlag, error) {
 	flag := models.FeatureFlag{}
 	apiError := repo.gateway.GetResource(
-		fmt.Sprintf("%s/v2/config/feature_flags/%s", repo.config.ApiEndpoint(), name),
+		fmt.Sprintf("%s/v2/config/feature_flags/%s", repo.config.APIEndpoint(), name),
 		&flag)
 
 	if apiError != nil {
@@ -59,5 +59,5 @@ func (repo CloudControllerFeatureFlagRepository) Update(flag string, set bool) e
 	url := fmt.Sprintf("/v2/config/feature_flags/%s", flag)
 	body := fmt.Sprintf(`{"enabled": %v}`, set)
 
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(body))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), url, strings.NewReader(body))
 }

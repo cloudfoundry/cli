@@ -37,7 +37,7 @@ var _ = Describe("marketplace command", func() {
 	BeforeEach(func() {
 		serviceBuilder = new(servicebuilderfakes.FakeServiceBuilder)
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{ApiEndpointSuccess: true}
+		requirementsFactory = &testreq.FakeReqFactory{APIEndpointSuccess: true}
 
 		serviceWithAPaidPlan = models.ServiceOffering{
 			Plans: []models.ServicePlanFields{
@@ -65,7 +65,7 @@ var _ = Describe("marketplace command", func() {
 		Context("when the an API endpoint is not targeted", func() {
 			It("does not meet its requirements", func() {
 				config = testconfig.NewRepository()
-				requirementsFactory.ApiEndpointSuccess = false
+				requirementsFactory.APIEndpointSuccess = false
 
 				Expect(testcmd.RunCLICommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 			})

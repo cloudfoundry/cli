@@ -45,7 +45,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", GUID: "my-cool-buildpack-guid"}
 
 		testServer, testServerHandler = testnet.NewServer([]testnet.TestRequest{uploadBuildpackRequest()})
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	})
 
 	AfterEach(func() {

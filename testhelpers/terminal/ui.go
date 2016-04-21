@@ -159,6 +159,6 @@ func (ui *FakeUI) Table(headers []string) *term.UITable {
 
 func (ui *FakeUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
 	if !config.IsMinCLIVersion(cf.Version) {
-		ui.Say("Cloud Foundry API version {{.ApiVer}} requires CLI version " + config.MinCLIVersion() + "  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads")
+		ui.Say("Cloud Foundry API version {{.APIVer}} requires CLI version " + config.MinCLIVersion() + "  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads")
 	}
 }

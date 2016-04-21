@@ -112,7 +112,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 	Context("when the service auth token does not exist", func() {
 		BeforeEach(func() {
-			authTokenRepo.FindByLabelAndProviderApiResponse = errors.NewModelNotFoundError("Service Auth Token", "")
+			authTokenRepo.FindByLabelAndProviderAPIResponse = errors.NewModelNotFoundError("Service Auth Token", "")
 		})
 
 		It("warns the user when the specified service auth token does not exist", func() {
@@ -129,7 +129,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 	Context("when there is an error deleting the service auth token", func() {
 		BeforeEach(func() {
-			authTokenRepo.FindByLabelAndProviderApiResponse = errors.New("OH NOES")
+			authTokenRepo.FindByLabelAndProviderAPIResponse = errors.New("OH NOES")
 		})
 
 		It("shows the user an error", func() {

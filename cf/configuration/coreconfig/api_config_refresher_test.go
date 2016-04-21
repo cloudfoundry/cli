@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ApiConfigRefresher", func() {
+var _ = Describe("APIConfigRefresher", func() {
 	Describe("LoggregatorEndpoint", func() {
 		r := APIConfigRefresher{}
 

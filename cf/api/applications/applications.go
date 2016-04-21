@@ -48,7 +48,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 	}
 
 	resource := new(resources.ApplicationResource)
-	err = repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/apps", bytes.NewReader(data), resource)
+	err = repo.gateway.CreateResource(repo.config.APIEndpoint(), "/v2/apps", bytes.NewReader(data), resource)
 	if err != nil {
 		return models.Application{}, err
 	}
@@ -57,7 +57,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 }
 
 func (repo CloudControllerApplicationRepository) GetApp(appGUID string) (app models.Application, apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.ApiEndpoint(), appGUID)
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.APIEndpoint(), appGUID)
 	appResources := new(resources.ApplicationResource)
 
 	apiErr = repo.gateway.GetResource(path, appResources)
@@ -74,7 +74,7 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app models.A
 }
 
 func (repo CloudControllerApplicationRepository) ReadFromSpace(name string, spaceGUID string) (app models.Application, apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), spaceGUID, url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.APIEndpoint(), spaceGUID, url.QueryEscape("name:"+name))
 	appResources := new(resources.PaginatedApplicationResources)
 	apiErr = repo.gateway.GetResource(path, appResources)
 	if apiErr != nil {
@@ -100,7 +100,7 @@ func (repo CloudControllerApplicationRepository) Update(appGUID string, params m
 
 	path := fmt.Sprintf("/v2/apps/%s?inline-relations-depth=1", appGUID)
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(data), resource)
+	apiErr = repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, bytes.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -111,7 +111,7 @@ func (repo CloudControllerApplicationRepository) Update(appGUID string, params m
 
 func (repo CloudControllerApplicationRepository) Delete(appGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/apps/%s?recursive=true", appGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
 
 func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.Environment, error) {
@@ -119,7 +119,7 @@ func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.E
 		err error
 	)
 
-	path := fmt.Sprintf("%s/v2/apps/%s/env", repo.config.ApiEndpoint(), guid)
+	path := fmt.Sprintf("%s/v2/apps/%s/env", repo.config.APIEndpoint(), guid)
 	appResource := models.NewEnvironment()
 
 	err = repo.gateway.GetResource(path, appResource)
@@ -132,5 +132,5 @@ func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.E
 
 func (repo CloudControllerApplicationRepository) CreateRestageRequest(guid string) error {
 	path := fmt.Sprintf("/v2/apps/%s/restage", guid)
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, strings.NewReader(""), nil)
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, strings.NewReader(""), nil)
 }

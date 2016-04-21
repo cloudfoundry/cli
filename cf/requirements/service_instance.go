@@ -12,20 +12,20 @@ type ServiceInstanceRequirement interface {
 	GetServiceInstance() models.ServiceInstance
 }
 
-type serviceInstanceApiRequirement struct {
+type serviceInstanceAPIRequirement struct {
 	name            string
 	serviceRepo     api.ServiceRepository
 	serviceInstance models.ServiceInstance
 }
 
-func NewServiceInstanceRequirement(name string, sR api.ServiceRepository) (req *serviceInstanceApiRequirement) {
-	req = new(serviceInstanceApiRequirement)
+func NewServiceInstanceRequirement(name string, sR api.ServiceRepository) (req *serviceInstanceAPIRequirement) {
+	req = new(serviceInstanceAPIRequirement)
 	req.name = name
 	req.serviceRepo = sR
 	return
 }
 
-func (req *serviceInstanceApiRequirement) Execute() error {
+func (req *serviceInstanceAPIRequirement) Execute() error {
 	var apiErr error
 	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
 
@@ -36,6 +36,6 @@ func (req *serviceInstanceApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *serviceInstanceApiRequirement) GetServiceInstance() models.ServiceInstance {
+func (req *serviceInstanceAPIRequirement) GetServiceInstance() models.ServiceInstance {
 	return req.serviceInstance
 }

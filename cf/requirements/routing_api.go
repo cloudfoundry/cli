@@ -18,7 +18,7 @@ func NewRoutingAPIRequirement(config coreconfig.Reader) RoutingAPIRequirement {
 }
 
 func (req RoutingAPIRequirement) Execute() error {
-	if len(req.config.RoutingApiEndpoint()) == 0 {
+	if len(req.config.RoutingAPIEndpoint()) == 0 {
 		return errors.New(T("This command requires the Routing API. Your targeted endpoint reports it is not enabled."))
 	}
 

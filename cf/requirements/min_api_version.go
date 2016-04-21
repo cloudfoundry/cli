@@ -28,21 +28,21 @@ func NewMinAPIVersionRequirement(
 }
 
 func (r MinAPIVersionRequirement) Execute() error {
-	if r.config.ApiVersion() == "" {
+	if r.config.APIVersion() == "" {
 		return errors.New(T("Unable to determine CC API Version. Please log in again."))
 	}
 
-	apiVersion, err := semver.Make(r.config.ApiVersion())
+	apiVersion, err := semver.Make(r.config.APIVersion())
 	if err != nil {
 		return errors.New(T("Unable to parse CC API Version '{{.APIVersion}}'", map[string]interface{}{
-			"APIVersion": r.config.ApiVersion(),
+			"APIVersion": r.config.APIVersion(),
 		}))
 	}
 
 	if apiVersion.LT(r.requiredVersion) {
-		return errors.New(T(`{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.`,
+		return errors.New(T(`{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.`,
 			map[string]interface{}{
-				"ApiVersion":      r.config.ApiVersion(),
+				"APIVersion":      r.config.APIVersion(),
 				"Feature":         r.feature,
 				"RequiredVersion": r.requiredVersion.String(),
 			}))

@@ -39,7 +39,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		configRepo.SetApiEndpoint("fake-api-endpoint")
+		configRepo.SetAPIEndpoint("fake-api-endpoint")
 		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 		repoLocator := deps.RepoLocator.SetEndpointRepository(endpointRepo)
 		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
@@ -59,13 +59,13 @@ var _ = Describe("OneTimeSSHCode", func() {
 		factory = new(requirementsfakes.FakeFactory)
 
 		endpointRequirement = &passingRequirement{Name: "endpoint-requirement"}
-		factory.NewApiEndpointRequirementReturns(endpointRequirement)
+		factory.NewAPIEndpointRequirementReturns(endpointRequirement)
 	})
 
 	Describe("Requirements", func() {
 		It("returns an EndpointRequirement", func() {
 			actualRequirements := cmd.Requirements(factory, flagContext)
-			Expect(factory.NewApiEndpointRequirementCallCount()).To(Equal(1))
+			Expect(factory.NewAPIEndpointRequirementCallCount()).To(Equal(1))
 			Expect(actualRequirements).To(ContainElement(endpointRequirement))
 		})
 
@@ -113,13 +113,13 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 		Context("when updating the endpoint succeeds", func() {
 			ccInfo := &coreconfig.CCInfo{
-				ApiVersion:               "some-version",
+				APIVersion:               "some-version",
 				AuthorizationEndpoint:    "auth/endpoint",
 				LoggregatorEndpoint:      "loggregator/endpoint",
 				MinCLIVersion:            "min-cli-version",
 				MinRecommendedCLIVersion: "min-rec-cli-version",
 				SSHOAuthClient:           "some-client",
-				RoutingApiEndpoint:       "routing/endpoint",
+				RoutingAPIEndpoint:       "routing/endpoint",
 			}
 			BeforeEach(func() {
 				endpointRepo.GetCCInfoReturns(

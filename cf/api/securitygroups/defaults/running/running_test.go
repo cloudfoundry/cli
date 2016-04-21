@@ -37,7 +37,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
 		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	}
 
 	Describe(".BindToRunningSet", func() {
@@ -72,7 +72,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 				}),
 			})
 
-			configRepo.SetApiEndpoint(testServer.URL)
+			configRepo.SetAPIEndpoint(testServer.URL)
 			err := repo.UnbindFromRunningSet("my-guid")
 
 			Expect(err).ToNot(HaveOccurred())

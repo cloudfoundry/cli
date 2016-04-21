@@ -164,6 +164,6 @@ func (cmd *SSH) Execute(fc flags.FlagContext) {
 
 func (cmd *SSH) getSSHEndpointInfo() (sshInfo, error) {
 	info := sshInfo{}
-	apiErr := cmd.gateway.GetResource(cmd.config.ApiEndpoint()+"/v2/info", &info)
+	apiErr := cmd.gateway.GetResource(cmd.config.APIEndpoint()+"/v2/info", &info)
 	return info, apiErr
 }

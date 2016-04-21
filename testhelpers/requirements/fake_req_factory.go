@@ -19,7 +19,7 @@ type FakeReqFactory struct {
 	ApplicationFails             bool
 	LoginSuccess                 bool
 	RoutingAPIEndpointSuccess    bool
-	ApiEndpointSuccess           bool
+	APIEndpointSuccess           bool
 	ValidAccessTokenSuccess      bool
 	TargetedSpaceSuccess         bool
 	TargetedOrgSuccess           bool
@@ -123,8 +123,8 @@ func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.
 	return FakeRequirement{f, f.BuildpackSuccess}
 }
 
-func (f *FakeReqFactory) NewApiEndpointRequirement() requirements.Requirement {
-	return FakeRequirement{f, f.ApiEndpointSuccess}
+func (f *FakeReqFactory) NewAPIEndpointRequirement() requirements.Requirement {
+	return FakeRequirement{f, f.APIEndpointSuccess}
 }
 
 func (f *FakeReqFactory) NewMinAPIVersionRequirement(featureName string, requiredVersion semver.Version) requirements.Requirement {

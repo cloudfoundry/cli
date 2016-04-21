@@ -42,7 +42,7 @@ func NewCloudControllerRouteRepository(config coreconfig.Reader, gateway net.Gat
 
 func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.SpaceFields().GUID),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
@@ -52,7 +52,7 @@ func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool
 
 func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/routes?q=organization_guid:%s&inline-relations-depth=1", repo.config.OrganizationFields().GUID),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
@@ -98,7 +98,7 @@ func (repo CloudControllerRouteRepository) Find(host string, domain models.Domai
 
 	found := false
 	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/routes?%s", opt.Encode()),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
@@ -131,7 +131,7 @@ func (repo CloudControllerRouteRepository) Create(host string, domain models.Dom
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
 	path = normalizedPath(path)
 
-	u, err := url.Parse(repo.config.ApiEndpoint())
+	u, err := url.Parse(repo.config.APIEndpoint())
 	if err != nil {
 		return false, err
 	}
@@ -181,7 +181,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID,
 
 	resource := new(resources.RouteResource)
 	err = repo.gateway.CreateResource(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		uriFragment,
 		bytes.NewReader(data),
 		resource,
@@ -195,15 +195,15 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID,
 
 func (repo CloudControllerRouteRepository) Bind(routeGUID, appGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGUID, routeGUID)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, nil)
 }
 
 func (repo CloudControllerRouteRepository) Unbind(routeGUID, appGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGUID, routeGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
 
 func (repo CloudControllerRouteRepository) Delete(routeGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/routes/%s", routeGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }

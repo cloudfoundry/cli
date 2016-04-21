@@ -76,8 +76,8 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 		cmd.ui.Warn(apiErr.Error())
 		return
 	default:
-		cmd.ui.Failed(T("Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-			map[string]interface{}{"DomainName": domainName, "ApiErr": apiErr.Error()}))
+		cmd.ui.Failed(T("Error finding domain {{.DomainName}}\n{{.APIErr}}",
+			map[string]interface{}{"DomainName": domainName, "APIErr": apiErr.Error()}))
 		return
 	}
 
@@ -94,8 +94,8 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 
 	apiErr = cmd.domainRepo.Delete(domain.GUID)
 	if apiErr != nil {
-		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-			map[string]interface{}{"DomainName": domainName, "ApiErr": apiErr.Error()}))
+		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+			map[string]interface{}{"DomainName": domainName, "APIErr": apiErr.Error()}))
 		return
 	}
 

@@ -127,11 +127,11 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 	reqs = append(reqs, usageReq)
 
 	if fc.String("route-path") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumAPIVersion))
 	}
 
 	if fc.String("app-ports") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumAPIVersion))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{
@@ -296,8 +296,8 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 
 		err = cmd.uploadApp(app.GUID, appDir, path, localFiles)
 		if err != nil {
-			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": err.Error()})))
+			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.APIErr}}",
+				map[string]interface{}{"APIErr": err.Error()})))
 			return
 		}
 		cmd.ui.Ok()

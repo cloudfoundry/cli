@@ -96,7 +96,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
-			configRepo.SetApiEndpoint(ccServer.URL())
+			configRepo.SetAPIEndpoint(ccServer.URL())
 			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 
@@ -587,7 +587,7 @@ var updateApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.Te
 func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
+	configRepo.SetAPIEndpoint(ts.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 	return

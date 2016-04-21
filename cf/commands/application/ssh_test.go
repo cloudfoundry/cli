@@ -189,7 +189,7 @@ var _ = Describe("SSH command", func() {
 					})
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
-					configRepo.SetApiEndpoint(testServer.URL)
+					configRepo.SetAPIEndpoint(testServer.URL)
 					ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
@@ -219,7 +219,7 @@ var _ = Describe("SSH command", func() {
 					})
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
-					configRepo.SetApiEndpoint(testServer.URL)
+					configRepo.SetAPIEndpoint(testServer.URL)
 					ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
@@ -258,7 +258,7 @@ var _ = Describe("SSH command", func() {
 				})
 
 				testServer, _ = testnet.NewServer([]testnet.TestRequest{getRequest})
-				configRepo.SetApiEndpoint(testServer.URL)
+				configRepo.SetAPIEndpoint(testServer.URL)
 				ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 				deps.Gateways["cloud-controller"] = ccGateway
 			})

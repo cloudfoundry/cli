@@ -18,13 +18,13 @@ type ConfigRepository struct {
 }
 
 type CCInfo struct {
-	ApiVersion               string `json:"api_version"`
+	APIVersion               string `json:"api_version"`
 	AuthorizationEndpoint    string `json:"authorization_endpoint"`
 	LoggregatorEndpoint      string `json:"logging_endpoint"`
 	MinCLIVersion            string `json:"min_cli_version"`
 	MinRecommendedCLIVersion string `json:"min_recommended_cli_version"`
 	SSHOAuthClient           string `json:"app_ssh_oauth_client"`
-	RoutingApiEndpoint       string `json:"routing_endpoint"`
+	RoutingAPIEndpoint       string `json:"routing_endpoint"`
 }
 
 func NewRepositoryFromFilepath(filepath string, errorHandler func(error)) Repository {
@@ -54,15 +54,15 @@ func NewRepositoryFromPersistor(persistor configuration.Persistor, errorHandler 
 }
 
 type Reader interface {
-	ApiEndpoint() string
-	ApiVersion() string
+	APIEndpoint() string
+	APIVersion() string
 	HasAPIEndpoint() bool
 
 	AuthenticationEndpoint() string
 	LoggregatorEndpoint() string
 	DopplerEndpoint() string
 	UaaEndpoint() string
-	RoutingApiEndpoint() string
+	RoutingAPIEndpoint() string
 	AccessToken() string
 	SSHOAuthClient() string
 	RefreshToken() string
@@ -78,7 +78,7 @@ type Reader interface {
 	UserEmail() string
 	IsLoggedIn() bool
 	IsSSLDisabled() bool
-	IsMinApiVersion(semver.Version) bool
+	IsMinAPIVersion(semver.Version) bool
 	IsMinCLIVersion(string) bool
 	MinCLIVersion() string
 	MinRecommendedCLIVersion() string
@@ -97,15 +97,15 @@ type Reader interface {
 type ReadWriter interface {
 	Reader
 	ClearSession()
-	SetApiEndpoint(string)
-	SetApiVersion(string)
+	SetAPIEndpoint(string)
+	SetAPIVersion(string)
 	SetMinCLIVersion(string)
 	SetMinRecommendedCLIVersion(string)
 	SetAuthenticationEndpoint(string)
 	SetLoggregatorEndpoint(string)
 	SetDopplerEndpoint(string)
 	SetUaaEndpoint(string)
-	SetRoutingApiEndpoint(string)
+	SetRoutingAPIEndpoint(string)
 	SetAccessToken(string)
 	SetSSHOAuthClient(string)
 	SetRefreshToken(string)
@@ -167,9 +167,9 @@ func (c *ConfigRepository) Close() {
 
 // GETTERS
 
-func (c *ConfigRepository) ApiVersion() (apiVersion string) {
+func (c *ConfigRepository) APIVersion() (apiVersion string) {
 	c.read(func() {
-		apiVersion = c.data.ApiVersion
+		apiVersion = c.data.APIVersion
 	})
 	return
 }
@@ -209,14 +209,14 @@ func (c *ConfigRepository) UaaEndpoint() (uaaEndpoint string) {
 	return
 }
 
-func (c *ConfigRepository) RoutingApiEndpoint() (routingApiEndpoint string) {
+func (c *ConfigRepository) RoutingAPIEndpoint() (routingAPIEndpoint string) {
 	c.read(func() {
-		routingApiEndpoint = c.data.RoutingApiEndpoint
+		routingAPIEndpoint = c.data.RoutingAPIEndpoint
 	})
 	return
 }
 
-func (c *ConfigRepository) ApiEndpoint() (apiEndpoint string) {
+func (c *ConfigRepository) APIEndpoint() (apiEndpoint string) {
 	c.read(func() {
 		apiEndpoint = c.data.Target
 	})
@@ -225,7 +225,7 @@ func (c *ConfigRepository) ApiEndpoint() (apiEndpoint string) {
 
 func (c *ConfigRepository) HasAPIEndpoint() (hasEndpoint bool) {
 	c.read(func() {
-		hasEndpoint = c.data.ApiVersion != "" && c.data.Target != ""
+		hasEndpoint = c.data.APIVersion != "" && c.data.Target != ""
 	})
 	return
 }
@@ -314,10 +314,10 @@ func (c *ConfigRepository) IsSSLDisabled() (isSSLDisabled bool) {
 	return
 }
 
-func (c *ConfigRepository) IsMinApiVersion(requiredVersion semver.Version) bool {
+func (c *ConfigRepository) IsMinAPIVersion(requiredVersion semver.Version) bool {
 	var apiVersion string
 	c.read(func() {
-		apiVersion = c.data.ApiVersion
+		apiVersion = c.data.APIVersion
 	})
 
 	actualVersion, err := semver.Make(apiVersion)
@@ -410,15 +410,15 @@ func (c *ConfigRepository) ClearSession() {
 	})
 }
 
-func (c *ConfigRepository) SetApiEndpoint(endpoint string) {
+func (c *ConfigRepository) SetAPIEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.Target = endpoint
 	})
 }
 
-func (c *ConfigRepository) SetApiVersion(version string) {
+func (c *ConfigRepository) SetAPIVersion(version string) {
 	c.write(func() {
-		c.data.ApiVersion = version
+		c.data.APIVersion = version
 	})
 }
 
@@ -458,9 +458,9 @@ func (c *ConfigRepository) SetUaaEndpoint(uaaEndpoint string) {
 	})
 }
 
-func (c *ConfigRepository) SetRoutingApiEndpoint(routingApiEndpoint string) {
+func (c *ConfigRepository) SetRoutingAPIEndpoint(routingAPIEndpoint string) {
 	c.write(func() {
-		c.data.RoutingApiEndpoint = routingApiEndpoint
+		c.data.RoutingAPIEndpoint = routingAPIEndpoint
 	})
 }
 

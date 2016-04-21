@@ -47,13 +47,13 @@ var _ = Describe("Api", func() {
 
 		endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
 			return &coreconfig.CCInfo{
-				ApiVersion:               config.ApiVersion(),
+				APIVersion:               config.APIVersion(),
 				AuthorizationEndpoint:    config.AuthenticationEndpoint(),
 				LoggregatorEndpoint:      "log/endpoint",
 				MinCLIVersion:            config.MinCLIVersion(),
 				MinRecommendedCLIVersion: config.MinRecommendedCLIVersion(),
 				SSHOAuthClient:           config.SSHOAuthClient(),
-				RoutingApiEndpoint:       config.RoutingApiEndpoint(),
+				RoutingAPIEndpoint:       config.RoutingAPIEndpoint(),
 			}, endpoint, nil
 		}
 
@@ -91,8 +91,8 @@ var _ = Describe("Api", func() {
 	Context("when the user does not provide an endpoint", func() {
 		Context("when the endpoint is set in the config", func() {
 			BeforeEach(func() {
-				config.SetApiEndpoint("https://api.run.pivotal.io")
-				config.SetApiVersion("2.0")
+				config.SetAPIEndpoint("https://api.run.pivotal.io")
+				config.SetAPIVersion("2.0")
 				config.SetSSLDisabled(true)
 			})
 
@@ -104,7 +104,7 @@ var _ = Describe("Api", func() {
 			})
 
 			Context("when the --unset flag is passed", func() {
-				It("unsets the ApiEndpoint", func() {
+				It("unsets the APIEndpoint", func() {
 					callApi([]string{"--unset"})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -112,7 +112,7 @@ var _ = Describe("Api", func() {
 						[]string{"OK"},
 						[]string{"No api endpoint set."},
 					))
-					Expect(config.ApiEndpoint()).To(Equal(""))
+					Expect(config.APIEndpoint()).To(Equal(""))
 				})
 			})
 		})
@@ -149,12 +149,12 @@ var _ = Describe("Api", func() {
 		})
 
 		Context("when the user passed in the unset flag", func() {
-			Context("when the config.ApiEndpoint is set", func() {
+			Context("when the config.APIEndpoint is set", func() {
 				BeforeEach(func() {
-					config.SetApiEndpoint("some-silly-thing")
+					config.SetAPIEndpoint("some-silly-thing")
 				})
 
-				It("unsets the ApiEndpoint", func() {
+				It("unsets the APIEndpoint", func() {
 					callApi([]string{"--unset", "https://example.com"})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -162,12 +162,12 @@ var _ = Describe("Api", func() {
 						[]string{"OK"},
 						[]string{"No api endpoint set."},
 					))
-					Expect(config.ApiEndpoint()).To(Equal(""))
+					Expect(config.APIEndpoint()).To(Equal(""))
 				})
 			})
 
-			Context("when the config.ApiEndpoint is empty", func() {
-				It("unsets the ApiEndpoint", func() {
+			Context("when the config.APIEndpoint is empty", func() {
+				It("unsets the APIEndpoint", func() {
 					callApi([]string{"--unset", "https://example.com"})
 
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -175,7 +175,7 @@ var _ = Describe("Api", func() {
 						[]string{"OK"},
 						[]string{"No api endpoint set."},
 					))
-					Expect(config.ApiEndpoint()).To(Equal(""))
+					Expect(config.APIEndpoint()).To(Equal(""))
 				})
 			})
 
@@ -216,7 +216,7 @@ var _ = Describe("Api", func() {
 					cmd.Execute(flagContext)
 				}).To(Panic())
 
-				Expect(config.ApiEndpoint()).To(Equal(""))
+				Expect(config.APIEndpoint()).To(Equal(""))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Invalid SSL Cert", "https://example.com"},
 					[]string{"TIP", "api"},

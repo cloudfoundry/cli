@@ -40,7 +40,7 @@ func NewCloudControllerQuotaRepository(config coreconfig.Reader, gateway net.Gat
 func (repo CloudControllerQuotaRepository) findAllWithPath(path string) ([]models.QuotaFields, error) {
 	var quotas []models.QuotaFields
 	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.QuotaResource{},
 		func(resource interface{}) bool {
@@ -73,21 +73,21 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 }
 
 func (repo CloudControllerQuotaRepository) Create(quota models.QuotaFields) error {
-	return repo.gateway.CreateResourceFromStruct(repo.config.ApiEndpoint(), "/v2/quota_definitions", quota)
+	return repo.gateway.CreateResourceFromStruct(repo.config.APIEndpoint(), "/v2/quota_definitions", quota)
 }
 
 func (repo CloudControllerQuotaRepository) Update(quota models.QuotaFields) error {
 	path := fmt.Sprintf("/v2/quota_definitions/%s", quota.GUID)
-	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
+	return repo.gateway.UpdateResourceFromStruct(repo.config.APIEndpoint(), path, quota)
 }
 
 func (repo CloudControllerQuotaRepository) AssignQuotaToOrg(orgGUID, quotaGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/organizations/%s", orgGUID)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGUID)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(data))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, strings.NewReader(data))
 }
 
 func (repo CloudControllerQuotaRepository) Delete(quotaGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/quota_definitions/%s", quotaGUID)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }

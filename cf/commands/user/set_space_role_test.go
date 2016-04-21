@@ -112,7 +112,7 @@ var _ = Describe("SetSpaceRole", func() {
 
 			Context("when the config version is >=2.37.0", func() {
 				BeforeEach(func() {
-					configRepo.SetApiVersion("2.37.0")
+					configRepo.SetAPIVersion("2.37.0")
 				})
 
 				It("requests the set_roles_by_username flag", func() {
@@ -172,7 +172,7 @@ var _ = Describe("SetSpaceRole", func() {
 
 			Context("when the config version is <2.37.0", func() {
 				BeforeEach(func() {
-					configRepo.SetApiVersion("2.36.0")
+					configRepo.SetAPIVersion("2.36.0")
 				})
 
 				It("returns a UserRequirement", func() {

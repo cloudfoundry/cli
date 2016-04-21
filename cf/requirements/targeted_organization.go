@@ -18,15 +18,15 @@ type TargetedOrgRequirement interface {
 	GetOrganizationFields() models.OrganizationFields
 }
 
-type targetedOrgApiRequirement struct {
+type targetedOrgAPIRequirement struct {
 	config coreconfig.Reader
 }
 
 func NewTargetedOrgRequirement(config coreconfig.Reader) TargetedOrgRequirement {
-	return targetedOrgApiRequirement{config}
+	return targetedOrgAPIRequirement{config}
 }
 
-func (req targetedOrgApiRequirement) Execute() error {
+func (req targetedOrgAPIRequirement) Execute() error {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf(T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG")}))
 		return errors.New(message)
@@ -35,6 +35,6 @@ func (req targetedOrgApiRequirement) Execute() error {
 	return nil
 }
 
-func (req targetedOrgApiRequirement) GetOrganizationFields() (org models.OrganizationFields) {
+func (req targetedOrgAPIRequirement) GetOrganizationFields() (org models.OrganizationFields) {
 	return req.config.OrganizationFields()
 }

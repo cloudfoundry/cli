@@ -54,26 +54,26 @@ func (cmd Api) SetDependency(deps commandregistry.Dependency, _ bool) commandreg
 func (cmd Api) Execute(c flags.FlagContext) {
 	if c.Bool("unset") {
 		cmd.ui.Say(T("Unsetting api endpoint..."))
-		cmd.config.SetApiEndpoint("")
+		cmd.config.SetAPIEndpoint("")
 
 		cmd.ui.Ok()
 		cmd.ui.Say(T("\nNo api endpoint set."))
 
 	} else if len(c.Args()) == 0 {
-		if cmd.config.ApiEndpoint() == "" {
+		if cmd.config.APIEndpoint() == "" {
 			cmd.ui.Say(fmt.Sprintf(T("No api endpoint set. Use '{{.Name}}' to set an endpoint",
 				map[string]interface{}{"Name": terminal.CommandColor(cf.Name + " api")})))
 		} else {
-			cmd.ui.Say(T("API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-				map[string]interface{}{"ApiEndpoint": terminal.EntityNameColor(cmd.config.ApiEndpoint()),
-					"ApiVersion": terminal.EntityNameColor(cmd.config.ApiVersion())}))
+			cmd.ui.Say(T("API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+				map[string]interface{}{"APIEndpoint": terminal.EntityNameColor(cmd.config.APIEndpoint()),
+					"APIVersion": terminal.EntityNameColor(cmd.config.APIVersion())}))
 		}
 	} else {
 		endpoint := c.Args()[0]
 
 		cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
 			map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
-		cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.MetaData().Name)
+		cmd.setAPIEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.MetaData().Name)
 		cmd.ui.Ok()
 
 		cmd.ui.Say("")
@@ -81,7 +81,7 @@ func (cmd Api) Execute(c flags.FlagContext) {
 	}
 }
 
-func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
+func (cmd Api) setAPIEndpoint(endpoint string, skipSSL bool, cmdName string) {
 	if strings.HasSuffix(endpoint, "/") {
 		endpoint = strings.TrimSuffix(endpoint, "/")
 	}
@@ -96,14 +96,14 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 
 	warning, err := refresher.Refresh()
 	if err != nil {
-		cmd.config.SetApiEndpoint("")
+		cmd.config.SetAPIEndpoint("")
 		cmd.config.SetSSLDisabled(false)
 
 		switch typedErr := err.(type) {
 		case *errors.InvalidSSLCert:
-			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s %s --skip-ssl-validation", cf.Name, cmdName))
-			tipMessage := fmt.Sprintf(T("TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-				map[string]interface{}{"ApiCommand": cfApiCommand}))
+			cfAPICommand := terminal.CommandColor(fmt.Sprintf("%s %s --skip-ssl-validation", cf.Name, cmdName))
+			tipMessage := fmt.Sprintf(T("TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+				map[string]interface{}{"APICommand": cfAPICommand}))
 			cmd.ui.Failed(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
 				map[string]interface{}{"URL": typedErr.URL, "TipMessage": tipMessage}))
 			return
