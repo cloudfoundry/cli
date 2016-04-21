@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"net/http"
 
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/appevents"
 	api_appfiles "github.com/cloudfoundry/cli/cf/api/appfiles"
 	"github.com/cloudfoundry/cli/cf/api/appinstances"
@@ -13,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
 	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/api/featureflags"
+	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/password"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
@@ -31,7 +34,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/cf/v3/repository"
 	v3client "github.com/cloudfoundry/go-ccapi/v3/client"
-	consumer "github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/loggregator_consumer"
+	"github.com/cloudfoundry/noaa/consumer"
 )
 
 type RepositoryLocator struct {
@@ -58,7 +62,7 @@ type RepositoryLocator struct {
 	serviceSummaryRepo              ServiceSummaryRepository
 	userRepo                        UserRepository
 	passwordRepo                    password.PasswordRepository
-	logsRepo                        LogsRepository
+	logsRepo                        logs.LogsRepository
 	authTokenRepo                   ServiceAuthTokenRepository
 	serviceBrokerRepo               ServiceBrokerRepository
 	servicePlanRepo                 CloudControllerServicePlanRepository
@@ -90,10 +94,6 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
-	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
-	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
-	loggregatorConsumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-
 	loc.appBitsRepo = applicationbits.NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway)
 	loc.appEventsRepo = appevents.NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = api_appfiles.NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
@@ -104,7 +104,21 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(cloudControllerGateway)
-	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer, loc.authRepo)
+
+	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
+
+	apiVersion, _ := semver.Make(config.APIVersion())
+
+	if apiVersion.GTE(cf.NoaaMinimumAPIVersion) {
+		consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
+		loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo)
+	} else {
+		consumer := loggregator_consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
+		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
+		loc.logsRepo = logs.NewLoggregatorLogsRepository(config, consumer, loc.authRepo)
+	}
+
 	loc.organizationRepo = organizations.NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = password.NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = quotas.NewCloudControllerQuotaRepository(config, cloudControllerGateway)
@@ -340,12 +354,12 @@ func (locator RepositoryLocator) GetPasswordRepository() password.PasswordReposi
 	return locator.passwordRepo
 }
 
-func (locator RepositoryLocator) SetLogsRepository(repo LogsRepository) RepositoryLocator {
+func (locator RepositoryLocator) SetLogsRepository(repo logs.LogsRepository) RepositoryLocator {
 	locator.logsRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetLogsRepository() LogsRepository {
+func (locator RepositoryLocator) GetLogsRepository() logs.LogsRepository {
 	return locator.logsRepo
 }
 
