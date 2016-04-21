@@ -123,9 +123,9 @@ var _ = Describe("spaces command", func() {
 			testcmd.RunCliCommand("spaces", []string{}, requirementsFactory, updateCommandDependency, true)
 			runCommand()
 			Expect(pluginModels[0].Name).To(Equal("space1"))
-			Expect(pluginModels[0].GUID).To(Equal("123"))
+			Expect(pluginModels[0].Guid).To(Equal("123"))
 			Expect(pluginModels[1].Name).To(Equal("space2"))
-			Expect(pluginModels[1].GUID).To(Equal("456"))
+			Expect(pluginModels[1].Guid).To(Equal("456"))
 		})
 	})
 

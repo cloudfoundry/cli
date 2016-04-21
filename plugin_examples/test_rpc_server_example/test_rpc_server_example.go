@@ -16,7 +16,7 @@ import (
 type DemoCmd struct{}
 
 type AppsModel struct {
-	NextURL   string     `json:"next_url,omitempty"`
+	NextUrl   string     `json:"next_url,omitempty"`
 	Resources []AppModel `json:"resources"`
 }
 
@@ -85,11 +85,11 @@ func (c *DemoCmd) Run(cliConnection plugin.CliConnection, args []string) {
 }
 
 func getAllApps(cliConnection plugin.CliConnection) (AppsModel, error) {
-	nextURL := "v2/apps"
+	nextUrl := "v2/apps"
 	allApps := AppsModel{}
 
-	for nextURL != "" {
-		output, err := cliConnection.CliCommandWithoutTerminalOutput("curl", nextURL)
+	for nextUrl != "" {
+		output, err := cliConnection.CliCommandWithoutTerminalOutput("curl", nextUrl)
 		if err != nil {
 			return AppsModel{}, err
 		}
@@ -102,7 +102,7 @@ func getAllApps(cliConnection plugin.CliConnection) (AppsModel, error) {
 
 		allApps.Resources = append(allApps.Resources, apps.Resources...)
 
-		nextURL = apps.NextURL
+		nextUrl = apps.NextUrl
 	}
 
 	return allApps, nil

@@ -280,22 +280,22 @@ var _ = Describe("space command", func() {
 			It("Fills in the PluginModel", func() {
 				testcmd.RunCliCommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
-				Expect(pluginModel.GUID).To(Equal("whose-space-is-it-anyway-guid"))
+				Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
 
 				Expect(pluginModel.Organization.Name).To(Equal("my-org"))
-				Expect(pluginModel.Organization.GUID).To(Equal("my-org-guid"))
+				Expect(pluginModel.Organization.Guid).To(Equal("my-org-guid"))
 
 				Expect(pluginModel.Applications).To(HaveLen(1))
 				Expect(pluginModel.Applications[0].Name).To(Equal("app1"))
-				Expect(pluginModel.Applications[0].GUID).To(Equal("app1-guid"))
+				Expect(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
 
 				Expect(pluginModel.Domains).To(HaveLen(1))
 				Expect(pluginModel.Domains[0].Name).To(Equal("domain1"))
-				Expect(pluginModel.Domains[0].GUID).To(Equal("domain1-guid"))
+				Expect(pluginModel.Domains[0].Guid).To(Equal("domain1-guid"))
 
 				Expect(pluginModel.ServiceInstances).To(HaveLen(1))
 				Expect(pluginModel.ServiceInstances[0].Name).To(Equal("service1"))
-				Expect(pluginModel.ServiceInstances[0].GUID).To(Equal("service1-guid"))
+				Expect(pluginModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
 
 				Expect(pluginModel.SecurityGroups).To(HaveLen(2))
 				Expect(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
@@ -317,7 +317,7 @@ var _ = Describe("space command", func() {
 				Expect(val).To(Equal("8080-9090"))
 
 				Expect(pluginModel.SpaceQuota.Name).To(Equal("runaway"))
-				Expect(pluginModel.SpaceQuota.GUID).To(Equal("runaway-guid"))
+				Expect(pluginModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
 				Expect(pluginModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
 				Expect(pluginModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
 				Expect(pluginModel.SpaceQuota.RoutesLimit).To(Equal(111))

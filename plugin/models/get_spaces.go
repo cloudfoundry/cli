@@ -1,6 +1,6 @@
 package plugin_models
 
 type GetSpaces_Model struct {
-	GUID string
+	Guid string
 	Name string
 }

@@ -28,7 +28,7 @@ var _ = Describe("App-Lister", func() {
 
 	BeforeEach(func() {
 		rpcHandlers = new(rpcserverfakes.FakeHandlers)
-		ts, err = rpcserver.NewTestRPCServer(rpcHandlers)
+		ts, err = rpcserver.NewTestRpcServer(rpcHandlers)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = ts.Start()
@@ -180,7 +180,7 @@ var _ = Describe("App-Lister", func() {
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
 								apps := sampleApps()
 								if count == 0 {
-									apps.NextURL = "v2/apps?page=2"
+									apps.NextUrl = "v2/apps?page=2"
 									*retVal = []string{marshal(apps)}
 									count++
 								} else {

@@ -48,10 +48,10 @@ type FakeCliConnection struct {
 		result1 string
 		result2 error
 	}
-	UserGUIDStub        func() (string, error)
-	userGUIDMutex       sync.RWMutex
-	userGUIDArgsForCall []struct{}
-	userGUIDReturns     struct {
+	UserGuidStub        func() (string, error)
+	userGuidMutex       sync.RWMutex
+	userGuidArgsForCall []struct{}
+	userGuidReturns     struct {
 		result1 string
 		result2 error
 	}
@@ -359,26 +359,26 @@ func (fake *FakeCliConnection) UsernameReturns(result1 string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *FakeCliConnection) UserGUID() (string, error) {
-	fake.userGUIDMutex.Lock()
-	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct{}{})
-	fake.userGUIDMutex.Unlock()
-	if fake.UserGUIDStub != nil {
-		return fake.UserGUIDStub()
+func (fake *FakeCliConnection) UserGuid() (string, error) {
+	fake.userGuidMutex.Lock()
+	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct{}{})
+	fake.userGuidMutex.Unlock()
+	if fake.UserGuidStub != nil {
+		return fake.UserGuidStub()
 	} else {
-		return fake.userGUIDReturns.result1, fake.userGUIDReturns.result2
+		return fake.userGuidReturns.result1, fake.userGuidReturns.result2
 	}
 }
 
-func (fake *FakeCliConnection) UserGUIDCallCount() int {
-	fake.userGUIDMutex.RLock()
-	defer fake.userGUIDMutex.RUnlock()
-	return len(fake.userGUIDArgsForCall)
+func (fake *FakeCliConnection) UserGuidCallCount() int {
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	return len(fake.userGuidArgsForCall)
 }
 
-func (fake *FakeCliConnection) UserGUIDReturns(result1 string, result2 error) {
-	fake.UserGUIDStub = nil
-	fake.userGUIDReturns = struct {
+func (fake *FakeCliConnection) UserGuidReturns(result1 string, result2 error) {
+	fake.UserGuidStub = nil
+	fake.userGuidReturns = struct {
 		result1 string
 		result2 error
 	}{result1, result2}

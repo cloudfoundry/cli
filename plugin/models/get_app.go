@@ -3,9 +3,9 @@ package plugin_models
 import "time"
 
 type GetAppModel struct {
-	GUID                 string
+	Guid                 string
 	Name                 string
-	BuildpackURL         string
+	BuildpackUrl         string
 	Command              string
 	Diego                bool
 	DetectedStartCommand string
@@ -16,7 +16,7 @@ type GetAppModel struct {
 	RunningInstances     int
 	HealthCheckTimeout   int
 	State                string
-	SpaceGUID            string
+	SpaceGuid            string
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string
@@ -31,7 +31,7 @@ type GetApp_AppInstanceFields struct {
 	State     string
 	Details   string
 	Since     time.Time
-	CPUUsage  float64 // percentage
+	CpuUsage  float64 // percentage
 	DiskQuota int64   // in bytes
 	DiskUsage int64
 	MemQuota  int64
@@ -39,23 +39,23 @@ type GetApp_AppInstanceFields struct {
 }
 
 type GetApp_Stack struct {
-	GUID        string
+	Guid        string
 	Name        string
 	Description string
 }
 
 type GetApp_RouteSummary struct {
-	GUID   string
+	Guid   string
 	Host   string
 	Domain GetApp_DomainFields
 }
 
 type GetApp_DomainFields struct {
-	GUID string
+	Guid string
 	Name string
 }
 
 type GetApp_ServiceSummary struct {
-	GUID string
+	Guid string
 	Name string
 }

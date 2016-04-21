@@ -8,9 +8,9 @@ import (
 	"testing"
 )
 
-var rpcService *rpc.CliRPCService
+var rpcService *rpc.CliRpcService
 
-func TestRPC(t *testing.T) {
+func TestRpc(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "RPC Suite")
+	RunSpecs(t, "Rpc Suite")
 }

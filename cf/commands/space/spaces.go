@@ -78,7 +78,7 @@ func (cmd *ListSpaces) Execute(c flags.FlagContext) {
 		if cmd.pluginCall {
 			s := plugin_models.GetSpaces_Model{}
 			s.Name = space.Name
-			s.GUID = space.GUID
+			s.Guid = space.GUID
 			*(cmd.pluginModel) = append(*(cmd.pluginModel), s)
 		}
 

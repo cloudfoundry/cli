@@ -19,7 +19,7 @@ import (
 type PluginUninstall struct {
 	ui         terminal.UI
 	config     pluginconfig.PluginConfiguration
-	rpcService *rpcService.CliRPCService
+	rpcService *rpcService.CliRpcService
 }
 
 func init() {
@@ -53,12 +53,12 @@ func (cmd *PluginUninstall) SetDependency(deps commandregistry.Dependency, plugi
 	//each service can only be registered once
 	rpc.DefaultServer = rpc.NewServer()
 
-	rpcService, err := rpcService.NewRPCService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger)
+	RPCService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}
 
-	cmd.rpcService = rpcService
+	cmd.rpcService = RPCService
 
 	return cmd
 }

@@ -32,7 +32,7 @@ GetCurrentSpace() (plugin_models.Space, error)
 
 Username() (userName string, error)
 
-UserGUID() (userGUID string, error)
+UserGuid() (userGuid string, error)
 
 UserEmail() (userEmail string, error)
 
@@ -44,15 +44,15 @@ HasOrganization() (bool, error)
 
 HasSpace() (bool, error)
 
-ApiEndpoint() (endpointURL string, error)
+ApiEndpoint() (endpointUrl string, error)
 
 ApiVersion() (ver string, error)
 
 HasAPIEndpoint() (bool, error)
 
-LoggregatorEndpoint() (endpointURL string, error)
+LoggregatorEndpoint() (endpointUrl string, error)
 
-DopplerEndpoint() (endpointURL string, error)
+DopplerEndpoint() (endpointUrl string, error)
 
 AccessToken() (token string, error)
 

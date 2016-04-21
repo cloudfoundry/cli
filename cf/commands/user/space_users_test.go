@@ -270,16 +270,16 @@ var _ = Describe("space-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.GUID).To(Equal("1111"))
+						Expect(u.Guid).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
 					case "user2":
-						Expect(u.GUID).To(Equal("2222"))
+						Expect(u.Guid).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
 					case "user3":
-						Expect(u.GUID).To(Equal("3333"))
+						Expect(u.Guid).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_AUDITOR}))
 					case "user4":
-						Expect(u.GUID).To(Equal("4444"))
+						Expect(u.Guid).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_DEVELOPER}))
 					default:
 						Fail("unexpected user: " + u.Username)
@@ -340,16 +340,16 @@ var _ = Describe("space-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.GUID).To(Equal("1111"))
+						Expect(u.Guid).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
 					case "user2":
-						Expect(u.GUID).To(Equal("2222"))
+						Expect(u.Guid).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
 					case "user3":
-						Expect(u.GUID).To(Equal("3333"))
+						Expect(u.Guid).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
 					case "user4":
-						Expect(u.GUID).To(Equal("4444"))
+						Expect(u.Guid).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
 					default:
 						Fail("unexpected user: " + u.Username)

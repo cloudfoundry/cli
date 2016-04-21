@@ -164,15 +164,15 @@ func (cmd *ShowSpace) quotaString(space models.Space) string {
 
 func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	cmd.pluginModel.Name = space.Name
-	cmd.pluginModel.GUID = space.GUID
+	cmd.pluginModel.Guid = space.GUID
 
 	cmd.pluginModel.Organization.Name = space.Organization.Name
-	cmd.pluginModel.Organization.GUID = space.Organization.GUID
+	cmd.pluginModel.Organization.Guid = space.Organization.GUID
 
 	for _, app := range space.Applications {
 		a := plugin_models.GetSpace_Apps{
 			Name: app.Name,
-			GUID: app.GUID,
+			Guid: app.GUID,
 		}
 		cmd.pluginModel.Applications = append(cmd.pluginModel.Applications, a)
 	}
@@ -180,8 +180,8 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	for _, domain := range space.Domains {
 		d := plugin_models.GetSpace_Domains{
 			Name: domain.Name,
-			GUID: domain.GUID,
-			OwningOrganizationGUID: domain.OwningOrganizationGUID,
+			Guid: domain.GUID,
+			OwningOrganizationGuid: domain.OwningOrganizationGUID,
 			Shared:                 domain.Shared,
 		}
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
@@ -190,14 +190,14 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	for _, service := range space.ServiceInstances {
 		si := plugin_models.GetSpace_ServiceInstance{
 			Name: service.Name,
-			GUID: service.GUID,
+			Guid: service.GUID,
 		}
 		cmd.pluginModel.ServiceInstances = append(cmd.pluginModel.ServiceInstances, si)
 	}
 	for _, group := range space.SecurityGroups {
 		sg := plugin_models.GetSpace_SecurityGroup{
 			Name:  group.Name,
-			GUID:  group.GUID,
+			Guid:  group.GUID,
 			Rules: group.Rules,
 		}
 		cmd.pluginModel.SecurityGroups = append(cmd.pluginModel.SecurityGroups, sg)
@@ -206,7 +206,7 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	quota, err := cmd.quotaRepo.FindByGUID(space.SpaceQuotaGUID)
 	if err == nil {
 		cmd.pluginModel.SpaceQuota.Name = quota.Name
-		cmd.pluginModel.SpaceQuota.GUID = quota.GUID
+		cmd.pluginModel.SpaceQuota.Guid = quota.GUID
 		cmd.pluginModel.SpaceQuota.MemoryLimit = quota.MemoryLimit
 		cmd.pluginModel.SpaceQuota.InstanceMemoryLimit = quota.InstanceMemoryLimit
 		cmd.pluginModel.SpaceQuota.RoutesLimit = quota.RoutesLimit

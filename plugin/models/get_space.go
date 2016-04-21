@@ -11,42 +11,42 @@ type GetSpace_Model struct {
 }
 
 type GetSpace_Orgs struct {
-	GUID string
+	Guid string
 	Name string
 }
 
 type GetSpace_Apps struct {
 	Name string
-	GUID string
+	Guid string
 }
 
 type GetSpace_AppsDomainFields struct {
-	GUID                   string
+	Guid                   string
 	Name                   string
-	OwningOrganizationGUID string
+	OwningOrganizationGuid string
 	Shared                 bool
 }
 
 type GetSpace_ServiceInstance struct {
-	GUID string
+	Guid string
 	Name string
 }
 
 type GetSpace_Domains struct {
-	GUID                   string
+	Guid                   string
 	Name                   string
-	OwningOrganizationGUID string
+	OwningOrganizationGuid string
 	Shared                 bool
 }
 
 type GetSpace_SecurityGroup struct {
 	Name  string
-	GUID  string
+	Guid  string
 	Rules []map[string]interface{}
 }
 
 type GetSpace_SpaceQuota struct {
-	GUID                    string
+	Guid                    string
 	Name                    string
 	MemoryLimit             int64
 	InstanceMemoryLimit     int64
