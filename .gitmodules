@@ -1,0 +1,3 @@
+[submodule "vendor/github.com/cloudfoundry/noaa"]
+	path = vendor/github.com/cloudfoundry/noaa
+	url = https://github.com/challiwill/noaa.git

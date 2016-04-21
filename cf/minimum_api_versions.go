@@ -11,4 +11,5 @@ var (
 	RoutePathMinimumAPIVersion, _                       = semver.Make("2.36.0")
 	OrgAppInstanceLimitMinimumAPIVersion, _             = semver.Make("2.33.0")
 	SpaceAppInstanceLimitMinimumAPIVersion, _           = semver.Make("2.40.0")
+	NoaaMinimumAPIVersion, _                            = semver.Make("2.29.0")
 )

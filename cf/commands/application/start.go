@@ -3,16 +3,17 @@ package application
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	"sync"
+
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/api/applications"
+	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -20,7 +21,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 const (
@@ -51,8 +51,8 @@ type Start struct {
 	appDisplayer     ApplicationDisplayer
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
+	logRepo          logs.LogsRepository
 	appInstancesRepo appinstances.AppInstancesRepository
-	logRepo          api.LogsRepository
 
 	LogServerConnectionTimeout time.Duration
 	StartupTimeout             time.Duration
@@ -153,21 +153,17 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 }
 
 func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
-	var isConnected bool
-	loggingStartedChan := make(chan bool)
-	doneLoggingChan := make(chan bool)
+	stopChan := make(chan bool, 1)
 
-	go cmd.tailStagingLogs(app, loggingStartedChan, doneLoggingChan)
-	timer := time.NewTimer(cmd.LogServerConnectionTimeout)
+	loggingStartedWait := &sync.WaitGroup{}
+	loggingStartedWait.Add(1)
 
-	select {
-	case <-timer.C:
-		cmd.ui.Warn("timeout connecting to log server, no log will be shown")
-		break
-	case <-loggingStartedChan: // block until we have established connection to Loggregator
-		isConnected = true
-		break
-	}
+	loggingDoneWait := &sync.WaitGroup{}
+	loggingDoneWait.Add(1)
+
+	go cmd.tailStagingLogs(app, stopChan, loggingStartedWait, loggingDoneWait)
+
+	loggingStartedWait.Wait()
 
 	updatedApp, apiErr := start(app)
 	if apiErr != nil {
@@ -177,11 +173,9 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 
 	isStaged := cmd.waitForInstancesToStage(updatedApp)
 
-	if isConnected { //only close when actually connected, else CLI hangs at closing consumer connection
-		cmd.logRepo.Close()
-	}
+	stopChan <- true
 
-	<-doneLoggingChan
+	loggingDoneWait.Wait()
 
 	cmd.ui.Say("")
 
@@ -223,38 +217,61 @@ func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
-func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
-	msgText = string(logMsg.GetMessage())
-	reg, err := regexp.Compile("[\n\r]+$")
-	if err != nil {
-		return
-	}
-	msgText = reg.ReplaceAllString(msgText, "")
-	return
-}
+func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, startWait, doneWait *sync.WaitGroup) {
+	var isConnected bool
+	var isDisconnected bool
 
-func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan chan bool) {
 	onConnect := func() {
-		startChan <- true
+		isConnected = true
+		startWait.Done()
 	}
 
-	c, err := cmd.logRepo.TailLogsFor(app.GUID, onConnect)
+	timer := time.NewTimer(cmd.LogServerConnectionTimeout)
 
-	if err != nil {
-		cmd.ui.Warn(T("Warning: error tailing logs"))
-		cmd.ui.Say("%s", err)
-		close(startChan)
-		close(doneChan)
-		return
-	}
+	c := make(chan logs.Loggable)
+	e := make(chan error)
 
-	for msg := range c {
-		if msg.GetSourceName() == LogMessageTypeStaging {
-			cmd.ui.Say(simpleLogMessageOutput(msg))
+	defer doneWait.Done()
+
+	go cmd.logRepo.TailLogsFor(app.GUID, onConnect, c, e)
+
+	for {
+		select {
+		case <-timer.C:
+			if !isConnected {
+				cmd.ui.Warn("timeout connecting to log server, no log will be shown")
+				startWait.Done()
+				return
+			}
+		case msg, ok := <-c:
+			if !ok {
+				return
+			} else if msg.GetSourceName() == LogMessageTypeStaging {
+				cmd.ui.Say(msg.ToSimpleLog())
+			}
+
+		case err, ok := <-e:
+			if ok {
+				if !isConnected {
+					startWait.Done()
+				}
+
+				if !isDisconnected {
+					cmd.ui.Warn(T("Warning: error tailing logs"))
+					cmd.ui.Say("%s", err)
+					return
+				}
+			}
+
+		case <-stopChan:
+			if isConnected {
+				isDisconnected = true
+				cmd.logRepo.Close()
+			} else {
+				return
+			}
 		}
 	}
-
-	close(doneChan)
 }
 
 func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
