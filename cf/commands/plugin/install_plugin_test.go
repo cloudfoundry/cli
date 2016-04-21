@@ -108,7 +108,7 @@ var _ = Describe("Install", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("install-plugin", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("install-plugin", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

@@ -1072,8 +1072,8 @@
     "translation": "Controllo della rotta..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "La versione API Cloud Foundry {{.ApiVer}} richiede la versione CLI {{.CliMin}}.  Stai utilizzando la versione {{.CliVer}}. Per aggiornare la tua CLI, visita: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "La versione API Cloud Foundry {{.ApiVer}} richiede la versione CLI {{.CLIMin}}.  Stai utilizzando la versione {{.CLIVer}}. Per aggiornare la tua CLI, visita: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",

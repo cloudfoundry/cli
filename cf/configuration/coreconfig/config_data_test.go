@@ -53,8 +53,8 @@ var _ = Describe("V3 Config files", func() {
 			"URL": "http://repo.com"
 		}
 		],
-		"MinCliVersion": "6.0.0",
-		"MinRecommendedCliVersion": "6.9.0"
+		"MinCLIVersion": "6.0.0",
+		"MinRecommendedCLIVersion": "6.9.0"
 	}`
 
 	// V2 by virtue of ConfigVersion only
@@ -99,8 +99,8 @@ var _ = Describe("V3 Config files", func() {
 			"URL": "http://repo.com"
 		}
 		],
-		"MinCliVersion": "6.0.0",
-		"MinRecommendedCliVersion": "6.9.0"
+		"MinCLIVersion": "6.0.0",
+		"MinRecommendedCLIVersion": "6.9.0"
 	}`
 
 	Describe("JSONMarshalV3", func() {
@@ -116,8 +116,8 @@ var _ = Describe("V3 Config files", func() {
 				AccessToken:              "the-access-token",
 				RefreshToken:             "the-refresh-token",
 				SSHOAuthClient:           "ssh-oauth-client-id",
-				MinCliVersion:            "6.0.0",
-				MinRecommendedCliVersion: "6.9.0",
+				MinCLIVersion:            "6.0.0",
+				MinRecommendedCLIVersion: "6.9.0",
 				OrganizationFields: models.OrganizationFields{
 					GUID: "the-org-guid",
 					Name: "the-org",
@@ -169,8 +169,8 @@ var _ = Describe("V3 Config files", func() {
 				AccessToken:              "the-access-token",
 				RefreshToken:             "the-refresh-token",
 				SSHOAuthClient:           "ssh-oauth-client-id",
-				MinCliVersion:            "6.0.0",
-				MinRecommendedCliVersion: "6.9.0",
+				MinCLIVersion:            "6.0.0",
+				MinRecommendedCLIVersion: "6.9.0",
 				OrganizationFields: models.OrganizationFields{
 					GUID: "the-org-guid",
 					Name: "the-org",

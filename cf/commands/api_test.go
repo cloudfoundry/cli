@@ -50,8 +50,8 @@ var _ = Describe("Api", func() {
 				ApiVersion:               config.ApiVersion(),
 				AuthorizationEndpoint:    config.AuthenticationEndpoint(),
 				LoggregatorEndpoint:      "log/endpoint",
-				MinCliVersion:            config.MinCliVersion(),
-				MinRecommendedCliVersion: config.MinRecommendedCliVersion(),
+				MinCLIVersion:            config.MinCLIVersion(),
+				MinRecommendedCLIVersion: config.MinRecommendedCLIVersion(),
 				SSHOAuthClient:           config.SSHOAuthClient(),
 				RoutingApiEndpoint:       config.RoutingApiEndpoint(),
 			}, endpoint, nil

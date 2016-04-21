@@ -41,7 +41,7 @@ var _ = Describe("allow-space-ssh command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("allow-space-ssh", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("allow-space-ssh", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

@@ -35,7 +35,7 @@ var _ = Describe("service command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -101,7 +101,7 @@ var _ = Describe("service command", func() {
 
 			It("populates the plugin model upon execution", func() {
 				createServiceInstanceWithState("in progress")
-				testcmd.RunCliCommand("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("service1"))
 				Expect(pluginModel.Guid).To(Equal("service1-guid"))
 				Expect(pluginModel.LastOperation.Type).To(Equal("create"))

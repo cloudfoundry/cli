@@ -106,7 +106,7 @@ var _ = Describe("MapRoute", func() {
 
 		BeforeEach(func() {
 			cmd := &route.MapRoute{}
-			up := commandregistry.CliCommandUsagePresenter(cmd)
+			up := commandregistry.CLICommandUsagePresenter(cmd)
 
 			usage = strings.Split(up.Usage(), "\n")
 		})

@@ -62,7 +62,7 @@ var _ = Describe("target command", func() {
 	})
 
 	var callTarget = func(args []string) bool {
-		return testcmd.RunCliCommand("target", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("target", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when there are too many arguments given", func() {
@@ -239,8 +239,8 @@ var _ = Describe("target command", func() {
 			})
 
 			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-				config.SetMinCliVersion("5.0.0")
-				config.SetMinRecommendedCliVersion("5.5.0")
+				config.SetMinCLIVersion("5.0.0")
+				config.SetMinRecommendedCLIVersion("5.5.0")
 				cf.Version = "4.5.0"
 
 				callTarget([]string{"-o", "my-organization"})

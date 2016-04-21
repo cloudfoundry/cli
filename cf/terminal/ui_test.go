@@ -413,8 +413,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("Prints a notification to user if current version < min cli version", func() {
-			config.SetMinCliVersion("6.0.0")
-			config.SetMinRecommendedCliVersion("6.5.0")
+			config.SetMinCLIVersion("6.0.0")
+			config.SetMinRecommendedCLIVersion("6.5.0")
 			config.SetApiVersion("2.15.1")
 			cf.Version = "5.0.0"
 			output = io_helpers.CaptureOutput(func() {
@@ -430,8 +430,8 @@ var _ = Describe("UI", func() {
 		})
 
 		It("Doesn't print a notification to user if current version >= min cli version", func() {
-			config.SetMinCliVersion("6.0.0")
-			config.SetMinRecommendedCliVersion("6.5.0")
+			config.SetMinCLIVersion("6.0.0")
+			config.SetMinRecommendedCLIVersion("6.5.0")
 			config.SetApiVersion("2.15.1")
 			cf.Version = "6.0.0"
 			output = io_helpers.CaptureOutput(func() {

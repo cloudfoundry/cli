@@ -284,13 +284,13 @@ func (u *UITable) Print() {
 }
 
 func (ui *terminalUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
-	if !config.IsMinCliVersion(cf.Version) {
+	if !config.IsMinCLIVersion(cf.Version) {
 		ui.Say("")
-		ui.Say(T("Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+		ui.Say(T("Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
 			map[string]interface{}{
 				"ApiVer": config.ApiVersion(),
-				"CliMin": config.MinCliVersion(),
-				"CliVer": cf.Version,
+				"CLIMin": config.MinCLIVersion(),
+				"CLIVer": cf.Version,
 			}))
 	}
 }

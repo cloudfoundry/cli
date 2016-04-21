@@ -38,8 +38,8 @@ type Data struct {
 	ColorEnabled             string
 	Locale                   string
 	PluginRepos              []models.PluginRepo
-	MinCliVersion            string
-	MinRecommendedCliVersion string
+	MinCLIVersion            string
+	MinRecommendedCLIVersion string
 }
 
 func NewData() (data *Data) {

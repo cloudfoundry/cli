@@ -166,7 +166,7 @@ var _ = Describe("start command", func() {
 		cmd.StartupTimeout = 500 * time.Millisecond
 		cmd.PingerThrottle = 10 * time.Millisecond
 		commandregistry.Register(cmd)
-		return testcmd.RunCliCommandWithoutDependency("start", args, requirementsFactory)
+		return testcmd.RunCLICommandWithoutDependency("start", args, requirementsFactory)
 	}
 
 	callStartWithLoggingTimeout := func(args []string) (ui *testterm.FakeUI) {
@@ -180,7 +180,7 @@ var _ = Describe("start command", func() {
 		cmd.PingerThrottle = 10 * time.Millisecond
 		commandregistry.Register(cmd)
 
-		testcmd.RunCliCommandWithoutDependency("start", args, requirementsFactory)
+		testcmd.RunCLICommandWithoutDependency("start", args, requirementsFactory)
 		return
 	}
 
@@ -262,7 +262,7 @@ var _ = Describe("start command", func() {
 			})
 
 			It("can still respond to staging failures", func() {
-				testcmd.RunCliCommandWithoutDependency("start", []string{"my-app"}, requirementsFactory)
+				testcmd.RunCLICommandWithoutDependency("start", []string{"my-app"}, requirementsFactory)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"my-app"},

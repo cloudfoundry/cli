@@ -1072,8 +1072,8 @@
     "translation": "라우트 확인 중..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API 버전 {{.ApiVer}}에는 CLI 버전 {{.CliMin}}이(가) 필요합니다. 현재 버전 {{.CliVer}}에 있습니다. CLI를 업그레이드하려면 https://github.com/cloudfoundry/cli#downloads를 방문하십시오."
+    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API 버전 {{.ApiVer}}에는 CLI 버전 {{.CLIMin}}이(가) 필요합니다. 현재 버전 {{.CLIVer}}에 있습니다. CLI를 업그레이드하려면 https://github.com/cloudfoundry/cli#downloads를 방문하십시오."
   },
   {
     "id": "Comma delimited list of ports the application may listen on",

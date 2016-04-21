@@ -40,7 +40,7 @@ var _ = Describe("staging-environment-variable-group command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("staging-environment-variable-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("staging-environment-variable-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

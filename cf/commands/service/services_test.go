@@ -38,7 +38,7 @@ var _ = Describe("services", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("services", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("services", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
@@ -217,7 +217,7 @@ var _ = Describe("services", func() {
 		})
 
 		It("populates the plugin model", func() {
-			testcmd.RunCliCommand("services", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCLICommand("services", []string{}, requirementsFactory, updateCommandDependency, true)
 
 			Expect(len(pluginModels)).To(Equal(3))
 			Expect(pluginModels[0].Name).To(Equal("my-service-1"))

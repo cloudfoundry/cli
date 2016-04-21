@@ -34,8 +34,8 @@ var _ = Describe("Login Command", func() {
 		org  models.Organization
 		deps commandregistry.Dependency
 
-		minCliVersion            string
-		minRecommendedCliVersion string
+		minCLIVersion            string
+		minRecommendedCLIVersion string
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -72,8 +72,8 @@ var _ = Describe("Login Command", func() {
 			return nil
 		}
 		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
-		minCliVersion = "1.0.0"
-		minRecommendedCliVersion = "1.0.0"
+		minCLIVersion = "1.0.0"
+		minRecommendedCLIVersion = "1.0.0"
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
@@ -108,8 +108,8 @@ var _ = Describe("Login Command", func() {
 					ApiVersion:               "some-version",
 					AuthorizationEndpoint:    "auth/endpoint",
 					LoggregatorEndpoint:      "loggregator/endpoint",
-					MinCliVersion:            minCliVersion,
-					MinRecommendedCliVersion: minRecommendedCliVersion,
+					MinCLIVersion:            minCLIVersion,
+					MinRecommendedCLIVersion: minRecommendedCLIVersion,
 					SSHOAuthClient:           "some-client",
 					RoutingApiEndpoint:       "routing/endpoint",
 				}, endpoint, nil
@@ -153,7 +153,7 @@ var _ = Describe("Login Command", func() {
 				OUT_OF_RANGE_CHOICE := "3"
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Select an org"},
@@ -173,8 +173,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.ApiVersion()).To(Equal("some-version"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
-				Expect(Config.MinCliVersion()).To(Equal("1.0.0"))
-				Expect(Config.MinRecommendedCliVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
 				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
 				Expect(Config.RoutingApiEndpoint()).To(Equal("routing/endpoint"))
@@ -192,7 +192,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-new-org", "my-space"}
 				orgRepo.FindByNameReturns(org2, nil)
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Select an org"},
@@ -221,7 +221,7 @@ var _ = Describe("Login Command", func() {
 				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "my-space"}
 
 				orgRepo.FindByNameReturns(org2, nil)
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
@@ -246,7 +246,7 @@ var _ = Describe("Login Command", func() {
 				Flags = []string{"-o", "my-new-org", "-s", "my-space"}
 				ui.Inputs = []string{"user@example.com", "password"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
 				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
@@ -262,15 +262,15 @@ var _ = Describe("Login Command", func() {
 
 		Describe("when the CLI version is below the minimum required", func() {
 			BeforeEach(func() {
-				minCliVersion = "5.0.0"
-				minRecommendedCliVersion = "5.5.0"
+				minCLIVersion = "5.0.0"
+				minRecommendedCLIVersion = "5.5.0"
 			})
 
 			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 				cf.Version = "4.5.0"
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"To upgrade your CLI"},
@@ -282,7 +282,7 @@ var _ = Describe("Login Command", func() {
 		It("tries to get the organizations", func() {
 			Flags = []string{}
 			ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
-			testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+			testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 			Expect(orgRepo.ListOrgsCallCount()).To(Equal(1))
 			Expect(orgRepo.ListOrgsArgsForCall(0)).To(Equal(50))
 		})
@@ -314,7 +314,7 @@ var _ = Describe("Login Command", func() {
 			It("doesn't display a list of orgs (the user must type the name)", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-org-1"))
@@ -326,7 +326,7 @@ var _ = Describe("Login Command", func() {
 			It("does not ask the user to select an org/space", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
@@ -352,7 +352,7 @@ var _ = Describe("Login Command", func() {
 
 			It("does not as the user to select an org", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(Config.OrganizationFields().GUID).To(Equal(""))
 				Expect(Config.SpaceFields().GUID).To(Equal(""))
@@ -378,7 +378,7 @@ var _ = Describe("Login Command", func() {
 
 			It("does not ask the user to select a space", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().GUID).To(Equal(""))
@@ -422,7 +422,7 @@ var _ = Describe("Login Command", func() {
 				It("prompts the user for 'password' prompt and any text type prompt", func() {
 					ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-password"}
 
-					testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 					Expect(ui.Prompts).To(ContainSubstrings(
 						[]string{"API endpoint"},
@@ -448,7 +448,7 @@ var _ = Describe("Login Command", func() {
 					Flags = []string{"--sso", "-a", "api.example.com"}
 					ui.Inputs = []string{"the-one-time-code"}
 
-					testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 					Expect(ui.Prompts).To(BeEmpty())
 					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"passcode"}))
@@ -463,7 +463,7 @@ var _ = Describe("Login Command", func() {
 				Flags = []string{"-p", "the-password"}
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-pin"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password"}))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
@@ -479,7 +479,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-1", "the-password-2", "the-password-3"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(3))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
@@ -509,7 +509,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-2", "the-password-3"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(3))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
@@ -543,8 +543,8 @@ var _ = Describe("Login Command", func() {
 					ApiVersion:               "some-version",
 					AuthorizationEndpoint:    "auth/endpoint",
 					LoggregatorEndpoint:      "loggregator/endpoint",
-					MinCliVersion:            minCliVersion,
-					MinRecommendedCliVersion: minRecommendedCliVersion,
+					MinCLIVersion:            minCLIVersion,
+					MinRecommendedCLIVersion: minRecommendedCLIVersion,
 					SSHOAuthClient:           "some-client",
 					RoutingApiEndpoint:       "routing/endpoint",
 				}, endpoint, nil
@@ -553,7 +553,7 @@ var _ = Describe("Login Command", func() {
 		})
 
 		JustBeforeEach(func() {
-			testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+			testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 		})
 
 		var ItShowsTheTarget = func() {
@@ -824,8 +824,8 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.ApiVersion()).To(Equal("some-version"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
 				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
-				Expect(Config.MinCliVersion()).To(Equal("1.0.0"))
-				Expect(Config.MinRecommendedCliVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
 				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
 				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
 				Expect(Config.RoutingApiEndpoint()).To(Equal("routing/endpoint"))

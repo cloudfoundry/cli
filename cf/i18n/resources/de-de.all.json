@@ -1072,8 +1072,8 @@
     "translation": "Suchen nach Route..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry-API-Version {{.ApiVer}} erfordert CLI-Version {{.CliMin}}.  Sie verwenden aktuell die Version {{.CliVer}}. Um eine Aktualisierung Ihrer CLI auszuführen, gehen Sie auf folgende Seite: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry-API-Version {{.ApiVer}} erfordert CLI-Version {{.CLIMin}}.  Sie verwenden aktuell die Version {{.CLIVer}}. Um eine Aktualisierung Ihrer CLI auszuführen, gehen Sie auf folgende Seite: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",

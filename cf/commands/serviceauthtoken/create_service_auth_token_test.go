@@ -39,7 +39,7 @@ var _ = Describe("create-service-auth-token command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-service-auth-token", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-service-auth-token", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

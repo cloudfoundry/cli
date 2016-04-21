@@ -34,8 +34,8 @@ func (a APIConfigRefresher) Refresh() (Warning, error) {
 	a.Config.SetApiVersion(ccInfo.ApiVersion)
 	a.Config.SetAuthenticationEndpoint(ccInfo.AuthorizationEndpoint)
 	a.Config.SetSSHOAuthClient(ccInfo.SSHOAuthClient)
-	a.Config.SetMinCliVersion(ccInfo.MinCliVersion)
-	a.Config.SetMinRecommendedCliVersion(ccInfo.MinRecommendedCliVersion)
+	a.Config.SetMinCLIVersion(ccInfo.MinCLIVersion)
+	a.Config.SetMinRecommendedCLIVersion(ccInfo.MinRecommendedCLIVersion)
 	a.Config.SetLoggregatorEndpoint(a.LoggregatorEndpoint(ccInfo, endpoint))
 
 	//* 3/5/15: loggregator endpoint will be renamed to doppler eventually,

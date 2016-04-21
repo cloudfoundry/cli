@@ -1072,8 +1072,8 @@
     "translation": "正在检查路径..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API V{{.ApiVer}} 需要 CLI V{{.CliMin}}。您目前的版本是 {{.CliVer}}。要升级 CLI，请访问：https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API V{{.ApiVer}} 需要 CLI V{{.CLIMin}}。您目前的版本是 {{.CLIVer}}。要升级 CLI，请访问：https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",

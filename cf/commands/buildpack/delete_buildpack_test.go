@@ -35,7 +35,7 @@ var _ = Describe("delete-buildpack command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-buildpack", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when the user is not logged in", func() {

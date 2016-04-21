@@ -50,7 +50,7 @@ var _ = Describe("delete-space-quota command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-space-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when the user is not logged in", func() {

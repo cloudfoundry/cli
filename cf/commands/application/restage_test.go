@@ -63,7 +63,7 @@ var _ = Describe("restage command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("restage", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restage", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("Requirements", func() {

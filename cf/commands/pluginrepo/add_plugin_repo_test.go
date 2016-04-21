@@ -41,7 +41,7 @@ var _ = Describe("add-plugin-repo", func() {
 	})
 
 	var callAddPluginRepo = func(args []string) bool {
-		return testcmd.RunCliCommand("add-plugin-repo", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("add-plugin-repo", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("When repo server is valid", func() {

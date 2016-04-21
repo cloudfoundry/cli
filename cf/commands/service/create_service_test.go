@@ -71,7 +71,7 @@ var _ = Describe("create-service command", func() {
 	})
 
 	var callCreateService = func(args []string) bool {
-		return testcmd.RunCliCommand("create-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

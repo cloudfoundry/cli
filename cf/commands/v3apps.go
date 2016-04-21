@@ -38,7 +38,7 @@ func (c *V3Apps) MetaData() commandregistry.CommandMetadata {
 }
 
 func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(c),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(c),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0

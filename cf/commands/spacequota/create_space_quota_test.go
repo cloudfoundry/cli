@@ -52,7 +52,7 @@ var _ = Describe("create-space-quota command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-space-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("requirements", func() {

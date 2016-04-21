@@ -47,7 +47,7 @@ var _ = Describe("service-brokers command", func() {
 	Describe("login requirements", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			Expect(testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 
 		Context("when arguments are provided", func() {
@@ -100,7 +100,7 @@ var _ = Describe("service-brokers command", func() {
 			return nil
 		}
 
-		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as", "my-user"},
@@ -143,7 +143,7 @@ var _ = Describe("service-brokers command", func() {
 			return nil
 		}
 
-		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(BeInDisplayOrder(
 			[]string{"Getting service brokers as", "my-user"},
@@ -156,7 +156,7 @@ var _ = Describe("service-brokers command", func() {
 	})
 
 	It("says when no service brokers were found", func() {
-		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as", "my-user"},
@@ -166,7 +166,7 @@ var _ = Describe("service-brokers command", func() {
 
 	It("reports errors when listing service brokers", func() {
 		repo.ListServiceBrokersReturns(errors.New("Error finding service brokers"))
-		testcmd.RunCliCommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting service brokers as ", "my-user"},

@@ -41,7 +41,7 @@ var _ = Describe("quota", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("When not logged in", func() {

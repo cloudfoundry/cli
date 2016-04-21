@@ -42,7 +42,7 @@ var _ = Describe("feature-flags command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("feature-flags", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("feature-flags", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

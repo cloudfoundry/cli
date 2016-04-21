@@ -185,7 +185,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	callPush := func(args ...string) bool {
-		return testcmd.RunCliCommand("push", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("push", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

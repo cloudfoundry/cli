@@ -41,7 +41,7 @@ var _ = Describe("Plugins", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("plugins", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("plugins", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("If --checksum flag is provided", func() {

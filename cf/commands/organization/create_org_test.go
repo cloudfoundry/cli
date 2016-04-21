@@ -71,7 +71,7 @@ var _ = Describe("create-org command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-org", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

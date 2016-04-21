@@ -40,7 +40,7 @@ var _ = Describe("Help", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("help", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("help", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when no argument is provided", func() {

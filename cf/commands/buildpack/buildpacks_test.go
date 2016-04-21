@@ -36,7 +36,7 @@ var _ = Describe("ListBuildpacks", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("buildpacks", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("buildpacks", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when arguments are provided", func() {

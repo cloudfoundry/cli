@@ -79,7 +79,7 @@ var _ = Describe("CopySource", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("copy-source", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("copy-source", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirement failures", func() {

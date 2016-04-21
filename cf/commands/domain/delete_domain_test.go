@@ -46,7 +46,7 @@ var _ = Describe("delete-domain command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-domain", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-domain", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

@@ -41,7 +41,7 @@ var _ = Describe("enable-ssh command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("enable-ssh", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("enable-ssh", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

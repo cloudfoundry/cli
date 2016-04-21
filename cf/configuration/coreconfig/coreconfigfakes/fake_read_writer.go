@@ -138,24 +138,24 @@ type FakeReadWriter struct {
 	isMinApiVersionReturns struct {
 		result1 bool
 	}
-	IsMinCliVersionStub        func(string) bool
-	isMinCliVersionMutex       sync.RWMutex
-	isMinCliVersionArgsForCall []struct {
+	IsMinCLIVersionStub        func(string) bool
+	isMinCLIVersionMutex       sync.RWMutex
+	isMinCLIVersionArgsForCall []struct {
 		arg1 string
 	}
-	isMinCliVersionReturns struct {
+	isMinCLIVersionReturns struct {
 		result1 bool
 	}
-	MinCliVersionStub        func() string
-	minCliVersionMutex       sync.RWMutex
-	minCliVersionArgsForCall []struct{}
-	minCliVersionReturns     struct {
+	MinCLIVersionStub        func() string
+	minCLIVersionMutex       sync.RWMutex
+	minCLIVersionArgsForCall []struct{}
+	minCLIVersionReturns     struct {
 		result1 string
 	}
-	MinRecommendedCliVersionStub        func() string
-	minRecommendedCliVersionMutex       sync.RWMutex
-	minRecommendedCliVersionArgsForCall []struct{}
-	minRecommendedCliVersionReturns     struct {
+	MinRecommendedCLIVersionStub        func() string
+	minRecommendedCLIVersionMutex       sync.RWMutex
+	minRecommendedCLIVersionArgsForCall []struct{}
+	minRecommendedCLIVersionReturns     struct {
 		result1 string
 	}
 	AsyncTimeoutStub        func() uint
@@ -201,14 +201,14 @@ type FakeReadWriter struct {
 	setApiVersionArgsForCall []struct {
 		arg1 string
 	}
-	SetMinCliVersionStub        func(string)
-	setMinCliVersionMutex       sync.RWMutex
-	setMinCliVersionArgsForCall []struct {
+	SetMinCLIVersionStub        func(string)
+	setMinCLIVersionMutex       sync.RWMutex
+	setMinCLIVersionArgsForCall []struct {
 		arg1 string
 	}
-	SetMinRecommendedCliVersionStub        func(string)
-	setMinRecommendedCliVersionMutex       sync.RWMutex
-	setMinRecommendedCliVersionArgsForCall []struct {
+	SetMinRecommendedCLIVersionStub        func(string)
+	setMinRecommendedCLIVersionMutex       sync.RWMutex
+	setMinRecommendedCLIVersionArgsForCall []struct {
 		arg1 string
 	}
 	SetAuthenticationEndpointStub        func(string)
@@ -810,82 +810,82 @@ func (fake *FakeReadWriter) IsMinApiVersionReturns(result1 bool) {
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsMinCliVersion(arg1 string) bool {
-	fake.isMinCliVersionMutex.Lock()
-	fake.isMinCliVersionArgsForCall = append(fake.isMinCliVersionArgsForCall, struct {
+func (fake *FakeReadWriter) IsMinCLIVersion(arg1 string) bool {
+	fake.isMinCLIVersionMutex.Lock()
+	fake.isMinCLIVersionArgsForCall = append(fake.isMinCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.isMinCliVersionMutex.Unlock()
-	if fake.IsMinCliVersionStub != nil {
-		return fake.IsMinCliVersionStub(arg1)
+	fake.isMinCLIVersionMutex.Unlock()
+	if fake.IsMinCLIVersionStub != nil {
+		return fake.IsMinCLIVersionStub(arg1)
 	} else {
-		return fake.isMinCliVersionReturns.result1
+		return fake.isMinCLIVersionReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) IsMinCliVersionCallCount() int {
-	fake.isMinCliVersionMutex.RLock()
-	defer fake.isMinCliVersionMutex.RUnlock()
-	return len(fake.isMinCliVersionArgsForCall)
+func (fake *FakeReadWriter) IsMinCLIVersionCallCount() int {
+	fake.isMinCLIVersionMutex.RLock()
+	defer fake.isMinCLIVersionMutex.RUnlock()
+	return len(fake.isMinCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsMinCliVersionArgsForCall(i int) string {
-	fake.isMinCliVersionMutex.RLock()
-	defer fake.isMinCliVersionMutex.RUnlock()
-	return fake.isMinCliVersionArgsForCall[i].arg1
+func (fake *FakeReadWriter) IsMinCLIVersionArgsForCall(i int) string {
+	fake.isMinCLIVersionMutex.RLock()
+	defer fake.isMinCLIVersionMutex.RUnlock()
+	return fake.isMinCLIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) IsMinCliVersionReturns(result1 bool) {
-	fake.IsMinCliVersionStub = nil
-	fake.isMinCliVersionReturns = struct {
+func (fake *FakeReadWriter) IsMinCLIVersionReturns(result1 bool) {
+	fake.IsMinCLIVersionStub = nil
+	fake.isMinCLIVersionReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) MinCliVersion() string {
-	fake.minCliVersionMutex.Lock()
-	fake.minCliVersionArgsForCall = append(fake.minCliVersionArgsForCall, struct{}{})
-	fake.minCliVersionMutex.Unlock()
-	if fake.MinCliVersionStub != nil {
-		return fake.MinCliVersionStub()
+func (fake *FakeReadWriter) MinCLIVersion() string {
+	fake.minCLIVersionMutex.Lock()
+	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct{}{})
+	fake.minCLIVersionMutex.Unlock()
+	if fake.MinCLIVersionStub != nil {
+		return fake.MinCLIVersionStub()
 	} else {
-		return fake.minCliVersionReturns.result1
+		return fake.minCLIVersionReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) MinCliVersionCallCount() int {
-	fake.minCliVersionMutex.RLock()
-	defer fake.minCliVersionMutex.RUnlock()
-	return len(fake.minCliVersionArgsForCall)
+func (fake *FakeReadWriter) MinCLIVersionCallCount() int {
+	fake.minCLIVersionMutex.RLock()
+	defer fake.minCLIVersionMutex.RUnlock()
+	return len(fake.minCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) MinCliVersionReturns(result1 string) {
-	fake.MinCliVersionStub = nil
-	fake.minCliVersionReturns = struct {
+func (fake *FakeReadWriter) MinCLIVersionReturns(result1 string) {
+	fake.MinCLIVersionStub = nil
+	fake.minCLIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) MinRecommendedCliVersion() string {
-	fake.minRecommendedCliVersionMutex.Lock()
-	fake.minRecommendedCliVersionArgsForCall = append(fake.minRecommendedCliVersionArgsForCall, struct{}{})
-	fake.minRecommendedCliVersionMutex.Unlock()
-	if fake.MinRecommendedCliVersionStub != nil {
-		return fake.MinRecommendedCliVersionStub()
+func (fake *FakeReadWriter) MinRecommendedCLIVersion() string {
+	fake.minRecommendedCLIVersionMutex.Lock()
+	fake.minRecommendedCLIVersionArgsForCall = append(fake.minRecommendedCLIVersionArgsForCall, struct{}{})
+	fake.minRecommendedCLIVersionMutex.Unlock()
+	if fake.MinRecommendedCLIVersionStub != nil {
+		return fake.MinRecommendedCLIVersionStub()
 	} else {
-		return fake.minRecommendedCliVersionReturns.result1
+		return fake.minRecommendedCLIVersionReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) MinRecommendedCliVersionCallCount() int {
-	fake.minRecommendedCliVersionMutex.RLock()
-	defer fake.minRecommendedCliVersionMutex.RUnlock()
-	return len(fake.minRecommendedCliVersionArgsForCall)
+func (fake *FakeReadWriter) MinRecommendedCLIVersionCallCount() int {
+	fake.minRecommendedCLIVersionMutex.RLock()
+	defer fake.minRecommendedCLIVersionMutex.RUnlock()
+	return len(fake.minRecommendedCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) MinRecommendedCliVersionReturns(result1 string) {
-	fake.MinRecommendedCliVersionStub = nil
-	fake.minRecommendedCliVersionReturns = struct {
+func (fake *FakeReadWriter) MinRecommendedCLIVersionReturns(result1 string) {
+	fake.MinRecommendedCLIVersionStub = nil
+	fake.minRecommendedCLIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1071,50 +1071,50 @@ func (fake *FakeReadWriter) SetApiVersionArgsForCall(i int) string {
 	return fake.setApiVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetMinCliVersion(arg1 string) {
-	fake.setMinCliVersionMutex.Lock()
-	fake.setMinCliVersionArgsForCall = append(fake.setMinCliVersionArgsForCall, struct {
+func (fake *FakeReadWriter) SetMinCLIVersion(arg1 string) {
+	fake.setMinCLIVersionMutex.Lock()
+	fake.setMinCLIVersionArgsForCall = append(fake.setMinCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.setMinCliVersionMutex.Unlock()
-	if fake.SetMinCliVersionStub != nil {
-		fake.SetMinCliVersionStub(arg1)
+	fake.setMinCLIVersionMutex.Unlock()
+	if fake.SetMinCLIVersionStub != nil {
+		fake.SetMinCLIVersionStub(arg1)
 	}
 }
 
-func (fake *FakeReadWriter) SetMinCliVersionCallCount() int {
-	fake.setMinCliVersionMutex.RLock()
-	defer fake.setMinCliVersionMutex.RUnlock()
-	return len(fake.setMinCliVersionArgsForCall)
+func (fake *FakeReadWriter) SetMinCLIVersionCallCount() int {
+	fake.setMinCLIVersionMutex.RLock()
+	defer fake.setMinCLIVersionMutex.RUnlock()
+	return len(fake.setMinCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetMinCliVersionArgsForCall(i int) string {
-	fake.setMinCliVersionMutex.RLock()
-	defer fake.setMinCliVersionMutex.RUnlock()
-	return fake.setMinCliVersionArgsForCall[i].arg1
+func (fake *FakeReadWriter) SetMinCLIVersionArgsForCall(i int) string {
+	fake.setMinCLIVersionMutex.RLock()
+	defer fake.setMinCLIVersionMutex.RUnlock()
+	return fake.setMinCLIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetMinRecommendedCliVersion(arg1 string) {
-	fake.setMinRecommendedCliVersionMutex.Lock()
-	fake.setMinRecommendedCliVersionArgsForCall = append(fake.setMinRecommendedCliVersionArgsForCall, struct {
+func (fake *FakeReadWriter) SetMinRecommendedCLIVersion(arg1 string) {
+	fake.setMinRecommendedCLIVersionMutex.Lock()
+	fake.setMinRecommendedCLIVersionArgsForCall = append(fake.setMinRecommendedCLIVersionArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.setMinRecommendedCliVersionMutex.Unlock()
-	if fake.SetMinRecommendedCliVersionStub != nil {
-		fake.SetMinRecommendedCliVersionStub(arg1)
+	fake.setMinRecommendedCLIVersionMutex.Unlock()
+	if fake.SetMinRecommendedCLIVersionStub != nil {
+		fake.SetMinRecommendedCLIVersionStub(arg1)
 	}
 }
 
-func (fake *FakeReadWriter) SetMinRecommendedCliVersionCallCount() int {
-	fake.setMinRecommendedCliVersionMutex.RLock()
-	defer fake.setMinRecommendedCliVersionMutex.RUnlock()
-	return len(fake.setMinRecommendedCliVersionArgsForCall)
+func (fake *FakeReadWriter) SetMinRecommendedCLIVersionCallCount() int {
+	fake.setMinRecommendedCLIVersionMutex.RLock()
+	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
+	return len(fake.setMinRecommendedCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetMinRecommendedCliVersionArgsForCall(i int) string {
-	fake.setMinRecommendedCliVersionMutex.RLock()
-	defer fake.setMinRecommendedCliVersionMutex.RUnlock()
-	return fake.setMinRecommendedCliVersionArgsForCall[i].arg1
+func (fake *FakeReadWriter) SetMinRecommendedCLIVersionArgsForCall(i int) string {
+	fake.setMinRecommendedCLIVersionMutex.RLock()
+	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
+	return fake.setMinRecommendedCLIVersionArgsForCall[i].arg1
 }
 
 func (fake *FakeReadWriter) SetAuthenticationEndpoint(arg1 string) {

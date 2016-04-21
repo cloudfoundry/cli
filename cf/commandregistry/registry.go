@@ -114,14 +114,14 @@ func (r *registry) Metadatas() []CommandMetadata {
 func (r *registry) CommandUsage(cmdName string) string {
 	cmd := r.FindCommand(cmdName)
 
-	return CliCommandUsagePresenter(cmd).Usage()
+	return CLICommandUsagePresenter(cmd).Usage()
 }
 
 type usagePresenter struct {
 	cmd Command
 }
 
-func CliCommandUsagePresenter(cmd Command) *usagePresenter {
+func CLICommandUsagePresenter(cmd Command) *usagePresenter {
 	return &usagePresenter{
 		cmd: cmd,
 	}

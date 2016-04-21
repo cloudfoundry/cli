@@ -39,7 +39,7 @@ var _ = Describe("rename-service-broker command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("rename-service-broker", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-service-broker", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

@@ -34,7 +34,7 @@ func (cmd *RouterGroups) MetaData() commandregistry.CommandMetadata {
 func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 
 	return []requirements.Requirement{
-		requirementsFactory.NewUsageRequirement(commandregistry.CliCommandUsagePresenter(cmd),
+		requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 			T("No argument required"),
 			func() bool {
 				return len(fc.Args()) != 0

@@ -48,7 +48,7 @@ var _ = Describe("delete-service-key command", func() {
 	})
 
 	var callDeleteServiceKey = func(args []string) bool {
-		return testcmd.RunCliCommand("delete-service-key", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-service-key", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements are not satisfied", func() {
