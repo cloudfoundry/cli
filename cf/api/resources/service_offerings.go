@@ -28,7 +28,7 @@ type ServiceOfferingEntity struct {
 }
 
 type ServiceOfferingExtra struct {
-	DocumentationURL string `json:"documentationUrl"`
+	DocumentationURL string `json:"documentationURL"`
 }
 
 func (resource ServiceOfferingResource) ToFields() models.ServiceOfferingFields {
@@ -39,7 +39,7 @@ func (resource ServiceOfferingResource) ToFields() models.ServiceOfferingFields 
 		Description:      resource.Entity.Description,
 		BrokerGUID:       resource.Entity.BrokerGUID,
 		GUID:             resource.Metadata.GUID,
-		DocumentationUrl: resource.Entity.Extra.DocumentationURL,
+		DocumentationURL: resource.Entity.Extra.DocumentationURL,
 		Requires:         resource.Entity.Requires,
 	}
 }

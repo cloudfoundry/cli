@@ -448,7 +448,7 @@ var _ = Describe("App", func() {
 				Expect(getAppModel.PackageUpdatedAt.String()).To(Equal(time.Date(2015, time.November, 19, 1, 0, 15, 0, time.UTC).String()))
 				Expect(getAppModel.PackageState).To(Equal("STAGED"))
 				Expect(getAppModel.StagingFailedReason).To(BeEmpty())
-				Expect(getAppModel.BuildpackUrl).To(Equal("fake-buildpack"))
+				Expect(getAppModel.BuildpackURL).To(Equal("fake-buildpack"))
 				Expect(getAppModel.AppPorts).To(Equal([]int{8080, 9090}))
 				Expect(getAppModel.Routes[0].Host).To(Equal("fake-route-host"))
 				Expect(getAppModel.Routes[0].GUID).To(Equal("fake-route-guid"))

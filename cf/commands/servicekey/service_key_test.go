@@ -84,9 +84,9 @@ var _ = Describe("service-key command", func() {
 					Fields: models.ServiceKeyFields{
 						Name:                "fake-service-key",
 						GUID:                "fake-service-key-guid",
-						Url:                 "fake-service-key-url",
+						URL:                 "fake-service-key-url",
 						ServiceInstanceGUID: "fake-service-instance-guid",
-						ServiceInstanceUrl:  "fake-service-instance-url",
+						ServiceInstanceURL:  "fake-service-instance-url",
 					},
 					Credentials: map[string]interface{}{
 						"username": "fake-username",

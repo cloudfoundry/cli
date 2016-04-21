@@ -172,7 +172,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 
 	var appParams models.AppParams
 	var errs []error
-	appParams.BuildpackUrl = stringValOrDefault(yamlMap, "buildpack", &errs)
+	appParams.BuildpackURL = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 
 	domainAry := *sliceOrEmptyVal(yamlMap, "domains", &errs)

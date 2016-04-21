@@ -153,10 +153,10 @@ var _ = Describe("Service Keys Repo", func() {
 				Expect(serviceKeys).To(HaveLen(2))
 
 				Expect(serviceKeys[0].Fields.GUID).To(Equal("fake-service-key-guid-1"))
-				Expect(serviceKeys[0].Fields.Url).To(Equal("/v2/service_keys/fake-guid-1"))
+				Expect(serviceKeys[0].Fields.URL).To(Equal("/v2/service_keys/fake-guid-1"))
 				Expect(serviceKeys[0].Fields.Name).To(Equal("fake-service-key-name-1"))
 				Expect(serviceKeys[0].Fields.ServiceInstanceGUID).To(Equal("fake-service-instance-guid-1"))
-				Expect(serviceKeys[0].Fields.ServiceInstanceUrl).To(Equal("http://fake/service/instance/url/1"))
+				Expect(serviceKeys[0].Fields.ServiceInstanceURL).To(Equal("http://fake/service/instance/url/1"))
 
 				Expect(serviceKeys[0].Credentials).To(HaveKeyWithValue("username", "fake-username-1"))
 				Expect(serviceKeys[0].Credentials).To(HaveKeyWithValue("password", "fake-password-1"))
@@ -166,10 +166,10 @@ var _ = Describe("Service Keys Repo", func() {
 				Expect(serviceKeys[0].Credentials).To(HaveKeyWithValue("uri", "mysql://fake-user-1:fake-password-1@fake-host-1:3306/fake-db-name-1"))
 
 				Expect(serviceKeys[1].Fields.GUID).To(Equal("fake-service-key-guid-2"))
-				Expect(serviceKeys[1].Fields.Url).To(Equal("/v2/service_keys/fake-guid-2"))
+				Expect(serviceKeys[1].Fields.URL).To(Equal("/v2/service_keys/fake-guid-2"))
 				Expect(serviceKeys[1].Fields.Name).To(Equal("fake-service-key-name-2"))
 				Expect(serviceKeys[1].Fields.ServiceInstanceGUID).To(Equal("fake-service-instance-guid-2"))
-				Expect(serviceKeys[1].Fields.ServiceInstanceUrl).To(Equal("http://fake/service/instance/url/1"))
+				Expect(serviceKeys[1].Fields.ServiceInstanceURL).To(Equal("http://fake/service/instance/url/1"))
 
 				Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("username", "fake-username-2"))
 				Expect(serviceKeys[1].Credentials).To(HaveKeyWithValue("password", "fake-password-2"))
@@ -217,10 +217,10 @@ var _ = Describe("Service Keys Repo", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(serviceKey.Fields.GUID).To(Equal("fake-service-key-guid"))
-				Expect(serviceKey.Fields.Url).To(Equal("/v2/service_keys/fake-guid"))
+				Expect(serviceKey.Fields.URL).To(Equal("/v2/service_keys/fake-guid"))
 				Expect(serviceKey.Fields.Name).To(Equal("fake-service-key-name"))
 				Expect(serviceKey.Fields.ServiceInstanceGUID).To(Equal("fake-service-instance-guid"))
-				Expect(serviceKey.Fields.ServiceInstanceUrl).To(Equal("http://fake/service/instance/url"))
+				Expect(serviceKey.Fields.ServiceInstanceURL).To(Equal("http://fake/service/instance/url"))
 
 				Expect(serviceKey.Credentials).To(HaveKeyWithValue("username", "fake-username"))
 				Expect(serviceKey.Credentials).To(HaveKeyWithValue("password", "fake-password"))

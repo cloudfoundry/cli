@@ -150,7 +150,7 @@ var _ = Describe("Install", func() {
 				Context("when repo is found in config", func() {
 					Context("when repo endpoint returns an error", func() {
 						It("informs user about the error", func() {
-							config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+							config.SetPluginRepo(models.PluginRepo{Name: "repo1", URL: ""})
 							fakePluginRepo.GetPluginsReturns(nil, []string{"repo error1"})
 							runCommand("plugin1", "-r", "repo1", "-f")
 
@@ -161,7 +161,7 @@ var _ = Describe("Install", func() {
 
 					Context("when plugin metadata is available and desired plugin is not found", func() {
 						It("informs user about the error", func() {
-							config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+							config.SetPluginRepo(models.PluginRepo{Name: "repo1", URL: ""})
 							fakePluginRepo.GetPluginsReturns(nil, nil)
 							runCommand("plugin1", "-r", "repo1", "-f")
 
@@ -170,7 +170,7 @@ var _ = Describe("Install", func() {
 					})
 
 					It("ignore cases in repo name", func() {
-						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+						config.SetPluginRepo(models.PluginRepo{Name: "repo1", URL: ""})
 						fakePluginRepo.GetPluginsReturns(nil, nil)
 						runCommand("plugin1", "-r", "REPO1", "-f")
 
@@ -188,7 +188,7 @@ var _ = Describe("Install", func() {
 						result := make(map[string][]clipr.Plugin)
 						result["repo1"] = []clipr.Plugin{p}
 
-						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+						config.SetPluginRepo(models.PluginRepo{Name: "repo1", URL: ""})
 						fakePluginRepo.GetPluginsReturns(result, nil)
 						runCommand("plugin1", "-r", "repo1", "-f")
 
@@ -238,7 +238,7 @@ var _ = Describe("Install", func() {
 						result := make(map[string][]clipr.Plugin)
 						result["repo1"] = []clipr.Plugin{p}
 
-						config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: ""})
+						config.SetPluginRepo(models.PluginRepo{Name: "repo1", URL: ""})
 						fakePluginRepo.GetPluginsReturns(result, nil)
 					})
 

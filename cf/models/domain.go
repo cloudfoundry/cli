@@ -9,7 +9,7 @@ type DomainFields struct {
 	Shared                 bool
 }
 
-func (model DomainFields) UrlForHostAndPath(host, path string, port int) string {
+func (model DomainFields) URLForHostAndPath(host, path string, port int) string {
 	return (&RoutePresenter{
 		Host:   host,
 		Domain: model.Name,

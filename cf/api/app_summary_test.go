@@ -53,7 +53,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			app1 := apps[0]
 			Expect(app1.Name).To(Equal("app1"))
 			Expect(app1.GUID).To(Equal("app-1-guid"))
-			Expect(app1.BuildpackUrl).To(Equal("go_buildpack"))
+			Expect(app1.BuildpackURL).To(Equal("go_buildpack"))
 			Expect(len(app1.Routes)).To(Equal(1))
 			Expect(app1.Routes[0].URL()).To(Equal("app1.cfapps.io"))
 
@@ -115,7 +115,7 @@ var _ = Describe("AppSummaryRepository", func() {
 
 			Expect(app.Name).To(Equal("app1"))
 			Expect(app.GUID).To(Equal("app-1-guid"))
-			Expect(app.BuildpackUrl).To(Equal("go_buildpack"))
+			Expect(app.BuildpackURL).To(Equal("go_buildpack"))
 			Expect(len(app.Routes)).To(Equal(1))
 			Expect(app.Routes[0].URL()).To(Equal("app1.cfapps.io"))
 

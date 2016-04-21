@@ -48,7 +48,7 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 
 	for _, binding := range instance.ServiceBindings {
 		if binding.AppGUID == appGUID {
-			path = binding.Url
+			path = binding.URL
 			break
 		}
 	}

@@ -43,11 +43,11 @@ var _ = Describe("list-plugin-repo", func() {
 	It("lists all added plugin repo in a table", func() {
 		config.SetPluginRepo(models.PluginRepo{
 			Name: "repo1",
-			Url:  "http://url1.com",
+			URL:  "http://url1.com",
 		})
 		config.SetPluginRepo(models.PluginRepo{
 			Name: "repo2",
-			Url:  "http://url2.com",
+			URL:  "http://url2.com",
 		})
 
 		callListPluginRepos()

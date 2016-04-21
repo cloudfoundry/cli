@@ -3,9 +3,9 @@ package models
 type ServiceKeyFields struct {
 	Name                string
 	GUID                string
-	Url                 string
+	URL                 string
 	ServiceInstanceGUID string
-	ServiceInstanceUrl  string
+	ServiceInstanceURL  string
 }
 
 type ServiceKeyRequest struct {

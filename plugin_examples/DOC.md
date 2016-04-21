@@ -44,15 +44,15 @@ HasOrganization() (bool, error)
 
 HasSpace() (bool, error)
 
-ApiEndpoint() (endpointUrl string, error)
+ApiEndpoint() (endpointURL string, error)
 
 ApiVersion() (ver string, error)
 
 HasAPIEndpoint() (bool, error)
 
-LoggregatorEndpoint() (endpointUrl string, error)
+LoggregatorEndpoint() (endpointURL string, error)
 
-DopplerEndpoint() (endpointUrl string, error)
+DopplerEndpoint() (endpointURL string, error)
 
 AccessToken() (token string, error)
 

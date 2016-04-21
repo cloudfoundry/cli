@@ -469,16 +469,16 @@ var _ = Describe("Services Repo", func() {
 
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.GUID).To(Equal("my-service-instance-guid"))
-			Expect(instance.DashboardUrl).To(Equal("my-dashboard-url"))
+			Expect(instance.DashboardURL).To(Equal("my-dashboard-url"))
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
-			Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
+			Expect(instance.ServiceOffering.DocumentationURL).To(Equal("http://info.example.com"))
 			Expect(instance.ServiceOffering.Description).To(Equal("MySQL database"))
 			Expect(instance.ServiceOffering.Requires).To(ContainElement("route_forwarding"))
 			Expect(instance.ServicePlan.Name).To(Equal("plan-name"))
 			Expect(len(instance.ServiceBindings)).To(Equal(2))
 
 			binding := instance.ServiceBindings[0]
-			Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
+			Expect(binding.URL).To(Equal("/v2/service_bindings/service-binding-1-guid"))
 			Expect(binding.GUID).To(Equal("service-binding-1-guid"))
 			Expect(binding.AppGUID).To(Equal("app-1-guid"))
 		})
@@ -534,7 +534,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(len(instance.ServiceBindings)).To(Equal(2))
 
 			binding := instance.ServiceBindings[0]
-			Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
+			Expect(binding.URL).To(Equal("/v2/service_bindings/service-binding-1-guid"))
 			Expect(binding.GUID).To(Equal("service-binding-1-guid"))
 			Expect(binding.AppGUID).To(Equal("app-1-guid"))
 		})
@@ -585,11 +585,11 @@ var _ = Describe("Services Repo", func() {
 			serviceInstance.GUID = "my-service-instance-guid"
 			serviceInstance.ServiceBindings = []models.ServiceBindingFields{
 				{
-					Url:     "/v2/service_bindings/service-binding-1-guid",
+					URL:     "/v2/service_bindings/service-binding-1-guid",
 					AppGUID: "app-1-guid",
 				},
 				{
-					Url:     "/v2/service_bindings/service-binding-2-guid",
+					URL:     "/v2/service_bindings/service-binding-2-guid",
 					AppGUID: "app-2-guid",
 				},
 			}
@@ -607,12 +607,12 @@ var _ = Describe("Services Repo", func() {
 			serviceInstance.ServiceKeys = []models.ServiceKeyFields{
 				{
 					Name: "fake-service-key-1",
-					Url:  "/v2/service_keys/service-key-1-guid",
+					URL:  "/v2/service_keys/service-key-1-guid",
 					GUID: "service-key-1-guid",
 				},
 				{
 					Name: "fake-service-key-2",
-					Url:  "/v2/service_keys/service-key-2-guid",
+					URL:  "/v2/service_keys/service-key-2-guid",
 					GUID: "service-key-2-guid",
 				},
 			}
@@ -1427,7 +1427,7 @@ var serviceOfferingReq = apifakes.NewCloudControllerTestRequest(testnet.TestRequ
 		  "entity": {
 			"label": "mysql",
 			"provider": "mysql",
-		    "extra": "{\"documentationUrl\":\"http://info.example.com\"}",
+		    "extra": "{\"documentationURL\":\"http://info.example.com\"}",
 			"description": "MySQL database",
 			"requires": ["route_forwarding"]
 		  }

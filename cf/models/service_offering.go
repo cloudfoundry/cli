@@ -7,7 +7,7 @@ type ServiceOfferingFields struct {
 	Provider         string
 	Version          string
 	Description      string
-	DocumentationUrl string
+	DocumentationURL string
 	Requires         []string
 }
 

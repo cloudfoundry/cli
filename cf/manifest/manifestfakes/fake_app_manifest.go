@@ -10,9 +10,9 @@ import (
 )
 
 type FakeAppManifest struct {
-	BuildpackUrlStub        func(string, string)
-	buildpackUrlMutex       sync.RWMutex
-	buildpackUrlArgsForCall []struct {
+	BuildpackURLStub        func(string, string)
+	buildpackURLMutex       sync.RWMutex
+	buildpackURLArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
@@ -94,28 +94,28 @@ type FakeAppManifest struct {
 	}
 }
 
-func (fake *FakeAppManifest) BuildpackUrl(arg1 string, arg2 string) {
-	fake.buildpackUrlMutex.Lock()
-	fake.buildpackUrlArgsForCall = append(fake.buildpackUrlArgsForCall, struct {
+func (fake *FakeAppManifest) BuildpackURL(arg1 string, arg2 string) {
+	fake.buildpackURLMutex.Lock()
+	fake.buildpackURLArgsForCall = append(fake.buildpackURLArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.buildpackUrlMutex.Unlock()
-	if fake.BuildpackUrlStub != nil {
-		fake.BuildpackUrlStub(arg1, arg2)
+	fake.buildpackURLMutex.Unlock()
+	if fake.BuildpackURLStub != nil {
+		fake.BuildpackURLStub(arg1, arg2)
 	}
 }
 
-func (fake *FakeAppManifest) BuildpackUrlCallCount() int {
-	fake.buildpackUrlMutex.RLock()
-	defer fake.buildpackUrlMutex.RUnlock()
-	return len(fake.buildpackUrlArgsForCall)
+func (fake *FakeAppManifest) BuildpackURLCallCount() int {
+	fake.buildpackURLMutex.RLock()
+	defer fake.buildpackURLMutex.RUnlock()
+	return len(fake.buildpackURLArgsForCall)
 }
 
-func (fake *FakeAppManifest) BuildpackUrlArgsForCall(i int) (string, string) {
-	fake.buildpackUrlMutex.RLock()
-	defer fake.buildpackUrlMutex.RUnlock()
-	return fake.buildpackUrlArgsForCall[i].arg1, fake.buildpackUrlArgsForCall[i].arg2
+func (fake *FakeAppManifest) BuildpackURLArgsForCall(i int) (string, string) {
+	fake.buildpackURLMutex.RLock()
+	defer fake.buildpackURLMutex.RUnlock()
+	return fake.buildpackURLArgsForCall[i].arg1, fake.buildpackURLArgsForCall[i].arg2
 }
 
 func (fake *FakeAppManifest) DiskQuota(arg1 string, arg2 int64) {

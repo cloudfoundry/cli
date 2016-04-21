@@ -81,7 +81,7 @@ var _ = Describe("Application resources", func() {
 			appPorts = []int{9090, 123}
 
 			appParams = models.AppParams{
-				BuildpackUrl:       &buildpackURL,
+				BuildpackURL:       &buildpackURL,
 				Command:            &command,
 				DiskQuota:          &diskQuota,
 				EnvironmentVars:    &environmentVars,

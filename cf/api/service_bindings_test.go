@@ -127,10 +127,10 @@ var _ = Describe("ServiceBindingsRepository", func() {
 				serviceInstance.GUID = "my-service-instance-guid"
 
 				binding := models.ServiceBindingFields{}
-				binding.Url = "/v2/service_bindings/service-binding-1-guid"
+				binding.URL = "/v2/service_bindings/service-binding-1-guid"
 				binding.AppGUID = "app-1-guid"
 				binding2 := models.ServiceBindingFields{}
-				binding2.Url = "/v2/service_bindings/service-binding-2-guid"
+				binding2.URL = "/v2/service_bindings/service-binding-2-guid"
 				binding2.AppGUID = "app-2-guid"
 				serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 			})

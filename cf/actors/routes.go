@@ -42,7 +42,7 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 		if useRandomPort {
 			route = routeActor.CreateRandomTCPRoute(domain)
 		} else {
-			routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.UrlForHostAndPath(hostname, path, port))}))
+			routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.URLForHostAndPath(hostname, path, port))}))
 
 			route, apiErr = routeActor.routeRepo.Create(hostname, domain, path, useRandomPort)
 			if apiErr != nil {

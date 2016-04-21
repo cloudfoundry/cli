@@ -53,11 +53,11 @@ var _ = Describe("PluginRepo", func() {
 			repoActor.GetPlugins([]models.PluginRepo{
 				models.PluginRepo{
 					Name: "repo1",
-					Url:  testServer1.URL,
+					URL:  testServer1.URL,
 				},
 				models.PluginRepo{
 					Name: "repo2",
-					Url:  testServer2.URL,
+					URL:  testServer2.URL,
 				},
 			})
 
@@ -69,11 +69,11 @@ var _ = Describe("PluginRepo", func() {
 			list, _ := repoActor.GetPlugins([]models.PluginRepo{
 				models.PluginRepo{
 					Name: "repo1",
-					Url:  testServer1.URL,
+					URL:  testServer1.URL,
 				},
 				models.PluginRepo{
 					Name: "repo2",
-					Url:  testServer2.URL,
+					URL:  testServer2.URL,
 				},
 			})
 
@@ -124,7 +124,7 @@ var _ = Describe("PluginRepo", func() {
 				list, _ := repoActor.GetPlugins([]models.PluginRepo{
 					models.PluginRepo{
 						Name: "repo1",
-						Url:  testServer1.URL,
+						URL:  testServer1.URL,
 					},
 				})
 
@@ -159,7 +159,7 @@ var _ = Describe("PluginRepo", func() {
 				_, err := repoActor.GetPlugins([]models.PluginRepo{
 					models.PluginRepo{
 						Name: "repo1",
-						Url:  testServer1.URL,
+						URL:  testServer1.URL,
 					},
 				})
 
@@ -187,7 +187,7 @@ var _ = Describe("PluginRepo", func() {
 				_, err := repoActor.GetPlugins([]models.PluginRepo{
 					models.PluginRepo{
 						Name: "repo1",
-						Url:  testServer1.URL,
+						URL:  testServer1.URL,
 					},
 				})
 

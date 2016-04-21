@@ -9,12 +9,12 @@ import (
 )
 
 type FakeUserProvidedServiceInstanceRepository struct {
-	CreateStub        func(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error)
+	CreateStub        func(name, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		name            string
-		drainUrl        string
-		routeServiceUrl string
+		drainURL        string
+		routeServiceURL string
 		params          map[string]interface{}
 	}
 	createReturns struct {
@@ -37,17 +37,17 @@ type FakeUserProvidedServiceInstanceRepository struct {
 	}
 }
 
-func (fake *FakeUserProvidedServiceInstanceRepository) Create(name string, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error) {
+func (fake *FakeUserProvidedServiceInstanceRepository) Create(name string, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error) {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		name            string
-		drainUrl        string
-		routeServiceUrl string
+		drainURL        string
+		routeServiceURL string
 		params          map[string]interface{}
-	}{name, drainUrl, routeServiceUrl, params})
+	}{name, drainURL, routeServiceURL, params})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(name, drainUrl, routeServiceUrl, params)
+		return fake.CreateStub(name, drainURL, routeServiceURL, params)
 	} else {
 		return fake.createReturns.result1
 	}
@@ -62,7 +62,7 @@ func (fake *FakeUserProvidedServiceInstanceRepository) CreateCallCount() int {
 func (fake *FakeUserProvidedServiceInstanceRepository) CreateArgsForCall(i int) (string, string, string, map[string]interface{}) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].drainUrl, fake.createArgsForCall[i].routeServiceUrl, fake.createArgsForCall[i].params
+	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].drainURL, fake.createArgsForCall[i].routeServiceURL, fake.createArgsForCall[i].params
 }
 
 func (fake *FakeUserProvidedServiceInstanceRepository) CreateReturns(result1 error) {

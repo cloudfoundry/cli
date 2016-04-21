@@ -101,7 +101,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 
 			name := "my-cool-app"
-			buildpackUrl := "buildpack-url"
+			buildpackURL := "buildpack-url"
 			spaceGUID := "some-space-guid"
 			stackGUID := "some-stack-guid"
 			command := "some-command"
@@ -111,7 +111,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			appParams = models.AppParams{
 				Name:          &name,
-				BuildpackUrl:  &buildpackUrl,
+				BuildpackURL:  &buildpackURL,
 				SpaceGUID:     &spaceGUID,
 				StackGUID:     &stackGUID,
 				Command:       &command,
@@ -320,7 +320,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			app := models.Application{}
 			app.GUID = "my-app-guid"
 			app.Name = "my-cool-app"
-			app.BuildpackUrl = "buildpack-url"
+			app.BuildpackURL = "buildpack-url"
 			app.Command = "some-command"
 			app.HealthCheckType = "none"
 			app.Memory = 2048
@@ -531,7 +531,7 @@ var createApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.Te
 
 func defaultAppParams() models.AppParams {
 	name := "my-cool-app"
-	buildpackUrl := "buildpack-url"
+	buildpackURL := "buildpack-url"
 	spaceGUID := "some-space-guid"
 	stackGUID := "some-stack-guid"
 	command := "some-command"
@@ -541,7 +541,7 @@ func defaultAppParams() models.AppParams {
 
 	return models.AppParams{
 		Name:          &name,
-		BuildpackUrl:  &buildpackUrl,
+		BuildpackURL:  &buildpackURL,
 		SpaceGUID:     &spaceGUID,
 		StackGUID:     &stackGUID,
 		Command:       &command,

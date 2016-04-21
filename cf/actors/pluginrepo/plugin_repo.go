@@ -31,7 +31,7 @@ func (r pluginRepo) GetPlugins(repos []models.PluginRepo) (map[string][]clipr.Pl
 	repoPlugins := make(map[string][]clipr.Plugin)
 
 	for _, repo := range repos {
-		resp, err := http.Get(getListEndpoint(repo.Url))
+		resp, err := http.Get(getListEndpoint(repo.URL))
 		if err != nil {
 			repoError = append(repoError, fmt.Sprintf(T("Error requesting from")+" '%s' - %s", repo.Name, err.Error()))
 			continue

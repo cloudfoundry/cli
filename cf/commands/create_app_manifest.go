@@ -124,8 +124,8 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) {
 		cmd.manifest.StartCommand(app.Name, app.Command)
 	}
 
-	if app.BuildpackUrl != "" {
-		cmd.manifest.BuildpackUrl(app.Name, app.BuildpackUrl)
+	if app.BuildpackURL != "" {
+		cmd.manifest.BuildpackURL(app.Name, app.BuildpackURL)
 	}
 
 	if len(app.Services) > 0 {

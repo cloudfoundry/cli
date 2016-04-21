@@ -70,7 +70,7 @@ func (repo cloudControllerSecurityGroupRepo) Read(name string) (models.SecurityG
 
 	err = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		group.SpaceUrl+"?inline-relations-depth=1",
+		group.SpaceURL+"?inline-relations-depth=1",
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			if asgr, ok := resource.(resources.SpaceResource); ok {
@@ -113,7 +113,7 @@ func (repo cloudControllerSecurityGroupRepo) FindAll() ([]models.SecurityGroup, 
 	for i := range securityGroups {
 		err = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
-			securityGroups[i].SpaceUrl+"?inline-relations-depth=1",
+			securityGroups[i].SpaceURL+"?inline-relations-depth=1",
 			resources.SpaceResource{},
 			func(resource interface{}) bool {
 				if asgr, ok := resource.(resources.SpaceResource); ok {

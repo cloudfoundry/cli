@@ -108,7 +108,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			foundBroker, apiErr := repo.FindByName("my-broker")
 			expectedBroker := models.ServiceBroker{}
 			expectedBroker.Name = "found-name"
-			expectedBroker.Url = "http://found.example.com"
+			expectedBroker.URL = "http://found.example.com"
 			expectedBroker.Username = "found-username"
 			expectedBroker.Password = "found-password"
 			expectedBroker.GUID = "found-guid"
@@ -187,7 +187,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			foundBroker, apiErr := repo.FindByGUID("found-guid")
 			expectedBroker := models.ServiceBroker{}
 			expectedBroker.Name = "found-name"
-			expectedBroker.Url = "http://found.example.com"
+			expectedBroker.URL = "http://found.example.com"
 			expectedBroker.Username = "found-username"
 			expectedBroker.GUID = "found-guid"
 
@@ -294,7 +294,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			serviceBroker := models.ServiceBroker{}
 			serviceBroker.GUID = "my-guid"
 			serviceBroker.Name = "foobroker"
-			serviceBroker.Url = "http://update.example.com"
+			serviceBroker.URL = "http://update.example.com"
 			serviceBroker.Username = "update-foouser"
 			serviceBroker.Password = "update-password"
 

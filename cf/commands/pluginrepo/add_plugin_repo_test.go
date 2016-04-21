@@ -74,13 +74,13 @@ var _ = Describe("add-plugin-repo", func() {
 			callAddPluginRepo([]string{"repo", testServer.URL})
 
 			Expect(config.PluginRepos()[0].Name).To(Equal("repo"))
-			Expect(config.PluginRepos()[0].Url).To(Equal(testServer.URL))
+			Expect(config.PluginRepos()[0].URL).To(Equal(testServer.URL))
 		})
 	})
 
 	Context("repo name already existing", func() {
 		BeforeEach(func() {
-			config.SetPluginRepo(models.PluginRepo{Name: "repo", Url: "http://repo.com"})
+			config.SetPluginRepo(models.PluginRepo{Name: "repo", URL: "http://repo.com"})
 		})
 
 		It("informs user of the already existing repo", func() {
@@ -95,7 +95,7 @@ var _ = Describe("add-plugin-repo", func() {
 
 	Context("repo address already existing", func() {
 		BeforeEach(func() {
-			config.SetPluginRepo(models.PluginRepo{Name: "repo1", Url: "http://repo.com"})
+			config.SetPluginRepo(models.PluginRepo{Name: "repo1", URL: "http://repo.com"})
 		})
 
 		It("informs user of the already existing repo", func() {

@@ -101,7 +101,7 @@ func WrapNetworkErrors(host string, err error) error {
 }
 
 func getBaseDomain(host string) string {
-	hostUrl, _ := url.Parse(host)
-	hostStrs := strings.Split(hostUrl.Host, ".")
+	hostURL, _ := url.Parse(host)
+	hostStrs := strings.Split(hostURL.Host, ".")
 	return hostStrs[len(hostStrs)-2] + "." + hostStrs[len(hostStrs)-1]
 }

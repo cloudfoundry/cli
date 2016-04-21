@@ -645,7 +645,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 		if buildpack == "null" || buildpack == "default" {
 			buildpack = ""
 		}
-		appParams.BuildpackUrl = &buildpack
+		appParams.BuildpackURL = &buildpack
 	}
 
 	if c.String("c") != "" {

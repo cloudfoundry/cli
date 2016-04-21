@@ -79,17 +79,17 @@ var _ = Describe("service-brokers command", func() {
 				{
 					Name: "service-broker-to-list-a",
 					GUID: "service-broker-to-list-guid-a",
-					Url:  "http://service-a-url.com",
+					URL:  "http://service-a-url.com",
 				},
 				{
 					Name: "service-broker-to-list-b",
 					GUID: "service-broker-to-list-guid-b",
-					Url:  "http://service-b-url.com",
+					URL:  "http://service-b-url.com",
 				},
 				{
 					Name: "service-broker-to-list-c",
 					GUID: "service-broker-to-list-guid-c",
-					Url:  "http://service-c-url.com",
+					URL:  "http://service-c-url.com",
 				},
 			}
 
@@ -117,22 +117,22 @@ var _ = Describe("service-brokers command", func() {
 				{
 					Name: "z-service-broker-to-list",
 					GUID: "z-service-broker-to-list-guid-a",
-					Url:  "http://service-a-url.com",
+					URL:  "http://service-a-url.com",
 				},
 				{
 					Name: "a-service-broker-to-list",
 					GUID: "a-service-broker-to-list-guid-c",
-					Url:  "http://service-c-url.com",
+					URL:  "http://service-c-url.com",
 				},
 				{
 					Name: "fun-service-broker-to-list",
 					GUID: "fun-service-broker-to-list-guid-b",
-					Url:  "http://service-b-url.com",
+					URL:  "http://service-b-url.com",
 				},
 				{
 					Name: "123-service-broker-to-list",
 					GUID: "123-service-broker-to-list-guid-c",
-					Url:  "http://service-d-url.com",
+					URL:  "http://service-d-url.com",
 				},
 			}
 

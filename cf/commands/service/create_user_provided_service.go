@@ -100,8 +100,8 @@ func (cmd *CreateUserProvidedService) SetDependency(deps commandregistry.Depende
 
 func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	name := c.Args()[0]
-	drainUrl := c.String("l")
-	routeServiceUrl := c.String("r")
+	drainURL := c.String("l")
+	routeServiceURL := c.String("r")
 	credentials := strings.Trim(c.String("p"), `"'`)
 	credentialsMap := make(map[string]interface{})
 
@@ -128,7 +128,7 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, routeServiceUrl, credentialsMap)
+	err := cmd.userProvidedServiceInstanceRepo.Create(name, drainURL, routeServiceURL, credentialsMap)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

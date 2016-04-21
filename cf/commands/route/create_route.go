@@ -136,7 +136,7 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {
 	cmd.ui.Say(T("Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
-			"URL":       terminal.EntityNameColor(domain.UrlForHostAndPath(hostName, path, port)),
+			"URL":       terminal.EntityNameColor(domain.URLForHostAndPath(hostName, path, port)),
 			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))

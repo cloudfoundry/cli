@@ -43,12 +43,12 @@ var _ = Describe("delte-plugin-repo", func() {
 		BeforeEach(func() {
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "repo1",
-				Url:  "http://someserver1.com:1234",
+				URL:  "http://someserver1.com:1234",
 			})
 
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "repo2",
-				Url:  "http://server2.org:8080",
+				URL:  "http://server2.org:8080",
 			})
 		})
 
@@ -56,7 +56,7 @@ var _ = Describe("delte-plugin-repo", func() {
 			callRemovePluginRepo("repo1")
 			Expect(len(config.PluginRepos())).To(Equal(1))
 			Expect(config.PluginRepos()[0].Name).To(Equal("repo2"))
-			Expect(config.PluginRepos()[0].Url).To(Equal("http://server2.org:8080"))
+			Expect(config.PluginRepos()[0].URL).To(Equal("http://server2.org:8080"))
 		})
 	})
 
@@ -64,12 +64,12 @@ var _ = Describe("delte-plugin-repo", func() {
 		BeforeEach(func() {
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "repo1",
-				Url:  "http://someserver1.com:1234",
+				URL:  "http://someserver1.com:1234",
 			})
 
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "repo2",
-				Url:  "http://server2.org:8080",
+				URL:  "http://server2.org:8080",
 			})
 		})
 
@@ -78,7 +78,7 @@ var _ = Describe("delte-plugin-repo", func() {
 
 			Expect(len(config.PluginRepos())).To(Equal(2))
 			Expect(config.PluginRepos()[0].Name).To(Equal("repo1"))
-			Expect(config.PluginRepos()[0].Url).To(Equal("http://someserver1.com:1234"))
+			Expect(config.PluginRepos()[0].URL).To(Equal("http://someserver1.com:1234"))
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"fake-repo", "does not exist as a repo"}))
 		})
 	})

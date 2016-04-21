@@ -61,34 +61,34 @@ func (cmd *AddPluginRepo) SetDependency(deps commandregistry.Dependency, pluginC
 func (cmd *AddPluginRepo) Execute(c flags.FlagContext) {
 
 	cmd.ui.Say("")
-	repoUrl := strings.ToLower(c.Args()[1])
+	repoURL := strings.ToLower(c.Args()[1])
 	repoName := strings.Trim(c.Args()[0], " ")
 
-	cmd.checkIfRepoExists(repoName, repoUrl)
+	cmd.checkIfRepoExists(repoName, repoURL)
 
-	repoUrl = cmd.verifyUrl(repoUrl)
+	repoURL = cmd.verifyURL(repoURL)
 
-	resp, err := http.Get(repoUrl)
+	resp, err := http.Get(repoURL)
 	if err != nil {
 		if urlErr, ok := err.(*url.Error); ok {
 			if opErr, opErrOk := urlErr.Err.(*net.OpError); opErrOk {
 				if opErr.Op == "dial" {
-					cmd.ui.Failed(T("There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}", map[string]interface{}{
-						"RepoUrl": repoUrl,
+					cmd.ui.Failed(T("There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}", map[string]interface{}{
+						"RepoURL": repoURL,
 						"Error":   err.Error(),
 						"Tip":     T("TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."),
 					}))
 				}
 			}
 		}
-		cmd.ui.Failed(T("There is an error performing request on '{{.RepoUrl}}': ", map[string]interface{}{
-			"RepoUrl": repoUrl,
+		cmd.ui.Failed(T("There is an error performing request on '{{.RepoURL}}': ", map[string]interface{}{
+			"RepoURL": repoURL,
 		}), err.Error())
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 404 {
-		cmd.ui.Failed(repoUrl + T(" is not responding. Please make sure it is a valid plugin repo."))
+		cmd.ui.Failed(repoURL + T(" is not responding. Please make sure it is a valid plugin repo."))
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -108,26 +108,26 @@ func (cmd *AddPluginRepo) Execute(c flags.FlagContext) {
 
 	cmd.config.SetPluginRepo(models.PluginRepo{
 		Name: c.Args()[0],
-		Url:  c.Args()[1],
+		URL:  c.Args()[1],
 	})
 
 	cmd.ui.Ok()
-	cmd.ui.Say(repoUrl + T(" added as '") + c.Args()[0] + "'")
+	cmd.ui.Say(repoURL + T(" added as '") + c.Args()[0] + "'")
 	cmd.ui.Say("")
 }
 
-func (cmd AddPluginRepo) checkIfRepoExists(repoName, repoUrl string) {
+func (cmd AddPluginRepo) checkIfRepoExists(repoName, repoURL string) {
 	repos := cmd.config.PluginRepos()
 	for _, repo := range repos {
 		if strings.ToLower(repo.Name) == strings.ToLower(repoName) {
 			cmd.ui.Failed(T(`Plugin repo named "{{.repoName}}" already exists, please use another name.`, map[string]interface{}{"repoName": repoName}))
-		} else if repo.Url == repoUrl {
-			cmd.ui.Failed(repo.Url + ` (` + repo.Name + T(`) already exists.`))
+		} else if repo.URL == repoURL {
+			cmd.ui.Failed(repo.URL + ` (` + repo.Name + T(`) already exists.`))
 		}
 	}
 }
 
-func (cmd AddPluginRepo) verifyUrl(repoURL string) string {
+func (cmd AddPluginRepo) verifyURL(repoURL string) string {
 	if !strings.HasPrefix(repoURL, "http://") && !strings.HasPrefix(repoURL, "https://") {
 		cmd.ui.Failed(T("{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com", map[string]interface{}{"URL": repoURL}))
 	}

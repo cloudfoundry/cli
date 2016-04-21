@@ -286,13 +286,13 @@ var _ = Describe("CreateAppManifest", func() {
 
 			Context("when the app has a buildpack", func() {
 				BeforeEach(func() {
-					application.BuildpackUrl = "buildpack"
+					application.BuildpackURL = "buildpack"
 				})
 
 				It("sets the buildpack", func() {
 					cmd.Execute(flagContext)
-					Expect(fakeManifest.BuildpackUrlCallCount()).To(Equal(1))
-					name, buildpack := fakeManifest.BuildpackUrlArgsForCall(0)
+					Expect(fakeManifest.BuildpackURLCallCount()).To(Equal(1))
+					name, buildpack := fakeManifest.BuildpackURLArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
 					Expect(buildpack).To(Equal("buildpack"))
 				})

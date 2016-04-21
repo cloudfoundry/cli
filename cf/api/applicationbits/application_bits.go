@@ -40,7 +40,7 @@ func NewCloudControllerApplicationBitsRepository(config coreconfig.Reader, gatew
 }
 
 func (repo CloudControllerApplicationBitsRepository) UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
-	apiUrl := fmt.Sprintf("/v2/apps/%s/bits", appGUID)
+	apiURL := fmt.Sprintf("/v2/apps/%s/bits", appGUID)
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
 			apiErr = fmt.Errorf("%s: %s", T("Error creating tmp file: {{.Err}}", map[string]interface{}{"Err": err}), err.Error())
@@ -65,7 +65,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGUID string, 
 		}
 
 		var request *net.Request
-		request, apiErr = repo.gateway.NewRequestForFile("PUT", repo.config.ApiEndpoint()+apiUrl, repo.config.AccessToken(), requestFile)
+		request, apiErr = repo.gateway.NewRequestForFile("PUT", repo.config.ApiEndpoint()+apiURL, repo.config.AccessToken(), requestFile)
 		if apiErr != nil {
 			return
 		}

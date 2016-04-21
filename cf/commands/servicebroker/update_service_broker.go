@@ -63,7 +63,7 @@ func (cmd *UpdateServiceBroker) Execute(c flags.FlagContext) {
 
 	serviceBroker.Username = c.Args()[1]
 	serviceBroker.Password = c.Args()[2]
-	serviceBroker.Url = c.Args()[3]
+	serviceBroker.URL = c.Args()[3]
 
 	apiErr = cmd.repo.Update(serviceBroker)
 

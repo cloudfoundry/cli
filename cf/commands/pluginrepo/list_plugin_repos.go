@@ -52,10 +52,10 @@ func (cmd *ListPluginRepos) SetDependency(deps commandregistry.Dependency, plugi
 func (cmd *ListPluginRepos) Execute(c flags.FlagContext) {
 	repos := cmd.config.PluginRepos()
 
-	table := cmd.ui.Table([]string{T("Repo Name"), T("Url")})
+	table := cmd.ui.Table([]string{T("Repo Name"), T("URL")})
 
 	for _, repo := range repos {
-		table.Add(repo.Name, repo.Url)
+		table.Add(repo.Name, repo.URL)
 	}
 
 	cmd.ui.Ok()

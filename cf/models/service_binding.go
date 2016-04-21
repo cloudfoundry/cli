@@ -8,6 +8,6 @@ type ServiceBindingRequest struct {
 
 type ServiceBindingFields struct {
 	GUID    string
-	Url     string
+	URL     string
 	AppGUID string
 }

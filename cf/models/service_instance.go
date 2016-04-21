@@ -26,11 +26,11 @@ type ServiceInstanceFields struct {
 	GUID             string
 	Name             string
 	LastOperation    LastOperationFields
-	SysLogDrainUrl   string
-	RouteServiceUrl  string
+	SysLogDrainURL   string
+	RouteServiceURL  string
 	ApplicationNames []string
 	Params           map[string]interface{}
-	DashboardUrl     string
+	DashboardURL     string
 	Tags             []string
 }
 

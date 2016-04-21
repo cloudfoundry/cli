@@ -98,9 +98,9 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 		return
 	}
 
-	drainUrl := c.String("l")
+	drainURL := c.String("l")
 	credentials := strings.Trim(c.String("p"), `'"`)
-	routeServiceUrl := c.String("r")
+	routeServiceURL := c.String("r")
 
 	credentialsMap := make(map[string]interface{})
 
@@ -128,8 +128,8 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 		}))
 
 	serviceInstance.Params = credentialsMap
-	serviceInstance.SysLogDrainUrl = drainUrl
-	serviceInstance.RouteServiceUrl = routeServiceUrl
+	serviceInstance.SysLogDrainURL = drainURL
+	serviceInstance.RouteServiceURL = routeServiceURL
 
 	apiErr := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance.ServiceInstanceFields)
 	if apiErr != nil {
@@ -143,7 +143,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 			"CFRestageCommand": terminal.CommandColor(cf.Name + " restage"),
 		}))
 
-	if routeServiceUrl == "" && credentials == "" && drainUrl == "" {
+	if routeServiceURL == "" && credentials == "" && drainURL == "" {
 		cmd.ui.Warn(T("No flags specified. No changes were made."))
 	}
 }

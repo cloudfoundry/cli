@@ -4104,12 +4104,12 @@
     "translation": "表示するオプションが多すぎます。名前を入力してください。"
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "'{{.repoUrl}}' で要求を実行したときエラーが発生しました: "
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "'{{.repoURL}}' で要求を実行したときエラーが発生しました: "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
@@ -4170,6 +4170,10 @@
   {
     "id": "UAA endpoint missing from config file",
     "translation": "UAA エンドポイントが構成ファイルにありません"
+  },
+  {
+    "id": "URL",
+    "translation": "URL"
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
@@ -4406,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "{{.ZipFileBytes}}、{{.FileCount}} 個のファイルをアップロードしています"
-  },
-  {
-    "id": "Url",
-    "translation": "URL"
   },
   {
     "id": "Use '{{.Command}}' for more information",
