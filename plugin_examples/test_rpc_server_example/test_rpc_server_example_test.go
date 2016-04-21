@@ -180,7 +180,7 @@ var _ = Describe("App-Lister", func() {
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
 								apps := sampleApps()
 								if count == 0 {
-									apps.NextUrl = "v2/apps?page=2"
+									apps.NextURL = "v2/apps?page=2"
 									*retVal = []string{marshal(apps)}
 									count++
 								} else {

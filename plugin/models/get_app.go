@@ -5,7 +5,7 @@ import "time"
 type GetAppModel struct {
 	GUID                 string
 	Name                 string
-	BuildpackUrl         string
+	BuildpackURL         string
 	Command              string
 	Diego                bool
 	DetectedStartCommand string

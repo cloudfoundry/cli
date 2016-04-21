@@ -76,7 +76,7 @@ func (cmd *ListServiceBrokers) Execute(c flags.FlagContext) {
 	apiErr := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
 		sbTable = append(sbTable, serviceBrokerRow{
 			name: serviceBroker.Name,
-			url:  serviceBroker.Url,
+			url:  serviceBroker.URL,
 		})
 		foundBrokers = true
 		return true

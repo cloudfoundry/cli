@@ -4,7 +4,7 @@ package models
 type SecurityGroupFields struct {
 	Name     string
 	GUID     string
-	SpaceUrl string `json:"spaces_url,omitempty"`
+	SpaceURL string `json:"spaces_url,omitempty"`
 	Rules    []map[string]interface{}
 }
 

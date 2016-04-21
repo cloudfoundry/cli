@@ -4104,12 +4104,12 @@
     "translation": "Há muitas opções a serem exibidas, digite o nome."
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "Há um erro ao executar a solicitação em '{{.repoUrl}}': "
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "Há um erro ao executar a solicitação em '{{.repoURL}}': "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
@@ -4170,6 +4170,10 @@
   {
     "id": "UAA endpoint missing from config file",
     "translation": "Terminal UAA ausente no arquivo de configuração"
+  },
+  {
+    "id": "URL",
+    "translation": "URL"
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
@@ -4406,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "Fazendo upload de arquivos {{.ZipFileBytes}}, {{.FileCount}}"
-  },
-  {
-    "id": "Url",
-    "translation": "URL"
   },
   {
     "id": "Use '{{.Command}}' for more information",

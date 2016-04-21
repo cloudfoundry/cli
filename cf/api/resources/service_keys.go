@@ -10,14 +10,14 @@ type ServiceKeyResource struct {
 type ServiceKeyEntity struct {
 	Name                string                 `json:"name"`
 	ServiceInstanceGUID string                 `json:"service_instance_guid"`
-	ServiceInstanceUrl  string                 `json:"service_instance_url"`
+	ServiceInstanceURL  string                 `json:"service_instance_url"`
 	Credentials         map[string]interface{} `json:"credentials"`
 }
 
 func (resource ServiceKeyResource) ToFields() models.ServiceKeyFields {
 	return models.ServiceKeyFields{
 		Name: resource.Entity.Name,
-		Url:  resource.Metadata.Url,
+		URL:  resource.Metadata.URL,
 		GUID: resource.Metadata.GUID,
 	}
 }
@@ -27,10 +27,10 @@ func (resource ServiceKeyResource) ToModel() models.ServiceKey {
 		Fields: models.ServiceKeyFields{
 			Name: resource.Entity.Name,
 			GUID: resource.Metadata.GUID,
-			Url:  resource.Metadata.Url,
+			URL:  resource.Metadata.URL,
 
 			ServiceInstanceGUID: resource.Entity.ServiceInstanceGUID,
-			ServiceInstanceUrl:  resource.Entity.ServiceInstanceUrl,
+			ServiceInstanceURL:  resource.Entity.ServiceInstanceURL,
 		},
 		Credentials: resource.Entity.Credentials,
 	}

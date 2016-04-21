@@ -77,7 +77,7 @@ func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, p
 	path := "/v2/service_brokers"
 	args := struct {
 		Name      string `json:"name"`
-		Url       string `json:"broker_url"`
+		URL       string `json:"broker_url"`
 		Username  string `json:"auth_username"`
 		Password  string `json:"auth_password"`
 		SpaceGUID string `json:"space_guid,omitempty"`
@@ -99,7 +99,7 @@ func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.S
 	path := fmt.Sprintf("/v2/service_brokers/%s", serviceBroker.GUID)
 	body := fmt.Sprintf(
 		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
-		serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
+		serviceBroker.URL, serviceBroker.Username, serviceBroker.Password,
 	)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }

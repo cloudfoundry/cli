@@ -62,7 +62,7 @@ var _ = Describe("repo-plugins", func() {
 		BeforeEach(func() {
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "cf",
-				Url:  "http://plugins.cloudfoundry.org",
+				URL:  "http://plugins.cloudfoundry.org",
 			})
 		})
 
@@ -72,7 +72,7 @@ var _ = Describe("repo-plugins", func() {
 
 			Expect(fakePluginRepo.GetPluginsCallCount()).To(Equal(1))
 			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("cf"))
-			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Url).To(Equal("https://plugins.cloudfoundry.org"))
+			Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].URL).To(Equal("https://plugins.cloudfoundry.org"))
 			Expect(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(1))
 		})
 	})
@@ -81,12 +81,12 @@ var _ = Describe("repo-plugins", func() {
 		BeforeEach(func() {
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "repo1",
-				Url:  "",
+				URL:  "",
 			})
 
 			config.SetPluginRepo(models.PluginRepo{
 				Name: "repo2",
-				Url:  "",
+				URL:  "",
 			})
 		})
 

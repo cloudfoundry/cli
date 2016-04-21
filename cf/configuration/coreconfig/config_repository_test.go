@@ -103,9 +103,9 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetLocale("en_US")
 		Expect(config.Locale()).To(Equal("en_US"))
 
-		config.SetPluginRepo(models.PluginRepo{Name: "repo", Url: "nowhere.com"})
+		config.SetPluginRepo(models.PluginRepo{Name: "repo", URL: "nowhere.com"})
 		Expect(config.PluginRepos()[0].Name).To(Equal("repo"))
-		Expect(config.PluginRepos()[0].Url).To(Equal("nowhere.com"))
+		Expect(config.PluginRepos()[0].URL).To(Equal("nowhere.com"))
 
 		s, _ := semver.Make("3.1")
 		Expect(config.IsMinApiVersion(s)).To(Equal(false))

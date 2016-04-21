@@ -27,7 +27,7 @@ func (model Application) ToParams() (params AppParams) {
 	params = AppParams{
 		GUID:            &model.GUID,
 		Name:            &model.Name,
-		BuildpackUrl:    &model.BuildpackUrl,
+		BuildpackURL:    &model.BuildpackURL,
 		Command:         &model.Command,
 		DiskQuota:       &model.DiskQuota,
 		InstanceCount:   &model.InstanceCount,
@@ -49,7 +49,7 @@ func (model Application) ToParams() (params AppParams) {
 type ApplicationFields struct {
 	GUID                 string
 	Name                 string
-	BuildpackUrl         string
+	BuildpackURL         string
 	Command              string
 	Diego                bool
 	DetectedStartCommand string
@@ -74,7 +74,7 @@ type ApplicationFields struct {
 }
 
 type AppParams struct {
-	BuildpackUrl       *string
+	BuildpackURL       *string
 	Command            *string
 	DiskQuota          *int64
 	Domains            *[]string
@@ -108,8 +108,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.AppPorts != nil {
 		app.AppPorts = other.AppPorts
 	}
-	if other.BuildpackUrl != nil {
-		app.BuildpackUrl = other.BuildpackUrl
+	if other.BuildpackURL != nil {
+		app.BuildpackURL = other.BuildpackURL
 	}
 	if other.Command != nil {
 		app.Command = other.Command

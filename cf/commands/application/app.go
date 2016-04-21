@@ -210,7 +210,7 @@ func (cmd *ShowApp) populatePluginModel(
 	stack *models.Stack,
 	instances []models.AppInstanceFields,
 ) {
-	cmd.pluginAppModel.BuildpackUrl = getSummaryApp.BuildpackUrl
+	cmd.pluginAppModel.BuildpackURL = getSummaryApp.BuildpackURL
 	cmd.pluginAppModel.Command = getSummaryApp.Command
 	cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
 	cmd.pluginAppModel.Diego = getSummaryApp.Diego

@@ -32,7 +32,7 @@ type ApplicationFromSummary struct {
 	Instances            int
 	DiskQuota            int64 `json:"disk_quota"`
 	AppPorts             []int `json:"ports"`
-	Urls                 []string
+	URLs                 []string
 	EnvironmentVars      map[string]interface{} `json:"environment_json,omitempty"`
 	HealthCheckTimeout   int                    `json:"health_check_timeout"`
 	State                string
@@ -61,7 +61,7 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app.PackageState = resource.PackageState
 	app.DetectedStartCommand = resource.DetectedStartCommand
 	app.HealthCheckTimeout = resource.HealthCheckTimeout
-	app.BuildpackUrl = resource.Buildpack
+	app.BuildpackURL = resource.Buildpack
 	app.Command = resource.Command
 	app.AppPorts = resource.AppPorts
 	app.EnvironmentVars = resource.EnvironmentVars

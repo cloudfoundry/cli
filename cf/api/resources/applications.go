@@ -92,7 +92,7 @@ func (resource AppFileResource) ToIntegrityFields() IntegrityFields {
 
 func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	entity := ApplicationEntity{
-		Buildpack:          app.BuildpackUrl,
+		Buildpack:          app.BuildpackURL,
 		Name:               app.Name,
 		SpaceGUID:          app.SpaceGUID,
 		Instances:          app.InstanceCount,

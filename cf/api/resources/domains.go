@@ -10,14 +10,14 @@ type DomainResource struct {
 type DomainEntity struct {
 	Name                   string `json:"name"`
 	OwningOrganizationGUID string `json:"owning_organization_guid,omitempty"`
-	SharedOrganizationsUrl string `json:"shared_organizations_url,omitempty"`
+	SharedOrganizationsURL string `json:"shared_organizations_url,omitempty"`
 	RouterGroupGUID        string `json:"router_group_guid,omitempty"`
 	RouterGroupType        string `json:"router_group_type,omitempty"`
 	Wildcard               bool   `json:"wildcard"`
 }
 
 func (resource DomainResource) ToFields() models.DomainFields {
-	privateDomain := resource.Entity.SharedOrganizationsUrl != "" || resource.Entity.OwningOrganizationGUID != ""
+	privateDomain := resource.Entity.SharedOrganizationsURL != "" || resource.Entity.OwningOrganizationGUID != ""
 	return models.DomainFields{
 		Name: resource.Entity.Name,
 		GUID: resource.Metadata.GUID,

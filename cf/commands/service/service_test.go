@@ -64,7 +64,7 @@ var _ = Describe("service command", func() {
 
 	Describe("After Requirement", func() {
 		createServiceInstanceWithState := func(state string) {
-			offering := models.ServiceOfferingFields{Label: "mysql", DocumentationUrl: "http://documentation.url", Description: "the-description"}
+			offering := models.ServiceOfferingFields{Label: "mysql", DocumentationURL: "http://documentation.url", Description: "the-description"}
 			plan := models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
 
 			serviceInstance := models.ServiceInstance{}
@@ -75,7 +75,7 @@ var _ = Describe("service command", func() {
 			serviceInstance.LastOperation.Description = "creating resource - step 1"
 			serviceInstance.ServicePlan = plan
 			serviceInstance.ServiceOffering = offering
-			serviceInstance.DashboardUrl = "some-url"
+			serviceInstance.DashboardURL = "some-url"
 			serviceInstance.LastOperation.State = state
 			serviceInstance.LastOperation.CreatedAt = "created-date"
 			serviceInstance.LastOperation.UpdatedAt = "updated-date"
@@ -112,7 +112,7 @@ var _ = Describe("service command", func() {
 				Expect(pluginModel.LastOperation.Type).To(Equal("create"))
 				Expect(pluginModel.ServicePlan.Name).To(Equal("plan-name"))
 				Expect(pluginModel.ServicePlan.GUID).To(Equal("plan-guid"))
-				Expect(pluginModel.ServiceOffering.DocumentationUrl).To(Equal("http://documentation.url"))
+				Expect(pluginModel.ServiceOffering.DocumentationURL).To(Equal("http://documentation.url"))
 				Expect(pluginModel.ServiceOffering.Name).To(Equal("mysql"))
 			})
 		})

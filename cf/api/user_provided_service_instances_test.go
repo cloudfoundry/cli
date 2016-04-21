@@ -100,8 +100,8 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			serviceInstance := models.ServiceInstanceFields{}
 			serviceInstance.GUID = "my-instance-guid"
 			serviceInstance.Params = params
-			serviceInstance.SysLogDrainUrl = "syslog://example.com"
-			serviceInstance.RouteServiceUrl = ""
+			serviceInstance.SysLogDrainURL = "syslog://example.com"
+			serviceInstance.RouteServiceURL = ""
 
 			apiErr := repo.Update(serviceInstance)
 			Expect(handler).To(HaveAllRequestsCalled())
@@ -150,7 +150,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 						},
             "space_guid": "f36dbf3e-eff1-4336-ae5c-aff01dd8ce94",
             "type": "user_provided_service_instance",
-            "syslog_drain_url": "sample/drainUrl",
+            "syslog_drain_url": "sample/drainURL",
             "space_url": "/v2/spaces/f36dbf3e-eff1-4336-ae5c-aff01dd8ce94",
             "service_bindings_url": "/v2/user_provided_service_instances/2d0a1eb6-b6e5-4b92-b1da-91c5e826b3b4/service_bindings"
          }
@@ -175,7 +175,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 			Expect(summaries.Resources[0].Name).To(Equal("test_service"))
 			Expect(summaries.Resources[1].Name).To(Equal("test_service2"))
 			Expect(summaries.Resources[1].Credentials["username"]).To(Equal("admin"))
-			Expect(summaries.Resources[1].SysLogDrainUrl).To(Equal("sample/drainUrl"))
+			Expect(summaries.Resources[1].SysLogDrainURL).To(Equal("sample/drainURL"))
 		})
 	})
 

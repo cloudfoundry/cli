@@ -80,7 +80,7 @@ var _ = Describe("update-service-broker command", func() {
 			expectedServiceBroker.Name = "my-found-broker"
 			expectedServiceBroker.Username = "new-username"
 			expectedServiceBroker.Password = "new-password"
-			expectedServiceBroker.Url = "new-url"
+			expectedServiceBroker.URL = "new-url"
 			expectedServiceBroker.GUID = "my-found-broker-guid"
 
 			Expect(serviceBrokerRepo.UpdateArgsForCall(0)).To(Equal(expectedServiceBroker))

@@ -558,7 +558,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.StackGUID).To(Equal("custom-linux-guid"))
 				Expect(*params.HealthCheckTimeout).To(Equal(1))
 				Expect(*params.HealthCheckType).To(Equal("port"))
-				Expect(*params.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
+				Expect(*params.BuildpackURL).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
 				Expect(*params.AppPorts).To(Equal([]int{8080, 9000}))
 
 				name, owningOrgGUID := domainRepo.FindByNameInOrgArgsForCall(0)
@@ -954,7 +954,7 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.Memory).To(Equal(int64(128)))
 				Expect(*params.InstanceCount).To(Equal(1))
 				Expect(*params.StackName).To(Equal("custom-stack"))
-				Expect(*params.BuildpackUrl).To(Equal("some-buildpack"))
+				Expect(*params.BuildpackURL).To(Equal("some-buildpack"))
 				Expect(*params.Command).To(Equal("JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run"))
 				// Expect(actor.UploadedDir).To(Equal(filepath.Clean("some/path/from/manifest"))) TODO: Re-enable this once we develop a strategy
 
@@ -1121,7 +1121,7 @@ var _ = Describe("Push Command", func() {
 		It("resets the app's buildpack when the -b flag is provided as 'default'", func() {
 			callPush("-b", "default", "existing-app")
 			_, params := appRepo.UpdateArgsForCall(0)
-			Expect(*params.BuildpackUrl).To(Equal(""))
+			Expect(*params.BuildpackURL).To(Equal(""))
 		})
 
 		It("resets the app's command when the -c flag is provided as 'default'", func() {
@@ -1133,7 +1133,7 @@ var _ = Describe("Push Command", func() {
 		It("resets the app's buildpack when the -b flag is provided as 'null'", func() {
 			callPush("-b", "null", "existing-app")
 			_, params := appRepo.UpdateArgsForCall(0)
-			Expect(*params.BuildpackUrl).To(Equal(""))
+			Expect(*params.BuildpackURL).To(Equal(""))
 		})
 
 		It("resets the app's command when the -c flag is provided as 'null'", func() {
@@ -1207,7 +1207,7 @@ var _ = Describe("Push Command", func() {
 			Expect(*params.Command).To(Equal("different start command"))
 			Expect(*params.InstanceCount).To(Equal(10))
 			Expect(*params.Memory).To(Equal(int64(1024)))
-			Expect(*params.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-different.git"))
+			Expect(*params.BuildpackURL).To(Equal("https://github.com/heroku/heroku-buildpack-different.git"))
 			Expect(*params.StackGUID).To(Equal("differentStack-guid"))
 		})
 

@@ -55,9 +55,9 @@ var _ = Describe("ServiceKeyResource", func() {
 
 				Expect(instance.Fields.Name).To(Equal("fake-service-key-name"))
 				Expect(instance.Fields.GUID).To(Equal("fake-service-key-guid"))
-				Expect(instance.Fields.Url).To(Equal("/v2/service_keys/fake-guid"))
+				Expect(instance.Fields.URL).To(Equal("/v2/service_keys/fake-guid"))
 				Expect(instance.Fields.ServiceInstanceGUID).To(Equal("fake-service-instance-guid"))
-				Expect(instance.Fields.ServiceInstanceUrl).To(Equal("http://fake/service/instance/url"))
+				Expect(instance.Fields.ServiceInstanceURL).To(Equal("http://fake/service/instance/url"))
 
 				Expect(instance.Credentials).To(HaveKeyWithValue("username", "fake-username"))
 				Expect(instance.Credentials).To(HaveKeyWithValue("password", "fake-password"))

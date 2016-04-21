@@ -12,7 +12,7 @@ type ServiceBindingEntity struct {
 }
 
 func (resource ServiceBindingResource) ToFields() (fields models.ServiceBindingFields) {
-	fields.Url = resource.Metadata.Url
+	fields.URL = resource.Metadata.URL
 	fields.GUID = resource.Metadata.GUID
 	fields.AppGUID = resource.Entity.AppGUID
 	return

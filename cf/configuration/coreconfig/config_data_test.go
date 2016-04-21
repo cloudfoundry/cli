@@ -50,7 +50,7 @@ var _ = Describe("V3 Config files", func() {
 		"PluginRepos": [
 		{
 			"Name": "repo1",
-			"Url": "http://repo.com"
+			"URL": "http://repo.com"
 		}
 		],
 		"MinCliVersion": "6.0.0",
@@ -96,7 +96,7 @@ var _ = Describe("V3 Config files", func() {
 		"PluginRepos": [
 		{
 			"Name": "repo1",
-			"Url": "http://repo.com"
+			"URL": "http://repo.com"
 		}
 		],
 		"MinCliVersion": "6.0.0",
@@ -134,7 +134,7 @@ var _ = Describe("V3 Config files", func() {
 				PluginRepos: []models.PluginRepo{
 					models.PluginRepo{
 						Name: "repo1",
-						Url:  "http://repo.com",
+						URL:  "http://repo.com",
 					},
 				},
 			}
@@ -187,7 +187,7 @@ var _ = Describe("V3 Config files", func() {
 				PluginRepos: []models.PluginRepo{
 					models.PluginRepo{
 						Name: "repo1",
-						Url:  "http://repo.com",
+						URL:  "http://repo.com",
 					},
 				},
 			}

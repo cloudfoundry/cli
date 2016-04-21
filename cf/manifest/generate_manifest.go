@@ -16,7 +16,7 @@ import (
 //go:generate counterfeiter . AppManifest
 
 type AppManifest interface {
-	BuildpackUrl(string, string)
+	BuildpackURL(string, string)
 	DiskQuota(string, int64)
 	Memory(string, int64)
 	Service(string, string)
@@ -85,9 +85,9 @@ func (m *appManifest) StartCommand(appName string, cmd string) {
 	m.contents[i].Command = cmd
 }
 
-func (m *appManifest) BuildpackUrl(appName string, url string) {
+func (m *appManifest) BuildpackURL(appName string, url string) {
 	i := m.findOrCreateApplication(appName)
-	m.contents[i].BuildpackUrl = url
+	m.contents[i].BuildpackURL = url
 }
 
 func (m *appManifest) HealthCheckTimeout(appName string, timeout int) {
@@ -157,7 +157,7 @@ func generateAppMap(app models.Application) (ManifestApplication, error) {
 	m := ManifestApplication{
 		Name:      app.Name,
 		Services:  services,
-		Buildpack: app.BuildpackUrl,
+		Buildpack: app.BuildpackURL,
 		Memory:    fmt.Sprintf("%dM", app.Memory),
 		Command:   app.Command,
 		Env:       app.EnvironmentVars,

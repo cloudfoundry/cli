@@ -97,11 +97,11 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 			cmd.ui.Say(T("Description: {{.ServiceDescription}}", map[string]interface{}{"ServiceDescription": terminal.EntityNameColor(serviceInstance.ServiceOffering.Description)}))
 			cmd.ui.Say(T("Documentation url: {{.URL}}",
 				map[string]interface{}{
-					"URL": terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationUrl),
+					"URL": terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationURL),
 				}))
 			cmd.ui.Say(T("Dashboard: {{.URL}}",
 				map[string]interface{}{
-					"URL": terminal.EntityNameColor(serviceInstance.DashboardUrl),
+					"URL": terminal.EntityNameColor(serviceInstance.DashboardURL),
 				}))
 			cmd.ui.Say("")
 			cmd.ui.Say(T("Last Operation"))
@@ -147,7 +147,7 @@ func ServiceInstanceStateToStatus(operationType string, state string, isUserProv
 func (cmd *ShowService) populatePluginModel(serviceInstance models.ServiceInstance) {
 	cmd.pluginModel.Name = serviceInstance.Name
 	cmd.pluginModel.GUID = serviceInstance.GUID
-	cmd.pluginModel.DashboardUrl = serviceInstance.DashboardUrl
+	cmd.pluginModel.DashboardURL = serviceInstance.DashboardURL
 	cmd.pluginModel.IsUserProvided = serviceInstance.IsUserProvided()
 	cmd.pluginModel.LastOperation.Type = serviceInstance.LastOperation.Type
 	cmd.pluginModel.LastOperation.State = serviceInstance.LastOperation.State
@@ -156,6 +156,6 @@ func (cmd *ShowService) populatePluginModel(serviceInstance models.ServiceInstan
 	cmd.pluginModel.LastOperation.UpdatedAt = serviceInstance.LastOperation.UpdatedAt
 	cmd.pluginModel.ServicePlan.Name = serviceInstance.ServicePlan.Name
 	cmd.pluginModel.ServicePlan.GUID = serviceInstance.ServicePlan.GUID
-	cmd.pluginModel.ServiceOffering.DocumentationUrl = serviceInstance.ServiceOffering.DocumentationUrl
+	cmd.pluginModel.ServiceOffering.DocumentationURL = serviceInstance.ServiceOffering.DocumentationURL
 	cmd.pluginModel.ServiceOffering.Name = serviceInstance.ServiceOffering.Label
 }

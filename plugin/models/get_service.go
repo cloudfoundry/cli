@@ -3,7 +3,7 @@ package plugin_models
 type GetService_Model struct {
 	GUID            string
 	Name            string
-	DashboardUrl    string
+	DashboardURL    string
 	IsUserProvided  bool
 	ServiceOffering GetService_ServiceFields
 	ServicePlan     GetService_ServicePlan
@@ -25,5 +25,5 @@ type GetService_ServicePlan struct {
 
 type GetService_ServiceFields struct {
 	Name             string
-	DocumentationUrl string
+	DocumentationURL string
 }

@@ -38,24 +38,24 @@ func (downloader *PluginDownloader) downloadFromPlugin(plugin clipr.Plugin) (str
 
 	switch runtime.GOOS {
 	case "darwin":
-		return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "osx")), downloader.getBinaryChecksum(plugin, "osx")
+		return downloader.downloadFromPath(downloader.getBinaryURL(plugin, "osx")), downloader.getBinaryChecksum(plugin, "osx")
 	case "linux":
 		if arch == "386" {
-			return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "linux32")), downloader.getBinaryChecksum(plugin, "linux32")
+			return downloader.downloadFromPath(downloader.getBinaryURL(plugin, "linux32")), downloader.getBinaryChecksum(plugin, "linux32")
 		}
-		return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "linux64")), downloader.getBinaryChecksum(plugin, "linux64")
+		return downloader.downloadFromPath(downloader.getBinaryURL(plugin, "linux64")), downloader.getBinaryChecksum(plugin, "linux64")
 	case "windows":
 		if arch == "386" {
-			return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "win32")), downloader.getBinaryChecksum(plugin, "win32")
+			return downloader.downloadFromPath(downloader.getBinaryURL(plugin, "win32")), downloader.getBinaryChecksum(plugin, "win32")
 		}
-		return downloader.downloadFromPath(downloader.getBinaryUrl(plugin, "win64")), downloader.getBinaryChecksum(plugin, "win64")
+		return downloader.downloadFromPath(downloader.getBinaryURL(plugin, "win64")), downloader.getBinaryChecksum(plugin, "win64")
 	default:
 		downloader.binaryNotAvailable()
 	}
 	return "", ""
 }
 
-func (downloader *PluginDownloader) getBinaryUrl(plugin clipr.Plugin, os string) string {
+func (downloader *PluginDownloader) getBinaryURL(plugin clipr.Plugin, os string) string {
 	for _, binary := range plugin.Binaries {
 		if binary.Platform == os {
 			return binary.Url

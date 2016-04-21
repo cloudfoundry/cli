@@ -952,6 +952,10 @@
     "translation": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)"
   },
   {
+    "id": "URL",
+    "translation": "URL"
+  },
+  {
     "id": "URL to which logs for bound applications will be streamed",
     "translation": "URL to which logs for bound applications will be streamed"
   },
@@ -990,10 +994,6 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Update user-provided service instance"
-  },
-  {
-    "id": "Url",
-    "translation": "Url"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",

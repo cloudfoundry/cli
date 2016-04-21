@@ -4104,12 +4104,12 @@
     "translation": "표시할 옵션이 너무 많습니다. 이름을 입력하십시오."
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "'{{.repoUrl}}'에 대한 요청 수행 중에 오류가 발생했습니다. "
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "'{{.repoURL}}'에 대한 요청 수행 중에 오류가 발생했습니다. "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
@@ -4170,6 +4170,10 @@
   {
     "id": "UAA endpoint missing from config file",
     "translation": "구성 파일에서 UAA 엔드포인트 누락"
+  },
+  {
+    "id": "URL",
+    "translation": "URL"
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
@@ -4406,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "{{.ZipFileBytes}}, {{.FileCount}} 파일 업로드"
-  },
-  {
-    "id": "Url",
-    "translation": "URL"
   },
   {
     "id": "Use '{{.Command}}' for more information",
