@@ -121,7 +121,7 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 
 	err := uaa.getAuthToken(data)
 	if err != nil {
-		httpError, ok := err.(errors.HttpError)
+		httpError, ok := err.(errors.HTTPError)
 		if ok {
 			switch {
 			case httpError.StatusCode() == http.StatusUnauthorized:
@@ -211,14 +211,14 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	if err != nil {
 		return fmt.Errorf("%s: %s", T("Failed to start oauth request"), err.Error())
 	}
-	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.HTTPReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
 	_, err = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
 	switch err.(type) {
 	case nil:
-	case errors.HttpError:
+	case errors.HTTPError:
 		return err
 	case *errors.InvalidTokenError:
 		return errors.New(T("Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a <endpoint> -u <user> -o <org> -s <space>` to log back in and re-authenticate."))
@@ -228,7 +228,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 
 	// TODO: get the actual status code
 	if response.Error.Code != "" {
-		return errors.NewHttpError(0, response.Error.Code, response.Error.Description)
+		return errors.NewHTTPError(0, response.Error.Code, response.Error.Description)
 	}
 
 	uaa.config.SetAccessToken(fmt.Sprintf("%s %s", response.TokenType, response.AccessToken))

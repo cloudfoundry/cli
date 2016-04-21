@@ -97,7 +97,7 @@ var _ = Describe("UserRepository", func() {
 
 				uaaServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`Id eq "user-1-guid"`))),
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`ID eq "user-1-guid"`))),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -160,7 +160,7 @@ var _ = Describe("UserRepository", func() {
 
 				uaaServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`Id eq "user-1-guid" or Id eq "user-2-guid" or Id eq "user-3-guid"`))),
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`ID eq "user-1-guid" or ID eq "user-2-guid" or ID eq "user-3-guid"`))),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -221,7 +221,7 @@ var _ = Describe("UserRepository", func() {
 
 			It("returns an error", func() {
 				_, err := client.ListUsersInOrgForRole("org-guid", models.ORG_MANAGER)
-				httpErr, ok := err.(errors.HttpError)
+				httpErr, ok := err.(errors.HTTPError)
 				Expect(ok).To(BeTrue())
 				Expect(httpErr.StatusCode()).To(Equal(http.StatusGatewayTimeout))
 			})
@@ -396,7 +396,7 @@ var _ = Describe("UserRepository", func() {
 
 			It("returns an error", func() {
 				_, err := client.ListUsersInOrgForRoleWithNoUAA("org-guid", models.ORG_MANAGER)
-				httpErr, ok := err.(errors.HttpError)
+				httpErr, ok := err.(errors.HTTPError)
 				Expect(ok).To(BeTrue())
 				Expect(httpErr.StatusCode()).To(Equal(http.StatusGatewayTimeout))
 			})
@@ -423,7 +423,7 @@ var _ = Describe("UserRepository", func() {
 				config.SetUaaEndpoint(uaaServer.URL())
 				uaaServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`Id eq "user-1-guid"`))),
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`ID eq "user-1-guid"`))),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -630,7 +630,7 @@ var _ = Describe("UserRepository", func() {
 
 			It("returns an error", func() {
 				_, err := client.ListUsersInSpaceForRoleWithNoUAA("space-guid", models.SPACE_MANAGER)
-				httpErr, ok := err.(errors.HttpError)
+				httpErr, ok := err.(errors.HTTPError)
 				Expect(ok).To(BeTrue())
 				Expect(httpErr.StatusCode()).To(Equal(http.StatusGatewayTimeout))
 			})
@@ -1634,7 +1634,7 @@ var _ = Describe("UserRepository", func() {
 
 				uaaServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`Id eq "user-1-guid"`))),
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`ID eq "user-1-guid"`))),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -1698,7 +1698,7 @@ var _ = Describe("UserRepository", func() {
 
 				uaaServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`Id eq "user-1-guid" or Id eq "user-2-guid" or Id eq "user-3-guid"`))),
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`ID eq "user-1-guid" or ID eq "user-2-guid" or ID eq "user-3-guid"`))),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),

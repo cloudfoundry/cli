@@ -119,7 +119,7 @@ func main() {
 	}
 
 	//non core command, try plugin command
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger)
+	rpcService, err := rpc.NewRPCService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger)
 	if err != nil {
 		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)

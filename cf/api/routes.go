@@ -146,7 +146,7 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	var raw_response interface{}
 	err = repo.gateway.GetResource(u.String(), &raw_response)
 	if err != nil {
-		if _, ok := err.(*errors.HttpNotFoundError); ok {
+		if _, ok := err.(*errors.HTTPNotFoundError); ok {
 			return false, nil
 		}
 		return false, err

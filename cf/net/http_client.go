@@ -14,9 +14,9 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-//go:generate counterfeiter . HttpClientInterface
+//go:generate counterfeiter . HTTPClientInterface
 
-type HttpClientInterface interface {
+type HTTPClientInterface interface {
 	RequestDumperInterface
 
 	Do(*http.Request) (*http.Response, error)
@@ -28,7 +28,7 @@ type client struct {
 	dumper RequestDumper
 }
 
-var NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
+var NewHTTPClient = func(tr *http.Transport, dumper RequestDumper) HTTPClientInterface {
 	c := client{
 		&http.Client{
 			Transport: tr,

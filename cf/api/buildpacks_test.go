@@ -172,7 +172,7 @@ var _ = Describe("Buildpacks repo", func() {
 			createdBuildpack, apiErr := repo.Create("name with space", &one, nil, nil)
 			Expect(apiErr).To(HaveOccurred())
 			Expect(createdBuildpack).To(Equal(models.Buildpack{}))
-			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("290003"))
+			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("290003"))
 			Expect(apiErr.Error()).To(ContainSubstring("Buildpack is invalid"))
 		})
 

@@ -22,10 +22,10 @@ func NewData() *PluginData {
 	}
 }
 
-func (pd *PluginData) JsonMarshalV3() (output []byte, err error) {
+func (pd *PluginData) JSONMarshalV3() (output []byte, err error) {
 	return json.MarshalIndent(pd, "", "  ")
 }
 
-func (pd *PluginData) JsonUnmarshalV3(input []byte) (err error) {
+func (pd *PluginData) JSONUnmarshalV3(input []byte) (err error) {
 	return json.Unmarshal(input, pd)
 }

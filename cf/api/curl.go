@@ -44,7 +44,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 		return
 	}
 
-	err = mergeHeaders(req.HttpReq.Header, headerString)
+	err = mergeHeaders(req.HTTPReq.Header, headerString)
 	if err != nil {
 		err = fmt.Errorf("%s: %s", T("Error parsing headers"), err.Error())
 		return
@@ -52,7 +52,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	res, err := repo.gateway.PerformRequest(req)
 
-	if _, ok := err.(errors.HttpError); ok {
+	if _, ok := err.(errors.HTTPError); ok {
 		err = nil
 	}
 

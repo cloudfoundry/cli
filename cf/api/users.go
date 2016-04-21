@@ -81,7 +81,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (model
 	users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
 
 	if apiErr != nil {
-		errType, ok := apiErr.(errors.HttpError)
+		errType, ok := apiErr.(errors.HTTPError)
 		if ok {
 			if errType.StatusCode() == 403 {
 				return user, errors.NewAccessDeniedError()
@@ -138,7 +138,7 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 		func(resource interface{}) bool {
 			user := resource.(resources.UserResource).ToFields()
 			users = append(users, user)
-			guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, user.Guid))
+			guidFilters = append(guidFilters, fmt.Sprintf(`ID eq "%s"`, user.Guid))
 			return true
 		})
 	if apiErr != nil {
@@ -171,14 +171,14 @@ func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers [
 		var ccUserFields models.UserFields
 
 		for _, u := range ccUsers {
-			if u.Guid == uaaResource.Id {
+			if u.Guid == uaaResource.ID {
 				ccUserFields = u
 				break
 			}
 		}
 
 		updatedUsers = append(updatedUsers, models.UserFields{
-			Guid:     uaaResource.Id,
+			Guid:     uaaResource.ID,
 			Username: uaaResource.Username,
 			IsAdmin:  ccUserFields.IsAdmin,
 		})
@@ -203,7 +203,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 	err = repo.uaaGateway.CreateResource(uaaEndpoint, path, bytes.NewReader(body), createUserResponse)
 	switch httpErr := err.(type) {
 	case nil:
-	case errors.HttpError:
+	case errors.HTTPError:
 		if httpErr.StatusCode() == http.StatusConflict {
 			err = errors.NewModelAlreadyExistsError("user", username)
 			return
@@ -215,7 +215,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 
 	path = "/v2/users"
 	body, err = json.Marshal(resources.Metadata{
-		Guid: createUserResponse.Id,
+		Guid: createUserResponse.ID,
 	})
 
 	if err != nil {
@@ -230,7 +230,7 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error)
 
 	apiErr = repo.ccGateway.DeleteResource(repo.config.ApiEndpoint(), path)
 
-	if httpErr, ok := apiErr.(errors.HttpError); ok && httpErr.ErrorCode() != errors.UserNotFound {
+	if httpErr, ok := apiErr.(errors.HTTPError); ok && httpErr.ErrorCode() != errors.UserNotFound {
 		return
 	}
 	uaaEndpoint, apiErr := repo.getAuthEndpoint()

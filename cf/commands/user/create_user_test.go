@@ -74,7 +74,7 @@ var _ = Describe("Create user command", func() {
 		})
 
 		It("fails when any error other than alreadyExists is returned", func() {
-			userRepo.CreateReturns(errors.NewHttpError(403, "403", "Forbidden"))
+			userRepo.CreateReturns(errors.NewHTTPError(403, "403", "Forbidden"))
 
 			runCommand("my-user", "my-password")
 

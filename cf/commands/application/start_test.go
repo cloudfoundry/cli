@@ -72,7 +72,7 @@ var _ = Describe("start command", func() {
 			errorCode, defaultInstanceErrorCodes = defaultInstanceErrorCodes[0], defaultInstanceErrorCodes[1:]
 
 			if errorCode != "" {
-				apiErr = errors.NewHttpError(400, errorCode, "Error staging app")
+				apiErr = errors.NewHTTPError(400, errorCode, "Error staging app")
 			}
 		}
 

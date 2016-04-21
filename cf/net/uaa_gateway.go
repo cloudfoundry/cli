@@ -22,7 +22,7 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 		return errors.NewInvalidTokenError(response.Description)
 	}
 
-	return errors.NewHttpError(statusCode, response.Code, response.Description)
+	return errors.NewHTTPError(statusCode, response.Code, response.Description)
 }
 
 func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printer) Gateway {

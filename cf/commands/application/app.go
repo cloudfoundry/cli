@@ -103,7 +103,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
 
 	appIsStopped := (application.State == "stopped")
-	if err, ok := apiErr.(errors.HttpError); ok {
+	if err, ok := apiErr.(errors.HTTPError); ok {
 		if err.ErrorCode() == errors.InstancesError || err.ErrorCode() == errors.NotStaged {
 			appIsStopped = true
 		}
@@ -189,7 +189,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 			fmt.Sprintf("#%d", index),
 			uihelpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
-			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
+			fmt.Sprintf("%.1f%%", instance.CPUUsage*100),
 			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",
 				map[string]interface{}{
 					"MemUsage": formatters.ByteSize(instance.MemUsage),
@@ -238,7 +238,7 @@ func (cmd *ShowApp) populatePluginModel(
 			State:     string(instance.State),
 			Details:   instance.Details,
 			Since:     instance.Since,
-			CpuUsage:  instance.CpuUsage,
+			CPUUsage:  instance.CPUUsage,
 			DiskQuota: instance.DiskQuota,
 			DiskUsage: instance.DiskUsage,
 			MemQuota:  instance.MemQuota,

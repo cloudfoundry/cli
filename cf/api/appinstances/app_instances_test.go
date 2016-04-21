@@ -43,7 +43,7 @@ var _ = Describe("AppInstancesRepo", func() {
 			Expect(instance0.DiskUsage).To(Equal(int64(56037376)))
 			Expect(instance0.MemQuota).To(Equal(int64(67108864)))
 			Expect(instance0.MemUsage).To(Equal(int64(19218432)))
-			Expect(instance0.CpuUsage).To(Equal(3.659571249238058e-05))
+			Expect(instance0.CPUUsage).To(Equal(3.659571249238058e-05))
 		})
 	})
 

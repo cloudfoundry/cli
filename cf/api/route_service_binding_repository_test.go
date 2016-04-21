@@ -95,10 +95,10 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 				)
 			})
 
-			It("returns an HttpError", func() {
+			It("returns an HTTPError", func() {
 				err := routeServiceBindingRepo.Bind(serviceInstanceGuid, routeGuid, false, "")
 				Expect(err).To(HaveOccurred())
-				httpErr, ok := err.(errors.HttpError)
+				httpErr, ok := err.(errors.HTTPError)
 				Expect(ok).To(BeTrue())
 
 				Expect(httpErr.ErrorCode()).To(Equal("61003"))
@@ -152,10 +152,10 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 				)
 			})
 
-			It("returns an HttpError", func() {
+			It("returns an HTTPError", func() {
 				err := routeServiceBindingRepo.Unbind(serviceInstanceGuid, routeGuid, false)
 				Expect(err).To(HaveOccurred())
-				httpErr, ok := err.(errors.HttpError)
+				httpErr, ok := err.(errors.HTTPError)
 				Expect(ok).To(BeTrue())
 
 				Expect(httpErr.ErrorCode()).To(Equal("61003"))

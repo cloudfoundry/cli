@@ -62,7 +62,7 @@ func (cmd *Password) Execute(c flags.FlagContext) {
 
 	switch typedErr := apiErr.(type) {
 	case nil:
-	case errors.HttpError:
+	case errors.HTTPError:
 		if typedErr.StatusCode() == 401 {
 			cmd.ui.Failed(T("Current password did not match"))
 		} else {

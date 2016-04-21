@@ -55,7 +55,7 @@ type TestServer struct {
 	server   *rpc.Server
 }
 
-func NewTestRpcServer(handlers Handlers) (*TestServer, error) {
+func NewTestRPCServer(handlers Handlers) (*TestServer, error) {
 	ts := &TestServer{
 		Handlers: handlers,
 	}
@@ -65,7 +65,7 @@ func NewTestRpcServer(handlers Handlers) (*TestServer, error) {
 	defer log.SetOutput(os.Stdout)
 
 	server := rpc.NewServer()
-	err := server.RegisterName("CliRpcCmd", ts.Handlers)
+	err := server.RegisterName("CliRPCCmd", ts.Handlers)
 	if err != nil {
 		return nil, err
 	}

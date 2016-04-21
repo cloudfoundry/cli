@@ -37,7 +37,7 @@ func (repo CloudControllerStackRepository) FindByGUID(guid string) (models.Stack
 	path := fmt.Sprintf("%s/v2/stacks/%s", repo.config.ApiEndpoint(), guid)
 	err := repo.gateway.GetResource(path, &stackRequest)
 	if err != nil {
-		if errNotFound, ok := err.(*errors.HttpNotFoundError); ok {
+		if errNotFound, ok := err.(*errors.HTTPNotFoundError); ok {
 			return models.Stack{}, errNotFound
 		}
 

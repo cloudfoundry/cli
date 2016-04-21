@@ -49,7 +49,7 @@ var _ = Describe("Routing Api Gateway", func() {
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The host is taken: test1"))
-		Expect(apiErr.(errors.HttpError).ErrorCode()).To(ContainSubstring("some-error"))
+		Expect(apiErr.(errors.HTTPError).ErrorCode()).To(ContainSubstring("some-error"))
 	})
 
 	It("parses invalid token responses", func() {
@@ -62,18 +62,18 @@ var _ = Describe("Routing Api Gateway", func() {
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("bad token"))
-		Expect(apiErr.(errors.HttpError)).To(HaveOccurred())
+		Expect(apiErr.(errors.HTTPError)).To(HaveOccurred())
 	})
 
-	Context("when the Routing API returns a invalid Json", func() {
-		var invalidJsonResponse = func(writer http.ResponseWriter, request *http.Request) {
+	Context("when the Routing API returns a invalid JSON", func() {
+		var invalidJSONResponse = func(writer http.ResponseWriter, request *http.Request) {
 			writer.WriteHeader(http.StatusUnauthorized)
 			jsonResponse := `¯\_(ツ)_/¯`
 			fmt.Fprintln(writer, jsonResponse)
 		}
 
 		It("returns a 500 http error", func() {
-			ts := httptest.NewTLSServer(http.HandlerFunc(invalidJsonResponse))
+			ts := httptest.NewTLSServer(http.HandlerFunc(invalidJSONResponse))
 			defer ts.Close()
 			gateway.SetTrustedCerts(ts.TLS.Certificates)
 
@@ -81,8 +81,8 @@ var _ = Describe("Routing Api Gateway", func() {
 			_, apiErr = gateway.PerformRequest(request)
 
 			Expect(apiErr).NotTo(BeNil())
-			Expect(apiErr.(errors.HttpError)).To(HaveOccurred())
-			Expect(apiErr.(errors.HttpError).StatusCode()).To(Equal(http.StatusInternalServerError))
+			Expect(apiErr.(errors.HTTPError)).To(HaveOccurred())
+			Expect(apiErr.(errors.HTTPError).StatusCode()).To(Equal(http.StatusInternalServerError))
 		})
 	})
 })

@@ -140,7 +140,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 
 	err = cmd.quotaRepo.Create(quota)
 
-	httpErr, ok := err.(errors.HttpError)
+	httpErr, ok := err.(errors.HTTPError)
 	if ok && httpErr.ErrorCode() == errors.QuotaDefinitionNameTaken {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Space Quota Definition {{.QuotaName}} already exists", map[string]interface{}{"QuotaName": quota.Name}))

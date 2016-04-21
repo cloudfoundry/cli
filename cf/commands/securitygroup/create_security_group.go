@@ -71,7 +71,7 @@ func (cmd *CreateSecurityGroup) SetDependency(deps commandregistry.Dependency, p
 func (cmd *CreateSecurityGroup) Execute(context flags.FlagContext) {
 	name := context.Args()[0]
 	pathToJSONFile := context.Args()[1]
-	rules, err := json.ParseJsonArray(pathToJSONFile)
+	rules, err := json.ParseJSONArray(pathToJSONFile)
 	if err != nil {
 		cmd.ui.Failed(T(`Incorrect json format: file: {{.JSONFile}}
 		
@@ -93,7 +93,7 @@ Valid json file example:
 
 	err = cmd.securityGroupRepo.Create(name, rules)
 
-	httpErr, ok := err.(errors.HttpError)
+	httpErr, ok := err.(errors.HTTPError)
 	if ok && httpErr.ErrorCode() == errors.SecurityGroupNameTaken {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Security group {{.security_group}} {{.error_message}}",

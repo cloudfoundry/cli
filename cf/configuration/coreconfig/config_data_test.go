@@ -103,7 +103,7 @@ var _ = Describe("V3 Config files", func() {
 		"MinRecommendedCliVersion": "6.9.0"
 	}`
 
-	Describe("JsonMarshalV3", func() {
+	Describe("JSONMarshalV3", func() {
 		It("creates a JSON string from the config object", func() {
 			data := &coreconfig.Data{
 				Target:                   "api.example.com",
@@ -139,7 +139,7 @@ var _ = Describe("V3 Config files", func() {
 				},
 			}
 
-			jsonData, err := data.JsonMarshalV3()
+			jsonData, err := data.JSONMarshalV3()
 			Expect(err).NotTo(HaveOccurred())
 
 			re := regexp.MustCompile(`\s+`)
@@ -149,10 +149,10 @@ var _ = Describe("V3 Config files", func() {
 		})
 	})
 
-	Describe("JsonUnmarshalV3", func() {
+	Describe("JSONUnmarshalV3", func() {
 		It("returns an error when the JSON is invalid", func() {
 			configData := coreconfig.NewData()
-			err := configData.JsonUnmarshalV3([]byte(`{ "not_valid": ### }`))
+			err := configData.JSONUnmarshalV3([]byte(`{ "not_valid": ### }`))
 			Expect(err).To(HaveOccurred())
 		})
 
@@ -193,7 +193,7 @@ var _ = Describe("V3 Config files", func() {
 			}
 
 			actualData := coreconfig.NewData()
-			err := actualData.JsonUnmarshalV3([]byte(exampleV3JSON))
+			err := actualData.JSONUnmarshalV3([]byte(exampleV3JSON))
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(actualData).To(Equal(expectedData))
@@ -201,7 +201,7 @@ var _ = Describe("V3 Config files", func() {
 
 		It("returns an empty Data object for non-V3 JSON", func() {
 			actualData := coreconfig.NewData()
-			err := actualData.JsonUnmarshalV3([]byte(exampleV2JSON))
+			err := actualData.JSONUnmarshalV3([]byte(exampleV2JSON))
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(*actualData).To(Equal(coreconfig.Data{}))

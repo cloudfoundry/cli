@@ -60,7 +60,7 @@ func (cmd *DisableSSH) SetDependency(deps commandregistry.Dependency, pluginCall
 func (cmd *DisableSSH) Execute(fc flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
-	if !app.EnableSsh {
+	if !app.EnableSSH {
 		cmd.ui.Say(fmt.Sprintf(T("ssh support is already disabled")+" for '%s'", app.Name))
 		return
 	}
@@ -69,12 +69,12 @@ func (cmd *DisableSSH) Execute(fc flags.FlagContext) {
 	cmd.ui.Say("")
 
 	enable := false
-	updatedApp, err := cmd.appRepo.Update(app.Guid, models.AppParams{EnableSsh: &enable})
+	updatedApp, err := cmd.appRepo.Update(app.Guid, models.AppParams{EnableSSH: &enable})
 	if err != nil {
 		cmd.ui.Failed(T("Error disabling ssh support for ") + app.Name + ": " + err.Error())
 	}
 
-	if !updatedApp.EnableSsh {
+	if !updatedApp.EnableSSH {
 		cmd.ui.Ok()
 	} else {
 		cmd.ui.Failed(T("ssh support is not disabled for ") + app.Name)

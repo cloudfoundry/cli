@@ -69,7 +69,7 @@ type ApplicationFields struct {
 	Buildpack            string
 	DetectedBuildpack    string
 	DockerImage          string
-	EnableSsh            bool
+	EnableSSH            bool
 	AppPorts             []int
 }
 
@@ -84,7 +84,7 @@ type AppParams struct {
 	HealthCheckTimeout *int
 	DockerImage        *string
 	Diego              *bool
-	EnableSsh          *bool
+	EnableSSH          *bool
 	Hosts              *[]string
 	RoutePath          *string
 	InstanceCount      *int
@@ -123,8 +123,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.Domains != nil {
 		app.Domains = other.Domains
 	}
-	if other.EnableSsh != nil {
-		app.EnableSsh = other.EnableSsh
+	if other.EnableSSH != nil {
+		app.EnableSSH = other.EnableSSH
 	}
 	if other.EnvironmentVars != nil {
 		app.EnvironmentVars = other.EnvironmentVars

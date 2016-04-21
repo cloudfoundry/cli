@@ -111,7 +111,7 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 
 	tagsList := uihelpers.ParseTags(tags)
 
-	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}

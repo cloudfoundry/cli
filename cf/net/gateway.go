@@ -51,7 +51,7 @@ type tokenRefresher interface {
 }
 
 type Request struct {
-	HttpReq      *http.Request
+	HTTPReq      *http.Request
 	SeekableBody io.ReadSeeker
 }
 
@@ -206,7 +206,7 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
 
-	return &Request{HttpReq: request, SeekableBody: body}
+	return &Request{HTTPReq: request, SeekableBody: body}
 }
 
 func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, body *os.File) (*Request, error) {
@@ -290,9 +290,9 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 }
 
 func (gateway Gateway) PerformPollingRequestForJSONResponse(endpoint string, request *Request, response interface{}, timeout time.Duration) (headers http.Header, apiErr error) {
-	query := request.HttpReq.URL.Query()
+	query := request.HTTPReq.URL.Query()
 	query.Add("async", "true")
-	request.HttpReq.URL.RawQuery = query.Encode()
+	request.HTTPReq.URL.RawQuery = query.Encode()
 
 	bytes, headers, rawResponse, apiErr := gateway.performRequestForResponseBytes(request)
 	if apiErr != nil {
@@ -326,7 +326,7 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(endpoint string, req
 		return
 	}
 
-	apiErr = gateway.waitForJob(endpoint+jobUrl, request.HttpReq.Header.Get("Authorization"), timeout)
+	apiErr = gateway.waitForJob(endpoint+jobUrl, request.HTTPReq.Header.Get("Authorization"), timeout)
 
 	return
 }
@@ -357,7 +357,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 			return
 		}
 
-		accessToken = request.HttpReq.Header.Get("Authorization")
+		accessToken = request.HTTPReq.Header.Get("Authorization")
 
 		time.Sleep(gateway.PollingThrottle)
 	}
@@ -365,7 +365,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 }
 
 func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, err error) {
-	httpReq := request.HttpReq
+	httpReq := request.HTTPReq
 
 	if request.SeekableBody != nil {
 		httpReq.Body = ioutil.NopCloser(request.SeekableBody)
@@ -401,9 +401,9 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 }
 
 func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, err error) {
-	rawResponse, err = gateway.doRequest(request.HttpReq)
+	rawResponse, err = gateway.doRequest(request.HTTPReq)
 	if err != nil {
-		err = WrapNetworkErrors(request.HttpReq.URL.Host, err)
+		err = WrapNetworkErrors(request.HTTPReq.URL.Host, err)
 		return
 	}
 
@@ -419,10 +419,10 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 
 func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
 	if gateway.transport == nil {
-		makeHttpTransport(&gateway)
+		makeHTTPTransport(&gateway)
 	}
 
-	httpClient := NewHttpClient(gateway.transport, NewRequestDumper(gateway.logger))
+	httpClient := NewHTTPClient(gateway.transport, NewRequestDumper(gateway.logger))
 
 	httpClient.DumpRequest(request)
 
@@ -451,7 +451,7 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 	return
 }
 
-func makeHttpTransport(gateway *Gateway) {
+func makeHTTPTransport(gateway *Gateway) {
 	gateway.transport = &http.Transport{
 		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
 		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
@@ -461,5 +461,5 @@ func makeHttpTransport(gateway *Gateway) {
 
 func (gateway *Gateway) SetTrustedCerts(certificates []tls.Certificate) {
 	gateway.trustedCerts = certificates
-	makeHttpTransport(gateway)
+	makeHTTPTransport(gateway)
 }

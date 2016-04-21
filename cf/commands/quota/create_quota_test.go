@@ -184,7 +184,7 @@ var _ = Describe("create-quota command", func() {
 			})
 
 			It("warns the user when quota already exists", func() {
-				quotaRepo.CreateReturns(errors.NewHttpError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
+				quotaRepo.CreateReturns(errors.NewHTTPError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
 				runCommand("Banana")
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings(

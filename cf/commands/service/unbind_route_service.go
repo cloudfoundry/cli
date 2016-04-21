@@ -127,7 +127,7 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 
 	err = cmd.UnbindRoute(route, serviceInstance)
 	if err != nil {
-		httpError, ok := err.(errors.HttpError)
+		httpError, ok := err.(errors.HTTPError)
 		if ok && httpError.ErrorCode() == errors.InvalidRelation {
 			cmd.ui.Warn(T("Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.", map[string]interface{}{"Route": route.URL(), "ServiceInstance": serviceInstance.Name}))
 		} else {

@@ -21,7 +21,7 @@ import (
 	"github.com/cloudfoundry/cli/utils"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
-	rpcService "github.com/cloudfoundry/cli/plugin/rpc"
+	pluginRPCService "github.com/cloudfoundry/cli/plugin/rpc"
 )
 
 type PluginInstall struct {
@@ -30,7 +30,7 @@ type PluginInstall struct {
 	pluginConfig pluginconfig.PluginConfiguration
 	pluginRepo   pluginrepo.PluginRepo
 	checksum     utils.Sha1Checksum
-	rpcService   *rpcService.CliRpcService
+	rpcService   *pluginRPCService.CliRPCService
 }
 
 func init() {
@@ -80,7 +80,7 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 	//each service can only be registered once
 	rpc.DefaultServer = rpc.NewServer()
 
-	rpcService, err := rpcService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpcService.NewCommandRunner(), deps.Logger)
+	rpcService, err := pluginRPCService.NewRPCService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, pluginRPCService.NewCommandRunner(), deps.Logger)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}
@@ -225,7 +225,7 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 
 	cmd.runPluginBinary(pluginSourceFilepath, cmd.rpcService.Port())
 
-	return cmd.rpcService.RpcCmd.PluginMetadata
+	return cmd.rpcService.RPCCmd.PluginMetadata
 }
 
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {

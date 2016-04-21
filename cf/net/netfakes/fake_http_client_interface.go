@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-type FakeHttpClientInterface struct {
+type FakeHTTPClientInterface struct {
 	DumpRequestStub        func(*http.Request)
 	dumpRequestMutex       sync.RWMutex
 	dumpRequestArgsForCall []struct {
@@ -40,7 +40,7 @@ type FakeHttpClientInterface struct {
 	}
 }
 
-func (fake *FakeHttpClientInterface) DumpRequest(arg1 *http.Request) {
+func (fake *FakeHTTPClientInterface) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestMutex.Lock()
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
@@ -51,19 +51,19 @@ func (fake *FakeHttpClientInterface) DumpRequest(arg1 *http.Request) {
 	}
 }
 
-func (fake *FakeHttpClientInterface) DumpRequestCallCount() int {
+func (fake *FakeHTTPClientInterface) DumpRequestCallCount() int {
 	fake.dumpRequestMutex.RLock()
 	defer fake.dumpRequestMutex.RUnlock()
 	return len(fake.dumpRequestArgsForCall)
 }
 
-func (fake *FakeHttpClientInterface) DumpRequestArgsForCall(i int) *http.Request {
+func (fake *FakeHTTPClientInterface) DumpRequestArgsForCall(i int) *http.Request {
 	fake.dumpRequestMutex.RLock()
 	defer fake.dumpRequestMutex.RUnlock()
 	return fake.dumpRequestArgsForCall[i].arg1
 }
 
-func (fake *FakeHttpClientInterface) DumpResponse(arg1 *http.Response) {
+func (fake *FakeHTTPClientInterface) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseMutex.Lock()
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
@@ -74,19 +74,19 @@ func (fake *FakeHttpClientInterface) DumpResponse(arg1 *http.Response) {
 	}
 }
 
-func (fake *FakeHttpClientInterface) DumpResponseCallCount() int {
+func (fake *FakeHTTPClientInterface) DumpResponseCallCount() int {
 	fake.dumpResponseMutex.RLock()
 	defer fake.dumpResponseMutex.RUnlock()
 	return len(fake.dumpResponseArgsForCall)
 }
 
-func (fake *FakeHttpClientInterface) DumpResponseArgsForCall(i int) *http.Response {
+func (fake *FakeHTTPClientInterface) DumpResponseArgsForCall(i int) *http.Response {
 	fake.dumpResponseMutex.RLock()
 	defer fake.dumpResponseMutex.RUnlock()
 	return fake.dumpResponseArgsForCall[i].arg1
 }
 
-func (fake *FakeHttpClientInterface) Do(arg1 *http.Request) (*http.Response, error) {
+func (fake *FakeHTTPClientInterface) Do(arg1 *http.Request) (*http.Response, error) {
 	fake.doMutex.Lock()
 	fake.doArgsForCall = append(fake.doArgsForCall, struct {
 		arg1 *http.Request
@@ -99,19 +99,19 @@ func (fake *FakeHttpClientInterface) Do(arg1 *http.Request) (*http.Response, err
 	}
 }
 
-func (fake *FakeHttpClientInterface) DoCallCount() int {
+func (fake *FakeHTTPClientInterface) DoCallCount() int {
 	fake.doMutex.RLock()
 	defer fake.doMutex.RUnlock()
 	return len(fake.doArgsForCall)
 }
 
-func (fake *FakeHttpClientInterface) DoArgsForCall(i int) *http.Request {
+func (fake *FakeHTTPClientInterface) DoArgsForCall(i int) *http.Request {
 	fake.doMutex.RLock()
 	defer fake.doMutex.RUnlock()
 	return fake.doArgsForCall[i].arg1
 }
 
-func (fake *FakeHttpClientInterface) DoReturns(result1 *http.Response, result2 error) {
+func (fake *FakeHTTPClientInterface) DoReturns(result1 *http.Response, result2 error) {
 	fake.DoStub = nil
 	fake.doReturns = struct {
 		result1 *http.Response
@@ -119,7 +119,7 @@ func (fake *FakeHttpClientInterface) DoReturns(result1 *http.Response, result2 e
 	}{result1, result2}
 }
 
-func (fake *FakeHttpClientInterface) ExecuteCheckRedirect(req *http.Request, via []*http.Request) error {
+func (fake *FakeHTTPClientInterface) ExecuteCheckRedirect(req *http.Request, via []*http.Request) error {
 	fake.executeCheckRedirectMutex.Lock()
 	fake.executeCheckRedirectArgsForCall = append(fake.executeCheckRedirectArgsForCall, struct {
 		req *http.Request
@@ -133,23 +133,23 @@ func (fake *FakeHttpClientInterface) ExecuteCheckRedirect(req *http.Request, via
 	}
 }
 
-func (fake *FakeHttpClientInterface) ExecuteCheckRedirectCallCount() int {
+func (fake *FakeHTTPClientInterface) ExecuteCheckRedirectCallCount() int {
 	fake.executeCheckRedirectMutex.RLock()
 	defer fake.executeCheckRedirectMutex.RUnlock()
 	return len(fake.executeCheckRedirectArgsForCall)
 }
 
-func (fake *FakeHttpClientInterface) ExecuteCheckRedirectArgsForCall(i int) (*http.Request, []*http.Request) {
+func (fake *FakeHTTPClientInterface) ExecuteCheckRedirectArgsForCall(i int) (*http.Request, []*http.Request) {
 	fake.executeCheckRedirectMutex.RLock()
 	defer fake.executeCheckRedirectMutex.RUnlock()
 	return fake.executeCheckRedirectArgsForCall[i].req, fake.executeCheckRedirectArgsForCall[i].via
 }
 
-func (fake *FakeHttpClientInterface) ExecuteCheckRedirectReturns(result1 error) {
+func (fake *FakeHTTPClientInterface) ExecuteCheckRedirectReturns(result1 error) {
 	fake.ExecuteCheckRedirectStub = nil
 	fake.executeCheckRedirectReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ net.HttpClientInterface = new(FakeHttpClientInterface)
+var _ net.HTTPClientInterface = new(FakeHTTPClientInterface)

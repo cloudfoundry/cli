@@ -89,7 +89,7 @@ var _ = Describe("Application resources", func() {
 				HealthCheckTimeout: &healthCheckTimeout,
 				DockerImage:        &dockerImage,
 				Diego:              &diego,
-				EnableSsh:          &enableSSH,
+				EnableSSH:          &enableSSH,
 				InstanceCount:      &instanceCount,
 				Memory:             &memory,
 				Name:               &name,
@@ -115,7 +115,7 @@ var _ = Describe("Application resources", func() {
 			Expect(*entity.HealthCheckTimeout).To(Equal(healthCheckTimeout))
 			Expect(*entity.DockerImage).To(Equal(dockerImage))
 			Expect(*entity.Diego).To(Equal(diego))
-			Expect(*entity.EnableSsh).To(Equal(enableSSH))
+			Expect(*entity.EnableSSH).To(Equal(enableSSH))
 			Expect(*entity.PackageUpdatedAt).To(Equal(packageUpdatedAt))
 			Expect(*entity.AppPorts).To(Equal(appPorts))
 		})
@@ -128,7 +128,7 @@ var _ = Describe("Application resources", func() {
 		It("does not include environment vars when they do not exist in the params", func() {
 			appParams.EnvironmentVars = nil
 			entity := resources.NewApplicationEntityFromAppParams(appParams)
-			Expect(entity.EnvironmentJson).To(BeNil())
+			Expect(entity.EnvironmentJSON).To(BeNil())
 		})
 	})
 })

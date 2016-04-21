@@ -14,7 +14,7 @@ type OldFakeServiceBindingRepo struct {
 	DeleteServiceInstance models.ServiceInstance
 	DeleteApplicationGuid string
 	DeleteBindingNotFound bool
-	CreateNonHttpErrCode  string
+	CreateNonHTTPErrCode  string
 }
 
 func (repo *OldFakeServiceBindingRepo) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
@@ -22,13 +22,13 @@ func (repo *OldFakeServiceBindingRepo) Create(instanceGuid, appGuid string, para
 	repo.CreateApplicationGuid = appGuid
 	repo.CreateParams = paramsMap
 
-	if repo.CreateNonHttpErrCode != "" {
-		apiErr = errors.New(repo.CreateNonHttpErrCode)
+	if repo.CreateNonHTTPErrCode != "" {
+		apiErr = errors.New(repo.CreateNonHTTPErrCode)
 		return
 	}
 
 	if repo.CreateErrorCode != "" {
-		apiErr = errors.NewHttpError(400, repo.CreateErrorCode, "Error binding service")
+		apiErr = errors.NewHTTPError(400, repo.CreateErrorCode, "Error binding service")
 	}
 
 	return

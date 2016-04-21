@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("JSON Parser", func() {
-	Describe("ParseJsonArray", func() {
+	Describe("ParseJSONArray", func() {
 		var filename string
 		var tmpFile *os.File
 
@@ -27,7 +27,7 @@ var _ = Describe("JSON Parser", func() {
 			})
 
 			It("converts a json file into an unmarshalled slice of string->string map objects", func() {
-				stringMaps, err := json.ParseJsonArray(filename)
+				stringMaps, err := json.ParseJSONArray(filename)
 				Expect(err).To(BeNil())
 				Expect(stringMaps[0]["akey"]).To(Equal("avalue"))
 			})
@@ -46,16 +46,16 @@ var _ = Describe("JSON Parser", func() {
 			})
 
 			It("tries to convert the json file but fails because it was given something it didn't like", func() {
-				_, err := json.ParseJsonArray(filename)
+				_, err := json.ParseJSONArray(filename)
 				Expect(err).To(MatchError("Incorrect json format: invalid character 'S' looking for beginning of value"))
 			})
 		})
 	})
 
-	Describe("ParseJsonFromFileOrString", func() {
+	Describe("ParseJSONFromFileOrString", func() {
 		Context("when the input is empty", func() {
 			It("returns nil", func() {
-				result, err := json.ParseJsonFromFileOrString("")
+				result, err := json.ParseJSONFromFileOrString("")
 
 				Expect(result).To(BeNil())
 				Expect(err).To(BeNil())
@@ -87,7 +87,7 @@ var _ = Describe("JSON Parser", func() {
 			})
 
 			It("returns the parsed json from the file", func() {
-				result, err := json.ParseJsonFromFileOrString(jsonFile.Name())
+				result, err := json.ParseJSONFromFileOrString(jsonFile.Name())
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(result).To(Equal(map[string]interface{}{"foo": "bar"}))
@@ -99,7 +99,7 @@ var _ = Describe("JSON Parser", func() {
 				})
 
 				It("returns an error", func() {
-					_, err := json.ParseJsonFromFileOrString(jsonFile.Name())
+					_, err := json.ParseJSONFromFileOrString(jsonFile.Name())
 					Expect(err).To(MatchError("Incorrect json format: invalid character 'b' looking for beginning of value"))
 				})
 			})
@@ -113,7 +113,7 @@ var _ = Describe("JSON Parser", func() {
 			})
 
 			It("returns the parsed json", func() {
-				result, err := json.ParseJsonFromFileOrString(jsonString)
+				result, err := json.ParseJSONFromFileOrString(jsonString)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(result).To(Equal(map[string]interface{}{"foo": "bar"}))
@@ -125,7 +125,7 @@ var _ = Describe("JSON Parser", func() {
 				})
 
 				It("returns a json parse error", func() {
-					_, err := json.ParseJsonFromFileOrString(jsonString)
+					_, err := json.ParseJSONFromFileOrString(jsonString)
 					Expect(err).To(MatchError("Incorrect json format: invalid character 'S' looking for beginning of value"))
 				})
 			})
@@ -139,7 +139,7 @@ var _ = Describe("JSON Parser", func() {
 			})
 
 			It("returns an error", func() {
-				_, err := json.ParseJsonFromFileOrString(invalidInput)
+				_, err := json.ParseJSONFromFileOrString(invalidInput)
 				Expect(err).To(HaveOccurred())
 			})
 		})

@@ -445,7 +445,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		err = cmd.serviceBinder.BindApplication(app, serviceInstance, nil)
 
 		switch httpErr := err.(type) {
-		case errors.HttpError:
+		case errors.HTTPError:
 			if httpErr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 				err = nil
 			}

@@ -8,10 +8,10 @@ import (
 	"testing"
 )
 
-func TestTestRpcServerExample(t *testing.T) {
+func TestTestRPCServerExample(t *testing.T) {
 	RegisterFailHandler(Fail)
 
 	pluginbuilder.BuildTestBinary("", "test_rpc_server_example")
 
-	RunSpecs(t, "TestRpcServerExample Suite")
+	RunSpecs(t, "TestRPCServerExample Suite")
 }

@@ -39,7 +39,7 @@ var _ = Describe("Gateway", func() {
 		currentTime time.Time
 		clock       func() time.Time
 
-		client *netfakes.FakeHttpClientInterface
+		client *netfakes.FakeHTTPClientInterface
 	)
 
 	BeforeEach(func() {
@@ -63,19 +63,19 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("Connection errors", func() {
-		var oldNewHttpClient func(tr *http.Transport, dumper RequestDumper) HttpClientInterface
+		var oldNewHTTPClient func(tr *http.Transport, dumper RequestDumper) HTTPClientInterface
 
 		BeforeEach(func() {
-			client = new(netfakes.FakeHttpClientInterface)
+			client = new(netfakes.FakeHTTPClientInterface)
 
-			oldNewHttpClient = NewHttpClient
-			NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
+			oldNewHTTPClient = NewHTTPClient
+			NewHTTPClient = func(tr *http.Transport, dumper RequestDumper) HTTPClientInterface {
 				return client
 			}
 		})
 
 		AfterEach(func() {
-			NewHttpClient = oldNewHttpClient
+			NewHTTPClient = oldNewHTTPClient
 		})
 
 		It("only retry when response body is nil and error occurred", func() {
@@ -116,15 +116,15 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("sets the Authorization header", func() {
-				Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
+				Expect(request.HTTPReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 			})
 
 			It("sets the accept header to application/json", func() {
-				Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
+				Expect(request.HTTPReq.Header.Get("accept")).To(Equal("application/json"))
 			})
 
 			It("sets the user agent header", func() {
-				Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+				Expect(request.HTTPReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
 			})
 		})
 
@@ -415,7 +415,7 @@ var _ = Describe("Gateway", func() {
 		It("sets the content length to the size of the file", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(request.HttpReq.ContentLength).To(Equal(int64(13)))
+			Expect(request.HTTPReq.ContentLength).To(Equal(int64(13)))
 		})
 
 		Describe("when the access token expires during the upload", func() {
@@ -495,7 +495,7 @@ var _ = Describe("Gateway", func() {
 			_, apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
+			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("333"))
 		})
 
 		It("returns a failure response when token refresh fails after a CC request", func() {
@@ -513,7 +513,7 @@ var _ = Describe("Gateway", func() {
 			_, apiErr = ccGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
+			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("333"))
 		})
 	})
 

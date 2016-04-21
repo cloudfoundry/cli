@@ -223,7 +223,7 @@ var _ = Describe("StacksRepo", func() {
 			It("returns an error", func() {
 				_, err := repo.FindByGUID("the-stack-guid")
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(BeAssignableToTypeOf(&errors.HttpNotFoundError{}))
+				Expect(err).To(BeAssignableToTypeOf(&errors.HTTPNotFoundError{}))
 			})
 		})
 	})
