@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -15,7 +15,7 @@ import (
 
 type BindRouteService struct {
 	ui                      terminal.UI
-	config                  core_config.Reader
+	config                  coreconfig.Reader
 	routeRepo               api.RouteRepository
 	routeServiceBindingRepo api.RouteServiceBindingRepository
 	domainReq               requirements.DomainRequirement
@@ -23,10 +23,10 @@ type BindRouteService struct {
 }
 
 func init() {
-	command_registry.Register(&BindRouteService{})
+	commandregistry.Register(&BindRouteService{})
 }
 
-func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
+func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["force"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
 	fs["hostname"] = &flags.StringFlag{
@@ -39,7 +39,7 @@ func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 		Usage:     T("Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."),
 	}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "bind-route-service",
 		ShortName:   "brs",
 		Description: T("Bind a service instance to an HTTP route"),
@@ -60,7 +60,7 @@ func (cmd *BindRouteService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("bind-route-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-route-service"))
 	}
 
 	domainName := fc.Args()[0]
@@ -88,8 +88,8 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 	return reqs
 }
 
-func (cmd *BindRouteService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *BindRouteService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 	cmd.routeServiceBindingRepo = deps.RepoLocator.GetRouteServiceBindingRepository()
@@ -152,9 +152,9 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided(), parameters)
+	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.GUID, route.GUID, serviceInstance.IsUserProvided(), parameters)
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ServiceInstanceAlreadyBoundToSameRoute {
+		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.ServiceInstanceAlreadyBoundToSameRoute {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
 				map[string]interface{}{
 					"URL": route.URL(),

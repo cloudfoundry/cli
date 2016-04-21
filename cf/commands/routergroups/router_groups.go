@@ -2,8 +2,8 @@ package routergroups
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -13,16 +13,16 @@ import (
 
 type RouterGroups struct {
 	ui             terminal.UI
-	routingApiRepo api.RoutingApiRepository
-	config         core_config.Reader
+	routingAPIRepo api.RoutingAPIRepository
+	config         coreconfig.Reader
 }
 
 func init() {
-	command_registry.Register(&RouterGroups{})
+	commandregistry.Register(&RouterGroups{})
 }
 
-func (cmd *RouterGroups) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RouterGroups) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "router-groups",
 		Description: T("List router groups"),
 		Usage: []string{
@@ -32,25 +32,23 @@ func (cmd *RouterGroups) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
-		T("No argument required"),
-		func() bool {
-			return len(fc.Args()) != 0
-		},
-	)
 
-	reqs := []requirements.Requirement{
-		usageReq,
+	return []requirements.Requirement{
+		requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
+			T("No argument required"),
+			func() bool {
+				return len(fc.Args()) != 0
+			},
+		),
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewRoutingAPIRequirement(),
 	}
-	return reqs
 }
 
-func (cmd *RouterGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *RouterGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
-	cmd.routingApiRepo = deps.RepoLocator.GetRoutingApiRepository()
+	cmd.routingAPIRepo = deps.RepoLocator.GetRoutingAPIRepository()
 	return cmd
 }
 
@@ -67,7 +65,7 @@ func (cmd *RouterGroups) Execute(c flags.FlagContext) {
 		return true
 	}
 
-	apiErr := cmd.routingApiRepo.ListRouterGroups(cb)
+	apiErr := cmd.routingAPIRepo.ListRouterGroups(cb)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 		return

@@ -3,9 +3,9 @@ package featureflag_test
 import (
 	"errors"
 
-	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,27 +20,27 @@ var _ = Describe("feature-flag command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		flagRepo            *fakeflag.FakeFeatureFlagRepository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("feature-flag").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("feature-flag").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("feature-flag", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("feature-flag", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

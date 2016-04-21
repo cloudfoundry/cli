@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+//go:generate counterfeiter . Sha1Checksum
+
 type Sha1Checksum interface {
 	ComputeFileSha1() ([]byte, error)
 	CheckSha1(string) bool

@@ -7,7 +7,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 
 	"github.com/cloudfoundry/noaa"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
@@ -15,14 +15,14 @@ import (
 )
 
 type NoaaLogsRepository struct {
-	config         core_config.Reader
+	config         coreconfig.Reader
 	consumer       NoaaConsumer
 	tokenRefresher authentication.TokenRefresher
 	messageQueue   *NoaaMessageQueue
 	BufferTime     time.Duration
 }
 
-func NewNoaaLogsRepository(config core_config.Reader, consumer NoaaConsumer, tr authentication.TokenRefresher) *NoaaLogsRepository {
+func NewNoaaLogsRepository(config coreconfig.Reader, consumer NoaaConsumer, tr authentication.TokenRefresher) *NoaaLogsRepository {
 	return &NoaaLogsRepository{
 		config:         config,
 		consumer:       consumer,

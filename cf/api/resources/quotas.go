@@ -21,7 +21,7 @@ func (resource QuotaResource) ToFields() models.QuotaFields {
 	}
 
 	return models.QuotaFields{
-		Guid:                    resource.Metadata.Guid,
+		GUID:                    resource.Metadata.GUID,
 		Name:                    resource.Entity.Name,
 		MemoryLimit:             resource.Entity.MemoryLimit,
 		InstanceMemoryLimit:     resource.Entity.InstanceMemoryLimit,
@@ -31,5 +31,3 @@ func (resource QuotaResource) ToFields() models.QuotaFields {
 		AppInstanceLimit:        appInstanceLimit,
 	}
 }
-
-const UnlimitedAppInstances int = -1

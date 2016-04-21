@@ -6,31 +6,31 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/actors/plan_builder"
+	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/json"
 )
 
 type UpdateService struct {
 	ui          terminal.UI
-	config      core_config.Reader
+	config      coreconfig.Reader
 	serviceRepo api.ServiceRepository
-	planBuilder plan_builder.PlanBuilder
+	planBuilder planbuilder.PlanBuilder
 }
 
 func init() {
-	command_registry.Register(&UpdateService{})
+	commandregistry.Register(&UpdateService{})
 }
 
-func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
+func (cmd *UpdateService) MetaData() commandregistry.CommandMetadata {
 	baseUsage := T("CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]")
 	paramsUsage := T(`   Optionally provide service-specific configuration parameters in a valid JSON object in-line.
    CF_NAME update-service -c '{"name":"value","name":"value"}'
@@ -53,7 +53,7 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
 	fs["t"] = &flags.StringFlag{ShortName: "t", Usage: T("User provided tags")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "update-service",
 		Description: T("Update a service instance"),
 		Usage: []string{
@@ -75,7 +75,7 @@ func (cmd *UpdateService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-service"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -84,14 +84,14 @@ func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory,
 	}
 
 	if fc.String("p") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumAPIVersion))
 	}
 
 	return reqs
 }
 
-func (cmd *UpdateService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *UpdateService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	cmd.planBuilder = deps.PlanBuilder
@@ -117,12 +117,12 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
-	tags := ui_helpers.ParseTags(tagsList)
+	tags := uihelpers.ParseTags(tagsList)
 
 	var plan models.ServicePlanFields
 	if planName != "" {
@@ -134,7 +134,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 
 	cmd.printUpdatingServiceInstanceMessage(serviceInstanceName)
 
-	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap, tags)
+	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.GUID, plan.GUID, paramsMap, tags)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -145,7 +145,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 }
 
 func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (plan models.ServicePlanFields, err error) {
-	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
+	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.GUID, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
 	}

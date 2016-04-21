@@ -3,16 +3,16 @@ package securitygroup_test
 import (
 	"errors"
 
-	fakeRunning "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running/runningfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,31 +21,31 @@ import (
 var _ = Describe("bind-running-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   core_config.Repository
+		configRepo                   coreconfig.Repository
 		requirementsFactory          *testreq.FakeReqFactory
-		fakeSecurityGroupRepo        *fakeSecurityGroup.FakeSecurityGroupRepo
-		fakeRunningSecurityGroupRepo *fakeRunning.FakeRunningSecurityGroupsRepo
-		deps                         command_registry.Dependency
+		fakeSecurityGroupRepo        *securitygroupsfakes.FakeSecurityGroupRepo
+		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(fakeSecurityGroupRepo)
 		deps.RepoLocator = deps.RepoLocator.SetRunningSecurityGroupRepository(fakeRunningSecurityGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("bind-running-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("bind-running-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		fakeRunningSecurityGroupRepo = &fakeRunning.FakeRunningSecurityGroupsRepo{}
+		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
+		fakeRunningSecurityGroupRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("bind-running-security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("bind-running-security-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -65,7 +65,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			group := models.SecurityGroup{}
-			group.Guid = "being-a-guid"
+			group.GUID = "being-a-guid"
 			group.Name = "security-group-name"
 			fakeSecurityGroupRepo.ReadReturns(group, nil)
 		})

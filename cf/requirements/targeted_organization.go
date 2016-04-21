@@ -5,27 +5,28 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter -o fakes/fake_targeted_org_requirement.go . TargetedOrgRequirement
+//go:generate counterfeiter . TargetedOrgRequirement
+
 type TargetedOrgRequirement interface {
 	Requirement
 	GetOrganizationFields() models.OrganizationFields
 }
 
-type targetedOrgApiRequirement struct {
-	config core_config.Reader
+type targetedOrgAPIRequirement struct {
+	config coreconfig.Reader
 }
 
-func NewTargetedOrgRequirement(config core_config.Reader) TargetedOrgRequirement {
-	return targetedOrgApiRequirement{config}
+func NewTargetedOrgRequirement(config coreconfig.Reader) TargetedOrgRequirement {
+	return targetedOrgAPIRequirement{config}
 }
 
-func (req targetedOrgApiRequirement) Execute() error {
+func (req targetedOrgAPIRequirement) Execute() error {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf(T("No org targeted, use '{{.Command}}' to target an org.", map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o ORG")}))
 		return errors.New(message)
@@ -34,6 +35,6 @@ func (req targetedOrgApiRequirement) Execute() error {
 	return nil
 }
 
-func (req targetedOrgApiRequirement) GetOrganizationFields() (org models.OrganizationFields) {
+func (req targetedOrgAPIRequirement) GetOrganizationFields() (org models.OrganizationFields) {
 	return req.config.OrganizationFields()
 }

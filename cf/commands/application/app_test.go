@@ -6,21 +6,21 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	fakeappinstances "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/appinstances/appinstancesfakes"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
@@ -31,18 +31,18 @@ import (
 var _ = Describe("App", func() {
 	var (
 		ui               *testterm.FakeUI
-		appSummaryRepo   *fakeapi.FakeAppSummaryRepository
-		appInstancesRepo *fakeappinstances.FakeAppInstancesRepository
+		appSummaryRepo   *apifakes.FakeAppSummaryRepository
+		appInstancesRepo *appinstancesfakes.FakeAppInstancesRepository
 		getAppModel      *plugin_models.GetAppModel
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
 		targetedSpaceRequirement requirements.Requirement
-		applicationRequirement   *fakerequirements.FakeApplicationRequirement
+		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
 	)
 
 	BeforeEach(func() {
@@ -54,15 +54,15 @@ var _ = Describe("App", func() {
 		getAppModel = &plugin_models.GetAppModel{}
 
 		repoLocator := api.RepositoryLocator{}
-		appSummaryRepo = &fakeapi.FakeAppSummaryRepository{}
+		appSummaryRepo = new(apifakes.FakeAppSummaryRepository)
 		repoLocator = repoLocator.SetAppSummaryRepository(appSummaryRepo)
-		appInstancesRepo = &fakeappinstances.FakeAppInstancesRepository{}
+		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		repoLocator = repoLocator.SetAppInstancesRepository(appInstancesRepo)
 
-		deps = command_registry.Dependency{
-			Ui:     ui,
+		deps = commandregistry.Dependency{
+			UI:     ui,
 			Config: testconfig.NewRepositoryWithDefaults(),
-			PluginModels: &command_registry.PluginModels{
+			PluginModels: &commandregistry.PluginModels{
 				Application: getAppModel,
 			},
 			RepoLocator: repoLocator,
@@ -70,7 +70,7 @@ var _ = Describe("App", func() {
 
 		cmd.SetDependency(deps, false)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{}
 		factory.NewLoginRequirementReturns(loginRequirement)
@@ -78,7 +78,7 @@ var _ = Describe("App", func() {
 		targetedSpaceRequirement = &passingRequirement{}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 
-		applicationRequirement = &fakerequirements.FakeApplicationRequirement{}
+		applicationRequirement = new(requirementsfakes.FakeApplicationRequirement)
 		factory.NewApplicationRequirementReturns(applicationRequirement)
 	})
 
@@ -157,7 +157,7 @@ var _ = Describe("App", func() {
 					State:     models.InstanceRunning,
 					Details:   "fake-instance-details",
 					Since:     time.Date(2015, time.November, 19, 1, 1, 17, 0, time.UTC),
-					CpuUsage:  float64(0.25),
+					CPUUsage:  float64(0.25),
 					DiskUsage: int64(1 * formatters.GIGABYTE),
 					DiskQuota: int64(2 * formatters.GIGABYTE),
 					MemUsage:  int64(24 * formatters.MEGABYTE),
@@ -191,7 +191,8 @@ var _ = Describe("App", func() {
 				[]string{"Showing health and status for app fake-app-name"},
 				[]string{"requested state: started"},
 				[]string{"instances: 1/1"},
-				[]string{"app ports: 8080, 9090"},
+				// Commented to hide app-ports for release #117189491
+				// []string{"app ports: 8080, 9090"},
 				[]string{"usage: 1G x 1 instances"},
 				[]string{"urls: fake-route-host.fake-route-domain-name"},
 				[]string{"last uploaded: Thu Nov 19 01:00:15 UTC 2015"},
@@ -206,7 +207,7 @@ var _ = Describe("App", func() {
 				getAppSummaryModel.RunningInstances = 0
 				getAppSummaryModel.InstanceCount = 1
 				getAppSummaryModel.State = "stopped"
-				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.InstancesError, "error"))
+				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHTTPError(400, errors.InstancesError, "error"))
 			})
 
 			It("prints appropriate output", func() {
@@ -226,7 +227,7 @@ var _ = Describe("App", func() {
 				getAppSummaryModel.RunningInstances = 0
 				getAppSummaryModel.InstanceCount = 1
 				getAppSummaryModel.State = "stopped"
-				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.NotStaged, "error"))
+				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHTTPError(400, errors.NotStaged, "error"))
 			})
 
 			It("prints appropriate output", func() {

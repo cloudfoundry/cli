@@ -13,6 +13,7 @@ type FlagSet interface {
 	GetShortName() string
 	GetValue() interface{}
 	Set(string)
+	Visible() bool
 }
 
 type FlagContext interface {

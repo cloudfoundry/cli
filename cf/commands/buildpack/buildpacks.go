@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -19,11 +19,11 @@ type ListBuildpacks struct {
 }
 
 func init() {
-	command_registry.Register(&ListBuildpacks{})
+	commandregistry.Register(&ListBuildpacks{})
 }
 
-func (cmd *ListBuildpacks) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ListBuildpacks) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "buildpacks",
 		Description: T("List all buildpacks"),
 		Usage: []string{
@@ -33,7 +33,7 @@ func (cmd *ListBuildpacks) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListBuildpacks) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -48,8 +48,8 @@ func (cmd *ListBuildpacks) Requirements(requirementsFactory requirements.Factory
 	return reqs
 }
 
-func (cmd *ListBuildpacks) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *ListBuildpacks) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
 	return cmd
 }

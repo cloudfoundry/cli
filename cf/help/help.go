@@ -9,8 +9,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
@@ -53,16 +53,16 @@ func showAppHelp(helpTemplate string) {
 }
 
 func newAppPresenter() (presenter appPresenter) {
-	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
+	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
 		//fail silently when running help
 	})
 	plugins := pluginConfig.Plugins()
 
-	maxNameLen := command_registry.Commands.MaxCommandNameLength()
+	maxNameLen := commandregistry.Commands.MaxCommandNameLength()
 	maxNameLen = maxPluginCommandNameLength(plugins, maxNameLen)
 
 	presentCommand := func(commandName string) (presenter cmdPresenter) {
-		cmd := command_registry.Commands.FindCommand(commandName)
+		cmd := commandregistry.Commands.FindCommand(commandName)
 		presenter.Name = cmd.MetaData().Name
 		padding := strings.Repeat(" ", maxNameLen-utf8.RuneCountInString(presenter.Name))
 		presenter.Name = presenter.Name + padding
@@ -214,6 +214,9 @@ func newAppPresenter() (presenter appPresenter) {
 					presentCommand("create-shared-domain"),
 					presentCommand("delete-shared-domain"),
 				},
+				{
+					presentCommand("router-groups"),
+				},
 			},
 		}, {
 			Name: T("ROUTES"),
@@ -226,13 +229,6 @@ func newAppPresenter() (presenter appPresenter) {
 					presentCommand("unmap-route"),
 					presentCommand("delete-route"),
 					presentCommand("delete-orphaned-routes"),
-				},
-			},
-		}, {
-			Name: T("ROUTER GROUPS"),
-			CommandSubGroups: [][]cmdPresenter{
-				{
-					presentCommand("router-groups"),
 				},
 			},
 		}, {
@@ -406,7 +402,7 @@ func (c groupedCommands) SubTitle(name string) string {
 	return terminal.HeaderColor(name + ":")
 }
 
-func maxPluginCommandNameLength(plugins map[string]plugin_config.PluginMetadata, maxNameLen int) int {
+func maxPluginCommandNameLength(plugins map[string]pluginconfig.PluginMetadata, maxNameLen int) int {
 	for _, pluginMetadata := range plugins {
 		for _, cmd := range pluginMetadata.Commands {
 			if nameLen := utf8.RuneCountInString(cmd.Name); nameLen > maxNameLen {

@@ -56,14 +56,6 @@
     "translation": ""
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": ""
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": ""
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   オプションで、バインド済みアプリケーションの VCAP_SERVICES 環境変数に書き込まれるコンマ区切りタグのリストを提供します。"
   },
@@ -84,10 +76,6 @@
     "translation": "   path は zip ファイル、zip ファイルへの URL、またはローカル・ディレクトリーでなければなりません。position は正整数で、優先順位を設定するものであり、低いものから高いものへの順にソートされます。"
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   マニフェストを使用して複数のアプリをプッシュします:\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   提供されるパスはファイルへの絶対パスまたは相対パスとすることができます。\n   このファイルは内部にルールを記述する JSON オブジェクトを含む単一の配列を持つものでなければなりません。"
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   許容割り当て量を 'CF_NAME quotas' で表示します"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -126,10 +110,6 @@
   {
     "id": " is empty",
     "translation": " は空です"
-  },
-  {
-    "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
-    "translation": " は有効な URL ではないので、有効な URL (例: http://your_repo.com) を提供してください"
   },
   {
     "id": " is not available in repo '",
@@ -200,12 +180,12 @@
     "translation": "API エンドポイント:"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API エンドポイント: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API エンドポイント: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API エンドポイント: {{.ApiEndpoint}} (API バージョン: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API エンドポイント: {{.APIEndpoint}} (API バージョン: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -217,6 +197,10 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
     "translation": ""
   },
   {
@@ -400,6 +384,10 @@
     "translation": "ビルドパック"
   },
   {
+    "id": "BUILDPACK_NAME",
+    "translation": ""
+  },
+  {
     "id": "Bind a security group to a space",
     "translation": "セキュリティー・グループをスペースにバインドします"
   },
@@ -572,10 +560,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": ""
   },
@@ -609,10 +593,6 @@
   },
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": ""
   },
   {
@@ -737,10 +717,6 @@
   },
   {
     "id": "CF_NAME logs APP_NAME",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
     "translation": ""
   },
   {
@@ -976,10 +952,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": ""
   },
@@ -1020,15 +992,15 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": ""
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+    "translation": ""
+  },
+  {
+    "id": "COMMAND",
     "translation": ""
   },
   {
@@ -1100,8 +1072,8 @@
     "translation": "経路を確認しています..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API バージョン {{.ApiVer}} には CLI バージョン {{.CliMin}} が必要です。現在のバージョンは {{.CliVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API バージョン {{.APIVer}} には CLI バージョン {{.CLIMin}} が必要です。現在のバージョンは {{.CLIVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1192,8 +1164,8 @@
     "translation": "更新を直列化できませんでした。 "
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "組織をターゲットにすることができませんでした。\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "組織をターゲットにすることができませんでした。\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1308,6 +1280,10 @@
     "translation": "{{.Username}} として割り当て量 {{.QuotaName}} を作成しています..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "経路 {{.Hostname}} を作成しています..."
   },
@@ -1384,6 +1360,14 @@
     "translation": "要求に組み込むカスタム・ヘッダー、フラグは何度でも指定できます"
   },
   {
+    "id": "DISK",
+    "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": ""
+  },
+  {
     "id": "DOMAIN",
     "translation": ""
   },
@@ -1402,6 +1386,10 @@
   {
     "id": "Define a new space resource quota",
     "translation": "新しいスペース・リソース割り当て量を定義します"
+  },
+  {
+    "id": "Delete a TCP route",
+    "translation": ""
   },
   {
     "id": "Delete a buildpack",
@@ -1454,6 +1442,10 @@
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "すべての孤立した経路 (つまり、アプリにマップされていない経路) を削除します"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": ""
   },
   {
     "id": "Delete an app",
@@ -1748,8 +1740,8 @@
     "translation": "ビルドパック {{.Name}} の削除時にエラーが発生しました\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "ドメイン {{.DomainName}} の削除時にエラーが発生しました\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1776,16 +1768,16 @@
     "translation": "次のスペースに対する SSH サポートを有効にしようとしたときエラーが発生しました: "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "使用可能な組織の検索時にエラーが発生しました\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "使用可能な組織の検索時にエラーが発生しました\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "使用可能なスペースの検索時にエラーが発生しました\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "ドメイン {{.DomainName}} の検索時にエラーが発生しました\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "ドメイン {{.DomainName}} の検索時にエラーが発生しました\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1826,10 +1818,6 @@
   {
     "id": "Error getting file info",
     "translation": "ファイル情報の取得時にエラーが発生しました"
-  },
-  {
-    "id": "Error getting info from v2/info: ",
-    "translation": "v2/info から情報を取得しようとしたときエラーが発生しました: "
   },
   {
     "id": "Error getting one time auth code: ",
@@ -1940,8 +1928,8 @@
     "translation": "次のものの health_check_type を更新しているときエラーが発生しました: "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "アプリケーションのアップロード時にエラーが発生しました。\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "アプリケーションのアップロード時にエラーが発生しました。\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2028,16 +2016,16 @@
     "translation": "ドメインを取り出せませんでした。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "イベントを取り出せませんでした。\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "イベントを取り出せませんでした。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "役割 {{.OrgRoleToDisplayName}} の組織ユーザーを取り出せませんでした。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "組織を取り出せませんでした。\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "組織を取り出せませんでした。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -2316,6 +2304,14 @@
     "translation": "{{.CurrentUser}} として組織 {{.TargetOrg}} 内のユーザーを取得しています..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2336,10 +2332,6 @@
     "translation": ""
   },
   {
-    "id": "Hostname for the route (required for shared domains)",
-    "translation": "Hostname for the route"
-  },
-  {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
     "translation": "ホスト名は経路をバインドするためにドメインと結合して使用します"
   },
@@ -2348,8 +2340,8 @@
     "translation": "ホスト名は経路をアンバインドするためにドメインと結合して使用します"
   },
   {
-    "id": "Hostname used to identify the route",
-    "translation": "Hostname for the route"
+    "id": "Hostname used to identify the HTTP route",
+    "translation": ""
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -2836,6 +2828,14 @@
     "translation": "リポジトリー '{{.repoName}}' から '{{.filePath}}' を検索しています"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": ""
+  },
+  {
+    "id": "MEMORY",
+    "translation": ""
+  },
+  {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
     "translation": "あるアプリケーションから他のアプリケーションにアプリ・ソース・コードをコピーします。オーバーライドされない限り、copy-source コマンドはそのアプリケーションを再始動します。"
   },
@@ -2854,6 +2854,14 @@
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
     "translation": "現行ディレクトリーにマニフェスト・ファイルが見つかりません、アプリ名またはマニフェストのいずれかを指定してください"
+  },
+  {
+    "id": "Map a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": ""
   },
   {
     "id": "Map the root domain to this app",
@@ -2905,6 +2913,10 @@
   },
   {
     "id": "NEW_NAME",
+    "translation": ""
+  },
+  {
+    "id": "NUM_INSTANCES",
     "translation": ""
   },
   {
@@ -3196,7 +3208,7 @@
     "translation": "マニフェストへのパス"
   },
   {
-    "id": "Path used to identify the route",
+    "id": "Path used to identify the HTTP route",
     "translation": ""
   },
   {
@@ -3272,6 +3284,10 @@
     "translation": ""
   },
   {
+    "id": "Port used to identify the TCP route",
+    "translation": ""
+  },
+  {
     "id": "Print API request diagnostics to stdout",
     "translation": "API 要求診断を stdout に出力します"
   },
@@ -3312,8 +3328,12 @@
     "translation": "新しいアプリ、または既存のアプリに対する同期変更をプッシュします"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "単一のアプリをプッシュします (マニフェストを使用する場合も使用しない場合もあります):\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "単一のアプリをプッシュします (マニフェストを使用する場合も使用しない場合もあります)"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "マニフェストを使用して複数のアプリをプッシュします"
   },
   {
     "id": "QUOTA",
@@ -3348,12 +3368,12 @@
     "translation": "役割:\n"
   },
   {
-    "id": "ROUTER GROUPS",
-    "translation": "ルーター・グループ"
-  },
-  {
     "id": "ROUTES",
     "translation": "経路"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3620,10 +3640,6 @@
     "translation": ""
   },
   {
-    "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-    "translation": "ルーティング API URI がありません。ログインし直してください。そうすると、この URI が自動的に設定されます。"
-  },
-  {
     "id": "Rules",
     "translation": "ルール"
   },
@@ -3676,6 +3692,10 @@
     "translation": "SSH 経由でアプリケーション・コンテナー・インスタンスに接続します"
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} をスケーリングしています..."
   },
@@ -3712,8 +3732,8 @@
     "translation": "サーバー・エラー、状況コード: 403: アクセスは拒否されました。このコマンドを実行する特権がありません。"
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "サーバー・エラー、状況コード: {{.ErrStatusCode}}、エラー・コード: {{.ErrApiErrorCode}}、メッセージ: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "サーバー・エラー、状況コード: {{.ErrStatusCode}}、エラー・コード: {{.ErrAPIErrorCode}}、メッセージ: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -3976,6 +3996,10 @@
     "translation": "システム提供:"
   },
   {
+    "id": "TIMEOUT",
+    "translation": ""
+  },
+  {
     "id": "TIP:\n",
     "translation": "ヒント:\n"
   },
@@ -3996,8 +4020,8 @@
     "translation": "ヒント: スペースがターゲットになっていません、'{{.CfTargetCommand}}' を使用してスペースをターゲットにしてください"
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "ヒント: 非セキュアな API エンドポイントから継続するには、'{{.ApiCommand}}' を使用します"
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "ヒント: 非セキュアな API エンドポイントから継続するには、'{{.APICommand}}' を使用します"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4080,12 +4104,16 @@
     "translation": "表示するオプションが多すぎます。名前を入力してください。"
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "'{{.repoUrl}}' で要求を実行したときエラーが発生しました: "
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "'{{.repoURL}}' で要求を実行したときエラーが発生しました: "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": ""
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4144,6 +4172,10 @@
     "translation": "UAA エンドポイントが構成ファイルにありません"
   },
   {
+    "id": "URL",
+    "translation": "URL"
+  },
+  {
     "id": "URL to which logs for bound applications will be streamed",
     "translation": "バインド済みアプリケーションのログがストリーミングされるURL"
   },
@@ -4168,8 +4200,8 @@
     "translation": "ユーザー"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "スペース {{.SpaceName}} にアクセスできません。\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "スペース {{.SpaceName}} にアクセスできません。\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -4266,6 +4298,14 @@
   {
     "id": "Unlock the buildpack to enable updates",
     "translation": "このビルドパックをアンロックして更新を有効にします"
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": ""
   },
   {
     "id": "Unsetting api endpoint...",
@@ -4370,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "{{.ZipFileBytes}}、{{.FileCount}} 個のファイルをアップロードしています"
-  },
-  {
-    "id": "Url",
-    "translation": "URL"
   },
   {
     "id": "Use '{{.Command}}' for more information",
@@ -4541,14 +4577,6 @@
   },
   {
     "id": "app instance limit",
-    "translation": ""
-  },
-  {
-    "id": "app ports",
-    "translation": ""
-  },
-  {
-    "id": "app ports:",
     "translation": ""
   },
   {
@@ -5000,8 +5028,8 @@
     "translation": "はい"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}} (API バージョン: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}} (API バージョン: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5048,12 +5076,12 @@
     "translation": "{{.Err}}\n\nヒント: 詳しくは '{{.Command}}' を使用してください"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "現在の CF CLI バージョン {{.Version}}\n\t現在の CF API バージョン {{.ApiVersion}}\n\t{{.CommandName}} フィーチャーを使用するには、CF API を少なくとも {{.RequiredVersion}} にアップグレードする必要があります"
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "現在の CF CLI バージョン {{.Version}}\n\t現在の CF API バージョン {{.APIVersion}}\n\t{{.CommandName}} フィーチャーを使用するには、CF API を少なくとも {{.RequiredVersion}} にアップグレードする必要があります"
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5122,6 +5150,10 @@
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
     "translation": "{{.State}} は進行中です。操作状況を確認するには '{{.ServicesCommand}}' または '{{.ServiceCommand}}' を使用します。"
+  },
+  {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": "{{.URL}} は有効な URL ではないので、有効な URL (例: https://your_repo.com) を提供してください"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

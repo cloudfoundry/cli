@@ -2,15 +2,17 @@ package strategy
 
 import "github.com/cloudfoundry/cli/cf/api/resources"
 
+//go:generate counterfeiter . EventsEndpointStrategy
+
 type EventsEndpointStrategy interface {
-	EventsURL(appGuid string, limit int64) string
+	EventsURL(appGUID string, limit int64) string
 	EventsResource() resources.EventResource
 }
 
 type eventsEndpointStrategy struct{}
 
-func (s eventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
-	return buildURL(v2("apps", appGuid, "events"), params{
+func (s eventsEndpointStrategy) EventsURL(appGUID string, limit int64) string {
+	return buildURL(v2("apps", appGUID, "events"), params{
 		resultsPerPage: limit,
 	})
 }
@@ -21,11 +23,11 @@ func (s eventsEndpointStrategy) EventsResource() resources.EventResource {
 
 type globalEventsEndpointStrategy struct{}
 
-func (s globalEventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
+func (s globalEventsEndpointStrategy) EventsURL(appGUID string, limit int64) string {
 	return buildURL(v2("events"), params{
 		resultsPerPage: limit,
 		orderDirection: "desc",
-		q:              map[string]string{"actee": appGuid},
+		q:              map[string]string{"actee": appGUID},
 	})
 }
 

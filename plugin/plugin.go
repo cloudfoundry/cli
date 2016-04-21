@@ -10,6 +10,7 @@ type Plugin interface {
 	GetMetadata() PluginMetadata
 }
 
+//go:generate counterfeiter . CliConnection
 /**
 	List of commands avaiable to CliConnection variable passed into run
 **/

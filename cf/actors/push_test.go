@@ -9,10 +9,10 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	fakeBits "github.com/cloudfoundry/cli/cf/api/application_bits/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applicationbits/applicationbitsfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/app_files/fakes"
+	"github.com/cloudfoundry/cli/cf/appfiles"
+	"github.com/cloudfoundry/cli/cf/appfiles/appfilesfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,9 +20,9 @@ import (
 
 var _ = Describe("Push Actor", func() {
 	var (
-		appBitsRepo  *fakeBits.FakeApplicationBitsRepository
-		appFiles     *fakes.FakeAppFiles
-		fakezipper   *fakes.FakeZipper
+		appBitsRepo  *applicationbitsfakes.FakeApplicationBitsRepository
+		appFiles     *appfilesfakes.FakeAppFiles
+		fakezipper   *appfilesfakes.FakeZipper
 		actor        actors.PushActor
 		fixturesDir  string
 		appDir       string
@@ -31,9 +31,9 @@ var _ = Describe("Push Actor", func() {
 	)
 
 	BeforeEach(func() {
-		appBitsRepo = &fakeBits.FakeApplicationBitsRepository{}
-		appFiles = &fakes.FakeAppFiles{}
-		fakezipper = &fakes.FakeZipper{}
+		appBitsRepo = new(applicationbitsfakes.FakeApplicationBitsRepository)
+		appFiles = new(appfilesfakes.FakeAppFiles)
+		fakezipper = new(appfilesfakes.FakeZipper)
 		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
 		fixturesDir = filepath.Join("..", "..", "fixtures", "applications")
 		allFiles = []models.AppFileFields{
@@ -272,7 +272,7 @@ var _ = Describe("Push Actor", func() {
 		)
 
 		BeforeEach(func() {
-			zipper := &app_files.ApplicationZipper{}
+			zipper := &appfiles.ApplicationZipper{}
 			actor = actors.NewPushActor(appBitsRepo, zipper, appFiles)
 		})
 

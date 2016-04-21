@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -22,19 +22,19 @@ var _ = Describe("ServiceBindingsRepository", func() {
 	var (
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
-		configRepo  core_config.ReadWriter
+		configRepo  coreconfig.ReadWriter
 		repo        CloudControllerServiceBindingRepository
 	)
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
 		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerServiceBindingRepository(configRepo, gateway)
 	})
 
@@ -50,7 +50,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			})
 
 			JustBeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "POST",
 					Path:     "/v2/service_bindings",
 					Matcher:  requestMatcher,
@@ -92,7 +92,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 		Context("when an API error occurs", func() {
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/service_bindings",
 					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
@@ -108,7 +108,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
+				Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("90003"))
 			})
 		})
 	})
@@ -118,20 +118,20 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			var serviceInstance models.ServiceInstance
 
 			BeforeEach(func() {
-				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "DELETE",
 					Path:     "/v2/service_bindings/service-binding-2-guid",
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
-				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.GUID = "my-service-instance-guid"
 
 				binding := models.ServiceBindingFields{}
-				binding.Url = "/v2/service_bindings/service-binding-1-guid"
-				binding.AppGuid = "app-1-guid"
+				binding.URL = "/v2/service_bindings/service-binding-1-guid"
+				binding.AppGUID = "app-1-guid"
 				binding2 := models.ServiceBindingFields{}
-				binding2.Url = "/v2/service_bindings/service-binding-2-guid"
-				binding2.AppGuid = "app-2-guid"
+				binding2.URL = "/v2/service_bindings/service-binding-2-guid"
+				binding2.AppGUID = "app-2-guid"
 				serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 			})
 
@@ -149,7 +149,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 			BeforeEach(func() {
 				setupTestServer()
-				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.GUID = "my-service-instance-guid"
 			})
 
 			It("does not return an error", func() {

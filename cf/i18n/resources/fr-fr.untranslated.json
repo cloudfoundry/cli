@@ -12,6 +12,10 @@
     "translation": "APP_INSTANCES"
   },
   {
+    "id": "APP_NAME",
+    "translation": "APP_NAME"
+  },
+  {
     "id": "App instance limit",
     "translation": "App instance limit"
   },
@@ -92,10 +96,6 @@
     "translation": "CF_NAME delete-quota QUOTA [-f]"
   },
   {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
-  },
-  {
     "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]",
     "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"
   },
@@ -138,10 +138,6 @@
   {
     "id": "CF_NAME logout",
     "translation": "CF_NAME logout"
-  },
-  {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
   },
   {
     "id": "CF_NAME oauth-token",
@@ -224,10 +220,6 @@
     "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
@@ -260,6 +252,10 @@
     "translation": "Create an HTTP route"
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": "Creating random route for {{.Domain}}"
+  },
+  {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
@@ -276,8 +272,16 @@
     "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
   },
   {
-    "id": "DOMAIN",
-    "translation": "DOMAIN"
+    "id": "DISK",
+    "translation": "DISK"
+  },
+  {
+    "id": "Delete a TCP route",
+    "translation": "Delete a TCP route"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": "Delete an HTTP route"
   },
   {
     "id": "EXAMPLES",
@@ -340,6 +344,14 @@
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": "HEALTH_CHECK_TYPE"
+  },
+  {
+    "id": "HOST",
+    "translation": "HOST"
+  },
+  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -358,6 +370,10 @@
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
+  },
+  {
+    "id": "Hostname used to identify the HTTP route",
+    "translation": "Hostname used to identify the HTTP route"
   },
   {
     "id": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
@@ -404,6 +420,18 @@
     "translation": "Make the broker's service plans only visible within the targeted space"
   },
   {
+    "id": "Map a TCP route",
+    "translation": "Map a TCP route"
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": "Map an HTTP route"
+  },
+  {
+    "id": "NUM_INSTANCES",
+    "translation": "NUM_INSTANCES"
+  },
+  {
     "id": "Name of a registered repository",
     "translation": "Name of a registered repository"
   },
@@ -440,16 +468,24 @@
     "translation": "Path for the route"
   },
   {
-    "id": "Path used to identify the route",
-    "translation": "Path used to identify the route"
+    "id": "Path used to identify the HTTP route",
+    "translation": "Path used to identify the HTTP route"
   },
   {
     "id": "Port for the TCP route",
     "translation": "Port for the TCP route"
   },
   {
+    "id": "Port used to identify the TCP route",
+    "translation": "Port used to identify the TCP route"
+  },
+  {
     "id": "ROUTES",
     "translation": "ROUTES"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": "ROUTE_PATH"
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
@@ -488,6 +524,10 @@
     "translation": "SPACE"
   },
   {
+    "id": "STACK",
+    "translation": "STACK"
+  },
+  {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
     "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org"
   },
@@ -500,6 +540,10 @@
     "translation": "Skip verification of the API endpoint. Not recommended!"
   },
   {
+    "id": "TIMEOUT",
+    "translation": "TIMEOUT"
+  },
+  {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
     "translation": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
   },
@@ -510,6 +554,10 @@
   {
     "id": "The targeted API endpoint could not be reached.",
     "translation": "The targeted API endpoint could not be reached."
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
@@ -544,6 +592,14 @@
     "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Unmap a TCP route",
+    "translation": "Unmap a TCP route"
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": "Unmap an HTTP route"
+  },
+  {
     "id": "Update user-provided service instance",
     "translation": "Update user-provided service instance"
   },
@@ -566,14 +622,6 @@
   {
     "id": "app instance limit",
     "translation": "app instance limit"
-  },
-  {
-    "id": "app ports",
-    "translation": "app ports"
-  },
-  {
-    "id": "app ports:",
-    "translation": "app ports:"
   },
   {
     "id": "description",
@@ -648,8 +696,8 @@
     "translation": "{{.AppInstanceLimit}} app instance limit"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
-    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}."
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

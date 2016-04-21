@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -51,7 +51,7 @@ type tokenRefresher interface {
 }
 
 type Request struct {
-	HttpReq      *http.Request
+	HTTPReq      *http.Request
 	SeekableBody io.ReadSeeker
 }
 
@@ -61,7 +61,7 @@ type Gateway struct {
 	PollingEnabled  bool
 	PollingThrottle time.Duration
 	trustedCerts    []tls.Certificate
-	config          core_config.Reader
+	config          coreconfig.Reader
 	warnings        *[]string
 	Clock           func() time.Time
 	transport       *http.Transport
@@ -69,7 +69,7 @@ type Gateway struct {
 	logger          trace.Printer
 }
 
-func newGateway(errHandler apiErrorHandler, config core_config.Reader, ui terminal.UI, logger trace.Printer) Gateway {
+func newGateway(errHandler apiErrorHandler, config coreconfig.Reader, ui terminal.UI, logger trace.Printer) Gateway {
 	return Gateway{
 		errHandler:      errHandler,
 		config:          config,
@@ -112,33 +112,33 @@ func (gateway Gateway) CreateResourceFromStruct(endpoint, url string, resource i
 	return gateway.CreateResource(endpoint, url, bytes.NewReader(data))
 }
 
-func (gateway Gateway) UpdateResourceFromStruct(endpoint, apiUrl string, resource interface{}) error {
+func (gateway Gateway) UpdateResourceFromStruct(endpoint, apiURL string, resource interface{}) error {
 	data, err := json.Marshal(resource)
 	if err != nil {
 		return err
 	}
 
-	return gateway.UpdateResource(endpoint, apiUrl, bytes.NewReader(data))
+	return gateway.UpdateResource(endpoint, apiURL, bytes.NewReader(data))
 }
 
-func (gateway Gateway) CreateResource(endpoint, apiUrl string, body io.ReadSeeker, resource ...interface{}) error {
-	return gateway.createUpdateOrDeleteResource("POST", endpoint, apiUrl, body, false, resource...)
+func (gateway Gateway) CreateResource(endpoint, apiURL string, body io.ReadSeeker, resource ...interface{}) error {
+	return gateway.createUpdateOrDeleteResource("POST", endpoint, apiURL, body, false, resource...)
 }
 
-func (gateway Gateway) UpdateResource(endpoint, apiUrl string, body io.ReadSeeker, resource ...interface{}) error {
-	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiUrl, body, false, resource...)
+func (gateway Gateway) UpdateResource(endpoint, apiURL string, body io.ReadSeeker, resource ...interface{}) error {
+	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiURL, body, false, resource...)
 }
 
-func (gateway Gateway) UpdateResourceSync(endpoint, apiUrl string, body io.ReadSeeker, resource ...interface{}) error {
-	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiUrl, body, true, resource...)
+func (gateway Gateway) UpdateResourceSync(endpoint, apiURL string, body io.ReadSeeker, resource ...interface{}) error {
+	return gateway.createUpdateOrDeleteResource("PUT", endpoint, apiURL, body, true, resource...)
 }
 
-func (gateway Gateway) DeleteResourceSynchronously(endpoint, apiUrl string) error {
-	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, true, &AsyncResource{})
+func (gateway Gateway) DeleteResourceSynchronously(endpoint, apiURL string) error {
+	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiURL, nil, true, &AsyncResource{})
 }
 
-func (gateway Gateway) DeleteResource(endpoint, apiUrl string) error {
-	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiUrl, nil, false, &AsyncResource{})
+func (gateway Gateway) DeleteResource(endpoint, apiURL string) error {
+	return gateway.createUpdateOrDeleteResource("DELETE", endpoint, apiURL, nil, false, &AsyncResource{})
 }
 
 func (gateway Gateway) ListPaginatedResources(
@@ -172,13 +172,13 @@ func (gateway Gateway) ListPaginatedResources(
 	return nil
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiUrl string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
+func (gateway Gateway) createUpdateOrDeleteResource(verb, endpoint, apiURL string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
 	var resource interface{}
 	if len(optionalResource) > 0 {
 		resource = optionalResource[0]
 	}
 
-	request, apiErr := gateway.NewRequest(verb, endpoint+apiUrl, gateway.config.AccessToken(), body)
+	request, apiErr := gateway.NewRequest(verb, endpoint+apiURL, gateway.config.AccessToken(), body)
 	if apiErr != nil {
 		return
 	}
@@ -206,10 +206,10 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
 
-	return &Request{HttpReq: request, SeekableBody: body}
+	return &Request{HTTPReq: request, SeekableBody: body}
 }
 
-func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, body *os.File) (*Request, error) {
+func (gateway Gateway) NewRequestForFile(method, fullURL, accessToken string, body *os.File) (*Request, error) {
 	progressReader := NewProgressReader(body, gateway.ui, 5*time.Second)
 	progressReader.Seek(0, 0)
 	fileStats, err := body.Stat()
@@ -218,7 +218,7 @@ func (gateway Gateway) NewRequestForFile(method, fullUrl, accessToken string, bo
 		return nil, fmt.Errorf("%s: %s", T("Error getting file info"), err.Error())
 	}
 
-	request, err := http.NewRequest(method, fullUrl, progressReader)
+	request, err := http.NewRequest(method, fullURL, progressReader)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", T("Error building request"), err.Error())
 	}
@@ -290,9 +290,9 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 }
 
 func (gateway Gateway) PerformPollingRequestForJSONResponse(endpoint string, request *Request, response interface{}, timeout time.Duration) (headers http.Header, apiErr error) {
-	query := request.HttpReq.URL.Query()
+	query := request.HTTPReq.URL.Query()
 	query.Add("async", "true")
-	request.HttpReq.URL.RawQuery = query.Encode()
+	request.HTTPReq.URL.RawQuery = query.Encode()
 
 	bytes, headers, rawResponse, apiErr := gateway.performRequestForResponseBytes(request)
 	if apiErr != nil {
@@ -317,16 +317,16 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(endpoint string, req
 		return
 	}
 
-	jobUrl := asyncResource.Metadata.URL
-	if jobUrl == "" {
+	jobURL := asyncResource.Metadata.URL
+	if jobURL == "" {
 		return
 	}
 
-	if !strings.Contains(jobUrl, "/jobs/") {
+	if !strings.Contains(jobURL, "/jobs/") {
 		return
 	}
 
-	apiErr = gateway.waitForJob(endpoint+jobUrl, request.HttpReq.Header.Get("Authorization"), timeout)
+	apiErr = gateway.waitForJob(endpoint+jobURL, request.HTTPReq.Header.Get("Authorization"), timeout)
 
 	return
 }
@@ -335,14 +335,14 @@ func (gateway Gateway) Warnings() []string {
 	return *gateway.warnings
 }
 
-func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (err error) {
+func (gateway Gateway) waitForJob(jobURL, accessToken string, timeout time.Duration) (err error) {
 	startTime := gateway.Clock()
 	for true {
 		if gateway.Clock().Sub(startTime) > timeout && timeout != 0 {
-			return errors.NewAsyncTimeoutError(jobUrl)
+			return errors.NewAsyncTimeoutError(jobURL)
 		}
 		var request *Request
-		request, err = gateway.NewRequest("GET", jobUrl, accessToken, nil)
+		request, err = gateway.NewRequest("GET", jobURL, accessToken, nil)
 		response := &JobResource{}
 		_, err = gateway.PerformRequestForJSONResponse(request, response)
 		if err != nil {
@@ -357,7 +357,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 			return
 		}
 
-		accessToken = request.HttpReq.Header.Get("Authorization")
+		accessToken = request.HTTPReq.Header.Get("Authorization")
 
 		time.Sleep(gateway.PollingThrottle)
 	}
@@ -365,7 +365,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 }
 
 func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, err error) {
-	httpReq := request.HttpReq
+	httpReq := request.HTTPReq
 
 	if request.SeekableBody != nil {
 		httpReq.Body = ioutil.NopCloser(request.SeekableBody)
@@ -401,9 +401,9 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 }
 
 func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, err error) {
-	rawResponse, err = gateway.doRequest(request.HttpReq)
+	rawResponse, err = gateway.doRequest(request.HTTPReq)
 	if err != nil {
-		err = WrapNetworkErrors(request.HttpReq.URL.Host, err)
+		err = WrapNetworkErrors(request.HTTPReq.URL.Host, err)
 		return
 	}
 
@@ -419,10 +419,10 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 
 func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
 	if gateway.transport == nil {
-		makeHttpTransport(&gateway)
+		makeHTTPTransport(&gateway)
 	}
 
-	httpClient := NewHttpClient(gateway.transport, NewRequestDumper(gateway.logger))
+	httpClient := NewHTTPClient(gateway.transport, NewRequestDumper(gateway.logger))
 
 	httpClient.DumpRequest(request)
 
@@ -451,7 +451,7 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 	return
 }
 
-func makeHttpTransport(gateway *Gateway) {
+func makeHTTPTransport(gateway *Gateway) {
 	gateway.transport = &http.Transport{
 		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
 		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
@@ -461,5 +461,5 @@ func makeHttpTransport(gateway *Gateway) {
 
 func (gateway *Gateway) SetTrustedCerts(certificates []tls.Certificate) {
 	gateway.trustedCerts = certificates
-	makeHttpTransport(gateway)
+	makeHTTPTransport(gateway)
 }

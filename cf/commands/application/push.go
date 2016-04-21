@@ -17,10 +17,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/stacks"
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/appfiles"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/manifest"
@@ -32,7 +32,7 @@ import (
 
 type Push struct {
 	ui            terminal.UI
-	config        core_config.Reader
+	config        coreconfig.Reader
 	manifestRepo  manifest.ManifestRepository
 	appStarter    ApplicationStarter
 	appStopper    ApplicationStopper
@@ -45,15 +45,15 @@ type Push struct {
 	authRepo      authentication.AuthenticationRepository
 	wordGenerator generator.WordGenerator
 	actor         actors.PushActor
-	zipper        app_files.Zipper
-	appfiles      app_files.AppFiles
+	zipper        appfiles.Zipper
+	appfiles      appfiles.AppFiles
 }
 
 func init() {
-	command_registry.Register(&Push{})
+	commandregistry.Register(&Push{})
 }
 
-func (cmd *Push) MetaData() command_registry.CommandMetadata {
+func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["b"] = &flags.StringFlag{ShortName: "b", Usage: T("Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'")}
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Startup command, set to null to reset to default start command")}
@@ -74,20 +74,42 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 	fs["no-start"] = &flags.BoolFlag{Name: "no-start", Usage: T("Do not start an app after pushing")}
 	fs["random-route"] = &flags.BoolFlag{Name: "random-route", Usage: T("Create a random route for this app")}
 	fs["route-path"] = &flags.StringFlag{Name: "route-path", Usage: T("Path for the route")}
-	fs["app-ports"] = &flags.StringFlag{Name: "app-ports", Usage: T("Comma delimited list of ports the application may listen on")}
+	// Hidden:true to hide app-ports for release #117189491
+	fs["app-ports"] = &flags.StringFlag{Name: "app-ports", Usage: T("Comma delimited list of ports the application may listen on"), Hidden: true}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "push",
 		ShortName:   "p",
 		Description: T("Push a new app or sync changes to an existing app"),
 		Usage: []string{
-			T("Push a single app (with or without a manifest):\n"),
-			T("   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"),
-			T("   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n"),
-			"   [--app-ports APP_PORTS] [--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
+			T("Push a single app (with or without a manifest)"),
+			":\n   ",
+			fmt.Sprintf("CF_NAME push %s ", T("APP_NAME")),
+			fmt.Sprintf("[-b %s] ", T("BUILDPACK_NAME")),
+			fmt.Sprintf("[-c %s] ", T("COMMAND")),
+			fmt.Sprintf("[-d %s] ", T("DOMAIN")),
+			fmt.Sprintf("[-f %s] ", T("MANIFEST_PATH")),
+			fmt.Sprintf("[--docker-image %s]", T("DOCKER_IMAGE")),
+			"\n   ",
+			fmt.Sprintf("[-i %s] ", T("NUM_INSTANCES")),
+			fmt.Sprintf("[-k %s] ", T("DISK")),
+			fmt.Sprintf("[-m %s] ", T("MEMORY")),
+			fmt.Sprintf("[--hostname %s] ", T("HOST")),
+			fmt.Sprintf("[-p %s] ", T("PATH")),
+			fmt.Sprintf("[-s %s] ", T("STACK")),
+			fmt.Sprintf("[-t %s] ", T("TIMEOUT")),
+			fmt.Sprintf("[-u %s] ", T("HEALTH_CHECK_TYPE")),
+			fmt.Sprintf("[--route-path %s] ", T("ROUTE_PATH")),
+			"\n   ",
+			// Commented to hide app-ports for release #117189491
+			// fmt.Sprintf("[--app-ports %s] ", T("APP_PORTS")),
+			"[--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
+			"\n   ",
+			T("Push multiple apps with a manifest"),
+			":\n   ",
+			"CF_NAME push ",
+			fmt.Sprintf("[-f %s] ", T("MANIFEST_PATH")),
 			"\n",
-			T("   Push multiple apps with a manifest:\n"),
-			T("   CF_NAME push [-f MANIFEST_PATH]\n"),
 		},
 		Flags: fs,
 	}
@@ -96,7 +118,7 @@ func (cmd *Push) MetaData() command_registry.CommandMetadata {
 func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	var reqs []requirements.Requirement
 
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd), "",
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd), "",
 		func() bool {
 			return len(fc.Args()) > 1
 		},
@@ -105,11 +127,11 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 	reqs = append(reqs, usageReq)
 
 	if fc.String("route-path") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--route-path'", cf.RoutePathMinimumAPIVersion))
 	}
 
 	if fc.String("app-ports") != "" {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumApiVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumAPIVersion))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{
@@ -120,23 +142,23 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 	return reqs
 }
 
-func (cmd *Push) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.manifestRepo = deps.ManifestRepo
 
 	//set appStarter
-	appCommand := command_registry.Commands.FindCommand("start")
+	appCommand := commandregistry.Commands.FindCommand("start")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appStarter = appCommand.(ApplicationStarter)
 
 	//set appStopper
-	appCommand = command_registry.Commands.FindCommand("stop")
+	appCommand = commandregistry.Commands.FindCommand("stop")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appStopper = appCommand.(ApplicationStopper)
 
 	//set serviceBinder
-	appCommand = command_registry.Commands.FindCommand("bind-service")
+	appCommand = commandregistry.Commands.FindCommand("bind-service")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.serviceBinder = appCommand.(service.ServiceBinder)
 
@@ -172,7 +194,7 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 			cmd.ui.Failed(T("Error: No name found for app"))
 		}
 
-		cmd.fetchStackGuid(&appParams)
+		cmd.fetchStackGUID(&appParams)
 
 		if c.IsSet("docker-image") {
 			diego := true
@@ -198,13 +220,13 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 				}
 			}
 
-			app, err = cmd.appRepo.Update(existingApp.Guid, appParams)
+			app, err = cmd.appRepo.Update(existingApp.GUID, appParams)
 			if err != nil {
 				cmd.ui.Failed(err.Error())
 			}
 		case *errors.ModelNotFoundError:
-			spaceGuid := cmd.config.SpaceFields().Guid
-			appParams.SpaceGuid = &spaceGuid
+			spaceGUID := cmd.config.SpaceFields().GUID
+			appParams.SpaceGUID = &spaceGUID
 
 			cmd.ui.Say(T("Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 				map[string]interface{}{
@@ -272,10 +294,10 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
 			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 
-		err = cmd.uploadApp(app.Guid, appDir, path, localFiles)
+		err = cmd.uploadApp(app.GUID, appDir, path, localFiles)
 		if err != nil {
-			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": err.Error()})))
+			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.APIErr}}",
+				map[string]interface{}{"APIErr": err.Error()})))
 			return
 		}
 		cmd.ui.Ok()
@@ -298,32 +320,76 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 
 	if routeDefined || defaultRouteAcceptable {
 		if appParams.Domains == nil {
-			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, cmd.findDomain(nil))
+			domain := cmd.findDomain(nil)
+			appParams.UseRandomPort = isTcp(domain)
+			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 		} else {
 			for _, d := range *(appParams.Domains) {
-				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, cmd.findDomain(&d))
+				domain := cmd.findDomain(&d)
+				appParams.UseRandomPort = isTcp(domain)
+				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 			}
 		}
 	}
 }
 
-func (cmd *Push) processDomainsAndBindRoutes(appParams models.AppParams, routeActor actors.RouteActor, app models.Application, domain models.DomainFields) {
+const TCP = "tcp"
+
+func isTcp(domain models.DomainFields) bool {
+	return domain.RouterGroupType == TCP
+}
+
+func (cmd *Push) processDomainsAndBindRoutes(
+	appParams models.AppParams,
+	routeActor actors.RouteActor,
+	app models.Application,
+	domain models.DomainFields,
+) {
 	if appParams.IsHostEmpty() {
-		cmd.createAndBindRoute(nil, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain, appParams.RoutePath)
+		cmd.createAndBindRoute(
+			nil,
+			appParams.UseRandomRoute,
+			appParams.UseRandomPort,
+			routeActor,
+			app,
+			appParams.NoHostname,
+			domain,
+			appParams.RoutePath,
+		)
 	} else {
 		for _, host := range *(appParams.Hosts) {
-			cmd.createAndBindRoute(&host, appParams.UseRandomHostname, routeActor, app, appParams.NoHostname, domain, appParams.RoutePath)
+			cmd.createAndBindRoute(
+				&host,
+				appParams.UseRandomRoute,
+				appParams.UseRandomPort,
+				routeActor,
+				app,
+				appParams.NoHostname,
+				domain,
+				appParams.RoutePath,
+			)
 		}
 	}
 }
 
-func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeActor actors.RouteActor, app models.Application, noHostName bool, domain models.DomainFields, routePath *string) {
+func (cmd *Push) createAndBindRoute(
+	host *string,
+	UseRandomRoute bool,
+	UseRandomPort bool,
+	routeActor actors.RouteActor,
+	app models.Application,
+	noHostName bool,
+	domain models.DomainFields,
+	routePath *string,
+) {
 	var hostname string
 	if !noHostName {
 		switch {
 		case host != nil:
 			hostname = *host
-		case UseRandomHostname:
+		case UseRandomPort:
+			//do nothing
+		case UseRandomRoute:
 			hostname = hostNameForString(app.Name) + "-" + cmd.wordGenerator.Babble()
 		default:
 			hostname = hostNameForString(app.Name)
@@ -332,9 +398,9 @@ func (cmd *Push) createAndBindRoute(host *string, UseRandomHostname bool, routeA
 
 	var route models.Route
 	if routePath != nil {
-		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath)
+		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath, UseRandomPort)
 	} else {
-		route = routeActor.FindOrCreateRoute(hostname, domain, "")
+		route = routeActor.FindOrCreateRoute(hostname, domain, "", UseRandomPort)
 	}
 	routeActor.BindRoute(app, route)
 }
@@ -349,13 +415,13 @@ func hostNameForString(name string) string {
 	return name
 }
 
-func (cmd *Push) findDomain(domainName *string) (domain models.DomainFields) {
-	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().Guid, domainName)
+func (cmd *Push) findDomain(domainName *string) models.DomainFields {
+	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().GUID, domainName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	return
+	return domain
 }
 
 func (cmd *Push) bindAppToServices(services []string, app models.Application) {
@@ -379,7 +445,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		err = cmd.serviceBinder.BindApplication(app, serviceInstance, nil)
 
 		switch httpErr := err.(type) {
-		case errors.HttpError:
+		case errors.HTTPError:
 			if httpErr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 				err = nil
 			}
@@ -394,7 +460,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 	}
 }
 
-func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
+func (cmd *Push) fetchStackGUID(appParams *models.AppParams) {
 	if appParams.StackName == nil {
 		return
 	}
@@ -410,7 +476,7 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	}
 
 	cmd.ui.Ok()
-	appParams.StackGuid = &stack.Guid
+	appParams.StackGUID = &stack.GUID
 }
 
 func (cmd *Push) restart(app models.Application, params models.AppParams, c flags.FlagContext) {
@@ -477,7 +543,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 			cmd.ui.Failed(
 				T("Manifest file is not found in the current directory, please provide either an app name or manifest") +
 					"\n\n" +
-					command_registry.Commands.CommandUsage("push"),
+					commandregistry.Commands.CommandUsage("push"),
 			)
 		} else {
 			err = addApp(&apps, contextApp)
@@ -539,9 +605,9 @@ func addApp(apps *[]models.AppParams, app models.AppParams) error {
 
 func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	appParams := models.AppParams{
-		NoRoute:           c.Bool("no-route"),
-		UseRandomHostname: c.Bool("random-route"),
-		NoHostname:        c.Bool("no-hostname"),
+		NoRoute:        c.Bool("no-route"),
+		UseRandomRoute: c.Bool("random-route"),
+		NoHostname:     c.Bool("no-hostname"),
 	}
 
 	if len(c.Args()) > 0 {
@@ -579,7 +645,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 		if buildpack == "null" || buildpack == "default" {
 			buildpack = ""
 		}
-		appParams.BuildpackUrl = &buildpack
+		appParams.BuildpackURL = &buildpack
 	}
 
 	if c.String("c") != "" {
@@ -658,7 +724,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	return appParams
 }
 
-func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
+func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
 	uploadDir, err := ioutil.TempDir("", "apps")
 	if err != nil {
 		return err
@@ -703,5 +769,5 @@ func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles [
 		}
 	}
 
-	return cmd.actor.UploadApp(appGuid, zipFile, remoteFiles)
+	return cmd.actor.UploadApp(appGUID, zipFile, remoteFiles)
 }

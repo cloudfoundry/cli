@@ -1,11 +1,11 @@
 package application_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,22 +22,22 @@ import (
 var _ = Describe("list-apps command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		appSummaryRepo      *testapi.FakeAppSummaryRepo
+		configRepo          coreconfig.Repository
+		appSummaryRepo      *apifakes.OldFakeAppSummaryRepo
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("apps").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("apps").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		appSummaryRepo = &testapi.FakeAppSummaryRepo{}
+		appSummaryRepo = new(apifakes.OldFakeAppSummaryRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
@@ -50,8 +50,8 @@ var _ = Describe("list-apps command", func() {
 				Domain: models.DomainFields{
 					Name:                   "cfapps.io",
 					Shared:                 true,
-					OwningOrganizationGuid: "org-123",
-					Guid: "domain-guid",
+					OwningOrganizationGUID: "org-123",
+					GUID: "domain-guid",
 				},
 			},
 			models.RouteSummary{
@@ -69,7 +69,7 @@ var _ = Describe("list-apps command", func() {
 
 		app := models.Application{}
 		app.Name = "Application-1"
-		app.Guid = "Application-1-guid"
+		app.GUID = "Application-1-guid"
 		app.State = "started"
 		app.RunningInstances = 1
 		app.InstanceCount = 1
@@ -80,7 +80,7 @@ var _ = Describe("list-apps command", func() {
 
 		app2 := models.Application{}
 		app2.Name = "Application-2"
-		app2.Guid = "Application-2-guid"
+		app2.GUID = "Application-2-guid"
 		app2.State = "started"
 		app2.RunningInstances = 1
 		app2.InstanceCount = 2
@@ -90,15 +90,15 @@ var _ = Describe("list-apps command", func() {
 
 		appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app, app2}
 
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("apps", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("apps", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
-		var cmd command_registry.Command
+		var cmd commandregistry.Command
 		var flagContext flags.FlagContext
 
 		BeforeEach(func() {
@@ -157,7 +157,7 @@ var _ = Describe("list-apps command", func() {
 		})
 
 		It("populates the plugin models upon execution", func() {
-			testcmd.RunCliCommand("apps", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCLICommand("apps", []string{}, requirementsFactory, updateCommandDependency, true)
 
 			Expect(pluginAppModels[0].Name).To(Equal("Application-1"))
 			Expect(pluginAppModels[0].Guid).To(Equal("Application-1-guid"))
@@ -168,7 +168,8 @@ var _ = Describe("list-apps command", func() {
 			Expect(pluginAppModels[0].RunningInstances).To(Equal(1))
 			Expect(pluginAppModels[0].Memory).To(Equal(int64(512)))
 			Expect(pluginAppModels[0].DiskQuota).To(Equal(int64(1024)))
-			Expect(pluginAppModels[0].AppPorts).To(Equal([]int{8080, 9090}))
+			// Commented to hide app-ports for release #117189491
+			// Expect(pluginAppModels[0].AppPorts).To(Equal([]int{8080, 9090}))
 			Expect(pluginAppModels[0].Routes[0].Host).To(Equal("app1"))
 			Expect(pluginAppModels[0].Routes[1].Host).To(Equal("app1"))
 			Expect(pluginAppModels[0].Routes[0].Domain.Name).To(Equal("cfapps.io"))
@@ -185,8 +186,8 @@ var _ = Describe("list-apps command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "requested state", "instances", "memory", "disk", "app ports", "urls"},
-				[]string{"Application-1", "started", "1/1", "512M", "1G", "8080, 9090", "app1.cfapps.io", "app1.example.com"},
+				[]string{"name", "requested state", "instances", "memory", "disk", "urls"},
+				[]string{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
 				[]string{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
 			))
 		})
@@ -200,7 +201,7 @@ var _ = Describe("list-apps command", func() {
 					}}
 				app := models.Application{}
 				app.Name = "Application-1"
-				app.Guid = "Application-1-guid"
+				app.GUID = "Application-1-guid"
 				app.State = "started"
 				app.RunningInstances = -1
 				app.InstanceCount = 2

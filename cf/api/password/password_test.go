@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("CloudControllerPasswordRepository", func() {
 	It("updates your password", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/Users/my-user-guid/password",
 			Matcher:  testnet.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`),
@@ -38,7 +38,7 @@ func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Serve
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetUaaEndpoint(passwordServer.URL)
-	gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerPasswordRepository(configRepo, gateway)
 	return
 }

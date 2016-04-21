@@ -1,11 +1,11 @@
 package space_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,29 +21,29 @@ var _ = Describe("space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		deps = command_registry.NewDependency(new(traceFakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("space", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -71,23 +71,29 @@ var _ = Describe("space command", func() {
 
 	Context("when logged in and an org is targeted", func() {
 		BeforeEach(func() {
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+			org := models.OrganizationFields{
+				Name: "my-org",
+				GUID: "my-org-guid",
+			}
 
-			app := models.ApplicationFields{}
-			app.Name = "app1"
-			app.Guid = "app1-guid"
+			app := models.ApplicationFields{
+				Name: "app1",
+				GUID: "app1-guid",
+			}
+
 			apps := []models.ApplicationFields{app}
 
-			domain := models.DomainFields{}
-			domain.Name = "domain1"
-			domain.Guid = "domain1-guid"
+			domain := models.DomainFields{
+				Name: "domain1",
+				GUID: "domain1-guid",
+			}
+
 			domains := []models.DomainFields{domain}
 
-			serviceInstance := models.ServiceInstanceFields{}
-			serviceInstance.Name = "service1"
-			serviceInstance.Guid = "service1-guid"
+			serviceInstance := models.ServiceInstanceFields{
+				Name: "service1",
+				GUID: "service1-guid",
+			}
 			services := []models.ServiceInstanceFields{serviceInstance}
 
 			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
@@ -98,30 +104,35 @@ var _ = Describe("space command", func() {
 			}}
 			securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
 
-			space := models.Space{}
-			space.Name = "whose-space-is-it-anyway"
-			space.Guid = "whose-space-is-it-anyway-guid"
-			space.Organization = org
-			space.Applications = apps
-			space.Domains = domains
-			space.ServiceInstances = services
-			space.SecurityGroups = securityGroups
-			space.SpaceQuotaGuid = "runaway-guid"
+			space := models.Space{
+				SpaceFields: models.SpaceFields{
+					Name: "whose-space-is-it-anyway",
+					GUID: "whose-space-is-it-anyway-guid",
+				},
+				Organization:     org,
+				Applications:     apps,
+				Domains:          domains,
+				ServiceInstances: services,
+				SecurityGroups:   securityGroups,
+				SpaceQuotaGUID:   "runaway-guid",
+			}
 
-			quota := models.SpaceQuota{}
-			quota.Guid = "runaway-guid"
-			quota.Name = "runaway"
-			quota.MemoryLimit = 102400
-			quota.InstanceMemoryLimit = -1
-			quota.RoutesLimit = 111
-			quota.ServicesLimit = 222
-			quota.NonBasicServicesAllowed = false
+			quota := models.SpaceQuota{
+				Name:                    "runaway",
+				GUID:                    "runaway-guid",
+				MemoryLimit:             102400,
+				InstanceMemoryLimit:     -1,
+				RoutesLimit:             111,
+				ServicesLimit:           222,
+				NonBasicServicesAllowed: false,
+				AppInstanceLimit:        7,
+			}
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
 			requirementsFactory.Space = space
 
-			quotaRepo.FindByGuidReturns(quota, nil)
+			quotaRepo.FindByGUIDReturns(quota, nil)
 		})
 
 		Context("when the guid flag is passed", func() {
@@ -168,17 +179,81 @@ var _ = Describe("space command", func() {
 					[]string{"Domains", "domain1"},
 					[]string{"Services", "service1"},
 					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-					[]string{"Space Quota", "runaway (100G memory limit, -1 instance memory limit, 111 routes, 222 services, paid services disallowed)"},
+					[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
 				))
+			})
+
+			Context("when the app instance limit is -1", func() {
+				BeforeEach(func() {
+					quota := models.SpaceQuota{
+						Name:                    "runaway",
+						GUID:                    "runaway-guid",
+						MemoryLimit:             102400,
+						InstanceMemoryLimit:     -1,
+						RoutesLimit:             111,
+						ServicesLimit:           222,
+						NonBasicServicesAllowed: false,
+						AppInstanceLimit:        -1,
+					}
+
+					quotaRepo.FindByGUIDReturns(quota, nil)
+				})
+
+				It("displays unlimited as the app instance limit", func() {
+					runCommand("whose-space-is-it-anyway")
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+						[]string{"OK"},
+						[]string{"whose-space-is-it-anyway"},
+						[]string{"Org", "my-org"},
+						[]string{"Apps", "app1"},
+						[]string{"Domains", "domain1"},
+						[]string{"Services", "service1"},
+						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+					))
+				})
+			})
+
+			Context("when the app instance limit is not provided", func() {
+				BeforeEach(func() {
+					quota := models.SpaceQuota{
+						Name:                    "runaway",
+						GUID:                    "runaway-guid",
+						MemoryLimit:             102400,
+						InstanceMemoryLimit:     -1,
+						RoutesLimit:             111,
+						ServicesLimit:           222,
+						NonBasicServicesAllowed: false,
+						AppInstanceLimit:        -1,
+					}
+
+					quotaRepo.FindByGUIDReturns(quota, nil)
+				})
+
+				It("displays unlimited as the app instance limit", func() {
+					runCommand("whose-space-is-it-anyway")
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+						[]string{"OK"},
+						[]string{"whose-space-is-it-anyway"},
+						[]string{"Org", "my-org"},
+						[]string{"Apps", "app1"},
+						[]string{"Domains", "domain1"},
+						[]string{"Services", "service1"},
+						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+					))
+				})
 			})
 
 		})
 
 		Context("when the space does not have a space quota", func() {
 			It("shows information without a space quota", func() {
-				requirementsFactory.Space.SpaceQuotaGuid = ""
+				requirementsFactory.Space.SpaceQuotaGUID = ""
 				runCommand("whose-space-is-it-anyway")
-				Expect(quotaRepo.FindByGuidCallCount()).To(Equal(0))
+				Expect(quotaRepo.FindByGUIDCallCount()).To(Equal(0))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 					[]string{"OK"},
@@ -203,7 +278,7 @@ var _ = Describe("space command", func() {
 			})
 
 			It("Fills in the PluginModel", func() {
-				testcmd.RunCliCommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
 				Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
 

@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,28 +18,28 @@ import (
 var _ = Describe("rename-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
-		serviceRepo         *testapi.FakeServiceRepository
+		config              coreconfig.Repository
+		serviceRepo         *apifakes.FakeServiceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("rename-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("rename-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -69,7 +69,7 @@ var _ = Describe("rename-service command", func() {
 		BeforeEach(func() {
 			serviceInstance = models.ServiceInstance{}
 			serviceInstance.Name = "different-name"
-			serviceInstance.Guid = "different-name-guid"
+			serviceInstance.GUID = "different-name-guid"
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true

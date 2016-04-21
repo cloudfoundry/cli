@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,26 +18,26 @@ import (
 var _ = Describe("set-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *fakes.FakeQuotaRepository
+		quotaRepo           *quotasfakes.FakeQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("set-quota").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("set-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		quotaRepo = &fakes.FakeQuotaRepository{}
+		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
@@ -73,9 +73,9 @@ var _ = Describe("set-quota command", func() {
 		It("assigns a quota to an org", func() {
 			org := models.Organization{}
 			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+			org.GUID = "my-org-guid"
 
-			quota := models.QuotaFields{Name: "my-quota", Guid: "my-quota-guid"}
+			quota := models.QuotaFields{Name: "my-quota", GUID: "my-quota-guid"}
 
 			quotaRepo.FindByNameReturns(quota, nil)
 			requirementsFactory.Organization = org
@@ -88,9 +88,9 @@ var _ = Describe("set-quota command", func() {
 			))
 
 			Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("my-quota"))
-			orgGuid, quotaGuid := quotaRepo.AssignQuotaToOrgArgsForCall(0)
-			Expect(orgGuid).To(Equal("my-org-guid"))
-			Expect(quotaGuid).To(Equal("my-quota-guid"))
+			orgGUID, quotaGUID := quotaRepo.AssignQuotaToOrgArgsForCall(0)
+			Expect(orgGUID).To(Equal("my-org-guid"))
+			Expect(quotaGUID).To(Equal("my-quota-guid"))
 		})
 	})
 })

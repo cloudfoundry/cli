@@ -4,14 +4,6 @@
     "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
-  },
-  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted."
   },
@@ -24,8 +16,16 @@
     "translation": "APP_INSTANCES"
   },
   {
+    "id": "APP_NAME",
+    "translation": "APP_NAME"
+  },
+  {
     "id": "App instance limit",
     "translation": "App instance limit"
+  },
+  {
+    "id": "BUILDPACK_NAME",
+    "translation": "BUILDPACK_NAME"
   },
   {
     "id": "Bind a service instance to an HTTP route",
@@ -144,10 +144,6 @@
     "translation": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"
   },
   {
-    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
-  },
-  {
     "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": "CF_NAME create-user USERNAME PASSWORD"
   },
@@ -182,10 +178,6 @@
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
     "translation": "CF_NAME delete-quota QUOTA [-f]"
-  },
-  {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
   },
   {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
@@ -306,10 +298,6 @@
   {
     "id": "CF_NAME logs APP_NAME",
     "translation": "CF_NAME logs APP_NAME"
-  },
-  {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
   },
   {
     "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
@@ -544,10 +532,6 @@
     "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
@@ -588,16 +572,16 @@
     "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
   },
   {
-    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
-  },
-  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
     "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
+  },
+  {
+    "id": "COMMAND",
+    "translation": "COMMAND"
   },
   {
     "id": "Cannot specify port together with hostname and/or path.",
@@ -628,6 +612,10 @@
     "translation": "Create an HTTP route"
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": "Creating random route for {{.Domain}}"
+  },
+  {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
   },
@@ -644,12 +632,28 @@
     "translation": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'"
   },
   {
+    "id": "DISK",
+    "translation": "DISK"
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": "DOCKER_IMAGE"
+  },
+  {
     "id": "DOMAIN",
     "translation": "DOMAIN"
   },
   {
     "id": "Dashboard: {{.URL}}",
     "translation": "Dashboard: {{.URL}}"
+  },
+  {
+    "id": "Delete a TCP route",
+    "translation": "Delete a TCP route"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": "Delete an HTTP route"
   },
   {
     "id": "EXAMPLES",
@@ -712,6 +716,14 @@
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": "HEALTH_CHECK_TYPE"
+  },
+  {
+    "id": "HOST",
+    "translation": "HOST"
+  },
+  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -730,6 +742,10 @@
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
+  },
+  {
+    "id": "Hostname used to identify the HTTP route",
+    "translation": "Hostname used to identify the HTTP route"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -772,12 +788,32 @@
     "translation": "List all available plugins in specified repository or in all added repositories"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": "MANIFEST_PATH"
+  },
+  {
+    "id": "MEMORY",
+    "translation": "MEMORY"
+  },
+  {
     "id": "Make the broker's service plans only visible within the targeted space",
     "translation": "Make the broker's service plans only visible within the targeted space"
   },
   {
+    "id": "Map a TCP route",
+    "translation": "Map a TCP route"
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": "Map an HTTP route"
+  },
+  {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
+  },
+  {
+    "id": "NUM_INSTANCES",
+    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name of a registered repository",
@@ -816,12 +852,16 @@
     "translation": "Path for the route"
   },
   {
-    "id": "Path used to identify the route",
-    "translation": "Path used to identify the route"
+    "id": "Path used to identify the HTTP route",
+    "translation": "Path used to identify the HTTP route"
   },
   {
     "id": "Port for the TCP route",
     "translation": "Port for the TCP route"
+  },
+  {
+    "id": "Port used to identify the TCP route",
+    "translation": "Port used to identify the TCP route"
   },
   {
     "id": "Provider",
@@ -830,6 +870,10 @@
   {
     "id": "QUOTA",
     "translation": "QUOTA"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": "ROUTE_PATH"
   },
   {
     "id": "Repository: ",
@@ -868,12 +912,20 @@
     "translation": "SPACE"
   },
   {
+    "id": "STACK",
+    "translation": "STACK"
+  },
+  {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
     "translation": "Server error, error code: 1002, message: cannot set space role because user is not part of the org"
   },
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
     "translation": "Skip verification of the API endpoint. Not recommended!"
+  },
+  {
+    "id": "TIMEOUT",
+    "translation": "TIMEOUT"
   },
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
@@ -892,8 +944,16 @@
     "translation": "The targeted API endpoint could not be reached."
   },
   {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
+  },
+  {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
     "translation": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)"
+  },
+  {
+    "id": "URL",
+    "translation": "URL"
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
@@ -924,12 +984,16 @@
     "translation": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
-    "id": "Update user-provided service instance",
-    "translation": "Update user-provided service instance"
+    "id": "Unmap a TCP route",
+    "translation": "Unmap a TCP route"
   },
   {
-    "id": "Url",
-    "translation": "Url"
+    "id": "Unmap an HTTP route",
+    "translation": "Unmap an HTTP route"
+  },
+  {
+    "id": "Update user-provided service instance",
+    "translation": "Update user-provided service instance"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
@@ -946,14 +1010,6 @@
   {
     "id": "app instance limit",
     "translation": "app instance limit"
-  },
-  {
-    "id": "app ports",
-    "translation": "app ports"
-  },
-  {
-    "id": "app ports:",
-    "translation": "app ports:"
   },
   {
     "id": "broker: {{.Name}}",
@@ -1016,7 +1072,7 @@
     "translation": "{{.AppInstanceLimit}} app instance limit"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
-    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}."
   }
 ]

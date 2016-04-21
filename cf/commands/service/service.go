@@ -3,7 +3,7 @@ package service
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -20,14 +20,14 @@ type ShowService struct {
 }
 
 func init() {
-	command_registry.Register(&ShowService{})
+	commandregistry.Register(&ShowService{})
 }
 
-func (cmd *ShowService) MetaData() command_registry.CommandMetadata {
+func (cmd *ShowService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service's guid.  All other output for the service is suppressed.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "service",
 		Description: T("Show service instance info"),
 		Usage: []string{
@@ -39,7 +39,7 @@ func (cmd *ShowService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("service"))
 	}
 
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
@@ -53,8 +53,8 @@ func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *ShowService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *ShowService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 
 	cmd.pluginCall = pluginCall
 	cmd.pluginModel = deps.PluginModels.Service
@@ -71,7 +71,7 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 	}
 
 	if c.Bool("guid") {
-		cmd.ui.Say(serviceInstance.Guid)
+		cmd.ui.Say(serviceInstance.GUID)
 	} else {
 		cmd.ui.Say("")
 		cmd.ui.Say(T("Service instance: {{.ServiceName}}", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceInstance.Name)}))
@@ -97,11 +97,11 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 			cmd.ui.Say(T("Description: {{.ServiceDescription}}", map[string]interface{}{"ServiceDescription": terminal.EntityNameColor(serviceInstance.ServiceOffering.Description)}))
 			cmd.ui.Say(T("Documentation url: {{.URL}}",
 				map[string]interface{}{
-					"URL": terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationUrl),
+					"URL": terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationURL),
 				}))
 			cmd.ui.Say(T("Dashboard: {{.URL}}",
 				map[string]interface{}{
-					"URL": terminal.EntityNameColor(serviceInstance.DashboardUrl),
+					"URL": terminal.EntityNameColor(serviceInstance.DashboardURL),
 				}))
 			cmd.ui.Say("")
 			cmd.ui.Say(T("Last Operation"))
@@ -146,8 +146,8 @@ func ServiceInstanceStateToStatus(operationType string, state string, isUserProv
 
 func (cmd *ShowService) populatePluginModel(serviceInstance models.ServiceInstance) {
 	cmd.pluginModel.Name = serviceInstance.Name
-	cmd.pluginModel.Guid = serviceInstance.Guid
-	cmd.pluginModel.DashboardUrl = serviceInstance.DashboardUrl
+	cmd.pluginModel.Guid = serviceInstance.GUID
+	cmd.pluginModel.DashboardUrl = serviceInstance.DashboardURL
 	cmd.pluginModel.IsUserProvided = serviceInstance.IsUserProvided()
 	cmd.pluginModel.LastOperation.Type = serviceInstance.LastOperation.Type
 	cmd.pluginModel.LastOperation.State = serviceInstance.LastOperation.State
@@ -155,7 +155,7 @@ func (cmd *ShowService) populatePluginModel(serviceInstance models.ServiceInstan
 	cmd.pluginModel.LastOperation.CreatedAt = serviceInstance.LastOperation.CreatedAt
 	cmd.pluginModel.LastOperation.UpdatedAt = serviceInstance.LastOperation.UpdatedAt
 	cmd.pluginModel.ServicePlan.Name = serviceInstance.ServicePlan.Name
-	cmd.pluginModel.ServicePlan.Guid = serviceInstance.ServicePlan.Guid
-	cmd.pluginModel.ServiceOffering.DocumentationUrl = serviceInstance.ServiceOffering.DocumentationUrl
+	cmd.pluginModel.ServicePlan.Guid = serviceInstance.ServicePlan.GUID
+	cmd.pluginModel.ServiceOffering.DocumentationUrl = serviceInstance.ServiceOffering.DocumentationURL
 	cmd.pluginModel.ServiceOffering.Name = serviceInstance.ServiceOffering.Label
 }

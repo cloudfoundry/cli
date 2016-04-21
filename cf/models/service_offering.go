@@ -1,13 +1,13 @@
 package models
 
 type ServiceOfferingFields struct {
-	Guid             string
-	BrokerGuid       string
+	GUID             string
+	BrokerGUID       string
 	Label            string
 	Provider         string
 	Version          string
 	Description      string
-	DocumentationUrl string
+	DocumentationURL string
 	Requires         []string
 }
 

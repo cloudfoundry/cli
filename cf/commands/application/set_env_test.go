@@ -3,9 +3,9 @@ package application_test
 import (
 	"errors"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,32 +20,32 @@ import (
 var _ = Describe("set-env command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		app                 models.Application
-		appRepo             *testApplication.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeApplicationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-env").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("set-env").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		app = models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
-		appRepo = &testApplication.FakeApplicationRepository{}
+		app.GUID = "my-app-guid"
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("set-env", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-env", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -103,7 +103,7 @@ var _ = Describe("set-env command", func() {
 
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				appGUID, params := appRepo.UpdateArgsForCall(0)
-				Expect(appGUID).To(Equal(app.Guid))
+				Expect(appGUID).To(Equal(app.GUID))
 				Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{
 					"DATABASE_URL": "mysql://new-example.com/my-db",
 					"foo":          "bar",

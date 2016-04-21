@@ -2,8 +2,8 @@ package servicekey
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -13,18 +13,18 @@ import (
 
 type ServiceKeys struct {
 	ui                         terminal.UI
-	config                     core_config.Reader
+	config                     coreconfig.Reader
 	serviceRepo                api.ServiceRepository
 	serviceKeyRepo             api.ServiceKeyRepository
 	serviceInstanceRequirement requirements.ServiceInstanceRequirement
 }
 
 func init() {
-	command_registry.Register(&ServiceKeys{})
+	commandregistry.Register(&ServiceKeys{})
 }
 
-func (cmd *ServiceKeys) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *ServiceKeys) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "service-keys",
 		ShortName:   "sk",
 		Description: T("List keys for a service instance"),
@@ -39,7 +39,7 @@ func (cmd *ServiceKeys) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ServiceKeys) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("service-keys"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("service-keys"))
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
@@ -51,8 +51,8 @@ func (cmd *ServiceKeys) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *ServiceKeys) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *ServiceKeys) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	cmd.serviceKeyRepo = deps.RepoLocator.GetServiceKeyRepository()
@@ -68,7 +68,7 @@ func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.Guid)
+	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

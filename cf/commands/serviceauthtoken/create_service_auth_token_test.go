@@ -1,9 +1,9 @@
 package serviceauthtoken_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,28 +18,28 @@ import (
 var _ = Describe("create-service-auth-token command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		authTokenRepo       *testapi.FakeAuthTokenRepo
+		configRepo          coreconfig.Repository
+		authTokenRepo       *apifakes.OldFakeAuthTokenRepo
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceAuthTokenRepository(authTokenRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service-auth-token").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-service-auth-token").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		authTokenRepo = &testapi.FakeAuthTokenRepo{}
+		authTokenRepo = new(apifakes.OldFakeAuthTokenRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-service-auth-token", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-service-auth-token", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

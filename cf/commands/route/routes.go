@@ -8,28 +8,29 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type ListRoutes struct {
-	ui        terminal.UI
-	routeRepo api.RouteRepository
-	config    core_config.Reader
+	ui         terminal.UI
+	routeRepo  api.RouteRepository
+	domainRepo api.DomainRepository
+	config     coreconfig.Reader
 }
 
 func init() {
-	command_registry.Register(&ListRoutes{})
+	commandregistry.Register(&ListRoutes{})
 }
 
-func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
+func (cmd *ListRoutes) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["orglevel"] = &flags.BoolFlag{Name: "orglevel", Usage: T("List all the routes for all spaces of current organization")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "routes",
 		ShortName:   "r",
 		Description: T("List all routes in the current space or the current organization"),
@@ -41,7 +42,7 @@ func (cmd *ListRoutes) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -57,10 +58,11 @@ func (cmd *ListRoutes) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *ListRoutes) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *ListRoutes) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
+	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
 	return cmd
 }
 
@@ -84,6 +86,12 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service")})
 
+	d := make(map[string]models.DomainFields)
+	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().GUID, func(domain models.DomainFields) bool {
+		d[domain.GUID] = domain
+		return true
+	})
+
 	var routesFound bool
 	cb := func(route models.Route) bool {
 		routesFound = true
@@ -97,13 +105,15 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			port = fmt.Sprintf("%d", route.Port)
 		}
 
+		domain := d[route.Domain.GUID]
+
 		table.Add(
 			route.Space.Name,
 			route.Host,
 			route.Domain.Name,
 			port,
 			route.Path,
-			strings.Join(route.Domain.RouterGroupTypes, ","),
+			domain.RouterGroupType,
 			strings.Join(appNames, ","),
 			route.ServiceInstance.Name,
 		)

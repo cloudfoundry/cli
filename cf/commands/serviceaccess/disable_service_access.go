@@ -3,8 +3,8 @@ package serviceaccess
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,21 +13,21 @@ import (
 
 type DisableServiceAccess struct {
 	ui             terminal.UI
-	config         core_config.Reader
+	config         coreconfig.Reader
 	actor          actors.ServicePlanActor
 	tokenRefresher authentication.TokenRefresher
 }
 
 func init() {
-	command_registry.Register(&DisableServiceAccess{})
+	commandregistry.Register(&DisableServiceAccess{})
 }
 
-func (cmd *DisableServiceAccess) MetaData() command_registry.CommandMetadata {
+func (cmd *DisableServiceAccess) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Disable access to a specified service plan")}
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Disable access for a specified organization")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "disable-service-access",
 		Description: T("Disable access to a service or service plan for one or all orgs"),
 		Usage: []string{
@@ -39,7 +39,7 @@ func (cmd *DisableServiceAccess) MetaData() command_registry.CommandMetadata {
 
 func (cmd *DisableServiceAccess) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("disable-service-access"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("disable-service-access"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -49,8 +49,8 @@ func (cmd *DisableServiceAccess) Requirements(requirementsFactory requirements.F
 	return reqs
 }
 
-func (cmd *DisableServiceAccess) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *DisableServiceAccess) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.actor = deps.ServicePlanHandler
 	cmd.tokenRefresher = deps.RepoLocator.GetAuthenticationRepository()

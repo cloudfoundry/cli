@@ -1,9 +1,9 @@
 package serviceauthtoken_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
@@ -20,28 +20,28 @@ import (
 var _ = Describe("delete-service-auth-token command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		authTokenRepo       *testapi.FakeAuthTokenRepo
+		configRepo          coreconfig.Repository
+		authTokenRepo       *apifakes.OldFakeAuthTokenRepo
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceAuthTokenRepository(authTokenRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service-auth-token").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-service-auth-token").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
-		authTokenRepo = &testapi.FakeAuthTokenRepo{}
+		authTokenRepo = new(apifakes.OldFakeAuthTokenRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, MaxAPIVersionSuccess: true}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-service-auth-token", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-service-auth-token", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -67,7 +67,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 	Context("when the service auth token exists", func() {
 		BeforeEach(func() {
 			authTokenRepo.FindByLabelAndProviderServiceAuthTokenFields = models.ServiceAuthTokenFields{
-				Guid:     "the-guid",
+				GUID:     "the-guid",
 				Label:    "a label",
 				Provider: "a provider",
 			}
@@ -82,7 +82,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 			Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
 			Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
-			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields.GUID).To(Equal("the-guid"))
 		})
 
 		It("does nothing when the user does not confirm", func() {
@@ -106,13 +106,13 @@ var _ = Describe("delete-service-auth-token command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields.GUID).To(Equal("the-guid"))
 		})
 	})
 
 	Context("when the service auth token does not exist", func() {
 		BeforeEach(func() {
-			authTokenRepo.FindByLabelAndProviderApiResponse = errors.NewModelNotFoundError("Service Auth Token", "")
+			authTokenRepo.FindByLabelAndProviderAPIResponse = errors.NewModelNotFoundError("Service Auth Token", "")
 		})
 
 		It("warns the user when the specified service auth token does not exist", func() {
@@ -129,7 +129,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 	Context("when there is an error deleting the service auth token", func() {
 		BeforeEach(func() {
-			authTokenRepo.FindByLabelAndProviderApiResponse = errors.New("OH NOES")
+			authTokenRepo.FindByLabelAndProviderAPIResponse = errors.New("OH NOES")
 		})
 
 		It("shows the user an error", func() {

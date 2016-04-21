@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -11,7 +11,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -24,34 +24,34 @@ import (
 var _ = Describe("services", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceSummaryRepo  *testapi.FakeServiceSummaryRepo
-		deps                command_registry.Dependency
+		serviceSummaryRepo  *apifakes.OldFakeServiceSummaryRepo
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetServiceSummaryRepository(serviceSummaryRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("services").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("services").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("services", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("services", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceSummaryRepo = &testapi.FakeServiceSummaryRepo{}
+		serviceSummaryRepo = new(apifakes.OldFakeServiceSummaryRepo)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 			TargetedOrgSuccess:   true,
 		}
 
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	Describe("services requirements", func() {
@@ -77,7 +77,7 @@ var _ = Describe("services", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -101,12 +101,12 @@ var _ = Describe("services", func() {
 
 	It("lists available services", func() {
 		plan := models.ServicePlanFields{
-			Guid: "spark-guid",
+			GUID: "spark-guid",
 			Name: "spark",
 		}
 
 		plan2 := models.ServicePlanFields{
-			Guid: "spark-guid-2",
+			GUID: "spark-guid-2",
 			Name: "spark-2",
 		}
 
@@ -176,12 +176,12 @@ var _ = Describe("services", func() {
 			pluginModels = []plugin_models.GetServices_Model{}
 			deps.PluginModels.Services = &pluginModels
 			plan := models.ServicePlanFields{
-				Guid: "spark-guid",
+				GUID: "spark-guid",
 				Name: "spark",
 			}
 
 			plan2 := models.ServicePlanFields{
-				Guid: "spark-guid-2",
+				GUID: "spark-guid-2",
 				Name: "spark-2",
 			}
 
@@ -189,7 +189,7 @@ var _ = Describe("services", func() {
 
 			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service-1"
-			serviceInstance.Guid = "123"
+			serviceInstance.GUID = "123"
 			serviceInstance.LastOperation.Type = "create"
 			serviceInstance.LastOperation.State = "in progress"
 			serviceInstance.LastOperation.Description = "fake state description"
@@ -199,7 +199,7 @@ var _ = Describe("services", func() {
 
 			serviceInstance2 := models.ServiceInstance{}
 			serviceInstance2.Name = "my-service-2"
-			serviceInstance2.Guid = "345"
+			serviceInstance2.GUID = "345"
 			serviceInstance2.LastOperation.Type = "create"
 			serviceInstance2.LastOperation.State = ""
 			serviceInstance2.LastOperation.Description = "fake state description"
@@ -209,7 +209,7 @@ var _ = Describe("services", func() {
 
 			userProvidedServiceInstance := models.ServiceInstance{}
 			userProvidedServiceInstance.Name = "my-service-provided-by-user"
-			userProvidedServiceInstance.Guid = "678"
+			userProvidedServiceInstance.GUID = "678"
 
 			serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
 
@@ -217,7 +217,7 @@ var _ = Describe("services", func() {
 		})
 
 		It("populates the plugin model", func() {
-			testcmd.RunCliCommand("services", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCLICommand("services", []string{}, requirementsFactory, updateCommandDependency, true)
 
 			Expect(len(pluginModels)).To(Equal(3))
 			Expect(pluginModels[0].Name).To(Equal("my-service-1"))

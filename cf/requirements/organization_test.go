@@ -3,7 +3,7 @@ package requirements_test
 import (
 	"errors"
 
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
@@ -11,12 +11,16 @@ import (
 )
 
 var _ = Describe("OrganizationRequirement", func() {
+	var orgRepo *organizationsfakes.FakeOrganizationRepository
+	BeforeEach(func() {
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
+	})
+
 	Context("when an org with the given name exists", func() {
 		It("succeeds", func() {
 			org := models.Organization{}
 			org.Name = "my-org-name"
-			org.Guid = "my-org-guid"
-			orgRepo := &test_org.FakeOrganizationRepository{}
+			org.GUID = "my-org-guid"
 			orgReq := NewOrganizationRequirement("my-org-name", orgRepo)
 
 			orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
@@ -30,8 +34,6 @@ var _ = Describe("OrganizationRequirement", func() {
 	})
 
 	It("fails when the org with the given name does not exist", func() {
-		orgRepo := &test_org.FakeOrganizationRepository{}
-
 		orgError := errors.New("not found")
 		orgRepo.FindByNameReturns(models.Organization{}, orgError)
 

@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,28 +22,28 @@ import (
 var _ = Describe("update-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
+		securityGroupRepo   *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(securityGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
+		securityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("update-security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-security-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -75,7 +75,7 @@ var _ = Describe("update-security-group command", func() {
 			securityGroup := models.SecurityGroup{
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name: "my-group-name",
-					Guid: "my-group-guid",
+					GUID: "my-group-guid",
 				},
 			}
 			securityGroupRepo.ReadReturns(securityGroup, nil)

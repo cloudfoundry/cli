@@ -2,15 +2,15 @@ package models
 
 type ServiceKeyFields struct {
 	Name                string
-	Guid                string
-	Url                 string
-	ServiceInstanceGuid string
-	ServiceInstanceUrl  string
+	GUID                string
+	URL                 string
+	ServiceInstanceGUID string
+	ServiceInstanceURL  string
 }
 
 type ServiceKeyRequest struct {
 	Name                string                 `json:"name"`
-	ServiceInstanceGuid string                 `json:"service_instance_guid"`
+	ServiceInstanceGUID string                 `json:"service_instance_guid"`
 	Params              map[string]interface{} `json:"parameters,omitempty"`
 }
 

@@ -82,10 +82,10 @@ type data struct {
 	Info string
 }
 
-func (d *data) JsonMarshalV3() ([]byte, error) {
+func (d *data) JSONMarshalV3() ([]byte, error) {
 	return json.MarshalIndent(d, "", "  ")
 }
 
-func (d *data) JsonUnmarshalV3(data []byte) error {
+func (d *data) JSONUnmarshalV3(data []byte) error {
 	return json.Unmarshal(data, d)
 }

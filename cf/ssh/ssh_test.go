@@ -24,9 +24,9 @@ import (
 	"github.com/cloudfoundry-incubator/diego-ssh/test_helpers/fake_ssh"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/ssh"
-	"github.com/cloudfoundry/cli/cf/ssh/fakes"
 	"github.com/cloudfoundry/cli/cf/ssh/options"
-	"github.com/cloudfoundry/cli/cf/ssh/terminal/terminal_helper_fakes"
+	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
+	"github.com/cloudfoundry/cli/cf/ssh/terminal/terminalhelperfakes"
 	"github.com/docker/docker/pkg/term"
 	"github.com/kr/pty"
 	"github.com/pivotal-golang/lager/lagertest"
@@ -38,13 +38,13 @@ import (
 
 var _ = Describe("SSH", func() {
 	var (
-		fakeTerminalHelper  *terminal_helper_fakes.FakeTerminalHelper
-		fakeListenerFactory *fakes.FakeListenerFactory
+		fakeTerminalHelper  *terminalhelperfakes.FakeTerminalHelper
+		fakeListenerFactory *sshfakes.FakeListenerFactory
 
 		fakeConnection    *fake_ssh.FakeConn
-		fakeSecureClient  *fakes.FakeSecureClient
-		fakeSecureDialer  *fakes.FakeSecureDialer
-		fakeSecureSession *fakes.FakeSecureSession
+		fakeSecureClient  *sshfakes.FakeSecureClient
+		fakeSecureDialer  *sshfakes.FakeSecureDialer
+		fakeSecureSession *sshfakes.FakeSecureSession
 
 		terminalHelper    terminal.TerminalHelper
 		keepAliveDuration time.Duration
@@ -59,10 +59,10 @@ var _ = Describe("SSH", func() {
 	)
 
 	BeforeEach(func() {
-		fakeTerminalHelper = &terminal_helper_fakes.FakeTerminalHelper{}
+		fakeTerminalHelper = &terminalhelperfakes.FakeTerminalHelper{}
 		terminalHelper = terminal.DefaultHelper()
 
-		fakeListenerFactory = &fakes.FakeListenerFactory{}
+		fakeListenerFactory = new(sshfakes.FakeListenerFactory)
 		fakeListenerFactory.ListenStub = net.Listen
 
 		keepAliveDuration = 30 * time.Second
@@ -73,9 +73,9 @@ var _ = Describe("SSH", func() {
 		token = ""
 
 		fakeConnection = &fake_ssh.FakeConn{}
-		fakeSecureClient = &fakes.FakeSecureClient{}
-		fakeSecureDialer = &fakes.FakeSecureDialer{}
-		fakeSecureSession = &fakes.FakeSecureSession{}
+		fakeSecureClient = new(sshfakes.FakeSecureClient)
+		fakeSecureDialer = new(sshfakes.FakeSecureDialer)
+		fakeSecureSession = new(sshfakes.FakeSecureSession)
 
 		fakeSecureDialer.DialReturns(fakeSecureClient, nil)
 		fakeSecureClient.NewSessionReturns(fakeSecureSession, nil)
@@ -187,7 +187,7 @@ var _ = Describe("SSH", func() {
 
 			currentApp.State = "STARTED"
 			currentApp.Diego = true
-			currentApp.Guid = "app-guid"
+			currentApp.GUID = "app-guid"
 			token = "bearer token"
 
 			interactiveSessionInvoker = func(secureShell sshCmd.SecureShell) {

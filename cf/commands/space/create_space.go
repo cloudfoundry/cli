@@ -4,11 +4,11 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,24 +19,24 @@ import (
 
 type CreateSpace struct {
 	ui              terminal.UI
-	config          core_config.Reader
+	config          coreconfig.Reader
 	spaceRepo       spaces.SpaceRepository
 	orgRepo         organizations.OrganizationRepository
 	userRepo        api.UserRepository
 	spaceRoleSetter user.SpaceRoleSetter
-	spaceQuotaRepo  space_quotas.SpaceQuotaRepository
+	spaceQuotaRepo  spacequotas.SpaceQuotaRepository
 }
 
 func init() {
-	command_registry.Register(&CreateSpace{})
+	commandregistry.Register(&CreateSpace{})
 }
 
-func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateSpace) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Organization")}
 	fs["q"] = &flags.StringFlag{ShortName: "q", Usage: T("Quota to assign to the newly created space")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-space",
 		Description: T("Create a space"),
 		Usage: []string{
@@ -48,7 +48,7 @@ func (cmd *CreateSpace) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-space"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -62,8 +62,8 @@ func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *CreateSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
@@ -71,7 +71,7 @@ func (cmd *CreateSpace) SetDependency(deps command_registry.Dependency, pluginCa
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 
 	//get command from registry for dependency
-	commandDep := command_registry.Commands.FindCommand("set-space-role")
+	commandDep := commandregistry.Commands.FindCommand("set-space-role")
 	commandDep = commandDep.SetDependency(deps, false)
 	cmd.spaceRoleSetter = commandDep.(user.SpaceRoleSetter)
 
@@ -82,10 +82,10 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[0]
 	orgName := c.String("o")
 	spaceQuotaName := c.String("q")
-	orgGuid := ""
+	orgGUID := ""
 	if orgName == "" {
 		orgName = cmd.config.OrganizationFields().Name
-		orgGuid = cmd.config.OrganizationFields().Guid
+		orgGUID = cmd.config.OrganizationFields().GUID
 	}
 
 	cmd.ui.Say(T("Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
@@ -95,7 +95,7 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	if orgGuid == "" {
+	if orgGUID == "" {
 		org, apiErr := cmd.orgRepo.FindByName(orgName)
 		switch apiErr.(type) {
 		case nil:
@@ -111,21 +111,21 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 			return
 		}
 
-		orgGuid = org.Guid
+		orgGUID = org.GUID
 	}
 
-	var spaceQuotaGuid string
+	var spaceQuotaGUID string
 	if spaceQuotaName != "" {
-		spaceQuota, err := cmd.spaceQuotaRepo.FindByNameAndOrgGuid(spaceQuotaName, orgGuid)
+		spaceQuota, err := cmd.spaceQuotaRepo.FindByNameAndOrgGUID(spaceQuotaName, orgGUID)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
-		spaceQuotaGuid = spaceQuota.Guid
+		spaceQuotaGUID = spaceQuota.GUID
 	}
 
-	space, err := cmd.spaceRepo.Create(spaceName, orgGuid, spaceQuotaGuid)
+	space, err := cmd.spaceRepo.Create(spaceName, orgGUID, spaceQuotaGUID)
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SpaceNameTaken {
+		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.SpaceNameTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Space {{.SpaceName}} already exists", map[string]interface{}{"SpaceName": spaceName}))
 			return
@@ -135,13 +135,13 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	}
 	cmd.ui.Ok()
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGuid(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_DEVELOPER, cmd.config.UserGuid(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_DEVELOPER, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

@@ -4,11 +4,11 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -22,38 +22,38 @@ import (
 var _ = Describe("auth command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
-		fakeLogger          *fakes.FakePrinter
+		deps                commandregistry.Dependency
+		fakeLogger          *tracefakes.FakePrinter
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("auth").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("auth").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			config.SetAccessToken("my-access-token")
 			config.SetRefreshToken("my-refresh-token")
 			return nil
 		}
 
-		fakeLogger = new(fakes.FakePrinter)
-		deps = command_registry.NewDependency(fakeLogger)
+		fakeLogger = new(tracefakes.FakePrinter)
+		deps = commandregistry.NewDependency(fakeLogger)
 	})
 
 	Describe("requirements", func() {
 		It("fails with usage when given too few arguments", func() {
-			testcmd.RunCliCommand("auth", []string{}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -61,19 +61,19 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
-			Expect(testcmd.RunCliCommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 	})
 
 	Context("when an api endpoint is targeted", func() {
 		BeforeEach(func() {
-			requirementsFactory.ApiEndpointSuccess = true
-			config.SetApiEndpoint("foo.example.org/authenticate")
+			requirementsFactory.APIEndpointSuccess = true
+			config.SetAPIEndpoint("foo.example.org/authenticate")
 		})
 
 		It("authenticates successfully", func() {
-			requirementsFactory.ApiEndpointSuccess = true
-			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			requirementsFactory.APIEndpointSuccess = true
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -88,11 +88,11 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-			config.SetMinCliVersion("5.0.0")
-			config.SetMinRecommendedCliVersion("5.5.0")
+			config.SetMinCLIVersion("5.0.0")
+			config.SetMinRecommendedCLIVersion("5.5.0")
 			cf.Version = "4.5.0"
 
-			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"To upgrade your CLI"},
@@ -101,20 +101,20 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
-			requirementsFactory.ApiEndpointSuccess = true
-			testcmd.RunCliCommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			requirementsFactory.APIEndpointSuccess = true
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
 			Expect(authRepo.GetLoginPromptsAndSaveUAAServerURLCallCount()).To(Equal(1))
 		})
 
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
 				authRepo.AuthenticateReturns(errors.New("Error authenticating."))
-				testcmd.RunCliCommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
 			})
 
 			It("does not prompt the user when provided username and password", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{config.ApiEndpoint()},
+					[]string{config.APIEndpoint()},
 					[]string{"Authenticating..."},
 					[]string{"FAILED"},
 					[]string{"Error authenticating"},

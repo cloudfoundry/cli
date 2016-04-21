@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -15,7 +15,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,26 +26,26 @@ var _ = Describe("logs command", func() {
 		ui                  *testterm.FakeUI
 		logsRepo            *logsfakes.FakeLogsRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		logsRepo = &logsfakes.FakeLogsRepository{}
+		logsRepo = new(logsfakes.FakeLogsRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("logs", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("logs", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -80,21 +80,21 @@ var _ = Describe("logs command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 
 			currentTime := time.Now()
 			recentLogs := []logs.Loggable{
-				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
-				testlogs.NewLogMessage("Log Line 2", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
+				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
+				testlogs.NewLogMessage("Log Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
 			}
 
 			appLogs := []logs.Loggable{
-				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 			}
 
 			requirementsFactory.Application = app
 			logsRepo.RecentLogsForReturns(recentLogs, nil)
-			logsRepo.TailLogsForStub = func(appGuid string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
+			logsRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 				onConnect()
 				go func() {
 					for _, log := range appLogs {
@@ -110,7 +110,7 @@ var _ = Describe("logs command", func() {
 			runCommand("--recent", "my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(app.Guid).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
+			Expect(app.GUID).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -121,7 +121,7 @@ var _ = Describe("logs command", func() {
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
 				logsRepo.RecentLogsForReturns([]logs.Loggable{
-					testlogs.NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+					testlogs.NewLogMessage("hello%2Bworld%v", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 				}, nil)
 			})
 
@@ -135,8 +135,8 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			appGuid, _, _, _ := logsRepo.TailLogsForArgsForCall(0)
-			Expect(app.Guid).To(Equal(appGuid))
+			appGUID, _, _, _ := logsRepo.TailLogsForArgsForCall(0)
+			Expect(app.GUID).To(Equal(appGUID))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},

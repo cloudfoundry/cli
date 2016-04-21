@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -20,7 +20,7 @@ import (
 
 var _ = Describe("Space Repository", func() {
 	It("lists all the spaces", func() {
-		firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		firstPageSpacesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1",
 			Response: testnet.TestResponse{
@@ -51,7 +51,7 @@ var _ = Describe("Space Repository", func() {
 					]
 				}`}})
 
-		secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		secondPageSpacesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1&page=2",
 			Response: testnet.TestResponse{
@@ -81,10 +81,10 @@ var _ = Describe("Space Repository", func() {
 		})
 
 		Expect(len(spaces)).To(Equal(2))
-		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
+		Expect(spaces[0].GUID).To(Equal("acceptance-space-guid"))
 		Expect(spaces[0].AllowSSH).To(BeTrue())
 		Expect(spaces[0].SecurityGroups[0].Name).To(Equal("imma-security-group"))
-		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
+		Expect(spaces[1].GUID).To(Equal("staging-space-guid"))
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(HaveAllRequestsCalled())
 	})
@@ -124,7 +124,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("creates spaces without a space-quota", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/spaces",
 			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid"}`),
@@ -145,12 +145,12 @@ var _ = Describe("Space Repository", func() {
 		space, apiErr := repo.Create("space-name", "my-org-guid", "")
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(space.Guid).To(Equal("space-guid"))
-		Expect(space.SpaceQuotaGuid).To(Equal(""))
+		Expect(space.GUID).To(Equal("space-guid"))
+		Expect(space.SpaceQuotaGUID).To(Equal(""))
 	})
 
 	It("creates spaces with a space-quota", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/spaces",
 			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid","space_quota_definition_guid":"space-quota-guid"}`),
@@ -172,12 +172,12 @@ var _ = Describe("Space Repository", func() {
 		space, apiErr := repo.Create("space-name", "my-org-guid", "space-quota-guid")
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(space.Guid).To(Equal("space-guid"))
-		Expect(space.SpaceQuotaGuid).To(Equal("space-quota-guid"))
+		Expect(space.GUID).To(Equal("space-guid"))
+		Expect(space.SpaceQuotaGUID).To(Equal("space-quota-guid"))
 	})
 
 	It("sets allow_ssh field", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/spaces/my-space-guid",
 			Matcher:  testnet.RequestBodyMatcher(`{"allow_ssh":true}`),
@@ -193,7 +193,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("renames spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/spaces/my-space-guid",
 			Matcher:  testnet.RequestBodyMatcher(`{"name":"new-space-name"}`),
@@ -209,7 +209,7 @@ var _ = Describe("Space Repository", func() {
 	})
 
 	It("deletes spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "DELETE",
 			Path:     "/v2/spaces/my-space-guid?recursive=true",
 			Response: testnet.TestResponse{Status: http.StatusOK},
@@ -224,7 +224,7 @@ var _ = Describe("Space Repository", func() {
 	})
 })
 
-func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
+func testSpacesFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository, string) (models.Space, error)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -287,9 +287,9 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
     }
   ]
 }`}
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
-		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
+		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGUID),
 		Response: findSpaceByNameResponse,
 	})
 
@@ -300,28 +300,28 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	Expect(handler).To(HaveAllRequestsCalled())
 	Expect(apiErr).NotTo(HaveOccurred())
 	Expect(space.Name).To(Equal("Space1"))
-	Expect(space.Guid).To(Equal("space1-guid"))
+	Expect(space.GUID).To(Equal("space1-guid"))
 
-	Expect(space.Organization.Guid).To(Equal("org1-guid"))
+	Expect(space.Organization.GUID).To(Equal("org1-guid"))
 
 	Expect(len(space.Applications)).To(Equal(2))
-	Expect(space.Applications[0].Guid).To(Equal("app1-guid"))
-	Expect(space.Applications[1].Guid).To(Equal("app2-guid"))
+	Expect(space.Applications[0].GUID).To(Equal("app1-guid"))
+	Expect(space.Applications[1].GUID).To(Equal("app2-guid"))
 
 	Expect(len(space.Domains)).To(Equal(1))
-	Expect(space.Domains[0].Guid).To(Equal("domain1-guid"))
+	Expect(space.Domains[0].GUID).To(Equal("domain1-guid"))
 
 	Expect(len(space.ServiceInstances)).To(Equal(1))
-	Expect(space.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+	Expect(space.ServiceInstances[0].GUID).To(Equal("service1-guid"))
 
 	Expect(apiErr).NotTo(HaveOccurred())
 	return
 }
 
-func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+func testSpacesDidNotFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository, string) (models.Space, error)) {
+	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
-		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
+		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGUID),
 		Response: testnet.TestResponse{
 			Status: http.StatusOK,
 			Body:   ` { "resources": [ ] }`,
@@ -340,8 +340,8 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
-	gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+	configRepo.SetAPIEndpoint(ts.URL)
+	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }

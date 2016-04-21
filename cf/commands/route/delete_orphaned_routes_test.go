@@ -1,7 +1,7 @@
 package route_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -9,9 +9,9 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,29 +20,29 @@ import (
 var _ = Describe("delete-orphaned-routes command", func() {
 	var (
 		ui         *testterm.FakeUI
-		routeRepo  *testapi.FakeRouteRepository
-		configRepo core_config.Repository
+		routeRepo  *apifakes.FakeRouteRepository
+		configRepo coreconfig.Repository
 		reqFactory *testreq.FakeReqFactory
-		deps       command_registry.Dependency
+		deps       commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-orphaned-routes").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-orphaned-routes").SetDependency(deps, pluginCall))
 	}
 
-	callDeleteOrphanedRoutes := func(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (*testterm.FakeUI, bool) {
+	callDeleteOrphanedRoutes := func(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *apifakes.FakeRouteRepository) (*testterm.FakeUI, bool) {
 		ui = &testterm.FakeUI{Inputs: []string{confirmation}}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		passed := testcmd.RunCliCommand("delete-orphaned-routes", args, reqFactory, updateCommandDependency, false)
+		passed := testcmd.RunCLICommand("delete-orphaned-routes", args, reqFactory, updateCommandDependency, false)
 
 		return ui, passed
 	}
 
 	BeforeEach(func() {
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		reqFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -52,7 +52,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 	})
 
 	Context("when arguments are provided", func() {
-		var cmd command_registry.Command
+		var cmd commandregistry.Command
 		var flagContext flags.FlagContext
 
 		BeforeEach(func() {
@@ -93,13 +93,13 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			routeRepo.ListRoutesStub = func(cb func(models.Route) bool) error {
 				route := models.Route{}
-				route.Guid = "route1-guid"
+				route.GUID = "route1-guid"
 				route.Host = "hostname-1"
 				route.Domain = domain
 				route.Apps = []models.ApplicationFields{app1}
 
 				route2 := models.Route{}
-				route2.Guid = "route2-guid"
+				route2.GUID = "route2-guid"
 				route2.Host = "hostname-2"
 				route2.Domain = domain2
 
@@ -138,7 +138,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				}
 
 				route2 := models.Route{}
-				route2.Guid = "route2-guid"
+				route2.GUID = "route2-guid"
 				route2.Host = "hostname-2"
 				route2.Domain = models.DomainFields{Name: "cookieclicker.co"}
 

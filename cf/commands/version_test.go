@@ -1,7 +1,7 @@
 package commands_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -15,14 +15,14 @@ import (
 var _ = Describe("Version", func() {
 	var (
 		ui  *testterm.FakeUI
-		cmd command_registry.Command
+		cmd commandregistry.Command
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 
-		deps := command_registry.Dependency{
-			Ui: ui,
+		deps := commandregistry.Dependency{
+			UI: ui,
 		}
 
 		cmd = &commands.Version{}

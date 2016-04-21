@@ -1,11 +1,11 @@
 package space_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,29 +23,29 @@ var _ = Describe("spaces command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		spaceRepo           *testapi.FakeSpaceRepository
+		configRepo          coreconfig.Repository
+		spaceRepo           *apifakes.FakeSpaceRepository
 
-		deps command_registry.Dependency
+		deps commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("spaces").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("spaces").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 		ui = &testterm.FakeUI{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("spaces", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("spaces", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -62,7 +62,7 @@ var _ = Describe("spaces command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -108,10 +108,10 @@ var _ = Describe("spaces command", func() {
 
 			space := models.Space{}
 			space.Name = "space1"
-			space.Guid = "123"
+			space.GUID = "123"
 			space2 := models.Space{}
 			space2.Name = "space2"
-			space2.Guid = "456"
+			space2.GUID = "456"
 			spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space, space2})
 
 			requirementsFactory.TargetedOrgSuccess = true
@@ -120,7 +120,7 @@ var _ = Describe("spaces command", func() {
 		})
 
 		It("populates the plugin models upon execution", func() {
-			testcmd.RunCliCommand("spaces", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCLICommand("spaces", []string{}, requirementsFactory, updateCommandDependency, true)
 			runCommand()
 			Expect(pluginModels[0].Name).To(Equal("space1"))
 			Expect(pluginModels[0].Guid).To(Equal("123"))

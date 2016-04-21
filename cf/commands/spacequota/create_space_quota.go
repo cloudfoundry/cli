@@ -1,10 +1,14 @@
 package spacequota
 
 import (
+	"fmt"
+
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/resources"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -16,28 +20,37 @@ import (
 
 type CreateSpaceQuota struct {
 	ui        terminal.UI
-	config    core_config.Reader
-	quotaRepo space_quotas.SpaceQuotaRepository
+	config    coreconfig.Reader
+	quotaRepo spacequotas.SpaceQuotaRepository
 	orgRepo   organizations.OrganizationRepository
 }
 
 func init() {
-	command_registry.Register(&CreateSpaceQuota{})
+	commandregistry.Register(&CreateSpaceQuota{})
 }
 
-func (cmd *CreateSpaceQuota) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateSpaceQuota) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans (Default: disallowed)")}
 	fs["i"] = &flags.StringFlag{ShortName: "i", Usage: T("Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)")}
 	fs["m"] = &flags.StringFlag{ShortName: "m", Usage: T("Total amount of memory a space can have (e.g. 1024M, 1G, 10G)")}
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
+	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-space-quota",
 		Description: T("Define a new space resource quota"),
 		Usage: []string{
-			T("CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"),
+			"CF_NAME create-space-quota ",
+			T("QUOTA"),
+			" ",
+			fmt.Sprintf("[-i %s] ", T("INSTANCE_MEMORY")),
+			fmt.Sprintf("[-m %s] ", T("MEMORY")),
+			fmt.Sprintf("[-r %s] ", T("ROUTES")),
+			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
+			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
+			"[--allow-paid-service-plans]",
 		},
 		Flags: fs,
 	}
@@ -45,7 +58,7 @@ func (cmd *CreateSpaceQuota) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("create-space-quota"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-space-quota"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -53,11 +66,15 @@ func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 
+	if fc.IsSet("a") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumAPIVersion))
+	}
+
 	return reqs
 }
 
-func (cmd *CreateSpaceQuota) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *CreateSpaceQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
@@ -76,7 +93,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 
 	quota := models.SpaceQuota{
 		Name:    name,
-		OrgGuid: org.Guid,
+		OrgGUID: org.GUID,
 	}
 
 	memoryLimit := context.String("m")
@@ -115,9 +132,15 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 		quota.NonBasicServicesAllowed = true
 	}
 
+	if context.IsSet("a") {
+		quota.AppInstanceLimit = context.Int("a")
+	} else {
+		quota.AppInstanceLimit = resources.UnlimitedAppInstances
+	}
+
 	err = cmd.quotaRepo.Create(quota)
 
-	httpErr, ok := err.(errors.HttpError)
+	httpErr, ok := err.(errors.HTTPError)
 	if ok && httpErr.ErrorCode() == errors.QuotaDefinitionNameTaken {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Space Quota Definition {{.QuotaName}} already exists", map[string]interface{}{"QuotaName": quota.Name}))

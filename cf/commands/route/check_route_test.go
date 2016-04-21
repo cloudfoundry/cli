@@ -4,15 +4,15 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -25,17 +25,17 @@ import (
 var _ = Describe("CheckRoute", func() {
 	var (
 		ui         *testterm.FakeUI
-		configRepo core_config.Repository
-		routeRepo  *fakeapi.FakeRouteRepository
-		domainRepo *fakeapi.FakeDomainRepository
+		configRepo coreconfig.Repository
+		routeRepo  *apifakes.FakeRouteRepository
+		domainRepo *apifakes.FakeDomainRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
-		targetedOrgRequirement   *fakerequirements.FakeTargetedOrgRequirement
+		targetedOrgRequirement   *requirementsfakes.FakeTargetedOrgRequirement
 		minAPIVersionRequirement requirements.Requirement
 	)
 
@@ -43,14 +43,14 @@ var _ = Describe("CheckRoute", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = &fakeapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		domainRepo = &fakeapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -60,12 +60,12 @@ var _ = Describe("CheckRoute", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		targetedOrgRequirement = &fakerequirements.FakeTargetedOrgRequirement{}
+		targetedOrgRequirement = new(requirementsfakes.FakeTargetedOrgRequirement)
 		factory.NewTargetedOrgRequirementReturns(targetedOrgRequirement)
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
@@ -143,7 +143,7 @@ var _ = Describe("CheckRoute", func() {
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 			configRepo.SetOrganizationFields(models.OrganizationFields{
-				Guid: "fake-org-guid",
+				GUID: "fake-org-guid",
 				Name: "fake-org-name",
 			})
 		})
@@ -169,7 +169,7 @@ var _ = Describe("CheckRoute", func() {
 
 			BeforeEach(func() {
 				actualDomain = models.DomainFields{
-					Guid: "domain-guid",
+					GUID: "domain-guid",
 					Name: "domain-name",
 				}
 				domainRepo.FindByNameInOrgReturns(actualDomain, nil)

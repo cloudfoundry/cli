@@ -3,36 +3,36 @@ package commands
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter -o fakes/fake_ssh_code_getter.go . SSHCodeGetter
+//go:generate counterfeiter . SSHCodeGetter
+
 type SSHCodeGetter interface {
-	command_registry.Command
+	commandregistry.Command
 	Get() (string, error)
 }
 
 type OneTimeSSHCode struct {
 	ui           terminal.UI
-	config       core_config.ReadWriter
+	config       coreconfig.ReadWriter
 	authRepo     authentication.AuthenticationRepository
-	endpointRepo api.EndpointRepository
+	endpointRepo coreconfig.EndpointRepository
 }
 
 func init() {
-	command_registry.Register(&OneTimeSSHCode{})
+	commandregistry.Register(&OneTimeSSHCode{})
 }
 
-func (cmd *OneTimeSSHCode) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *OneTimeSSHCode) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "ssh-code",
 		Description: T("Get a one time password for ssh clients"),
 		Usage: []string{
@@ -42,7 +42,7 @@ func (cmd *OneTimeSSHCode) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -51,14 +51,14 @@ func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory
 
 	reqs := []requirements.Requirement{
 		usageReq,
-		requirementsFactory.NewApiEndpointRequirement(),
+		requirementsFactory.NewAPIEndpointRequirement(),
 	}
 
 	return reqs
 }
 
-func (cmd *OneTimeSSHCode) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *OneTimeSSHCode) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()
@@ -76,9 +76,15 @@ func (cmd *OneTimeSSHCode) Execute(c flags.FlagContext) {
 }
 
 func (cmd *OneTimeSSHCode) Get() (string, error) {
-	_, err := cmd.endpointRepo.UpdateEndpoint(cmd.config.ApiEndpoint())
+	refresher := coreconfig.APIConfigRefresher{
+		Endpoint:     cmd.config.APIEndpoint(),
+		EndpointRepo: cmd.endpointRepo,
+		Config:       cmd.config,
+	}
+
+	_, err := refresher.Refresh()
 	if err != nil {
-		return "", errors.New(T("Error getting info from v2/info: ") + err.Error())
+		return "", errors.New("Error refreshing config: " + err.Error())
 	}
 
 	token, err := cmd.authRepo.RefreshAuthToken()

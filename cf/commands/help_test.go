@@ -1,10 +1,10 @@
 package commands_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
-	testconfig "github.com/cloudfoundry/cli/cf/configuration/plugin_config/fakes"
-	"github.com/cloudfoundry/cli/commands_loader"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
+	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
@@ -18,29 +18,29 @@ import (
 
 var _ = Describe("Help", func() {
 
-	commands_loader.Load()
+	commandsloader.Load()
 
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              *testconfig.FakePluginConfiguration
-		deps                command_registry.Dependency
+		config              *pluginconfigfakes.FakePluginConfiguration
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.PluginConfig = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("help").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("help").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		config = &testconfig.FakePluginConfiguration{}
+		config = new(pluginconfigfakes.FakePluginConfiguration)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("help", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("help", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when no argument is provided", func() {
@@ -72,8 +72,8 @@ var _ = Describe("Help", func() {
 
 	Context("when a command provided is a plugin command", func() {
 		BeforeEach(func() {
-			m := make(map[string]plugin_config.PluginMetadata)
-			m["fakePlugin"] = plugin_config.PluginMetadata{
+			m := make(map[string]pluginconfig.PluginMetadata)
+			m["fakePlugin"] = pluginconfig.PluginMetadata{
 				Commands: []plugin.Command{
 					plugin.Command{
 						Name:     "fakePluginCmd1",

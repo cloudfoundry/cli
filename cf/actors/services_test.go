@@ -2,9 +2,9 @@ package actors_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/actors"
-	broker_builder "github.com/cloudfoundry/cli/cf/actors/broker_builder/fakes"
-	service_builder "github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
-	organization_fakes "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder/brokerbuilderfakes"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder/servicebuilderfakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -15,35 +15,35 @@ import (
 var _ = Describe("Services", func() {
 	var (
 		actor          actors.ServiceActor
-		brokerBuilder  *broker_builder.FakeBrokerBuilder
-		serviceBuilder *service_builder.FakeServiceBuilder
-		orgRepo        *organization_fakes.FakeOrganizationRepository
+		brokerBuilder  *brokerbuilderfakes.FakeBrokerBuilder
+		serviceBuilder *servicebuilderfakes.FakeServiceBuilder
+		orgRepo        *organizationsfakes.FakeOrganizationRepository
 		serviceBroker1 models.ServiceBroker
 		service1       models.ServiceOffering
 	)
 
 	BeforeEach(func() {
-		orgRepo = &organization_fakes.FakeOrganizationRepository{}
-		brokerBuilder = &broker_builder.FakeBrokerBuilder{}
-		serviceBuilder = &service_builder.FakeServiceBuilder{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
+		brokerBuilder = new(brokerbuilderfakes.FakeBrokerBuilder)
+		serviceBuilder = new(servicebuilderfakes.FakeServiceBuilder)
 
 		actor = actors.NewServiceHandler(orgRepo, brokerBuilder, serviceBuilder)
 
-		serviceBroker1 = models.ServiceBroker{Guid: "my-service-broker-guid1", Name: "my-service-broker1"}
+		serviceBroker1 = models.ServiceBroker{GUID: "my-service-broker-guid1", Name: "my-service-broker1"}
 
 		service1 = models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{
 			Label:      "my-service1",
-			Guid:       "service-guid1",
-			BrokerGuid: "my-service-broker-guid1"},
+			GUID:       "service-guid1",
+			BrokerGUID: "my-service-broker-guid1"},
 		}
 
 		org1 := models.Organization{}
 		org1.Name = "org1"
-		org1.Guid = "org-guid"
+		org1.GUID = "org-guid"
 
 		org2 := models.Organization{}
 		org2.Name = "org2"
-		org2.Guid = "org2-guid"
+		org2.GUID = "org2-guid"
 	})
 
 	Describe("FilterBrokers", func() {
@@ -83,7 +83,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers)).To(Equal(1))
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -110,7 +110,7 @@ var _ = Describe("Services", func() {
 
 				Expect(len(brokers)).To(Equal(1))
 				Expect(len(brokers[0].Services)).To(Equal(1))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 
 			Context("when the -b AND -e intersection is the empty set", func() {
@@ -156,7 +156,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -175,7 +175,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -194,7 +194,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 	})

@@ -172,7 +172,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 
 	var appParams models.AppParams
 	var errs []error
-	appParams.BuildpackUrl = stringValOrDefault(yamlMap, "buildpack", &errs)
+	appParams.BuildpackURL = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 
 	domainAry := *sliceOrEmptyVal(yamlMap, "domains", &errs)
@@ -196,7 +196,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
 	appParams.NoHostname = boolVal(yamlMap, "no-hostname", &errs)
-	appParams.UseRandomHostname = boolVal(yamlMap, "random-route", &errs)
+	appParams.UseRandomRoute = boolVal(yamlMap, "random-route", &errs)
 	appParams.ServicesToBind = sliceOrEmptyVal(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 	appParams.HealthCheckType = stringVal(yamlMap, "health-check-type", &errs)

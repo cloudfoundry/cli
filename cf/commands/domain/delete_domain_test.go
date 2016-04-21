@@ -1,9 +1,9 @@
 package domain_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,17 +19,17 @@ import (
 var _ = Describe("delete-domain command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		domainRepo          *testapi.FakeDomainRepository
+		configRepo          coreconfig.Repository
+		domainRepo          *apifakes.FakeDomainRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-domain").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-domain").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -37,7 +37,7 @@ var _ = Describe("delete-domain command", func() {
 			Inputs: []string{"yes"},
 		}
 
-		domainRepo = &testapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:       true,
 			TargetedOrgSuccess: true,
@@ -46,7 +46,7 @@ var _ = Describe("delete-domain command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-domain", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-domain", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -68,7 +68,7 @@ var _ = Describe("delete-domain command", func() {
 			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name:   "foo1.com",
-					Guid:   "foo1-guid",
+					GUID:   "foo1-guid",
 					Shared: true,
 				}, nil)
 		})
@@ -92,7 +92,7 @@ var _ = Describe("delete-domain command", func() {
 			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name: "foo.com",
-					Guid: "foo-guid",
+					GUID: "foo-guid",
 				}, nil)
 		})
 

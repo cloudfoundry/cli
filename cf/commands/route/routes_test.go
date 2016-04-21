@@ -3,10 +3,11 @@ package route_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -22,17 +23,18 @@ import (
 var _ = Describe("routes command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		routeRepo           *testapi.FakeRouteRepository
-		configRepo          core_config.Repository
+		routeRepo           *apifakes.FakeRouteRepository
+		domainRepo          *apifakes.FakeDomainRepository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
+		deps.UI = ui
+		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo).SetDomainRepository(domainRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("routes").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("routes").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -42,11 +44,12 @@ var _ = Describe("routes command", func() {
 			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
 		}
-		routeRepo = &testapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
+		domainRepo = new(apifakes.FakeDomainRepository)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("routes", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("routes", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("login requirements", func() {
@@ -62,7 +65,7 @@ var _ = Describe("routes command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -86,6 +89,17 @@ var _ = Describe("routes command", func() {
 
 	Context("when there are routes", func() {
 		BeforeEach(func() {
+			cookieClickerGUID := "cookie-clicker-guid"
+
+			domainRepo.ListDomainsForOrgStub = func(_ string, cb func(models.DomainFields) bool) error {
+				tcpDomain := models.DomainFields{
+					GUID:            cookieClickerGUID,
+					RouterGroupType: "tcp",
+				}
+				cb(tcpDomain)
+				return nil
+			}
+
 			routeRepo.ListRoutesStub = func(cb func(models.Route) bool) error {
 				app1 := models.ApplicationFields{Name: "dora"}
 				app2 := models.ApplicationFields{Name: "bora"}
@@ -99,7 +113,7 @@ var _ = Describe("routes command", func() {
 					Apps:   []models.ApplicationFields{app1},
 					ServiceInstance: models.ServiceInstanceFields{
 						Name: "test-service",
-						Guid: "service-guid",
+						GUID: "service-guid",
 					},
 				}
 
@@ -118,9 +132,8 @@ var _ = Describe("routes command", func() {
 						Name: "my-space",
 					},
 					Domain: models.DomainFields{
+						GUID: cookieClickerGUID,
 						Name: "cookieclicker.co",
-						RouterGroupTypes: []string{
-							"tcp", "bar"},
 					},
 					Apps: []models.ApplicationFields{app1, app2},
 					Port: 9090,
@@ -142,9 +155,10 @@ var _ = Describe("routes command", func() {
 				[]string{"space", "host", "domain", "port", "path", "type", "apps", "service"},
 			))
 
-			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`)))
-			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`)))
-			Expect(ui.Outputs).To(ContainElement(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp,bar\s+dora,bora\s*$`)))
+			Expect(terminal.Decolorize(ui.Outputs[3])).To(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs[4])).To(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp\s+dora,bora\s*$`))
+
 		})
 	})
 
@@ -167,7 +181,7 @@ var _ = Describe("routes command", func() {
 				route.Space = space1
 				route.ServiceInstance = models.ServiceInstanceFields{
 					Name: "test-service",
-					Guid: "service-guid",
+					GUID: "service-guid",
 				}
 
 				route2 := models.Route{}

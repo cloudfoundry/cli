@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -20,13 +20,13 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 	var (
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
-		configRepo  core_config.ReadWriter
+		configRepo  coreconfig.ReadWriter
 		repo        CloudControllerServicePlanVisibilityRepository
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerServicePlanVisibilityRepository(configRepo, gateway)
 	})
 
@@ -36,12 +36,12 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 
 	setupTestServer := func(reqs ...testnet.TestRequest) {
 		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetApiEndpoint(testServer.URL)
+		configRepo.SetAPIEndpoint(testServer.URL)
 	}
 
 	Describe(".Create", func() {
 		BeforeEach(func() {
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/service_plan_visibilities",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"service_plan_guid", "organization_guid":"org_guid"}`),
@@ -68,28 +68,28 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(servicePlansVisibilitiesFields)).To(Equal(2))
-			Expect(servicePlansVisibilitiesFields[0].Guid).To(Equal("request-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].ServicePlanGuid).To(Equal("service-plan-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].OrganizationGuid).To(Equal("org-guid-1"))
-			Expect(servicePlansVisibilitiesFields[1].Guid).To(Equal("request-guid-2"))
-			Expect(servicePlansVisibilitiesFields[1].ServicePlanGuid).To(Equal("service-plan-guid-2"))
-			Expect(servicePlansVisibilitiesFields[1].OrganizationGuid).To(Equal("org-guid-2"))
+			Expect(servicePlansVisibilitiesFields[0].GUID).To(Equal("request-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].ServicePlanGUID).To(Equal("service-plan-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].OrganizationGUID).To(Equal("org-guid-1"))
+			Expect(servicePlansVisibilitiesFields[1].GUID).To(Equal("request-guid-2"))
+			Expect(servicePlansVisibilitiesFields[1].ServicePlanGUID).To(Equal("service-plan-guid-2"))
+			Expect(servicePlansVisibilitiesFields[1].OrganizationGUID).To(Equal("org-guid-2"))
 		})
 	})
 
 	Describe(".Delete", func() {
 		It("deletes a service plan visibility", func() {
-			servicePlanVisibilityGuid := "the-service-plan-visibility-guid"
-			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			servicePlanVisibilityGUID := "the-service-plan-visibility-guid"
+			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "DELETE",
-				Path:    "/v2/service_plan_visibilities/" + servicePlanVisibilityGuid,
+				Path:    "/v2/service_plan_visibilities/" + servicePlanVisibilityGUID,
 				Matcher: testnet.EmptyQueryParamMatcher(),
 				Response: testnet.TestResponse{
 					Status: http.StatusNoContent,
 				},
 			}))
 
-			err := repo.Delete(servicePlanVisibilityGuid)
+			err := repo.Delete(servicePlanVisibilityGUID)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -102,14 +102,14 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(servicePlansVisibilitiesFields)).To(Equal(1))
-			Expect(servicePlansVisibilitiesFields[0].Guid).To(Equal("request-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].ServicePlanGuid).To(Equal("service-plan-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].OrganizationGuid).To(Equal("org-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].GUID).To(Equal("request-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].ServicePlanGUID).To(Equal("service-plan-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].OrganizationGUID).To(Equal("org-guid-1"))
 		})
 	})
 })
 
-var firstPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstPlanVisibilityRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plan_visibilities",
 	Response: testnet.TestResponse{
@@ -133,7 +133,7 @@ var firstPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.T
 	},
 })
 
-var secondPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPlanVisibilityRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plan_visibilities?page=2",
 	Response: testnet.TestResponse{
@@ -156,7 +156,7 @@ var secondPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.
 	},
 })
 
-var searchPlanVisibilityRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var searchPlanVisibilityRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/service_plan_visibilities?q=service_plan_guid%3Aservice-plan-guid-1%3Borganization_guid%3Aorg-guid-1",
 	Response: testnet.TestResponse{

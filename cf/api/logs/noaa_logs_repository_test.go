@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 
@@ -24,7 +24,7 @@ import (
 var _ = Describe("logs with noaa repository", func() {
 	var (
 		fakeNoaaConsumer   *testapi.FakeNoaaConsumer
-		config             core_config.ReadWriter
+		config             coreconfig.ReadWriter
 		fakeTokenRefresher *authenticationfakes.FakeAuthenticationRepository
 		repo               *logs.NoaaLogsRepository
 	)

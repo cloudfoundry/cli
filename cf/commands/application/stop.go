@@ -7,32 +7,33 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter -o fakes/fake_application_stopper.go . ApplicationStopper
+//go:generate counterfeiter . ApplicationStopper
+
 type ApplicationStopper interface {
-	command_registry.Command
+	commandregistry.Command
 	ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
 type Stop struct {
 	ui      terminal.UI
-	config  core_config.Reader
+	config  coreconfig.Reader
 	appRepo applications.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
 func init() {
-	command_registry.Register(&Stop{})
+	commandregistry.Register(&Stop{})
 }
 
-func (cmd *Stop) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Stop) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "stop",
 		ShortName:   "sp",
 		Description: T("Stop an app"),
@@ -44,7 +45,7 @@ func (cmd *Stop) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Stop) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("stop"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("stop"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -58,8 +59,8 @@ func (cmd *Stop) Requirements(requirementsFactory requirements.Factory, fc flags
 	return reqs
 }
 
-func (cmd *Stop) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Stop) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	return cmd
@@ -79,7 +80,7 @@ func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName stri
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	state := "STOPPED"
-	updatedApp, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+	updatedApp, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
 	if apiErr != nil {
 		err = errors.New(apiErr.Error())
 		cmd.ui.Failed(apiErr.Error())

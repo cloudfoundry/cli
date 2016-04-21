@@ -11,11 +11,11 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/api/logs"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -31,25 +31,28 @@ const (
 
 const LogMessageTypeStaging = "STG"
 
+//go:generate counterfeiter . ApplicationStagingWatcher
+
 type ApplicationStagingWatcher interface {
 	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-//go:generate counterfeiter -o fakes/fake_application_starter.go . ApplicationStarter
+//go:generate counterfeiter . ApplicationStarter
+
 type ApplicationStarter interface {
-	command_registry.Command
+	commandregistry.Command
 	SetStartTimeoutInSeconds(timeout int)
 	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
 
 type Start struct {
 	ui               terminal.UI
-	config           core_config.Reader
+	config           coreconfig.Reader
 	appDisplayer     ApplicationDisplayer
 	appReq           requirements.ApplicationRequirement
 	appRepo          applications.ApplicationRepository
-	appInstancesRepo app_instances.AppInstancesRepository
 	logRepo          logs.LogsRepository
+	appInstancesRepo appinstances.AppInstancesRepository
 
 	LogServerConnectionTimeout time.Duration
 	StartupTimeout             time.Duration
@@ -58,11 +61,11 @@ type Start struct {
 }
 
 func init() {
-	command_registry.Register(&Start{})
+	commandregistry.Register(&Start{})
 }
 
-func (cmd *Start) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Start) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "start",
 		ShortName:   "st",
 		Description: T("Start an app"),
@@ -74,7 +77,7 @@ func (cmd *Start) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("start"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("start"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -88,8 +91,8 @@ func (cmd *Start) Requirements(requirementsFactory requirements.Factory, fc flag
 	return reqs
 }
 
-func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Start) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
@@ -119,7 +122,7 @@ func (cmd *Start) SetDependency(deps command_registry.Dependency, pluginCall boo
 		cmd.StartupTimeout = DefaultStartupTimeout
 	}
 
-	appCommand := command_registry.Commands.FindCommand("app")
+	appCommand := commandregistry.Commands.FindCommand("app")
 	appCommand = appCommand.SetDependency(deps, false)
 	cmd.appDisplayer = appCommand.(ApplicationDisplayer)
 
@@ -145,7 +148,7 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 		state := "STARTED"
-		return cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+		return cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
 	})
 }
 
@@ -185,8 +188,8 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	cmd.ui.Say("")
 	cmd.ui.Ok()
 
-	//detected start command on first push is not present until starting completes
-	startedApp, apiErr := cmd.appRepo.GetApp(updatedApp.Guid)
+	//detectedstartcommand on first push is not present until starting completes
+	startedApp, apiErr := cmd.appRepo.GetApp(updatedApp.GUID)
 	if err != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -230,7 +233,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, st
 
 	defer doneWait.Done()
 
-	go cmd.logRepo.TailLogsFor(app.Guid, onConnect, c, e)
+	go cmd.logRepo.TailLogsFor(app.GUID, onConnect, c, e)
 
 	for {
 		select {
@@ -277,10 +280,10 @@ func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
 	var err error
 
 	if cmd.StagingTimeout == 0 {
-		app, err = cmd.appRepo.GetApp(app.Guid)
+		app, err = cmd.appRepo.GetApp(app.GUID)
 	} else {
 		for app.PackageState != "STAGED" && app.PackageState != "FAILED" && time.Since(stagingStartTime) < cmd.StagingTimeout {
-			app, err = cmd.appRepo.GetApp(app.Guid)
+			app, err = cmd.appRepo.GetApp(app.GUID)
 			if err != nil {
 				break
 			}
@@ -336,7 +339,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 			return
 
 		default:
-			count, err := cmd.fetchInstanceCount(app.Guid)
+			count, err := cmd.fetchInstanceCount(app.GUID)
 			if err != nil {
 				cmd.ui.Warn("Could not fetch instance count: %s", err.Error())
 				time.Sleep(cmd.PingerThrottle)
@@ -370,12 +373,12 @@ type instanceCount struct {
 	total           int
 }
 
-func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
+func (cmd Start) fetchInstanceCount(appGUID string) (instanceCount, error) {
 	count := instanceCount{
 		startingDetails: make(map[string]struct{}),
 	}
 
-	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGuid)
+	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGUID)
 	if apiErr != nil {
 		return instanceCount{}, apiErr
 	}

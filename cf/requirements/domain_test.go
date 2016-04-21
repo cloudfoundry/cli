@@ -1,8 +1,8 @@
 package requirements_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
@@ -12,16 +12,16 @@ import (
 )
 
 var _ = Describe("DomainRequirement", func() {
-	var config core_config.ReadWriter
+	var config coreconfig.ReadWriter
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		config.SetOrganizationFields(models.OrganizationFields{Guid: "the-org-guid"})
+		config.SetOrganizationFields(models.OrganizationFields{GUID: "the-org-guid"})
 	})
 
 	It("succeeds when the domain is found", func() {
-		domain := models.DomainFields{Name: "example.com", Guid: "domain-guid"}
-		domainRepo := &testapi.FakeDomainRepository{}
+		domain := models.DomainFields{Name: "example.com", GUID: "domain-guid"}
+		domainRepo := new(apifakes.FakeDomainRepository)
 		domainRepo.FindByNameInOrgReturns(domain, nil)
 		domainReq := NewDomainRequirement("example.com", config, domainRepo)
 		err := domainReq.Execute()
@@ -34,7 +34,7 @@ var _ = Describe("DomainRequirement", func() {
 	})
 
 	It("fails when the domain is not found", func() {
-		domainRepo := &testapi.FakeDomainRepository{}
+		domainRepo := new(apifakes.FakeDomainRepository)
 		domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.NewModelNotFoundError("Domain", ""))
 		domainReq := NewDomainRequirement("example.com", config, domainRepo)
 
@@ -45,7 +45,7 @@ var _ = Describe("DomainRequirement", func() {
 	})
 
 	It("fails when an error occurs fetching the domain", func() {
-		domainRepo := &testapi.FakeDomainRepository{}
+		domainRepo := new(apifakes.FakeDomainRepository)
 		domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.New("an-error"))
 		domainReq := NewDomainRequirement("example.com", config, domainRepo)
 

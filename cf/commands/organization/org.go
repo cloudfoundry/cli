@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -19,20 +19,20 @@ import (
 
 type ShowOrg struct {
 	ui          terminal.UI
-	config      core_config.Reader
+	config      coreconfig.Reader
 	orgReq      requirements.OrganizationRequirement
 	pluginModel *plugin_models.GetOrg_Model
 	pluginCall  bool
 }
 
 func init() {
-	command_registry.Register(&ShowOrg{})
+	commandregistry.Register(&ShowOrg{})
 }
 
-func (cmd *ShowOrg) MetaData() command_registry.CommandMetadata {
+func (cmd *ShowOrg) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given org's guid.  All other output for the org is suppressed.")}
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "org",
 		Description: T("Show org info"),
 		Usage: []string{
@@ -44,7 +44,7 @@ func (cmd *ShowOrg) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("org"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("org"))
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -57,8 +57,8 @@ func (cmd *ShowOrg) Requirements(requirementsFactory requirements.Factory, fc fl
 	return reqs
 }
 
-func (cmd *ShowOrg) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *ShowOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.pluginCall = pluginCall
 	cmd.pluginModel = deps.PluginModels.Organization
@@ -69,7 +69,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 	org := cmd.orgReq.GetOrganization()
 
 	if c.Bool("guid") {
-		cmd.ui.Say(org.Guid)
+		cmd.ui.Say(org.GUID)
 	} else {
 		cmd.ui.Say(T("Getting info for org {{.OrgName}} as {{.Username}}...",
 			map[string]interface{}{
@@ -78,7 +78,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 
-		table := terminal.NewTable(cmd.ui, []string{terminal.EntityNameColor(org.Name) + ":", "", ""})
+		table := cmd.ui.Table([]string{terminal.EntityNameColor(org.Name) + ":", "", ""})
 
 		domains := []string{}
 		for _, domain := range org.Domains {
@@ -127,7 +127,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 
 func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.QuotaFields) {
 	cmd.pluginModel.Name = org.Name
-	cmd.pluginModel.Guid = org.Guid
+	cmd.pluginModel.Guid = org.GUID
 	cmd.pluginModel.QuotaDefinition.Name = quota.Name
 	cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
 	cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
@@ -138,8 +138,8 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	for _, domain := range org.Domains {
 		d := plugin_models.GetOrg_Domains{
 			Name: domain.Name,
-			Guid: domain.Guid,
-			OwningOrganizationGuid: domain.OwningOrganizationGuid,
+			Guid: domain.GUID,
+			OwningOrganizationGuid: domain.OwningOrganizationGUID,
 			Shared:                 domain.Shared,
 		}
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
@@ -148,7 +148,7 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	for _, space := range org.Spaces {
 		s := plugin_models.GetOrg_Space{
 			Name: space.Name,
-			Guid: space.Guid,
+			Guid: space.GUID,
 		}
 		cmd.pluginModel.Spaces = append(cmd.pluginModel.Spaces, s)
 	}
@@ -156,7 +156,7 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	for _, spaceQuota := range org.SpaceQuotas {
 		sq := plugin_models.GetOrg_SpaceQuota{
 			Name:                spaceQuota.Name,
-			Guid:                spaceQuota.Guid,
+			Guid:                spaceQuota.GUID,
 			MemoryLimit:         spaceQuota.MemoryLimit,
 			InstanceMemoryLimit: spaceQuota.InstanceMemoryLimit,
 		}

@@ -1,6 +1,7 @@
 package trace
 
-//go:generate counterfeiter -o fakes/fake_printer.go . Printer
+//go:generate counterfeiter . Printer
+
 type Printer interface {
 	Print(v ...interface{})
 	Printf(format string, v ...interface{})

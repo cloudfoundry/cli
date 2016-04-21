@@ -5,10 +5,12 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
+
+//go:generate counterfeiter . ServicePlanVisibilityRepository
 
 type ServicePlanVisibilityRepository interface {
 	Create(string, string) error
@@ -18,26 +20,26 @@ type ServicePlanVisibilityRepository interface {
 }
 
 type CloudControllerServicePlanVisibilityRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServicePlanVisibilityRepository(config core_config.Reader, gateway net.Gateway) CloudControllerServicePlanVisibilityRepository {
+func NewCloudControllerServicePlanVisibilityRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerServicePlanVisibilityRepository {
 	return CloudControllerServicePlanVisibilityRepository{
 		config:  config,
 		gateway: gateway,
 	}
 }
 
-func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGuid, orgGuid string) error {
+func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGUID, orgGUID string) error {
 	url := "/v2/service_plan_visibilities"
-	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGuid, orgGuid)
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
+	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGUID, orgGUID)
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), url, strings.NewReader(data))
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) List() (visibilities []models.ServicePlanVisibilityFields, err error) {
 	err = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		"/v2/service_plan_visibilities",
 		resources.ServicePlanVisibilityResource{},
 		func(resource interface{}) bool {
@@ -49,16 +51,16 @@ func (repo CloudControllerServicePlanVisibilityRepository) List() (visibilities 
 	return
 }
 
-func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGuid string) error {
-	path := fmt.Sprintf("/v2/service_plan_visibilities/%s", servicePlanGuid)
-	return repo.gateway.DeleteResourceSynchronously(repo.config.ApiEndpoint(), path)
+func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGUID string) error {
+	path := fmt.Sprintf("/v2/service_plan_visibilities/%s", servicePlanGUID)
+	return repo.gateway.DeleteResourceSynchronously(repo.config.APIEndpoint(), path)
 }
 
 func (repo CloudControllerServicePlanVisibilityRepository) Search(queryParams map[string]string) ([]models.ServicePlanVisibilityFields, error) {
 	var visibilities []models.ServicePlanVisibilityFields
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		combineQueryParametersWithUri("/v2/service_plan_visibilities", queryParams),
+		repo.config.APIEndpoint(),
+		combineQueryParametersWithURI("/v2/service_plan_visibilities", queryParams),
 		resources.ServicePlanVisibilityResource{},
 		func(resource interface{}) bool {
 			if sp, ok := resource.(resources.ServicePlanVisibilityResource); ok {

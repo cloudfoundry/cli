@@ -5,9 +5,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,19 +17,19 @@ import (
 
 type UnsetOrgRole struct {
 	ui       terminal.UI
-	config   core_config.Reader
+	config   coreconfig.Reader
 	userRepo api.UserRepository
-	flagRepo feature_flags.FeatureFlagRepository
+	flagRepo featureflags.FeatureFlagRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }
 
 func init() {
-	command_registry.Register(&UnsetOrgRole{})
+	commandregistry.Register(&UnsetOrgRole{})
 }
 
-func (cmd *UnsetOrgRole) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *UnsetOrgRole) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "unset-org-role",
 		Description: T("Remove an org role from a user"),
 		Usage: []string{
@@ -44,18 +44,18 @@ func (cmd *UnsetOrgRole) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-org-role"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("unset-org-role"))
 	}
 
-	var wantGuid bool
-	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
+	var wantGUID bool
+	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
-		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -67,8 +67,8 @@ func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, 
 	return reqs
 }
 
-func (cmd *UnsetOrgRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *UnsetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
@@ -89,10 +89,10 @@ func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 		}))
 
 	var err error
-	if len(user.Guid) > 0 {
-		err = cmd.userRepo.UnsetOrgRoleByGuid(user.Guid, org.Guid, role)
+	if len(user.GUID) > 0 {
+		err = cmd.userRepo.UnsetOrgRoleByGUID(user.GUID, org.GUID, role)
 	} else {
-		err = cmd.userRepo.UnsetOrgRoleByUsername(user.Username, org.Guid, role)
+		err = cmd.userRepo.UnsetOrgRoleByUsername(user.Username, org.GUID, role)
 	}
 
 	if err != nil {

@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,11 +15,11 @@ type Version struct {
 }
 
 func init() {
-	command_registry.Register(&Version{})
+	commandregistry.Register(&Version{})
 }
 
-func (cmd *Version) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Version) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "version",
 		Description: T("Print the version"),
 		Usage: []string{
@@ -33,8 +33,8 @@ func (cmd *Version) MetaData() command_registry.CommandMetadata {
 	}
 }
 
-func (cmd *Version) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Version) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	return cmd
 }
 

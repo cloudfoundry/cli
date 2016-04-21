@@ -14,12 +14,12 @@ type SpaceEntity struct {
 	Domains          []DomainResource
 	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
 	SecurityGroups   []SecurityGroupResource   `json:"security_groups"`
-	SpaceQuotaGuid   string                    `json:"space_quota_definition_guid"`
+	SpaceQuotaGUID   string                    `json:"space_quota_definition_guid"`
 	AllowSSH         bool                      `json:"allow_ssh"`
 }
 
 func (resource SpaceResource) ToFields() (fields models.SpaceFields) {
-	fields.Guid = resource.Metadata.Guid
+	fields.GUID = resource.Metadata.GUID
 	fields.Name = resource.Entity.Name
 	fields.AllowSSH = resource.Entity.AllowSSH
 	return
@@ -44,6 +44,6 @@ func (resource SpaceResource) ToModel() (space models.Space) {
 	}
 
 	space.Organization = resource.Entity.Organization.ToFields()
-	space.SpaceQuotaGuid = resource.Entity.SpaceQuotaGuid
+	space.SpaceQuotaGUID = resource.Entity.SpaceQuotaGUID
 	return
 }

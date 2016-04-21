@@ -2,18 +2,18 @@ package maker
 
 import "github.com/cloudfoundry/cli/cf/models"
 
-var routeSummaryGuid func() string
+var routeSummaryGUID func() string
 
 func init() {
-	routeSummaryGuid = guidGenerator("route-summary")
+	routeSummaryGUID = guidGenerator("route-summary")
 }
 
 func NewRouteSummary(overrides Overrides) (routeSummary models.RouteSummary) {
-	routeSummary.Guid = routeSummaryGuid()
+	routeSummary.GUID = routeSummaryGUID()
 	routeSummary.Host = "route-host"
 
-	if overrides.Has("Guid") {
-		routeSummary.Guid = overrides.Get("Guid").(string)
+	if overrides.Has("GUID") {
+		routeSummary.GUID = overrides.Get("GUID").(string)
 	}
 
 	if overrides.Has("Host") {

@@ -7,12 +7,12 @@ import (
 	"os"
 )
 
-func ParseJsonArray(path string) ([]map[string]interface{}, error) {
+func ParseJSONArray(path string) ([]map[string]interface{}, error) {
 	if path == "" {
 		return nil, nil
 	}
 
-	bytes, err := readJsonFile(path)
+	bytes, err := readJSONFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -26,25 +26,25 @@ func ParseJsonArray(path string) ([]map[string]interface{}, error) {
 	return stringMaps, nil
 }
 
-func ParseJsonFromFileOrString(fileOrJson string) (map[string]interface{}, error) {
+func ParseJSONFromFileOrString(fileOrJSON string) (map[string]interface{}, error) {
 	var jsonMap map[string]interface{}
 	var err error
 	var bytes []byte
 
-	if fileOrJson == "" {
+	if fileOrJSON == "" {
 		return nil, nil
 	}
 
-	if fileExists(fileOrJson) {
-		bytes, err = readJsonFile(fileOrJson)
+	if fileExists(fileOrJSON) {
+		bytes, err = readJSONFile(fileOrJSON)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		bytes = []byte(fileOrJson)
+		bytes = []byte(fileOrJSON)
 	}
 
-	jsonMap, err = parseJson(bytes)
+	jsonMap, err = parseJSON(bytes)
 
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func fileExists(path string) bool {
 	return err == nil
 }
 
-func readJsonFile(path string) ([]byte, error) {
+func readJSONFile(path string) ([]byte, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func readJsonFile(path string) ([]byte, error) {
 	return bytes, nil
 }
 
-func parseJson(bytes []byte) (map[string]interface{}, error) {
+func parseJSON(bytes []byte) (map[string]interface{}, error) {
 	stringMap := map[string]interface{}{}
 	err := json.Unmarshal(bytes, &stringMap)
 	if err != nil {

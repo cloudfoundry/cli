@@ -3,9 +3,9 @@ package application_test
 import (
 	"errors"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,27 +21,27 @@ var _ = Describe("set-health-check command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		appRepo             *testApplication.FakeApplicationRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		appRepo             *applicationsfakes.FakeApplicationRepository
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-health-check").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("set-health-check").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("set-health-check", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-health-check", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -85,7 +85,7 @@ var _ = Describe("set-health-check command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.HealthCheckType = "none"
 
 			requirementsFactory.Application = app
@@ -104,7 +104,7 @@ var _ = Describe("set-health-check command", func() {
 				BeforeEach(func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
+					app.GUID = "my-app-guid"
 					app.HealthCheckType = "port"
 
 					appRepo.UpdateReturns(app, nil)
@@ -138,7 +138,7 @@ var _ = Describe("set-health-check command", func() {
 				It("notifies user when updated result is not in the desired state", func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
+					app.GUID = "my-app-guid"
 					app.HealthCheckType = "none"
 					appRepo.UpdateReturns(app, nil)
 

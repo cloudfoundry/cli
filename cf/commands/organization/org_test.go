@@ -1,10 +1,10 @@
 package organization_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,15 +19,15 @@ import (
 var _ = Describe("org command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("org").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("org").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -35,11 +35,11 @@ var _ = Describe("org command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("org", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -60,24 +60,24 @@ var _ = Describe("org command", func() {
 		BeforeEach(func() {
 			developmentSpaceFields := models.SpaceFields{}
 			developmentSpaceFields.Name = "development"
-			developmentSpaceFields.Guid = "dev-space-guid-1"
+			developmentSpaceFields.GUID = "dev-space-guid-1"
 			stagingSpaceFields := models.SpaceFields{}
 			stagingSpaceFields.Name = "staging"
-			stagingSpaceFields.Guid = "staging-space-guid-1"
+			stagingSpaceFields.GUID = "staging-space-guid-1"
 			domainFields := models.DomainFields{}
 			domainFields.Name = "cfapps.io"
-			domainFields.Guid = "1111"
-			domainFields.OwningOrganizationGuid = "my-org-guid"
+			domainFields.GUID = "1111"
+			domainFields.OwningOrganizationGUID = "my-org-guid"
 			domainFields.Shared = true
 			cfAppDomainFields := models.DomainFields{}
 			cfAppDomainFields.Name = "cf-app.com"
-			cfAppDomainFields.Guid = "2222"
-			cfAppDomainFields.OwningOrganizationGuid = "my-org-guid"
+			cfAppDomainFields.GUID = "2222"
+			cfAppDomainFields.OwningOrganizationGUID = "my-org-guid"
 			cfAppDomainFields.Shared = false
 
 			org := models.Organization{}
 			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+			org.GUID = "my-org-guid"
 			org.QuotaDefinition = models.QuotaFields{
 				Name:                    "cantina-quota",
 				MemoryLimit:             512,
@@ -90,8 +90,8 @@ var _ = Describe("org command", func() {
 			org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 			org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 			org.SpaceQuotas = []models.SpaceQuota{
-				{Name: "space-quota-1", Guid: "space-quota-1-guid", MemoryLimit: 512, InstanceMemoryLimit: -1},
-				{Name: "space-quota-2", Guid: "space-quota-2-guid", MemoryLimit: 256, InstanceMemoryLimit: 128},
+				{Name: "space-quota-1", GUID: "space-quota-1-guid", MemoryLimit: 512, InstanceMemoryLimit: -1},
+				{Name: "space-quota-2", GUID: "space-quota-2-guid", MemoryLimit: 256, InstanceMemoryLimit: 128},
 			}
 
 			requirementsFactory.LoginSuccess = true
@@ -137,7 +137,7 @@ var _ = Describe("org command", func() {
 			})
 
 			It("populates the plugin model", func() {
-				testcmd.RunCliCommand("org", []string{"my-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org", []string{"my-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginModel.Name).To(Equal("my-org"))
 				Expect(pluginModel.Guid).To(Equal("my-org-guid"))

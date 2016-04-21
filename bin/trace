@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -e
-
-CF_TRACE=true go run main/cf.go $*

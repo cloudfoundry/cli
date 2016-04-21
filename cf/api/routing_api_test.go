@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -22,28 +22,28 @@ import (
 var _ = Describe("RoutingApi", func() {
 
 	var (
-		repo             api.RoutingApiRepository
-		configRepo       core_config.Repository
-		routingApiServer *ghttp.Server
+		repo             api.RoutingAPIRepository
+		configRepo       coreconfig.Repository
+		routingAPIServer *ghttp.Server
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewRoutingApiGateway(configRepo, time.Now, &testterm.FakeUI{}, new(fakes.FakePrinter))
+		gateway := net.NewRoutingAPIGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 
-		repo = api.NewRoutingApiRepository(configRepo, gateway)
+		repo = api.NewRoutingAPIRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {
-		routingApiServer.Close()
+		routingAPIServer.Close()
 	})
 
 	Describe("ListRouterGroups", func() {
 
 		Context("when routing api return router groups", func() {
 			BeforeEach(func() {
-				routingApiServer = ghttp.NewServer()
-				routingApiServer.RouteToHandler("GET", "/v1/router_groups",
+				routingAPIServer = ghttp.NewServer()
+				routingAPIServer.RouteToHandler("GET", "/v1/router_groups",
 					func(w http.ResponseWriter, req *http.Request) {
 						responseBody := []byte(`[
 			{
@@ -56,13 +56,13 @@ var _ = Describe("RoutingApi", func() {
 						w.WriteHeader(http.StatusOK)
 						w.Write(responseBody)
 					})
-				configRepo.SetRoutingApiEndpoint(routingApiServer.URL())
+				configRepo.SetRoutingAPIEndpoint(routingAPIServer.URL())
 			})
 
 			It("lists routing groups", func() {
 				cb := func(grp models.RouterGroup) bool {
 					Expect(grp).To(Equal(models.RouterGroup{
-						Guid: "bad25cff-9332-48a6-8603-b619858e7992",
+						GUID: "bad25cff-9332-48a6-8603-b619858e7992",
 						Name: "default-tcp",
 						Type: "tcp",
 					}))
@@ -75,8 +75,8 @@ var _ = Describe("RoutingApi", func() {
 
 		Context("when routing api returns an empty response ", func() {
 			BeforeEach(func() {
-				routingApiServer = ghttp.NewServer()
-				routingApiServer.RouteToHandler("GET", "/v1/router_groups",
+				routingAPIServer = ghttp.NewServer()
+				routingAPIServer.RouteToHandler("GET", "/v1/router_groups",
 					func(w http.ResponseWriter, req *http.Request) {
 						responseBody := []byte("[]")
 						w.Header().Set("Content-Length", strconv.Itoa(len(responseBody)))
@@ -84,7 +84,7 @@ var _ = Describe("RoutingApi", func() {
 						w.WriteHeader(http.StatusOK)
 						w.Write(responseBody)
 					})
-				configRepo.SetRoutingApiEndpoint(routingApiServer.URL())
+				configRepo.SetRoutingAPIEndpoint(routingAPIServer.URL())
 			})
 
 			It("doesn't list any router groups", func() {
@@ -99,13 +99,13 @@ var _ = Describe("RoutingApi", func() {
 
 		Context("when routing api returns an error ", func() {
 			BeforeEach(func() {
-				routingApiServer = ghttp.NewServer()
-				routingApiServer.RouteToHandler("GET", "/v1/router_groups",
+				routingAPIServer = ghttp.NewServer()
+				routingAPIServer.RouteToHandler("GET", "/v1/router_groups",
 					func(w http.ResponseWriter, req *http.Request) {
 						w.WriteHeader(http.StatusUnauthorized)
 						w.Write([]byte(`{"name":"UnauthorizedError","message":"token is expired"}`))
 					})
-				configRepo.SetRoutingApiEndpoint(routingApiServer.URL())
+				configRepo.SetRoutingAPIEndpoint(routingAPIServer.URL())
 			})
 
 			It("doesn't list any router groups and displays error message", func() {
@@ -117,8 +117,8 @@ var _ = Describe("RoutingApi", func() {
 				err := repo.ListRouterGroups(cb)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("token is expired"))
-				Expect(err.(errors.HttpError).ErrorCode()).To(ContainSubstring("UnauthorizedError"))
-				Expect(err.(errors.HttpError).StatusCode()).To(Equal(http.StatusUnauthorized))
+				Expect(err.(errors.HTTPError).ErrorCode()).To(ContainSubstring("UnauthorizedError"))
+				Expect(err.(errors.HTTPError).StatusCode()).To(Equal(http.StatusUnauthorized))
 			})
 		})
 	})

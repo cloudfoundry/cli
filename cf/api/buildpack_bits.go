@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/app_files"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/appfiles"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -24,18 +24,20 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
+//go:generate counterfeiter . BuildpackBitsRepository
+
 type BuildpackBitsRepository interface {
 	UploadBuildpack(buildpack models.Buildpack, dir string) (apiErr error)
 }
 
 type CloudControllerBuildpackBitsRepository struct {
-	config       core_config.Reader
+	config       coreconfig.Reader
 	gateway      net.Gateway
-	zipper       app_files.Zipper
+	zipper       appfiles.Zipper
 	TrustedCerts []tls.Certificate
 }
 
-func NewCloudControllerBuildpackBitsRepository(config core_config.Reader, gateway net.Gateway, zipper app_files.Zipper) (repo CloudControllerBuildpackBitsRepository) {
+func NewCloudControllerBuildpackBitsRepository(config coreconfig.Reader, gateway net.Gateway, zipper appfiles.Zipper) (repo CloudControllerBuildpackBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper
@@ -213,7 +215,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 
 func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) error {
 	return repo.performMultiPartUpload(
-		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid),
+		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.APIEndpoint(), buildpack.GUID),
 		"buildpack",
 		buildpackName,
 		body)
@@ -245,7 +247,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		var request *net.Request
 		request, apiErr = repo.gateway.NewRequestForFile("PUT", url, repo.config.AccessToken(), requestFile)
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
-		request.HttpReq.Header.Set("Content-Type", contentType)
+		request.HTTPReq.Header.Set("Content-Type", contentType)
 		if apiErr != nil {
 			return
 		}

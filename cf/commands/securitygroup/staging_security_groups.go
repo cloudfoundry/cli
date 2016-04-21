@@ -1,9 +1,9 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,15 +13,15 @@ import (
 type listStagingSecurityGroups struct {
 	ui                       terminal.UI
 	stagingSecurityGroupRepo staging.StagingSecurityGroupsRepo
-	configRepo               core_config.Reader
+	configRepo               coreconfig.Reader
 }
 
 func init() {
-	command_registry.Register(&listStagingSecurityGroups{})
+	commandregistry.Register(&listStagingSecurityGroups{})
 }
 
-func (cmd *listStagingSecurityGroups) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *listStagingSecurityGroups) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "staging-security-groups",
 		Description: T("List security groups in the staging set for applications"),
 		Usage: []string{
@@ -31,7 +31,7 @@ func (cmd *listStagingSecurityGroups) MetaData() command_registry.CommandMetadat
 }
 
 func (cmd *listStagingSecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -45,8 +45,8 @@ func (cmd *listStagingSecurityGroups) Requirements(requirementsFactory requireme
 	return reqs
 }
 
-func (cmd *listStagingSecurityGroups) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *listStagingSecurityGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.stagingSecurityGroupRepo = deps.RepoLocator.GetStagingSecurityGroupsRepository()
 	return cmd

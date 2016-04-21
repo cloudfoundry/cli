@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strings"
 
-	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -13,9 +13,9 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/serviceaccess"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,33 +24,33 @@ import (
 var _ = Describe("service-access command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		actor               *testactor.FakeServiceActor
+		actor               *actorsfakes.FakeServiceActor
 		requirementsFactory *testreq.FakeReqFactory
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.ServiceHandler = actor
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service-access").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("service-access").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		actor = &testactor.FakeServiceActor{}
+		actor = new(actorsfakes.FakeServiceActor)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("service-access", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("service-access", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -60,7 +60,7 @@ var _ = Describe("service-access command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -85,7 +85,7 @@ var _ = Describe("service-access command", func() {
 	Describe("when logged in", func() {
 		BeforeEach(func() {
 			serviceBroker1 = models.ServiceBroker{
-				Guid: "broker1",
+				GUID: "broker1",
 				Name: "brokername1",
 				Services: []models.ServiceOffering{
 					{
@@ -105,7 +105,7 @@ var _ = Describe("service-access command", func() {
 				},
 			}
 			serviceBroker2 = models.ServiceBroker{
-				Guid: "broker2",
+				GUID: "broker2",
 				Name: "brokername2",
 				Services: []models.ServiceOffering{
 					{ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service-3"}},

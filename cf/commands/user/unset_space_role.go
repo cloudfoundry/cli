@@ -5,10 +5,10 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -18,20 +18,20 @@ import (
 
 type UnsetSpaceRole struct {
 	ui        terminal.UI
-	config    core_config.Reader
+	config    coreconfig.Reader
 	spaceRepo spaces.SpaceRepository
 	userRepo  api.UserRepository
-	flagRepo  feature_flags.FeatureFlagRepository
+	flagRepo  featureflags.FeatureFlagRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
 
 func init() {
-	command_registry.Register(&UnsetSpaceRole{})
+	commandregistry.Register(&UnsetSpaceRole{})
 }
 
-func (cmd *UnsetSpaceRole) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *UnsetSpaceRole) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "unset-space-role",
 		Description: T("Remove a space role from a user"),
 		Usage: []string{
@@ -46,18 +46,18 @@ func (cmd *UnsetSpaceRole) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 4 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("unset-space-role"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("unset-space-role"))
 	}
 
-	var wantGuid bool
-	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
+	var wantGUID bool
+	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
 		unsetRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
-		wantGuid = (err != nil || !unsetRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !unsetRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -69,8 +69,8 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 	return reqs
 }
 
-func (cmd *UnsetSpaceRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *UnsetSpaceRole) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
@@ -83,7 +83,7 @@ func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 	role := models.UserInputToSpaceRole[c.Args()[3]]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -97,10 +97,10 @@ func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	if len(user.Guid) > 0 {
-		err = cmd.userRepo.UnsetSpaceRoleByGuid(user.Guid, space.Guid, role)
+	if len(user.GUID) > 0 {
+		err = cmd.userRepo.UnsetSpaceRoleByGUID(user.GUID, space.GUID, role)
 	} else {
-		err = cmd.userRepo.UnsetSpaceRoleByUsername(user.Username, space.Guid, role)
+		err = cmd.userRepo.UnsetSpaceRoleByUsername(user.Username, space.GUID, role)
 	}
 	if err != nil {
 		cmd.ui.Failed(err.Error())

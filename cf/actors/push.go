@@ -7,29 +7,30 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/cloudfoundry/cli/cf/api/application_bits"
+	"github.com/cloudfoundry/cli/cf/api/applicationbits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/app_files"
+	"github.com/cloudfoundry/cli/cf/appfiles"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
 const windowsPathPrefix = `\\?\`
 
-//go:generate counterfeiter -o fakes/fake_push_actor.go . PushActor
+//go:generate counterfeiter . PushActor
+
 type PushActor interface {
-	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
+	UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	ProcessPath(dirOrZipFile string, f func(string)) error
 	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
 
 type PushActorImpl struct {
-	appBitsRepo application_bits.ApplicationBitsRepository
-	appfiles    app_files.AppFiles
-	zipper      app_files.Zipper
+	appBitsRepo applicationbits.ApplicationBitsRepository
+	appfiles    appfiles.AppFiles
+	zipper      appfiles.Zipper
 }
 
-func NewPushActor(appBitsRepo application_bits.ApplicationBitsRepository, zipper app_files.Zipper, appfiles app_files.AppFiles) PushActor {
+func NewPushActor(appBitsRepo applicationbits.ApplicationBitsRepository, zipper appfiles.Zipper, appfiles appfiles.AppFiles) PushActor {
 	return PushActorImpl{
 		appBitsRepo: appBitsRepo,
 		appfiles:    appfiles,
@@ -148,6 +149,6 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 	return remoteFiles, len(filesToUpload) > 0, nil
 }
 
-func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
-	return actor.appBitsRepo.UploadBits(appGuid, zipFile, presentFiles)
+func (actor PushActorImpl) UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
+	return actor.appBitsRepo.UploadBits(appGUID, zipFile, presentFiles)
 }

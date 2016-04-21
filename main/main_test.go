@@ -14,11 +14,18 @@ import (
 )
 
 var buildPath string
-var buildErr error
 
-var _ = BeforeSuite(func() {
-	buildPath, buildErr = Build("github.com/cloudfoundry/cli/main")
+var _ = SynchronizedBeforeSuite(func() []byte {
+	path, buildErr := Build("github.com/cloudfoundry/cli/main")
 	Expect(buildErr).NotTo(HaveOccurred())
+	return []byte(path)
+}, func(data []byte) {
+	buildPath = string(data)
+})
+
+// gexec.Build leaves a compiled binary behind in /tmp.
+var _ = SynchronizedAfterSuite(func() {}, func() {
+	CleanupBuildArtifacts()
 })
 
 var _ = Describe("main", func() {
@@ -284,8 +291,3 @@ func CfWith_CF_HOME(cfHome string, args ...string) *Session {
 
 	return session
 }
-
-// gexec.Build leaves a compiled binary behind in /tmp.
-var _ = AfterSuite(func() {
-	CleanupBuildArtifacts()
-})

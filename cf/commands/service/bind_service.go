@@ -2,10 +2,11 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -15,23 +16,25 @@ import (
 	"github.com/cloudfoundry/cli/json"
 )
 
+//go:generate counterfeiter . ServiceBinder
+
 type ServiceBinder interface {
 	BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error)
 }
 
 type BindService struct {
 	ui                 terminal.UI
-	config             core_config.Reader
+	config             coreconfig.Reader
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
 func init() {
-	command_registry.Register(&BindService{})
+	commandregistry.Register(&BindService{})
 }
 
-func (cmd *BindService) MetaData() command_registry.CommandMetadata {
+func (cmd *BindService) MetaData() commandregistry.CommandMetadata {
 	baseUsage := T("CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]")
 	paramsUsage := T(`   Optionally provide service-specific configuration parameters in a valid JSON object in-line:
 
@@ -49,7 +52,7 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "bind-service",
 		ShortName:   "bs",
 		Description: T("Bind a service instance to an app"),
@@ -76,7 +79,7 @@ func (cmd *BindService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *BindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("bind-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-service"))
 	}
 
 	serviceName := fc.Args()[1]
@@ -93,8 +96,8 @@ func (cmd *BindService) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *BindService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *BindService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceBindingRepo = deps.RepoLocator.GetServiceBindingRepository()
 	return cmd
@@ -105,7 +108,7 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	params := c.String("c")
 
-	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
@@ -121,7 +124,7 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 
 	err = cmd.BindApplication(app, serviceInstance, paramsMap)
 	if err != nil {
-		if httperr, ok := err.(errors.HttpError); ok && httperr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
+		if httperr, ok := err.(errors.HTTPError); ok && httperr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("App {{.AppName}} is already bound to {{.ServiceName}}.",
 				map[string]interface{}{
@@ -140,6 +143,6 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 }
 
 func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {
-	apiErr = cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid, paramsMap)
+	apiErr = cmd.serviceBindingRepo.Create(serviceInstance.GUID, app.GUID, paramsMap)
 	return
 }

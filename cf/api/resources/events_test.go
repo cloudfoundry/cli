@@ -39,7 +39,7 @@ var _ = Describe("Event resources", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			eventFields := resource.ToFields()
-			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.GUID).To(Equal("event-1-guid"))
 			Expect(eventFields.Name).To(Equal("app.crash"))
 			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2013-10-07T16:51:07+00:00")))
 			Expect(eventFields.Description).To(Equal(`index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`))
@@ -69,7 +69,7 @@ var _ = Describe("Event resources", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			eventFields := resource.ToFields()
-			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.GUID).To(Equal("event-1-guid"))
 			Expect(eventFields.Name).To(Equal("audit.app.update"))
 			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00")))
 			Expect(eventFields.Description).To(Equal("instances: 1, memory: 256, state: STOPPED, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN"))
@@ -96,7 +96,7 @@ var _ = Describe("Event resources", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			eventFields := resource.ToFields()
-			Expect(eventFields.Guid).To(Equal("event-2-guid"))
+			Expect(eventFields.GUID).To(Equal("event-2-guid"))
 			Expect(eventFields.Name).To(Equal("audit.app.delete-request"))
 			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-21T18:39:09+00:00")))
 			Expect(eventFields.Description).To(Equal("recursive: true"))
@@ -130,7 +130,7 @@ var _ = Describe("Event resources", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			eventFields := resource.ToFields()
-			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.GUID).To(Equal("event-1-guid"))
 			Expect(eventFields.Name).To(Equal("audit.app.create"))
 			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-22T19:34:16+00:00")))
 			Expect(eventFields.Description).To(Equal("disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN"))
@@ -158,7 +158,7 @@ var _ = Describe("Event resources", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			eventFields := resource.ToFields()
-			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.GUID).To(Equal("event-1-guid"))
 			Expect(eventFields.Name).To(Equal("app crashed"))
 			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-22T19:34:16+00:00")))
 			Expect(eventFields.Description).To(Equal("instance: 4, reason: the exit description, exit_status: 3"))

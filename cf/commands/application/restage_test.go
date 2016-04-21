@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -21,23 +21,23 @@ var _ = Describe("restage command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *testApplication.FakeApplicationRepository
-		configRepo          core_config.Repository
+		appRepo             *applicationsfakes.FakeApplicationRepository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		stagingWatcher      *fakeStagingWatcher
-		OriginalCommand     command_registry.Command
-		deps                command_registry.Dependency
+		OriginalCommand     commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.Config = configRepo
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(stagingWatcher)
+		commandregistry.Register(stagingWatcher)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restage").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restage").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -46,24 +46,24 @@ var _ = Describe("restage command", func() {
 		app = models.Application{}
 		app.Name = "my-app"
 		app.PackageState = "STAGED"
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("start")
+		OriginalCommand = commandregistry.Commands.FindCommand("start")
 
 		stagingWatcher = &fakeStagingWatcher{}
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("restage", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restage", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("Requirements", func() {
@@ -100,7 +100,7 @@ var _ = Describe("restage command", func() {
 		BeforeEach(func() {
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "the-app-guid"
+			app.GUID = "the-app-guid"
 
 			appRepo.ReadReturns(app, nil)
 		})
@@ -139,11 +139,11 @@ func (f *fakeStagingWatcher) ApplicationWatchStaging(app models.Application, org
 	f.spaceName = spaceName
 	return start(app)
 }
-func (cmd *fakeStagingWatcher) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{Name: "start"}
+func (cmd *fakeStagingWatcher) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{Name: "start"}
 }
 
-func (cmd *fakeStagingWatcher) SetDependency(_ command_registry.Dependency, _ bool) command_registry.Command {
+func (cmd *fakeStagingWatcher) SetDependency(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 	return cmd
 }
 

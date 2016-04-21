@@ -5,18 +5,18 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/actors/service_builder/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/actors/servicebuilder/servicebuilderfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,40 +27,40 @@ import (
 var _ = Describe("create-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
-		serviceBuilder      *fakes.FakeServiceBuilder
+		serviceRepo         *apifakes.FakeServiceRepository
+		serviceBuilder      *servicebuilderfakes.FakeServiceBuilder
 
 		offering1 models.ServiceOffering
 		offering2 models.ServiceOffering
-		deps      command_registry.Dependency
+		deps      commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.ServiceBuilder = serviceBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		serviceRepo = &testapi.FakeServiceRepository{}
-		serviceBuilder = &fakes.FakeServiceBuilder{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
+		serviceBuilder = new(servicebuilderfakes.FakeServiceBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"
 		offering1.Plans = []models.ServicePlanFields{{
 			Name: "spark",
-			Guid: "cleardb-spark-guid",
+			GUID: "cleardb-spark-guid",
 			Free: true,
 		}, {
 			Name: "expensive",
-			Guid: "luxury-guid",
+			GUID: "luxury-guid",
 			Free: false,
 		}}
 
@@ -71,7 +71,7 @@ var _ = Describe("create-service command", func() {
 	})
 
 	var callCreateService = func(args []string) bool {
-		return testcmd.RunCliCommand("create-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -93,8 +93,8 @@ var _ = Describe("create-service command", func() {
 	It("successfully creates a service", func() {
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-		spaceGuid, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
-		Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
+		spaceGUID, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
+		Expect(spaceGUID).To(Equal(config.SpaceFields().GUID))
 		Expect(serviceName).To(Equal("cleardb"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
@@ -215,8 +215,8 @@ var _ = Describe("create-service command", func() {
 		It("successfully starts async service creation", func() {
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-			spaceGuid, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
-			Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
+			spaceGUID, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
+			Expect(spaceGUID).To(Equal(config.SpaceFields().GUID))
 			Expect(serviceName).To(Equal("cleardb"))
 
 			creatingServiceMessage := fmt.Sprintf("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstance.ServiceInstanceFields.Name)

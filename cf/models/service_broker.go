@@ -1,10 +1,10 @@
 package models
 
 type ServiceBroker struct {
-	Guid     string
+	GUID     string
 	Name     string
 	Username string
 	Password string
-	Url      string
+	URL      string
 	Services []ServiceOffering
 }

@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -13,13 +13,15 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
+//go:generate counterfeiter . RouteServiceUnbinder
+
 type RouteServiceUnbinder interface {
 	UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error
 }
 
 type UnbindRouteService struct {
 	ui                      terminal.UI
-	config                  core_config.Reader
+	config                  coreconfig.Reader
 	routeRepo               api.RouteRepository
 	routeServiceBindingRepo api.RouteServiceBindingRepository
 	domainReq               requirements.DomainRequirement
@@ -27,15 +29,15 @@ type UnbindRouteService struct {
 }
 
 func init() {
-	command_registry.Register(&UnbindRouteService{})
+	commandregistry.Register(&UnbindRouteService{})
 }
 
-func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
+func (cmd *UnbindRouteService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force unbinding without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "unbind-route-service",
 		ShortName:   "urs",
 		Description: T("Unbind a service instance from an HTTP route"),
@@ -51,7 +53,7 @@ func (cmd *UnbindRouteService) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + command_registry.Commands.CommandUsage("unbind-route-service"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("unbind-route-service"))
 	}
 
 	serviceName := fc.Args()[1]
@@ -79,8 +81,8 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 	return reqs
 }
 
-func (cmd *UnbindRouteService) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *UnbindRouteService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 	cmd.routeServiceBindingRepo = deps.RepoLocator.GetRouteServiceBindingRepository()
@@ -125,7 +127,7 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 
 	err = cmd.UnbindRoute(route, serviceInstance)
 	if err != nil {
-		httpError, ok := err.(errors.HttpError)
+		httpError, ok := err.(errors.HTTPError)
 		if ok && httpError.ErrorCode() == errors.InvalidRelation {
 			cmd.ui.Warn(T("Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.", map[string]interface{}{"Route": route.URL(), "ServiceInstance": serviceInstance.Name}))
 		} else {
@@ -137,5 +139,5 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 }
 
 func (cmd *UnbindRouteService) UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error {
-	return cmd.routeServiceBindingRepo.Unbind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided())
+	return cmd.routeServiceBindingRepo.Unbind(serviceInstance.GUID, route.GUID, serviceInstance.IsUserProvided())
 }

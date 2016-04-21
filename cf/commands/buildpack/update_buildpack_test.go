@@ -3,12 +3,12 @@ package buildpack_test
 import (
 	"strings"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,27 +32,27 @@ var _ = Describe("Updating buildpack command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		repo                *testapi.FakeBuildpackRepository
-		bitsRepo            *testapi.FakeBuildpackBitsRepository
-		deps                command_registry.Dependency
+		repo                *apifakes.OldFakeBuildpackRepository
+		bitsRepo            *apifakes.OldFakeBuildpackBitsRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(repo)
 		deps.RepoLocator = deps.RepoLocator.SetBuildpackBitsRepository(bitsRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-buildpack").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-buildpack").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		ui = new(testterm.FakeUI)
-		repo = &testapi.FakeBuildpackRepository{}
-		bitsRepo = &testapi.FakeBuildpackBitsRepository{}
+		repo = new(apifakes.OldFakeBuildpackRepository)
+		bitsRepo = new(apifakes.OldFakeBuildpackBitsRepository)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("update-buildpack", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("is only successful on login and buildpack success", func() {

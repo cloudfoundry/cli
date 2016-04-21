@@ -3,15 +3,14 @@ package commands
 import (
 	"strconv"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
-	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -22,18 +21,18 @@ const maxChoices = 50
 
 type Login struct {
 	ui            terminal.UI
-	config        core_config.ReadWriter
+	config        coreconfig.ReadWriter
 	authenticator authentication.AuthenticationRepository
-	endpointRepo  api.EndpointRepository
+	endpointRepo  coreconfig.EndpointRepository
 	orgRepo       organizations.OrganizationRepository
 	spaceRepo     spaces.SpaceRepository
 }
 
 func init() {
-	command_registry.Register(&Login{})
+	commandregistry.Register(&Login{})
 }
 
-func (cmd *Login) MetaData() command_registry.CommandMetadata {
+func (cmd *Login) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["a"] = &flags.StringFlag{ShortName: "a", Usage: T("API endpoint (e.g. https://api.example.com)")}
 	fs["u"] = &flags.StringFlag{ShortName: "u", Usage: T("Username")}
@@ -43,7 +42,7 @@ func (cmd *Login) MetaData() command_registry.CommandMetadata {
 	fs["sso"] = &flags.BoolFlag{Name: "sso", Usage: T("Use a one-time password to login")}
 	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "login",
 		ShortName:   "l",
 		Description: T("Log user in"),
@@ -67,8 +66,8 @@ func (cmd *Login) Requirements(requirementsFactory requirements.Factory, fc flag
 	return reqs
 }
 
-func (cmd *Login) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Login) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.authenticator = deps.RepoLocator.GetAuthenticationRepository()
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()
@@ -86,7 +85,7 @@ func (cmd *Login) Execute(c flags.FlagContext) {
 		ui:           cmd.ui,
 		config:       cmd.config,
 		endpointRepo: cmd.endpointRepo,
-	}.setApiEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
+	}.setAPIEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
 
 	defer func() {
 		cmd.ui.Say("")
@@ -121,7 +120,7 @@ func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
 	endpoint := c.String("a")
 	skipSSL := c.Bool("skip-ssl-validation")
 	if endpoint == "" {
-		endpoint = cmd.config.ApiEndpoint()
+		endpoint = cmd.config.APIEndpoint()
 		skipSSL = cmd.config.IsSSLDisabled() || skipSSL
 	}
 
@@ -175,7 +174,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 	credentials := make(map[string]string)
 
 	if value, ok := prompts["username"]; ok {
-		if prompts["username"].Type == core_config.AuthPromptTypeText && usernameFlagValue != "" {
+		if prompts["username"].Type == coreconfig.AuthPromptTypeText && usernameFlagValue != "" {
 			credentials["username"] = usernameFlagValue
 		} else {
 			credentials["username"] = cmd.ui.Ask(value.DisplayName)
@@ -183,7 +182,7 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 	}
 
 	for key, prompt := range prompts {
-		if prompt.Type == core_config.AuthPromptTypePassword {
+		if prompt.Type == coreconfig.AuthPromptTypePassword {
 			if key == "passcode" {
 				continue
 			}
@@ -234,8 +233,8 @@ func (cmd Login) setOrganization(c flags.FlagContext) (isOrgSet bool) {
 	if orgName == "" {
 		orgs, err := cmd.orgRepo.ListOrgs(maxChoices)
 		if err != nil {
-			cmd.ui.Failed(T("Error finding available orgs\n{{.ApiErr}}",
-				map[string]interface{}{"ApiErr": err.Error()}))
+			cmd.ui.Failed(T("Error finding available orgs\n{{.APIErr}}",
+				map[string]interface{}{"APIErr": err.Error()}))
 		}
 
 		switch len(orgs) {

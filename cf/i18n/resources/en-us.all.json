@@ -56,14 +56,6 @@
     "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n"
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": "   CF_NAME push [-f MANIFEST_PATH]\n"
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications."
   },
@@ -84,10 +76,6 @@
     "translation": "   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   Push multiple apps with a manifest:\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules."
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   View allowable quotas with 'CF_NAME quotas'"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n"
   },
   {
     "id": " added as '",
@@ -126,10 +110,6 @@
   {
     "id": " is empty",
     "translation": " is empty"
-  },
-  {
-    "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
-    "translation": " is not a valid url, please provide a url, e.g. http://your_repo.com"
   },
   {
     "id": " is not available in repo '",
@@ -200,12 +180,12 @@
     "translation": "API endpoint:"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API endpoint: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API endpoint: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -218,6 +198,10 @@
   {
     "id": "APP_INSTANCES",
     "translation": "APP_INSTANCES"
+  },
+  {
+    "id": "APP_NAME",
+    "translation": "APP_NAME"
   },
   {
     "id": "Access for plans of a particular broker",
@@ -400,6 +384,10 @@
     "translation": "BUILDPACKS"
   },
   {
+    "id": "BUILDPACK_NAME",
+    "translation": "BUILDPACK_NAME"
+  },
+  {
     "id": "Bind a security group to a space",
     "translation": "Bind a security group to a space"
   },
@@ -572,10 +560,6 @@
     "translation": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"
   },
   {
-    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]"
-  },
-  {
     "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": "CF_NAME create-user USERNAME PASSWORD"
   },
@@ -610,10 +594,6 @@
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
     "translation": "CF_NAME delete-quota QUOTA [-f]"
-  },
-  {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"
   },
   {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
@@ -738,10 +718,6 @@
   {
     "id": "CF_NAME logs APP_NAME",
     "translation": "CF_NAME logs APP_NAME"
-  },
-  {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
   },
   {
     "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
@@ -976,10 +952,6 @@
     "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]"
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
@@ -1020,16 +992,16 @@
     "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
   },
   {
-    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]"
-  },
-  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
     "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
+  },
+  {
+    "id": "COMMAND",
+    "translation": "COMMAND"
   },
   {
     "id": "Can not provision instances of paid service plans",
@@ -1100,8 +1072,8 @@
     "translation": "Checking for route..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1192,8 +1164,8 @@
     "translation": "Could not serialize updates."
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "Could not target org.\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "Could not target org.\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1308,6 +1280,10 @@
     "translation": "Creating quota {{.QuotaName}} as {{.Username}}..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": "Creating random route for {{.Domain}}"
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "Creating route {{.Hostname}}..."
   },
@@ -1384,6 +1360,14 @@
     "translation": "Custom headers to include in the request, flag can be specified multiple times"
   },
   {
+    "id": "DISK",
+    "translation": "DISK"
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": "DOCKER_IMAGE"
+  },
+  {
     "id": "DOMAIN",
     "translation": "DOMAIN"
   },
@@ -1402,6 +1386,10 @@
   {
     "id": "Define a new space resource quota",
     "translation": "Define a new space resource quota"
+  },
+  {
+    "id": "Delete a TCP route",
+    "translation": "Delete a TCP route"
   },
   {
     "id": "Delete a buildpack",
@@ -1454,6 +1442,10 @@
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "Delete all orphaned routes (i.e. those that are not mapped to an app)"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": "Delete an HTTP route"
   },
   {
     "id": "Delete an app",
@@ -1748,8 +1740,8 @@
     "translation": "Error deleting buildpack {{.Name}}\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Error deleting domain {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1776,16 +1768,16 @@
     "translation": "Error enabling ssh support for space "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "Error finding available orgs\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "Error finding available orgs\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "Error finding available spaces\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Error finding domain {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Error finding domain {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1826,10 +1818,6 @@
   {
     "id": "Error getting file info",
     "translation": "Error getting file info"
-  },
-  {
-    "id": "Error getting info from v2/info: ",
-    "translation": "Error getting info from v2/info: "
   },
   {
     "id": "Error getting one time auth code: ",
@@ -1940,8 +1928,8 @@
     "translation": "Error updating health_check_type for "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "Error uploading application.\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "Error uploading application.\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2028,16 +2016,16 @@
     "translation": "Failed fetching domains.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "Failed fetching events.\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "Failed fetching events.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "Failed fetching orgs.\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "Failed fetching orgs.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -2316,6 +2304,14 @@
     "translation": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": "HEALTH_CHECK_TYPE"
+  },
+  {
+    "id": "HOST",
+    "translation": "HOST"
+  },
+  {
     "id": "HOSTNAME",
     "translation": "HOSTNAME"
   },
@@ -2336,10 +2332,6 @@
     "translation": "Hostname for the HTTP route (required for shared domains)"
   },
   {
-    "id": "Hostname for the route (required for shared domains)",
-    "translation": "Hostname for the route (required for shared domains)"
-  },
-  {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
     "translation": "Hostname used in combination with DOMAIN to specify the route to bind"
   },
@@ -2348,8 +2340,8 @@
     "translation": "Hostname used in combination with DOMAIN to specify the route to unbind"
   },
   {
-    "id": "Hostname used to identify the route",
-    "translation": "Hostname used to identify the route"
+    "id": "Hostname used to identify the HTTP route",
+    "translation": "Hostname used to identify the HTTP route"
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -2836,6 +2828,14 @@
     "translation": "Looking up '{{.filePath}}' from repository '{{.repoName}}'"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": "MANIFEST_PATH"
+  },
+  {
+    "id": "MEMORY",
+    "translation": "MEMORY"
+  },
+  {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
     "translation": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application."
   },
@@ -2854,6 +2854,14 @@
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
     "translation": "Manifest file is not found in the current directory, please provide either an app name or manifest"
+  },
+  {
+    "id": "Map a TCP route",
+    "translation": "Map a TCP route"
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": "Map an HTTP route"
   },
   {
     "id": "Map the root domain to this app",
@@ -2906,6 +2914,10 @@
   {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
+  },
+  {
+    "id": "NUM_INSTANCES",
+    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name",
@@ -3196,8 +3208,8 @@
     "translation": "Path to manifest"
   },
   {
-    "id": "Path used to identify the route",
-    "translation": "Path used to identify the route"
+    "id": "Path used to identify the HTTP route",
+    "translation": "Path used to identify the HTTP route"
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
@@ -3272,6 +3284,10 @@
     "translation": "Port for the TCP route"
   },
   {
+    "id": "Port used to identify the TCP route",
+    "translation": "Port used to identify the TCP route"
+  },
+  {
     "id": "Print API request diagnostics to stdout",
     "translation": "Print API request diagnostics to stdout"
   },
@@ -3312,8 +3328,12 @@
     "translation": "Push a new app or sync changes to an existing app"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "Push a single app (with or without a manifest):\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "Push a single app (with or without a manifest)"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "Push multiple apps with a manifest"
   },
   {
     "id": "QUOTA",
@@ -3348,12 +3368,12 @@
     "translation": "ROLES:\n"
   },
   {
-    "id": "ROUTER GROUPS",
-    "translation": "ROUTER GROUPS"
-  },
-  {
     "id": "ROUTES",
     "translation": "ROUTES"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": "ROUTE_PATH"
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3620,10 +3640,6 @@
     "translation": "Routes for this domain will be configured only on the specified router group"
   },
   {
-    "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-    "translation": "Routing API URI missing. Please log in again to set the URI automatically."
-  },
-  {
     "id": "Rules",
     "translation": "Rules"
   },
@@ -3676,6 +3692,10 @@
     "translation": "SSH to an application container instance"
   },
   {
+    "id": "STACK",
+    "translation": "STACK"
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
@@ -3712,8 +3732,8 @@
     "translation": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command."
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -3976,6 +3996,10 @@
     "translation": "System-Provided:"
   },
   {
+    "id": "TIMEOUT",
+    "translation": "TIMEOUT"
+  },
+  {
     "id": "TIP:\n",
     "translation": "TIP:\n"
   },
@@ -3996,8 +4020,8 @@
     "translation": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space"
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint"
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4080,12 +4104,16 @@
     "translation": "There are too many options to display, please type in the name."
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "There is an error performing request on '{{.RepoUrl}}': "
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "There is an error performing request on '{{.RepoURL}}': "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}"
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4144,6 +4172,10 @@
     "translation": "UAA endpoint missing from config file"
   },
   {
+    "id": "URL",
+    "translation": "URL"
+  },
+  {
     "id": "URL to which logs for bound applications will be streamed",
     "translation": "URL to which logs for bound applications will be streamed"
   },
@@ -4168,8 +4200,8 @@
     "translation": "USERS"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -4266,6 +4298,14 @@
   {
     "id": "Unlock the buildpack to enable updates",
     "translation": "Unlock the buildpack to enable updates"
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": "Unmap a TCP route"
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": "Unmap an HTTP route"
   },
   {
     "id": "Unsetting api endpoint...",
@@ -4370,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files"
-  },
-  {
-    "id": "Url",
-    "translation": "Url"
   },
   {
     "id": "Use '{{.Command}}' for more information",
@@ -4542,14 +4578,6 @@
   {
     "id": "app instance limit",
     "translation": "app instance limit"
-  },
-  {
-    "id": "app ports",
-    "translation": "app ports"
-  },
-  {
-    "id": "app ports:",
-    "translation": "app ports:"
   },
   {
     "id": "apps",
@@ -5000,8 +5028,8 @@
     "translation": "yes"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}} (API version: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5048,12 +5076,12 @@
     "translation": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
-    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}."
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}."
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}."
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}."
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5122,6 +5150,10 @@
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
     "translation": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status."
+  },
+  {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

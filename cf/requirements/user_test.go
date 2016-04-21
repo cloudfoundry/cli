@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,16 +14,16 @@ import (
 
 var _ = Describe("UserRequirement", func() {
 	var (
-		userRepo        *fakeapi.FakeUserRepository
+		userRepo        *apifakes.FakeUserRepository
 		userRequirement requirements.UserRequirement
 	)
 
 	BeforeEach(func() {
-		userRepo = &fakeapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 	})
 
 	Describe("Execute", func() {
-		Context("when wantGuid is true", func() {
+		Context("when wantGUID is true", func() {
 			BeforeEach(func() {
 				userRequirement = requirements.NewUserRequirement("the-username", userRepo, true)
 			})
@@ -37,7 +37,7 @@ var _ = Describe("UserRequirement", func() {
 			Context("when the call to find the user succeeds", func() {
 				var user models.UserFields
 				BeforeEach(func() {
-					user = models.UserFields{Username: "the-username", Guid: "the-guid"}
+					user = models.UserFields{Username: "the-username", GUID: "the-guid"}
 					userRepo.FindByUsernameReturns(user, nil)
 				})
 
@@ -67,7 +67,7 @@ var _ = Describe("UserRequirement", func() {
 			})
 		})
 
-		Context("when wantGuid is false", func() {
+		Context("when wantGUID is false", func() {
 			BeforeEach(func() {
 				userRequirement = requirements.NewUserRequirement("the-username", userRepo, false)
 			})

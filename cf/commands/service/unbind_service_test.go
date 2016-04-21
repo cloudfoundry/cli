@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,43 +19,43 @@ var _ = Describe("unbind-service command", func() {
 	var (
 		app                 models.Application
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		serviceInstance     models.ServiceInstance
 		requirementsFactory *testreq.FakeReqFactory
-		serviceBindingRepo  *testapi.FakeServiceBindingRepo
-		deps                command_registry.Dependency
+		serviceBindingRepo  *apifakes.OldFakeServiceBindingRepo
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceBindingRepository(serviceBindingRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("unbind-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 
 		ui = &testterm.FakeUI{}
 		serviceInstance.Name = "my-service"
-		serviceInstance.Guid = "my-service-guid"
+		serviceInstance.GUID = "my-service-guid"
 
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		requirementsFactory.Application = app
 		requirementsFactory.ServiceInstance = serviceInstance
 
-		serviceBindingRepo = &testapi.FakeServiceBindingRepo{}
+		serviceBindingRepo = new(apifakes.OldFakeServiceBindingRepo)
 	})
 
 	callUnbindService := func(args []string) bool {
-		return testcmd.RunCliCommand("unbind-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("unbind-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when not logged in", func() {
 		It("fails requirements when not logged in", func() {
-			Expect(testcmd.RunCliCommand("unbind-service", []string{"my-service", "my-app"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("unbind-service", []string{"my-service", "my-app"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
 		})
 	})
 
@@ -76,7 +76,7 @@ var _ = Describe("unbind-service command", func() {
 					[]string{"OK"},
 				))
 				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
-				Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
+				Expect(serviceBindingRepo.DeleteApplicationGUID).To(Equal("my-app-guid"))
 			})
 		})
 
@@ -97,7 +97,7 @@ var _ = Describe("unbind-service command", func() {
 					[]string{"my-service", "my-app", "did not exist"},
 				))
 				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
-				Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
+				Expect(serviceBindingRepo.DeleteApplicationGUID).To(Equal("my-app-guid"))
 			})
 		})
 

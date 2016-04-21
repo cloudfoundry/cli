@@ -4,16 +4,15 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -27,27 +26,27 @@ import (
 var _ = Describe("CreateRoute", func() {
 	var (
 		ui         *testterm.FakeUI
-		routeRepo  *fakeapi.FakeRouteRepository
-		configRepo core_config.Repository
+		routeRepo  *apifakes.FakeRouteRepository
+		configRepo coreconfig.Repository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
-		spaceRequirement         *fakerequirements.FakeSpaceRequirement
-		domainRequirement        *fakerequirements.FakeDomainRequirement
+		spaceRequirement         *requirementsfakes.FakeSpaceRequirement
+		domainRequirement        *requirementsfakes.FakeDomainRequirement
 		minAPIVersionRequirement requirements.Requirement
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = &fakeapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -57,18 +56,18 @@ var _ = Describe("CreateRoute", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
-		spaceRequirement = &fakerequirements.FakeSpaceRequirement{}
+		spaceRequirement = new(requirementsfakes.FakeSpaceRequirement)
 		space := models.Space{}
-		space.Guid = "space-guid"
+		space.GUID = "space-guid"
 		space.Name = "space-name"
 		spaceRequirement.GetSpaceReturns(space)
 		factory.NewSpaceRequirementReturns(spaceRequirement)
 
-		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		domainRequirement.GetDomainReturns(models.DomainFields{
-			Guid: "domain-guid",
+			GUID: "domain-guid",
 			Name: "domain-name",
 		})
 		factory.NewDomainRequirementReturns(domainRequirement)
@@ -146,12 +145,15 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
+				expectedVersion, err := semver.Make("2.53.0")
+				Expect(err).NotTo(HaveOccurred())
+
 				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
 				Expect(feature).To(Equal("Option '--port'"))
-				Expect(requiredVersion).To(Equal(cf.TcpRoutingMinimumApiVersion))
+				Expect(requiredVersion).To(Equal(expectedVersion))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
 		})
@@ -163,12 +165,15 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
+				expectedVersion, err := semver.Make("2.53.0")
+				Expect(err).NotTo(HaveOccurred())
+
 				actualRequirements := cmd.Requirements(factory, flagContext)
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
 				Expect(feature).To(Equal("Option '--random-port'"))
-				Expect(requiredVersion).To(Equal(cf.TcpRoutingMinimumApiVersion))
+				Expect(requiredVersion).To(Equal(expectedVersion))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 			})
 		})
@@ -407,11 +412,11 @@ var _ = Describe("CreateRoute", func() {
 				BeforeEach(func() {
 					routeRepo.FindReturns(models.Route{
 						Domain: models.DomainFields{
-							Guid: "domain-guid",
+							GUID: "domain-guid",
 							Name: "domain-name",
 						},
 						Space: models.SpaceFields{
-							Guid: "space-guid",
+							GUID: "space-guid",
 						},
 					}, nil)
 				})
@@ -434,11 +439,11 @@ var _ = Describe("CreateRoute", func() {
 
 		BeforeEach(func() {
 			domainFields = models.DomainFields{
-				Guid: "domain-guid",
+				GUID: "domain-guid",
 				Name: "domain-name",
 			}
 			spaceFields = models.SpaceFields{
-				Guid: "space-guid",
+				GUID: "space-guid",
 				Name: "space-name",
 			}
 
@@ -454,8 +459,8 @@ var _ = Describe("CreateRoute", func() {
 			hostname, path, domain, space, port, randomPort := routeRepo.CreateInSpaceArgsForCall(0)
 			Expect(hostname).To(Equal("hostname"))
 			Expect(path).To(Equal("path"))
-			Expect(domain).To(Equal(domainFields.Guid))
-			Expect(space).To(Equal(spaceFields.Guid))
+			Expect(domain).To(Equal(domainFields.GUID))
+			Expect(space).To(Equal(spaceFields.GUID))
 			Expect(port).To(Equal(9090))
 			Expect(randomPort).To(BeTrue())
 		})
@@ -504,11 +509,11 @@ var _ = Describe("CreateRoute", func() {
 						Host: "hostname",
 						Path: "path",
 						Domain: models.DomainFields{
-							Guid: "domain-guid",
+							GUID: "domain-guid",
 							Name: "domain-name",
 						},
 						Space: models.SpaceFields{
-							Guid: "space-guid",
+							GUID: "space-guid",
 						},
 					}, nil)
 				})

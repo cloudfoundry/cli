@@ -4,17 +4,17 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -24,36 +24,36 @@ import (
 var _ = Describe("create-service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
-		serviceKeyRepo      *testapi.FakeServiceKeyRepo
-		deps                command_registry.Dependency
+		serviceRepo         *apifakes.FakeServiceRepository
+		serviceKeyRepo      *apifakes.OldFakeServiceKeyRepo
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetServiceKeyRepository(serviceKeyRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-service-key").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-service-key").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = &apifakes.FakeServiceRepository{}
 		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "fake-instance-guid"
+		serviceInstance.GUID = "fake-instance-guid"
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
-		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
+		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
 		requirementsFactory.ServiceInstance = serviceInstance
 	})
 
 	var callCreateService = func(args []string) bool {
-		return testcmd.RunCliCommand("create-service-key", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-service-key", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -87,7 +87,7 @@ var _ = Describe("create-service-key command", func() {
 				[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGuid).To(Equal("fake-instance-guid"))
+			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGUID).To(Equal("fake-instance-guid"))
 			Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
 		})
 
@@ -122,7 +122,7 @@ var _ = Describe("create-service-key command", func() {
 					[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"OK"},
 				))
-				Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGuid).To(Equal("fake-instance-guid"))
+				Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGUID).To(Equal("fake-instance-guid"))
 				Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
 				Expect(serviceKeyRepo.CreateServiceKeyMethod.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
 			})

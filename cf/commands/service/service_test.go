@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -19,23 +19,23 @@ var _ = Describe("service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service").SetDependency(deps, pluginCall))
+		deps.UI = ui
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -64,18 +64,18 @@ var _ = Describe("service command", func() {
 
 	Describe("After Requirement", func() {
 		createServiceInstanceWithState := func(state string) {
-			offering := models.ServiceOfferingFields{Label: "mysql", DocumentationUrl: "http://documentation.url", Description: "the-description"}
-			plan := models.ServicePlanFields{Guid: "plan-guid", Name: "plan-name"}
+			offering := models.ServiceOfferingFields{Label: "mysql", DocumentationURL: "http://documentation.url", Description: "the-description"}
+			plan := models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
 
 			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "service1"
-			serviceInstance.Guid = "service1-guid"
+			serviceInstance.GUID = "service1-guid"
 			serviceInstance.LastOperation.Type = "create"
 			serviceInstance.LastOperation.State = "in progress"
 			serviceInstance.LastOperation.Description = "creating resource - step 1"
 			serviceInstance.ServicePlan = plan
 			serviceInstance.ServiceOffering = offering
-			serviceInstance.DashboardUrl = "some-url"
+			serviceInstance.DashboardURL = "some-url"
 			serviceInstance.LastOperation.State = state
 			serviceInstance.LastOperation.CreatedAt = "created-date"
 			serviceInstance.LastOperation.UpdatedAt = "updated-date"
@@ -101,7 +101,7 @@ var _ = Describe("service command", func() {
 
 			It("populates the plugin model upon execution", func() {
 				createServiceInstanceWithState("in progress")
-				testcmd.RunCliCommand("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("service1"))
 				Expect(pluginModel.Guid).To(Equal("service1-guid"))
 				Expect(pluginModel.LastOperation.Type).To(Equal("create"))
@@ -231,7 +231,7 @@ var _ = Describe("service command", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
 					serviceInstance.Name = "service1"
-					serviceInstance.Guid = "service1-guid"
+					serviceInstance.GUID = "service1-guid"
 					requirementsFactory.ServiceInstance = serviceInstance
 				})
 
@@ -249,7 +249,7 @@ var _ = Describe("service command", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
 					serviceInstance.Tags = []string{"tag1", "tag2"}
-					serviceInstance.ServicePlan = models.ServicePlanFields{Guid: "plan-guid", Name: "plan-name"}
+					serviceInstance.ServicePlan = models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
 					requirementsFactory.ServiceInstance = serviceInstance
 				})
 

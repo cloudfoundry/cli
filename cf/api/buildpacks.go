@@ -7,27 +7,29 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . BuildpackRepository
+
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack models.Buildpack, apiErr error)
 	ListBuildpacks(func(models.Buildpack) bool) error
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error)
-	Delete(buildpackGuid string) (apiErr error)
+	Delete(buildpackGUID string) (apiErr error)
 	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error)
 }
 
 type CloudControllerBuildpackRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerBuildpackRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerBuildpackRepository) {
+func NewCloudControllerBuildpackRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerBuildpackRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -35,7 +37,7 @@ func NewCloudControllerBuildpackRepository(config core_config.Reader, gateway ne
 
 func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		buildpacks_path,
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
@@ -46,7 +48,7 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
 	foundIt := false
 	apiErr = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:"+name)),
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
@@ -70,7 +72,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.CreateResource(repo.config.ApiEndpoint(), buildpacks_path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.APIEndpoint(), buildpacks_path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
@@ -79,14 +81,14 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGuid)
-	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+func (repo CloudControllerBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
+	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGUID)
+	apiErr = repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 	return
 }
 
 func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
-	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpack.Guid)
+	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpack.GUID)
 
 	entity := resources.BuildpackEntity{
 		Name:     buildpack.Name,
@@ -104,7 +106,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

@@ -3,11 +3,11 @@ package user_test
 import (
 	"errors"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -23,32 +23,32 @@ var _ = Describe("space-users command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		spaceRepo           *testapi.FakeSpaceRepository
-		userRepo            *testapi.FakeUserRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		spaceRepo           *apifakes.FakeSpaceRepository
+		userRepo            *apifakes.FakeUserRepository
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space-users").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space-users").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
-		userRepo = &testapi.FakeUserRepository{}
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		spaceRepo = new(apifakes.FakeSpaceRepository)
+		userRepo = new(apifakes.FakeUserRepository)
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("space-users", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("space-users", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -78,10 +78,10 @@ var _ = Describe("space-users command", func() {
 
 			org := models.Organization{}
 			org.Name = "Org1"
-			org.Guid = "org1-guid"
+			org.GUID = "org1-guid"
 			space := models.Space{}
 			space.Name = "Space1"
-			space.Guid = "space1-guid"
+			space.GUID = "space1-guid"
 
 			requirementsFactory.Organization = org
 			spaceRepo.FindByNameInOrgReturns(space, nil)
@@ -132,7 +132,7 @@ var _ = Describe("space-users command", func() {
 
 		Context("when cc api verson is >= 2.21.0", func() {
 			BeforeEach(func() {
-				configRepo.SetApiVersion("2.22.0")
+				configRepo.SetAPIVersion("2.22.0")
 			})
 
 			It("calls ListUsersInSpaceForRoleWithNoUAA()", func() {
@@ -159,7 +159,7 @@ var _ = Describe("space-users command", func() {
 
 		Context("when cc api verson is < 2.21.0", func() {
 			It("calls ListUsersInSpaceForRole()", func() {
-				configRepo.SetApiVersion("2.20.0")
+				configRepo.SetAPIVersion("2.20.0")
 				runCommand("my-org", "my-space")
 
 				Expect(userRepo.ListUsersInSpaceForRoleWithNoUAACallCount()).To(Equal(0))
@@ -174,10 +174,10 @@ var _ = Describe("space-users command", func() {
 
 			org := models.Organization{}
 			org.Name = "Org1"
-			org.Guid = "org1-guid"
+			org.GUID = "org1-guid"
 			space := models.Space{}
 			space.Name = "Space1"
-			space.Guid = "space1-guid"
+			space.GUID = "space1-guid"
 
 			requirementsFactory.Organization = org
 			spaceRepo.FindByNameInOrgReturns(space, nil)
@@ -215,37 +215,37 @@ var _ = Describe("space-users command", func() {
 		)
 
 		BeforeEach(func() {
-			configRepo.SetApiVersion("2.22.0")
+			configRepo.SetAPIVersion("2.22.0")
 		})
 
 		Context("single roles", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "the-org"
-				org.Guid = "the-org-guid"
+				org.GUID = "the-org-guid"
 
 				space := models.Space{}
 				space.Name = "the-space"
-				space.Guid = "the-space-guid"
+				space.GUID = "the-space-guid"
 
 				// space managers
 				user := models.UserFields{}
 				user.Username = "user1"
-				user.Guid = "1111"
+				user.GUID = "1111"
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
-				user2.Guid = "2222"
+				user2.GUID = "2222"
 
 				// space auditor
 				user3 := models.UserFields{}
 				user3.Username = "user3"
-				user3.Guid = "3333"
+				user3.GUID = "3333"
 
 				// space developer
 				user4 := models.UserFields{}
 				user4.Username = "user4"
-				user4.Guid = "4444"
+				user4.GUID = "4444"
 
 				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
@@ -264,7 +264,7 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles", func() {
-				testcmd.RunCliCommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
@@ -292,30 +292,30 @@ var _ = Describe("space-users command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "the-org"
-				org.Guid = "the-org-guid"
+				org.GUID = "the-org-guid"
 
 				space := models.Space{}
 				space.Name = "the-space"
-				space.Guid = "the-space-guid"
+				space.GUID = "the-space-guid"
 
 				// space managers
 				user := models.UserFields{}
 				user.Username = "user1"
-				user.Guid = "1111"
+				user.GUID = "1111"
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
-				user2.Guid = "2222"
+				user2.GUID = "2222"
 
 				// space auditor
 				user3 := models.UserFields{}
 				user3.Username = "user3"
-				user3.Guid = "3333"
+				user3.GUID = "3333"
 
 				// space developer
 				user4 := models.UserFields{}
 				user4.Username = "user4"
-				user4.Guid = "4444"
+				user4.GUID = "4444"
 
 				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
@@ -334,7 +334,7 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles", func() {
-				testcmd.RunCliCommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("space-users", []string{"the-org", "the-space"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {

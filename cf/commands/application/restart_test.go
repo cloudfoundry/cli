@@ -1,16 +1,16 @@
 package application_test
 
 import (
-	appCmdFakes "github.com/cloudfoundry/cli/cf/commands/application/fakes"
+	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,61 +20,61 @@ var _ = Describe("restart command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		starter             *appCmdFakes.FakeApplicationStarter
-		stopper             *appCmdFakes.FakeApplicationStopper
-		config              core_config.Repository
+		starter             *applicationfakes.FakeApplicationStarter
+		stopper             *applicationfakes.FakeApplicationStopper
+		config              coreconfig.Repository
 		app                 models.Application
-		originalStop        command_registry.Command
-		originalStart       command_registry.Command
-		deps                command_registry.Dependency
+		originalStop        commandregistry.Command
+		originalStart       commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 
 		//inject fake 'stopper and starter' into registry
-		command_registry.Register(starter)
-		command_registry.Register(stopper)
+		commandregistry.Register(starter)
+		commandregistry.Register(stopper)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restart").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restart").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("restart", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restart", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		deps = command_registry.NewDependency(new(traceFakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 		requirementsFactory = &testreq.FakeReqFactory{}
-		starter = &appCmdFakes.FakeApplicationStarter{}
-		stopper = &appCmdFakes.FakeApplicationStopper{}
+		starter = new(applicationfakes.FakeApplicationStarter)
+		stopper = new(applicationfakes.FakeApplicationStopper)
 		config = testconfig.NewRepositoryWithDefaults()
 
 		app = models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 
 		//save original command and restore later
-		originalStart = command_registry.Commands.FindCommand("start")
-		originalStop = command_registry.Commands.FindCommand("stop")
+		originalStart = commandregistry.Commands.FindCommand("start")
+		originalStop = commandregistry.Commands.FindCommand("stop")
 
-		//setup fakes to correctly interact with command_registry
-		starter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fakes to correctly interact with commandregistry
+		starter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return starter
 		}
-		starter.MetaDataReturns(command_registry.CommandMetadata{Name: "start"})
+		starter.MetaDataReturns(commandregistry.CommandMetadata{Name: "start"})
 
-		stopper.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		stopper.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return stopper
 		}
-		stopper.MetaDataReturns(command_registry.CommandMetadata{Name: "stop"})
+		stopper.MetaDataReturns(commandregistry.CommandMetadata{Name: "stop"})
 	})
 
 	AfterEach(func() {
-		command_registry.Register(originalStart)
-		command_registry.Register(originalStop)
+		commandregistry.Register(originalStart)
+		commandregistry.Register(originalStop)
 	})
 
 	Describe("requirements", func() {

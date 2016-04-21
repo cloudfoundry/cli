@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -17,14 +17,14 @@ type PurgeServiceInstance struct {
 }
 
 func init() {
-	command_registry.Register(&PurgeServiceInstance{})
+	commandregistry.Register(&PurgeServiceInstance{})
 }
 
-func (cmd *PurgeServiceInstance) MetaData() command_registry.CommandMetadata {
+func (cmd *PurgeServiceInstance) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "purge-service-instance",
 		Description: T("Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"),
 		Usage: []string{
@@ -38,7 +38,7 @@ func (cmd *PurgeServiceInstance) MetaData() command_registry.CommandMetadata {
 
 func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-instance"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("purge-service-instance"))
 	}
 
 	minRequiredAPIVersion, err := semver.Make("2.36.0")
@@ -54,8 +54,8 @@ func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.F
 	return reqs
 }
 
-func (cmd *PurgeServiceInstance) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *PurgeServiceInstance) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	return cmd
 }

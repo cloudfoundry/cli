@@ -99,7 +99,7 @@ var _ = Describe("generate_manifest", func() {
 
 			Context("when an application has a buildpack", func() {
 				BeforeEach(func() {
-					m.BuildpackUrl("app1", "buildpack")
+					m.BuildpackURL("app1", "buildpack")
 				})
 
 				It("includes the buildpack url for that app", func() {

@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"sort"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -17,16 +17,16 @@ import (
 
 type Env struct {
 	ui      terminal.UI
-	config  core_config.Reader
+	config  coreconfig.Reader
 	appRepo applications.ApplicationRepository
 }
 
 func init() {
-	command_registry.Register(&Env{})
+	commandregistry.Register(&Env{})
 }
 
-func (cmd *Env) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *Env) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "env",
 		ShortName:   "e",
 		Description: T("Show all env variables for an app"),
@@ -38,7 +38,7 @@ func (cmd *Env) MetaData() command_registry.CommandMetadata {
 
 func (cmd *Env) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("env"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("env"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -49,8 +49,8 @@ func (cmd *Env) Requirements(requirementsFactory requirements.Factory, fc flags.
 	return reqs
 }
 
-func (cmd *Env) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Env) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	return cmd
@@ -69,7 +69,7 @@ func (cmd *Env) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	env, err := cmd.appRepo.ReadEnv(app.Guid)
+	env, err := cmd.appRepo.ReadEnv(app.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

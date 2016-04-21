@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/flags"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -18,9 +18,9 @@ const (
 	RunCommandResultRequirementsFailed = iota
 )
 
-func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (passedRequirements bool) {
+func RunCLICommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (passedRequirements bool) {
 	updateFunc(pluginCall)
-	cmd := command_registry.Commands.FindCommand(cmdName)
+	cmd := commandregistry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
 	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
 	err := context.Parse(args...)
@@ -51,8 +51,8 @@ func RunCliCommand(cmdName string, args []string, requirementsFactory *testreq.F
 	return
 }
 
-func RunCliCommandWithoutDependency(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
-	cmd := command_registry.Commands.FindCommand(cmdName)
+func RunCLICommandWithoutDependency(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
+	cmd := commandregistry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
 	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
 	err := context.Parse(args...)

@@ -4,9 +4,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,27 +21,27 @@ var _ = Describe("quota", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
-		quotaRepo           *fakes.FakeQuotaRepository
-		deps                command_registry.Dependency
+		config              coreconfig.Repository
+		quotaRepo           *quotasfakes.FakeQuotaRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		quotaRepo = &fakes.FakeQuotaRepository{}
+		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("When not logged in", func() {
@@ -68,7 +68,7 @@ var _ = Describe("quota", func() {
 			Context("that exists", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     5,
@@ -98,7 +98,7 @@ var _ = Describe("quota", func() {
 			Context("when the app instance limit is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     5,
@@ -128,7 +128,7 @@ var _ = Describe("quota", func() {
 			Context("when instance memory limit is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     -1,
@@ -156,7 +156,7 @@ var _ = Describe("quota", func() {
 			Context("when the services limit is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     14,

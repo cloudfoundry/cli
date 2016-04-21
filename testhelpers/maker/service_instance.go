@@ -2,15 +2,15 @@ package maker
 
 import "github.com/cloudfoundry/cli/cf/models"
 
-var serviceInstanceGuid func() string
+var serviceInstanceGUID func() string
 
 func init() {
-	serviceInstanceGuid = guidGenerator("services")
+	serviceInstanceGUID = guidGenerator("services")
 }
 
 func NewServiceInstance(name string) (service models.ServiceInstance) {
 	return models.ServiceInstance{ServiceInstanceFields: models.ServiceInstanceFields{
 		Name: name,
-		Guid: serviceInstanceGuid(),
+		GUID: serviceInstanceGUID(),
 	}}
 }

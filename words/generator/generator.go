@@ -8,6 +8,8 @@ import (
 	. "github.com/cloudfoundry/cli/words"
 )
 
+//go:generate counterfeiter . WordGenerator
+
 type WordGenerator interface {
 	Babble() string
 }

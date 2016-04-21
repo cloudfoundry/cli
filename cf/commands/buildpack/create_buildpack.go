@@ -10,7 +10,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -24,15 +24,15 @@ type CreateBuildpack struct {
 }
 
 func init() {
-	command_registry.Register(&CreateBuildpack{})
+	commandregistry.Register(&CreateBuildpack{})
 }
 
-func (cmd *CreateBuildpack) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateBuildpack) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["enable"] = &flags.BoolFlag{Name: "enable", Usage: T("Enable the buildpack to be used for staging")}
 	fs["disable"] = &flags.BoolFlag{Name: "disable", Usage: T("Disable the buildpack from being used for staging")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-buildpack",
 		Description: T("Create a buildpack"),
 		Usage: []string{
@@ -47,7 +47,7 @@ func (cmd *CreateBuildpack) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n") + command_registry.Commands.CommandUsage("create-buildpack"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n") + commandregistry.Commands.CommandUsage("create-buildpack"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -57,8 +57,8 @@ func (cmd *CreateBuildpack) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *CreateBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *CreateBuildpack) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
 	cmd.buildpackBitsRepo = deps.RepoLocator.GetBuildpackBitsRepository()
 	return cmd
@@ -72,7 +72,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
 
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BuildpackNameTaken {
+		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.BuildpackNameTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
 			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name + " " + "update-buildpack")}))

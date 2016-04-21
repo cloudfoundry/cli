@@ -3,8 +3,8 @@ package plugin
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -14,18 +14,18 @@ import (
 
 type Plugins struct {
 	ui     terminal.UI
-	config plugin_config.PluginConfiguration
+	config pluginconfig.PluginConfiguration
 }
 
 func init() {
-	command_registry.Register(&Plugins{})
+	commandregistry.Register(&Plugins{})
 }
 
-func (cmd *Plugins) MetaData() command_registry.CommandMetadata {
+func (cmd *Plugins) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["checksum"] = &flags.BoolFlag{Name: "checksum", Usage: T("Compute and show the sha1 value of the plugin binary file")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "plugins",
 		Description: T("List all available plugin commands"),
 		Usage: []string{
@@ -36,7 +36,7 @@ func (cmd *Plugins) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *Plugins) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -49,8 +49,8 @@ func (cmd *Plugins) Requirements(requirementsFactory requirements.Factory, fc fl
 	return reqs
 }
 
-func (cmd *Plugins) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *Plugins) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.PluginConfig
 	return cmd
 }
@@ -62,12 +62,12 @@ func (cmd *Plugins) Execute(c flags.FlagContext) {
 
 	plugins := cmd.config.Plugins()
 
-	var table terminal.Table
+	var table *terminal.UITable
 	if c.Bool("checksum") {
 		cmd.ui.Say(T("Computing sha1 for installed plugins, this may take a while ..."))
-		table = terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), "sha1", T("Command Help")})
+		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), "sha1", T("Command Help")})
 	} else {
-		table = terminal.NewTable(cmd.ui, []string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
+		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
 	}
 
 	for pluginName, metadata := range plugins {

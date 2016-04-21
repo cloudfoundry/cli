@@ -13,6 +13,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//go:generate counterfeiter . ManifestRepository
+
 type ManifestRepository interface {
 	ReadManifest(string) (*Manifest, error)
 }

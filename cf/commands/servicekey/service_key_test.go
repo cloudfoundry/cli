@@ -1,12 +1,12 @@
 package servicekey_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -21,36 +21,36 @@ import (
 var _ = Describe("service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
-		serviceKeyRepo      *testapi.FakeServiceKeyRepo
-		deps                command_registry.Dependency
+		serviceRepo         *apifakes.FakeServiceRepository
+		serviceKeyRepo      *apifakes.OldFakeServiceKeyRepo
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetServiceKeyRepository(serviceKeyRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("service-key").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("service-key").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "fake-service-instance-guid"
+		serviceInstance.GUID = "fake-service-instance-guid"
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
-		serviceKeyRepo = testapi.NewFakeServiceKeyRepo()
+		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
 		requirementsFactory.ServiceInstance = serviceInstance
 	})
 
 	var callGetServiceKey = func(args []string) bool {
-		return testcmd.RunCliCommand("service-key", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("service-key", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -83,10 +83,10 @@ var _ = Describe("service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{
 					Fields: models.ServiceKeyFields{
 						Name:                "fake-service-key",
-						Guid:                "fake-service-key-guid",
-						Url:                 "fake-service-key-url",
-						ServiceInstanceGuid: "fake-service-instance-guid",
-						ServiceInstanceUrl:  "fake-service-instance-url",
+						GUID:                "fake-service-key-guid",
+						URL:                 "fake-service-key-url",
+						ServiceInstanceGUID: "fake-service-instance-guid",
+						ServiceInstanceURL:  "fake-service-instance-url",
 					},
 					Credentials: map[string]interface{}{
 						"username": "fake-username",
@@ -111,7 +111,7 @@ var _ = Describe("service-key command", func() {
 					[]string{"uri", "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"},
 				))
 				Expect(ui.Outputs[1]).To(BeEmpty())
-				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGuid).To(Equal("fake-service-instance-guid"))
+				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGUID).To(Equal("fake-service-instance-guid"))
 			})
 
 			It("gets service guid when '--guid' flag is provided", func() {
