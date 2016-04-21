@@ -924,6 +924,10 @@
     "translation": "The targeted API endpoint could not be reached."
   },
   {
+    "id": "This command",
+    "translation": "This command"
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
   },

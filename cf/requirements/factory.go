@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 //go:generate counterfeiter . Factory
@@ -74,7 +75,7 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 
 func (f apiRequirementFactory) NewRoutingAPIRequirement() Requirement {
 	req := Requirements{
-		f.NewMinAPIVersionRequirement("RoutingAPI", cf.TcpRoutingMinimumAPIVersion),
+		f.NewMinAPIVersionRequirement(T("This command"), cf.TcpRoutingMinimumAPIVersion),
 		NewRoutingAPIRequirement(
 			f.config,
 		),
