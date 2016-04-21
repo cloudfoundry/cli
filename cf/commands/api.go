@@ -94,7 +94,7 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 		Config:       cmd.config,
 	}
 
-	err := refresher.Refresh()
+	warning, err := refresher.Refresh()
 	if err != nil {
 		cmd.config.SetApiEndpoint("")
 		cmd.config.SetSSLDisabled(false)
@@ -113,7 +113,7 @@ func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool, cmdName string) {
 		}
 	}
 
-	if !strings.HasPrefix(endpoint, "https://") {
-		cmd.ui.Say(terminal.WarningColor(T("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n")))
+	if warning != nil {
+		cmd.ui.Say(terminal.WarningColor(warning.Warn()))
 	}
 }

@@ -4,26 +4,28 @@ package requirementsfakes
 import (
 	"sync"
 
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 )
 
 type FakeConfigRefresher struct {
-	RefreshStub        func() error
+	RefreshStub        func() (coreconfig.Warning, error)
 	refreshMutex       sync.RWMutex
 	refreshArgsForCall []struct{}
 	refreshReturns     struct {
-		result1 error
+		result1 coreconfig.Warning
+		result2 error
 	}
 }
 
-func (fake *FakeConfigRefresher) Refresh() error {
+func (fake *FakeConfigRefresher) Refresh() (coreconfig.Warning, error) {
 	fake.refreshMutex.Lock()
 	fake.refreshArgsForCall = append(fake.refreshArgsForCall, struct{}{})
 	fake.refreshMutex.Unlock()
 	if fake.RefreshStub != nil {
 		return fake.RefreshStub()
 	} else {
-		return fake.refreshReturns.result1
+		return fake.refreshReturns.result1, fake.refreshReturns.result2
 	}
 }
 
@@ -33,11 +35,12 @@ func (fake *FakeConfigRefresher) RefreshCallCount() int {
 	return len(fake.refreshArgsForCall)
 }
 
-func (fake *FakeConfigRefresher) RefreshReturns(result1 error) {
+func (fake *FakeConfigRefresher) RefreshReturns(result1 coreconfig.Warning, result2 error) {
 	fake.RefreshStub = nil
 	fake.refreshReturns = struct {
-		result1 error
-	}{result1}
+		result1 coreconfig.Warning
+		result2 error
+	}{result1, result2}
 }
 
 var _ requirements.ConfigRefresher = new(FakeConfigRefresher)

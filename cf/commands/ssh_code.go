@@ -82,7 +82,7 @@ func (cmd *OneTimeSSHCode) Get() (string, error) {
 		Config:       cmd.config,
 	}
 
-	err := refresher.Refresh()
+	_, err := refresher.Refresh()
 	if err != nil {
 		return "", errors.New("Error refreshing config: " + err.Error())
 	}
