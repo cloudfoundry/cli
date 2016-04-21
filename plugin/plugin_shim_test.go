@@ -35,7 +35,7 @@ var _ = Describe("Command", func() {
 
 			BeforeEach(func() {
 				rpcHandlers = new(rpcserverfakes.FakeHandlers)
-				ts, err = rpcserver.NewTestRpcServer(rpcHandlers)
+				ts, err = rpcserver.NewTestRPCServer(rpcHandlers)
 				Expect(err).NotTo(HaveOccurred())
 
 				err = ts.Start()

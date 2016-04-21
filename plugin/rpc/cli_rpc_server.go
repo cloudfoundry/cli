@@ -23,14 +23,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
-type CliRpcService struct {
+type CliRPCService struct {
 	listener net.Listener
 	stopCh   chan struct{}
 	Pinged   bool
-	RpcCmd   *CliRpcCmd
+	RPCCmd   *CliRPCCmd
 }
 
-type CliRpcCmd struct {
+type CliRPCCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
@@ -53,16 +53,16 @@ type OutputCapture interface {
 	SetOutputBucket(io.Writer)
 }
 
-func NewRpcService(
+func NewRPCService(
 	outputCapture OutputCapture,
 	terminalOutputSwitch TerminalOutputSwitch,
 	cliConfig coreconfig.Repository,
 	repoLocator api.RepositoryLocator,
 	newCmdRunner CommandRunner,
 	logger trace.Printer,
-) (*CliRpcService, error) {
-	rpcService := &CliRpcService{
-		RpcCmd: &CliRpcCmd{
+) (*CliRPCService, error) {
+	rpcService := &CliRPCService{
+		RPCCmd: &CliRPCCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
@@ -74,7 +74,7 @@ func NewRpcService(
 		},
 	}
 
-	err := rpc.Register(rpcService.RpcCmd)
+	err := rpc.Register(rpcService.RPCCmd)
 	if err != nil {
 		return nil, err
 	}
@@ -82,16 +82,16 @@ func NewRpcService(
 	return rpcService, nil
 }
 
-func (cli *CliRpcService) Stop() {
+func (cli *CliRPCService) Stop() {
 	close(cli.stopCh)
 	cli.listener.Close()
 }
 
-func (cli *CliRpcService) Port() string {
+func (cli *CliRPCService) Port() string {
 	return strconv.Itoa(cli.listener.Addr().(*net.TCPAddr).Port)
 }
 
-func (cli *CliRpcService) Start() error {
+func (cli *CliRPCService) Start() error {
 	var err error
 
 	cli.stopCh = make(chan struct{})
@@ -120,7 +120,7 @@ func (cli *CliRpcService) Start() error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
+func (cmd *CliRPCCmd) IsMinCliVersion(version string, retVal *bool) error {
 	if cf.Version == "BUILT_FROM_SOURCE" {
 		*retVal = true
 		return nil
@@ -141,19 +141,19 @@ func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
+func (cmd *CliRPCCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
 	cmd.PluginMetadata = &pluginMetadata
 	*retVal = true
 	return nil
 }
 
-func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
+func (cmd *CliRPCCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
 	cmd.terminalOutputSwitch.DisableTerminalOutput(disable)
 	*retVal = true
 	return nil
 }
 
-func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
+func (cmd *CliRPCCmd) CallCoreCommand(args []string, retVal *bool) error {
 	defer func() {
 		recover()
 	}()
@@ -172,7 +172,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		deps.Config = cmd.cliConfig
 		deps.RepoLocator = cmd.repoLocator
 
-		//set command ui's TeePrinter to be the one used by RpcService, for output to be captured
+		//set command ui's TeePrinter to be the one used by RPCService, for output to be captured
 		deps.Ui = terminal.NewUI(os.Stdin, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
 
 		err = cmd.newCmdRunner.Command(args, deps, false)
@@ -190,98 +190,98 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
+func (cmd *CliRPCCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 	v := &[]string{cmd.outputBucket.String()}
 	*retVal = *v
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
+func (cmd *CliRPCCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
 	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
+func (cmd *CliRPCCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
 	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) Username(args string, retVal *string) error {
+func (cmd *CliRPCCmd) Username(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.Username()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) UserGuid(args string, retVal *string) error {
+func (cmd *CliRPCCmd) UserGuid(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.UserGuid()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) UserEmail(args string, retVal *string) error {
+func (cmd *CliRPCCmd) UserEmail(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.UserEmail()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) IsLoggedIn(args string, retVal *bool) error {
+func (cmd *CliRPCCmd) IsLoggedIn(args string, retVal *bool) error {
 	*retVal = cmd.cliConfig.IsLoggedIn()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) IsSSLDisabled(args string, retVal *bool) error {
+func (cmd *CliRPCCmd) IsSSLDisabled(args string, retVal *bool) error {
 	*retVal = cmd.cliConfig.IsSSLDisabled()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) HasOrganization(args string, retVal *bool) error {
+func (cmd *CliRPCCmd) HasOrganization(args string, retVal *bool) error {
 	*retVal = cmd.cliConfig.HasOrganization()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) HasSpace(args string, retVal *bool) error {
+func (cmd *CliRPCCmd) HasSpace(args string, retVal *bool) error {
 	*retVal = cmd.cliConfig.HasSpace()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) ApiEndpoint(args string, retVal *string) error {
+func (cmd *CliRPCCmd) ApiEndpoint(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.ApiEndpoint()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) HasAPIEndpoint(args string, retVal *bool) error {
+func (cmd *CliRPCCmd) HasAPIEndpoint(args string, retVal *bool) error {
 	*retVal = cmd.cliConfig.HasAPIEndpoint()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) ApiVersion(args string, retVal *string) error {
+func (cmd *CliRPCCmd) ApiVersion(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.ApiVersion()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) LoggregatorEndpoint(args string, retVal *string) error {
+func (cmd *CliRPCCmd) LoggregatorEndpoint(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.LoggregatorEndpoint()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) DopplerEndpoint(args string, retVal *string) error {
+func (cmd *CliRPCCmd) DopplerEndpoint(args string, retVal *string) error {
 	*retVal = cmd.cliConfig.DopplerEndpoint()
 
 	return nil
 }
 
-func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
+func (cmd *CliRPCCmd) AccessToken(args string, retVal *string) error {
 	token, err := cmd.repoLocator.GetAuthenticationRepository().RefreshAuthToken()
 	if err != nil {
 		return err
@@ -292,7 +292,7 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
+func (cmd *CliRPCCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
 	defer func() {
 		recover()
 	}()
@@ -310,7 +310,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
+func (cmd *CliRPCCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
 	defer func() {
 		recover()
 	}()
@@ -328,7 +328,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
+func (cmd *CliRPCCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -346,7 +346,7 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 	return cmd.newCmdRunner.Command([]string{"orgs"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
+func (cmd *CliRPCCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -364,7 +364,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
+func (cmd *CliRPCCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -383,7 +383,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 	return cmd.newCmdRunner.Command([]string{"services"}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
+func (cmd *CliRPCCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -401,7 +401,7 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
+func (cmd *CliRPCCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -419,7 +419,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
 }
 
-func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
+func (cmd *CliRPCCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -437,7 +437,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
+func (cmd *CliRPCCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
 	defer func() {
 		recover()
 	}()
@@ -455,7 +455,7 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 	return cmd.newCmdRunner.Command([]string{"space", spaceName}, deps, true)
 }
 
-func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
+func (cmd *CliRPCCmd) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
 	defer func() {
 		recover()
 	}()

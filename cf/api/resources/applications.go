@@ -57,14 +57,14 @@ type ApplicationEntity struct {
 	Routes               *[]AppRouteResource     `json:"routes,omitempty"`
 	Buildpack            *string                 `json:"buildpack,omitempty"`
 	DetectedBuildpack    *string                 `json:"detected_buildpack,omitempty"`
-	EnvironmentJson      *map[string]interface{} `json:"environment_json,omitempty"`
+	EnvironmentJSON      *map[string]interface{} `json:"environment_json,omitempty"`
 	HealthCheckType      *string                 `json:"health_check_type,omitempty"`
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
 	PackageState         *string                 `json:"package_state,omitempty"`
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
 	Diego                *bool                   `json:"diego,omitempty"`
 	DockerImage          *string                 `json:"docker_image,omitempty"`
-	EnableSsh            *bool                   `json:"enable_ssh,omitempty"`
+	EnableSSH            *bool                   `json:"enable_ssh,omitempty"`
 	PackageUpdatedAt     *time.Time              `json:"package_updated_at,omitempty"`
 	AppPorts             *[]int                  `json:"ports,omitempty"`
 }
@@ -104,7 +104,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		HealthCheckTimeout: app.HealthCheckTimeout,
 		DockerImage:        app.DockerImage,
 		Diego:              app.Diego,
-		EnableSsh:          app.EnableSsh,
+		EnableSSH:          app.EnableSSH,
 		PackageUpdatedAt:   app.PackageUpdatedAt,
 		AppPorts:           app.AppPorts,
 	}
@@ -115,7 +115,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	}
 
 	if app.EnvironmentVars != nil && *app.EnvironmentVars != nil {
-		entity.EnvironmentJson = app.EnvironmentVars
+		entity.EnvironmentJSON = app.EnvironmentVars
 	}
 
 	return entity
@@ -140,8 +140,8 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.State != nil {
 		app.State = strings.ToLower(*entity.State)
 	}
-	if entity.EnvironmentJson != nil {
-		app.EnvironmentVars = *entity.EnvironmentJson
+	if entity.EnvironmentJSON != nil {
+		app.EnvironmentVars = *entity.EnvironmentJSON
 	}
 	if entity.SpaceGuid != nil {
 		app.SpaceGuid = *entity.SpaceGuid
@@ -173,8 +173,8 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.Diego != nil {
 		app.Diego = *entity.Diego
 	}
-	if entity.EnableSsh != nil {
-		app.EnableSsh = *entity.EnableSsh
+	if entity.EnableSSH != nil {
+		app.EnableSSH = *entity.EnableSSH
 	}
 	if entity.PackageUpdatedAt != nil {
 		app.PackageUpdatedAt = entity.PackageUpdatedAt

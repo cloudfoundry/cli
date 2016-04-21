@@ -56,7 +56,7 @@ func (cmd *SSHEnabled) SetDependency(deps commandregistry.Dependency, pluginCall
 func (cmd *SSHEnabled) Execute(fc flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
-	if app.EnableSsh {
+	if app.EnableSSH {
 		cmd.ui.Say(fmt.Sprintf(T("ssh support is enabled for")+" '%s'", app.Name))
 	} else {
 		cmd.ui.Say(fmt.Sprintf(T("ssh support is disabled for")+" '%s'", app.Name))

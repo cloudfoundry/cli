@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 )
 
-func RunMethodIfExists(rpcService *CliRpcService, args []string, pluginList map[string]pluginconfig.PluginMetadata) bool {
+func RunMethodIfExists(rpcService *CliRPCService, args []string, pluginList map[string]pluginconfig.PluginMetadata) bool {
 	for _, metadata := range pluginList {
 		for _, command := range metadata.Commands {
 			if command.Name == args[0] || command.Alias == args[0] {

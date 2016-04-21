@@ -233,7 +233,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 			It("returns an error", func() {
 				_, err := repo.FindByNameAndOrgGuid("my-remote-quota", "totally-not-an-org")
-				Expect(err.(*errors.HttpNotFoundError)).To(HaveOccurred())
+				Expect(err.(*errors.HTTPNotFoundError)).To(HaveOccurred())
 			})
 		})
 	})

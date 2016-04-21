@@ -22,8 +22,8 @@ type Persistor interface {
 //go:generate counterfeiter . DataInterface
 
 type DataInterface interface {
-	JsonMarshalV3() ([]byte, error)
-	JsonUnmarshalV3([]byte) error
+	JSONMarshalV3() ([]byte, error)
+	JSONUnmarshalV3([]byte) error
 }
 
 type DiskPersistor struct {
@@ -72,12 +72,12 @@ func (dp DiskPersistor) read(data DataInterface) error {
 		return err
 	}
 
-	err = data.JsonUnmarshalV3(jsonBytes)
+	err = data.JSONUnmarshalV3(jsonBytes)
 	return err
 }
 
 func (dp DiskPersistor) write(data DataInterface) error {
-	bytes, err := data.JsonMarshalV3()
+	bytes, err := data.JSONMarshalV3()
 	if err != nil {
 		return err
 	}

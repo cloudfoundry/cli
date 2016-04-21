@@ -71,7 +71,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 		}
 
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
-		request.HttpReq.Header.Set("Content-Type", contentType)
+		request.HTTPReq.Header.Set("Content-Type", contentType)
 
 		response := &resources.Resource{}
 		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(repo.config.ApiEndpoint(), request, response, DefaultAppUploadBitsTimeout)
@@ -84,7 +84,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, 
 }
 
 func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFilesToCheck []resources.AppFileResource) ([]resources.AppFileResource, error) {
-	integrityFieldsJson, err := json.Marshal(mapAppFilesToIntegrityFields(appFilesToCheck))
+	integrityFieldsJSON, err := json.Marshal(mapAppFilesToIntegrityFields(appFilesToCheck))
 	if err != nil {
 		apiErr := fmt.Errorf("%s: %s", T("Failed to create json for resource_match request"), err.Error())
 		return nil, apiErr
@@ -94,7 +94,7 @@ func (repo CloudControllerApplicationBitsRepository) GetApplicationFiles(appFile
 	apiErr := repo.gateway.UpdateResourceSync(
 		repo.config.ApiEndpoint(),
 		"/v2/resource_match",
-		bytes.NewReader(integrityFieldsJson),
+		bytes.NewReader(integrityFieldsJSON),
 		&responseFieldsColl)
 
 	if apiErr != nil {
@@ -133,7 +133,7 @@ func appFilesBySha(in []resources.AppFileResource) (out map[string]resources.App
 	return out
 }
 
-func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, presentResourcesJson []byte) (boundary string, err error) {
+func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, presentResourcesJSON []byte) (boundary string, err error) {
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 
@@ -144,7 +144,7 @@ func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os
 		return
 	}
 
-	_, err = io.Copy(part, bytes.NewBuffer(presentResourcesJson))
+	_, err = io.Copy(part, bytes.NewBuffer(presentResourcesJSON))
 	if err != nil {
 		return
 	}

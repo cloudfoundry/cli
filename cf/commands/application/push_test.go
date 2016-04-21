@@ -1429,7 +1429,7 @@ var _ = Describe("Push Command", func() {
 		Context("when the app is already bound to the service", func() {
 			BeforeEach(func() {
 				appRepo.ReadReturns(maker.NewApp(maker.Overrides{}), nil)
-				serviceBinder.BindApplicationReturns.Error = errors.NewHttpError(500, errors.ServiceBindingAppServiceTaken, "it don't work")
+				serviceBinder.BindApplicationReturns.Error = errors.NewHTTPError(500, errors.ServiceBindingAppServiceTaken, "it don't work")
 			})
 
 			It("gracefully continues", func() {
@@ -1507,7 +1507,7 @@ var _ = Describe("Push Command", func() {
 		})
 
 		It("suggests using 'random-route' if the default route is taken", func() {
-			routeRepo.BindReturns(errors.NewHttpError(400, errors.InvalidRelation, "The URL not available"))
+			routeRepo.BindReturns(errors.NewHTTPError(400, errors.InvalidRelation, "The URL not available"))
 
 			callPush("existing-app")
 
@@ -1519,7 +1519,7 @@ var _ = Describe("Push Command", func() {
 		})
 
 		It("does not suggest using 'random-route' for other failures", func() {
-			routeRepo.BindReturns(errors.NewHttpError(500, "some-code", "exception happened"))
+			routeRepo.BindReturns(errors.NewHTTPError(500, "some-code", "exception happened"))
 
 			callPush("existing-app")
 

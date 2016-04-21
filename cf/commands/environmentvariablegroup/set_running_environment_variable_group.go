@@ -58,7 +58,7 @@ func (cmd *SetRunningEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 	if err != nil {
 		suggestionText := ""
 
-		httpError, ok := err.(cf_errors.HttpError)
+		httpError, ok := err.(cf_errors.HTTPError)
 		if ok && httpError.ErrorCode() == cf_errors.MessageParseError {
 			suggestionText = T(`
 

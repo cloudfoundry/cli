@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("HTTP Client", func() {
 	var (
-		client      HttpClientInterface
+		client      HTTPClientInterface
 		dumper      RequestDumper
 		fakePrinter *tracefakes.FakePrinter
 	)
@@ -25,7 +25,7 @@ var _ = Describe("HTTP Client", func() {
 	BeforeEach(func() {
 		fakePrinter = new(tracefakes.FakePrinter)
 		dumper = NewRequestDumper(fakePrinter)
-		client = NewHttpClient(&http.Transport{}, dumper)
+		client = NewHTTPClient(&http.Transport{}, dumper)
 	})
 
 	Describe("ExecuteCheckRedirect", func() {

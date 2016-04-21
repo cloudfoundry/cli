@@ -13,13 +13,13 @@ type TokenInfo struct {
 }
 
 func NewTokenInfo(accessToken string) (info TokenInfo) {
-	tokenJson, err := DecodeAccessToken(accessToken)
+	tokenJSON, err := DecodeAccessToken(accessToken)
 	if err != nil {
 		return TokenInfo{}
 	}
 
 	info = TokenInfo{}
-	err = json.Unmarshal(tokenJson, &info)
+	err = json.Unmarshal(tokenJSON, &info)
 	if err != nil {
 		return TokenInfo{}
 	}
@@ -27,7 +27,7 @@ func NewTokenInfo(accessToken string) (info TokenInfo) {
 	return info
 }
 
-func DecodeAccessToken(accessToken string) (tokenJson []byte, err error) {
+func DecodeAccessToken(accessToken string) (tokenJSON []byte, err error) {
 	tokenParts := strings.Split(accessToken, " ")
 
 	if len(tokenParts) < 2 {
@@ -41,8 +41,8 @@ func DecodeAccessToken(accessToken string) (tokenJson []byte, err error) {
 		return
 	}
 
-	encodedTokenJson := encodedParts[1]
-	return base64Decode(encodedTokenJson)
+	encodedTokenJSON := encodedParts[1]
+	return base64Decode(encodedTokenJSON)
 }
 
 func base64Decode(encodedData string) ([]byte, error) {

@@ -23,7 +23,7 @@ func (repo *OldFakeAppSummaryRepo) GetSummary(appGuid string) (summary models.Ap
 	summary = repo.GetSummarySummary
 
 	if repo.GetSummaryErrorCode != "" {
-		apiErr = errors.NewHttpError(400, repo.GetSummaryErrorCode, "Error")
+		apiErr = errors.NewHTTPError(400, repo.GetSummaryErrorCode, "Error")
 	}
 
 	return

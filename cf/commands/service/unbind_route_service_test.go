@@ -220,7 +220,7 @@ var _ = Describe("UnbindRouteService", func() {
 
 				Context("when unbinding the route service fails because it was not bound", func() {
 					BeforeEach(func() {
-						routeServiceBindingRepo.UnbindReturns(errors.NewHttpError(http.StatusOK, errors.InvalidRelation, "http-err"))
+						routeServiceBindingRepo.UnbindReturns(errors.NewHTTPError(http.StatusOK, errors.InvalidRelation, "http-err"))
 					})
 
 					It("says OK", func() {

@@ -108,7 +108,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
+				Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("90003"))
 			})
 		})
 	})

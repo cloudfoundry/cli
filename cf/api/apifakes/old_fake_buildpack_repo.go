@@ -49,7 +49,7 @@ func (repo *OldFakeBuildpackRepository) FindByName(name string) (buildpack model
 
 func (repo *OldFakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	if repo.CreateBuildpackExists {
-		return repo.CreateBuildpack, errors.NewHttpError(400, errors.BuildpackNameTaken, "Buildpack already exists")
+		return repo.CreateBuildpack, errors.NewHTTPError(400, errors.BuildpackNameTaken, "Buildpack already exists")
 	}
 
 	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}

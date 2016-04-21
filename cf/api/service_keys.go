@@ -49,7 +49,7 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid strin
 
 	err = c.gateway.CreateResource(c.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
-	if httpErr, ok := err.(errors.HttpError); ok {
+	if httpErr, ok := err.(errors.HTTPError); ok {
 		switch httpErr.ErrorCode() {
 		case errors.ServiceKeyNameTaken:
 			return errors.NewModelAlreadyExistsError("Service key", keyName)
@@ -93,7 +93,7 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 		})
 
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.NotAuthorized {
+		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.NotAuthorized {
 			return []models.ServiceKey{}, errors.NewNotAuthorizedError()
 		}
 		return []models.ServiceKey{}, err

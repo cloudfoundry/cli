@@ -26,7 +26,7 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 		return errors.NewInvalidTokenError(response.Description)
 	}
 
-	return errors.NewHttpError(statusCode, strconv.Itoa(response.Code), response.Description)
+	return errors.NewHTTPError(statusCode, strconv.Itoa(response.Code), response.Description)
 }
 
 func NewCloudControllerGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {

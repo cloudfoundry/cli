@@ -125,7 +125,7 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 
 	space, err := cmd.spaceRepo.Create(spaceName, orgGuid, spaceQuotaGuid)
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SpaceNameTaken {
+		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.SpaceNameTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Space {{.SpaceName}} already exists", map[string]interface{}{"SpaceName": spaceName}))
 			return

@@ -157,7 +157,7 @@ var _ = Describe("App", func() {
 					State:     models.InstanceRunning,
 					Details:   "fake-instance-details",
 					Since:     time.Date(2015, time.November, 19, 1, 1, 17, 0, time.UTC),
-					CpuUsage:  float64(0.25),
+					CPUUsage:  float64(0.25),
 					DiskUsage: int64(1 * formatters.GIGABYTE),
 					DiskQuota: int64(2 * formatters.GIGABYTE),
 					MemUsage:  int64(24 * formatters.MEGABYTE),
@@ -207,7 +207,7 @@ var _ = Describe("App", func() {
 				getAppSummaryModel.RunningInstances = 0
 				getAppSummaryModel.InstanceCount = 1
 				getAppSummaryModel.State = "stopped"
-				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.InstancesError, "error"))
+				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHTTPError(400, errors.InstancesError, "error"))
 			})
 
 			It("prints appropriate output", func() {
@@ -227,7 +227,7 @@ var _ = Describe("App", func() {
 				getAppSummaryModel.RunningInstances = 0
 				getAppSummaryModel.InstanceCount = 1
 				getAppSummaryModel.State = "stopped"
-				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHttpError(400, errors.NotStaged, "error"))
+				appSummaryRepo.GetSummaryReturns(getAppSummaryModel, errors.NewHTTPError(400, errors.NotStaged, "error"))
 			})
 
 			It("prints appropriate output", func() {
@@ -460,7 +460,7 @@ var _ = Describe("App", func() {
 				// from GetInstances model
 				Expect(getAppModel.Instances[0].State).To(Equal("running"))
 				Expect(getAppModel.Instances[0].Details).To(Equal("fake-instance-details"))
-				Expect(getAppModel.Instances[0].CpuUsage).To(Equal(float64(0.25)))
+				Expect(getAppModel.Instances[0].CPUUsage).To(Equal(float64(0.25)))
 				Expect(getAppModel.Instances[0].DiskUsage).To(Equal(int64(1 * formatters.GIGABYTE)))
 				Expect(getAppModel.Instances[0].DiskQuota).To(Equal(int64(2 * formatters.GIGABYTE)))
 				Expect(getAppModel.Instances[0].MemUsage).To(Equal(int64(24 * formatters.MEGABYTE)))

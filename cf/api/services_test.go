@@ -364,7 +364,7 @@ var _ = Describe("Services Repo", func() {
 
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(400, "", "")))
+				Expect(err).To(BeAssignableToTypeOf(errors.NewHTTPError(400, "", "")))
 			})
 		})
 	})
@@ -741,7 +741,7 @@ var _ = Describe("Services Repo", func() {
 
 			_, err := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 			Expect(err).To(HaveOccurred())
-			Expect(err.(errors.HttpError).ErrorCode()).To(Equal("10005"))
+			Expect(err.(errors.HTTPError).ErrorCode()).To(Equal("10005"))
 		})
 	})
 
@@ -824,7 +824,7 @@ var _ = Describe("Services Repo", func() {
 
 			_, err := repo.FindServiceOfferingsByLabel("offering-1")
 			Expect(err).To(HaveOccurred())
-			Expect(err.(errors.HttpError).ErrorCode()).To(Equal("10005"))
+			Expect(err.(errors.HTTPError).ErrorCode()).To(Equal("10005"))
 		})
 	})
 
@@ -884,7 +884,7 @@ var _ = Describe("Services Repo", func() {
 			It("returns a ModelNotFoundError", func() {
 				offering, err := repo.GetServiceOfferingByGuid("offering-1-guid")
 
-				Expect(err).To(BeAssignableToTypeOf(&errors.HttpNotFoundError{}))
+				Expect(err).To(BeAssignableToTypeOf(&errors.HTTPNotFoundError{}))
 				Expect(offering.Guid).To(Equal(""))
 			})
 		})
@@ -1164,7 +1164,7 @@ var _ = Describe("Services Repo", func() {
 				_, err := repo.FindServicePlanByDescription(planDescription)
 
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(500, "", "")))
+				Expect(err).To(BeAssignableToTypeOf(errors.NewHTTPError(500, "", "")))
 			})
 		})
 	})
@@ -1282,7 +1282,7 @@ var _ = Describe("Services Repo", func() {
 			})
 
 			_, err := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(400, "", "")))
+			Expect(err).To(BeAssignableToTypeOf(errors.NewHTTPError(400, "", "")))
 		})
 
 		Describe("when api returns query by label is invalid", func() {

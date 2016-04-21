@@ -76,7 +76,7 @@ var _ = Describe("disable-ssh command", func() {
 
 		Context("when enable_ssh is set to the true", func() {
 			BeforeEach(func() {
-				app.EnableSsh = true
+				app.EnableSSH = true
 				requirementsFactory.Application = app
 			})
 
@@ -89,7 +89,7 @@ var _ = Describe("disable-ssh command", func() {
 
 		Context("when enable_ssh is set to the false", func() {
 			BeforeEach(func() {
-				app.EnableSsh = false
+				app.EnableSSH = false
 				requirementsFactory.Application = app
 			})
 

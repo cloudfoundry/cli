@@ -47,12 +47,12 @@ func NewData() (data *Data) {
 	return
 }
 
-func (d *Data) JsonMarshalV3() (output []byte, err error) {
+func (d *Data) JSONMarshalV3() (output []byte, err error) {
 	d.ConfigVersion = 3
 	return json.MarshalIndent(d, "", "  ")
 }
 
-func (d *Data) JsonUnmarshalV3(input []byte) (err error) {
+func (d *Data) JSONUnmarshalV3(input []byte) (err error) {
 	err = json.Unmarshal(input, d)
 	if err != nil {
 		return

@@ -108,7 +108,7 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	params := c.String("c")
 
-	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
@@ -124,7 +124,7 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 
 	err = cmd.BindApplication(app, serviceInstance, paramsMap)
 	if err != nil {
-		if httperr, ok := err.(errors.HttpError); ok && httperr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
+		if httperr, ok := err.(errors.HTTPError); ok && httperr.ErrorCode() == errors.ServiceBindingAppServiceTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("App {{.AppName}} is already bound to {{.ServiceName}}.",
 				map[string]interface{}{

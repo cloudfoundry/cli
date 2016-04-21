@@ -63,7 +63,7 @@ func (cmd *UpdateSecurityGroup) Execute(context flags.FlagContext) {
 	}
 
 	pathToJSONFile := context.Args()[1]
-	rules, err := json.ParseJsonArray(pathToJSONFile)
+	rules, err := json.ParseJSONArray(pathToJSONFile)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

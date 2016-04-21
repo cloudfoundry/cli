@@ -161,7 +161,7 @@ var _ = Describe("SSH command", func() {
 			currentApp.Name = "my-app"
 			currentApp.State = "started"
 			currentApp.Guid = "my-app-guid"
-			currentApp.EnableSsh = true
+			currentApp.EnableSSH = true
 			currentApp.Diego = true
 
 			requirementsFactory.Application = currentApp

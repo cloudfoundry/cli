@@ -14,7 +14,7 @@ type UserEntity struct {
 
 type UAAUserResources struct {
 	Resources []struct {
-		Id       string
+		ID       string
 		Username string
 	}
 }
@@ -56,5 +56,5 @@ func NewUAAUserResource(username, password string) UAAUserResource {
 }
 
 type UAAUserFields struct {
-	Id string
+	ID string
 }

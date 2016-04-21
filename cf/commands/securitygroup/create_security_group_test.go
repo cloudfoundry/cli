@@ -119,7 +119,7 @@ var _ = Describe("create-security-group command", func() {
 
 				Context("when the group already exists", func() {
 					BeforeEach(func() {
-						securityGroupRepo.CreateReturns(errors.NewHttpError(400, errors.SecurityGroupNameTaken, "The security group is taken: my-group"))
+						securityGroupRepo.CreateReturns(errors.NewHTTPError(400, errors.SecurityGroupNameTaken, "The security group is taken: my-group"))
 					})
 
 					It("warns the user when group already exists", func() {

@@ -78,14 +78,14 @@ var _ = Describe("disable-ssh command", func() {
 			app = models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			app.EnableSsh = true
+			app.EnableSSH = true
 
 			requirementsFactory.Application = app
 		})
 
 		Context("when enable_ssh is already set to the false", func() {
 			BeforeEach(func() {
-				app.EnableSsh = false
+				app.EnableSSH = false
 				requirementsFactory.Application = app
 			})
 
@@ -102,7 +102,7 @@ var _ = Describe("disable-ssh command", func() {
 					app = models.Application{}
 					app.Name = "my-app"
 					app.Guid = "my-app-guid"
-					app.EnableSsh = false
+					app.EnableSSH = false
 
 					appRepo.UpdateReturns(app, nil)
 				})
@@ -113,7 +113,7 @@ var _ = Describe("disable-ssh command", func() {
 					Expect(appRepo.UpdateCallCount()).To(Equal(1))
 					appGUID, params := appRepo.UpdateArgsForCall(0)
 					Expect(appGUID).To(Equal("my-app-guid"))
-					Expect(*params.EnableSsh).To(BeFalse())
+					Expect(*params.EnableSSH).To(BeFalse())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"Disabling ssh support for 'my-app'"}))
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
@@ -136,7 +136,7 @@ var _ = Describe("disable-ssh command", func() {
 					app = models.Application{}
 					app.Name = "my-app"
 					app.Guid = "my-app-guid"
-					app.EnableSsh = true
+					app.EnableSSH = true
 					appRepo.UpdateReturns(app, nil)
 
 					runCommand("my-app")

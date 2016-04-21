@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestJson(t *testing.T) {
+func TestJSON(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Json Suite")
+	RunSpecs(t, "JSON Suite")
 }

@@ -69,7 +69,7 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 			routeActor.ui.Ok()
 			routeActor.ui.Say("")
 			return
-		case errors.HttpError:
+		case errors.HTTPError:
 			if apiErr.ErrorCode() == errors.InvalidRelation {
 				routeActor.ui.Failed(T("The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", map[string]interface{}{"URL": route.URL()}))
 			}

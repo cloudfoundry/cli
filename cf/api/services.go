@@ -64,7 +64,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGu
 func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offerings models.ServiceOfferings, err error) {
 	offerings, err = repo.getServiceOfferings(fmt.Sprintf("/v2/spaces/%s/services?q=%s", spaceGuid, url.QueryEscape("label:"+name)))
 
-	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BadQueryParameter {
+	if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.BadQueryParameter {
 		offerings, err = repo.findServiceOfferingsByPaginating(spaceGuid, name)
 	}
 
@@ -155,7 +155,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 
 	err = repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 
-	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.ServiceInstanceNameTaken {
+	if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.ServiceInstanceNameTaken {
 		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
 
 		if findInstanceErr == nil && serviceInstance.ServicePlan.Guid == planGuid {

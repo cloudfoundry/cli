@@ -97,7 +97,7 @@ var _ = Describe("bind-service command", func() {
 			))
 		})
 
-		It("warns the user when the error is non HttpError ", func() {
+		It("warns the user when the error is non HTTPError ", func() {
 			app := models.Application{}
 			app.Name = "my-app1"
 			app.Guid = "my-app1-guid1"
@@ -106,7 +106,7 @@ var _ = Describe("bind-service command", func() {
 			serviceInstance.Guid = "my-service1-guid1"
 			requirementsFactory.Application = app
 			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo = &apifakes.OldFakeServiceBindingRepo{CreateNonHttpErrCode: "1001"}
+			serviceBindingRepo = &apifakes.OldFakeServiceBindingRepo{CreateNonHTTPErrCode: "1001"}
 			callBindService([]string{"my-app1", "my-service1"})
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
