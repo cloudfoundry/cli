@@ -32,7 +32,7 @@ func NewOrgUsersPluginPrinter(
 			var orgUsers []plugin_models.GetOrgUsers_Model
 			for _, user := range users {
 				orgUsers = append(orgUsers, plugin_models.GetOrgUsers_Model{
-					GUID:     user.GUID,
+					Guid:     user.GUID,
 					Username: user.Username,
 					IsAdmin:  user.IsAdmin,
 					Roles:    user.Roles,
@@ -56,7 +56,7 @@ func NewSpaceUsersPluginPrinter(
 			var spaceUsers []plugin_models.GetSpaceUsers_Model
 			for _, user := range users {
 				spaceUsers = append(spaceUsers, plugin_models.GetSpaceUsers_Model{
-					GUID:     user.GUID,
+					Guid:     user.GUID,
 					Username: user.Username,
 					IsAdmin:  user.IsAdmin,
 					Roles:    user.Roles,

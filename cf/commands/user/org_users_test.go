@@ -321,16 +321,16 @@ var _ = Describe("org-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.GUID).To(Equal("1111"))
+						Expect(u.Guid).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER}))
 					case "user2":
-						Expect(u.GUID).To(Equal("2222"))
+						Expect(u.Guid).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER}))
 					case "user3":
-						Expect(u.GUID).To(Equal("3333"))
+						Expect(u.Guid).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_AUDITOR}))
 					case "user4":
-						Expect(u.GUID).To(Equal("4444"))
+						Expect(u.Guid).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.BILLING_MANAGER}))
 					default:
 						Fail("unexpected user: " + u.Username)
@@ -343,7 +343,7 @@ var _ = Describe("org-users command", func() {
 				testcmd.RunCliCommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginUserModel).To(HaveLen(1))
 				Expect(pluginUserModel[0].Username).To(Equal("user3"))
-				Expect(pluginUserModel[0].GUID).To(Equal("3333"))
+				Expect(pluginUserModel[0].Guid).To(Equal("3333"))
 				Expect(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_USER))
 			})
 
@@ -399,17 +399,17 @@ var _ = Describe("org-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.GUID).To(Equal("1111"))
+						Expect(u.Guid).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER, models.ORG_AUDITOR}))
 						Expect(u.IsAdmin).To(BeTrue())
 					case "user2":
-						Expect(u.GUID).To(Equal("2222"))
+						Expect(u.Guid).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER, models.BILLING_MANAGER}))
 					case "user3":
-						Expect(u.GUID).To(Equal("3333"))
+						Expect(u.Guid).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_AUDITOR, models.ORG_MANAGER}))
 					case "user4":
-						Expect(u.GUID).To(Equal("4444"))
+						Expect(u.Guid).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.BILLING_MANAGER, models.ORG_MANAGER}))
 					default:
 						Fail("unexpected user: " + u.Username)
@@ -425,16 +425,16 @@ var _ = Describe("org-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.GUID).To(Equal("1111"))
+						Expect(u.Guid).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
 					case "user2":
-						Expect(u.GUID).To(Equal("2222"))
+						Expect(u.Guid).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
 					case "user3":
-						Expect(u.GUID).To(Equal("3333"))
+						Expect(u.Guid).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
 					case "user4":
-						Expect(u.GUID).To(Equal("4444"))
+						Expect(u.Guid).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
 					default:
 						Fail("unexpected user: " + u.Username)

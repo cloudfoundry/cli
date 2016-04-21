@@ -24,7 +24,7 @@ type Handlers interface {
 	GetCurrentOrg(args string, retVal *plugin_models.Organization) error
 	GetCurrentSpace(args string, retVal *plugin_models.Space) error
 	Username(args string, retVal *string) error
-	UserGUID(args string, retVal *string) error
+	UserGuid(args string, retVal *string) error
 	UserEmail(args string, retVal *string) error
 	IsLoggedIn(args string, retVal *bool) error
 	IsSSLDisabled(args string, retVal *bool) error
@@ -55,7 +55,7 @@ type TestServer struct {
 	server   *rpc.Server
 }
 
-func NewTestRPCServer(handlers Handlers) (*TestServer, error) {
+func NewTestRpcServer(handlers Handlers) (*TestServer, error) {
 	ts := &TestServer{
 		Handlers: handlers,
 	}
@@ -65,7 +65,7 @@ func NewTestRPCServer(handlers Handlers) (*TestServer, error) {
 	defer log.SetOutput(os.Stdout)
 
 	server := rpc.NewServer()
-	err := server.RegisterName("CliRPCCmd", ts.Handlers)
+	err := server.RegisterName("CliRpcCmd", ts.Handlers)
 	if err != nil {
 		return nil, err
 	}

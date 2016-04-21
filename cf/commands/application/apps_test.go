@@ -160,9 +160,9 @@ var _ = Describe("list-apps command", func() {
 			testcmd.RunCliCommand("apps", []string{}, requirementsFactory, updateCommandDependency, true)
 
 			Expect(pluginAppModels[0].Name).To(Equal("Application-1"))
-			Expect(pluginAppModels[0].GUID).To(Equal("Application-1-guid"))
+			Expect(pluginAppModels[0].Guid).To(Equal("Application-1-guid"))
 			Expect(pluginAppModels[1].Name).To(Equal("Application-2"))
-			Expect(pluginAppModels[1].GUID).To(Equal("Application-2-guid"))
+			Expect(pluginAppModels[1].Guid).To(Equal("Application-2-guid"))
 			Expect(pluginAppModels[0].State).To(Equal("started"))
 			Expect(pluginAppModels[0].TotalInstances).To(Equal(1))
 			Expect(pluginAppModels[0].RunningInstances).To(Equal(1))
@@ -174,8 +174,8 @@ var _ = Describe("list-apps command", func() {
 			Expect(pluginAppModels[0].Routes[1].Host).To(Equal("app1"))
 			Expect(pluginAppModels[0].Routes[0].Domain.Name).To(Equal("cfapps.io"))
 			Expect(pluginAppModels[0].Routes[0].Domain.Shared).To(BeTrue())
-			Expect(pluginAppModels[0].Routes[0].Domain.OwningOrganizationGUID).To(Equal("org-123"))
-			Expect(pluginAppModels[0].Routes[0].Domain.GUID).To(Equal("domain-guid"))
+			Expect(pluginAppModels[0].Routes[0].Domain.OwningOrganizationGuid).To(Equal("org-123"))
+			Expect(pluginAppModels[0].Routes[0].Domain.Guid).To(Equal("domain-guid"))
 		})
 	})
 

@@ -210,13 +210,13 @@ func (cmd *ShowApp) populatePluginModel(
 	stack *models.Stack,
 	instances []models.AppInstanceFields,
 ) {
-	cmd.pluginAppModel.BuildpackURL = getSummaryApp.BuildpackURL
+	cmd.pluginAppModel.BuildpackUrl = getSummaryApp.BuildpackURL
 	cmd.pluginAppModel.Command = getSummaryApp.Command
 	cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
 	cmd.pluginAppModel.Diego = getSummaryApp.Diego
 	cmd.pluginAppModel.DiskQuota = getSummaryApp.DiskQuota
 	cmd.pluginAppModel.EnvironmentVars = getSummaryApp.EnvironmentVars
-	cmd.pluginAppModel.GUID = getSummaryApp.GUID
+	cmd.pluginAppModel.Guid = getSummaryApp.GUID
 	cmd.pluginAppModel.HealthCheckTimeout = getSummaryApp.HealthCheckTimeout
 	cmd.pluginAppModel.InstanceCount = getSummaryApp.InstanceCount
 	cmd.pluginAppModel.Memory = getSummaryApp.Memory
@@ -224,11 +224,11 @@ func (cmd *ShowApp) populatePluginModel(
 	cmd.pluginAppModel.PackageState = getSummaryApp.PackageState
 	cmd.pluginAppModel.PackageUpdatedAt = getSummaryApp.PackageUpdatedAt
 	cmd.pluginAppModel.RunningInstances = getSummaryApp.RunningInstances
-	cmd.pluginAppModel.SpaceGUID = getSummaryApp.SpaceGUID
+	cmd.pluginAppModel.SpaceGuid = getSummaryApp.SpaceGUID
 	cmd.pluginAppModel.AppPorts = getSummaryApp.AppPorts
 	cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
 		Name: stack.Name,
-		GUID: stack.GUID,
+		Guid: stack.GUID,
 	}
 	cmd.pluginAppModel.StagingFailedReason = getSummaryApp.StagingFailedReason
 	cmd.pluginAppModel.State = getSummaryApp.State
@@ -238,7 +238,7 @@ func (cmd *ShowApp) populatePluginModel(
 			State:     string(instance.State),
 			Details:   instance.Details,
 			Since:     instance.Since,
-			CPUUsage:  instance.CPUUsage,
+			CpuUsage:  instance.CPUUsage,
 			DiskQuota: instance.DiskQuota,
 			DiskUsage: instance.DiskUsage,
 			MemQuota:  instance.MemQuota,
@@ -250,10 +250,10 @@ func (cmd *ShowApp) populatePluginModel(
 	for i := range getSummaryApp.Routes {
 		routeSummary := plugin_models.GetApp_RouteSummary{
 			Host: getSummaryApp.Routes[i].Host,
-			GUID: getSummaryApp.Routes[i].GUID,
+			Guid: getSummaryApp.Routes[i].GUID,
 			Domain: plugin_models.GetApp_DomainFields{
 				Name: getSummaryApp.Routes[i].Domain.Name,
-				GUID: getSummaryApp.Routes[i].Domain.GUID,
+				Guid: getSummaryApp.Routes[i].Domain.GUID,
 			},
 		}
 		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, routeSummary)
@@ -262,7 +262,7 @@ func (cmd *ShowApp) populatePluginModel(
 	for i := range getSummaryApp.Services {
 		serviceSummary := plugin_models.GetApp_ServiceSummary{
 			Name: getSummaryApp.Services[i].Name,
-			GUID: getSummaryApp.Services[i].GUID,
+			Guid: getSummaryApp.Services[i].GUID,
 		}
 		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, serviceSummary)
 	}

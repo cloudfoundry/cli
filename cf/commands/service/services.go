@@ -109,10 +109,10 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) {
 		if cmd.pluginCall {
 			s := plugin_models.GetServices_Model{
 				Name: instance.Name,
-				GUID: instance.GUID,
+				Guid: instance.GUID,
 				ServicePlan: plugin_models.GetServices_ServicePlan{
 					Name: instance.ServicePlan.Name,
-					GUID: instance.ServicePlan.GUID,
+					Guid: instance.ServicePlan.GUID,
 				},
 				Service: plugin_models.GetServices_ServiceFields{
 					Name: instance.ServiceOffering.Label,

@@ -35,7 +35,7 @@ func (c *cliConnection) sendPluginMetadataToCliServer(metadata PluginMetadata) {
 	var success bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.SetPluginMetadata", metadata, &success)
+		return client.Call("CliRpcCmd.SetPluginMetadata", metadata, &success)
 	})
 
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *cliConnection) isMinCliVersion(version string) bool {
 	var result bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.IsMinCliVersion", version, &result)
+		return client.Call("CliRpcCmd.IsMinCliVersion", version, &result)
 	})
 
 	if err != nil {
@@ -83,9 +83,9 @@ func (c *cliConnection) callCliCommand(silently bool, args ...string) ([]string,
 	)
 
 	c.withClientDo(func(client *rpc.Client) error {
-		disableTerminalOutputErr = client.Call("CliRPCCmd.DisableTerminalOutput", silently, &success)
-		callCoreCommandErr = client.Call("CliRPCCmd.CallCoreCommand", args, &success)
-		getOutputAndResetErr = client.Call("CliRPCCmd.GetOutputAndReset", success, &cmdOutput)
+		disableTerminalOutputErr = client.Call("CliRpcCmd.DisableTerminalOutput", silently, &success)
+		callCoreCommandErr = client.Call("CliRpcCmd.CallCoreCommand", args, &success)
+		getOutputAndResetErr = client.Call("CliRpcCmd.GetOutputAndReset", success, &cmdOutput)
 
 		return nil
 	})
@@ -132,7 +132,7 @@ func (c *cliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
 	var result plugin_models.Organization
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetCurrentOrg", "", &result)
+		return client.Call("CliRpcCmd.GetCurrentOrg", "", &result)
 	})
 
 	return result, err
@@ -142,7 +142,7 @@ func (c *cliConnection) GetCurrentSpace() (plugin_models.Space, error) {
 	var result plugin_models.Space
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetCurrentSpace", "", &result)
+		return client.Call("CliRpcCmd.GetCurrentSpace", "", &result)
 	})
 
 	return result, err
@@ -152,17 +152,17 @@ func (c *cliConnection) Username() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.Username", "", &result)
+		return client.Call("CliRpcCmd.Username", "", &result)
 	})
 
 	return result, err
 }
 
-func (c *cliConnection) UserGUID() (string, error) {
+func (c *cliConnection) UserGuid() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.UserGUID", "", &result)
+		return client.Call("CliRpcCmd.UserGuid", "", &result)
 	})
 
 	return result, err
@@ -172,7 +172,7 @@ func (c *cliConnection) UserEmail() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.UserEmail", "", &result)
+		return client.Call("CliRpcCmd.UserEmail", "", &result)
 	})
 
 	return result, err
@@ -182,7 +182,7 @@ func (c *cliConnection) IsSSLDisabled() (bool, error) {
 	var result bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.IsSSLDisabled", "", &result)
+		return client.Call("CliRpcCmd.IsSSLDisabled", "", &result)
 	})
 
 	return result, err
@@ -192,7 +192,7 @@ func (c *cliConnection) IsLoggedIn() (bool, error) {
 	var result bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.IsLoggedIn", "", &result)
+		return client.Call("CliRpcCmd.IsLoggedIn", "", &result)
 	})
 
 	return result, err
@@ -202,7 +202,7 @@ func (c *cliConnection) HasOrganization() (bool, error) {
 	var result bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.HasOrganization", "", &result)
+		return client.Call("CliRpcCmd.HasOrganization", "", &result)
 	})
 
 	return result, err
@@ -212,7 +212,7 @@ func (c *cliConnection) HasSpace() (bool, error) {
 	var result bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.HasSpace", "", &result)
+		return client.Call("CliRpcCmd.HasSpace", "", &result)
 	})
 
 	return result, err
@@ -222,7 +222,7 @@ func (c *cliConnection) ApiEndpoint() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.ApiEndpoint", "", &result)
+		return client.Call("CliRpcCmd.ApiEndpoint", "", &result)
 	})
 
 	return result, err
@@ -232,7 +232,7 @@ func (c *cliConnection) HasAPIEndpoint() (bool, error) {
 	var result bool
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.HasAPIEndpoint", "", &result)
+		return client.Call("CliRpcCmd.HasAPIEndpoint", "", &result)
 	})
 
 	return result, err
@@ -242,7 +242,7 @@ func (c *cliConnection) ApiVersion() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.ApiVersion", "", &result)
+		return client.Call("CliRpcCmd.ApiVersion", "", &result)
 	})
 
 	return result, err
@@ -252,7 +252,7 @@ func (c *cliConnection) LoggregatorEndpoint() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.LoggregatorEndpoint", "", &result)
+		return client.Call("CliRpcCmd.LoggregatorEndpoint", "", &result)
 	})
 
 	return result, err
@@ -262,7 +262,7 @@ func (c *cliConnection) DopplerEndpoint() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.DopplerEndpoint", "", &result)
+		return client.Call("CliRpcCmd.DopplerEndpoint", "", &result)
 	})
 
 	return result, err
@@ -272,7 +272,7 @@ func (c *cliConnection) AccessToken() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.AccessToken", "", &result)
+		return client.Call("CliRpcCmd.AccessToken", "", &result)
 	})
 
 	return result, err
@@ -282,7 +282,7 @@ func (c *cliConnection) GetApp(appName string) (plugin_models.GetAppModel, error
 	var result plugin_models.GetAppModel
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetApp", appName, &result)
+		return client.Call("CliRpcCmd.GetApp", appName, &result)
 	})
 
 	return result, err
@@ -292,7 +292,7 @@ func (c *cliConnection) GetApps() ([]plugin_models.GetAppsModel, error) {
 	var result []plugin_models.GetAppsModel
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetApps", "", &result)
+		return client.Call("CliRpcCmd.GetApps", "", &result)
 	})
 
 	return result, err
@@ -302,7 +302,7 @@ func (c *cliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, error) {
 	var result []plugin_models.GetOrgs_Model
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetOrgs", "", &result)
+		return client.Call("CliRpcCmd.GetOrgs", "", &result)
 	})
 
 	return result, err
@@ -312,7 +312,7 @@ func (c *cliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model, error) {
 	var result []plugin_models.GetSpaces_Model
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetSpaces", "", &result)
+		return client.Call("CliRpcCmd.GetSpaces", "", &result)
 	})
 
 	return result, err
@@ -322,7 +322,7 @@ func (c *cliConnection) GetServices() ([]plugin_models.GetServices_Model, error)
 	var result []plugin_models.GetServices_Model
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetServices", "", &result)
+		return client.Call("CliRpcCmd.GetServices", "", &result)
 	})
 
 	return result, err
@@ -334,7 +334,7 @@ func (c *cliConnection) GetOrgUsers(orgName string, args ...string) ([]plugin_mo
 	cmdArgs := append([]string{orgName}, args...)
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetOrgUsers", cmdArgs, &result)
+		return client.Call("CliRpcCmd.GetOrgUsers", cmdArgs, &result)
 	})
 
 	return result, err
@@ -346,7 +346,7 @@ func (c *cliConnection) GetSpaceUsers(orgName string, spaceName string) ([]plugi
 	cmdArgs := []string{orgName, spaceName}
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetSpaceUsers", cmdArgs, &result)
+		return client.Call("CliRpcCmd.GetSpaceUsers", cmdArgs, &result)
 	})
 
 	return result, err
@@ -356,7 +356,7 @@ func (c *cliConnection) GetOrg(orgName string) (plugin_models.GetOrg_Model, erro
 	var result plugin_models.GetOrg_Model
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetOrg", orgName, &result)
+		return client.Call("CliRpcCmd.GetOrg", orgName, &result)
 	})
 
 	return result, err
@@ -366,7 +366,7 @@ func (c *cliConnection) GetSpace(spaceName string) (plugin_models.GetSpace_Model
 	var result plugin_models.GetSpace_Model
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetSpace", spaceName, &result)
+		return client.Call("CliRpcCmd.GetSpace", spaceName, &result)
 	})
 
 	return result, err
@@ -376,7 +376,7 @@ func (c *cliConnection) GetService(serviceInstance string) (plugin_models.GetSer
 	var result plugin_models.GetService_Model
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.GetService", serviceInstance, &result)
+		return client.Call("CliRpcCmd.GetService", serviceInstance, &result)
 	})
 
 	return result, err

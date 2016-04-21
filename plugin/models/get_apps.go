@@ -2,7 +2,7 @@ package plugin_models
 
 type GetAppsModel struct {
 	Name             string
-	GUID             string
+	Guid             string
 	State            string
 	TotalInstances   int
 	RunningInstances int
@@ -13,14 +13,14 @@ type GetAppsModel struct {
 }
 
 type GetAppsRouteSummary struct {
-	GUID   string
+	Guid   string
 	Host   string
 	Domain GetAppsDomainFields
 }
 
 type GetAppsDomainFields struct {
-	GUID                   string
+	Guid                   string
 	Name                   string
-	OwningOrganizationGUID string
+	OwningOrganizationGuid string
 	Shared                 bool
 }
