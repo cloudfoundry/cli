@@ -44,7 +44,7 @@ var _ = Describe("create-service-key command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = &apifakes.FakeServiceRepository{}
 		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "fake-instance-guid"
+		serviceInstance.GUID = "fake-instance-guid"
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
@@ -87,7 +87,7 @@ var _ = Describe("create-service-key command", func() {
 				[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGuid).To(Equal("fake-instance-guid"))
+			Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGUID).To(Equal("fake-instance-guid"))
 			Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
 		})
 
@@ -122,7 +122,7 @@ var _ = Describe("create-service-key command", func() {
 					[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"OK"},
 				))
-				Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGuid).To(Equal("fake-instance-guid"))
+				Expect(serviceKeyRepo.CreateServiceKeyMethod.InstanceGUID).To(Equal("fake-instance-guid"))
 				Expect(serviceKeyRepo.CreateServiceKeyMethod.KeyName).To(Equal("fake-service-key"))
 				Expect(serviceKeyRepo.CreateServiceKeyMethod.Params).To(Equal(map[string]interface{}{"foo": "bar"}))
 			})

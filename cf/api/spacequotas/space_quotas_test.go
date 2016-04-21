@@ -81,13 +81,13 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			Expect(quota).To(Equal(models.SpaceQuota{
-				Guid:                    "my-quota-guid",
+				GUID:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
 				MemoryLimit:             1024,
 				RoutesLimit:             123,
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
-				OrgGuid:                 "my-org-guid",
+				OrgGUID:                 "my-org-guid",
 				AppInstanceLimit:        333,
 			}))
 		})
@@ -98,7 +98,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		})
 	})
 
-	Describe("FindByNameAndOrgGuid", func() {
+	Describe("FindByNameAndOrgGUID", func() {
 		Context("when the org exists", func() {
 			Context("when the app_instance_limit is provided", func() {
 				BeforeEach(func() {
@@ -142,23 +142,23 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				})
 
 				It("Finds Quota definitions by name and org guid", func() {
-					quota, err := repo.FindByNameAndOrgGuid("my-remote-quota", "other-org-guid")
+					quota, err := repo.FindByNameAndOrgGUID("my-remote-quota", "other-org-guid")
 					Expect(err).NotTo(HaveOccurred())
 					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 					Expect(quota).To(Equal(models.SpaceQuota{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "my-remote-quota",
 						MemoryLimit:             1024,
 						RoutesLimit:             123,
 						ServicesLimit:           321,
 						NonBasicServicesAllowed: true,
-						OrgGuid:                 "other-org-guid",
+						OrgGUID:                 "other-org-guid",
 						AppInstanceLimit:        333,
 					}))
 				})
 
 				It("Returns an error if the quota cannot be found", func() {
-					_, err := repo.FindByNameAndOrgGuid("totally-not-a-quota", "other-org-guid")
+					_, err := repo.FindByNameAndOrgGUID("totally-not-a-quota", "other-org-guid")
 					Expect(err.(*errors.ModelNotFoundError)).To(HaveOccurred())
 				})
 			})
@@ -204,17 +204,17 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				})
 
 				It("sets app instance limit to -1", func() {
-					quota, err := repo.FindByNameAndOrgGuid("my-remote-quota", "other-org-guid")
+					quota, err := repo.FindByNameAndOrgGUID("my-remote-quota", "other-org-guid")
 					Expect(err).NotTo(HaveOccurred())
 					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 					Expect(quota).To(Equal(models.SpaceQuota{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "my-remote-quota",
 						MemoryLimit:             1024,
 						RoutesLimit:             123,
 						ServicesLimit:           321,
 						NonBasicServicesAllowed: true,
-						OrgGuid:                 "other-org-guid",
+						OrgGUID:                 "other-org-guid",
 						AppInstanceLimit:        -1,
 					}))
 				})
@@ -232,7 +232,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			})
 
 			It("returns an error", func() {
-				_, err := repo.FindByNameAndOrgGuid("my-remote-quota", "totally-not-an-org")
+				_, err := repo.FindByNameAndOrgGUID("my-remote-quota", "totally-not-an-org")
 				Expect(err.(*errors.HTTPNotFoundError)).To(HaveOccurred())
 			})
 		})
@@ -283,21 +283,21 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(quotas).To(HaveLen(3))
 
-			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
+			Expect(quotas[0].GUID).To(Equal("my-quota-guid"))
 			Expect(quotas[0].Name).To(Equal("my-remote-quota"))
 			Expect(quotas[0].MemoryLimit).To(Equal(int64(1024)))
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
-			Expect(quotas[0].OrgGuid).To(Equal("my-org-guid"))
+			Expect(quotas[0].OrgGUID).To(Equal("my-org-guid"))
 
-			Expect(quotas[1].Guid).To(Equal("my-quota-guid2"))
-			Expect(quotas[1].OrgGuid).To(Equal("my-org-guid"))
-			Expect(quotas[2].Guid).To(Equal("my-quota-guid3"))
-			Expect(quotas[2].OrgGuid).To(Equal("my-org-guid"))
+			Expect(quotas[1].GUID).To(Equal("my-quota-guid2"))
+			Expect(quotas[1].OrgGUID).To(Equal("my-org-guid"))
+			Expect(quotas[2].GUID).To(Equal("my-quota-guid3"))
+			Expect(quotas[2].OrgGUID).To(Equal("my-org-guid"))
 		})
 	})
 
-	Describe("FindByGuid", func() {
+	Describe("FindByGUID", func() {
 		BeforeEach(func() {
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -337,23 +337,23 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			)
 		})
 
-		It("Finds Quota definitions by Guid", func() {
-			quota, err := repo.FindByGuid("my-quota-guid")
+		It("Finds Quota definitions by GUID", func() {
+			quota, err := repo.FindByGUID("my-quota-guid")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(quota).To(Equal(models.SpaceQuota{
-				Guid:                    "my-quota-guid",
+				GUID:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
 				MemoryLimit:             1024,
 				RoutesLimit:             123,
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
-				OrgGuid:                 "my-org-guid",
+				OrgGUID:                 "my-org-guid",
 				AppInstanceLimit:        -1,
 			}))
 		})
 
 		It("Returns an error if the quota cannot be found", func() {
-			_, err := repo.FindByGuid("totally-not-a-quota-guid")
+			_, err := repo.FindByGUID("totally-not-a-quota-guid")
 			Expect(err.(*errors.ModelNotFoundError)).NotTo(BeNil())
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 		})
@@ -417,7 +417,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				ServicesLimit:    1,
 				RoutesLimit:      12,
 				MemoryLimit:      123,
-				OrgGuid:          "my-org-guid",
+				OrgGUID:          "my-org-guid",
 				AppInstanceLimit: 10,
 			}
 			err := repo.Create(quota)
@@ -449,7 +449,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("updates an existing quota", func() {
 			quota := models.SpaceQuota{
-				Guid: "my-quota-guid",
+				GUID: "my-quota-guid",
 				Name: "amazing-quota",
 				NonBasicServicesAllowed: false,
 				ServicesLimit:           1,
@@ -457,7 +457,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				MemoryLimit:             123,
 				InstanceMemoryLimit:     1234,
 				AppInstanceLimit:        23,
-				OrgGuid:                 "myorgguid",
+				OrgGUID:                 "myorgguid",
 			}
 
 			err := repo.Update(quota)

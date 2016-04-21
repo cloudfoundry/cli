@@ -40,7 +40,7 @@ var _ = Describe("Routes", func() {
 			}
 
 			route = models.Route{
-				Guid: "some-guid",
+				GUID: "some-guid",
 			}
 
 			fakeRouteRepository.CreateReturns(route, nil)

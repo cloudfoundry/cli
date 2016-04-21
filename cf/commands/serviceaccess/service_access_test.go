@@ -85,7 +85,7 @@ var _ = Describe("service-access command", func() {
 	Describe("when logged in", func() {
 		BeforeEach(func() {
 			serviceBroker1 = models.ServiceBroker{
-				Guid: "broker1",
+				GUID: "broker1",
 				Name: "brokername1",
 				Services: []models.ServiceOffering{
 					{
@@ -105,7 +105,7 @@ var _ = Describe("service-access command", func() {
 				},
 			}
 			serviceBroker2 = models.ServiceBroker{
-				Guid: "broker2",
+				GUID: "broker2",
 				Name: "brokername2",
 				Services: []models.ServiceOffering{
 					{ServiceOfferingFields: models.ServiceOfferingFields{Label: "my-service-3"}},

@@ -77,6 +77,6 @@ func (cmd *Restage) Execute(c flags.FlagContext) {
 	app.PackageState = ""
 
 	cmd.appStagingWatcher.ApplicationWatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
-		return app, cmd.appRepo.CreateRestageRequest(app.Guid)
+		return app, cmd.appRepo.CreateRestageRequest(app.GUID)
 	})
 }

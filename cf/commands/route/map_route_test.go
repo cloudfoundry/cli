@@ -78,14 +78,14 @@ var _ = Describe("MapRoute", func() {
 		factory.NewApplicationRequirementReturns(applicationRequirement)
 
 		fakeApplication := models.Application{}
-		fakeApplication.Guid = "fake-app-guid"
+		fakeApplication.GUID = "fake-app-guid"
 		applicationRequirement.GetApplicationReturns(fakeApplication)
 
 		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{
-			Guid: "fake-domain-guid",
+			GUID: "fake-domain-guid",
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
@@ -369,7 +369,7 @@ var _ = Describe("MapRoute", func() {
 			Expect(domain).To(Equal(fakeDomain))
 			Expect(space).To(Equal(models.SpaceFields{
 				Name: "my-space",
-				Guid: "my-space-guid",
+				GUID: "my-space-guid",
 			}))
 		})
 
@@ -429,7 +429,7 @@ var _ = Describe("MapRoute", func() {
 			BeforeEach(func() {
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
-				fakeRouteCreator.CreateRouteReturns(models.Route{Guid: "fake-route-guid"}, nil)
+				fakeRouteCreator.CreateRouteReturns(models.Route{GUID: "fake-route-guid"}, nil)
 			})
 
 			It("tells the user that it is adding the route", func() {

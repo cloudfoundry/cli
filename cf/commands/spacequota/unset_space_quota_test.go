@@ -82,11 +82,11 @@ var _ = Describe("unset-space-quota command", func() {
 			space := models.Space{
 				SpaceFields: models.SpaceFields{
 					Name: "my-space",
-					Guid: "my-space-guid",
+					GUID: "my-space-guid",
 				},
 			}
 
-			quota := models.SpaceQuota{Name: "my-quota", Guid: "my-quota-guid"}
+			quota := models.SpaceQuota{Name: "my-quota", GUID: "my-quota-guid"}
 
 			quotaRepo.FindByNameReturns(quota, nil)
 			spaceRepo.FindByNameReturns(space, nil)
@@ -99,9 +99,9 @@ var _ = Describe("unset-space-quota command", func() {
 			))
 
 			Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("my-quota"))
-			spaceGuid, quotaGuid := quotaRepo.UnassignQuotaFromSpaceArgsForCall(0)
-			Expect(spaceGuid).To(Equal("my-space-guid"))
-			Expect(quotaGuid).To(Equal("my-quota-guid"))
+			spaceGUID, quotaGUID := quotaRepo.UnassignQuotaFromSpaceArgsForCall(0)
+			Expect(spaceGUID).To(Equal("my-space-guid"))
+			Expect(quotaGUID).To(Equal("my-quota-guid"))
 		})
 	})
 })

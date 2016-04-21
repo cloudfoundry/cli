@@ -91,10 +91,10 @@ var _ = Describe("Endpoints Repository", func() {
 			)
 			BeforeEach(func() {
 				org.Name = "my-org"
-				org.Guid = "my-org-guid"
+				org.GUID = "my-org-guid"
 
 				space.Name = "my-space"
-				space.Guid = "my-space-guid"
+				space.GUID = "my-space-guid"
 
 				coreConfig.SetOrganizationFields(org)
 				coreConfig.SetSpaceFields(space)

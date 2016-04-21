@@ -83,7 +83,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 
 			space = models.Space{}
 			space.Name = "the-space-name"
-			space.Guid = "the-space-guid"
+			space.GUID = "the-space-guid"
 		})
 
 		Context("when allow_ssh is already set to the false", func() {

@@ -39,7 +39,7 @@ var _ = Describe("delete-user command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
 		token, err := testconfig.EncodeAccessToken(coreconfig.TokenInfo{
-			UserGuid: "admin-user-guid",
+			UserGUID: "admin-user-guid",
 			Username: "admin-user",
 		})
 		Expect(err).ToNot(HaveOccurred())
@@ -69,7 +69,7 @@ var _ = Describe("delete-user command", func() {
 		BeforeEach(func() {
 			userRepo.FindByUsernameReturns(models.UserFields{
 				Username: "user-name",
-				Guid:     "user-guid",
+				GUID:     "user-guid",
 			}, nil)
 		})
 

@@ -16,8 +16,8 @@ import (
 //go:generate counterfeiter . LogsRepository
 
 type LogsRepository interface {
-	RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error)
-	TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error)
+	RecentLogsFor(appGUID string) ([]*logmessage.LogMessage, error)
+	TailLogsFor(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error)
 	Close()
 }
 
@@ -43,14 +43,14 @@ func (repo *LoggregatorLogsRepository) Close() {
 	repo.consumer.Close()
 }
 
-func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
-	messages, err := repo.consumer.Recent(appGuid, repo.config.AccessToken())
+func (repo *LoggregatorLogsRepository) RecentLogsFor(appGUID string) ([]*logmessage.LogMessage, error) {
+	messages, err := repo.consumer.Recent(appGUID, repo.config.AccessToken())
 
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
-		messages, err = repo.consumer.Recent(appGuid, repo.config.AccessToken())
+		messages, err = repo.consumer.Recent(appGUID, repo.config.AccessToken())
 	default:
 		return messages, err
 	}
@@ -59,7 +59,7 @@ func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmess
 	return messages, err
 }
 
-func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+func (repo *LoggregatorLogsRepository) TailLogsFor(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 	ticker := time.NewTicker(bufferTime)
 
 	c := make(chan *logmessage.LogMessage)
@@ -70,12 +70,12 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect fun
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
-	logChan, err := repo.consumer.Tail(appGuid, repo.config.AccessToken())
+	logChan, err := repo.consumer.Tail(appGUID, repo.config.AccessToken())
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
-		logChan, err = repo.consumer.Tail(appGuid, repo.config.AccessToken())
+		logChan, err = repo.consumer.Tail(appGUID, repo.config.AccessToken())
 	default:
 		return nil, err
 	}

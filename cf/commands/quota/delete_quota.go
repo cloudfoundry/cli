@@ -82,7 +82,7 @@ func (cmd *DeleteQuota) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(apiErr.Error())
 	}
 
-	apiErr = cmd.quotaRepo.Delete(quota.Guid)
+	apiErr = cmd.quotaRepo.Delete(quota.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}

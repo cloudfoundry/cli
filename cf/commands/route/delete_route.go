@@ -132,7 +132,7 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 		return
 	}
 
-	err = cmd.routeRepo.Delete(route.Guid)
+	err = cmd.routeRepo.Delete(route.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

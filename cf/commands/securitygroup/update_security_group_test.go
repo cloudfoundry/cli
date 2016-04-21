@@ -75,7 +75,7 @@ var _ = Describe("update-security-group command", func() {
 			securityGroup := models.SecurityGroup{
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name: "my-group-name",
-					Guid: "my-group-guid",
+					GUID: "my-group-guid",
 				},
 			}
 			securityGroupRepo.ReadReturns(securityGroup, nil)

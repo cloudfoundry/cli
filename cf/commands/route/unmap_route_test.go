@@ -69,14 +69,14 @@ var _ = Describe("UnmapRoute", func() {
 		factory.NewApplicationRequirementReturns(applicationRequirement)
 
 		fakeApplication := models.Application{}
-		fakeApplication.Guid = "fake-app-guid"
+		fakeApplication.GUID = "fake-app-guid"
 		applicationRequirement.GetApplicationReturns(fakeApplication)
 
 		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{
-			Guid: "fake-domain-guid",
+			GUID: "fake-domain-guid",
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
@@ -287,7 +287,7 @@ var _ = Describe("UnmapRoute", func() {
 
 		Context("when the route can be found", func() {
 			BeforeEach(func() {
-				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, nil)
+				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
 			})
 
 			It("tells the user that it is removing the route", func() {
@@ -300,9 +300,9 @@ var _ = Describe("UnmapRoute", func() {
 			Context("when the returned route has an app with the requested app's guid", func() {
 				BeforeEach(func() {
 					route := models.Route{
-						Guid: "route-guid",
+						GUID: "route-guid",
 						Apps: []models.ApplicationFields{
-							{Guid: "fake-app-guid"},
+							{GUID: "fake-app-guid"},
 						},
 					}
 					routeRepo.FindReturns(route, nil)
@@ -347,9 +347,9 @@ var _ = Describe("UnmapRoute", func() {
 			Context("when the returned route does not have an app with the requested app's guid", func() {
 				BeforeEach(func() {
 					route := models.Route{
-						Guid: "route-guid",
+						GUID: "route-guid",
 						Apps: []models.ApplicationFields{
-							{Guid: "other-fake-app-guid"},
+							{GUID: "other-fake-app-guid"},
 						},
 					}
 					routeRepo.FindReturns(route, nil)

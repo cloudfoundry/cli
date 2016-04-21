@@ -83,7 +83,7 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) {
 
 	}
 
-	apiErr = cmd.buildpackRepo.Delete(buildpack.Guid)
+	apiErr = cmd.buildpackRepo.Delete(buildpack.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error deleting buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 			"Name":  terminal.EntityNameColor(buildpack.Name),

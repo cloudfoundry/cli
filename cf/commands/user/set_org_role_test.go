@@ -126,9 +126,9 @@ var _ = Describe("SetOrgRole", func() {
 					It("returns a UserRequirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGuid).To(BeFalse())
+						Expect(actualWantGUID).To(BeFalse())
 
 						Expect(actualRequirements).To(ContainElement(userRequirement))
 					})
@@ -142,9 +142,9 @@ var _ = Describe("SetOrgRole", func() {
 					It("returns a UserRequirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGuid).To(BeTrue())
+						Expect(actualWantGUID).To(BeTrue())
 
 						Expect(actualRequirements).To(ContainElement(userRequirement))
 					})
@@ -158,9 +158,9 @@ var _ = Describe("SetOrgRole", func() {
 					It("returns a UserRequirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGuid).To(BeTrue())
+						Expect(actualWantGUID).To(BeTrue())
 
 						Expect(actualRequirements).To(ContainElement(userRequirement))
 					})
@@ -175,9 +175,9 @@ var _ = Describe("SetOrgRole", func() {
 				It("returns a UserRequirement", func() {
 					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-					actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+					actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 					Expect(actualUsername).To(Equal("the-user-name"))
-					Expect(actualWantGuid).To(BeTrue())
+					Expect(actualWantGUID).To(BeTrue())
 
 					Expect(actualRequirements).To(ContainElement(userRequirement))
 				})
@@ -191,14 +191,14 @@ var _ = Describe("SetOrgRole", func() {
 			cmd.Requirements(factory, flagContext)
 
 			org := models.Organization{}
-			org.Guid = "the-org-guid"
+			org.GUID = "the-org-guid"
 			org.Name = "the-org-name"
 			organizationRequirement.GetOrganizationReturns(org)
 		})
 
 		Context("when the UserRequirement returns a user with a GUID", func() {
 			BeforeEach(func() {
-				userFields := models.UserFields{Guid: "the-user-guid", Username: "the-user-name"}
+				userFields := models.UserFields{GUID: "the-user-guid", Username: "the-user-name"}
 				userRequirement.GetUserReturns(userFields)
 			})
 
@@ -212,8 +212,8 @@ var _ = Describe("SetOrgRole", func() {
 
 			It("sets the role using the GUID", func() {
 				cmd.Execute(flagContext)
-				Expect(userRepo.SetOrgRoleByGuidCallCount()).To(Equal(1))
-				actualUserGUID, actualOrgGUID, actualRole := userRepo.SetOrgRoleByGuidArgsForCall(0)
+				Expect(userRepo.SetOrgRoleByGUIDCallCount()).To(Equal(1))
+				actualUserGUID, actualOrgGUID, actualRole := userRepo.SetOrgRoleByGUIDArgsForCall(0)
 				Expect(actualUserGUID).To(Equal("the-user-guid"))
 				Expect(actualOrgGUID).To(Equal("the-org-guid"))
 				Expect(actualRole).To(Equal("OrgManager"))
@@ -221,7 +221,7 @@ var _ = Describe("SetOrgRole", func() {
 
 			Context("when the call to CC fails", func() {
 				BeforeEach(func() {
-					userRepo.SetOrgRoleByGuidReturns(errors.New("user-repo-error"))
+					userRepo.SetOrgRoleByGUIDReturns(errors.New("user-repo-error"))
 				})
 
 				It("panics and prints a failure message", func() {
@@ -241,9 +241,9 @@ var _ = Describe("SetOrgRole", func() {
 
 			It("sets the role using the given username", func() {
 				cmd.Execute(flagContext)
-				username, orgGuid, role := userRepo.SetOrgRoleByUsernameArgsForCall(0)
+				username, orgGUID, role := userRepo.SetOrgRoleByUsernameArgsForCall(0)
 				Expect(username).To(Equal("the-user-name"))
-				Expect(orgGuid).To(Equal("the-org-guid"))
+				Expect(orgGUID).To(Equal("the-org-guid"))
 				Expect(role).To(Equal("OrgManager"))
 			})
 

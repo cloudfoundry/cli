@@ -80,7 +80,7 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) {
 		return
 	}
 
-	apiErr = cmd.userRepo.Delete(user.Guid)
+	apiErr = cmd.userRepo.Delete(user.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

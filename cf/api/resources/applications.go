@@ -48,11 +48,11 @@ type ApplicationEntity struct {
 	Command              *string                 `json:"command,omitempty"`
 	DetectedStartCommand *string                 `json:"detected_start_command,omitempty"`
 	State                *string                 `json:"state,omitempty"`
-	SpaceGuid            *string                 `json:"space_guid,omitempty"`
+	SpaceGUID            *string                 `json:"space_guid,omitempty"`
 	Instances            *int                    `json:"instances,omitempty"`
 	Memory               *int64                  `json:"memory,omitempty"`
 	DiskQuota            *int64                  `json:"disk_quota,omitempty"`
-	StackGuid            *string                 `json:"stack_guid,omitempty"`
+	StackGUID            *string                 `json:"stack_guid,omitempty"`
 	Stack                *StackResource          `json:"stack,omitempty"`
 	Routes               *[]AppRouteResource     `json:"routes,omitempty"`
 	Buildpack            *string                 `json:"buildpack,omitempty"`
@@ -70,15 +70,15 @@ type ApplicationEntity struct {
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
-	route.Guid = resource.Metadata.Guid
+	route.GUID = resource.Metadata.GUID
 	route.Host = resource.Entity.Host
 	return
 }
 
 func (resource AppRouteResource) ToModel() (route models.RouteSummary) {
-	route.Guid = resource.Metadata.Guid
+	route.GUID = resource.Metadata.GUID
 	route.Host = resource.Entity.Host
-	route.Domain.Guid = resource.Entity.Domain.Metadata.Guid
+	route.Domain.GUID = resource.Entity.Domain.Metadata.GUID
 	route.Domain.Name = resource.Entity.Domain.Entity.Name
 	return
 }
@@ -94,11 +94,11 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	entity := ApplicationEntity{
 		Buildpack:          app.BuildpackUrl,
 		Name:               app.Name,
-		SpaceGuid:          app.SpaceGuid,
+		SpaceGUID:          app.SpaceGUID,
 		Instances:          app.InstanceCount,
 		Memory:             app.Memory,
 		DiskQuota:          app.DiskQuota,
-		StackGuid:          app.StackGuid,
+		StackGUID:          app.StackGUID,
 		Command:            app.Command,
 		HealthCheckType:    app.HealthCheckType,
 		HealthCheckTimeout: app.HealthCheckTimeout,
@@ -123,7 +123,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 
 func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	entity := resource.Entity
-	app.Guid = resource.Metadata.Guid
+	app.GUID = resource.Metadata.GUID
 
 	if entity.Name != nil {
 		app.Name = *entity.Name
@@ -143,8 +143,8 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.EnvironmentJSON != nil {
 		app.EnvironmentVars = *entity.EnvironmentJSON
 	}
-	if entity.SpaceGuid != nil {
-		app.SpaceGuid = *entity.SpaceGuid
+	if entity.SpaceGUID != nil {
+		app.SpaceGUID = *entity.SpaceGUID
 	}
 	if entity.DetectedStartCommand != nil {
 		app.DetectedStartCommand = *entity.DetectedStartCommand

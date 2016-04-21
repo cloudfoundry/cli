@@ -69,7 +69,7 @@ func (cmd *RenameApp) Execute(c flags.FlagContext) {
 
 	params := models.AppParams{Name: &newName}
 
-	_, apiErr := cmd.appRepo.Update(app.Guid, params)
+	_, apiErr := cmd.appRepo.Update(app.GUID, params)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

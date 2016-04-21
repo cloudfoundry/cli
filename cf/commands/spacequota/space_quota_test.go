@@ -78,7 +78,7 @@ var _ = Describe("quotas command", func() {
 						RoutesLimit:             111,
 						ServicesLimit:           222,
 						NonBasicServicesAllowed: true,
-						OrgGuid:                 "my-org-guid",
+						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        5,
 					}, nil)
 			})
@@ -107,7 +107,7 @@ var _ = Describe("quotas command", func() {
 							RoutesLimit:             111,
 							ServicesLimit:           -1,
 							NonBasicServicesAllowed: true,
-							OrgGuid:                 "my-org-guid",
+							OrgGUID:                 "my-org-guid",
 						}, nil)
 
 				})
@@ -136,7 +136,7 @@ var _ = Describe("quotas command", func() {
 							RoutesLimit:             111,
 							ServicesLimit:           222,
 							NonBasicServicesAllowed: true,
-							OrgGuid:                 "my-org-guid",
+							OrgGUID:                 "my-org-guid",
 							AppInstanceLimit:        -1,
 						}, nil)
 				})
@@ -166,7 +166,7 @@ var _ = Describe("quotas command", func() {
 							RoutesLimit:             111,
 							ServicesLimit:           222,
 							NonBasicServicesAllowed: true,
-							OrgGuid:                 "my-org-guid",
+							OrgGUID:                 "my-org-guid",
 							AppInstanceLimit:        -1,
 						}, nil)
 				})

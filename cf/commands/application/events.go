@@ -66,7 +66,7 @@ func (cmd *Events) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{T("time"), T("event"), T("actor"), T("description")})
 
-	events, apiErr := cmd.eventsRepo.RecentEvents(app.Guid, 50)
+	events, apiErr := cmd.eventsRepo.RecentEvents(app.GUID, 50)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Failed fetching events.\n{{.ApiErr}}",
 			map[string]interface{}{"ApiErr": apiErr.Error()}))

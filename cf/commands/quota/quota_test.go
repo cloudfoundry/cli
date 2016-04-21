@@ -68,7 +68,7 @@ var _ = Describe("quota", func() {
 			Context("that exists", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     5,
@@ -98,7 +98,7 @@ var _ = Describe("quota", func() {
 			Context("when the app instance limit is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     5,
@@ -128,7 +128,7 @@ var _ = Describe("quota", func() {
 			Context("when instance memory limit is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     -1,
@@ -156,7 +156,7 @@ var _ = Describe("quota", func() {
 			Context("when the services limit is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
-						Guid:                    "my-quota-guid",
+						GUID:                    "my-quota-guid",
 						Name:                    "muh-muh-muh-my-qua-quota",
 						MemoryLimit:             512,
 						InstanceMemoryLimit:     14,

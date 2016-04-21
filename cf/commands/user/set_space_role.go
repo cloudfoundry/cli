@@ -21,7 +21,7 @@ import (
 
 type SpaceRoleSetter interface {
 	commandregistry.Command
-	SetSpaceRole(space models.Space, role, userGuid, userName string) (err error)
+	SetSpaceRole(space models.Space, role, userGUID, userName string) (err error)
 }
 
 type SetSpaceRole struct {
@@ -57,15 +57,15 @@ func (cmd *SetSpaceRole) Requirements(requirementsFactory requirements.Factory, 
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("set-space-role"))
 	}
 
-	var wantGuid bool
+	var wantGUID bool
 	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
-		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -92,18 +92,18 @@ func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.SetSpaceRole(space, role, user.Guid, user.Username)
+	err = cmd.SetSpaceRole(space, role, user.GUID, user.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 }
 
-func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userName string) error {
+func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGUID, userName string) error {
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"Role":        terminal.EntityNameColor(role),
@@ -114,10 +114,10 @@ func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userNa
 		}))
 
 	var err error
-	if len(userGuid) > 0 {
-		err = cmd.userRepo.SetSpaceRoleByGuid(userGuid, space.Guid, space.Organization.Guid, role)
+	if len(userGUID) > 0 {
+		err = cmd.userRepo.SetSpaceRoleByGUID(userGUID, space.GUID, space.Organization.GUID, role)
 	} else {
-		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.Guid, space.Organization.Guid, role)
+		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.GUID, space.Organization.GUID, role)
 	}
 	if err != nil {
 		return err

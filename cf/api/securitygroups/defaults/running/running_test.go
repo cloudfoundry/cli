@@ -108,7 +108,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 			Expect(defaults).To(ConsistOf([]models.SecurityGroupFields{
 				{
 					Name:     "name-71",
-					Guid:     "cd186158-b356-474d-9861-724f34f48502",
+					GUID:     "cd186158-b356-474d-9861-724f34f48502",
 					SpaceUrl: "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces",
 					Rules: []map[string]interface{}{{
 						"protocol": "udp",
@@ -116,7 +116,7 @@ var _ = Describe("RunningSecurityGroupsRepo", func() {
 				},
 				{
 					Name:     "name-72",
-					Guid:     "d3374b62-7eac-4823-afbd-460d2bf44c67",
+					GUID:     "d3374b62-7eac-4823-afbd-460d2bf44c67",
 					SpaceUrl: "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces",
 					Rules: []map[string]interface{}{{
 						"destination": "198.41.191.47/1",

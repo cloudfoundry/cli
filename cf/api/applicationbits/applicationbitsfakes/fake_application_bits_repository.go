@@ -19,10 +19,10 @@ type FakeApplicationBitsRepository struct {
 		result1 []resources.AppFileResource
 		result2 error
 	}
-	UploadBitsStub        func(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error)
+	UploadBitsStub        func(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error)
 	uploadBitsMutex       sync.RWMutex
 	uploadBitsArgsForCall []struct {
-		appGuid      string
+		appGUID      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
 	}
@@ -64,16 +64,16 @@ func (fake *FakeApplicationBitsRepository) GetApplicationFilesReturns(result1 []
 	}{result1, result2}
 }
 
-func (fake *FakeApplicationBitsRepository) UploadBits(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
+func (fake *FakeApplicationBitsRepository) UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
 	fake.uploadBitsMutex.Lock()
 	fake.uploadBitsArgsForCall = append(fake.uploadBitsArgsForCall, struct {
-		appGuid      string
+		appGUID      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
-	}{appGuid, zipFile, presentFiles})
+	}{appGUID, zipFile, presentFiles})
 	fake.uploadBitsMutex.Unlock()
 	if fake.UploadBitsStub != nil {
-		return fake.UploadBitsStub(appGuid, zipFile, presentFiles)
+		return fake.UploadBitsStub(appGUID, zipFile, presentFiles)
 	} else {
 		return fake.uploadBitsReturns.result1
 	}
@@ -88,7 +88,7 @@ func (fake *FakeApplicationBitsRepository) UploadBitsCallCount() int {
 func (fake *FakeApplicationBitsRepository) UploadBitsArgsForCall(i int) (string, *os.File, []resources.AppFileResource) {
 	fake.uploadBitsMutex.RLock()
 	defer fake.uploadBitsMutex.RUnlock()
-	return fake.uploadBitsArgsForCall[i].appGuid, fake.uploadBitsArgsForCall[i].zipFile, fake.uploadBitsArgsForCall[i].presentFiles
+	return fake.uploadBitsArgsForCall[i].appGUID, fake.uploadBitsArgsForCall[i].zipFile, fake.uploadBitsArgsForCall[i].presentFiles
 }
 
 func (fake *FakeApplicationBitsRepository) UploadBitsReturns(result1 error) {

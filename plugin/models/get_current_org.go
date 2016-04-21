@@ -5,13 +5,13 @@ type Organization struct {
 }
 
 type OrganizationFields struct {
-	Guid            string
+	GUID            string
 	Name            string
 	QuotaDefinition QuotaFields
 }
 
 type QuotaFields struct {
-	Guid                    string
+	GUID                    string
 	Name                    string
 	MemoryLimit             int64
 	InstanceMemoryLimit     int64

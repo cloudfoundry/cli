@@ -3,7 +3,7 @@ package models
 import "encoding/json"
 
 type QuotaFields struct {
-	Guid                    string `json:"guid,omitempty"`
+	GUID                    string `json:"guid,omitempty"`
 	Name                    string `json:"name"`
 	MemoryLimit             int64  `json:"memory_limit"`          // in Megabytes
 	InstanceMemoryLimit     int64  `json:"instance_memory_limit"` // in Megabytes
@@ -14,7 +14,7 @@ type QuotaFields struct {
 }
 
 type QuotaResponse struct {
-	Guid                    string      `json:"guid,omitempty"`
+	GUID                    string      `json:"guid,omitempty"`
 	Name                    string      `json:"name"`
 	MemoryLimit             int64       `json:"memory_limit"`          // in Megabytes
 	InstanceMemoryLimit     int64       `json:"instance_memory_limit"` // in Megabytes

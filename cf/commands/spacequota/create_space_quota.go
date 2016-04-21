@@ -93,7 +93,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 
 	quota := models.SpaceQuota{
 		Name:    name,
-		OrgGuid: org.Guid,
+		OrgGUID: org.GUID,
 	}
 
 	memoryLimit := context.String("m")

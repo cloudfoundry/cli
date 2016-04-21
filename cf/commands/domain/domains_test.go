@@ -68,7 +68,7 @@ var _ = Describe("ListDomains", func() {
 		targetedOrgRequirement = new(requirementsfakes.FakeTargetedOrgRequirement)
 		factory.NewTargetedOrgRequirementReturns(targetedOrgRequirement)
 
-		domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+		domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 			for _, field := range domainFields {
 				if !cb(field) {
 					break
@@ -79,7 +79,7 @@ var _ = Describe("ListDomains", func() {
 
 		routerGroups = models.RouterGroups{
 			models.RouterGroup{
-				Guid: "router-group-guid",
+				GUID: "router-group-guid",
 				Name: "my-router-name1",
 				Type: "tcp",
 			},
@@ -156,8 +156,8 @@ var _ = Describe("ListDomains", func() {
 		It("tries to get the list of domains for org", func() {
 			cmd.Execute(flagContext)
 			Expect(domainRepo.ListDomainsForOrgCallCount()).To(Equal(1))
-			orgGuid, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
-			Expect(orgGuid).To(Equal("my-org-guid"))
+			orgGUID, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
+			Expect(orgGUID).To(Equal("my-org-guid"))
 		})
 
 		It("prints no domains found message", func() {

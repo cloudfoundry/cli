@@ -16,16 +16,16 @@ import (
 type SpaceQuotaRepository interface {
 	FindByName(name string) (quota models.SpaceQuota, apiErr error)
 	FindByOrg(guid string) (quota []models.SpaceQuota, apiErr error)
-	FindByGuid(guid string) (quota models.SpaceQuota, apiErr error)
-	FindByNameAndOrgGuid(spaceQuotaName string, orgGuid string) (quota models.SpaceQuota, apiErr error)
+	FindByGUID(guid string) (quota models.SpaceQuota, apiErr error)
+	FindByNameAndOrgGUID(spaceQuotaName string, orgGUID string) (quota models.SpaceQuota, apiErr error)
 
-	AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error
-	UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error
+	AssociateSpaceWithQuota(spaceGUID string, quotaGUID string) error
+	UnassignQuotaFromSpace(spaceGUID string, quotaGUID string) error
 
 	// CRUD ahoy
 	Create(quota models.SpaceQuota) error
 	Update(quota models.SpaceQuota) error
-	Delete(quotaGuid string) error
+	Delete(quotaGUID string) error
 }
 
 type CloudControllerSpaceQuotaRepository struct {
@@ -55,11 +55,11 @@ func (repo CloudControllerSpaceQuotaRepository) findAllWithPath(path string) ([]
 }
 
 func (repo CloudControllerSpaceQuotaRepository) FindByName(name string) (quota models.SpaceQuota, apiErr error) {
-	return repo.FindByNameAndOrgGuid(name, repo.config.OrganizationFields().Guid)
+	return repo.FindByNameAndOrgGUID(name, repo.config.OrganizationFields().GUID)
 }
 
-func (repo CloudControllerSpaceQuotaRepository) FindByNameAndOrgGuid(spaceQuotaName string, orgGuid string) (models.SpaceQuota, error) {
-	quotas, apiErr := repo.FindByOrg(orgGuid)
+func (repo CloudControllerSpaceQuotaRepository) FindByNameAndOrgGUID(spaceQuotaName string, orgGUID string) (models.SpaceQuota, error) {
+	quotas, apiErr := repo.FindByOrg(orgGUID)
 	if apiErr != nil {
 		return models.SpaceQuota{}, apiErr
 	}
@@ -83,14 +83,14 @@ func (repo CloudControllerSpaceQuotaRepository) FindByOrg(guid string) ([]models
 	return quotas, nil
 }
 
-func (repo CloudControllerSpaceQuotaRepository) FindByGuid(guid string) (quota models.SpaceQuota, apiErr error) {
-	quotas, apiErr := repo.FindByOrg(repo.config.OrganizationFields().Guid)
+func (repo CloudControllerSpaceQuotaRepository) FindByGUID(guid string) (quota models.SpaceQuota, apiErr error) {
+	quotas, apiErr := repo.FindByOrg(repo.config.OrganizationFields().GUID)
 	if apiErr != nil {
 		return
 	}
 
 	for _, quota := range quotas {
-		if quota.Guid == guid {
+		if quota.GUID == guid {
 			return quota, nil
 		}
 	}
@@ -105,21 +105,21 @@ func (repo CloudControllerSpaceQuotaRepository) Create(quota models.SpaceQuota) 
 }
 
 func (repo CloudControllerSpaceQuotaRepository) Update(quota models.SpaceQuota) error {
-	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quota.Guid)
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quota.GUID)
 	return repo.gateway.UpdateResourceFromStruct(repo.config.ApiEndpoint(), path, quota)
 }
 
-func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGuid string, quotaGuid string) error {
-	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGuid, spaceGuid)
+func (repo CloudControllerSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGUID string, quotaGUID string) error {
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGUID, spaceGUID)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(""))
 }
 
-func (repo CloudControllerSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGuid string, quotaGuid string) error {
-	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGuid, spaceGuid)
+func (repo CloudControllerSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGUID string, quotaGUID string) error {
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s/spaces/%s", quotaGUID, spaceGUID)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
-func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGuid string) (apiErr error) {
-	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quotaGuid)
+func (repo CloudControllerSpaceQuotaRepository) Delete(quotaGUID string) (apiErr error) {
+	path := fmt.Sprintf("/v2/space_quota_definitions/%s", quotaGUID)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

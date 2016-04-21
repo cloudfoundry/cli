@@ -72,7 +72,7 @@ var _ = Describe("loggregator logs repository", func() {
 
 			It("gets the logs for the requested app", func() {
 				logsRepo.RecentLogsFor("app-guid")
-				Expect(fakeConsumer.RecentCalledWith.AppGuid).To(Equal("app-guid"))
+				Expect(fakeConsumer.RecentCalledWith.AppGUID).To(Equal("app-guid"))
 			})
 
 			It("writes the sorted log messages onto the provided channel", func() {
@@ -133,8 +133,8 @@ var _ = Describe("loggregator logs repository", func() {
 
 		Context("when no error occurs", func() {
 			It("asks for the logs for the given app", func(done Done) {
-				fakeConsumer.TailFunc = func(appGuid, token string) (<-chan *logmessage.LogMessage, error) {
-					Expect(appGuid).To(Equal("app-guid"))
+				fakeConsumer.TailFunc = func(appGUID, token string) (<-chan *logmessage.LogMessage, error) {
+					Expect(appGUID).To(Equal("app-guid"))
 					Expect(token).To(Equal("the-access-token"))
 					close(done)
 					return nil, nil

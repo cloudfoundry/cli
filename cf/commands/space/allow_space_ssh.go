@@ -67,7 +67,7 @@ func (cmd *AllowSpaceSSH) Execute(fc flags.FlagContext) {
 	cmd.ui.Say(fmt.Sprintf(T("Enabling ssh support for space '%s'..."), space.Name))
 	cmd.ui.Say("")
 
-	err := cmd.spaceRepo.SetAllowSSH(space.Guid, true)
+	err := cmd.spaceRepo.SetAllowSSH(space.GUID, true)
 	if err != nil {
 		cmd.ui.Failed(T("Error enabling ssh support for space ") + space.Name + ": " + err.Error())
 	}

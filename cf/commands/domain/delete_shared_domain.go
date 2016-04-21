@@ -68,7 +68,7 @@ func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) {
 			"DomainName": terminal.EntityNameColor(domainName),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
+	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().GUID)
 	switch apiErr.(type) {
 	case nil:
 		if !domain.Shared {
@@ -96,7 +96,7 @@ func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) {
 		}
 	}
 
-	apiErr = cmd.domainRepo.DeleteSharedDomain(domain.Guid)
+	apiErr = cmd.domainRepo.DeleteSharedDomain(domain.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
 			map[string]interface{}{"DomainName": domainName, "ApiErr": apiErr.Error()}))

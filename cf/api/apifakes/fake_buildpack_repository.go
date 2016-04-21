@@ -38,10 +38,10 @@ type FakeBuildpackRepository struct {
 		result1 models.Buildpack
 		result2 error
 	}
-	DeleteStub        func(buildpackGuid string) (apiErr error)
+	DeleteStub        func(buildpackGUID string) (apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		buildpackGuid string
+		buildpackGUID string
 	}
 	deleteReturns struct {
 		result1 error
@@ -158,14 +158,14 @@ func (fake *FakeBuildpackRepository) CreateReturns(result1 models.Buildpack, res
 	}{result1, result2}
 }
 
-func (fake *FakeBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
+func (fake *FakeBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		buildpackGuid string
-	}{buildpackGuid})
+		buildpackGUID string
+	}{buildpackGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(buildpackGuid)
+		return fake.DeleteStub(buildpackGUID)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -180,7 +180,7 @@ func (fake *FakeBuildpackRepository) DeleteCallCount() int {
 func (fake *FakeBuildpackRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].buildpackGuid
+	return fake.deleteArgsForCall[i].buildpackGUID
 }
 
 func (fake *FakeBuildpackRepository) DeleteReturns(result1 error) {

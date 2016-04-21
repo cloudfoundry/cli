@@ -61,7 +61,7 @@ func (cmd *ListSpaceQuotas) SetDependency(deps commandregistry.Dependency, plugi
 func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Getting space quotas as {{.Username}}...", map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	quotas, apiErr := cmd.spaceQuotaRepo.FindByOrg(cmd.config.OrganizationFields().Guid)
+	quotas, apiErr := cmd.spaceQuotaRepo.FindByOrg(cmd.config.OrganizationFields().GUID)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

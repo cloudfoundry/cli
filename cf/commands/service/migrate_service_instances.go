@@ -82,7 +82,7 @@ func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 	}
 	force := c.Bool("f")
 
-	v1Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v1)
+	v1GUID, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v1)
 	switch apiErr.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
@@ -96,7 +96,7 @@ func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 		return
 	}
 
-	v2Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v2)
+	v2GUID, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v2)
 	switch apiErr.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
@@ -110,7 +110,7 @@ func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 		return
 	}
 
-	count, apiErr := cmd.serviceRepo.GetServiceInstanceCountForServicePlan(v1Guid)
+	count, apiErr := cmd.serviceRepo.GetServiceInstanceCountForServicePlan(v1GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -138,7 +138,7 @@ func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 
 	cmd.ui.Say(T("Attempting to migrate {{.ServiceInstanceDescription}}...", map[string]interface{}{"ServiceInstanceDescription": serviceInstancesPhrase}))
 
-	changedCount, apiErr := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1Guid, v2Guid)
+	changedCount, apiErr := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1GUID, v2GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}

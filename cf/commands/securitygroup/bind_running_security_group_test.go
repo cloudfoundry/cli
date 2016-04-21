@@ -65,7 +65,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			group := models.SecurityGroup{}
-			group.Guid = "being-a-guid"
+			group.GUID = "being-a-guid"
 			group.Name = "security-group-name"
 			fakeSecurityGroupRepo.ReadReturns(group, nil)
 		})

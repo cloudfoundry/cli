@@ -22,7 +22,7 @@ func (resource ApplicationSummaries) ToModels() (apps []models.ApplicationFields
 }
 
 type ApplicationFromSummary struct {
-	Guid                 string
+	GUID                 string
 	Name                 string
 	Routes               []RouteSummary
 	Services             []ServicePlanSummary
@@ -37,8 +37,8 @@ type ApplicationFromSummary struct {
 	HealthCheckTimeout   int                    `json:"health_check_timeout"`
 	State                string
 	DetectedStartCommand string     `json:"detected_start_command"`
-	SpaceGuid            string     `json:"space_guid"`
-	StackGuid            string     `json:"stack_guid"`
+	SpaceGUID            string     `json:"space_guid"`
+	StackGUID            string     `json:"stack_guid"`
 	Command              string     `json:"command"`
 	PackageState         string     `json:"package_state"`
 	PackageUpdatedAt     *time.Time `json:"package_updated_at"`
@@ -47,7 +47,7 @@ type ApplicationFromSummary struct {
 
 func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields) {
 	app = models.ApplicationFields{}
-	app.Guid = resource.Guid
+	app.GUID = resource.GUID
 	app.Name = resource.Name
 	app.Diego = resource.Diego
 	app.State = strings.ToLower(resource.State)
@@ -55,8 +55,8 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	app.DiskQuota = resource.DiskQuota
 	app.RunningInstances = resource.RunningInstances
 	app.Memory = resource.Memory
-	app.SpaceGuid = resource.SpaceGuid
-	app.StackGuid = resource.StackGuid
+	app.SpaceGUID = resource.SpaceGUID
+	app.StackGUID = resource.StackGUID
 	app.PackageUpdatedAt = resource.PackageUpdatedAt
 	app.PackageState = resource.PackageState
 	app.DetectedStartCommand = resource.DetectedStartCommand
@@ -92,7 +92,7 @@ func (resource ApplicationFromSummary) ToModel() models.Application {
 }
 
 type RouteSummary struct {
-	Guid   string
+	GUID   string
 	Host   string
 	Path   string
 	Port   int
@@ -101,11 +101,11 @@ type RouteSummary struct {
 
 func (resource RouteSummary) ToModel() (route models.RouteSummary) {
 	domain := models.DomainFields{}
-	domain.Guid = resource.Domain.Guid
+	domain.GUID = resource.Domain.GUID
 	domain.Name = resource.Domain.Name
-	domain.Shared = resource.Domain.OwningOrganizationGuid != ""
+	domain.Shared = resource.Domain.OwningOrganizationGUID != ""
 
-	route.Guid = resource.Guid
+	route.GUID = resource.GUID
 	route.Host = resource.Host
 	route.Path = resource.Path
 	route.Port = resource.Port
@@ -114,22 +114,22 @@ func (resource RouteSummary) ToModel() (route models.RouteSummary) {
 }
 
 func (resource ServicePlanSummary) ToModel() (route models.ServicePlanSummary) {
-	route.Guid = resource.Guid
+	route.GUID = resource.GUID
 	route.Name = resource.Name
 	return
 }
 
 type DomainSummary struct {
-	Guid                   string
+	GUID                   string
 	Name                   string
-	OwningOrganizationGuid string
+	OwningOrganizationGUID string
 }
 
 //go:generate counterfeiter . AppSummaryRepository
 
 type AppSummaryRepository interface {
 	GetSummariesInCurrentSpace() (apps []models.Application, apiErr error)
-	GetSummary(appGuid string) (summary models.Application, apiErr error)
+	GetSummary(appGUID string) (summary models.Application, apiErr error)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -146,7 +146,7 @@ func NewCloudControllerAppSummaryRepository(config coreconfig.Reader, gateway ne
 func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() ([]models.Application, error) {
 	resources := new(ApplicationSummaries)
 
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().GUID)
 	err := repo.gateway.GetResource(path, resources)
 	if err != nil {
 		return []models.Application{}, err
@@ -160,8 +160,8 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() ([]
 	return apps, nil
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.Application, apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.ApiEndpoint(), appGuid)
+func (repo CloudControllerAppSummaryRepository) GetSummary(appGUID string) (summary models.Application, apiErr error) {
+	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.ApiEndpoint(), appGUID)
 	summaryResponse := new(ApplicationFromSummary)
 	apiErr = repo.gateway.GetResource(path, summaryResponse)
 	if apiErr != nil {

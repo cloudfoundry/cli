@@ -8,8 +8,8 @@ type ServicePlanVisibilityResource struct {
 }
 
 func (resource ServicePlanVisibilityResource) ToFields() (fields models.ServicePlanVisibilityFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.ServicePlanGuid = resource.Entity.ServicePlanGuid
-	fields.OrganizationGuid = resource.Entity.OrganizationGuid
+	fields.GUID = resource.Metadata.GUID
+	fields.ServicePlanGUID = resource.Entity.ServicePlanGUID
+	fields.OrganizationGUID = resource.Entity.OrganizationGUID
 	return
 }

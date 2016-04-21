@@ -35,7 +35,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	jsonBytes, err := json.Marshal(models.UserProvidedService{
 		Name:            name,
 		Credentials:     params,
-		SpaceGuid:       repo.config.SpaceFields().Guid,
+		SpaceGUID:       repo.config.SpaceFields().GUID,
 		SysLogDrainUrl:  drainUrl,
 		RouteServiceUrl: routeServiceUrl,
 	})
@@ -49,7 +49,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
-	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.Guid)
+	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.GUID)
 
 	reqBody := models.UserProvidedService{
 		Credentials:     serviceInstanceFields.Params,

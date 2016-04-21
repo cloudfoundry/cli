@@ -62,7 +62,7 @@ var _ = Describe("rename-org command", func() {
 		BeforeEach(func() {
 			org := models.Organization{}
 			org.Name = "the-old-org-name"
-			org.Guid = "the-old-org-guid"
+			org.GUID = "the-old-org-guid"
 			requirementsFactory.Organization = org
 			requirementsFactory.LoginSuccess = true
 		})
@@ -90,7 +90,7 @@ var _ = Describe("rename-org command", func() {
 		Describe("when the organization is currently targeted", func() {
 			It("updates the name of the org in the config", func() {
 				configRepo.SetOrganizationFields(models.OrganizationFields{
-					Guid: "the-old-org-guid",
+					GUID: "the-old-org-guid",
 					Name: "the-old-org-name",
 				})
 				callRenameOrg([]string{"the-old-org-name", "the-new-org-name"})

@@ -9,21 +9,21 @@ import (
 )
 
 type FakeServiceBindingRepository struct {
-	CreateStub        func(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error)
+	CreateStub        func(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		instanceGuid string
-		appGuid      string
+		instanceGUID string
+		appGUID      string
 		paramsMap    map[string]interface{}
 	}
 	createReturns struct {
 		result1 error
 	}
-	DeleteStub        func(instance models.ServiceInstance, appGuid string) (found bool, apiErr error)
+	DeleteStub        func(instance models.ServiceInstance, appGUID string) (found bool, apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
 		instance models.ServiceInstance
-		appGuid  string
+		appGUID  string
 	}
 	deleteReturns struct {
 		result1 bool
@@ -31,16 +31,16 @@ type FakeServiceBindingRepository struct {
 	}
 }
 
-func (fake *FakeServiceBindingRepository) Create(instanceGuid string, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
+func (fake *FakeServiceBindingRepository) Create(instanceGUID string, appGUID string, paramsMap map[string]interface{}) (apiErr error) {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		instanceGuid string
-		appGuid      string
+		instanceGUID string
+		appGUID      string
 		paramsMap    map[string]interface{}
-	}{instanceGuid, appGuid, paramsMap})
+	}{instanceGUID, appGUID, paramsMap})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(instanceGuid, appGuid, paramsMap)
+		return fake.CreateStub(instanceGUID, appGUID, paramsMap)
 	} else {
 		return fake.createReturns.result1
 	}
@@ -55,7 +55,7 @@ func (fake *FakeServiceBindingRepository) CreateCallCount() int {
 func (fake *FakeServiceBindingRepository) CreateArgsForCall(i int) (string, string, map[string]interface{}) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].instanceGuid, fake.createArgsForCall[i].appGuid, fake.createArgsForCall[i].paramsMap
+	return fake.createArgsForCall[i].instanceGUID, fake.createArgsForCall[i].appGUID, fake.createArgsForCall[i].paramsMap
 }
 
 func (fake *FakeServiceBindingRepository) CreateReturns(result1 error) {
@@ -65,15 +65,15 @@ func (fake *FakeServiceBindingRepository) CreateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceBindingRepository) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error) {
+func (fake *FakeServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		instance models.ServiceInstance
-		appGuid  string
-	}{instance, appGuid})
+		appGUID  string
+	}{instance, appGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(instance, appGuid)
+		return fake.DeleteStub(instance, appGUID)
 	} else {
 		return fake.deleteReturns.result1, fake.deleteReturns.result2
 	}
@@ -88,7 +88,7 @@ func (fake *FakeServiceBindingRepository) DeleteCallCount() int {
 func (fake *FakeServiceBindingRepository) DeleteArgsForCall(i int) (models.ServiceInstance, string) {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].instance, fake.deleteArgsForCall[i].appGuid
+	return fake.deleteArgsForCall[i].instance, fake.deleteArgsForCall[i].appGUID
 }
 
 func (fake *FakeServiceBindingRepository) DeleteReturns(result1 bool, result2 error) {

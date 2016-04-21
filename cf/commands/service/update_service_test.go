@@ -61,10 +61,10 @@ var _ = Describe("update-service command", func() {
 		offering1.Label = "cleardb"
 		offering1.Plans = []models.ServicePlanFields{{
 			Name: "spark",
-			Guid: "cleardb-spark-guid",
+			GUID: "cleardb-spark-guid",
 		}, {
 			Name: "flare",
-			Guid: "cleardb-flare-guid",
+			GUID: "cleardb-flare-guid",
 		},
 		}
 
@@ -143,7 +143,7 @@ var _ = Describe("update-service command", func() {
 			serviceInstance := models.ServiceInstance{
 				ServiceInstanceFields: models.ServiceInstanceFields{
 					Name: "my-service-instance",
-					Guid: "my-service-instance-guid",
+					GUID: "my-service-instance-guid",
 					LastOperation: models.LastOperationFields{
 						Type:        "update",
 						State:       "in progress",
@@ -152,16 +152,16 @@ var _ = Describe("update-service command", func() {
 				},
 				ServiceOffering: models.ServiceOfferingFields{
 					Label: "murkydb",
-					Guid:  "murkydb-guid",
+					GUID:  "murkydb-guid",
 				},
 			}
 
 			servicePlans := []models.ServicePlanFields{{
 				Name: "spark",
-				Guid: "murkydb-spark-guid",
+				GUID: "murkydb-spark-guid",
 			}, {
 				Name: "flare",
-				Guid: "murkydb-flare-guid",
+				GUID: "murkydb-flare-guid",
 			},
 			}
 			serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
@@ -298,7 +298,7 @@ var _ = Describe("update-service command", func() {
 				serviceInstance := models.ServiceInstance{
 					ServiceInstanceFields: models.ServiceInstanceFields{
 						Name: "my-service-instance",
-						Guid: "my-service-instance-guid",
+						GUID: "my-service-instance-guid",
 						LastOperation: models.LastOperationFields{
 							Type:        "update",
 							State:       "in progress",
@@ -307,16 +307,16 @@ var _ = Describe("update-service command", func() {
 					},
 					ServiceOffering: models.ServiceOfferingFields{
 						Label: "murkydb",
-						Guid:  "murkydb-guid",
+						GUID:  "murkydb-guid",
 					},
 				}
 
 				servicePlans := []models.ServicePlanFields{{
 					Name: "spark",
-					Guid: "murkydb-spark-guid",
+					GUID: "murkydb-spark-guid",
 				}, {
 					Name: "flare",
-					Guid: "murkydb-flare-guid",
+					GUID: "murkydb-flare-guid",
 				},
 				}
 				serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
@@ -409,20 +409,20 @@ var _ = Describe("update-service command", func() {
 				serviceInstance := models.ServiceInstance{
 					ServiceInstanceFields: models.ServiceInstanceFields{
 						Name: "my-service-instance",
-						Guid: "my-service-instance-guid",
+						GUID: "my-service-instance-guid",
 					},
 					ServiceOffering: models.ServiceOfferingFields{
 						Label: "murkydb",
-						Guid:  "murkydb-guid",
+						GUID:  "murkydb-guid",
 					},
 				}
 
 				servicePlans := []models.ServicePlanFields{{
 					Name: "spark",
-					Guid: "murkydb-spark-guid",
+					GUID: "murkydb-spark-guid",
 				}, {
 					Name: "flare",
-					Guid: "murkydb-flare-guid",
+					GUID: "murkydb-flare-guid",
 				},
 				}
 				serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
@@ -437,8 +437,8 @@ var _ = Describe("update-service command", func() {
 					[]string{"OK"},
 				))
 				Expect(serviceRepo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service-instance"))
-				serviceGuid, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
-				Expect(serviceGuid).To(Equal("murkydb-guid"))
+				serviceGUID, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
+				Expect(serviceGUID).To(Equal("murkydb-guid"))
 				Expect(orgName).To(Equal("my-org"))
 
 				instanceGUID, planGUID, _, _ := serviceRepo.UpdateServiceInstanceArgsForCall(0)

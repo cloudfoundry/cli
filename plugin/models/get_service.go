@@ -1,7 +1,7 @@
 package plugin_models
 
 type GetService_Model struct {
-	Guid            string
+	GUID            string
 	Name            string
 	DashboardUrl    string
 	IsUserProvided  bool
@@ -20,7 +20,7 @@ type GetService_LastOperation struct {
 
 type GetService_ServicePlan struct {
 	Name string
-	Guid string
+	GUID string
 }
 
 type GetService_ServiceFields struct {

@@ -69,7 +69,7 @@ func (cmd *Env) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	env, err := cmd.appRepo.ReadEnv(app.Guid)
+	env, err := cmd.appRepo.ReadEnv(app.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

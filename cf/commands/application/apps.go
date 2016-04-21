@@ -135,7 +135,7 @@ func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 	for _, app := range apps {
 		appModel := plugin_models.GetAppsModel{}
 		appModel.Name = app.Name
-		appModel.Guid = app.Guid
+		appModel.GUID = app.GUID
 		appModel.TotalInstances = app.InstanceCount
 		appModel.RunningInstances = app.RunningInstances
 		appModel.Memory = app.Memory
@@ -148,10 +148,10 @@ func (cmd *ListApps) populatePluginModel(apps []models.Application) {
 		for _, route := range app.Routes {
 			r := plugin_models.GetAppsRouteSummary{}
 			r.Host = route.Host
-			r.Guid = route.Guid
-			r.Domain.Guid = route.Domain.Guid
+			r.GUID = route.GUID
+			r.Domain.GUID = route.Domain.GUID
 			r.Domain.Name = route.Domain.Name
-			r.Domain.OwningOrganizationGuid = route.Domain.OwningOrganizationGuid
+			r.Domain.OwningOrganizationGUID = route.Domain.OwningOrganizationGUID
 			r.Domain.Shared = route.Domain.Shared
 
 			(*(cmd.pluginAppModels))[len(*(cmd.pluginAppModels))-1].Routes = append((*(cmd.pluginAppModels))[len(*(cmd.pluginAppModels))-1].Routes, r)

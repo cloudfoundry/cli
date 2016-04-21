@@ -18,11 +18,11 @@ import (
 type SpaceRepository interface {
 	ListSpaces(func(models.Space) bool) error
 	FindByName(name string) (space models.Space, apiErr error)
-	FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error)
-	Create(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error)
-	Rename(spaceGuid, newName string) (apiErr error)
-	SetAllowSSH(spaceGuid string, allow bool) (apiErr error)
-	Delete(spaceGuid string) (apiErr error)
+	FindByNameInOrg(name, orgGUID string) (space models.Space, apiErr error)
+	Create(name string, orgGUID string, spaceQuotaGUID string) (space models.Space, apiErr error)
+	Rename(spaceGUID, newName string) (apiErr error)
+	SetAllowSSH(spaceGUID string, allow bool) (apiErr error)
+	Delete(spaceGUID string) (apiErr error)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -39,7 +39,7 @@ func NewCloudControllerSpaceRepository(config coreconfig.Reader, gateway net.Gat
 func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/organizations/%s/spaces?inline-relations-depth=1", repo.config.OrganizationFields().Guid),
+		fmt.Sprintf("/v2/organizations/%s/spaces?inline-relations-depth=1", repo.config.OrganizationFields().GUID),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			return callback(resource.(resources.SpaceResource).ToModel())
@@ -47,14 +47,14 @@ func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space
 }
 
 func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiErr error) {
-	return repo.FindByNameInOrg(name, repo.config.OrganizationFields().Guid)
+	return repo.FindByNameInOrg(name, repo.config.OrganizationFields().GUID)
 }
 
-func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error) {
+func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGUID string) (space models.Space, apiErr error) {
 	foundSpace := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name))),
+		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGUID, url.QueryEscape("name:"+strings.ToLower(name))),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			space = resource.(resources.SpaceResource).ToModel()
@@ -69,12 +69,12 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name, orgGuid, spaceQuotaGuid string) (space models.Space, apiErr error) {
+func (repo CloudControllerSpaceRepository) Create(name, orgGUID, spaceQuotaGUID string) (space models.Space, apiErr error) {
 	path := "/v2/spaces?inline-relations-depth=1"
 
-	bodyMap := map[string]string{"name": name, "organization_guid": orgGuid}
-	if spaceQuotaGuid != "" {
-		bodyMap["space_quota_definition_guid"] = spaceQuotaGuid
+	bodyMap := map[string]string{"name": name, "organization_guid": orgGUID}
+	if spaceQuotaGUID != "" {
+		bodyMap["space_quota_definition_guid"] = spaceQuotaGUID
 	}
 
 	body, apiErr := json.Marshal(bodyMap)
@@ -91,19 +91,19 @@ func (repo CloudControllerSpaceRepository) Create(name, orgGuid, spaceQuotaGuid 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiErr error) {
-	path := fmt.Sprintf("/v2/spaces/%s", spaceGuid)
+func (repo CloudControllerSpaceRepository) Rename(spaceGUID, newName string) (apiErr error) {
+	path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
-func (repo CloudControllerSpaceRepository) SetAllowSSH(spaceGuid string, allow bool) (apiErr error) {
-	path := fmt.Sprintf("/v2/spaces/%s", spaceGuid)
+func (repo CloudControllerSpaceRepository) SetAllowSSH(spaceGUID string, allow bool) (apiErr error) {
+	path := fmt.Sprintf("/v2/spaces/%s", spaceGUID)
 	body := fmt.Sprintf(`{"allow_ssh":%t}`, allow)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, strings.NewReader(body))
 }
 
-func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr error) {
-	path := fmt.Sprintf("/v2/spaces/%s?recursive=true", spaceGuid)
+func (repo CloudControllerSpaceRepository) Delete(spaceGUID string) (apiErr error) {
+	path := fmt.Sprintf("/v2/spaces/%s?recursive=true", spaceGUID)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }

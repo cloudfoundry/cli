@@ -139,5 +139,5 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 }
 
 func (cmd *UnbindRouteService) UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error {
-	return cmd.routeServiceBindingRepo.Unbind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided())
+	return cmd.routeServiceBindingRepo.Unbind(serviceInstance.GUID, route.GUID, serviceInstance.IsUserProvided())
 }

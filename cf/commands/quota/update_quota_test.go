@@ -90,7 +90,7 @@ var _ = Describe("app Command", func() {
 	Describe("updating quota fields", func() {
 		BeforeEach(func() {
 			quota = models.QuotaFields{
-				Guid:             "quota-guid",
+				GUID:             "quota-guid",
 				Name:             "quota-name",
 				MemoryLimit:      1024,
 				RoutesLimit:      111,

@@ -86,7 +86,7 @@ func (cmd *ShowApp) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	if c.Bool("guid") {
-		cmd.ui.Say(app.Guid)
+		cmd.ui.Say(app.GUID)
 	} else {
 		cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 	}
@@ -100,7 +100,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 			"SpaceName": terminal.EntityNameColor(spaceName),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
+	application, apiErr := cmd.appSummaryRepo.GetSummary(app.GUID)
 
 	appIsStopped := (application.State == "stopped")
 	if err, ok := apiErr.(errors.HTTPError); ok {
@@ -115,7 +115,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	var instances []models.AppInstanceFields
-	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.GUID)
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -216,7 +216,7 @@ func (cmd *ShowApp) populatePluginModel(
 	cmd.pluginAppModel.Diego = getSummaryApp.Diego
 	cmd.pluginAppModel.DiskQuota = getSummaryApp.DiskQuota
 	cmd.pluginAppModel.EnvironmentVars = getSummaryApp.EnvironmentVars
-	cmd.pluginAppModel.Guid = getSummaryApp.Guid
+	cmd.pluginAppModel.GUID = getSummaryApp.GUID
 	cmd.pluginAppModel.HealthCheckTimeout = getSummaryApp.HealthCheckTimeout
 	cmd.pluginAppModel.InstanceCount = getSummaryApp.InstanceCount
 	cmd.pluginAppModel.Memory = getSummaryApp.Memory
@@ -224,11 +224,11 @@ func (cmd *ShowApp) populatePluginModel(
 	cmd.pluginAppModel.PackageState = getSummaryApp.PackageState
 	cmd.pluginAppModel.PackageUpdatedAt = getSummaryApp.PackageUpdatedAt
 	cmd.pluginAppModel.RunningInstances = getSummaryApp.RunningInstances
-	cmd.pluginAppModel.SpaceGuid = getSummaryApp.SpaceGuid
+	cmd.pluginAppModel.SpaceGUID = getSummaryApp.SpaceGUID
 	cmd.pluginAppModel.AppPorts = getSummaryApp.AppPorts
 	cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
 		Name: stack.Name,
-		Guid: stack.Guid,
+		GUID: stack.GUID,
 	}
 	cmd.pluginAppModel.StagingFailedReason = getSummaryApp.StagingFailedReason
 	cmd.pluginAppModel.State = getSummaryApp.State
@@ -250,10 +250,10 @@ func (cmd *ShowApp) populatePluginModel(
 	for i := range getSummaryApp.Routes {
 		routeSummary := plugin_models.GetApp_RouteSummary{
 			Host: getSummaryApp.Routes[i].Host,
-			Guid: getSummaryApp.Routes[i].Guid,
+			GUID: getSummaryApp.Routes[i].GUID,
 			Domain: plugin_models.GetApp_DomainFields{
 				Name: getSummaryApp.Routes[i].Domain.Name,
-				Guid: getSummaryApp.Routes[i].Domain.Guid,
+				GUID: getSummaryApp.Routes[i].Domain.GUID,
 			},
 		}
 		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, routeSummary)
@@ -262,7 +262,7 @@ func (cmd *ShowApp) populatePluginModel(
 	for i := range getSummaryApp.Services {
 		serviceSummary := plugin_models.GetApp_ServiceSummary{
 			Name: getSummaryApp.Services[i].Name,
-			Guid: getSummaryApp.Services[i].Guid,
+			GUID: getSummaryApp.Services[i].GUID,
 		}
 		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, serviceSummary)
 	}

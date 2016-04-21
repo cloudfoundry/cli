@@ -69,7 +69,7 @@ func (cmd *SetSpaceQuota) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	if space.SpaceQuotaGuid != "" {
+	if space.SpaceQuotaGUID != "" {
 		cmd.ui.Failed(T("This space already has an assigned space quota."))
 	}
 
@@ -78,7 +78,7 @@ func (cmd *SetSpaceQuota) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.quotaRepo.AssociateSpaceWithQuota(space.Guid, quota.Guid)
+	err = cmd.quotaRepo.AssociateSpaceWithQuota(space.GUID, quota.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

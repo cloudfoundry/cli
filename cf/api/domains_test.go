@@ -61,13 +61,13 @@ var _ = Describe("DomainRepository", func() {
 
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(len(receivedDomains)).To(Equal(6))
-			Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
-			Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
-			Expect(receivedDomains[2].Guid).To(Equal("domain3-guid"))
+			Expect(receivedDomains[0].GUID).To(Equal("domain1-guid"))
+			Expect(receivedDomains[1].GUID).To(Equal("domain2-guid"))
+			Expect(receivedDomains[2].GUID).To(Equal("domain3-guid"))
 			Expect(receivedDomains[2].Shared).To(BeFalse())
-			Expect(receivedDomains[3].Guid).To(Equal("shared-domain1-guid"))
-			Expect(receivedDomains[4].Guid).To(Equal("shared-domain2-guid"))
-			Expect(receivedDomains[5].Guid).To(Equal("shared-domain3-guid"))
+			Expect(receivedDomains[3].GUID).To(Equal("shared-domain1-guid"))
+			Expect(receivedDomains[4].GUID).To(Equal("shared-domain2-guid"))
+			Expect(receivedDomains[5].GUID).To(Equal("shared-domain3-guid"))
 			Expect(handler).To(HaveAllRequestsCalled())
 		})
 	})
@@ -82,7 +82,7 @@ var _ = Describe("DomainRepository", func() {
 			domain, apiErr := repo.FirstOrDefault("my-org-guid", nil)
 
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(domain.Guid).To(Equal("shared-domain1-guid"))
+			Expect(domain.GUID).To(Equal("shared-domain1-guid"))
 		})
 	})
 
@@ -106,7 +106,7 @@ var _ = Describe("DomainRepository", func() {
 		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
-		Expect(domain.Guid).To(Equal("domain2-guid"))
+		Expect(domain.GUID).To(Equal("domain2-guid"))
 		Expect(domain.Shared).To(BeTrue())
 	})
 
@@ -130,7 +130,7 @@ var _ = Describe("DomainRepository", func() {
 		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
-		Expect(domain.Guid).To(Equal("domain2-guid"))
+		Expect(domain.GUID).To(Equal("domain2-guid"))
 		Expect(domain.Shared).To(BeFalse())
 	})
 
@@ -158,7 +158,7 @@ var _ = Describe("DomainRepository", func() {
 		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
-		Expect(domain.Guid).To(Equal("domain2-guid"))
+		Expect(domain.GUID).To(Equal("domain2-guid"))
 		Expect(domain.RouterGroupType).To(Equal("tcp"))
 	})
 
@@ -186,7 +186,7 @@ var _ = Describe("DomainRepository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(domain.Name).To(Equal("my-example.com"))
-			Expect(domain.Guid).To(Equal("my-domain-guid"))
+			Expect(domain.GUID).To(Equal("my-domain-guid"))
 			Expect(domain.Shared).To(BeFalse())
 		})
 
@@ -220,7 +220,7 @@ var _ = Describe("DomainRepository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(domain.Name).To(Equal("shared-example.com"))
-			Expect(domain.Guid).To(Equal("shared-domain-guid"))
+			Expect(domain.GUID).To(Equal("shared-domain-guid"))
 			Expect(domain.Shared).To(BeTrue())
 		})
 
@@ -295,7 +295,7 @@ var _ = Describe("DomainRepository", func() {
 
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(createdDomain.Guid).To(Equal("abc-123"))
+				Expect(createdDomain.GUID).To(Equal("abc-123"))
 			})
 		})
 
@@ -321,7 +321,7 @@ var _ = Describe("DomainRepository", func() {
 
 				Expect(handler).To(HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(createdDomain.Guid).To(Equal("abc-123"))
+				Expect(createdDomain.GUID).To(Equal("abc-123"))
 			})
 		})
 	})

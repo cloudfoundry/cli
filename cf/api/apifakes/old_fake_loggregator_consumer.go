@@ -7,7 +7,7 @@ import (
 
 type OldFakeLoggregatorConsumer struct {
 	RecentCalledWith struct {
-		AppGuid   string
+		AppGUID   string
 		AuthToken string
 	}
 
@@ -17,7 +17,7 @@ type OldFakeLoggregatorConsumer struct {
 		callIndex int
 	}
 
-	TailFunc func(appGuid, token string) (<-chan *logmessage.LogMessage, error)
+	TailFunc func(appGUID, token string) (<-chan *logmessage.LogMessage, error)
 
 	IsClosed bool
 
@@ -32,8 +32,8 @@ func NewFakeLoggregatorConsumer() *OldFakeLoggregatorConsumer {
 	}
 }
 
-func (c *OldFakeLoggregatorConsumer) Recent(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
-	c.RecentCalledWith.AppGuid = appGuid
+func (c *OldFakeLoggregatorConsumer) Recent(appGUID string, authToken string) ([]*logmessage.LogMessage, error) {
+	c.RecentCalledWith.AppGUID = appGUID
 	c.RecentCalledWith.AuthToken = authToken
 
 	var err error
@@ -55,8 +55,8 @@ func (c *OldFakeLoggregatorConsumer) SetOnConnectCallback(cb func()) {
 	c.OnConnectCallback = cb
 }
 
-func (c *OldFakeLoggregatorConsumer) Tail(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error) {
-	return c.TailFunc(appGuid, authToken)
+func (c *OldFakeLoggregatorConsumer) Tail(appGUID string, authToken string) (<-chan *logmessage.LogMessage, error) {
+	return c.TailFunc(appGUID, authToken)
 }
 
 func (c *OldFakeLoggregatorConsumer) WaitForClose() {

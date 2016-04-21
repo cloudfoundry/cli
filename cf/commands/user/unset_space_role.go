@@ -49,15 +49,15 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("unset-space-role"))
 	}
 
-	var wantGuid bool
+	var wantGUID bool
 	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		unsetRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
-		wantGuid = (err != nil || !unsetRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !unsetRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -83,7 +83,7 @@ func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 	role := models.UserInputToSpaceRole[c.Args()[3]]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -97,10 +97,10 @@ func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	if len(user.Guid) > 0 {
-		err = cmd.userRepo.UnsetSpaceRoleByGuid(user.Guid, space.Guid, role)
+	if len(user.GUID) > 0 {
+		err = cmd.userRepo.UnsetSpaceRoleByGUID(user.GUID, space.GUID, role)
 	} else {
-		err = cmd.userRepo.UnsetSpaceRoleByUsername(user.Username, space.Guid, role)
+		err = cmd.userRepo.UnsetSpaceRoleByUsername(user.Username, space.GUID, role)
 	}
 	if err != nil {
 		cmd.ui.Failed(err.Error())

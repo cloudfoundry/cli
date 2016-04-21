@@ -65,13 +65,13 @@ func (cmd *RenameSpace) Execute(c flags.FlagContext) {
 			"CurrentUser":  terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.spaceRepo.Rename(space.Guid, newName)
+	apiErr := cmd.spaceRepo.Rename(space.GUID, newName)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	if cmd.config.SpaceFields().Guid == space.Guid {
+	if cmd.config.SpaceFields().GUID == space.GUID {
 		space.Name = newName
 		cmd.config.SetSpaceFields(space.SpaceFields)
 	}

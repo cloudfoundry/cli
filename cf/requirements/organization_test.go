@@ -20,7 +20,7 @@ var _ = Describe("OrganizationRequirement", func() {
 		It("succeeds", func() {
 			org := models.Organization{}
 			org.Name = "my-org-name"
-			org.Guid = "my-org-guid"
+			org.GUID = "my-org-guid"
 			orgReq := NewOrganizationRequirement("my-org-name", orgRepo)
 
 			orgRepo.ListOrgsReturns([]models.Organization{org}, nil)

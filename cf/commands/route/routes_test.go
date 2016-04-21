@@ -89,11 +89,11 @@ var _ = Describe("routes command", func() {
 
 	Context("when there are routes", func() {
 		BeforeEach(func() {
-			cookieClickerGuid := "cookie-clicker-guid"
+			cookieClickerGUID := "cookie-clicker-guid"
 
 			domainRepo.ListDomainsForOrgStub = func(_ string, cb func(models.DomainFields) bool) error {
 				tcpDomain := models.DomainFields{
-					Guid:            cookieClickerGuid,
+					GUID:            cookieClickerGUID,
 					RouterGroupType: "tcp",
 				}
 				cb(tcpDomain)
@@ -113,7 +113,7 @@ var _ = Describe("routes command", func() {
 					Apps:   []models.ApplicationFields{app1},
 					ServiceInstance: models.ServiceInstanceFields{
 						Name: "test-service",
-						Guid: "service-guid",
+						GUID: "service-guid",
 					},
 				}
 
@@ -132,7 +132,7 @@ var _ = Describe("routes command", func() {
 						Name: "my-space",
 					},
 					Domain: models.DomainFields{
-						Guid: cookieClickerGuid,
+						GUID: cookieClickerGUID,
 						Name: "cookieclicker.co",
 					},
 					Apps: []models.ApplicationFields{app1, app2},
@@ -181,7 +181,7 @@ var _ = Describe("routes command", func() {
 				route.Space = space1
 				route.ServiceInstance = models.ServiceInstanceFields{
 					Name: "test-service",
-					Guid: "service-guid",
+					GUID: "service-guid",
 				}
 
 				route2 := models.Route{}

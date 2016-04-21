@@ -44,7 +44,7 @@ var _ = Describe("delete-space-quota command", func() {
 
 		org := models.Organization{}
 		org.Name = "my-org"
-		org.Guid = "my-org-guid"
+		org.GUID = "my-org-guid"
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 		orgRepo.FindByNameReturns(org, nil)
 	})
@@ -84,8 +84,8 @@ var _ = Describe("delete-space-quota command", func() {
 			BeforeEach(func() {
 				quota := models.SpaceQuota{}
 				quota.Name = "my-quota"
-				quota.Guid = "my-quota-guid"
-				quota.OrgGuid = "my-org-guid"
+				quota.GUID = "my-quota-guid"
+				quota.OrgGUID = "my-org-guid"
 				quotaRepo.FindByNameReturns(quota, nil)
 			})
 

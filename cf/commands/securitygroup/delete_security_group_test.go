@@ -67,7 +67,7 @@ var _ = Describe("delete-security-group command", func() {
 				securityGroupRepo.ReadReturns(models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name: "my-group",
-						Guid: "group-guid",
+						GUID: "group-guid",
 					},
 				}, nil)
 			})

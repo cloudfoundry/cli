@@ -247,7 +247,7 @@ var _ = Describe("UI", func() {
 
 		BeforeEach(func() {
 			accessToken := coreconfig.TokenInfo{
-				UserGuid: "my-user-guid",
+				UserGUID: "my-user-guid",
 				Username: "my-user",
 				Email:    "my-user-email",
 			}
@@ -282,7 +282,7 @@ var _ = Describe("UI", func() {
 				BeforeEach(func() {
 					config.SetOrganizationFields(models.OrganizationFields{
 						Name: "org-name",
-						Guid: "org-guid",
+						GUID: "org-guid",
 					})
 				})
 
@@ -295,7 +295,7 @@ var _ = Describe("UI", func() {
 				BeforeEach(func() {
 					config.SetSpaceFields(models.SpaceFields{
 						Name: "my-space",
-						Guid: "space-guid",
+						GUID: "space-guid",
 					})
 				})
 
@@ -316,7 +316,7 @@ var _ = Describe("UI", func() {
 
 		It("prompts the user to target an org when no org is targeted", func() {
 			sf := models.SpaceFields{}
-			sf.Guid = "guid"
+			sf.GUID = "guid"
 			sf.Name = "name"
 
 			output := io_helpers.CaptureOutput(func() {
@@ -329,7 +329,7 @@ var _ = Describe("UI", func() {
 
 		It("prompts the user to target a space when no space is targeted", func() {
 			of := models.OrganizationFields{}
-			of.Guid = "of-guid"
+			of.GUID = "of-guid"
 			of.Name = "of-name"
 
 			output := io_helpers.CaptureOutput(func() {

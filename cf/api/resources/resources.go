@@ -1,7 +1,7 @@
 package resources
 
 type Metadata struct {
-	Guid string `json:"guid"`
+	GUID string `json:"guid"`
 	Url  string `json:"url,omitempty"`
 }
 

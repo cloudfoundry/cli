@@ -98,7 +98,7 @@ func (cmd *CreateServiceKey) Execute(c flags.FlagContext) {
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.Guid, serviceKeyName, paramsMap)
+	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.GUID, serviceKeyName, paramsMap)
 	switch err.(type) {
 	case nil:
 		cmd.ui.Ok()

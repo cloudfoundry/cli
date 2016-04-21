@@ -61,7 +61,7 @@ var _ = Describe("delete-service-broker command", func() {
 		BeforeEach(func() {
 			brokerRepo.FindByNameReturns(models.ServiceBroker{
 				Name: "service-broker-to-delete",
-				Guid: "service-broker-to-delete-guid",
+				GUID: "service-broker-to-delete-guid",
 			}, nil)
 		})
 

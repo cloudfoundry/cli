@@ -75,7 +75,7 @@ func (cmd *SetHealthCheck) Execute(fc flags.FlagContext) {
 	cmd.ui.Say(fmt.Sprintf(T("Updating %s health_check_type to '%s'"), app.Name, healthCheckType))
 	cmd.ui.Say("")
 
-	updatedApp, err := cmd.appRepo.Update(app.Guid, models.AppParams{HealthCheckType: &healthCheckType})
+	updatedApp, err := cmd.appRepo.Update(app.GUID, models.AppParams{HealthCheckType: &healthCheckType})
 	if err != nil {
 		cmd.ui.Failed(T("Error updating health_check_type for ") + app.Name + ": " + err.Error())
 	}

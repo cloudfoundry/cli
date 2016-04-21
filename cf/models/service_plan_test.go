@@ -11,13 +11,13 @@ var _ = Describe("ServicePlanFields", func() {
 
 	BeforeEach(func() {
 		servicePlanFields = ServicePlanFields{
-			Guid:                "I-am-a-guid",
+			GUID:                "I-am-a-guid",
 			Name:                "BestServicePlanEver",
 			Free:                false,
 			Public:              true,
 			Description:         "A Plan For Service",
 			Active:              true,
-			ServiceOfferingGuid: "service-offering-guid",
+			ServiceOfferingGUID: "service-offering-guid",
 			OrgNames:            []string{"org1", "org2"},
 		}
 	})

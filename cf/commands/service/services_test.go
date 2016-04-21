@@ -101,12 +101,12 @@ var _ = Describe("services", func() {
 
 	It("lists available services", func() {
 		plan := models.ServicePlanFields{
-			Guid: "spark-guid",
+			GUID: "spark-guid",
 			Name: "spark",
 		}
 
 		plan2 := models.ServicePlanFields{
-			Guid: "spark-guid-2",
+			GUID: "spark-guid-2",
 			Name: "spark-2",
 		}
 
@@ -176,12 +176,12 @@ var _ = Describe("services", func() {
 			pluginModels = []plugin_models.GetServices_Model{}
 			deps.PluginModels.Services = &pluginModels
 			plan := models.ServicePlanFields{
-				Guid: "spark-guid",
+				GUID: "spark-guid",
 				Name: "spark",
 			}
 
 			plan2 := models.ServicePlanFields{
-				Guid: "spark-guid-2",
+				GUID: "spark-guid-2",
 				Name: "spark-2",
 			}
 
@@ -189,7 +189,7 @@ var _ = Describe("services", func() {
 
 			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service-1"
-			serviceInstance.Guid = "123"
+			serviceInstance.GUID = "123"
 			serviceInstance.LastOperation.Type = "create"
 			serviceInstance.LastOperation.State = "in progress"
 			serviceInstance.LastOperation.Description = "fake state description"
@@ -199,7 +199,7 @@ var _ = Describe("services", func() {
 
 			serviceInstance2 := models.ServiceInstance{}
 			serviceInstance2.Name = "my-service-2"
-			serviceInstance2.Guid = "345"
+			serviceInstance2.GUID = "345"
 			serviceInstance2.LastOperation.Type = "create"
 			serviceInstance2.LastOperation.State = ""
 			serviceInstance2.LastOperation.Description = "fake state description"
@@ -209,7 +209,7 @@ var _ = Describe("services", func() {
 
 			userProvidedServiceInstance := models.ServiceInstance{}
 			userProvidedServiceInstance.Name = "my-service-provided-by-user"
-			userProvidedServiceInstance.Guid = "678"
+			userProvidedServiceInstance.GUID = "678"
 
 			serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, userProvidedServiceInstance}
 
@@ -221,9 +221,9 @@ var _ = Describe("services", func() {
 
 			Expect(len(pluginModels)).To(Equal(3))
 			Expect(pluginModels[0].Name).To(Equal("my-service-1"))
-			Expect(pluginModels[0].Guid).To(Equal("123"))
+			Expect(pluginModels[0].GUID).To(Equal("123"))
 			Expect(pluginModels[0].ServicePlan.Name).To(Equal("spark"))
-			Expect(pluginModels[0].ServicePlan.Guid).To(Equal("spark-guid"))
+			Expect(pluginModels[0].ServicePlan.GUID).To(Equal("spark-guid"))
 			Expect(pluginModels[0].Service.Name).To(Equal("cleardb"))
 			Expect(pluginModels[0].ApplicationNames).To(Equal([]string{"cli1", "cli2"}))
 			Expect(pluginModels[0].LastOperation.Type).To(Equal("create"))
@@ -231,9 +231,9 @@ var _ = Describe("services", func() {
 			Expect(pluginModels[0].IsUserProvided).To(BeFalse())
 
 			Expect(pluginModels[1].Name).To(Equal("my-service-2"))
-			Expect(pluginModels[1].Guid).To(Equal("345"))
+			Expect(pluginModels[1].GUID).To(Equal("345"))
 			Expect(pluginModels[1].ServicePlan.Name).To(Equal("spark-2"))
-			Expect(pluginModels[1].ServicePlan.Guid).To(Equal("spark-guid-2"))
+			Expect(pluginModels[1].ServicePlan.GUID).To(Equal("spark-guid-2"))
 			Expect(pluginModels[1].Service.Name).To(Equal("cleardb"))
 			Expect(pluginModels[1].ApplicationNames).To(Equal([]string{"cli1"}))
 			Expect(pluginModels[1].LastOperation.Type).To(Equal("create"))
@@ -241,9 +241,9 @@ var _ = Describe("services", func() {
 			Expect(pluginModels[1].IsUserProvided).To(BeFalse())
 
 			Expect(pluginModels[2].Name).To(Equal("my-service-provided-by-user"))
-			Expect(pluginModels[2].Guid).To(Equal("678"))
+			Expect(pluginModels[2].GUID).To(Equal("678"))
 			Expect(pluginModels[2].ServicePlan.Name).To(Equal(""))
-			Expect(pluginModels[2].ServicePlan.Guid).To(Equal(""))
+			Expect(pluginModels[2].ServicePlan.GUID).To(Equal(""))
 			Expect(pluginModels[2].Service.Name).To(Equal(""))
 			Expect(pluginModels[2].ApplicationNames).To(BeNil())
 			Expect(pluginModels[2].LastOperation.Type).To(Equal(""))

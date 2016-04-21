@@ -187,7 +187,7 @@ var _ = Describe("SSH", func() {
 
 			currentApp.State = "STARTED"
 			currentApp.Diego = true
-			currentApp.Guid = "app-guid"
+			currentApp.GUID = "app-guid"
 			token = "bearer token"
 
 			interactiveSessionInvoker = func(secureShell sshCmd.SecureShell) {

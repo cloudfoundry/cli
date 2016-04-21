@@ -11,7 +11,7 @@ import (
 //go:generate counterfeiter . AppEventsRepository
 
 type AppEventsRepository interface {
-	RecentEvents(appGuid string, limit int64) ([]models.EventFields, error)
+	RecentEvents(appGUID string, limit int64) ([]models.EventFields, error)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -28,10 +28,10 @@ func NewCloudControllerAppEventsRepository(config coreconfig.Reader, gateway net
 	}
 }
 
-func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit int64) ([]models.EventFields, error) {
+func (repo CloudControllerAppEventsRepository) RecentEvents(appGUID string, limit int64) ([]models.EventFields, error) {
 	count := int64(0)
 	events := make([]models.EventFields, 0, limit)
-	apiErr := repo.listEvents(appGuid, limit, func(eventField models.EventFields) bool {
+	apiErr := repo.listEvents(appGUID, limit, func(eventField models.EventFields) bool {
 		count++
 		events = append(events, eventField)
 		return count < limit
@@ -40,10 +40,10 @@ func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limi
 	return events, apiErr
 }
 
-func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, limit int64, cb func(models.EventFields) bool) error {
+func (repo CloudControllerAppEventsRepository) listEvents(appGUID string, limit int64, cb func(models.EventFields) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.strategy.EventsURL(appGuid, limit),
+		repo.strategy.EventsURL(appGUID, limit),
 		repo.strategy.EventsResource(),
 
 		func(resource interface{}) bool {

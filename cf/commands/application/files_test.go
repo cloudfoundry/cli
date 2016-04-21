@@ -66,7 +66,7 @@ var _ = Describe("Files", func() {
 		factory.NewDEAApplicationRequirementReturns(deaApplicationRequirement)
 		app := models.Application{}
 		app.InstanceCount = 1
-		app.Guid = "app-guid"
+		app.GUID = "app-guid"
 		app.Name = "app-name"
 		deaApplicationRequirement.GetApplicationReturns(app)
 	})

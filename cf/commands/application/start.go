@@ -148,7 +148,7 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 		state := "STARTED"
-		return cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+		return cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
 	})
 }
 
@@ -195,7 +195,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	cmd.ui.Ok()
 
 	//detectedstartcommand on first push is not present until starting completes
-	startedApp, apiErr := cmd.appRepo.GetApp(updatedApp.Guid)
+	startedApp, apiErr := cmd.appRepo.GetApp(updatedApp.GUID)
 	if err != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -238,7 +238,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, startChan, doneChan ch
 		startChan <- true
 	}
 
-	c, err := cmd.logRepo.TailLogsFor(app.Guid, onConnect)
+	c, err := cmd.logRepo.TailLogsFor(app.GUID, onConnect)
 
 	if err != nil {
 		cmd.ui.Warn(T("Warning: error tailing logs"))
@@ -263,10 +263,10 @@ func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
 	var err error
 
 	if cmd.StagingTimeout == 0 {
-		app, err = cmd.appRepo.GetApp(app.Guid)
+		app, err = cmd.appRepo.GetApp(app.GUID)
 	} else {
 		for app.PackageState != "STAGED" && app.PackageState != "FAILED" && time.Since(stagingStartTime) < cmd.StagingTimeout {
-			app, err = cmd.appRepo.GetApp(app.Guid)
+			app, err = cmd.appRepo.GetApp(app.GUID)
 			if err != nil {
 				break
 			}
@@ -322,7 +322,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 			return
 
 		default:
-			count, err := cmd.fetchInstanceCount(app.Guid)
+			count, err := cmd.fetchInstanceCount(app.GUID)
 			if err != nil {
 				cmd.ui.Warn("Could not fetch instance count: %s", err.Error())
 				time.Sleep(cmd.PingerThrottle)
@@ -356,12 +356,12 @@ type instanceCount struct {
 	total           int
 }
 
-func (cmd Start) fetchInstanceCount(appGuid string) (instanceCount, error) {
+func (cmd Start) fetchInstanceCount(appGUID string) (instanceCount, error) {
 	count := instanceCount{
 		startingDetails: make(map[string]struct{}),
 	}
 
-	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGuid)
+	instances, apiErr := cmd.appInstancesRepo.GetInstances(appGUID)
 	if apiErr != nil {
 		return instanceCount{}, apiErr
 	}

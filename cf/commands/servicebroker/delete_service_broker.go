@@ -79,7 +79,7 @@ func (cmd *DeleteServiceBroker) Execute(c flags.FlagContext) {
 		return
 	}
 
-	apiErr = cmd.repo.Delete(broker.Guid)
+	apiErr = cmd.repo.Delete(broker.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

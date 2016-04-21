@@ -12,8 +12,8 @@ import (
 //go:generate counterfeiter . ServiceBindingRepository
 
 type ServiceBindingRepository interface {
-	Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error)
-	Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error)
+	Create(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error)
+	Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error)
 }
 
 type CloudControllerServiceBindingRepository struct {
@@ -27,11 +27,11 @@ func NewCloudControllerServiceBindingRepository(config coreconfig.Reader, gatewa
 	return
 }
 
-func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
+func (repo CloudControllerServiceBindingRepository) Create(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error) {
 	path := "/v2/service_bindings"
 	request := models.ServiceBindingRequest{
-		AppGuid:             appGuid,
-		ServiceInstanceGuid: instanceGuid,
+		AppGUID:             appGUID,
+		ServiceInstanceGUID: instanceGUID,
 		Params:              paramsMap,
 	}
 
@@ -43,11 +43,11 @@ func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid
 	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
-func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error) {
+func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error) {
 	var path string
 
 	for _, binding := range instance.ServiceBindings {
-		if binding.AppGuid == appGuid {
+		if binding.AppGUID == appGUID {
 			path = binding.Url
 			break
 		}

@@ -14,8 +14,8 @@ type DefaultSecurityGroupsRepoBase struct {
 	Gateway    net.Gateway
 }
 
-func (repo *DefaultSecurityGroupsRepoBase) Bind(groupGuid string, path string) error {
-	updatedPath := fmt.Sprintf("%s/%s", path, groupGuid)
+func (repo *DefaultSecurityGroupsRepoBase) Bind(groupGUID string, path string) error {
+	updatedPath := fmt.Sprintf("%s/%s", path, groupGUID)
 	return repo.Gateway.UpdateResourceFromStruct(repo.ConfigRepo.ApiEndpoint(), updatedPath, "")
 }
 
@@ -38,7 +38,7 @@ func (repo *DefaultSecurityGroupsRepoBase) List(path string) ([]models.SecurityG
 	return groups, err
 }
 
-func (repo *DefaultSecurityGroupsRepoBase) Delete(groupGuid string, path string) error {
-	updatedPath := fmt.Sprintf("%s/%s", path, groupGuid)
+func (repo *DefaultSecurityGroupsRepoBase) Delete(groupGUID string, path string) error {
+	updatedPath := fmt.Sprintf("%s/%s", path, groupGUID)
 	return repo.Gateway.DeleteResource(repo.ConfigRepo.ApiEndpoint(), updatedPath)
 }

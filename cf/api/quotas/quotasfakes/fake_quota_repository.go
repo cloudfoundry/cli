@@ -25,11 +25,11 @@ type FakeQuotaRepository struct {
 		result1 models.QuotaFields
 		result2 error
 	}
-	AssignQuotaToOrgStub        func(orgGuid, quotaGuid string) error
+	AssignQuotaToOrgStub        func(orgGUID, quotaGUID string) error
 	assignQuotaToOrgMutex       sync.RWMutex
 	assignQuotaToOrgArgsForCall []struct {
-		orgGuid   string
-		quotaGuid string
+		orgGUID   string
+		quotaGUID string
 	}
 	assignQuotaToOrgReturns struct {
 		result1 error
@@ -50,10 +50,10 @@ type FakeQuotaRepository struct {
 	updateReturns struct {
 		result1 error
 	}
-	DeleteStub        func(quotaGuid string) error
+	DeleteStub        func(quotaGUID string) error
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		quotaGuid string
+		quotaGUID string
 	}
 	deleteReturns struct {
 		result1 error
@@ -118,15 +118,15 @@ func (fake *FakeQuotaRepository) FindByNameReturns(result1 models.QuotaFields, r
 	}{result1, result2}
 }
 
-func (fake *FakeQuotaRepository) AssignQuotaToOrg(orgGuid string, quotaGuid string) error {
+func (fake *FakeQuotaRepository) AssignQuotaToOrg(orgGUID string, quotaGUID string) error {
 	fake.assignQuotaToOrgMutex.Lock()
 	fake.assignQuotaToOrgArgsForCall = append(fake.assignQuotaToOrgArgsForCall, struct {
-		orgGuid   string
-		quotaGuid string
-	}{orgGuid, quotaGuid})
+		orgGUID   string
+		quotaGUID string
+	}{orgGUID, quotaGUID})
 	fake.assignQuotaToOrgMutex.Unlock()
 	if fake.AssignQuotaToOrgStub != nil {
-		return fake.AssignQuotaToOrgStub(orgGuid, quotaGuid)
+		return fake.AssignQuotaToOrgStub(orgGUID, quotaGUID)
 	} else {
 		return fake.assignQuotaToOrgReturns.result1
 	}
@@ -141,7 +141,7 @@ func (fake *FakeQuotaRepository) AssignQuotaToOrgCallCount() int {
 func (fake *FakeQuotaRepository) AssignQuotaToOrgArgsForCall(i int) (string, string) {
 	fake.assignQuotaToOrgMutex.RLock()
 	defer fake.assignQuotaToOrgMutex.RUnlock()
-	return fake.assignQuotaToOrgArgsForCall[i].orgGuid, fake.assignQuotaToOrgArgsForCall[i].quotaGuid
+	return fake.assignQuotaToOrgArgsForCall[i].orgGUID, fake.assignQuotaToOrgArgsForCall[i].quotaGUID
 }
 
 func (fake *FakeQuotaRepository) AssignQuotaToOrgReturns(result1 error) {
@@ -215,14 +215,14 @@ func (fake *FakeQuotaRepository) UpdateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeQuotaRepository) Delete(quotaGuid string) error {
+func (fake *FakeQuotaRepository) Delete(quotaGUID string) error {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		quotaGuid string
-	}{quotaGuid})
+		quotaGUID string
+	}{quotaGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(quotaGuid)
+		return fake.DeleteStub(quotaGUID)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -237,7 +237,7 @@ func (fake *FakeQuotaRepository) DeleteCallCount() int {
 func (fake *FakeQuotaRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].quotaGuid
+	return fake.deleteArgsForCall[i].quotaGUID
 }
 
 func (fake *FakeQuotaRepository) DeleteReturns(result1 error) {

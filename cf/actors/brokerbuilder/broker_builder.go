@@ -33,20 +33,20 @@ func (builder Builder) AttachBrokersToServices(services []models.ServiceOffering
 	brokersMap := make(map[string]models.ServiceBroker)
 
 	for _, service := range services {
-		if service.BrokerGuid == "" {
+		if service.BrokerGUID == "" {
 			continue
 		}
 
-		if broker, ok := brokersMap[service.BrokerGuid]; ok {
+		if broker, ok := brokersMap[service.BrokerGUID]; ok {
 			broker.Services = append(broker.Services, service)
-			brokersMap[broker.Guid] = broker
+			brokersMap[broker.GUID] = broker
 		} else {
-			broker, err := builder.brokerRepo.FindByGuid(service.BrokerGuid)
+			broker, err := builder.brokerRepo.FindByGUID(service.BrokerGUID)
 			if err != nil {
 				return nil, err
 			}
 			broker.Services = append(broker.Services, service)
-			brokersMap[service.BrokerGuid] = broker
+			brokersMap[service.BrokerGUID] = broker
 		}
 	}
 
@@ -64,7 +64,7 @@ func (builder Builder) AttachSpecificBrokerToServices(brokerName string, service
 	}
 
 	for _, service := range services {
-		if service.BrokerGuid == broker.Guid {
+		if service.BrokerGUID == broker.GUID {
 			broker.Services = append(broker.Services, service)
 		}
 	}
@@ -74,20 +74,20 @@ func (builder Builder) AttachSpecificBrokerToServices(brokerName string, service
 
 func (builder Builder) GetAllServiceBrokers() ([]models.ServiceBroker, error) {
 	brokers := []models.ServiceBroker{}
-	brokerGuids := []string{}
+	brokerGUIDs := []string{}
 	var err error
 	var services models.ServiceOfferings
 
 	err = builder.brokerRepo.ListServiceBrokers(func(broker models.ServiceBroker) bool {
 		brokers = append(brokers, broker)
-		brokerGuids = append(brokerGuids, broker.Guid)
+		brokerGUIDs = append(brokerGUIDs, broker.GUID)
 		return true
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	services, err = builder.serviceBuilder.GetServicesForManyBrokers(brokerGuids)
+	services, err = builder.serviceBuilder.GetServicesForManyBrokers(brokerGUIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (builder Builder) GetAllServiceBrokers() ([]models.ServiceBroker, error) {
 func (builder Builder) attachServiceOfferingsToBrokers(services models.ServiceOfferings, brokers []models.ServiceBroker) ([]models.ServiceBroker, error) {
 	for _, service := range services {
 		for index, broker := range brokers {
-			if broker.Guid == service.BrokerGuid {
+			if broker.GUID == service.BrokerGUID {
 				brokers[index].Services = append(brokers[index].Services, service)
 				break
 			}
@@ -117,7 +117,7 @@ func (builder Builder) GetBrokerWithAllServices(brokerName string) (models.Servi
 	if err != nil {
 		return models.ServiceBroker{}, err
 	}
-	services, err := builder.serviceBuilder.GetServicesForBroker(broker.Guid)
+	services, err := builder.serviceBuilder.GetServicesForBroker(broker.GUID)
 	if err != nil {
 		return models.ServiceBroker{}, err
 	}

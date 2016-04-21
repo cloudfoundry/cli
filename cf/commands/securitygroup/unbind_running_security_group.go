@@ -79,7 +79,7 @@ func (cmd *unbindFromRunningGroup) Execute(context flags.FlagContext) {
 			"security_group": terminal.EntityNameColor(securityGroup.Name),
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 		}))
-	err = cmd.runningGroupRepo.UnbindFromRunningSet(securityGroup.Guid)
+	err = cmd.runningGroupRepo.UnbindFromRunningSet(securityGroup.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

@@ -83,7 +83,7 @@ var _ = Describe("env command", func() {
 		BeforeEach(func() {
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "the-app-guid"
+			app.GUID = "the-app-guid"
 
 			appRepo.ReadReturns(app, nil)
 			appRepo.ReadEnvReturns(&models.Environment{
@@ -173,7 +173,7 @@ var _ = Describe("env command", func() {
 		BeforeEach(func() {
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "the-app-guid"
+			app.GUID = "the-app-guid"
 
 			appRepo.ReadReturns(app, nil)
 			appRepo.ReadEnvReturns(&models.Environment{

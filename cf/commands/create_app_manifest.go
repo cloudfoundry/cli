@@ -73,12 +73,12 @@ func (cmd *CreateAppManifest) SetDependency(deps commandregistry.Dependency, plu
 }
 
 func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
-	application, apiErr := cmd.appSummaryRepo.GetSummary(cmd.appReq.GetApplication().Guid)
+	application, apiErr := cmd.appSummaryRepo.GetSummary(cmd.appReq.GetApplication().GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error getting application summary: ") + apiErr.Error())
 	}
 
-	stack, err := cmd.stackRepo.FindByGUID(application.StackGuid)
+	stack, err := cmd.stackRepo.FindByGUID(application.StackGUID)
 	if err != nil {
 		cmd.ui.Failed(T("Error retrieving stack: ") + err.Error())
 	}

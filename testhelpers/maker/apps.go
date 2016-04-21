@@ -2,19 +2,19 @@ package maker
 
 import "github.com/cloudfoundry/cli/cf/models"
 
-var appGuid func() string
+var appGUID func() string
 
 func init() {
-	appGuid = guidGenerator("app")
+	appGUID = guidGenerator("app")
 }
 
 func NewAppFields(overrides Overrides) (app models.ApplicationFields) {
 	app.Name = "app-name"
-	app.Guid = appGuid()
+	app.GUID = appGUID()
 	app.State = "started"
 
-	if overrides.Has("Guid") {
-		app.Guid = overrides.Get("Guid").(string)
+	if overrides.Has("GUID") {
+		app.GUID = overrides.Get("GUID").(string)
 	}
 
 	if overrides.Has("Name") {

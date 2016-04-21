@@ -117,7 +117,7 @@ var _ = Describe("bind-security-group command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "org-name"
-				org.Guid = "org-guid"
+				org.GUID = "org-guid"
 				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				fakeOrgRepo.FindByNameReturns(org, nil)
 				fakeSpaceRepo.FindByNameInOrgReturns(models.Space{}, errors.NewModelNotFoundError("Space", "space-name"))
@@ -140,17 +140,17 @@ var _ = Describe("bind-security-group command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "org-name"
-				org.Guid = "org-guid"
+				org.GUID = "org-guid"
 				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 				space := models.Space{}
 				space.Name = "space-name"
-				space.Guid = "space-guid"
+				space.GUID = "space-guid"
 				fakeSpaceRepo.FindByNameInOrgReturns(space, nil)
 
 				securityGroup := models.SecurityGroup{}
 				securityGroup.Name = "security-group"
-				securityGroup.Guid = "security-group-guid"
+				securityGroup.GUID = "security-group-guid"
 				fakeSecurityGroupRepo.ReadReturns(securityGroup, nil)
 			})
 
@@ -159,9 +159,9 @@ var _ = Describe("bind-security-group command", func() {
 			})
 
 			It("assigns the security group to the space", func() {
-				secGroupGuid, spaceGuid := fakeSpaceBinder.BindSpaceArgsForCall(0)
-				Expect(secGroupGuid).To(Equal("security-group-guid"))
-				Expect(spaceGuid).To(Equal("space-guid"))
+				secGroupGUID, spaceGUID := fakeSpaceBinder.BindSpaceArgsForCall(0)
+				Expect(secGroupGUID).To(Equal("security-group-guid"))
+				Expect(spaceGUID).To(Equal("space-guid"))
 			})
 
 			It("describes what it is doing for the user's benefit", func() {

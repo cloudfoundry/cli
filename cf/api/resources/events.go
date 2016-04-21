@@ -42,7 +42,7 @@ func (resource EventResourceNewV2) ToFields() models.EventFields {
 	}
 
 	return models.EventFields{
-		Guid:        resource.Metadata.Guid,
+		GUID:        resource.Metadata.GUID,
 		Name:        resource.Entity.Type,
 		Timestamp:   resource.Entity.Timestamp,
 		Description: formatDescription(metadata, knownMetadataKeys),
@@ -52,7 +52,7 @@ func (resource EventResourceNewV2) ToFields() models.EventFields {
 
 func (resource EventResourceOldV2) ToFields() models.EventFields {
 	return models.EventFields{
-		Guid:      resource.Metadata.Guid,
+		GUID:      resource.Metadata.GUID,
 		Name:      T("app crashed"),
 		Timestamp: resource.Entity.Timestamp,
 		Description: fmt.Sprintf(T("instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",

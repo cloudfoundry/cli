@@ -63,7 +63,7 @@ func (cmd *CreateDomain) Execute(c flags.FlagContext) {
 			"OrgName":    terminal.EntityNameColor(owningOrg.Name),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	_, apiErr := cmd.domainRepo.Create(domainName, owningOrg.Guid)
+	_, apiErr := cmd.domainRepo.Create(domainName, owningOrg.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

@@ -61,11 +61,11 @@ func (cmd *UnbindSecurityGroup) SetDependency(deps commandregistry.Dependency, p
 }
 
 func (cmd *UnbindSecurityGroup) Execute(context flags.FlagContext) {
-	var spaceGuid string
+	var spaceGUID string
 	secName := context.Args()[0]
 
 	if len(context.Args()) == 1 {
-		spaceGuid = cmd.configRepo.SpaceFields().Guid
+		spaceGUID = cmd.configRepo.SpaceFields().GUID
 		spaceName := cmd.configRepo.SpaceFields().Name
 		orgName := cmd.configRepo.OrganizationFields().Name
 
@@ -76,7 +76,7 @@ func (cmd *UnbindSecurityGroup) Execute(context flags.FlagContext) {
 
 		cmd.flavorText(secName, orgName, spaceName)
 
-		spaceGuid = cmd.lookupSpaceGuid(orgName, spaceName)
+		spaceGUID = cmd.lookupSpaceGUID(orgName, spaceName)
 	}
 
 	securityGroup, err := cmd.securityGroupRepo.Read(secName)
@@ -84,9 +84,9 @@ func (cmd *UnbindSecurityGroup) Execute(context flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	secGuid := securityGroup.Guid
+	secGUID := securityGroup.GUID
 
-	err = cmd.secBinder.UnbindSpace(secGuid, spaceGuid)
+	err = cmd.secBinder.UnbindSpace(secGUID, spaceGUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -105,16 +105,16 @@ func (cmd UnbindSecurityGroup) flavorText(secName string, orgName string, spaceN
 		}))
 }
 
-func (cmd UnbindSecurityGroup) lookupSpaceGuid(orgName string, spaceName string) string {
+func (cmd UnbindSecurityGroup) lookupSpaceGUID(orgName string, spaceName string) string {
 	organization, err := cmd.orgRepo.FindByName(orgName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
-	orgGuid := organization.Guid
+	orgGUID := organization.GUID
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, orgGuid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, orgGUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
-	return space.Guid
+	return space.GUID
 }

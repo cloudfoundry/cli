@@ -7,7 +7,7 @@ import (
 
 type pluginPrinter struct {
 	roles      []string
-	userLister func(spaceGuid string, role string) ([]models.UserFields, error)
+	userLister func(spaceGUID string, role string) ([]models.UserFields, error)
 	users      userCollection
 	printer    func([]userWithRoles)
 }
@@ -32,7 +32,7 @@ func NewOrgUsersPluginPrinter(
 			var orgUsers []plugin_models.GetOrgUsers_Model
 			for _, user := range users {
 				orgUsers = append(orgUsers, plugin_models.GetOrgUsers_Model{
-					Guid:     user.Guid,
+					GUID:     user.GUID,
 					Username: user.Username,
 					IsAdmin:  user.IsAdmin,
 					Roles:    user.Roles,
@@ -56,7 +56,7 @@ func NewSpaceUsersPluginPrinter(
 			var spaceUsers []plugin_models.GetSpaceUsers_Model
 			for _, user := range users {
 				spaceUsers = append(spaceUsers, plugin_models.GetSpaceUsers_Model{
-					Guid:     user.Guid,
+					GUID:     user.GUID,
 					Username: user.Username,
 					IsAdmin:  user.IsAdmin,
 					Roles:    user.Roles,
@@ -71,7 +71,7 @@ func (p *pluginPrinter) PrintUsers(guid string, username string) {
 	for _, role := range p.roles {
 		users, _ := p.userLister(guid, role)
 		for _, user := range users {
-			p.users.storeAppendingRole(role, user.Username, user.Guid, user.IsAdmin)
+			p.users.storeAppendingRole(role, user.Username, user.GUID, user.IsAdmin)
 		}
 	}
 	p.printer(p.users.all())
@@ -81,7 +81,7 @@ func (coll userCollection) storeAppendingRole(role string, username string, guid
 	u := coll[username]
 	u.Roles = append(u.Roles, role)
 	u.Username = username
-	u.Guid = guid
+	u.GUID = guid
 	u.IsAdmin = isAdmin
 	coll[username] = u
 }

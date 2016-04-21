@@ -36,8 +36,8 @@ type InstanceStatsApiResponse struct {
 //go:generate counterfeiter . AppInstancesRepository
 
 type AppInstancesRepository interface {
-	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error)
-	DeleteInstance(appGuid string, instance int) error
+	GetInstances(appGUID string) (instances []models.AppInstanceFields, apiErr error)
+	DeleteInstance(appGUID string, instance int) error
 }
 
 type CloudControllerAppInstancesRepository struct {
@@ -51,10 +51,10 @@ func NewCloudControllerAppInstancesRepository(config coreconfig.Reader, gateway 
 	return
 }
 
-func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, err error) {
+func (repo CloudControllerAppInstancesRepository) GetInstances(appGUID string) (instances []models.AppInstanceFields, err error) {
 	instancesResponse := InstancesApiResponse{}
 	err = repo.gateway.GetResource(
-		fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid),
+		fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGUID),
 		&instancesResponse)
 	if err != nil {
 		return
@@ -74,11 +74,11 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 		}
 	}
 
-	return repo.updateInstancesWithStats(appGuid, instances)
+	return repo.updateInstancesWithStats(appGUID, instances)
 }
 
-func (repo CloudControllerAppInstancesRepository) DeleteInstance(appGuid string, instance int) error {
-	err := repo.gateway.DeleteResource(repo.config.ApiEndpoint(), fmt.Sprintf("/v2/apps/%s/instances/%d", appGuid, instance))
+func (repo CloudControllerAppInstancesRepository) DeleteInstance(appGUID string, instance int) error {
+	err := repo.gateway.DeleteResource(repo.config.ApiEndpoint(), fmt.Sprintf("/v2/apps/%s/instances/%d", appGUID, instance))
 	if err != nil {
 		return err
 	}

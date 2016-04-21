@@ -16,7 +16,7 @@ import (
 type ServicePlanRepository interface {
 	Search(searchParameters map[string]string) ([]models.ServicePlanFields, error)
 	Update(models.ServicePlanFields, string, bool) error
-	ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error)
+	ListPlansFromManyServices(serviceGUIDs []string) ([]models.ServicePlanFields, error)
 }
 
 type CloudControllerServicePlanRepository struct {
@@ -31,21 +31,21 @@ func NewCloudControllerServicePlanRepository(config coreconfig.Reader, gateway n
 	}
 }
 
-func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGuid string, public bool) error {
+func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGUID string, public bool) error {
 	return repo.gateway.UpdateResource(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/service_plans/%s", servicePlan.Guid),
+		fmt.Sprintf("/v2/service_plans/%s", servicePlan.GUID),
 		strings.NewReader(fmt.Sprintf(`{"public":%t}`, public)),
 	)
 }
 
-func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error) {
-	serviceGuidsString := strings.Join(serviceGuids, ",")
+func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(serviceGUIDs []string) ([]models.ServicePlanFields, error) {
+	serviceGUIDsString := strings.Join(serviceGUIDs, ",")
 	plans := []models.ServicePlanFields{}
 
 	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/service_plans?q=%s", url.QueryEscape("service_guid IN "+serviceGuidsString)),
+		fmt.Sprintf("/v2/service_plans?q=%s", url.QueryEscape("service_guid IN "+serviceGUIDsString)),
 		resources.ServicePlanResource{},
 		func(resource interface{}) bool {
 			if plan, ok := resource.(resources.ServicePlanResource); ok {

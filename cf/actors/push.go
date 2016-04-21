@@ -19,7 +19,7 @@ const windowsPathPrefix = `\\?\`
 //go:generate counterfeiter . PushActor
 
 type PushActor interface {
-	UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
+	UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	ProcessPath(dirOrZipFile string, f func(string)) error
 	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
@@ -149,6 +149,6 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 	return remoteFiles, len(filesToUpload) > 0, nil
 }
 
-func (actor PushActorImpl) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
-	return actor.appBitsRepo.UploadBits(appGuid, zipFile, presentFiles)
+func (actor PushActorImpl) UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
+	return actor.appBitsRepo.UploadBits(appGUID, zipFile, presentFiles)
 }

@@ -60,13 +60,13 @@ type FakeRouteRepository struct {
 		result1 bool
 		result2 error
 	}
-	CreateInSpaceStub        func(host, path, domainGuid, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
+	CreateInSpaceStub        func(host, path, domainGUID, spaceGUID string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
 	createInSpaceMutex       sync.RWMutex
 	createInSpaceArgsForCall []struct {
 		host       string
 		path       string
-		domainGuid string
-		spaceGuid  string
+		domainGUID string
+		spaceGUID  string
 		port       int
 		randomPort bool
 	}
@@ -74,28 +74,28 @@ type FakeRouteRepository struct {
 		result1 models.Route
 		result2 error
 	}
-	BindStub        func(routeGuid, appGuid string) (apiErr error)
+	BindStub        func(routeGUID, appGUID string) (apiErr error)
 	bindMutex       sync.RWMutex
 	bindArgsForCall []struct {
-		routeGuid string
-		appGuid   string
+		routeGUID string
+		appGUID   string
 	}
 	bindReturns struct {
 		result1 error
 	}
-	UnbindStub        func(routeGuid, appGuid string) (apiErr error)
+	UnbindStub        func(routeGUID, appGUID string) (apiErr error)
 	unbindMutex       sync.RWMutex
 	unbindArgsForCall []struct {
-		routeGuid string
-		appGuid   string
+		routeGUID string
+		appGUID   string
 	}
 	unbindReturns struct {
 		result1 error
 	}
-	DeleteStub        func(routeGuid string) (apiErr error)
+	DeleteStub        func(routeGUID string) (apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		routeGuid string
+		routeGUID string
 	}
 	deleteReturns struct {
 		result1 error
@@ -273,19 +273,19 @@ func (fake *FakeRouteRepository) CheckIfExistsReturns(result1 bool, result2 erro
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainGuid string, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error) {
+func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainGUID string, spaceGUID string, port int, randomPort bool) (createdRoute models.Route, apiErr error) {
 	fake.createInSpaceMutex.Lock()
 	fake.createInSpaceArgsForCall = append(fake.createInSpaceArgsForCall, struct {
 		host       string
 		path       string
-		domainGuid string
-		spaceGuid  string
+		domainGUID string
+		spaceGUID  string
 		port       int
 		randomPort bool
-	}{host, path, domainGuid, spaceGuid, port, randomPort})
+	}{host, path, domainGUID, spaceGUID, port, randomPort})
 	fake.createInSpaceMutex.Unlock()
 	if fake.CreateInSpaceStub != nil {
-		return fake.CreateInSpaceStub(host, path, domainGuid, spaceGuid, port, randomPort)
+		return fake.CreateInSpaceStub(host, path, domainGUID, spaceGUID, port, randomPort)
 	} else {
 		return fake.createInSpaceReturns.result1, fake.createInSpaceReturns.result2
 	}
@@ -300,7 +300,7 @@ func (fake *FakeRouteRepository) CreateInSpaceCallCount() int {
 func (fake *FakeRouteRepository) CreateInSpaceArgsForCall(i int) (string, string, string, string, int, bool) {
 	fake.createInSpaceMutex.RLock()
 	defer fake.createInSpaceMutex.RUnlock()
-	return fake.createInSpaceArgsForCall[i].host, fake.createInSpaceArgsForCall[i].path, fake.createInSpaceArgsForCall[i].domainGuid, fake.createInSpaceArgsForCall[i].spaceGuid, fake.createInSpaceArgsForCall[i].port, fake.createInSpaceArgsForCall[i].randomPort
+	return fake.createInSpaceArgsForCall[i].host, fake.createInSpaceArgsForCall[i].path, fake.createInSpaceArgsForCall[i].domainGUID, fake.createInSpaceArgsForCall[i].spaceGUID, fake.createInSpaceArgsForCall[i].port, fake.createInSpaceArgsForCall[i].randomPort
 }
 
 func (fake *FakeRouteRepository) CreateInSpaceReturns(result1 models.Route, result2 error) {
@@ -311,15 +311,15 @@ func (fake *FakeRouteRepository) CreateInSpaceReturns(result1 models.Route, resu
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) Bind(routeGuid string, appGuid string) (apiErr error) {
+func (fake *FakeRouteRepository) Bind(routeGUID string, appGUID string) (apiErr error) {
 	fake.bindMutex.Lock()
 	fake.bindArgsForCall = append(fake.bindArgsForCall, struct {
-		routeGuid string
-		appGuid   string
-	}{routeGuid, appGuid})
+		routeGUID string
+		appGUID   string
+	}{routeGUID, appGUID})
 	fake.bindMutex.Unlock()
 	if fake.BindStub != nil {
-		return fake.BindStub(routeGuid, appGuid)
+		return fake.BindStub(routeGUID, appGUID)
 	} else {
 		return fake.bindReturns.result1
 	}
@@ -334,7 +334,7 @@ func (fake *FakeRouteRepository) BindCallCount() int {
 func (fake *FakeRouteRepository) BindArgsForCall(i int) (string, string) {
 	fake.bindMutex.RLock()
 	defer fake.bindMutex.RUnlock()
-	return fake.bindArgsForCall[i].routeGuid, fake.bindArgsForCall[i].appGuid
+	return fake.bindArgsForCall[i].routeGUID, fake.bindArgsForCall[i].appGUID
 }
 
 func (fake *FakeRouteRepository) BindReturns(result1 error) {
@@ -344,15 +344,15 @@ func (fake *FakeRouteRepository) BindReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeRouteRepository) Unbind(routeGuid string, appGuid string) (apiErr error) {
+func (fake *FakeRouteRepository) Unbind(routeGUID string, appGUID string) (apiErr error) {
 	fake.unbindMutex.Lock()
 	fake.unbindArgsForCall = append(fake.unbindArgsForCall, struct {
-		routeGuid string
-		appGuid   string
-	}{routeGuid, appGuid})
+		routeGUID string
+		appGUID   string
+	}{routeGUID, appGUID})
 	fake.unbindMutex.Unlock()
 	if fake.UnbindStub != nil {
-		return fake.UnbindStub(routeGuid, appGuid)
+		return fake.UnbindStub(routeGUID, appGUID)
 	} else {
 		return fake.unbindReturns.result1
 	}
@@ -367,7 +367,7 @@ func (fake *FakeRouteRepository) UnbindCallCount() int {
 func (fake *FakeRouteRepository) UnbindArgsForCall(i int) (string, string) {
 	fake.unbindMutex.RLock()
 	defer fake.unbindMutex.RUnlock()
-	return fake.unbindArgsForCall[i].routeGuid, fake.unbindArgsForCall[i].appGuid
+	return fake.unbindArgsForCall[i].routeGUID, fake.unbindArgsForCall[i].appGUID
 }
 
 func (fake *FakeRouteRepository) UnbindReturns(result1 error) {
@@ -377,14 +377,14 @@ func (fake *FakeRouteRepository) UnbindReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeRouteRepository) Delete(routeGuid string) (apiErr error) {
+func (fake *FakeRouteRepository) Delete(routeGUID string) (apiErr error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		routeGuid string
-	}{routeGuid})
+		routeGUID string
+	}{routeGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(routeGuid)
+		return fake.DeleteStub(routeGUID)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -399,7 +399,7 @@ func (fake *FakeRouteRepository) DeleteCallCount() int {
 func (fake *FakeRouteRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].routeGuid
+	return fake.deleteArgsForCall[i].routeGUID
 }
 
 func (fake *FakeRouteRepository) DeleteReturns(result1 error) {

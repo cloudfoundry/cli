@@ -60,7 +60,7 @@ func (cmd *ListStack) Execute(c flags.FlagContext) {
 	stack, apiErr := cmd.stacksRepo.FindByName(stackName)
 
 	if c.Bool("guid") {
-		cmd.ui.Say(stack.Guid)
+		cmd.ui.Say(stack.GUID)
 	} else {
 		if apiErr != nil {
 			cmd.ui.Failed(apiErr.Error())

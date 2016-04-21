@@ -80,7 +80,7 @@ func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName stri
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	state := "STOPPED"
-	updatedApp, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+	updatedApp, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
 	if apiErr != nil {
 		err = errors.New(apiErr.Error())
 		cmd.ui.Failed(apiErr.Error())

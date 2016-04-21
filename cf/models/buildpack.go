@@ -1,7 +1,7 @@
 package models
 
 type Buildpack struct {
-	Guid     string
+	GUID     string
 	Name     string
 	Position *int
 	Enabled  *bool

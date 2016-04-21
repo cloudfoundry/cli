@@ -28,10 +28,10 @@ type FakeServicePlanRepository struct {
 	updateReturns struct {
 		result1 error
 	}
-	ListPlansFromManyServicesStub        func(serviceGuids []string) ([]models.ServicePlanFields, error)
+	ListPlansFromManyServicesStub        func(serviceGUIDs []string) ([]models.ServicePlanFields, error)
 	listPlansFromManyServicesMutex       sync.RWMutex
 	listPlansFromManyServicesArgsForCall []struct {
-		serviceGuids []string
+		serviceGUIDs []string
 	}
 	listPlansFromManyServicesReturns struct {
 		result1 []models.ServicePlanFields
@@ -106,14 +106,14 @@ func (fake *FakeServicePlanRepository) UpdateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServicePlanRepository) ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error) {
+func (fake *FakeServicePlanRepository) ListPlansFromManyServices(serviceGUIDs []string) ([]models.ServicePlanFields, error) {
 	fake.listPlansFromManyServicesMutex.Lock()
 	fake.listPlansFromManyServicesArgsForCall = append(fake.listPlansFromManyServicesArgsForCall, struct {
-		serviceGuids []string
-	}{serviceGuids})
+		serviceGUIDs []string
+	}{serviceGUIDs})
 	fake.listPlansFromManyServicesMutex.Unlock()
 	if fake.ListPlansFromManyServicesStub != nil {
-		return fake.ListPlansFromManyServicesStub(serviceGuids)
+		return fake.ListPlansFromManyServicesStub(serviceGUIDs)
 	} else {
 		return fake.listPlansFromManyServicesReturns.result1, fake.listPlansFromManyServicesReturns.result2
 	}
@@ -128,7 +128,7 @@ func (fake *FakeServicePlanRepository) ListPlansFromManyServicesCallCount() int 
 func (fake *FakeServicePlanRepository) ListPlansFromManyServicesArgsForCall(i int) []string {
 	fake.listPlansFromManyServicesMutex.RLock()
 	defer fake.listPlansFromManyServicesMutex.RUnlock()
-	return fake.listPlansFromManyServicesArgsForCall[i].serviceGuids
+	return fake.listPlansFromManyServicesArgsForCall[i].serviceGUIDs
 }
 
 func (fake *FakeServicePlanRepository) ListPlansFromManyServicesReturns(result1 []models.ServicePlanFields, result2 error) {

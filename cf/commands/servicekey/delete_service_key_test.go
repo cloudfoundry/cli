@@ -41,7 +41,7 @@ var _ = Describe("delete-service-key command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = &apifakes.FakeServiceRepository{}
 		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "fake-service-instance-guid"
+		serviceInstance.GUID = "fake-service-instance-guid"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -75,9 +75,9 @@ var _ = Describe("delete-service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{
 					Fields: models.ServiceKeyFields{
 						Name:                "fake-service-key",
-						Guid:                "fake-service-key-guid",
+						GUID:                "fake-service-key-guid",
 						Url:                 "fake-service-key-url",
-						ServiceInstanceGuid: "fake-service-instance-guid",
+						ServiceInstanceGUID: "fake-service-instance-guid",
 						ServiceInstanceUrl:  "fake-service-instance-url",
 					},
 					Credentials: map[string]interface{}{

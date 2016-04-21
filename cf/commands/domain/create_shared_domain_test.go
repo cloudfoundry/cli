@@ -177,7 +177,7 @@ var _ = Describe("CreateSharedDomain", func() {
 				routerGroups = models.RouterGroups{
 					models.RouterGroup{
 						Name: "router-group-name",
-						Guid: "router-group-guid",
+						GUID: "router-group-guid",
 						Type: "router-group-type",
 					},
 				}
@@ -199,9 +199,9 @@ var _ = Describe("CreateSharedDomain", func() {
 			It("tries to create a shared domain with router group", func() {
 				cmd.Execute(flagContext)
 				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
-				domainName, routerGroupGuid := domainRepo.CreateSharedDomainArgsForCall(0)
+				domainName, routerGroupGUID := domainRepo.CreateSharedDomainArgsForCall(0)
 				Expect(domainName).To(Equal("domain-name"))
-				Expect(routerGroupGuid).To(Equal("router-group-guid"))
+				Expect(routerGroupGUID).To(Equal("router-group-guid"))
 			})
 
 			It("prints success message", func() {
@@ -260,9 +260,9 @@ var _ = Describe("CreateSharedDomain", func() {
 			It("tries to create a shared domain without router group", func() {
 				cmd.Execute(flagContext)
 				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
-				domainName, routerGroupGuid := domainRepo.CreateSharedDomainArgsForCall(0)
+				domainName, routerGroupGUID := domainRepo.CreateSharedDomainArgsForCall(0)
 				Expect(domainName).To(Equal("domain-name"))
-				Expect(routerGroupGuid).To(Equal(""))
+				Expect(routerGroupGUID).To(Equal(""))
 			})
 
 			It("prints success message", func() {

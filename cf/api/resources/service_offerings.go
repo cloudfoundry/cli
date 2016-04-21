@@ -21,7 +21,7 @@ type ServiceOfferingEntity struct {
 	Version      string                `json:"version"`
 	Description  string                `json:"description"`
 	Provider     string                `json:"provider"`
-	BrokerGuid   string                `json:"service_broker_guid"`
+	BrokerGUID   string                `json:"service_broker_guid"`
 	Requires     []string              `json:"requires"`
 	ServicePlans []ServicePlanResource `json:"service_plans"`
 	Extra        ServiceOfferingExtra
@@ -37,8 +37,8 @@ func (resource ServiceOfferingResource) ToFields() models.ServiceOfferingFields 
 		Version:          resource.Entity.Version,
 		Provider:         resource.Entity.Provider,
 		Description:      resource.Entity.Description,
-		BrokerGuid:       resource.Entity.BrokerGuid,
-		Guid:             resource.Metadata.Guid,
+		BrokerGUID:       resource.Entity.BrokerGUID,
+		GUID:             resource.Metadata.GUID,
 		DocumentationUrl: resource.Entity.Extra.DocumentationURL,
 		Requires:         resource.Entity.Requires,
 	}
@@ -53,7 +53,7 @@ func (resource ServiceOfferingResource) ToModel() models.ServiceOffering {
 		offering.Plans = append(offering.Plans,
 			models.ServicePlanFields{
 				Name: p.Entity.Name,
-				Guid: p.Metadata.Guid,
+				GUID: p.Metadata.GUID,
 			},
 		)
 	}

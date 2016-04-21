@@ -43,7 +43,7 @@ var _ = Describe("delete-org command", func() {
 
 		org = models.Organization{}
 		org.Name = "org-to-delete"
-		org.Guid = "org-to-delete-guid"
+		org.GUID = "org-to-delete-guid"
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
@@ -83,7 +83,7 @@ var _ = Describe("delete-org command", func() {
 		Context("when deleting an org that is not targeted", func() {
 			BeforeEach(func() {
 				otherOrgFields := models.OrganizationFields{}
-				otherOrgFields.Guid = "some-other-org-guid"
+				otherOrgFields.GUID = "some-other-org-guid"
 				otherOrgFields.Name = "some-other-org"
 				config.SetOrganizationFields(otherOrgFields)
 

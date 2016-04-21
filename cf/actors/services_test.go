@@ -29,21 +29,21 @@ var _ = Describe("Services", func() {
 
 		actor = actors.NewServiceHandler(orgRepo, brokerBuilder, serviceBuilder)
 
-		serviceBroker1 = models.ServiceBroker{Guid: "my-service-broker-guid1", Name: "my-service-broker1"}
+		serviceBroker1 = models.ServiceBroker{GUID: "my-service-broker-guid1", Name: "my-service-broker1"}
 
 		service1 = models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{
 			Label:      "my-service1",
-			Guid:       "service-guid1",
-			BrokerGuid: "my-service-broker-guid1"},
+			GUID:       "service-guid1",
+			BrokerGUID: "my-service-broker-guid1"},
 		}
 
 		org1 := models.Organization{}
 		org1.Name = "org1"
-		org1.Guid = "org-guid"
+		org1.GUID = "org-guid"
 
 		org2 := models.Organization{}
 		org2.Name = "org2"
-		org2.Guid = "org2-guid"
+		org2.GUID = "org2-guid"
 	})
 
 	Describe("FilterBrokers", func() {
@@ -83,7 +83,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers)).To(Equal(1))
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -110,7 +110,7 @@ var _ = Describe("Services", func() {
 
 				Expect(len(brokers)).To(Equal(1))
 				Expect(len(brokers[0].Services)).To(Equal(1))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 
 			Context("when the -b AND -e intersection is the empty set", func() {
@@ -156,7 +156,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -175,7 +175,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 
@@ -194,7 +194,7 @@ var _ = Describe("Services", func() {
 				Expect(len(brokers[0].Services)).To(Equal(1))
 
 				Expect(brokers[0].Services[0].Label).To(Equal("my-service1"))
-				Expect(brokers[0].Services[0].Guid).To(Equal("service-guid1"))
+				Expect(brokers[0].Services[0].GUID).To(Equal("service-guid1"))
 			})
 		})
 	})

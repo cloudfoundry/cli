@@ -19,7 +19,7 @@ var _ = Describe("ApplicationRequirement", func() {
 	It("succeeds when an app with the given name exists", func() {
 		app := models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 		appRepo.ReadReturns(app, nil)
 
 		appReq := NewApplicationRequirement("foo", appRepo)

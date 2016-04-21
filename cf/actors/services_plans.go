@@ -100,9 +100,9 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 		if plan.Public || visibilityExists == setPlanVisibility {
 			continue
 		} else if visibilityExists && !setPlanVisibility {
-			actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.Guid, "service_plan_guid": plan.Guid})
+			actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.GUID, "service_plan_guid": plan.GUID})
 		} else if !visibilityExists && setPlanVisibility {
-			err = actor.servicePlanVisibilityRepo.Create(plan.Guid, org.Guid)
+			err = actor.servicePlanVisibilityRepo.Create(plan.GUID, org.GUID)
 			if err != nil {
 				return false, err
 			}
@@ -142,14 +142,14 @@ func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName
 		}
 
 		// Enable service access
-		err = actor.servicePlanVisibilityRepo.Create(servicePlan.Guid, org.Guid)
+		err = actor.servicePlanVisibilityRepo.Create(servicePlan.GUID, org.GUID)
 		if err != nil {
 			return PlanAccessError, err
 		}
 	} else if !servicePlan.Public && !setPlanVisibility {
 		// Disable service access
 		if servicePlan.OrgHasVisibility(org.Name) {
-			err = actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.Guid, "service_plan_guid": servicePlan.Guid})
+			err = actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.GUID, "service_plan_guid": servicePlan.GUID})
 			if err != nil {
 				return PlanAccessError, err
 			}
@@ -182,7 +182,7 @@ func (actor ServicePlanHandler) updateSinglePlan(serviceOffering models.ServiceO
 		return PlanAccessError, fmt.Errorf("The plan %s could not be found for service %s", planName, serviceOffering.Label)
 	}
 
-	err := actor.updateServicePlanAvailability(serviceOffering.Guid, *planToUpdate, setPlanVisibility)
+	err := actor.updateServicePlanAvailability(serviceOffering.GUID, *planToUpdate, setPlanVisibility)
 	if err != nil {
 		return PlanAccessError, err
 	}
@@ -197,7 +197,7 @@ func (actor ServicePlanHandler) deleteServicePlanVisibilities(queryParams map[st
 		return err
 	}
 	for _, visibility := range visibilities {
-		err = actor.servicePlanVisibilityRepo.Delete(visibility.Guid)
+		err = actor.servicePlanVisibilityRepo.Delete(visibility.GUID)
 		if err != nil {
 			return err
 		}
@@ -206,10 +206,10 @@ func (actor ServicePlanHandler) deleteServicePlanVisibilities(queryParams map[st
 	return nil
 }
 
-func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string, servicePlan models.ServicePlanFields, setPlanVisibility bool) error {
+func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGUID string, servicePlan models.ServicePlanFields, setPlanVisibility bool) error {
 	// We delete all service plan visibilities for the given Plan since the attribute public should function as a giant on/off
 	// switch for all orgs. Thus we need to clean up any visibilities laying around so that they don't carry over.
-	err := actor.deleteServicePlanVisibilities(map[string]string{"service_plan_guid": servicePlan.Guid})
+	err := actor.deleteServicePlanVisibilities(map[string]string{"service_plan_guid": servicePlan.GUID})
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func (actor ServicePlanHandler) updateServicePlanAvailability(serviceGuid string
 		return nil
 	}
 
-	return actor.servicePlanRepo.Update(servicePlan, serviceGuid, setPlanVisibility)
+	return actor.servicePlanRepo.Update(servicePlan, serviceGUID, setPlanVisibility)
 }
 
 func (actor ServicePlanHandler) FindServiceAccess(serviceName string, orgName string) (ServiceAccess, error) {

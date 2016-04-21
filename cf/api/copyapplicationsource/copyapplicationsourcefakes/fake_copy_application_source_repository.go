@@ -8,26 +8,26 @@ import (
 )
 
 type FakeCopyApplicationSourceRepository struct {
-	CopyApplicationStub        func(sourceAppGuid, targetAppGuid string) error
+	CopyApplicationStub        func(sourceAppGUID, targetAppGUID string) error
 	copyApplicationMutex       sync.RWMutex
 	copyApplicationArgsForCall []struct {
-		sourceAppGuid string
-		targetAppGuid string
+		sourceAppGUID string
+		targetAppGUID string
 	}
 	copyApplicationReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeCopyApplicationSourceRepository) CopyApplication(sourceAppGuid string, targetAppGuid string) error {
+func (fake *FakeCopyApplicationSourceRepository) CopyApplication(sourceAppGUID string, targetAppGUID string) error {
 	fake.copyApplicationMutex.Lock()
 	fake.copyApplicationArgsForCall = append(fake.copyApplicationArgsForCall, struct {
-		sourceAppGuid string
-		targetAppGuid string
-	}{sourceAppGuid, targetAppGuid})
+		sourceAppGUID string
+		targetAppGUID string
+	}{sourceAppGUID, targetAppGUID})
 	fake.copyApplicationMutex.Unlock()
 	if fake.CopyApplicationStub != nil {
-		return fake.CopyApplicationStub(sourceAppGuid, targetAppGuid)
+		return fake.CopyApplicationStub(sourceAppGUID, targetAppGUID)
 	} else {
 		return fake.copyApplicationReturns.result1
 	}
@@ -42,7 +42,7 @@ func (fake *FakeCopyApplicationSourceRepository) CopyApplicationCallCount() int 
 func (fake *FakeCopyApplicationSourceRepository) CopyApplicationArgsForCall(i int) (string, string) {
 	fake.copyApplicationMutex.RLock()
 	defer fake.copyApplicationMutex.RUnlock()
-	return fake.copyApplicationArgsForCall[i].sourceAppGuid, fake.copyApplicationArgsForCall[i].targetAppGuid
+	return fake.copyApplicationArgsForCall[i].sourceAppGUID, fake.copyApplicationArgsForCall[i].targetAppGUID
 }
 
 func (fake *FakeCopyApplicationSourceRepository) CopyApplicationReturns(result1 error) {

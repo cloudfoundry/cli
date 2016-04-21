@@ -53,12 +53,12 @@ var _ = Describe("Service Plan Repository", func() {
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(len(servicePlansFields)).To(Equal(2))
 				Expect(servicePlansFields[0].Name).To(Equal("The big one"))
-				Expect(servicePlansFields[0].Guid).To(Equal("the-big-guid"))
+				Expect(servicePlansFields[0].GUID).To(Equal("the-big-guid"))
 				Expect(servicePlansFields[0].Free).To(BeTrue())
 				Expect(servicePlansFields[0].Public).To(BeTrue())
 				Expect(servicePlansFields[0].Active).To(BeTrue())
 				Expect(servicePlansFields[1].Name).To(Equal("The small second"))
-				Expect(servicePlansFields[1].Guid).To(Equal("the-small-second"))
+				Expect(servicePlansFields[1].GUID).To(Equal("the-small-second"))
 				Expect(servicePlansFields[1].Free).To(BeTrue())
 				Expect(servicePlansFields[1].Public).To(BeFalse())
 				Expect(servicePlansFields[1].Active).To(BeFalse())
@@ -76,12 +76,12 @@ var _ = Describe("Service Plan Repository", func() {
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(len(servicePlansFields)).To(Equal(2))
 				Expect(servicePlansFields[0].Name).To(Equal("The big one"))
-				Expect(servicePlansFields[0].Guid).To(Equal("the-big-guid"))
+				Expect(servicePlansFields[0].GUID).To(Equal("the-big-guid"))
 				Expect(servicePlansFields[0].Free).To(BeTrue())
 				Expect(servicePlansFields[0].Public).To(BeTrue())
 				Expect(servicePlansFields[0].Active).To(BeTrue())
 				Expect(servicePlansFields[1].Name).To(Equal("The small second"))
-				Expect(servicePlansFields[1].Guid).To(Equal("the-small-second"))
+				Expect(servicePlansFields[1].GUID).To(Equal("the-small-second"))
 				Expect(servicePlansFields[1].Free).To(BeTrue())
 				Expect(servicePlansFields[1].Public).To(BeFalse())
 				Expect(servicePlansFields[1].Active).To(BeFalse())
@@ -102,7 +102,7 @@ var _ = Describe("Service Plan Repository", func() {
 		It("updates public on the service to whatever is passed", func() {
 			servicePlan := models.ServicePlanFields{
 				Name:        "my-service-plan",
-				Guid:        "my-service-plan-guid",
+				GUID:        "my-service-plan-guid",
 				Description: "descriptive text",
 				Free:        true,
 				Public:      false,
@@ -120,19 +120,19 @@ var _ = Describe("Service Plan Repository", func() {
 		})
 
 		It("returns all service plans for a list of service guids", func() {
-			serviceGuids := []string{"service-guid1", "service-guid2"}
+			serviceGUIDs := []string{"service-guid1", "service-guid2"}
 
-			servicePlansFields, err := repo.ListPlansFromManyServices(serviceGuids)
+			servicePlansFields, err := repo.ListPlansFromManyServices(serviceGUIDs)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(servicePlansFields)).To(Equal(2))
 
 			Expect(servicePlansFields[0].Name).To(Equal("plan one"))
-			Expect(servicePlansFields[0].Guid).To(Equal("plan1"))
+			Expect(servicePlansFields[0].GUID).To(Equal("plan1"))
 
 			Expect(servicePlansFields[1].Name).To(Equal("plan two"))
-			Expect(servicePlansFields[1].Guid).To(Equal("plan2"))
+			Expect(servicePlansFields[1].GUID).To(Equal("plan2"))
 		})
 	})
 })

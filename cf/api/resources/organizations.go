@@ -17,7 +17,7 @@ type OrganizationEntity struct {
 
 func (resource OrganizationResource) ToFields() (fields models.OrganizationFields) {
 	fields.Name = resource.Entity.Name
-	fields.Guid = resource.Metadata.Guid
+	fields.GUID = resource.Metadata.GUID
 
 	fields.QuotaDefinition = resource.Entity.QuotaDefinition.ToFields()
 	return

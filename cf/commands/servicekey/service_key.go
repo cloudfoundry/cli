@@ -77,7 +77,7 @@ func (cmd *ServiceKey) Execute(c flags.FlagContext) {
 			}))
 	}
 
-	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
+	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.GUID, serviceKeyName)
 	if err != nil {
 		switch err.(type) {
 		case *errors.NotAuthorizedError:
@@ -93,7 +93,7 @@ func (cmd *ServiceKey) Execute(c flags.FlagContext) {
 	}
 
 	if c.Bool("guid") {
-		cmd.ui.Say(serviceKey.Fields.Guid)
+		cmd.ui.Say(serviceKey.Fields.GUID)
 	} else {
 		if serviceKey.Fields.Name == "" {
 			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",

@@ -85,13 +85,13 @@ func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.spaceBinder.BindSpace(securityGroup.Guid, space.Guid)
+	err = cmd.spaceBinder.BindSpace(securityGroup.GUID, space.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

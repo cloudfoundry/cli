@@ -62,7 +62,7 @@ var _ = Describe("stop command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.State = "started"
 		})
 

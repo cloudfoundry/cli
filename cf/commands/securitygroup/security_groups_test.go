@@ -107,7 +107,7 @@ var _ = Describe("list-security-groups command", func() {
 			BeforeEach(func() {
 				securityGroup := models.SecurityGroup{}
 				securityGroup.Name = "my-group"
-				securityGroup.Guid = "group-guid"
+				securityGroup.GUID = "group-guid"
 
 				repo.FindAllReturns([]models.SecurityGroup{securityGroup}, nil)
 			})
@@ -118,16 +118,16 @@ var _ = Describe("list-security-groups command", func() {
 						{
 							SecurityGroupFields: models.SecurityGroupFields{
 								Name: "my-group",
-								Guid: "group-guid",
+								GUID: "group-guid",
 							},
 							Spaces: []models.Space{
 								{
-									SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
-									Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
+									SpaceFields:  models.SpaceFields{GUID: "my-space-guid-1", Name: "space-1"},
+									Organization: models.OrganizationFields{GUID: "my-org-guid-1", Name: "org-1"},
 								},
 								{
-									SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
-									Organization: models.OrganizationFields{Guid: "my-org-guid-2", Name: "org-2"},
+									SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "space-2"},
+									Organization: models.OrganizationFields{GUID: "my-org-guid-2", Name: "org-2"},
 								},
 							},
 						},

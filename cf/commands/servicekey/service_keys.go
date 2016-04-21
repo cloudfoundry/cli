@@ -68,7 +68,7 @@ func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.Guid)
+	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

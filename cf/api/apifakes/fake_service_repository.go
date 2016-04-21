@@ -18,12 +18,12 @@ type FakeServiceRepository struct {
 	purgeServiceOfferingReturns struct {
 		result1 error
 	}
-	GetServiceOfferingByGuidStub        func(serviceGuid string) (offering models.ServiceOffering, apiErr error)
-	getServiceOfferingByGuidMutex       sync.RWMutex
-	getServiceOfferingByGuidArgsForCall []struct {
-		serviceGuid string
+	GetServiceOfferingByGUIDStub        func(serviceGUID string) (offering models.ServiceOffering, apiErr error)
+	getServiceOfferingByGUIDMutex       sync.RWMutex
+	getServiceOfferingByGUIDArgsForCall []struct {
+		serviceGUID string
 	}
-	getServiceOfferingByGuidReturns struct {
+	getServiceOfferingByGUIDReturns struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
@@ -46,10 +46,10 @@ type FakeServiceRepository struct {
 		result1 models.ServiceOffering
 		result2 error
 	}
-	FindServiceOfferingsForSpaceByLabelStub        func(spaceGuid, name string) (offering models.ServiceOfferings, apiErr error)
+	FindServiceOfferingsForSpaceByLabelStub        func(spaceGUID, name string) (offering models.ServiceOfferings, apiErr error)
 	findServiceOfferingsForSpaceByLabelMutex       sync.RWMutex
 	findServiceOfferingsForSpaceByLabelArgsForCall []struct {
-		spaceGuid string
+		spaceGUID string
 		name      string
 	}
 	findServiceOfferingsForSpaceByLabelReturns struct {
@@ -63,10 +63,10 @@ type FakeServiceRepository struct {
 		result1 models.ServiceOfferings
 		result2 error
 	}
-	GetServiceOfferingsForSpaceStub        func(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
+	GetServiceOfferingsForSpaceStub        func(spaceGUID string) (offerings models.ServiceOfferings, apiErr error)
 	getServiceOfferingsForSpaceMutex       sync.RWMutex
 	getServiceOfferingsForSpaceArgsForCall []struct {
-		spaceGuid string
+		spaceGUID string
 	}
 	getServiceOfferingsForSpaceReturns struct {
 		result1 models.ServiceOfferings
@@ -89,22 +89,22 @@ type FakeServiceRepository struct {
 	purgeServiceInstanceReturns struct {
 		result1 error
 	}
-	CreateServiceInstanceStub        func(name, planGuid string, params map[string]interface{}, tags []string) (apiErr error)
+	CreateServiceInstanceStub        func(name, planGUID string, params map[string]interface{}, tags []string) (apiErr error)
 	createServiceInstanceMutex       sync.RWMutex
 	createServiceInstanceArgsForCall []struct {
 		name     string
-		planGuid string
+		planGUID string
 		params   map[string]interface{}
 		tags     []string
 	}
 	createServiceInstanceReturns struct {
 		result1 error
 	}
-	UpdateServiceInstanceStub        func(instanceGuid, planGuid string, params map[string]interface{}, tags []string) (apiErr error)
+	UpdateServiceInstanceStub        func(instanceGUID, planGUID string, params map[string]interface{}, tags []string) (apiErr error)
 	updateServiceInstanceMutex       sync.RWMutex
 	updateServiceInstanceArgsForCall []struct {
-		instanceGuid string
-		planGuid     string
+		instanceGUID string
+		planGUID     string
 		params       map[string]interface{}
 		tags         []string
 	}
@@ -128,7 +128,7 @@ type FakeServiceRepository struct {
 	deleteServiceReturns struct {
 		result1 error
 	}
-	FindServicePlanByDescriptionStub        func(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error)
+	FindServicePlanByDescriptionStub        func(planDescription resources.ServicePlanDescription) (planGUID string, apiErr error)
 	findServicePlanByDescriptionMutex       sync.RWMutex
 	findServicePlanByDescriptionArgsForCall []struct {
 		planDescription resources.ServicePlanDescription
@@ -137,38 +137,38 @@ type FakeServiceRepository struct {
 		result1 string
 		result2 error
 	}
-	ListServicesFromBrokerStub        func(brokerGuid string) (services []models.ServiceOffering, err error)
+	ListServicesFromBrokerStub        func(brokerGUID string) (services []models.ServiceOffering, err error)
 	listServicesFromBrokerMutex       sync.RWMutex
 	listServicesFromBrokerArgsForCall []struct {
-		brokerGuid string
+		brokerGUID string
 	}
 	listServicesFromBrokerReturns struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
-	ListServicesFromManyBrokersStub        func(brokerGuids []string) (services []models.ServiceOffering, err error)
+	ListServicesFromManyBrokersStub        func(brokerGUIDs []string) (services []models.ServiceOffering, err error)
 	listServicesFromManyBrokersMutex       sync.RWMutex
 	listServicesFromManyBrokersArgsForCall []struct {
-		brokerGuids []string
+		brokerGUIDs []string
 	}
 	listServicesFromManyBrokersReturns struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
-	GetServiceInstanceCountForServicePlanStub        func(v1PlanGuid string) (count int, apiErr error)
+	GetServiceInstanceCountForServicePlanStub        func(v1PlanGUID string) (count int, apiErr error)
 	getServiceInstanceCountForServicePlanMutex       sync.RWMutex
 	getServiceInstanceCountForServicePlanArgsForCall []struct {
-		v1PlanGuid string
+		v1PlanGUID string
 	}
 	getServiceInstanceCountForServicePlanReturns struct {
 		result1 int
 		result2 error
 	}
-	MigrateServicePlanFromV1ToV2Stub        func(v1PlanGuid, v2PlanGuid string) (changedCount int, apiErr error)
+	MigrateServicePlanFromV1ToV2Stub        func(v1PlanGUID, v2PlanGUID string) (changedCount int, apiErr error)
 	migrateServicePlanFromV1ToV2Mutex       sync.RWMutex
 	migrateServicePlanFromV1ToV2ArgsForCall []struct {
-		v1PlanGuid string
-		v2PlanGuid string
+		v1PlanGUID string
+		v2PlanGUID string
 	}
 	migrateServicePlanFromV1ToV2Returns struct {
 		result1 int
@@ -208,34 +208,34 @@ func (fake *FakeServiceRepository) PurgeServiceOfferingReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceRepository) GetServiceOfferingByGuid(serviceGuid string) (offering models.ServiceOffering, apiErr error) {
-	fake.getServiceOfferingByGuidMutex.Lock()
-	fake.getServiceOfferingByGuidArgsForCall = append(fake.getServiceOfferingByGuidArgsForCall, struct {
-		serviceGuid string
-	}{serviceGuid})
-	fake.getServiceOfferingByGuidMutex.Unlock()
-	if fake.GetServiceOfferingByGuidStub != nil {
-		return fake.GetServiceOfferingByGuidStub(serviceGuid)
+func (fake *FakeServiceRepository) GetServiceOfferingByGUID(serviceGUID string) (offering models.ServiceOffering, apiErr error) {
+	fake.getServiceOfferingByGUIDMutex.Lock()
+	fake.getServiceOfferingByGUIDArgsForCall = append(fake.getServiceOfferingByGUIDArgsForCall, struct {
+		serviceGUID string
+	}{serviceGUID})
+	fake.getServiceOfferingByGUIDMutex.Unlock()
+	if fake.GetServiceOfferingByGUIDStub != nil {
+		return fake.GetServiceOfferingByGUIDStub(serviceGUID)
 	} else {
-		return fake.getServiceOfferingByGuidReturns.result1, fake.getServiceOfferingByGuidReturns.result2
+		return fake.getServiceOfferingByGUIDReturns.result1, fake.getServiceOfferingByGUIDReturns.result2
 	}
 }
 
-func (fake *FakeServiceRepository) GetServiceOfferingByGuidCallCount() int {
-	fake.getServiceOfferingByGuidMutex.RLock()
-	defer fake.getServiceOfferingByGuidMutex.RUnlock()
-	return len(fake.getServiceOfferingByGuidArgsForCall)
+func (fake *FakeServiceRepository) GetServiceOfferingByGUIDCallCount() int {
+	fake.getServiceOfferingByGUIDMutex.RLock()
+	defer fake.getServiceOfferingByGUIDMutex.RUnlock()
+	return len(fake.getServiceOfferingByGUIDArgsForCall)
 }
 
-func (fake *FakeServiceRepository) GetServiceOfferingByGuidArgsForCall(i int) string {
-	fake.getServiceOfferingByGuidMutex.RLock()
-	defer fake.getServiceOfferingByGuidMutex.RUnlock()
-	return fake.getServiceOfferingByGuidArgsForCall[i].serviceGuid
+func (fake *FakeServiceRepository) GetServiceOfferingByGUIDArgsForCall(i int) string {
+	fake.getServiceOfferingByGUIDMutex.RLock()
+	defer fake.getServiceOfferingByGUIDMutex.RUnlock()
+	return fake.getServiceOfferingByGUIDArgsForCall[i].serviceGUID
 }
 
-func (fake *FakeServiceRepository) GetServiceOfferingByGuidReturns(result1 models.ServiceOffering, result2 error) {
-	fake.GetServiceOfferingByGuidStub = nil
-	fake.getServiceOfferingByGuidReturns = struct {
+func (fake *FakeServiceRepository) GetServiceOfferingByGUIDReturns(result1 models.ServiceOffering, result2 error) {
+	fake.GetServiceOfferingByGUIDStub = nil
+	fake.getServiceOfferingByGUIDReturns = struct {
 		result1 models.ServiceOffering
 		result2 error
 	}{result1, result2}
@@ -308,15 +308,15 @@ func (fake *FakeServiceRepository) FindServiceOfferingByLabelAndProviderReturns(
 	}{result1, result2}
 }
 
-func (fake *FakeServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid string, name string) (offering models.ServiceOfferings, apiErr error) {
+func (fake *FakeServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGUID string, name string) (offering models.ServiceOfferings, apiErr error) {
 	fake.findServiceOfferingsForSpaceByLabelMutex.Lock()
 	fake.findServiceOfferingsForSpaceByLabelArgsForCall = append(fake.findServiceOfferingsForSpaceByLabelArgsForCall, struct {
-		spaceGuid string
+		spaceGUID string
 		name      string
-	}{spaceGuid, name})
+	}{spaceGUID, name})
 	fake.findServiceOfferingsForSpaceByLabelMutex.Unlock()
 	if fake.FindServiceOfferingsForSpaceByLabelStub != nil {
-		return fake.FindServiceOfferingsForSpaceByLabelStub(spaceGuid, name)
+		return fake.FindServiceOfferingsForSpaceByLabelStub(spaceGUID, name)
 	} else {
 		return fake.findServiceOfferingsForSpaceByLabelReturns.result1, fake.findServiceOfferingsForSpaceByLabelReturns.result2
 	}
@@ -331,7 +331,7 @@ func (fake *FakeServiceRepository) FindServiceOfferingsForSpaceByLabelCallCount(
 func (fake *FakeServiceRepository) FindServiceOfferingsForSpaceByLabelArgsForCall(i int) (string, string) {
 	fake.findServiceOfferingsForSpaceByLabelMutex.RLock()
 	defer fake.findServiceOfferingsForSpaceByLabelMutex.RUnlock()
-	return fake.findServiceOfferingsForSpaceByLabelArgsForCall[i].spaceGuid, fake.findServiceOfferingsForSpaceByLabelArgsForCall[i].name
+	return fake.findServiceOfferingsForSpaceByLabelArgsForCall[i].spaceGUID, fake.findServiceOfferingsForSpaceByLabelArgsForCall[i].name
 }
 
 func (fake *FakeServiceRepository) FindServiceOfferingsForSpaceByLabelReturns(result1 models.ServiceOfferings, result2 error) {
@@ -367,14 +367,14 @@ func (fake *FakeServiceRepository) GetAllServiceOfferingsReturns(result1 models.
 	}{result1, result2}
 }
 
-func (fake *FakeServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error) {
+func (fake *FakeServiceRepository) GetServiceOfferingsForSpace(spaceGUID string) (offerings models.ServiceOfferings, apiErr error) {
 	fake.getServiceOfferingsForSpaceMutex.Lock()
 	fake.getServiceOfferingsForSpaceArgsForCall = append(fake.getServiceOfferingsForSpaceArgsForCall, struct {
-		spaceGuid string
-	}{spaceGuid})
+		spaceGUID string
+	}{spaceGUID})
 	fake.getServiceOfferingsForSpaceMutex.Unlock()
 	if fake.GetServiceOfferingsForSpaceStub != nil {
-		return fake.GetServiceOfferingsForSpaceStub(spaceGuid)
+		return fake.GetServiceOfferingsForSpaceStub(spaceGUID)
 	} else {
 		return fake.getServiceOfferingsForSpaceReturns.result1, fake.getServiceOfferingsForSpaceReturns.result2
 	}
@@ -389,7 +389,7 @@ func (fake *FakeServiceRepository) GetServiceOfferingsForSpaceCallCount() int {
 func (fake *FakeServiceRepository) GetServiceOfferingsForSpaceArgsForCall(i int) string {
 	fake.getServiceOfferingsForSpaceMutex.RLock()
 	defer fake.getServiceOfferingsForSpaceMutex.RUnlock()
-	return fake.getServiceOfferingsForSpaceArgsForCall[i].spaceGuid
+	return fake.getServiceOfferingsForSpaceArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeServiceRepository) GetServiceOfferingsForSpaceReturns(result1 models.ServiceOfferings, result2 error) {
@@ -465,17 +465,17 @@ func (fake *FakeServiceRepository) PurgeServiceInstanceReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceRepository) CreateServiceInstance(name string, planGuid string, params map[string]interface{}, tags []string) (apiErr error) {
+func (fake *FakeServiceRepository) CreateServiceInstance(name string, planGUID string, params map[string]interface{}, tags []string) (apiErr error) {
 	fake.createServiceInstanceMutex.Lock()
 	fake.createServiceInstanceArgsForCall = append(fake.createServiceInstanceArgsForCall, struct {
 		name     string
-		planGuid string
+		planGUID string
 		params   map[string]interface{}
 		tags     []string
-	}{name, planGuid, params, tags})
+	}{name, planGUID, params, tags})
 	fake.createServiceInstanceMutex.Unlock()
 	if fake.CreateServiceInstanceStub != nil {
-		return fake.CreateServiceInstanceStub(name, planGuid, params, tags)
+		return fake.CreateServiceInstanceStub(name, planGUID, params, tags)
 	} else {
 		return fake.createServiceInstanceReturns.result1
 	}
@@ -490,7 +490,7 @@ func (fake *FakeServiceRepository) CreateServiceInstanceCallCount() int {
 func (fake *FakeServiceRepository) CreateServiceInstanceArgsForCall(i int) (string, string, map[string]interface{}, []string) {
 	fake.createServiceInstanceMutex.RLock()
 	defer fake.createServiceInstanceMutex.RUnlock()
-	return fake.createServiceInstanceArgsForCall[i].name, fake.createServiceInstanceArgsForCall[i].planGuid, fake.createServiceInstanceArgsForCall[i].params, fake.createServiceInstanceArgsForCall[i].tags
+	return fake.createServiceInstanceArgsForCall[i].name, fake.createServiceInstanceArgsForCall[i].planGUID, fake.createServiceInstanceArgsForCall[i].params, fake.createServiceInstanceArgsForCall[i].tags
 }
 
 func (fake *FakeServiceRepository) CreateServiceInstanceReturns(result1 error) {
@@ -500,17 +500,17 @@ func (fake *FakeServiceRepository) CreateServiceInstanceReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceRepository) UpdateServiceInstance(instanceGuid string, planGuid string, params map[string]interface{}, tags []string) (apiErr error) {
+func (fake *FakeServiceRepository) UpdateServiceInstance(instanceGUID string, planGUID string, params map[string]interface{}, tags []string) (apiErr error) {
 	fake.updateServiceInstanceMutex.Lock()
 	fake.updateServiceInstanceArgsForCall = append(fake.updateServiceInstanceArgsForCall, struct {
-		instanceGuid string
-		planGuid     string
+		instanceGUID string
+		planGUID     string
 		params       map[string]interface{}
 		tags         []string
-	}{instanceGuid, planGuid, params, tags})
+	}{instanceGUID, planGUID, params, tags})
 	fake.updateServiceInstanceMutex.Unlock()
 	if fake.UpdateServiceInstanceStub != nil {
-		return fake.UpdateServiceInstanceStub(instanceGuid, planGuid, params, tags)
+		return fake.UpdateServiceInstanceStub(instanceGUID, planGUID, params, tags)
 	} else {
 		return fake.updateServiceInstanceReturns.result1
 	}
@@ -525,7 +525,7 @@ func (fake *FakeServiceRepository) UpdateServiceInstanceCallCount() int {
 func (fake *FakeServiceRepository) UpdateServiceInstanceArgsForCall(i int) (string, string, map[string]interface{}, []string) {
 	fake.updateServiceInstanceMutex.RLock()
 	defer fake.updateServiceInstanceMutex.RUnlock()
-	return fake.updateServiceInstanceArgsForCall[i].instanceGuid, fake.updateServiceInstanceArgsForCall[i].planGuid, fake.updateServiceInstanceArgsForCall[i].params, fake.updateServiceInstanceArgsForCall[i].tags
+	return fake.updateServiceInstanceArgsForCall[i].instanceGUID, fake.updateServiceInstanceArgsForCall[i].planGUID, fake.updateServiceInstanceArgsForCall[i].params, fake.updateServiceInstanceArgsForCall[i].tags
 }
 
 func (fake *FakeServiceRepository) UpdateServiceInstanceReturns(result1 error) {
@@ -600,7 +600,7 @@ func (fake *FakeServiceRepository) DeleteServiceReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceRepository) FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error) {
+func (fake *FakeServiceRepository) FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGUID string, apiErr error) {
 	fake.findServicePlanByDescriptionMutex.Lock()
 	fake.findServicePlanByDescriptionArgsForCall = append(fake.findServicePlanByDescriptionArgsForCall, struct {
 		planDescription resources.ServicePlanDescription
@@ -633,14 +633,14 @@ func (fake *FakeServiceRepository) FindServicePlanByDescriptionReturns(result1 s
 	}{result1, result2}
 }
 
-func (fake *FakeServiceRepository) ListServicesFromBroker(brokerGuid string) (services []models.ServiceOffering, err error) {
+func (fake *FakeServiceRepository) ListServicesFromBroker(brokerGUID string) (services []models.ServiceOffering, err error) {
 	fake.listServicesFromBrokerMutex.Lock()
 	fake.listServicesFromBrokerArgsForCall = append(fake.listServicesFromBrokerArgsForCall, struct {
-		brokerGuid string
-	}{brokerGuid})
+		brokerGUID string
+	}{brokerGUID})
 	fake.listServicesFromBrokerMutex.Unlock()
 	if fake.ListServicesFromBrokerStub != nil {
-		return fake.ListServicesFromBrokerStub(brokerGuid)
+		return fake.ListServicesFromBrokerStub(brokerGUID)
 	} else {
 		return fake.listServicesFromBrokerReturns.result1, fake.listServicesFromBrokerReturns.result2
 	}
@@ -655,7 +655,7 @@ func (fake *FakeServiceRepository) ListServicesFromBrokerCallCount() int {
 func (fake *FakeServiceRepository) ListServicesFromBrokerArgsForCall(i int) string {
 	fake.listServicesFromBrokerMutex.RLock()
 	defer fake.listServicesFromBrokerMutex.RUnlock()
-	return fake.listServicesFromBrokerArgsForCall[i].brokerGuid
+	return fake.listServicesFromBrokerArgsForCall[i].brokerGUID
 }
 
 func (fake *FakeServiceRepository) ListServicesFromBrokerReturns(result1 []models.ServiceOffering, result2 error) {
@@ -666,14 +666,14 @@ func (fake *FakeServiceRepository) ListServicesFromBrokerReturns(result1 []model
 	}{result1, result2}
 }
 
-func (fake *FakeServiceRepository) ListServicesFromManyBrokers(brokerGuids []string) (services []models.ServiceOffering, err error) {
+func (fake *FakeServiceRepository) ListServicesFromManyBrokers(brokerGUIDs []string) (services []models.ServiceOffering, err error) {
 	fake.listServicesFromManyBrokersMutex.Lock()
 	fake.listServicesFromManyBrokersArgsForCall = append(fake.listServicesFromManyBrokersArgsForCall, struct {
-		brokerGuids []string
-	}{brokerGuids})
+		brokerGUIDs []string
+	}{brokerGUIDs})
 	fake.listServicesFromManyBrokersMutex.Unlock()
 	if fake.ListServicesFromManyBrokersStub != nil {
-		return fake.ListServicesFromManyBrokersStub(brokerGuids)
+		return fake.ListServicesFromManyBrokersStub(brokerGUIDs)
 	} else {
 		return fake.listServicesFromManyBrokersReturns.result1, fake.listServicesFromManyBrokersReturns.result2
 	}
@@ -688,7 +688,7 @@ func (fake *FakeServiceRepository) ListServicesFromManyBrokersCallCount() int {
 func (fake *FakeServiceRepository) ListServicesFromManyBrokersArgsForCall(i int) []string {
 	fake.listServicesFromManyBrokersMutex.RLock()
 	defer fake.listServicesFromManyBrokersMutex.RUnlock()
-	return fake.listServicesFromManyBrokersArgsForCall[i].brokerGuids
+	return fake.listServicesFromManyBrokersArgsForCall[i].brokerGUIDs
 }
 
 func (fake *FakeServiceRepository) ListServicesFromManyBrokersReturns(result1 []models.ServiceOffering, result2 error) {
@@ -699,14 +699,14 @@ func (fake *FakeServiceRepository) ListServicesFromManyBrokersReturns(result1 []
 	}{result1, result2}
 }
 
-func (fake *FakeServiceRepository) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiErr error) {
+func (fake *FakeServiceRepository) GetServiceInstanceCountForServicePlan(v1PlanGUID string) (count int, apiErr error) {
 	fake.getServiceInstanceCountForServicePlanMutex.Lock()
 	fake.getServiceInstanceCountForServicePlanArgsForCall = append(fake.getServiceInstanceCountForServicePlanArgsForCall, struct {
-		v1PlanGuid string
-	}{v1PlanGuid})
+		v1PlanGUID string
+	}{v1PlanGUID})
 	fake.getServiceInstanceCountForServicePlanMutex.Unlock()
 	if fake.GetServiceInstanceCountForServicePlanStub != nil {
-		return fake.GetServiceInstanceCountForServicePlanStub(v1PlanGuid)
+		return fake.GetServiceInstanceCountForServicePlanStub(v1PlanGUID)
 	} else {
 		return fake.getServiceInstanceCountForServicePlanReturns.result1, fake.getServiceInstanceCountForServicePlanReturns.result2
 	}
@@ -721,7 +721,7 @@ func (fake *FakeServiceRepository) GetServiceInstanceCountForServicePlanCallCoun
 func (fake *FakeServiceRepository) GetServiceInstanceCountForServicePlanArgsForCall(i int) string {
 	fake.getServiceInstanceCountForServicePlanMutex.RLock()
 	defer fake.getServiceInstanceCountForServicePlanMutex.RUnlock()
-	return fake.getServiceInstanceCountForServicePlanArgsForCall[i].v1PlanGuid
+	return fake.getServiceInstanceCountForServicePlanArgsForCall[i].v1PlanGUID
 }
 
 func (fake *FakeServiceRepository) GetServiceInstanceCountForServicePlanReturns(result1 int, result2 error) {
@@ -732,15 +732,15 @@ func (fake *FakeServiceRepository) GetServiceInstanceCountForServicePlanReturns(
 	}{result1, result2}
 }
 
-func (fake *FakeServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid string, v2PlanGuid string) (changedCount int, apiErr error) {
+func (fake *FakeServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGUID string, v2PlanGUID string) (changedCount int, apiErr error) {
 	fake.migrateServicePlanFromV1ToV2Mutex.Lock()
 	fake.migrateServicePlanFromV1ToV2ArgsForCall = append(fake.migrateServicePlanFromV1ToV2ArgsForCall, struct {
-		v1PlanGuid string
-		v2PlanGuid string
-	}{v1PlanGuid, v2PlanGuid})
+		v1PlanGUID string
+		v2PlanGUID string
+	}{v1PlanGUID, v2PlanGUID})
 	fake.migrateServicePlanFromV1ToV2Mutex.Unlock()
 	if fake.MigrateServicePlanFromV1ToV2Stub != nil {
-		return fake.MigrateServicePlanFromV1ToV2Stub(v1PlanGuid, v2PlanGuid)
+		return fake.MigrateServicePlanFromV1ToV2Stub(v1PlanGUID, v2PlanGUID)
 	} else {
 		return fake.migrateServicePlanFromV1ToV2Returns.result1, fake.migrateServicePlanFromV1ToV2Returns.result2
 	}
@@ -755,7 +755,7 @@ func (fake *FakeServiceRepository) MigrateServicePlanFromV1ToV2CallCount() int {
 func (fake *FakeServiceRepository) MigrateServicePlanFromV1ToV2ArgsForCall(i int) (string, string) {
 	fake.migrateServicePlanFromV1ToV2Mutex.RLock()
 	defer fake.migrateServicePlanFromV1ToV2Mutex.RUnlock()
-	return fake.migrateServicePlanFromV1ToV2ArgsForCall[i].v1PlanGuid, fake.migrateServicePlanFromV1ToV2ArgsForCall[i].v2PlanGuid
+	return fake.migrateServicePlanFromV1ToV2ArgsForCall[i].v1PlanGUID, fake.migrateServicePlanFromV1ToV2ArgsForCall[i].v2PlanGUID
 }
 
 func (fake *FakeServiceRepository) MigrateServicePlanFromV1ToV2Returns(result1 int, result2 error) {

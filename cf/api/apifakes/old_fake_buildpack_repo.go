@@ -17,7 +17,7 @@ type OldFakeBuildpackRepository struct {
 	CreateBuildpack       models.Buildpack
 	CreateApiResponse     error
 
-	DeleteBuildpackGuid string
+	DeleteBuildpackGUID string
 	DeleteApiResponse   error
 
 	UpdateBuildpackArgs struct {
@@ -56,8 +56,8 @@ func (repo *OldFakeBuildpackRepository) Create(name string, position *int, enabl
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
-func (repo *OldFakeBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
-	repo.DeleteBuildpackGuid = buildpackGuid
+func (repo *OldFakeBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
+	repo.DeleteBuildpackGUID = buildpackGUID
 	apiErr = repo.DeleteApiResponse
 	return
 }

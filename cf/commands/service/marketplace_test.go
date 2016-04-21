@@ -46,7 +46,7 @@ var _ = Describe("marketplace command", func() {
 			},
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:       "zzz-my-service-offering",
-				Guid:        "service-1-guid",
+				GUID:        "service-1-guid",
 				Description: "service offering 1 description",
 			}}
 		service2 = models.ServiceOffering{
@@ -102,7 +102,7 @@ var _ = Describe("marketplace command", func() {
 		Context("when the user has a space targeted", func() {
 			BeforeEach(func() {
 				config.SetSpaceFields(models.SpaceFields{
-					Guid: "the-space-guid",
+					GUID: "the-space-guid",
 					Name: "the-space-name",
 				})
 				serviceBuilder.GetServicesForSpaceWithPlansReturns(fakeServiceOfferings, nil)

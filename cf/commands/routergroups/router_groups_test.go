@@ -96,7 +96,7 @@ var _ = Describe("RouterGroups", func() {
 		BeforeEach(func() {
 			routerGroups := models.RouterGroups{
 				models.RouterGroup{
-					Guid: "guid-0001",
+					GUID: "guid-0001",
 					Name: "default-router-group",
 					Type: "tcp",
 				},

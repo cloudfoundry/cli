@@ -7,7 +7,7 @@ import (
 )
 
 type Route struct {
-	Guid   string
+	GUID   string
 	Host   string
 	Domain DomainFields
 	Path   string

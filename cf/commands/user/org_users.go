@@ -75,7 +75,7 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 		}))
 
 	printer := cmd.printer(c)
-	printer.PrintUsers(org.Guid, cmd.config.Username())
+	printer.PrintUsers(org.GUID, cmd.config.Username())
 }
 
 func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
@@ -106,7 +106,7 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 	}
 }
 
-func (cmd *OrgUsers) userLister() func(orgGuid string, role string) ([]models.UserFields, error) {
+func (cmd *OrgUsers) userLister() func(orgGUID string, role string) ([]models.UserFields, error) {
 	if cmd.config.IsMinApiVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion) {
 		return cmd.userRepo.ListUsersInOrgForRoleWithNoUAA
 	}

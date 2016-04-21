@@ -138,7 +138,7 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	updatedApp, apiErr := cmd.appRepo.Update(currentApp.Guid, params)
+	updatedApp, apiErr := cmd.appRepo.Update(currentApp.GUID, params)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

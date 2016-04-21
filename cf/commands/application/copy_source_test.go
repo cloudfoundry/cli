@@ -133,7 +133,7 @@ var _ = Describe("CopySource", func() {
 					sourceApp = models.Application{
 						ApplicationFields: models.ApplicationFields{
 							Name: "source-app",
-							Guid: "source-app-guid",
+							GUID: "source-app-guid",
 						},
 					}
 					appRepo.ReadReturns(sourceApp, nil)
@@ -141,7 +141,7 @@ var _ = Describe("CopySource", func() {
 					targetApp = models.Application{
 						ApplicationFields: models.ApplicationFields{
 							Name: "target-app",
-							Guid: "target-app-guid",
+							GUID: "target-app-guid",
 						},
 					}
 					appRepo.ReadFromSpaceReturns(targetApp, nil)
@@ -151,15 +151,15 @@ var _ = Describe("CopySource", func() {
 					It("obtains both the source and target application from the same space", func() {
 						runCommand("source-app", "target-app")
 
-						targetAppName, spaceGuid := appRepo.ReadFromSpaceArgsForCall(0)
+						targetAppName, spaceGUID := appRepo.ReadFromSpaceArgsForCall(0)
 						Expect(targetAppName).To(Equal("target-app"))
-						Expect(spaceGuid).To(Equal("my-space-guid"))
+						Expect(spaceGUID).To(Equal("my-space-guid"))
 
 						Expect(appRepo.ReadArgsForCall(0)).To(Equal("source-app"))
 
-						sourceAppGuid, targetAppGuid := copyAppSourceRepo.CopyApplicationArgsForCall(0)
-						Expect(sourceAppGuid).To(Equal("source-app-guid"))
-						Expect(targetAppGuid).To(Equal("target-app-guid"))
+						sourceAppGUID, targetAppGUID := copyAppSourceRepo.CopyApplicationArgsForCall(0)
+						Expect(sourceAppGUID).To(Equal("source-app-guid"))
+						Expect(targetAppGUID).To(Equal("target-app-guid"))
 
 						appArg, orgName, spaceName := appRestarter.ApplicationRestartArgsForCall(0)
 						Expect(appArg).To(Equal(targetApp))
@@ -200,14 +200,14 @@ var _ = Describe("CopySource", func() {
 					It("send the correct target appplication for the current org and target space", func() {
 						space := models.Space{}
 						space.Name = "space-name"
-						space.Guid = "model-space-guid"
+						space.GUID = "model-space-guid"
 						spaceRepo.FindByNameReturns(space, nil)
 
 						runCommand("-s", "space-name", "source-app", "target-app")
 
-						targetAppName, spaceGuid := appRepo.ReadFromSpaceArgsForCall(0)
+						targetAppName, spaceGUID := appRepo.ReadFromSpaceArgsForCall(0)
 						Expect(targetAppName).To(Equal("target-app"))
-						Expect(spaceGuid).To(Equal("model-space-guid"))
+						Expect(spaceGUID).To(Equal("model-space-guid"))
 
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space space-name as my-user..."},
@@ -235,20 +235,20 @@ var _ = Describe("CopySource", func() {
 							Spaces: []models.SpaceFields{
 								{
 									Name: "space-name",
-									Guid: "space-guid",
+									GUID: "space-guid",
 								},
 							},
 						}, nil)
 
 						runCommand("-o", "org-name", "-s", "space-name", "source-app", "target-app")
 
-						targetAppName, spaceGuid := appRepo.ReadFromSpaceArgsForCall(0)
+						targetAppName, spaceGUID := appRepo.ReadFromSpaceArgsForCall(0)
 						Expect(targetAppName).To(Equal("target-app"))
-						Expect(spaceGuid).To(Equal("space-guid"))
+						Expect(spaceGUID).To(Equal("space-guid"))
 
-						sourceAppGuid, targetAppGuid := copyAppSourceRepo.CopyApplicationArgsForCall(0)
-						Expect(sourceAppGuid).To(Equal("source-app-guid"))
-						Expect(targetAppGuid).To(Equal("target-app-guid"))
+						sourceAppGUID, targetAppGUID := copyAppSourceRepo.CopyApplicationArgsForCall(0)
+						Expect(sourceAppGUID).To(Equal("source-app-guid"))
+						Expect(targetAppGUID).To(Equal("target-app-guid"))
 
 						appArg, orgName, spaceName := appRestarter.ApplicationRestartArgsForCall(0)
 						Expect(appArg).To(Equal(targetApp))
@@ -297,7 +297,7 @@ var _ = Describe("CopySource", func() {
 								Spaces: []models.SpaceFields{
 									{
 										Name: "space-name",
-										Guid: "space-guid",
+										GUID: "space-guid",
 									},
 								},
 							}, nil)

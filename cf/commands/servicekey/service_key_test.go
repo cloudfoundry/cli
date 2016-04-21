@@ -41,7 +41,7 @@ var _ = Describe("service-key command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "fake-service-instance-guid"
+		serviceInstance.GUID = "fake-service-instance-guid"
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
@@ -83,9 +83,9 @@ var _ = Describe("service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{
 					Fields: models.ServiceKeyFields{
 						Name:                "fake-service-key",
-						Guid:                "fake-service-key-guid",
+						GUID:                "fake-service-key-guid",
 						Url:                 "fake-service-key-url",
-						ServiceInstanceGuid: "fake-service-instance-guid",
+						ServiceInstanceGUID: "fake-service-instance-guid",
 						ServiceInstanceUrl:  "fake-service-instance-url",
 					},
 					Credentials: map[string]interface{}{
@@ -111,7 +111,7 @@ var _ = Describe("service-key command", func() {
 					[]string{"uri", "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"},
 				))
 				Expect(ui.Outputs[1]).To(BeEmpty())
-				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGuid).To(Equal("fake-service-instance-guid"))
+				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGUID).To(Equal("fake-service-instance-guid"))
 			})
 
 			It("gets service guid when '--guid' flag is provided", func() {

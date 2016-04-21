@@ -129,9 +129,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 					It("returns a UserRequirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGuid).To(BeFalse())
+						Expect(actualWantGUID).To(BeFalse())
 
 						Expect(actualRequirements).To(ContainElement(userRequirement))
 					})
@@ -145,9 +145,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 					It("returns a UserRequirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGuid).To(BeTrue())
+						Expect(actualWantGUID).To(BeTrue())
 
 						Expect(actualRequirements).To(ContainElement(userRequirement))
 					})
@@ -161,9 +161,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 					It("returns a UserRequirement", func() {
 						actualRequirements := cmd.Requirements(factory, flagContext)
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-						actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
-						Expect(actualWantGuid).To(BeTrue())
+						Expect(actualWantGUID).To(BeTrue())
 
 						Expect(actualRequirements).To(ContainElement(userRequirement))
 					})
@@ -178,9 +178,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 				It("returns a UserRequirement", func() {
 					actualRequirements := cmd.Requirements(factory, flagContext)
 					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
-					actualUsername, actualWantGuid := factory.NewUserRequirementArgsForCall(0)
+					actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 					Expect(actualUsername).To(Equal("the-user-name"))
-					Expect(actualWantGuid).To(BeTrue())
+					Expect(actualWantGUID).To(BeTrue())
 
 					Expect(actualRequirements).To(ContainElement(userRequirement))
 				})
@@ -196,7 +196,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 			cmd.Requirements(factory, flagContext)
 
 			org = models.Organization{}
-			org.Guid = "the-org-guid"
+			org.GUID = "the-org-guid"
 			org.Name = "the-org-name"
 			organizationRequirement.GetOrganizationReturns(org)
 		})
@@ -207,7 +207,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 			})
 
 			It("doesn't call CC", func() {
-				Expect(userRepo.UnsetSpaceRoleByGuidCallCount()).To(BeZero())
+				Expect(userRepo.UnsetSpaceRoleByGUIDCallCount()).To(BeZero())
 				Expect(userRepo.UnsetSpaceRoleByUsernameCallCount()).To(BeZero())
 			})
 
@@ -223,7 +223,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 		Context("when the space is found", func() {
 			BeforeEach(func() {
 				space := models.Space{}
-				space.Guid = "the-space-guid"
+				space.GUID = "the-space-guid"
 				space.Name = "the-space-name"
 				space.Organization = org.OrganizationFields
 				spaceRepo.FindByNameInOrgReturns(space, nil)
@@ -231,7 +231,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 
 			Context("when the UserRequirement returns a user with a GUID", func() {
 				BeforeEach(func() {
-					userFields := models.UserFields{Guid: "the-user-guid", Username: "the-user-name"}
+					userFields := models.UserFields{GUID: "the-user-guid", Username: "the-user-name"}
 					userRequirement.GetUserReturns(userFields)
 				})
 
@@ -245,8 +245,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 
 				It("removes the role using the GUID", func() {
 					cmd.Execute(flagContext)
-					Expect(userRepo.UnsetSpaceRoleByGuidCallCount()).To(Equal(1))
-					actualUserGUID, actualSpaceGUID, actualRole := userRepo.UnsetSpaceRoleByGuidArgsForCall(0)
+					Expect(userRepo.UnsetSpaceRoleByGUIDCallCount()).To(Equal(1))
+					actualUserGUID, actualSpaceGUID, actualRole := userRepo.UnsetSpaceRoleByGUIDArgsForCall(0)
 					Expect(actualUserGUID).To(Equal("the-user-guid"))
 					Expect(actualSpaceGUID).To(Equal("the-space-guid"))
 					Expect(actualRole).To(Equal("SpaceManager"))
@@ -254,7 +254,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 
 				Context("when the call to CC fails", func() {
 					BeforeEach(func() {
-						userRepo.UnsetSpaceRoleByGuidReturns(errors.New("user-repo-error"))
+						userRepo.UnsetSpaceRoleByGUIDReturns(errors.New("user-repo-error"))
 					})
 
 					It("panics and prints a failure message", func() {

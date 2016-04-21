@@ -30,7 +30,7 @@ var _ = Describe("restart-app-instance", func() {
 	BeforeEach(func() {
 		application = models.Application{}
 		application.Name = "my-app"
-		application.Guid = "my-app-guid"
+		application.GUID = "my-app-guid"
 		application.InstanceCount = 1
 
 		ui = &testterm.FakeUI{}
@@ -77,7 +77,7 @@ var _ = Describe("restart-app-instance", func() {
 			runCommand("my-app", "0")
 
 			app_guid, instance := appInstancesRepo.DeleteInstanceArgsForCall(0)
-			Expect(app_guid).To(Equal(application.Guid))
+			Expect(app_guid).To(Equal(application.GUID))
 			Expect(instance).To(Equal(0))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Restarting instance 0 of application my-app as my-user"},
@@ -93,7 +93,7 @@ var _ = Describe("restart-app-instance", func() {
 				runCommand("my-app", "0")
 
 				app_guid, instance := appInstancesRepo.DeleteInstanceArgsForCall(0)
-				Expect(app_guid).To(Equal(application.Guid))
+				Expect(app_guid).To(Equal(application.GUID))
 				Expect(instance).To(Equal(0))
 
 				Expect(ui.Outputs).To(ContainSubstrings(

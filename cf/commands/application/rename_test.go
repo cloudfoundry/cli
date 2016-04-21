@@ -64,14 +64,14 @@ var _ = Describe("Rename command", func() {
 	It("renames an application", func() {
 		app := models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 		requirementsFactory.LoginSuccess = true
 		requirementsFactory.TargetedSpaceSuccess = true
 		requirementsFactory.Application = app
 		runCommand("my-app", "my-new-app")
 
 		appGUID, params := appRepo.UpdateArgsForCall(0)
-		Expect(appGUID).To(Equal(app.Guid))
+		Expect(appGUID).To(Equal(app.GUID))
 		Expect(*params.Name).To(Equal("my-new-app"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},

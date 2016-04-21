@@ -106,10 +106,10 @@ type FakeReadWriter struct {
 	usernameReturns     struct {
 		result1 string
 	}
-	UserGuidStub        func() string
-	userGuidMutex       sync.RWMutex
-	userGuidArgsForCall []struct{}
-	userGuidReturns     struct {
+	UserGUIDStub        func() string
+	userGUIDMutex       sync.RWMutex
+	userGUIDArgsForCall []struct{}
+	userGUIDReturns     struct {
 		result1 string
 	}
 	UserEmailStub        func() string
@@ -682,26 +682,26 @@ func (fake *FakeReadWriter) UsernameReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeReadWriter) UserGuid() string {
-	fake.userGuidMutex.Lock()
-	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct{}{})
-	fake.userGuidMutex.Unlock()
-	if fake.UserGuidStub != nil {
-		return fake.UserGuidStub()
+func (fake *FakeReadWriter) UserGUID() string {
+	fake.userGUIDMutex.Lock()
+	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct{}{})
+	fake.userGUIDMutex.Unlock()
+	if fake.UserGUIDStub != nil {
+		return fake.UserGUIDStub()
 	} else {
-		return fake.userGuidReturns.result1
+		return fake.userGUIDReturns.result1
 	}
 }
 
-func (fake *FakeReadWriter) UserGuidCallCount() int {
-	fake.userGuidMutex.RLock()
-	defer fake.userGuidMutex.RUnlock()
-	return len(fake.userGuidArgsForCall)
+func (fake *FakeReadWriter) UserGUIDCallCount() int {
+	fake.userGUIDMutex.RLock()
+	defer fake.userGUIDMutex.RUnlock()
+	return len(fake.userGUIDArgsForCall)
 }
 
-func (fake *FakeReadWriter) UserGuidReturns(result1 string) {
-	fake.UserGuidStub = nil
-	fake.userGuidReturns = struct {
+func (fake *FakeReadWriter) UserGUIDReturns(result1 string) {
+	fake.UserGUIDStub = nil
+	fake.userGUIDReturns = struct {
 		result1 string
 	}{result1}
 }

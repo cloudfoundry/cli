@@ -19,7 +19,7 @@ import (
 type ServiceBrokerRepository interface {
 	ListServiceBrokers(callback func(models.ServiceBroker) bool) error
 	FindByName(name string) (serviceBroker models.ServiceBroker, apiErr error)
-	FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error)
+	FindByGUID(guid string) (serviceBroker models.ServiceBroker, apiErr error)
 	Create(name, url, username, password, spaceGUID string) (apiErr error)
 	Update(serviceBroker models.ServiceBroker) (apiErr error)
 	Rename(guid, name string) (apiErr error)
@@ -66,7 +66,7 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 
 	return
 }
-func (repo CloudControllerServiceBrokerRepository) FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
+func (repo CloudControllerServiceBrokerRepository) FindByGUID(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
 	broker := new(resources.ServiceBrokerResource)
 	apiErr = repo.gateway.GetResource(repo.config.ApiEndpoint()+fmt.Sprintf("/v2/service_brokers/%s", guid), broker)
 	serviceBroker = broker.ToFields()
@@ -96,7 +96,7 @@ func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, p
 }
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.ServiceBroker) (apiErr error) {
-	path := fmt.Sprintf("/v2/service_brokers/%s", serviceBroker.Guid)
+	path := fmt.Sprintf("/v2/service_brokers/%s", serviceBroker.GUID)
 	body := fmt.Sprintf(
 		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
 		serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,

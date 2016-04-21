@@ -20,7 +20,7 @@ var _ = Describe("SpaceRequirement", func() {
 		It("succeeds", func() {
 			space := models.Space{}
 			space.Name = "awesome-sauce-space"
-			space.Guid = "my-space-guid"
+			space.GUID = "my-space-guid"
 			spaceRepo.FindByNameReturns(space, nil)
 
 			spaceReq := NewSpaceRequirement("awesome-sauce-space", spaceRepo)

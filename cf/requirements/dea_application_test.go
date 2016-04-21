@@ -33,14 +33,14 @@ var _ = Describe("DeaApplication", func() {
 		Context("when the requirement has been executed", func() {
 			BeforeEach(func() {
 				app := models.Application{}
-				app.Guid = "fake-app-guid"
+				app.GUID = "fake-app-guid"
 				appRepo.ReadReturns(app, nil)
 
 				req.Execute()
 			})
 
 			It("returns the application", func() {
-				Expect(req.GetApplication().Guid).To(Equal("fake-app-guid"))
+				Expect(req.GetApplication().GUID).To(Equal("fake-app-guid"))
 			})
 		})
 	})

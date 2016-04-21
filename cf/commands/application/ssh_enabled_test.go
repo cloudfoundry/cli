@@ -71,7 +71,7 @@ var _ = Describe("disable-ssh command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 		})
 
 		Context("when enable_ssh is set to the true", func() {

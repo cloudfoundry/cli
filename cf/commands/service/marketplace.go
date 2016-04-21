@@ -85,7 +85,7 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
 				"ServiceName": terminal.EntityNameColor(serviceName),
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 			}))
-		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().Guid)
+		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().GUID)
 	} else if !cmd.config.IsLoggedIn() {
 		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
 		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
@@ -102,7 +102,7 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	if serviceOffering.Guid == "" {
+	if serviceOffering.GUID == "" {
 		cmd.ui.Say(T("Service offering not found"))
 		return
 	}
@@ -134,7 +134,7 @@ func (cmd MarketplaceServices) marketplace() {
 				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 			}))
-		serviceOfferings, apiErr = cmd.serviceBuilder.GetServicesForSpaceWithPlans(cmd.config.SpaceFields().Guid)
+		serviceOfferings, apiErr = cmd.serviceBuilder.GetServicesForSpaceWithPlans(cmd.config.SpaceFields().GUID)
 	} else if !cmd.config.IsLoggedIn() {
 		cmd.ui.Say(T("Getting all services from marketplace..."))
 		serviceOfferings, apiErr = cmd.serviceBuilder.GetAllServicesWithPlans()

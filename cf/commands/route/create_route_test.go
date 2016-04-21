@@ -60,14 +60,14 @@ var _ = Describe("CreateRoute", func() {
 
 		spaceRequirement = new(requirementsfakes.FakeSpaceRequirement)
 		space := models.Space{}
-		space.Guid = "space-guid"
+		space.GUID = "space-guid"
 		space.Name = "space-name"
 		spaceRequirement.GetSpaceReturns(space)
 		factory.NewSpaceRequirementReturns(spaceRequirement)
 
 		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		domainRequirement.GetDomainReturns(models.DomainFields{
-			Guid: "domain-guid",
+			GUID: "domain-guid",
 			Name: "domain-name",
 		})
 		factory.NewDomainRequirementReturns(domainRequirement)
@@ -412,11 +412,11 @@ var _ = Describe("CreateRoute", func() {
 				BeforeEach(func() {
 					routeRepo.FindReturns(models.Route{
 						Domain: models.DomainFields{
-							Guid: "domain-guid",
+							GUID: "domain-guid",
 							Name: "domain-name",
 						},
 						Space: models.SpaceFields{
-							Guid: "space-guid",
+							GUID: "space-guid",
 						},
 					}, nil)
 				})
@@ -439,11 +439,11 @@ var _ = Describe("CreateRoute", func() {
 
 		BeforeEach(func() {
 			domainFields = models.DomainFields{
-				Guid: "domain-guid",
+				GUID: "domain-guid",
 				Name: "domain-name",
 			}
 			spaceFields = models.SpaceFields{
-				Guid: "space-guid",
+				GUID: "space-guid",
 				Name: "space-name",
 			}
 
@@ -459,8 +459,8 @@ var _ = Describe("CreateRoute", func() {
 			hostname, path, domain, space, port, randomPort := routeRepo.CreateInSpaceArgsForCall(0)
 			Expect(hostname).To(Equal("hostname"))
 			Expect(path).To(Equal("path"))
-			Expect(domain).To(Equal(domainFields.Guid))
-			Expect(space).To(Equal(spaceFields.Guid))
+			Expect(domain).To(Equal(domainFields.GUID))
+			Expect(space).To(Equal(spaceFields.GUID))
 			Expect(port).To(Equal(9090))
 			Expect(randomPort).To(BeTrue())
 		})
@@ -509,11 +509,11 @@ var _ = Describe("CreateRoute", func() {
 						Host: "hostname",
 						Path: "path",
 						Domain: models.DomainFields{
-							Guid: "domain-guid",
+							GUID: "domain-guid",
 							Name: "domain-name",
 						},
 						Space: models.SpaceFields{
-							Guid: "space-guid",
+							GUID: "space-guid",
 						},
 					}, nil)
 				})

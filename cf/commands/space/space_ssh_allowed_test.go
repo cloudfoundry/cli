@@ -72,7 +72,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 			space = models.Space{}
 			space.Name = "the-space-name"
-			space.Guid = "the-space-guid"
+			space.GUID = "the-space-guid"
 		})
 
 		Context("when SSH is enabled for the space", func() {

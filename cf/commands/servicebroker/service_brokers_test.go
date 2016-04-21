@@ -78,17 +78,17 @@ var _ = Describe("service-brokers command", func() {
 			sbs := []models.ServiceBroker{
 				{
 					Name: "service-broker-to-list-a",
-					Guid: "service-broker-to-list-guid-a",
+					GUID: "service-broker-to-list-guid-a",
 					Url:  "http://service-a-url.com",
 				},
 				{
 					Name: "service-broker-to-list-b",
-					Guid: "service-broker-to-list-guid-b",
+					GUID: "service-broker-to-list-guid-b",
 					Url:  "http://service-b-url.com",
 				},
 				{
 					Name: "service-broker-to-list-c",
-					Guid: "service-broker-to-list-guid-c",
+					GUID: "service-broker-to-list-guid-c",
 					Url:  "http://service-c-url.com",
 				},
 			}
@@ -116,22 +116,22 @@ var _ = Describe("service-brokers command", func() {
 			sbs := []models.ServiceBroker{
 				{
 					Name: "z-service-broker-to-list",
-					Guid: "z-service-broker-to-list-guid-a",
+					GUID: "z-service-broker-to-list-guid-a",
 					Url:  "http://service-a-url.com",
 				},
 				{
 					Name: "a-service-broker-to-list",
-					Guid: "a-service-broker-to-list-guid-c",
+					GUID: "a-service-broker-to-list-guid-c",
 					Url:  "http://service-c-url.com",
 				},
 				{
 					Name: "fun-service-broker-to-list",
-					Guid: "fun-service-broker-to-list-guid-b",
+					GUID: "fun-service-broker-to-list-guid-b",
 					Url:  "http://service-b-url.com",
 				},
 				{
 					Name: "123-service-broker-to-list",
-					Guid: "123-service-broker-to-list-guid-c",
+					GUID: "123-service-broker-to-list-guid-c",
 					Url:  "http://service-d-url.com",
 				},
 			}

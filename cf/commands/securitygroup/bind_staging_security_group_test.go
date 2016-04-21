@@ -65,7 +65,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			group := models.SecurityGroup{}
-			group.Guid = "just-pretend-this-is-a-guid"
+			group.GUID = "just-pretend-this-is-a-guid"
 			group.Name = "a-security-group-name"
 			fakeSecurityGroupRepo.ReadReturns(group, nil)
 		})

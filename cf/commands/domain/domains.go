@@ -66,7 +66,7 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 			"OrgName":  terminal.EntityNameColor(org.Name),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	domains, err := cmd.getDomains(org.Guid)
+	domains, err := cmd.getDomains(org.GUID)
 	if err != nil {
 		cmd.ui.Failed(T("Failed fetching domains.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
 	}
@@ -92,9 +92,9 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 	}
 }
 
-func (cmd *ListDomains) getDomains(orgGuid string) ([]models.DomainFields, error) {
+func (cmd *ListDomains) getDomains(orgGUID string) ([]models.DomainFields, error) {
 	domains := []models.DomainFields{}
-	err := cmd.domainRepo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
+	err := cmd.domainRepo.ListDomainsForOrg(orgGUID, func(domain models.DomainFields) bool {
 		domains = append(domains, domain)
 		return true
 	})

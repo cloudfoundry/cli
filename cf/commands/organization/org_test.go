@@ -60,24 +60,24 @@ var _ = Describe("org command", func() {
 		BeforeEach(func() {
 			developmentSpaceFields := models.SpaceFields{}
 			developmentSpaceFields.Name = "development"
-			developmentSpaceFields.Guid = "dev-space-guid-1"
+			developmentSpaceFields.GUID = "dev-space-guid-1"
 			stagingSpaceFields := models.SpaceFields{}
 			stagingSpaceFields.Name = "staging"
-			stagingSpaceFields.Guid = "staging-space-guid-1"
+			stagingSpaceFields.GUID = "staging-space-guid-1"
 			domainFields := models.DomainFields{}
 			domainFields.Name = "cfapps.io"
-			domainFields.Guid = "1111"
-			domainFields.OwningOrganizationGuid = "my-org-guid"
+			domainFields.GUID = "1111"
+			domainFields.OwningOrganizationGUID = "my-org-guid"
 			domainFields.Shared = true
 			cfAppDomainFields := models.DomainFields{}
 			cfAppDomainFields.Name = "cf-app.com"
-			cfAppDomainFields.Guid = "2222"
-			cfAppDomainFields.OwningOrganizationGuid = "my-org-guid"
+			cfAppDomainFields.GUID = "2222"
+			cfAppDomainFields.OwningOrganizationGUID = "my-org-guid"
 			cfAppDomainFields.Shared = false
 
 			org := models.Organization{}
 			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+			org.GUID = "my-org-guid"
 			org.QuotaDefinition = models.QuotaFields{
 				Name:                    "cantina-quota",
 				MemoryLimit:             512,
@@ -90,8 +90,8 @@ var _ = Describe("org command", func() {
 			org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 			org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 			org.SpaceQuotas = []models.SpaceQuota{
-				{Name: "space-quota-1", Guid: "space-quota-1-guid", MemoryLimit: 512, InstanceMemoryLimit: -1},
-				{Name: "space-quota-2", Guid: "space-quota-2-guid", MemoryLimit: 256, InstanceMemoryLimit: 128},
+				{Name: "space-quota-1", GUID: "space-quota-1-guid", MemoryLimit: 512, InstanceMemoryLimit: -1},
+				{Name: "space-quota-2", GUID: "space-quota-2-guid", MemoryLimit: 256, InstanceMemoryLimit: 128},
 			}
 
 			requirementsFactory.LoginSuccess = true
@@ -140,7 +140,7 @@ var _ = Describe("org command", func() {
 				testcmd.RunCliCommand("org", []string{"my-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginModel.Name).To(Equal("my-org"))
-				Expect(pluginModel.Guid).To(Equal("my-org-guid"))
+				Expect(pluginModel.GUID).To(Equal("my-org-guid"))
 				// quota
 				Expect(pluginModel.QuotaDefinition.Name).To(Equal("cantina-quota"))
 				Expect(pluginModel.QuotaDefinition.MemoryLimit).To(Equal(int64(512)))
@@ -152,29 +152,29 @@ var _ = Describe("org command", func() {
 				// domains
 				Expect(pluginModel.Domains).To(HaveLen(2))
 				Expect(pluginModel.Domains[0].Name).To(Equal("cfapps.io"))
-				Expect(pluginModel.Domains[0].Guid).To(Equal("1111"))
-				Expect(pluginModel.Domains[0].OwningOrganizationGuid).To(Equal("my-org-guid"))
+				Expect(pluginModel.Domains[0].GUID).To(Equal("1111"))
+				Expect(pluginModel.Domains[0].OwningOrganizationGUID).To(Equal("my-org-guid"))
 				Expect(pluginModel.Domains[0].Shared).To(BeTrue())
 				Expect(pluginModel.Domains[1].Name).To(Equal("cf-app.com"))
-				Expect(pluginModel.Domains[1].Guid).To(Equal("2222"))
-				Expect(pluginModel.Domains[1].OwningOrganizationGuid).To(Equal("my-org-guid"))
+				Expect(pluginModel.Domains[1].GUID).To(Equal("2222"))
+				Expect(pluginModel.Domains[1].OwningOrganizationGUID).To(Equal("my-org-guid"))
 				Expect(pluginModel.Domains[1].Shared).To(BeFalse())
 
 				// spaces
 				Expect(pluginModel.Spaces).To(HaveLen(2))
 				Expect(pluginModel.Spaces[0].Name).To(Equal("development"))
-				Expect(pluginModel.Spaces[0].Guid).To(Equal("dev-space-guid-1"))
+				Expect(pluginModel.Spaces[0].GUID).To(Equal("dev-space-guid-1"))
 				Expect(pluginModel.Spaces[1].Name).To(Equal("staging"))
-				Expect(pluginModel.Spaces[1].Guid).To(Equal("staging-space-guid-1"))
+				Expect(pluginModel.Spaces[1].GUID).To(Equal("staging-space-guid-1"))
 
 				// space quotas
 				Expect(pluginModel.SpaceQuotas).To(HaveLen(2))
 				Expect(pluginModel.SpaceQuotas[0].Name).To(Equal("space-quota-1"))
-				Expect(pluginModel.SpaceQuotas[0].Guid).To(Equal("space-quota-1-guid"))
+				Expect(pluginModel.SpaceQuotas[0].GUID).To(Equal("space-quota-1-guid"))
 				Expect(pluginModel.SpaceQuotas[0].MemoryLimit).To(Equal(int64(512)))
 				Expect(pluginModel.SpaceQuotas[0].InstanceMemoryLimit).To(Equal(int64(-1)))
 				Expect(pluginModel.SpaceQuotas[1].Name).To(Equal("space-quota-2"))
-				Expect(pluginModel.SpaceQuotas[1].Guid).To(Equal("space-quota-2-guid"))
+				Expect(pluginModel.SpaceQuotas[1].GUID).To(Equal("space-quota-2-guid"))
 				Expect(pluginModel.SpaceQuotas[1].MemoryLimit).To(Equal(int64(256)))
 				Expect(pluginModel.SpaceQuotas[1].InstanceMemoryLimit).To(Equal(int64(128)))
 			})

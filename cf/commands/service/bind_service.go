@@ -143,6 +143,6 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 }
 
 func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {
-	apiErr = cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid, paramsMap)
+	apiErr = cmd.serviceBindingRepo.Create(serviceInstance.GUID, app.GUID, paramsMap)
 	return
 }

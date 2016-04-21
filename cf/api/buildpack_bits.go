@@ -215,7 +215,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 
 func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) error {
 	return repo.performMultiPartUpload(
-		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid),
+		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.GUID),
 		"buildpack",
 		buildpackName,
 		body)

@@ -46,7 +46,7 @@ var _ = Describe("create-space-quota command", func() {
 
 		org := models.Organization{}
 		org.Name = "my-org"
-		org.Guid = "my-org-guid"
+		org.GUID = "my-org-guid"
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 		orgRepo.FindByNameReturns(org, nil)
 	})
@@ -105,7 +105,7 @@ var _ = Describe("create-space-quota command", func() {
 		It("creates a quota with a given name", func() {
 			runCommand("my-quota")
 			Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
-			Expect(quotaRepo.CreateArgsForCall(0).OrgGuid).To(Equal("my-org-guid"))
+			Expect(quotaRepo.CreateArgsForCall(0).OrgGUID).To(Equal("my-org-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating space quota", "my-org", "my-quota", "my-user", "..."},

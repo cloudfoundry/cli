@@ -93,8 +93,8 @@ var _ = Describe("Application resources", func() {
 				InstanceCount:      &instanceCount,
 				Memory:             &memory,
 				Name:               &name,
-				SpaceGuid:          &spaceGUID,
-				StackGuid:          &stackGUID,
+				SpaceGUID:          &spaceGUID,
+				StackGUID:          &stackGUID,
 				State:              &state,
 				PackageUpdatedAt:   &packageUpdatedAt,
 				AppPorts:           &appPorts,
@@ -105,11 +105,11 @@ var _ = Describe("Application resources", func() {
 			entity := resources.NewApplicationEntityFromAppParams(appParams)
 			Expect(*entity.Buildpack).To(Equal(buildpackURL))
 			Expect(*entity.Name).To(Equal(name))
-			Expect(*entity.SpaceGuid).To(Equal(spaceGUID))
+			Expect(*entity.SpaceGUID).To(Equal(spaceGUID))
 			Expect(*entity.Instances).To(Equal(instanceCount))
 			Expect(*entity.Memory).To(Equal(memory))
 			Expect(*entity.DiskQuota).To(Equal(diskQuota))
-			Expect(*entity.StackGuid).To(Equal(stackGUID))
+			Expect(*entity.StackGUID).To(Equal(stackGUID))
 			Expect(*entity.Command).To(Equal(command))
 			Expect(*entity.HealthCheckType).To(Equal(healthCheckType))
 			Expect(*entity.HealthCheckTimeout).To(Equal(healthCheckTimeout))

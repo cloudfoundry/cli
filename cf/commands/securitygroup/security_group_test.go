@@ -68,17 +68,17 @@ var _ = Describe("security-group command", func() {
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
-						Guid:  "group-guid",
+						GUID:  "group-guid",
 						Rules: rulesMap,
 					},
 					Spaces: []models.Space{
 						{
-							SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
-							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
+							SpaceFields:  models.SpaceFields{GUID: "my-space-guid-1", Name: "space-1"},
+							Organization: models.OrganizationFields{GUID: "my-org-guid-1", Name: "org-1"},
 						},
 						{
-							SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
-							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-2"},
+							SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "space-2"},
+							Organization: models.OrganizationFields{GUID: "my-org-guid-1", Name: "org-2"},
 						},
 					},
 				}
@@ -112,7 +112,7 @@ var _ = Describe("security-group command", func() {
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
-						Guid:  "group-guid",
+						GUID:  "group-guid",
 						Rules: []map[string]interface{}{},
 					},
 					Spaces: []models.Space{},

@@ -69,7 +69,7 @@ func (cmd *EnableSSH) Execute(fc flags.FlagContext) {
 	cmd.ui.Say("")
 
 	enable := true
-	updatedApp, err := cmd.appRepo.Update(app.Guid, models.AppParams{EnableSSH: &enable})
+	updatedApp, err := cmd.appRepo.Update(app.GUID, models.AppParams{EnableSSH: &enable})
 	if err != nil {
 		cmd.ui.Failed(T("Error enabling ssh support for ") + app.Name + ": " + err.Error())
 	}

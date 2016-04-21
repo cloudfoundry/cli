@@ -171,7 +171,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 			It("unmarshalls the fields of a service instance resource", func() {
 				fields := resource.ToFields()
 
-				Expect(fields.Guid).To(Equal("fake-guid"))
+				Expect(fields.GUID).To(Equal("fake-guid"))
 				Expect(fields.Name).To(Equal("fake service name"))
 				Expect(fields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(fields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
@@ -219,7 +219,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 			It("unmarshalls the service instance resource model", func() {
 				instance := resource.ToModel()
 
-				Expect(instance.ServiceInstanceFields.Guid).To(Equal("fake-guid"))
+				Expect(instance.ServiceInstanceFields.GUID).To(Equal("fake-guid"))
 				Expect(instance.ServiceInstanceFields.Name).To(Equal("fake service name"))
 				Expect(instance.ServiceInstanceFields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(instance.ServiceInstanceFields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
@@ -229,16 +229,16 @@ var _ = Describe("ServiceInstanceResource", func() {
 				Expect(instance.ServiceInstanceFields.LastOperation.CreatedAt).To(Equal("fake created at"))
 				Expect(instance.ServiceInstanceFields.LastOperation.UpdatedAt).To(Equal("fake updated at"))
 
-				Expect(instance.ServicePlan.Guid).To(Equal("fake-service-plan-guid"))
+				Expect(instance.ServicePlan.GUID).To(Equal("fake-service-plan-guid"))
 				Expect(instance.ServicePlan.Free).To(BeTrue())
 				Expect(instance.ServicePlan.Description).To(Equal("fake-description"))
 				Expect(instance.ServicePlan.Public).To(BeTrue())
 				Expect(instance.ServicePlan.Active).To(BeTrue())
-				Expect(instance.ServicePlan.ServiceOfferingGuid).To(Equal("fake-service-guid"))
+				Expect(instance.ServicePlan.ServiceOfferingGUID).To(Equal("fake-service-guid"))
 
-				Expect(instance.ServiceBindings[0].Guid).To(Equal("fake-service-binding-guid"))
+				Expect(instance.ServiceBindings[0].GUID).To(Equal("fake-service-binding-guid"))
 				Expect(instance.ServiceBindings[0].Url).To(Equal("http://fake/url"))
-				Expect(instance.ServiceBindings[0].AppGuid).To(Equal("fake-app-guid"))
+				Expect(instance.ServiceBindings[0].AppGUID).To(Equal("fake-app-guid"))
 			})
 		})
 	})
@@ -248,7 +248,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 			It("unmarshalls the fields of a service instance resource", func() {
 				fields := resourceWithNullLastOp.ToFields()
 
-				Expect(fields.Guid).To(Equal("fake-guid"))
+				Expect(fields.GUID).To(Equal("fake-guid"))
 				Expect(fields.Name).To(Equal("fake service name"))
 				Expect(fields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(fields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
@@ -262,7 +262,7 @@ var _ = Describe("ServiceInstanceResource", func() {
 			It("unmarshalls the service instance resource model", func() {
 				instance := resourceWithNullLastOp.ToModel()
 
-				Expect(instance.ServiceInstanceFields.Guid).To(Equal("fake-guid"))
+				Expect(instance.ServiceInstanceFields.GUID).To(Equal("fake-guid"))
 				Expect(instance.ServiceInstanceFields.Name).To(Equal("fake service name"))
 				Expect(instance.ServiceInstanceFields.Tags).To(Equal([]string{"tag1", "tag2"}))
 				Expect(instance.ServiceInstanceFields.DashboardUrl).To(Equal("https://fake/dashboard/url"))
@@ -271,16 +271,16 @@ var _ = Describe("ServiceInstanceResource", func() {
 				Expect(instance.ServiceInstanceFields.LastOperation.State).To(Equal(""))
 				Expect(instance.ServiceInstanceFields.LastOperation.Description).To(Equal(""))
 
-				Expect(instance.ServicePlan.Guid).To(Equal("fake-service-plan-guid"))
+				Expect(instance.ServicePlan.GUID).To(Equal("fake-service-plan-guid"))
 				Expect(instance.ServicePlan.Free).To(BeTrue())
 				Expect(instance.ServicePlan.Description).To(Equal("fake-description"))
 				Expect(instance.ServicePlan.Public).To(BeTrue())
 				Expect(instance.ServicePlan.Active).To(BeTrue())
-				Expect(instance.ServicePlan.ServiceOfferingGuid).To(Equal("fake-service-guid"))
+				Expect(instance.ServicePlan.ServiceOfferingGUID).To(Equal("fake-service-guid"))
 
-				Expect(instance.ServiceBindings[0].Guid).To(Equal("fake-service-binding-guid"))
+				Expect(instance.ServiceBindings[0].GUID).To(Equal("fake-service-binding-guid"))
 				Expect(instance.ServiceBindings[0].Url).To(Equal("http://fake/url"))
-				Expect(instance.ServiceBindings[0].AppGuid).To(Equal("fake-app-guid"))
+				Expect(instance.ServiceBindings[0].AppGUID).To(Equal("fake-app-guid"))
 			})
 		})
 	})

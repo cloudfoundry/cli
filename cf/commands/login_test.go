@@ -77,13 +77,13 @@ var _ = Describe("Login Command", func() {
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
-		org.Guid = "my-new-org-guid"
+		org.GUID = "my-new-org-guid"
 
 		orgRepo = &organizationsfakes.FakeOrganizationRepository{}
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 		space := models.Space{}
-		space.Guid = "my-space-guid"
+		space.GUID = "my-space-guid"
 		space.Name = "my-space"
 
 		spaceRepo = new(apifakes.FakeSpaceRepository)
@@ -122,19 +122,19 @@ var _ = Describe("Login Command", func() {
 
 			BeforeEach(func() {
 				org1 := models.Organization{}
-				org1.Guid = "some-org-guid"
+				org1.GUID = "some-org-guid"
 				org1.Name = "some-org"
 
 				org2 = models.Organization{}
-				org2.Guid = "my-new-org-guid"
+				org2.GUID = "my-new-org-guid"
 				org2.Name = "my-new-org"
 
 				space1 := models.Space{}
-				space1.Guid = "my-space-guid"
+				space1.GUID = "my-space-guid"
 				space1.Name = "my-space"
 
 				space2 = models.Space{}
-				space2.Guid = "some-space-guid"
+				space2.GUID = "some-space-guid"
 				space2.Name = "some-space"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
@@ -164,8 +164,8 @@ var _ = Describe("Login Command", func() {
 					[]string{"2. some-space"},
 				))
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -203,8 +203,8 @@ var _ = Describe("Login Command", func() {
 					[]string{"2. some-space"},
 				))
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -223,8 +223,8 @@ var _ = Describe("Login Command", func() {
 				orgRepo.FindByNameReturns(org2, nil)
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -249,8 +249,8 @@ var _ = Describe("Login Command", func() {
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -293,7 +293,7 @@ var _ = Describe("Login Command", func() {
 				for i := 0; i < 60; i++ {
 					id := strconv.Itoa(i)
 					org := models.Organization{}
-					org.Guid = "my-org-guid-" + id
+					org.GUID = "my-org-guid-" + id
 					org.Name = "my-org-" + id
 					organizations = append(organizations, org)
 				}
@@ -301,11 +301,11 @@ var _ = Describe("Login Command", func() {
 				orgRepo.FindByNameReturns(organizations[1], nil)
 
 				space1 := models.Space{}
-				space1.Guid = "my-space-guid"
+				space1.GUID = "my-space-guid"
 				space1.Name = "my-space"
 
 				space2 := models.Space{}
-				space2.Guid = "some-space-guid"
+				space2.GUID = "some-space-guid"
 				space2.Name = "some-space"
 
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1, space2})
@@ -318,7 +318,7 @@ var _ = Describe("Login Command", func() {
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-org-1"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid-1"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-org-guid-1"))
 			})
 		})
 
@@ -328,8 +328,8 @@ var _ = Describe("Login Command", func() {
 
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -354,8 +354,8 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal(""))
-				Expect(Config.SpaceFields().Guid).To(Equal(""))
+				Expect(Config.OrganizationFields().GUID).To(Equal(""))
+				Expect(Config.SpaceFields().GUID).To(Equal(""))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -380,8 +380,8 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal(""))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal(""))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -620,8 +620,8 @@ var _ = Describe("Login Command", func() {
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 						Expect(Config.AccessToken()).To(BeEmpty())
 						Expect(Config.RefreshToken()).To(BeEmpty())
-						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-						Expect(Config.SpaceFields().Guid).To(BeEmpty())
+						Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+						Expect(Config.SpaceFields().GUID).To(BeEmpty())
 					})
 				})
 			})
@@ -656,8 +656,8 @@ var _ = Describe("Login Command", func() {
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 						Expect(Config.AccessToken()).To(BeEmpty())
 						Expect(Config.RefreshToken()).To(BeEmpty())
-						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-						Expect(Config.SpaceFields().Guid).To(BeEmpty())
+						Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+						Expect(Config.SpaceFields().GUID).To(BeEmpty())
 					})
 				})
 			})
@@ -727,8 +727,8 @@ var _ = Describe("Login Command", func() {
 				It("clears Access Token, Refresh Token, Org, and Space in the config", func() {
 					Expect(Config.AccessToken()).To(BeEmpty())
 					Expect(Config.RefreshToken()).To(BeEmpty())
-					Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-					Expect(Config.SpaceFields().Guid).To(BeEmpty())
+					Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+					Expect(Config.SpaceFields().GUID).To(BeEmpty())
 				})
 			})
 		})
@@ -749,8 +749,8 @@ var _ = Describe("Login Command", func() {
 			})
 
 			It("clears Org, and Space in the config", func() {
-				Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-				Expect(Config.SpaceFields().Guid).To(BeEmpty())
+				Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+				Expect(Config.SpaceFields().GUID).To(BeEmpty())
 			})
 		})
 
@@ -772,11 +772,11 @@ var _ = Describe("Login Command", func() {
 			})
 
 			It("updates the org in the config", func() {
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
 			})
 
 			It("clears the space in the config", func() {
-				Expect(Config.SpaceFields().Guid).To(BeEmpty())
+				Expect(Config.SpaceFields().GUID).To(BeEmpty())
 			})
 		})
 
@@ -785,12 +785,12 @@ var _ = Describe("Login Command", func() {
 				orgRepo.FindByNameReturns(models.Organization{
 					OrganizationFields: models.OrganizationFields{
 						Name: "new-org",
-						Guid: "new-org-guid",
+						GUID: "new-org-guid",
 					},
 				}, nil)
 
 				space1 := models.Space{}
-				space1.Guid = "new-space-guid"
+				space1.GUID = "new-space-guid"
 				space1.Name = "new-space-name"
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1})
 				spaceRepo.FindByNameReturns(space1, nil)
@@ -818,8 +818,8 @@ var _ = Describe("Login Command", func() {
 			It("updates the config", func() {
 				Expect(Config.AccessToken()).To(Equal("new_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("new-space-guid"))
 
 				Expect(Config.ApiVersion()).To(Equal("some-version"))
 				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))

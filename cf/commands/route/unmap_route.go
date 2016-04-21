@@ -124,9 +124,9 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 
 	var routeFound bool
 	for _, routeApp := range route.Apps {
-		if routeApp.Guid == app.Guid {
+		if routeApp.GUID == app.GUID {
 			routeFound = true
-			err = cmd.routeRepo.Unbind(route.Guid, app.Guid)
+			err = cmd.routeRepo.Unbind(route.GUID, app.GUID)
 			if err != nil {
 				cmd.ui.Failed(err.Error())
 			}

@@ -141,7 +141,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, rand
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.Guid, space.Guid, port, randomPort)
+	route, err := cmd.routeRepo.CreateInSpace(hostName, path, domain.GUID, space.GUID, port, randomPort)
 	if err != nil {
 		var findErr error
 		route, findErr = cmd.routeRepo.Find(hostName, domain, path, port)
@@ -149,7 +149,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, rand
 			return models.Route{}, err
 		}
 
-		if route.Space.Guid != space.Guid || route.Domain.Guid != domain.Guid {
+		if route.Space.GUID != space.GUID || route.Domain.GUID != domain.GUID {
 			return models.Route{}, err
 		}
 

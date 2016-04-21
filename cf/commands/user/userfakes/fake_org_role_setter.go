@@ -40,12 +40,12 @@ type FakeOrgRoleSetter struct {
 	executeArgsForCall []struct {
 		context flags.FlagContext
 	}
-	SetOrgRoleStub        func(orgGuid string, role, userGuid, userName string) error
+	SetOrgRoleStub        func(orgGUID string, role, userGUID, userName string) error
 	setOrgRoleMutex       sync.RWMutex
 	setOrgRoleArgsForCall []struct {
-		orgGuid  string
+		orgGUID  string
 		role     string
-		userGuid string
+		userGUID string
 		userName string
 	}
 	setOrgRoleReturns struct {
@@ -166,17 +166,17 @@ func (fake *FakeOrgRoleSetter) ExecuteArgsForCall(i int) flags.FlagContext {
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeOrgRoleSetter) SetOrgRole(orgGuid string, role string, userGuid string, userName string) error {
+func (fake *FakeOrgRoleSetter) SetOrgRole(orgGUID string, role string, userGUID string, userName string) error {
 	fake.setOrgRoleMutex.Lock()
 	fake.setOrgRoleArgsForCall = append(fake.setOrgRoleArgsForCall, struct {
-		orgGuid  string
+		orgGUID  string
 		role     string
-		userGuid string
+		userGUID string
 		userName string
-	}{orgGuid, role, userGuid, userName})
+	}{orgGUID, role, userGUID, userName})
 	fake.setOrgRoleMutex.Unlock()
 	if fake.SetOrgRoleStub != nil {
-		return fake.SetOrgRoleStub(orgGuid, role, userGuid, userName)
+		return fake.SetOrgRoleStub(orgGUID, role, userGUID, userName)
 	} else {
 		return fake.setOrgRoleReturns.result1
 	}
@@ -191,7 +191,7 @@ func (fake *FakeOrgRoleSetter) SetOrgRoleCallCount() int {
 func (fake *FakeOrgRoleSetter) SetOrgRoleArgsForCall(i int) (string, string, string, string) {
 	fake.setOrgRoleMutex.RLock()
 	defer fake.setOrgRoleMutex.RUnlock()
-	return fake.setOrgRoleArgsForCall[i].orgGuid, fake.setOrgRoleArgsForCall[i].role, fake.setOrgRoleArgsForCall[i].userGuid, fake.setOrgRoleArgsForCall[i].userName
+	return fake.setOrgRoleArgsForCall[i].orgGUID, fake.setOrgRoleArgsForCall[i].role, fake.setOrgRoleArgsForCall[i].userGUID, fake.setOrgRoleArgsForCall[i].userName
 }
 
 func (fake *FakeOrgRoleSetter) SetOrgRoleReturns(result1 error) {

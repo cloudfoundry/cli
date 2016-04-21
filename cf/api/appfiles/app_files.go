@@ -10,7 +10,7 @@ import (
 //go:generate counterfeiter . AppFilesRepository
 
 type AppFilesRepository interface {
-	ListFiles(appGuid string, instance int, path string) (files string, apiErr error)
+	ListFiles(appGUID string, instance int, path string) (files string, apiErr error)
 }
 
 type CloudControllerAppFilesRepository struct {
@@ -24,8 +24,8 @@ func NewCloudControllerAppFilesRepository(config coreconfig.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerAppFilesRepository) ListFiles(appGuid string, instance int, path string) (files string, apiErr error) {
-	url := fmt.Sprintf("%s/v2/apps/%s/instances/%d/files/%s", repo.config.ApiEndpoint(), appGuid, instance, path)
+func (repo CloudControllerAppFilesRepository) ListFiles(appGUID string, instance int, path string) (files string, apiErr error) {
+	url := fmt.Sprintf("%s/v2/apps/%s/instances/%d/files/%s", repo.config.ApiEndpoint(), appGUID, instance, path)
 	request, apiErr := repo.gateway.NewRequest("GET", url, repo.config.AccessToken(), nil)
 	if apiErr != nil {
 		return

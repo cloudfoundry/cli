@@ -12,7 +12,7 @@ type OldFakeServiceKeyRepo struct {
 }
 
 type CreateServiceKeyType struct {
-	InstanceGuid string
+	InstanceGUID string
 	KeyName      string
 	Params       map[string]interface{}
 
@@ -20,14 +20,14 @@ type CreateServiceKeyType struct {
 }
 
 type ListServiceKeysType struct {
-	InstanceGuid string
+	InstanceGUID string
 
 	ServiceKeys []models.ServiceKey
 	Error       error
 }
 
 type GetServiceKeyType struct {
-	InstanceGuid string
+	InstanceGUID string
 	KeyName      string
 
 	ServiceKey models.ServiceKey
@@ -35,7 +35,7 @@ type GetServiceKeyType struct {
 }
 
 type DeleteServiceKeyType struct {
-	Guid string
+	GUID string
 
 	Error error
 }
@@ -49,28 +49,28 @@ func NewFakeServiceKeyRepo() *OldFakeServiceKeyRepo {
 	}
 }
 
-func (f *OldFakeServiceKeyRepo) CreateServiceKey(instanceGuid string, serviceKeyName string, params map[string]interface{}) error {
-	f.CreateServiceKeyMethod.InstanceGuid = instanceGuid
+func (f *OldFakeServiceKeyRepo) CreateServiceKey(instanceGUID string, serviceKeyName string, params map[string]interface{}) error {
+	f.CreateServiceKeyMethod.InstanceGUID = instanceGUID
 	f.CreateServiceKeyMethod.KeyName = serviceKeyName
 	f.CreateServiceKeyMethod.Params = params
 
 	return f.CreateServiceKeyMethod.Error
 }
 
-func (f *OldFakeServiceKeyRepo) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
-	f.ListServiceKeysMethod.InstanceGuid = instanceGuid
+func (f *OldFakeServiceKeyRepo) ListServiceKeys(instanceGUID string) ([]models.ServiceKey, error) {
+	f.ListServiceKeysMethod.InstanceGUID = instanceGUID
 
 	return f.ListServiceKeysMethod.ServiceKeys, f.ListServiceKeysMethod.Error
 }
 
-func (f *OldFakeServiceKeyRepo) GetServiceKey(instanceGuid string, serviceKeyName string) (models.ServiceKey, error) {
-	f.GetServiceKeyMethod.InstanceGuid = instanceGuid
+func (f *OldFakeServiceKeyRepo) GetServiceKey(instanceGUID string, serviceKeyName string) (models.ServiceKey, error) {
+	f.GetServiceKeyMethod.InstanceGUID = instanceGUID
 
 	return f.GetServiceKeyMethod.ServiceKey, f.GetServiceKeyMethod.Error
 }
 
-func (f *OldFakeServiceKeyRepo) DeleteServiceKey(serviceKeyGuid string) error {
-	f.DeleteServiceKeyMethod.Guid = serviceKeyGuid
+func (f *OldFakeServiceKeyRepo) DeleteServiceKey(serviceKeyGUID string) error {
+	f.DeleteServiceKeyMethod.GUID = serviceKeyGUID
 
 	return f.DeleteServiceKeyMethod.Error
 }

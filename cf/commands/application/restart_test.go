@@ -54,7 +54,7 @@ var _ = Describe("restart command", func() {
 
 		app = models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 
 		//save original command and restore later
 		originalStart = commandregistry.Commands.FindCommand("start")

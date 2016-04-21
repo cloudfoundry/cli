@@ -15,7 +15,7 @@ type Application struct {
 
 func (model Application) HasRoute(route Route) bool {
 	for _, boundRoute := range model.Routes {
-		if boundRoute.Guid == route.Guid {
+		if boundRoute.GUID == route.GUID {
 			return true
 		}
 	}
@@ -25,7 +25,7 @@ func (model Application) HasRoute(route Route) bool {
 func (model Application) ToParams() (params AppParams) {
 	state := strings.ToUpper(model.State)
 	params = AppParams{
-		Guid:            &model.Guid,
+		GUID:            &model.GUID,
 		Name:            &model.Name,
 		BuildpackUrl:    &model.BuildpackUrl,
 		Command:         &model.Command,
@@ -34,20 +34,20 @@ func (model Application) ToParams() (params AppParams) {
 		HealthCheckType: &model.HealthCheckType,
 		Memory:          &model.Memory,
 		State:           &state,
-		SpaceGuid:       &model.SpaceGuid,
+		SpaceGUID:       &model.SpaceGUID,
 		EnvironmentVars: &model.EnvironmentVars,
 		DockerImage:     &model.DockerImage,
 	}
 
 	if model.Stack != nil {
-		params.StackGuid = &model.Stack.Guid
+		params.StackGUID = &model.Stack.GUID
 	}
 
 	return
 }
 
 type ApplicationFields struct {
-	Guid                 string
+	GUID                 string
 	Name                 string
 	BuildpackUrl         string
 	Command              string
@@ -61,8 +61,8 @@ type ApplicationFields struct {
 	HealthCheckType      string
 	HealthCheckTimeout   int
 	State                string
-	SpaceGuid            string
-	StackGuid            string
+	SpaceGUID            string
+	StackGUID            string
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string
@@ -79,7 +79,7 @@ type AppParams struct {
 	DiskQuota          *int64
 	Domains            *[]string
 	EnvironmentVars    *map[string]interface{}
-	Guid               *string
+	GUID               *string
 	HealthCheckType    *string
 	HealthCheckTimeout *int
 	DockerImage        *string
@@ -96,8 +96,8 @@ type AppParams struct {
 	UseRandomPort      bool
 	Path               *string
 	ServicesToBind     *[]string
-	SpaceGuid          *string
-	StackGuid          *string
+	SpaceGUID          *string
+	StackGUID          *string
 	StackName          *string
 	State              *string
 	PackageUpdatedAt   *time.Time
@@ -129,8 +129,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.EnvironmentVars != nil {
 		app.EnvironmentVars = other.EnvironmentVars
 	}
-	if other.Guid != nil {
-		app.Guid = other.Guid
+	if other.GUID != nil {
+		app.GUID = other.GUID
 	}
 	if other.HealthCheckType != nil {
 		app.HealthCheckType = other.HealthCheckType
@@ -159,11 +159,11 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.ServicesToBind != nil {
 		app.ServicesToBind = other.ServicesToBind
 	}
-	if other.SpaceGuid != nil {
-		app.SpaceGuid = other.SpaceGuid
+	if other.SpaceGUID != nil {
+		app.SpaceGUID = other.SpaceGUID
 	}
-	if other.StackGuid != nil {
-		app.StackGuid = other.StackGuid
+	if other.StackGUID != nil {
+		app.StackGUID = other.StackGUID
 	}
 	if other.StackName != nil {
 		app.StackName = other.StackName

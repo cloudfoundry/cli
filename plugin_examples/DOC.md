@@ -32,7 +32,7 @@ GetCurrentSpace() (plugin_models.Space, error)
 
 Username() (userName string, error)
 
-UserGuid() (userGuid string, error)
+UserGUID() (userGUID string, error)
 
 UserEmail() (userEmail string, error)
 

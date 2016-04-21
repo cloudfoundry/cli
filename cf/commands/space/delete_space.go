@@ -77,7 +77,7 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) {
 
 	space := cmd.spaceReq.GetSpace()
 
-	apiErr := cmd.spaceRepo.Delete(space.Guid)
+	apiErr := cmd.spaceRepo.Delete(space.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -85,7 +85,7 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 
-	if cmd.config.SpaceFields().Guid == space.Guid {
+	if cmd.config.SpaceFields().GUID == space.GUID {
 		cmd.config.SetSpaceFields(models.SpaceFields{})
 		cmd.ui.Say(T("TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
 			map[string]interface{}{"CfTargetCommand": cf.Name + " target -s"}))

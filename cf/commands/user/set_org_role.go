@@ -19,7 +19,7 @@ import (
 
 type OrgRoleSetter interface {
 	commandregistry.Command
-	SetOrgRole(orgGuid string, role, userGuid, userName string) error
+	SetOrgRole(orgGUID string, role, userGUID, userName string) error
 }
 
 type SetOrgRole struct {
@@ -54,15 +54,15 @@ func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("set-org-role"))
 	}
 
-	var wantGuid bool
+	var wantGUID bool
 	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
-		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -95,7 +95,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.SetOrgRole(org.Guid, role, user.Guid, user.Username)
+	err := cmd.SetOrgRole(org.GUID, role, user.GUID, user.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -103,10 +103,10 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 }
 
-func (cmd *SetOrgRole) SetOrgRole(orgGuid string, role, userGuid, userName string) error {
-	if len(userGuid) > 0 {
-		return cmd.userRepo.SetOrgRoleByGuid(userGuid, orgGuid, role)
+func (cmd *SetOrgRole) SetOrgRole(orgGUID string, role, userGUID, userName string) error {
+	if len(userGUID) > 0 {
+		return cmd.userRepo.SetOrgRoleByGUID(userGUID, orgGUID, role)
 	}
 
-	return cmd.userRepo.SetOrgRoleByUsername(userName, orgGuid, role)
+	return cmd.userRepo.SetOrgRoleByUsername(userName, orgGUID, role)
 }

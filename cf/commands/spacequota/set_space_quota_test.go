@@ -80,31 +80,31 @@ var _ = Describe("set-space-quota command", func() {
 				quotaRepo.FindByNameReturns(
 					models.SpaceQuota{
 						Name:                    "quota-name",
-						Guid:                    "quota-guid",
+						GUID:                    "quota-guid",
 						MemoryLimit:             1024,
 						InstanceMemoryLimit:     512,
 						RoutesLimit:             111,
 						ServicesLimit:           222,
 						NonBasicServicesAllowed: true,
-						OrgGuid:                 "my-org-guid",
+						OrgGUID:                 "my-org-guid",
 					}, nil)
 
 				spaceRepo.FindByNameReturns(
 					models.Space{
 						SpaceFields: models.SpaceFields{
 							Name: "my-space",
-							Guid: "my-space-guid",
+							GUID: "my-space-guid",
 						},
-						SpaceQuotaGuid: "",
+						SpaceQuotaGUID: "",
 					}, nil)
 			})
 
 			Context("when the space quota was not previously assigned to a space", func() {
 				It("associates the provided space with the provided space quota", func() {
-					spaceGuid, quotaGuid := quotaRepo.AssociateSpaceWithQuotaArgsForCall(0)
+					spaceGUID, quotaGUID := quotaRepo.AssociateSpaceWithQuotaArgsForCall(0)
 
-					Expect(spaceGuid).To(Equal("my-space-guid"))
-					Expect(quotaGuid).To(Equal("quota-guid"))
+					Expect(spaceGUID).To(Equal("my-space-guid"))
+					Expect(quotaGUID).To(Equal("quota-guid"))
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Assigning space quota", "to space", "my-user"},
 						[]string{"OK"},
@@ -118,9 +118,9 @@ var _ = Describe("set-space-quota command", func() {
 						models.Space{
 							SpaceFields: models.SpaceFields{
 								Name: "my-space",
-								Guid: "my-space-guid",
+								GUID: "my-space-guid",
 							},
-							SpaceQuotaGuid: "another-quota",
+							SpaceQuotaGUID: "another-quota",
 						}, nil)
 				})
 
@@ -155,9 +155,9 @@ var _ = Describe("set-space-quota command", func() {
 					models.Space{
 						SpaceFields: models.SpaceFields{
 							Name: "my-space",
-							Guid: "my-space-guid",
+							GUID: "my-space-guid",
 						},
-						SpaceQuotaGuid: "",
+						SpaceQuotaGUID: "",
 					}, nil)
 
 				quotaRepo.FindByNameReturns(models.SpaceQuota{}, errors.New("I can't find my quota name!"))

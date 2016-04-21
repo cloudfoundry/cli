@@ -18,12 +18,12 @@ type FakeOrganizationRepository struct {
 		result1 []models.Organization
 		result2 error
 	}
-	GetManyOrgsByGuidStub        func(orgGuids []string) (orgs []models.Organization, apiErr error)
-	getManyOrgsByGuidMutex       sync.RWMutex
-	getManyOrgsByGuidArgsForCall []struct {
-		orgGuids []string
+	GetManyOrgsByGUIDStub        func(orgGUIDs []string) (orgs []models.Organization, apiErr error)
+	getManyOrgsByGUIDMutex       sync.RWMutex
+	getManyOrgsByGUIDArgsForCall []struct {
+		orgGUIDs []string
 	}
-	getManyOrgsByGuidReturns struct {
+	getManyOrgsByGUIDReturns struct {
 		result1 []models.Organization
 		result2 error
 	}
@@ -44,37 +44,37 @@ type FakeOrganizationRepository struct {
 	createReturns struct {
 		result1 error
 	}
-	RenameStub        func(orgGuid string, name string) (apiErr error)
+	RenameStub        func(orgGUID string, name string) (apiErr error)
 	renameMutex       sync.RWMutex
 	renameArgsForCall []struct {
-		orgGuid string
+		orgGUID string
 		name    string
 	}
 	renameReturns struct {
 		result1 error
 	}
-	DeleteStub        func(orgGuid string) (apiErr error)
+	DeleteStub        func(orgGUID string) (apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		orgGuid string
+		orgGUID string
 	}
 	deleteReturns struct {
 		result1 error
 	}
-	SharePrivateDomainStub        func(orgGuid string, domainGuid string) (apiErr error)
+	SharePrivateDomainStub        func(orgGUID string, domainGUID string) (apiErr error)
 	sharePrivateDomainMutex       sync.RWMutex
 	sharePrivateDomainArgsForCall []struct {
-		orgGuid    string
-		domainGuid string
+		orgGUID    string
+		domainGUID string
 	}
 	sharePrivateDomainReturns struct {
 		result1 error
 	}
-	UnsharePrivateDomainStub        func(orgGuid string, domainGuid string) (apiErr error)
+	UnsharePrivateDomainStub        func(orgGUID string, domainGUID string) (apiErr error)
 	unsharePrivateDomainMutex       sync.RWMutex
 	unsharePrivateDomainArgsForCall []struct {
-		orgGuid    string
-		domainGuid string
+		orgGUID    string
+		domainGUID string
 	}
 	unsharePrivateDomainReturns struct {
 		result1 error
@@ -114,34 +114,34 @@ func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organiz
 	}{result1, result2}
 }
 
-func (fake *FakeOrganizationRepository) GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, apiErr error) {
-	fake.getManyOrgsByGuidMutex.Lock()
-	fake.getManyOrgsByGuidArgsForCall = append(fake.getManyOrgsByGuidArgsForCall, struct {
-		orgGuids []string
-	}{orgGuids})
-	fake.getManyOrgsByGuidMutex.Unlock()
-	if fake.GetManyOrgsByGuidStub != nil {
-		return fake.GetManyOrgsByGuidStub(orgGuids)
+func (fake *FakeOrganizationRepository) GetManyOrgsByGUID(orgGUIDs []string) (orgs []models.Organization, apiErr error) {
+	fake.getManyOrgsByGUIDMutex.Lock()
+	fake.getManyOrgsByGUIDArgsForCall = append(fake.getManyOrgsByGUIDArgsForCall, struct {
+		orgGUIDs []string
+	}{orgGUIDs})
+	fake.getManyOrgsByGUIDMutex.Unlock()
+	if fake.GetManyOrgsByGUIDStub != nil {
+		return fake.GetManyOrgsByGUIDStub(orgGUIDs)
 	} else {
-		return fake.getManyOrgsByGuidReturns.result1, fake.getManyOrgsByGuidReturns.result2
+		return fake.getManyOrgsByGUIDReturns.result1, fake.getManyOrgsByGUIDReturns.result2
 	}
 }
 
-func (fake *FakeOrganizationRepository) GetManyOrgsByGuidCallCount() int {
-	fake.getManyOrgsByGuidMutex.RLock()
-	defer fake.getManyOrgsByGuidMutex.RUnlock()
-	return len(fake.getManyOrgsByGuidArgsForCall)
+func (fake *FakeOrganizationRepository) GetManyOrgsByGUIDCallCount() int {
+	fake.getManyOrgsByGUIDMutex.RLock()
+	defer fake.getManyOrgsByGUIDMutex.RUnlock()
+	return len(fake.getManyOrgsByGUIDArgsForCall)
 }
 
-func (fake *FakeOrganizationRepository) GetManyOrgsByGuidArgsForCall(i int) []string {
-	fake.getManyOrgsByGuidMutex.RLock()
-	defer fake.getManyOrgsByGuidMutex.RUnlock()
-	return fake.getManyOrgsByGuidArgsForCall[i].orgGuids
+func (fake *FakeOrganizationRepository) GetManyOrgsByGUIDArgsForCall(i int) []string {
+	fake.getManyOrgsByGUIDMutex.RLock()
+	defer fake.getManyOrgsByGUIDMutex.RUnlock()
+	return fake.getManyOrgsByGUIDArgsForCall[i].orgGUIDs
 }
 
-func (fake *FakeOrganizationRepository) GetManyOrgsByGuidReturns(result1 []models.Organization, result2 error) {
-	fake.GetManyOrgsByGuidStub = nil
-	fake.getManyOrgsByGuidReturns = struct {
+func (fake *FakeOrganizationRepository) GetManyOrgsByGUIDReturns(result1 []models.Organization, result2 error) {
+	fake.GetManyOrgsByGUIDStub = nil
+	fake.getManyOrgsByGUIDReturns = struct {
 		result1 []models.Organization
 		result2 error
 	}{result1, result2}
@@ -212,15 +212,15 @@ func (fake *FakeOrganizationRepository) CreateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeOrganizationRepository) Rename(orgGuid string, name string) (apiErr error) {
+func (fake *FakeOrganizationRepository) Rename(orgGUID string, name string) (apiErr error) {
 	fake.renameMutex.Lock()
 	fake.renameArgsForCall = append(fake.renameArgsForCall, struct {
-		orgGuid string
+		orgGUID string
 		name    string
-	}{orgGuid, name})
+	}{orgGUID, name})
 	fake.renameMutex.Unlock()
 	if fake.RenameStub != nil {
-		return fake.RenameStub(orgGuid, name)
+		return fake.RenameStub(orgGUID, name)
 	} else {
 		return fake.renameReturns.result1
 	}
@@ -235,7 +235,7 @@ func (fake *FakeOrganizationRepository) RenameCallCount() int {
 func (fake *FakeOrganizationRepository) RenameArgsForCall(i int) (string, string) {
 	fake.renameMutex.RLock()
 	defer fake.renameMutex.RUnlock()
-	return fake.renameArgsForCall[i].orgGuid, fake.renameArgsForCall[i].name
+	return fake.renameArgsForCall[i].orgGUID, fake.renameArgsForCall[i].name
 }
 
 func (fake *FakeOrganizationRepository) RenameReturns(result1 error) {
@@ -245,14 +245,14 @@ func (fake *FakeOrganizationRepository) RenameReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeOrganizationRepository) Delete(orgGuid string) (apiErr error) {
+func (fake *FakeOrganizationRepository) Delete(orgGUID string) (apiErr error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		orgGuid string
-	}{orgGuid})
+		orgGUID string
+	}{orgGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(orgGuid)
+		return fake.DeleteStub(orgGUID)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -267,7 +267,7 @@ func (fake *FakeOrganizationRepository) DeleteCallCount() int {
 func (fake *FakeOrganizationRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].orgGuid
+	return fake.deleteArgsForCall[i].orgGUID
 }
 
 func (fake *FakeOrganizationRepository) DeleteReturns(result1 error) {
@@ -277,15 +277,15 @@ func (fake *FakeOrganizationRepository) DeleteReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeOrganizationRepository) SharePrivateDomain(orgGuid string, domainGuid string) (apiErr error) {
+func (fake *FakeOrganizationRepository) SharePrivateDomain(orgGUID string, domainGUID string) (apiErr error) {
 	fake.sharePrivateDomainMutex.Lock()
 	fake.sharePrivateDomainArgsForCall = append(fake.sharePrivateDomainArgsForCall, struct {
-		orgGuid    string
-		domainGuid string
-	}{orgGuid, domainGuid})
+		orgGUID    string
+		domainGUID string
+	}{orgGUID, domainGUID})
 	fake.sharePrivateDomainMutex.Unlock()
 	if fake.SharePrivateDomainStub != nil {
-		return fake.SharePrivateDomainStub(orgGuid, domainGuid)
+		return fake.SharePrivateDomainStub(orgGUID, domainGUID)
 	} else {
 		return fake.sharePrivateDomainReturns.result1
 	}
@@ -300,7 +300,7 @@ func (fake *FakeOrganizationRepository) SharePrivateDomainCallCount() int {
 func (fake *FakeOrganizationRepository) SharePrivateDomainArgsForCall(i int) (string, string) {
 	fake.sharePrivateDomainMutex.RLock()
 	defer fake.sharePrivateDomainMutex.RUnlock()
-	return fake.sharePrivateDomainArgsForCall[i].orgGuid, fake.sharePrivateDomainArgsForCall[i].domainGuid
+	return fake.sharePrivateDomainArgsForCall[i].orgGUID, fake.sharePrivateDomainArgsForCall[i].domainGUID
 }
 
 func (fake *FakeOrganizationRepository) SharePrivateDomainReturns(result1 error) {
@@ -310,15 +310,15 @@ func (fake *FakeOrganizationRepository) SharePrivateDomainReturns(result1 error)
 	}{result1}
 }
 
-func (fake *FakeOrganizationRepository) UnsharePrivateDomain(orgGuid string, domainGuid string) (apiErr error) {
+func (fake *FakeOrganizationRepository) UnsharePrivateDomain(orgGUID string, domainGUID string) (apiErr error) {
 	fake.unsharePrivateDomainMutex.Lock()
 	fake.unsharePrivateDomainArgsForCall = append(fake.unsharePrivateDomainArgsForCall, struct {
-		orgGuid    string
-		domainGuid string
-	}{orgGuid, domainGuid})
+		orgGUID    string
+		domainGUID string
+	}{orgGUID, domainGUID})
 	fake.unsharePrivateDomainMutex.Unlock()
 	if fake.UnsharePrivateDomainStub != nil {
-		return fake.UnsharePrivateDomainStub(orgGuid, domainGuid)
+		return fake.UnsharePrivateDomainStub(orgGUID, domainGUID)
 	} else {
 		return fake.unsharePrivateDomainReturns.result1
 	}
@@ -333,7 +333,7 @@ func (fake *FakeOrganizationRepository) UnsharePrivateDomainCallCount() int {
 func (fake *FakeOrganizationRepository) UnsharePrivateDomainArgsForCall(i int) (string, string) {
 	fake.unsharePrivateDomainMutex.RLock()
 	defer fake.unsharePrivateDomainMutex.RUnlock()
-	return fake.unsharePrivateDomainArgsForCall[i].orgGuid, fake.unsharePrivateDomainArgsForCall[i].domainGuid
+	return fake.unsharePrivateDomainArgsForCall[i].orgGUID, fake.unsharePrivateDomainArgsForCall[i].domainGUID
 }
 
 func (fake *FakeOrganizationRepository) UnsharePrivateDomainReturns(result1 error) {

@@ -78,7 +78,7 @@ func (cmd *SetEnv) Execute(c flags.FlagContext) {
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue
 
-	_, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
+	_, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

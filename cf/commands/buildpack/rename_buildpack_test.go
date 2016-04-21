@@ -54,7 +54,7 @@ var _ = Describe("rename-buildpack command", func() {
 		It("renames a buildpack", func() {
 			fakeRepo.FindByNameBuildpack = models.Buildpack{
 				Name: "my-buildpack",
-				Guid: "my-buildpack-guid",
+				GUID: "my-buildpack-guid",
 			}
 
 			runCommand("my-buildpack", "new-buildpack")
@@ -78,7 +78,7 @@ var _ = Describe("rename-buildpack command", func() {
 		It("fails when there is an error updating the buildpack", func() {
 			fakeRepo.FindByNameBuildpack = models.Buildpack{
 				Name: "my-buildpack",
-				Guid: "my-buildpack-guid",
+				GUID: "my-buildpack-guid",
 			}
 			fakeRepo.UpdateBuildpackReturns.Error = errors.New("SAD TROMBONE")
 

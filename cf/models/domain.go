@@ -1,10 +1,10 @@
 package models
 
 type DomainFields struct {
-	Guid                   string
+	GUID                   string
 	Name                   string
-	OwningOrganizationGuid string
-	RouterGroupGuid        string
+	OwningOrganizationGUID string
+	RouterGroupGUID        string
 	RouterGroupType        string
 	Shared                 bool
 }

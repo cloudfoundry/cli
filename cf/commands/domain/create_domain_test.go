@@ -77,7 +77,7 @@ var _ = Describe("create domain command", func() {
 	It("creates a domain", func() {
 		org := models.Organization{}
 		org.Name = "myOrg"
-		org.Guid = "myOrg-guid"
+		org.GUID = "myOrg-guid"
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 		runCommand("myOrg", "example.com")
 

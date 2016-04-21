@@ -71,7 +71,7 @@ func (cmd *UnbindService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	found, apiErr := cmd.serviceBindingRepo.Delete(instance, app.Guid)
+	found, apiErr := cmd.serviceBindingRepo.Delete(instance, app.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

@@ -24,7 +24,7 @@ type Handlers interface {
 	GetCurrentOrg(args string, retVal *plugin_models.Organization) error
 	GetCurrentSpace(args string, retVal *plugin_models.Space) error
 	Username(args string, retVal *string) error
-	UserGuid(args string, retVal *string) error
+	UserGUID(args string, retVal *string) error
 	UserEmail(args string, retVal *string) error
 	IsLoggedIn(args string, retVal *bool) error
 	IsSSLDisabled(args string, retVal *bool) error
