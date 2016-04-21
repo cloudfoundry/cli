@@ -41,12 +41,12 @@ type FakeSpaceRoleSetter struct {
 	executeArgsForCall []struct {
 		context flags.FlagContext
 	}
-	SetSpaceRoleStub        func(space models.Space, role, userGuid, userName string) (err error)
+	SetSpaceRoleStub        func(space models.Space, role, userGUID, userName string) (err error)
 	setSpaceRoleMutex       sync.RWMutex
 	setSpaceRoleArgsForCall []struct {
 		space    models.Space
 		role     string
-		userGuid string
+		userGUID string
 		userName string
 	}
 	setSpaceRoleReturns struct {
@@ -167,17 +167,17 @@ func (fake *FakeSpaceRoleSetter) ExecuteArgsForCall(i int) flags.FlagContext {
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeSpaceRoleSetter) SetSpaceRole(space models.Space, role string, userGuid string, userName string) (err error) {
+func (fake *FakeSpaceRoleSetter) SetSpaceRole(space models.Space, role string, userGUID string, userName string) (err error) {
 	fake.setSpaceRoleMutex.Lock()
 	fake.setSpaceRoleArgsForCall = append(fake.setSpaceRoleArgsForCall, struct {
 		space    models.Space
 		role     string
-		userGuid string
+		userGUID string
 		userName string
-	}{space, role, userGuid, userName})
+	}{space, role, userGUID, userName})
 	fake.setSpaceRoleMutex.Unlock()
 	if fake.SetSpaceRoleStub != nil {
-		return fake.SetSpaceRoleStub(space, role, userGuid, userName)
+		return fake.SetSpaceRoleStub(space, role, userGUID, userName)
 	} else {
 		return fake.setSpaceRoleReturns.result1
 	}
@@ -192,7 +192,7 @@ func (fake *FakeSpaceRoleSetter) SetSpaceRoleCallCount() int {
 func (fake *FakeSpaceRoleSetter) SetSpaceRoleArgsForCall(i int) (models.Space, string, string, string) {
 	fake.setSpaceRoleMutex.RLock()
 	defer fake.setSpaceRoleMutex.RUnlock()
-	return fake.setSpaceRoleArgsForCall[i].space, fake.setSpaceRoleArgsForCall[i].role, fake.setSpaceRoleArgsForCall[i].userGuid, fake.setSpaceRoleArgsForCall[i].userName
+	return fake.setSpaceRoleArgsForCall[i].space, fake.setSpaceRoleArgsForCall[i].role, fake.setSpaceRoleArgsForCall[i].userGUID, fake.setSpaceRoleArgsForCall[i].userName
 }
 
 func (fake *FakeSpaceRoleSetter) SetSpaceRoleReturns(result1 error) {

@@ -9,10 +9,10 @@ import (
 )
 
 type FakeEventsEndpointStrategy struct {
-	EventsURLStub        func(appGuid string, limit int64) string
+	EventsURLStub        func(appGUID string, limit int64) string
 	eventsURLMutex       sync.RWMutex
 	eventsURLArgsForCall []struct {
-		appGuid string
+		appGUID string
 		limit   int64
 	}
 	eventsURLReturns struct {
@@ -26,15 +26,15 @@ type FakeEventsEndpointStrategy struct {
 	}
 }
 
-func (fake *FakeEventsEndpointStrategy) EventsURL(appGuid string, limit int64) string {
+func (fake *FakeEventsEndpointStrategy) EventsURL(appGUID string, limit int64) string {
 	fake.eventsURLMutex.Lock()
 	fake.eventsURLArgsForCall = append(fake.eventsURLArgsForCall, struct {
-		appGuid string
+		appGUID string
 		limit   int64
-	}{appGuid, limit})
+	}{appGUID, limit})
 	fake.eventsURLMutex.Unlock()
 	if fake.EventsURLStub != nil {
-		return fake.EventsURLStub(appGuid, limit)
+		return fake.EventsURLStub(appGUID, limit)
 	} else {
 		return fake.eventsURLReturns.result1
 	}
@@ -49,7 +49,7 @@ func (fake *FakeEventsEndpointStrategy) EventsURLCallCount() int {
 func (fake *FakeEventsEndpointStrategy) EventsURLArgsForCall(i int) (string, int64) {
 	fake.eventsURLMutex.RLock()
 	defer fake.eventsURLMutex.RUnlock()
-	return fake.eventsURLArgsForCall[i].appGuid, fake.eventsURLArgsForCall[i].limit
+	return fake.eventsURLArgsForCall[i].appGUID, fake.eventsURLArgsForCall[i].limit
 }
 
 func (fake *FakeEventsEndpointStrategy) EventsURLReturns(result1 string) {

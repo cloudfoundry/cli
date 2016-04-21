@@ -96,7 +96,7 @@ var _ = Describe("quotas command", func() {
 						RoutesLimit:             111,
 						ServicesLimit:           222,
 						NonBasicServicesAllowed: true,
-						OrgGuid:                 "my-org-guid",
+						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        7,
 					},
 					models.SpaceQuota{
@@ -106,7 +106,7 @@ var _ = Describe("quotas command", func() {
 						RoutesLimit:             1,
 						ServicesLimit:           2,
 						NonBasicServicesAllowed: false,
-						OrgGuid:                 "my-org-guid",
+						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        1,
 					},
 					models.SpaceQuota{
@@ -116,7 +116,7 @@ var _ = Describe("quotas command", func() {
 						RoutesLimit:             1,
 						ServicesLimit:           2,
 						NonBasicServicesAllowed: false,
-						OrgGuid:                 "my-org-guid",
+						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        -1,
 					},
 				}, nil)
@@ -144,7 +144,7 @@ var _ = Describe("quotas command", func() {
 							RoutesLimit:             1,
 							ServicesLimit:           -1,
 							NonBasicServicesAllowed: false,
-							OrgGuid:                 "my-org-guid",
+							OrgGUID:                 "my-org-guid",
 						},
 					}, nil)
 				})
@@ -169,7 +169,7 @@ var _ = Describe("quotas command", func() {
 							RoutesLimit:             1,
 							ServicesLimit:           512,
 							NonBasicServicesAllowed: false,
-							OrgGuid:                 "my-org-guid",
+							OrgGUID:                 "my-org-guid",
 							AppInstanceLimit:        -1,
 						},
 					}, nil)

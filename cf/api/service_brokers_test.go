@@ -77,8 +77,8 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 
 		Expect(len(serviceBrokers)).To(Equal(2))
-		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
-		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
+		Expect(serviceBrokers[0].GUID).To(Equal("found-guid-1"))
+		Expect(serviceBrokers[1].GUID).To(Equal("found-guid-2"))
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
@@ -111,7 +111,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			expectedBroker.Url = "http://found.example.com"
 			expectedBroker.Username = "found-username"
 			expectedBroker.Password = "found-password"
-			expectedBroker.Guid = "found-guid"
+			expectedBroker.GUID = "found-guid"
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -157,7 +157,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 	})
 
-	Describe("FindByGuid", func() {
+	Describe("FindByGUID", func() {
 		It("returns the service broker with the given guid", func() {
 			responseBody := `
 {
@@ -184,12 +184,12 @@ var _ = Describe("Service Brokers Repo", func() {
 			ts, handler, repo := createServiceBrokerRepo(req)
 			defer ts.Close()
 
-			foundBroker, apiErr := repo.FindByGuid("found-guid")
+			foundBroker, apiErr := repo.FindByGUID("found-guid")
 			expectedBroker := models.ServiceBroker{}
 			expectedBroker.Name = "found-name"
 			expectedBroker.Url = "http://found.example.com"
 			expectedBroker.Username = "found-username"
-			expectedBroker.Guid = "found-guid"
+			expectedBroker.GUID = "found-guid"
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -207,7 +207,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			ts, handler, repo := createServiceBrokerRepo(req)
 			defer ts.Close()
 
-			_, apiErr := repo.FindByGuid("bogus-guid")
+			_, apiErr := repo.FindByGUID("bogus-guid")
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).To(HaveOccurred())
@@ -292,7 +292,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			ts, handler, repo := createServiceBrokerRepo(req)
 			defer ts.Close()
 			serviceBroker := models.ServiceBroker{}
-			serviceBroker.Guid = "my-guid"
+			serviceBroker.GUID = "my-guid"
 			serviceBroker.Name = "foobroker"
 			serviceBroker.Url = "http://update.example.com"
 			serviceBroker.Username = "update-foouser"

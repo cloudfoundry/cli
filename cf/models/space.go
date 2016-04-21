@@ -1,7 +1,7 @@
 package models
 
 type SpaceFields struct {
-	Guid     string
+	GUID     string
 	Name     string
 	AllowSSH bool
 }
@@ -13,5 +13,5 @@ type Space struct {
 	ServiceInstances []ServiceInstanceFields
 	Domains          []DomainFields
 	SecurityGroups   []SecurityGroupFields
-	SpaceQuotaGuid   string
+	SpaceQuotaGUID   string
 }

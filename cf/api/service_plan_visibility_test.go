@@ -68,28 +68,28 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(servicePlansVisibilitiesFields)).To(Equal(2))
-			Expect(servicePlansVisibilitiesFields[0].Guid).To(Equal("request-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].ServicePlanGuid).To(Equal("service-plan-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].OrganizationGuid).To(Equal("org-guid-1"))
-			Expect(servicePlansVisibilitiesFields[1].Guid).To(Equal("request-guid-2"))
-			Expect(servicePlansVisibilitiesFields[1].ServicePlanGuid).To(Equal("service-plan-guid-2"))
-			Expect(servicePlansVisibilitiesFields[1].OrganizationGuid).To(Equal("org-guid-2"))
+			Expect(servicePlansVisibilitiesFields[0].GUID).To(Equal("request-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].ServicePlanGUID).To(Equal("service-plan-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].OrganizationGUID).To(Equal("org-guid-1"))
+			Expect(servicePlansVisibilitiesFields[1].GUID).To(Equal("request-guid-2"))
+			Expect(servicePlansVisibilitiesFields[1].ServicePlanGUID).To(Equal("service-plan-guid-2"))
+			Expect(servicePlansVisibilitiesFields[1].OrganizationGUID).To(Equal("org-guid-2"))
 		})
 	})
 
 	Describe(".Delete", func() {
 		It("deletes a service plan visibility", func() {
-			servicePlanVisibilityGuid := "the-service-plan-visibility-guid"
+			servicePlanVisibilityGUID := "the-service-plan-visibility-guid"
 			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "DELETE",
-				Path:    "/v2/service_plan_visibilities/" + servicePlanVisibilityGuid,
+				Path:    "/v2/service_plan_visibilities/" + servicePlanVisibilityGUID,
 				Matcher: testnet.EmptyQueryParamMatcher(),
 				Response: testnet.TestResponse{
 					Status: http.StatusNoContent,
 				},
 			}))
 
-			err := repo.Delete(servicePlanVisibilityGuid)
+			err := repo.Delete(servicePlanVisibilityGUID)
 			Expect(err).ToNot(HaveOccurred())
 		})
 	})
@@ -102,9 +102,9 @@ var _ = Describe("Service Plan Visibility Repository", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(servicePlansVisibilitiesFields)).To(Equal(1))
-			Expect(servicePlansVisibilitiesFields[0].Guid).To(Equal("request-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].ServicePlanGuid).To(Equal("service-plan-guid-1"))
-			Expect(servicePlansVisibilitiesFields[0].OrganizationGuid).To(Equal("org-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].GUID).To(Equal("request-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].ServicePlanGUID).To(Equal("service-plan-guid-1"))
+			Expect(servicePlansVisibilitiesFields[0].OrganizationGUID).To(Equal("org-guid-1"))
 		})
 	})
 })

@@ -83,7 +83,7 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	messages, err := cmd.logsRepo.RecentLogsFor(app.Guid)
+	messages, err := cmd.logsRepo.RecentLogsFor(app.GUID)
 	if err != nil {
 		cmd.handleError(err)
 	}
@@ -103,7 +103,7 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 	}
 
-	c, err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect)
+	c, err := cmd.logsRepo.TailLogsFor(app.GUID, onConnect)
 	if err != nil {
 		cmd.handleError(err)
 	}

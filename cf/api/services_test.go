@@ -77,7 +77,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(firstOffering.Version).To(Equal("1.0"))
 			Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
 			Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
-			Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+			Expect(firstOffering.GUID).To(Equal("first-offering-1-guid"))
 		})
 	})
 
@@ -107,7 +107,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(firstOffering.Version).To(Equal("1.0"))
 			Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
 			Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
-			Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+			Expect(firstOffering.GUID).To(Equal("first-offering-1-guid"))
 			Expect(len(firstOffering.Plans)).To(Equal(0))
 
 			secondOffering := offerings[1]
@@ -115,7 +115,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(secondOffering.Version).To(Equal("1.0"))
 			Expect(secondOffering.Description).To(Equal("Offering 1 description"))
 			Expect(secondOffering.Provider).To(Equal("Offering 1 provider"))
-			Expect(secondOffering.Guid).To(Equal("offering-1-guid"))
+			Expect(secondOffering.GUID).To(Equal("offering-1-guid"))
 			Expect(len(secondOffering.Plans)).To(Equal(0))
 		})
 	})
@@ -185,8 +185,8 @@ var _ = Describe("Services Repo", func() {
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(services)).To(Equal(2))
 
-			Expect(services[0].Guid).To(Equal("my-service-guid"))
-			Expect(services[1].Guid).To(Equal("my-service-guid2"))
+			Expect(services[0].GUID).To(Equal("my-service-guid"))
+			Expect(services[1].GUID).To(Equal("my-service-guid2"))
 		})
 	})
 
@@ -251,15 +251,15 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns the service brokers services", func() {
-			brokerGuids := []string{"my-service-broker-guid", "my-service-broker-guid2"}
-			services, err := repo.ListServicesFromManyBrokers(brokerGuids)
+			brokerGUIDs := []string{"my-service-broker-guid", "my-service-broker-guid2"}
+			services, err := repo.ListServicesFromManyBrokers(brokerGUIDs)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(testHandler).To(HaveAllRequestsCalled())
 			Expect(len(services)).To(Equal(2))
 
-			Expect(services[0].Guid).To(Equal("my-service-guid"))
-			Expect(services[1].Guid).To(Equal("my-service-guid2"))
+			Expect(services[0].GUID).To(Equal("my-service-guid"))
+			Expect(services[1].GUID).To(Equal("my-service-guid2"))
 		})
 	})
 
@@ -468,7 +468,7 @@ var _ = Describe("Services Repo", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Name).To(Equal("my-service"))
-			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
+			Expect(instance.GUID).To(Equal("my-service-instance-guid"))
 			Expect(instance.DashboardUrl).To(Equal("my-dashboard-url"))
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
 			Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
@@ -479,8 +479,8 @@ var _ = Describe("Services Repo", func() {
 
 			binding := instance.ServiceBindings[0]
 			Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
-			Expect(binding.Guid).To(Equal("service-binding-1-guid"))
-			Expect(binding.AppGuid).To(Equal("app-1-guid"))
+			Expect(binding.GUID).To(Equal("service-binding-1-guid"))
+			Expect(binding.AppGUID).To(Equal("app-1-guid"))
 		})
 
 		It("returns user provided services", func() {
@@ -528,15 +528,15 @@ var _ = Describe("Services Repo", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(instance.Name).To(Equal("my-service"))
-			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
+			Expect(instance.GUID).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal(""))
 			Expect(instance.ServicePlan.Name).To(Equal(""))
 			Expect(len(instance.ServiceBindings)).To(Equal(2))
 
 			binding := instance.ServiceBindings[0]
 			Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
-			Expect(binding.Guid).To(Equal("service-binding-1-guid"))
-			Expect(binding.AppGuid).To(Equal("app-1-guid"))
+			Expect(binding.GUID).To(Equal("service-binding-1-guid"))
+			Expect(binding.AppGUID).To(Equal("app-1-guid"))
 		})
 
 		It("returns a failure response when the instance doesn't exist", func() {
@@ -571,7 +571,7 @@ var _ = Describe("Services Repo", func() {
 			}))
 
 			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
+			serviceInstance.GUID = "my-service-instance-guid"
 
 			err := repo.DeleteService(serviceInstance)
 			Expect(testHandler).To(HaveAllRequestsCalled())
@@ -582,15 +582,15 @@ var _ = Describe("Services Repo", func() {
 			setupTestServer()
 
 			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
+			serviceInstance.GUID = "my-service-instance-guid"
 			serviceInstance.ServiceBindings = []models.ServiceBindingFields{
 				{
 					Url:     "/v2/service_bindings/service-binding-1-guid",
-					AppGuid: "app-1-guid",
+					AppGUID: "app-1-guid",
 				},
 				{
 					Url:     "/v2/service_bindings/service-binding-2-guid",
-					AppGuid: "app-2-guid",
+					AppGUID: "app-2-guid",
 				},
 			}
 
@@ -603,17 +603,17 @@ var _ = Describe("Services Repo", func() {
 			setupTestServer()
 
 			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
+			serviceInstance.GUID = "my-service-instance-guid"
 			serviceInstance.ServiceKeys = []models.ServiceKeyFields{
 				{
 					Name: "fake-service-key-1",
 					Url:  "/v2/service_keys/service-key-1-guid",
-					Guid: "service-key-1-guid",
+					GUID: "service-key-1-guid",
 				},
 				{
 					Name: "fake-service-key-2",
 					Url:  "/v2/service_keys/service-key-2-guid",
-					Guid: "service-key-2-guid",
+					GUID: "service-key-2-guid",
 				},
 			}
 
@@ -637,9 +637,9 @@ var _ = Describe("Services Repo", func() {
 
 			It("renames the service", func() {
 				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.GUID = "my-service-instance-guid"
 				serviceInstance.ServicePlan = models.ServicePlanFields{
-					Guid: "some-plan-guid",
+					GUID: "some-plan-guid",
 				}
 
 				err := repo.RenameService(serviceInstance, "new-name")
@@ -660,7 +660,7 @@ var _ = Describe("Services Repo", func() {
 
 			It("renames the service", func() {
 				serviceInstance := models.ServiceInstance{}
-				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.GUID = "my-service-instance-guid"
 
 				err := repo.RenameService(serviceInstance, "new-name")
 				Expect(testHandler).To(HaveAllRequestsCalled())
@@ -699,7 +699,7 @@ var _ = Describe("Services Repo", func() {
 
 			It("finds service offerings by label and provider", func() {
 				offering, err := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-				Expect(offering.Guid).To(Equal("offering-1-guid"))
+				Expect(offering.GUID).To(Equal("offering-1-guid"))
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
@@ -723,7 +723,7 @@ var _ = Describe("Services Repo", func() {
 				offering, err := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 
 				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
-				Expect(offering.Guid).To(Equal(""))
+				Expect(offering.GUID).To(Equal(""))
 			})
 		})
 
@@ -776,12 +776,12 @@ var _ = Describe("Services Repo", func() {
 
 			It("finds service offerings by label", func() {
 				offerings, err := repo.FindServiceOfferingsByLabel("offering-1")
-				Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
+				Expect(offerings[0].GUID).To(Equal("offering-1-guid"))
 				Expect(offerings[0].Label).To(Equal("offering-1"))
 				Expect(offerings[0].Provider).To(Equal("provider-1"))
 				Expect(offerings[0].Description).To(Equal("offering 1 description"))
 				Expect(offerings[0].Version).To(Equal("1.0"))
-				Expect(offerings[0].BrokerGuid).To(Equal("broker-1-guid"))
+				Expect(offerings[0].BrokerGUID).To(Equal("broker-1-guid"))
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
@@ -828,7 +828,7 @@ var _ = Describe("Services Repo", func() {
 		})
 	})
 
-	Describe("GetServiceOfferingByGuid", func() {
+	Describe("GetServiceOfferingByGUID", func() {
 		Context("when the service offering can be found", func() {
 			BeforeEach(func() {
 				setupTestServer(testnet.TestRequest{
@@ -853,13 +853,13 @@ var _ = Describe("Services Repo", func() {
 			})
 
 			It("finds service offerings by guid", func() {
-				offering, err := repo.GetServiceOfferingByGuid("offering-1-guid")
-				Expect(offering.Guid).To(Equal("offering-1-guid"))
+				offering, err := repo.GetServiceOfferingByGUID("offering-1-guid")
+				Expect(offering.GUID).To(Equal("offering-1-guid"))
 				Expect(offering.Label).To(Equal("offering-1"))
 				Expect(offering.Provider).To(Equal("provider-1"))
 				Expect(offering.Description).To(Equal("offering 1 description"))
 				Expect(offering.Version).To(Equal("1.0"))
-				Expect(offering.BrokerGuid).To(Equal("broker-1-guid"))
+				Expect(offering.BrokerGUID).To(Equal("broker-1-guid"))
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
@@ -882,10 +882,10 @@ var _ = Describe("Services Repo", func() {
 			})
 
 			It("returns a ModelNotFoundError", func() {
-				offering, err := repo.GetServiceOfferingByGuid("offering-1-guid")
+				offering, err := repo.GetServiceOfferingByGUID("offering-1-guid")
 
 				Expect(err).To(BeAssignableToTypeOf(&errors.HTTPNotFoundError{}))
-				Expect(offering.Guid).To(Equal(""))
+				Expect(offering.GUID).To(Equal(""))
 			})
 		})
 	})
@@ -900,7 +900,7 @@ var _ = Describe("Services Repo", func() {
 				}})
 
 			offering := maker.NewServiceOffering("the-offering")
-			offering.Guid = "the-service-guid"
+			offering.GUID = "the-service-guid"
 
 			err := repo.PurgeServiceOffering(offering)
 			Expect(err).NotTo(HaveOccurred())
@@ -918,7 +918,7 @@ var _ = Describe("Services Repo", func() {
 				}})
 
 			instance := maker.NewServiceInstance("schrodinger")
-			instance.Guid = "instance-guid"
+			instance.GUID = "instance-guid"
 
 			err := repo.PurgeServiceInstance(instance)
 			Expect(err).NotTo(HaveOccurred())
@@ -927,12 +927,12 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	Describe("getting the count of service instances for a service plan", func() {
-		var planGuid = "abc123"
+		var planGUID = "abc123"
 
 		It("returns the number of service instances", func() {
 			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
-				Path:   fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
+				Path:   fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGUID),
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
                     {
                       "total_results": 9,
@@ -964,7 +964,7 @@ var _ = Describe("Services Repo", func() {
                 `},
 			}))
 
-			count, err := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			count, err := repo.GetServiceInstanceCountForServicePlan(planGUID)
 			Expect(count).To(Equal(9))
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -972,11 +972,11 @@ var _ = Describe("Services Repo", func() {
 		It("returns the API error when one occurs", func() {
 			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
+				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGUID),
 				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
 			}))
 
-			_, err := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			_, err := repo.GetServiceInstanceCountForServicePlan(planGUID)
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -1247,7 +1247,7 @@ var _ = Describe("Services Repo", func() {
 			offerings, err := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(offerings).To(HaveLen(2))
-			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
+			Expect(offerings[0].GUID).To(Equal("offering-1-guid"))
 		})
 
 		It("returns an error if the offering cannot be found", func() {

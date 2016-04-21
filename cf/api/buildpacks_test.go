@@ -93,13 +93,13 @@ var _ = Describe("Buildpacks repo", func() {
 		two := 2
 		Expect(buildpacks).To(ConsistOf([]models.Buildpack{
 			{
-				Guid:     "buildpack1-guid",
+				GUID:     "buildpack1-guid",
 				Name:     "Buildpack1",
 				Position: &one,
 				Filename: "firstbp.zip",
 			},
 			{
-				Guid:     "buildpack2-guid",
+				GUID:     "buildpack2-guid",
 				Name:     "Buildpack2",
 				Position: &two,
 			},
@@ -134,7 +134,7 @@ var _ = Describe("Buildpacks repo", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(buildpack.Name).To(Equal("Buildpack1"))
-			Expect(buildpack.Guid).To(Equal("buildpack1-guid"))
+			Expect(buildpack.GUID).To(Equal("buildpack1-guid"))
 			Expect(*buildpack.Position).To(Equal(10))
 		})
 
@@ -200,7 +200,7 @@ var _ = Describe("Buildpacks repo", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
-			Expect(created.Guid).NotTo(BeNil())
+			Expect(created.GUID).NotTo(BeNil())
 			Expect("my-cool-buildpack").To(Equal(created.Name))
 			Expect(999).To(Equal(*created.Position))
 		})
@@ -231,7 +231,7 @@ var _ = Describe("Buildpacks repo", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 
-			Expect(created.Guid).NotTo(BeNil())
+			Expect(created.GUID).NotTo(BeNil())
 			Expect(created.Name).To(Equal("my-cool-buildpack"))
 			Expect(999).To(Equal(*created.Position))
 		})
@@ -275,7 +275,7 @@ var _ = Describe("Buildpacks repo", func() {
 			enabled := false
 			buildpack := models.Buildpack{
 				Name:     "my-cool-buildpack",
-				Guid:     "my-cool-buildpack-guid",
+				GUID:     "my-cool-buildpack-guid",
 				Position: &position,
 				Enabled:  &enabled,
 			}
@@ -311,7 +311,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 			buildpack := models.Buildpack{
 				Name:   "my-cool-buildpack",
-				Guid:   "my-cool-buildpack-guid",
+				GUID:   "my-cool-buildpack-guid",
 				Locked: &locked,
 			}
 
@@ -323,7 +323,7 @@ var _ = Describe("Buildpacks repo", func() {
 			position := 123
 			Expect(updated).To(Equal(models.Buildpack{
 				Name:     "my-cool-buildpack",
-				Guid:     "my-cool-buildpack-guid",
+				GUID:     "my-cool-buildpack-guid",
 				Position: &position,
 				Locked:   &locked,
 			}))

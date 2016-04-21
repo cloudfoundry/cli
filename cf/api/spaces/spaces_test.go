@@ -81,10 +81,10 @@ var _ = Describe("Space Repository", func() {
 		})
 
 		Expect(len(spaces)).To(Equal(2))
-		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
+		Expect(spaces[0].GUID).To(Equal("acceptance-space-guid"))
 		Expect(spaces[0].AllowSSH).To(BeTrue())
 		Expect(spaces[0].SecurityGroups[0].Name).To(Equal("imma-security-group"))
-		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
+		Expect(spaces[1].GUID).To(Equal("staging-space-guid"))
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(HaveAllRequestsCalled())
 	})
@@ -145,8 +145,8 @@ var _ = Describe("Space Repository", func() {
 		space, apiErr := repo.Create("space-name", "my-org-guid", "")
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(space.Guid).To(Equal("space-guid"))
-		Expect(space.SpaceQuotaGuid).To(Equal(""))
+		Expect(space.GUID).To(Equal("space-guid"))
+		Expect(space.SpaceQuotaGUID).To(Equal(""))
 	})
 
 	It("creates spaces with a space-quota", func() {
@@ -172,8 +172,8 @@ var _ = Describe("Space Repository", func() {
 		space, apiErr := repo.Create("space-name", "my-org-guid", "space-quota-guid")
 		Expect(handler).To(HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(space.Guid).To(Equal("space-guid"))
-		Expect(space.SpaceQuotaGuid).To(Equal("space-quota-guid"))
+		Expect(space.GUID).To(Equal("space-guid"))
+		Expect(space.SpaceQuotaGUID).To(Equal("space-quota-guid"))
 	})
 
 	It("sets allow_ssh field", func() {
@@ -224,7 +224,7 @@ var _ = Describe("Space Repository", func() {
 	})
 })
 
-func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
+func testSpacesFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository, string) (models.Space, error)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -289,7 +289,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 }`}
 	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
-		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
+		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGUID),
 		Response: findSpaceByNameResponse,
 	})
 
@@ -300,28 +300,28 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	Expect(handler).To(HaveAllRequestsCalled())
 	Expect(apiErr).NotTo(HaveOccurred())
 	Expect(space.Name).To(Equal("Space1"))
-	Expect(space.Guid).To(Equal("space1-guid"))
+	Expect(space.GUID).To(Equal("space1-guid"))
 
-	Expect(space.Organization.Guid).To(Equal("org1-guid"))
+	Expect(space.Organization.GUID).To(Equal("org1-guid"))
 
 	Expect(len(space.Applications)).To(Equal(2))
-	Expect(space.Applications[0].Guid).To(Equal("app1-guid"))
-	Expect(space.Applications[1].Guid).To(Equal("app2-guid"))
+	Expect(space.Applications[0].GUID).To(Equal("app1-guid"))
+	Expect(space.Applications[1].GUID).To(Equal("app2-guid"))
 
 	Expect(len(space.Domains)).To(Equal(1))
-	Expect(space.Domains[0].Guid).To(Equal("domain1-guid"))
+	Expect(space.Domains[0].GUID).To(Equal("domain1-guid"))
 
 	Expect(len(space.ServiceInstances)).To(Equal(1))
-	Expect(space.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+	Expect(space.ServiceInstances[0].GUID).To(Equal("service1-guid"))
 
 	Expect(apiErr).NotTo(HaveOccurred())
 	return
 }
 
-func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
+func testSpacesDidNotFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository, string) (models.Space, error)) {
 	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
-		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
+		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGUID),
 		Response: testnet.TestResponse{
 			Status: http.StatusOK,
 			Body:   ` { "resources": [ ] }`,

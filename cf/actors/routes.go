@@ -63,7 +63,7 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 	if !app.HasRoute(route) {
 		routeActor.ui.Say(T("Binding {{.URL}} to {{.AppName}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL()), "AppName": terminal.EntityNameColor(app.Name)}))
 
-		apiErr := routeActor.routeRepo.Bind(route.Guid, app.Guid)
+		apiErr := routeActor.routeRepo.Bind(route.GUID, app.GUID)
 		switch apiErr := apiErr.(type) {
 		case nil:
 			routeActor.ui.Ok()
@@ -81,6 +81,6 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 func (routeActor RouteActor) UnbindAll(app models.Application) {
 	for _, route := range app.Routes {
 		routeActor.ui.Say(T("Removing route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL())}))
-		routeActor.routeRepo.Unbind(route.Guid, app.Guid)
+		routeActor.routeRepo.Unbind(route.GUID, app.GUID)
 	}
 }

@@ -71,7 +71,7 @@ var _ = Describe("StacksRepo", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(stack).To(Equal(models.Stack{
 					Name: "custom-linux",
-					Guid: "custom-linux-guid",
+					GUID: "custom-linux-guid",
 				}))
 			})
 		})
@@ -155,12 +155,12 @@ var _ = Describe("StacksRepo", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(stacks).To(ConsistOf([]models.Stack{
 				{
-					Guid:        "stack-guid-1",
+					GUID:        "stack-guid-1",
 					Name:        "lucid64",
 					Description: "Ubuntu 10.04",
 				},
 				{
-					Guid:        "stack-guid-2",
+					GUID:        "stack-guid-2",
 					Name:        "lucid64custom",
 					Description: "Fake Ubuntu 10.04",
 				},
@@ -199,7 +199,7 @@ var _ = Describe("StacksRepo", func() {
 				stack, err := repo.FindByGUID("the-stack-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(stack).To(Equal(models.Stack{
-					Guid:        "the-stack-guid",
+					GUID:        "the-stack-guid",
 					Name:        "the-stack-name",
 					Description: "the-stack-description",
 				}))

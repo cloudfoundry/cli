@@ -23,14 +23,14 @@ func (resource SpaceQuotaResource) ToModel() models.SpaceQuota {
 	}
 
 	return models.SpaceQuota{
-		Guid:                    resource.Metadata.Guid,
+		GUID:                    resource.Metadata.GUID,
 		Name:                    entity.Name,
 		MemoryLimit:             entity.MemoryLimit,
 		InstanceMemoryLimit:     entity.InstanceMemoryLimit,
 		RoutesLimit:             entity.RoutesLimit,
 		ServicesLimit:           entity.ServicesLimit,
 		NonBasicServicesAllowed: entity.NonBasicServicesAllowed,
-		OrgGuid:                 entity.OrgGuid,
+		OrgGUID:                 entity.OrgGUID,
 		AppInstanceLimit:        appInstanceLimit,
 	}
 }

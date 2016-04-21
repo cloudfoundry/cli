@@ -64,7 +64,7 @@ func (cmd *RenameServiceBroker) Execute(c flags.FlagContext) {
 
 	newName := c.Args()[1]
 
-	apiErr = cmd.repo.Rename(serviceBroker.Guid, newName)
+	apiErr = cmd.repo.Rename(serviceBroker.GUID, newName)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

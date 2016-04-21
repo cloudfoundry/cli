@@ -74,7 +74,7 @@ var _ = Describe("BindRouteService", func() {
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{
-			Guid: "fake-domain-guid",
+			GUID: "fake-domain-guid",
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
@@ -172,7 +172,7 @@ var _ = Describe("BindRouteService", func() {
 
 		Context("when the route can be found", func() {
 			BeforeEach(func() {
-				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, nil)
+				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
 			})
 
 			Context("when the service instance is not user-provided and requires route forwarding", func() {
@@ -183,7 +183,7 @@ var _ = Describe("BindRouteService", func() {
 						},
 					}
 					serviceInstance.ServicePlan = models.ServicePlanFields{
-						Guid: "service-plan-guid",
+						GUID: "service-plan-guid",
 					}
 					serviceInstanceRequirement.GetServiceInstanceReturns(serviceInstance)
 				})
@@ -358,9 +358,9 @@ var _ = Describe("BindRouteService", func() {
 			Context("when the service instance is user-provided", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
-					serviceInstance.Guid = "service-instance-guid"
+					serviceInstance.GUID = "service-instance-guid"
 					serviceInstance.ServicePlan = models.ServicePlanFields{
-						Guid: "",
+						GUID: "",
 					}
 					serviceInstanceRequirement.GetServiceInstanceReturns(serviceInstance)
 				})
@@ -461,7 +461,7 @@ var _ = Describe("BindRouteService", func() {
 
 		Context("when finding the route results in an error", func() {
 			BeforeEach(func() {
-				routeRepo.FindReturns(models.Route{Guid: "route-guid"}, errors.New("find-err"))
+				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, errors.New("find-err"))
 			})
 
 			It("fails with error", func() {

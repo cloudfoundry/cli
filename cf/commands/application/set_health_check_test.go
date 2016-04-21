@@ -85,7 +85,7 @@ var _ = Describe("set-health-check command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.HealthCheckType = "none"
 
 			requirementsFactory.Application = app
@@ -104,7 +104,7 @@ var _ = Describe("set-health-check command", func() {
 				BeforeEach(func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
+					app.GUID = "my-app-guid"
 					app.HealthCheckType = "port"
 
 					appRepo.UpdateReturns(app, nil)
@@ -138,7 +138,7 @@ var _ = Describe("set-health-check command", func() {
 				It("notifies user when updated result is not in the desired state", func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
+					app.GUID = "my-app-guid"
 					app.HealthCheckType = "none"
 					appRepo.UpdateReturns(app, nil)
 

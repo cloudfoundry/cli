@@ -15,7 +15,7 @@ type UserRequirement interface {
 type userApiRequirement struct {
 	username string
 	userRepo api.UserRepository
-	wantGuid bool
+	wantGUID bool
 
 	user models.UserFields
 }
@@ -23,18 +23,18 @@ type userApiRequirement struct {
 func NewUserRequirement(
 	username string,
 	userRepo api.UserRepository,
-	wantGuid bool,
+	wantGUID bool,
 ) *userApiRequirement {
 	req := new(userApiRequirement)
 	req.username = username
 	req.userRepo = userRepo
-	req.wantGuid = wantGuid
+	req.wantGUID = wantGUID
 
 	return req
 }
 
 func (req *userApiRequirement) Execute() error {
-	if req.wantGuid {
+	if req.wantGUID {
 		var err error
 		req.user, err = req.userRepo.FindByUsername(req.username)
 		if err != nil {

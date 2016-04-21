@@ -74,7 +74,7 @@ var _ = Describe("CreateAppManifest", func() {
 
 		applicationRequirement = new(requirementsfakes.FakeApplicationRequirement)
 		application := models.Application{}
-		application.Guid = "app-guid"
+		application.GUID = "app-guid"
 		applicationRequirement.GetApplicationReturns(application)
 		factory.NewApplicationRequirementReturns(applicationRequirement)
 	})
@@ -156,7 +156,7 @@ var _ = Describe("CreateAppManifest", func() {
 			BeforeEach(func() {
 				application.Memory = 1024
 				application.InstanceCount = 2
-				application.StackGuid = "the-stack-guid"
+				application.StackGUID = "the-stack-guid"
 			})
 
 			JustBeforeEach(func() {
@@ -209,7 +209,7 @@ var _ = Describe("CreateAppManifest", func() {
 			Context("when getting stacks succeeds", func() {
 				BeforeEach(func() {
 					stackRepo.FindByGUIDReturns(models.Stack{
-						Guid: "the-stack-guid",
+						GUID: "the-stack-guid",
 						Name: "the-stack-name",
 					}, nil)
 				})

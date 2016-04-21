@@ -62,7 +62,7 @@ var _ = Describe("stack command", func() {
 		stack1 := models.Stack{
 			Name:        "Stack-1",
 			Description: "Stack 1 Description",
-			Guid:        "Stack-1-GUID",
+			GUID:        "Stack-1-GUID",
 		}
 
 		repo.FindByNameReturns(stack1, nil)
@@ -77,7 +77,7 @@ var _ = Describe("stack command", func() {
 		stack1 := models.Stack{
 			Name:        "Stack-1",
 			Description: "Stack 1 Description",
-			Guid:        "Stack-1-GUID",
+			GUID:        "Stack-1-GUID",
 		}
 
 		repo.FindByNameReturns(stack1, nil)

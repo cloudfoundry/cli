@@ -93,7 +93,7 @@ var _ = Describe("update-space-quota command", func() {
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
 			quota = models.SpaceQuota{
-				Guid:                    "my-quota-guid",
+				GUID:                    "my-quota-guid",
 				Name:                    "my-quota",
 				MemoryLimit:             1024,
 				InstanceMemoryLimit:     512,
@@ -101,7 +101,7 @@ var _ = Describe("update-space-quota command", func() {
 				ServicesLimit:           222,
 				AppInstanceLimit:        333,
 				NonBasicServicesAllowed: false,
-				OrgGuid:                 "my-org-guid",
+				OrgGUID:                 "my-org-guid",
 			}
 
 			quotaPaidService = models.SpaceQuota{NonBasicServicesAllowed: true}

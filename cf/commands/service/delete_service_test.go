@@ -76,7 +76,7 @@ var _ = Describe("delete-service command", func() {
 				BeforeEach(func() {
 					serviceInstance = models.ServiceInstance{}
 					serviceInstance.Name = "my-service"
-					serviceInstance.Guid = "my-service-guid"
+					serviceInstance.GUID = "my-service-guid"
 					serviceInstance.LastOperation.Type = "delete"
 					serviceInstance.LastOperation.State = "in progress"
 					serviceInstance.LastOperation.Description = "delete"
@@ -115,7 +115,7 @@ var _ = Describe("delete-service command", func() {
 				BeforeEach(func() {
 					serviceInstance = models.ServiceInstance{}
 					serviceInstance.Name = "my-service"
-					serviceInstance.Guid = "my-service-guid"
+					serviceInstance.GUID = "my-service-guid"
 					serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 				})
 

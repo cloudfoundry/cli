@@ -124,7 +124,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			BeforeEach(func() {
 				serviceInstanceRequirement.GetServiceInstanceReturns(models.ServiceInstance{
 					ServicePlan: models.ServicePlanFields{
-						Guid: "service-plan-guid",
+						GUID: "service-plan-guid",
 					},
 				})
 			})
@@ -143,7 +143,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			BeforeEach(func() {
 				serviceInstance = models.ServiceInstance{
 					ServicePlan: models.ServicePlanFields{
-						Guid:        "",
+						GUID:        "",
 						Description: "service-plan-description",
 					},
 				}

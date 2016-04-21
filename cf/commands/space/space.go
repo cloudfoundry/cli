@@ -76,7 +76,7 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 		return
 	}
 	if c.Bool("guid") {
-		cmd.ui.Say(space.Guid)
+		cmd.ui.Say(space.GUID)
 	} else {
 		cmd.ui.Say(T("Getting info for space {{.TargetSpace}} in org {{.OrgName}} as {{.CurrentUser}}...",
 			map[string]interface{}{
@@ -138,11 +138,11 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 }
 
 func (cmd *ShowSpace) quotaString(space models.Space) string {
-	if space.SpaceQuotaGuid == "" {
+	if space.SpaceQuotaGUID == "" {
 		return ""
 	}
 
-	quota, err := cmd.quotaRepo.FindByGuid(space.SpaceQuotaGuid)
+	quota, err := cmd.quotaRepo.FindByGUID(space.SpaceQuotaGUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return ""
@@ -164,15 +164,15 @@ func (cmd *ShowSpace) quotaString(space models.Space) string {
 
 func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	cmd.pluginModel.Name = space.Name
-	cmd.pluginModel.Guid = space.Guid
+	cmd.pluginModel.GUID = space.GUID
 
 	cmd.pluginModel.Organization.Name = space.Organization.Name
-	cmd.pluginModel.Organization.Guid = space.Organization.Guid
+	cmd.pluginModel.Organization.GUID = space.Organization.GUID
 
 	for _, app := range space.Applications {
 		a := plugin_models.GetSpace_Apps{
 			Name: app.Name,
-			Guid: app.Guid,
+			GUID: app.GUID,
 		}
 		cmd.pluginModel.Applications = append(cmd.pluginModel.Applications, a)
 	}
@@ -180,8 +180,8 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	for _, domain := range space.Domains {
 		d := plugin_models.GetSpace_Domains{
 			Name: domain.Name,
-			Guid: domain.Guid,
-			OwningOrganizationGuid: domain.OwningOrganizationGuid,
+			GUID: domain.GUID,
+			OwningOrganizationGUID: domain.OwningOrganizationGUID,
 			Shared:                 domain.Shared,
 		}
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
@@ -190,23 +190,23 @@ func (cmd *ShowSpace) populatePluginModel(space models.Space) {
 	for _, service := range space.ServiceInstances {
 		si := plugin_models.GetSpace_ServiceInstance{
 			Name: service.Name,
-			Guid: service.Guid,
+			GUID: service.GUID,
 		}
 		cmd.pluginModel.ServiceInstances = append(cmd.pluginModel.ServiceInstances, si)
 	}
 	for _, group := range space.SecurityGroups {
 		sg := plugin_models.GetSpace_SecurityGroup{
 			Name:  group.Name,
-			Guid:  group.Guid,
+			GUID:  group.GUID,
 			Rules: group.Rules,
 		}
 		cmd.pluginModel.SecurityGroups = append(cmd.pluginModel.SecurityGroups, sg)
 	}
 
-	quota, err := cmd.quotaRepo.FindByGuid(space.SpaceQuotaGuid)
+	quota, err := cmd.quotaRepo.FindByGUID(space.SpaceQuotaGUID)
 	if err == nil {
 		cmd.pluginModel.SpaceQuota.Name = quota.Name
-		cmd.pluginModel.SpaceQuota.Guid = quota.Guid
+		cmd.pluginModel.SpaceQuota.GUID = quota.GUID
 		cmd.pluginModel.SpaceQuota.MemoryLimit = quota.MemoryLimit
 		cmd.pluginModel.SpaceQuota.InstanceMemoryLimit = quota.InstanceMemoryLimit
 		cmd.pluginModel.SpaceQuota.RoutesLimit = quota.RoutesLimit

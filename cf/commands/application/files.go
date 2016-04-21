@@ -95,7 +95,7 @@ func (cmd *Files) Execute(c flags.FlagContext) {
 		path = c.Args()[1]
 	}
 
-	list, apiErr := cmd.appFilesRepo.ListFiles(app.Guid, instance, path)
+	list, apiErr := cmd.appFilesRepo.ListFiles(app.GUID, instance, path)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

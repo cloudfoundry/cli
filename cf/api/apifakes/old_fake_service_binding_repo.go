@@ -6,20 +6,20 @@ import (
 )
 
 type OldFakeServiceBindingRepo struct {
-	CreateServiceInstanceGuid string
-	CreateApplicationGuid     string
+	CreateServiceInstanceGUID string
+	CreateApplicationGUID     string
 	CreateErrorCode           string
 	CreateParams              map[string]interface{}
 
 	DeleteServiceInstance models.ServiceInstance
-	DeleteApplicationGuid string
+	DeleteApplicationGUID string
 	DeleteBindingNotFound bool
 	CreateNonHTTPErrCode  string
 }
 
-func (repo *OldFakeServiceBindingRepo) Create(instanceGuid, appGuid string, paramsMap map[string]interface{}) (apiErr error) {
-	repo.CreateServiceInstanceGuid = instanceGuid
-	repo.CreateApplicationGuid = appGuid
+func (repo *OldFakeServiceBindingRepo) Create(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error) {
+	repo.CreateServiceInstanceGUID = instanceGUID
+	repo.CreateApplicationGUID = appGUID
 	repo.CreateParams = paramsMap
 
 	if repo.CreateNonHTTPErrCode != "" {
@@ -34,9 +34,9 @@ func (repo *OldFakeServiceBindingRepo) Create(instanceGuid, appGuid string, para
 	return
 }
 
-func (repo *OldFakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr error) {
+func (repo *OldFakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error) {
 	repo.DeleteServiceInstance = instance
-	repo.DeleteApplicationGuid = appGuid
+	repo.DeleteApplicationGUID = appGUID
 	found = !repo.DeleteBindingNotFound
 	return
 }

@@ -108,15 +108,15 @@ var _ = Describe("Push Command", func() {
 
 		domainRepo = new(apifakes.FakeDomainRepository)
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-		domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+		domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 			cb(sharedDomain)
 			return nil
 		}
 
-		domainRepo.FirstOrDefaultStub = func(orgGuid string, name *string) (models.DomainFields, error) {
+		domainRepo.FirstOrDefaultStub = func(orgGUID string, name *string) (models.DomainFields, error) {
 			if name == nil {
 				var foundDomain *models.DomainFields
-				domainRepo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
+				domainRepo.ListDomainsForOrg(orgGUID, func(domain models.DomainFields) bool {
 					foundDomain = &domain
 					return !domain.Shared
 				})
@@ -128,7 +128,7 @@ var _ = Describe("Push Command", func() {
 				return *foundDomain, nil
 			}
 
-			return domainRepo.FindByNameInOrg(*name, orgGuid)
+			return domainRepo.FindByNameInOrg(*name, orgGUID)
 		}
 
 		//save original command dependences and restore later
@@ -141,7 +141,7 @@ var _ = Describe("Push Command", func() {
 			// This never returns an error, which means it isn't tested.
 			// This is copied from the old route repo fake.
 			route := models.Route{}
-			route.Guid = host + "-route-guid"
+			route.GUID = host + "-route-guid"
 			route.Domain = domain
 			route.Host = host
 			route.Path = path
@@ -264,7 +264,7 @@ var _ = Describe("Push Command", func() {
 			appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("App", "the-app"))
 			appRepo.CreateStub = func(params models.AppParams) (models.Application, error) {
 				a := models.Application{}
-				a.Guid = *params.Name + "-guid"
+				a.GUID = *params.Name + "-guid"
 				a.Name = *params.Name
 				a.State = "stopped"
 
@@ -309,7 +309,7 @@ var _ = Describe("Push Command", func() {
 		Context("when the default route for the app already exists", func() {
 			BeforeEach(func() {
 				route := models.Route{}
-				route.Guid = "my-route-guid"
+				route.GUID = "my-route-guid"
 				route.Host = "app-name"
 				route.Domain = maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
 
@@ -379,10 +379,10 @@ var _ = Describe("Push Command", func() {
 
 			Context("when multiple domains are specified in manifest", func() {
 				BeforeEach(func() {
-					domainRepo.FindByNameInOrgStub = func(name string, owningOrgGuid string) (models.DomainFields, error) {
+					domainRepo.FindByNameInOrgStub = func(name string, owningOrgGUID string) (models.DomainFields, error) {
 						return map[string]models.DomainFields{
-							"example1.com": {Name: "example1.com", Guid: "example-domain-guid"},
-							"example2.com": {Name: "example2.com", Guid: "example-domain-guid"},
+							"example1.com": {Name: "example1.com", GUID: "example-domain-guid"},
+							"example2.com": {Name: "example2.com", GUID: "example-domain-guid"},
 						}[name], nil
 					}
 
@@ -449,7 +449,7 @@ var _ = Describe("Push Command", func() {
 
 				params := appRepo.CreateArgsForCall(0)
 				Expect(*params.Name).To(Equal("app-name"))
-				Expect(*params.SpaceGuid).To(Equal("my-space-guid"))
+				Expect(*params.SpaceGUID).To(Equal("my-space-guid"))
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				host, _, _, _ := routeRepo.FindArgsForCall(0)
@@ -458,7 +458,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("app-name"))
-				Expect(createdDomainFields.Guid).To(Equal("foo-domain-guid"))
+				Expect(createdDomainFields.GUID).To(Equal("foo-domain-guid"))
 				Expect(createdPath).To(BeEmpty())
 				Expect(randomPort).To(BeFalse())
 
@@ -467,8 +467,8 @@ var _ = Describe("Push Command", func() {
 				Expect(boundAppGUID).To(Equal("app-name-guid"))
 				Expect(boundRouteGUID).To(Equal("app-name-route-guid"))
 
-				appGuid, _, _ := actor.UploadAppArgsForCall(0)
-				Expect(appGuid).To(Equal("app-name-guid"))
+				appGUID, _, _ := actor.UploadAppArgsForCall(0)
+				Expect(appGUID).To(Equal("app-name-guid"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating app", "app-name", "my-org", "my-space"},
@@ -484,7 +484,7 @@ var _ = Describe("Push Command", func() {
 				Expect(stopper.ApplicationStopCallCount()).To(Equal(0))
 
 				app, orgName, spaceName := starter.ApplicationStartArgsForCall(0)
-				Expect(app.Guid).To(Equal(appGuid))
+				Expect(app.GUID).To(Equal(appGUID))
 				Expect(app.Name).To(Equal("app-name"))
 				Expect(orgName).To(Equal(configRepo.OrganizationFields().Name))
 				Expect(spaceName).To(Equal(configRepo.SpaceFields().Name))
@@ -511,11 +511,11 @@ var _ = Describe("Push Command", func() {
 			It("sets the app params from the flags", func() {
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{
 					Name: "bar.cf-app.com",
-					Guid: "bar-domain-guid",
+					GUID: "bar-domain-guid",
 				}, nil)
 				stackRepo.FindByNameReturns(models.Stack{
 					Name: "customLinux",
-					Guid: "custom-linux-guid",
+					GUID: "custom-linux-guid",
 				}, nil)
 
 				callPush(
@@ -555,20 +555,20 @@ var _ = Describe("Push Command", func() {
 				Expect(*params.InstanceCount).To(Equal(3))
 				Expect(*params.DiskQuota).To(Equal(int64(4096)))
 				Expect(*params.Memory).To(Equal(int64(2048)))
-				Expect(*params.StackGuid).To(Equal("custom-linux-guid"))
+				Expect(*params.StackGUID).To(Equal("custom-linux-guid"))
 				Expect(*params.HealthCheckTimeout).To(Equal(1))
 				Expect(*params.HealthCheckType).To(Equal("port"))
 				Expect(*params.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
 				Expect(*params.AppPorts).To(Equal([]int{8080, 9000}))
 
-				name, owningOrgGuid := domainRepo.FindByNameInOrgArgsForCall(0)
+				name, owningOrgGUID := domainRepo.FindByNameInOrgArgsForCall(0)
 				Expect(name).To(Equal("bar.cf-app.com"))
-				Expect(owningOrgGuid).To(Equal("my-org-guid"))
+				Expect(owningOrgGUID).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("my-hostname"))
-				Expect(createdDomainFields.Guid).To(Equal("bar-domain-guid"))
+				Expect(createdDomainFields.GUID).To(Equal("bar-domain-guid"))
 				Expect(createdPath).To(Equal("my-route-path"))
 				Expect(randomPort).To(BeFalse())
 
@@ -577,8 +577,8 @@ var _ = Describe("Push Command", func() {
 				Expect(boundAppGUID).To(Equal("app-name-guid"))
 				Expect(boundRouteGUID).To(Equal("my-hostname-route-guid"))
 
-				appGuid, _, _ := actor.UploadAppArgsForCall(0)
-				Expect(appGuid).To(Equal("app-name-guid"))
+				appGUID, _, _ := actor.UploadAppArgsForCall(0)
+				Expect(appGUID).To(Equal("app-name-guid"))
 
 				Expect(starter.ApplicationStartCallCount()).To(Equal(0))
 			})
@@ -634,15 +634,15 @@ var _ = Describe("Push Command", func() {
 					privateDomain := models.DomainFields{
 						Shared: false,
 						Name:   "private.cf-app.com",
-						Guid:   "private-domain-guid",
+						GUID:   "private-domain-guid",
 					}
 					sharedDomain := models.DomainFields{
 						Name:   "shared.cf-app.com",
 						Shared: true,
-						Guid:   "shared-domain-guid",
+						GUID:   "shared-domain-guid",
 					}
 
-					domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+					domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 						cb(privateDomain)
 						cb(sharedDomain)
 						return nil
@@ -657,7 +657,7 @@ var _ = Describe("Push Command", func() {
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
 					createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 					Expect(createdHost).To(Equal("app-name"))
-					Expect(createdDomainFields.Guid).To(Equal("shared-domain-guid"))
+					Expect(createdDomainFields.GUID).To(Equal("shared-domain-guid"))
 					Expect(createdPath).To(Equal("the-route-path"))
 					Expect(randomPort).To(BeFalse())
 
@@ -684,10 +684,10 @@ var _ = Describe("Push Command", func() {
 					privateDomain := models.DomainFields{
 						Shared: false,
 						Name:   "private.cf-app.com",
-						Guid:   "private-domain-guid",
+						GUID:   "private-domain-guid",
 					}
 
-					domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+					domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 						cb(privateDomain)
 						return nil
 					}
@@ -703,7 +703,7 @@ var _ = Describe("Push Command", func() {
 					Expect(routeRepo.CreateCallCount()).To(Equal(1))
 					createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
 					Expect(createdHost).To(Equal("app-name"))
-					Expect(createdDomainFields.Guid).To(Equal("private-domain-guid"))
+					Expect(createdDomainFields.GUID).To(Equal("private-domain-guid"))
 					Expect(createdPath).To(BeEmpty())
 					Expect(randomPort).To(BeFalse())
 
@@ -762,10 +762,10 @@ var _ = Describe("Push Command", func() {
 						expectedPort = 7777
 
 						expectedDomain = models.DomainFields{
-							Guid: "some-guid",
+							GUID: "some-guid",
 							Name: "some-name",
-							OwningOrganizationGuid: "some-organization-guid",
-							RouterGroupGuid:        "some-router-group-guid",
+							OwningOrganizationGUID: "some-organization-guid",
+							RouterGroupGUID:        "some-router-group-guid",
 							RouterGroupType:        "tcp",
 							Shared:                 true,
 						}
@@ -935,7 +935,7 @@ var _ = Describe("Push Command", func() {
 			It("pushes an app when provided a manifest with one app defined", func() {
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{
 					Name: "manifest-example.com",
-					Guid: "bar-domain-guid",
+					GUID: "bar-domain-guid",
 				}, nil)
 
 				manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
@@ -967,7 +967,7 @@ var _ = Describe("Push Command", func() {
 			It("pushes an app with multiple routes when multiple hosts are provided", func() {
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{
 					Name: "manifest-example.com",
-					Guid: "bar-domain-guid",
+					GUID: "bar-domain-guid",
 				}, nil)
 
 				manifestRepo.ReadManifestReturns.Manifest = multipleHostManifest()
@@ -1001,7 +1001,7 @@ var _ = Describe("Push Command", func() {
 			It("does not create a route when provided the --no-route flag", func() {
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{
 					Name: "bar.cf-app.com",
-					Guid: "bar-domain-guid",
+					GUID: "bar-domain-guid",
 				}, nil)
 
 				callPush("--no-route", "app-name")
@@ -1012,10 +1012,10 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("maps the root domain route to the app when given the --no-hostname flag", func() {
-				domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+				domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 					cb(models.DomainFields{
 						Name:   "bar.cf-app.com",
-						Guid:   "bar-domain-guid",
+						GUID:   "bar-domain-guid",
 						Shared: true,
 					})
 
@@ -1031,7 +1031,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, _, _ := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal(""))
-				Expect(createdDomainFields.Guid).To(Equal("bar-domain-guid"))
+				Expect(createdDomainFields.GUID).To(Equal("bar-domain-guid"))
 			})
 
 			It("Does not create a route when the no-route property is in the manifest", func() {
@@ -1106,7 +1106,7 @@ var _ = Describe("Push Command", func() {
 		BeforeEach(func() {
 			existingApp = models.Application{}
 			existingApp.Name = "existing-app"
-			existingApp.Guid = "existing-app-guid"
+			existingApp.GUID = "existing-app-guid"
 			existingApp.Command = "unicorn -c config/unicorn.rb -D"
 			existingApp.EnvironmentVars = map[string]interface{}{
 				"crazy": "pants",
@@ -1161,13 +1161,13 @@ var _ = Describe("Push Command", func() {
 			callPush("existing-app")
 
 			app, orgName, spaceName := stopper.ApplicationStopArgsForCall(0)
-			Expect(app.Guid).To(Equal(existingApp.Guid))
+			Expect(app.GUID).To(Equal(existingApp.GUID))
 			Expect(app.Name).To(Equal("existing-app"))
 			Expect(orgName).To(Equal(configRepo.OrganizationFields().Name))
 			Expect(spaceName).To(Equal(configRepo.SpaceFields().Name))
 
-			appGuid, _, _ := actor.UploadAppArgsForCall(0)
-			Expect(appGuid).To(Equal(existingApp.Guid))
+			appGUID, _, _ := actor.UploadAppArgsForCall(0)
+			Expect(appGUID).To(Equal(existingApp.GUID))
 		})
 
 		It("does not stop the app when it is already stopped", func() {
@@ -1190,7 +1190,7 @@ var _ = Describe("Push Command", func() {
 
 			stackRepo.FindByNameReturns(models.Stack{
 				Name: "differentStack",
-				Guid: "differentStack-guid",
+				GUID: "differentStack-guid",
 			}, nil)
 
 			callPush(
@@ -1203,12 +1203,12 @@ var _ = Describe("Push Command", func() {
 			)
 
 			appGUID, params := appRepo.UpdateArgsForCall(0)
-			Expect(appGUID).To(Equal(existingApp.Guid))
+			Expect(appGUID).To(Equal(existingApp.GUID))
 			Expect(*params.Command).To(Equal("different start command"))
 			Expect(*params.InstanceCount).To(Equal(10))
 			Expect(*params.Memory).To(Equal(int64(1024)))
 			Expect(*params.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-different.git"))
-			Expect(*params.StackGuid).To(Equal("differentStack-guid"))
+			Expect(*params.StackGUID).To(Equal("differentStack-guid"))
 		})
 
 		It("re-uploads the app", func() {
@@ -1224,11 +1224,11 @@ var _ = Describe("Push Command", func() {
 			BeforeEach(func() {
 				domain := models.DomainFields{
 					Name:   "example.com",
-					Guid:   "domain-guid",
+					GUID:   "domain-guid",
 					Shared: true,
 				}
 
-				domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+				domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 					cb(domain)
 					return nil
 				}
@@ -1238,7 +1238,7 @@ var _ = Describe("Push Command", func() {
 				}, nil)
 
 				existingApp.Routes = []models.RouteSummary{models.RouteSummary{
-					Guid:   "existing-route-guid",
+					GUID:   "existing-route-guid",
 					Host:   "existing-app",
 					Domain: domain,
 				}}
@@ -1260,8 +1260,8 @@ var _ = Describe("Push Command", func() {
 					It("does not add a route to the app", func() {
 						callPush("existing-app")
 
-						appGuid, _, _ := actor.UploadAppArgsForCall(0)
-						Expect(appGuid).To(Equal("existing-app-guid"))
+						appGUID, _, _ := actor.UploadAppArgsForCall(0)
+						Expect(appGUID).To(Equal("existing-app-guid"))
 						Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
 						Expect(routeRepo.FindCallCount()).To(BeZero())
 						Expect(routeRepo.CreateCallCount()).To(BeZero())
@@ -1272,7 +1272,7 @@ var _ = Describe("Push Command", func() {
 					BeforeEach(func() {
 						manifestRepo.ReadManifestReturns.Manifest = existingAppManifest()
 						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "an-error"))
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{Name: "example.com", Guid: "example-domain-guid"}, nil)
+						domainRepo.FindByNameInOrgReturns(models.DomainFields{Name: "example.com", GUID: "example-domain-guid"}, nil)
 					})
 
 					It("adds the route", func() {
@@ -1286,12 +1286,12 @@ var _ = Describe("Push Command", func() {
 
 			It("creates and binds a route when a different domain is specified", func() {
 				routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.newdomain.com"))
-				domainRepo.FindByNameInOrgReturns(models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"}, nil)
+				domainRepo.FindByNameInOrgReturns(models.DomainFields{GUID: "domain-guid", Name: "newdomain.com"}, nil)
 
 				callPush("-d", "newdomain.com", "existing-app")
-				domainName, domainOrgGuid := domainRepo.FindByNameInOrgArgsForCall(0)
+				domainName, domainOrgGUID := domainRepo.FindByNameInOrgArgsForCall(0)
 				Expect(domainName).To(Equal("newdomain.com"))
-				Expect(domainOrgGuid).To(Equal("my-org-guid"))
+				Expect(domainOrgGUID).To(Equal("my-org-guid"))
 
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				host, domain, _, _ := routeRepo.FindArgsForCall(0)
@@ -1301,7 +1301,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, _, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("existing-app"))
-				Expect(createdDomainFields.Guid).To(Equal("domain-guid"))
+				Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
 				Expect(randomPort).To(BeFalse())
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -1324,7 +1324,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, _, _ := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("new-host"))
-				Expect(createdDomainFields.Guid).To(Equal("domain-guid"))
+				Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating route", "new-host.example.com"},
@@ -1336,8 +1336,8 @@ var _ = Describe("Push Command", func() {
 			It("removes the route when the --no-route flag is given", func() {
 				callPush("--no-route", "existing-app")
 
-				appGuid, _, _ := actor.UploadAppArgsForCall(0)
-				Expect(appGuid).To(Equal("existing-app-guid"))
+				appGUID, _, _ := actor.UploadAppArgsForCall(0)
+				Expect(appGUID).To(Equal("existing-app-guid"))
 
 				Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
 				Expect(routeRepo.FindCallCount()).To(BeZero())
@@ -1362,7 +1362,7 @@ var _ = Describe("Push Command", func() {
 				Expect(routeRepo.CreateCallCount()).To(Equal(1))
 				createdHost, createdDomainFields, _, randomPort := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal(""))
-				Expect(createdDomainFields.Guid).To(Equal("domain-guid"))
+				Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
 				Expect(randomPort).To(BeFalse())
 
 				Expect(ui.Outputs).To(ContainSubstrings(

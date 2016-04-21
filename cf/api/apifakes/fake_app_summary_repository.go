@@ -16,10 +16,10 @@ type FakeAppSummaryRepository struct {
 		result1 []models.Application
 		result2 error
 	}
-	GetSummaryStub        func(appGuid string) (summary models.Application, apiErr error)
+	GetSummaryStub        func(appGUID string) (summary models.Application, apiErr error)
 	getSummaryMutex       sync.RWMutex
 	getSummaryArgsForCall []struct {
-		appGuid string
+		appGUID string
 	}
 	getSummaryReturns struct {
 		result1 models.Application
@@ -52,14 +52,14 @@ func (fake *FakeAppSummaryRepository) GetSummariesInCurrentSpaceReturns(result1 
 	}{result1, result2}
 }
 
-func (fake *FakeAppSummaryRepository) GetSummary(appGuid string) (summary models.Application, apiErr error) {
+func (fake *FakeAppSummaryRepository) GetSummary(appGUID string) (summary models.Application, apiErr error) {
 	fake.getSummaryMutex.Lock()
 	fake.getSummaryArgsForCall = append(fake.getSummaryArgsForCall, struct {
-		appGuid string
-	}{appGuid})
+		appGUID string
+	}{appGUID})
 	fake.getSummaryMutex.Unlock()
 	if fake.GetSummaryStub != nil {
-		return fake.GetSummaryStub(appGuid)
+		return fake.GetSummaryStub(appGUID)
 	} else {
 		return fake.getSummaryReturns.result1, fake.getSummaryReturns.result2
 	}
@@ -74,7 +74,7 @@ func (fake *FakeAppSummaryRepository) GetSummaryCallCount() int {
 func (fake *FakeAppSummaryRepository) GetSummaryArgsForCall(i int) string {
 	fake.getSummaryMutex.RLock()
 	defer fake.getSummaryMutex.RUnlock()
-	return fake.getSummaryArgsForCall[i].appGuid
+	return fake.getSummaryArgsForCall[i].appGUID
 }
 
 func (fake *FakeAppSummaryRepository) GetSummaryReturns(result1 models.Application, result2 error) {

@@ -71,7 +71,7 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 	}
 
 	if c.Bool("guid") {
-		cmd.ui.Say(serviceInstance.Guid)
+		cmd.ui.Say(serviceInstance.GUID)
 	} else {
 		cmd.ui.Say("")
 		cmd.ui.Say(T("Service instance: {{.ServiceName}}", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceInstance.Name)}))
@@ -146,7 +146,7 @@ func ServiceInstanceStateToStatus(operationType string, state string, isUserProv
 
 func (cmd *ShowService) populatePluginModel(serviceInstance models.ServiceInstance) {
 	cmd.pluginModel.Name = serviceInstance.Name
-	cmd.pluginModel.Guid = serviceInstance.Guid
+	cmd.pluginModel.GUID = serviceInstance.GUID
 	cmd.pluginModel.DashboardUrl = serviceInstance.DashboardUrl
 	cmd.pluginModel.IsUserProvided = serviceInstance.IsUserProvided()
 	cmd.pluginModel.LastOperation.Type = serviceInstance.LastOperation.Type
@@ -155,7 +155,7 @@ func (cmd *ShowService) populatePluginModel(serviceInstance models.ServiceInstan
 	cmd.pluginModel.LastOperation.CreatedAt = serviceInstance.LastOperation.CreatedAt
 	cmd.pluginModel.LastOperation.UpdatedAt = serviceInstance.LastOperation.UpdatedAt
 	cmd.pluginModel.ServicePlan.Name = serviceInstance.ServicePlan.Name
-	cmd.pluginModel.ServicePlan.Guid = serviceInstance.ServicePlan.Guid
+	cmd.pluginModel.ServicePlan.GUID = serviceInstance.ServicePlan.GUID
 	cmd.pluginModel.ServiceOffering.DocumentationUrl = serviceInstance.ServiceOffering.DocumentationUrl
 	cmd.pluginModel.ServiceOffering.Name = serviceInstance.ServiceOffering.Label
 }

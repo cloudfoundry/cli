@@ -18,7 +18,7 @@ type StackEntity struct {
 
 func (resource StackResource) ToFields() *models.Stack {
 	return &models.Stack{
-		Guid:        resource.Metadata.Guid,
+		GUID:        resource.Metadata.GUID,
 		Name:        resource.Entity.Name,
 		Description: resource.Entity.Description,
 	}

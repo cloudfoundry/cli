@@ -3,7 +3,7 @@ package plugin_models
 import "time"
 
 type GetAppModel struct {
-	Guid                 string
+	GUID                 string
 	Name                 string
 	BuildpackUrl         string
 	Command              string
@@ -16,7 +16,7 @@ type GetAppModel struct {
 	RunningInstances     int
 	HealthCheckTimeout   int
 	State                string
-	SpaceGuid            string
+	SpaceGUID            string
 	PackageUpdatedAt     *time.Time
 	PackageState         string
 	StagingFailedReason  string
@@ -39,23 +39,23 @@ type GetApp_AppInstanceFields struct {
 }
 
 type GetApp_Stack struct {
-	Guid        string
+	GUID        string
 	Name        string
 	Description string
 }
 
 type GetApp_RouteSummary struct {
-	Guid   string
+	GUID   string
 	Host   string
 	Domain GetApp_DomainFields
 }
 
 type GetApp_DomainFields struct {
-	Guid string
+	GUID string
 	Name string
 }
 
 type GetApp_ServiceSummary struct {
-	Guid string
+	GUID string
 	Name string
 }

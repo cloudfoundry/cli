@@ -8,35 +8,35 @@ import (
 )
 
 type FakeSecurityGroupSpaceBinder struct {
-	BindSpaceStub        func(securityGroupGuid string, spaceGuid string) error
+	BindSpaceStub        func(securityGroupGUID string, spaceGUID string) error
 	bindSpaceMutex       sync.RWMutex
 	bindSpaceArgsForCall []struct {
-		securityGroupGuid string
-		spaceGuid         string
+		securityGroupGUID string
+		spaceGUID         string
 	}
 	bindSpaceReturns struct {
 		result1 error
 	}
-	UnbindSpaceStub        func(securityGroupGuid string, spaceGuid string) error
+	UnbindSpaceStub        func(securityGroupGUID string, spaceGUID string) error
 	unbindSpaceMutex       sync.RWMutex
 	unbindSpaceArgsForCall []struct {
-		securityGroupGuid string
-		spaceGuid         string
+		securityGroupGUID string
+		spaceGUID         string
 	}
 	unbindSpaceReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeSecurityGroupSpaceBinder) BindSpace(securityGroupGuid string, spaceGuid string) error {
+func (fake *FakeSecurityGroupSpaceBinder) BindSpace(securityGroupGUID string, spaceGUID string) error {
 	fake.bindSpaceMutex.Lock()
 	fake.bindSpaceArgsForCall = append(fake.bindSpaceArgsForCall, struct {
-		securityGroupGuid string
-		spaceGuid         string
-	}{securityGroupGuid, spaceGuid})
+		securityGroupGUID string
+		spaceGUID         string
+	}{securityGroupGUID, spaceGUID})
 	fake.bindSpaceMutex.Unlock()
 	if fake.BindSpaceStub != nil {
-		return fake.BindSpaceStub(securityGroupGuid, spaceGuid)
+		return fake.BindSpaceStub(securityGroupGUID, spaceGUID)
 	} else {
 		return fake.bindSpaceReturns.result1
 	}
@@ -51,7 +51,7 @@ func (fake *FakeSecurityGroupSpaceBinder) BindSpaceCallCount() int {
 func (fake *FakeSecurityGroupSpaceBinder) BindSpaceArgsForCall(i int) (string, string) {
 	fake.bindSpaceMutex.RLock()
 	defer fake.bindSpaceMutex.RUnlock()
-	return fake.bindSpaceArgsForCall[i].securityGroupGuid, fake.bindSpaceArgsForCall[i].spaceGuid
+	return fake.bindSpaceArgsForCall[i].securityGroupGUID, fake.bindSpaceArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeSecurityGroupSpaceBinder) BindSpaceReturns(result1 error) {
@@ -61,15 +61,15 @@ func (fake *FakeSecurityGroupSpaceBinder) BindSpaceReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeSecurityGroupSpaceBinder) UnbindSpace(securityGroupGuid string, spaceGuid string) error {
+func (fake *FakeSecurityGroupSpaceBinder) UnbindSpace(securityGroupGUID string, spaceGUID string) error {
 	fake.unbindSpaceMutex.Lock()
 	fake.unbindSpaceArgsForCall = append(fake.unbindSpaceArgsForCall, struct {
-		securityGroupGuid string
-		spaceGuid         string
-	}{securityGroupGuid, spaceGuid})
+		securityGroupGUID string
+		spaceGUID         string
+	}{securityGroupGUID, spaceGUID})
 	fake.unbindSpaceMutex.Unlock()
 	if fake.UnbindSpaceStub != nil {
-		return fake.UnbindSpaceStub(securityGroupGuid, spaceGuid)
+		return fake.UnbindSpaceStub(securityGroupGUID, spaceGUID)
 	} else {
 		return fake.unbindSpaceReturns.result1
 	}
@@ -84,7 +84,7 @@ func (fake *FakeSecurityGroupSpaceBinder) UnbindSpaceCallCount() int {
 func (fake *FakeSecurityGroupSpaceBinder) UnbindSpaceArgsForCall(i int) (string, string) {
 	fake.unbindSpaceMutex.RLock()
 	defer fake.unbindSpaceMutex.RUnlock()
-	return fake.unbindSpaceArgsForCall[i].securityGroupGuid, fake.unbindSpaceArgsForCall[i].spaceGuid
+	return fake.unbindSpaceArgsForCall[i].securityGroupGUID, fake.unbindSpaceArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeSecurityGroupSpaceBinder) UnbindSpaceReturns(result1 error) {

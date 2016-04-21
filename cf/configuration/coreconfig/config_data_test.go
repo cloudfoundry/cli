@@ -25,7 +25,7 @@ var _ = Describe("V3 Config files", func() {
 		"SSHOAuthClient": "ssh-oauth-client-id",
 		"RefreshToken": "the-refresh-token",
 		"OrganizationFields": {
-			"Guid": "the-org-guid",
+			"GUID": "the-org-guid",
 			"Name": "the-org",
 			"QuotaDefinition": {
 				"name":"",
@@ -38,7 +38,7 @@ var _ = Describe("V3 Config files", func() {
 			}
 		},
 		"SpaceFields": {
-			"Guid": "the-space-guid",
+			"GUID": "the-space-guid",
 			"Name": "the-space",
 			"AllowSSH": false
 		},
@@ -72,7 +72,7 @@ var _ = Describe("V3 Config files", func() {
 		"SSHOAuthClient": "ssh-oauth-client-id",
 		"RefreshToken": "the-refresh-token",
 		"OrganizationFields": {
-			"Guid": "the-org-guid",
+			"GUID": "the-org-guid",
 			"Name": "the-org",
 			"QuotaDefinition": {
 				"name":"",
@@ -84,7 +84,7 @@ var _ = Describe("V3 Config files", func() {
 			}
 		},
 		"SpaceFields": {
-			"Guid": "the-space-guid",
+			"GUID": "the-space-guid",
 			"Name": "the-space",
 			"AllowSSH": false
 		},
@@ -119,11 +119,11 @@ var _ = Describe("V3 Config files", func() {
 				MinCliVersion:            "6.0.0",
 				MinRecommendedCliVersion: "6.9.0",
 				OrganizationFields: models.OrganizationFields{
-					Guid: "the-org-guid",
+					GUID: "the-org-guid",
 					Name: "the-org",
 				},
 				SpaceFields: models.SpaceFields{
-					Guid: "the-space-guid",
+					GUID: "the-space-guid",
 					Name: "the-space",
 				},
 				SSLDisabled:  true,
@@ -172,11 +172,11 @@ var _ = Describe("V3 Config files", func() {
 				MinCliVersion:            "6.0.0",
 				MinRecommendedCliVersion: "6.9.0",
 				OrganizationFields: models.OrganizationFields{
-					Guid: "the-org-guid",
+					GUID: "the-org-guid",
 					Name: "the-org",
 				},
 				SpaceFields: models.SpaceFields{
-					Guid: "the-space-guid",
+					GUID: "the-space-guid",
 					Name: "the-space",
 				},
 				SSLDisabled:  true,

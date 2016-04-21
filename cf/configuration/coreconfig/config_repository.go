@@ -74,7 +74,7 @@ type Reader interface {
 	HasSpace() bool
 
 	Username() string
-	UserGuid() string
+	UserGUID() string
 	UserEmail() string
 	IsLoggedIn() bool
 	IsSSLDisabled() bool
@@ -272,9 +272,9 @@ func (c *ConfigRepository) UserEmail() (email string) {
 	return
 }
 
-func (c *ConfigRepository) UserGuid() (guid string) {
+func (c *ConfigRepository) UserGUID() (guid string) {
 	c.read(func() {
-		guid = NewTokenInfo(c.data.AccessToken).UserGuid
+		guid = NewTokenInfo(c.data.AccessToken).UserGUID
 	})
 	return
 }
@@ -295,14 +295,14 @@ func (c *ConfigRepository) IsLoggedIn() (loggedIn bool) {
 
 func (c *ConfigRepository) HasOrganization() (hasOrg bool) {
 	c.read(func() {
-		hasOrg = c.data.OrganizationFields.Guid != "" && c.data.OrganizationFields.Name != ""
+		hasOrg = c.data.OrganizationFields.GUID != "" && c.data.OrganizationFields.Name != ""
 	})
 	return
 }
 
 func (c *ConfigRepository) HasSpace() (hasSpace bool) {
 	c.read(func() {
-		hasSpace = c.data.SpaceFields.Guid != "" && c.data.SpaceFields.Name != ""
+		hasSpace = c.data.SpaceFields.GUID != "" && c.data.SpaceFields.Name != ""
 	})
 	return
 }

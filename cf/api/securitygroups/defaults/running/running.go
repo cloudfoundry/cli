@@ -31,14 +31,14 @@ func NewRunningSecurityGroupsRepo(configRepo coreconfig.Reader, gateway net.Gate
 	}
 }
 
-func (repo *cloudControllerRunningSecurityGroupRepo) BindToRunningSet(groupGuid string) error {
-	return repo.repoBase.Bind(groupGuid, urlPath)
+func (repo *cloudControllerRunningSecurityGroupRepo) BindToRunningSet(groupGUID string) error {
+	return repo.repoBase.Bind(groupGUID, urlPath)
 }
 
 func (repo *cloudControllerRunningSecurityGroupRepo) List() ([]models.SecurityGroupFields, error) {
 	return repo.repoBase.List(urlPath)
 }
 
-func (repo *cloudControllerRunningSecurityGroupRepo) UnbindFromRunningSet(groupGuid string) error {
-	return repo.repoBase.Delete(groupGuid, urlPath)
+func (repo *cloudControllerRunningSecurityGroupRepo) UnbindFromRunningSet(groupGUID string) error {
+	return repo.repoBase.Delete(groupGUID, urlPath)
 }

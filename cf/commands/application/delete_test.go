@@ -39,7 +39,7 @@ var _ = Describe("delete app command", func() {
 	BeforeEach(func() {
 		app = models.Application{}
 		app.Name = "app-to-delete"
-		app.Guid = "app-to-delete-guid"
+		app.GUID = "app-to-delete-guid"
 
 		ui = &testterm.FakeUI{}
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
@@ -113,11 +113,11 @@ var _ = Describe("delete app command", func() {
 			Describe("mapped routes", func() {
 				BeforeEach(func() {
 					route1 := models.RouteSummary{}
-					route1.Guid = "the-first-route-guid"
+					route1.GUID = "the-first-route-guid"
 					route1.Host = "my-app-is-good.com"
 
 					route2 := models.RouteSummary{}
-					route2.Guid = "the-second-route-guid"
+					route2.GUID = "the-second-route-guid"
 					route2.Host = "my-app-is-bad.com"
 
 					appRepo.ReadReturns(models.Application{

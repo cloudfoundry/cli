@@ -61,7 +61,7 @@ var _ = Describe("rename-service-broker command", func() {
 			requirementsFactory.LoginSuccess = true
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
-			broker.Guid = "my-found-broker-guid"
+			broker.GUID = "my-found-broker-guid"
 			serviceBrokerRepo.FindByNameReturns(broker, nil)
 		})
 

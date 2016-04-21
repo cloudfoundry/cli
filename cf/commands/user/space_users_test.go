@@ -78,10 +78,10 @@ var _ = Describe("space-users command", func() {
 
 			org := models.Organization{}
 			org.Name = "Org1"
-			org.Guid = "org1-guid"
+			org.GUID = "org1-guid"
 			space := models.Space{}
 			space.Name = "Space1"
-			space.Guid = "space1-guid"
+			space.GUID = "space1-guid"
 
 			requirementsFactory.Organization = org
 			spaceRepo.FindByNameInOrgReturns(space, nil)
@@ -174,10 +174,10 @@ var _ = Describe("space-users command", func() {
 
 			org := models.Organization{}
 			org.Name = "Org1"
-			org.Guid = "org1-guid"
+			org.GUID = "org1-guid"
 			space := models.Space{}
 			space.Name = "Space1"
-			space.Guid = "space1-guid"
+			space.GUID = "space1-guid"
 
 			requirementsFactory.Organization = org
 			spaceRepo.FindByNameInOrgReturns(space, nil)
@@ -222,30 +222,30 @@ var _ = Describe("space-users command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "the-org"
-				org.Guid = "the-org-guid"
+				org.GUID = "the-org-guid"
 
 				space := models.Space{}
 				space.Name = "the-space"
-				space.Guid = "the-space-guid"
+				space.GUID = "the-space-guid"
 
 				// space managers
 				user := models.UserFields{}
 				user.Username = "user1"
-				user.Guid = "1111"
+				user.GUID = "1111"
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
-				user2.Guid = "2222"
+				user2.GUID = "2222"
 
 				// space auditor
 				user3 := models.UserFields{}
 				user3.Username = "user3"
-				user3.Guid = "3333"
+				user3.GUID = "3333"
 
 				// space developer
 				user4 := models.UserFields{}
 				user4.Username = "user4"
-				user4.Guid = "4444"
+				user4.GUID = "4444"
 
 				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
@@ -270,16 +270,16 @@ var _ = Describe("space-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.Guid).To(Equal("1111"))
+						Expect(u.GUID).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
 					case "user2":
-						Expect(u.Guid).To(Equal("2222"))
+						Expect(u.GUID).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
 					case "user3":
-						Expect(u.Guid).To(Equal("3333"))
+						Expect(u.GUID).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_AUDITOR}))
 					case "user4":
-						Expect(u.Guid).To(Equal("4444"))
+						Expect(u.GUID).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_DEVELOPER}))
 					default:
 						Fail("unexpected user: " + u.Username)
@@ -292,30 +292,30 @@ var _ = Describe("space-users command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "the-org"
-				org.Guid = "the-org-guid"
+				org.GUID = "the-org-guid"
 
 				space := models.Space{}
 				space.Name = "the-space"
-				space.Guid = "the-space-guid"
+				space.GUID = "the-space-guid"
 
 				// space managers
 				user := models.UserFields{}
 				user.Username = "user1"
-				user.Guid = "1111"
+				user.GUID = "1111"
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
-				user2.Guid = "2222"
+				user2.GUID = "2222"
 
 				// space auditor
 				user3 := models.UserFields{}
 				user3.Username = "user3"
-				user3.Guid = "3333"
+				user3.GUID = "3333"
 
 				// space developer
 				user4 := models.UserFields{}
 				user4.Username = "user4"
-				user4.Guid = "4444"
+				user4.GUID = "4444"
 
 				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
@@ -340,16 +340,16 @@ var _ = Describe("space-users command", func() {
 				for _, u := range pluginUserModel {
 					switch u.Username {
 					case "user1":
-						Expect(u.Guid).To(Equal("1111"))
+						Expect(u.GUID).To(Equal("1111"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
 					case "user2":
-						Expect(u.Guid).To(Equal("2222"))
+						Expect(u.GUID).To(Equal("2222"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
 					case "user3":
-						Expect(u.Guid).To(Equal("3333"))
+						Expect(u.GUID).To(Equal("3333"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
 					case "user4":
-						Expect(u.Guid).To(Equal("4444"))
+						Expect(u.GUID).To(Equal("4444"))
 						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
 					default:
 						Fail("unexpected user: " + u.Username)

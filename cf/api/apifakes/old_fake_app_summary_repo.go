@@ -9,7 +9,7 @@ type OldFakeAppSummaryRepo struct {
 	GetSummariesInCurrentSpaceApps []models.Application
 
 	GetSummaryErrorCode string
-	GetSummaryAppGuid   string
+	GetSummaryAppGUID   string
 	GetSummarySummary   models.Application
 }
 
@@ -18,8 +18,8 @@ func (repo *OldFakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.A
 	return
 }
 
-func (repo *OldFakeAppSummaryRepo) GetSummary(appGuid string) (summary models.Application, apiErr error) {
-	repo.GetSummaryAppGuid = appGuid
+func (repo *OldFakeAppSummaryRepo) GetSummary(appGUID string) (summary models.Application, apiErr error) {
+	repo.GetSummaryAppGUID = appGUID
 	summary = repo.GetSummarySummary
 
 	if repo.GetSummaryErrorCode != "" {

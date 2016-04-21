@@ -40,7 +40,7 @@ var _ = Describe("service-keys command", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "fake-instance-guid"
+		serviceInstance.GUID = "fake-instance-guid"
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
@@ -97,7 +97,7 @@ var _ = Describe("service-keys command", func() {
 				[]string{"fake-service-key-2"},
 			))
 			Expect(ui.Outputs[1]).To(BeEmpty())
-			Expect(serviceKeyRepo.ListServiceKeysMethod.InstanceGuid).To(Equal("fake-instance-guid"))
+			Expect(serviceKeyRepo.ListServiceKeysMethod.InstanceGUID).To(Equal("fake-instance-guid"))
 		})
 
 		It("does not list service keys when none are returned", func() {

@@ -100,7 +100,7 @@ func (cmd *ListOrgs) populatePluginModel(orgs []models.Organization) {
 	for _, org := range orgs {
 		orgModel := plugin_models.GetOrgs_Model{}
 		orgModel.Name = org.Name
-		orgModel.Guid = org.Guid
+		orgModel.GUID = org.GUID
 		*(cmd.pluginOrgsModel) = append(*(cmd.pluginOrgsModel), orgModel)
 	}
 }

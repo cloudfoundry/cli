@@ -62,7 +62,7 @@ var _ = Describe("update-service-broker command", func() {
 			requirementsFactory.LoginSuccess = true
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
-			broker.Guid = "my-found-broker-guid"
+			broker.GUID = "my-found-broker-guid"
 			serviceBrokerRepo.FindByNameReturns(broker, nil)
 		})
 
@@ -81,7 +81,7 @@ var _ = Describe("update-service-broker command", func() {
 			expectedServiceBroker.Username = "new-username"
 			expectedServiceBroker.Password = "new-password"
 			expectedServiceBroker.Url = "new-url"
-			expectedServiceBroker.Guid = "my-found-broker-guid"
+			expectedServiceBroker.GUID = "my-found-broker-guid"
 
 			Expect(serviceBrokerRepo.UpdateArgsForCall(0)).To(Equal(expectedServiceBroker))
 		})

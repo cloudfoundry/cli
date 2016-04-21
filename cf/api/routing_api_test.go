@@ -62,7 +62,7 @@ var _ = Describe("RoutingApi", func() {
 			It("lists routing groups", func() {
 				cb := func(grp models.RouterGroup) bool {
 					Expect(grp).To(Equal(models.RouterGroup{
-						Guid: "bad25cff-9332-48a6-8603-b619858e7992",
+						GUID: "bad25cff-9332-48a6-8603-b619858e7992",
 						Name: "default-tcp",
 						Type: "tcp",
 					}))

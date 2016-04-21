@@ -131,11 +131,11 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 
 			Expect(authTokens[0].Label).To(Equal("mongodb"))
 			Expect(authTokens[0].Provider).To(Equal("mongodb-core"))
-			Expect(authTokens[0].Guid).To(Equal("mongodb-core-guid"))
+			Expect(authTokens[0].GUID).To(Equal("mongodb-core-guid"))
 
 			Expect(authTokens[1].Label).To(Equal("mysql"))
 			Expect(authTokens[1].Provider).To(Equal("mysql-core"))
-			Expect(authTokens[1].Guid).To(Equal("mysql-core-guid"))
+			Expect(authTokens[1].GUID).To(Equal("mysql-core-guid"))
 		})
 	})
 
@@ -165,7 +165,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 				Expect(testHandler).To(HaveAllRequestsCalled())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(serviceAuthToken).To(Equal(models.ServiceAuthTokenFields{
-					Guid:     "mysql-core-guid",
+					GUID:     "mysql-core-guid",
 					Label:    "mysql",
 					Provider: "mysql-core",
 				}))
@@ -202,7 +202,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 			}))
 
 			err := repo.Update(models.ServiceAuthTokenFields{
-				Guid:  "mysql-core-guid",
+				GUID:  "mysql-core-guid",
 				Token: "a value",
 			})
 
@@ -221,7 +221,7 @@ var _ = Describe("ServiceAuthTokensRepo", func() {
 			}))
 
 			err := repo.Delete(models.ServiceAuthTokenFields{
-				Guid: "mysql-core-guid",
+				GUID: "mysql-core-guid",
 			})
 
 			Expect(testHandler).To(HaveAllRequestsCalled())

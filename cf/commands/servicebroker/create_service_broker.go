@@ -82,7 +82,7 @@ func (cmd *CreateServiceBroker) Execute(c flags.FlagContext) {
 				"Org":      terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 				"Space":    terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 				"Username": terminal.EntityNameColor(cmd.config.Username())}))
-		err = cmd.serviceBrokerRepo.Create(name, url, username, password, cmd.config.SpaceFields().Guid)
+		err = cmd.serviceBrokerRepo.Create(name, url, username, password, cmd.config.SpaceFields().GUID)
 	} else {
 		cmd.ui.Say(T("Creating service broker {{.Name}} as {{.Username}}...",
 			map[string]interface{}{

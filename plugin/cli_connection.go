@@ -158,11 +158,11 @@ func (c *cliConnection) Username() (string, error) {
 	return result, err
 }
 
-func (c *cliConnection) UserGuid() (string, error) {
+func (c *cliConnection) UserGUID() (string, error) {
 	var result string
 
 	err := c.withClientDo(func(client *rpc.Client) error {
-		return client.Call("CliRPCCmd.UserGuid", "", &result)
+		return client.Call("CliRPCCmd.UserGUID", "", &result)
 	})
 
 	return result, err

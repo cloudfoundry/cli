@@ -68,7 +68,7 @@ var _ = Describe("DeleteRoute", func() {
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{
-			Guid: "fake-domain-guid",
+			GUID: "fake-domain-guid",
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
@@ -285,7 +285,7 @@ var _ = Describe("DeleteRoute", func() {
 			Context("when the route can be found", func() {
 				BeforeEach(func() {
 					routeRepo.FindReturns(models.Route{
-						Guid: "route-guid",
+						GUID: "route-guid",
 					}, nil)
 				})
 

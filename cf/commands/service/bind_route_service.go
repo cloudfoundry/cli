@@ -152,7 +152,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.Guid, route.Guid, serviceInstance.IsUserProvided(), parameters)
+	err = cmd.routeServiceBindingRepo.Bind(serviceInstance.GUID, route.GUID, serviceInstance.IsUserProvided(), parameters)
 	if err != nil {
 		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.ServiceInstanceAlreadyBoundToSameRoute {
 			cmd.ui.Warn(T("Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",

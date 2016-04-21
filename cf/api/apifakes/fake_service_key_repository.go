@@ -9,55 +9,55 @@ import (
 )
 
 type FakeServiceKeyRepository struct {
-	CreateServiceKeyStub        func(serviceKeyGuid string, keyName string, params map[string]interface{}) error
+	CreateServiceKeyStub        func(serviceKeyGUID string, keyName string, params map[string]interface{}) error
 	createServiceKeyMutex       sync.RWMutex
 	createServiceKeyArgsForCall []struct {
-		serviceKeyGuid string
+		serviceKeyGUID string
 		keyName        string
 		params         map[string]interface{}
 	}
 	createServiceKeyReturns struct {
 		result1 error
 	}
-	ListServiceKeysStub        func(serviceKeyGuid string) ([]models.ServiceKey, error)
+	ListServiceKeysStub        func(serviceKeyGUID string) ([]models.ServiceKey, error)
 	listServiceKeysMutex       sync.RWMutex
 	listServiceKeysArgsForCall []struct {
-		serviceKeyGuid string
+		serviceKeyGUID string
 	}
 	listServiceKeysReturns struct {
 		result1 []models.ServiceKey
 		result2 error
 	}
-	GetServiceKeyStub        func(serviceKeyGuid string, keyName string) (models.ServiceKey, error)
+	GetServiceKeyStub        func(serviceKeyGUID string, keyName string) (models.ServiceKey, error)
 	getServiceKeyMutex       sync.RWMutex
 	getServiceKeyArgsForCall []struct {
-		serviceKeyGuid string
+		serviceKeyGUID string
 		keyName        string
 	}
 	getServiceKeyReturns struct {
 		result1 models.ServiceKey
 		result2 error
 	}
-	DeleteServiceKeyStub        func(serviceKeyGuid string) error
+	DeleteServiceKeyStub        func(serviceKeyGUID string) error
 	deleteServiceKeyMutex       sync.RWMutex
 	deleteServiceKeyArgsForCall []struct {
-		serviceKeyGuid string
+		serviceKeyGUID string
 	}
 	deleteServiceKeyReturns struct {
 		result1 error
 	}
 }
 
-func (fake *FakeServiceKeyRepository) CreateServiceKey(serviceKeyGuid string, keyName string, params map[string]interface{}) error {
+func (fake *FakeServiceKeyRepository) CreateServiceKey(serviceKeyGUID string, keyName string, params map[string]interface{}) error {
 	fake.createServiceKeyMutex.Lock()
 	fake.createServiceKeyArgsForCall = append(fake.createServiceKeyArgsForCall, struct {
-		serviceKeyGuid string
+		serviceKeyGUID string
 		keyName        string
 		params         map[string]interface{}
-	}{serviceKeyGuid, keyName, params})
+	}{serviceKeyGUID, keyName, params})
 	fake.createServiceKeyMutex.Unlock()
 	if fake.CreateServiceKeyStub != nil {
-		return fake.CreateServiceKeyStub(serviceKeyGuid, keyName, params)
+		return fake.CreateServiceKeyStub(serviceKeyGUID, keyName, params)
 	} else {
 		return fake.createServiceKeyReturns.result1
 	}
@@ -72,7 +72,7 @@ func (fake *FakeServiceKeyRepository) CreateServiceKeyCallCount() int {
 func (fake *FakeServiceKeyRepository) CreateServiceKeyArgsForCall(i int) (string, string, map[string]interface{}) {
 	fake.createServiceKeyMutex.RLock()
 	defer fake.createServiceKeyMutex.RUnlock()
-	return fake.createServiceKeyArgsForCall[i].serviceKeyGuid, fake.createServiceKeyArgsForCall[i].keyName, fake.createServiceKeyArgsForCall[i].params
+	return fake.createServiceKeyArgsForCall[i].serviceKeyGUID, fake.createServiceKeyArgsForCall[i].keyName, fake.createServiceKeyArgsForCall[i].params
 }
 
 func (fake *FakeServiceKeyRepository) CreateServiceKeyReturns(result1 error) {
@@ -82,14 +82,14 @@ func (fake *FakeServiceKeyRepository) CreateServiceKeyReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceKeyRepository) ListServiceKeys(serviceKeyGuid string) ([]models.ServiceKey, error) {
+func (fake *FakeServiceKeyRepository) ListServiceKeys(serviceKeyGUID string) ([]models.ServiceKey, error) {
 	fake.listServiceKeysMutex.Lock()
 	fake.listServiceKeysArgsForCall = append(fake.listServiceKeysArgsForCall, struct {
-		serviceKeyGuid string
-	}{serviceKeyGuid})
+		serviceKeyGUID string
+	}{serviceKeyGUID})
 	fake.listServiceKeysMutex.Unlock()
 	if fake.ListServiceKeysStub != nil {
-		return fake.ListServiceKeysStub(serviceKeyGuid)
+		return fake.ListServiceKeysStub(serviceKeyGUID)
 	} else {
 		return fake.listServiceKeysReturns.result1, fake.listServiceKeysReturns.result2
 	}
@@ -104,7 +104,7 @@ func (fake *FakeServiceKeyRepository) ListServiceKeysCallCount() int {
 func (fake *FakeServiceKeyRepository) ListServiceKeysArgsForCall(i int) string {
 	fake.listServiceKeysMutex.RLock()
 	defer fake.listServiceKeysMutex.RUnlock()
-	return fake.listServiceKeysArgsForCall[i].serviceKeyGuid
+	return fake.listServiceKeysArgsForCall[i].serviceKeyGUID
 }
 
 func (fake *FakeServiceKeyRepository) ListServiceKeysReturns(result1 []models.ServiceKey, result2 error) {
@@ -115,15 +115,15 @@ func (fake *FakeServiceKeyRepository) ListServiceKeysReturns(result1 []models.Se
 	}{result1, result2}
 }
 
-func (fake *FakeServiceKeyRepository) GetServiceKey(serviceKeyGuid string, keyName string) (models.ServiceKey, error) {
+func (fake *FakeServiceKeyRepository) GetServiceKey(serviceKeyGUID string, keyName string) (models.ServiceKey, error) {
 	fake.getServiceKeyMutex.Lock()
 	fake.getServiceKeyArgsForCall = append(fake.getServiceKeyArgsForCall, struct {
-		serviceKeyGuid string
+		serviceKeyGUID string
 		keyName        string
-	}{serviceKeyGuid, keyName})
+	}{serviceKeyGUID, keyName})
 	fake.getServiceKeyMutex.Unlock()
 	if fake.GetServiceKeyStub != nil {
-		return fake.GetServiceKeyStub(serviceKeyGuid, keyName)
+		return fake.GetServiceKeyStub(serviceKeyGUID, keyName)
 	} else {
 		return fake.getServiceKeyReturns.result1, fake.getServiceKeyReturns.result2
 	}
@@ -138,7 +138,7 @@ func (fake *FakeServiceKeyRepository) GetServiceKeyCallCount() int {
 func (fake *FakeServiceKeyRepository) GetServiceKeyArgsForCall(i int) (string, string) {
 	fake.getServiceKeyMutex.RLock()
 	defer fake.getServiceKeyMutex.RUnlock()
-	return fake.getServiceKeyArgsForCall[i].serviceKeyGuid, fake.getServiceKeyArgsForCall[i].keyName
+	return fake.getServiceKeyArgsForCall[i].serviceKeyGUID, fake.getServiceKeyArgsForCall[i].keyName
 }
 
 func (fake *FakeServiceKeyRepository) GetServiceKeyReturns(result1 models.ServiceKey, result2 error) {
@@ -149,14 +149,14 @@ func (fake *FakeServiceKeyRepository) GetServiceKeyReturns(result1 models.Servic
 	}{result1, result2}
 }
 
-func (fake *FakeServiceKeyRepository) DeleteServiceKey(serviceKeyGuid string) error {
+func (fake *FakeServiceKeyRepository) DeleteServiceKey(serviceKeyGUID string) error {
 	fake.deleteServiceKeyMutex.Lock()
 	fake.deleteServiceKeyArgsForCall = append(fake.deleteServiceKeyArgsForCall, struct {
-		serviceKeyGuid string
-	}{serviceKeyGuid})
+		serviceKeyGUID string
+	}{serviceKeyGUID})
 	fake.deleteServiceKeyMutex.Unlock()
 	if fake.DeleteServiceKeyStub != nil {
-		return fake.DeleteServiceKeyStub(serviceKeyGuid)
+		return fake.DeleteServiceKeyStub(serviceKeyGUID)
 	} else {
 		return fake.deleteServiceKeyReturns.result1
 	}
@@ -171,7 +171,7 @@ func (fake *FakeServiceKeyRepository) DeleteServiceKeyCallCount() int {
 func (fake *FakeServiceKeyRepository) DeleteServiceKeyArgsForCall(i int) string {
 	fake.deleteServiceKeyMutex.RLock()
 	defer fake.deleteServiceKeyMutex.RUnlock()
-	return fake.deleteServiceKeyArgsForCall[i].serviceKeyGuid
+	return fake.deleteServiceKeyArgsForCall[i].serviceKeyGUID
 }
 
 func (fake *FakeServiceKeyRepository) DeleteServiceKeyReturns(result1 error) {

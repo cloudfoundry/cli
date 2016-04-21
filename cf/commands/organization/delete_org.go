@@ -84,13 +84,13 @@ func (cmd *DeleteOrg) Execute(c flags.FlagContext) {
 		return
 	}
 
-	apiErr = cmd.orgRepo.Delete(org.Guid)
+	apiErr = cmd.orgRepo.Delete(org.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	if org.Guid == cmd.config.OrganizationFields().Guid {
+	if org.GUID == cmd.config.OrganizationFields().GUID {
 		cmd.config.SetOrganizationFields(models.OrganizationFields{})
 		cmd.config.SetSpaceFields(models.SpaceFields{})
 	}

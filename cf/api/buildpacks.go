@@ -20,7 +20,7 @@ type BuildpackRepository interface {
 	FindByName(name string) (buildpack models.Buildpack, apiErr error)
 	ListBuildpacks(func(models.Buildpack) bool) error
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error)
-	Delete(buildpackGuid string) (apiErr error)
+	Delete(buildpackGUID string) (apiErr error)
 	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error)
 }
 
@@ -81,14 +81,14 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGuid)
+func (repo CloudControllerBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
+	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGUID)
 	apiErr = repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 	return
 }
 
 func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
-	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpack.Guid)
+	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpack.GUID)
 
 	entity := resources.BuildpackEntity{
 		Name:     buildpack.Name,

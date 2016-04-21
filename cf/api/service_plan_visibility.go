@@ -31,9 +31,9 @@ func NewCloudControllerServicePlanVisibilityRepository(config coreconfig.Reader,
 	}
 }
 
-func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGuid, orgGuid string) error {
+func (repo CloudControllerServicePlanVisibilityRepository) Create(serviceGUID, orgGUID string) error {
 	url := "/v2/service_plan_visibilities"
-	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGuid, orgGuid)
+	data := fmt.Sprintf(`{"service_plan_guid":"%s", "organization_guid":"%s"}`, serviceGUID, orgGUID)
 	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
 }
 
@@ -51,8 +51,8 @@ func (repo CloudControllerServicePlanVisibilityRepository) List() (visibilities 
 	return
 }
 
-func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGuid string) error {
-	path := fmt.Sprintf("/v2/service_plan_visibilities/%s", servicePlanGuid)
+func (repo CloudControllerServicePlanVisibilityRepository) Delete(servicePlanGUID string) error {
+	path := fmt.Sprintf("/v2/service_plan_visibilities/%s", servicePlanGUID)
 	return repo.gateway.DeleteResourceSynchronously(repo.config.ApiEndpoint(), path)
 }
 

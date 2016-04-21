@@ -100,7 +100,7 @@ func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) {
 			"DomainName": terminal.EntityNameColor(domainName),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	err := cmd.domainRepo.CreateSharedDomain(domainName, routerGroup.Guid)
+	err := cmd.domainRepo.CreateSharedDomain(domainName, routerGroup.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

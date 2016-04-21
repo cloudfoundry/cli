@@ -8,14 +8,14 @@ import (
 )
 
 type SpaceQuota struct {
-	Guid                    string `json:"guid,omitempty"`
+	GUID                    string `json:"guid,omitempty"`
 	Name                    string `json:"name"`
 	MemoryLimit             int64  `json:"memory_limit"`          // in Megabytes
 	InstanceMemoryLimit     int64  `json:"instance_memory_limit"` // in Megabytes
 	RoutesLimit             int    `json:"total_routes"`
 	ServicesLimit           int    `json:"total_services"`
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
-	OrgGuid                 string `json:"organization_guid"`
+	OrgGUID                 string `json:"organization_guid"`
 	AppInstanceLimit        int    `json:"app_instance_limit"`
 }
 
@@ -40,13 +40,13 @@ func (q SpaceQuota) FormattedAppInstanceLimit() string {
 }
 
 type SpaceQuotaResponse struct {
-	Guid                    string      `json:"guid,omitempty"`
+	GUID                    string      `json:"guid,omitempty"`
 	Name                    string      `json:"name"`
 	MemoryLimit             int64       `json:"memory_limit"`          // in Megabytes
 	InstanceMemoryLimit     int64       `json:"instance_memory_limit"` // in Megabytes
 	RoutesLimit             int         `json:"total_routes"`
 	ServicesLimit           int         `json:"total_services"`
 	NonBasicServicesAllowed bool        `json:"non_basic_services_allowed"`
-	OrgGuid                 string      `json:"organization_guid"`
+	OrgGUID                 string      `json:"organization_guid"`
 	AppInstanceLimit        json.Number `json:"app_instance_limit"`
 }

@@ -124,14 +124,14 @@ var _ = Describe("ServiceBindingsRepository", func() {
 					Response: testnet.TestResponse{Status: http.StatusOK},
 				}))
 
-				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.GUID = "my-service-instance-guid"
 
 				binding := models.ServiceBindingFields{}
 				binding.Url = "/v2/service_bindings/service-binding-1-guid"
-				binding.AppGuid = "app-1-guid"
+				binding.AppGUID = "app-1-guid"
 				binding2 := models.ServiceBindingFields{}
 				binding2.Url = "/v2/service_bindings/service-binding-2-guid"
-				binding2.AppGuid = "app-2-guid"
+				binding2.AppGUID = "app-2-guid"
 				serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 			})
 
@@ -149,7 +149,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 			BeforeEach(func() {
 				setupTestServer()
-				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.GUID = "my-service-instance-guid"
 			})
 
 			It("does not return an error", func() {

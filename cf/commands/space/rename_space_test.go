@@ -71,7 +71,7 @@ var _ = Describe("rename-space command", func() {
 		BeforeEach(func() {
 			space := models.Space{}
 			space.Name = "the-old-space-name"
-			space.Guid = "the-old-space-guid"
+			space.GUID = "the-old-space-guid"
 			requirementsFactory.Space = space
 		})
 

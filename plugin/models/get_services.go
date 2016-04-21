@@ -1,7 +1,7 @@
 package plugin_models
 
 type GetServices_Model struct {
-	Guid             string
+	GUID             string
 	Name             string
 	ServicePlan      GetServices_ServicePlan
 	Service          GetServices_ServiceFields
@@ -16,7 +16,7 @@ type GetServices_LastOperation struct {
 }
 
 type GetServices_ServicePlan struct {
-	Guid string
+	GUID string
 	Name string
 }
 

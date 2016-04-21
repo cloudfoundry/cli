@@ -25,9 +25,9 @@ var _ = Describe("AppInstancesRepo", func() {
 				appStatsRequest,
 			})
 			defer ts.Close()
-			appGuid := "my-cool-app-guid"
+			appGUID := "my-cool-app-guid"
 
-			instances, err := repo.GetInstances(appGuid)
+			instances, err := repo.GetInstances(appGUID)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
 
@@ -53,9 +53,9 @@ var _ = Describe("AppInstancesRepo", func() {
 				deleteInstanceRequest,
 			})
 			defer ts.Close()
-			appGuid := "my-cool-app-guid"
+			appGUID := "my-cool-app-guid"
 
-			err := repo.DeleteInstance(appGuid, 0)
+			err := repo.DeleteInstance(appGUID, 0)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
 		})
@@ -65,9 +65,9 @@ var _ = Describe("AppInstancesRepo", func() {
 				deleteInstanceFromUnkownApp,
 			})
 			defer ts.Close()
-			appGuid := "some-wrong-app-guid"
+			appGUID := "some-wrong-app-guid"
 
-			err := repo.DeleteInstance(appGuid, 0)
+			err := repo.DeleteInstance(appGUID, 0)
 			Expect(err).To(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
 
@@ -135,7 +135,7 @@ var deleteInstanceFromUnkownApp = apifakes.NewCloudControllerTestRequest(testnet
 func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
 	ts, handler = testnet.NewServer(requests)
 	space := models.SpaceFields{}
-	space.Guid = "my-space-guid"
+	space.GUID = "my-space-guid"
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)

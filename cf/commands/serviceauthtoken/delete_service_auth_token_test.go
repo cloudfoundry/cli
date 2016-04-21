@@ -67,7 +67,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 	Context("when the service auth token exists", func() {
 		BeforeEach(func() {
 			authTokenRepo.FindByLabelAndProviderServiceAuthTokenFields = models.ServiceAuthTokenFields{
-				Guid:     "the-guid",
+				GUID:     "the-guid",
 				Label:    "a label",
 				Provider: "a provider",
 			}
@@ -82,7 +82,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 			Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
 			Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
-			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields.GUID).To(Equal("the-guid"))
 		})
 
 		It("does nothing when the user does not confirm", func() {
@@ -106,7 +106,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields.GUID).To(Equal("the-guid"))
 		})
 	})
 

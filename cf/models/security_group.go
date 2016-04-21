@@ -3,7 +3,7 @@ package models
 // represents just the attributes for an security group
 type SecurityGroupFields struct {
 	Name     string
-	Guid     string
+	GUID     string
 	SpaceUrl string `json:"spaces_url,omitempty"`
 	Rules    []map[string]interface{}
 }
@@ -11,7 +11,7 @@ type SecurityGroupFields struct {
 // represents the JSON that we send up to CC when the user creates / updates a record
 type SecurityGroupParams struct {
 	Name  string                   `json:"name,omitempty"`
-	Guid  string                   `json:"guid,omitempty"`
+	GUID  string                   `json:"guid,omitempty"`
 	Rules []map[string]interface{} `json:"rules"`
 }
 

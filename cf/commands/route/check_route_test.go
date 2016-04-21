@@ -143,7 +143,7 @@ var _ = Describe("CheckRoute", func() {
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 			configRepo.SetOrganizationFields(models.OrganizationFields{
-				Guid: "fake-org-guid",
+				GUID: "fake-org-guid",
 				Name: "fake-org-name",
 			})
 		})
@@ -169,7 +169,7 @@ var _ = Describe("CheckRoute", func() {
 
 			BeforeEach(func() {
 				actualDomain = models.DomainFields{
-					Guid: "domain-guid",
+					GUID: "domain-guid",
 					Name: "domain-name",
 				}
 				domainRepo.FindByNameInOrgReturns(actualDomain, nil)

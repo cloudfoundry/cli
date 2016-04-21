@@ -87,8 +87,8 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service")})
 
 	d := make(map[string]models.DomainFields)
-	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().Guid, func(domain models.DomainFields) bool {
-		d[domain.Guid] = domain
+	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().GUID, func(domain models.DomainFields) bool {
+		d[domain.GUID] = domain
 		return true
 	})
 
@@ -105,7 +105,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 			port = fmt.Sprintf("%d", route.Port)
 		}
 
-		domain := d[route.Domain.Guid]
+		domain := d[route.Domain.GUID]
 
 		table.Add(
 			route.Space.Name,

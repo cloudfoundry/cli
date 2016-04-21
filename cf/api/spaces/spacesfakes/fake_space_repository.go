@@ -26,49 +26,49 @@ type FakeSpaceRepository struct {
 		result1 models.Space
 		result2 error
 	}
-	FindByNameInOrgStub        func(name, orgGuid string) (space models.Space, apiErr error)
+	FindByNameInOrgStub        func(name, orgGUID string) (space models.Space, apiErr error)
 	findByNameInOrgMutex       sync.RWMutex
 	findByNameInOrgArgsForCall []struct {
 		name    string
-		orgGuid string
+		orgGUID string
 	}
 	findByNameInOrgReturns struct {
 		result1 models.Space
 		result2 error
 	}
-	CreateStub        func(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error)
+	CreateStub        func(name string, orgGUID string, spaceQuotaGUID string) (space models.Space, apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		name           string
-		orgGuid        string
-		spaceQuotaGuid string
+		orgGUID        string
+		spaceQuotaGUID string
 	}
 	createReturns struct {
 		result1 models.Space
 		result2 error
 	}
-	RenameStub        func(spaceGuid, newName string) (apiErr error)
+	RenameStub        func(spaceGUID, newName string) (apiErr error)
 	renameMutex       sync.RWMutex
 	renameArgsForCall []struct {
-		spaceGuid string
+		spaceGUID string
 		newName   string
 	}
 	renameReturns struct {
 		result1 error
 	}
-	SetAllowSSHStub        func(spaceGuid string, allow bool) (apiErr error)
+	SetAllowSSHStub        func(spaceGUID string, allow bool) (apiErr error)
 	setAllowSSHMutex       sync.RWMutex
 	setAllowSSHArgsForCall []struct {
-		spaceGuid string
+		spaceGUID string
 		allow     bool
 	}
 	setAllowSSHReturns struct {
 		result1 error
 	}
-	DeleteStub        func(spaceGuid string) (apiErr error)
+	DeleteStub        func(spaceGUID string) (apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		spaceGuid string
+		spaceGUID string
 	}
 	deleteReturns struct {
 		result1 error
@@ -140,15 +140,15 @@ func (fake *FakeSpaceRepository) FindByNameReturns(result1 models.Space, result2
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceRepository) FindByNameInOrg(name string, orgGuid string) (space models.Space, apiErr error) {
+func (fake *FakeSpaceRepository) FindByNameInOrg(name string, orgGUID string) (space models.Space, apiErr error) {
 	fake.findByNameInOrgMutex.Lock()
 	fake.findByNameInOrgArgsForCall = append(fake.findByNameInOrgArgsForCall, struct {
 		name    string
-		orgGuid string
-	}{name, orgGuid})
+		orgGUID string
+	}{name, orgGUID})
 	fake.findByNameInOrgMutex.Unlock()
 	if fake.FindByNameInOrgStub != nil {
-		return fake.FindByNameInOrgStub(name, orgGuid)
+		return fake.FindByNameInOrgStub(name, orgGUID)
 	} else {
 		return fake.findByNameInOrgReturns.result1, fake.findByNameInOrgReturns.result2
 	}
@@ -163,7 +163,7 @@ func (fake *FakeSpaceRepository) FindByNameInOrgCallCount() int {
 func (fake *FakeSpaceRepository) FindByNameInOrgArgsForCall(i int) (string, string) {
 	fake.findByNameInOrgMutex.RLock()
 	defer fake.findByNameInOrgMutex.RUnlock()
-	return fake.findByNameInOrgArgsForCall[i].name, fake.findByNameInOrgArgsForCall[i].orgGuid
+	return fake.findByNameInOrgArgsForCall[i].name, fake.findByNameInOrgArgsForCall[i].orgGUID
 }
 
 func (fake *FakeSpaceRepository) FindByNameInOrgReturns(result1 models.Space, result2 error) {
@@ -174,16 +174,16 @@ func (fake *FakeSpaceRepository) FindByNameInOrgReturns(result1 models.Space, re
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceRepository) Create(name string, orgGuid string, spaceQuotaGuid string) (space models.Space, apiErr error) {
+func (fake *FakeSpaceRepository) Create(name string, orgGUID string, spaceQuotaGUID string) (space models.Space, apiErr error) {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		name           string
-		orgGuid        string
-		spaceQuotaGuid string
-	}{name, orgGuid, spaceQuotaGuid})
+		orgGUID        string
+		spaceQuotaGUID string
+	}{name, orgGUID, spaceQuotaGUID})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(name, orgGuid, spaceQuotaGuid)
+		return fake.CreateStub(name, orgGUID, spaceQuotaGUID)
 	} else {
 		return fake.createReturns.result1, fake.createReturns.result2
 	}
@@ -198,7 +198,7 @@ func (fake *FakeSpaceRepository) CreateCallCount() int {
 func (fake *FakeSpaceRepository) CreateArgsForCall(i int) (string, string, string) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].orgGuid, fake.createArgsForCall[i].spaceQuotaGuid
+	return fake.createArgsForCall[i].name, fake.createArgsForCall[i].orgGUID, fake.createArgsForCall[i].spaceQuotaGUID
 }
 
 func (fake *FakeSpaceRepository) CreateReturns(result1 models.Space, result2 error) {
@@ -209,15 +209,15 @@ func (fake *FakeSpaceRepository) CreateReturns(result1 models.Space, result2 err
 	}{result1, result2}
 }
 
-func (fake *FakeSpaceRepository) Rename(spaceGuid string, newName string) (apiErr error) {
+func (fake *FakeSpaceRepository) Rename(spaceGUID string, newName string) (apiErr error) {
 	fake.renameMutex.Lock()
 	fake.renameArgsForCall = append(fake.renameArgsForCall, struct {
-		spaceGuid string
+		spaceGUID string
 		newName   string
-	}{spaceGuid, newName})
+	}{spaceGUID, newName})
 	fake.renameMutex.Unlock()
 	if fake.RenameStub != nil {
-		return fake.RenameStub(spaceGuid, newName)
+		return fake.RenameStub(spaceGUID, newName)
 	} else {
 		return fake.renameReturns.result1
 	}
@@ -232,7 +232,7 @@ func (fake *FakeSpaceRepository) RenameCallCount() int {
 func (fake *FakeSpaceRepository) RenameArgsForCall(i int) (string, string) {
 	fake.renameMutex.RLock()
 	defer fake.renameMutex.RUnlock()
-	return fake.renameArgsForCall[i].spaceGuid, fake.renameArgsForCall[i].newName
+	return fake.renameArgsForCall[i].spaceGUID, fake.renameArgsForCall[i].newName
 }
 
 func (fake *FakeSpaceRepository) RenameReturns(result1 error) {
@@ -242,15 +242,15 @@ func (fake *FakeSpaceRepository) RenameReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeSpaceRepository) SetAllowSSH(spaceGuid string, allow bool) (apiErr error) {
+func (fake *FakeSpaceRepository) SetAllowSSH(spaceGUID string, allow bool) (apiErr error) {
 	fake.setAllowSSHMutex.Lock()
 	fake.setAllowSSHArgsForCall = append(fake.setAllowSSHArgsForCall, struct {
-		spaceGuid string
+		spaceGUID string
 		allow     bool
-	}{spaceGuid, allow})
+	}{spaceGUID, allow})
 	fake.setAllowSSHMutex.Unlock()
 	if fake.SetAllowSSHStub != nil {
-		return fake.SetAllowSSHStub(spaceGuid, allow)
+		return fake.SetAllowSSHStub(spaceGUID, allow)
 	} else {
 		return fake.setAllowSSHReturns.result1
 	}
@@ -265,7 +265,7 @@ func (fake *FakeSpaceRepository) SetAllowSSHCallCount() int {
 func (fake *FakeSpaceRepository) SetAllowSSHArgsForCall(i int) (string, bool) {
 	fake.setAllowSSHMutex.RLock()
 	defer fake.setAllowSSHMutex.RUnlock()
-	return fake.setAllowSSHArgsForCall[i].spaceGuid, fake.setAllowSSHArgsForCall[i].allow
+	return fake.setAllowSSHArgsForCall[i].spaceGUID, fake.setAllowSSHArgsForCall[i].allow
 }
 
 func (fake *FakeSpaceRepository) SetAllowSSHReturns(result1 error) {
@@ -275,14 +275,14 @@ func (fake *FakeSpaceRepository) SetAllowSSHReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeSpaceRepository) Delete(spaceGuid string) (apiErr error) {
+func (fake *FakeSpaceRepository) Delete(spaceGUID string) (apiErr error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		spaceGuid string
-	}{spaceGuid})
+		spaceGUID string
+	}{spaceGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(spaceGuid)
+		return fake.DeleteStub(spaceGUID)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -297,7 +297,7 @@ func (fake *FakeSpaceRepository) DeleteCallCount() int {
 func (fake *FakeSpaceRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].spaceGuid
+	return fake.deleteArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeSpaceRepository) DeleteReturns(result1 error) {

@@ -75,7 +75,7 @@ func (cmd *RestartAppInstance) Execute(fc flags.FlagContext) {
 			"Username": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.appInstancesRepo.DeleteInstance(app.Guid, instance)
+	err = cmd.appInstancesRepo.DeleteInstance(app.GUID, instance)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

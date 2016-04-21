@@ -5,6 +5,6 @@ type Space struct {
 }
 
 type SpaceFields struct {
-	Guid string
+	GUID string
 	Name string
 }

@@ -14,8 +14,8 @@ import (
 //go:generate counterfeiter . RouteServiceBindingRepository
 
 type RouteServiceBindingRepository interface {
-	Bind(instanceGuid, routeGuid string, userProvided bool, parameters string) error
-	Unbind(instanceGuid, routeGuid string, userProvided bool) error
+	Bind(instanceGUID, routeGUID string, userProvided bool, parameters string) error
+	Unbind(instanceGUID, routeGUID string, userProvided bool) error
 }
 
 type CloudControllerRouteServiceBindingRepository struct {
@@ -31,8 +31,8 @@ func NewCloudControllerRouteServiceBindingRepository(config coreconfig.Reader, g
 }
 
 func (repo CloudControllerRouteServiceBindingRepository) Bind(
-	instanceGuid string,
-	routeGuid string,
+	instanceGUID string,
+	routeGUID string,
 	userProvided bool,
 	opaque_params string,
 ) error {
@@ -57,17 +57,17 @@ func (repo CloudControllerRouteServiceBindingRepository) Bind(
 
 	return repo.gateway.UpdateResourceSync(
 		repo.config.ApiEndpoint(),
-		getPath(instanceGuid, routeGuid, userProvided),
+		getPath(instanceGUID, routeGUID, userProvided),
 		rs,
 	)
 }
 
-func (repo CloudControllerRouteServiceBindingRepository) Unbind(instanceGuid, routeGuid string, userProvided bool) error {
-	path := getPath(instanceGuid, routeGuid, userProvided)
+func (repo CloudControllerRouteServiceBindingRepository) Unbind(instanceGUID, routeGUID string, userProvided bool) error {
+	path := getPath(instanceGUID, routeGUID, userProvided)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
 }
 
-func getPath(instanceGuid, routeGuid string, userProvided bool) string {
+func getPath(instanceGUID, routeGUID string, userProvided bool) string {
 	var resource string
 	if userProvided {
 		resource = "user_provided_service_instances"
@@ -75,5 +75,5 @@ func getPath(instanceGuid, routeGuid string, userProvided bool) string {
 		resource = "service_instances"
 	}
 
-	return fmt.Sprintf("/v2/%s/%s/routes/%s", resource, instanceGuid, routeGuid)
+	return fmt.Sprintf("/v2/%s/%s/routes/%s", resource, instanceGUID, routeGUID)
 }

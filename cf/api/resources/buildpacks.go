@@ -18,7 +18,7 @@ type BuildpackEntity struct {
 
 func (resource BuildpackResource) ToFields() models.Buildpack {
 	return models.Buildpack{
-		Guid:     resource.Metadata.Guid,
+		GUID:     resource.Metadata.GUID,
 		Name:     resource.Entity.Name,
 		Position: resource.Entity.Position,
 		Enabled:  resource.Entity.Enabled,

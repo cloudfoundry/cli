@@ -69,7 +69,7 @@ var _ = Describe("delete-quota command", func() {
 			BeforeEach(func() {
 				quota := models.QuotaFields{}
 				quota.Name = "my-quota"
-				quota.Guid = "my-quota-guid"
+				quota.GUID = "my-quota-guid"
 
 				quotaRepo.FindByNameReturns(quota, nil)
 			})

@@ -36,13 +36,13 @@ var _ = Describe("Plan builder", func() {
 
 		plan1 = models.ServicePlanFields{
 			Name:                "service-plan1",
-			Guid:                "service-plan1-guid",
-			ServiceOfferingGuid: "service-guid1",
+			GUID:                "service-plan1-guid",
+			ServiceOfferingGUID: "service-guid1",
 		}
 		plan2 = models.ServicePlanFields{
 			Name:                "service-plan2",
-			Guid:                "service-plan2-guid",
-			ServiceOfferingGuid: "service-guid1",
+			GUID:                "service-plan2-guid",
+			ServiceOfferingGUID: "service-guid1",
 		}
 
 		planRepo.SearchReturns = map[string][]models.ServicePlanFields{
@@ -50,17 +50,17 @@ var _ = Describe("Plan builder", func() {
 		}
 		org1 = models.Organization{}
 		org1.Name = "org1"
-		org1.Guid = "org1-guid"
+		org1.GUID = "org1-guid"
 
 		org2 = models.Organization{}
 		org2.Name = "org2"
-		org2.Guid = "org2-guid"
+		org2.GUID = "org2-guid"
 		visibilityRepo.ListReturns([]models.ServicePlanVisibilityFields{
-			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org1-guid"},
-			{ServicePlanGuid: "service-plan1-guid", OrganizationGuid: "org2-guid"},
-			{ServicePlanGuid: "service-plan2-guid", OrganizationGuid: "org1-guid"},
+			{ServicePlanGUID: "service-plan1-guid", OrganizationGUID: "org1-guid"},
+			{ServicePlanGUID: "service-plan1-guid", OrganizationGUID: "org2-guid"},
+			{ServicePlanGUID: "service-plan2-guid", OrganizationGUID: "org1-guid"},
 		}, nil)
-		orgRepo.GetManyOrgsByGuidReturns([]models.Organization{org1, org2}, nil)
+		orgRepo.GetManyOrgsByGUIDReturns([]models.Organization{org1, org2}, nil)
 	})
 
 	Describe(".AttachOrgsToPlans", func() {
@@ -103,11 +103,11 @@ var _ = Describe("Plan builder", func() {
 			planRepo.ListPlansFromManyServicesReturns = []models.ServicePlanFields{
 				plan1, plan2,
 			}
-			serviceGuids := []string{"service-guid1", "service-guid2"}
-			plans, err := builder.GetPlansForManyServicesWithOrgs(serviceGuids)
+			serviceGUIDs := []string{"service-guid1", "service-guid2"}
+			plans, err := builder.GetPlansForManyServicesWithOrgs(serviceGUIDs)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(orgRepo.GetManyOrgsByGuidCallCount()).To(Equal(1))
-			Expect(orgRepo.GetManyOrgsByGuidArgsForCall(0)).To(ConsistOf("org1-guid", "org2-guid"))
+			Expect(orgRepo.GetManyOrgsByGUIDCallCount()).To(Equal(1))
+			Expect(orgRepo.GetManyOrgsByGUIDArgsForCall(0)).To(ConsistOf("org1-guid", "org2-guid"))
 
 			Expect(len(plans)).To(Equal(2))
 			Expect(plans[0].Name).To(Equal("service-plan1"))
@@ -117,8 +117,8 @@ var _ = Describe("Plan builder", func() {
 
 		It("returns errors from the service plan repo", func() {
 			planRepo.ListPlansFromManyServicesError = errors.New("Error")
-			serviceGuids := []string{"service-guid1", "service-guid2"}
-			_, err := builder.GetPlansForManyServicesWithOrgs(serviceGuids)
+			serviceGUIDs := []string{"service-guid1", "service-guid2"}
+			_, err := builder.GetPlansForManyServicesWithOrgs(serviceGUIDs)
 			Expect(err).To(HaveOccurred())
 		})
 	})

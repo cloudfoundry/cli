@@ -147,18 +147,18 @@ var _ = Describe("app security group api", func() {
 			Expect(group).To(Equal(models.SecurityGroup{
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:     "the-name",
-					Guid:     "the-group-guid",
+					GUID:     "the-group-guid",
 					SpaceUrl: "/v2/security_groups/guid-id/spaces",
 					Rules:    []map[string]interface{}{{"key": "value"}},
 				},
 				Spaces: []models.Space{
 					{
-						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
+						SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "my-space"},
+						Organization: models.OrganizationFields{GUID: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 					{
-						SpaceFields:  models.SpaceFields{Guid: "my-space-guid2", Name: "my-space2"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid2", Name: "my-org2", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
+						SpaceFields:  models.SpaceFields{GUID: "my-space-guid2", Name: "my-space2"},
+						Organization: models.OrganizationFields{GUID: "my-org-guid2", Name: "my-org2", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 				},
 			}))
@@ -183,16 +183,16 @@ var _ = Describe("app security group api", func() {
 
 	Describe(".Delete", func() {
 		It("deletes the security group", func() {
-			securityGroupGuid := "the-security-group-guid"
+			securityGroupGUID := "the-security-group-guid"
 			setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "DELETE",
-				Path:   "/v2/security_groups/" + securityGroupGuid,
+				Path:   "/v2/security_groups/" + securityGroupGUID,
 				Response: testnet.TestResponse{
 					Status: http.StatusNoContent,
 				},
 			}))
 
-			err := repo.Delete(securityGroupGuid)
+			err := repo.Delete(securityGroupGUID)
 
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -242,28 +242,28 @@ var _ = Describe("app security group api", func() {
 			Expect(groups[0]).To(Equal(models.SecurityGroup{
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:     "name-71",
-					Guid:     "cd186158-b356-474d-9861-724f34f48502",
+					GUID:     "cd186158-b356-474d-9861-724f34f48502",
 					Rules:    []map[string]interface{}{{"protocol": "udp"}},
 					SpaceUrl: "/v2/security_groups/cd186158-b356-474d-9861-724f34f48502/spaces",
 				},
 				Spaces: []models.Space{
 					{
-						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
+						SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "my-space"},
+						Organization: models.OrganizationFields{GUID: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 				},
 			}))
 			Expect(groups[1]).To(Equal(models.SecurityGroup{
 				SecurityGroupFields: models.SecurityGroupFields{
 					Name:     "name-72",
-					Guid:     "d3374b62-7eac-4823-afbd-460d2bf44c67",
+					GUID:     "d3374b62-7eac-4823-afbd-460d2bf44c67",
 					Rules:    []map[string]interface{}{{"destination": "198.41.191.47/1"}},
 					SpaceUrl: "/v2/security_groups/d3374b62-7eac-4823-afbd-460d2bf44c67/spaces",
 				},
 				Spaces: []models.Space{
 					{
-						SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "my-space"},
-						Organization: models.OrganizationFields{Guid: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
+						SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "my-space"},
+						Organization: models.OrganizationFields{GUID: "my-org-guid", Name: "my-org", QuotaDefinition: models.QuotaFields{AppInstanceLimit: -1}},
 					},
 				},
 			}))

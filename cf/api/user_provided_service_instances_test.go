@@ -98,7 +98,7 @@ var _ = Describe("UserProvidedServiceRepository", func() {
 				"password": "secret",
 			}
 			serviceInstance := models.ServiceInstanceFields{}
-			serviceInstance.Guid = "my-instance-guid"
+			serviceInstance.GUID = "my-instance-guid"
 			serviceInstance.Params = params
 			serviceInstance.SysLogDrainUrl = "syslog://example.com"
 			serviceInstance.RouteServiceUrl = ""

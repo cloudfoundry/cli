@@ -81,7 +81,7 @@ var _ = Describe("set-health-check command", func() {
 			BeforeEach(func() {
 				app := models.Application{}
 				app.Name = "my-app"
-				app.Guid = "my-app-guid"
+				app.GUID = "my-app-guid"
 				app.HealthCheckType = "port"
 
 				requirementsFactory.Application = app

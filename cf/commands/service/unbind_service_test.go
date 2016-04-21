@@ -35,11 +35,11 @@ var _ = Describe("unbind-service command", func() {
 
 	BeforeEach(func() {
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 
 		ui = &testterm.FakeUI{}
 		serviceInstance.Name = "my-service"
-		serviceInstance.Guid = "my-service-guid"
+		serviceInstance.GUID = "my-service-guid"
 
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
@@ -76,7 +76,7 @@ var _ = Describe("unbind-service command", func() {
 					[]string{"OK"},
 				))
 				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
-				Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
+				Expect(serviceBindingRepo.DeleteApplicationGUID).To(Equal("my-app-guid"))
 			})
 		})
 
@@ -97,7 +97,7 @@ var _ = Describe("unbind-service command", func() {
 					[]string{"my-service", "my-app", "did not exist"},
 				))
 				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
-				Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
+				Expect(serviceBindingRepo.DeleteApplicationGUID).To(Equal("my-app-guid"))
 			})
 		})
 

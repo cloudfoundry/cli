@@ -56,9 +56,9 @@ var _ = Describe("Organization Repository", func() {
 			orgs, apiErr := repo.ListOrgs(0)
 
 			Expect(len(orgs)).To(Equal(3))
-			Expect(orgs[0].Guid).To(Equal("org1-guid"))
-			Expect(orgs[1].Guid).To(Equal("org2-guid"))
-			Expect(orgs[2].Guid).To(Equal("org3-guid"))
+			Expect(orgs[0].GUID).To(Equal("org1-guid"))
+			Expect(orgs[1].GUID).To(Equal("org2-guid"))
+			Expect(orgs[2].GUID).To(Equal("org3-guid"))
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(handler).To(HaveAllRequestsCalled())
 		})
@@ -166,7 +166,7 @@ var _ = Describe("Organization Repository", func() {
 		})
 	})
 
-	Describe(".GetManyOrgsByGuid", func() {
+	Describe(".GetManyOrgsByGUID", func() {
 		It("requests each org", func() {
 			firstOrgRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
@@ -187,14 +187,14 @@ var _ = Describe("Organization Repository", func() {
 			testserver, handler, repo := createOrganizationRepo(firstOrgRequest, secondOrgRequest)
 			defer testserver.Close()
 
-			orgGuids := []string{"org1-guid", "org2-guid"}
-			orgs, err := repo.GetManyOrgsByGuid(orgGuids)
+			orgGUIDs := []string{"org1-guid", "org2-guid"}
+			orgs, err := repo.GetManyOrgsByGUID(orgGUIDs)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(len(orgs)).To(Equal(2))
-			Expect(orgs[0].Guid).To(Equal("org1-guid"))
-			Expect(orgs[1].Guid).To(Equal("org2-guid"))
+			Expect(orgs[0].GUID).To(Equal("org1-guid"))
+			Expect(orgs[1].GUID).To(Equal("org2-guid"))
 		})
 	})
 
@@ -232,7 +232,7 @@ var _ = Describe("Organization Repository", func() {
 			testserver, handler, repo := createOrganizationRepo(req)
 			defer testserver.Close()
 			existingOrg := models.Organization{}
-			existingOrg.Guid = "org1-guid"
+			existingOrg.GUID = "org1-guid"
 			existingOrg.Name = "Org1"
 
 			org, apiErr := repo.FindByName("Org1")
@@ -240,18 +240,18 @@ var _ = Describe("Organization Repository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(org.Name).To(Equal(existingOrg.Name))
-			Expect(org.Guid).To(Equal(existingOrg.Guid))
+			Expect(org.GUID).To(Equal(existingOrg.GUID))
 			Expect(org.QuotaDefinition.Name).To(Equal("not-your-average-quota"))
 			Expect(org.QuotaDefinition.MemoryLimit).To(Equal(int64(128)))
 			Expect(len(org.Spaces)).To(Equal(1))
 			Expect(org.Spaces[0].Name).To(Equal("Space1"))
-			Expect(org.Spaces[0].Guid).To(Equal("space1-guid"))
+			Expect(org.Spaces[0].GUID).To(Equal("space1-guid"))
 			Expect(len(org.Domains)).To(Equal(1))
 			Expect(org.Domains[0].Name).To(Equal("cfapps.io"))
-			Expect(org.Domains[0].Guid).To(Equal("domain1-guid"))
+			Expect(org.Domains[0].GUID).To(Equal("domain1-guid"))
 			Expect(len(org.SpaceQuotas)).To(Equal(1))
 			Expect(org.SpaceQuotas[0].Name).To(Equal("space-quota1"))
-			Expect(org.SpaceQuotas[0].Guid).To(Equal("space-quota1-guid"))
+			Expect(org.SpaceQuotas[0].GUID).To(Equal("space-quota1-guid"))
 		})
 
 		It("returns a ModelNotFoundError when the org cannot be found", func() {
@@ -313,7 +313,7 @@ var _ = Describe("Organization Repository", func() {
 				OrganizationFields: models.OrganizationFields{
 					Name: "my-org",
 					QuotaDefinition: models.QuotaFields{
-						Guid: "my-quota-guid",
+						GUID: "my-quota-guid",
 					},
 				}}
 

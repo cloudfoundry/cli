@@ -18,7 +18,7 @@ type RouteEntity struct {
 }
 
 func (resource RouteResource) ToFields() (fields models.Route) {
-	fields.Guid = resource.Metadata.Guid
+	fields.GUID = resource.Metadata.GUID
 	fields.Host = resource.Entity.Host
 	return
 }
@@ -27,7 +27,7 @@ func (resource RouteResource) ToModel() (route models.Route) {
 	route.Host = resource.Entity.Host
 	route.Path = resource.Entity.Path
 	route.Port = resource.Entity.Port
-	route.Guid = resource.Metadata.Guid
+	route.GUID = resource.Metadata.GUID
 	route.Domain = resource.Entity.Domain.ToFields()
 	route.Space = resource.Entity.Space.ToFields()
 	route.ServiceInstance = resource.Entity.ServiceInstance.ToFields()

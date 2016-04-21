@@ -73,7 +73,7 @@ func (cmd *UpdateSecurityGroup) Execute(context flags.FlagContext) {
 			"security_group": terminal.EntityNameColor(name),
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 		}))
-	err = cmd.securityGroupRepo.Update(securityGroup.Guid, rules)
+	err = cmd.securityGroupRepo.Update(securityGroup.GUID, rules)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

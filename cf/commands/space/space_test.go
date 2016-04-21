@@ -73,26 +73,26 @@ var _ = Describe("space command", func() {
 		BeforeEach(func() {
 			org := models.OrganizationFields{
 				Name: "my-org",
-				Guid: "my-org-guid",
+				GUID: "my-org-guid",
 			}
 
 			app := models.ApplicationFields{
 				Name: "app1",
-				Guid: "app1-guid",
+				GUID: "app1-guid",
 			}
 
 			apps := []models.ApplicationFields{app}
 
 			domain := models.DomainFields{
 				Name: "domain1",
-				Guid: "domain1-guid",
+				GUID: "domain1-guid",
 			}
 
 			domains := []models.DomainFields{domain}
 
 			serviceInstance := models.ServiceInstanceFields{
 				Name: "service1",
-				Guid: "service1-guid",
+				GUID: "service1-guid",
 			}
 			services := []models.ServiceInstanceFields{serviceInstance}
 
@@ -107,19 +107,19 @@ var _ = Describe("space command", func() {
 			space := models.Space{
 				SpaceFields: models.SpaceFields{
 					Name: "whose-space-is-it-anyway",
-					Guid: "whose-space-is-it-anyway-guid",
+					GUID: "whose-space-is-it-anyway-guid",
 				},
 				Organization:     org,
 				Applications:     apps,
 				Domains:          domains,
 				ServiceInstances: services,
 				SecurityGroups:   securityGroups,
-				SpaceQuotaGuid:   "runaway-guid",
+				SpaceQuotaGUID:   "runaway-guid",
 			}
 
 			quota := models.SpaceQuota{
 				Name:                    "runaway",
-				Guid:                    "runaway-guid",
+				GUID:                    "runaway-guid",
 				MemoryLimit:             102400,
 				InstanceMemoryLimit:     -1,
 				RoutesLimit:             111,
@@ -132,7 +132,7 @@ var _ = Describe("space command", func() {
 			requirementsFactory.TargetedOrgSuccess = true
 			requirementsFactory.Space = space
 
-			quotaRepo.FindByGuidReturns(quota, nil)
+			quotaRepo.FindByGUIDReturns(quota, nil)
 		})
 
 		Context("when the guid flag is passed", func() {
@@ -187,7 +187,7 @@ var _ = Describe("space command", func() {
 				BeforeEach(func() {
 					quota := models.SpaceQuota{
 						Name:                    "runaway",
-						Guid:                    "runaway-guid",
+						GUID:                    "runaway-guid",
 						MemoryLimit:             102400,
 						InstanceMemoryLimit:     -1,
 						RoutesLimit:             111,
@@ -196,7 +196,7 @@ var _ = Describe("space command", func() {
 						AppInstanceLimit:        -1,
 					}
 
-					quotaRepo.FindByGuidReturns(quota, nil)
+					quotaRepo.FindByGUIDReturns(quota, nil)
 				})
 
 				It("displays unlimited as the app instance limit", func() {
@@ -219,7 +219,7 @@ var _ = Describe("space command", func() {
 				BeforeEach(func() {
 					quota := models.SpaceQuota{
 						Name:                    "runaway",
-						Guid:                    "runaway-guid",
+						GUID:                    "runaway-guid",
 						MemoryLimit:             102400,
 						InstanceMemoryLimit:     -1,
 						RoutesLimit:             111,
@@ -228,7 +228,7 @@ var _ = Describe("space command", func() {
 						AppInstanceLimit:        -1,
 					}
 
-					quotaRepo.FindByGuidReturns(quota, nil)
+					quotaRepo.FindByGUIDReturns(quota, nil)
 				})
 
 				It("displays unlimited as the app instance limit", func() {
@@ -251,9 +251,9 @@ var _ = Describe("space command", func() {
 
 		Context("when the space does not have a space quota", func() {
 			It("shows information without a space quota", func() {
-				requirementsFactory.Space.SpaceQuotaGuid = ""
+				requirementsFactory.Space.SpaceQuotaGUID = ""
 				runCommand("whose-space-is-it-anyway")
-				Expect(quotaRepo.FindByGuidCallCount()).To(Equal(0))
+				Expect(quotaRepo.FindByGUIDCallCount()).To(Equal(0))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 					[]string{"OK"},
@@ -280,22 +280,22 @@ var _ = Describe("space command", func() {
 			It("Fills in the PluginModel", func() {
 				testcmd.RunCliCommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
-				Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
+				Expect(pluginModel.GUID).To(Equal("whose-space-is-it-anyway-guid"))
 
 				Expect(pluginModel.Organization.Name).To(Equal("my-org"))
-				Expect(pluginModel.Organization.Guid).To(Equal("my-org-guid"))
+				Expect(pluginModel.Organization.GUID).To(Equal("my-org-guid"))
 
 				Expect(pluginModel.Applications).To(HaveLen(1))
 				Expect(pluginModel.Applications[0].Name).To(Equal("app1"))
-				Expect(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
+				Expect(pluginModel.Applications[0].GUID).To(Equal("app1-guid"))
 
 				Expect(pluginModel.Domains).To(HaveLen(1))
 				Expect(pluginModel.Domains[0].Name).To(Equal("domain1"))
-				Expect(pluginModel.Domains[0].Guid).To(Equal("domain1-guid"))
+				Expect(pluginModel.Domains[0].GUID).To(Equal("domain1-guid"))
 
 				Expect(pluginModel.ServiceInstances).To(HaveLen(1))
 				Expect(pluginModel.ServiceInstances[0].Name).To(Equal("service1"))
-				Expect(pluginModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+				Expect(pluginModel.ServiceInstances[0].GUID).To(Equal("service1-guid"))
 
 				Expect(pluginModel.SecurityGroups).To(HaveLen(2))
 				Expect(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
@@ -317,7 +317,7 @@ var _ = Describe("space command", func() {
 				Expect(val).To(Equal("8080-9090"))
 
 				Expect(pluginModel.SpaceQuota.Name).To(Equal("runaway"))
-				Expect(pluginModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
+				Expect(pluginModel.SpaceQuota.GUID).To(Equal("runaway-guid"))
 				Expect(pluginModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
 				Expect(pluginModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
 				Expect(pluginModel.SpaceQuota.RoutesLimit).To(Equal(111))

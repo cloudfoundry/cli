@@ -32,7 +32,7 @@ type ServiceInstanceEntity struct {
 
 func (resource ServiceInstanceResource) ToFields() models.ServiceInstanceFields {
 	return models.ServiceInstanceFields{
-		Guid:         resource.Metadata.Guid,
+		GUID:         resource.Metadata.GUID,
 		Name:         resource.Entity.Name,
 		Tags:         resource.Entity.Tags,
 		DashboardUrl: resource.Entity.DashboardUrl,

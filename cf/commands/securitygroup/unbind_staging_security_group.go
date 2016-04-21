@@ -80,7 +80,7 @@ func (cmd *unbindFromStagingGroup) Execute(context flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.stagingGroupRepo.UnbindFromStagingSet(securityGroup.Guid)
+	err = cmd.stagingGroupRepo.UnbindFromStagingSet(securityGroup.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

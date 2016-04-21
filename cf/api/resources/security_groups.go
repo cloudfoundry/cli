@@ -20,7 +20,7 @@ func (resource SecurityGroupResource) ToFields() (fields models.SecurityGroupFie
 	fields.Name = resource.Entity.Name
 	fields.Rules = resource.Entity.Rules
 	fields.SpaceUrl = resource.Entity.SpaceUrl
-	fields.Guid = resource.Metadata.Guid
+	fields.GUID = resource.Metadata.GUID
 
 	return
 }

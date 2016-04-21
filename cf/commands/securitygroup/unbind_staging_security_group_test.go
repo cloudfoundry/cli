@@ -68,7 +68,7 @@ var _ = Describe("unbind-staging-security-group command", func() {
 		Context("security group exists", func() {
 			BeforeEach(func() {
 				group := models.SecurityGroup{}
-				group.Guid = "just-pretend-this-is-a-guid"
+				group.GUID = "just-pretend-this-is-a-guid"
 				group.Name = "a-security-group-name"
 				fakeSecurityGroupRepo.ReadReturns(group, nil)
 			})

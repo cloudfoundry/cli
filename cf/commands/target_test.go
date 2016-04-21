@@ -137,7 +137,7 @@ var _ = Describe("target command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
+				org.GUID = "my-organization-guid"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				orgRepo.FindByNameReturns(org, nil)
@@ -149,36 +149,36 @@ var _ = Describe("target command", func() {
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 			})
 
 			It("updates the space in the config", func() {
 				space := models.Space{}
 				space.Name = "my-space"
-				space.Guid = "my-space-guid"
+				space.GUID = "my-space-guid"
 
 				spaceRepo.FindByNameReturns(space, nil)
 
 				callTarget([]string{"-s", "my-space"})
 
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 
 			It("updates both the organization and the space in the config", func() {
 				space := models.Space{}
 				space.Name = "my-space"
-				space.Guid = "my-space-guid"
+				space.GUID = "my-space-guid"
 				spaceRepo.FindByNameReturns(space, nil)
 
 				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -191,10 +191,10 @@ var _ = Describe("target command", func() {
 				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeFalse())
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -207,14 +207,14 @@ var _ = Describe("target command", func() {
 				It("target space automatically ", func() {
 					space := models.Space{}
 					space.Name = "my-space"
-					space.Guid = "my-space-guid"
+					space.GUID = "my-space-guid"
 					spaceRepo.FindByNameReturns(space, nil)
 					spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
 					callTarget([]string{"-o", "my-organization"})
 
-					Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-					Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+					Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+					Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 
 					Expect(ui.ShowConfigurationCalled).To(BeTrue())
 				})
@@ -224,16 +224,16 @@ var _ = Describe("target command", func() {
 			It("not target space automatically for orgs having multiple spaces", func() {
 				space1 := models.Space{}
 				space1.Name = "my-space"
-				space1.Guid = "my-space-guid"
+				space1.GUID = "my-space-guid"
 				space2 := models.Space{}
 				space2.Name = "my-space"
-				space2.Guid = "my-space-guid"
+				space2.GUID = "my-space-guid"
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1, space2})
 
 				callTarget([]string{"-o", "my-organization"})
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -299,10 +299,10 @@ var _ = Describe("target command", func() {
 					[]string{"Unable to access space", "my-space"},
 				))
 
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 				Expect(ui.ShowConfigurationCalled).To(BeFalse())
 
-				Expect(config.OrganizationFields().Guid).NotTo(BeEmpty())
+				Expect(config.OrganizationFields().GUID).NotTo(BeEmpty())
 				expectSpaceToBeCleared()
 			})
 
@@ -321,7 +321,7 @@ var _ = Describe("target command", func() {
 			It("fails to target the space automatically if is not found", func() {
 				org := models.Organization{}
 				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
+				org.GUID = "my-organization-guid"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				orgRepo.FindByNameReturns(org, nil)
@@ -330,8 +330,8 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-o", "my-organization"})
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})

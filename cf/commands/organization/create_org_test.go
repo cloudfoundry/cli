@@ -125,7 +125,7 @@ var _ = Describe("create-org command", func() {
 				}, nil)
 				orgRepo.FindByNameReturns(models.Organization{
 					OrganizationFields: models.OrganizationFields{
-						Guid: "my-org-guid",
+						GUID: "my-org-guid",
 					},
 				}, nil)
 			})
@@ -133,12 +133,12 @@ var _ = Describe("create-org command", func() {
 			It("assigns manager role to user", func() {
 				runCommand("my-org")
 
-				orgGuid, role, userGuid, userName := orgRoleSetter.SetOrgRoleArgsForCall(0)
+				orgGUID, role, userGUID, userName := orgRoleSetter.SetOrgRoleArgsForCall(0)
 
 				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
-				Expect(orgGuid).To(Equal("my-org-guid"))
+				Expect(orgGUID).To(Equal("my-org-guid"))
 				Expect(role).To(Equal("OrgManager"))
-				Expect(userGuid).To(Equal(""))
+				Expect(userGUID).To(Equal(""))
 				Expect(userName).To(Equal("my-user"))
 			})
 
@@ -190,7 +190,7 @@ var _ = Describe("create-org command", func() {
 			BeforeEach(func() {
 				quota = models.QuotaFields{
 					Name: "non-default-quota",
-					Guid: "non-default-quota-guid",
+					GUID: "non-default-quota-guid",
 				}
 			})
 
@@ -199,7 +199,7 @@ var _ = Describe("create-org command", func() {
 				runCommand("-q", "non-default-quota", "my-org")
 
 				Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("non-default-quota"))
-				Expect(orgRepo.CreateArgsForCall(0).QuotaDefinition.Guid).To(Equal("non-default-quota-guid"))
+				Expect(orgRepo.CreateArgsForCall(0).QuotaDefinition.GUID).To(Equal("non-default-quota-guid"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating org", "my-org"},
 					[]string{"OK"},

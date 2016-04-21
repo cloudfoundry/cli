@@ -63,14 +63,14 @@ func (cmd *RenameOrg) Execute(c flags.FlagContext) {
 			"NewName":  terminal.EntityNameColor(newName),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr := cmd.orgRepo.Rename(org.Guid, newName)
+	apiErr := cmd.orgRepo.Rename(org.GUID, newName)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 	cmd.ui.Ok()
 
-	if org.Guid == cmd.config.OrganizationFields().Guid {
+	if org.GUID == cmd.config.OrganizationFields().GUID {
 		org.Name = newName
 		cmd.config.SetOrganizationFields(org.OrganizationFields)
 	}

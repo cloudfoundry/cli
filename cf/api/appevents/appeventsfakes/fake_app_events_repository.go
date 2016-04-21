@@ -9,10 +9,10 @@ import (
 )
 
 type FakeAppEventsRepository struct {
-	RecentEventsStub        func(appGuid string, limit int64) ([]models.EventFields, error)
+	RecentEventsStub        func(appGUID string, limit int64) ([]models.EventFields, error)
 	recentEventsMutex       sync.RWMutex
 	recentEventsArgsForCall []struct {
-		appGuid string
+		appGUID string
 		limit   int64
 	}
 	recentEventsReturns struct {
@@ -21,15 +21,15 @@ type FakeAppEventsRepository struct {
 	}
 }
 
-func (fake *FakeAppEventsRepository) RecentEvents(appGuid string, limit int64) ([]models.EventFields, error) {
+func (fake *FakeAppEventsRepository) RecentEvents(appGUID string, limit int64) ([]models.EventFields, error) {
 	fake.recentEventsMutex.Lock()
 	fake.recentEventsArgsForCall = append(fake.recentEventsArgsForCall, struct {
-		appGuid string
+		appGUID string
 		limit   int64
-	}{appGuid, limit})
+	}{appGUID, limit})
 	fake.recentEventsMutex.Unlock()
 	if fake.RecentEventsStub != nil {
-		return fake.RecentEventsStub(appGuid, limit)
+		return fake.RecentEventsStub(appGUID, limit)
 	} else {
 		return fake.recentEventsReturns.result1, fake.recentEventsReturns.result2
 	}
@@ -44,7 +44,7 @@ func (fake *FakeAppEventsRepository) RecentEventsCallCount() int {
 func (fake *FakeAppEventsRepository) RecentEventsArgsForCall(i int) (string, int64) {
 	fake.recentEventsMutex.RLock()
 	defer fake.recentEventsMutex.RUnlock()
-	return fake.recentEventsArgsForCall[i].appGuid, fake.recentEventsArgsForCall[i].limit
+	return fake.recentEventsArgsForCall[i].appGUID, fake.recentEventsArgsForCall[i].limit
 }
 
 func (fake *FakeAppEventsRepository) RecentEventsReturns(result1 []models.EventFields, result2 error) {

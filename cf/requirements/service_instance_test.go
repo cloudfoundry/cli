@@ -20,7 +20,7 @@ var _ = Describe("ServiceInstanceRequirement", func() {
 		It("succeeds", func() {
 			instance := models.ServiceInstance{}
 			instance.Name = "my-service"
-			instance.Guid = "my-service-guid"
+			instance.GUID = "my-service-guid"
 			repo.FindInstanceByNameReturns(instance, nil)
 
 			req := NewServiceInstanceRequirement("my-service", repo)

@@ -160,7 +160,7 @@ var _ = Describe("SSH command", func() {
 			currentApp = models.Application{}
 			currentApp.Name = "my-app"
 			currentApp.State = "started"
-			currentApp.Guid = "my-app-guid"
+			currentApp.GUID = "my-app-guid"
 			currentApp.EnableSSH = true
 			currentApp.Diego = true
 

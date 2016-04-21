@@ -88,8 +88,8 @@ func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
 		return
 	}
 
-	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.Guid, serviceKeyName)
-	if err != nil || serviceKey.Fields.Guid == "" {
+	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.GUID, serviceKeyName)
+	if err != nil || serviceKey.Fields.GUID == "" {
 		switch err.(type) {
 		case *errors.NotAuthorizedError:
 			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
@@ -108,7 +108,7 @@ func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
 		}
 	}
 
-	err = cmd.serviceKeyRepo.DeleteServiceKey(serviceKey.Fields.Guid)
+	err = cmd.serviceKeyRepo.DeleteServiceKey(serviceKey.Fields.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

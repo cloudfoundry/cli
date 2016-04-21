@@ -10,20 +10,20 @@ type LastOperationFields struct {
 
 type ServiceInstanceCreateRequest struct {
 	Name      string                 `json:"name"`
-	SpaceGuid string                 `json:"space_guid"`
-	PlanGuid  string                 `json:"service_plan_guid,omitempty"`
+	SpaceGUID string                 `json:"space_guid"`
+	PlanGUID  string                 `json:"service_plan_guid,omitempty"`
 	Params    map[string]interface{} `json:"parameters,omitempty"`
 	Tags      []string               `json:"tags,omitempty"`
 }
 
 type ServiceInstanceUpdateRequest struct {
-	PlanGuid string                 `json:"service_plan_guid,omitempty"`
+	PlanGUID string                 `json:"service_plan_guid,omitempty"`
 	Params   map[string]interface{} `json:"parameters,omitempty"`
 	Tags     []string               `json:"tags"`
 }
 
 type ServiceInstanceFields struct {
-	Guid             string
+	GUID             string
 	Name             string
 	LastOperation    LastOperationFields
 	SysLogDrainUrl   string
@@ -43,5 +43,5 @@ type ServiceInstance struct {
 }
 
 func (inst ServiceInstance) IsUserProvided() bool {
-	return inst.ServicePlan.Guid == ""
+	return inst.ServicePlan.GUID == ""
 }

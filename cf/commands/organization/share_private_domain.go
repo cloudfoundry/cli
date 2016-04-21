@@ -72,7 +72,7 @@ func (cmd *SharePrivateDomain) Execute(c flags.FlagContext) {
 			"OrgName":    terminal.EntityNameColor(org.Name),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	err = cmd.orgRepo.SharePrivateDomain(org.Guid, domain.Guid)
+	err = cmd.orgRepo.SharePrivateDomain(org.GUID, domain.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

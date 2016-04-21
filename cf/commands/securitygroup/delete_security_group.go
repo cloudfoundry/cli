@@ -77,7 +77,7 @@ func (cmd *DeleteSecurityGroup) Execute(context flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.securityGroupRepo.Delete(group.Guid)
+	err = cmd.securityGroupRepo.Delete(group.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

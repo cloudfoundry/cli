@@ -96,7 +96,7 @@ var _ = Describe("unbind-security-group command", func() {
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
-						Guid:  "my-group-guid",
+						GUID:  "my-group-guid",
 						Rules: []map[string]interface{}{},
 					},
 				}
@@ -106,11 +106,11 @@ var _ = Describe("unbind-security-group command", func() {
 				orgRepo.ListOrgsReturns([]models.Organization{{
 					OrganizationFields: models.OrganizationFields{
 						Name: "my-org",
-						Guid: "my-org-guid",
+						GUID: "my-org-guid",
 					}},
 				}, nil)
 
-				space := models.Space{SpaceFields: models.SpaceFields{Name: "my-space", Guid: "my-space-guid"}}
+				space := models.Space{SpaceFields: models.SpaceFields{Name: "my-space", GUID: "my-space-guid"}}
 				spaceRepo.FindByNameInOrgReturns(space, nil)
 			})
 
@@ -121,9 +121,9 @@ var _ = Describe("unbind-security-group command", func() {
 					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
-				securityGroupGuid, spaceGuid := secBinder.UnbindSpaceArgsForCall(0)
-				Expect(securityGroupGuid).To(Equal("my-group-guid"))
-				Expect(spaceGuid).To(Equal("my-space-guid"))
+				securityGroupGUID, spaceGUID := secBinder.UnbindSpaceArgsForCall(0)
+				Expect(securityGroupGUID).To(Equal("my-group-guid"))
+				Expect(spaceGUID).To(Equal("my-space-guid"))
 			})
 
 			It("removes the security group when we pass the org and space", func() {
@@ -133,9 +133,9 @@ var _ = Describe("unbind-security-group command", func() {
 					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
-				securityGroupGuid, spaceGuid := secBinder.UnbindSpaceArgsForCall(0)
-				Expect(securityGroupGuid).To(Equal("my-group-guid"))
-				Expect(spaceGuid).To(Equal("my-space-guid"))
+				securityGroupGUID, spaceGUID := secBinder.UnbindSpaceArgsForCall(0)
+				Expect(securityGroupGUID).To(Equal("my-group-guid"))
+				Expect(spaceGUID).To(Equal("my-space-guid"))
 			})
 		})
 

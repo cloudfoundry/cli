@@ -9,7 +9,7 @@ import (
 type TokenInfo struct {
 	Username string `json:"user_name"`
 	Email    string `json:"email"`
-	UserGuid string `json:"user_id"`
+	UserGUID string `json:"user_id"`
 }
 
 func NewTokenInfo(accessToken string) (info TokenInfo) {

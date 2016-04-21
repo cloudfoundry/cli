@@ -152,7 +152,7 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 }
 
 func (cmd CreateService) CreateService(serviceName, planName, serviceInstanceName string, params map[string]interface{}, tags []string) (models.ServicePlanFields, error) {
-	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(cmd.config.SpaceFields().Guid, serviceName)
+	offerings, apiErr := cmd.serviceBuilder.GetServicesByNameForSpaceWithPlans(cmd.config.SpaceFields().GUID, serviceName)
 	if apiErr != nil {
 		return models.ServicePlanFields{}, apiErr
 	}
@@ -162,7 +162,7 @@ func (cmd CreateService) CreateService(serviceName, planName, serviceInstanceNam
 		return plan, apiErr
 	}
 
-	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid, params, tags)
+	apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.GUID, params, tags)
 	return plan, apiErr
 }
 

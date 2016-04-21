@@ -27,7 +27,7 @@ type OldFakeServicePlanRepo struct {
 	ListPlansFromManyServicesError   error
 }
 
-func (fake *OldFakeServicePlanRepo) ListPlansFromManyServices(serviceGuids []string) (plans []models.ServicePlanFields, err error) {
+func (fake *OldFakeServicePlanRepo) ListPlansFromManyServices(serviceGUIDs []string) (plans []models.ServicePlanFields, err error) {
 	if fake.ListPlansFromManyServicesError != nil {
 		return nil, fake.ListPlansFromManyServicesError
 	}

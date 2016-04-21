@@ -42,7 +42,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")
 		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, appfiles.ApplicationZipper{})
-		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
+		buildpack = models.Buildpack{Name: "my-cool-buildpack", GUID: "my-cool-buildpack-guid"}
 
 		testServer, testServerHandler = testnet.NewServer([]testnet.TestRequest{uploadBuildpackRequest()})
 		configRepo.SetApiEndpoint(testServer.URL)

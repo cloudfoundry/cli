@@ -57,7 +57,7 @@ var _ = Describe("delete-buildpack command", func() {
 			BeforeEach(func() {
 				buildpackRepo.FindByNameBuildpack = models.Buildpack{
 					Name: "my-buildpack",
-					Guid: "my-buildpack-guid",
+					GUID: "my-buildpack-guid",
 				}
 			})
 
@@ -66,7 +66,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 				runCommand("my-buildpack")
 
-				Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
+				Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete the buildpack my-buildpack"}))
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -79,7 +79,7 @@ var _ = Describe("delete-buildpack command", func() {
 				It("does not prompt the user to delete the buildback", func() {
 					runCommand("-f", "my-buildpack")
 
-					Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
+					Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
 					Expect(len(ui.Prompts)).To(Equal(0))
 					Expect(ui.Outputs).To(ContainSubstrings(
@@ -117,7 +117,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 				buildpackRepo.FindByNameBuildpack = models.Buildpack{
 					Name: "my-buildpack",
-					Guid: "my-buildpack-guid",
+					GUID: "my-buildpack-guid",
 				}
 				buildpackRepo.DeleteApiResponse = errors.New("failed badly")
 			})
@@ -125,7 +125,7 @@ var _ = Describe("delete-buildpack command", func() {
 			It("fails with the error", func() {
 				runCommand("my-buildpack")
 
-				Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
+				Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Deleting buildpack", "my-buildpack"},

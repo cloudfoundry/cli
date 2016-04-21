@@ -35,57 +35,57 @@ var _ = Describe("Service Builder", func() {
 		service1 = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "my-service1",
-				Guid:       "service-guid1",
-				BrokerGuid: "my-service-broker-guid1",
+				GUID:       "service-guid1",
+				BrokerGUID: "my-service-broker-guid1",
 			},
 		}
 
 		service2 = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "my-service2",
-				Guid:       "service-guid2",
-				BrokerGuid: "my-service-broker-guid2",
+				GUID:       "service-guid2",
+				BrokerGUID: "my-service-broker-guid2",
 			},
 		}
 
 		v1Service = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "v1Service",
-				Guid:       "v1Service-guid",
-				BrokerGuid: "my-service-broker-guid1",
+				GUID:       "v1Service-guid",
+				BrokerGUID: "my-service-broker-guid1",
 				Provider:   "IAmV1",
 			},
 		}
 
 		serviceOfferings := models.ServiceOfferings([]models.ServiceOffering{service1, v1Service})
 		serviceRepo.FindServiceOfferingsByLabelReturns(serviceOfferings, nil)
-		serviceRepo.GetServiceOfferingByGuidReturns(service1, nil)
+		serviceRepo.GetServiceOfferingByGUIDReturns(service1, nil)
 		serviceRepo.ListServicesFromBrokerReturns([]models.ServiceOffering{service1}, nil)
 		serviceRepo.ListServicesFromManyBrokersReturns([]models.ServiceOffering{service1, service2}, nil)
 
 		plan1 = models.ServicePlanFields{
 			Name:                "service-plan1",
-			Guid:                "service-plan1-guid",
-			ServiceOfferingGuid: "service-guid1",
+			GUID:                "service-plan1-guid",
+			ServiceOfferingGUID: "service-guid1",
 			OrgNames:            []string{"org1", "org2"},
 		}
 
 		plan2 = models.ServicePlanFields{
 			Name:                "service-plan2",
-			Guid:                "service-plan2-guid",
-			ServiceOfferingGuid: "service-guid1",
+			GUID:                "service-plan2-guid",
+			ServiceOfferingGUID: "service-guid1",
 		}
 
 		plan3 = models.ServicePlanFields{
 			Name:                "service-plan3",
-			Guid:                "service-plan3-guid",
-			ServiceOfferingGuid: "service-guid2",
+			GUID:                "service-plan3-guid",
+			ServiceOfferingGUID: "service-guid2",
 		}
 
 		planWithoutOrgs = models.ServicePlanFields{
 			Name:                "service-plan-without-orgs",
-			Guid:                "service-plan-without-orgs-guid",
-			ServiceOfferingGuid: "service-guid1",
+			GUID:                "service-plan-without-orgs-guid",
+			ServiceOfferingGUID: "service-guid1",
 		}
 
 		planBuilder.GetPlansVisibleToOrgReturns([]models.ServicePlanFields{plan1, plan2}, nil)
@@ -100,7 +100,7 @@ var _ = Describe("Service Builder", func() {
 		})
 
 		It("returns the services for the space", func() {
-			services, err := serviceBuilder.GetServicesForSpace("spaceGuid")
+			services, err := serviceBuilder.GetServicesForSpace("spaceGUID")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(services)).To(Equal(2))
@@ -114,7 +114,7 @@ var _ = Describe("Service Builder", func() {
 		})
 
 		It("returns the services for the space, populated with plans", func() {
-			services, err := serviceBuilder.GetServicesForSpaceWithPlans("spaceGuid")
+			services, err := serviceBuilder.GetServicesForSpaceWithPlans("spaceGUID")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(services)).To(Equal(2))
@@ -184,14 +184,14 @@ var _ = Describe("Service Builder", func() {
 				service2 := models.ServiceOffering{
 					ServiceOfferingFields: models.ServiceOfferingFields{
 						Label: "service",
-						Guid:  "service-guid-v2",
+						GUID:  "service-guid-v2",
 					},
 				}
 
 				service1 := models.ServiceOffering{
 					ServiceOfferingFields: models.ServiceOfferingFields{
 						Label:    "service",
-						Guid:     "service-guid",
+						GUID:     "service-guid",
 						Provider: "a provider",
 					},
 				}
@@ -203,11 +203,11 @@ var _ = Describe("Service Builder", func() {
 			})
 
 			It("returns the nv2 service", func() {
-				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGuid")
+				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGUID")
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(service.Plans)).To(Equal(0))
-				Expect(service.Guid).To(Equal("service-guid-v2"))
+				Expect(service.GUID).To(Equal("service-guid-v2"))
 			})
 		})
 
@@ -216,7 +216,7 @@ var _ = Describe("Service Builder", func() {
 				service := models.ServiceOffering{
 					ServiceOfferingFields: models.ServiceOfferingFields{
 						Label: "service",
-						Guid:  "service-guid",
+						GUID:  "service-guid",
 					},
 				}
 
@@ -227,11 +227,11 @@ var _ = Describe("Service Builder", func() {
 			})
 
 			It("returns the named service", func() {
-				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGuid")
+				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGUID")
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(service.Plans)).To(Equal(0))
-				Expect(service.Guid).To(Equal("service-guid"))
+				Expect(service.GUID).To(Equal("service-guid"))
 			})
 		})
 
@@ -240,7 +240,7 @@ var _ = Describe("Service Builder", func() {
 				service := models.ServiceOffering{
 					ServiceOfferingFields: models.ServiceOfferingFields{
 						Label:    "service",
-						Guid:     "service-guid",
+						GUID:     "service-guid",
 						Provider: "a provider",
 					},
 				}
@@ -252,7 +252,7 @@ var _ = Describe("Service Builder", func() {
 			})
 
 			It("returns the an error", func() {
-				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGuid")
+				service, err := serviceBuilder.GetServiceByNameForSpace("service", "spaceGUID")
 				Expect(service).To(Equal(models.ServiceOffering{}))
 				Expect(err).To(HaveOccurred())
 			})
@@ -275,7 +275,7 @@ var _ = Describe("Service Builder", func() {
 		})
 
 		It("returns the named service", func() {
-			service, err := serviceBuilder.GetServiceByNameForSpaceWithPlans("serviceWithPlans", "spaceGuid")
+			service, err := serviceBuilder.GetServiceByNameForSpaceWithPlans("serviceWithPlans", "spaceGUID")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(service.Plans)).To(Equal(1))
@@ -295,7 +295,7 @@ var _ = Describe("Service Builder", func() {
 		})
 
 		It("returns the named service", func() {
-			services, err := serviceBuilder.GetServicesByNameForSpaceWithPlans("serviceWithPlans", "spaceGuid")
+			services, err := serviceBuilder.GetServicesByNameForSpaceWithPlans("serviceWithPlans", "spaceGUID")
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(services)).To(Equal(2))
@@ -341,8 +341,8 @@ var _ = Describe("Service Builder", func() {
 
 	Describe(".GetServicesForManyBrokers", func() {
 		It("returns all the services for an array of broker guids, fully populated", func() {
-			brokerGuids := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
-			services, err := serviceBuilder.GetServicesForManyBrokers(brokerGuids)
+			brokerGUIDs := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
+			services, err := serviceBuilder.GetServicesForManyBrokers(brokerGUIDs)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(services).To(HaveLen(2))
@@ -362,15 +362,15 @@ var _ = Describe("Service Builder", func() {
 
 		It("raises errors from the service repo", func() {
 			serviceRepo.ListServicesFromManyBrokersReturns([]models.ServiceOffering{}, errors.New("error"))
-			brokerGuids := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
-			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGuids)
+			brokerGUIDs := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
+			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGUIDs)
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("raises errors from the plan builder", func() {
 			planBuilder.GetPlansForManyServicesWithOrgsReturns(nil, errors.New("error"))
-			brokerGuids := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
-			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGuids)
+			brokerGUIDs := []string{"my-service-broker-guid1", "my-service-broker-guid2"}
+			_, err := serviceBuilder.GetServicesForManyBrokers(brokerGUIDs)
 			Expect(err).To(HaveOccurred())
 		})
 	})

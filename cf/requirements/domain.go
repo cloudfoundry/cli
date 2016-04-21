@@ -30,7 +30,7 @@ func NewDomainRequirement(name string, config coreconfig.Reader, domainRepo api.
 
 func (req *domainApiRequirement) Execute() error {
 	var apiErr error
-	req.domain, apiErr = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields().Guid)
+	req.domain, apiErr = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields().GUID)
 
 	if apiErr != nil {
 		return apiErr

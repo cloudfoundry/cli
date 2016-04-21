@@ -99,9 +99,9 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(apiErr.Error())
 	}
 
-	var targetOrgName, targetSpaceName, spaceGuid, copyStr string
+	var targetOrgName, targetSpaceName, spaceGUID, copyStr string
 	if targetOrg != "" && targetSpace != "" {
-		spaceGuid = cmd.findSpaceGuid(targetOrg, targetSpace)
+		spaceGUID = cmd.findSpaceGUID(targetOrg, targetSpace)
 		targetOrgName = targetOrg
 		targetSpaceName = targetSpace
 	} else if targetSpace != "" {
@@ -109,18 +109,18 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
-		spaceGuid = space.Guid
+		spaceGUID = space.GUID
 		targetOrgName = cmd.config.OrganizationFields().Name
 		targetSpaceName = targetSpace
 	} else {
-		spaceGuid = cmd.config.SpaceFields().Guid
+		spaceGUID = cmd.config.SpaceFields().GUID
 		targetOrgName = cmd.config.OrganizationFields().Name
 		targetSpaceName = cmd.config.SpaceFields().Name
 	}
 
 	copyStr = buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, cmd.config.Username())
 
-	targetApp, apiErr := cmd.appRepo.ReadFromSpace(targetAppName, spaceGuid)
+	targetApp, apiErr := cmd.appRepo.ReadFromSpace(targetAppName, spaceGUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}
@@ -129,7 +129,7 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 	cmd.ui.Say(T("Note: this may take some time"))
 	cmd.ui.Say("")
 
-	apiErr = cmd.copyAppSourceRepo.CopyApplication(sourceApp.Guid, targetApp.Guid)
+	apiErr = cmd.copyAppSourceRepo.CopyApplication(sourceApp.GUID, targetApp.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}
@@ -141,7 +141,7 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 }
 
-func (cmd *CopySource) findSpaceGuid(targetOrg, targetSpace string) string {
+func (cmd *CopySource) findSpaceGUID(targetOrg, targetSpace string) string {
 	org, err := cmd.orgRepo.FindByName(targetOrg)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -165,7 +165,7 @@ func (cmd *CopySource) findSpaceGuid(targetOrg, targetSpace string) string {
 		)))
 	}
 
-	return space.Guid
+	return space.GUID
 }
 
 func buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, username string) string {

@@ -134,7 +134,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 
 	cmd.printUpdatingServiceInstanceMessage(serviceInstanceName)
 
-	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.Guid, plan.Guid, paramsMap, tags)
+	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.GUID, plan.GUID, paramsMap, tags)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -145,7 +145,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 }
 
 func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (plan models.ServicePlanFields, err error) {
-	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.Guid, cmd.config.OrganizationFields().Name)
+	plans, err := cmd.planBuilder.GetPlansForServiceForOrg(serviceInstance.ServiceOffering.GUID, cmd.config.OrganizationFields().Name)
 	if err != nil {
 		return
 	}

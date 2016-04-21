@@ -38,7 +38,7 @@ var _ = Describe("set-env command", func() {
 		ui = &testterm.FakeUI{}
 		app = models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -103,7 +103,7 @@ var _ = Describe("set-env command", func() {
 
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				appGUID, params := appRepo.UpdateArgsForCall(0)
-				Expect(appGUID).To(Equal(app.Guid))
+				Expect(appGUID).To(Equal(app.GUID))
 				Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{
 					"DATABASE_URL": "mysql://new-example.com/my-db",
 					"foo":          "bar",

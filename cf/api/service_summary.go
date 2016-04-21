@@ -20,7 +20,7 @@ func (resource ServiceInstancesSummaries) ToModels() (instances []models.Service
 		planSummary := instanceSummary.ServicePlan
 		servicePlan := models.ServicePlanFields{}
 		servicePlan.Name = planSummary.Name
-		servicePlan.Guid = planSummary.Guid
+		servicePlan.GUID = planSummary.GUID
 
 		offeringSummary := planSummary.ServiceOffering
 		serviceOffering := models.ServiceOfferingFields{}
@@ -74,7 +74,7 @@ type ServiceInstanceSummary struct {
 
 type ServicePlanSummary struct {
 	Name            string
-	Guid            string
+	GUID            string
 	ServiceOffering ServiceOfferingSummary `json:"service"`
 }
 
@@ -102,7 +102,7 @@ func NewCloudControllerServiceSummaryRepository(config coreconfig.Reader, gatewa
 }
 
 func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().GUID)
 	resource := new(ServiceInstancesSummaries)
 
 	apiErr = repo.gateway.GetResource(path, resource)

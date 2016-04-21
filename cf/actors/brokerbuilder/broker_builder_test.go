@@ -35,17 +35,17 @@ var _ = Describe("Broker Builder", func() {
 		serviceBuilder = new(servicebuilderfakes.FakeServiceBuilder)
 		brokerBuilder = brokerbuilder.NewBuilder(brokerRepo, serviceBuilder)
 
-		serviceBroker1 = models.ServiceBroker{Guid: "my-service-broker-guid", Name: "my-service-broker"}
+		serviceBroker1 = models.ServiceBroker{GUID: "my-service-broker-guid", Name: "my-service-broker"}
 
 		publicServicePlan = models.ServicePlanFields{
 			Name:   "public-service-plan",
-			Guid:   "public-service-plan-guid",
+			GUID:   "public-service-plan-guid",
 			Public: true,
 		}
 
 		privateServicePlan = models.ServicePlanFields{
 			Name:   "private-service-plan",
-			Guid:   "private-service-plan-guid",
+			GUID:   "private-service-plan-guid",
 			Public: false,
 			OrgNames: []string{
 				"org-1",
@@ -56,8 +56,8 @@ var _ = Describe("Broker Builder", func() {
 		service1 = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "my-public-service",
-				Guid:       "my-public-service-guid",
-				BrokerGuid: "my-service-broker-guid",
+				GUID:       "my-public-service-guid",
+				BrokerGUID: "my-service-broker-guid",
 			},
 			Plans: []models.ServicePlanFields{
 				publicServicePlan,
@@ -68,8 +68,8 @@ var _ = Describe("Broker Builder", func() {
 		service2 = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "my-other-public-service",
-				Guid:       "my-other-public-service-guid",
-				BrokerGuid: "my-service-broker-guid",
+				GUID:       "my-other-public-service-guid",
+				BrokerGUID: "my-service-broker-guid",
 			},
 			Plans: []models.ServicePlanFields{
 				publicServicePlan,
@@ -80,8 +80,8 @@ var _ = Describe("Broker Builder", func() {
 		service3 = models.ServiceOffering{
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:      "my-other-public-service",
-				Guid:       "my-other-public-service-guid",
-				BrokerGuid: "my-service-broker-guid",
+				GUID:       "my-other-public-service-guid",
+				BrokerGUID: "my-service-broker-guid",
 			},
 			Plans: []models.ServicePlanFields{
 				publicServicePlan,
@@ -95,7 +95,7 @@ var _ = Describe("Broker Builder", func() {
 				service2,
 			})
 
-		brokerRepo.FindByGuidReturns(serviceBroker1, nil)
+		brokerRepo.FindByGUIDReturns(serviceBroker1, nil)
 	})
 
 	Describe(".AttachBrokersToServices", func() {
@@ -115,7 +115,7 @@ var _ = Describe("Broker Builder", func() {
 			brokerlessService := models.ServiceOffering{
 				ServiceOfferingFields: models.ServiceOfferingFields{
 					Label: "lonely-v1-service",
-					Guid:  "i-am-sad-and-old",
+					GUID:  "i-am-sad-and-old",
 				},
 				Plans: []models.ServicePlanFields{
 					publicServicePlan,
@@ -145,8 +145,8 @@ var _ = Describe("Broker Builder", func() {
 			service3 = models.ServiceOffering{
 				ServiceOfferingFields: models.ServiceOfferingFields{
 					Label:      "my-other-public-service",
-					Guid:       "my-other-public-service-guid",
-					BrokerGuid: "my-other-service-broker-guid",
+					GUID:       "my-other-public-service-guid",
+					BrokerGUID: "my-other-service-broker-guid",
 				},
 				Plans: []models.ServicePlanFields{
 					publicServicePlan,
@@ -234,7 +234,7 @@ var _ = Describe("Broker Builder", func() {
 
 		It("returns the service broker populated with the specific service", func() {
 			serviceBuilder.GetServiceByNameWithPlansWithOrgNamesReturns(service1, nil)
-			brokerRepo.FindByGuidReturns(serviceBroker1, nil)
+			brokerRepo.FindByGUIDReturns(serviceBroker1, nil)
 
 			broker, err := brokerBuilder.GetBrokerWithSpecifiedService("my-public-service")
 			Expect(err).NotTo(HaveOccurred())

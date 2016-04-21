@@ -77,7 +77,7 @@ var _ = Describe("disable-ssh command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.EnableSSH = true
 
 			requirementsFactory.Application = app
@@ -101,7 +101,7 @@ var _ = Describe("disable-ssh command", func() {
 				BeforeEach(func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
+					app.GUID = "my-app-guid"
 					app.EnableSSH = false
 
 					appRepo.UpdateReturns(app, nil)
@@ -135,7 +135,7 @@ var _ = Describe("disable-ssh command", func() {
 				It("notifies user when updated result is not in the desired state", func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
+					app.GUID = "my-app-guid"
 					app.EnableSSH = true
 					appRepo.UpdateReturns(app, nil)
 

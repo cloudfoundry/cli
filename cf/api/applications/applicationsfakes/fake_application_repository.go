@@ -18,10 +18,10 @@ type FakeApplicationRepository struct {
 		result1 models.Application
 		result2 error
 	}
-	GetAppStub        func(appGuid string) (models.Application, error)
+	GetAppStub        func(appGUID string) (models.Application, error)
 	getAppMutex       sync.RWMutex
 	getAppArgsForCall []struct {
-		appGuid string
+		appGUID string
 	}
 	getAppReturns struct {
 		result1 models.Application
@@ -36,30 +36,30 @@ type FakeApplicationRepository struct {
 		result1 models.Application
 		result2 error
 	}
-	ReadFromSpaceStub        func(name string, spaceGuid string) (app models.Application, apiErr error)
+	ReadFromSpaceStub        func(name string, spaceGUID string) (app models.Application, apiErr error)
 	readFromSpaceMutex       sync.RWMutex
 	readFromSpaceArgsForCall []struct {
 		name      string
-		spaceGuid string
+		spaceGUID string
 	}
 	readFromSpaceReturns struct {
 		result1 models.Application
 		result2 error
 	}
-	UpdateStub        func(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
+	UpdateStub        func(appGUID string, params models.AppParams) (updatedApp models.Application, apiErr error)
 	updateMutex       sync.RWMutex
 	updateArgsForCall []struct {
-		appGuid string
+		appGUID string
 		params  models.AppParams
 	}
 	updateReturns struct {
 		result1 models.Application
 		result2 error
 	}
-	DeleteStub        func(appGuid string) (apiErr error)
+	DeleteStub        func(appGUID string) (apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		appGuid string
+		appGUID string
 	}
 	deleteReturns struct {
 		result1 error
@@ -116,14 +116,14 @@ func (fake *FakeApplicationRepository) CreateReturns(result1 models.Application,
 	}{result1, result2}
 }
 
-func (fake *FakeApplicationRepository) GetApp(appGuid string) (models.Application, error) {
+func (fake *FakeApplicationRepository) GetApp(appGUID string) (models.Application, error) {
 	fake.getAppMutex.Lock()
 	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
-		appGuid string
-	}{appGuid})
+		appGUID string
+	}{appGUID})
 	fake.getAppMutex.Unlock()
 	if fake.GetAppStub != nil {
-		return fake.GetAppStub(appGuid)
+		return fake.GetAppStub(appGUID)
 	} else {
 		return fake.getAppReturns.result1, fake.getAppReturns.result2
 	}
@@ -138,7 +138,7 @@ func (fake *FakeApplicationRepository) GetAppCallCount() int {
 func (fake *FakeApplicationRepository) GetAppArgsForCall(i int) string {
 	fake.getAppMutex.RLock()
 	defer fake.getAppMutex.RUnlock()
-	return fake.getAppArgsForCall[i].appGuid
+	return fake.getAppArgsForCall[i].appGUID
 }
 
 func (fake *FakeApplicationRepository) GetAppReturns(result1 models.Application, result2 error) {
@@ -182,15 +182,15 @@ func (fake *FakeApplicationRepository) ReadReturns(result1 models.Application, r
 	}{result1, result2}
 }
 
-func (fake *FakeApplicationRepository) ReadFromSpace(name string, spaceGuid string) (app models.Application, apiErr error) {
+func (fake *FakeApplicationRepository) ReadFromSpace(name string, spaceGUID string) (app models.Application, apiErr error) {
 	fake.readFromSpaceMutex.Lock()
 	fake.readFromSpaceArgsForCall = append(fake.readFromSpaceArgsForCall, struct {
 		name      string
-		spaceGuid string
-	}{name, spaceGuid})
+		spaceGUID string
+	}{name, spaceGUID})
 	fake.readFromSpaceMutex.Unlock()
 	if fake.ReadFromSpaceStub != nil {
-		return fake.ReadFromSpaceStub(name, spaceGuid)
+		return fake.ReadFromSpaceStub(name, spaceGUID)
 	} else {
 		return fake.readFromSpaceReturns.result1, fake.readFromSpaceReturns.result2
 	}
@@ -205,7 +205,7 @@ func (fake *FakeApplicationRepository) ReadFromSpaceCallCount() int {
 func (fake *FakeApplicationRepository) ReadFromSpaceArgsForCall(i int) (string, string) {
 	fake.readFromSpaceMutex.RLock()
 	defer fake.readFromSpaceMutex.RUnlock()
-	return fake.readFromSpaceArgsForCall[i].name, fake.readFromSpaceArgsForCall[i].spaceGuid
+	return fake.readFromSpaceArgsForCall[i].name, fake.readFromSpaceArgsForCall[i].spaceGUID
 }
 
 func (fake *FakeApplicationRepository) ReadFromSpaceReturns(result1 models.Application, result2 error) {
@@ -216,15 +216,15 @@ func (fake *FakeApplicationRepository) ReadFromSpaceReturns(result1 models.Appli
 	}{result1, result2}
 }
 
-func (fake *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error) {
+func (fake *FakeApplicationRepository) Update(appGUID string, params models.AppParams) (updatedApp models.Application, apiErr error) {
 	fake.updateMutex.Lock()
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
-		appGuid string
+		appGUID string
 		params  models.AppParams
-	}{appGuid, params})
+	}{appGUID, params})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
-		return fake.UpdateStub(appGuid, params)
+		return fake.UpdateStub(appGUID, params)
 	} else {
 		return fake.updateReturns.result1, fake.updateReturns.result2
 	}
@@ -239,7 +239,7 @@ func (fake *FakeApplicationRepository) UpdateCallCount() int {
 func (fake *FakeApplicationRepository) UpdateArgsForCall(i int) (string, models.AppParams) {
 	fake.updateMutex.RLock()
 	defer fake.updateMutex.RUnlock()
-	return fake.updateArgsForCall[i].appGuid, fake.updateArgsForCall[i].params
+	return fake.updateArgsForCall[i].appGUID, fake.updateArgsForCall[i].params
 }
 
 func (fake *FakeApplicationRepository) UpdateReturns(result1 models.Application, result2 error) {
@@ -250,14 +250,14 @@ func (fake *FakeApplicationRepository) UpdateReturns(result1 models.Application,
 	}{result1, result2}
 }
 
-func (fake *FakeApplicationRepository) Delete(appGuid string) (apiErr error) {
+func (fake *FakeApplicationRepository) Delete(appGUID string) (apiErr error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		appGuid string
-	}{appGuid})
+		appGUID string
+	}{appGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
-		return fake.DeleteStub(appGuid)
+		return fake.DeleteStub(appGUID)
 	} else {
 		return fake.deleteReturns.result1
 	}
@@ -272,7 +272,7 @@ func (fake *FakeApplicationRepository) DeleteCallCount() int {
 func (fake *FakeApplicationRepository) DeleteArgsForCall(i int) string {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
-	return fake.deleteArgsForCall[i].appGuid
+	return fake.deleteArgsForCall[i].appGUID
 }
 
 func (fake *FakeApplicationRepository) DeleteReturns(result1 error) {

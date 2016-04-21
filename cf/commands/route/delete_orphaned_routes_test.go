@@ -93,13 +93,13 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			routeRepo.ListRoutesStub = func(cb func(models.Route) bool) error {
 				route := models.Route{}
-				route.Guid = "route1-guid"
+				route.GUID = "route1-guid"
 				route.Host = "hostname-1"
 				route.Domain = domain
 				route.Apps = []models.ApplicationFields{app1}
 
 				route2 := models.Route{}
-				route2.Guid = "route2-guid"
+				route2.GUID = "route2-guid"
 				route2.Host = "hostname-2"
 				route2.Domain = domain2
 
@@ -138,7 +138,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				}
 
 				route2 := models.Route{}
-				route2.Guid = "route2-guid"
+				route2.GUID = "route2-guid"
 				route2.Host = "hostname-2"
 				route2.Domain = models.DomainFields{Name: "cookieclicker.co"}
 

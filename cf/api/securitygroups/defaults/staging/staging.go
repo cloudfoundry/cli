@@ -31,14 +31,14 @@ func NewStagingSecurityGroupsRepo(configRepo coreconfig.Reader, gateway net.Gate
 	}
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) BindToStagingSet(groupGuid string) error {
-	return repo.repoBase.Bind(groupGuid, urlPath)
+func (repo *cloudControllerStagingSecurityGroupRepo) BindToStagingSet(groupGUID string) error {
+	return repo.repoBase.Bind(groupGUID, urlPath)
 }
 
 func (repo *cloudControllerStagingSecurityGroupRepo) List() ([]models.SecurityGroupFields, error) {
 	return repo.repoBase.List(urlPath)
 }
 
-func (repo *cloudControllerStagingSecurityGroupRepo) UnbindFromStagingSet(groupGuid string) error {
-	return repo.repoBase.Delete(groupGuid, urlPath)
+func (repo *cloudControllerStagingSecurityGroupRepo) UnbindFromStagingSet(groupGUID string) error {
+	return repo.repoBase.Delete(groupGUID, urlPath)
 }

@@ -92,14 +92,14 @@ func (cmd *DeleteApp) Execute(c flags.FlagContext) {
 
 	if c.Bool("r") {
 		for _, route := range app.Routes {
-			apiErr = cmd.routeRepo.Delete(route.Guid)
+			apiErr = cmd.routeRepo.Delete(route.GUID)
 			if apiErr != nil {
 				cmd.ui.Failed(apiErr.Error())
 			}
 		}
 	}
 
-	apiErr = cmd.appRepo.Delete(app.Guid)
+	apiErr = cmd.appRepo.Delete(app.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}

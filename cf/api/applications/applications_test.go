@@ -29,7 +29,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(app.Name).To(Equal("My App"))
-			Expect(app.Guid).To(Equal("app1-guid"))
+			Expect(app.GUID).To(Equal("app1-guid"))
 			Expect(app.Memory).To(Equal(int64(128)))
 			Expect(app.DiskQuota).To(Equal(int64(512)))
 			Expect(app.InstanceCount).To(Equal(1))
@@ -102,8 +102,8 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			name := "my-cool-app"
 			buildpackUrl := "buildpack-url"
-			spaceGuid := "some-space-guid"
-			stackGuid := "some-stack-guid"
+			spaceGUID := "some-space-guid"
+			stackGUID := "some-stack-guid"
 			command := "some-command"
 			memory := int64(2048)
 			diskQuota := int64(512)
@@ -112,8 +112,8 @@ var _ = Describe("ApplicationsRepository", func() {
 			appParams = models.AppParams{
 				Name:          &name,
 				BuildpackUrl:  &buildpackUrl,
-				SpaceGuid:     &spaceGuid,
-				StackGuid:     &stackGuid,
+				SpaceGUID:     &spaceGUID,
+				StackGUID:     &stackGUID,
 				Command:       &command,
 				Memory:        &memory,
 				DiskQuota:     &diskQuota,
@@ -170,7 +170,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 				app := models.Application{}
 				app.Name = "my-cool-app"
-				app.Guid = "my-cool-app-guid"
+				app.GUID = "my-cool-app-guid"
 				Expect(createdApp).To(Equal(app))
 			})
 		})
@@ -318,27 +318,27 @@ var _ = Describe("ApplicationsRepository", func() {
 			defer ts.Close()
 
 			app := models.Application{}
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.Name = "my-cool-app"
 			app.BuildpackUrl = "buildpack-url"
 			app.Command = "some-command"
 			app.HealthCheckType = "none"
 			app.Memory = 2048
 			app.InstanceCount = 3
-			app.Stack = &models.Stack{Guid: "some-stack-guid"}
-			app.SpaceGuid = "some-space-guid"
+			app.Stack = &models.Stack{GUID: "some-stack-guid"}
+			app.SpaceGUID = "some-space-guid"
 			app.State = "started"
 			app.DiskQuota = 512
 			Expect(app.EnvironmentVars).To(BeNil())
 
-			updatedApp, apiErr := repo.Update(app.Guid, app.ToParams())
+			updatedApp, apiErr := repo.Update(app.GUID, app.ToParams())
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(updatedApp.Command).To(Equal("some-command"))
 			Expect(updatedApp.DetectedStartCommand).To(Equal("detected command"))
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
-			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
+			Expect(updatedApp.GUID).To(Equal("my-cool-app-guid"))
 		})
 
 		It("sets environment variables", func() {
@@ -532,8 +532,8 @@ var createApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.Te
 func defaultAppParams() models.AppParams {
 	name := "my-cool-app"
 	buildpackUrl := "buildpack-url"
-	spaceGuid := "some-space-guid"
-	stackGuid := "some-stack-guid"
+	spaceGUID := "some-space-guid"
+	stackGUID := "some-stack-guid"
 	command := "some-command"
 	memory := int64(2048)
 	diskQuota := int64(512)
@@ -542,8 +542,8 @@ func defaultAppParams() models.AppParams {
 	return models.AppParams{
 		Name:          &name,
 		BuildpackUrl:  &buildpackUrl,
-		SpaceGuid:     &spaceGuid,
-		StackGuid:     &stackGuid,
+		SpaceGUID:     &spaceGUID,
+		StackGUID:     &stackGUID,
 		Command:       &command,
 		Memory:        &memory,
 		DiskQuota:     &diskQuota,

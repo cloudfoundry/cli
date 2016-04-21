@@ -26,12 +26,12 @@ type FakeServiceBrokerRepository struct {
 		result1 models.ServiceBroker
 		result2 error
 	}
-	FindByGuidStub        func(guid string) (serviceBroker models.ServiceBroker, apiErr error)
-	findByGuidMutex       sync.RWMutex
-	findByGuidArgsForCall []struct {
+	FindByGUIDStub        func(guid string) (serviceBroker models.ServiceBroker, apiErr error)
+	findByGUIDMutex       sync.RWMutex
+	findByGUIDArgsForCall []struct {
 		guid string
 	}
-	findByGuidReturns struct {
+	findByGUIDReturns struct {
 		result1 models.ServiceBroker
 		result2 error
 	}
@@ -139,34 +139,34 @@ func (fake *FakeServiceBrokerRepository) FindByNameReturns(result1 models.Servic
 	}{result1, result2}
 }
 
-func (fake *FakeServiceBrokerRepository) FindByGuid(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
-	fake.findByGuidMutex.Lock()
-	fake.findByGuidArgsForCall = append(fake.findByGuidArgsForCall, struct {
+func (fake *FakeServiceBrokerRepository) FindByGUID(guid string) (serviceBroker models.ServiceBroker, apiErr error) {
+	fake.findByGUIDMutex.Lock()
+	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		guid string
 	}{guid})
-	fake.findByGuidMutex.Unlock()
-	if fake.FindByGuidStub != nil {
-		return fake.FindByGuidStub(guid)
+	fake.findByGUIDMutex.Unlock()
+	if fake.FindByGUIDStub != nil {
+		return fake.FindByGUIDStub(guid)
 	} else {
-		return fake.findByGuidReturns.result1, fake.findByGuidReturns.result2
+		return fake.findByGUIDReturns.result1, fake.findByGUIDReturns.result2
 	}
 }
 
-func (fake *FakeServiceBrokerRepository) FindByGuidCallCount() int {
-	fake.findByGuidMutex.RLock()
-	defer fake.findByGuidMutex.RUnlock()
-	return len(fake.findByGuidArgsForCall)
+func (fake *FakeServiceBrokerRepository) FindByGUIDCallCount() int {
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	return len(fake.findByGUIDArgsForCall)
 }
 
-func (fake *FakeServiceBrokerRepository) FindByGuidArgsForCall(i int) string {
-	fake.findByGuidMutex.RLock()
-	defer fake.findByGuidMutex.RUnlock()
-	return fake.findByGuidArgsForCall[i].guid
+func (fake *FakeServiceBrokerRepository) FindByGUIDArgsForCall(i int) string {
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	return fake.findByGUIDArgsForCall[i].guid
 }
 
-func (fake *FakeServiceBrokerRepository) FindByGuidReturns(result1 models.ServiceBroker, result2 error) {
-	fake.FindByGuidStub = nil
-	fake.findByGuidReturns = struct {
+func (fake *FakeServiceBrokerRepository) FindByGUIDReturns(result1 models.ServiceBroker, result2 error) {
+	fake.FindByGUIDStub = nil
+	fake.findByGUIDReturns = struct {
 		result1 models.ServiceBroker
 		result2 error
 	}{result1, result2}

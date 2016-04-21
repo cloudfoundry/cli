@@ -67,7 +67,7 @@ var _ = Describe("update-service-auth-token command", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.MaxAPIVersionSuccess = true
 			foundAuthToken := models.ServiceAuthTokenFields{}
-			foundAuthToken.Guid = "found-auth-token-guid"
+			foundAuthToken.GUID = "found-auth-token-guid"
 			foundAuthToken.Label = "found label"
 			foundAuthToken.Provider = "found provider"
 			authTokenRepo.FindByLabelAndProviderServiceAuthTokenFields = foundAuthToken
@@ -77,7 +77,7 @@ var _ = Describe("update-service-auth-token command", func() {
 			runCommand("a label", "a provider", "a value")
 
 			expectedAuthToken := models.ServiceAuthTokenFields{}
-			expectedAuthToken.Guid = "found-auth-token-guid"
+			expectedAuthToken.GUID = "found-auth-token-guid"
 			expectedAuthToken.Label = "found label"
 			expectedAuthToken.Provider = "found provider"
 			expectedAuthToken.Token = "a value"

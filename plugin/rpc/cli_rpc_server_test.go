@@ -480,10 +480,10 @@ var _ = Describe("Server", func() {
 			Context(".GetCurrentOrg", func() {
 				BeforeEach(func() {
 					config.SetOrganizationFields(models.OrganizationFields{
-						Guid: "test-guid",
+						GUID: "test-guid",
 						Name: "test-org",
 						QuotaDefinition: models.QuotaFields{
-							Guid:                    "guid123",
+							GUID:                    "guid123",
 							Name:                    "quota123",
 							MemoryLimit:             128,
 							InstanceMemoryLimit:     16,
@@ -509,14 +509,14 @@ var _ = Describe("Server", func() {
 
 					Expect(err).ToNot(HaveOccurred())
 					Expect(org.Name).To(Equal("test-org"))
-					Expect(org.Guid).To(Equal("test-guid"))
+					Expect(org.GUID).To(Equal("test-guid"))
 				})
 			})
 
 			Context(".GetCurrentSpace", func() {
 				BeforeEach(func() {
 					config.SetSpaceFields(models.SpaceFields{
-						Guid: "space-guid",
+						GUID: "space-guid",
 						Name: "space-name",
 					})
 
@@ -536,11 +536,11 @@ var _ = Describe("Server", func() {
 
 					Expect(err).ToNot(HaveOccurred())
 					Expect(space.Name).To(Equal("space-name"))
-					Expect(space.Guid).To(Equal("space-guid"))
+					Expect(space.GUID).To(Equal("space-guid"))
 				})
 			})
 
-			Context(".Username, .UserGuid, .UserEmail", func() {
+			Context(".Username, .UserGUID, .UserEmail", func() {
 				BeforeEach(func() {
 					rpcService, err = NewRPCService(nil, nil, config, api.RepositoryLocator{}, nil, nil)
 					err := rpcService.Start()
@@ -558,7 +558,7 @@ var _ = Describe("Server", func() {
 					Expect(err).ToNot(HaveOccurred())
 					Expect(result).To(Equal("my-user"))
 
-					err = client.Call("CliRPCCmd.UserGuid", "", &result)
+					err = client.Call("CliRPCCmd.UserGUID", "", &result)
 					Expect(err).ToNot(HaveOccurred())
 					Expect(result).To(Equal("my-user-guid"))
 

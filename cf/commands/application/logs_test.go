@@ -81,21 +81,21 @@ var _ = Describe("logs command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 
 			currentTime := time.Now()
 			recentLogs := []*logmessage.LogMessage{
-				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
-				testlogs.NewLogMessage("Log Line 2", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
+				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
+				testlogs.NewLogMessage("Log Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
 			}
 
 			appLogs := []*logmessage.LogMessage{
-				testlogs.NewLogMessage("Log Line 1", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 			}
 
 			requirementsFactory.Application = app
 			logsRepo.RecentLogsForReturns(recentLogs, nil)
-			logsRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+			logsRepo.TailLogsForStub = func(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 				c := make(chan *logmessage.LogMessage)
 
 				onConnect()
@@ -115,7 +115,7 @@ var _ = Describe("logs command", func() {
 			runCommand("--recent", "my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(app.Guid).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
+			Expect(app.GUID).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -126,7 +126,7 @@ var _ = Describe("logs command", func() {
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
 				logsRepo.RecentLogsForReturns([]*logmessage.LogMessage{
-					testlogs.NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+					testlogs.NewLogMessage("hello%2Bworld%v", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 				}, nil)
 			})
 
@@ -140,8 +140,8 @@ var _ = Describe("logs command", func() {
 			runCommand("my-app")
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			appGuid, _ := logsRepo.TailLogsForArgsForCall(0)
-			Expect(app.Guid).To(Equal(appGuid))
+			appGUID, _ := logsRepo.TailLogsForArgsForCall(0)
+			Expect(app.GUID).To(Equal(appGUID))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
@@ -190,25 +190,25 @@ var _ = Describe("logs command", func() {
 
 			Context("when the message comes", func() {
 				It("include the instance index", func() {
-					msg := testlogs.NewLogMessage("Hello World!", app.Guid, "DEA", "4", logmessage.LogMessage_OUT, date)
+					msg := testlogs.NewLogMessage("Hello World!", app.GUID, "DEA", "4", logmessage.LogMessage_OUT, date)
 					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA/4]      OUT Hello World!"))
 				})
 
 				It("doesn't include the instance index if sourceID is empty", func() {
-					msg := testlogs.NewLogMessage("Hello World!", app.Guid, "DEA", "", logmessage.LogMessage_OUT, date)
+					msg := testlogs.NewLogMessage("Hello World!", app.GUID, "DEA", "", logmessage.LogMessage_OUT, date)
 					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA]        OUT Hello World!"))
 				})
 			})
 
 			Context("when the message was written to stderr", func() {
 				It("shows the log type as 'ERR'", func() {
-					msg := testlogs.NewLogMessage("Hello World!", app.Guid, "DEA", "4", logmessage.LogMessage_ERR, date)
+					msg := testlogs.NewLogMessage("Hello World!", app.GUID, "DEA", "4", logmessage.LogMessage_ERR, date)
 					Expect(terminal.Decolorize(LogMessageOutput(msg, time.UTC))).To(Equal("2014-04-04T11:39:20.00+0000 [DEA/4]      ERR Hello World!"))
 				})
 			})
 
 			It("formats the time in the given time zone", func() {
-				msg := testlogs.NewLogMessage("Hello World!", app.Guid, "DEA", "4", logmessage.LogMessage_ERR, date)
+				msg := testlogs.NewLogMessage("Hello World!", app.GUID, "DEA", "4", logmessage.LogMessage_ERR, date)
 				Expect(terminal.Decolorize(LogMessageOutput(msg, time.FixedZone("the-zone", 3*60*60)))).To(Equal("2014-04-04T14:39:20.00+0300 [DEA/4]      ERR Hello World!"))
 			})
 		})

@@ -103,7 +103,7 @@ func (m *appManifest) Instances(appName string, instances int) {
 func (m *appManifest) Service(appName string, name string) {
 	i := m.findOrCreateApplication(appName)
 	m.contents[i].Services = append(m.contents[i].Services, models.ServicePlanSummary{
-		Guid: "",
+		GUID: "",
 		Name: name,
 	})
 }

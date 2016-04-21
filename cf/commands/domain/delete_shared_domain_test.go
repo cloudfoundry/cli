@@ -64,7 +64,7 @@ var _ = Describe("delete-shared-domain command", func() {
 			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name:   "foo1.com",
-					Guid:   "foo1-guid",
+					GUID:   "foo1-guid",
 					Shared: false,
 				}, nil)
 		})
@@ -89,7 +89,7 @@ var _ = Describe("delete-shared-domain command", func() {
 			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name:   "foo.com",
-					Guid:   "foo-guid",
+					GUID:   "foo-guid",
 					Shared: true,
 				}, nil)
 		})

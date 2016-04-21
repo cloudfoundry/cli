@@ -8,7 +8,7 @@ type ServiceBrokerResource struct {
 }
 
 type ServiceBrokerEntity struct {
-	Guid     string
+	GUID     string
 	Name     string
 	Password string `json:"auth_password"`
 	Username string `json:"auth_username"`
@@ -17,7 +17,7 @@ type ServiceBrokerEntity struct {
 
 func (resource ServiceBrokerResource) ToFields() (fields models.ServiceBroker) {
 	fields.Name = resource.Entity.Name
-	fields.Guid = resource.Metadata.Guid
+	fields.GUID = resource.Metadata.GUID
 	fields.Url = resource.Entity.Url
 	fields.Username = resource.Entity.Username
 	fields.Password = resource.Entity.Password

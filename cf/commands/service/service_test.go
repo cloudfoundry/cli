@@ -65,11 +65,11 @@ var _ = Describe("service command", func() {
 	Describe("After Requirement", func() {
 		createServiceInstanceWithState := func(state string) {
 			offering := models.ServiceOfferingFields{Label: "mysql", DocumentationUrl: "http://documentation.url", Description: "the-description"}
-			plan := models.ServicePlanFields{Guid: "plan-guid", Name: "plan-name"}
+			plan := models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
 
 			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "service1"
-			serviceInstance.Guid = "service1-guid"
+			serviceInstance.GUID = "service1-guid"
 			serviceInstance.LastOperation.Type = "create"
 			serviceInstance.LastOperation.State = "in progress"
 			serviceInstance.LastOperation.Description = "creating resource - step 1"
@@ -103,7 +103,7 @@ var _ = Describe("service command", func() {
 				createServiceInstanceWithState("in progress")
 				testcmd.RunCliCommand("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("service1"))
-				Expect(pluginModel.Guid).To(Equal("service1-guid"))
+				Expect(pluginModel.GUID).To(Equal("service1-guid"))
 				Expect(pluginModel.LastOperation.Type).To(Equal("create"))
 				Expect(pluginModel.LastOperation.State).To(Equal("in progress"))
 				Expect(pluginModel.LastOperation.Description).To(Equal("creating resource - step 1"))
@@ -111,7 +111,7 @@ var _ = Describe("service command", func() {
 				Expect(pluginModel.LastOperation.UpdatedAt).To(Equal("updated-date"))
 				Expect(pluginModel.LastOperation.Type).To(Equal("create"))
 				Expect(pluginModel.ServicePlan.Name).To(Equal("plan-name"))
-				Expect(pluginModel.ServicePlan.Guid).To(Equal("plan-guid"))
+				Expect(pluginModel.ServicePlan.GUID).To(Equal("plan-guid"))
 				Expect(pluginModel.ServiceOffering.DocumentationUrl).To(Equal("http://documentation.url"))
 				Expect(pluginModel.ServiceOffering.Name).To(Equal("mysql"))
 			})
@@ -231,7 +231,7 @@ var _ = Describe("service command", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
 					serviceInstance.Name = "service1"
-					serviceInstance.Guid = "service1-guid"
+					serviceInstance.GUID = "service1-guid"
 					requirementsFactory.ServiceInstance = serviceInstance
 				})
 
@@ -249,7 +249,7 @@ var _ = Describe("service command", func() {
 				BeforeEach(func() {
 					serviceInstance := models.ServiceInstance{}
 					serviceInstance.Tags = []string{"tag1", "tag2"}
-					serviceInstance.ServicePlan = models.ServicePlanFields{Guid: "plan-guid", Name: "plan-name"}
+					serviceInstance.ServicePlan = models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
 					requirementsFactory.ServiceInstance = serviceInstance
 				})
 

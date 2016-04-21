@@ -11,8 +11,8 @@ import (
 //go:generate counterfeiter . SecurityGroupSpaceBinder
 
 type SecurityGroupSpaceBinder interface {
-	BindSpace(securityGroupGuid string, spaceGuid string) error
-	UnbindSpace(securityGroupGuid string, spaceGuid string) error
+	BindSpace(securityGroupGUID string, spaceGUID string) error
+	UnbindSpace(securityGroupGUID string, spaceGUID string) error
 }
 
 type securityGroupSpaceBinder struct {
@@ -27,19 +27,19 @@ func NewSecurityGroupSpaceBinder(configRepo coreconfig.Reader, gateway net.Gatew
 	}
 }
 
-func (repo securityGroupSpaceBinder) BindSpace(securityGroupGuid string, spaceGuid string) error {
+func (repo securityGroupSpaceBinder) BindSpace(securityGroupGUID string, spaceGUID string) error {
 	url := fmt.Sprintf("/v2/security_groups/%s/spaces/%s",
-		securityGroupGuid,
-		spaceGuid,
+		securityGroupGUID,
+		spaceGUID,
 	)
 
 	return repo.gateway.UpdateResourceFromStruct(repo.configRepo.ApiEndpoint(), url, models.SecurityGroupParams{})
 }
 
-func (repo securityGroupSpaceBinder) UnbindSpace(securityGroupGuid string, spaceGuid string) error {
+func (repo securityGroupSpaceBinder) UnbindSpace(securityGroupGUID string, spaceGUID string) error {
 	url := fmt.Sprintf("/v2/security_groups/%s/spaces/%s",
-		securityGroupGuid,
-		spaceGuid,
+		securityGroupGUID,
+		spaceGUID,
 	)
 
 	return repo.gateway.DeleteResource(repo.configRepo.ApiEndpoint(), url)

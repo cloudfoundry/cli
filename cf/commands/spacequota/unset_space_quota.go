@@ -75,7 +75,7 @@ func (cmd *UnsetSpaceQuota) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.quotaRepo.UnassignQuotaFromSpace(space.Guid, quota.Guid)
+	apiErr = cmd.quotaRepo.UnassignQuotaFromSpace(space.GUID, quota.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

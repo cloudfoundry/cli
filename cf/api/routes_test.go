@@ -31,7 +31,7 @@ var _ = Describe("route repository", func() {
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetSpaceFields(models.SpaceFields{
-			Guid: "the-space-guid",
+			GUID: "the-space-guid",
 			Name: "the-space-name",
 		})
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
@@ -67,11 +67,11 @@ var _ = Describe("route repository", func() {
 			})
 
 			Expect(len(routes)).To(Equal(2))
-			Expect(routes[0].Guid).To(Equal("route-1-guid"))
+			Expect(routes[0].GUID).To(Equal("route-1-guid"))
 			Expect(routes[0].Path).To(Equal(""))
-			Expect(routes[0].ServiceInstance.Guid).To(Equal("service-guid"))
+			Expect(routes[0].ServiceInstance.GUID).To(Equal("service-guid"))
 			Expect(routes[0].ServiceInstance.Name).To(Equal("test-service"))
-			Expect(routes[1].Guid).To(Equal("route-2-guid"))
+			Expect(routes[1].GUID).To(Equal("route-2-guid"))
 			Expect(routes[1].Path).To(Equal("/path-2"))
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -99,12 +99,12 @@ var _ = Describe("route repository", func() {
 			})
 
 			Expect(len(routes)).To(Equal(2))
-			Expect(routes[0].Guid).To(Equal("route-1-guid"))
-			Expect(routes[0].Space.Guid).To(Equal("space-1-guid"))
-			Expect(routes[0].ServiceInstance.Guid).To(Equal("service-guid"))
+			Expect(routes[0].GUID).To(Equal("route-1-guid"))
+			Expect(routes[0].Space.GUID).To(Equal("space-1-guid"))
+			Expect(routes[0].ServiceInstance.GUID).To(Equal("service-guid"))
 			Expect(routes[0].ServiceInstance.Name).To(Equal("test-service"))
-			Expect(routes[1].Guid).To(Equal("route-2-guid"))
-			Expect(routes[1].Space.Guid).To(Equal("space-2-guid"))
+			Expect(routes[1].GUID).To(Equal("route-2-guid"))
+			Expect(routes[1].Space.GUID).To(Equal("space-2-guid"))
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -141,16 +141,16 @@ var _ = Describe("route repository", func() {
 
 			It("returns the route", func() {
 				domain := models.DomainFields{}
-				domain.Guid = "my-domain-guid"
+				domain.GUID = "my-domain-guid"
 
 				route, apiErr := repo.Find("my-cool-app", domain, "somepath", 0)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(route.Host).To(Equal("my-cool-app"))
-				Expect(route.Guid).To(Equal("my-route-guid"))
+				Expect(route.GUID).To(Equal("my-route-guid"))
 				Expect(route.Path).To(Equal("/somepath"))
 				Expect(route.Port).To(Equal(0))
-				Expect(route.Domain.Guid).To(Equal(domain.Guid))
+				Expect(route.Domain.GUID).To(Equal(domain.GUID))
 			})
 		})
 
@@ -173,15 +173,15 @@ var _ = Describe("route repository", func() {
 
 			It("returns the route", func() {
 				domain := models.DomainFields{}
-				domain.Guid = "my-domain-guid"
+				domain.GUID = "my-domain-guid"
 
 				route, apiErr := repo.Find("my-cool-app", domain, "", 0)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(route.Host).To(Equal("my-cool-app"))
-				Expect(route.Guid).To(Equal("my-route-guid"))
+				Expect(route.GUID).To(Equal("my-route-guid"))
 				Expect(route.Path).To(Equal(""))
-				Expect(route.Domain.Guid).To(Equal(domain.Guid))
+				Expect(route.Domain.GUID).To(Equal(domain.GUID))
 			})
 		})
 
@@ -204,16 +204,16 @@ var _ = Describe("route repository", func() {
 
 			It("returns the route", func() {
 				domain := models.DomainFields{}
-				domain.Guid = "my-domain-guid"
+				domain.GUID = "my-domain-guid"
 
 				route, apiErr := repo.Find("my-cool-app", domain, "somepath", 8148)
 
 				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(route.Host).To(Equal("my-cool-app"))
-				Expect(route.Guid).To(Equal("my-route-guid"))
+				Expect(route.GUID).To(Equal("my-route-guid"))
 				Expect(route.Path).To(Equal("/somepath"))
 				Expect(route.Port).To(Equal(8148))
-				Expect(route.Domain.Guid).To(Equal(domain.Guid))
+				Expect(route.Domain.GUID).To(Equal(domain.GUID))
 			})
 		})
 
@@ -245,7 +245,7 @@ var _ = Describe("route repository", func() {
 				configRepo.SetApiEndpoint(ts.URL)
 
 				domain := models.DomainFields{}
-				domain.Guid = "my-domain-guid"
+				domain.GUID = "my-domain-guid"
 
 				_, apiErr := repo.Find("my-cool-app", domain, "somepath", 1478)
 
@@ -309,7 +309,7 @@ var _ = Describe("route repository", func() {
 				It("returns the created route", func() {
 					createdRoute, err := repo.CreateInSpace("", "", "my-domain-guid", "my-space-guid", 0, false)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(createdRoute.Guid).To(Equal("my-route-guid"))
+					Expect(createdRoute.GUID).To(Equal("my-route-guid"))
 				})
 			})
 		})
@@ -518,7 +518,7 @@ var _ = Describe("route repository", func() {
 
 		BeforeEach(func() {
 			domain = models.DomainFields{
-				Guid: "domain-guid",
+				GUID: "domain-guid",
 			}
 			ccServer = ghttp.NewServer()
 			configRepo.SetApiEndpoint(ccServer.URL())

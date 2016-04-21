@@ -56,11 +56,11 @@ var _ = Describe("create-service command", func() {
 		offering1.Label = "cleardb"
 		offering1.Plans = []models.ServicePlanFields{{
 			Name: "spark",
-			Guid: "cleardb-spark-guid",
+			GUID: "cleardb-spark-guid",
 			Free: true,
 		}, {
 			Name: "expensive",
-			Guid: "luxury-guid",
+			GUID: "luxury-guid",
 			Free: false,
 		}}
 
@@ -93,8 +93,8 @@ var _ = Describe("create-service command", func() {
 	It("successfully creates a service", func() {
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-		spaceGuid, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
-		Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
+		spaceGUID, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
+		Expect(spaceGUID).To(Equal(config.SpaceFields().GUID))
 		Expect(serviceName).To(Equal("cleardb"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
@@ -215,8 +215,8 @@ var _ = Describe("create-service command", func() {
 		It("successfully starts async service creation", func() {
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-			spaceGuid, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
-			Expect(spaceGuid).To(Equal(config.SpaceFields().Guid))
+			spaceGUID, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
+			Expect(spaceGUID).To(Equal(config.SpaceFields().GUID))
 			Expect(serviceName).To(Equal("cleardb"))
 
 			creatingServiceMessage := fmt.Sprintf("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstance.ServiceInstanceFields.Name)

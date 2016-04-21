@@ -82,13 +82,13 @@ type FakeHandlers struct {
 	usernameReturns struct {
 		result1 error
 	}
-	UserGuidStub        func(args string, retVal *string) error
-	userGuidMutex       sync.RWMutex
-	userGuidArgsForCall []struct {
+	UserGUIDStub        func(args string, retVal *string) error
+	userGUIDMutex       sync.RWMutex
+	userGUIDArgsForCall []struct {
 		args   string
 		retVal *string
 	}
-	userGuidReturns struct {
+	userGUIDReturns struct {
 		result1 error
 	}
 	UserEmailStub        func(args string, retVal *string) error
@@ -546,35 +546,35 @@ func (fake *FakeHandlers) UsernameReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeHandlers) UserGuid(args string, retVal *string) error {
-	fake.userGuidMutex.Lock()
-	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct {
+func (fake *FakeHandlers) UserGUID(args string, retVal *string) error {
+	fake.userGUIDMutex.Lock()
+	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct {
 		args   string
 		retVal *string
 	}{args, retVal})
-	fake.userGuidMutex.Unlock()
-	if fake.UserGuidStub != nil {
-		return fake.UserGuidStub(args, retVal)
+	fake.userGUIDMutex.Unlock()
+	if fake.UserGUIDStub != nil {
+		return fake.UserGUIDStub(args, retVal)
 	} else {
-		return fake.userGuidReturns.result1
+		return fake.userGUIDReturns.result1
 	}
 }
 
-func (fake *FakeHandlers) UserGuidCallCount() int {
-	fake.userGuidMutex.RLock()
-	defer fake.userGuidMutex.RUnlock()
-	return len(fake.userGuidArgsForCall)
+func (fake *FakeHandlers) UserGUIDCallCount() int {
+	fake.userGUIDMutex.RLock()
+	defer fake.userGUIDMutex.RUnlock()
+	return len(fake.userGUIDArgsForCall)
 }
 
-func (fake *FakeHandlers) UserGuidArgsForCall(i int) (string, *string) {
-	fake.userGuidMutex.RLock()
-	defer fake.userGuidMutex.RUnlock()
-	return fake.userGuidArgsForCall[i].args, fake.userGuidArgsForCall[i].retVal
+func (fake *FakeHandlers) UserGUIDArgsForCall(i int) (string, *string) {
+	fake.userGUIDMutex.RLock()
+	defer fake.userGUIDMutex.RUnlock()
+	return fake.userGUIDArgsForCall[i].args, fake.userGUIDArgsForCall[i].retVal
 }
 
-func (fake *FakeHandlers) UserGuidReturns(result1 error) {
-	fake.UserGuidStub = nil
-	fake.userGuidReturns = struct {
+func (fake *FakeHandlers) UserGUIDReturns(result1 error) {
+	fake.UserGUIDStub = nil
+	fake.userGUIDReturns = struct {
 		result1 error
 	}{result1}
 }

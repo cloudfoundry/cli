@@ -82,10 +82,10 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[0]
 	orgName := c.String("o")
 	spaceQuotaName := c.String("q")
-	orgGuid := ""
+	orgGUID := ""
 	if orgName == "" {
 		orgName = cmd.config.OrganizationFields().Name
-		orgGuid = cmd.config.OrganizationFields().Guid
+		orgGUID = cmd.config.OrganizationFields().GUID
 	}
 
 	cmd.ui.Say(T("Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
@@ -95,7 +95,7 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	if orgGuid == "" {
+	if orgGUID == "" {
 		org, apiErr := cmd.orgRepo.FindByName(orgName)
 		switch apiErr.(type) {
 		case nil:
@@ -111,19 +111,19 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 			return
 		}
 
-		orgGuid = org.Guid
+		orgGUID = org.GUID
 	}
 
-	var spaceQuotaGuid string
+	var spaceQuotaGUID string
 	if spaceQuotaName != "" {
-		spaceQuota, err := cmd.spaceQuotaRepo.FindByNameAndOrgGuid(spaceQuotaName, orgGuid)
+		spaceQuota, err := cmd.spaceQuotaRepo.FindByNameAndOrgGUID(spaceQuotaName, orgGUID)
 		if err != nil {
 			cmd.ui.Failed(err.Error())
 		}
-		spaceQuotaGuid = spaceQuota.Guid
+		spaceQuotaGUID = spaceQuota.GUID
 	}
 
-	space, err := cmd.spaceRepo.Create(spaceName, orgGuid, spaceQuotaGuid)
+	space, err := cmd.spaceRepo.Create(spaceName, orgGUID, spaceQuotaGUID)
 	if err != nil {
 		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.SpaceNameTaken {
 			cmd.ui.Ok()
@@ -135,13 +135,13 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	}
 	cmd.ui.Ok()
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGuid(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_DEVELOPER, cmd.config.UserGuid(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_DEVELOPER, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

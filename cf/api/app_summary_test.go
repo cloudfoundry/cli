@@ -52,7 +52,7 @@ var _ = Describe("AppSummaryRepository", func() {
 
 			app1 := apps[0]
 			Expect(app1.Name).To(Equal("app1"))
-			Expect(app1.Guid).To(Equal("app-1-guid"))
+			Expect(app1.GUID).To(Equal("app-1-guid"))
 			Expect(app1.BuildpackUrl).To(Equal("go_buildpack"))
 			Expect(len(app1.Routes)).To(Equal(1))
 			Expect(app1.Routes[0].URL()).To(Equal("app1.cfapps.io"))
@@ -68,7 +68,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			app2 := apps[1]
 			Expect(app2.Name).To(Equal("app2"))
 			Expect(app2.Command).To(Equal(""))
-			Expect(app2.Guid).To(Equal("app-2-guid"))
+			Expect(app2.GUID).To(Equal("app-2-guid"))
 			Expect(len(app2.Routes)).To(Equal(2))
 			Expect(app2.Routes[0].URL()).To(Equal("app2.cfapps.io"))
 			Expect(app2.Routes[1].URL()).To(Equal("foo.cfapps.io"))
@@ -114,7 +114,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(app.Name).To(Equal("app1"))
-			Expect(app.Guid).To(Equal("app-1-guid"))
+			Expect(app.GUID).To(Equal("app-1-guid"))
 			Expect(app.BuildpackUrl).To(Equal("go_buildpack"))
 			Expect(len(app.Routes)).To(Equal(1))
 			Expect(app.Routes[0].URL()).To(Equal("app1.cfapps.io"))
@@ -125,7 +125,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			Expect(app.RunningInstances).To(Equal(1))
 			Expect(app.Memory).To(Equal(int64(128)))
 			Expect(app.PackageUpdatedAt.Format("2006-01-02T15:04:05Z07:00")).To(Equal("2014-10-24T19:54:00Z"))
-			Expect(app.StackGuid).To(Equal("the-stack-guid"))
+			Expect(app.StackGUID).To(Equal("the-stack-guid"))
 		})
 	})
 

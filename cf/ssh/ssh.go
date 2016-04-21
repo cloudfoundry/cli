@@ -120,7 +120,7 @@ func (c *secureShell) Connect(opts *options.SSHOptions) error {
 	}
 
 	clientConfig := &ssh.ClientConfig{
-		User: fmt.Sprintf("cf:%s/%d", c.app.Guid, opts.Index),
+		User: fmt.Sprintf("cf:%s/%d", c.app.GUID, opts.Index),
 		Auth: []ssh.AuthMethod{
 			ssh.Password(c.token),
 		},

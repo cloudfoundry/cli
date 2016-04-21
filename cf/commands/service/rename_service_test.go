@@ -69,7 +69,7 @@ var _ = Describe("rename-service command", func() {
 		BeforeEach(func() {
 			serviceInstance = models.ServiceInstance{}
 			serviceInstance.Name = "different-name"
-			serviceInstance.Guid = "different-name-guid"
+			serviceInstance.GUID = "different-name-guid"
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true

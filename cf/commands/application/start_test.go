@@ -60,7 +60,7 @@ var _ = Describe("start command", func() {
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("start").SetDependency(deps, false))
 	}
 
-	getInstance := func(appGuid string) ([]models.AppInstanceFields, error) {
+	getInstance := func(appGUID string) ([]models.AppInstanceFields, error) {
 		var apiErr error
 		var instances []models.AppInstanceFields
 
@@ -103,7 +103,7 @@ var _ = Describe("start command", func() {
 		defaultAppForStart = models.Application{
 			ApplicationFields: models.ApplicationFields{
 				Name:          "my-app",
-				Guid:          "my-app-guid",
+				GUID:          "my-app-guid",
 				InstanceCount: 2,
 				PackageState:  "STAGED",
 			},
@@ -142,7 +142,7 @@ var _ = Describe("start command", func() {
 
 		logRepo = new(apifakes.FakeLogsRepository)
 		logMessages = []*logmessage.LogMessage{}
-		logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+		logRepo.TailLogsForStub = func(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 			c := make(chan *logmessage.LogMessage)
 
 			onConnect()
@@ -366,10 +366,10 @@ var _ = Describe("start command", func() {
 			correctSourceName := "STG"
 
 			logMessages = []*logmessage.LogMessage{
-				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
-				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
-				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
-				testlogs.NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
+				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.GUID, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
+				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.GUID, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
+				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.GUID, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
+				testlogs.NewLogMessage("Log Line 4", defaultAppForStart.GUID, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
 			}
 
 			callStart([]string{"my-app"})
@@ -387,18 +387,18 @@ var _ = Describe("start command", func() {
 		It("gracefully handles starting an app that is still staging", func() {
 			logRepoClosed := make(chan struct{})
 
-			logRepo.TailLogsForStub = func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+			logRepo.TailLogsForStub = func(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 				c := make(chan *logmessage.LogMessage)
 				onConnect()
 
 				go func() {
-					c <- testlogs.NewLogMessage("Before close", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					c <- testlogs.NewLogMessage("Before close", appGUID, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
 
 					<-logRepoClosed
 
 					time.Sleep(50 * time.Millisecond)
-					c <- testlogs.NewLogMessage("After close 1", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
-					c <- testlogs.NewLogMessage("After close 2", appGuid, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					c <- testlogs.NewLogMessage("After close 1", appGUID, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
+					c <- testlogs.NewLogMessage("After close 2", appGUID, LogMessageTypeStaging, "1", logmessage.LogMessage_ERR, time.Now())
 
 					close(c)
 				}()
@@ -619,7 +619,7 @@ var _ = Describe("start command", func() {
 		It("tells the user about the failure when starting the app fails", func() {
 			app := models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 			appRepo.ReadReturns(app, nil)
 			args := []string{"my-app"}
@@ -638,7 +638,7 @@ var _ = Describe("start command", func() {
 		It("warns the user when the app is already running", func() {
 			app := models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.State = "started"
 			appRepo := new(applicationsfakes.FakeApplicationRepository)
 			appRepo.ReadReturns(app, nil)

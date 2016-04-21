@@ -87,7 +87,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 			cmd.ui.Failed(err.Error())
 		}
 
-		org.QuotaDefinition.Guid = quota.Guid
+		org.QuotaDefinition.GUID = quota.GUID
 	}
 
 	err := cmd.orgRepo.Create(org)
@@ -124,7 +124,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 					"TargetOrg":   terminal.EntityNameColor(name),
 				}))
 
-			err = cmd.orgRoleSetter.SetOrgRole(org.Guid, "OrgManager", "", cmd.config.Username())
+			err = cmd.orgRoleSetter.SetOrgRole(org.GUID, "OrgManager", "", cmd.config.Username())
 			if err != nil {
 				cmd.ui.Failed(T("Failed assigning org role to user: ") + err.Error())
 			}

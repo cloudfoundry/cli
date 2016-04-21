@@ -21,7 +21,7 @@ type UAAUserResources struct {
 
 func (resource UserResource) ToFields() models.UserFields {
 	return models.UserFields{
-		Guid:     resource.Metadata.Guid,
+		GUID:     resource.Metadata.GUID,
 		IsAdmin:  resource.Entity.Admin,
 		Username: resource.Entity.Name,
 	}

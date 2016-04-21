@@ -34,14 +34,14 @@ var _ = Describe("DiegoApplication", func() {
 			BeforeEach(func() {
 				app := models.Application{}
 				app.Diego = true
-				app.Guid = "fake-app-guid"
+				app.GUID = "fake-app-guid"
 				appRepo.ReadReturns(app, nil)
 
 				Expect(req.Execute()).ToNot(HaveOccurred())
 			})
 
 			It("returns the application", func() {
-				Expect(req.GetApplication().Guid).To(Equal("fake-app-guid"))
+				Expect(req.GetApplication().GUID).To(Equal("fake-app-guid"))
 			})
 		})
 	})

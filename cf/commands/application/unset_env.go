@@ -78,7 +78,7 @@ func (cmd *UnsetEnv) Execute(c flags.FlagContext) {
 
 	delete(envParams, varName)
 
-	_, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
+	_, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

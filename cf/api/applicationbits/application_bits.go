@@ -25,7 +25,7 @@ const (
 
 type ApplicationBitsRepository interface {
 	GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error)
-	UploadBits(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error)
+	UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -39,8 +39,8 @@ func NewCloudControllerApplicationBitsRepository(config coreconfig.Reader, gatew
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadBits(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
-	apiUrl := fmt.Sprintf("/v2/apps/%s/bits", appGuid)
+func (repo CloudControllerApplicationBitsRepository) UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
+	apiUrl := fmt.Sprintf("/v2/apps/%s/bits", appGUID)
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
 			apiErr = fmt.Errorf("%s: %s", T("Error creating tmp file: {{.Err}}", map[string]interface{}{"Err": err}), err.Error())

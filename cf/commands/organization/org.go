@@ -69,7 +69,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 	org := cmd.orgReq.GetOrganization()
 
 	if c.Bool("guid") {
-		cmd.ui.Say(org.Guid)
+		cmd.ui.Say(org.GUID)
 	} else {
 		cmd.ui.Say(T("Getting info for org {{.OrgName}} as {{.Username}}...",
 			map[string]interface{}{
@@ -127,7 +127,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 
 func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.QuotaFields) {
 	cmd.pluginModel.Name = org.Name
-	cmd.pluginModel.Guid = org.Guid
+	cmd.pluginModel.GUID = org.GUID
 	cmd.pluginModel.QuotaDefinition.Name = quota.Name
 	cmd.pluginModel.QuotaDefinition.MemoryLimit = quota.MemoryLimit
 	cmd.pluginModel.QuotaDefinition.InstanceMemoryLimit = quota.InstanceMemoryLimit
@@ -138,8 +138,8 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	for _, domain := range org.Domains {
 		d := plugin_models.GetOrg_Domains{
 			Name: domain.Name,
-			Guid: domain.Guid,
-			OwningOrganizationGuid: domain.OwningOrganizationGuid,
+			GUID: domain.GUID,
+			OwningOrganizationGUID: domain.OwningOrganizationGUID,
 			Shared:                 domain.Shared,
 		}
 		cmd.pluginModel.Domains = append(cmd.pluginModel.Domains, d)
@@ -148,7 +148,7 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	for _, space := range org.Spaces {
 		s := plugin_models.GetOrg_Space{
 			Name: space.Name,
-			Guid: space.Guid,
+			GUID: space.GUID,
 		}
 		cmd.pluginModel.Spaces = append(cmd.pluginModel.Spaces, s)
 	}
@@ -156,7 +156,7 @@ func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.Qu
 	for _, spaceQuota := range org.SpaceQuotas {
 		sq := plugin_models.GetOrg_SpaceQuota{
 			Name:                spaceQuota.Name,
-			Guid:                spaceQuota.Guid,
+			GUID:                spaceQuota.GUID,
 			MemoryLimit:         spaceQuota.MemoryLimit,
 			InstanceMemoryLimit: spaceQuota.InstanceMemoryLimit,
 		}

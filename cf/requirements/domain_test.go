@@ -16,11 +16,11 @@ var _ = Describe("DomainRequirement", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		config.SetOrganizationFields(models.OrganizationFields{Guid: "the-org-guid"})
+		config.SetOrganizationFields(models.OrganizationFields{GUID: "the-org-guid"})
 	})
 
 	It("succeeds when the domain is found", func() {
-		domain := models.DomainFields{Name: "example.com", Guid: "domain-guid"}
+		domain := models.DomainFields{Name: "example.com", GUID: "domain-guid"}
 		domainRepo := new(apifakes.FakeDomainRepository)
 		domainRepo.FindByNameInOrgReturns(domain, nil)
 		domainReq := NewDomainRequirement("example.com", config, domainRepo)

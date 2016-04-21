@@ -126,7 +126,7 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(1))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(Equal("Super user 1"))
 			})
 		})
@@ -192,11 +192,11 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(3))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(Equal("Super user 1"))
-				Expect(users[1].Guid).To(Equal("user-2-guid"))
+				Expect(users[1].GUID).To(Equal("user-2-guid"))
 				Expect(users[1].Username).To(Equal("Super user 2"))
-				Expect(users[2].Guid).To(Equal("user-3-guid"))
+				Expect(users[2].GUID).To(Equal("user-3-guid"))
 				Expect(users[2].Username).To(Equal("Super user 3"))
 			})
 		})
@@ -285,7 +285,7 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(1))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(BeEmpty())
 			})
 		})
@@ -335,11 +335,11 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(3))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(BeEmpty())
-				Expect(users[1].Guid).To(Equal("user-2-guid"))
+				Expect(users[1].GUID).To(Equal("user-2-guid"))
 				Expect(users[1].Username).To(Equal("user 2 from cc"))
-				Expect(users[2].Guid).To(Equal("user-3-guid"))
+				Expect(users[2].GUID).To(Equal("user-3-guid"))
 				Expect(users[2].Username).To(Equal("user 3 from cc"))
 			})
 		})
@@ -453,7 +453,7 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(1))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(Equal("Super user 1"))
 			})
 		})
@@ -519,7 +519,7 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(1))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(BeEmpty())
 			})
 		})
@@ -569,11 +569,11 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(3))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(BeEmpty())
-				Expect(users[1].Guid).To(Equal("user-2-guid"))
+				Expect(users[1].GUID).To(Equal("user-2-guid"))
 				Expect(users[1].Username).To(Equal("user 2 from cc"))
-				Expect(users[2].Guid).To(Equal("user-3-guid"))
+				Expect(users[2].GUID).To(Equal("user-3-guid"))
 				Expect(users[2].Username).To(Equal("user 3 from cc"))
 			})
 		})
@@ -665,7 +665,7 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(user).To(Equal(models.UserFields{
 					Username: "my-full-username",
-					Guid:     "my-guid",
+					GUID:     "my-guid",
 				}))
 			})
 		})
@@ -933,7 +933,7 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
-	Describe("SetOrgRoleByGuid", func() {
+	Describe("SetOrgRoleByGUID", func() {
 		Context("when given the OrgManager role", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
@@ -949,7 +949,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetOrgRoleByGuid("user-guid", "org-guid", models.ORG_MANAGER)
+				err := client.SetOrgRoleByGUID("user-guid", "org-guid", models.ORG_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -970,7 +970,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetOrgRoleByGuid("user-guid", "org-guid", models.BILLING_MANAGER)
+				err := client.SetOrgRoleByGUID("user-guid", "org-guid", models.BILLING_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -991,7 +991,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetOrgRoleByGuid("user-guid", "org-guid", models.ORG_AUDITOR)
+				err := client.SetOrgRoleByGUID("user-guid", "org-guid", models.ORG_AUDITOR)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -999,18 +999,18 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when given an invalid role", func() {
 			It("does not make a request to CC", func() {
-				client.SetOrgRoleByGuid("user-guid", "org-guid", "Wibble")
+				client.SetOrgRoleByGUID("user-guid", "org-guid", "Wibble")
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
 
 			It("returns an error", func() {
-				err := client.SetOrgRoleByGuid("user-guid", "org-guid", "Wibble")
+				err := client.SetOrgRoleByGUID("user-guid", "org-guid", "Wibble")
 				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
 
-	Describe("UnsetOrgRoleByGuid", func() {
+	Describe("UnsetOrgRoleByGUID", func() {
 		Context("when given the OrgManager role", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
@@ -1022,7 +1022,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes a request to CC", func() {
-				err := client.UnsetOrgRoleByGuid("user-guid", "org-guid", models.ORG_MANAGER)
+				err := client.UnsetOrgRoleByGUID("user-guid", "org-guid", models.ORG_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
@@ -1039,7 +1039,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes a request to CC", func() {
-				err := client.UnsetOrgRoleByGuid("user-guid", "org-guid", models.BILLING_MANAGER)
+				err := client.UnsetOrgRoleByGUID("user-guid", "org-guid", models.BILLING_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
@@ -1056,7 +1056,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes a request to CC", func() {
-				err := client.UnsetOrgRoleByGuid("user-guid", "org-guid", models.ORG_AUDITOR)
+				err := client.UnsetOrgRoleByGUID("user-guid", "org-guid", models.ORG_AUDITOR)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
@@ -1064,12 +1064,12 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when given an invalid role", func() {
 			It("does not make a request to CC", func() {
-				client.UnsetOrgRoleByGuid("user-guid", "org-guid", "Wibble")
+				client.UnsetOrgRoleByGUID("user-guid", "org-guid", "Wibble")
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
 
 			It("returns an error", func() {
-				err := client.UnsetOrgRoleByGuid("user-guid", "org-guid", "Wibble")
+				err := client.UnsetOrgRoleByGUID("user-guid", "org-guid", "Wibble")
 				Expect(err).To(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
@@ -1448,7 +1448,7 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
-	Describe("SetSpaceRoleByGuid", func() {
+	Describe("SetSpaceRoleByGUID", func() {
 		Context("when given the SpaceManager role", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
@@ -1464,7 +1464,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", models.SPACE_MANAGER)
+				err := client.SetSpaceRoleByGUID("user-guid", "space-guid", "org-guid", models.SPACE_MANAGER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -1485,7 +1485,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", models.SPACE_DEVELOPER)
+				err := client.SetSpaceRoleByGUID("user-guid", "space-guid", "org-guid", models.SPACE_DEVELOPER)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -1506,7 +1506,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes two requests to CC", func() {
-				err := client.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", models.SPACE_AUDITOR)
+				err := client.SetSpaceRoleByGUID("user-guid", "space-guid", "org-guid", models.SPACE_AUDITOR)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			})
@@ -1514,7 +1514,7 @@ var _ = Describe("UserRepository", func() {
 
 		Context("when given an invalid role", func() {
 			It("returns an error", func() {
-				err := client.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", "Wibble")
+				err := client.SetSpaceRoleByGUID("user-guid", "space-guid", "org-guid", "Wibble")
 				Expect(err).To(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
@@ -1531,7 +1531,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("returns an error", func() {
-				err := client.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", models.SPACE_AUDITOR)
+				err := client.SetSpaceRoleByGUID("user-guid", "space-guid", "org-guid", models.SPACE_AUDITOR)
 				Expect(err).To(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 				Expect(err.Error()).To(ContainSubstring("status code: 500"))
@@ -1553,7 +1553,7 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("returns an error", func() {
-				err := client.SetSpaceRoleByGuid("user-guid", "space-guid", "org-guid", models.SPACE_AUDITOR)
+				err := client.SetSpaceRoleByGUID("user-guid", "space-guid", "org-guid", models.SPACE_AUDITOR)
 				Expect(err).To(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 				Expect(err.Error()).To(ContainSubstring("status code: 500"))
@@ -1664,7 +1664,7 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(len(users)).To(Equal(1))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(Equal("Super user 1"))
 			})
 		})
@@ -1730,11 +1730,11 @@ var _ = Describe("UserRepository", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(len(users)).To(Equal(3))
-				Expect(users[0].Guid).To(Equal("user-1-guid"))
+				Expect(users[0].GUID).To(Equal("user-1-guid"))
 				Expect(users[0].Username).To(Equal("Super user 1"))
-				Expect(users[1].Guid).To(Equal("user-2-guid"))
+				Expect(users[1].GUID).To(Equal("user-2-guid"))
 				Expect(users[1].Username).To(Equal("Super user 2"))
-				Expect(users[2].Guid).To(Equal("user-3-guid"))
+				Expect(users[2].GUID).To(Equal("user-3-guid"))
 				Expect(users[2].Username).To(Equal("Super user 3"))
 			})
 		})

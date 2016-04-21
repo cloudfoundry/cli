@@ -81,7 +81,7 @@ func (cmd *DeleteSpaceQuota) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(apiErr.Error())
 	}
 
-	apiErr = cmd.spaceQuotaRepo.Delete(quota.Guid)
+	apiErr = cmd.spaceQuotaRepo.Delete(quota.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}

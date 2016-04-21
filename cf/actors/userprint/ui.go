@@ -10,7 +10,7 @@ import (
 
 type SpaceUsersUiPrinter struct {
 	Ui               terminal.UI
-	UserLister       func(spaceGuid string, role string) ([]models.UserFields, error)
+	UserLister       func(spaceGUID string, role string) ([]models.UserFields, error)
 	Roles            []string
 	RoleDisplayNames map[string]string
 }
@@ -18,7 +18,7 @@ type SpaceUsersUiPrinter struct {
 type OrgUsersUiPrinter struct {
 	Roles            []string
 	RoleDisplayNames map[string]string
-	UserLister       func(orgGuid string, role string) ([]models.UserFields, error)
+	UserLister       func(orgGUID string, role string) ([]models.UserFields, error)
 	Ui               terminal.UI
 }
 

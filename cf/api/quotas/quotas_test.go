@@ -81,7 +81,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			Expect(quota).To(Equal(models.QuotaFields{
-				Guid:                    "my-quota-guid",
+				GUID:                    "my-quota-guid",
 				Name:                    "my-remote-quota",
 				MemoryLimit:             1024,
 				InstanceMemoryLimit:     -1,
@@ -147,15 +147,15 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		It("finds all Quota definitions", func() {
 			Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
 			Expect(quotas).To(HaveLen(3))
-			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
+			Expect(quotas[0].GUID).To(Equal("my-quota-guid"))
 			Expect(quotas[0].Name).To(Equal("my-remote-quota"))
 			Expect(quotas[0].MemoryLimit).To(Equal(int64(1024)))
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
 			Expect(quotas[0].AppInstanceLimit).To(Equal(7))
 
-			Expect(quotas[1].Guid).To(Equal("my-quota-guid2"))
-			Expect(quotas[2].Guid).To(Equal("my-quota-guid3"))
+			Expect(quotas[1].GUID).To(Equal("my-quota-guid2"))
+			Expect(quotas[2].GUID).To(Equal("my-quota-guid3"))
 		})
 
 		It("defaults missing app instance limit to -1 (unlimited)", func() {
@@ -238,7 +238,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("updates an existing quota", func() {
 			quota := models.QuotaFields{
-				Guid:             "my-quota-guid",
+				GUID:             "my-quota-guid",
 				Name:             "amazing-quota",
 				ServicesLimit:    1,
 				RoutesLimit:      12,

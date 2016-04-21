@@ -61,7 +61,7 @@ func (cmd *DeleteDomain) SetDependency(deps commandregistry.Dependency, pluginCa
 
 func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 	domainName := c.Args()[0]
-	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
+	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().GUID)
 
 	switch apiErr.(type) {
 	case nil:
@@ -92,7 +92,7 @@ func (cmd *DeleteDomain) Execute(c flags.FlagContext) {
 			"DomainName": terminal.EntityNameColor(domainName),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.domainRepo.Delete(domain.Guid)
+	apiErr = cmd.domainRepo.Delete(domain.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
 			map[string]interface{}{"DomainName": domainName, "ApiErr": apiErr.Error()}))

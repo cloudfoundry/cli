@@ -69,13 +69,13 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
 	printer := cmd.printer(org, space, cmd.config.Username())
-	printer.PrintUsers(space.Guid, cmd.config.Username())
+	printer.PrintUsers(space.GUID, cmd.config.Username())
 }
 
 func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, username string) userprint.UserPrinter {
@@ -108,7 +108,7 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 	}
 }
 
-func (cmd *SpaceUsers) userLister() func(spaceGuid string, role string) ([]models.UserFields, error) {
+func (cmd *SpaceUsers) userLister() func(spaceGUID string, role string) ([]models.UserFields, error) {
 	if cmd.config.IsMinApiVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumApiVersion) {
 		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
 	}

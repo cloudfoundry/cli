@@ -1,7 +1,7 @@
 package models
 
 type ServiceAuthTokenFields struct {
-	Guid     string
+	GUID     string
 	Label    string
 	Provider string
 	Token    string

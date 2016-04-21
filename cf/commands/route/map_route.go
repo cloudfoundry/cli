@@ -147,7 +147,7 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
+	apiErr = cmd.routeRepo.Bind(route.GUID, app.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return

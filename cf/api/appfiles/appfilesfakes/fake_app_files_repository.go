@@ -8,10 +8,10 @@ import (
 )
 
 type FakeAppFilesRepository struct {
-	ListFilesStub        func(appGuid string, instance int, path string) (files string, apiErr error)
+	ListFilesStub        func(appGUID string, instance int, path string) (files string, apiErr error)
 	listFilesMutex       sync.RWMutex
 	listFilesArgsForCall []struct {
-		appGuid  string
+		appGUID  string
 		instance int
 		path     string
 	}
@@ -21,16 +21,16 @@ type FakeAppFilesRepository struct {
 	}
 }
 
-func (fake *FakeAppFilesRepository) ListFiles(appGuid string, instance int, path string) (files string, apiErr error) {
+func (fake *FakeAppFilesRepository) ListFiles(appGUID string, instance int, path string) (files string, apiErr error) {
 	fake.listFilesMutex.Lock()
 	fake.listFilesArgsForCall = append(fake.listFilesArgsForCall, struct {
-		appGuid  string
+		appGUID  string
 		instance int
 		path     string
-	}{appGuid, instance, path})
+	}{appGUID, instance, path})
 	fake.listFilesMutex.Unlock()
 	if fake.ListFilesStub != nil {
-		return fake.ListFilesStub(appGuid, instance, path)
+		return fake.ListFilesStub(appGUID, instance, path)
 	} else {
 		return fake.listFilesReturns.result1, fake.listFilesReturns.result2
 	}
@@ -45,7 +45,7 @@ func (fake *FakeAppFilesRepository) ListFilesCallCount() int {
 func (fake *FakeAppFilesRepository) ListFilesArgsForCall(i int) (string, int, string) {
 	fake.listFilesMutex.RLock()
 	defer fake.listFilesMutex.RUnlock()
-	return fake.listFilesArgsForCall[i].appGuid, fake.listFilesArgsForCall[i].instance, fake.listFilesArgsForCall[i].path
+	return fake.listFilesArgsForCall[i].appGUID, fake.listFilesArgsForCall[i].instance, fake.listFilesArgsForCall[i].path
 }
 
 func (fake *FakeAppFilesRepository) ListFilesReturns(result1 string, result2 error) {

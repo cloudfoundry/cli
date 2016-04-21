@@ -198,13 +198,13 @@ func (cmd *CliRPCCmd) GetOutputAndReset(args bool, retVal *[]string) error {
 
 func (cmd *CliRPCCmd) GetCurrentOrg(args string, retVal *plugin_models.Organization) error {
 	retVal.Name = cmd.cliConfig.OrganizationFields().Name
-	retVal.Guid = cmd.cliConfig.OrganizationFields().Guid
+	retVal.GUID = cmd.cliConfig.OrganizationFields().GUID
 	return nil
 }
 
 func (cmd *CliRPCCmd) GetCurrentSpace(args string, retVal *plugin_models.Space) error {
 	retVal.Name = cmd.cliConfig.SpaceFields().Name
-	retVal.Guid = cmd.cliConfig.SpaceFields().Guid
+	retVal.GUID = cmd.cliConfig.SpaceFields().GUID
 
 	return nil
 }
@@ -215,8 +215,8 @@ func (cmd *CliRPCCmd) Username(args string, retVal *string) error {
 	return nil
 }
 
-func (cmd *CliRPCCmd) UserGuid(args string, retVal *string) error {
-	*retVal = cmd.cliConfig.UserGuid()
+func (cmd *CliRPCCmd) UserGUID(args string, retVal *string) error {
+	*retVal = cmd.cliConfig.UserGUID()
 
 	return nil
 }

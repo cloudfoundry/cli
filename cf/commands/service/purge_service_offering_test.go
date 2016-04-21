@@ -117,7 +117,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 		Context("when finding the service offering succeeds", func() {
 			BeforeEach(func() {
 				serviceOffering := models.ServiceOffering{}
-				serviceOffering.Guid = "service-offering-guid"
+				serviceOffering.GUID = "service-offering-guid"
 				serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{serviceOffering}, nil)
 			})
 
@@ -241,7 +241,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 			Context("when finding the service offering succeeds", func() {
 				BeforeEach(func() {
 					serviceOffering := models.ServiceOffering{}
-					serviceOffering.Guid = "service-offering-guid"
+					serviceOffering.GUID = "service-offering-guid"
 					serviceRepo.FindServiceOfferingByLabelAndProviderReturns(serviceOffering, nil)
 				})
 

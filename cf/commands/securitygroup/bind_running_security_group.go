@@ -69,7 +69,7 @@ func (cmd *bindToRunningGroup) Execute(context flags.FlagContext) {
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 		}))
 
-	err = cmd.runningGroupRepo.BindToRunningSet(securityGroup.Guid)
+	err = cmd.runningGroupRepo.BindToRunningSet(securityGroup.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

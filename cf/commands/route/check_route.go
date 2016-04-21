@@ -115,8 +115,8 @@ func (cmd *CheckRoute) Execute(c flags.FlagContext) {
 }
 
 func (cmd *CheckRoute) CheckRoute(hostName, domainName, path string) (bool, error) {
-	orgGuid := cmd.config.OrganizationFields().Guid
-	domain, err := cmd.domainRepo.FindByNameInOrg(domainName, orgGuid)
+	orgGUID := cmd.config.OrganizationFields().GUID
+	domain, err := cmd.domainRepo.FindByNameInOrg(domainName, orgGUID)
 	if err != nil {
 		return false, err
 	}

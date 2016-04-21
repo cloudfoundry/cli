@@ -73,9 +73,9 @@ var _ = Describe("set-quota command", func() {
 		It("assigns a quota to an org", func() {
 			org := models.Organization{}
 			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+			org.GUID = "my-org-guid"
 
-			quota := models.QuotaFields{Name: "my-quota", Guid: "my-quota-guid"}
+			quota := models.QuotaFields{Name: "my-quota", GUID: "my-quota-guid"}
 
 			quotaRepo.FindByNameReturns(quota, nil)
 			requirementsFactory.Organization = org
@@ -88,9 +88,9 @@ var _ = Describe("set-quota command", func() {
 			))
 
 			Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("my-quota"))
-			orgGuid, quotaGuid := quotaRepo.AssignQuotaToOrgArgsForCall(0)
-			Expect(orgGuid).To(Equal("my-org-guid"))
-			Expect(quotaGuid).To(Equal("my-quota-guid"))
+			orgGUID, quotaGUID := quotaRepo.AssignQuotaToOrgArgsForCall(0)
+			Expect(orgGUID).To(Equal("my-org-guid"))
+			Expect(quotaGUID).To(Equal("my-quota-guid"))
 		})
 	})
 })

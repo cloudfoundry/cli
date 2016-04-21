@@ -9,19 +9,19 @@ import (
 )
 
 type FakeLogsRepository struct {
-	RecentLogsForStub        func(appGuid string) ([]*logmessage.LogMessage, error)
+	RecentLogsForStub        func(appGUID string) ([]*logmessage.LogMessage, error)
 	recentLogsForMutex       sync.RWMutex
 	recentLogsForArgsForCall []struct {
-		appGuid string
+		appGUID string
 	}
 	recentLogsForReturns struct {
 		result1 []*logmessage.LogMessage
 		result2 error
 	}
-	TailLogsForStub        func(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error)
+	TailLogsForStub        func(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error)
 	tailLogsForMutex       sync.RWMutex
 	tailLogsForArgsForCall []struct {
-		appGuid   string
+		appGUID   string
 		onConnect func()
 	}
 	tailLogsForReturns struct {
@@ -33,14 +33,14 @@ type FakeLogsRepository struct {
 	closeArgsForCall []struct{}
 }
 
-func (fake *FakeLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
+func (fake *FakeLogsRepository) RecentLogsFor(appGUID string) ([]*logmessage.LogMessage, error) {
 	fake.recentLogsForMutex.Lock()
 	fake.recentLogsForArgsForCall = append(fake.recentLogsForArgsForCall, struct {
-		appGuid string
-	}{appGuid})
+		appGUID string
+	}{appGUID})
 	fake.recentLogsForMutex.Unlock()
 	if fake.RecentLogsForStub != nil {
-		return fake.RecentLogsForStub(appGuid)
+		return fake.RecentLogsForStub(appGUID)
 	} else {
 		return fake.recentLogsForReturns.result1, fake.recentLogsForReturns.result2
 	}
@@ -55,7 +55,7 @@ func (fake *FakeLogsRepository) RecentLogsForCallCount() int {
 func (fake *FakeLogsRepository) RecentLogsForArgsForCall(i int) string {
 	fake.recentLogsForMutex.RLock()
 	defer fake.recentLogsForMutex.RUnlock()
-	return fake.recentLogsForArgsForCall[i].appGuid
+	return fake.recentLogsForArgsForCall[i].appGUID
 }
 
 func (fake *FakeLogsRepository) RecentLogsForReturns(result1 []*logmessage.LogMessage, result2 error) {
@@ -66,15 +66,15 @@ func (fake *FakeLogsRepository) RecentLogsForReturns(result1 []*logmessage.LogMe
 	}{result1, result2}
 }
 
-func (fake *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
+func (fake *FakeLogsRepository) TailLogsFor(appGUID string, onConnect func()) (<-chan *logmessage.LogMessage, error) {
 	fake.tailLogsForMutex.Lock()
 	fake.tailLogsForArgsForCall = append(fake.tailLogsForArgsForCall, struct {
-		appGuid   string
+		appGUID   string
 		onConnect func()
-	}{appGuid, onConnect})
+	}{appGUID, onConnect})
 	fake.tailLogsForMutex.Unlock()
 	if fake.TailLogsForStub != nil {
-		return fake.TailLogsForStub(appGuid, onConnect)
+		return fake.TailLogsForStub(appGUID, onConnect)
 	} else {
 		return fake.tailLogsForReturns.result1, fake.tailLogsForReturns.result2
 	}
@@ -89,7 +89,7 @@ func (fake *FakeLogsRepository) TailLogsForCallCount() int {
 func (fake *FakeLogsRepository) TailLogsForArgsForCall(i int) (string, func()) {
 	fake.tailLogsForMutex.RLock()
 	defer fake.tailLogsForMutex.RUnlock()
-	return fake.tailLogsForArgsForCall[i].appGuid, fake.tailLogsForArgsForCall[i].onConnect
+	return fake.tailLogsForArgsForCall[i].appGUID, fake.tailLogsForArgsForCall[i].onConnect
 }
 
 func (fake *FakeLogsRepository) TailLogsForReturns(result1 <-chan *logmessage.LogMessage, result2 error) {

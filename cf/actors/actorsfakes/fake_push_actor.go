@@ -11,10 +11,10 @@ import (
 )
 
 type FakePushActor struct {
-	UploadAppStub        func(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error
+	UploadAppStub        func(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	uploadAppMutex       sync.RWMutex
 	uploadAppArgsForCall []struct {
-		appGuid      string
+		appGUID      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
 	}
@@ -44,16 +44,16 @@ type FakePushActor struct {
 	}
 }
 
-func (fake *FakePushActor) UploadApp(appGuid string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
+func (fake *FakePushActor) UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
 	fake.uploadAppMutex.Lock()
 	fake.uploadAppArgsForCall = append(fake.uploadAppArgsForCall, struct {
-		appGuid      string
+		appGUID      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
-	}{appGuid, zipFile, presentFiles})
+	}{appGUID, zipFile, presentFiles})
 	fake.uploadAppMutex.Unlock()
 	if fake.UploadAppStub != nil {
-		return fake.UploadAppStub(appGuid, zipFile, presentFiles)
+		return fake.UploadAppStub(appGUID, zipFile, presentFiles)
 	} else {
 		return fake.uploadAppReturns.result1
 	}
@@ -68,7 +68,7 @@ func (fake *FakePushActor) UploadAppCallCount() int {
 func (fake *FakePushActor) UploadAppArgsForCall(i int) (string, *os.File, []resources.AppFileResource) {
 	fake.uploadAppMutex.RLock()
 	defer fake.uploadAppMutex.RUnlock()
-	return fake.uploadAppArgsForCall[i].appGuid, fake.uploadAppArgsForCall[i].zipFile, fake.uploadAppArgsForCall[i].presentFiles
+	return fake.uploadAppArgsForCall[i].appGUID, fake.uploadAppArgsForCall[i].zipFile, fake.uploadAppArgsForCall[i].presentFiles
 }
 
 func (fake *FakePushActor) UploadAppReturns(result1 error) {

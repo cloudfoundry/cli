@@ -65,7 +65,7 @@ func (cmd *bindToStagingGroup) Execute(context flags.FlagContext) {
 			"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 		}))
 
-	err = cmd.stagingGroupRepo.BindToStagingSet(securityGroup.Guid)
+	err = cmd.stagingGroupRepo.BindToStagingSet(securityGroup.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

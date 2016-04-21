@@ -47,15 +47,15 @@ func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, 
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("unset-org-role"))
 	}
 
-	var wantGuid bool
+	var wantGUID bool
 	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("unset_roles_by_username")
-		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -89,10 +89,10 @@ func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 		}))
 
 	var err error
-	if len(user.Guid) > 0 {
-		err = cmd.userRepo.UnsetOrgRoleByGuid(user.Guid, org.Guid, role)
+	if len(user.GUID) > 0 {
+		err = cmd.userRepo.UnsetOrgRoleByGUID(user.GUID, org.GUID, role)
 	} else {
-		err = cmd.userRepo.UnsetOrgRoleByUsername(user.Username, org.Guid, role)
+		err = cmd.userRepo.UnsetOrgRoleByUsername(user.Username, org.GUID, role)
 	}
 
 	if err != nil {

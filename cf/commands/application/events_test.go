@@ -64,19 +64,19 @@ var _ = Describe("events command", func() {
 
 		app := models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 		requirementsFactory.Application = app
 
 		eventsRepo.RecentEventsReturns([]models.EventFields{
 			{
-				Guid:        "event-guid-1",
+				GUID:        "event-guid-1",
 				Name:        "app crashed",
 				Timestamp:   earlierTimestamp,
 				Description: "reason: app instance exited, exit_status: 78",
 				ActorName:   "George Clooney",
 			},
 			{
-				Guid:        "event-guid-2",
+				GUID:        "event-guid-2",
 				Name:        "app crashed",
 				Timestamp:   timestamp,
 				Description: "reason: app instance was stopped, exit_status: 77",
@@ -87,9 +87,9 @@ var _ = Describe("events command", func() {
 		runCommand("my-app")
 
 		Expect(eventsRepo.RecentEventsCallCount()).To(Equal(1))
-		appGuid, limit := eventsRepo.RecentEventsArgsForCall(0)
+		appGUID, limit := eventsRepo.RecentEventsArgsForCall(0)
 		Expect(limit).To(Equal(int64(50)))
-		Expect(appGuid).To(Equal("my-app-guid"))
+		Expect(appGUID).To(Equal("my-app-guid"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 			[]string{"time", "event", "actor", "description"},

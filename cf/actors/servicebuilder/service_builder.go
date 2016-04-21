@@ -55,7 +55,7 @@ func (builder Builder) GetAllServicesWithPlans() ([]models.ServiceOffering, erro
 
 	var plans []models.ServicePlanFields
 	for index, service := range services {
-		plans, err = builder.planBuilder.GetPlansForService(service.Guid)
+		plans, err = builder.planBuilder.GetPlansForService(service.GUID)
 		if err != nil {
 			return []models.ServiceOffering{}, err
 		}
@@ -65,18 +65,18 @@ func (builder Builder) GetAllServicesWithPlans() ([]models.ServiceOffering, erro
 	return services, err
 }
 
-func (builder Builder) GetServicesForSpace(spaceGuid string) ([]models.ServiceOffering, error) {
-	return builder.serviceRepo.GetServiceOfferingsForSpace(spaceGuid)
+func (builder Builder) GetServicesForSpace(spaceGUID string) ([]models.ServiceOffering, error) {
+	return builder.serviceRepo.GetServiceOfferingsForSpace(spaceGUID)
 }
 
-func (builder Builder) GetServicesForSpaceWithPlans(spaceGuid string) ([]models.ServiceOffering, error) {
-	services, err := builder.GetServicesForSpace(spaceGuid)
+func (builder Builder) GetServicesForSpaceWithPlans(spaceGUID string) ([]models.ServiceOffering, error) {
+	services, err := builder.GetServicesForSpace(spaceGUID)
 	if err != nil {
 		return []models.ServiceOffering{}, err
 	}
 
 	for index, service := range services {
-		services[index].Plans, err = builder.planBuilder.GetPlansForService(service.Guid)
+		services[index].Plans, err = builder.planBuilder.GetPlansForService(service.GUID)
 		if err != nil {
 			return []models.ServiceOffering{}, err
 		}
@@ -92,7 +92,7 @@ func (builder Builder) GetServiceByNameWithPlans(serviceLabel string) (models.Se
 	}
 	service := returnV2Service(services)
 
-	service.Plans, err = builder.planBuilder.GetPlansForService(service.Guid)
+	service.Plans, err = builder.planBuilder.GetPlansForService(service.GUID)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
@@ -113,8 +113,8 @@ func (builder Builder) GetServiceByNameForOrg(serviceLabel, orgName string) (mod
 	return service, nil
 }
 
-func (builder Builder) GetServiceByNameForSpace(serviceLabel, spaceGuid string) (models.ServiceOffering, error) {
-	offerings, err := builder.serviceRepo.FindServiceOfferingsForSpaceByLabel(spaceGuid, serviceLabel)
+func (builder Builder) GetServiceByNameForSpace(serviceLabel, spaceGUID string) (models.ServiceOffering, error) {
+	offerings, err := builder.serviceRepo.FindServiceOfferingsForSpaceByLabel(spaceGUID, serviceLabel)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
@@ -128,13 +128,13 @@ func (builder Builder) GetServiceByNameForSpace(serviceLabel, spaceGuid string) 
 	return models.ServiceOffering{}, errors.New("Could not find service")
 }
 
-func (builder Builder) GetServiceByNameForSpaceWithPlans(serviceLabel, spaceGuid string) (models.ServiceOffering, error) {
-	offering, err := builder.GetServiceByNameForSpace(serviceLabel, spaceGuid)
+func (builder Builder) GetServiceByNameForSpaceWithPlans(serviceLabel, spaceGUID string) (models.ServiceOffering, error) {
+	offering, err := builder.GetServiceByNameForSpace(serviceLabel, spaceGUID)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
 
-	offering.Plans, err = builder.planBuilder.GetPlansForService(offering.Guid)
+	offering.Plans, err = builder.planBuilder.GetPlansForService(offering.GUID)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
@@ -142,14 +142,14 @@ func (builder Builder) GetServiceByNameForSpaceWithPlans(serviceLabel, spaceGuid
 	return offering, nil
 }
 
-func (builder Builder) GetServicesByNameForSpaceWithPlans(serviceLabel, spaceGuid string) (models.ServiceOfferings, error) {
-	offerings, err := builder.serviceRepo.FindServiceOfferingsForSpaceByLabel(serviceLabel, spaceGuid)
+func (builder Builder) GetServicesByNameForSpaceWithPlans(serviceLabel, spaceGUID string) (models.ServiceOfferings, error) {
+	offerings, err := builder.serviceRepo.FindServiceOfferingsForSpaceByLabel(serviceLabel, spaceGUID)
 	if err != nil {
 		return models.ServiceOfferings{}, err
 	}
 
 	for index, offering := range offerings {
-		offerings[index].Plans, err = builder.planBuilder.GetPlansForService(offering.Guid)
+		offerings[index].Plans, err = builder.planBuilder.GetPlansForService(offering.GUID)
 		if err != nil {
 			return models.ServiceOfferings{}, err
 		}
@@ -171,16 +171,16 @@ func (builder Builder) GetServiceByNameWithPlansWithOrgNames(serviceLabel string
 	return service, nil
 }
 
-func (builder Builder) GetServicesForManyBrokers(brokerGuids []string) ([]models.ServiceOffering, error) {
-	services, err := builder.serviceRepo.ListServicesFromManyBrokers(brokerGuids)
+func (builder Builder) GetServicesForManyBrokers(brokerGUIDs []string) ([]models.ServiceOffering, error) {
+	services, err := builder.serviceRepo.ListServicesFromManyBrokers(brokerGUIDs)
 	if err != nil {
 		return nil, err
 	}
 	return builder.populateServicesWithPlansAndOrgs(services)
 }
 
-func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.ServiceOffering, error) {
-	services, err := builder.serviceRepo.ListServicesFromBroker(brokerGuid)
+func (builder Builder) GetServicesForBroker(brokerGUID string) ([]models.ServiceOffering, error) {
+	services, err := builder.serviceRepo.ListServicesFromBroker(brokerGUID)
 	if err != nil {
 		return nil, err
 	}
@@ -188,12 +188,12 @@ func (builder Builder) GetServicesForBroker(brokerGuid string) ([]models.Service
 }
 
 func (builder Builder) populateServicesWithPlansAndOrgs(services []models.ServiceOffering) ([]models.ServiceOffering, error) {
-	serviceGuids := []string{}
+	serviceGUIDs := []string{}
 	for _, service := range services {
-		serviceGuids = append(serviceGuids, service.Guid)
+		serviceGUIDs = append(serviceGUIDs, service.GUID)
 	}
 
-	plans, err := builder.planBuilder.GetPlansForManyServicesWithOrgs(serviceGuids)
+	plans, err := builder.planBuilder.GetPlansForManyServicesWithOrgs(serviceGUIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func (builder Builder) GetServicesVisibleToOrg(orgName string) ([]models.Service
 }
 
 func (builder Builder) attachPlansToServiceForOrg(service models.ServiceOffering, orgName string) (models.ServiceOffering, error) {
-	plans, err := builder.planBuilder.GetPlansForServiceForOrg(service.Guid, orgName)
+	plans, err := builder.planBuilder.GetPlansForServiceForOrg(service.GUID, orgName)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
@@ -239,7 +239,7 @@ func (builder Builder) attachPlansToServiceForOrg(service models.ServiceOffering
 func (builder Builder) attachPlansToManyServices(services []models.ServiceOffering, plans []models.ServicePlanFields) ([]models.ServiceOffering, error) {
 	for _, plan := range plans {
 		for index, service := range services {
-			if service.Guid == plan.ServiceOfferingGuid {
+			if service.GUID == plan.ServiceOfferingGUID {
 				services[index].Plans = append(service.Plans, plan)
 				break
 			}
@@ -249,7 +249,7 @@ func (builder Builder) attachPlansToManyServices(services []models.ServiceOfferi
 }
 
 func (builder Builder) attachPlansToService(service models.ServiceOffering) (models.ServiceOffering, error) {
-	plans, err := builder.planBuilder.GetPlansForServiceWithOrgs(service.Guid)
+	plans, err := builder.planBuilder.GetPlansForServiceWithOrgs(service.GUID)
 	if err != nil {
 		return models.ServiceOffering{}, err
 	}
@@ -263,20 +263,20 @@ func (builder Builder) attachServicesToPlans(plans []models.ServicePlanFields) (
 	servicesMap := make(map[string]models.ServiceOffering)
 
 	for _, plan := range plans {
-		if plan.ServiceOfferingGuid == "" {
+		if plan.ServiceOfferingGUID == "" {
 			continue
 		}
 
-		if service, ok := servicesMap[plan.ServiceOfferingGuid]; ok {
+		if service, ok := servicesMap[plan.ServiceOfferingGUID]; ok {
 			service.Plans = append(service.Plans, plan)
-			servicesMap[service.Guid] = service
+			servicesMap[service.GUID] = service
 		} else {
-			service, err := builder.serviceRepo.GetServiceOfferingByGuid(plan.ServiceOfferingGuid)
+			service, err := builder.serviceRepo.GetServiceOfferingByGUID(plan.ServiceOfferingGUID)
 			if err != nil {
 				return nil, err
 			}
 			service.Plans = append(service.Plans, plan)
-			servicesMap[service.Guid] = service
+			servicesMap[service.GUID] = service
 		}
 	}
 
@@ -295,7 +295,7 @@ func (builder Builder) attachSpecificServiceToPlans(serviceName string, plans []
 
 	service := services[0]
 	for _, plan := range plans {
-		if plan.ServiceOfferingGuid == service.Guid {
+		if plan.ServiceOfferingGUID == service.GUID {
 			service.Plans = append(service.Plans, plan)
 		}
 	}

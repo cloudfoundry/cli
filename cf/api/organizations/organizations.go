@@ -16,13 +16,13 @@ import (
 
 type OrganizationRepository interface {
 	ListOrgs(limit int) ([]models.Organization, error)
-	GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, apiErr error)
+	GetManyOrgsByGUID(orgGUIDs []string) (orgs []models.Organization, apiErr error)
 	FindByName(name string) (org models.Organization, apiErr error)
 	Create(org models.Organization) (apiErr error)
-	Rename(orgGuid string, name string) (apiErr error)
-	Delete(orgGuid string) (apiErr error)
-	SharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
-	UnsharePrivateDomain(orgGuid string, domainGuid string) (apiErr error)
+	Rename(orgGUID string, name string) (apiErr error)
+	Delete(orgGUID string) (apiErr error)
+	SharePrivateDomain(orgGUID string, domainGUID string) (apiErr error)
+	UnsharePrivateDomain(orgGUID string, domainGUID string) (apiErr error)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -53,9 +53,9 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(limit int) ([]models.
 	return orgs, err
 }
 
-func (repo CloudControllerOrganizationRepository) GetManyOrgsByGuid(orgGuids []string) (orgs []models.Organization, err error) {
-	for _, orgGuid := range orgGuids {
-		url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
+func (repo CloudControllerOrganizationRepository) GetManyOrgsByGUID(orgGUIDs []string) (orgs []models.Organization, err error) {
+	for _, orgGUID := range orgGUIDs {
+		url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGUID)
 		orgResource := resources.OrganizationResource{}
 		err = repo.gateway.GetResource(url, &orgResource)
 		if err != nil {
@@ -87,30 +87,30 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 
 func (repo CloudControllerOrganizationRepository) Create(org models.Organization) (apiErr error) {
 	data := fmt.Sprintf(`{"name":"%s"`, org.Name)
-	if org.QuotaDefinition.Guid != "" {
-		data = data + fmt.Sprintf(`, "quota_definition_guid":"%s"`, org.QuotaDefinition.Guid)
+	if org.QuotaDefinition.GUID != "" {
+		data = data + fmt.Sprintf(`, "quota_definition_guid":"%s"`, org.QuotaDefinition.GUID)
 	}
 	data = data + "}"
 	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), "/v2/organizations", strings.NewReader(data))
 }
 
-func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiErr error) {
-	url := fmt.Sprintf("/v2/organizations/%s", orgGuid)
+func (repo CloudControllerOrganizationRepository) Rename(orgGUID string, name string) (apiErr error) {
+	url := fmt.Sprintf("/v2/organizations/%s", orgGUID)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, strings.NewReader(data))
 }
 
-func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr error) {
-	url := fmt.Sprintf("/v2/organizations/%s?recursive=true", orgGuid)
+func (repo CloudControllerOrganizationRepository) Delete(orgGUID string) (apiErr error) {
+	url := fmt.Sprintf("/v2/organizations/%s?recursive=true", orgGUID)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
 }
 
-func (repo CloudControllerOrganizationRepository) SharePrivateDomain(orgGuid string, domainGuid string) error {
-	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGuid, domainGuid)
+func (repo CloudControllerOrganizationRepository) SharePrivateDomain(orgGUID string, domainGUID string) error {
+	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGUID, domainGUID)
 	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), url, nil)
 }
 
-func (repo CloudControllerOrganizationRepository) UnsharePrivateDomain(orgGuid string, domainGuid string) error {
-	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGuid, domainGuid)
+func (repo CloudControllerOrganizationRepository) UnsharePrivateDomain(orgGUID string, domainGUID string) error {
+	url := fmt.Sprintf("/v2/organizations/%s/private_domains/%s", orgGUID, domainGUID)
 	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), url)
 }

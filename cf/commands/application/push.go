@@ -194,7 +194,7 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 			cmd.ui.Failed(T("Error: No name found for app"))
 		}
 
-		cmd.fetchStackGuid(&appParams)
+		cmd.fetchStackGUID(&appParams)
 
 		if c.IsSet("docker-image") {
 			diego := true
@@ -220,13 +220,13 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 				}
 			}
 
-			app, err = cmd.appRepo.Update(existingApp.Guid, appParams)
+			app, err = cmd.appRepo.Update(existingApp.GUID, appParams)
 			if err != nil {
 				cmd.ui.Failed(err.Error())
 			}
 		case *errors.ModelNotFoundError:
-			spaceGuid := cmd.config.SpaceFields().Guid
-			appParams.SpaceGuid = &spaceGuid
+			spaceGUID := cmd.config.SpaceFields().GUID
+			appParams.SpaceGUID = &spaceGUID
 
 			cmd.ui.Say(T("Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 				map[string]interface{}{
@@ -294,7 +294,7 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
 			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 
-		err = cmd.uploadApp(app.Guid, appDir, path, localFiles)
+		err = cmd.uploadApp(app.GUID, appDir, path, localFiles)
 		if err != nil {
 			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.ApiErr}}",
 				map[string]interface{}{"ApiErr": err.Error()})))
@@ -416,7 +416,7 @@ func hostNameForString(name string) string {
 }
 
 func (cmd *Push) findDomain(domainName *string) models.DomainFields {
-	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().Guid, domainName)
+	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().GUID, domainName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -460,7 +460,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 	}
 }
 
-func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
+func (cmd *Push) fetchStackGUID(appParams *models.AppParams) {
 	if appParams.StackName == nil {
 		return
 	}
@@ -476,7 +476,7 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	}
 
 	cmd.ui.Ok()
-	appParams.StackGuid = &stack.Guid
+	appParams.StackGUID = &stack.GUID
 }
 
 func (cmd *Push) restart(app models.Application, params models.AppParams, c flags.FlagContext) {
@@ -724,7 +724,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	return appParams
 }
 
-func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
+func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
 	uploadDir, err := ioutil.TempDir("", "apps")
 	if err != nil {
 		return err
@@ -769,5 +769,5 @@ func (cmd *Push) uploadApp(appGuid, appDir, appDirOrZipFile string, localFiles [
 		}
 	}
 
-	return cmd.actor.UploadApp(appGuid, zipFile, remoteFiles)
+	return cmd.actor.UploadApp(appGUID, zipFile, remoteFiles)
 }
