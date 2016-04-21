@@ -1,8 +1,8 @@
 package securitygroup_test
 
 import (
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -10,7 +10,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,28 +19,28 @@ import (
 var _ = Describe("security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
+		securityGroupRepo   *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(securityGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
+		securityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("security-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -68,17 +68,17 @@ var _ = Describe("security-group command", func() {
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
-						Guid:  "group-guid",
+						GUID:  "group-guid",
 						Rules: rulesMap,
 					},
 					Spaces: []models.Space{
 						{
-							SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
-							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
+							SpaceFields:  models.SpaceFields{GUID: "my-space-guid-1", Name: "space-1"},
+							Organization: models.OrganizationFields{GUID: "my-org-guid-1", Name: "org-1"},
 						},
 						{
-							SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
-							Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-2"},
+							SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "space-2"},
+							Organization: models.OrganizationFields{GUID: "my-org-guid-1", Name: "org-2"},
 						},
 					},
 				}
@@ -112,7 +112,7 @@ var _ = Describe("security-group command", func() {
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
-						Guid:  "group-guid",
+						GUID:  "group-guid",
 						Rules: []map[string]interface{}{},
 					},
 					Spaces: []models.Space{},

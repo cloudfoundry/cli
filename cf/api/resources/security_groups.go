@@ -19,8 +19,8 @@ type SecurityGroup struct {
 func (resource SecurityGroupResource) ToFields() (fields models.SecurityGroupFields) {
 	fields.Name = resource.Entity.Name
 	fields.Rules = resource.Entity.Rules
-	fields.SpaceUrl = resource.Entity.SpaceUrl
-	fields.Guid = resource.Metadata.Guid
+	fields.SpaceURL = resource.Entity.SpaceURL
+	fields.GUID = resource.Metadata.GUID
 
 	return
 }

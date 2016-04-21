@@ -5,13 +5,15 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
+
+//go:generate counterfeiter . StackRepository
 
 type StackRepository interface {
 	FindByName(name string) (stack models.Stack, apiErr error)
@@ -20,11 +22,11 @@ type StackRepository interface {
 }
 
 type CloudControllerStackRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerStackRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerStackRepository) {
+func NewCloudControllerStackRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerStackRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -32,10 +34,10 @@ func NewCloudControllerStackRepository(config core_config.Reader, gateway net.Ga
 
 func (repo CloudControllerStackRepository) FindByGUID(guid string) (models.Stack, error) {
 	stackRequest := resources.StackResource{}
-	path := fmt.Sprintf("%s/v2/stacks/%s", repo.config.ApiEndpoint(), guid)
+	path := fmt.Sprintf("%s/v2/stacks/%s", repo.config.APIEndpoint(), guid)
 	err := repo.gateway.GetResource(path, &stackRequest)
 	if err != nil {
-		if errNotFound, ok := err.(*errors.HttpNotFoundError); ok {
+		if errNotFound, ok := err.(*errors.HTTPNotFoundError); ok {
 			return models.Stack{}, errNotFound
 		}
 
@@ -70,7 +72,7 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, api
 func (repo CloudControllerStackRepository) findAllWithPath(path string) ([]models.Stack, error) {
 	var stacks []models.Stack
 	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		path,
 		resources.StackResource{},
 		func(resource interface{}) bool {

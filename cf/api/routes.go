@@ -8,32 +8,33 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/google/go-querystring/query"
 )
 
-//go:generate counterfeiter -o fakes/fake_route_repository.go . RouteRepository
+//go:generate counterfeiter . RouteRepository
+
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
 	ListAllRoutes(cb func(models.Route) bool) (apiErr error)
 	Find(host string, domain models.DomainFields, path string, port int) (route models.Route, apiErr error)
-	Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error)
+	Create(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error)
 	CheckIfExists(host string, domain models.DomainFields, path string) (found bool, apiErr error)
-	CreateInSpace(host, path, domainGuid, spaceGuid string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
-	Bind(routeGuid, appGuid string) (apiErr error)
-	Unbind(routeGuid, appGuid string) (apiErr error)
-	Delete(routeGuid string) (apiErr error)
+	CreateInSpace(host, path, domainGUID, spaceGUID string, port int, randomPort bool) (createdRoute models.Route, apiErr error)
+	Bind(routeGUID, appGUID string) (apiErr error)
+	Unbind(routeGUID, appGUID string) (apiErr error)
+	Delete(routeGUID string) (apiErr error)
 }
 
 type CloudControllerRouteRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerRouteRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerRouteRepository) {
+func NewCloudControllerRouteRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerRouteRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -41,8 +42,8 @@ func NewCloudControllerRouteRepository(config core_config.Reader, gateway net.Ga
 
 func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.SpaceFields().Guid),
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.SpaceFields().GUID),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			return cb(resource.(resources.RouteResource).ToModel())
@@ -51,8 +52,8 @@ func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool
 
 func (repo CloudControllerRouteRepository) ListAllRoutes(cb func(models.Route) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/routes?q=organization_guid:%s&inline-relations-depth=1", repo.config.OrganizationFields().Guid),
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("/v2/routes?q=organization_guid:%s&inline-relations-depth=1", repo.config.OrganizationFields().GUID),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
 			return cb(resource.(resources.RouteResource).ToModel())
@@ -86,7 +87,7 @@ func queryStringForRouteSearch(host, guid, path string, port int) string {
 
 func (repo CloudControllerRouteRepository) Find(host string, domain models.DomainFields, path string, port int) (models.Route, error) {
 	var route models.Route
-	queryString := queryStringForRouteSearch(host, domain.Guid, path, port)
+	queryString := queryStringForRouteSearch(host, domain.GUID, path, port)
 
 	q := struct {
 		Query                string `url:"q"`
@@ -97,7 +98,7 @@ func (repo CloudControllerRouteRepository) Find(host string, domain models.Domai
 
 	found := false
 	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/routes?%s", opt.Encode()),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
@@ -122,21 +123,20 @@ func doesNotMatchVersionSpecificAttributes(route models.Route, path string, port
 	return normalizedPath(route.Path) != normalizedPath(path) || route.Port != port
 }
 
-func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string) (createdRoute models.Route, apiErr error) {
+func (repo CloudControllerRouteRepository) Create(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error) {
 	var port int
-	var randomRoute bool
-	return repo.CreateInSpace(host, path, domain.Guid, repo.config.SpaceFields().Guid, port, randomRoute)
+	return repo.CreateInSpace(host, path, domain.GUID, repo.config.SpaceFields().GUID, port, useRandomPort)
 }
 
 func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain models.DomainFields, path string) (bool, error) {
 	path = normalizedPath(path)
 
-	u, err := url.Parse(repo.config.ApiEndpoint())
+	u, err := url.Parse(repo.config.APIEndpoint())
 	if err != nil {
 		return false, err
 	}
 
-	u.Path = fmt.Sprintf("/v2/routes/reserved/domain/%s/host/%s", domain.Guid, host)
+	u.Path = fmt.Sprintf("/v2/routes/reserved/domain/%s/host/%s", domain.GUID, host)
 	if path != "" {
 		q := u.Query()
 		q.Set("path", path)
@@ -146,7 +146,7 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	var raw_response interface{}
 	err = repo.gateway.GetResource(u.String(), &raw_response)
 	if err != nil {
-		if _, ok := err.(*errors.HttpNotFoundError); ok {
+		if _, ok := err.(*errors.HTTPNotFoundError); ok {
 			return false, nil
 		}
 		return false, err
@@ -155,16 +155,16 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 	return true, nil
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid, spaceGuid string, port int, randomPort bool) (models.Route, error) {
+func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGUID, spaceGUID string, port int, randomPort bool) (models.Route, error) {
 	path = normalizedPath(path)
 
 	body := struct {
 		Host       string `json:"host,omitempty"`
 		Path       string `json:"path,omitempty"`
 		Port       int    `json:"port,omitempty"`
-		DomainGuid string `json:"domain_guid"`
-		SpaceGuid  string `json:"space_guid"`
-	}{host, path, port, domainGuid, spaceGuid}
+		DomainGUID string `json:"domain_guid"`
+		SpaceGUID  string `json:"space_guid"`
+	}{host, path, port, domainGUID, spaceGUID}
 
 	data, err := json.Marshal(body)
 	if err != nil {
@@ -181,7 +181,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid,
 
 	resource := new(resources.RouteResource)
 	err = repo.gateway.CreateResource(
-		repo.config.ApiEndpoint(),
+		repo.config.APIEndpoint(),
 		uriFragment,
 		bytes.NewReader(data),
 		resource,
@@ -193,17 +193,17 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, path, domainGuid,
 	return resource.ToModel(), nil
 }
 
-func (repo CloudControllerRouteRepository) Bind(routeGuid, appGuid string) (apiErr error) {
-	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGuid, routeGuid)
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, nil)
+func (repo CloudControllerRouteRepository) Bind(routeGUID, appGUID string) (apiErr error) {
+	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGUID, routeGUID)
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, nil)
 }
 
-func (repo CloudControllerRouteRepository) Unbind(routeGuid, appGuid string) (apiErr error) {
-	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGuid, routeGuid)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+func (repo CloudControllerRouteRepository) Unbind(routeGUID, appGUID string) (apiErr error) {
+	path := fmt.Sprintf("/v2/apps/%s/routes/%s", appGUID, routeGUID)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
 
-func (repo CloudControllerRouteRepository) Delete(routeGuid string) (apiErr error) {
-	path := fmt.Sprintf("/v2/routes/%s", routeGuid)
-	return repo.gateway.DeleteResource(repo.config.ApiEndpoint(), path)
+func (repo CloudControllerRouteRepository) Delete(routeGUID string) (apiErr error) {
+	path := fmt.Sprintf("/v2/routes/%s", routeGUID)
+	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }

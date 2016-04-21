@@ -1,10 +1,10 @@
 package securitygroup
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	"github.com/cloudfoundry/cli/cf/api/security_groups/defaults/staging"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,19 +14,19 @@ import (
 
 type unbindFromStagingGroup struct {
 	ui                terminal.UI
-	configRepo        core_config.Reader
+	configRepo        coreconfig.Reader
 	securityGroupRepo security_groups.SecurityGroupRepo
 	stagingGroupRepo  staging.StagingSecurityGroupsRepo
 }
 
 func init() {
-	command_registry.Register(&unbindFromStagingGroup{})
+	commandregistry.Register(&unbindFromStagingGroup{})
 }
 
-func (cmd *unbindFromStagingGroup) MetaData() command_registry.CommandMetadata {
+func (cmd *unbindFromStagingGroup) MetaData() commandregistry.CommandMetadata {
 	primaryUsage := T("CF_NAME unbind-staging-security-group SECURITY_GROUP")
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "unbind-staging-security-group",
 		Description: T("Unbind a security group from the set of security groups for staging applications"),
 		Usage: []string{
@@ -39,7 +39,7 @@ func (cmd *unbindFromStagingGroup) MetaData() command_registry.CommandMetadata {
 
 func (cmd *unbindFromStagingGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("unbind-staging-security-group"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("unbind-staging-security-group"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -48,8 +48,8 @@ func (cmd *unbindFromStagingGroup) Requirements(requirementsFactory requirements
 	return reqs
 }
 
-func (cmd *unbindFromStagingGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *unbindFromStagingGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
 	cmd.stagingGroupRepo = deps.RepoLocator.GetStagingSecurityGroupsRepository()
@@ -80,7 +80,7 @@ func (cmd *unbindFromStagingGroup) Execute(context flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.stagingGroupRepo.UnbindFromStagingSet(securityGroup.Guid)
+	err = cmd.stagingGroupRepo.UnbindFromStagingSet(securityGroup.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

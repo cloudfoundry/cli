@@ -3,11 +3,11 @@ package stacks_test
 import (
 	"net/http"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 
 	"github.com/onsi/gomega/ghttp"
@@ -20,7 +20,7 @@ import (
 var _ = Describe("StacksRepo", func() {
 	var (
 		testServer *ghttp.Server
-		configRepo core_config.ReadWriter
+		configRepo coreconfig.ReadWriter
 		repo       StackRepository
 	)
 
@@ -28,13 +28,13 @@ var _ = Describe("StacksRepo", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAccessToken("BEARER my_access_token")
 
-		gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerStackRepository(configRepo, gateway)
 	})
 
 	BeforeEach(func() {
 		testServer = ghttp.NewServer()
-		configRepo.SetApiEndpoint(testServer.URL())
+		configRepo.SetAPIEndpoint(testServer.URL())
 	})
 
 	AfterEach(func() {
@@ -71,7 +71,7 @@ var _ = Describe("StacksRepo", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(stack).To(Equal(models.Stack{
 					Name: "custom-linux",
-					Guid: "custom-linux-guid",
+					GUID: "custom-linux-guid",
 				}))
 			})
 		})
@@ -155,12 +155,12 @@ var _ = Describe("StacksRepo", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(stacks).To(ConsistOf([]models.Stack{
 				{
-					Guid:        "stack-guid-1",
+					GUID:        "stack-guid-1",
 					Name:        "lucid64",
 					Description: "Ubuntu 10.04",
 				},
 				{
-					Guid:        "stack-guid-2",
+					GUID:        "stack-guid-2",
 					Name:        "lucid64custom",
 					Description: "Fake Ubuntu 10.04",
 				},
@@ -199,7 +199,7 @@ var _ = Describe("StacksRepo", func() {
 				stack, err := repo.FindByGUID("the-stack-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(stack).To(Equal(models.Stack{
-					Guid:        "the-stack-guid",
+					GUID:        "the-stack-guid",
 					Name:        "the-stack-name",
 					Description: "the-stack-description",
 				}))
@@ -223,7 +223,7 @@ var _ = Describe("StacksRepo", func() {
 			It("returns an error", func() {
 				_, err := repo.FindByGUID("the-stack-guid")
 				Expect(err).To(HaveOccurred())
-				Expect(err).To(BeAssignableToTypeOf(&errors.HttpNotFoundError{}))
+				Expect(err).To(BeAssignableToTypeOf(&errors.HTTPNotFoundError{}))
 			})
 		})
 	})

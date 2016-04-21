@@ -9,7 +9,7 @@ resources:
 - name: bosh-lite-lock
   type: pool
   source:
-    uri: git@github.com:cloudfoundry/cli-ci
+    uri: git@github.com:cloudfoundry/cli-private
     private_key: {{cf-cli-eng-github-private-key}}
     branch: locks
     pool: bosh-lites
@@ -23,10 +23,10 @@ resources:
     paths:
     - ci
 
-- name: cli-ci
+- name: cli-private
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli-ci
+    uri: git@github.com:cloudfoundry/cli-private
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
@@ -61,7 +61,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
-    branch: release_candidate
+    branch: release-candidate
 
 jobs:
 - name: deploy-boshlite-1
@@ -72,34 +72,31 @@ jobs:
       claim: {{lite-1-hostname}}
   - do:
     - aggregate:
-      - get: cli-ci
+      - get: cli-private
       - get: cf-release
         resource: cf-release-repo
       - get: bosh-lite
       - get: cli
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          LITE_INSTANCE_NAME: bosh-lite-1
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-1
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-          LITE_NAME: {{lite-1-name}}
-          LITE_KEYPAIR: {{lite-keypair}}
-          LITE_HOSTNAME: {{lite-1-hostname}}
-          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
-          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-1-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+        LITE_HOSTNAME: {{lite-1-hostname}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -124,9 +121,8 @@ jobs:
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -136,6 +132,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-1]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
@@ -146,10 +143,13 @@ jobs:
       - get: cli
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
-          LITE_HOSTNAME: {{lite-1-hostname}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+        LITE_HOSTNAME: {{lite-1-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -163,34 +163,31 @@ jobs:
       claim: {{lite-2-hostname}}
   - do:
     - aggregate:
-      - get: cli-ci
+      - get: cli-private
       - get: cf-release
         resource: cf-release-repo
       - get: bosh-lite
       - get: cli
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          LITE_INSTANCE_NAME: bosh-lite-2
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-2
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-          LITE_NAME: {{lite-2-name}}
-          LITE_KEYPAIR: {{lite-keypair}}
-          LITE_HOSTNAME: {{lite-2-hostname}}
-          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
-          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-2-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+        LITE_HOSTNAME: {{lite-2-hostname}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -215,9 +212,8 @@ jobs:
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -227,6 +223,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-2]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
@@ -237,10 +234,13 @@ jobs:
       - get: cli
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
-          LITE_HOSTNAME: {{lite-2-hostname}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+        LITE_HOSTNAME: {{lite-2-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -255,34 +255,31 @@ jobs:
       claim: {{lite-3-hostname}}
   - do:
     - aggregate:
-      - get: cli-ci
+      - get: cli-private
       - get: cf-release
         resource: cf-release-repo
       - get: bosh-lite
       - get: cli
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          LITE_INSTANCE_NAME: bosh-lite-3
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-3
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-          LITE_NAME: {{lite-3-name}}
-          LITE_KEYPAIR: {{lite-keypair}}
-          LITE_HOSTNAME: {{lite-3-hostname}}
-          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
-          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-3-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+        LITE_HOSTNAME: {{lite-3-hostname}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -307,9 +304,8 @@ jobs:
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -319,6 +315,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-3]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
@@ -329,10 +326,13 @@ jobs:
       - get: cli
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
-          LITE_HOSTNAME: {{lite-3-hostname}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+        LITE_HOSTNAME: {{lite-3-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -346,34 +346,31 @@ jobs:
       claim: {{lite-4-hostname}}
   - do:
     - aggregate:
-      - get: cli-ci
+      - get: cli-private
       - get: cf-release
         resource: cf-release-repo
       - get: bosh-lite
       - get: cli
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          LITE_INSTANCE_NAME: bosh-lite-4
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-4
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
-      config:
-        params:
-          AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-          AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-          AWS_REGION: {{lite-aws-region}}
-          AWS_SUBNET_ID: {{lite-aws-subnet-id}}
-          AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-          LITE_NAME: {{lite-4-name}}
-          LITE_KEYPAIR: {{lite-keypair}}
-          LITE_HOSTNAME: {{lite-4-hostname}}
-          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-          LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: {{lite-4-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_HOSTNAME: {{lite-4-hostname}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -398,9 +395,8 @@ jobs:
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -410,6 +406,7 @@ jobs:
   plan:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-4]
+    trigger: true
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
@@ -420,10 +417,13 @@ jobs:
       - get: cli
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
-      config:
-        params:
-          LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-          LITE_HOSTNAME: {{lite-4-hostname}}
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_HOSTNAME: {{lite-4-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
       put: bosh-lite-lock
       params:

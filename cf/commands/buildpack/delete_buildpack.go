@@ -2,7 +2,7 @@ package buildpack
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -16,20 +16,20 @@ type DeleteBuildpack struct {
 }
 
 func init() {
-	command_registry.Register(&DeleteBuildpack{})
+	commandregistry.Register(&DeleteBuildpack{})
 }
 
-func (cmd *DeleteBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *DeleteBuildpack) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
 	return cmd
 }
 
-func (cmd *DeleteBuildpack) MetaData() command_registry.CommandMetadata {
+func (cmd *DeleteBuildpack) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "delete-buildpack",
 		Description: T("Delete a buildpack"),
 		Usage: []string{
@@ -40,7 +40,7 @@ func (cmd *DeleteBuildpack) MetaData() command_registry.CommandMetadata {
 }
 
 func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(cmd), "",
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd), "",
 		func() bool {
 			return len(fc.Args()) != 1
 		},
@@ -83,7 +83,7 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) {
 
 	}
 
-	apiErr = cmd.buildpackRepo.Delete(buildpack.Guid)
+	apiErr = cmd.buildpackRepo.Delete(buildpack.GUID)
 	if apiErr != nil {
 		cmd.ui.Failed(T("Error deleting buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 			"Name":  terminal.EntityNameColor(buildpack.Name),

@@ -5,16 +5,17 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-//go:generate counterfeiter -o fakes/fake_user_requirement.go . UserRequirement
+//go:generate counterfeiter . UserRequirement
+
 type UserRequirement interface {
 	Requirement
 	GetUser() models.UserFields
 }
 
-type userApiRequirement struct {
+type userAPIRequirement struct {
 	username string
 	userRepo api.UserRepository
-	wantGuid bool
+	wantGUID bool
 
 	user models.UserFields
 }
@@ -22,18 +23,18 @@ type userApiRequirement struct {
 func NewUserRequirement(
 	username string,
 	userRepo api.UserRepository,
-	wantGuid bool,
-) *userApiRequirement {
-	req := new(userApiRequirement)
+	wantGUID bool,
+) *userAPIRequirement {
+	req := new(userAPIRequirement)
 	req.username = username
 	req.userRepo = userRepo
-	req.wantGuid = wantGuid
+	req.wantGUID = wantGUID
 
 	return req
 }
 
-func (req *userApiRequirement) Execute() error {
-	if req.wantGuid {
+func (req *userAPIRequirement) Execute() error {
+	if req.wantGUID {
 		var err error
 		req.user, err = req.userRepo.FindByUsername(req.username)
 		if err != nil {
@@ -46,6 +47,6 @@ func (req *userApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *userApiRequirement) GetUser() models.UserFields {
+func (req *userAPIRequirement) GetUser() models.UserFields {
 	return req.user
 }

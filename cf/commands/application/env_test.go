@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,17 +20,17 @@ var _ = Describe("env command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *testApplication.FakeApplicationRepository
-		configRepo          core_config.Repository
+		appRepo             *applicationsfakes.FakeApplicationRepository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("env").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("env").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -38,7 +38,7 @@ var _ = Describe("env command", func() {
 
 		app = models.Application{}
 		app.Name = "my-app"
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -46,7 +46,7 @@ var _ = Describe("env command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("env", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("env", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("Requirements", func() {
@@ -83,7 +83,7 @@ var _ = Describe("env command", func() {
 		BeforeEach(func() {
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "the-app-guid"
+			app.GUID = "the-app-guid"
 
 			appRepo.ReadReturns(app, nil)
 			appRepo.ReadEnvReturns(&models.Environment{
@@ -173,7 +173,7 @@ var _ = Describe("env command", func() {
 		BeforeEach(func() {
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "the-app-guid"
+			app.GUID = "the-app-guid"
 
 			appRepo.ReadReturns(app, nil)
 			appRepo.ReadEnvReturns(&models.Environment{

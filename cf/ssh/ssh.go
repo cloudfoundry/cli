@@ -29,7 +29,8 @@ const (
 	sha1FingerprintLength = 59 // inclusive of space between bytes
 )
 
-//go:generate counterfeiter -o fakes/fake_secure_shell.go . SecureShell
+//go:generate counterfeiter . SecureShell
+
 type SecureShell interface {
 	Connect(opts *options.SSHOptions) error
 	InteractiveSession() error
@@ -38,12 +39,14 @@ type SecureShell interface {
 	Close() error
 }
 
-//go:generate counterfeiter -o fakes/fake_secure_dialer.go . SecureDialer
+//go:generate counterfeiter . SecureDialer
+
 type SecureDialer interface {
 	Dial(network, address string, config *ssh.ClientConfig) (SecureClient, error)
 }
 
-//go:generate counterfeiter -o fakes/fake_secure_client.go . SecureClient
+//go:generate counterfeiter . SecureClient
+
 type SecureClient interface {
 	NewSession() (SecureSession, error)
 	Conn() ssh.Conn
@@ -52,12 +55,14 @@ type SecureClient interface {
 	Close() error
 }
 
-//go:generate counterfeiter -o fakes/fake_listener_factory.go . ListenerFactory
+//go:generate counterfeiter . ListenerFactory
+
 type ListenerFactory interface {
 	Listen(network, address string) (net.Listener, error)
 }
 
-//go:generate counterfeiter -o fakes/fake_secure_session.go . SecureSession
+//go:generate counterfeiter . SecureSession
+
 type SecureSession interface {
 	RequestPty(term string, height, width int, termModes ssh.TerminalModes) error
 	SendRequest(name string, wantReply bool, payload []byte) (bool, error)
@@ -115,7 +120,7 @@ func (c *secureShell) Connect(opts *options.SSHOptions) error {
 	}
 
 	clientConfig := &ssh.ClientConfig{
-		User: fmt.Sprintf("cf:%s/%d", c.app.Guid, opts.Index),
+		User: fmt.Sprintf("cf:%s/%d", c.app.GUID, opts.Index),
 		Auth: []ssh.AuthMethod{
 			ssh.Password(c.token),
 		},

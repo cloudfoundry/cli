@@ -264,7 +264,7 @@ var _ = Describe("Manifests", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(apps)).To(Equal(1))
 
-		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
+		Expect(*apps[0].BuildpackURL).To(Equal("my-buildpack"))
 		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
 		Expect(*apps[0].Domains).To(ConsistOf([]string{"domain1.test", "domain2.test", "my-domain"}))
 		Expect(*apps[0].Hosts).To(ConsistOf([]string{"host-1", "host-2", "my-hostname"}))
@@ -276,7 +276,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
 		Expect(apps[0].NoRoute).To(BeTrue())
 		Expect(apps[0].NoHostname).To(BeTrue())
-		Expect(apps[0].UseRandomHostname).To(BeTrue())
+		Expect(apps[0].UseRandomRoute).To(BeTrue())
 	})
 
 	It("removes duplicated values in 'hosts' and 'domains'", func() {
@@ -355,7 +355,7 @@ var _ = Describe("Manifests", func() {
 		apps, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].Command).To(Equal(""))
-		Expect(*apps[0].BuildpackUrl).To(Equal(""))
+		Expect(*apps[0].BuildpackURL).To(Equal(""))
 	})
 
 	It("sets the command and buildpack to blank when their values are 'default' in the manifest", func() {
@@ -371,7 +371,7 @@ var _ = Describe("Manifests", func() {
 		apps, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].Command).To(Equal(""))
-		Expect(*apps[0].BuildpackUrl).To(Equal(""))
+		Expect(*apps[0].BuildpackURL).To(Equal(""))
 	})
 
 	It("does not set the start command when the manifest doesn't have the 'command' key", func() {

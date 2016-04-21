@@ -2,14 +2,17 @@ package requirements
 
 import (
 	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 )
 
-//go:generate counterfeiter -o fakes/fake_factory.go . Factory
+//go:generate counterfeiter . Factory
+
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
 	NewDEAApplicationRequirement(name string) DEAApplicationRequirement
+	NewDiegoApplicationRequirement(name string) DiegoApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement
 	NewLoginRequirement() Requirement
 	NewRoutingAPIRequirement() Requirement
@@ -18,19 +21,20 @@ type Factory interface {
 	NewTargetedOrgRequirement() TargetedOrgRequirement
 	NewOrganizationRequirement(name string) OrganizationRequirement
 	NewDomainRequirement(name string) DomainRequirement
-	NewUserRequirement(username string, wantGuid bool) UserRequirement
+	NewUserRequirement(username string, wantGUID bool) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
-	NewApiEndpointRequirement() Requirement
+	NewAPIEndpointRequirement() Requirement
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
+	NewUsageRequirement(Usable, string, func() bool) Requirement
 }
 
 type apiRequirementFactory struct {
-	config      core_config.Reader
+	config      coreconfig.ReadWriter
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(config core_config.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
+func NewFactory(config coreconfig.ReadWriter, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
 	return apiRequirementFactory{config, repoLocator}
 }
 
@@ -43,6 +47,13 @@ func (f apiRequirementFactory) NewApplicationRequirement(name string) Applicatio
 
 func (f apiRequirementFactory) NewDEAApplicationRequirement(name string) DEAApplicationRequirement {
 	return NewDEAApplicationRequirement(
+		name,
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
+func (f apiRequirementFactory) NewDiegoApplicationRequirement(name string) DiegoApplicationRequirement {
+	return NewDiegoApplicationRequirement(
 		name,
 		f.repoLocator.GetApplicationRepository(),
 	)
@@ -62,9 +73,14 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 }
 
 func (f apiRequirementFactory) NewRoutingAPIRequirement() Requirement {
-	return NewRoutingAPIRequirement(
-		f.config,
-	)
+	req := Requirements{
+		f.NewMinAPIVersionRequirement("RoutingAPI", cf.TcpRoutingMinimumAPIVersion),
+		NewRoutingAPIRequirement(
+			f.config,
+		),
+	}
+
+	return req
 }
 
 func (f apiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement {
@@ -101,11 +117,11 @@ func (f apiRequirementFactory) NewDomainRequirement(name string) DomainRequireme
 	)
 }
 
-func (f apiRequirementFactory) NewUserRequirement(username string, wantGuid bool) UserRequirement {
+func (f apiRequirementFactory) NewUserRequirement(username string, wantGUID bool) UserRequirement {
 	return NewUserRequirement(
 		username,
 		f.repoLocator.GetUserRepository(),
-		wantGuid,
+		wantGUID,
 	)
 }
 
@@ -116,18 +132,26 @@ func (f apiRequirementFactory) NewBuildpackRequirement(buildpack string) Buildpa
 	)
 }
 
-func (f apiRequirementFactory) NewApiEndpointRequirement() Requirement {
-	return NewApiEndpointRequirement(
+func (f apiRequirementFactory) NewAPIEndpointRequirement() Requirement {
+	return NewAPIEndpointRequirement(
 		f.config,
 	)
 }
 
 func (f apiRequirementFactory) NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement {
-	return NewMinAPIVersionRequirement(
+	r := NewMinAPIVersionRequirement(
 		f.config,
 		commandName,
 		requiredVersion,
 	)
+
+	refresher := coreconfig.APIConfigRefresher{
+		Endpoint:     f.config.APIEndpoint(),
+		EndpointRepo: f.repoLocator.GetEndpointRepository(),
+		Config:       f.config,
+	}
+
+	return NewConfigRefreshingRequirement(r, refresher)
 }
 
 func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement {
@@ -136,4 +160,8 @@ func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, m
 		commandName,
 		maximumVersion,
 	)
+}
+
+func (f apiRequirementFactory) NewUsageRequirement(cmd Usable, errorMessage string, pred func() bool) Requirement {
+	return NewUsageRequirement(cmd, errorMessage, pred)
 }

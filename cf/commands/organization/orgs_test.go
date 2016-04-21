@@ -1,11 +1,11 @@
 package organization_test
 
 import (
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -22,30 +22,30 @@ import (
 var _ = Describe("orgs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		orgRepo             *test_org.FakeOrganizationRepository
-		configRepo          core_config.Repository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("orgs").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("orgs").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("orgs", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("orgs", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	Describe("requirements", func() {
@@ -56,7 +56,7 @@ var _ = Describe("orgs command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -86,7 +86,7 @@ var _ = Describe("orgs command", func() {
 		BeforeEach(func() {
 			org1 := models.Organization{}
 			org1.Name = "Organization-1"
-			org1.Guid = "org-1-guid"
+			org1.GUID = "org-1-guid"
 
 			org2 := models.Organization{}
 			org2.Name = "Organization-2"
@@ -101,7 +101,7 @@ var _ = Describe("orgs command", func() {
 		})
 
 		It("populates the plugin models upon execution", func() {
-			testcmd.RunCliCommand("orgs", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCLICommand("orgs", []string{}, requirementsFactory, updateCommandDependency, true)
 			Expect(pluginOrgsModel[0].Name).To(Equal("Organization-1"))
 			Expect(pluginOrgsModel[0].Guid).To(Equal("org-1-guid"))
 			Expect(pluginOrgsModel[1].Name).To(Equal("Organization-2"))

@@ -2,18 +2,18 @@ package maker
 
 import "github.com/cloudfoundry/cli/cf/models"
 
-var spaceGuid func() string
+var spaceGUID func() string
 
 func init() {
-	spaceGuid = guidGenerator("space")
+	spaceGUID = guidGenerator("space")
 }
 
 func NewSpaceFields(overrides Overrides) (space models.SpaceFields) {
 	space.Name = "new-space"
-	space.Guid = spaceGuid()
+	space.GUID = spaceGUID()
 
-	if overrides.Has("Guid") {
-		space.Guid = overrides.Get("Guid").(string)
+	if overrides.Has("GUID") {
+		space.GUID = overrides.Get("GUID").(string)
 	}
 
 	if overrides.Has("Name") {

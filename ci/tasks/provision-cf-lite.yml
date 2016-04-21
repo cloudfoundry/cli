@@ -6,18 +6,16 @@ image: docker:///cloudfoundry/cli-vagrant-ci
 params:
   AWS_ACCESS_KEY_ID:
   AWS_SECRET_ACCESS_KEY:
-  AWS_REGION: us-east-1
-  AWS_SUBNET_ID:
+  LITE_KEYPAIR:
+  LITE_PRIVATE_KEY_PATH:
   AWS_SECURITY_GROUP:
+  AWS_SUBNET_ID:
   LITE_NAME:
   LITE_PRIVATE_IP_ADDRESS:
   LITE_HOSTNAME:
-  LITE_PRIVATE_KEY_PATH:
-  LITE_INSTANCE_TYPE: m3.2xlarge
-  LITE_KEYPAIR:
 
 inputs:
-  - name: cli-ci
+  - name: cli-private
   - name: bosh-lite
   - name: cf-release
 
@@ -28,36 +26,31 @@ run:
   - |
     set -ex
 
-    export AWS_DEFAULT_REGION="${AWS_REGION}"
     export BOSH_AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
     export BOSH_AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
-    export BOSH_LITE_SUBNET_ID="${AWS_SUBNET_ID}"
-    export BOSH_LITE_SECURITY_GROUP="${AWS_SECURITY_GROUP}"
     export BOSH_LITE_KEYPAIR="${LITE_KEYPAIR}"
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
+    export BOSH_LITE_SECURITY_GROUP="${AWS_SECURITY_GROUP}"
+    export BOSH_LITE_SUBNET_ID="${AWS_SUBNET_ID}"
     export BOSH_LITE_NAME="${LITE_NAME}"
-    export BOSH_LITE_INSTANCE_TYPE="${LITE_INSTANCE_TYPE}"
     export BOSH_LITE_ROOT="$PWD/bosh-lite"
+    export SCRATCH_ROOT="$PWD/scratch"
 
     mkdir scratch
 
     pushd scratch
+      cat > property-overrides.yml << EOF
+    properties:
+      domain: ${LITE_HOSTNAME}
+    EOF
+
       vagrant init cloudfoundry/bosh-lite
 
       sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.private_ip_address = '${LITE_PRIVATE_IP_ADDRESS}'\n  end/" \
         Vagrantfile
 
       vagrant up --provider aws
+
+      $BOSH_LITE_ROOT/bin/provision_cf $SCRATCH_ROOT/property-overrides.yml
     popd
 
-    sed -i -e "s/bosh-lite-ip-${LITE_NAME}: \(.*\)/bosh-lite-ip-${LITE_NAME}: ${DIRECTOR_IP}/" \
-      cli-ci/concourse/credentials.yml
-
-    pushd cf-release
-      sed -i -e "s/^properties:/properties:\n  domain: ${LITE_HOSTNAME}/" \
-        bosh-lite/stubs/property_overrides.yml
-    popd
-
-    pushd scratch
-      $BOSH_LITE_ROOT/bin/provision_cf
-    popd

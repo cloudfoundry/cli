@@ -2,8 +2,8 @@ package servicekey
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,21 +15,21 @@ import (
 
 type CreateServiceKey struct {
 	ui                         terminal.UI
-	config                     core_config.Reader
+	config                     coreconfig.Reader
 	serviceRepo                api.ServiceRepository
 	serviceKeyRepo             api.ServiceKeyRepository
 	serviceInstanceRequirement requirements.ServiceInstanceRequirement
 }
 
 func init() {
-	command_registry.Register(&CreateServiceKey{})
+	commandregistry.Register(&CreateServiceKey{})
 }
 
-func (cmd *CreateServiceKey) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateServiceKey) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["c"] = &flags.StringFlag{ShortName: "c", Usage: T("Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-service-key",
 		ShortName:   "csk",
 		Description: T("Create key for a service instance"),
@@ -57,7 +57,7 @@ func (cmd *CreateServiceKey) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n") + command_registry.Commands.CommandUsage("create-service-key"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service-key"))
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
@@ -73,8 +73,8 @@ func (cmd *CreateServiceKey) Requirements(requirementsFactory requirements.Facto
 	return reqs
 }
 
-func (cmd *CreateServiceKey) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *CreateServiceKey) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	cmd.serviceKeyRepo = deps.RepoLocator.GetServiceKeyRepository()
@@ -86,7 +86,7 @@ func (cmd *CreateServiceKey) Execute(c flags.FlagContext) {
 	serviceKeyName := c.Args()[1]
 	params := c.String("c")
 
-	paramsMap, err := json.ParseJsonFromFileOrString(params)
+	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
 		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
@@ -98,7 +98,7 @@ func (cmd *CreateServiceKey) Execute(c flags.FlagContext) {
 			"CurrentUser":         terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.Guid, serviceKeyName, paramsMap)
+	err = cmd.serviceKeyRepo.CreateServiceKey(serviceInstance.GUID, serviceKeyName, paramsMap)
 	switch err.(type) {
 	case nil:
 		cmd.ui.Ok()

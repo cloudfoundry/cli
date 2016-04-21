@@ -2,7 +2,7 @@ package buildpack
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,11 +15,11 @@ type RenameBuildpack struct {
 }
 
 func init() {
-	command_registry.Register(&RenameBuildpack{})
+	commandregistry.Register(&RenameBuildpack{})
 }
 
-func (cmd *RenameBuildpack) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RenameBuildpack) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "rename-buildpack",
 		Description: T("Rename a buildpack"),
 		Usage: []string{
@@ -30,7 +30,7 @@ func (cmd *RenameBuildpack) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n") + command_registry.Commands.CommandUsage("rename-buildpack"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-buildpack"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -40,8 +40,8 @@ func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *RenameBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *RenameBuildpack) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
 	return cmd
 }

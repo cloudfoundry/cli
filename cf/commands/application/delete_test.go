@@ -1,10 +1,10 @@
 package application_test
 
 import (
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,36 +21,36 @@ var _ = Describe("delete app command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		configRepo          core_config.Repository
-		appRepo             *testApplication.FakeApplicationRepository
-		routeRepo           *testapi.FakeRouteRepository
+		configRepo          coreconfig.Repository
+		appRepo             *applicationsfakes.FakeApplicationRepository
+		routeRepo           *apifakes.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetRouteRepository(routeRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		app = models.Application{}
 		app.Name = "app-to-delete"
-		app.Guid = "app-to-delete-guid"
+		app.GUID = "app-to-delete-guid"
 
 		ui = &testterm.FakeUI{}
-		appRepo = &testApplication.FakeApplicationRepository{}
-		routeRepo = &testapi.FakeRouteRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		routeRepo = new(apifakes.FakeRouteRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when not logged in", func() {
@@ -113,11 +113,11 @@ var _ = Describe("delete app command", func() {
 			Describe("mapped routes", func() {
 				BeforeEach(func() {
 					route1 := models.RouteSummary{}
-					route1.Guid = "the-first-route-guid"
+					route1.GUID = "the-first-route-guid"
 					route1.Host = "my-app-is-good.com"
 
 					route2 := models.RouteSummary{}
-					route2.Guid = "the-second-route-guid"
+					route2.GUID = "the-second-route-guid"
 					route2.Host = "my-app-is-bad.com"
 
 					appRepo.ReadReturns(models.Application{

@@ -1,12 +1,18 @@
 package models
 
 type RouteSummary struct {
-	Guid   string
+	GUID   string
 	Host   string
 	Domain DomainFields
 	Path   string
+	Port   int
 }
 
 func (r RouteSummary) URL() string {
-	return urlStringFromParts(r.Host, r.Domain.Name, r.Path)
+	return (&RoutePresenter{
+		Host:   r.Host,
+		Domain: r.Domain.Name,
+		Path:   r.Path,
+		Port:   r.Port,
+	}).URL()
 }

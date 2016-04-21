@@ -56,14 +56,6 @@
     "translation": ""
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": ""
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": ""
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   （可选）提供逗号分隔的标记列表，此列表将写入任何绑定应用程序的 VCAP_SERVICES 环境变量。"
   },
@@ -84,10 +76,6 @@
     "translation": "   Path 应该为 zip 文件、zip 文件的 URL 或本地目录。Position 应该为正整数，用于设置优先级，并按从低到高的顺序排序。"
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   通过清单推送多个应用程序：\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   提供的路径可以为文件的绝对路径或相对路径。\n   它应该具有一个数组，其中包含用于描述规则的 JSON 对象。"
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   通过“CF_NAME quotas”查看允许的配额"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -126,10 +110,6 @@
   {
     "id": " is empty",
     "translation": " 为空"
-  },
-  {
-    "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
-    "translation": " 不是有效的 URL，请提供有效的 URL，例如 http://your_repo.com"
   },
   {
     "id": " is not available in repo '",
@@ -200,12 +180,12 @@
     "translation": "API 端点："
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API 端点：{{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API 端点：{{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API 端点：{{.ApiEndpoint}}（API 版本：{{.ApiVersion}}）"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API 端点：{{.APIEndpoint}}（API 版本：{{.APIVersion}}）"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -217,6 +197,10 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
     "translation": ""
   },
   {
@@ -400,6 +384,10 @@
     "translation": "BUILDPACK"
   },
   {
+    "id": "BUILDPACK_NAME",
+    "translation": ""
+  },
+  {
     "id": "Bind a security group to a space",
     "translation": "将安全组绑定到空间"
   },
@@ -572,10 +560,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": ""
   },
@@ -609,10 +593,6 @@
   },
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": ""
   },
   {
@@ -737,10 +717,6 @@
   },
   {
     "id": "CF_NAME logs APP_NAME",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
     "translation": ""
   },
   {
@@ -976,10 +952,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": ""
   },
@@ -1020,15 +992,15 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": ""
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+    "translation": ""
+  },
+  {
+    "id": "COMMAND",
     "translation": ""
   },
   {
@@ -1100,8 +1072,8 @@
     "translation": "正在检查路径..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API V{{.ApiVer}} 需要 CLI V{{.CliMin}}。您目前的版本是 {{.CliVer}}。要升级 CLI，请访问：https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry API V{{.APIVer}} 需要 CLI V{{.CLIMin}}。您目前的版本是 {{.CLIVer}}。要升级 CLI，请访问：https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1192,8 +1164,8 @@
     "translation": "无法序列化更新。"
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "无法确定目标组织。\n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "无法确定目标组织。\n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1308,6 +1280,10 @@
     "translation": "正在以 {{.Username}} 身份创建配额 {{.QuotaName}}..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "正在创建路径 {{.Hostname}}..."
   },
@@ -1384,6 +1360,14 @@
     "translation": "要包含在请求中的定制头，标志可以指定多次"
   },
   {
+    "id": "DISK",
+    "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": ""
+  },
+  {
     "id": "DOMAIN",
     "translation": ""
   },
@@ -1402,6 +1386,10 @@
   {
     "id": "Define a new space resource quota",
     "translation": "定义新的空间资源配额"
+  },
+  {
+    "id": "Delete a TCP route",
+    "translation": ""
   },
   {
     "id": "Delete a buildpack",
@@ -1454,6 +1442,10 @@
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "删除所有孤立的路径（例如：未映射到应用程序的路径）"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": ""
   },
   {
     "id": "Delete an app",
@@ -1748,8 +1740,8 @@
     "translation": "删除 buildpack {{.Name}} 时出错\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "删除域 {{.DomainName}} 时出错\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "删除域 {{.DomainName}} 时出错\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1776,16 +1768,16 @@
     "translation": "启用对空间的 SSH 支持时出错"
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "查找可用组织时出错\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "查找可用组织时出错\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "查找可用空间时出错\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "查找域 {{.DomainName}} 时出错\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "查找域 {{.DomainName}} 时出错\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1826,10 +1818,6 @@
   {
     "id": "Error getting file info",
     "translation": "获取文件信息时出错"
-  },
-  {
-    "id": "Error getting info from v2/info: ",
-    "translation": "从 V2/信息获取信息时出错："
   },
   {
     "id": "Error getting one time auth code: ",
@@ -1940,8 +1928,8 @@
     "translation": "更新以下项的 health_check_type 时出错："
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "上传应用程序时出错。\n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "上传应用程序时出错。\n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2028,16 +2016,16 @@
     "translation": "访存域失败。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "访存事件失败。\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "访存事件失败。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "访存角色 {{.OrgRoleToDisplayName}} 的组织用户失败。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "访存组织失败。\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "访存组织失败。\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -2316,6 +2304,14 @@
     "translation": "正在以 {{.CurrentUser}} 身份获取组织 {{.TargetOrg}} 中的用户..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2336,10 +2332,6 @@
     "translation": ""
   },
   {
-    "id": "Hostname for the route (required for shared domains)",
-    "translation": "Hostname for the route"
-  },
-  {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
     "translation": ""
   },
@@ -2348,8 +2340,8 @@
     "translation": ""
   },
   {
-    "id": "Hostname used to identify the route",
-    "translation": "Hostname for the route"
+    "id": "Hostname used to identify the HTTP route",
+    "translation": ""
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -2836,6 +2828,14 @@
     "translation": "正在存储库“{{.repoName}}”中查找“{{.filePath}}”"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": ""
+  },
+  {
+    "id": "MEMORY",
+    "translation": ""
+  },
+  {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
     "translation": "将应用程序源代码从一个应用程序复制到另一个应用程序。除非已覆盖，否则 copy-source 命令将重新启动应用程序。"
   },
@@ -2854,6 +2854,14 @@
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
     "translation": "在当前目录中找不到清单文件，请提供应用程序名称或清单"
+  },
+  {
+    "id": "Map a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": ""
   },
   {
     "id": "Map the root domain to this app",
@@ -2905,6 +2913,10 @@
   },
   {
     "id": "NEW_NAME",
+    "translation": ""
+  },
+  {
+    "id": "NUM_INSTANCES",
     "translation": ""
   },
   {
@@ -3196,7 +3208,7 @@
     "translation": "清单路径"
   },
   {
-    "id": "Path used to identify the route",
+    "id": "Path used to identify the HTTP route",
     "translation": ""
   },
   {
@@ -3272,6 +3284,10 @@
     "translation": ""
   },
   {
+    "id": "Port used to identify the TCP route",
+    "translation": ""
+  },
+  {
     "id": "Print API request diagnostics to stdout",
     "translation": "将 API 请求诊断打印到 stdout"
   },
@@ -3312,8 +3328,12 @@
     "translation": "推送新应用程序，或将更改同步到现有应用程序"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "推送单个应用程序（使用或不使用清单）：\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "推送单个应用程序（使用或不使用清单）"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "通过清单推送多个应用程序"
   },
   {
     "id": "QUOTA",
@@ -3348,12 +3368,12 @@
     "translation": "角色：\n"
   },
   {
-    "id": "ROUTER GROUPS",
-    "translation": "路由器组"
-  },
-  {
     "id": "ROUTES",
     "translation": "路径"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3620,10 +3640,6 @@
     "translation": ""
   },
   {
-    "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-    "translation": "缺少路由 API URI。请重新登录以自动设置该 URI。"
-  },
-  {
     "id": "Rules",
     "translation": "规则"
   },
@@ -3676,6 +3692,10 @@
     "translation": "通过 SSH 连接到应用程序容器实例"
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身份扩展组织 {{.OrgName}}/空间 {{.SpaceName}} 中的应用程序 {{.AppName}}..."
   },
@@ -3712,8 +3732,8 @@
     "translation": "服务器错误，状态码：403：访问已拒绝。您无权执行此命令。"
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "服务器错误，状态码：{{.ErrStatusCode}}，错误代码：{{.ErrApiErrorCode}}，消息：{{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "服务器错误，状态码：{{.ErrStatusCode}}，错误代码：{{.ErrAPIErrorCode}}，消息：{{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -3976,6 +3996,10 @@
     "translation": "系统提供的项："
   },
   {
+    "id": "TIMEOUT",
+    "translation": ""
+  },
+  {
     "id": "TIP:\n",
     "translation": "提示:\n"
   },
@@ -3996,8 +4020,8 @@
     "translation": "提示：无目标空间，请使用“{{.CfTargetCommand}}”来确定目标空间"
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "提示：使用“{{.ApiCommand}}”可继续使用不安全的 API 端点"
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "提示：使用“{{.APICommand}}”可继续使用不安全的 API 端点"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4080,12 +4104,16 @@
     "translation": "要显示的选项过多，请输入名称。"
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "对“{{.repoUrl}}”执行请求时发生错误："
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "对“{{.repoURL}}”执行请求时发生错误："
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": ""
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4144,6 +4172,10 @@
     "translation": "配置文件中缺少 UAA 端点"
   },
   {
+    "id": "URL",
+    "translation": "URL"
+  },
+  {
     "id": "URL to which logs for bound applications will be streamed",
     "translation": ""
   },
@@ -4168,8 +4200,8 @@
     "translation": "用户"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "无法访问空间 {{.SpaceName}}。\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "无法访问空间 {{.SpaceName}}。\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -4266,6 +4298,14 @@
   {
     "id": "Unlock the buildpack to enable updates",
     "translation": "解锁 buildpack 以启用更新"
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": ""
   },
   {
     "id": "Unsetting api endpoint...",
@@ -4370,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "正在上传 {{.ZipFileBytes}}，{{.FileCount}} 个文件"
-  },
-  {
-    "id": "Url",
-    "translation": "URL"
   },
   {
     "id": "Use '{{.Command}}' for more information",
@@ -4541,14 +4577,6 @@
   },
   {
     "id": "app instance limit",
-    "translation": ""
-  },
-  {
-    "id": "app ports",
-    "translation": ""
-  },
-  {
-    "id": "app ports:",
     "translation": ""
   },
   {
@@ -5000,8 +5028,8 @@
     "translation": "是"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}}（API 版本：{{.ApiVersionString}}）"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}}（API 版本：{{.APIVersionString}}）"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5048,12 +5076,12 @@
     "translation": "{{.Err}}\n\n提示：使用“{{.Command}}”可获取更多信息"
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "当前 CF CLI V{{.Version}}\n\t当前 CF API V{{.ApiVersion}}\n\t要使用 {{.CommandName}} 功能，需要至少将 CF API 升级到 {{.RequiredVersion}}"
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "当前 CF CLI V{{.Version}}\n\t当前 CF API V{{.APIVersion}}\n\t要使用 {{.CommandName}} 功能，需要至少将 CF API 升级到 {{.RequiredVersion}}"
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5122,6 +5150,10 @@
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
     "translation": "{{.State}} 正在进行中。使用“{{.ServicesCommand}}”或“{{.ServiceCommand}}”可检查操作状态。"
+  },
+  {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": "{{.URL}} 不是有效的 URL，请提供有效的 URL，例如 https://your_repo.com"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

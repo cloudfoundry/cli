@@ -3,8 +3,8 @@ package servicebroker
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -13,19 +13,19 @@ import (
 
 type CreateServiceBroker struct {
 	ui                terminal.UI
-	config            core_config.Reader
+	config            coreconfig.Reader
 	serviceBrokerRepo api.ServiceBrokerRepository
 }
 
 func init() {
-	command_registry.Register(&CreateServiceBroker{})
+	commandregistry.Register(&CreateServiceBroker{})
 }
 
-func (cmd *CreateServiceBroker) MetaData() command_registry.CommandMetadata {
+func (cmd *CreateServiceBroker) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["space-scoped"] = &flags.BoolFlag{Name: "space-scoped", Usage: T("Make the broker's service plans only visible within the targeted space")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "create-service-broker",
 		ShortName:   "csb",
 		Description: T("Create a service broker"),
@@ -38,7 +38,7 @@ func (cmd *CreateServiceBroker) MetaData() command_registry.CommandMetadata {
 
 func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 4 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + command_registry.Commands.CommandUsage("create-service-broker"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service-broker"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -61,8 +61,8 @@ func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Fa
 	return reqs
 }
 
-func (cmd *CreateServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *CreateServiceBroker) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceBrokerRepo = deps.RepoLocator.GetServiceBrokerRepository()
 	return cmd
@@ -82,7 +82,7 @@ func (cmd *CreateServiceBroker) Execute(c flags.FlagContext) {
 				"Org":      terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 				"Space":    terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 				"Username": terminal.EntityNameColor(cmd.config.Username())}))
-		err = cmd.serviceBrokerRepo.Create(name, url, username, password, cmd.config.SpaceFields().Guid)
+		err = cmd.serviceBrokerRepo.Create(name, url, username, password, cmd.config.SpaceFields().GUID)
 	} else {
 		cmd.ui.Say(T("Creating service broker {{.Name}} as {{.Username}}...",
 			map[string]interface{}{

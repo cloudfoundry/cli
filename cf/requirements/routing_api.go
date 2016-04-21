@@ -3,23 +3,23 @@ package requirements
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type RoutingAPIRequirement struct {
-	config core_config.Reader
+	config coreconfig.Reader
 }
 
-func NewRoutingAPIRequirement(config core_config.Reader) RoutingAPIRequirement {
+func NewRoutingAPIRequirement(config coreconfig.Reader) RoutingAPIRequirement {
 	return RoutingAPIRequirement{
 		config,
 	}
 }
 
 func (req RoutingAPIRequirement) Execute() error {
-	if len(req.config.RoutingApiEndpoint()) == 0 {
-		return errors.New(T("Routing API URI missing. Please log in again to set the URI automatically."))
+	if len(req.config.RoutingAPIEndpoint()) == 0 {
+		return errors.New(T("This command requires the Routing API. Your targeted endpoint reports it is not enabled."))
 	}
 
 	return nil

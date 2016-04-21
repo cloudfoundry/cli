@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -18,16 +18,16 @@ import (
 
 type V3Apps struct {
 	ui         terminal.UI
-	config     core_config.ReadWriter
+	config     coreconfig.ReadWriter
 	repository repository.Repository
 }
 
 func init() {
-	command_registry.Register(&V3Apps{})
+	commandregistry.Register(&V3Apps{})
 }
 
-func (c *V3Apps) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (c *V3Apps) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "v3apps",
 		Description: T("List all apps in the target space"),
 		Usage: []string{
@@ -38,7 +38,7 @@ func (c *V3Apps) MetaData() command_registry.CommandMetadata {
 }
 
 func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	usageReq := requirements.NewUsageRequirement(command_registry.CliCommandUsagePresenter(c),
+	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(c),
 		T("No argument required"),
 		func() bool {
 			return len(fc.Args()) != 0
@@ -54,8 +54,8 @@ func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags
 	return reqs
 }
 
-func (c *V3Apps) SetDependency(deps command_registry.Dependency, _ bool) command_registry.Command {
-	c.ui = deps.Ui
+func (c *V3Apps) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
+	c.ui = deps.UI
 	c.config = deps.Config
 	c.repository = deps.RepoLocator.GetV3Repository()
 
@@ -85,7 +85,7 @@ func (c *V3Apps) Execute(fc flags.FlagContext) {
 		routes[i] = rs
 	}
 
-	table := terminal.NewTable(c.ui, []string{T("name"), T("requested state"), T("instances"), T("memory"), T("disk"), T("urls")})
+	table := c.ui.Table([]string{T("name"), T("requested state"), T("instances"), T("memory"), T("disk"), T("urls")})
 
 	for i := range applications {
 		c.addRow(table, applications[i], processes[i], routes[i])
@@ -94,8 +94,13 @@ func (c *V3Apps) Execute(fc flags.FlagContext) {
 	table.Print()
 }
 
+type table interface {
+	Add(row ...string)
+	Print()
+}
+
 func (c *V3Apps) addRow(
-	table terminal.Table,
+	table table,
 	application models.V3Application,
 	processes []models.V3Process,
 	routes []models.V3Route,

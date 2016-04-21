@@ -1,15 +1,17 @@
 package spacequota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/resources"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,37 +22,37 @@ import (
 var _ = Describe("create-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		orgRepo             *test_org.FakeOrganizationRepository
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-space-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-space-quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		org := models.Organization{}
 		org.Name = "my-org"
-		org.Guid = "my-org-guid"
+		org.GUID = "my-org-guid"
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 		orgRepo.FindByNameReturns(org, nil)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-space-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("requirements", func() {
@@ -65,12 +67,32 @@ var _ = Describe("create-space-quota command", func() {
 
 			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
 		})
+
+		Context("the minimum API version requirement", func() {
+			BeforeEach(func() {
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.TargetedOrgSuccess = true
+				requirementsFactory.MinAPIVersionSuccess = false
+			})
+
+			It("fails when the -a option is provided", func() {
+				Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
+
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumAPIVersion))
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+			})
+
+			It("does not fail when the -a option is not provided", func() {
+				Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
+			})
+		})
 	})
 
 	Context("when requirements have been met", func() {
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.MinAPIVersionSuccess = true
 		})
 
 		It("fails requirements when called without a quota name", func() {
@@ -83,7 +105,7 @@ var _ = Describe("create-space-quota command", func() {
 		It("creates a quota with a given name", func() {
 			runCommand("my-quota")
 			Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
-			Expect(quotaRepo.CreateArgsForCall(0).OrgGuid).To(Equal("my-org-guid"))
+			Expect(quotaRepo.CreateArgsForCall(0).OrgGUID).To(Equal("my-org-guid"))
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating space quota", "my-org", "my-quota", "my-user", "..."},
@@ -130,6 +152,18 @@ var _ = Describe("create-space-quota command", func() {
 			})
 		})
 
+		Context("when the -a flag is provided", func() {
+			It("sets the instance limit", func() {
+				runCommand("-a", "50", "my special quota")
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(50))
+			})
+
+			It("defaults to unlimited", func() {
+				runCommand("my special quota")
+				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
+			})
+		})
+
 		It("sets the route limit", func() {
 			runCommand("-r", "12", "ecstatic")
 
@@ -165,7 +199,7 @@ var _ = Describe("create-space-quota command", func() {
 			})
 
 			It("warns the user when quota already exists", func() {
-				quotaRepo.CreateReturns(errors.NewHttpError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
+				quotaRepo.CreateReturns(errors.NewHTTPError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
 				runCommand("Banana")
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings(

@@ -7,37 +7,39 @@ import (
 	"net/url"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServiceKeyRepository
+
 type ServiceKeyRepository interface {
-	CreateServiceKey(serviceKeyGuid string, keyName string, params map[string]interface{}) error
-	ListServiceKeys(serviceKeyGuid string) ([]models.ServiceKey, error)
-	GetServiceKey(serviceKeyGuid string, keyName string) (models.ServiceKey, error)
-	DeleteServiceKey(serviceKeyGuid string) error
+	CreateServiceKey(serviceKeyGUID string, keyName string, params map[string]interface{}) error
+	ListServiceKeys(serviceKeyGUID string) ([]models.ServiceKey, error)
+	GetServiceKey(serviceKeyGUID string, keyName string) (models.ServiceKey, error)
+	DeleteServiceKey(serviceKeyGUID string) error
 }
 
 type CloudControllerServiceKeyRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceKeyRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerServiceKeyRepository) {
+func NewCloudControllerServiceKeyRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerServiceKeyRepository) {
 	return CloudControllerServiceKeyRepository{
 		config:  config,
 		gateway: gateway,
 	}
 }
 
-func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid string, keyName string, params map[string]interface{}) error {
+func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGUID string, keyName string, params map[string]interface{}) error {
 	path := "/v2/service_keys"
 
 	request := models.ServiceKeyRequest{
 		Name:                keyName,
-		ServiceInstanceGuid: instanceGuid,
+		ServiceInstanceGUID: instanceGUID,
 		Params:              params,
 	}
 	jsonBytes, err := json.Marshal(request)
@@ -45,9 +47,9 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid strin
 		return err
 	}
 
-	err = c.gateway.CreateResource(c.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	err = c.gateway.CreateResource(c.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 
-	if httpErr, ok := err.(errors.HttpError); ok {
+	if httpErr, ok := err.(errors.HTTPError); ok {
 		switch httpErr.ErrorCode() {
 		case errors.ServiceKeyNameTaken:
 			return errors.NewModelAlreadyExistsError("Service key", keyName)
@@ -61,14 +63,14 @@ func (c CloudControllerServiceKeyRepository) CreateServiceKey(instanceGuid strin
 	return nil
 }
 
-func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceGuid string) ([]models.ServiceKey, error) {
-	path := fmt.Sprintf("/v2/service_instances/%s/service_keys", instanceGuid)
+func (c CloudControllerServiceKeyRepository) ListServiceKeys(instanceGUID string) ([]models.ServiceKey, error) {
+	path := fmt.Sprintf("/v2/service_instances/%s/service_keys", instanceGUID)
 
 	return c.listServiceKeys(path)
 }
 
-func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceGuid string, keyName string) (models.ServiceKey, error) {
-	path := fmt.Sprintf("/v2/service_instances/%s/service_keys?q=%s", instanceGuid, url.QueryEscape("name:"+keyName))
+func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceGUID string, keyName string) (models.ServiceKey, error) {
+	path := fmt.Sprintf("/v2/service_instances/%s/service_keys?q=%s", instanceGUID, url.QueryEscape("name:"+keyName))
 
 	serviceKeys, err := c.listServiceKeys(path)
 	if err != nil || len(serviceKeys) == 0 {
@@ -81,7 +83,7 @@ func (c CloudControllerServiceKeyRepository) GetServiceKey(instanceGuid string, 
 func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]models.ServiceKey, error) {
 	serviceKeys := []models.ServiceKey{}
 	err := c.gateway.ListPaginatedResources(
-		c.config.ApiEndpoint(),
+		c.config.APIEndpoint(),
 		path,
 		resources.ServiceKeyResource{},
 		func(resource interface{}) bool {
@@ -91,7 +93,7 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 		})
 
 	if err != nil {
-		if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.NotAuthorized {
+		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.NotAuthorized {
 			return []models.ServiceKey{}, errors.NewNotAuthorizedError()
 		}
 		return []models.ServiceKey{}, err
@@ -100,7 +102,7 @@ func (c CloudControllerServiceKeyRepository) listServiceKeys(path string) ([]mod
 	return serviceKeys, nil
 }
 
-func (c CloudControllerServiceKeyRepository) DeleteServiceKey(serviceKeyGuid string) error {
-	path := fmt.Sprintf("/v2/service_keys/%s", serviceKeyGuid)
-	return c.gateway.DeleteResource(c.config.ApiEndpoint(), path)
+func (c CloudControllerServiceKeyRepository) DeleteServiceKey(serviceKeyGUID string) error {
+	path := fmt.Sprintf("/v2/service_keys/%s", serviceKeyGUID)
+	return c.gateway.DeleteResource(c.config.APIEndpoint(), path)
 }

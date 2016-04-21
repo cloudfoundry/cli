@@ -3,9 +3,9 @@ package application_test
 import (
 	"time"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/app_events/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/appevents/appeventsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -21,30 +21,30 @@ import (
 var _ = Describe("events command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		eventsRepo          *testapi.FakeAppEventsRepository
+		eventsRepo          *appeventsfakes.FakeAppEventsRepository
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	const TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppEventsRepository(eventsRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("events").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("events").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
-		eventsRepo = new(testapi.FakeAppEventsRepository)
+		eventsRepo = new(appeventsfakes.FakeAppEventsRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("events", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("events", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage when called without an app name", func() {
@@ -64,19 +64,19 @@ var _ = Describe("events command", func() {
 
 		app := models.Application{}
 		app.Name = "my-app"
-		app.Guid = "my-app-guid"
+		app.GUID = "my-app-guid"
 		requirementsFactory.Application = app
 
 		eventsRepo.RecentEventsReturns([]models.EventFields{
 			{
-				Guid:        "event-guid-1",
+				GUID:        "event-guid-1",
 				Name:        "app crashed",
 				Timestamp:   earlierTimestamp,
 				Description: "reason: app instance exited, exit_status: 78",
 				ActorName:   "George Clooney",
 			},
 			{
-				Guid:        "event-guid-2",
+				GUID:        "event-guid-2",
 				Name:        "app crashed",
 				Timestamp:   timestamp,
 				Description: "reason: app instance was stopped, exit_status: 77",
@@ -87,9 +87,9 @@ var _ = Describe("events command", func() {
 		runCommand("my-app")
 
 		Expect(eventsRepo.RecentEventsCallCount()).To(Equal(1))
-		appGuid, limit := eventsRepo.RecentEventsArgsForCall(0)
+		appGUID, limit := eventsRepo.RecentEventsArgsForCall(0)
 		Expect(limit).To(Equal(int64(50)))
-		Expect(appGuid).To(Equal("my-app-guid"))
+		Expect(appGUID).To(Equal("my-app-guid"))
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 			[]string{"time", "event", "actor", "description"},

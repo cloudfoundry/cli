@@ -3,19 +3,19 @@ package trace_test
 import (
 	. "github.com/cloudfoundry/cli/cf/trace"
 
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("CombinePrinters", func() {
-	var printer1, printer2 *fakes.FakePrinter
+	var printer1, printer2 *tracefakes.FakePrinter
 	var printer Printer
 
 	BeforeEach(func() {
-		printer1 = &fakes.FakePrinter{}
-		printer2 = &fakes.FakePrinter{}
+		printer1 = new(tracefakes.FakePrinter)
+		printer2 = new(tracefakes.FakePrinter)
 
 		printer = CombinePrinters([]Printer{printer1, printer2})
 	})

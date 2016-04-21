@@ -1,8 +1,8 @@
 package buildpack_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -16,26 +16,26 @@ import (
 
 var _ = Describe("rename-buildpack command", func() {
 	var (
-		fakeRepo            *testapi.FakeBuildpackRepository
+		fakeRepo            *apifakes.OldFakeBuildpackRepository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(fakeRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-buildpack").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("rename-buildpack").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 		ui = new(testterm.FakeUI)
-		fakeRepo = &testapi.FakeBuildpackRepository{}
+		fakeRepo = new(apifakes.OldFakeBuildpackRepository)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("rename-buildpack", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-buildpack", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when called without the current name and the new name to use", func() {
@@ -54,7 +54,7 @@ var _ = Describe("rename-buildpack command", func() {
 		It("renames a buildpack", func() {
 			fakeRepo.FindByNameBuildpack = models.Buildpack{
 				Name: "my-buildpack",
-				Guid: "my-buildpack-guid",
+				GUID: "my-buildpack-guid",
 			}
 
 			runCommand("my-buildpack", "new-buildpack")
@@ -78,7 +78,7 @@ var _ = Describe("rename-buildpack command", func() {
 		It("fails when there is an error updating the buildpack", func() {
 			fakeRepo.FindByNameBuildpack = models.Buildpack{
 				Name: "my-buildpack",
-				Guid: "my-buildpack-guid",
+				GUID: "my-buildpack-guid",
 			}
 			fakeRepo.UpdateBuildpackReturns.Error = errors.New("SAD TROMBONE")
 

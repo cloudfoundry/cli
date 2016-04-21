@@ -5,9 +5,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/feature_flags"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/featureflags"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -15,27 +15,28 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_org_role_setter.go . OrgRoleSetter
+//go:generate counterfeiter . OrgRoleSetter
+
 type OrgRoleSetter interface {
-	command_registry.Command
-	SetOrgRole(orgGuid string, role, userGuid, userName string) error
+	commandregistry.Command
+	SetOrgRole(orgGUID string, role, userGUID, userName string) error
 }
 
 type SetOrgRole struct {
 	ui       terminal.UI
-	config   core_config.Reader
-	flagRepo feature_flags.FeatureFlagRepository
+	config   coreconfig.Reader
+	flagRepo featureflags.FeatureFlagRepository
 	userRepo api.UserRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }
 
 func init() {
-	command_registry.Register(&SetOrgRole{})
+	commandregistry.Register(&SetOrgRole{})
 }
 
-func (cmd *SetOrgRole) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SetOrgRole) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "set-org-role",
 		Description: T("Assign an org role to a user"),
 		Usage: []string{
@@ -50,18 +51,18 @@ func (cmd *SetOrgRole) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + command_registry.Commands.CommandUsage("set-org-role"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("set-org-role"))
 	}
 
-	var wantGuid bool
-	if cmd.config.IsMinApiVersion(cf.SetRolesByUsernameMinimumApiVersion) {
+	var wantGUID bool
+	if cmd.config.IsMinAPIVersion(cf.SetRolesByUsernameMinimumAPIVersion) {
 		setRolesByUsernameFlag, err := cmd.flagRepo.FindByName("set_roles_by_username")
-		wantGuid = (err != nil || !setRolesByUsernameFlag.Enabled)
+		wantGUID = (err != nil || !setRolesByUsernameFlag.Enabled)
 	} else {
-		wantGuid = true
+		wantGUID = true
 	}
 
-	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGuid)
+	cmd.userReq = requirementsFactory.NewUserRequirement(fc.Args()[0], wantGUID)
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[1])
 
 	reqs := []requirements.Requirement{
@@ -73,8 +74,8 @@ func (cmd *SetOrgRole) Requirements(requirementsFactory requirements.Factory, fc
 	return reqs
 }
 
-func (cmd *SetOrgRole) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *SetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
@@ -94,7 +95,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.SetOrgRole(org.Guid, role, user.Guid, user.Username)
+	err := cmd.SetOrgRole(org.GUID, role, user.GUID, user.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -102,10 +103,10 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 }
 
-func (cmd *SetOrgRole) SetOrgRole(orgGuid string, role, userGuid, userName string) error {
-	if len(userGuid) > 0 {
-		return cmd.userRepo.SetOrgRoleByGuid(userGuid, orgGuid, role)
+func (cmd *SetOrgRole) SetOrgRole(orgGUID string, role, userGUID, userName string) error {
+	if len(userGUID) > 0 {
+		return cmd.userRepo.SetOrgRoleByGUID(userGUID, orgGUID, role)
 	}
 
-	return cmd.userRepo.SetOrgRoleByUsername(userName, orgGuid, role)
+	return cmd.userRepo.SetOrgRoleByUsername(userName, orgGUID, role)
 }

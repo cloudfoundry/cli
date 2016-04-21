@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
@@ -29,7 +29,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(app.Name).To(Equal("My App"))
-			Expect(app.Guid).To(Equal("app1-guid"))
+			Expect(app.GUID).To(Equal("app1-guid"))
 			Expect(app.Memory).To(Equal(int64(128)))
 			Expect(app.DiskQuota).To(Equal(int64(512)))
 			Expect(app.InstanceCount).To(Equal(1))
@@ -40,7 +40,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 
 		It("returns a failure response when the app is not found", func() {
-			request := testapi.NewCloudControllerTestRequest(findAppRequest)
+			request := apifakes.NewCloudControllerTestRequest(findAppRequest)
 			request.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
@@ -54,7 +54,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 	Describe(".GetApp", func() {
 		It("returns an application using the given app guid", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/apps/app-guid",
 				Response: appModelResponse,
@@ -71,7 +71,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 	Describe(".ReadFromSpace", func() {
 		It("returns an application using the given space guid", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/another-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
 				Response: singleAppResponse,
@@ -96,14 +96,14 @@ var _ = Describe("ApplicationsRepository", func() {
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
-			configRepo.SetApiEndpoint(ccServer.URL())
-			gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+			configRepo.SetAPIEndpoint(ccServer.URL())
+			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 			repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 
 			name := "my-cool-app"
-			buildpackUrl := "buildpack-url"
-			spaceGuid := "some-space-guid"
-			stackGuid := "some-stack-guid"
+			buildpackURL := "buildpack-url"
+			spaceGUID := "some-space-guid"
+			stackGUID := "some-stack-guid"
 			command := "some-command"
 			memory := int64(2048)
 			diskQuota := int64(512)
@@ -111,9 +111,9 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			appParams = models.AppParams{
 				Name:          &name,
-				BuildpackUrl:  &buildpackUrl,
-				SpaceGuid:     &spaceGuid,
-				StackGuid:     &stackGuid,
+				BuildpackURL:  &buildpackURL,
+				SpaceGUID:     &spaceGUID,
+				StackGUID:     &stackGUID,
 				Command:       &command,
 				Memory:        &memory,
 				DiskQuota:     &diskQuota,
@@ -170,7 +170,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 				app := models.Application{}
 				app.Name = "my-cool-app"
-				app.Guid = "my-cool-app-guid"
+				app.GUID = "my-cool-app-guid"
 				Expect(createdApp).To(Equal(app))
 			})
 		})
@@ -210,7 +210,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			Context("when there are system provided env vars", func() {
 				BeforeEach(func() {
 
-					var appEnvRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					var appEnvRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/apps/some-cool-app-guid/env",
 						Response: testnet.TestResponse{
@@ -271,7 +271,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 			Context("when there are no environment variables", func() {
 				BeforeEach(func() {
-					var emptyEnvRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					var emptyEnvRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/apps/some-cool-app-guid/env",
 						Response: testnet.TestResponse{
@@ -295,7 +295,7 @@ var _ = Describe("ApplicationsRepository", func() {
 
 	Describe("restaging applications", func() {
 		It("POSTs to the right URL", func() {
-			appRestageRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			appRestageRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "POST",
 				Path:   "/v2/apps/some-cool-app-guid/restage",
 				Response: testnet.TestResponse{
@@ -318,31 +318,31 @@ var _ = Describe("ApplicationsRepository", func() {
 			defer ts.Close()
 
 			app := models.Application{}
-			app.Guid = "my-app-guid"
+			app.GUID = "my-app-guid"
 			app.Name = "my-cool-app"
-			app.BuildpackUrl = "buildpack-url"
+			app.BuildpackURL = "buildpack-url"
 			app.Command = "some-command"
 			app.HealthCheckType = "none"
 			app.Memory = 2048
 			app.InstanceCount = 3
-			app.Stack = &models.Stack{Guid: "some-stack-guid"}
-			app.SpaceGuid = "some-space-guid"
+			app.Stack = &models.Stack{GUID: "some-stack-guid"}
+			app.SpaceGUID = "some-space-guid"
 			app.State = "started"
 			app.DiskQuota = 512
 			Expect(app.EnvironmentVars).To(BeNil())
 
-			updatedApp, apiErr := repo.Update(app.Guid, app.ToParams())
+			updatedApp, apiErr := repo.Update(app.GUID, app.ToParams())
 
 			Expect(handler).To(HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(updatedApp.Command).To(Equal("some-command"))
 			Expect(updatedApp.DetectedStartCommand).To(Equal("detected command"))
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
-			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
+			Expect(updatedApp.GUID).To(Equal("my-cool-app-guid"))
 		})
 
 		It("sets environment variables", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/apps/app1-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
@@ -362,7 +362,7 @@ var _ = Describe("ApplicationsRepository", func() {
 		})
 
 		It("can remove environment variables", func() {
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/apps/app1-guid",
 				Matcher:  testnet.RequestBodyMatcher(`{"environment_json":{}}`),
@@ -383,7 +383,7 @@ var _ = Describe("ApplicationsRepository", func() {
 	})
 
 	It("deletes applications", func() {
-		deleteApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		deleteApplicationRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "DELETE",
 			Path:     "/v2/apps/my-cool-app-guid?recursive=true",
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: ""},
@@ -495,7 +495,7 @@ var singleAppResponse = testnet.TestResponse{
   ]
 }`}
 
-var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var findAppRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "GET",
 	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
 	Response: singleAppResponse,
@@ -511,7 +511,7 @@ var createApplicationResponse = `
     }
 }`
 
-var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var createApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "POST",
 	Path:   "/v2/apps",
 	Matcher: testnet.RequestBodyMatcher(`{
@@ -531,9 +531,9 @@ var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 
 func defaultAppParams() models.AppParams {
 	name := "my-cool-app"
-	buildpackUrl := "buildpack-url"
-	spaceGuid := "some-space-guid"
-	stackGuid := "some-stack-guid"
+	buildpackURL := "buildpack-url"
+	spaceGUID := "some-space-guid"
+	stackGUID := "some-stack-guid"
 	command := "some-command"
 	memory := int64(2048)
 	diskQuota := int64(512)
@@ -541,9 +541,9 @@ func defaultAppParams() models.AppParams {
 
 	return models.AppParams{
 		Name:          &name,
-		BuildpackUrl:  &buildpackUrl,
-		SpaceGuid:     &spaceGuid,
-		StackGuid:     &stackGuid,
+		BuildpackURL:  &buildpackURL,
+		SpaceGUID:     &spaceGUID,
+		StackGUID:     &stackGUID,
 		Command:       &command,
 		Memory:        &memory,
 		DiskQuota:     &diskQuota,
@@ -563,7 +563,7 @@ var updateApplicationResponse = `
     }
 }`
 
-var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var updateApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "PUT",
 	Path:   "/v2/apps/my-app-guid?inline-relations-depth=1",
 	Matcher: testnet.RequestBodyMatcher(`{
@@ -587,8 +587,8 @@ var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
-	gateway := cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+	configRepo.SetAPIEndpoint(ts.URL)
+	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 	return
 }

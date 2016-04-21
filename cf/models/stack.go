@@ -1,7 +1,7 @@
 package models
 
 type Stack struct {
-	Guid        string
+	GUID        string
 	Name        string
 	Description string
 }

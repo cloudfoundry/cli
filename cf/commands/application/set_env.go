@@ -3,8 +3,8 @@ package application
 import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -14,17 +14,17 @@ import (
 
 type SetEnv struct {
 	ui      terminal.UI
-	config  core_config.Reader
+	config  coreconfig.Reader
 	appRepo applications.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
 func init() {
-	command_registry.Register(&SetEnv{})
+	commandregistry.Register(&SetEnv{})
 }
 
-func (cmd *SetEnv) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *SetEnv) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "set-env",
 		ShortName:   "se",
 		Description: T("Set an env variable for an app"),
@@ -37,7 +37,7 @@ func (cmd *SetEnv) MetaData() command_registry.CommandMetadata {
 
 func (cmd *SetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n") + command_registry.Commands.CommandUsage("set-env"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n") + commandregistry.Commands.CommandUsage("set-env"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -51,8 +51,8 @@ func (cmd *SetEnv) Requirements(requirementsFactory requirements.Factory, fc fla
 	return reqs
 }
 
-func (cmd *SetEnv) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *SetEnv) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	return cmd
@@ -78,7 +78,7 @@ func (cmd *SetEnv) Execute(c flags.FlagContext) {
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue
 
-	_, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
+	_, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

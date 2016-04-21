@@ -2,9 +2,10 @@ package quota_test
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
+	"github.com/cloudfoundry/cli/cf/api/resources"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,17 +22,17 @@ var _ = Describe("app Command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *fakes.FakeQuotaRepository
+		quotaRepo           *quotasfakes.FakeQuotaRepository
 		quota               models.QuotaFields
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -41,11 +42,11 @@ var _ = Describe("app Command", func() {
 			LoginSuccess:         true,
 			MinAPIVersionSuccess: true,
 		}
-		quotaRepo = &fakes.FakeQuotaRepository{}
+		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("update-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -76,7 +77,7 @@ var _ = Describe("app Command", func() {
 			It("fails when the -a option is provided", func() {
 				Expect(runCommand("quota-name", "-a", "10")).To(BeFalse())
 
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.AppInstanceLimitMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.OrgAppInstanceLimitMinimumAPIVersion))
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
 			})
 
@@ -89,11 +90,12 @@ var _ = Describe("app Command", func() {
 	Describe("updating quota fields", func() {
 		BeforeEach(func() {
 			quota = models.QuotaFields{
-				Guid:          "quota-guid",
-				Name:          "quota-name",
-				MemoryLimit:   1024,
-				RoutesLimit:   111,
-				ServicesLimit: 222,
+				GUID:             "quota-guid",
+				Name:             "quota-name",
+				MemoryLimit:      1024,
+				RoutesLimit:      111,
+				ServicesLimit:    222,
+				AppInstanceLimit: 333,
 			}
 		})
 
@@ -132,7 +134,13 @@ var _ = Describe("app Command", func() {
 			It("totally accepts -1 as a value because it means unlimited", func() {
 				runCommand("-a", "-1", "quota-name")
 				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
-				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(-1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
+			})
+
+			It("does not override the value if it's not provided", func() {
+				runCommand("-s", "5", "quota-name")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(333))
 			})
 		})
 

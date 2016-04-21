@@ -1,9 +1,10 @@
 package spacequota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -18,30 +19,30 @@ import (
 var _ = Describe("update-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *fakes.FakeSpaceQuotaRepository
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
 		requirementsFactory *testreq.FakeReqFactory
 
 		quota            models.SpaceQuota
 		quotaPaidService models.SpaceQuota
-		configRepo       core_config.Repository
-		deps             command_registry.Dependency
+		configRepo       coreconfig.Repository
+		deps             commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-space-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-space-quota").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("update-space-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
@@ -68,25 +69,46 @@ var _ = Describe("update-space-quota command", func() {
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
+
+		Context("the minimum API version requirement", func() {
+			BeforeEach(func() {
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.TargetedOrgSuccess = true
+				requirementsFactory.MinAPIVersionSuccess = false
+			})
+
+			It("fails when the -a option is provided", func() {
+				Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
+
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumAPIVersion))
+				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+			})
+
+			It("does not fail when the -a option is not provided", func() {
+				Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
+			})
+		})
 	})
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
 			quota = models.SpaceQuota{
-				Guid:                    "my-quota-guid",
+				GUID:                    "my-quota-guid",
 				Name:                    "my-quota",
 				MemoryLimit:             1024,
 				InstanceMemoryLimit:     512,
 				RoutesLimit:             111,
 				ServicesLimit:           222,
+				AppInstanceLimit:        333,
 				NonBasicServicesAllowed: false,
-				OrgGuid:                 "my-org-guid",
+				OrgGUID:                 "my-org-guid",
 			}
 
 			quotaPaidService = models.SpaceQuota{NonBasicServicesAllowed: true}
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.MinAPIVersionSuccess = true
 		})
 
 		JustBeforeEach(func() {
@@ -121,6 +143,19 @@ var _ = Describe("update-space-quota command", func() {
 			It("alerts the user when parsing the memory limit fails", func() {
 				runCommand("-i", "whoops", "my-quota")
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
+		})
+
+		Context("when the -a flag is provided", func() {
+			It("sets the instance limit", func() {
+				runCommand("-a", "50", "my-quota")
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(50))
+			})
+
+			It("does not override the value if it's not provided", func() {
+				runCommand("-s", "5", "my-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(333))
 			})
 		})
 

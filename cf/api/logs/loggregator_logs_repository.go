@@ -7,7 +7,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	consumer "github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
@@ -15,13 +15,13 @@ import (
 
 type LoggregatorLogsRepository struct {
 	consumer       consumer.LoggregatorConsumer
-	config         core_config.Reader
+	config         coreconfig.Reader
 	tokenRefresher authentication.TokenRefresher
 	messageQueue   *LoggregatorMessageQueue
 	BufferTime     time.Duration
 }
 
-func NewLoggregatorLogsRepository(config core_config.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) *LoggregatorLogsRepository {
+func NewLoggregatorLogsRepository(config coreconfig.Reader, consumer consumer.LoggregatorConsumer, refresher authentication.TokenRefresher) *LoggregatorLogsRepository {
 	return &LoggregatorLogsRepository{
 		config:         config,
 		consumer:       consumer,
@@ -45,14 +45,14 @@ func loggableMessagesFromLoggregatorMessages(messages []*logmessage.LogMessage) 
 	return loggableMessages
 }
 
-func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error) {
-	messages, err := repo.consumer.Recent(appGuid, repo.config.AccessToken())
+func (repo *LoggregatorLogsRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
+	messages, err := repo.consumer.Recent(appGUID, repo.config.AccessToken())
 
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
-		return repo.RecentLogsFor(appGuid)
+		return repo.RecentLogsFor(appGUID)
 	default:
 		return loggableMessagesFromLoggregatorMessages(messages), err
 	}
@@ -62,7 +62,7 @@ func (repo *LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]Loggable
 	return loggableMessagesFromLoggregatorMessages(messages), nil
 }
 
-func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
+func (repo *LoggregatorLogsRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
 	ticker := time.NewTicker(repo.BufferTime)
 	endpoint := repo.config.LoggregatorEndpoint()
 	if endpoint == "" {
@@ -71,13 +71,13 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect fun
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
-	c, err := repo.consumer.Tail(appGuid, repo.config.AccessToken())
+	c, err := repo.consumer.Tail(appGUID, repo.config.AccessToken())
 
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
 		repo.tokenRefresher.RefreshAuthToken()
-		c, err = repo.consumer.Tail(appGuid, repo.config.AccessToken())
+		c, err = repo.consumer.Tail(appGUID, repo.config.AccessToken())
 	default:
 		errChan <- err
 		return

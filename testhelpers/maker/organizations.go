@@ -2,18 +2,18 @@ package maker
 
 import "github.com/cloudfoundry/cli/cf/models"
 
-var orgGuid func() string
+var orgGUID func() string
 
 func init() {
-	orgGuid = guidGenerator("org")
+	orgGUID = guidGenerator("org")
 }
 
 func NewOrgFields(overrides Overrides) (org models.OrganizationFields) {
 	org.Name = "new-org"
-	org.Guid = orgGuid()
+	org.GUID = orgGUID()
 
-	if overrides.Has("Guid") {
-		org.Guid = overrides.Get("Guid").(string)
+	if overrides.Has("GUID") {
+		org.GUID = overrides.Get("GUID").(string)
 	}
 
 	if overrides.Has("Name") {

@@ -2,7 +2,6 @@ package application
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -10,16 +9,18 @@ import (
 	"github.com/cloudfoundry/cli/plugin/models"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/api/app_instances"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/appinstances"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/cf/ui_helpers"
+	"github.com/cloudfoundry/cli/cf/uihelpers"
 )
+
+//go:generate counterfeiter . ApplicationDisplayer
 
 type ApplicationDisplayer interface {
 	ShowApp(app models.Application, orgName string, spaceName string)
@@ -27,23 +28,23 @@ type ApplicationDisplayer interface {
 
 type ShowApp struct {
 	ui               terminal.UI
-	config           core_config.Reader
+	config           coreconfig.Reader
 	appSummaryRepo   api.AppSummaryRepository
-	appInstancesRepo app_instances.AppInstancesRepository
+	appInstancesRepo appinstances.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
 	pluginAppModel   *plugin_models.GetAppModel
 	pluginCall       bool
 }
 
 func init() {
-	command_registry.Register(&ShowApp{})
+	commandregistry.Register(&ShowApp{})
 }
 
-func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
+func (cmd *ShowApp) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "app",
 		Description: T("Display health and status for app"),
 		Usage: []string{
@@ -55,7 +56,7 @@ func (cmd *ShowApp) MetaData() command_registry.CommandMetadata {
 
 func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("app"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("app"))
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -69,8 +70,8 @@ func (cmd *ShowApp) Requirements(requirementsFactory requirements.Factory, fc fl
 	return reqs
 }
 
-func (cmd *ShowApp) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *ShowApp) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
@@ -85,7 +86,7 @@ func (cmd *ShowApp) Execute(c flags.FlagContext) {
 	app := cmd.appReq.GetApplication()
 
 	if c.Bool("guid") {
-		cmd.ui.Say(app.Guid)
+		cmd.ui.Say(app.GUID)
 	} else {
 		cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 	}
@@ -99,10 +100,10 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 			"SpaceName": terminal.EntityNameColor(spaceName),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
+	application, apiErr := cmd.appSummaryRepo.GetSummary(app.GUID)
 
 	appIsStopped := (application.State == "stopped")
-	if err, ok := apiErr.(errors.HttpError); ok {
+	if err, ok := apiErr.(errors.HTTPError); ok {
 		if err.ErrorCode() == errors.InstancesError || err.ErrorCode() == errors.NotStaged {
 			appIsStopped = true
 		}
@@ -114,7 +115,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	var instances []models.AppInstanceFields
-	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.GUID)
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -130,17 +131,18 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), ui_helpers.ColoredAppState(application.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), ui_helpers.ColoredAppInstances(application.ApplicationFields))
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor(T("requested state:")), uihelpers.ColoredAppState(application.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor(T("instances:")), uihelpers.ColoredAppInstances(application.ApplicationFields))
 
-	if len(application.AppPorts) > 0 {
-		appPorts := make([]string, len(application.AppPorts))
-		for i, p := range application.AppPorts {
-			appPorts[i] = strconv.Itoa(p)
-		}
+	// Commented to hide app-ports for release #117189491
+	// if len(application.AppPorts) > 0 {
+	// 	appPorts := make([]string, len(application.AppPorts))
+	// 	for i, p := range application.AppPorts {
+	// 		appPorts[i] = strconv.Itoa(p)
+	// 	}
 
-		cmd.ui.Say("%s %s", terminal.HeaderColor(T("app ports:")), strings.Join(appPorts, ", "))
-	}
+	// 	cmd.ui.Say("%s %s", terminal.HeaderColor(T("app ports:")), strings.Join(appPorts, ", "))
+	// }
 
 	cmd.ui.Say(T("{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
 		map[string]interface{}{
@@ -180,14 +182,14 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 		return
 	}
 
-	table := terminal.NewTable(cmd.ui, []string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk"), T("details")})
+	table := cmd.ui.Table([]string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk"), T("details")})
 
 	for index, instance := range instances {
 		table.Add(
 			fmt.Sprintf("#%d", index),
-			ui_helpers.ColoredInstanceState(instance),
+			uihelpers.ColoredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
-			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
+			fmt.Sprintf("%.1f%%", instance.CPUUsage*100),
 			fmt.Sprintf(T("{{.MemUsage}} of {{.MemQuota}}",
 				map[string]interface{}{
 					"MemUsage": formatters.ByteSize(instance.MemUsage),
@@ -208,13 +210,13 @@ func (cmd *ShowApp) populatePluginModel(
 	stack *models.Stack,
 	instances []models.AppInstanceFields,
 ) {
-	cmd.pluginAppModel.BuildpackUrl = getSummaryApp.BuildpackUrl
+	cmd.pluginAppModel.BuildpackUrl = getSummaryApp.BuildpackURL
 	cmd.pluginAppModel.Command = getSummaryApp.Command
 	cmd.pluginAppModel.DetectedStartCommand = getSummaryApp.DetectedStartCommand
 	cmd.pluginAppModel.Diego = getSummaryApp.Diego
 	cmd.pluginAppModel.DiskQuota = getSummaryApp.DiskQuota
 	cmd.pluginAppModel.EnvironmentVars = getSummaryApp.EnvironmentVars
-	cmd.pluginAppModel.Guid = getSummaryApp.Guid
+	cmd.pluginAppModel.Guid = getSummaryApp.GUID
 	cmd.pluginAppModel.HealthCheckTimeout = getSummaryApp.HealthCheckTimeout
 	cmd.pluginAppModel.InstanceCount = getSummaryApp.InstanceCount
 	cmd.pluginAppModel.Memory = getSummaryApp.Memory
@@ -222,11 +224,11 @@ func (cmd *ShowApp) populatePluginModel(
 	cmd.pluginAppModel.PackageState = getSummaryApp.PackageState
 	cmd.pluginAppModel.PackageUpdatedAt = getSummaryApp.PackageUpdatedAt
 	cmd.pluginAppModel.RunningInstances = getSummaryApp.RunningInstances
-	cmd.pluginAppModel.SpaceGuid = getSummaryApp.SpaceGuid
+	cmd.pluginAppModel.SpaceGuid = getSummaryApp.SpaceGUID
 	cmd.pluginAppModel.AppPorts = getSummaryApp.AppPorts
 	cmd.pluginAppModel.Stack = &plugin_models.GetApp_Stack{
 		Name: stack.Name,
-		Guid: stack.Guid,
+		Guid: stack.GUID,
 	}
 	cmd.pluginAppModel.StagingFailedReason = getSummaryApp.StagingFailedReason
 	cmd.pluginAppModel.State = getSummaryApp.State
@@ -236,7 +238,7 @@ func (cmd *ShowApp) populatePluginModel(
 			State:     string(instance.State),
 			Details:   instance.Details,
 			Since:     instance.Since,
-			CpuUsage:  instance.CpuUsage,
+			CpuUsage:  instance.CPUUsage,
 			DiskQuota: instance.DiskQuota,
 			DiskUsage: instance.DiskUsage,
 			MemQuota:  instance.MemQuota,
@@ -248,10 +250,10 @@ func (cmd *ShowApp) populatePluginModel(
 	for i := range getSummaryApp.Routes {
 		routeSummary := plugin_models.GetApp_RouteSummary{
 			Host: getSummaryApp.Routes[i].Host,
-			Guid: getSummaryApp.Routes[i].Guid,
+			Guid: getSummaryApp.Routes[i].GUID,
 			Domain: plugin_models.GetApp_DomainFields{
 				Name: getSummaryApp.Routes[i].Domain.Name,
-				Guid: getSummaryApp.Routes[i].Domain.Guid,
+				Guid: getSummaryApp.Routes[i].Domain.GUID,
 			},
 		}
 		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, routeSummary)
@@ -260,7 +262,7 @@ func (cmd *ShowApp) populatePluginModel(
 	for i := range getSummaryApp.Services {
 		serviceSummary := plugin_models.GetApp_ServiceSummary{
 			Name: getSummaryApp.Services[i].Name,
-			Guid: getSummaryApp.Services[i].Guid,
+			Guid: getSummaryApp.Services[i].GUID,
 		}
 		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, serviceSummary)
 	}

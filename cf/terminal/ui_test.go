@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,17 +21,18 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("UI", func() {
-	var fakeLogger *fakes.FakePrinter
+	var fakeLogger *tracefakes.FakePrinter
 	BeforeEach(func() {
-		fakeLogger = new(fakes.FakePrinter)
+		fakeLogger = new(tracefakes.FakePrinter)
 	})
 
 	Describe("Printing message to stdout with PrintCapturingNoOutput", func() {
 		It("prints strings without using the TeePrinter", func() {
-			bucket := &[]string{}
+			bucket := gbytes.NewBuffer()
 
 			printer := NewTeePrinter()
 			printer.SetOutputBucket(bucket)
@@ -43,7 +44,7 @@ var _ = Describe("UI", func() {
 				})
 
 				Expect("Hello").To(Equal(strings.Join(output, "")))
-				Expect(len(*bucket)).To(Equal(0))
+				Expect(bucket.Contents()).To(HaveLen(0))
 			})
 		})
 	})
@@ -224,7 +225,7 @@ var _ = Describe("UI", func() {
 	})
 
 	Context("when user is not logged in", func() {
-		var config core_config.Reader
+		var config coreconfig.Reader
 
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
@@ -242,17 +243,17 @@ var _ = Describe("UI", func() {
 	})
 
 	Context("when an api endpoint is set and the user logged in", func() {
-		var config core_config.ReadWriter
+		var config coreconfig.ReadWriter
 
 		BeforeEach(func() {
-			accessToken := core_config.TokenInfo{
-				UserGuid: "my-user-guid",
+			accessToken := coreconfig.TokenInfo{
+				UserGUID: "my-user-guid",
 				Username: "my-user",
 				Email:    "my-user-email",
 			}
 			config = testconfig.NewRepositoryWithAccessToken(accessToken)
-			config.SetApiEndpoint("https://test.example.org")
-			config.SetApiVersion("☃☃☃")
+			config.SetAPIEndpoint("https://test.example.org")
+			config.SetAPIVersion("☃☃☃")
 		})
 
 		Describe("tells the user what is set in the config", func() {
@@ -281,7 +282,7 @@ var _ = Describe("UI", func() {
 				BeforeEach(func() {
 					config.SetOrganizationFields(models.OrganizationFields{
 						Name: "org-name",
-						Guid: "org-guid",
+						GUID: "org-guid",
 					})
 				})
 
@@ -294,7 +295,7 @@ var _ = Describe("UI", func() {
 				BeforeEach(func() {
 					config.SetSpaceFields(models.SpaceFields{
 						Name: "my-space",
-						Guid: "space-guid",
+						GUID: "space-guid",
 					})
 				})
 
@@ -315,7 +316,7 @@ var _ = Describe("UI", func() {
 
 		It("prompts the user to target an org when no org is targeted", func() {
 			sf := models.SpaceFields{}
-			sf.Guid = "guid"
+			sf.GUID = "guid"
 			sf.Name = "name"
 
 			output := io_helpers.CaptureOutput(func() {
@@ -328,7 +329,7 @@ var _ = Describe("UI", func() {
 
 		It("prompts the user to target a space when no space is targeted", func() {
 			of := models.OrganizationFields{}
-			of.Guid = "of-guid"
+			of.GUID = "of-guid"
 			of.Name = "of-name"
 
 			output := io_helpers.CaptureOutput(func() {
@@ -404,7 +405,7 @@ var _ = Describe("UI", func() {
 
 		var (
 			output []string
-			config core_config.ReadWriter
+			config coreconfig.ReadWriter
 		)
 
 		BeforeEach(func() {
@@ -412,9 +413,9 @@ var _ = Describe("UI", func() {
 		})
 
 		It("Prints a notification to user if current version < min cli version", func() {
-			config.SetMinCliVersion("6.0.0")
-			config.SetMinRecommendedCliVersion("6.5.0")
-			config.SetApiVersion("2.15.1")
+			config.SetMinCLIVersion("6.0.0")
+			config.SetMinRecommendedCLIVersion("6.5.0")
+			config.SetAPIVersion("2.15.1")
 			cf.Version = "5.0.0"
 			output = io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
@@ -429,9 +430,9 @@ var _ = Describe("UI", func() {
 		})
 
 		It("Doesn't print a notification to user if current version >= min cli version", func() {
-			config.SetMinCliVersion("6.0.0")
-			config.SetMinRecommendedCliVersion("6.5.0")
-			config.SetApiVersion("2.15.1")
+			config.SetMinCLIVersion("6.0.0")
+			config.SetMinRecommendedCLIVersion("6.5.0")
+			config.SetAPIVersion("2.15.1")
 			cf.Version = "6.0.0"
 			output = io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)

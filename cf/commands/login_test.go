@@ -4,11 +4,12 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fake_organizations "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -23,25 +24,28 @@ import (
 var _ = Describe("Login Command", func() {
 	var (
 		Flags        []string
-		Config       core_config.Repository
+		Config       coreconfig.Repository
 		ui           *testterm.FakeUI
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
-		endpointRepo *testapi.FakeEndpointRepository
-		orgRepo      *fake_organizations.FakeOrganizationRepository
-		spaceRepo    *testapi.FakeSpaceRepository
+		endpointRepo *coreconfigfakes.FakeEndpointRepository
+		orgRepo      *organizationsfakes.FakeOrganizationRepository
+		spaceRepo    *apifakes.FakeSpaceRepository
 
 		org  models.Organization
-		deps command_registry.Dependency
+		deps commandregistry.Dependency
+
+		minCLIVersion            string
+		minRecommendedCLIVersion string
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = Config
 		deps.RepoLocator = deps.RepoLocator.SetEndpointRepository(endpointRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("login").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("login").SetDependency(deps, pluginCall))
 	}
 
 	listSpacesStub := func(spaces []models.Space) func(func(models.Space) bool) error {
@@ -61,60 +65,76 @@ var _ = Describe("Login Command", func() {
 		Flags = []string{}
 		Config = testconfig.NewRepository()
 		ui = &testterm.FakeUI{}
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			Config.SetAccessToken("my_access_token")
 			Config.SetRefreshToken("my_refresh_token")
 			return nil
 		}
-		endpointRepo = &testapi.FakeEndpointRepository{}
+		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
+		minCLIVersion = "1.0.0"
+		minRecommendedCLIVersion = "1.0.0"
 
 		org = models.Organization{}
 		org.Name = "my-new-org"
-		org.Guid = "my-new-org-guid"
+		org.GUID = "my-new-org-guid"
 
-		orgRepo = &fake_organizations.FakeOrganizationRepository{}
+		orgRepo = &organizationsfakes.FakeOrganizationRepository{}
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 		space := models.Space{}
-		space.Guid = "my-space-guid"
+		space.GUID = "my-space-guid"
 		space.Name = "my-space"
 
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
-		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{
-			"username": core_config.AuthPrompt{
+		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
+			"username": coreconfig.AuthPrompt{
 				DisplayName: "Username",
-				Type:        core_config.AuthPromptTypeText,
+				Type:        coreconfig.AuthPromptTypeText,
 			},
-			"password": core_config.AuthPrompt{
+			"password": coreconfig.AuthPrompt{
 				DisplayName: "Password",
-				Type:        core_config.AuthPromptTypePassword,
+				Type:        coreconfig.AuthPromptTypePassword,
 			},
 		}, nil)
 	})
 
 	Context("interactive usage", func() {
+		JustBeforeEach(func() {
+			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
+				return &coreconfig.CCInfo{
+					APIVersion:               "some-version",
+					AuthorizationEndpoint:    "auth/endpoint",
+					LoggregatorEndpoint:      "loggregator/endpoint",
+					MinCLIVersion:            minCLIVersion,
+					MinRecommendedCLIVersion: minRecommendedCLIVersion,
+					SSHOAuthClient:           "some-client",
+					RoutingAPIEndpoint:       "routing/endpoint",
+				}, endpoint, nil
+			}
+		})
+
 		Describe("when there are a small number of organizations and spaces", func() {
 			var org2 models.Organization
 			var space2 models.Space
 
 			BeforeEach(func() {
 				org1 := models.Organization{}
-				org1.Guid = "some-org-guid"
+				org1.GUID = "some-org-guid"
 				org1.Name = "some-org"
 
 				org2 = models.Organization{}
-				org2.Guid = "my-new-org-guid"
+				org2.GUID = "my-new-org-guid"
 				org2.Name = "my-new-org"
 
 				space1 := models.Space{}
-				space1.Guid = "my-space-guid"
+				space1.GUID = "my-space-guid"
 				space1.Name = "my-space"
 
 				space2 = models.Space{}
-				space2.Guid = "some-space-guid"
+				space2.GUID = "some-space-guid"
 				space2.Name = "some-space"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org1, org2}, nil)
@@ -133,7 +153,7 @@ var _ = Describe("Login Command", func() {
 				OUT_OF_RANGE_CHOICE := "3"
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Select an org"},
@@ -144,13 +164,23 @@ var _ = Describe("Login Command", func() {
 					[]string{"2. some-space"},
 				))
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.example.com"))
+				Expect(Config.APIVersion()).To(Equal("some-version"))
+				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
+				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
+				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
+				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
+				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
+				Expect(Config.RoutingAPIEndpoint()).To(Equal("routing/endpoint"))
+
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
@@ -162,7 +192,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-new-org", "my-space"}
 				orgRepo.FindByNameReturns(org2, nil)
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Select an org"},
@@ -173,13 +203,13 @@ var _ = Describe("Login Command", func() {
 					[]string{"2. some-space"},
 				))
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
@@ -191,15 +221,15 @@ var _ = Describe("Login Command", func() {
 				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "my-space"}
 
 				orgRepo.FindByNameReturns(org2, nil)
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -211,36 +241,36 @@ var _ = Describe("Login Command", func() {
 
 			It("doesn't ask the user for the API url if they have it in their config", func() {
 				orgRepo.FindByNameReturns(org, nil)
-				Config.SetApiEndpoint("http://api.example.com")
+				Config.SetAPIEndpoint("http://api.example.com")
 
 				Flags = []string{"-o", "my-new-org", "-s", "my-space"}
 				ui.Inputs = []string{"user@example.com", "password"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.APIEndpoint()).To(Equal("http://api.example.com"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
 
 		Describe("when the CLI version is below the minimum required", func() {
 			BeforeEach(func() {
-				Config.SetMinCliVersion("5.0.0")
-				Config.SetMinRecommendedCliVersion("5.5.0")
+				minCLIVersion = "5.0.0"
+				minRecommendedCLIVersion = "5.5.0"
 			})
 
 			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 				cf.Version = "4.5.0"
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"To upgrade your CLI"},
@@ -252,7 +282,7 @@ var _ = Describe("Login Command", func() {
 		It("tries to get the organizations", func() {
 			Flags = []string{}
 			ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
-			testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+			testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 			Expect(orgRepo.ListOrgsCallCount()).To(Equal(1))
 			Expect(orgRepo.ListOrgsArgsForCall(0)).To(Equal(50))
 		})
@@ -263,7 +293,7 @@ var _ = Describe("Login Command", func() {
 				for i := 0; i < 60; i++ {
 					id := strconv.Itoa(i)
 					org := models.Organization{}
-					org.Guid = "my-org-guid-" + id
+					org.GUID = "my-org-guid-" + id
 					org.Name = "my-org-" + id
 					organizations = append(organizations, org)
 				}
@@ -271,11 +301,11 @@ var _ = Describe("Login Command", func() {
 				orgRepo.FindByNameReturns(organizations[1], nil)
 
 				space1 := models.Space{}
-				space1.Guid = "my-space-guid"
+				space1.GUID = "my-space-guid"
 				space1.Name = "my-space"
 
 				space2 := models.Space{}
-				space2.Guid = "some-space-guid"
+				space2.GUID = "some-space-guid"
 				space2.Name = "some-space"
 
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1, space2})
@@ -284,11 +314,11 @@ var _ = Describe("Login Command", func() {
 			It("doesn't display a list of orgs (the user must type the name)", func() {
 				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-org-1"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid-1"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-org-guid-1"))
 			})
 		})
 
@@ -296,15 +326,15 @@ var _ = Describe("Login Command", func() {
 			It("does not ask the user to select an org/space", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -322,15 +352,15 @@ var _ = Describe("Login Command", func() {
 
 			It("does not as the user to select an org", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal(""))
-				Expect(Config.SpaceFields().Guid).To(Equal(""))
+				Expect(Config.OrganizationFields().GUID).To(Equal(""))
+				Expect(Config.SpaceFields().GUID).To(Equal(""))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -348,15 +378,15 @@ var _ = Describe("Login Command", func() {
 
 			It("does not ask the user to select a space", func() {
 				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal(""))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal(""))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-				Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-				Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("http://api.example.com"))
+				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("http://api.example.com"))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
 					"username": "user@example.com",
@@ -368,22 +398,22 @@ var _ = Describe("Login Command", func() {
 
 		Describe("login prompts", func() {
 			BeforeEach(func() {
-				authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]core_config.AuthPrompt{
-					"account_number": core_config.AuthPrompt{
+				authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
+					"account_number": coreconfig.AuthPrompt{
 						DisplayName: "Account Number",
-						Type:        core_config.AuthPromptTypeText,
+						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"username": core_config.AuthPrompt{
+					"username": coreconfig.AuthPrompt{
 						DisplayName: "Username",
-						Type:        core_config.AuthPromptTypeText,
+						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"passcode": core_config.AuthPrompt{
+					"passcode": coreconfig.AuthPrompt{
 						DisplayName: "It's a passcode, what you want it to be???",
-						Type:        core_config.AuthPromptTypePassword,
+						Type:        coreconfig.AuthPromptTypePassword,
 					},
-					"password": core_config.AuthPrompt{
+					"password": coreconfig.AuthPrompt{
 						DisplayName: "Your Password",
-						Type:        core_config.AuthPromptTypePassword,
+						Type:        coreconfig.AuthPromptTypePassword,
 					},
 				}, nil)
 			})
@@ -392,7 +422,7 @@ var _ = Describe("Login Command", func() {
 				It("prompts the user for 'password' prompt and any text type prompt", func() {
 					ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-password"}
 
-					testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 					Expect(ui.Prompts).To(ContainSubstrings(
 						[]string{"API endpoint"},
@@ -418,7 +448,7 @@ var _ = Describe("Login Command", func() {
 					Flags = []string{"--sso", "-a", "api.example.com"}
 					ui.Inputs = []string{"the-one-time-code"}
 
-					testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 					Expect(ui.Prompts).To(BeEmpty())
 					Expect(ui.PasswordPrompts).To(ContainSubstrings([]string{"passcode"}))
@@ -433,7 +463,7 @@ var _ = Describe("Login Command", func() {
 				Flags = []string{"-p", "the-password"}
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number", "the-pin"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(ui.PasswordPrompts).ToNot(ContainSubstrings([]string{"Your Password"}))
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
@@ -449,7 +479,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-1", "the-password-2", "the-password-3"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(3))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
@@ -479,7 +509,7 @@ var _ = Describe("Login Command", func() {
 				ui.Inputs = []string{"api.example.com", "the-username", "the-account-number",
 					"the-password-2", "the-password-3"}
 
-				testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 
 				Expect(authRepo.AuthenticateCallCount()).To(Equal(3))
 				Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
@@ -505,13 +535,25 @@ var _ = Describe("Login Command", func() {
 
 	Describe("updates to the config", func() {
 		BeforeEach(func() {
-			Config.SetApiEndpoint("api.the-old-endpoint.com")
+			Config.SetAPIEndpoint("api.the-old-endpoint.com")
 			Config.SetAccessToken("the-old-access-token")
 			Config.SetRefreshToken("the-old-refresh-token")
+			endpointRepo.GetCCInfoStub = func(endpoint string) (*coreconfig.CCInfo, string, error) {
+				return &coreconfig.CCInfo{
+					APIVersion:               "some-version",
+					AuthorizationEndpoint:    "auth/endpoint",
+					LoggregatorEndpoint:      "loggregator/endpoint",
+					MinCLIVersion:            minCLIVersion,
+					MinRecommendedCLIVersion: minRecommendedCLIVersion,
+					SSHOAuthClient:           "some-client",
+					RoutingAPIEndpoint:       "routing/endpoint",
+				}, endpoint, nil
+			}
+
 		})
 
 		JustBeforeEach(func() {
-			testcmd.RunCliCommand("login", Flags, nil, updateCommandDependency, false)
+			testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false)
 		})
 
 		var ItShowsTheTarget = func() {
@@ -558,8 +600,8 @@ var _ = Describe("Login Command", func() {
 					ItShowsTheTarget()
 
 					It("stores the API endpoint and the skip-ssl flag", func() {
-						Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-						Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://api.the-server.com"))
+						Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+						Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeTrue())
 					})
 				})
@@ -567,19 +609,19 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointReturns("", errors.New("API endpoint not found"))
+						endpointRepo.GetCCInfoReturns(nil, "", errors.New("API endpoint not found"))
 					})
 
 					ItFails()
 					ItDoesntShowTheTarget()
 
 					It("clears the entire config", func() {
-						Expect(Config.ApiEndpoint()).To(BeEmpty())
+						Expect(Config.APIEndpoint()).To(BeEmpty())
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 						Expect(Config.AccessToken()).To(BeEmpty())
 						Expect(Config.RefreshToken()).To(BeEmpty())
-						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-						Expect(Config.SpaceFields().Guid).To(BeEmpty())
+						Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+						Expect(Config.SpaceFields().GUID).To(BeEmpty())
 					})
 				})
 			})
@@ -594,8 +636,8 @@ var _ = Describe("Login Command", func() {
 					ItShowsTheTarget()
 
 					It("updates the API endpoint and enables SSL validation", func() {
-						Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-						Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("https://api.the-server.com"))
+						Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+						Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 					})
 				})
@@ -603,26 +645,26 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointReturns("", errors.New("API endpoint not found"))
+						endpointRepo.GetCCInfoReturns(nil, "", errors.New("API endpoint not found"))
 					})
 
 					ItFails()
 					ItDoesntShowTheTarget()
 
 					It("clears the entire config", func() {
-						Expect(Config.ApiEndpoint()).To(BeEmpty())
+						Expect(Config.APIEndpoint()).To(BeEmpty())
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
 						Expect(Config.AccessToken()).To(BeEmpty())
 						Expect(Config.RefreshToken()).To(BeEmpty())
-						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-						Expect(Config.SpaceFields().Guid).To(BeEmpty())
+						Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+						Expect(Config.SpaceFields().GUID).To(BeEmpty())
 					})
 				})
 			})
 
 			Describe("when there is an invalid SSL cert", func() {
 				BeforeEach(func() {
-					endpointRepo.UpdateEndpointReturns("", errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS"))
+					endpointRepo.GetCCInfoReturns(nil, "", errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS"))
 					ui.Inputs = []string{"bobs-burgers.com"}
 				})
 
@@ -678,15 +720,15 @@ var _ = Describe("Login Command", func() {
 				ItShowsTheTarget()
 
 				It("does not change the api endpoint or SSL setting in the config", func() {
-					Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+					Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 					Expect(Config.IsSSLDisabled()).To(BeTrue())
 				})
 
 				It("clears Access Token, Refresh Token, Org, and Space in the config", func() {
 					Expect(Config.AccessToken()).To(BeEmpty())
 					Expect(Config.RefreshToken()).To(BeEmpty())
-					Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-					Expect(Config.SpaceFields().Guid).To(BeEmpty())
+					Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+					Expect(Config.SpaceFields().GUID).To(BeEmpty())
 				})
 			})
 		})
@@ -702,13 +744,13 @@ var _ = Describe("Login Command", func() {
 			ItShowsTheTarget()
 
 			It("does not update the api endpoint or ssl setting in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
 			It("clears Org, and Space in the config", func() {
-				Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-				Expect(Config.SpaceFields().Guid).To(BeEmpty())
+				Expect(Config.OrganizationFields().GUID).To(BeEmpty())
+				Expect(Config.SpaceFields().GUID).To(BeEmpty())
 			})
 		})
 
@@ -725,16 +767,16 @@ var _ = Describe("Login Command", func() {
 			ItShowsTheTarget()
 
 			It("does not update the api endpoint or ssl setting in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
 			It("updates the org in the config", func() {
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("my-new-org-guid"))
 			})
 
 			It("clears the space in the config", func() {
-				Expect(Config.SpaceFields().Guid).To(BeEmpty())
+				Expect(Config.SpaceFields().GUID).To(BeEmpty())
 			})
 		})
 
@@ -743,12 +785,12 @@ var _ = Describe("Login Command", func() {
 				orgRepo.FindByNameReturns(models.Organization{
 					OrganizationFields: models.OrganizationFields{
 						Name: "new-org",
-						Guid: "new-org-guid",
+						GUID: "new-org-guid",
 					},
 				}, nil)
 
 				space1 := models.Space{}
-				space1.Guid = "new-space-guid"
+				space1.GUID = "new-space-guid"
 				space1.Name = "new-space-name"
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1})
 				spaceRepo.FindByNameReturns(space1, nil)
@@ -761,7 +803,7 @@ var _ = Describe("Login Command", func() {
 
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "new-org", "-s", "new-space"}
 
-				Config.SetApiEndpoint("api.the-old-endpoint.com")
+				Config.SetAPIEndpoint("api.the-old-endpoint.com")
 				Config.SetSSLDisabled(true)
 			})
 
@@ -769,15 +811,25 @@ var _ = Describe("Login Command", func() {
 			ItShowsTheTarget()
 
 			It("does not update the api endpoint or SSL setting", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.APIEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
-			It("updates Access Token, Refresh Token, Org, and Space in the config", func() {
+			It("updates the config", func() {
 				Expect(Config.AccessToken()).To(Equal("new_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
-				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
+				Expect(Config.OrganizationFields().GUID).To(Equal("new-org-guid"))
+				Expect(Config.SpaceFields().GUID).To(Equal("new-space-guid"))
+
+				Expect(Config.APIVersion()).To(Equal("some-version"))
+				Expect(Config.AuthenticationEndpoint()).To(Equal("auth/endpoint"))
+				Expect(Config.SSHOAuthClient()).To(Equal("some-client"))
+				Expect(Config.MinCLIVersion()).To(Equal("1.0.0"))
+				Expect(Config.MinRecommendedCLIVersion()).To(Equal("1.0.0"))
+				Expect(Config.LoggregatorEndpoint()).To(Equal("loggregator/endpoint"))
+				Expect(Config.DopplerEndpoint()).To(Equal("doppler/endpoint"))
+				Expect(Config.RoutingAPIEndpoint()).To(Equal("routing/endpoint"))
+
 			})
 		})
 	})

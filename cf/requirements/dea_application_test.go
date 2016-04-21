@@ -6,7 +6,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,13 +15,13 @@ import (
 var _ = Describe("DeaApplication", func() {
 	var (
 		req     requirements.DEAApplicationRequirement
-		appRepo *testApplication.FakeApplicationRepository
+		appRepo *applicationsfakes.FakeApplicationRepository
 		appName string
 	)
 
 	BeforeEach(func() {
 		appName = "fake-app-name"
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 		req = requirements.NewDEAApplicationRequirement(appName, appRepo)
 	})
 
@@ -33,14 +33,14 @@ var _ = Describe("DeaApplication", func() {
 		Context("when the requirement has been executed", func() {
 			BeforeEach(func() {
 				app := models.Application{}
-				app.Guid = "fake-app-guid"
+				app.GUID = "fake-app-guid"
 				appRepo.ReadReturns(app, nil)
 
 				req.Execute()
 			})
 
 			It("returns the application", func() {
-				Expect(req.GetApplication().Guid).To(Equal("fake-app-guid"))
+				Expect(req.GetApplication().GUID).To(Equal("fake-app-guid"))
 			})
 		})
 	})

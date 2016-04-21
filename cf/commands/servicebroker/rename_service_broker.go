@@ -2,8 +2,8 @@ package servicebroker
 
 import (
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -12,16 +12,16 @@ import (
 
 type RenameServiceBroker struct {
 	ui     terminal.UI
-	config core_config.Reader
+	config coreconfig.Reader
 	repo   api.ServiceBrokerRepository
 }
 
 func init() {
-	command_registry.Register(&RenameServiceBroker{})
+	commandregistry.Register(&RenameServiceBroker{})
 }
 
-func (cmd *RenameServiceBroker) MetaData() command_registry.CommandMetadata {
-	return command_registry.CommandMetadata{
+func (cmd *RenameServiceBroker) MetaData() commandregistry.CommandMetadata {
+	return commandregistry.CommandMetadata{
 		Name:        "rename-service-broker",
 		Description: T("Rename a service broker"),
 		Usage: []string{
@@ -32,7 +32,7 @@ func (cmd *RenameServiceBroker) MetaData() command_registry.CommandMetadata {
 
 func (cmd *RenameServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n") + command_registry.Commands.CommandUsage("rename-service-broker"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-service-broker"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -42,8 +42,8 @@ func (cmd *RenameServiceBroker) Requirements(requirementsFactory requirements.Fa
 	return reqs
 }
 
-func (cmd *RenameServiceBroker) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *RenameServiceBroker) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.repo = deps.RepoLocator.GetServiceBrokerRepository()
 	return cmd
@@ -64,7 +64,7 @@ func (cmd *RenameServiceBroker) Execute(c flags.FlagContext) {
 
 	newName := c.Args()[1]
 
-	apiErr = cmd.repo.Rename(serviceBroker.Guid, newName)
+	apiErr = cmd.repo.Rename(serviceBroker.GUID, newName)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

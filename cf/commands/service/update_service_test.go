@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	testplanbuilder "github.com/cloudfoundry/cli/cf/actors/plan_builder/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	planbuilderfakes "github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -27,20 +27,20 @@ import (
 var _ = Describe("update-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
+		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
-		planBuilder         *testplanbuilder.FakePlanBuilder
+		serviceRepo         *apifakes.FakeServiceRepository
+		planBuilder         *planbuilderfakes.FakePlanBuilder
 		offering1           models.ServiceOffering
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
 		deps.PlanBuilder = planBuilder
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -54,24 +54,24 @@ var _ = Describe("update-service command", func() {
 			MinAPIVersionSuccess: true,
 		}
 
-		serviceRepo = &testapi.FakeServiceRepository{}
-		planBuilder = &testplanbuilder.FakePlanBuilder{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
+		planBuilder = new(planbuilderfakes.FakePlanBuilder)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"
 		offering1.Plans = []models.ServicePlanFields{{
 			Name: "spark",
-			Guid: "cleardb-spark-guid",
+			GUID: "cleardb-spark-guid",
 		}, {
 			Name: "flare",
-			Guid: "cleardb-flare-guid",
+			GUID: "cleardb-flare-guid",
 		},
 		}
 
 	})
 
 	var callUpdateService = func(args []string) bool {
-		return testcmd.RunCliCommand("update-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -94,7 +94,7 @@ var _ = Describe("update-service command", func() {
 		})
 
 		Context("-p", func() {
-			It("when provided, requires a CC API version > cf.UpdateServicePlanMinimumApiVersion", func() {
+			It("when provided, requires a CC API version > cf.UpdateServicePlanMinimumAPIVersion", func() {
 				cmd := &service.UpdateService{}
 
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -104,7 +104,7 @@ var _ = Describe("update-service command", func() {
 				Expect(reqs).NotTo(BeEmpty())
 
 				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Updating a plan"))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.UpdateServicePlanMinimumApiVersion))
+				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.UpdateServicePlanMinimumAPIVersion))
 			})
 
 			It("does not requirue a CC Api Version if not provided", func() {
@@ -143,7 +143,7 @@ var _ = Describe("update-service command", func() {
 			serviceInstance := models.ServiceInstance{
 				ServiceInstanceFields: models.ServiceInstanceFields{
 					Name: "my-service-instance",
-					Guid: "my-service-instance-guid",
+					GUID: "my-service-instance-guid",
 					LastOperation: models.LastOperationFields{
 						Type:        "update",
 						State:       "in progress",
@@ -152,16 +152,16 @@ var _ = Describe("update-service command", func() {
 				},
 				ServiceOffering: models.ServiceOfferingFields{
 					Label: "murkydb",
-					Guid:  "murkydb-guid",
+					GUID:  "murkydb-guid",
 				},
 			}
 
 			servicePlans := []models.ServicePlanFields{{
 				Name: "spark",
-				Guid: "murkydb-spark-guid",
+				GUID: "murkydb-spark-guid",
 			}, {
 				Name: "flare",
-				Guid: "murkydb-flare-guid",
+				GUID: "murkydb-flare-guid",
 			},
 			}
 			serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
@@ -298,7 +298,7 @@ var _ = Describe("update-service command", func() {
 				serviceInstance := models.ServiceInstance{
 					ServiceInstanceFields: models.ServiceInstanceFields{
 						Name: "my-service-instance",
-						Guid: "my-service-instance-guid",
+						GUID: "my-service-instance-guid",
 						LastOperation: models.LastOperationFields{
 							Type:        "update",
 							State:       "in progress",
@@ -307,16 +307,16 @@ var _ = Describe("update-service command", func() {
 					},
 					ServiceOffering: models.ServiceOfferingFields{
 						Label: "murkydb",
-						Guid:  "murkydb-guid",
+						GUID:  "murkydb-guid",
 					},
 				}
 
 				servicePlans := []models.ServicePlanFields{{
 					Name: "spark",
-					Guid: "murkydb-spark-guid",
+					GUID: "murkydb-spark-guid",
 				}, {
 					Name: "flare",
-					Guid: "murkydb-flare-guid",
+					GUID: "murkydb-flare-guid",
 				},
 				}
 				serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
@@ -409,20 +409,20 @@ var _ = Describe("update-service command", func() {
 				serviceInstance := models.ServiceInstance{
 					ServiceInstanceFields: models.ServiceInstanceFields{
 						Name: "my-service-instance",
-						Guid: "my-service-instance-guid",
+						GUID: "my-service-instance-guid",
 					},
 					ServiceOffering: models.ServiceOfferingFields{
 						Label: "murkydb",
-						Guid:  "murkydb-guid",
+						GUID:  "murkydb-guid",
 					},
 				}
 
 				servicePlans := []models.ServicePlanFields{{
 					Name: "spark",
-					Guid: "murkydb-spark-guid",
+					GUID: "murkydb-spark-guid",
 				}, {
 					Name: "flare",
-					Guid: "murkydb-flare-guid",
+					GUID: "murkydb-flare-guid",
 				},
 				}
 				serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
@@ -437,8 +437,8 @@ var _ = Describe("update-service command", func() {
 					[]string{"OK"},
 				))
 				Expect(serviceRepo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service-instance"))
-				serviceGuid, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
-				Expect(serviceGuid).To(Equal("murkydb-guid"))
+				serviceGUID, orgName := planBuilder.GetPlansForServiceForOrgArgsForCall(0)
+				Expect(serviceGUID).To(Equal("murkydb-guid"))
 				Expect(orgName).To(Equal("my-org"))
 
 				instanceGUID, planGUID, _, _ := serviceRepo.UpdateServiceInstanceArgsForCall(0)

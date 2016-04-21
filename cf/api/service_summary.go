@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
@@ -20,7 +20,7 @@ func (resource ServiceInstancesSummaries) ToModels() (instances []models.Service
 		planSummary := instanceSummary.ServicePlan
 		servicePlan := models.ServicePlanFields{}
 		servicePlan.Name = planSummary.Name
-		servicePlan.Guid = planSummary.Guid
+		servicePlan.GUID = planSummary.GUID
 
 		offeringSummary := planSummary.ServiceOffering
 		serviceOffering := models.ServiceOfferingFields{}
@@ -74,7 +74,7 @@ type ServiceInstanceSummary struct {
 
 type ServicePlanSummary struct {
 	Name            string
-	Guid            string
+	GUID            string
 	ServiceOffering ServiceOfferingSummary `json:"service"`
 }
 
@@ -84,23 +84,25 @@ type ServiceOfferingSummary struct {
 	Version  string
 }
 
+//go:generate counterfeiter . ServiceSummaryRepository
+
 type ServiceSummaryRepository interface {
 	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error)
 }
 
 type CloudControllerServiceSummaryRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceSummaryRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerServiceSummaryRepository) {
+func NewCloudControllerServiceSummaryRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerServiceSummaryRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.APIEndpoint(), repo.config.SpaceFields().GUID)
 	resource := new(ServiceInstancesSummaries)
 
 	apiErr = repo.gateway.GetResource(path, resource)

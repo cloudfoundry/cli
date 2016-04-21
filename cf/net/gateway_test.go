@@ -15,12 +15,12 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/net/fakes"
-	traceFakes "github.com/cloudfoundry/cli/cf/trace/fakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/cf/net/netfakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -34,12 +34,12 @@ var _ = Describe("Gateway", func() {
 		ccServer    *ghttp.Server
 		ccGateway   Gateway
 		uaaGateway  Gateway
-		config      core_config.ReadWriter
+		config      coreconfig.ReadWriter
 		authRepo    authentication.AuthenticationRepository
 		currentTime time.Time
 		clock       func() time.Time
 
-		client *fakes.FakeHttpClientInterface
+		client *netfakes.FakeHTTPClientInterface
 	)
 
 	BeforeEach(func() {
@@ -47,35 +47,35 @@ var _ = Describe("Gateway", func() {
 		clock = func() time.Time { return currentTime }
 		config = testconfig.NewRepository()
 
-		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
+		ccGateway = NewCloudControllerGateway(config, clock, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		ccGateway.PollingThrottle = 3 * time.Millisecond
-		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
+		uaaGateway = NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	})
 
 	Describe("async timeout", func() {
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(config)
+				ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(config)
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})
 	})
 
 	Describe("Connection errors", func() {
-		var oldNewHttpClient func(tr *http.Transport, dumper RequestDumper) HttpClientInterface
+		var oldNewHTTPClient func(tr *http.Transport, dumper RequestDumper) HTTPClientInterface
 
 		BeforeEach(func() {
-			client = &fakes.FakeHttpClientInterface{}
+			client = new(netfakes.FakeHTTPClientInterface)
 
-			oldNewHttpClient = NewHttpClient
-			NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
+			oldNewHTTPClient = NewHTTPClient
+			NewHTTPClient = func(tr *http.Transport, dumper RequestDumper) HTTPClientInterface {
 				return client
 			}
 		})
 
 		AfterEach(func() {
-			NewHttpClient = oldNewHttpClient
+			NewHTTPClient = oldNewHTTPClient
 		})
 
 		It("only retry when response body is nil and error occurred", func() {
@@ -116,15 +116,15 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("sets the Authorization header", func() {
-				Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
+				Expect(request.HTTPReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 			})
 
 			It("sets the accept header to application/json", func() {
-				Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
+				Expect(request.HTTPReq.Header.Get("accept")).To(Equal("application/json"))
 			})
 
 			It("sets the user agent header", func() {
-				Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+				Expect(request.HTTPReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
 			})
 		})
 
@@ -146,7 +146,7 @@ var _ = Describe("Gateway", func() {
 	Describe("PerformRequestForJSONResponse()", func() {
 		BeforeEach(func() {
 			ccServer = ghttp.NewServer()
-			config.SetApiEndpoint(ccServer.URL())
+			config.SetAPIEndpoint(ccServer.URL())
 		})
 
 		AfterEach(func() {
@@ -177,7 +177,7 @@ var _ = Describe("Gateway", func() {
 				}
 
 				errResponse := new(apiErrResponse)
-				request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
+				request, _ := ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
 				_, apiErr := ccGateway.PerformRequestForJSONResponse(request, errResponse)
 
 				Expect(apiErr).To(HaveOccurred())
@@ -185,7 +185,7 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("ignores any unmarshal error and does not alter the api err response", func() {
-				request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
+				request, _ := ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/some-endpoint", config.AccessToken(), nil)
 				_, apiErr := ccGateway.PerformRequestForJSONResponse(request, nil)
 
 				Expect(apiErr.Error()).To(Equal("Server error, status code: 401, error code: 10003, message: You are not authorized to perform the requested action"))
@@ -345,8 +345,8 @@ var _ = Describe("Gateway", func() {
 				statusChannel <- "finished"
 			}()
 
-			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.ApiEndpoint(), request, new(struct{}), 500*time.Millisecond)
+			request, _ := ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/foo", config.AccessToken(), nil)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.APIEndpoint(), request, new(struct{}), 500*time.Millisecond)
 			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
@@ -356,8 +356,8 @@ var _ = Describe("Gateway", func() {
 				statusChannel <- "failed"
 			}()
 
-			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.ApiEndpoint(), request, new(struct{}), 500*time.Millisecond)
+			request, _ := ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/foo", config.AccessToken(), nil)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.APIEndpoint(), request, new(struct{}), 500*time.Millisecond)
 			Expect(apiErr.Error()).To(ContainSubstring("he's dead, Jim"))
 		})
 
@@ -366,8 +366,8 @@ var _ = Describe("Gateway", func() {
 				statusChannel <- "queued"
 				statusChannel <- "OHNOES"
 			}()
-			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.ApiEndpoint(), request, new(struct{}), 10*time.Millisecond)
+			request, _ := ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/foo", config.AccessToken(), nil)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(config.APIEndpoint(), request, new(struct{}), 10*time.Millisecond)
 			Expect(apiErr).To(HaveOccurred())
 			Expect(apiErr).To(BeAssignableToTypeOf(errors.NewAsyncTimeoutError("http://some.url")))
 		})
@@ -384,7 +384,7 @@ var _ = Describe("Gateway", func() {
 		)
 
 		BeforeEach(func() {
-			apiServer = httptest.NewTLSServer(refreshTokenApiEndPoint(
+			apiServer = httptest.NewTLSServer(refreshTokenAPIEndPoint(
 				`{ "code": 1000, "description": "Auth token is invalid" }`,
 				testnet.TestResponse{Status: http.StatusOK},
 			))
@@ -402,7 +402,7 @@ var _ = Describe("Gateway", func() {
 			ccGateway.SetTokenRefresher(auth)
 			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
-			request, apiErr = ccGateway.NewRequestForFile("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
+			request, apiErr = ccGateway.NewRequestForFile("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
 		})
 
 		AfterEach(func() {
@@ -415,7 +415,7 @@ var _ = Describe("Gateway", func() {
 		It("sets the content length to the size of the file", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(request.HttpReq.ContentLength).To(Equal(int64(13)))
+			Expect(request.HTTPReq.ContentLength).To(Equal(int64(13)))
 		})
 
 		Describe("when the access token expires during the upload", func() {
@@ -446,7 +446,7 @@ var _ = Describe("Gateway", func() {
 		})
 
 		It("refreshes the token when UAA requests fail", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
 				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
 				testnet.TestResponse{Status: http.StatusOK},
 			))
@@ -455,7 +455,7 @@ var _ = Describe("Gateway", func() {
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
-			request, apiErr := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			request, apiErr := uaaGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			_, apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -464,7 +464,7 @@ var _ = Describe("Gateway", func() {
 		})
 
 		It("refreshes the token when CC requests fail", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
 				`{ "code": 1000, "description": "Auth token is invalid" }`,
 				testnet.TestResponse{Status: http.StatusOK}))
 			defer apiServer.Close()
@@ -472,7 +472,7 @@ var _ = Describe("Gateway", func() {
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
-			request, apiErr := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			request, apiErr := ccGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			_, apiErr = ccGateway.PerformRequest(request)
 
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -481,7 +481,7 @@ var _ = Describe("Gateway", func() {
 		})
 
 		It("returns a failure response when token refresh fails after a UAA request", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
 				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
 				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
 					"error": "333", "error_description": "bad request"
@@ -491,15 +491,15 @@ var _ = Describe("Gateway", func() {
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
-			request, apiErr := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			request, apiErr := uaaGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			_, apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
+			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("333"))
 		})
 
 		It("returns a failure response when token refresh fails after a CC request", func() {
-			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+			apiServer := httptest.NewTLSServer(refreshTokenAPIEndPoint(
 				`{ "code": 1000, "description": "Auth token is invalid" }`,
 				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
 					"code": 333, "description": "bad request"
@@ -509,11 +509,11 @@ var _ = Describe("Gateway", func() {
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
-			request, apiErr := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			request, apiErr := ccGateway.NewRequest("POST", config.APIEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			_, apiErr = ccGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
+			Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("333"))
 		})
 	})
 
@@ -622,11 +622,11 @@ var _ = Describe("Gateway", func() {
 		})
 
 		It("saves all X-Cf-Warnings headers and exposes them", func() {
-			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/happy", config.AccessToken(), nil)
+			request, _ := ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/happy", config.AccessToken(), nil)
 			ccGateway.PerformRequest(request)
-			request, _ = ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/warning1", config.AccessToken(), nil)
+			request, _ = ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/warning1", config.AccessToken(), nil)
 			ccGateway.PerformRequest(request)
-			request, _ = ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/warning2", config.AccessToken(), nil)
+			request, _ = ccGateway.NewRequest("GET", config.APIEndpoint()+"/v2/warning2", config.AccessToken(), nil)
 			ccGateway.PerformRequest(request)
 
 			Expect(ccGateway.Warnings()).To(Equal(
@@ -648,7 +648,7 @@ func getHost(urlString string) string {
 	return url.Host
 }
 
-func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
+func refreshTokenAPIEndPoint(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var jsonResponse string
 
@@ -673,18 +673,18 @@ func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.Test
 	}
 }
 
-func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (core_config.ReadWriter, authentication.AuthenticationRepository) {
+func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (coreconfig.ReadWriter, authentication.AuthenticationRepository) {
 	config := testconfig.NewRepository()
 	config.SetAuthenticationEndpoint(authServer.URL)
-	config.SetApiEndpoint(apiServer.URL)
+	config.SetAPIEndpoint(apiServer.URL)
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")
 
-	authGateway := NewUAAGateway(config, &testterm.FakeUI{}, new(traceFakes.FakePrinter))
+	authGateway := NewUAAGateway(config, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
-	fakePrinter := *new(traceFakes.FakePrinter)
-	dumper := NewRequestDumper(&fakePrinter)
+	fakePrinter := new(tracefakes.FakePrinter)
+	dumper := NewRequestDumper(fakePrinter)
 	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config, dumper)
 
 	return config, authenticator

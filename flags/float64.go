@@ -7,6 +7,7 @@ type Float64Flag struct {
 	Value     float64
 	Usage     string
 	ShortName string
+	Hidden    bool
 }
 
 func (f *Float64Flag) Set(v string) {
@@ -28,4 +29,8 @@ func (f *Float64Flag) GetShortName() string {
 
 func (f *Float64Flag) GetValue() interface{} {
 	return f.Value
+}
+
+func (f *Float64Flag) Visible() bool {
+	return !f.Hidden
 }

@@ -17,7 +17,7 @@ type ServicePlanEntity struct {
 	Public              bool
 	Active              bool
 	Description         string                  `json:"description"`
-	ServiceOfferingGuid string                  `json:"service_guid"`
+	ServiceOfferingGUID string                  `json:"service_guid"`
 	ServiceOffering     ServiceOfferingResource `json:"service"`
 }
 
@@ -28,13 +28,13 @@ type ServicePlanDescription struct {
 }
 
 func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields) {
-	fields.Guid = resource.Metadata.Guid
+	fields.GUID = resource.Metadata.GUID
 	fields.Name = resource.Entity.Name
 	fields.Free = resource.Entity.Free
 	fields.Description = resource.Entity.Description
 	fields.Public = resource.Entity.Public
 	fields.Active = resource.Entity.Active
-	fields.ServiceOfferingGuid = resource.Entity.ServiceOfferingGuid
+	fields.ServiceOfferingGUID = resource.Entity.ServiceOfferingGUID
 	return
 }
 

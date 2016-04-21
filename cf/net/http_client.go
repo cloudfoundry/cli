@@ -14,8 +14,9 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-//go:generate counterfeiter . HttpClientInterface
-type HttpClientInterface interface {
+//go:generate counterfeiter . HTTPClientInterface
+
+type HTTPClientInterface interface {
 	RequestDumperInterface
 
 	Do(*http.Request) (*http.Response, error)
@@ -27,7 +28,7 @@ type client struct {
 	dumper RequestDumper
 }
 
-var NewHttpClient = func(tr *http.Transport, dumper RequestDumper) HttpClientInterface {
+var NewHTTPClient = func(tr *http.Transport, dumper RequestDumper) HTTPClientInterface {
 	c := client{
 		&http.Client{
 			Transport: tr,
@@ -100,7 +101,7 @@ func WrapNetworkErrors(host string, err error) error {
 }
 
 func getBaseDomain(host string) string {
-	hostUrl, _ := url.Parse(host)
-	hostStrs := strings.Split(hostUrl.Host, ".")
+	hostURL, _ := url.Parse(host)
+	hostStrs := strings.Split(hostURL.Host, ".")
 	return hostStrs[len(hostStrs)-2] + "." + hostStrs[len(hostStrs)-1]
 }

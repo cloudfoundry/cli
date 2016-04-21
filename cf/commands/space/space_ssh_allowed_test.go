@@ -1,7 +1,7 @@
 package space_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -15,26 +15,21 @@ var _ = Describe("space-ssh-allowed command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		// configRepo          core_config.Repository
-		deps command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
-		// deps.Config = configRepo
-		// deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("space-ssh-allowed").SetDependency(deps, pluginCall))
+		deps.UI = ui
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space-ssh-allowed").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("space-ssh-allowed", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("space-ssh-allowed", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		// configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		// spaceRepo = &testapi.FakeSpaceRepository{}
 	})
 
 	Describe("requirements", func() {
@@ -77,7 +72,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 			space = models.Space{}
 			space.Name = "the-space-name"
-			space.Guid = "the-space-guid"
+			space.GUID = "the-space-guid"
 		})
 
 		Context("when SSH is enabled for the space", func() {

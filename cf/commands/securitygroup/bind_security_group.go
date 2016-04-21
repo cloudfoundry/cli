@@ -2,11 +2,11 @@ package securitygroup
 
 import (
 	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/security_groups"
-	sgbinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups"
+	sgbinder "github.com/cloudfoundry/cli/cf/api/securitygroups/spaces"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -15,7 +15,7 @@ import (
 
 type BindSecurityGroup struct {
 	ui                terminal.UI
-	configRepo        core_config.Reader
+	configRepo        coreconfig.Reader
 	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
 	securityGroupRepo security_groups.SecurityGroupRepo
@@ -23,13 +23,13 @@ type BindSecurityGroup struct {
 }
 
 func init() {
-	command_registry.Register(&BindSecurityGroup{})
+	commandregistry.Register(&BindSecurityGroup{})
 }
 
-func (cmd *BindSecurityGroup) MetaData() command_registry.CommandMetadata {
+func (cmd *BindSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	primaryUsage := T("CF_NAME bind-security-group SECURITY_GROUP ORG SPACE")
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "bind-security-group",
 		Description: T("Bind a security group to a space"),
 		Usage: []string{
@@ -42,7 +42,7 @@ func (cmd *BindSecurityGroup) MetaData() command_registry.CommandMetadata {
 
 func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + command_registry.Commands.CommandUsage("bind-security-group"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-security-group"))
 	}
 
 	reqs := []requirements.Requirement{}
@@ -50,8 +50,8 @@ func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Fact
 	return reqs
 }
 
-func (cmd *BindSecurityGroup) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *BindSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
@@ -85,13 +85,13 @@ func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.spaceBinder.BindSpace(securityGroup.Guid, space.Guid)
+	err = cmd.spaceBinder.BindSpace(securityGroup.GUID, space.GUID)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

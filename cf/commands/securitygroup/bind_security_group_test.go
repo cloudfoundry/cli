@@ -1,11 +1,11 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/fakes"
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	zoidberg "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/spaces/spacesfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -13,7 +13,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,37 +22,37 @@ import (
 var _ = Describe("bind-security-group command", func() {
 	var (
 		ui                    *testterm.FakeUI
-		configRepo            core_config.Repository
-		fakeSecurityGroupRepo *testapi.FakeSecurityGroupRepo
+		configRepo            coreconfig.Repository
+		fakeSecurityGroupRepo *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory   *testreq.FakeReqFactory
-		fakeSpaceRepo         *fakes.FakeSpaceRepository
-		fakeOrgRepo           *test_org.FakeOrganizationRepository
-		fakeSpaceBinder       *zoidberg.FakeSecurityGroupSpaceBinder
-		deps                  command_registry.Dependency
+		fakeSpaceRepo         *apifakes.FakeSpaceRepository
+		fakeOrgRepo           *organizationsfakes.FakeOrganizationRepository
+		fakeSpaceBinder       *spacesfakes.FakeSecurityGroupSpaceBinder
+		deps                  commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(fakeSpaceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(fakeOrgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(fakeSecurityGroupRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupSpaceBinder(fakeSpaceBinder)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("bind-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("bind-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		fakeOrgRepo = &test_org.FakeOrganizationRepository{}
-		fakeSpaceRepo = &fakes.FakeSpaceRepository{}
+		fakeOrgRepo = new(organizationsfakes.FakeOrganizationRepository)
+		fakeSpaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
-		fakeSecurityGroupRepo = &testapi.FakeSecurityGroupRepo{}
+		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		fakeSpaceBinder = &zoidberg.FakeSecurityGroupSpaceBinder{}
+		fakeSpaceBinder = new(spacesfakes.FakeSecurityGroupSpaceBinder)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("bind-security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("bind-security-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -117,7 +117,7 @@ var _ = Describe("bind-security-group command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "org-name"
-				org.Guid = "org-guid"
+				org.GUID = "org-guid"
 				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				fakeOrgRepo.FindByNameReturns(org, nil)
 				fakeSpaceRepo.FindByNameInOrgReturns(models.Space{}, errors.NewModelNotFoundError("Space", "space-name"))
@@ -140,17 +140,17 @@ var _ = Describe("bind-security-group command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "org-name"
-				org.Guid = "org-guid"
+				org.GUID = "org-guid"
 				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 
 				space := models.Space{}
 				space.Name = "space-name"
-				space.Guid = "space-guid"
+				space.GUID = "space-guid"
 				fakeSpaceRepo.FindByNameInOrgReturns(space, nil)
 
 				securityGroup := models.SecurityGroup{}
 				securityGroup.Name = "security-group"
-				securityGroup.Guid = "security-group-guid"
+				securityGroup.GUID = "security-group-guid"
 				fakeSecurityGroupRepo.ReadReturns(securityGroup, nil)
 			})
 
@@ -159,9 +159,9 @@ var _ = Describe("bind-security-group command", func() {
 			})
 
 			It("assigns the security group to the space", func() {
-				secGroupGuid, spaceGuid := fakeSpaceBinder.BindSpaceArgsForCall(0)
-				Expect(secGroupGuid).To(Equal("security-group-guid"))
-				Expect(spaceGuid).To(Equal("space-guid"))
+				secGroupGUID, spaceGUID := fakeSpaceBinder.BindSpaceArgsForCall(0)
+				Expect(secGroupGUID).To(Equal("security-group-guid"))
+				Expect(spaceGUID).To(Equal("space-guid"))
 			})
 
 			It("describes what it is doing for the user's benefit", func() {

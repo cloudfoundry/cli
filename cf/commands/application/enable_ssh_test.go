@@ -3,9 +3,9 @@ package application_test
 import (
 	"errors"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/applications/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,27 +21,27 @@ var _ = Describe("enable-ssh command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		appRepo             *testApplication.FakeApplicationRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		appRepo             *applicationsfakes.FakeApplicationRepository
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appRepo = &testApplication.FakeApplicationRepository{}
+		appRepo = new(applicationsfakes.FakeApplicationRepository)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("enable-ssh").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("enable-ssh").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("enable-ssh", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("enable-ssh", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -77,15 +77,15 @@ var _ = Describe("enable-ssh command", func() {
 
 			app = models.Application{}
 			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			app.EnableSsh = false
+			app.GUID = "my-app-guid"
+			app.EnableSSH = false
 
 			requirementsFactory.Application = app
 		})
 
 		Context("when enable_ssh is already set to the true", func() {
 			BeforeEach(func() {
-				app.EnableSsh = true
+				app.EnableSSH = true
 				requirementsFactory.Application = app
 			})
 
@@ -101,8 +101,8 @@ var _ = Describe("enable-ssh command", func() {
 				BeforeEach(func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
-					app.EnableSsh = true
+					app.GUID = "my-app-guid"
+					app.EnableSSH = true
 
 					appRepo.UpdateReturns(app, nil)
 				})
@@ -113,7 +113,7 @@ var _ = Describe("enable-ssh command", func() {
 					Expect(appRepo.UpdateCallCount()).To(Equal(1))
 					appGUID, params := appRepo.UpdateArgsForCall(0)
 					Expect(appGUID).To(Equal("my-app-guid"))
-					Expect(*params.EnableSsh).To(Equal(true))
+					Expect(*params.EnableSSH).To(Equal(true))
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"Enabling ssh support for 'my-app'"}))
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
@@ -135,8 +135,8 @@ var _ = Describe("enable-ssh command", func() {
 				It("notifies user when updated result is not in the desired state", func() {
 					app = models.Application{}
 					app.Name = "my-app"
-					app.Guid = "my-app-guid"
-					app.EnableSsh = false
+					app.GUID = "my-app-guid"
+					app.EnableSSH = false
 					appRepo.UpdateReturns(app, nil)
 
 					runCommand("my-app")

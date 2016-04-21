@@ -4,13 +4,13 @@ import (
 	"errors"
 
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -33,17 +33,17 @@ func (r passingRequirement) Execute() error {
 var _ = Describe("CreateSharedDomain", func() {
 	var (
 		ui             *testterm.FakeUI
-		routingApiRepo *fakeapi.FakeRoutingApiRepository
-		domainRepo     *fakeapi.FakeDomainRepository
-		configRepo     core_config.Repository
+		routingAPIRepo *apifakes.FakeRoutingAPIRepository
+		domainRepo     *apifakes.FakeDomainRepository
+		configRepo     coreconfig.Repository
 
 		cmd         domain.CreateSharedDomain
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
-		routingApiRequirement    requirements.Requirement
+		routingAPIRequirement    requirements.Requirement
 		minAPIVersionRequirement requirements.Requirement
 
 		routerGroups models.RouterGroups
@@ -52,14 +52,14 @@ var _ = Describe("CreateSharedDomain", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routingApiRepo = &fakeapi.FakeRoutingApiRepository{}
-		repoLocator := deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
+		routingAPIRepo = new(apifakes.FakeRoutingAPIRepository)
+		repoLocator := deps.RepoLocator.SetRoutingAPIRepository(routingAPIRepo)
 
-		domainRepo = &fakeapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -69,18 +69,18 @@ var _ = Describe("CreateSharedDomain", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "Login"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		routingApiRequirement = &passingRequirement{Name: "RoutingApi"}
-		factory.NewRoutingAPIRequirementReturns(routingApiRequirement)
+		routingAPIRequirement = &passingRequirement{Name: "RoutingApi"}
+		factory.NewRoutingAPIRequirementReturns(routingAPIRequirement)
 
-		minAPIVersionRequirement = &passingRequirement{"MinApiVersionRequirement"}
+		minAPIVersionRequirement = &passingRequirement{"MinAPIVersionRequirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
 
-		routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
+		routingAPIRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
 			for _, r := range routerGroups {
 				if !cb(r) {
 					break
@@ -126,10 +126,10 @@ var _ = Describe("CreateSharedDomain", func() {
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
-			It("does not return a RoutingApiRequirement", func() {
+			It("does not return a RoutingAPIRequirement", func() {
 				actualRequirements := cmd.Requirements(factory, flagContext)
 				Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(0))
-				Expect(actualRequirements).ToNot(ContainElement(routingApiRequirement))
+				Expect(actualRequirements).ToNot(ContainElement(routingAPIRequirement))
 			})
 
 			It("does not return a MinAPIVersionRequirement", func() {
@@ -148,11 +148,11 @@ var _ = Describe("CreateSharedDomain", func() {
 					Expect(actualRequirements).To(ContainElement(loginRequirement))
 				})
 
-				It("returns a RoutingApiRequirement", func() {
+				It("returns a RoutingAPIRequirement", func() {
 					actualRequirements := cmd.Requirements(factory, flagContext)
 
 					Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
-					Expect(actualRequirements).To(ContainElement(routingApiRequirement))
+					Expect(actualRequirements).To(ContainElement(routingAPIRequirement))
 				})
 
 				It("returns a MinAPIVersionRequirement", func() {
@@ -177,7 +177,7 @@ var _ = Describe("CreateSharedDomain", func() {
 				routerGroups = models.RouterGroups{
 					models.RouterGroup{
 						Name: "router-group-name",
-						Guid: "router-group-guid",
+						GUID: "router-group-guid",
 						Type: "router-group-type",
 					},
 				}
@@ -186,7 +186,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("tries to retrieve the router group", func() {
 				cmd.Execute(flagContext)
-				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(1))
+				Expect(routingAPIRepo.ListRouterGroupsCallCount()).To(Equal(1))
 			})
 
 			It("prints a message", func() {
@@ -199,9 +199,9 @@ var _ = Describe("CreateSharedDomain", func() {
 			It("tries to create a shared domain with router group", func() {
 				cmd.Execute(flagContext)
 				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
-				domainName, routerGroupGuid := domainRepo.CreateSharedDomainArgsForCall(0)
+				domainName, routerGroupGUID := domainRepo.CreateSharedDomainArgsForCall(0)
 				Expect(domainName).To(Equal("domain-name"))
-				Expect(routerGroupGuid).To(Equal("router-group-guid"))
+				Expect(routerGroupGUID).To(Equal("router-group-guid"))
 			})
 
 			It("prints success message", func() {
@@ -213,7 +213,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			Context("when listing router groups returns an error", func() {
 				BeforeEach(func() {
-					routingApiRepo.ListRouterGroupsReturns(errors.New("router-group-error"))
+					routingAPIRepo.ListRouterGroupsReturns(errors.New("router-group-error"))
 				})
 
 				It("fails with error message", func() {
@@ -247,7 +247,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("does not try to retrieve the router group", func() {
 				cmd.Execute(flagContext)
-				Expect(routingApiRepo.ListRouterGroupsCallCount()).To(Equal(0))
+				Expect(routingAPIRepo.ListRouterGroupsCallCount()).To(Equal(0))
 			})
 
 			It("prints a message", func() {
@@ -260,9 +260,9 @@ var _ = Describe("CreateSharedDomain", func() {
 			It("tries to create a shared domain without router group", func() {
 				cmd.Execute(flagContext)
 				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
-				domainName, routerGroupGuid := domainRepo.CreateSharedDomainArgsForCall(0)
+				domainName, routerGroupGUID := domainRepo.CreateSharedDomainArgsForCall(0)
 				Expect(domainName).To(Equal("domain-name"))
-				Expect(routerGroupGuid).To(Equal(""))
+				Expect(routerGroupGUID).To(Equal(""))
 			})
 
 			It("prints success message", func() {

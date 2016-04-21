@@ -1,9 +1,9 @@
 package securitygroup_test
 
 import (
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -21,28 +21,28 @@ import (
 var _ = Describe("list-security-groups command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		repo                *fakeSecurityGroup.FakeSecurityGroupRepo
+		repo                *securitygroupsfakes.FakeSecurityGroupRepo
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(repo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("security-groups").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("security-groups").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		repo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
+		repo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("security-groups", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("security-groups", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -51,7 +51,7 @@ var _ = Describe("list-security-groups command", func() {
 		})
 
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -107,7 +107,7 @@ var _ = Describe("list-security-groups command", func() {
 			BeforeEach(func() {
 				securityGroup := models.SecurityGroup{}
 				securityGroup.Name = "my-group"
-				securityGroup.Guid = "group-guid"
+				securityGroup.GUID = "group-guid"
 
 				repo.FindAllReturns([]models.SecurityGroup{securityGroup}, nil)
 			})
@@ -118,16 +118,16 @@ var _ = Describe("list-security-groups command", func() {
 						{
 							SecurityGroupFields: models.SecurityGroupFields{
 								Name: "my-group",
-								Guid: "group-guid",
+								GUID: "group-guid",
 							},
 							Spaces: []models.Space{
 								{
-									SpaceFields:  models.SpaceFields{Guid: "my-space-guid-1", Name: "space-1"},
-									Organization: models.OrganizationFields{Guid: "my-org-guid-1", Name: "org-1"},
+									SpaceFields:  models.SpaceFields{GUID: "my-space-guid-1", Name: "space-1"},
+									Organization: models.OrganizationFields{GUID: "my-org-guid-1", Name: "org-1"},
 								},
 								{
-									SpaceFields:  models.SpaceFields{Guid: "my-space-guid", Name: "space-2"},
-									Organization: models.OrganizationFields{Guid: "my-org-guid-2", Name: "org-2"},
+									SpaceFields:  models.SpaceFields{GUID: "my-space-guid", Name: "space-2"},
+									Organization: models.OrganizationFields{GUID: "my-org-guid-2", Name: "org-2"},
 								},
 							},
 						},

@@ -8,8 +8,9 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
+	"bytes"
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
@@ -23,6 +24,8 @@ func NotLoggedInText() string {
 type UI interface {
 	PrintPaginator(rows []string, err error)
 	Say(message string, args ...interface{})
+
+	// ProgressReader
 	PrintCapturingNoOutput(message string, args ...interface{})
 	Warn(message string, args ...interface{})
 	Ask(prompt string) (answer string)
@@ -33,10 +36,16 @@ type UI interface {
 	Ok()
 	Failed(message string, args ...interface{})
 	PanicQuietly()
-	ShowConfiguration(core_config.Reader)
+	ShowConfiguration(coreconfig.Reader)
 	LoadingIndication()
-	Table(headers []string) Table
-	NotifyUpdateIfNeeded(core_config.Reader)
+	Table(headers []string) *UITable
+	NotifyUpdateIfNeeded(coreconfig.Reader)
+}
+
+type Printer interface {
+	Print(a ...interface{}) (n int, err error)
+	Printf(format string, a ...interface{}) (n int, err error)
+	Println(a ...interface{}) (n int, err error)
 }
 
 type terminalUI struct {
@@ -161,16 +170,16 @@ func (ui *terminalUI) PanicQuietly() {
 	panic(QuietPanic)
 }
 
-func (ui *terminalUI) ShowConfiguration(config core_config.Reader) {
-	table := NewTable(ui, []string{"", ""})
+func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) {
+	table := ui.Table([]string{"", ""})
 
 	if config.HasAPIEndpoint() {
 		table.Add(
 			T("API endpoint:"),
-			T("{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
+			T("{{.APIEndpoint}} (API version: {{.APIVersionString}})",
 				map[string]interface{}{
-					"ApiEndpoint":      EntityNameColor(config.ApiEndpoint()),
-					"ApiVersionString": EntityNameColor(config.ApiVersion()),
+					"APIEndpoint":      EntityNameColor(config.APIEndpoint()),
+					"APIVersionString": EntityNameColor(config.APIVersion()),
 				}),
 		)
 	}
@@ -229,18 +238,59 @@ func (ui *terminalUI) LoadingIndication() {
 	ui.printer.Print(".")
 }
 
-func (ui *terminalUI) Table(headers []string) Table {
-	return NewTable(ui, headers)
+func (ui *terminalUI) Table(headers []string) *UITable {
+	return &UITable{
+		UI:    ui,
+		Table: NewTable(headers),
+	}
 }
 
-func (ui *terminalUI) NotifyUpdateIfNeeded(config core_config.Reader) {
-	if !config.IsMinCliVersion(cf.Version) {
+type UITable struct {
+	UI    UI
+	Table *Table
+}
+
+func (u *UITable) Add(row ...string) {
+	u.Table.Add(row...)
+}
+
+// Print formats the table and then prints it to the UI specified at
+// the time of the construction. Afterwards the table is cleared,
+// becoming ready for another round of rows and printing.
+func (u *UITable) Print() {
+	result := &bytes.Buffer{}
+	t := u.Table
+
+	t.PrintTo(result)
+
+	// DevNote. With the change to printing into a buffer all
+	// lines now come with a terminating \n. The t.ui.Say() below
+	// will then add another \n to that. To avoid this additional
+	// line we chop off the last \n from the output (if there is
+	// any). Operating on the slice avoids string copying.
+	//
+	// WIBNI if the terminal API had a variant of Say not assuming
+	// that each output is a single line.
+
+	r := result.Bytes()
+	if len(r) > 0 {
+		r = r[0 : len(r)-1]
+	}
+
+	// Only generate output for a non-empty table.
+	if len(r) > 0 {
+		u.UI.Say("%s", string(r))
+	}
+}
+
+func (ui *terminalUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
+	if !config.IsMinCLIVersion(cf.Version) {
 		ui.Say("")
-		ui.Say(T("Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+		ui.Say(T("Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
 			map[string]interface{}{
-				"ApiVer": config.ApiVersion(),
-				"CliMin": config.MinCliVersion(),
-				"CliVer": cf.Version,
+				"APIVer": config.APIVersion(),
+				"CLIMin": config.MinCLIVersion(),
+				"CLIVer": cf.Version,
 			}))
 	}
 }

@@ -1,17 +1,19 @@
 package route_test
 
 import (
+	"strings"
+
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/route"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -24,16 +26,16 @@ import (
 var _ = Describe("DeleteRoute", func() {
 	var (
 		ui         *testterm.FakeUI
-		configRepo core_config.Repository
-		routeRepo  *fakeapi.FakeRouteRepository
+		configRepo coreconfig.Repository
+		routeRepo  *apifakes.FakeRouteRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
-		domainRequirement        *fakerequirements.FakeDomainRequirement
+		domainRequirement        *requirementsfakes.FakeDomainRequirement
 		minAPIVersionRequirement requirements.Requirement
 
 		fakeDomain models.DomainFields
@@ -43,11 +45,11 @@ var _ = Describe("DeleteRoute", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routeRepo = &fakeapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -57,22 +59,50 @@ var _ = Describe("DeleteRoute", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		domainRequirement = &fakerequirements.FakeDomainRequirement{}
+		domainRequirement = new(requirementsfakes.FakeDomainRequirement)
 		factory.NewDomainRequirementReturns(domainRequirement)
 
 		fakeDomain = models.DomainFields{
-			Guid: "fake-domain-guid",
+			GUID: "fake-domain-guid",
 			Name: "fake-domain-name",
 		}
 		domainRequirement.GetDomainReturns(fakeDomain)
 
 		minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
 		factory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
+	})
+
+	Describe("Help text", func() {
+		var usage []string
+
+		BeforeEach(func() {
+			dr := &route.DeleteRoute{}
+			up := commandregistry.CLICommandUsagePresenter(dr)
+			usage = strings.Split(up.Usage(), "\n")
+		})
+
+		It("has a HTTP route usage", func() {
+			Expect(usage).To(ContainElement("   Delete an HTTP route:"))
+			Expect(usage).To(ContainElement("      cf delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]"))
+		})
+
+		It("has a TCP route usage", func() {
+			Expect(usage).To(ContainElement("   Delete a TCP route:"))
+			Expect(usage).To(ContainElement("      cf delete-route DOMAIN --port PORT [-f]"))
+		})
+
+		It("has a TCP route example", func() {
+			Expect(usage).To(ContainElement("   cf delete-route example.com --port 50000                 # example.com:50000"))
+		})
+
+		It("has a TCP option", func() {
+			Expect(usage).To(ContainElement("   --port              Port used to identify the TCP route"))
+		})
 	})
 
 	Describe("Requirements", func() {
@@ -140,6 +170,55 @@ var _ = Describe("DeleteRoute", func() {
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})
 			})
+
+			Describe("deleting a tcp route", func() {
+				Context("when passing port with a hostname", func() {
+					BeforeEach(func() {
+						flagContext.Parse("example.com", "--port", "8080", "--hostname", "something-else")
+					})
+
+					It("fails", func() {
+						Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Cannot specify port together with hostname and/or path."},
+						))
+					})
+				})
+
+				Context("when passing port with a path", func() {
+					BeforeEach(func() {
+						flagContext.Parse("example.com", "--port", "8080", "--path", "something-else")
+					})
+
+					It("fails", func() {
+						Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"Cannot specify port together with hostname and/or path."},
+						))
+					})
+				})
+
+				Context("when a port is passed", func() {
+					BeforeEach(func() {
+						flagContext.Parse("example.com", "--port", "8080")
+					})
+
+					It("returns a MinAPIVersionRequirement as the first requirement", func() {
+						actualRequirements := cmd.Requirements(factory, flagContext)
+
+						expectedVersion, err := semver.Make("2.53.0")
+						Expect(err).NotTo(HaveOccurred())
+
+						Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+						feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
+						Expect(feature).To(Equal("Option '--port'"))
+						Expect(requiredVersion).To(Equal(expectedVersion))
+						Expect(actualRequirements[0]).To(Equal(minAPIVersionRequirement))
+					})
+				})
+			})
 		})
 	})
 
@@ -188,10 +267,25 @@ var _ = Describe("DeleteRoute", func() {
 				})
 			})
 
+			Context("when a port is passed", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("domain-name", "-f", "--port", "60000")
+					Expect(err).NotTo(HaveOccurred())
+					cmd.Requirements(factory, flagContext)
+				})
+
+				It("tries to find the route with the port", func() {
+					cmd.Execute(flagContext)
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					_, _, _, port := routeRepo.FindArgsForCall(0)
+					Expect(port).To(Equal(60000))
+				})
+			})
+
 			Context("when the route can be found", func() {
 				BeforeEach(func() {
 					routeRepo.FindReturns(models.Route{
-						Guid: "route-guid",
+						GUID: "route-guid",
 					}, nil)
 				})
 

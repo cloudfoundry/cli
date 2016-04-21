@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -19,27 +19,27 @@ import (
 var _ = Describe("delete-user command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
-		userRepo            *testapi.FakeUserRepository
+		configRepo          coreconfig.Repository
+		userRepo            *apifakes.FakeUserRepository
 		requirementsFactory *testreq.FakeReqFactory
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-user").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-user").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		token, err := testconfig.EncodeAccessToken(core_config.TokenInfo{
-			UserGuid: "admin-user-guid",
+		token, err := testconfig.EncodeAccessToken(coreconfig.TokenInfo{
+			UserGUID: "admin-user-guid",
 			Username: "admin-user",
 		})
 		Expect(err).ToNot(HaveOccurred())
@@ -47,7 +47,7 @@ var _ = Describe("delete-user command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-user", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-user", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -69,7 +69,7 @@ var _ = Describe("delete-user command", func() {
 		BeforeEach(func() {
 			userRepo.FindByUsernameReturns(models.UserFields{
 				Username: "user-name",
-				Guid:     "user-guid",
+				GUID:     "user-guid",
 			}, nil)
 		})
 

@@ -56,14 +56,6 @@
     "translation": ""
   },
   {
-    "id": "   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n",
-    "translation": ""
-  },
-  {
-    "id": "   CF_NAME push [-f MANIFEST_PATH]\n",
-    "translation": ""
-  },
-  {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
     "translation": "   Optional stellen Sie eine Liste mit durch Kommas begrenzten Tags zur Verfügung, die für alle gebundenen Anwendungen in die Umgebungsvariable VCAP_SERVICES geschrieben werden. "
   },
@@ -84,10 +76,6 @@
     "translation": "   Der Pfad sollte eine komprimierte Datei, eine URL zu einer komprimierten Datei oder ein lokales Verzeichnis sein. Die Position ist eine positive ganze Zahl, legt die Priorität fest und wird von der niedrigsten zur höchsten Zahl sortiert. "
   },
   {
-    "id": "   Push multiple apps with a manifest:\n",
-    "translation": "   Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:\n"
-  },
-  {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
     "translation": "   Der bereitgestellte Pfad kann ein absoluter oder relativer Pfad zu einer Datei sein.\n   Diese sollte über einen einzelnen Array mit JSON-Objekten verfügen, die die Regeln beschreiben."
   },
@@ -98,10 +86,6 @@
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
     "translation": "   Zulässige Größenbeschränkungen mit 'CF_NAME quotas' anzeigen"
-  },
-  {
-    "id": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n",
-    "translation": "   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] \n"
   },
   {
     "id": " added as '",
@@ -126,10 +110,6 @@
   {
     "id": " is empty",
     "translation": " ist leer"
-  },
-  {
-    "id": " is not a valid url, please provide a url, e.g. http://your_repo.com",
-    "translation": " ist keine gültige URL. Bitte stellen Sie eine URL zur Verfügung. Beispiel: http://your_repo.com"
   },
   {
     "id": " is not available in repo '",
@@ -200,12 +180,12 @@
     "translation": "API-Endpunkt: "
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}}",
-    "translation": "API-Endpunkt: {{.ApiEndpoint}}"
+    "id": "API endpoint: {{.APIEndpoint}}",
+    "translation": "API-Endpunkt: {{.APIEndpoint}}"
   },
   {
-    "id": "API endpoint: {{.ApiEndpoint}} (API version: {{.ApiVersion}})",
-    "translation": "API-Endpunkt: {{.ApiEndpoint}} (API-Version: {{.ApiVersion}})"
+    "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
+    "translation": "API-Endpunkt: {{.APIEndpoint}} (API-Version: {{.APIVersion}})"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
@@ -217,6 +197,10 @@
   },
   {
     "id": "APP_INSTANCES",
+    "translation": ""
+  },
+  {
+    "id": "APP_NAME",
     "translation": ""
   },
   {
@@ -400,6 +384,10 @@
     "translation": "BUILDPAKETE"
   },
   {
+    "id": "BUILDPACK_NAME",
+    "translation": ""
+  },
+  {
     "id": "Bind a security group to a space",
     "translation": "Eine Sicherheitsgruppe an einen Bereich binden"
   },
@@ -572,10 +560,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [--allow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": ""
   },
@@ -609,10 +593,6 @@
   },
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": ""
   },
   {
@@ -737,10 +717,6 @@
   },
   {
     "id": "CF_NAME logs APP_NAME",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
     "translation": ""
   },
   {
@@ -976,10 +952,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
     "translation": ""
   },
@@ -1020,15 +992,15 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME update-space-quota SPACE-QUOTA-NAME [-i MAX-INSTANCE-MEMORY] [-m MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICES] [--allow-paid-service-plans | --disallow-paid-service-plans]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": ""
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
+    "translation": ""
+  },
+  {
+    "id": "COMMAND",
     "translation": ""
   },
   {
@@ -1100,8 +1072,8 @@
     "translation": "Suchen nach Route..."
   },
   {
-    "id": "Cloud Foundry API version {{.ApiVer}} requires CLI version {{.CliMin}}.  You are currently on version {{.CliVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry-API-Version {{.ApiVer}} erfordert CLI-Version {{.CliMin}}.  Sie verwenden aktuell die Version {{.CliVer}}. Um eine Aktualisierung Ihrer CLI auszuführen, gehen Sie auf folgende Seite: https://github.com/cloudfoundry/cli#downloads"
+    "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+    "translation": "Cloud Foundry-API-Version {{.APIVer}} erfordert CLI-Version {{.CLIMin}}.  Sie verwenden aktuell die Version {{.CLIVer}}. Um eine Aktualisierung Ihrer CLI auszuführen, gehen Sie auf folgende Seite: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1192,8 +1164,8 @@
     "translation": "Konnte die Aktualisierungen nicht serialisieren"
   },
   {
-    "id": "Could not target org.\n{{.ApiErr}}",
-    "translation": "Konnte die Organisation nicht als Ziel auswählen \n{{.ApiErr}}"
+    "id": "Could not target org.\n{{.APIErr}}",
+    "translation": "Konnte die Organisation nicht als Ziel auswählen \n{{.APIErr}}"
   },
   {
     "id": "Couldn't create temp file for upload",
@@ -1308,6 +1280,10 @@
     "translation": "Erstellen von Größenbeschränkung {{.QuotaName}} als {{.Username}}..."
   },
   {
+    "id": "Creating random route for {{.Domain}}",
+    "translation": ""
+  },
+  {
     "id": "Creating route {{.Hostname}}...",
     "translation": "Erstellen von Route {{.Hostname}}..."
   },
@@ -1384,6 +1360,14 @@
     "translation": "Angepasste Header, die in die Anforderung einbezogen werden sollen. Das Flag kann mehrfach angegeben werden. "
   },
   {
+    "id": "DISK",
+    "translation": ""
+  },
+  {
+    "id": "DOCKER_IMAGE",
+    "translation": ""
+  },
+  {
     "id": "DOMAIN",
     "translation": ""
   },
@@ -1402,6 +1386,10 @@
   {
     "id": "Define a new space resource quota",
     "translation": "Neue Bereichsressourcengrößenbeschränkung definieren"
+  },
+  {
+    "id": "Delete a TCP route",
+    "translation": ""
   },
   {
     "id": "Delete a buildpack",
@@ -1454,6 +1442,10 @@
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
     "translation": "Alle verwaisten Routen (z.B.:  die keiner Map zugeordnet sind) löschen"
+  },
+  {
+    "id": "Delete an HTTP route",
+    "translation": ""
   },
   {
     "id": "Delete an app",
@@ -1748,8 +1740,8 @@
     "translation": "Fehler beim Löschen des Buildpacks {{.Name}}\n{{.Error}}"
   },
   {
-    "id": "Error deleting domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Fehler beim Löschen der Domäne {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error deleting domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Fehler beim Löschen der Domäne {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1776,16 +1768,16 @@
     "translation": "Fehler beim Aktivieren der SSH-Unterstützung für Bereich "
   },
   {
-    "id": "Error finding available orgs\n{{.ApiErr}}",
-    "translation": "Fehler beim Suchen verfügbarer Organisationen\n{{.ApiErr}}"
+    "id": "Error finding available orgs\n{{.APIErr}}",
+    "translation": "Fehler beim Suchen verfügbarer Organisationen\n{{.APIErr}}"
   },
   {
     "id": "Error finding available spaces\n{{.Err}}",
     "translation": "Fehler beim Suchen verfügbarer Bereiche\n{{.Err}}"
   },
   {
-    "id": "Error finding domain {{.DomainName}}\n{{.ApiErr}}",
-    "translation": "Fehler beim Suchen von Domänen {{.DomainName}}\n{{.ApiErr}}"
+    "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
+    "translation": "Fehler beim Suchen von Domänen {{.DomainName}}\n{{.APIErr}}"
   },
   {
     "id": "Error finding manifest",
@@ -1826,10 +1818,6 @@
   {
     "id": "Error getting file info",
     "translation": "Fehler beim Abrufen der Datei-Info"
-  },
-  {
-    "id": "Error getting info from v2/info: ",
-    "translation": "Fehler beim Abrufen der Info von v2/info: "
   },
   {
     "id": "Error getting one time auth code: ",
@@ -1940,8 +1928,8 @@
     "translation": "Fehler bei der Aktualisierung von health_check_type für "
   },
   {
-    "id": "Error uploading application.\n{{.ApiErr}}",
-    "translation": "Fehler beim Hochladen der Anwendung \n{{.ApiErr}}"
+    "id": "Error uploading application.\n{{.APIErr}}",
+    "translation": "Fehler beim Hochladen der Anwendung \n{{.APIErr}}"
   },
   {
     "id": "Error uploading buildpack {{.Name}}\n{{.Error}}",
@@ -2028,16 +2016,16 @@
     "translation": "Abrufen von Domänen ist fehlgeschlagen. \n{{.Error}}"
   },
   {
-    "id": "Failed fetching events.\n{{.ApiErr}}",
-    "translation": "Abrufen von Ereignissen ist fehlgeschlagen.\n{{.ApiErr}}"
+    "id": "Failed fetching events.\n{{.APIErr}}",
+    "translation": "Abrufen von Ereignissen ist fehlgeschlagen.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching org-users for role {{.OrgRoleToDisplayName}}.\n{{.Error}}",
     "translation": "Abrufen von Organisationsbenutzern für Rolle {{.OrgRoleToDisplayName}} ist fehlgeschlagen.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching orgs.\n{{.ApiErr}}",
-    "translation": "Abrufen von Organisationen ist fehlgeschlagen.\n{{.ApiErr}}"
+    "id": "Failed fetching orgs.\n{{.APIErr}}",
+    "translation": "Abrufen von Organisationen ist fehlgeschlagen.\n{{.APIErr}}"
   },
   {
     "id": "Failed fetching router groups.\n{{.Err}}",
@@ -2316,6 +2304,14 @@
     "translation": "Abrufen von Benutzern in Organisation {{.TargetOrg}} als {{.CurrentUser}}..."
   },
   {
+    "id": "HEALTH_CHECK_TYPE",
+    "translation": ""
+  },
+  {
+    "id": "HOST",
+    "translation": ""
+  },
+  {
     "id": "HOSTNAME",
     "translation": ""
   },
@@ -2336,10 +2332,6 @@
     "translation": ""
   },
   {
-    "id": "Hostname for the route (required for shared domains)",
-    "translation": "Hostname for the route"
-  },
-  {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
     "translation": ""
   },
@@ -2348,8 +2340,8 @@
     "translation": ""
   },
   {
-    "id": "Hostname used to identify the route",
-    "translation": "Hostname for the route"
+    "id": "Hostname used to identify the HTTP route",
+    "translation": ""
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -2836,6 +2828,14 @@
     "translation": "Im Repository '{{.repoName}}' nach '{{.filePath}}' suchen"
   },
   {
+    "id": "MANIFEST_PATH",
+    "translation": ""
+  },
+  {
+    "id": "MEMORY",
+    "translation": ""
+  },
+  {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
     "translation": "Kopie des Quellcodes der App von einer Anwendung für eine andere erstellen. Der Befehl copy-source startet die Anwendung erneut, wenn er nicht überschrieben wurde. "
   },
@@ -2854,6 +2854,14 @@
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
     "translation": "Manifestdatei wurde im aktuellen Verzeichnis nicht gefunden. Bitte stellen Sie entweder einen App-Namen oder ein Manifest zur Verfügung."
+  },
+  {
+    "id": "Map a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Map an HTTP route",
+    "translation": ""
   },
   {
     "id": "Map the root domain to this app",
@@ -2905,6 +2913,10 @@
   },
   {
     "id": "NEW_NAME",
+    "translation": ""
+  },
+  {
+    "id": "NUM_INSTANCES",
     "translation": ""
   },
   {
@@ -3196,7 +3208,7 @@
     "translation": "Pfad zum Manifest"
   },
   {
-    "id": "Path used to identify the route",
+    "id": "Path used to identify the HTTP route",
     "translation": ""
   },
   {
@@ -3272,6 +3284,10 @@
     "translation": ""
   },
   {
+    "id": "Port used to identify the TCP route",
+    "translation": ""
+  },
+  {
     "id": "Print API request diagnostics to stdout",
     "translation": "API-Anforderungsdiagnose in Standardausgabe drucken"
   },
@@ -3312,8 +3328,12 @@
     "translation": "Neue App oder Synchronisationsänderungen mit einer Push-Operation an eine vorhandene App übertragen"
   },
   {
-    "id": "Push a single app (with or without a manifest):\n",
-    "translation": "Eine einzelne App mit einer Push-Operation übertragen (mit oder ohne Manifest):\n"
+    "id": "Push a single app (with or without a manifest)",
+    "translation": "Eine einzelne App mit einer Push-Operation übertragen (mit oder ohne Manifest)"
+  },
+  {
+    "id": "Push multiple apps with a manifest",
+    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen"
   },
   {
     "id": "QUOTA",
@@ -3348,12 +3368,12 @@
     "translation": "ROLLEN:\n"
   },
   {
-    "id": "ROUTER GROUPS",
-    "translation": "ROUTER-GRUPPEN"
-  },
-  {
     "id": "ROUTES",
     "translation": "ROUTEN"
+  },
+  {
+    "id": "ROUTE_PATH",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3620,10 +3640,6 @@
     "translation": ""
   },
   {
-    "id": "Routing API URI missing. Please log in again to set the URI automatically.",
-    "translation": "URI der Weiterleitungs-API fehlt. Bitte melden Sie sich erneut an, damit die URI automatisch festgelegt wird. "
-  },
-  {
     "id": "Rules",
     "translation": "Regeln"
   },
@@ -3676,6 +3692,10 @@
     "translation": "SSH zu einer Anwendungscontainerinstanz"
   },
   {
+    "id": "STACK",
+    "translation": ""
+  },
+  {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Skalieren von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}}..."
   },
@@ -3712,8 +3732,8 @@
     "translation": "Serverfehler, Statuscode: 403: Zugriff verweigert. Sie haben nicht die Berechtigung zum Ausführen dieses Befehls. "
   },
   {
-    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "Serverfehler, Statuscode: {{.ErrStatusCode}}, Fehlercode: {{.ErrApiErrorCode}}, Nachricht: {{.ErrDescription}}"
+    "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
+    "translation": "Serverfehler, Statuscode: {{.ErrStatusCode}}, Fehlercode: {{.ErrAPIErrorCode}}, Nachricht: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -3976,6 +3996,10 @@
     "translation": "Vom System zur Verfügung gestellt:"
   },
   {
+    "id": "TIMEOUT",
+    "translation": ""
+  },
+  {
     "id": "TIP:\n",
     "translation": "TIPP:\n"
   },
@@ -3996,8 +4020,8 @@
     "translation": "TIPP: Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.CfTargetCommand}}', um einen Bereich als Ziel auszuwählen."
   },
   {
-    "id": "TIP: Use '{{.ApiCommand}}' to continue with an insecure API endpoint",
-    "translation": "TIPP: Verwenden Sie '{{.ApiCommand}}', um mit einem unsicheren API-Endpunkt fortzufahren."
+    "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
+    "translation": "TIPP: Verwenden Sie '{{.APICommand}}', um mit einem unsicheren API-Endpunkt fortzufahren."
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
@@ -4080,12 +4104,16 @@
     "translation": "Es gibt zu viele anzuzeigende Optionen. Bitte geben Sie den Namen ein. "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': ",
-    "translation": "Bei der Ausführung der Anforderung für '{{.repoUrl}}' trat ein Fehler auf: "
+    "id": "There is an error performing request on '{{.RepoURL}}': ",
+    "translation": "Bei der Ausführung der Anforderung für '{{.repoURL}}' trat ein Fehler auf: "
   },
   {
-    "id": "There is an error performing request on '{{.RepoUrl}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoUrl}}': {{.Error}}%s"
+    "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
+    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
+  },
+  {
+    "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
+    "translation": ""
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4144,6 +4172,10 @@
     "translation": "UAA-Endpunkt fehlt in Konfigurationsdatei"
   },
   {
+    "id": "URL",
+    "translation": "URL"
+  },
+  {
     "id": "URL to which logs for bound applications will be streamed",
     "translation": ""
   },
@@ -4168,8 +4200,8 @@
     "translation": "BENUTZER"
   },
   {
-    "id": "Unable to access space {{.SpaceName}}.\n{{.ApiErr}}",
-    "translation": "Auf Bereich {{.SpaceName}} konnte nicht zugegriffen werden.\n{{.ApiErr}}"
+    "id": "Unable to access space {{.SpaceName}}.\n{{.APIErr}}",
+    "translation": "Auf Bereich {{.SpaceName}} konnte nicht zugegriffen werden.\n{{.APIErr}}"
   },
   {
     "id": "Unable to acquire one time code from authorization response",
@@ -4266,6 +4298,14 @@
   {
     "id": "Unlock the buildpack to enable updates",
     "translation": "Buildpack entsperren, um Aktualisierungen zu ermöglichen"
+  },
+  {
+    "id": "Unmap a TCP route",
+    "translation": ""
+  },
+  {
+    "id": "Unmap an HTTP route",
+    "translation": ""
   },
   {
     "id": "Unsetting api endpoint...",
@@ -4370,10 +4410,6 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "Hochladen von {{.ZipFileBytes}}, {{.FileCount}} Dateien"
-  },
-  {
-    "id": "Url",
-    "translation": "URL"
   },
   {
     "id": "Use '{{.Command}}' for more information",
@@ -4541,14 +4577,6 @@
   },
   {
     "id": "app instance limit",
-    "translation": ""
-  },
-  {
-    "id": "app ports",
-    "translation": ""
-  },
-  {
-    "id": "app ports:",
     "translation": ""
   },
   {
@@ -5000,8 +5028,8 @@
     "translation": "Ja"
   },
   {
-    "id": "{{.ApiEndpoint}} (API version: {{.ApiVersionString}})",
-    "translation": "{{.ApiEndpoint}} (API-Version: {{.ApiVersionString}})"
+    "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
+    "translation": "{{.APIEndpoint}} (API-Version: {{.APIVersionString}})"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
@@ -5048,12 +5076,12 @@
     "translation": "{{.Err}}\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten."
   },
   {
-    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.ApiVersion}}.",
+    "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
     "translation": ""
   },
   {
-    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.ApiVersion}}.",
-    "translation": "Aktuelle CF CLI Version {{.Version}}\n\tAktuelle CF API Version {{.ApiVersion}}\n\tUm die Funktion {{.CommandName}} zu verwenden, müssen Sie die CF API mindestens auf {{.RequiredVersion}} aktualisieren."
+    "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
+    "translation": "Aktuelle CF CLI Version {{.Version}}\n\tAktuelle CF API Version {{.APIVersion}}\n\tUm die Funktion {{.CommandName}} zu verwenden, müssen Sie die CF API mindestens auf {{.RequiredVersion}} aktualisieren."
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5122,6 +5150,10 @@
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
     "translation": "{{.State}} in Bearbeitung. Verwenden Sie '{{.ServicesCommand}}' oder '{{.ServiceCommand}}', um den Betriebsstatus zu überprüfen."
+  },
+  {
+    "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
+    "translation": "{{.URL}} ist keine gültige URL. Bitte stellen Sie eine URL zur Verfügung. Beispiel: https://your_repo.com"
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",

@@ -25,16 +25,16 @@ func Sanitize(input string) string {
 	re = regexp.MustCompile(`password=[^&]*&`)
 	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER()+"&")
 
-	sanitized = sanitizeJson("access_token", sanitized)
-	sanitized = sanitizeJson("refresh_token", sanitized)
-	sanitized = sanitizeJson("token", sanitized)
-	sanitized = sanitizeJson("password", sanitized)
-	sanitized = sanitizeJson("oldPassword", sanitized)
+	sanitized = sanitizeJSON("access_token", sanitized)
+	sanitized = sanitizeJSON("refresh_token", sanitized)
+	sanitized = sanitizeJSON("token", sanitized)
+	sanitized = sanitizeJSON("password", sanitized)
+	sanitized = sanitizeJSON("oldPassword", sanitized)
 
 	return sanitized
 }
 
-func sanitizeJson(propertyName string, json string) string {
+func sanitizeJSON(propertyName string, json string) string {
 	regex := regexp.MustCompile(fmt.Sprintf(`"%s":\s*"[^\,]*"`, propertyName))
 	return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER()))
 }

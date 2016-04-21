@@ -1,14 +1,19 @@
 package models
 
 type DomainFields struct {
-	Guid                   string
+	GUID                   string
 	Name                   string
-	OwningOrganizationGuid string
-	RouterGroupGuid        string
-	RouterGroupTypes       []string
+	OwningOrganizationGUID string
+	RouterGroupGUID        string
+	RouterGroupType        string
 	Shared                 bool
 }
 
-func (model DomainFields) UrlForHostAndPath(host, path string) string {
-	return urlStringFromParts(host, model.Name, path)
+func (model DomainFields) URLForHostAndPath(host, path string, port int) string {
+	return (&RoutePresenter{
+		Host:   host,
+		Domain: model.Name,
+		Path:   path,
+		Port:   port,
+	}).URL()
 }

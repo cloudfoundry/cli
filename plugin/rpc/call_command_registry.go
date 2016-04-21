@@ -1,14 +1,15 @@
 package rpc
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter -o fakes/fake_command_runner.go . CommandRunner
+//go:generate counterfeiter . CommandRunner
+
 type CommandRunner interface {
-	Command([]string, command_registry.Dependency, bool) error
+	Command([]string, commandregistry.Dependency, bool) error
 }
 
 type commandRunner struct{}
@@ -17,10 +18,10 @@ func NewCommandRunner() CommandRunner {
 	return &commandRunner{}
 }
 
-func (c *commandRunner) Command(args []string, deps command_registry.Dependency, pluginApiCall bool) error {
+func (c *commandRunner) Command(args []string, deps commandregistry.Dependency, pluginApiCall bool) error {
 	var err error
 
-	cmdRegistry := command_registry.Commands
+	cmdRegistry := commandregistry.Commands
 
 	if cmdRegistry.CommandExists(args[0]) {
 		fc := flags.NewFlagContext(cmdRegistry.FindCommand(args[0]).MetaData().Flags)

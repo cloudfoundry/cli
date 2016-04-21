@@ -5,26 +5,27 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-//go:generate counterfeiter -o fakes/fake_application_requirement.go . ApplicationRequirement
+//go:generate counterfeiter . ApplicationRequirement
+
 type ApplicationRequirement interface {
 	Requirement
 	GetApplication() models.Application
 }
 
-type applicationApiRequirement struct {
+type applicationAPIRequirement struct {
 	name        string
 	appRepo     applications.ApplicationRepository
 	application models.Application
 }
 
-func NewApplicationRequirement(name string, aR applications.ApplicationRepository) *applicationApiRequirement {
-	req := &applicationApiRequirement{}
+func NewApplicationRequirement(name string, aR applications.ApplicationRepository) *applicationAPIRequirement {
+	req := &applicationAPIRequirement{}
 	req.name = name
 	req.appRepo = aR
 	return req
 }
 
-func (req *applicationApiRequirement) Execute() error {
+func (req *applicationAPIRequirement) Execute() error {
 	var apiErr error
 	req.application, apiErr = req.appRepo.Read(req.name)
 
@@ -35,6 +36,6 @@ func (req *applicationApiRequirement) Execute() error {
 	return nil
 }
 
-func (req *applicationApiRequirement) GetApplication() models.Application {
+func (req *applicationAPIRequirement) GetApplication() models.Application {
 	return req.application
 }

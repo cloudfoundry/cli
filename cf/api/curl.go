@@ -9,29 +9,31 @@ import (
 	"net/textproto"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . CurlRepository
+
 type CurlRepository interface {
-	Request(method, path, header, body string) (resHeaders, resBody string, apiErr error)
+	Request(method, path, header, body string) (resHeaders string, resBody string, apiErr error)
 }
 
 type CloudControllerCurlRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerCurlRepository(config core_config.Reader, gateway net.Gateway) (repo CloudControllerCurlRepository) {
+func NewCloudControllerCurlRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerCurlRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, err error) {
-	url := fmt.Sprintf("%s/%s", repo.config.ApiEndpoint(), strings.TrimLeft(path, "/"))
+	url := fmt.Sprintf("%s/%s", repo.config.APIEndpoint(), strings.TrimLeft(path, "/"))
 
 	if method == "" && body != "" {
 		method = "POST"
@@ -42,7 +44,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 		return
 	}
 
-	err = mergeHeaders(req.HttpReq.Header, headerString)
+	err = mergeHeaders(req.HTTPReq.Header, headerString)
 	if err != nil {
 		err = fmt.Errorf("%s: %s", T("Error parsing headers"), err.Error())
 		return
@@ -50,7 +52,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	res, err := repo.gateway.PerformRequest(req)
 
-	if _, ok := err.(errors.HttpError); ok {
+	if _, ok := err.(errors.HTTPError); ok {
 		err = nil
 	}
 

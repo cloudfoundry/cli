@@ -3,15 +3,15 @@ package application_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeappfiles "github.com/cloudfoundry/cli/cf/api/app_files/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/appfiles/appfilesfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -23,28 +23,28 @@ import (
 var _ = Describe("Files", func() {
 	var (
 		ui           *testterm.FakeUI
-		configRepo   core_config.Repository
-		appFilesRepo *fakeappfiles.FakeAppFilesRepository
+		configRepo   coreconfig.Repository
+		appFilesRepo *appfilesfakes.FakeAppFilesRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement          requirements.Requirement
 		targetedSpaceRequirement  requirements.Requirement
-		deaApplicationRequirement *fakerequirements.FakeDEAApplicationRequirement
+		deaApplicationRequirement *requirementsfakes.FakeDEAApplicationRequirement
 	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		appFilesRepo = &fakeappfiles.FakeAppFilesRepository{}
+		appFilesRepo = new(appfilesfakes.FakeAppFilesRepository)
 		repoLocator := deps.RepoLocator.SetAppFileRepository(appFilesRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -54,7 +54,7 @@ var _ = Describe("Files", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
@@ -62,11 +62,11 @@ var _ = Describe("Files", func() {
 		targetedSpaceRequirement = &passingRequirement{}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 
-		deaApplicationRequirement = &fakerequirements.FakeDEAApplicationRequirement{}
+		deaApplicationRequirement = new(requirementsfakes.FakeDEAApplicationRequirement)
 		factory.NewDEAApplicationRequirementReturns(deaApplicationRequirement)
 		app := models.Application{}
 		app.InstanceCount = 1
-		app.Guid = "app-guid"
+		app.GUID = "app-guid"
 		app.Name = "app-name"
 		deaApplicationRequirement.GetApplicationReturns(app)
 	})

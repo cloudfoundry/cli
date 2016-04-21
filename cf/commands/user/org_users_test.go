@@ -1,11 +1,11 @@
 package user_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -21,29 +21,29 @@ var _ = Describe("org-users command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		userRepo            *testapi.FakeUserRepository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		userRepo            *apifakes.FakeUserRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("org-users").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("org-users").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		userRepo = &testapi.FakeUserRepository{}
+		userRepo = new(apifakes.FakeUserRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		deps = command_registry.NewDependency(new(fakes.FakePrinter))
+		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("org-users", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("org-users", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -68,7 +68,7 @@ var _ = Describe("org-users command", func() {
 		BeforeEach(func() {
 			org := models.Organization{}
 			org.Name = "the-org"
-			org.Guid = "the-org-guid"
+			org.GUID = "the-org-guid"
 
 			user1 = models.UserFields{}
 			user1.Username = "user1"
@@ -94,8 +94,8 @@ var _ = Describe("org-users command", func() {
 
 				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
 				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
-					orgGuid, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
-					Expect(orgGuid).To(Equal("the-org-guid"))
+					orgGUID, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
+					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
 				}
 
@@ -126,8 +126,8 @@ var _ = Describe("org-users command", func() {
 
 				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
 				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
-					orgGuid, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
-					Expect(orgGuid).To(Equal("the-org-guid"))
+					orgGUID, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
+					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
 				}
 
@@ -158,8 +158,8 @@ var _ = Describe("org-users command", func() {
 
 				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
 				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
-					orgGuid, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
-					Expect(orgGuid).To(Equal("the-org-guid"))
+					orgGUID, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
+					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
 				}
 				Expect(ui.Outputs).To(BeInDisplayOrder(
@@ -180,7 +180,7 @@ var _ = Describe("org-users command", func() {
 		BeforeEach(func() {
 			org := models.Organization{}
 			org.Name = "the-org"
-			org.Guid = "the-org-guid"
+			org.GUID = "the-org-guid"
 
 			user := models.UserFields{Username: "user1"}
 			user2 := models.UserFields{Username: "user2"}
@@ -202,8 +202,8 @@ var _ = Describe("org-users command", func() {
 		It("shows the special users in the given org", func() {
 			runCommand("the-org")
 
-			orgGuid, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
-			Expect(orgGuid).To(Equal("the-org-guid"))
+			orgGUID, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
+			Expect(orgGUID).To(Equal("the-org-guid"))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting users in org", "the-org", "my-user"},
 				[]string{"ORG MANAGER"},
@@ -231,8 +231,8 @@ var _ = Describe("org-users command", func() {
 			It("lists all org users, regardless of role", func() {
 				runCommand("-a", "the-org")
 
-				orgGuid, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
-				Expect(orgGuid).To(Equal("the-org-guid"))
+				orgGUID, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
+				Expect(orgGUID).To(Equal("the-org-guid"))
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"USERS"},
@@ -244,7 +244,7 @@ var _ = Describe("org-users command", func() {
 
 		Context("when cc api verson is >= 2.21.0", func() {
 			It("calls ListUsersInOrgForRoleWithNoUAA()", func() {
-				configRepo.SetApiVersion("2.22.0")
+				configRepo.SetAPIVersion("2.22.0")
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleWithNoUAACallCount()).To(BeNumerically(">=", 1))
@@ -254,7 +254,7 @@ var _ = Describe("org-users command", func() {
 
 		Context("when cc api verson is < 2.21.0", func() {
 			It("calls ListUsersInOrgForRole()", func() {
-				configRepo.SetApiVersion("2.20.0")
+				configRepo.SetAPIVersion("2.20.0")
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleWithNoUAACallCount()).To(Equal(0))
@@ -269,7 +269,7 @@ var _ = Describe("org-users command", func() {
 		)
 
 		BeforeEach(func() {
-			configRepo.SetApiVersion("2.22.0")
+			configRepo.SetAPIVersion("2.22.0")
 		})
 
 		Context("single roles", func() {
@@ -277,26 +277,26 @@ var _ = Describe("org-users command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "the-org"
-				org.Guid = "the-org-guid"
+				org.GUID = "the-org-guid"
 
 				// org managers
 				user := models.UserFields{}
 				user.Username = "user1"
-				user.Guid = "1111"
+				user.GUID = "1111"
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
-				user2.Guid = "2222"
+				user2.GUID = "2222"
 
 				// billing manager
 				user3 := models.UserFields{}
 				user3.Username = "user3"
-				user3.Guid = "3333"
+				user3.GUID = "3333"
 
 				// auditors
 				user4 := models.UserFields{}
 				user4.Username = "user4"
-				user4.Guid = "4444"
+				user4.GUID = "4444"
 
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
@@ -315,7 +315,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles", func() {
-				testcmd.RunCliCommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginUserModel).To(HaveLen(4))
 
 				for _, u := range pluginUserModel {
@@ -340,7 +340,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with single roles -a flag", func() {
-				testcmd.RunCliCommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginUserModel).To(HaveLen(1))
 				Expect(pluginUserModel[0].Username).To(Equal("user3"))
 				Expect(pluginUserModel[0].Guid).To(Equal("3333"))
@@ -354,27 +354,27 @@ var _ = Describe("org-users command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "the-org"
-				org.Guid = "the-org-guid"
+				org.GUID = "the-org-guid"
 
 				// org managers
 				user := models.UserFields{}
 				user.Username = "user1"
-				user.Guid = "1111"
+				user.GUID = "1111"
 				user.IsAdmin = true
 
 				user2 := models.UserFields{}
 				user2.Username = "user2"
-				user2.Guid = "2222"
+				user2.GUID = "2222"
 
 				// billing manager
 				user3 := models.UserFields{}
 				user3.Username = "user3"
-				user3.Guid = "3333"
+				user3.GUID = "3333"
 
 				// auditors
 				user4 := models.UserFields{}
 				user4.Username = "user4"
-				user4.Guid = "4444"
+				user4.GUID = "4444"
 
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
@@ -393,7 +393,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles", func() {
-				testcmd.RunCliCommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"the-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {
@@ -419,7 +419,7 @@ var _ = Describe("org-users command", func() {
 			})
 
 			It("populates the plugin model with users with multiple roles -a flag", func() {
-				testcmd.RunCliCommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("org-users", []string{"-a", "the-org"}, requirementsFactory, updateCommandDependency, true)
 
 				Expect(pluginUserModel).To(HaveLen(4))
 				for _, u := range pluginUserModel {

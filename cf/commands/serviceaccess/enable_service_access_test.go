@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/actors"
-	testactor "github.com/cloudfoundry/cli/cf/actors/fakes"
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -21,31 +21,31 @@ import (
 var _ = Describe("enable-service-access command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		actor               *testactor.FakeServicePlanActor
+		actor               *actorsfakes.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
 		deps.ServicePlanHandler = actor
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("enable-service-access").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("enable-service-access").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		actor = &testactor.FakeServicePlanActor{}
+		actor = new(actorsfakes.FakeServicePlanActor)
 		configRepo = configuration.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		tokenRefresher = &authenticationfakes.FakeAuthenticationRepository{}
+		tokenRefresher = new(authenticationfakes.FakeAuthenticationRepository)
 	})
 
 	runCommand := func(args []string) bool {
-		return testcmd.RunCliCommand("enable-service-access", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("enable-service-access", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {

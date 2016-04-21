@@ -12,6 +12,7 @@ import (
 )
 
 //go:generate counterfeiter . RequestDumperInterface
+
 type RequestDumperInterface interface {
 	DumpRequest(*http.Request)
 	DumpResponse(*http.Response)

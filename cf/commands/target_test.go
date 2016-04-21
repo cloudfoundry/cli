@@ -2,10 +2,10 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/flags"
@@ -23,20 +23,20 @@ import (
 
 var _ = Describe("target command", func() {
 	var (
-		orgRepo             *fake_org.FakeOrganizationRepository
-		spaceRepo           *testapi.FakeSpaceRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
 		requirementsFactory *testreq.FakeReqFactory
-		config              core_config.Repository
+		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("target").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("target").SetDependency(deps, pluginCall))
 	}
 
 	listSpacesStub := func(spaces []models.Space) func(func(models.Space) bool) error {
@@ -54,19 +54,19 @@ var _ = Describe("target command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		orgRepo = &fake_org.FakeOrganizationRepository{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		requirementsFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory.ApiEndpointSuccess = true
+		requirementsFactory.APIEndpointSuccess = true
 	})
 
 	var callTarget = func(args []string) bool {
-		return testcmd.RunCliCommand("target", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("target", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when there are too many arguments given", func() {
-		var cmd command_registry.Command
+		var cmd commandregistry.Command
 		var flagContext flags.FlagContext
 
 		BeforeEach(func() {
@@ -90,7 +90,7 @@ var _ = Describe("target command", func() {
 
 	Describe("when there is no api endpoint set", func() {
 		BeforeEach(func() {
-			requirementsFactory.ApiEndpointSuccess = false
+			requirementsFactory.APIEndpointSuccess = false
 		})
 
 		It("fails requirements", func() {
@@ -137,7 +137,7 @@ var _ = Describe("target command", func() {
 			BeforeEach(func() {
 				org := models.Organization{}
 				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
+				org.GUID = "my-organization-guid"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				orgRepo.FindByNameReturns(org, nil)
@@ -149,36 +149,36 @@ var _ = Describe("target command", func() {
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 			})
 
 			It("updates the space in the config", func() {
 				space := models.Space{}
 				space.Name = "my-space"
-				space.Guid = "my-space-guid"
+				space.GUID = "my-space-guid"
 
 				spaceRepo.FindByNameReturns(space, nil)
 
 				callTarget([]string{"-s", "my-space"})
 
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 
 			It("updates both the organization and the space in the config", func() {
 				space := models.Space{}
 				space.Name = "my-space"
-				space.Guid = "my-space-guid"
+				space.GUID = "my-space-guid"
 				spaceRepo.FindByNameReturns(space, nil)
 
 				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
@@ -191,10 +191,10 @@ var _ = Describe("target command", func() {
 				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeFalse())
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -207,14 +207,14 @@ var _ = Describe("target command", func() {
 				It("target space automatically ", func() {
 					space := models.Space{}
 					space.Name = "my-space"
-					space.Guid = "my-space-guid"
+					space.GUID = "my-space-guid"
 					spaceRepo.FindByNameReturns(space, nil)
 					spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
 					callTarget([]string{"-o", "my-organization"})
 
-					Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-					Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+					Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+					Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 
 					Expect(ui.ShowConfigurationCalled).To(BeTrue())
 				})
@@ -224,23 +224,23 @@ var _ = Describe("target command", func() {
 			It("not target space automatically for orgs having multiple spaces", func() {
 				space1 := models.Space{}
 				space1.Name = "my-space"
-				space1.Guid = "my-space-guid"
+				space1.GUID = "my-space-guid"
 				space2 := models.Space{}
 				space2.Name = "my-space"
-				space2.Guid = "my-space-guid"
+				space2.GUID = "my-space-guid"
 				spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space1, space2})
 
 				callTarget([]string{"-o", "my-organization"})
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 
 			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-				config.SetMinCliVersion("5.0.0")
-				config.SetMinRecommendedCliVersion("5.5.0")
+				config.SetMinCLIVersion("5.0.0")
+				config.SetMinRecommendedCLIVersion("5.5.0")
 				cf.Version = "4.5.0"
 
 				callTarget([]string{"-o", "my-organization"})
@@ -299,10 +299,10 @@ var _ = Describe("target command", func() {
 					[]string{"Unable to access space", "my-space"},
 				))
 
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 				Expect(ui.ShowConfigurationCalled).To(BeFalse())
 
-				Expect(config.OrganizationFields().Guid).NotTo(BeEmpty())
+				Expect(config.OrganizationFields().GUID).NotTo(BeEmpty())
 				expectSpaceToBeCleared()
 			})
 
@@ -321,7 +321,7 @@ var _ = Describe("target command", func() {
 			It("fails to target the space automatically if is not found", func() {
 				org := models.Organization{}
 				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
+				org.GUID = "my-organization-guid"
 
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				orgRepo.FindByNameReturns(org, nil)
@@ -330,8 +330,8 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-o", "my-organization"})
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
+				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})

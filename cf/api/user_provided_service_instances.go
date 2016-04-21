@@ -5,37 +5,39 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . UserProvidedServiceInstanceRepository
+
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error)
+	Create(name, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error)
 	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)
 	GetSummaries() (models.UserProvidedServiceSummary, error)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCCUserProvidedServiceInstanceRepository(config core_config.Reader, gateway net.Gateway) (repo CCUserProvidedServiceInstanceRepository) {
+func NewCCUserProvidedServiceInstanceRepository(config coreconfig.Reader, gateway net.Gateway) (repo CCUserProvidedServiceInstanceRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, routeServiceUrl string, params map[string]interface{}) (apiErr error) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error) {
 	path := "/v2/user_provided_service_instances"
 
 	jsonBytes, err := json.Marshal(models.UserProvidedService{
 		Name:            name,
 		Credentials:     params,
-		SpaceGuid:       repo.config.SpaceFields().Guid,
-		SysLogDrainUrl:  drainUrl,
-		RouteServiceUrl: routeServiceUrl,
+		SpaceGUID:       repo.config.SpaceFields().GUID,
+		SysLogDrainURL:  drainURL,
+		RouteServiceURL: routeServiceURL,
 	})
 
 	if err != nil {
@@ -43,16 +45,16 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 		return
 	}
 
-	return repo.gateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
-	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.Guid)
+	path := fmt.Sprintf("/v2/user_provided_service_instances/%s", serviceInstanceFields.GUID)
 
 	reqBody := models.UserProvidedService{
 		Credentials:     serviceInstanceFields.Params,
-		SysLogDrainUrl:  serviceInstanceFields.SysLogDrainUrl,
-		RouteServiceUrl: serviceInstanceFields.RouteServiceUrl,
+		SysLogDrainURL:  serviceInstanceFields.SysLogDrainURL,
+		RouteServiceURL: serviceInstanceFields.RouteServiceURL,
 	}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
@@ -60,11 +62,11 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		return
 	}
 
-	return repo.gateway.UpdateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(jsonBytes))
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) GetSummaries() (models.UserProvidedServiceSummary, error) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.APIEndpoint())
 
 	model := models.UserProvidedServiceSummary{}
 

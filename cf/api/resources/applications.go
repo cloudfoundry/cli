@@ -48,37 +48,37 @@ type ApplicationEntity struct {
 	Command              *string                 `json:"command,omitempty"`
 	DetectedStartCommand *string                 `json:"detected_start_command,omitempty"`
 	State                *string                 `json:"state,omitempty"`
-	SpaceGuid            *string                 `json:"space_guid,omitempty"`
+	SpaceGUID            *string                 `json:"space_guid,omitempty"`
 	Instances            *int                    `json:"instances,omitempty"`
 	Memory               *int64                  `json:"memory,omitempty"`
 	DiskQuota            *int64                  `json:"disk_quota,omitempty"`
-	StackGuid            *string                 `json:"stack_guid,omitempty"`
+	StackGUID            *string                 `json:"stack_guid,omitempty"`
 	Stack                *StackResource          `json:"stack,omitempty"`
 	Routes               *[]AppRouteResource     `json:"routes,omitempty"`
 	Buildpack            *string                 `json:"buildpack,omitempty"`
 	DetectedBuildpack    *string                 `json:"detected_buildpack,omitempty"`
-	EnvironmentJson      *map[string]interface{} `json:"environment_json,omitempty"`
+	EnvironmentJSON      *map[string]interface{} `json:"environment_json,omitempty"`
 	HealthCheckType      *string                 `json:"health_check_type,omitempty"`
 	HealthCheckTimeout   *int                    `json:"health_check_timeout,omitempty"`
 	PackageState         *string                 `json:"package_state,omitempty"`
 	StagingFailedReason  *string                 `json:"staging_failed_reason,omitempty"`
 	Diego                *bool                   `json:"diego,omitempty"`
 	DockerImage          *string                 `json:"docker_image,omitempty"`
-	EnableSsh            *bool                   `json:"enable_ssh,omitempty"`
+	EnableSSH            *bool                   `json:"enable_ssh,omitempty"`
 	PackageUpdatedAt     *time.Time              `json:"package_updated_at,omitempty"`
 	AppPorts             *[]int                  `json:"ports,omitempty"`
 }
 
 func (resource AppRouteResource) ToFields() (route models.RouteSummary) {
-	route.Guid = resource.Metadata.Guid
+	route.GUID = resource.Metadata.GUID
 	route.Host = resource.Entity.Host
 	return
 }
 
 func (resource AppRouteResource) ToModel() (route models.RouteSummary) {
-	route.Guid = resource.Metadata.Guid
+	route.GUID = resource.Metadata.GUID
 	route.Host = resource.Entity.Host
-	route.Domain.Guid = resource.Entity.Domain.Metadata.Guid
+	route.Domain.GUID = resource.Entity.Domain.Metadata.GUID
 	route.Domain.Name = resource.Entity.Domain.Entity.Name
 	return
 }
@@ -92,19 +92,19 @@ func (resource AppFileResource) ToIntegrityFields() IntegrityFields {
 
 func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	entity := ApplicationEntity{
-		Buildpack:          app.BuildpackUrl,
+		Buildpack:          app.BuildpackURL,
 		Name:               app.Name,
-		SpaceGuid:          app.SpaceGuid,
+		SpaceGUID:          app.SpaceGUID,
 		Instances:          app.InstanceCount,
 		Memory:             app.Memory,
 		DiskQuota:          app.DiskQuota,
-		StackGuid:          app.StackGuid,
+		StackGUID:          app.StackGUID,
 		Command:            app.Command,
 		HealthCheckType:    app.HealthCheckType,
 		HealthCheckTimeout: app.HealthCheckTimeout,
 		DockerImage:        app.DockerImage,
 		Diego:              app.Diego,
-		EnableSsh:          app.EnableSsh,
+		EnableSSH:          app.EnableSSH,
 		PackageUpdatedAt:   app.PackageUpdatedAt,
 		AppPorts:           app.AppPorts,
 	}
@@ -115,7 +115,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	}
 
 	if app.EnvironmentVars != nil && *app.EnvironmentVars != nil {
-		entity.EnvironmentJson = app.EnvironmentVars
+		entity.EnvironmentJSON = app.EnvironmentVars
 	}
 
 	return entity
@@ -123,7 +123,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 
 func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	entity := resource.Entity
-	app.Guid = resource.Metadata.Guid
+	app.GUID = resource.Metadata.GUID
 
 	if entity.Name != nil {
 		app.Name = *entity.Name
@@ -140,11 +140,11 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.State != nil {
 		app.State = strings.ToLower(*entity.State)
 	}
-	if entity.EnvironmentJson != nil {
-		app.EnvironmentVars = *entity.EnvironmentJson
+	if entity.EnvironmentJSON != nil {
+		app.EnvironmentVars = *entity.EnvironmentJSON
 	}
-	if entity.SpaceGuid != nil {
-		app.SpaceGuid = *entity.SpaceGuid
+	if entity.SpaceGUID != nil {
+		app.SpaceGUID = *entity.SpaceGUID
 	}
 	if entity.DetectedStartCommand != nil {
 		app.DetectedStartCommand = *entity.DetectedStartCommand
@@ -173,8 +173,8 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	if entity.Diego != nil {
 		app.Diego = *entity.Diego
 	}
-	if entity.EnableSsh != nil {
-		app.EnableSsh = *entity.EnableSsh
+	if entity.EnableSSH != nil {
+		app.EnableSSH = *entity.EnableSSH
 	}
 	if entity.PackageUpdatedAt != nil {
 		app.PackageUpdatedAt = entity.PackageUpdatedAt

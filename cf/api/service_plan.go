@@ -6,44 +6,46 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
+//go:generate counterfeiter . ServicePlanRepository
+
 type ServicePlanRepository interface {
 	Search(searchParameters map[string]string) ([]models.ServicePlanFields, error)
 	Update(models.ServicePlanFields, string, bool) error
-	ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error)
+	ListPlansFromManyServices(serviceGUIDs []string) ([]models.ServicePlanFields, error)
 }
 
 type CloudControllerServicePlanRepository struct {
-	config  core_config.Reader
+	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServicePlanRepository(config core_config.Reader, gateway net.Gateway) CloudControllerServicePlanRepository {
+func NewCloudControllerServicePlanRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerServicePlanRepository {
 	return CloudControllerServicePlanRepository{
 		config:  config,
 		gateway: gateway,
 	}
 }
 
-func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGuid string, public bool) error {
+func (repo CloudControllerServicePlanRepository) Update(servicePlan models.ServicePlanFields, serviceGUID string, public bool) error {
 	return repo.gateway.UpdateResource(
-		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/service_plans/%s", servicePlan.Guid),
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("/v2/service_plans/%s", servicePlan.GUID),
 		strings.NewReader(fmt.Sprintf(`{"public":%t}`, public)),
 	)
 }
 
-func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(serviceGuids []string) ([]models.ServicePlanFields, error) {
-	serviceGuidsString := strings.Join(serviceGuids, ",")
+func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(serviceGUIDs []string) ([]models.ServicePlanFields, error) {
+	serviceGUIDsString := strings.Join(serviceGUIDs, ",")
 	plans := []models.ServicePlanFields{}
 
 	err := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		fmt.Sprintf("/v2/service_plans?q=%s", url.QueryEscape("service_guid IN "+serviceGuidsString)),
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("/v2/service_plans?q=%s", url.QueryEscape("service_guid IN "+serviceGUIDsString)),
 		resources.ServicePlanResource{},
 		func(resource interface{}) bool {
 			if plan, ok := resource.(resources.ServicePlanResource); ok {
@@ -56,8 +58,8 @@ func (repo CloudControllerServicePlanRepository) ListPlansFromManyServices(servi
 
 func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]string) (plans []models.ServicePlanFields, err error) {
 	err = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		combineQueryParametersWithUri("/v2/service_plans", queryParams),
+		repo.config.APIEndpoint(),
+		combineQueryParametersWithURI("/v2/service_plans", queryParams),
 		resources.ServicePlanResource{},
 		func(resource interface{}) bool {
 			if sp, ok := resource.(resources.ServicePlanResource); ok {
@@ -68,7 +70,7 @@ func (repo CloudControllerServicePlanRepository) Search(queryParams map[string]s
 	return
 }
 
-func combineQueryParametersWithUri(uri string, queryParams map[string]string) string {
+func combineQueryParametersWithURI(uri string, queryParams map[string]string) string {
 	if len(queryParams) == 0 {
 		return uri
 	}

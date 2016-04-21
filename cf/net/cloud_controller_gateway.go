@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -26,10 +26,10 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 		return errors.NewInvalidTokenError(response.Description)
 	}
 
-	return errors.NewHttpError(statusCode, strconv.Itoa(response.Code), response.Description)
+	return errors.NewHTTPError(statusCode, strconv.Itoa(response.Code), response.Description)
 }
 
-func NewCloudControllerGateway(config core_config.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
+func NewCloudControllerGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
 	gateway := newGateway(cloudControllerErrorHandler, config, ui, logger)
 	gateway.Clock = clock
 	gateway.PollingEnabled = true

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -19,10 +19,10 @@ type UpdateBuildpack struct {
 }
 
 func init() {
-	command_registry.Register(&UpdateBuildpack{})
+	commandregistry.Register(&UpdateBuildpack{})
 }
 
-func (cmd *UpdateBuildpack) MetaData() command_registry.CommandMetadata {
+func (cmd *UpdateBuildpack) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["i"] = &flags.IntFlag{ShortName: "i", Usage: T("The order in which the buildpacks are checked during buildpack auto-detection")}
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Path to directory or zip file")}
@@ -31,7 +31,7 @@ func (cmd *UpdateBuildpack) MetaData() command_registry.CommandMetadata {
 	fs["lock"] = &flags.BoolFlag{Name: "lock", Usage: T("Lock the buildpack to prevent updates")}
 	fs["unlock"] = &flags.BoolFlag{Name: "unlock", Usage: T("Unlock the buildpack to enable updates")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "update-buildpack",
 		Description: T("Update a buildpack"),
 		Usage: []string{
@@ -45,7 +45,7 @@ func (cmd *UpdateBuildpack) MetaData() command_registry.CommandMetadata {
 
 func (cmd *UpdateBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("update-buildpack"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-buildpack"))
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
@@ -59,8 +59,8 @@ func (cmd *UpdateBuildpack) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *UpdateBuildpack) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *UpdateBuildpack) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
 	cmd.buildpackBitsRepo = deps.RepoLocator.GetBuildpackBitsRepository()
 	return cmd

@@ -6,22 +6,22 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/configuration/plugin_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/panic_printer"
+	"github.com/cloudfoundry/cli/cf/panicprinter"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/trace"
-	"github.com/cloudfoundry/cli/commands_loader"
+	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 )
 
-var cmdRegistry = command_registry.Commands
+var cmdRegistry = commandregistry.Commands
 
 func main() {
 	traceEnv := os.Getenv("CF_TRACE")
@@ -53,20 +53,20 @@ func main() {
 	}
 
 	// Only used to get Trace, so our errorHandler doesn't matter, since it's not used
-	config := core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), errFunc)
+	config := coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errFunc)
 	defer config.Close()
 
 	traceConfigVal := config.Trace()
 
 	traceLogger = trace.NewLogger(isVerbose, traceEnv, traceConfigVal)
 
-	deps := command_registry.NewDependency(traceLogger)
+	deps := commandregistry.NewDependency(traceLogger)
 	defer handlePanics(deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 
 	//handle `cf --build`
 	if len(os.Args) == 2 && (os.Args[1] == "--build" || os.Args[1] == "-b") {
-		deps.Ui.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
+		deps.UI.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
 			map[string]interface{}{
 				"CFName":    os.Args[0],
 				"GoVersion": runtime.Version(),
@@ -79,9 +79,9 @@ func main() {
 		warningProducers = append(warningProducers, warningProducer)
 	}
 
-	warningsCollector := net.NewWarningsCollector(deps.Ui, warningProducers...)
+	warningsCollector := net.NewWarningsCollector(deps.UI, warningProducers...)
 
-	commands_loader.Load()
+	commandsloader.Load()
 
 	//run core command
 	cmdName := os.Args[1]
@@ -95,7 +95,7 @@ func main() {
 		err := flagContext.Parse(cmdArgs...)
 		if err != nil {
 			usage := cmdRegistry.CommandUsage(cmdName)
-			deps.Ui.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
+			deps.UI.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
 		}
 
 		cmd = cmd.SetDependency(deps, false)
@@ -107,7 +107,7 @@ func main() {
 		for _, req := range reqs {
 			err = req.Execute()
 			if err != nil {
-				deps.Ui.Failed(err.Error())
+				deps.UI.Failed(err.Error())
 			}
 		}
 
@@ -121,31 +121,31 @@ func main() {
 	//non core command, try plugin command
 	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger)
 	if err != nil {
-		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
+		deps.UI.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)
 	}
 
-	pluginConfig := plugin_config.NewPluginConfig(func(err error) {
-		deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
+	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
+		deps.UI.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
 	})
 	pluginList := pluginConfig.Plugins()
 
 	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
 	if !ran {
-		deps.Ui.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
+		deps.UI.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
 		os.Exit(1)
 	}
 
 }
 
 func handlePanics(printer terminal.Printer, logger trace.Printer) {
-	panic_printer.UI = terminal.NewUI(os.Stdin, printer, logger)
+	panicprinter.UI = terminal.NewUI(os.Stdin, printer, logger)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()
 
 	err := recover()
-	panic_printer.DisplayCrashDialog(err, commandArgs, stackTrace)
+	panicprinter.DisplayCrashDialog(err, commandArgs, stackTrace)
 
 	if err != nil {
 		os.Exit(1)

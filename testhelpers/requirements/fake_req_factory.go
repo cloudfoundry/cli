@@ -19,7 +19,7 @@ type FakeReqFactory struct {
 	ApplicationFails             bool
 	LoginSuccess                 bool
 	RoutingAPIEndpointSuccess    bool
-	ApiEndpointSuccess           bool
+	APIEndpointSuccess           bool
 	ValidAccessTokenSuccess      bool
 	TargetedSpaceSuccess         bool
 	TargetedOrgSuccess           bool
@@ -64,6 +64,10 @@ func (f *FakeReqFactory) NewDEAApplicationRequirement(name string) requirements.
 	return FakeRequirement{f, false}
 }
 
+func (f *FakeReqFactory) NewDiegoApplicationRequirement(name string) requirements.DiegoApplicationRequirement {
+	return FakeRequirement{f, false}
+}
+
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
 	f.ApplicationName = name
 	return FakeRequirement{f, !f.ApplicationFails}
@@ -75,6 +79,10 @@ func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements
 }
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
+	return FakeRequirement{f, f.LoginSuccess}
+}
+
+func (f *FakeReqFactory) NewUsageRequirement(requirements.Usable, string, func() bool) requirements.Requirement {
 	return FakeRequirement{f, f.LoginSuccess}
 }
 
@@ -105,7 +113,7 @@ func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRe
 	return FakeRequirement{f, true}
 }
 
-func (f *FakeReqFactory) NewUserRequirement(username string, wantGuid bool) requirements.UserRequirement {
+func (f *FakeReqFactory) NewUserRequirement(username string, wantGUID bool) requirements.UserRequirement {
 	f.UserUsername = username
 	return FakeRequirement{f, !f.UserRequirementFails}
 }
@@ -115,8 +123,8 @@ func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.
 	return FakeRequirement{f, f.BuildpackSuccess}
 }
 
-func (f *FakeReqFactory) NewApiEndpointRequirement() requirements.Requirement {
-	return FakeRequirement{f, f.ApiEndpointSuccess}
+func (f *FakeReqFactory) NewAPIEndpointRequirement() requirements.Requirement {
+	return FakeRequirement{f, f.APIEndpointSuccess}
 }
 
 func (f *FakeReqFactory) NewMinAPIVersionRequirement(featureName string, requiredVersion semver.Version) requirements.Requirement {

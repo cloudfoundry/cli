@@ -1,13 +1,13 @@
 package space_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakeflag "github.com/cloudfoundry/cli/cf/api/feature_flags/fakes"
-	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -26,19 +26,19 @@ var _ = Describe("create-space command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configOrg           models.OrganizationFields
-		configRepo          core_config.Repository
-		spaceRepo           *testapi.FakeSpaceRepository
-		orgRepo             *fake_org.FakeOrganizationRepository
-		userRepo            *testapi.FakeUserRepository
+		configRepo          coreconfig.Repository
+		spaceRepo           *apifakes.FakeSpaceRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
+		userRepo            *apifakes.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
-		flagRepo            *fakeflag.FakeFeatureFlagRepository
-		spaceQuotaRepo      *fakes.FakeSpaceQuotaRepository
-		OriginalCommand     command_registry.Command
-		deps                command_registry.Dependency
+		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
+		spaceQuotaRepo      *spacequotasfakes.FakeSpaceQuotaRepository
+		OriginalCommand     commandregistry.Command
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(spaceQuotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
@@ -47,41 +47,41 @@ var _ = Describe("create-space command", func() {
 		deps.Config = configRepo
 
 		//inject fake 'command dependency' into registry
-		command_registry.Register(spaceRoleSetter)
+		commandregistry.Register(spaceRoleSetter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-space").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-space").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-space", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		orgRepo = &fake_org.FakeOrganizationRepository{}
-		userRepo = &testapi.FakeUserRepository{}
-		spaceRoleSetter = command_registry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
-		spaceQuotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		flagRepo = &fakeflag.FakeFeatureFlagRepository{}
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
+		userRepo = new(apifakes.FakeUserRepository)
+		spaceRoleSetter = commandregistry.Commands.FindCommand("set-space-role").(user.SpaceRoleSetter)
+		spaceQuotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
+		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		configOrg = models.OrganizationFields{
 			Name: "my-org",
-			Guid: "my-org-guid",
+			GUID: "my-org-guid",
 		}
 
 		//save original command and restore later
-		OriginalCommand = command_registry.Commands.FindCommand("set-space-role")
+		OriginalCommand = commandregistry.Commands.FindCommand("set-space-role")
 
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 		space := maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid", "organization": configOrg})
 		spaceRepo.CreateReturns(space, nil)
 	})
 
 	AfterEach(func() {
-		command_registry.Register(OriginalCommand)
+		commandregistry.Register(OriginalCommand)
 	})
 
 	Describe("Requirements", func() {
@@ -127,15 +127,15 @@ var _ = Describe("create-space command", func() {
 		Expect(name).To(Equal("my-space"))
 		Expect(orgGUID).To(Equal("my-org-guid"))
 
-		userGuid, spaceGuid, orgGuid, role := userRepo.SetSpaceRoleByGuidArgsForCall(0)
-		Expect(userGuid).To(Equal("my-user-guid"))
-		Expect(spaceGuid).To(Equal("my-space-guid"))
-		Expect(orgGuid).To(Equal("my-org-guid"))
+		userGUID, spaceGUID, orgGUID, role := userRepo.SetSpaceRoleByGUIDArgsForCall(0)
+		Expect(userGUID).To(Equal("my-user-guid"))
+		Expect(spaceGUID).To(Equal("my-space-guid"))
+		Expect(orgGUID).To(Equal("my-org-guid"))
 		Expect(role).To(Equal(models.SPACE_MANAGER))
 	})
 
 	It("warns the user when a space with that name already exists", func() {
-		spaceRepo.CreateReturns(models.Space{}, errors.NewHttpError(400, errors.SpaceNameTaken, "Space already exists"))
+		spaceRepo.CreateReturns(models.Space{}, errors.NewHTTPError(400, errors.SpaceNameTaken, "Space already exists"))
 		runCommand("my-space")
 
 		Expect(ui.Outputs).To(ContainSubstrings(
@@ -150,7 +150,7 @@ var _ = Describe("create-space command", func() {
 		Expect(spaceRepo.CreateCallCount()).To(Equal(1))
 		actualSpaceName, _, _ := spaceRepo.CreateArgsForCall(0)
 		Expect(actualSpaceName).To(Equal("my-space"))
-		Expect(userRepo.SetSpaceRoleByGuidCallCount()).To(BeZero())
+		Expect(userRepo.SetSpaceRoleByGUIDCallCount()).To(BeZero())
 	})
 
 	Context("when the -o flag is provided", func() {
@@ -158,7 +158,7 @@ var _ = Describe("create-space command", func() {
 			org := models.Organization{
 				OrganizationFields: models.OrganizationFields{
 					Name: "other-org",
-					Guid: "org-guid-1",
+					GUID: "org-guid-1",
 				}}
 			orgRepo.FindByNameReturns(org, nil)
 
@@ -174,12 +174,12 @@ var _ = Describe("create-space command", func() {
 
 			actualSpaceName, actualOrgGUID, _ := spaceRepo.CreateArgsForCall(0)
 			Expect(actualSpaceName).To(Equal("my-space"))
-			Expect(actualOrgGUID).To(Equal(org.Guid))
+			Expect(actualOrgGUID).To(Equal(org.GUID))
 
-			userGuid, spaceGuid, orgGuid, role := userRepo.SetSpaceRoleByGuidArgsForCall(0)
-			Expect(userGuid).To(Equal("my-user-guid"))
-			Expect(spaceGuid).To(Equal("my-space-guid"))
-			Expect(orgGuid).To(Equal("my-org-guid"))
+			userGUID, spaceGUID, orgGUID, role := userRepo.SetSpaceRoleByGUIDArgsForCall(0)
+			Expect(userGUID).To(Equal("my-user-guid"))
+			Expect(spaceGUID).To(Equal("my-space-guid"))
+			Expect(orgGUID).To(Equal("my-org-guid"))
 			Expect(role).To(Equal(models.SPACE_MANAGER))
 		})
 
@@ -212,23 +212,23 @@ var _ = Describe("create-space command", func() {
 		It("assigns the space-quota specified to the space", func() {
 			spaceQuota := models.SpaceQuota{
 				Name: "my-space-quota",
-				Guid: "my-space-quota-guid",
+				GUID: "my-space-quota-guid",
 			}
-			spaceQuotaRepo.FindByNameAndOrgGuidReturns(spaceQuota, nil)
+			spaceQuotaRepo.FindByNameAndOrgGUIDReturns(spaceQuota, nil)
 			runCommand("-q", "my-space-quota", "my-space")
 
-			spaceQuotaName, orgGuid := spaceQuotaRepo.FindByNameAndOrgGuidArgsForCall(0)
+			spaceQuotaName, orgGUID := spaceQuotaRepo.FindByNameAndOrgGUIDArgsForCall(0)
 
 			Expect(spaceQuotaName).To(Equal(spaceQuota.Name))
-			Expect(orgGuid).To(Equal(configOrg.Guid))
+			Expect(orgGUID).To(Equal(configOrg.GUID))
 
 			_, _, actualSpaceQuotaGUID := spaceRepo.CreateArgsForCall(0)
-			Expect(actualSpaceQuotaGUID).To(Equal(spaceQuota.Guid))
+			Expect(actualSpaceQuotaGUID).To(Equal(spaceQuota.GUID))
 		})
 
 		Context("when the space-quota provided does not exist", func() {
 			It("fails", func() {
-				spaceQuotaRepo.FindByNameAndOrgGuidReturns(models.SpaceQuota{}, errors.New("Error"))
+				spaceQuotaRepo.FindByNameAndOrgGUIDReturns(models.SpaceQuota{}, errors.New("Error"))
 				runCommand("-q", "my-space-quota", "my-space")
 
 				Expect(ui.Outputs).To(ContainSubstrings(
@@ -244,28 +244,28 @@ var _ = Describe("create-space command", func() {
 			org := models.Organization{
 				OrganizationFields: models.OrganizationFields{
 					Name: "other-org",
-					Guid: "other-org-guid",
+					GUID: "other-org-guid",
 				}}
 			orgRepo.FindByNameReturns(org, nil)
 
 			spaceQuota := models.SpaceQuota{
 				Name: "my-space-quota",
-				Guid: "my-space-quota-guid",
+				GUID: "my-space-quota-guid",
 			}
-			spaceQuotaRepo.FindByNameAndOrgGuidReturns(spaceQuota, nil)
+			spaceQuotaRepo.FindByNameAndOrgGUIDReturns(spaceQuota, nil)
 		})
 
 		It("assigns the space-quota from the specified org to the space", func() {
 			runCommand("my-space", "-o", "other-org", "-q", "my-space-quota")
 
 			Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("other-org"))
-			spaceName, orgGuid := spaceQuotaRepo.FindByNameAndOrgGuidArgsForCall(0)
+			spaceName, orgGUID := spaceQuotaRepo.FindByNameAndOrgGUIDArgsForCall(0)
 			Expect(spaceName).To(Equal("my-space-quota"))
-			Expect(orgGuid).To(Equal("other-org-guid"))
+			Expect(orgGUID).To(Equal("other-org-guid"))
 
-			actualSpaceName, actualOrgGuid, actualSpaceQuotaGUID := spaceRepo.CreateArgsForCall(0)
+			actualSpaceName, actualOrgGUID, actualSpaceQuotaGUID := spaceRepo.CreateArgsForCall(0)
 			Expect(actualSpaceName).To(Equal("my-space"))
-			Expect(actualOrgGuid).To(Equal("other-org-guid"))
+			Expect(actualOrgGUID).To(Equal("other-org-guid"))
 			Expect(actualSpaceQuotaGUID).To(Equal("my-space-quota-guid"))
 		})
 	})

@@ -1,9 +1,9 @@
 package logs_test
 
 import (
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -21,7 +21,7 @@ var _ = Describe("loggregator logs repository", func() {
 	var (
 		fakeConsumer *logsfakes.FakeLoggregatorConsumer
 		logsRepo     *LoggregatorLogsRepository
-		configRepo   core_config.ReadWriter
+		configRepo   coreconfig.ReadWriter
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
 	)
 

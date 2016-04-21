@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,17 +20,17 @@ var _ = Describe("delete-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		serviceRepo         *testapi.FakeServiceRepository
+		serviceRepo         *apifakes.FakeServiceRepository
 		serviceInstance     models.ServiceInstance
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-service").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-service").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -39,14 +39,14 @@ var _ = Describe("delete-service command", func() {
 		}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		serviceRepo = &testapi.FakeServiceRepository{}
+		serviceRepo = new(apifakes.FakeServiceRepository)
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess: true,
 		}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-service", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when not logged in", func() {
@@ -76,7 +76,7 @@ var _ = Describe("delete-service command", func() {
 				BeforeEach(func() {
 					serviceInstance = models.ServiceInstance{}
 					serviceInstance.Name = "my-service"
-					serviceInstance.Guid = "my-service-guid"
+					serviceInstance.GUID = "my-service-guid"
 					serviceInstance.LastOperation.Type = "delete"
 					serviceInstance.LastOperation.State = "in progress"
 					serviceInstance.LastOperation.Description = "delete"
@@ -115,7 +115,7 @@ var _ = Describe("delete-service command", func() {
 				BeforeEach(func() {
 					serviceInstance = models.ServiceInstance{}
 					serviceInstance.Name = "my-service"
-					serviceInstance.Guid = "my-service-guid"
+					serviceInstance.GUID = "my-service-guid"
 					serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 				})
 

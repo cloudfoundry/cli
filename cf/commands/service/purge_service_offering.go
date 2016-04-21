@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -18,15 +18,15 @@ type PurgeServiceOffering struct {
 }
 
 func init() {
-	command_registry.Register(&PurgeServiceOffering{})
+	commandregistry.Register(&PurgeServiceOffering{})
 }
 
-func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
+func (cmd *PurgeServiceOffering) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
 	fs["p"] = &flags.StringFlag{ShortName: "p", Usage: T("Provider")}
 
-	return command_registry.CommandMetadata{
+	return commandregistry.CommandMetadata{
 		Name:        "purge-service-offering",
 		Description: T("Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"),
 		Usage: []string{
@@ -40,7 +40,7 @@ func (cmd *PurgeServiceOffering) MetaData() command_registry.CommandMetadata {
 
 func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + command_registry.Commands.CommandUsage("purge-service-offering"))
+		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("purge-service-offering"))
 	}
 
 	reqs := []requirements.Requirement{
@@ -58,8 +58,8 @@ func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.F
 	return reqs
 }
 
-func (cmd *PurgeServiceOffering) SetDependency(deps command_registry.Dependency, pluginCall bool) command_registry.Command {
-	cmd.ui = deps.Ui
+func (cmd *PurgeServiceOffering) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+	cmd.ui = deps.UI
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	return cmd
 }

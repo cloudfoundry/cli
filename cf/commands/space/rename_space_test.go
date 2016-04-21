@@ -1,9 +1,9 @@
 package space_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,28 +18,28 @@ import (
 var _ = Describe("rename-space command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		configRepo          core_config.Repository
+		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		spaceRepo           *testapi.FakeSpaceRepository
-		deps                command_registry.Dependency
+		spaceRepo           *apifakes.FakeSpaceRepository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("rename-space").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("rename-space").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		spaceRepo = &testapi.FakeSpaceRepository{}
+		spaceRepo = new(apifakes.FakeSpaceRepository)
 	})
 
 	var callRenameSpace = func(args []string) bool {
-		return testcmd.RunCliCommand("rename-space", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-space", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("when the user is not logged in", func() {
@@ -71,7 +71,7 @@ var _ = Describe("rename-space command", func() {
 		BeforeEach(func() {
 			space := models.Space{}
 			space.Name = "the-old-space-name"
-			space.Guid = "the-old-space-guid"
+			space.GUID = "the-old-space-guid"
 			requirementsFactory.Space = space
 		})
 

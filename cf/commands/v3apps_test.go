@@ -3,17 +3,17 @@ package commands_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/v3/models"
-	fakerepository "github.com/cloudfoundry/cli/cf/v3/repository/fakes"
+	"github.com/cloudfoundry/cli/cf/v3/repository/repositoryfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -26,13 +26,13 @@ import (
 var _ = Describe("V3Apps", func() {
 	var (
 		ui         *testterm.FakeUI
-		routeRepo  *fakeapi.FakeRouteRepository
-		configRepo core_config.Repository
-		repository *fakerepository.FakeRepository
+		routeRepo  *apifakes.FakeRouteRepository
+		configRepo coreconfig.Repository
+		repository *repositoryfakes.FakeRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
@@ -42,14 +42,14 @@ var _ = Describe("V3Apps", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 
-		routeRepo = &fakeapi.FakeRouteRepository{}
+		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
-		repository = &fakerepository.FakeRepository{}
+		repository = new(repositoryfakes.FakeRepository)
 		repoLocator = repoLocator.SetV3Repository(repository)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -59,7 +59,7 @@ var _ = Describe("V3Apps", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{}
 		factory.NewLoginRequirementReturns(loginRequirement)

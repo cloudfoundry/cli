@@ -3,15 +3,15 @@ package commands_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -23,13 +23,13 @@ import (
 var _ = Describe("OneTimeSSHCode", func() {
 	var (
 		ui           *testterm.FakeUI
-		configRepo   core_config.Repository
+		configRepo   coreconfig.Repository
 		authRepo     *authenticationfakes.FakeAuthenticationRepository
-		endpointRepo *testapi.FakeEndpointRepository
+		endpointRepo *coreconfigfakes.FakeEndpointRepository
 
-		cmd         command_registry.Command
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		cmd         commandregistry.Command
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		endpointRequirement requirements.Requirement
@@ -39,14 +39,14 @@ var _ = Describe("OneTimeSSHCode", func() {
 		ui = &testterm.FakeUI{}
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		configRepo.SetApiEndpoint("fake-api-endpoint")
-		endpointRepo = &testapi.FakeEndpointRepository{}
+		configRepo.SetAPIEndpoint("fake-api-endpoint")
+		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 		repoLocator := deps.RepoLocator.SetEndpointRepository(endpointRepo)
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		repoLocator = repoLocator.SetAuthenticationRepository(authRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -56,16 +56,16 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 
 		endpointRequirement = &passingRequirement{Name: "endpoint-requirement"}
-		factory.NewApiEndpointRequirementReturns(endpointRequirement)
+		factory.NewAPIEndpointRequirementReturns(endpointRequirement)
 	})
 
 	Describe("Requirements", func() {
 		It("returns an EndpointRequirement", func() {
 			actualRequirements := cmd.Requirements(factory, flagContext)
-			Expect(factory.NewApiEndpointRequirementCallCount()).To(Equal(1))
+			Expect(factory.NewAPIEndpointRequirementCallCount()).To(Equal(1))
 			Expect(actualRequirements).To(ContainElement(endpointRequirement))
 		})
 
@@ -95,17 +95,38 @@ var _ = Describe("OneTimeSSHCode", func() {
 	Describe("Execute", func() {
 		BeforeEach(func() {
 			cmd.Requirements(factory, flagContext)
+
+			endpointRepo.GetCCInfoReturns(
+				&coreconfig.CCInfo{
+					LoggregatorEndpoint: "loggregator/endpoint",
+				},
+				"some-endpoint",
+				nil,
+			)
 		})
 
 		It("tries to update the endpoint", func() {
 			cmd.Execute(flagContext)
-			Expect(endpointRepo.UpdateEndpointCallCount()).To(Equal(1))
-			Expect(endpointRepo.UpdateEndpointArgsForCall(0)).To(Equal("fake-api-endpoint"))
+			Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
+			Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("fake-api-endpoint"))
 		})
 
 		Context("when updating the endpoint succeeds", func() {
+			ccInfo := &coreconfig.CCInfo{
+				APIVersion:               "some-version",
+				AuthorizationEndpoint:    "auth/endpoint",
+				LoggregatorEndpoint:      "loggregator/endpoint",
+				MinCLIVersion:            "min-cli-version",
+				MinRecommendedCLIVersion: "min-rec-cli-version",
+				SSHOAuthClient:           "some-client",
+				RoutingAPIEndpoint:       "routing/endpoint",
+			}
 			BeforeEach(func() {
-				endpointRepo.UpdateEndpointReturns("updated-endpoint", nil)
+				endpointRepo.GetCCInfoReturns(
+					ccInfo,
+					"updated-endpoint",
+					nil,
+				)
 			})
 
 			It("tries to refresh the auth token", func() {

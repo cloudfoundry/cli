@@ -1,9 +1,9 @@
 package domain_test
 
 import (
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -20,27 +20,27 @@ var _ = Describe("create domain command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		domainRepo          *testapi.FakeDomainRepository
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		domainRepo          *apifakes.FakeDomainRepository
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("create-domain").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-domain").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		domainRepo = &testapi.FakeDomainRepository{}
-		configRepo = testconfig.NewRepositoryWithAccessToken(core_config.TokenInfo{Username: "my-user"})
+		domainRepo = new(apifakes.FakeDomainRepository)
+		configRepo = testconfig.NewRepositoryWithAccessToken(coreconfig.TokenInfo{Username: "my-user"})
 	})
 
 	runCommand := func(args ...string) bool {
 		ui = new(testterm.FakeUI)
-		return testcmd.RunCliCommand("create-domain", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-domain", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails with usage", func() {
@@ -77,7 +77,7 @@ var _ = Describe("create domain command", func() {
 	It("creates a domain", func() {
 		org := models.Organization{}
 		org.Name = "myOrg"
-		org.Guid = "myOrg-guid"
+		org.GUID = "myOrg-guid"
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 		runCommand("myOrg", "example.com")
 

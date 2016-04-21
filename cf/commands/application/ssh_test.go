@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	cmdFakes "github.com/cloudfoundry/cli/cf/commands/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/commands/commandsfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	testssh "github.com/cloudfoundry/cli/cf/ssh/fakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway"
+	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
+	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -28,15 +28,15 @@ var _ = Describe("SSH command", func() {
 	var (
 		ui *testterm.FakeUI
 
-		sshCodeGetter         *cmdFakes.FakeSSHCodeGetter
-		originalSSHCodeGetter command_registry.Command
+		sshCodeGetter         *commandsfakes.FakeSSHCodeGetter
+		originalSSHCodeGetter commandregistry.Command
 
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 		ccGateway           net.Gateway
 
-		fakeSecureShell *testssh.FakeSecureShell
+		fakeSecureShell *sshfakes.FakeSecureShell
 	)
 
 	BeforeEach(func() {
@@ -46,34 +46,34 @@ var _ = Describe("SSH command", func() {
 		deps.Gateways = make(map[string]net.Gateway)
 
 		//save original command and restore later
-		originalSSHCodeGetter = command_registry.Commands.FindCommand("ssh-code")
+		originalSSHCodeGetter = commandregistry.Commands.FindCommand("ssh-code")
 
-		sshCodeGetter = &cmdFakes.FakeSSHCodeGetter{}
+		sshCodeGetter = new(commandsfakes.FakeSSHCodeGetter)
 
-		//setup fakes to correctly interact with command_registry
-		sshCodeGetter.SetDependencyStub = func(_ command_registry.Dependency, _ bool) command_registry.Command {
+		//setup fakes to correctly interact with commandregistry
+		sshCodeGetter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return sshCodeGetter
 		}
-		sshCodeGetter.MetaDataReturns(command_registry.CommandMetadata{Name: "ssh-code"})
+		sshCodeGetter.MetaDataReturns(commandregistry.CommandMetadata{Name: "ssh-code"})
 	})
 
 	AfterEach(func() {
 		//restore original command
-		command_registry.Register(originalSSHCodeGetter)
+		commandregistry.Register(originalSSHCodeGetter)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 
 		//inject fake 'sshCodeGetter' into registry
-		command_registry.Register(sshCodeGetter)
+		commandregistry.Register(sshCodeGetter)
 
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("ssh").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("ssh").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("ssh", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("ssh", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("Requirements", func() {
@@ -160,8 +160,8 @@ var _ = Describe("SSH command", func() {
 			currentApp = models.Application{}
 			currentApp.Name = "my-app"
 			currentApp.State = "started"
-			currentApp.Guid = "my-app-guid"
-			currentApp.EnableSsh = true
+			currentApp.GUID = "my-app-guid"
+			currentApp.EnableSSH = true
 			currentApp.Diego = true
 
 			requirementsFactory.Application = currentApp
@@ -179,7 +179,7 @@ var _ = Describe("SSH command", func() {
 
 			Context("error when getting SSH info from /v2/info", func() {
 				BeforeEach(func() {
-					getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					getRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/info",
 						Response: testnet.TestResponse{
@@ -189,8 +189,8 @@ var _ = Describe("SSH command", func() {
 					})
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
-					configRepo.SetApiEndpoint(testServer.URL)
-					ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+					configRepo.SetAPIEndpoint(testServer.URL)
+					ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -209,7 +209,7 @@ var _ = Describe("SSH command", func() {
 				BeforeEach(func() {
 					sshCodeGetter.GetReturns("", errors.New("auth api error"))
 
-					getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					getRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method: "GET",
 						Path:   "/v2/info",
 						Response: testnet.TestResponse{
@@ -219,8 +219,8 @@ var _ = Describe("SSH command", func() {
 					})
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
-					configRepo.SetApiEndpoint(testServer.URL)
-					ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+					configRepo.SetAPIEndpoint(testServer.URL)
+					ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -244,11 +244,11 @@ var _ = Describe("SSH command", func() {
 			})
 
 			BeforeEach(func() {
-				fakeSecureShell = &testssh.FakeSecureShell{}
+				fakeSecureShell = new(sshfakes.FakeSecureShell)
 
 				deps.WildcardDependency = fakeSecureShell
 
-				getRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				getRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   "/v2/info",
 					Response: testnet.TestResponse{
@@ -258,8 +258,8 @@ var _ = Describe("SSH command", func() {
 				})
 
 				testServer, _ = testnet.NewServer([]testnet.TestRequest{getRequest})
-				configRepo.SetApiEndpoint(testServer.URL)
-				ccGateway = cloud_controller_gateway.NewTestCloudControllerGateway(configRepo)
+				configRepo.SetAPIEndpoint(testServer.URL)
+				ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 				deps.Gateways["cloud-controller"] = ccGateway
 			})
 

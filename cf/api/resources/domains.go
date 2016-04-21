@@ -8,22 +8,22 @@ type DomainResource struct {
 }
 
 type DomainEntity struct {
-	Name                   string   `json:"name"`
-	OwningOrganizationGuid string   `json:"owning_organization_guid,omitempty"`
-	SharedOrganizationsUrl string   `json:"shared_organizations_url,omitempty"`
-	RouterGroupGuid        string   `json:"router_group_guid,omitempty"`
-	RouterGroupTypes       []string `json:"router_group_types,omitempty"`
-	Wildcard               bool     `json:"wildcard"`
+	Name                   string `json:"name"`
+	OwningOrganizationGUID string `json:"owning_organization_guid,omitempty"`
+	SharedOrganizationsURL string `json:"shared_organizations_url,omitempty"`
+	RouterGroupGUID        string `json:"router_group_guid,omitempty"`
+	RouterGroupType        string `json:"router_group_type,omitempty"`
+	Wildcard               bool   `json:"wildcard"`
 }
 
 func (resource DomainResource) ToFields() models.DomainFields {
-	privateDomain := resource.Entity.SharedOrganizationsUrl != "" || resource.Entity.OwningOrganizationGuid != ""
+	privateDomain := resource.Entity.SharedOrganizationsURL != "" || resource.Entity.OwningOrganizationGUID != ""
 	return models.DomainFields{
 		Name: resource.Entity.Name,
-		Guid: resource.Metadata.Guid,
-		OwningOrganizationGuid: resource.Entity.OwningOrganizationGuid,
+		GUID: resource.Metadata.GUID,
+		OwningOrganizationGUID: resource.Entity.OwningOrganizationGUID,
 		Shared:                 !privateDomain,
-		RouterGroupGuid:        resource.Entity.RouterGroupGuid,
-		RouterGroupTypes:       resource.Entity.RouterGroupTypes,
+		RouterGroupGUID:        resource.Entity.RouterGroupGUID,
+		RouterGroupType:        resource.Entity.RouterGroupType,
 	}
 }

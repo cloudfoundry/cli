@@ -3,10 +3,10 @@ package commands_test
 import (
 	"errors"
 
-	authenticationfakes "github.com/cloudfoundry/cli/cf/api/authentication/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -23,28 +23,28 @@ var _ = Describe("OauthToken", func() {
 		ui                  *testterm.FakeUI
 		authRepo            *authenticationfakes.FakeAuthenticationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("oauth-token").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("oauth-token").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		fakeLogger := new(fakes.FakePrinter)
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		fakeLogger := new(tracefakes.FakePrinter)
+		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		deps = command_registry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(fakeLogger)
 	})
 
 	runCommand := func() bool {
-		return testcmd.RunCliCommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -89,7 +89,7 @@ var _ = Describe("OauthToken", func() {
 
 			It("populates the plugin model upon execution", func() {
 				authRepo.RefreshAuthTokenReturns("911999111", nil)
-				testcmd.RunCliCommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Token).To(Equal("911999111"))
 			})
 		})

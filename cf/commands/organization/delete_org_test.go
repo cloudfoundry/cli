@@ -3,9 +3,9 @@ package organization_test
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
 
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -19,19 +19,19 @@ import (
 
 var _ = Describe("delete-org command", func() {
 	var (
-		config              core_config.Repository
+		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		orgRepo             *test_org.FakeOrganizationRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		org                 models.Organization
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.Config = config
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-org").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-org").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
@@ -43,15 +43,15 @@ var _ = Describe("delete-org command", func() {
 
 		org = models.Organization{}
 		org.Name = "org-to-delete"
-		org.Guid = "org-to-delete-guid"
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		org.GUID = "org-to-delete-guid"
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 		orgRepo.FindByNameReturns(org, nil)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-org", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-org", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("fails requirements when not logged in", func() {
@@ -83,7 +83,7 @@ var _ = Describe("delete-org command", func() {
 		Context("when deleting an org that is not targeted", func() {
 			BeforeEach(func() {
 				otherOrgFields := models.OrganizationFields{}
-				otherOrgFields.Guid = "some-other-org-guid"
+				otherOrgFields.GUID = "some-other-org-guid"
 				otherOrgFields.Name = "some-other-org"
 				config.SetOrganizationFields(otherOrgFields)
 

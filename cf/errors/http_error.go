@@ -6,48 +6,48 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
-type HttpError interface {
+type HTTPError interface {
 	error
 	StatusCode() int   // actual HTTP status code
 	ErrorCode() string // error code returned in response body from CC or UAA
 }
 
-type baseHttpError struct {
+type baseHTTPError struct {
 	statusCode   int
 	apiErrorCode string
 	description  string
 }
 
-type HttpNotFoundError struct {
-	baseHttpError
+type HTTPNotFoundError struct {
+	baseHTTPError
 }
 
-func NewHttpError(statusCode int, code string, description string) error {
-	err := baseHttpError{
+func NewHTTPError(statusCode int, code string, description string) error {
+	err := baseHTTPError{
 		statusCode:   statusCode,
 		apiErrorCode: code,
 		description:  description,
 	}
 	switch statusCode {
 	case 404:
-		return &HttpNotFoundError{err}
+		return &HTTPNotFoundError{err}
 	default:
 		return &err
 	}
 }
 
-func (err *baseHttpError) StatusCode() int {
+func (err *baseHTTPError) StatusCode() int {
 	return err.statusCode
 }
 
-func (err *baseHttpError) Error() string {
-	return fmt.Sprintf(T("Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrApiErrorCode}}, message: {{.ErrDescription}}",
+func (err *baseHTTPError) Error() string {
+	return fmt.Sprintf(T("Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
 		map[string]interface{}{"ErrStatusCode": err.statusCode,
-			"ErrApiErrorCode": err.apiErrorCode,
+			"ErrAPIErrorCode": err.apiErrorCode,
 			"ErrDescription":  err.description}),
 	)
 }
 
-func (err *baseHttpError) ErrorCode() string {
+func (err *baseHTTPError) ErrorCode() string {
 	return err.apiErrorCode
 }

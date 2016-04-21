@@ -9,7 +9,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/trace/fakes"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/websocket"
@@ -17,15 +17,15 @@ import (
 
 var _ = Describe("HTTP Client", func() {
 	var (
-		client      HttpClientInterface
+		client      HTTPClientInterface
 		dumper      RequestDumper
-		fakePrinter fakes.FakePrinter
+		fakePrinter *tracefakes.FakePrinter
 	)
 
 	BeforeEach(func() {
-		fakePrinter = *new(fakes.FakePrinter)
-		dumper = NewRequestDumper(&fakePrinter)
-		client = NewHttpClient(&http.Transport{}, dumper)
+		fakePrinter = new(tracefakes.FakePrinter)
+		dumper = NewRequestDumper(fakePrinter)
+		client = NewHTTPClient(&http.Transport{}, dumper)
 	})
 
 	Describe("ExecuteCheckRedirect", func() {

@@ -1,10 +1,10 @@
 package strategy
 
 type DomainsEndpointStrategy interface {
-	OrgDomainURL(orgGuid, name string) string
+	OrgDomainURL(orgGUID, name string) string
 	SharedDomainURL(name string) string
 	PrivateDomainURL(name string) string
-	OrgDomainsURL(orgGuid string) string
+	OrgDomainsURL(orgGUID string) string
 	PrivateDomainsURL() string
 	SharedDomainsURL() string
 	DeleteDomainURL(guid string) string
@@ -28,12 +28,12 @@ func (s domainsEndpointStrategy) PrivateDomainURL(name string) string {
 	})
 }
 
-func (s domainsEndpointStrategy) OrgDomainsURL(orgGuid string) string {
-	return v2("organizations", orgGuid, "domains")
+func (s domainsEndpointStrategy) OrgDomainsURL(orgGUID string) string {
+	return v2("organizations", orgGUID, "domains")
 }
 
-func (s domainsEndpointStrategy) OrgDomainURL(orgGuid, name string) string {
-	return buildURL(s.OrgDomainsURL(orgGuid), params{
+func (s domainsEndpointStrategy) OrgDomainURL(orgGUID, name string) string {
+	return buildURL(s.OrgDomainsURL(orgGUID), params{
 		inlineRelationsDepth: 1,
 		q:                    map[string]string{"name": name},
 	})
@@ -47,7 +47,7 @@ func (s domainsEndpointStrategy) SharedDomainsURL() string {
 	return v2("domains")
 }
 
-func (s domainsEndpointStrategy) PrivateDomainsByOrgURL(orgGuid string) string {
+func (s domainsEndpointStrategy) PrivateDomainsByOrgURL(orgGUID string) string {
 	return v2("domains")
 }
 
@@ -73,12 +73,12 @@ func (s separatedDomainsEndpointStrategy) PrivateDomainURL(name string) string {
 	})
 }
 
-func (s separatedDomainsEndpointStrategy) OrgDomainsURL(orgGuid string) string {
-	return v2("organizations", orgGuid, "private_domains")
+func (s separatedDomainsEndpointStrategy) OrgDomainsURL(orgGUID string) string {
+	return v2("organizations", orgGUID, "private_domains")
 }
 
-func (s separatedDomainsEndpointStrategy) OrgDomainURL(orgGuid, name string) string {
-	return buildURL(s.OrgDomainsURL(orgGuid), params{
+func (s separatedDomainsEndpointStrategy) OrgDomainURL(orgGUID, name string) string {
+	return buildURL(s.OrgDomainsURL(orgGUID), params{
 		q: map[string]string{"name": name},
 	})
 }
@@ -90,8 +90,8 @@ func (s separatedDomainsEndpointStrategy) SharedDomainsURL() string {
 	return v2("shared_domains")
 }
 
-func (s separatedDomainsEndpointStrategy) PrivateDomainsByOrgURL(orgGuid string) string {
-	return v2("organizations", orgGuid, "private_domains")
+func (s separatedDomainsEndpointStrategy) PrivateDomainsByOrgURL(orgGUID string) string {
+	return v2("organizations", orgGUID, "private_domains")
 }
 
 func (s separatedDomainsEndpointStrategy) DeleteDomainURL(guid string) string {

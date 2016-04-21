@@ -3,15 +3,15 @@ package application_test
 import (
 	"errors"
 
-	testApplication "github.com/cloudfoundry/cli/cf/api/app_instances/fakes"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/appinstances/appinstancesfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,21 +20,21 @@ import (
 var _ = Describe("restart-app-instance", func() {
 	var (
 		ui                  *testterm.FakeUI
-		config              core_config.Repository
-		appInstancesRepo    *testApplication.FakeAppInstancesRepository
+		config              coreconfig.Repository
+		appInstancesRepo    *appinstancesfakes.FakeAppInstancesRepository
 		requirementsFactory *testreq.FakeReqFactory
 		application         models.Application
-		deps                command_registry.Dependency
+		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
 		application = models.Application{}
 		application.Name = "my-app"
-		application.Guid = "my-app-guid"
+		application.GUID = "my-app-guid"
 		application.InstanceCount = 1
 
 		ui = &testterm.FakeUI{}
-		appInstancesRepo = &testApplication.FakeAppInstancesRepository{}
+		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{
 			LoginSuccess:         true,
@@ -44,14 +44,14 @@ var _ = Describe("restart-app-instance", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("restart-app-instance", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restart-app-instance", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -77,7 +77,7 @@ var _ = Describe("restart-app-instance", func() {
 			runCommand("my-app", "0")
 
 			app_guid, instance := appInstancesRepo.DeleteInstanceArgsForCall(0)
-			Expect(app_guid).To(Equal(application.Guid))
+			Expect(app_guid).To(Equal(application.GUID))
 			Expect(instance).To(Equal(0))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Restarting instance 0 of application my-app as my-user"},
@@ -93,7 +93,7 @@ var _ = Describe("restart-app-instance", func() {
 				runCommand("my-app", "0")
 
 				app_guid, instance := appInstancesRepo.DeleteInstanceArgsForCall(0)
-				Expect(app_guid).To(Equal(application.Guid))
+				Expect(app_guid).To(Equal(application.GUID))
 				Expect(instance).To(Equal(0))
 
 				Expect(ui.Outputs).To(ContainSubstrings(

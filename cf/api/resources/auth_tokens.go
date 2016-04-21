@@ -17,7 +17,7 @@ type AuthTokenEntity struct {
 }
 
 func (resource AuthTokenResource) ToFields() (authToken models.ServiceAuthTokenFields) {
-	authToken.Guid = resource.Metadata.Guid
+	authToken.GUID = resource.Metadata.GUID
 	authToken.Label = resource.Entity.Label
 	authToken.Provider = resource.Entity.Provider
 	return

@@ -1,9 +1,9 @@
 package environmentvariablegroup_test
 
 import (
-	test_environmentVariableGroups "github.com/cloudfoundry/cli/cf/api/environment_variable_groups/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups/environmentvariablegroupsfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -18,27 +18,27 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
-		configRepo                   core_config.Repository
-		environmentVariableGroupRepo *test_environmentVariableGroups.FakeEnvironmentVariableGroupsRepository
-		deps                         command_registry.Dependency
+		configRepo                   coreconfig.Repository
+		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetEnvironmentVariableGroupsRepository(environmentVariableGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("set-running-environment-variable-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("set-running-environment-variable-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		environmentVariableGroupRepo = &test_environmentVariableGroups.FakeEnvironmentVariableGroupsRepository{}
+		environmentVariableGroupRepo = new(environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("set-running-environment-variable-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-running-environment-variable-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -72,7 +72,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		})
 
 		It("Fails with a reasonable message when invalid JSON is passed", func() {
-			environmentVariableGroupRepo.SetRunningReturns(cf_errors.NewHttpError(400, cf_errors.MessageParseError, "Request invalid due to parse error"))
+			environmentVariableGroupRepo.SetRunningReturns(cf_errors.NewHTTPError(400, cf_errors.MessageParseError, "Request invalid due to parse error"))
 			runCommand(`{"abc":"123", "invalid : "json"}`)
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Setting the contents of the running environment variable group as my-user..."},

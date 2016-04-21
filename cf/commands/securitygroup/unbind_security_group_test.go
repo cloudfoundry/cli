@@ -3,14 +3,14 @@ package securitygroup_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	fake_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	fakeSecurityGroup "github.com/cloudfoundry/cli/cf/api/security_groups/fakes"
-	fakeBinder "github.com/cloudfoundry/cli/cf/api/security_groups/spaces/fakes"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/spaces/spacesfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -23,37 +23,37 @@ import (
 var _ = Describe("unbind-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		securityGroupRepo   *fakeSecurityGroup.FakeSecurityGroupRepo
-		orgRepo             *fake_org.FakeOrganizationRepository
-		spaceRepo           *fakes.FakeSpaceRepository
-		secBinder           *fakeBinder.FakeSecurityGroupSpaceBinder
+		securityGroupRepo   *securitygroupsfakes.FakeSecurityGroupRepo
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
+		spaceRepo           *apifakes.FakeSpaceRepository
+		secBinder           *spacesfakes.FakeSecurityGroupSpaceBinder
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(securityGroupRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupSpaceBinder(secBinder)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("unbind-security-group").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("unbind-security-group").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
-		securityGroupRepo = &fakeSecurityGroup.FakeSecurityGroupRepo{}
-		orgRepo = &fake_org.FakeOrganizationRepository{}
-		spaceRepo = &fakes.FakeSpaceRepository{}
-		secBinder = &fakeBinder.FakeSecurityGroupSpaceBinder{}
+		securityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
+		spaceRepo = new(apifakes.FakeSpaceRepository)
+		secBinder = new(spacesfakes.FakeSecurityGroupSpaceBinder)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("unbind-security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("unbind-security-group", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
@@ -96,7 +96,7 @@ var _ = Describe("unbind-security-group command", func() {
 				securityGroup := models.SecurityGroup{
 					SecurityGroupFields: models.SecurityGroupFields{
 						Name:  "my-group",
-						Guid:  "my-group-guid",
+						GUID:  "my-group-guid",
 						Rules: []map[string]interface{}{},
 					},
 				}
@@ -106,11 +106,11 @@ var _ = Describe("unbind-security-group command", func() {
 				orgRepo.ListOrgsReturns([]models.Organization{{
 					OrganizationFields: models.OrganizationFields{
 						Name: "my-org",
-						Guid: "my-org-guid",
+						GUID: "my-org-guid",
 					}},
 				}, nil)
 
-				space := models.Space{SpaceFields: models.SpaceFields{Name: "my-space", Guid: "my-space-guid"}}
+				space := models.Space{SpaceFields: models.SpaceFields{Name: "my-space", GUID: "my-space-guid"}}
 				spaceRepo.FindByNameInOrgReturns(space, nil)
 			})
 
@@ -121,9 +121,9 @@ var _ = Describe("unbind-security-group command", func() {
 					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
-				securityGroupGuid, spaceGuid := secBinder.UnbindSpaceArgsForCall(0)
-				Expect(securityGroupGuid).To(Equal("my-group-guid"))
-				Expect(spaceGuid).To(Equal("my-space-guid"))
+				securityGroupGUID, spaceGUID := secBinder.UnbindSpaceArgsForCall(0)
+				Expect(securityGroupGUID).To(Equal("my-group-guid"))
+				Expect(spaceGUID).To(Equal("my-space-guid"))
 			})
 
 			It("removes the security group when we pass the org and space", func() {
@@ -133,9 +133,9 @@ var _ = Describe("unbind-security-group command", func() {
 					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
-				securityGroupGuid, spaceGuid := secBinder.UnbindSpaceArgsForCall(0)
-				Expect(securityGroupGuid).To(Equal("my-group-guid"))
-				Expect(spaceGuid).To(Equal("my-space-guid"))
+				securityGroupGUID, spaceGUID := secBinder.UnbindSpaceArgsForCall(0)
+				Expect(securityGroupGUID).To(Equal("my-group-guid"))
+				Expect(spaceGUID).To(Equal("my-space-guid"))
 			})
 		})
 

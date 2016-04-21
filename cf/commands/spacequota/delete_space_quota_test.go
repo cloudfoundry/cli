@@ -1,10 +1,10 @@
 package spacequota_test
 
 import (
-	test_org "github.com/cloudfoundry/cli/cf/api/organizations/fakes"
-	"github.com/cloudfoundry/cli/cf/api/space_quotas/fakes"
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -20,37 +20,37 @@ import (
 var _ = Describe("delete-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		quotaRepo           *fakes.FakeSpaceQuotaRepository
-		orgRepo             *test_org.FakeOrganizationRepository
+		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		requirementsFactory *testreq.FakeReqFactory
-		configRepo          core_config.Repository
-		deps                command_registry.Dependency
+		configRepo          coreconfig.Repository
+		deps                commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("delete-space-quota").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-space-quota").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		quotaRepo = &fakes.FakeSpaceQuotaRepository{}
-		orgRepo = &test_org.FakeOrganizationRepository{}
+		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 
 		org := models.Organization{}
 		org.Name = "my-org"
-		org.Guid = "my-org-guid"
+		org.GUID = "my-org-guid"
 		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 		orgRepo.FindByNameReturns(org, nil)
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("delete-space-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-space-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Context("when the user is not logged in", func() {
@@ -84,8 +84,8 @@ var _ = Describe("delete-space-quota command", func() {
 			BeforeEach(func() {
 				quota := models.SpaceQuota{}
 				quota.Name = "my-quota"
-				quota.Guid = "my-quota-guid"
-				quota.OrgGuid = "my-org-guid"
+				quota.GUID = "my-quota-guid"
+				quota.OrgGUID = "my-org-guid"
 				quotaRepo.FindByNameReturns(quota, nil)
 			})
 

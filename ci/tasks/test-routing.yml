@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-vagrant-ci
+
+params:
+  LITE_PRIVATE_IP_ADDRESS:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -eux
+
+    export ADMIN_USER=admin
+    export ADMIN_PASSWORD=admin
+
+    routing_deployment_name=cf-warden-routing
+    routing_deployment_file=cf-warden-routing.yml
+
+    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $routing_deployment_name $routing_deployment_file
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deployment $routing_deployment_file
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD run errand router_acceptance_tests

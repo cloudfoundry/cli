@@ -1,13 +1,13 @@
 package models
 
 type ServiceBindingRequest struct {
-	AppGuid             string                 `json:"app_guid"`
-	ServiceInstanceGuid string                 `json:"service_instance_guid"`
+	AppGUID             string                 `json:"app_guid"`
+	ServiceInstanceGUID string                 `json:"service_instance_guid"`
 	Params              map[string]interface{} `json:"parameters,omitempty"`
 }
 
 type ServiceBindingFields struct {
-	Guid    string
-	Url     string
-	AppGuid string
+	GUID    string
+	URL     string
+	AppGUID string
 }

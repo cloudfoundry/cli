@@ -3,14 +3,14 @@ package domain_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 
-	fakeapi "github.com/cloudfoundry/cli/cf/api/fakes"
-	fakerequirements "github.com/cloudfoundry/cli/cf/requirements/fakes"
+	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -25,17 +25,17 @@ import (
 var _ = Describe("ListDomains", func() {
 	var (
 		ui             *testterm.FakeUI
-		routingApiRepo *fakeapi.FakeRoutingApiRepository
-		domainRepo     *fakeapi.FakeDomainRepository
-		configRepo     core_config.Repository
+		routingAPIRepo *apifakes.FakeRoutingAPIRepository
+		domainRepo     *apifakes.FakeDomainRepository
+		configRepo     coreconfig.Repository
 
 		cmd         domain.ListDomains
-		deps        command_registry.Dependency
-		factory     *fakerequirements.FakeFactory
+		deps        commandregistry.Dependency
+		factory     *requirementsfakes.FakeFactory
 		flagContext flags.FlagContext
 
 		loginRequirement       requirements.Requirement
-		targetedOrgRequirement *fakerequirements.FakeTargetedOrgRequirement
+		targetedOrgRequirement *requirementsfakes.FakeTargetedOrgRequirement
 
 		domainFields []models.DomainFields
 		routerGroups models.RouterGroups
@@ -44,14 +44,14 @@ var _ = Describe("ListDomains", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		routingApiRepo = &fakeapi.FakeRoutingApiRepository{}
-		repoLocator := deps.RepoLocator.SetRoutingApiRepository(routingApiRepo)
+		routingAPIRepo = new(apifakes.FakeRoutingAPIRepository)
+		repoLocator := deps.RepoLocator.SetRoutingAPIRepository(routingAPIRepo)
 
-		domainRepo = &fakeapi.FakeDomainRepository{}
+		domainRepo = new(apifakes.FakeDomainRepository)
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
-		deps = command_registry.Dependency{
-			Ui:          ui,
+		deps = commandregistry.Dependency{
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}
@@ -61,14 +61,14 @@ var _ = Describe("ListDomains", func() {
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 
-		factory = &fakerequirements.FakeFactory{}
+		factory = new(requirementsfakes.FakeFactory)
 		loginRequirement = &passingRequirement{Name: "LoginRequirement"}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		targetedOrgRequirement = &fakerequirements.FakeTargetedOrgRequirement{}
+		targetedOrgRequirement = new(requirementsfakes.FakeTargetedOrgRequirement)
 		factory.NewTargetedOrgRequirementReturns(targetedOrgRequirement)
 
-		domainRepo.ListDomainsForOrgStub = func(orgGuid string, cb func(models.DomainFields) bool) error {
+		domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 			for _, field := range domainFields {
 				if !cb(field) {
 					break
@@ -79,12 +79,12 @@ var _ = Describe("ListDomains", func() {
 
 		routerGroups = models.RouterGroups{
 			models.RouterGroup{
-				Guid: "router-group-guid",
+				GUID: "router-group-guid",
 				Name: "my-router-name1",
 				Type: "tcp",
 			},
 		}
-		routingApiRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
+		routingAPIRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) error {
 			for _, routerGroup := range routerGroups {
 				if !cb(routerGroup) {
 					break
@@ -96,7 +96,7 @@ var _ = Describe("ListDomains", func() {
 
 	Describe("Requirements", func() {
 		Context("when arguments are provided", func() {
-			var cmd command_registry.Command
+			var cmd commandregistry.Command
 			var flagContext flags.FlagContext
 
 			BeforeEach(func() {
@@ -156,8 +156,8 @@ var _ = Describe("ListDomains", func() {
 		It("tries to get the list of domains for org", func() {
 			cmd.Execute(flagContext)
 			Expect(domainRepo.ListDomainsForOrgCallCount()).To(Equal(1))
-			orgGuid, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
-			Expect(orgGuid).To(Equal("my-org-guid"))
+			orgGUID, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
+			Expect(orgGUID).To(Equal("my-org-guid"))
 		})
 
 		It("prints no domains found message", func() {
@@ -187,9 +187,9 @@ var _ = Describe("ListDomains", func() {
 			BeforeEach(func() {
 				domainFields = []models.DomainFields{
 					models.DomainFields{Shared: false, Name: "Private-domain1"},
-					models.DomainFields{Shared: false, Name: "Private-domain2", RouterGroupTypes: []string{"tcp", "bazquux"}},
+					models.DomainFields{Shared: false, Name: "Private-domain2", RouterGroupType: "tcp"},
 					models.DomainFields{Shared: true, Name: "Shared-domain1"},
-					models.DomainFields{Shared: true, Name: "Shared-domain2", RouterGroupTypes: []string{"tcp", "foobar"}},
+					models.DomainFields{Shared: true, Name: "Shared-domain2", RouterGroupType: "foobar"},
 				}
 			})
 
@@ -209,9 +209,9 @@ var _ = Describe("ListDomains", func() {
 				Expect(ui.Outputs).To(BeInDisplayOrder(
 					[]string{"name", "status", "type"},
 					[]string{"Shared-domain1", "shared"},
-					[]string{"Shared-domain2", "shared", "tcp, foobar"},
+					[]string{"Shared-domain2", "shared", "foobar"},
 					[]string{"Private-domain1", "owned"},
-					[]string{"Private-domain2", "owned", "tcp, bazquux"},
+					[]string{"Private-domain2", "owned", "tcp"},
 				))
 			})
 		})

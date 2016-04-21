@@ -1,12 +1,12 @@
 package securitygroup_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/command_registry"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 
-	testapi "github.com/cloudfoundry/cli/cf/api/security_groups/defaults/running/fakes"
+	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running/runningfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -20,28 +20,28 @@ import (
 var _ = Describe("Running-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		configRepo                   core_config.Repository
-		fakeRunningSecurityGroupRepo *testapi.FakeRunningSecurityGroupsRepo
+		configRepo                   coreconfig.Repository
+		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo
 		requirementsFactory          *testreq.FakeReqFactory
-		deps                         command_registry.Dependency
+		deps                         commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetRunningSecurityGroupRepository(fakeRunningSecurityGroupRepo)
 		deps.Config = configRepo
-		command_registry.Commands.SetCommand(command_registry.Commands.FindCommand("running-security-groups").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("running-security-groups").SetDependency(deps, pluginCall))
 	}
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		fakeRunningSecurityGroupRepo = &testapi.FakeRunningSecurityGroupsRepo{}
+		fakeRunningSecurityGroupRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("running-security-groups", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("running-security-groups", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	Describe("requirements", func() {
