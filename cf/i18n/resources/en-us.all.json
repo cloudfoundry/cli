@@ -4112,6 +4112,10 @@
     "translation": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}"
   },
   {
+    "id": "This command",
+    "translation": "This command"
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
   },
