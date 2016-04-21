@@ -46,7 +46,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 		repoLocator = repoLocator.SetAuthenticationRepository(authRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

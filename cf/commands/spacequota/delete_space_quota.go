@@ -49,7 +49,7 @@ func (cmd *DeleteSpaceQuota) Requirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *DeleteSpaceQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 	return cmd

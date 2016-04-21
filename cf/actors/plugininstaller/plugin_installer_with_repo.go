@@ -13,7 +13,7 @@ import (
 )
 
 type PluginInstallerWithRepo struct {
-	Ui               terminal.UI
+	UI               terminal.UI
 	PluginDownloader *PluginDownloader
 	DownloadFromPath downloadFromPath
 	RepoName         string
@@ -27,16 +27,16 @@ func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) st
 
 	targetPluginName := strings.ToLower(inputSourceFilepath)
 
-	installer.Ui.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": inputSourceFilepath, "repoName": installer.RepoName}))
+	installer.UI.Say(T("Looking up '{{.filePath}}' from repository '{{.repoName}}'", map[string]interface{}{"filePath": inputSourceFilepath, "repoName": installer.RepoName}))
 
 	repoModel, err := installer.getRepoFromConfig(installer.RepoName)
 	if err != nil {
-		installer.Ui.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
+		installer.UI.Failed(err.Error() + "\n" + T("Tip: use 'add-plugin-repo' to register the repo"))
 	}
 
 	pluginList, repoAry := installer.PluginRepo.GetPlugins([]models.PluginRepo{repoModel})
 	if len(repoAry) != 0 {
-		installer.Ui.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
+		installer.UI.Failed(T("Error getting plugin metadata from repo: ") + repoAry[0])
 	}
 
 	found := false
@@ -48,13 +48,13 @@ func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) st
 
 			installer.Checksummer.SetFilePath(outputSourceFilepath)
 			if !installer.Checksummer.CheckSha1(sha1) {
-				installer.Ui.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
+				installer.UI.Failed(T("Downloaded plugin binary's checksum does not match repo metadata"))
 			}
 		}
 
 	}
 	if !found {
-		installer.Ui.Failed(inputSourceFilepath + T(" is not available in repo '") + installer.RepoName + "'")
+		installer.UI.Failed(inputSourceFilepath + T(" is not available in repo '") + installer.RepoName + "'")
 	}
 
 	return outputSourceFilepath

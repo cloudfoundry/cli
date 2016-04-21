@@ -49,7 +49,7 @@ func (cmd *SharePrivateDomain) Requirements(requirementsFactory requirements.Fac
 }
 
 func (cmd *SharePrivateDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()

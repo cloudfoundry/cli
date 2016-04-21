@@ -25,7 +25,7 @@ var _ = Describe("delete-service-broker command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(brokerRepo)
 		deps.Config = configRepo
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-service-broker").SetDependency(deps, pluginCall))

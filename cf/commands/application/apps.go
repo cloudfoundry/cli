@@ -60,7 +60,7 @@ func (cmd *ListApps) Requirements(requirementsFactory requirements.Factory, fc f
 }
 
 func (cmd *ListApps) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
 	cmd.pluginAppModels = deps.PluginModels.AppsSummary

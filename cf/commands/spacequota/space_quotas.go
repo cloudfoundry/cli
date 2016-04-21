@@ -52,7 +52,7 @@ func (cmd *ListSpaceQuotas) Requirements(requirementsFactory requirements.Factor
 }
 
 func (cmd *ListSpaceQuotas) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceQuotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 	return cmd

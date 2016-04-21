@@ -29,7 +29,7 @@ var _ = Describe("add-plugin-repo", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("add-plugin-repo").SetDependency(deps, pluginCall))
 	}

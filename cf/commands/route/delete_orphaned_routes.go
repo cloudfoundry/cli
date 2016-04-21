@@ -52,7 +52,7 @@ func (cmd *DeleteOrphanedRoutes) Requirements(requirementsFactory requirements.F
 }
 
 func (cmd *DeleteOrphanedRoutes) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 	return cmd

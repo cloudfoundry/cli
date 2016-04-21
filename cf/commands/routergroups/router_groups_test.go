@@ -42,7 +42,7 @@ var _ = Describe("RouterGroups", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 		repoLocator = api.RepositoryLocator{}.SetRoutingAPIRepository(routingAPIRepo)
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      config,
 			RepoLocator: repoLocator,
 		}

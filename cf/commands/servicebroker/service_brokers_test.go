@@ -31,7 +31,7 @@ var _ = Describe("service-brokers command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceBrokerRepository(repo)
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("service-brokers").SetDependency(deps, pluginCall))

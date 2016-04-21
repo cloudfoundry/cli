@@ -26,7 +26,7 @@ var _ = Describe("delete-user command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-user").SetDependency(deps, pluginCall))

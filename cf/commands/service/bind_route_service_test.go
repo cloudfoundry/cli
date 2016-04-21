@@ -55,7 +55,7 @@ var _ = Describe("BindRouteService", func() {
 		repoLocator = repoLocator.SetRouteServiceBindingRepository(routeServiceBindingRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

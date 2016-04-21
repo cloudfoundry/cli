@@ -42,7 +42,7 @@ var _ = Describe("CreateServiceBroker", func() {
 		repoLocator := deps.RepoLocator.SetServiceBrokerRepository(serviceBrokerRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

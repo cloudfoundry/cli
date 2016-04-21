@@ -28,7 +28,7 @@ var _ = Describe("feature-flags command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)
 		deps.Config = configRepo
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("feature-flags").SetDependency(deps, pluginCall))

@@ -48,7 +48,7 @@ func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc 
 }
 
 func (cmd *ListStack) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.stacksRepo = deps.RepoLocator.GetStackRepository()
 	return cmd

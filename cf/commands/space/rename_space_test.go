@@ -25,7 +25,7 @@ var _ = Describe("rename-space command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.Config = configRepo
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("rename-space").SetDependency(deps, pluginCall))

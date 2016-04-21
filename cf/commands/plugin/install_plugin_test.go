@@ -57,7 +57,7 @@ var _ = Describe("Install", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.PluginConfig = pluginConfig
 		deps.PluginRepo = fakePluginRepo

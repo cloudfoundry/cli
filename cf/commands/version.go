@@ -34,7 +34,7 @@ func (cmd *Version) MetaData() commandregistry.CommandMetadata {
 }
 
 func (cmd *Version) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	return cmd
 }
 

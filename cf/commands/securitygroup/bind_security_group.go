@@ -51,7 +51,7 @@ func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Fact
 }
 
 func (cmd *BindSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()

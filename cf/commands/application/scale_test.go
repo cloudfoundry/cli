@@ -30,7 +30,7 @@ var _ = Describe("scale command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.Config = config
 

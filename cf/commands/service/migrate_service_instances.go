@@ -60,7 +60,7 @@ func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirement
 }
 
 func (cmd *MigrateServiceInstances) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	return cmd

@@ -27,7 +27,7 @@ var _ = Describe("delete-service command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = configRepo
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-service").SetDependency(deps, pluginCall))

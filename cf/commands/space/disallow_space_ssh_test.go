@@ -34,7 +34,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("disallow-space-ssh").SetDependency(deps, pluginCall))

@@ -19,7 +19,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space-ssh-allowed").SetDependency(deps, pluginCall))
 	}
 

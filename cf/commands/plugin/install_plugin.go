@@ -70,7 +70,7 @@ func (cmd *PluginInstall) Requirements(requirementsFactory requirements.Factory,
 }
 
 func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.pluginConfig = deps.PluginConfig
 	cmd.pluginRepo = deps.PluginRepo
@@ -114,7 +114,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 		FileDownloader: fileDownloader,
 		PluginRepo:     cmd.pluginRepo,
 		RepoName:       c.String("r"),
-		Ui:             cmd.ui,
+		UI:             cmd.ui,
 	}
 	installer := plugininstaller.NewPluginInstaller(deps)
 	pluginSourceFilepath := installer.Install(c.Args()[0])

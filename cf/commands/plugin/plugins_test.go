@@ -27,7 +27,7 @@ var _ = Describe("Plugins", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.PluginConfig = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("plugins").SetDependency(deps, pluginCall))
 	}

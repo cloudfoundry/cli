@@ -45,7 +45,7 @@ func (cmd *RemovePluginRepo) Requirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *RemovePluginRepo) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	return cmd
 }

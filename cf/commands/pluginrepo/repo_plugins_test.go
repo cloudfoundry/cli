@@ -38,7 +38,7 @@ var _ = Describe("repo-plugins", func() {
 		config = testconfig.NewRepositoryWithDefaults()
 
 		deps = commandregistry.Dependency{
-			Ui:         ui,
+			UI:         ui,
 			Config:     config,
 			PluginRepo: fakePluginRepo,
 		}

@@ -53,7 +53,7 @@ func (cmd *RestartAppInstance) Requirements(requirementsFactory requirements.Fac
 }
 
 func (cmd *RestartAppInstance) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
 	return cmd

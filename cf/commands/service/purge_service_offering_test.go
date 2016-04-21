@@ -41,7 +41,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 		repoLocator := deps.RepoLocator.SetServiceRepository(serviceRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

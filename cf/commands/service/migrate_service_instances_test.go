@@ -27,7 +27,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("migrate-service-instances").SetDependency(deps, pluginCall))

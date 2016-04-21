@@ -28,7 +28,7 @@ var _ = Describe("marketplace command", func() {
 	var deps commandregistry.Dependency
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.ServiceBuilder = serviceBuilder
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("marketplace").SetDependency(deps, pluginCall))

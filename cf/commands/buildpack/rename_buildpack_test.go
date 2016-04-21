@@ -23,7 +23,7 @@ var _ = Describe("rename-buildpack command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(fakeRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("rename-buildpack").SetDependency(deps, pluginCall))
 	}

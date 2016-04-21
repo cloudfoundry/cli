@@ -47,7 +47,7 @@ func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *ListFeatureFlags) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.flagRepo = deps.RepoLocator.GetFeatureFlagRepository()
 	return cmd

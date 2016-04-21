@@ -29,7 +29,7 @@ var _ = Describe("list-apps command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppSummaryRepository(appSummaryRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("apps").SetDependency(deps, pluginCall))

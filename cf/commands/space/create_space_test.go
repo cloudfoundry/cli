@@ -38,7 +38,7 @@ var _ = Describe("create-space command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(spaceQuotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)

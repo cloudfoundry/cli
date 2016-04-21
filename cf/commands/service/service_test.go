@@ -23,7 +23,7 @@ var _ = Describe("service command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("service").SetDependency(deps, pluginCall))
 	}
 

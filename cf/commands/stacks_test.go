@@ -27,7 +27,7 @@ var _ = Describe("stacks command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetStackRepository(repo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("stacks").SetDependency(deps, pluginCall))

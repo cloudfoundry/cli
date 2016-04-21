@@ -57,7 +57,7 @@ func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc f
 }
 
 func (cmd *OrgUsers) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.pluginCall = pluginCall
@@ -93,8 +93,8 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 			roles,
 		)
 	}
-	return &userprint.OrgUsersUiPrinter{
-		Ui:         cmd.ui,
+	return &userprint.OrgUsersUIPrinter{
+		UI:         cmd.ui,
 		UserLister: cmd.userLister(),
 		Roles:      roles,
 		RoleDisplayNames: map[string]string{

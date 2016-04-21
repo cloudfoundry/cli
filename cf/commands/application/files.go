@@ -56,7 +56,7 @@ func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags
 }
 
 func (cmd *Files) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appFilesRepo = deps.RepoLocator.GetAppFilesRepository()
 	return cmd

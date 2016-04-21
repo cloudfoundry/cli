@@ -58,7 +58,7 @@ func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory
 }
 
 func (cmd *OneTimeSSHCode) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()

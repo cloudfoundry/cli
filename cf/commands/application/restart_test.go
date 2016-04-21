@@ -30,7 +30,7 @@ var _ = Describe("restart command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 
 		//inject fake 'stopper and starter' into registry

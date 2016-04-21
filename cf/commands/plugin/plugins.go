@@ -50,7 +50,7 @@ func (cmd *Plugins) Requirements(requirementsFactory requirements.Factory, fc fl
 }
 
 func (cmd *Plugins) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.PluginConfig
 	return cmd
 }

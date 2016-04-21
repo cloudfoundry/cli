@@ -30,7 +30,7 @@ var _ = Describe("auth command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("auth").SetDependency(deps, pluginCall))

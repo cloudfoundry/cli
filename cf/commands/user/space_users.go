@@ -55,7 +55,7 @@ func (cmd *SpaceUsers) Requirements(requirementsFactory requirements.Factory, fc
 }
 
 func (cmd *SpaceUsers) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
@@ -96,8 +96,8 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 			"CurrentUser": terminal.EntityNameColor(username),
 		}))
 
-	return &userprint.SpaceUsersUiPrinter{
-		Ui:         cmd.ui,
+	return &userprint.SpaceUsersUIPrinter{
+		UI:         cmd.ui,
 		UserLister: cmd.userLister(),
 		Roles:      roles,
 		RoleDisplayNames: map[string]string{

@@ -61,7 +61,7 @@ func (cmd *ShowSpace) Requirements(requirementsFactory requirements.Factory, fc 
 }
 
 func (cmd *ShowSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
 	cmd.pluginCall = pluginCall

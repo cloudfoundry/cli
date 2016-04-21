@@ -26,7 +26,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		fakeLogger = new(tracefakes.FakePrinter)
 		deps = commandregistry.NewDependency(fakeLogger)
 		ui = &testterm.FakeUI{}
-		deps.Ui = ui
+		deps.UI = ui
 
 		cmd := commandregistry.Commands.FindCommand("fake-command")
 		commandregistry.Commands.SetCommand(cmd.SetDependency(deps, true))

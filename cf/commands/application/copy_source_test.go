@@ -39,7 +39,7 @@ var _ = Describe("CopySource", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		deps.RepoLocator = deps.RepoLocator.SetCopyApplicationSourceRepository(copyAppSourceRepo)

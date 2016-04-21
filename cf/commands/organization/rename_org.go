@@ -47,7 +47,7 @@ func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc 
 }
 
 func (cmd *RenameOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	return cmd

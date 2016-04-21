@@ -34,7 +34,7 @@ var _ = Describe("service-access command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)
 		deps.ServiceHandler = actor
 		deps.Config = configRepo

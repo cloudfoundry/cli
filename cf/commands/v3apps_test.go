@@ -49,7 +49,7 @@ var _ = Describe("V3Apps", func() {
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

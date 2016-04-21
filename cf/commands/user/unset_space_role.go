@@ -70,7 +70,7 @@ func (cmd *UnsetSpaceRole) Requirements(requirementsFactory requirements.Factory
 }
 
 func (cmd *UnsetSpaceRole) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()

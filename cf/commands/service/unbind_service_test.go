@@ -27,7 +27,7 @@ var _ = Describe("unbind-service command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceBindingRepository(serviceBindingRepo)
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("unbind-service").SetDependency(deps, pluginCall))

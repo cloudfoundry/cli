@@ -51,7 +51,7 @@ var _ = Describe("ListDomains", func() {
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

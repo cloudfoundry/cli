@@ -15,7 +15,7 @@ var _ = Describe("Dependency", func() {
 		fakeLogger := new(tracefakes.FakePrinter)
 		dependency = commandregistry.NewDependency(fakeLogger)
 
-		Expect(dependency.Ui).ToNot(BeNil())
+		Expect(dependency.UI).ToNot(BeNil())
 		Expect(dependency.Config).ToNot(BeNil())
 		Expect(dependency.RepoLocator).ToNot(BeNil())
 		Expect(dependency.PluginConfig).ToNot(BeNil())

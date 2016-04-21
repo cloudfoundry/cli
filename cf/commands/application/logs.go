@@ -59,7 +59,7 @@ func (cmd *Logs) Requirements(requirementsFactory requirements.Factory, fc flags
 }
 
 func (cmd *Logs) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.logsRepo = deps.RepoLocator.GetLogsRepository()
 	return cmd

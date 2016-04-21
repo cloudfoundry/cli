@@ -55,7 +55,7 @@ func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags
 }
 
 func (c *V3Apps) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
-	c.ui = deps.Ui
+	c.ui = deps.UI
 	c.config = deps.Config
 	c.repository = deps.RepoLocator.GetV3Repository()
 

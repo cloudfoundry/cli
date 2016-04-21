@@ -29,7 +29,7 @@ var _ = Describe("enable-service-access command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(tokenRefresher)
 		deps.ServicePlanHandler = actor
 		deps.Config = configRepo

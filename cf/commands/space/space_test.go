@@ -27,7 +27,7 @@ var _ = Describe("space command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space").SetDependency(deps, pluginCall))

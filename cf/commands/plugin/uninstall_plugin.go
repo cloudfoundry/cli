@@ -46,7 +46,7 @@ func (cmd *PluginUninstall) Requirements(requirementsFactory requirements.Factor
 }
 
 func (cmd *PluginUninstall) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.PluginConfig
 
 	//reset rpc registration in case there is other running instance,

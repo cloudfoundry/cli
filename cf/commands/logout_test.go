@@ -20,7 +20,7 @@ var _ = Describe("logout command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("logout").SetDependency(deps, pluginCall))
 	}

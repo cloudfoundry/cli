@@ -35,7 +35,7 @@ func (cmd *Logout) Requirements(requirementsFactory requirements.Factory, fc fla
 }
 
 func (cmd *Logout) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	return cmd
 }

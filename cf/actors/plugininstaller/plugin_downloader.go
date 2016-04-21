@@ -13,7 +13,7 @@ import (
 )
 
 type PluginDownloader struct {
-	Ui             terminal.UI
+	UI             terminal.UI
 	FileDownloader downloader.Downloader
 }
 type downloadFromPath func(string, downloader.Downloader) string
@@ -22,10 +22,10 @@ func (downloader *PluginDownloader) downloadFromPath(pluginSourceFilepath string
 	size, filename, err := downloader.FileDownloader.DownloadFile(pluginSourceFilepath)
 
 	if err != nil {
-		downloader.Ui.Failed(fmt.Sprintf(T("Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url.", map[string]interface{}{"Error": err.Error()})))
+		downloader.UI.Failed(fmt.Sprintf(T("Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url.", map[string]interface{}{"Error": err.Error()})))
 	}
 
-	downloader.Ui.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
+	downloader.UI.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
 
 	executablePath := filepath.Join(downloader.FileDownloader.SavePath(), filename)
 	os.Chmod(executablePath, 0700)
@@ -75,5 +75,5 @@ func (downloader *PluginDownloader) getBinaryChecksum(plugin clipr.Plugin, os st
 }
 
 func (downloader *PluginDownloader) binaryNotAvailable() {
-	downloader.Ui.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
+	downloader.UI.Failed(T("Plugin requested has no binary available for your OS: ") + runtime.GOOS + ", " + runtime.GOARCH)
 }
