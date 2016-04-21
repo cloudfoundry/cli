@@ -60,7 +60,7 @@ func (repo CloudControllerServicePlanVisibilityRepository) Search(queryParams ma
 	var visibilities []models.ServicePlanVisibilityFields
 	err := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		combineQueryParametersWithUri("/v2/service_plan_visibilities", queryParams),
+		combineQueryParametersWithURI("/v2/service_plan_visibilities", queryParams),
 		resources.ServicePlanVisibilityResource{},
 		func(resource interface{}) bool {
 			if sp, ok := resource.(resources.ServicePlanVisibilityResource); ok {
