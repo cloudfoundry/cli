@@ -48,7 +48,7 @@ var _ = Describe("start command", func() {
 	)
 
 	updateCommandDependency := func(logsRepo api.LogsRepository) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)

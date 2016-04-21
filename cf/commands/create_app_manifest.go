@@ -64,7 +64,7 @@ func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Fact
 }
 
 func (cmd *CreateAppManifest) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
 	cmd.stackRepo = deps.RepoLocator.GetStackRepository()

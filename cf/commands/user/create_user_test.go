@@ -36,7 +36,7 @@ var _ = Describe("Create user command", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-user").SetDependency(deps, pluginCall))

@@ -29,7 +29,7 @@ var _ = Describe("bind-service command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetServiceBindingRepository(serviceBindingRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("bind-service").SetDependency(deps, pluginCall))

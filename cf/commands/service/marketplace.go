@@ -57,7 +57,7 @@ func (cmd *MarketplaceServices) Requirements(requirementsFactory requirements.Fa
 }
 
 func (cmd *MarketplaceServices) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceBuilder = deps.ServiceBuilder
 	return cmd

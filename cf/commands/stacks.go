@@ -47,7 +47,7 @@ func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc
 }
 
 func (cmd *ListStacks) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.stacksRepo = deps.RepoLocator.GetStackRepository()
 	return cmd

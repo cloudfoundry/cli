@@ -49,7 +49,7 @@ func (cmd *ListBuildpacks) Requirements(requirementsFactory requirements.Factory
 }
 
 func (cmd *ListBuildpacks) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.buildpackRepo = deps.RepoLocator.GetBuildpackRepository()
 	return cmd
 }

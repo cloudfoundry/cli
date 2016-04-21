@@ -44,7 +44,7 @@ var _ = Describe("Files", func() {
 		repoLocator := deps.RepoLocator.SetAppFileRepository(appFilesRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

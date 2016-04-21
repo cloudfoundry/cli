@@ -48,7 +48,7 @@ func (cmd *DeleteUser) Requirements(requirementsFactory requirements.Factory, fc
 }
 
 func (cmd *DeleteUser) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	return cmd

@@ -45,7 +45,7 @@ func (cmd Api) Requirements(requirementsFactory requirements.Factory, fc flags.F
 }
 
 func (cmd Api) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()
 	return cmd

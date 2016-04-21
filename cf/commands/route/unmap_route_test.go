@@ -50,7 +50,7 @@ var _ = Describe("UnmapRoute", func() {
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

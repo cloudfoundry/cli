@@ -63,7 +63,7 @@ func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, f
 }
 
 func (cmd *CreateSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()

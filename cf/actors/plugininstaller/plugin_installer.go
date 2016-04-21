@@ -20,7 +20,7 @@ type PluginInstallerContext struct {
 	GetPluginRepos pluginReposFetcher
 	PluginRepo     pluginrepo.PluginRepo
 	RepoName       string
-	Ui             terminal.UI
+	UI             terminal.UI
 }
 
 type pluginReposFetcher func() []models.PluginRepo
@@ -28,16 +28,16 @@ type pluginReposFetcher func() []models.PluginRepo
 func NewPluginInstaller(context *PluginInstallerContext) PluginInstaller {
 	var installer PluginInstaller
 
-	pluginDownloader := &PluginDownloader{Ui: context.Ui, FileDownloader: context.FileDownloader}
+	pluginDownloader := &PluginDownloader{UI: context.UI, FileDownloader: context.FileDownloader}
 	if context.RepoName == "" {
 		installer = &PluginInstallerWithoutRepo{
-			Ui:               context.Ui,
+			UI:               context.UI,
 			PluginDownloader: pluginDownloader,
 			RepoName:         context.RepoName,
 		}
 	} else {
 		installer = &PluginInstallerWithRepo{
-			Ui:               context.Ui,
+			UI:               context.UI,
 			PluginDownloader: pluginDownloader,
 			RepoName:         context.RepoName,
 			Checksummer:      context.Checksummer,

@@ -54,7 +54,7 @@ var _ = Describe("CreateAppManifest", func() {
 		fakeManifest = new(manifestfakes.FakeAppManifest)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 			AppManifest: fakeManifest,

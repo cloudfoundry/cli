@@ -63,7 +63,7 @@ var _ = Describe("SSH command", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 
 		//inject fake 'sshCodeGetter' into registry

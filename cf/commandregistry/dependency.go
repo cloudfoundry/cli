@@ -25,7 +25,7 @@ import (
 )
 
 type Dependency struct {
-	Ui                 terminal.UI
+	UI                 terminal.UI
 	Config             coreconfig.Repository
 	RepoLocator        api.RepositoryLocator
 	PluginConfig       pluginconfig.PluginConfiguration
@@ -66,11 +66,11 @@ type PluginModels struct {
 func NewDependency(logger trace.Printer) Dependency {
 	deps := Dependency{}
 	deps.TeePrinter = terminal.NewTeePrinter()
-	deps.Ui = terminal.NewUI(os.Stdin, deps.TeePrinter, logger)
+	deps.UI = terminal.NewUI(os.Stdin, deps.TeePrinter, logger)
 
 	errorHandler := func(err error) {
 		if err != nil {
-			deps.Ui.Failed(fmt.Sprintf("Config error: %s", err))
+			deps.UI.Failed(fmt.Sprintf("Config error: %s", err))
 		}
 	}
 	deps.Config = coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errorHandler)
@@ -83,9 +83,9 @@ func NewDependency(logger trace.Printer) Dependency {
 	terminal.InitColorSupport()
 
 	deps.Gateways = map[string]net.Gateway{
-		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.Ui, logger),
-		"uaa":              net.NewUAAGateway(deps.Config, deps.Ui, logger),
-		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.Ui, logger),
+		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.UI, logger),
+		"uaa":              net.NewUAAGateway(deps.Config, deps.UI, logger),
+		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.UI, logger),
 	}
 	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways, logger)
 

@@ -63,7 +63,7 @@ func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc fla
 }
 
 func (cmd *Target) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()

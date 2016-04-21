@@ -50,7 +50,7 @@ func (cmd *DisallowSpaceSSH) Requirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *DisallowSpaceSSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	return cmd

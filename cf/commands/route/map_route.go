@@ -115,7 +115,7 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 }
 
 func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 

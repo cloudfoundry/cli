@@ -88,7 +88,7 @@ func (cmd *SSH) Requirements(requirementsFactory requirements.Factory, fc flags.
 }
 
 func (cmd *SSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.gateway = deps.Gateways["cloud-controller"]
 

@@ -60,7 +60,7 @@ var _ = Describe("Api", func() {
 		repoLocator = api.RepositoryLocator{}.SetEndpointRepository(endpointRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      config,
 			RepoLocator: repoLocator,
 		}

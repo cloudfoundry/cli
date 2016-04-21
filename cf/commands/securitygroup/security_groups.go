@@ -50,7 +50,7 @@ func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory
 }
 
 func (cmd *SecurityGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
 	return cmd

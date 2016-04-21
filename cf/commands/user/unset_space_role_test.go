@@ -50,7 +50,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 		repoLocator = repoLocator.SetFeatureFlagRepository(flagRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

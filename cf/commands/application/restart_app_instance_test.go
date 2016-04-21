@@ -44,7 +44,7 @@ var _ = Describe("restart-app-instance", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetAppInstancesRepository(appInstancesRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("restart-app-instance").SetDependency(deps, pluginCall))

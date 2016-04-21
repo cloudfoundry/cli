@@ -39,8 +39,8 @@ func (cmd FakeCommand1) SetDependency(deps commandregistry.Dependency, pluginCal
 		cmd.ui.Say("SetDependency() called, pluginCall " + fmt.Sprintf("%t", pluginCall))
 	}
 
-	cmd.req.ui = deps.Ui
-	cmd.ui = deps.Ui
+	cmd.req.ui = deps.UI
+	cmd.ui = deps.UI
 
 	return cmd
 }

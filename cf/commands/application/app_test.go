@@ -60,7 +60,7 @@ var _ = Describe("App", func() {
 		repoLocator = repoLocator.SetAppInstancesRepository(appInstancesRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:     ui,
+			UI:     ui,
 			Config: testconfig.NewRepositoryWithDefaults(),
 			PluginModels: &commandregistry.PluginModels{
 				Application: getAppModel,

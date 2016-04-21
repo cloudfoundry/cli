@@ -49,7 +49,7 @@ func (cmd *unbindFromStagingGroup) Requirements(requirementsFactory requirements
 }
 
 func (cmd *unbindFromStagingGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
 	cmd.stagingGroupRepo = deps.RepoLocator.GetStagingSecurityGroupsRepository()

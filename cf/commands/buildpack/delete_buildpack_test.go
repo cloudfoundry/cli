@@ -23,7 +23,7 @@ var _ = Describe("delete-buildpack command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(buildpackRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-buildpack").SetDependency(deps, pluginCall))
 	}

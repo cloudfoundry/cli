@@ -24,7 +24,7 @@ var _ = Describe("delte-plugin-repo", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("remove-plugin-repo").SetDependency(deps, pluginCall))
 	}

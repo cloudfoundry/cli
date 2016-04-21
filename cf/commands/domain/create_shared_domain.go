@@ -61,7 +61,7 @@ func (cmd *CreateSharedDomain) Requirements(requirementsFactory requirements.Fac
 }
 
 func (cmd *CreateSharedDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
 	cmd.routingAPIRepo = deps.RepoLocator.GetRoutingAPIRepository()

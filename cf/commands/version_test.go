@@ -22,7 +22,7 @@ var _ = Describe("Version", func() {
 		ui = &testterm.FakeUI{}
 
 		deps := commandregistry.Dependency{
-			Ui: ui,
+			UI: ui,
 		}
 
 		cmd = &commands.Version{}

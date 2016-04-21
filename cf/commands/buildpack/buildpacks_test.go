@@ -24,7 +24,7 @@ var _ = Describe("ListBuildpacks", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetBuildpackRepository(buildpackRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("buildpacks").SetDependency(deps, pluginCall))
 	}

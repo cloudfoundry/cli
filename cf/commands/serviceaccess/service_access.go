@@ -59,7 +59,7 @@ func (cmd *ServiceAccess) Requirements(requirementsFactory requirements.Factory,
 }
 
 func (cmd *ServiceAccess) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.actor = deps.ServiceHandler
 	cmd.tokenRefresher = deps.RepoLocator.GetAuthenticationRepository()

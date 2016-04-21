@@ -26,7 +26,7 @@ var _ = Describe("delete-shared-domain command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetDomainRepository(domainRepo)
 		deps.Config = configRepo
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-shared-domain").SetDependency(deps, pluginCall))

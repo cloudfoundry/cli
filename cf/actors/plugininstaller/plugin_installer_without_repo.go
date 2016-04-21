@@ -10,7 +10,7 @@ import (
 )
 
 type PluginInstallerWithoutRepo struct {
-	Ui               terminal.UI
+	UI               terminal.UI
 	PluginDownloader *PluginDownloader
 	DownloadFromPath downloadFromPath
 	RepoName         string
@@ -23,13 +23,13 @@ func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string)
 		outputSourceFilepath = inputSourceFilepath
 	}
 
-	installer.Ui.Say("")
+	installer.UI.Say("")
 	if strings.HasPrefix(outputSourceFilepath, "https://") || strings.HasPrefix(outputSourceFilepath, "http://") ||
 		strings.HasPrefix(outputSourceFilepath, "ftp://") || strings.HasPrefix(outputSourceFilepath, "ftps://") {
-		installer.Ui.Say(T("Attempting to download binary file from internet address..."))
+		installer.UI.Say(T("Attempting to download binary file from internet address..."))
 		return installer.PluginDownloader.downloadFromPath(outputSourceFilepath)
 	} else if !installer.ensureCandidatePluginBinaryExistsAtGivenPath(outputSourceFilepath) {
-		installer.Ui.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": outputSourceFilepath}))
+		installer.UI.Failed(T("File not found locally, make sure the file exists at given path {{.filepath}}", map[string]interface{}{"filepath": outputSourceFilepath}))
 	}
 
 	return outputSourceFilepath

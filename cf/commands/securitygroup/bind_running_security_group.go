@@ -48,7 +48,7 @@ func (cmd *bindToRunningGroup) Requirements(requirementsFactory requirements.Fac
 }
 
 func (cmd *bindToRunningGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.configRepo = deps.Config
 	cmd.securityGroupRepo = deps.RepoLocator.GetSecurityGroupRepository()
 	cmd.runningGroupRepo = deps.RepoLocator.GetRunningSecurityGroupsRepository()

@@ -66,7 +66,7 @@ func main() {
 
 	//handle `cf --build`
 	if len(os.Args) == 2 && (os.Args[1] == "--build" || os.Args[1] == "-b") {
-		deps.Ui.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
+		deps.UI.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
 			map[string]interface{}{
 				"CFName":    os.Args[0],
 				"GoVersion": runtime.Version(),
@@ -79,7 +79,7 @@ func main() {
 		warningProducers = append(warningProducers, warningProducer)
 	}
 
-	warningsCollector := net.NewWarningsCollector(deps.Ui, warningProducers...)
+	warningsCollector := net.NewWarningsCollector(deps.UI, warningProducers...)
 
 	commandsloader.Load()
 
@@ -95,7 +95,7 @@ func main() {
 		err := flagContext.Parse(cmdArgs...)
 		if err != nil {
 			usage := cmdRegistry.CommandUsage(cmdName)
-			deps.Ui.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
+			deps.UI.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
 		}
 
 		cmd = cmd.SetDependency(deps, false)
@@ -107,7 +107,7 @@ func main() {
 		for _, req := range reqs {
 			err = req.Execute()
 			if err != nil {
-				deps.Ui.Failed(err.Error())
+				deps.UI.Failed(err.Error())
 			}
 		}
 
@@ -121,18 +121,18 @@ func main() {
 	//non core command, try plugin command
 	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger)
 	if err != nil {
-		deps.Ui.Say(T("Error initializing RPC service: ") + err.Error())
+		deps.UI.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)
 	}
 
 	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
-		deps.Ui.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
+		deps.UI.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
 	})
 	pluginList := pluginConfig.Plugins()
 
 	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
 	if !ran {
-		deps.Ui.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
+		deps.UI.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
 		os.Exit(1)
 	}
 

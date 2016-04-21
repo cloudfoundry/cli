@@ -49,7 +49,7 @@ func (cmd *Authenticate) Requirements(requirementsFactory requirements.Factory, 
 }
 
 func (cmd *Authenticate) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.authenticator = deps.RepoLocator.GetAuthenticationRepository()
 	return cmd

@@ -30,7 +30,7 @@ var _ = Describe("Uninstall", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.PluginConfig = pluginConfig
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("uninstall-plugin").SetDependency(deps, pluginCall))
 	}

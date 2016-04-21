@@ -64,7 +64,7 @@ var _ = Describe("Push Command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.ManifestRepo = manifestRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)

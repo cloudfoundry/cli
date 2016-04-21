@@ -49,7 +49,7 @@ func (cmd *RenameApp) Requirements(requirementsFactory requirements.Factory, c f
 }
 
 func (cmd *RenameApp) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	return cmd

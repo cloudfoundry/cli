@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestUiHelpers(t *testing.T) {
+func TestUIHelpers(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "UiHelpers Suite")
+	RunSpecs(t, "UIHelpers Suite")
 }

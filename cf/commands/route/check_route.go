@@ -66,7 +66,7 @@ func (cmd *CheckRoute) Requirements(requirementsFactory requirements.Factory, fc
 }
 
 func (cmd *CheckRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()

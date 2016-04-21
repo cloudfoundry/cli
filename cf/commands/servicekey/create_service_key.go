@@ -74,7 +74,7 @@ func (cmd *CreateServiceKey) Requirements(requirementsFactory requirements.Facto
 }
 
 func (cmd *CreateServiceKey) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	cmd.serviceKeyRepo = deps.RepoLocator.GetServiceKeyRepository()

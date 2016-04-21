@@ -82,7 +82,7 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 }
 
 func (cmd *UnbindRouteService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.routeRepo = deps.RepoLocator.GetRouteRepository()
 	cmd.routeServiceBindingRepo = deps.RepoLocator.GetRouteServiceBindingRepository()

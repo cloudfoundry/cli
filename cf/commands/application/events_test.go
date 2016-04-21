@@ -30,7 +30,7 @@ var _ = Describe("events command", func() {
 	const TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetAppEventsRepository(eventsRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("events").SetDependency(deps, pluginCall))

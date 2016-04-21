@@ -59,7 +59,7 @@ var _ = Describe("CreateSharedDomain", func() {
 		repoLocator = repoLocator.SetDomainRepository(domainRepo)
 
 		deps = commandregistry.Dependency{
-			Ui:          ui,
+			UI:          ui,
 			Config:      configRepo,
 			RepoLocator: repoLocator,
 		}

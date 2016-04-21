@@ -28,7 +28,7 @@ var _ = Describe("quotas command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("quotas").SetDependency(deps, pluginCall))

@@ -59,7 +59,7 @@ func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.F
 }
 
 func (cmd *PurgeServiceOffering) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.serviceRepo = deps.RepoLocator.GetServiceRepository()
 	return cmd
 }

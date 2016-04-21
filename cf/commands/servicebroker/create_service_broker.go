@@ -62,7 +62,7 @@ func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Fa
 }
 
 func (cmd *CreateServiceBroker) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceBrokerRepo = deps.RepoLocator.GetServiceBrokerRepository()
 	return cmd

@@ -55,7 +55,7 @@ func (cmd *ListServices) Requirements(requirementsFactory requirements.Factory, 
 }
 
 func (cmd *ListServices) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.serviceSummaryRepo = deps.RepoLocator.GetServiceSummaryRepository()
 	cmd.pluginModel = deps.PluginModels.Services

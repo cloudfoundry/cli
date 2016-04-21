@@ -32,7 +32,7 @@ var _ = Describe("bind-security-group command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(fakeSpaceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(fakeOrgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetSecurityGroupRepository(fakeSecurityGroupRepo)

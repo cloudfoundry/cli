@@ -51,7 +51,7 @@ func (cmd *DisableSSH) Requirements(requirementsFactory requirements.Factory, fc
 }
 
 func (cmd *DisableSSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	return cmd

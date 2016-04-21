@@ -34,7 +34,7 @@ var _ = Describe("enable-ssh command", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetApplicationRepository(appRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("enable-ssh").SetDependency(deps, pluginCall))

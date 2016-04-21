@@ -34,7 +34,7 @@ var _ = Describe("create-org command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.RepoLocator = deps.RepoLocator.SetQuotaRepository(quotaRepo)
 		deps.RepoLocator = deps.RepoLocator.SetFeatureFlagRepository(flagRepo)

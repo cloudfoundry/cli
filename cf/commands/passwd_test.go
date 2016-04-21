@@ -23,7 +23,7 @@ var _ = Describe("password command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = pwDeps.Config
 		deps.RepoLocator = deps.RepoLocator.SetPasswordRepository(pwDeps.PwdRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("passwd").SetDependency(deps, pluginCall))

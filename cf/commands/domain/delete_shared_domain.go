@@ -53,7 +53,7 @@ func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Fac
 }
 
 func (cmd *DeleteSharedDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()
 	return cmd

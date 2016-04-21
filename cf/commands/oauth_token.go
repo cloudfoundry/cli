@@ -42,7 +42,7 @@ func (cmd *OAuthToken) Requirements(requirementsFactory requirements.Factory, fc
 }
 
 func (cmd *OAuthToken) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
-	cmd.ui = deps.Ui
+	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
 	cmd.pluginCall = pluginCall

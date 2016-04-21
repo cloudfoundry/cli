@@ -29,7 +29,7 @@ var _ = Describe("orgs command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("orgs").SetDependency(deps, pluginCall))

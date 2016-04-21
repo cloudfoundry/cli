@@ -39,7 +39,7 @@ var _ = Describe("Login Command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = Config
 		deps.RepoLocator = deps.RepoLocator.SetEndpointRepository(endpointRepo)
 		deps.RepoLocator = deps.RepoLocator.SetAuthenticationRepository(authRepo)

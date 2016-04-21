@@ -29,7 +29,7 @@ var _ = Describe("service-key command", func() {
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
 		deps.RepoLocator = deps.RepoLocator.SetServiceKeyRepository(serviceKeyRepo)
 		deps.Config = config
