@@ -43,6 +43,12 @@ type Author struct {
 	Contact  string `json:"contact"`
 }
 
+func NewPlugins(logger io.Writer) PluginModel {
+	return &Plugins{
+		logger: logger,
+	}
+}
+
 func (p *Plugins) PopulateModel(input interface{}) []Plugin {
 	plugins := []Plugin{}
 	if contents, ok := input.(map[interface{}]interface{})["plugins"].([]interface{}); ok {
