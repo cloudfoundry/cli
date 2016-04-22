@@ -85,8 +85,8 @@
 	"create-service",
 	"create-service-auth-token",
 	"create-service-broker",
-  "create-user",
-  "create-ldap-user",
+	"create-user",
+	"create-external-user",
 	"create-user-provided-service",
 
 	"curl",

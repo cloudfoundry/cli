@@ -67,13 +67,14 @@ type FakeUserRepository struct {
 	createReturns struct {
 		result1 error
 	}
-	CreateLDAPStub        func(username, externalID string) (apiErr error)
-	createLDAPMutex       sync.RWMutex
-	createLDAPArgsForCall []struct {
+	CreateExternalStub        func(username, origin, externalID string) (apiErr error)
+	createExternalMutex       sync.RWMutex
+	createExternalArgsForCall []struct {
 		username   string
+		origin     string
 		externalID string
 	}
-	createLDAPReturns struct {
+	createExternalReturns struct {
 		result1 error
 	}
 	DeleteStub        func(userGuid string) (apiErr error)
@@ -370,35 +371,36 @@ func (fake *FakeUserRepository) CreateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) CreateLDAP(username string, externalID string) (apiErr error) {
-	fake.createLDAPMutex.Lock()
-	fake.createLDAPArgsForCall = append(fake.createLDAPArgsForCall, struct {
+func (fake *FakeUserRepository) CreateExternal(username string, origin string, externalID string) (apiErr error) {
+	fake.createExternalMutex.Lock()
+	fake.createExternalArgsForCall = append(fake.createExternalArgsForCall, struct {
 		username   string
+		origin     string
 		externalID string
-	}{username, externalID})
-	fake.createLDAPMutex.Unlock()
-	if fake.CreateLDAPStub != nil {
-		return fake.CreateLDAPStub(username, externalID)
+	}{username, origin, externalID})
+	fake.createExternalMutex.Unlock()
+	if fake.CreateExternalStub != nil {
+		return fake.CreateExternalStub(username, origin, externalID)
 	} else {
-		return fake.createLDAPReturns.result1
+		return fake.createExternalReturns.result1
 	}
 }
 
-func (fake *FakeUserRepository) CreateLDAPCallCount() int {
-	fake.createLDAPMutex.RLock()
-	defer fake.createLDAPMutex.RUnlock()
-	return len(fake.createLDAPArgsForCall)
+func (fake *FakeUserRepository) CreateExternalCallCount() int {
+	fake.createExternalMutex.RLock()
+	defer fake.createExternalMutex.RUnlock()
+	return len(fake.createExternalArgsForCall)
 }
 
-func (fake *FakeUserRepository) CreateLDAPArgsForCall(i int) (string, string) {
-	fake.createLDAPMutex.RLock()
-	defer fake.createLDAPMutex.RUnlock()
-	return fake.createLDAPArgsForCall[i].username, fake.createLDAPArgsForCall[i].externalID
+func (fake *FakeUserRepository) CreateExternalArgsForCall(i int) (string, string, string) {
+	fake.createExternalMutex.RLock()
+	defer fake.createExternalMutex.RUnlock()
+	return fake.createExternalArgsForCall[i].username, fake.createExternalArgsForCall[i].origin, fake.createExternalArgsForCall[i].externalID
 }
 
-func (fake *FakeUserRepository) CreateLDAPReturns(result1 error) {
-	fake.CreateLDAPStub = nil
-	fake.createLDAPReturns = struct {
+func (fake *FakeUserRepository) CreateExternalReturns(result1 error) {
+	fake.CreateExternalStub = nil
+	fake.createExternalReturns = struct {
 		result1 error
 	}{result1}
 }

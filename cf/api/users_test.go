@@ -869,7 +869,7 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
-	Describe("CreateLDAP", func() {
+	Describe("CreateExternal", func() {
 		Context("when the user does not exist", func() {
 			BeforeEach(func() {
 				ccServer.AppendHandlers(
@@ -888,7 +888,7 @@ var _ = Describe("UserRepository", func() {
 							"userName":"my-user",
 							"emails":[{"value":"my-user"}],
 							"externalid":"my-external-id",
-							"origin":"ldap"
+							"origin":"my-origin"
 							}`),
 						ghttp.RespondWith(http.StatusOK, `{"id":"my-user-guid"}`),
 					),
@@ -896,13 +896,13 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes a call to CC", func() {
-				err := client.CreateLDAP("my-user", "my-external-id")
+				err := client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ccServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
 			It("makes a call to UAA", func() {
-				err := client.CreateLDAP("my-user", "my-external-id")
+				err := client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
 			})
@@ -926,7 +926,7 @@ var _ = Describe("UserRepository", func() {
 								"userName":"my-user",
 								"emails":[{"value":"my-user"}],
 								"externalid":"my-external-id",
-								"origin":"ldap"
+								"origin":"my-origin"
 								}`),
 						ghttp.RespondWith(http.StatusConflict, `
 								{
@@ -938,17 +938,17 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("does not make a call to CC", func() {
-				client.CreateLDAP("my-user", "my-external-id")
+				client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
 
 			It("makes a call to UAA", func() {
-				client.CreateLDAP("my-user", "my-external-id")
+				client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
 			It("returns an error", func() {
-				err := client.CreateLDAP("my-user", "my-external-id")
+				err := client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 			})
 		})
@@ -974,17 +974,17 @@ var _ = Describe("UserRepository", func() {
 			})
 
 			It("makes a call to UAA", func() {
-				client.CreateLDAP("my-user", "my-external-id")
+				client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
 			})
 
 			It("does not make a call to CC", func() {
-				client.CreateLDAP("my-user", "my-external-id")
+				client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(ccServer.ReceivedRequests()).To(BeZero())
 			})
 
 			It("returns an error", func() {
-				err := client.CreateLDAP("my-user", "my-external-id")
+				err := client.CreateExternal("my-user", "my-origin", "my-external-id")
 				Expect(err.Error()).To(ContainSubstring("Forbidden"))
 			})
 		})

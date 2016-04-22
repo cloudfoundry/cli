@@ -12,29 +12,29 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type CreateLDAPUser struct {
+type CreateExternalUser struct {
 	ui       terminal.UI
 	config   coreconfig.Reader
 	userRepo api.UserRepository
 }
 
 func init() {
-	commandregistry.Register(&CreateLDAPUser{})
+	commandregistry.Register(&CreateExternalUser{})
 }
 
-func (cmd *CreateLDAPUser) MetaData() commandregistry.CommandMetadata {
+func (cmd *CreateExternalUser) MetaData() commandregistry.CommandMetadata {
 	return commandregistry.CommandMetadata{
-		Name:        "create-ldap-user",
-		Description: T("Create a new user authenticated by LDAP"),
+		Name:        "create-external-user",
+		Description: T("Create a new user authenticated by an external provider"),
 		Usage: []string{
-			T("CF_NAME create-ldap-user USERNAME EXTERNALID"),
+			T("CF_NAME create-external-user USERNAME ORIGIN EXTERNALID"),
 		},
 	}
 }
 
-func (cmd *CreateLDAPUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 2 {
-		usage := commandregistry.Commands.CommandUsage("create-ldap-user")
+func (cmd *CreateExternalUser) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+	if len(fc.Args()) != 3 {
+		usage := commandregistry.Commands.CommandUsage("create-external-user")
 		cmd.ui.Failed(T("Incorrect Usage. Requires arguments\n\n") + usage)
 	}
 
@@ -45,16 +45,17 @@ func (cmd *CreateLDAPUser) Requirements(requirementsFactory requirements.Factory
 	return reqs
 }
 
-func (cmd *CreateLDAPUser) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+func (cmd *CreateExternalUser) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.Ui
 	cmd.config = deps.Config
 	cmd.userRepo = deps.RepoLocator.GetUserRepository()
 	return cmd
 }
 
-func (cmd *CreateLDAPUser) Execute(c flags.FlagContext) {
+func (cmd *CreateExternalUser) Execute(c flags.FlagContext) {
 	username := c.Args()[0]
-	externalID := c.Args()[1]
+	origin := c.Args()[1]
+	externalID := c.Args()[2]
 
 	cmd.ui.Say(T("Creating user {{.TargetUser}}...",
 		map[string]interface{}{
@@ -62,7 +63,7 @@ func (cmd *CreateLDAPUser) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.userRepo.CreateLDAP(username, externalID)
+	err := cmd.userRepo.CreateExternal(username, origin, externalID)
 	switch err.(type) {
 	case nil:
 	case *errors.ModelAlreadyExistsError:

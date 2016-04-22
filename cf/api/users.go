@@ -45,7 +45,7 @@ type UserRepository interface {
 	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, error)
 	ListUsersInSpaceForRoleWithNoUAA(spaceGuid string, role string) ([]models.UserFields, error)
 	Create(username, password string) (apiErr error)
-	CreateLDAP(username, externalID string) (apiErr error)
+	CreateExternal(username, origin, externalID string) (apiErr error)
 	Delete(userGuid string) (apiErr error)
 	SetOrgRoleByGuid(userGuid, orgGuid, role string) (apiErr error)
 	SetOrgRoleByUsername(username, orgGuid, role string) (apiErr error)
@@ -226,14 +226,14 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 	return repo.ccGateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body))
 }
 
-func (repo CloudControllerUserRepository) CreateLDAP(username, externalID string) (err error) {
+func (repo CloudControllerUserRepository) CreateExternal(username, origin, externalID string) (err error) {
 	uaaEndpoint, err := repo.getAuthEndpoint()
 	if err != nil {
 		return
 	}
 
 	path := "/Users"
-	body, err := json.Marshal(resources.NewLDAPUserResource(username, externalID))
+	body, err := json.Marshal(resources.NewExternalUserResource(username, origin, externalID))
 
 	if err != nil {
 		return
