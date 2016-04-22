@@ -221,85 +221,137 @@ var _ = Describe("logs with noaa repository", func() {
 
 		Context("and the buffer time is sufficient for sorting", func() {
 			var msg1, msg2, msg3 *events.LogMessage
+			var errorChan chan error
+			var outputChan chan *events.LogMessage
+			var writeToChan func()
+			var closeWait sync.WaitGroup
 
 			BeforeEach(func() {
-				repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
+				closeWait = sync.WaitGroup{}
+			})
 
-				closeWait := sync.WaitGroup{}
+			JustBeforeEach(func() {
+				repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
 
 				msg1 = makeNoaaLogMessage("hello1", 100)
 				msg2 = makeNoaaLogMessage("hello2", 200)
 				msg3 = makeNoaaLogMessage("hello3", 300)
 
 				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					errorChan := make(chan error)
-					outputChan := make(chan *events.LogMessage)
 					closeWait.Add(1)
 
-					go func() {
+					go writeToChan()
+					return outputChan, errorChan
+				}
+
+				fakeNoaaConsumer.CloseStub = func() error {
+					closeWait.Done()
+					return nil
+				}
+			})
+
+			Context("when the channels are closed before reading", func() {
+				BeforeEach(func() {
+					errorChan = make(chan error)
+					outputChan = make(chan *events.LogMessage)
+					writeToChan = func() {
 						outputChan <- msg3
 						outputChan <- msg2
 						outputChan <- msg1
 
 						close(errorChan)
 						close(outputChan)
-					}()
-					return outputChan, errorChan
-				}
-
-				fakeNoaaConsumer.CloseStub = func() error {
-					closeWait.Done()
-
-					return nil
-				}
-			})
-
-			It("sorts the messages before yielding them", func() {
-				receivedMessages := []logs.Loggable{}
-
-				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
-				Consistently(errChan).ShouldNot(Receive())
-
-				m := <-logChan
-				receivedMessages = append(receivedMessages, m)
-				m = <-logChan
-				receivedMessages = append(receivedMessages, m)
-				m = <-logChan
-				receivedMessages = append(receivedMessages, m)
-				repo.Close()
-
-				Expect(receivedMessages).To(Equal([]logs.Loggable{
-					logs.NewNoaaLogMessage(msg1),
-					logs.NewNoaaLogMessage(msg2),
-					logs.NewNoaaLogMessage(msg3),
-				}))
-			})
-
-			It("flushes remaining log messages when Close is called", func() {
-				repo.BufferTime = 10 * time.Second
-
-				receivedMessages := []logs.Loggable{}
-
-				go func() {
-					for msg := range logChan {
-						receivedMessages = append(receivedMessages, msg)
 					}
-				}()
+				})
 
-				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
-				Consistently(errChan).ShouldNot(Receive())
+				It("sorts the messages before yielding them", func() {
+					receivedMessages := []logs.Loggable{}
 
-				repo.Close()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+					Consistently(errChan).ShouldNot(Receive())
 
-				getReceivedMessages := func() []logs.Loggable {
-					return receivedMessages
-				}
+					m := <-logChan
+					receivedMessages = append(receivedMessages, m)
+					m = <-logChan
+					receivedMessages = append(receivedMessages, m)
+					m = <-logChan
+					receivedMessages = append(receivedMessages, m)
+					repo.Close()
 
-				Eventually(getReceivedMessages).Should(Equal([]logs.Loggable{
-					logs.NewNoaaLogMessage(msg1),
-					logs.NewNoaaLogMessage(msg2),
-					logs.NewNoaaLogMessage(msg3),
-				}))
+					Expect(receivedMessages).To(Equal([]logs.Loggable{
+						logs.NewNoaaLogMessage(msg1),
+						logs.NewNoaaLogMessage(msg2),
+						logs.NewNoaaLogMessage(msg3),
+					}))
+				})
+			})
+
+			Context("when the channels are read while being written to", func() {
+				BeforeEach(func() {
+					errorChan = make(chan error)
+					outputChan = make(chan *events.LogMessage)
+					writeToChan = func() {
+						outputChan <- msg3
+						outputChan <- msg2
+						outputChan <- msg1
+
+						closeWait.Wait()
+
+						close(errorChan)
+						close(outputChan)
+					}
+				})
+
+				It("sorts the messages before yielding them", func(done Done) {
+					receivedMessages := []logs.Loggable{}
+
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+					Consistently(errChan).ShouldNot(Receive())
+
+					m := <-logChan
+					receivedMessages = append(receivedMessages, m)
+					m = <-logChan
+					receivedMessages = append(receivedMessages, m)
+					m = <-logChan
+					receivedMessages = append(receivedMessages, m)
+
+					repo.Close()
+
+					Expect(receivedMessages).To(Equal([]logs.Loggable{
+						logs.NewNoaaLogMessage(msg1),
+						logs.NewNoaaLogMessage(msg2),
+						logs.NewNoaaLogMessage(msg3),
+					}))
+
+					close(done)
+				})
+
+				It("flushes remaining log messages when Close is called", func() {
+					repo.BufferTime = 10 * time.Second
+
+					receivedMessages := []logs.Loggable{}
+
+					go func() {
+						for msg := range logChan {
+							receivedMessages = append(receivedMessages, msg)
+						}
+					}()
+
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+					Consistently(errChan).ShouldNot(Receive())
+
+					repo.Close()
+
+					getReceivedMessages := func() []logs.Loggable {
+						return receivedMessages
+					}
+
+					Eventually(getReceivedMessages).Should(Equal([]logs.Loggable{
+						logs.NewNoaaLogMessage(msg1),
+						logs.NewNoaaLogMessage(msg2),
+						logs.NewNoaaLogMessage(msg3),
+					}))
+				})
 			})
 		})
 	})
