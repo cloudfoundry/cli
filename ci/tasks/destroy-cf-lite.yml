@@ -22,7 +22,7 @@ run:
       --region "${AWS_REGION}" \
       --filters "Name=tag:Name,Values=${LITE_INSTANCE_NAME}" | \
       jq -r ".Reservations | map(.Instances[0]) | \
-        map(.InstanceID) | join(\" \")")"
+        map(.InstanceId) | join(\" \")")"
 
     if [[ ! -z $INSTANCE_IDS ]]; then
       aws ec2 terminate-instances \
