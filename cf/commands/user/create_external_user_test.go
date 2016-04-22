@@ -36,14 +36,14 @@ var _ = Describe("Create External user command", func() {
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
-		deps.Ui = ui
+		deps.UI = ui
 		deps.Config = config
 		deps.RepoLocator = deps.RepoLocator.SetUserRepository(userRepo)
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-external-user").SetDependency(deps, pluginCall))
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCliCommand("create-external-user", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-external-user", args, requirementsFactory, updateCommandDependency, false)
 	}
 
 	It("creates a user authenticated by an external provider", func() {
@@ -75,7 +75,7 @@ var _ = Describe("Create External user command", func() {
 		})
 
 		It("fails when any error other than alreadyExists is returned", func() {
-			userRepo.CreateExternalReturns(errors.NewHttpError(403, "403", "Forbidden"))
+			userRepo.CreateExternalReturns(errors.NewHTTPError(403, "403", "Forbidden"))
 
 			runCommand("my-user", "my-origin", "my-external-id")
 

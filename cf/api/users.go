@@ -243,7 +243,7 @@ func (repo CloudControllerUserRepository) CreateExternal(username, origin, exter
 	err = repo.uaaGateway.CreateResource(uaaEndpoint, path, bytes.NewReader(body), createUserResponse)
 	switch httpErr := err.(type) {
 	case nil:
-	case errors.HttpError:
+	case errors.HTTPError:
 		if httpErr.StatusCode() == http.StatusConflict {
 			err = errors.NewModelAlreadyExistsError("user", username)
 			return
@@ -255,14 +255,14 @@ func (repo CloudControllerUserRepository) CreateExternal(username, origin, exter
 
 	path = "/v2/users"
 	body, err = json.Marshal(resources.Metadata{
-		Guid: createUserResponse.Id,
+		GUID: createUserResponse.ID,
 	})
 
 	if err != nil {
 		return
 	}
 
-	return repo.ccGateway.CreateResource(repo.config.ApiEndpoint(), path, bytes.NewReader(body))
+	return repo.ccGateway.CreateResource(repo.config.APIEndpoint(), path, bytes.NewReader(body))
 }
 
 func (repo CloudControllerUserRepository) Delete(userGUID string) (apiErr error) {
