@@ -108,6 +108,10 @@
     "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
+    "id": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID",
+    "translation": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID"
+  },
+  {
     "id": "CF_NAME create-org ORG",
     "translation": "CF_NAME create-org ORG"
   },
@@ -598,6 +602,10 @@
   {
     "id": "Create a TCP route",
     "translation": "Create a TCP route"
+  },
+  {
+    "id": "Create a new user authenticated by an external provider",
+    "translation": "Create a new user authenticated by an external provider"
   },
   {
     "id": "Create a random port for the TCP route",
