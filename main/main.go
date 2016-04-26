@@ -53,7 +53,11 @@ func main() {
 	}
 
 	// Only used to get Trace, so our errorHandler doesn't matter, since it's not used
-	config := coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errFunc)
+	configPath, err := confighelpers.DefaultFilePath()
+	if err != nil {
+		errFunc(err)
+	}
+	config := coreconfig.NewRepositoryFromFilepath(configPath, errFunc)
 	defer config.Close()
 
 	traceConfigVal := config.Trace()

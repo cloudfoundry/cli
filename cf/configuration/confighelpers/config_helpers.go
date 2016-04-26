@@ -1,22 +1,26 @@
 package confighelpers
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 )
 
-func DefaultFilePath() string {
-	var configDir string
+func DefaultFilePath() (string, error) {
+	var homeDir string
 
 	if os.Getenv("CF_HOME") != "" {
-		cfHome := os.Getenv("CF_HOME")
-		configDir = filepath.Join(cfHome, ".cf")
+		homeDir = os.Getenv("CF_HOME")
+
+		if _, err := os.Stat(homeDir); os.IsNotExist(err) {
+			return "", fmt.Errorf("Error locating CF_HOME folder '%s'", homeDir)
+		}
 	} else {
-		configDir = filepath.Join(userHomeDir(), ".cf")
+		homeDir = userHomeDir()
 	}
 
-	return filepath.Join(configDir, "config.json")
+	return filepath.Join(homeDir, ".cf", "config.json"), nil
 }
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory

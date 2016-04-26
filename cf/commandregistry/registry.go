@@ -26,7 +26,12 @@ func initI18nFunc() bool {
 			os.Exit(1)
 		}
 	}
-	T = Init(coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errorHandler))
+
+	configPath, err := confighelpers.DefaultFilePath()
+	if err != nil {
+		errorHandler(err)
+	}
+	T = Init(coreconfig.NewRepositoryFromFilepath(configPath, errorHandler))
 	return true
 }
 
