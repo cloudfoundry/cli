@@ -1,16 +1,21 @@
+High five for submitting a report!
+To avoid additional back and forth, please include the following details as relevant:
+
 ### Command
 
 e.g. cf org-users
 
 ### CLI Version
 
-e.g. 6.13.0-dfba612
+e.g. 6.13.0-dfba612 (visit the [releases page](https://github.com/cloudfoundry/cli/releases/) and confirm it's reproducible on the latest version)
 
 ### Error
 
 ### Stack Trace
 
-### CC API Version
+### CC API Endpoint Version
+
+see `cf api` output
 
 ### CF Trace
 
