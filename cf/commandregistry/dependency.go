@@ -73,7 +73,12 @@ func NewDependency(logger trace.Printer) Dependency {
 			deps.UI.Failed(fmt.Sprintf("Config error: %s", err))
 		}
 	}
-	deps.Config = coreconfig.NewRepositoryFromFilepath(confighelpers.DefaultFilePath(), errorHandler)
+
+	configPath, err := confighelpers.DefaultFilePath()
+	if err != nil {
+		errorHandler(err)
+	}
+	deps.Config = coreconfig.NewRepositoryFromFilepath(configPath, errorHandler)
 
 	deps.ManifestRepo = manifest.NewManifestDiskRepository()
 	deps.AppManifest = manifest.NewGenerator()
