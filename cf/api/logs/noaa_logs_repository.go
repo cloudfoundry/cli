@@ -77,8 +77,10 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 			select {
 			case msg, ok := <-c:
 				if !ok {
+					ticker.Stop()
 					repo.flushMessages(logChan)
 					close(logChan)
+					close(errChan)
 					return
 				}
 
@@ -88,9 +90,15 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 				case nil:
 				case *noaa_errors.UnauthorizedError:
 					repo.tokenRefresher.RefreshAuthToken()
+					ticker.Stop()
 					repo.TailLogsFor(appGuid, onConnect, logChan, errChan)
+					return
 				default:
 					errChan <- err
+
+					ticker.Stop()
+					close(logChan)
+					close(errChan)
 					return
 				}
 			}
