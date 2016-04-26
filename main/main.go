@@ -198,7 +198,7 @@ func handleVerbose(args []string) ([]string, bool) {
 		}
 	}
 
-	if idx != -1 && len(args) > 1 {
+	if idx == 1 && len(args) > 1 {
 		verbose = true
 		args = append(args[:idx], args[idx+1:]...)
 	}
