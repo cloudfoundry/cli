@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-
+	
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
@@ -102,40 +102,71 @@ var _ = Describe("logs with noaa repository", func() {
 		})
 	})
 
-	Describe("tailing logs", func() {
+	Describe("TailLogsFor", func() {
 		var errChan chan error
 		var logChan chan logs.Loggable
 
-		BeforeEach(func() {
-			errChan = make(chan error)
-			logChan = make(chan logs.Loggable)
+		AfterEach(func() {
+			Eventually(errChan).Should(BeClosed())
+			Eventually(logChan).Should(BeClosed())
 		})
 
 		Context("when an error occurs", func() {
+			var e chan error
+			var c chan *events.LogMessage
+
+			BeforeEach(func() {
+				errChan = make(chan error)
+				logChan = make(chan logs.Loggable)
+
+				e = make(chan error)
+				c = make(chan *events.LogMessage)
+
+				fakeNoaaConsumer.CloseStub = func() error {
+					close(e)
+					close(c)
+					return nil
+				}
+			})
+
 			It("returns an error when it occurs", func(done Done) {
+				defer repo.Close()
 				err := errors.New("oops")
 
 				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					errorChan := make(chan error)
 					go func() {
-						errorChan <- err
+						e <- err
 					}()
-					return nil, errorChan
+					return c, e
 				}
+				go repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
-				go func() {
-					defer GinkgoRecover()
+				Eventually(errChan).Should(Receive(&err))
 
-					Eventually(errChan).Should(Receive(&err))
-					close(done)
-				}()
-
-				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				close(done)
 			})
 		})
 
 		Context("when a noaa_errors.UnauthorizedError occurs", func() {
+			var e chan error
+			var c chan *events.LogMessage
+
+			BeforeEach(func() {
+				errChan = make(chan error)
+				logChan = make(chan logs.Loggable)
+
+				e = make(chan error)
+				c = make(chan *events.LogMessage)
+
+				fakeNoaaConsumer.CloseStub = func() error {
+					close(e)
+					close(c)
+					return nil
+				}
+			})
+
 			It("refreshes the access token and tail logs once more", func(done Done) {
+				defer repo.Close()
 				calledOnce := false
 				err := errors.New("2nd Error")
 				synchronization := make(chan bool)
@@ -146,69 +177,70 @@ var _ = Describe("logs with noaa repository", func() {
 				}
 
 				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					errorChan := make(chan error)
-					logChan := make(chan *events.LogMessage)
+					ec := make(chan error)
+					lc := make(chan *events.LogMessage)
 
 					go func() {
 						if !calledOnce {
 							calledOnce = true
-							errorChan <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
+							ec <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
 						} else {
-							errorChan <- err
+							ec <- err
 							<-synchronization
-							close(errorChan)
-							close(logChan)
+							close(ec)
+							close(lc)
 						}
 					}()
 
-					return logChan, errorChan
+					return lc, ec
 				}
 
-				go func() {
-					defer GinkgoRecover()
+				go repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
-					Eventually(errChan).Should(Receive(&err))
-					Eventually(fakeTokenRefresher.RefreshAuthTokenCallCount()).Should(Equal(1))
+				Eventually(errChan).Should(Receive(&err))
+				Eventually(fakeTokenRefresher.RefreshAuthTokenCallCount).Should(Equal(1))
 
-					close(done)
-				}()
-
-				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				close(done)
 			})
 		})
 
 		Context("when no error occurs", func() {
-			It("asks for the logs for the given app", func(done Done) {
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					errorChan := make(chan error)
-					go func() {
-						errorChan <- errors.New("quit Tailing")
-					}()
-					return nil, errorChan
+			var e chan error
+			var c chan *events.LogMessage
+
+			BeforeEach(func() {
+				errChan = make(chan error)
+				logChan = make(chan logs.Loggable)
+
+				e = make(chan error)
+				c = make(chan *events.LogMessage)
+
+				fakeNoaaConsumer.CloseStub = func() error {
+					close(e)
+					close(c)
+					return nil
 				}
-
-				go func() {
-					defer GinkgoRecover()
-
-					Eventually(fakeNoaaConsumer.TailingLogsCallCount()).Should(Equal(1))
-					appGuid, token := fakeNoaaConsumer.TailingLogsArgsForCall(0)
-					Expect(appGuid).To(Equal("app-guid"))
-					Expect(token).To(Equal("the-access-token"))
-
-					close(done)
-				}()
-
-				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 			})
 
+			It("asks for the logs for the given app", func(done Done) {
+				defer repo.Close()
+
+				fakeNoaaConsumer.TailingLogsReturns(c, e)
+
+				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+
+				Eventually(fakeNoaaConsumer.TailingLogsCallCount).Should(Equal(1))
+				appGuid, token := fakeNoaaConsumer.TailingLogsArgsForCall(0)
+				Expect(appGuid).To(Equal("app-guid"))
+				Expect(token).To(Equal("the-access-token"))
+
+				close(done)
+			}, 2)
+
 			It("sets the on connect callback", func() {
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					errorChan := make(chan error)
-					go func() {
-						errorChan <- errors.New("quit Tailing")
-					}()
-					return nil, errorChan
-				}
+				defer repo.Close()
+
+				fakeNoaaConsumer.TailingLogsReturns(c, e)
 
 				var cb = func() { return }
 				repo.TailLogsFor("app-guid", cb, logChan, errChan)
@@ -221,50 +253,51 @@ var _ = Describe("logs with noaa repository", func() {
 
 		Context("and the buffer time is sufficient for sorting", func() {
 			var msg1, msg2, msg3 *events.LogMessage
-			var errorChan chan error
-			var outputChan chan *events.LogMessage
-			var writeToChan func()
-			var closeWait sync.WaitGroup
+			var ec chan error
+			var lc chan *events.LogMessage
+			var syncMu sync.Mutex
 
 			BeforeEach(func() {
-				closeWait = sync.WaitGroup{}
+				msg1 = makeNoaaLogMessage("hello1", 100)
+				msg2 = makeNoaaLogMessage("hello2", 200)
+				msg3 = makeNoaaLogMessage("hello3", 300)
+
+				errChan = make(chan error)
+				logChan = make(chan logs.Loggable)
+				ec = make(chan error)
+
+				syncMu.Lock()
+				lc = make(chan *events.LogMessage)
+				syncMu.Unlock()
+
+				fakeNoaaConsumer.TailingLogsStub = func(string, string) (<-chan *events.LogMessage, <-chan error) {
+					go func() {
+						syncMu.Lock()
+						lc <- msg3
+						lc <- msg2
+						lc <- msg1
+						syncMu.Unlock()
+					}()
+
+					return lc, ec
+				}
 			})
 
 			JustBeforeEach(func() {
 				repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
 
-				msg1 = makeNoaaLogMessage("hello1", 100)
-				msg2 = makeNoaaLogMessage("hello2", 200)
-				msg3 = makeNoaaLogMessage("hello3", 300)
-
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					closeWait.Add(1)
-
-					go writeToChan()
-					return outputChan, errorChan
-				}
-
 				fakeNoaaConsumer.CloseStub = func() error {
-					closeWait.Done()
+					syncMu.Lock()
+					close(lc)
+					syncMu.Unlock()
+					close(ec)
+
 					return nil
 				}
 			})
 
 			Context("when the channels are closed before reading", func() {
-				BeforeEach(func() {
-					errorChan = make(chan error)
-					outputChan = make(chan *events.LogMessage)
-					writeToChan = func() {
-						outputChan <- msg3
-						outputChan <- msg2
-						outputChan <- msg1
-
-						close(errorChan)
-						close(outputChan)
-					}
-				})
-
-				It("sorts the messages before yielding them", func() {
+				It("sorts the messages before yielding them", func(done Done) {
 					receivedMessages := []logs.Loggable{}
 
 					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
@@ -283,25 +316,11 @@ var _ = Describe("logs with noaa repository", func() {
 						logs.NewNoaaLogMessage(msg2),
 						logs.NewNoaaLogMessage(msg3),
 					}))
+					close(done)
 				})
 			})
 
 			Context("when the channels are read while being written to", func() {
-				BeforeEach(func() {
-					errorChan = make(chan error)
-					outputChan = make(chan *events.LogMessage)
-					writeToChan = func() {
-						outputChan <- msg3
-						outputChan <- msg2
-						outputChan <- msg1
-
-						closeWait.Wait()
-
-						close(errorChan)
-						close(outputChan)
-					}
-				})
-
 				It("sorts the messages before yielding them", func(done Done) {
 					receivedMessages := []logs.Loggable{}
 
@@ -329,28 +348,15 @@ var _ = Describe("logs with noaa repository", func() {
 				It("flushes remaining log messages when Close is called", func() {
 					repo.BufferTime = 10 * time.Second
 
-					receivedMessages := []logs.Loggable{}
-
-					go func() {
-						for msg := range logChan {
-							receivedMessages = append(receivedMessages, msg)
-						}
-					}()
-
 					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 					Consistently(errChan).ShouldNot(Receive())
+					Consistently(logChan).ShouldNot(Receive())
 
 					repo.Close()
 
-					getReceivedMessages := func() []logs.Loggable {
-						return receivedMessages
-					}
-
-					Eventually(getReceivedMessages).Should(Equal([]logs.Loggable{
-						logs.NewNoaaLogMessage(msg1),
-						logs.NewNoaaLogMessage(msg2),
-						logs.NewNoaaLogMessage(msg3),
-					}))
+					Eventually(logChan).Should(Receive(Equal(logs.NewNoaaLogMessage(msg1))))
+					Eventually(logChan).Should(Receive(Equal(logs.NewNoaaLogMessage(msg2))))
+					Eventually(logChan).Should(Receive(Equal(logs.NewNoaaLogMessage(msg3))))
 				})
 			})
 		})
