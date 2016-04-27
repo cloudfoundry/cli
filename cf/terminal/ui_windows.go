@@ -3,8 +3,13 @@
 package terminal
 
 import (
+	"bufio"
+	"fmt"
 	"os"
+	"strings"
 	"syscall"
+
+	"github.com/fatih/color"
 )
 
 // see SetConsoleMode documentation for bit flags
@@ -42,4 +47,23 @@ func setConsoleMode(console syscall.Handle, mode uint32) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (ui *terminalUI) Ask(prompt string) string {
+	fmt.Fprintf(color.Output, "\n%s%s ", prompt, PromptColor(">"))
+
+	rd := bufio.NewReader(ui.stdin)
+	line, err := rd.ReadString('\n')
+	if err == nil {
+		return strings.TrimSpace(line)
+	}
+	return ""
+}
+
+func PrintToTerminal(str string) (int, error) {
+	return fmt.Fprint(color.Output, str)
+}
+
+func PrintlnToTerminal(str string) (int, error) {
+	return fmt.Fprintln(color.Output, str)
 }

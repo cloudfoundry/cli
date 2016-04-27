@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"strings"
@@ -9,6 +8,7 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
 	"bytes"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -128,17 +128,6 @@ func (ui *terminalUI) Confirm(message string) bool {
 		return true
 	}
 	return false
-}
-
-func (ui *terminalUI) Ask(prompt string) (answer string) {
-	fmt.Printf("\n%s%s ", prompt, PromptColor(">"))
-
-	rd := bufio.NewReader(ui.stdin)
-	line, err := rd.ReadString('\n')
-	if err == nil {
-		return strings.TrimSpace(line)
-	}
-	return ""
 }
 
 func (ui *terminalUI) Ok() {

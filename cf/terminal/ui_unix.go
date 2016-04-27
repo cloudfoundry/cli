@@ -1,6 +1,6 @@
 // Copied from https://code.google.com/p/gopass/
 
-// +build darwin freebsd linux netbsd openbsd
+// +build !windows
 
 package terminal
 
@@ -99,4 +99,23 @@ func catchSignal(fd []uintptr, sig chan os.Signal) {
 		echoOn(fd)
 		os.Exit(2)
 	}
+}
+
+func (ui *terminalUI) Ask(prompt string) string {
+	fmt.Printf("\n%s%s ", prompt, PromptColor(">"))
+
+	rd := bufio.NewReader(ui.stdin)
+	line, err := rd.ReadString('\n')
+	if err == nil {
+		return strings.TrimSpace(line)
+	}
+	return ""
+}
+
+func PrintToTerminal(str string) (int, error) {
+	return fmt.Print(str)
+}
+
+func PrintlnToTerminal(str string) (int, error) {
+	return fmt.Println(str)
 }

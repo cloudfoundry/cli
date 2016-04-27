@@ -1,29 +1,25 @@
 package terminal
 
 import (
-	"fmt"
 	"os"
 	"regexp"
-	"runtime"
 
+	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-type Color uint
-
 const (
-	red     Color = 31
-	green         = 32
-	yellow        = 33
-	magenta       = 35
-	cyan          = 36
-	grey          = 37
-	white         = 38
+	red     color.Attribute = color.FgRed
+	green                   = color.FgGreen
+	yellow                  = color.FgYellow
+	magenta                 = color.FgMagenta
+	cyan                    = color.FgCyan
+	grey                    = color.FgWhite
+	white                   = color.FgHiWhite
 )
 
 var (
-	colorize               func(message string, color Color, bold int) string
-	OsSupportsColors       = runtime.GOOS != "windows"
+	colorize               func(message string, textColor color.Attribute, bold int) string
 	TerminalSupportsColors = isTerminal()
 	UserAskedForColors     = ""
 )
@@ -34,11 +30,16 @@ func init() {
 
 func InitColorSupport() {
 	if colorsEnabled() {
-		colorize = func(message string, color Color, bold int) string {
-			return fmt.Sprintf("\033[%d;%dm%s\033[0m", bold, color, message)
+		colorize = func(message string, textColor color.Attribute, bold int) string {
+			colorPrinter := color.New(textColor)
+			if bold == 1 {
+				colorPrinter = colorPrinter.Add(color.Bold)
+			}
+			f := colorPrinter.SprintFunc()
+			return f(message)
 		}
 	} else {
-		colorize = func(message string, _ Color, _ int) string {
+		colorize = func(message string, _ color.Attribute, _ int) string {
 			return message
 		}
 	}
@@ -46,7 +47,7 @@ func InitColorSupport() {
 
 func colorsEnabled() bool {
 	return userDidNotDisableColor() &&
-		(userEnabledColors() || (TerminalSupportsColors && OsSupportsColors))
+		(userEnabledColors() || TerminalSupportsColors)
 }
 
 func userEnabledColors() bool {
@@ -57,12 +58,12 @@ func userDidNotDisableColor() bool {
 	return os.Getenv("CF_COLOR") != "false" && (UserAskedForColors != "false" || os.Getenv("CF_COLOR") == "true")
 }
 
-func Colorize(message string, color Color) string {
-	return colorize(message, color, 0)
+func Colorize(message string, textColor color.Attribute) string {
+	return colorize(message, textColor, 0)
 }
 
-func ColorizeBold(message string, color Color) string {
-	return colorize(message, color, 1)
+func ColorizeBold(message string, textColor color.Attribute) string {
+	return colorize(message, textColor, 1)
 }
 
 var decolorizerRegex = regexp.MustCompile(`\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`)

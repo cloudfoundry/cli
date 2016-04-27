@@ -2,9 +2,9 @@ package terminal_test
 
 import (
 	"os"
-	"runtime"
 
 	. "github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/fatih/color"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -19,28 +19,7 @@ var _ = Describe("Terminal colors", func() {
 	})
 
 	Describe("CF_COLOR", func() {
-		Context("On OSes that don't support colors", func() {
-			BeforeEach(func() { OsSupportsColors = false })
-
-			Context("When the CF_COLOR env variable is specified", func() {
-				BeforeEach(func() { os.Setenv("CF_COLOR", "true") })
-				itColorizes()
-			})
-
-			Context("When the CF_COLOR env variable is not specified", func() {
-				BeforeEach(func() { os.Setenv("CF_COLOR", "") })
-				itDoesntColorize()
-
-				Context("when the user DOES ask for colors", func() {
-					BeforeEach(func() { UserAskedForColors = "true" })
-					itColorizes()
-				})
-			})
-		})
-
-		Context("On OSes that support colors", func() {
-			BeforeEach(func() { OsSupportsColors = true })
-
+		Context("All OSes support colors", func() {
 			Context("When the CF_COLOR env variable is not specified", func() {
 				BeforeEach(func() { os.Setenv("CF_COLOR", "") })
 
@@ -110,28 +89,15 @@ var _ = Describe("Terminal colors", func() {
 		})
 	})
 
-	Describe("OsSupportsColors", func() {
-		It("Returns false on windows, and true otherwise", func() {
-			if runtime.GOOS == "windows" {
-				Expect(OsSupportsColors).To(BeFalse())
-			} else {
-				Expect(OsSupportsColors).To(BeTrue())
-			}
-		})
-	})
-
 	var (
-		originalOsSupportsColors       bool
 		originalTerminalSupportsColors bool
 	)
 
 	BeforeEach(func() {
-		originalOsSupportsColors = OsSupportsColors
 		originalTerminalSupportsColors = TerminalSupportsColors
 	})
 
 	AfterEach(func() {
-		OsSupportsColors = originalOsSupportsColors
 		TerminalSupportsColors = originalTerminalSupportsColors
 		os.Setenv("CF_COLOR", "false")
 	})
@@ -140,15 +106,16 @@ var _ = Describe("Terminal colors", func() {
 func itColorizes() {
 	It("colorizes", func() {
 		text := "Hello World"
-		colorizedText := ColorizeBold(text, 31)
-		Expect(colorizedText).To(Equal("\033[1;31mHello World\033[0m"))
+		colorizedText := ColorizeBold(text, 33)
+		colorizeYellow := color.New(color.FgYellow).Add(color.Bold).SprintFunc()
+		Expect(colorizedText).To(Equal(colorizeYellow(text)))
 	})
 }
 
 func itDoesntColorize() {
 	It("doesn't colorize", func() {
 		text := "Hello World"
-		colorizedText := ColorizeBold(text, 31)
+		colorizedText := ColorizeBold(text, 33)
 		Expect(colorizedText).To(Equal("Hello World"))
 	})
 }
