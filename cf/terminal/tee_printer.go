@@ -25,31 +25,31 @@ func (t *TeePrinter) SetOutputBucket(bucket io.Writer) {
 	t.outputBucket = bucket
 }
 
-func (t *TeePrinter) Print(values ...interface{}) (n int, err error) {
+func (t *TeePrinter) Print(values ...interface{}) (int, error) {
 	str := fmt.Sprint(values...)
 	t.saveOutputToBucket(str)
 	if !t.disableTerminalOutput {
-		return fmt.Print(str)
+		return PrintToTerminal(str)
 	}
-	return
+	return 0, nil
 }
 
-func (t *TeePrinter) Printf(format string, a ...interface{}) (n int, err error) {
+func (t *TeePrinter) Printf(format string, a ...interface{}) (int, error) {
 	str := fmt.Sprintf(format, a...)
 	t.saveOutputToBucket(str)
 	if !t.disableTerminalOutput {
-		return fmt.Print(str)
+		return PrintToTerminal(str)
 	}
-	return
+	return 0, nil
 }
 
-func (t *TeePrinter) Println(values ...interface{}) (n int, err error) {
+func (t *TeePrinter) Println(values ...interface{}) (int, error) {
 	str := fmt.Sprint(values...)
 	t.saveOutputToBucket(str)
 	if !t.disableTerminalOutput {
-		return fmt.Println(str)
+		return PrintlnToTerminal(str)
 	}
-	return
+	return 0, nil
 }
 
 func (t *TeePrinter) DisableTerminalOutput(disable bool) {
