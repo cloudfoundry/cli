@@ -1,6 +1,9 @@
 package user
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -23,12 +26,25 @@ func init() {
 }
 
 func (cmd *CreateUser) MetaData() commandregistry.CommandMetadata {
+	fs := make(map[string]flags.FlagSet)
+	fs["origin"] = &flags.StringFlag{Name: "origin", Usage: T("User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied")}
+
 	return commandregistry.CommandMetadata{
 		Name:        "create-user",
 		Description: T("Create a new user"),
 		Usage: []string{
-			T("CF_NAME create-user USERNAME PASSWORD"),
+
+			fmt.Sprintf("%s:\n", T("Create a UAA authenticated user")),
+			"      CF_NAME create-user USERNAME PASSWORD\n\n",
+
+			fmt.Sprintf("  %s:\n", T("Create an externally authenticated user")),
+			"      CF_NAME create-user USERNAME EXTERNAL_ID --origin ORIGIN\n\n",
 		},
+		Examples: []string{
+			"CF_NAME create-user j.smith@mydomain.com S3cr3t                                                  # UAA-authenticated user",
+			"CF_NAME create-user j.smith@mydomain.com 'cn=1234,ou=MYCORD,dc=Dev,dc=HQ,dc=MYCO' --origin ldap  # LDAP-authenticated user",
+		},
+		Flags: fs,
 	}
 }
 
@@ -53,8 +69,10 @@ func (cmd *CreateUser) SetDependency(deps commandregistry.Dependency, pluginCall
 }
 
 func (cmd *CreateUser) Execute(c flags.FlagContext) {
+
 	username := c.Args()[0]
-	password := c.Args()[1]
+
+	var err error
 
 	cmd.ui.Say(T("Creating user {{.TargetUser}}...",
 		map[string]interface{}{
@@ -62,7 +80,15 @@ func (cmd *CreateUser) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.userRepo.Create(username, password)
+	if !c.IsSet("origin") || c.IsSet("origin") && strings.ToLower(c.String("origin")) == "uaa" {
+		password := c.Args()[1]
+		err = cmd.userRepo.Create(username, password)
+	} else {
+		externalid := c.Args()[1]
+		origin := strings.ToLower(c.String("origin"))
+		err = cmd.userRepo.CreateExternal(username, origin, externalid)
+	}
+
 	switch err.(type) {
 	case nil:
 	case *errors.ModelAlreadyExistsError:

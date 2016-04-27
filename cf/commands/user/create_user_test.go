@@ -60,6 +60,35 @@ var _ = Describe("Create user command", func() {
 		Expect(password).To(Equal("my-password"))
 	})
 
+	It("creates a user when '--origin uaa' is specified", func() {
+		runCommand("my-user", "my-password", "--origin", "uaa")
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user", "my-user"},
+			[]string{"OK"},
+			[]string{"TIP"},
+		))
+
+		userName, password := userRepo.CreateArgsForCall(0)
+		Expect(userName).To(Equal("my-user"))
+		Expect(password).To(Equal("my-password"))
+	})
+
+	It("creates a user when '--origin ldap' is specified", func() {
+		runCommand("my-user", "my-external-id", "--origin", "ldap")
+
+		Expect(ui.Outputs).To(ContainSubstrings(
+			[]string{"Creating user", "my-user"},
+			[]string{"OK"},
+			[]string{"TIP"},
+		))
+
+		userName, origin, externalid := userRepo.CreateExternalArgsForCall(0)
+		Expect(userName).To(Equal("my-user"))
+		Expect(origin).To(Equal("ldap"))
+		Expect(externalid).To(Equal("my-external-id"))
+	})
+
 	Context("when creating the user returns an error", func() {
 		It("prints a warning when the given user already exists", func() {
 			userRepo.CreateReturns(errors.NewModelAlreadyExistsError("User", "my-user"))

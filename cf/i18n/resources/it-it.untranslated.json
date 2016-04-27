@@ -112,10 +112,6 @@
     "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
-    "id": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID",
-    "translation": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID"
-  },
-  {
     "id": "CF_NAME create-org ORG",
     "translation": "CF_NAME create-org ORG"
   },
@@ -146,10 +142,6 @@
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
     "translation": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"
-  },
-  {
-    "id": "CF_NAME create-user USERNAME PASSWORD",
-    "translation": "CF_NAME create-user USERNAME PASSWORD"
   },
   {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
@@ -608,8 +600,8 @@
     "translation": "Create a TCP route"
   },
   {
-    "id": "Create a new user authenticated by an external provider",
-    "translation": "Create a new user authenticated by an external provider"
+    "id": "Create a UAA authenticated user",
+    "translation": "Create a UAA authenticated user"
   },
   {
     "id": "Create a random port for the TCP route",
@@ -618,6 +610,10 @@
   {
     "id": "Create an HTTP route",
     "translation": "Create an HTTP route"
+  },
+  {
+    "id": "Create an externally authenticated user",
+    "translation": "Create an externally authenticated user"
   },
   {
     "id": "Creating random route for {{.Domain}}",
@@ -1006,6 +1002,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Update user-provided service instance"
+  },
+  {
+    "id": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied",
+    "translation": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",

@@ -528,10 +528,6 @@
     "translation": "CF_NAME create-domain ORG DOMAINE "
   },
   {
-    "id": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-org ORG",
     "translation": ""
   },
@@ -562,10 +558,6 @@
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
     "translation": "CF_NAME create-space ESPACE [-o ORG] [-q QUOTA-ESPACE]"
-  },
-  {
-    "id": "CF_NAME create-user USERNAME PASSWORD",
-    "translation": "CF_NAME create-user NOM_UTILISATEUR MOT_DE_PASSE "
   },
   {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
@@ -1188,6 +1180,10 @@
     "translation": ""
   },
   {
+    "id": "Create a UAA authenticated user",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "Créer un pack de construction "
   },
@@ -1202,10 +1198,6 @@
   {
     "id": "Create a new user",
     "translation": "Créer un utilisateur "
-  },
-  {
-    "id": "Create a new user authenticated by an external provider",
-    "translation": ""
   },
   {
     "id": "Create a random port for the TCP route",
@@ -1246,6 +1238,10 @@
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
     "translation": "Créez un manifeste d'application pour une application dont l'envoi par commande push a abouti"
+  },
+  {
+    "id": "Create an externally authenticated user",
+    "translation": ""
   },
   {
     "id": "Create an org",
@@ -4434,6 +4430,10 @@
   {
     "id": "Use a one-time password to login",
     "translation": "Utiliser un mot de passe à utilisation unique pour la connexion "
+  },
+  {
+    "id": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied",
+    "translation": ""
   },
   {
     "id": "User provided tags",

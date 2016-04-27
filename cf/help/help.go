@@ -247,7 +247,6 @@ func newAppPresenter() (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					presentCommand("create-user"),
-					presentCommand("create-external-user"),
 					presentCommand("delete-user"),
 				}, {
 					presentCommand("org-users"),

@@ -64,10 +64,6 @@
     "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"
   },
   {
-    "id": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID",
-    "translation": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID"
-  },
-  {
     "id": "CF_NAME create-org ORG",
     "translation": "CF_NAME create-org ORG"
   },
@@ -248,8 +244,8 @@
     "translation": "Create a TCP route"
   },
   {
-    "id": "Create a new user authenticated by an external provider",
-    "translation": "Create a new user authenticated by an external provider"
+    "id": "Create a UAA authenticated user",
+    "translation": "Create a UAA authenticated user"
   },
   {
     "id": "Create a random port for the TCP route",
@@ -258,6 +254,10 @@
   {
     "id": "Create an HTTP route",
     "translation": "Create an HTTP route"
+  },
+  {
+    "id": "Create an externally authenticated user",
+    "translation": "Create an externally authenticated user"
   },
   {
     "id": "Creating random route for {{.Domain}}",
@@ -614,6 +614,10 @@
   {
     "id": "Update user-provided service instance",
     "translation": "Update user-provided service instance"
+  },
+  {
+    "id": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied",
+    "translation": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",

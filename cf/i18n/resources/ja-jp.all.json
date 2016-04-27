@@ -528,10 +528,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-external-user USERNAME ORIGIN EXTERNALID",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-org ORG",
     "translation": ""
   },
@@ -561,10 +557,6 @@
   },
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME create-user USERNAME PASSWORD",
     "translation": ""
   },
   {
@@ -1188,6 +1180,10 @@
     "translation": ""
   },
   {
+    "id": "Create a UAA authenticated user",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "ビルドパックを作成します"
   },
@@ -1202,10 +1198,6 @@
   {
     "id": "Create a new user",
     "translation": "新しいユーザーを作成します"
-  },
-  {
-    "id": "Create a new user authenticated by an external provider",
-    "translation": ""
   },
   {
     "id": "Create a random port for the TCP route",
@@ -1246,6 +1238,10 @@
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
     "translation": "正常にプッシュされたアプリのアプリ・マニフェストを作成します"
+  },
+  {
+    "id": "Create an externally authenticated user",
+    "translation": ""
   },
   {
     "id": "Create an org",
@@ -4434,6 +4430,10 @@
   {
     "id": "Use a one-time password to login",
     "translation": "ワンタイム・パスワードを使用してログインします"
+  },
+  {
+    "id": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied",
+    "translation": ""
   },
   {
     "id": "User provided tags",
