@@ -62,7 +62,7 @@ func (repo *NoaaLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error
 }
 
 func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
-
+	ticker := time.NewTicker(repo.BufferTime)
 	endpoint := repo.config.DopplerEndpoint()
 	if endpoint == "" {
 		errChan <- errors.New(T("Loggregator endpoint missing from config file"))
@@ -77,8 +77,10 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 			select {
 			case msg, ok := <-c:
 				if !ok {
+					ticker.Stop()
 					repo.flushMessages(logChan)
 					close(logChan)
+					close(errChan)
 					return
 				}
 
@@ -88,15 +90,26 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 				case nil:
 				case *noaa_errors.UnauthorizedError:
 					repo.tokenRefresher.RefreshAuthToken()
+					ticker.Stop()
 					repo.TailLogsFor(appGuid, onConnect, logChan, errChan)
+					return
 				default:
 					errChan <- err
+
+					ticker.Stop()
+					close(logChan)
+					close(errChan)
 					return
 				}
 			}
 		}
 	}()
 
+	go func() {
+		for _ = range ticker.C {
+			repo.flushMessages(logChan)
+		}
+	}()
 }
 
 func (repo *NoaaLogsRepository) flushMessages(c chan<- Loggable) {
