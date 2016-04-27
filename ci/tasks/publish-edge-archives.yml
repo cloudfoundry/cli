@@ -70,6 +70,6 @@ run:
         os_arch="${BASH_REMATCH[2]}"
         extension="${BASH_REMATCH[3]}"
 
-        aws s3 cp $installer s3://go-cli/master/cf-cli_edge_installer${os_arch}${extension}
+        aws s3 cp $installer s3://go-cli/master/cf-cli-installer_edge${os_arch}${extension}
       done
     popd
