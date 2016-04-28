@@ -13,7 +13,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	testapi "github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	
+
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
