@@ -96,7 +96,7 @@ func main() {
 		flagContext.SkipFlagParsing(meta.SkipFlagParsing)
 
 		cmdArgs := os.Args[2:]
-		err := flagContext.Parse(cmdArgs...)
+		err = flagContext.Parse(cmdArgs...)
 		if err != nil {
 			usage := cmdRegistry.CommandUsage(cmdName)
 			deps.UI.Failed(T("Incorrect Usage") + "\n\n" + err.Error() + "\n\n" + usage)
