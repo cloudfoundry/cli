@@ -51,6 +51,11 @@ resources:
   source:
     repository: cloudfoundry-incubator/diego-release
 
+- name: cflinuxfs2-rootfs-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/cflinuxfs2-rootfs-release
+
 - name: diego-repo
   type: git
   source:
@@ -118,6 +123,7 @@ jobs:
       - get: diego-repo
       - get: cf-release
         resource: cf-release-repo
+      - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
@@ -209,6 +215,7 @@ jobs:
       - get: diego-repo
       - get: cf-release
         resource: cf-release-repo
+      - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
@@ -301,6 +308,7 @@ jobs:
       - get: diego-repo
       - get: cf-release
         resource: cf-release-repo
+      - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
@@ -392,6 +400,7 @@ jobs:
       - get: diego-repo
       - get: cf-release
         resource: cf-release-repo
+      - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
