@@ -68,4 +68,4 @@ run:
     export CONFIG=$PWD/config.json
     GOPATH=$GOPATH:$cf_acceptance_tests_path/Godeps/_workspace/
 
-    ./bin/test_default
+    ./bin/test_default -nodes=2
