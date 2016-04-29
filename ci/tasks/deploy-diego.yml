@@ -12,6 +12,7 @@ inputs:
 - name: garden-linux-release
 - name: diego-release
 - name: diego-repo
+- name: cflinuxfs2-rootfs-release
 - name: cf-release # needed for diego-repo/generate-bosh-lite-manifests
 
 run:
@@ -28,6 +29,7 @@ run:
     export API_ENDPOINT="https://api.${DOMAIN}"
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n -u admin -p admin upload release cflinuxfs2-rootfs-release/release.tgz --skip-if-exists
     bosh -n -u admin -p admin upload release etcd-release/release.tgz --skip-if-exists
     bosh -n -u admin -p admin upload release garden-linux-release/release.tgz --skip-if-exists
     bosh -n -u admin -p admin upload release diego-release/release.tgz --skip-if-exists
