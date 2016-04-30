@@ -292,6 +292,9 @@ jobs:
   - aggregate:
     - task: windows
       file: cli-ci/ci/tasks/create-installers-windows.yml
+      params:
+        SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
+        SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
     - task: unix
       file: cli-ci/ci/tasks/create-installers.yml
   - aggregate:
