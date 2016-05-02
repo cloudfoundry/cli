@@ -76,7 +76,7 @@ func (cmd *DeleteOrphanedRoutes) Execute(c flags.FlagContext) {
 
 		if len(route.Apps) == 0 {
 			cmd.ui.Say(T("Deleting route {{.Route}}...",
-				map[string]interface{}{"Route": terminal.EntityNameColor(route.Host + "." + route.Domain.Name)}))
+				map[string]interface{}{"Route": terminal.EntityNameColor(route.URL())}))
 			apiErr := cmd.routeRepo.Delete(route.GUID)
 			if apiErr != nil {
 				cmd.ui.Failed(apiErr.Error())
