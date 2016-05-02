@@ -1,3 +1,78 @@
+## 6.17.1
+* Bump version to 6.17.1
+* Set the deployment prior to running smoketest
+* Run smoke tests after deploy-boshlite
+* Backfill CHANGELOG.md for v6.17.0
+* generate-changelog writes to CHANGELOG.md
+* suggestions made by 'gofmt -s'
+* Use InnoSetup to sign the generated windows exe installer
+* All the nodes (except only 2) and for CATS
+* No nodes for gats linux
+* Pump up the jam, pump it up/ While your feet are stompin'
+* Add cflinuxfs2-rootfs-release to deploy-diego
+* Can you C what I did here? :grin:
+* Formatting
+* Fix capturing terminal output on windows
+* WHAT AMI!? I CAN'T EVEN?!
+* Run tests in parallel
+* Up the size of bosh lite
+* Fix err variable shadowing govet error
+* Staticly link Linux binaries
+* rename edge installer to match version installers
+* Taste the rainbow (bring colors to windows)
+* Check for existence of CF_HOME
+* Update README
+* Revert "Windows x64 installer puts things in correct directory"
+* Remove data races from NOAA log repo
+* Windows x64 installer puts things in correct directory
+* added request to check the latest version
+* Merge pull request #821 from andreas-kupries/ticket-ref-117404629
+* Adding back in noaa library
+* Removing noaa, so hopefully submodule doesn't show
+* Using gvt to Recreate vendor directory
+* Fix collateral damage
+* Important to flush (message queues, that is)
+* Remove tests from noaa package
+* Merge noaa to master
+* Merge master into wip/104053574-switch-to-noaa
+* Change error message to specify command instead of RoutingAPIRequirement
+* Update noaa to challiwill fork
+* Ui -> UI
+* Api -> API
+* Cli -> CLI
+* Do not break plugins
+* Url -> URL
+* Uri -> URI
+* Guid -> GUID
+* Update acronyms
+* Only display insecure warning for insecure api's
+* Ref ticket 117404629. Reviewed transforms done on a cell value. Had to trim value before transformation in all places (*). Moved application of the transform into printCellValue, to keep things nearer to each other and make comparison of printing and width calculation easier.
+* Copy old translations and update them to 'https'
+* Use new noaa consumer library
+* Update noaa library and some others
+* Linter won't complain
+* Make returned vars explicit
+* Add back properties in stub
+* Fix routing api property
+* Remove RunCliCommand
+* Enforce https connections to plugins.cloudfoundry.org
+* Use https:// in plugin help text
+* Put property-override where it won't get deleated
+* Make consistent with deploy-routing-release
+* Set appropriate tabbing
+* Make formatting correct
+* Use https for plugin-repos
+* Add LITE_HOSTNAME back
+* Add property-override stub back
+* for concourse to pick up previous commit
+* Update provision cf script and remove unnecessary envs
+* Update final-cli resource path
+* Noaa Log repository added
+* Changed LogsRepository interface
+* Moved FakeLoggregatorConsumer
+* Introduce generic interface for LogsRepository
+* Adding noaa library to deps
+
 ## 6.17.0
 * Bump version to 6.17.0
 * Update TcpRoutingMinAPIVersion to 2.53.0
