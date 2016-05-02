@@ -46,16 +46,19 @@ func InitColorSupport() {
 }
 
 func colorsEnabled() bool {
-	return userDidNotDisableColor() &&
-		(userEnabledColors() || TerminalSupportsColors)
-}
+	if os.Getenv("CF_COLOR") == "true" {
+		return true
+	}
 
-func userEnabledColors() bool {
-	return UserAskedForColors == "true" || os.Getenv("CF_COLOR") == "true"
-}
+	if os.Getenv("CF_COLOR") == "false" {
+		return false
+	}
 
-func userDidNotDisableColor() bool {
-	return os.Getenv("CF_COLOR") != "false" && (UserAskedForColors != "false" || os.Getenv("CF_COLOR") == "true")
+	if UserAskedForColors == "true" {
+		return true
+	}
+
+	return UserAskedForColors != "false" && TerminalSupportsColors
 }
 
 func Colorize(message string, textColor color.Attribute) string {
