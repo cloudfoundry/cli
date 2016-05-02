@@ -1237,7 +1237,7 @@ var _ = Describe("Push Command", func() {
 					Domain: domain,
 				}, nil)
 
-				existingApp.Routes = []models.RouteSummary{models.RouteSummary{
+				existingApp.Routes = []models.RouteSummary{{
 					GUID:   "existing-route-guid",
 					Host:   "existing-app",
 					Domain: domain,
@@ -1474,7 +1474,7 @@ var _ = Describe("Push Command", func() {
 			appfiles.CountFilesReturns(11)
 			zipper.ZipReturns(nil)
 			zipper.GetZipSizeReturns(6100000, nil)
-			actor.GatherFilesReturns([]resources.AppFileResource{resources.AppFileResource{Path: "path/to/app"}, resources.AppFileResource{Path: "bar"}}, true, nil)
+			actor.GatherFilesReturns([]resources.AppFileResource{{Path: "path/to/app"}, {Path: "bar"}}, true, nil)
 
 			curDir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())

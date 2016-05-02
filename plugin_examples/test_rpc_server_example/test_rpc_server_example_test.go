@@ -225,13 +225,13 @@ var _ = Describe("App-Lister", func() {
 func sampleApps() AppsModel {
 	allApps := AppsModel{
 		Resources: []AppModel{
-			AppModel{
+			{
 				EntityModel{Name: "app1", State: "STARTED"},
 			},
-			AppModel{
+			{
 				EntityModel{Name: "app2", State: "STARTED"},
 			},
-			AppModel{
+			{
 				EntityModel{Name: "app3", State: "STOPPED"},
 			},
 		},

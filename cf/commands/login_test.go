@@ -90,11 +90,11 @@ var _ = Describe("Login Command", func() {
 		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
 		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
-			"username": coreconfig.AuthPrompt{
+			"username": {
 				DisplayName: "Username",
 				Type:        coreconfig.AuthPromptTypeText,
 			},
-			"password": coreconfig.AuthPrompt{
+			"password": {
 				DisplayName: "Password",
 				Type:        coreconfig.AuthPromptTypePassword,
 			},
@@ -399,19 +399,19 @@ var _ = Describe("Login Command", func() {
 		Describe("login prompts", func() {
 			BeforeEach(func() {
 				authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
-					"account_number": coreconfig.AuthPrompt{
+					"account_number": {
 						DisplayName: "Account Number",
 						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"username": coreconfig.AuthPrompt{
+					"username": {
 						DisplayName: "Username",
 						Type:        coreconfig.AuthPromptTypeText,
 					},
-					"passcode": coreconfig.AuthPrompt{
+					"passcode": {
 						DisplayName: "It's a passcode, what you want it to be???",
 						Type:        coreconfig.AuthPromptTypePassword,
 					},
-					"password": coreconfig.AuthPrompt{
+					"password": {
 						DisplayName: "Your Password",
 						Type:        coreconfig.AuthPromptTypePassword,
 					},

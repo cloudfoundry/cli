@@ -50,8 +50,8 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(envVars).To(ConsistOf([]models.EnvironmentVariable{
-				models.EnvironmentVariable{Name: "abc", Value: "123"},
-				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
+				{Name: "abc", Value: "123"},
+				{Name: "do-re-mi", Value: "fa-sol-la-ti"},
 			}))
 		})
 	})
@@ -70,8 +70,8 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 			envVars, err := repo.ListStaging()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(envVars).To(ConsistOf([]models.EnvironmentVariable{
-				models.EnvironmentVariable{Name: "abc", Value: "123"},
-				models.EnvironmentVariable{Name: "do-re-mi", Value: "fa-sol-la-ti"},
+				{Name: "abc", Value: "123"},
+				{Name: "do-re-mi", Value: "fa-sol-la-ti"},
 			}))
 		})
 	})

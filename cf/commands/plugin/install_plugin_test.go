@@ -213,23 +213,23 @@ var _ = Describe("Install", func() {
 						p := clipr.Plugin{
 							Name: "plugin1",
 							Binaries: []clipr.Binary{
-								clipr.Binary{
+								{
 									Platform: "osx",
 									Url:      testServer.URL + "/test.exe",
 								},
-								clipr.Binary{
+								{
 									Platform: "win64",
 									Url:      testServer.URL + "/test.exe",
 								},
-								clipr.Binary{
+								{
 									Platform: "win32",
 									Url:      testServer.URL + "/test.exe",
 								},
-								clipr.Binary{
+								{
 									Platform: "linux32",
 									Url:      testServer.URL + "/test.exe",
 								},
-								clipr.Binary{
+								{
 									Platform: "linux64",
 									Url:      testServer.URL + "/test.exe",
 								},
@@ -511,7 +511,7 @@ var _ = Describe("Install", func() {
 		})
 
 		It("if plugin name is already taken", func() {
-			pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"Test1": pluginconfig.PluginMetadata{}})
+			pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"Test1": {}})
 			runCommand(test_1, "-f")
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -527,7 +527,7 @@ var _ = Describe("Install", func() {
 			})
 
 			It("if a file with the plugin name already exists under ~/.cf/plugin/", func() {
-				pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"useless": pluginconfig.PluginMetadata{}})
+				pluginConfig.PluginsReturns(map[string]pluginconfig.PluginMetadata{"useless": {}})
 				pluginConfig.GetPluginPathReturns(curDir)
 
 				runCommand(filepath.Join(curDir, pluginFile.Name()), "-f")

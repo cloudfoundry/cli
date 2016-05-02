@@ -77,7 +77,7 @@ var _ = Describe("quotas command", func() {
 	Context("when quotas exist", func() {
 		BeforeEach(func() {
 			quotaRepo.FindAllReturns([]models.QuotaFields{
-				models.QuotaFields{
+				{
 					Name:                    "quota-name",
 					MemoryLimit:             1024,
 					InstanceMemoryLimit:     512,
@@ -86,7 +86,7 @@ var _ = Describe("quotas command", func() {
 					NonBasicServicesAllowed: true,
 					AppInstanceLimit:        -1,
 				},
-				models.QuotaFields{
+				{
 					Name:                    "quota-non-basic-not-allowed",
 					MemoryLimit:             434,
 					InstanceMemoryLimit:     -1,
@@ -111,7 +111,7 @@ var _ = Describe("quotas command", func() {
 
 		It("displays unlimited services properly", func() {
 			quotaRepo.FindAllReturns([]models.QuotaFields{
-				models.QuotaFields{
+				{
 					Name:                    "quota-with-no-limit-to-services",
 					MemoryLimit:             434,
 					InstanceMemoryLimit:     1,
@@ -127,7 +127,7 @@ var _ = Describe("quotas command", func() {
 			))
 
 			quotaRepo.FindAllReturns([]models.QuotaFields{
-				models.QuotaFields{
+				{
 					Name:                    "quota-with-no-limit-to-app-instance",
 					MemoryLimit:             434,
 					InstanceMemoryLimit:     1,

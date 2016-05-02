@@ -78,12 +78,12 @@ var _ = Describe("service-keys command", func() {
 	Describe("requirements are satisfied", func() {
 		It("list service keys successfully", func() {
 			serviceKeyRepo.ListServiceKeysMethod.ServiceKeys = []models.ServiceKey{
-				models.ServiceKey{
+				{
 					Fields: models.ServiceKeyFields{
 						Name: "fake-service-key-1",
 					},
 				},
-				models.ServiceKey{
+				{
 					Fields: models.ServiceKeyFields{
 						Name: "fake-service-key-2",
 					},

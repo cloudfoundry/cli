@@ -77,24 +77,24 @@ var _ = Describe("feature-flags command", func() {
 	Describe("when logged in", func() {
 		BeforeEach(func() {
 			flags := []models.FeatureFlag{
-				models.FeatureFlag{
+				{
 					Name:         "user_org_creation",
 					Enabled:      true,
 					ErrorMessage: "error",
 				},
-				models.FeatureFlag{
+				{
 					Name:    "private_domain_creation",
 					Enabled: false,
 				},
-				models.FeatureFlag{
+				{
 					Name:    "app_bits_upload",
 					Enabled: true,
 				},
-				models.FeatureFlag{
+				{
 					Name:    "app_scaling",
 					Enabled: true,
 				},
-				models.FeatureFlag{
+				{
 					Name:    "route_creation",
 					Enabled: false,
 				},

@@ -84,8 +84,8 @@ var _ = Describe("service-auth-tokens command", func() {
 			requirementsFactory.MaxAPIVersionSuccess = true
 
 			authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{
-				models.ServiceAuthTokenFields{Label: "a label", Provider: "a provider"},
-				models.ServiceAuthTokenFields{Label: "a second label", Provider: "a second provider"},
+				{Label: "a label", Provider: "a provider"},
+				{Label: "a second label", Provider: "a second provider"},
 			}
 		})
 

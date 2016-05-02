@@ -113,7 +113,7 @@ var _ = Describe("start command", func() {
 		}
 
 		defaultAppForStart.Routes = []models.RouteSummary{
-			models.RouteSummary{
+			{
 				Host: "my-app",
 				Domain: models.DomainFields{
 					Name: "example.com",
@@ -138,9 +138,9 @@ var _ = Describe("start command", func() {
 		}
 
 		defaultInstanceResponses = [][]models.AppInstanceFields{
-			[]models.AppInstanceFields{instance1, instance2},
-			[]models.AppInstanceFields{instance1, instance2},
-			[]models.AppInstanceFields{instance3, instance4},
+			{instance1, instance2},
+			{instance1, instance2},
+			{instance3, instance4},
 		}
 
 		logRepo = new(logsfakes.FakeLogsRepository)
@@ -417,11 +417,11 @@ var _ = Describe("start command", func() {
 			}
 
 			defaultInstanceResponses = [][]models.AppInstanceFields{
-				[]models.AppInstanceFields{},
-				[]models.AppInstanceFields{},
-				[]models.AppInstanceFields{{State: models.InstanceDown}, {State: models.InstanceStarting}},
-				[]models.AppInstanceFields{{State: models.InstanceStarting}, {State: models.InstanceStarting}},
-				[]models.AppInstanceFields{{State: models.InstanceRunning}, {State: models.InstanceRunning}},
+				{},
+				{},
+				{{State: models.InstanceDown}, {State: models.InstanceStarting}},
+				{{State: models.InstanceStarting}, {State: models.InstanceStarting}},
+				{{State: models.InstanceRunning}, {State: models.InstanceRunning}},
 			}
 
 			defaultInstanceErrorCodes = []string{errors.NotStaged, errors.NotStaged, "", "", ""}
@@ -474,8 +474,8 @@ var _ = Describe("start command", func() {
 			appInstance4 := models.AppInstanceFields{}
 			appInstance4.State = models.InstanceStarting
 			defaultInstanceResponses = [][]models.AppInstanceFields{
-				[]models.AppInstanceFields{appInstance, appInstance2},
-				[]models.AppInstanceFields{appInstance3, appInstance4},
+				{appInstance, appInstance2},
+				{appInstance3, appInstance4},
 			}
 
 			defaultInstanceErrorCodes = []string{"some error", ""}
@@ -509,8 +509,8 @@ var _ = Describe("start command", func() {
 				appInstance4 := models.AppInstanceFields{}
 				appInstance4.State = models.InstanceFlapping
 				defaultInstanceResponses = [][]models.AppInstanceFields{
-					[]models.AppInstanceFields{appInstance, appInstance2},
-					[]models.AppInstanceFields{appInstance3, appInstance4},
+					{appInstance, appInstance2},
+					{appInstance3, appInstance4},
 				}
 
 				defaultInstanceErrorCodes = []string{"", ""}
@@ -537,8 +537,8 @@ var _ = Describe("start command", func() {
 				appInstance4 := models.AppInstanceFields{}
 				appInstance4.State = models.InstanceCrashed
 				defaultInstanceResponses = [][]models.AppInstanceFields{
-					[]models.AppInstanceFields{appInstance, appInstance2},
-					[]models.AppInstanceFields{appInstance3, appInstance4},
+					{appInstance, appInstance2},
+					{appInstance3, appInstance4},
 				}
 
 				defaultInstanceErrorCodes = []string{"", ""}
@@ -588,10 +588,10 @@ var _ = Describe("start command", func() {
 				}
 
 				defaultInstanceResponses = [][]models.AppInstanceFields{
-					[]models.AppInstanceFields{appInstance, appInstance2},
-					[]models.AppInstanceFields{appInstance3, appInstance4},
-					[]models.AppInstanceFields{appInstance5, appInstance6},
-					[]models.AppInstanceFields{appInstance7, appInstance8},
+					{appInstance, appInstance2},
+					{appInstance3, appInstance4},
+					{appInstance5, appInstance6},
+					{appInstance7, appInstance8},
 				}
 
 				defaultInstanceErrorCodes = []string{"", ""}

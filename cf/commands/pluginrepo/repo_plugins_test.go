@@ -119,13 +119,13 @@ var _ = Describe("repo-plugins", func() {
 			It("lists all plugin data", func() {
 				result := make(map[string][]clipr.Plugin)
 				result["repo1"] = []clipr.Plugin{
-					clipr.Plugin{
+					{
 						Name:        "plugin1",
 						Description: "none1",
 					},
 				}
 				result["repo2"] = []clipr.Plugin{
-					clipr.Plugin{
+					{
 						Name:        "plugin2",
 						Description: "none2",
 					},
