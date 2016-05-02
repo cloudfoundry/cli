@@ -13,11 +13,13 @@ var _ = Describe("RouteSummary", func() {
 			r    models.RouteSummary
 			host string
 			path string
+			port int
 		)
 
-		AfterEach(func() {
+		BeforeEach(func() {
 			host = ""
 			path = ""
+			port = 0
 		})
 
 		JustBeforeEach(func() {
@@ -27,6 +29,7 @@ var _ = Describe("RouteSummary", func() {
 					Name: "the-domain",
 				},
 				Path: path,
+				Port: port,
 			}
 		})
 
@@ -46,6 +49,16 @@ var _ = Describe("RouteSummary", func() {
 
 				It("returns the domain and path", func() {
 					Expect(r.URL()).To(Equal("the-domain/the-path"))
+				})
+			})
+
+			Context("when the port is present", func() {
+				BeforeEach(func() {
+					port = 9001
+				})
+
+				It("returns the port", func() {
+					Expect(r.URL()).To(Equal("the-domain:9001"))
 				})
 			})
 		})
