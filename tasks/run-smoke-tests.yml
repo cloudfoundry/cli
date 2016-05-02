@@ -23,4 +23,6 @@ run:
     export API_ENDPOINT="https://api.${DOMAIN}"
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n download manifest 'cf-warden' cf-warden.yml
+    bosh -n deployment cf-warden.yml
     bosh -n -u admin -p admin run errand smoke_tests
