@@ -27,6 +27,7 @@ _testmain.go
 out/
 release/*
 !release/index.html
+CHANGELOG.md.old
 
 *.iml
 *.zpi
