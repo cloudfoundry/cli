@@ -132,7 +132,7 @@ var _ = Describe("V3 Config files", func() {
 				ColorEnabled: "true",
 				Locale:       "fr_FR",
 				PluginRepos: []models.PluginRepo{
-					models.PluginRepo{
+					{
 						Name: "repo1",
 						URL:  "http://repo.com",
 					},
@@ -185,7 +185,7 @@ var _ = Describe("V3 Config files", func() {
 				ColorEnabled: "true",
 				Locale:       "fr_FR",
 				PluginRepos: []models.PluginRepo{
-					models.PluginRepo{
+					{
 						Name: "repo1",
 						URL:  "http://repo.com",
 					},

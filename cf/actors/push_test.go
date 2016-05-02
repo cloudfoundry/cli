@@ -37,13 +37,13 @@ var _ = Describe("Push Actor", func() {
 		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
 		fixturesDir = filepath.Join("..", "..", "fixtures", "applications")
 		allFiles = []models.AppFileFields{
-			models.AppFileFields{Path: "example-app/.cfignore"},
-			models.AppFileFields{Path: "example-app/app.rb"},
-			models.AppFileFields{Path: "example-app/config.ru"},
-			models.AppFileFields{Path: "example-app/Gemfile"},
-			models.AppFileFields{Path: "example-app/Gemfile.lock"},
-			models.AppFileFields{Path: "example-app/ignore-me"},
-			models.AppFileFields{Path: "example-app/manifest.yml"},
+			{Path: "example-app/.cfignore"},
+			{Path: "example-app/app.rb"},
+			{Path: "example-app/config.ru"},
+			{Path: "example-app/Gemfile"},
+			{Path: "example-app/Gemfile.lock"},
+			{Path: "example-app/ignore-me"},
+			{Path: "example-app/manifest.yml"},
 		}
 	})
 
@@ -52,7 +52,7 @@ var _ = Describe("Push Actor", func() {
 
 		BeforeEach(func() {
 			presentFiles = []resources.AppFileResource{
-				resources.AppFileResource{Path: "example-app/ignore-me"},
+				{Path: "example-app/ignore-me"},
 			}
 
 			appDir = filepath.Join(fixturesDir, "example-app.zip")
@@ -126,7 +126,7 @@ var _ = Describe("Push Actor", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			expectedFiles := []resources.AppFileResource{
-				resources.AppFileResource{
+				{
 					Path: "example-app/ignore-me",
 					Mode: expectedFileMode,
 				},
@@ -195,7 +195,7 @@ var _ = Describe("Push Actor", func() {
 
 			BeforeEach(func() {
 				remoteFiles = []resources.AppFileResource{
-					resources.AppFileResource{Path: "example-app/manifest.yml"},
+					{Path: "example-app/manifest.yml"},
 				}
 
 				appBitsRepo.GetApplicationFilesReturns(remoteFiles, nil)

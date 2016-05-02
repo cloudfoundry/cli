@@ -75,7 +75,7 @@ var _ = Describe("Help", func() {
 			m := make(map[string]pluginconfig.PluginMetadata)
 			m["fakePlugin"] = pluginconfig.PluginMetadata{
 				Commands: []plugin.Command{
-					plugin.Command{
+					{
 						Name:     "fakePluginCmd1",
 						Alias:    "fpc1",
 						HelpText: "help text here",

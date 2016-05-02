@@ -287,7 +287,7 @@ func (c *secureShell) InteractiveSession() error {
 			defer ticker.Stop()
 
 			go func() {
-				for _ = range ticker.C {
+				for range ticker.C {
 					resized <- syscall.Signal(-1)
 				}
 				close(resized)
@@ -395,7 +395,7 @@ func (c *secureShell) resize(resized <-chan os.Signal, session SecureSession, te
 
 	var previousWidth, previousHeight int
 
-	for _ = range resized {
+	for range resized {
 		width, height := c.getWindowDimensions(terminalFd)
 
 		if width == previousWidth && height == previousHeight {

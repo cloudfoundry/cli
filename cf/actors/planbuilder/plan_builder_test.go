@@ -46,7 +46,7 @@ var _ = Describe("Plan builder", func() {
 		}
 
 		planRepo.SearchReturns = map[string][]models.ServicePlanFields{
-			"service-guid1": []models.ServicePlanFields{plan1, plan2},
+			"service-guid1": {plan1, plan2},
 		}
 		org1 = models.Organization{}
 		org1.Name = "org1"

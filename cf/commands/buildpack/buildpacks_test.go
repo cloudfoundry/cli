@@ -78,9 +78,9 @@ var _ = Describe("ListBuildpacks", func() {
 			f := false
 
 			buildpackRepo.Buildpacks = []models.Buildpack{
-				models.Buildpack{Name: "Buildpack-1", Position: &p1, Enabled: &t, Locked: &f},
-				models.Buildpack{Name: "Buildpack-2", Position: &p2, Enabled: &f, Locked: &t},
-				models.Buildpack{Name: "Buildpack-3", Position: &p3, Enabled: &t, Locked: &f},
+				{Name: "Buildpack-1", Position: &p1, Enabled: &t, Locked: &f},
+				{Name: "Buildpack-2", Position: &p2, Enabled: &f, Locked: &t},
+				{Name: "Buildpack-3", Position: &p3, Enabled: &t, Locked: &f},
 			}
 
 			runCommand()

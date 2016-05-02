@@ -83,9 +83,9 @@ var _ = Describe("org-users command", func() {
 			It("shows the special users in the given org", func() {
 				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     []models.UserFields{},
-						models.BILLING_MANAGER: []models.UserFields{user1},
-						models.ORG_AUDITOR:     []models.UserFields{user2},
+						models.ORG_MANAGER:     {},
+						models.BILLING_MANAGER: {user1},
+						models.ORG_AUDITOR:     {user2},
 					}[roleName]
 					return userFields, nil
 				}
@@ -115,9 +115,9 @@ var _ = Describe("org-users command", func() {
 			It("shows the special users in the given org", func() {
 				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     []models.UserFields{user1},
-						models.BILLING_MANAGER: []models.UserFields{},
-						models.ORG_AUDITOR:     []models.UserFields{user2},
+						models.ORG_MANAGER:     {user1},
+						models.BILLING_MANAGER: {},
+						models.ORG_AUDITOR:     {user2},
 					}[roleName]
 					return userFields, nil
 				}
@@ -147,9 +147,9 @@ var _ = Describe("org-users command", func() {
 			It("shows the special users in the given org", func() {
 				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     []models.UserFields{user1},
-						models.BILLING_MANAGER: []models.UserFields{user2},
-						models.ORG_AUDITOR:     []models.UserFields{},
+						models.ORG_MANAGER:     {user1},
+						models.BILLING_MANAGER: {user2},
+						models.ORG_AUDITOR:     {},
 					}[roleName]
 					return userFields, nil
 				}
@@ -188,9 +188,9 @@ var _ = Describe("org-users command", func() {
 			user4 := models.UserFields{Username: "user4"}
 			userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 				userFields := map[string][]models.UserFields{
-					models.ORG_MANAGER:     []models.UserFields{user, user2},
-					models.BILLING_MANAGER: []models.UserFields{user4},
-					models.ORG_AUDITOR:     []models.UserFields{user3},
+					models.ORG_MANAGER:     {user, user2},
+					models.BILLING_MANAGER: {user4},
+					models.ORG_AUDITOR:     {user3},
 				}[roleName]
 				return userFields, nil
 			}
@@ -222,7 +222,7 @@ var _ = Describe("org-users command", func() {
 				user2 := models.UserFields{Username: "user2"}
 				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.ORG_USER: []models.UserFields{user, user2},
+						models.ORG_USER: {user, user2},
 					}[roleName]
 					return userFields, nil
 				}
@@ -300,10 +300,10 @@ var _ = Describe("org-users command", func() {
 
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     []models.UserFields{user, user2},
-						models.BILLING_MANAGER: []models.UserFields{user4},
-						models.ORG_AUDITOR:     []models.UserFields{user3},
-						models.ORG_USER:        []models.UserFields{user3},
+						models.ORG_MANAGER:     {user, user2},
+						models.BILLING_MANAGER: {user4},
+						models.ORG_AUDITOR:     {user3},
+						models.ORG_USER:        {user3},
 					}[roleName]
 					return userFields, nil
 				}
@@ -378,10 +378,10 @@ var _ = Describe("org-users command", func() {
 
 				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     []models.UserFields{user, user2, user3, user4},
-						models.BILLING_MANAGER: []models.UserFields{user2, user4},
-						models.ORG_AUDITOR:     []models.UserFields{user, user3},
-						models.ORG_USER:        []models.UserFields{user, user2, user3, user4},
+						models.ORG_MANAGER:     {user, user2, user3, user4},
+						models.BILLING_MANAGER: {user2, user4},
+						models.ORG_AUDITOR:     {user, user3},
+						models.ORG_USER:        {user, user2, user3, user4},
 					}[roleName]
 					return userFields, nil
 				}

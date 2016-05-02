@@ -51,11 +51,11 @@ var _ = Describe("PluginRepo", func() {
 
 		It("make query to all repos listed in config.json", func() {
 			repoActor.GetPlugins([]models.PluginRepo{
-				models.PluginRepo{
+				{
 					Name: "repo1",
 					URL:  testServer1.URL,
 				},
-				models.PluginRepo{
+				{
 					Name: "repo2",
 					URL:  testServer2.URL,
 				},
@@ -67,11 +67,11 @@ var _ = Describe("PluginRepo", func() {
 
 		It("lists each of the repos in config.json", func() {
 			list, _ := repoActor.GetPlugins([]models.PluginRepo{
-				models.PluginRepo{
+				{
 					Name: "repo1",
 					URL:  testServer1.URL,
 				},
-				models.PluginRepo{
+				{
 					Name: "repo2",
 					URL:  testServer2.URL,
 				},
@@ -122,7 +122,7 @@ var _ = Describe("PluginRepo", func() {
 
 			It("lists the info for each plugin", func() {
 				list, _ := repoActor.GetPlugins([]models.PluginRepo{
-					models.PluginRepo{
+					{
 						Name: "repo1",
 						URL:  testServer1.URL,
 					},
@@ -157,7 +157,7 @@ var _ = Describe("PluginRepo", func() {
 
 			It("informs user of invalid json", func() {
 				_, err := repoActor.GetPlugins([]models.PluginRepo{
-					models.PluginRepo{
+					{
 						Name: "repo1",
 						URL:  testServer1.URL,
 					},
@@ -185,7 +185,7 @@ var _ = Describe("PluginRepo", func() {
 
 			It("informs user of invalid repo data", func() {
 				_, err := repoActor.GetPlugins([]models.PluginRepo{
-					models.PluginRepo{
+					{
 						Name: "repo1",
 						URL:  testServer1.URL,
 					},

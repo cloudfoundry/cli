@@ -157,11 +157,11 @@ var _ = Describe("AuthenticationRepository", func() {
 
 				It("gets the login prompts", func() {
 					Expect(prompts).To(Equal(map[string]coreconfig.AuthPrompt{
-						"username": coreconfig.AuthPrompt{
+						"username": {
 							DisplayName: "Email",
 							Type:        coreconfig.AuthPromptTypeText,
 						},
-						"pin": coreconfig.AuthPrompt{
+						"pin": {
 							DisplayName: "PIN Number",
 							Type:        coreconfig.AuthPromptTypePassword,
 						},

@@ -106,7 +106,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 	}()
 
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			repo.flushMessages(logChan)
 		}
 	}()

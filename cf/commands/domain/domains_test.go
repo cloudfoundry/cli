@@ -186,10 +186,10 @@ var _ = Describe("ListDomains", func() {
 		Context("when domains are found", func() {
 			BeforeEach(func() {
 				domainFields = []models.DomainFields{
-					models.DomainFields{Shared: false, Name: "Private-domain1"},
-					models.DomainFields{Shared: false, Name: "Private-domain2", RouterGroupType: "tcp"},
-					models.DomainFields{Shared: true, Name: "Shared-domain1"},
-					models.DomainFields{Shared: true, Name: "Shared-domain2", RouterGroupType: "foobar"},
+					{Shared: false, Name: "Private-domain1"},
+					{Shared: false, Name: "Private-domain2", RouterGroupType: "tcp"},
+					{Shared: true, Name: "Shared-domain1"},
+					{Shared: true, Name: "Shared-domain2", RouterGroupType: "foobar"},
 				}
 			})
 

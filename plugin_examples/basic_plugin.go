@@ -62,7 +62,7 @@ func (c *BasicPlugin) GetMetadata() plugin.PluginMetadata {
 			Build: 0,
 		},
 		Commands: []plugin.Command{
-			plugin.Command{
+			{
 				Name:     "basic-plugin-command",
 				HelpText: "Basic plugin command's help text",
 

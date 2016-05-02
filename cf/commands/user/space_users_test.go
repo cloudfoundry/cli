@@ -96,9 +96,9 @@ var _ = Describe("space-users command", func() {
 			user4.Username = "user4"
 			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 				userFields := map[string][]models.UserFields{
-					models.SPACE_MANAGER:   []models.UserFields{user, user2},
-					models.SPACE_DEVELOPER: []models.UserFields{user4},
-					models.SPACE_AUDITOR:   []models.UserFields{user3},
+					models.SPACE_MANAGER:   {user, user2},
+					models.SPACE_DEVELOPER: {user4},
+					models.SPACE_AUDITOR:   {user3},
 				}[roleName]
 				return userFields, nil
 			}
@@ -186,9 +186,9 @@ var _ = Describe("space-users command", func() {
 			user.Username = "mr-pointy-hair"
 			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
 				userFields := map[string][]models.UserFields{
-					models.SPACE_MANAGER:   []models.UserFields{user},
-					models.SPACE_DEVELOPER: []models.UserFields{},
-					models.SPACE_AUDITOR:   []models.UserFields{},
+					models.SPACE_MANAGER:   {user},
+					models.SPACE_DEVELOPER: {},
+					models.SPACE_AUDITOR:   {},
 				}[roleName]
 				return userFields, nil
 			}
@@ -249,9 +249,9 @@ var _ = Describe("space-users command", func() {
 
 				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.SPACE_MANAGER:   []models.UserFields{user, user2},
-						models.SPACE_DEVELOPER: []models.UserFields{user4},
-						models.SPACE_AUDITOR:   []models.UserFields{user3},
+						models.SPACE_MANAGER:   {user, user2},
+						models.SPACE_DEVELOPER: {user4},
+						models.SPACE_AUDITOR:   {user3},
 					}[roleName]
 					return userFields, nil
 				}
@@ -319,9 +319,9 @@ var _ = Describe("space-users command", func() {
 
 				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
 					userFields := map[string][]models.UserFields{
-						models.SPACE_MANAGER:   []models.UserFields{user, user2, user3, user4},
-						models.SPACE_DEVELOPER: []models.UserFields{user2, user4},
-						models.SPACE_AUDITOR:   []models.UserFields{user, user3},
+						models.SPACE_MANAGER:   {user, user2, user3, user4},
+						models.SPACE_DEVELOPER: {user2, user4},
+						models.SPACE_AUDITOR:   {user, user3},
 					}[roleName]
 					return userFields, nil
 				}

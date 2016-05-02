@@ -53,14 +53,14 @@ var _ = Describe("App Events Repo", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(list).To(ConsistOf([]models.EventFields{
-				models.EventFields{
+				{
 					GUID:        "event-1-guid",
 					Name:        "audit.app.update",
 					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
 					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
 					ActorName:   "somebody@pivotallabs.com",
 				},
-				models.EventFields{
+				{
 					GUID:        "event-2-guid",
 					Name:        "audit.app.update",
 					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),

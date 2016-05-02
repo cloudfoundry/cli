@@ -41,8 +41,8 @@ var _ = Describe("marketplace command", func() {
 
 		serviceWithAPaidPlan = models.ServiceOffering{
 			Plans: []models.ServicePlanFields{
-				models.ServicePlanFields{Name: "service-plan-a", Description: "service-plan-a description", Free: true},
-				models.ServicePlanFields{Name: "service-plan-b", Description: "service-plan-b description", Free: false},
+				{Name: "service-plan-a", Description: "service-plan-a description", Free: true},
+				{Name: "service-plan-b", Description: "service-plan-b description", Free: false},
 			},
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:       "zzz-my-service-offering",
@@ -51,8 +51,8 @@ var _ = Describe("marketplace command", func() {
 			}}
 		service2 = models.ServiceOffering{
 			Plans: []models.ServicePlanFields{
-				models.ServicePlanFields{Name: "service-plan-c", Free: true},
-				models.ServicePlanFields{Name: "service-plan-d", Free: true}},
+				{Name: "service-plan-c", Free: true},
+				{Name: "service-plan-d", Free: true}},
 			ServiceOfferingFields: models.ServiceOfferingFields{
 				Label:       "aaa-my-service-offering",
 				Description: "service offering 2 description",

@@ -45,7 +45,7 @@ var _ = Describe("list-apps command", func() {
 		}
 
 		app1Routes := []models.RouteSummary{
-			models.RouteSummary{
+			{
 				Host: "app1",
 				Domain: models.DomainFields{
 					Name:                   "cfapps.io",
@@ -54,7 +54,7 @@ var _ = Describe("list-apps command", func() {
 					GUID: "domain-guid",
 				},
 			},
-			models.RouteSummary{
+			{
 				Host: "app1",
 				Domain: models.DomainFields{
 					Name: "example.com",
@@ -62,7 +62,7 @@ var _ = Describe("list-apps command", func() {
 			}}
 
 		app2Routes := []models.RouteSummary{
-			models.RouteSummary{
+			{
 				Host:   "app2",
 				Domain: models.DomainFields{Name: "cfapps.io"},
 			}}
@@ -195,7 +195,7 @@ var _ = Describe("list-apps command", func() {
 		Context("when an app's running instances is unknown", func() {
 			It("dipslays a '?' for running instances", func() {
 				appRoutes := []models.RouteSummary{
-					models.RouteSummary{
+					{
 						Host:   "app1",
 						Domain: models.DomainFields{Name: "cfapps.io"},
 					}}

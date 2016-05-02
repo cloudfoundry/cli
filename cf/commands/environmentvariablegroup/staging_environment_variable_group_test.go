@@ -77,8 +77,8 @@ var _ = Describe("staging-environment-variable-group command", func() {
 			requirementsFactory.LoginSuccess = true
 			environmentVariableGroupRepo.ListStagingReturns(
 				[]models.EnvironmentVariable{
-					models.EnvironmentVariable{Name: "abc", Value: "123"},
-					models.EnvironmentVariable{Name: "def", Value: "456"},
+					{Name: "abc", Value: "123"},
+					{Name: "def", Value: "456"},
 				}, nil)
 		})
 

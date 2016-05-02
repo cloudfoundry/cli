@@ -47,7 +47,7 @@ var _ = Describe("Plugins", func() {
 	Context("If --checksum flag is provided", func() {
 		It("computes and prints the sha1 checksum of the binary", func() {
 			config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-				"Test1": pluginconfig.PluginMetadata{
+				"Test1": {
 					Location: "../../../fixtures/plugins/test_1.go",
 					Version:  plugin.VersionType{Major: 1, Minor: 2, Build: 3},
 					Commands: []plugin.Command{
@@ -88,7 +88,7 @@ var _ = Describe("Plugins", func() {
 
 	It("returns a list of available methods of a plugin", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"Test1": pluginconfig.PluginMetadata{
+			"Test1": {
 				Location: "path/to/plugin",
 				Commands: []plugin.Command{
 					{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"},
@@ -110,7 +110,7 @@ var _ = Describe("Plugins", func() {
 
 	It("lists the name of the command, it's alias and version", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"Test1": pluginconfig.PluginMetadata{
+			"Test1": {
 				Location: "path/to/plugin",
 				Version:  plugin.VersionType{Major: 1, Minor: 2, Build: 3},
 				Commands: []plugin.Command{
@@ -130,7 +130,7 @@ var _ = Describe("Plugins", func() {
 
 	It("lists 'N/A' as version when plugin does not provide a version", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"Test1": pluginconfig.PluginMetadata{
+			"Test1": {
 				Location: "path/to/plugin",
 				Commands: []plugin.Command{
 					{Name: "test_1_cmd1", Alias: "test_1_cmd1_alias", HelpText: "help text for test_1_cmd1"},
@@ -147,7 +147,7 @@ var _ = Describe("Plugins", func() {
 
 	It("does not list the plugin when it provides no available commands", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"EmptyPlugin": pluginconfig.PluginMetadata{Location: "../../../fixtures/plugins/empty_plugin.exe"},
+			"EmptyPlugin": {Location: "../../../fixtures/plugins/empty_plugin.exe"},
 		})
 
 		runCommand()
@@ -158,8 +158,8 @@ var _ = Describe("Plugins", func() {
 
 	It("list multiple plugins and their associated commands", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"Test1": pluginconfig.PluginMetadata{Location: "path/to/plugin1", Commands: []plugin.Command{{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"}}},
-			"Test2": pluginconfig.PluginMetadata{Location: "path/to/plugin2", Commands: []plugin.Command{{Name: "test_2_cmd1", HelpText: "help text for test_2_cmd1"}}},
+			"Test1": {Location: "path/to/plugin1", Commands: []plugin.Command{{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"}}},
+			"Test2": {Location: "path/to/plugin2", Commands: []plugin.Command{{Name: "test_2_cmd1", HelpText: "help text for test_2_cmd1"}}},
 		})
 
 		runCommand()

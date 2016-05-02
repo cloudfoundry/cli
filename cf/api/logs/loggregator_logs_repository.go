@@ -89,7 +89,7 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGUID string, onConnect fun
 	}
 
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			repo.flushMessages(logChan)
 		}
 	}()

@@ -89,7 +89,7 @@ var _ = Describe("quotas command", func() {
 		Context("when quotas exist", func() {
 			BeforeEach(func() {
 				quotaRepo.FindByOrgReturns([]models.SpaceQuota{
-					models.SpaceQuota{
+					{
 						Name:                    "quota-name",
 						MemoryLimit:             1024,
 						InstanceMemoryLimit:     512,
@@ -99,7 +99,7 @@ var _ = Describe("quotas command", func() {
 						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        7,
 					},
-					models.SpaceQuota{
+					{
 						Name:                    "quota-non-basic-not-allowed",
 						MemoryLimit:             434,
 						InstanceMemoryLimit:     -1,
@@ -109,7 +109,7 @@ var _ = Describe("quotas command", func() {
 						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        1,
 					},
-					models.SpaceQuota{
+					{
 						Name:                    "quota-app-instances",
 						MemoryLimit:             434,
 						InstanceMemoryLimit:     512,
@@ -137,7 +137,7 @@ var _ = Describe("quotas command", func() {
 			Context("when services are unlimited", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByOrgReturns([]models.SpaceQuota{
-						models.SpaceQuota{
+						{
 							Name:                    "quota-non-basic-not-allowed",
 							MemoryLimit:             434,
 							InstanceMemoryLimit:     57,
@@ -162,7 +162,7 @@ var _ = Describe("quotas command", func() {
 			Context("when app instances are not provided", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByOrgReturns([]models.SpaceQuota{
-						models.SpaceQuota{
+						{
 							Name:                    "quota-non-basic-not-allowed",
 							MemoryLimit:             434,
 							InstanceMemoryLimit:     57,
