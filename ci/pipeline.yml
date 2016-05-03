@@ -140,15 +140,21 @@ jobs:
   - aggregate:
     - get: cli
       trigger: true
+      tags: ["non-check-worker"]
     - get: final-cli
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
   - aggregate:
     - task: units-linux
       file: cli-ci/ci/tasks/units-linux.yml
+      tags: ["non-check-worker"]
     - task: units-osx
       file: cli-ci/ci/tasks/units-osx.yml
+      tags: ["non-check-worker"]
     - task: units-windows
       file: cli-ci/ci/tasks/units-windows.yml
+      tags: ["non-check-worker"]
 
 - name: build-binaries
   serial: true
@@ -157,19 +163,26 @@ jobs:
     - get: cli
       trigger: true
       passed: [units]
+      tags: ["non-check-worker"]
     - get: final-cli
       passed: [units]
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
   - aggregate:
     - task: build
       file: cli-ci/ci/tasks/build-binaries.yml
+      tags: ["non-check-worker"]
     - task: build-osx
       file: cli-ci/ci/tasks/build-osx-binary.yml
+      tags: ["non-check-worker"]
   - task: combine-binaries
     file: cli-ci/ci/tasks/combine-binaries.yml
+    tags: ["non-check-worker"]
   - put: cf-cli-binaries
     params:
       file: compiled/cf-cli-binaries.tgz
+    tags: ["non-check-worker"]
 
 - name: gats-linux
   serial: true
@@ -178,17 +191,24 @@ jobs:
     - get: cf-cli-binaries
       trigger: true
       passed: [build-binaries]
+      tags: ["non-check-worker"]
     - get: final-cli
       passed: [build-binaries]
+      tags: ["non-check-worker"]
     - get: cli
       passed: [build-binaries]
+      tags: ["non-check-worker"]
     - get: cli-acceptance-tests
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
     - put: bosh-lite-lock
       params:
         acquire: true
+      tags: ["non-check-worker"]
   - task: gats
     file: cli-ci/ci/tasks/gats-linux.yml
+    tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -255,22 +275,34 @@ jobs:
   - aggregate:
     - get: final-cli
       passed: [gats-linux]
+      tags: ["non-check-worker"]
     - get: cli
       passed: [gats-linux]
+      tags: ["non-check-worker"]
+    - get: cli
+      tags: ["non-check-worker"]
+    - get: cli
     - get: cf-release-repo
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
+      tags: ["non-check-worker"]
+    - get: cli
+      tags: ["non-check-worker"]
     - get: cf-cli-binaries
       trigger: true
       passed: [gats-linux]
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
     - put: bosh-lite-lock
       params:
         acquire: true
+      tags: ["non-check-worker"]
   - aggregate:
     - task: cats-dea
       file: cli-ci/ci/tasks/cats-linux.yml
+      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -282,13 +314,18 @@ jobs:
   - aggregate:
     - get: final-cli
       passed: [cats-linux, cats-windows]
+      tags: ["non-check-worker"]
     - get: cli
       passed: [cats-linux, cats-windows]
+      tags: ["non-check-worker"]
     - get: cf-cli-binaries
       trigger: true
       passed: [cats-linux, cats-windows]
+      tags: ["non-check-worker"]
     - get: cli-private
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
   - aggregate:
     - task: windows
       file: cli-ci/ci/tasks/create-installers-windows.yml
@@ -297,16 +334,20 @@ jobs:
         SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
     - task: unix
       file: cli-ci/ci/tasks/create-installers.yml
+      tags: ["non-check-worker"]
   - aggregate:
     - put: cf-cli-installer-win32
       params:
         file: winstallers/cf-cli-installer_win32.zip
+      tags: ["non-check-worker"]
     - put: cf-cli-installer-win64
       params:
         file: winstallers/cf-cli-installer_winx64.zip
+      tags: ["non-check-worker"]
     - put: cf-cli-installers
       params:
         file: installers/cf-cli-installers.tgz
+      tags: ["non-check-worker"]
 
 - name: publish-edge-archives
   serial: true
@@ -315,24 +356,32 @@ jobs:
     - get: cf-cli-binaries
       trigger: true
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cli
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-installers
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-installer-win32
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-installer-win64
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
   - task: publish
     file: cli-ci/ci/tasks/publish-edge-archives.yml
     params:
       AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+    tags: ["non-check-worker"]
   - put: cf-cli-tracker
     params:
       repos:
       - cli
+    tags: ["non-check-worker"]
 
 - name: publish-final-release
   serial: true
@@ -341,20 +390,27 @@ jobs:
     - get: final-cli
       trigger: true
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-binaries
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-installers
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-installer-win32
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cf-cli-installer-win64
       passed: [create-installers]
+      tags: ["non-check-worker"]
     - get: cli-ci
+      tags: ["non-check-worker"]
   - task: publish
     file: cli-ci/ci/tasks/publish-final-release.yml
     params:
       AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+    tags: ["non-check-worker"]
 
 - name: create-cli-ci-image
   serial: true
@@ -362,10 +418,13 @@ jobs:
   - aggregate:
     - get: cli-ci-dockerfile
       trigger: true
+      tags: ["non-check-worker"]
     - get: golang
       trigger: true
       params: {save: true}
+      tags: ["non-check-worker"]
   - put: cf-cli-image
     params:
       load_base: golang
       build: cli-ci-dockerfile/ci
+    tags: ["non-check-worker"]
