@@ -42,16 +42,15 @@ type DebugPrinter interface {
 type Consumer struct {
 	trafficControllerUrl string
 	idleTimeout          time.Duration
-	ws                   *websocket.Conn
 	callback             func()
 	callbackLock         sync.RWMutex
 	proxy                func(*http.Request) (*url.URL, error)
 	debugPrinter         DebugPrinter
-	conLock              sync.RWMutex
-	closed               bool
-	closedLock           sync.Mutex
 	client               *http.Client
 	dialer               websocket.Dialer
+
+	conns     []*connection
+	connsLock sync.Mutex
 }
 
 // New creates a new consumer to a traffic controller.

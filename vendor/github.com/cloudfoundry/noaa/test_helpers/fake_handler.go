@@ -60,13 +60,12 @@ func (fh *FakeHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Set("Content-Length", fh.ContentLen)
 	}
 
-	fh.Lock()
-	defer fh.Unlock()
-
 	if fh.Fail {
 		return
 	}
 
+	fh.RLock()
+	defer fh.RUnlock()
 	handler := fh.GenerateHandler(fh.InputChan)
 	handler.ServeHTTP(rw, r)
 }
