@@ -6,7 +6,7 @@ params:
   ADMIN_PASSWORD:
 
 inputs:
-  - name: cli-acceptance-tests-verbose
+- name: cli-acceptance-tests-verbose
   path: gopath/src/github.com/cloudfoundry/cli-acceptance-tests
 - name: cf-cli-binaries
 - name: bosh-lite-lock

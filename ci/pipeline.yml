@@ -322,7 +322,7 @@ jobs:
       params:
         acquire: true
   - task: gats
-    file: cli-ci/ci/tasks/gats-windows.yml
+    file: cli-ci/ci/tasks/gats-windows-verbose.yml
     params:
       ADMIN_USER: {{bosh-lite-admin-username}}
       ADMIN_PASSWORD: {{bosh-lite-admin-password}}
