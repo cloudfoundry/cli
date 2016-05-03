@@ -56,6 +56,11 @@ resources:
   source:
     repository: cloudfoundry/cflinuxfs2-rootfs-release
 
+- name: cf-routing-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/cf-routing-release
+
 - name: diego-repo
   type: git
   source:
@@ -168,6 +173,8 @@ jobs:
     tags: ["non-check-worker"]
   - do:
     - aggregate:
+      - get: cf-routing-release
+        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
         tags: ["non-check-worker"]
       - get: cf-release-repo
@@ -289,6 +296,8 @@ jobs:
     tags: ["non-check-worker"]
   - do:
     - aggregate:
+      - get: cf-routing-release
+        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
         tags: ["non-check-worker"]
       - get: cf-release-repo
@@ -411,6 +420,8 @@ jobs:
     tags: ["non-check-worker"]
   - do:
     - aggregate:
+      - get: cf-routing-release
+        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
         tags: ["non-check-worker"]
       - get: cf-release-repo
@@ -532,6 +543,8 @@ jobs:
     tags: ["non-check-worker"]
   - do:
     - aggregate:
+      - get: cf-routing-release
+        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
         tags: ["non-check-worker"]
       - get: cf-release-repo
