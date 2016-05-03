@@ -8,6 +8,7 @@ params:
   LITE_HOSTNAME:
 
 inputs:
+- name: cf-routing-release
 - name: cf-routing-release-repo
 - name: cf-release-repo
 
@@ -32,29 +33,28 @@ run:
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
 
-    cat<<EOF > cf-routing-release-repo/post-routing-release-deploy-overrides.yml
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release cf-routing-release/release.tgz
+
+    cd cf-routing-release-repo
+
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $cf_deployment_name $cf_deployment_file
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $diego_deployment_name $diego_deployment_file
+
+    ./scripts/generate-bosh-lite-manifest $cf_deployment_file $diego_deployment_file
+
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
+
+    ####
+    # Redeploy CF with new routing stuff enabled
+    cat<<EOF > post-routing-release-deploy-overrides.yml
     properties:
       routing_api:
         enabled: true
     EOF
 
-    pushd cf-routing-release-repo
-      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD create release --force
-      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release --rebase
-
-      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $cf_deployment_name $cf_deployment_file
-      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $diego_deployment_name $diego_deployment_file
-
-      ./scripts/generate-bosh-lite-manifest $cf_deployment_file $diego_deployment_file
-
-      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
-
-      ####
-      # Redeploy CF with new routing stuff enabled
-      spiff merge $cf_deployment_file post-routing-release-deploy-overrides.yml > cf-warden-plus-plus.yml
-      bosh deployment cf-warden-plus-plus.yml
-      bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
-      ####
-    popd
+    spiff merge $cf_deployment_file post-routing-release-deploy-overrides.yml > cf-warden-plus-plus.yml
+    bosh deployment cf-warden-plus-plus.yml
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
+    ####
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD cleanup
