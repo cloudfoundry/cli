@@ -8,7 +8,7 @@
    "/",
    "false",
    "true",
-   
+
    "%.1f",
    ".0",
    "(?i)^(-?\\d+)([KMGT])B?$",
@@ -42,7 +42,7 @@
     "%s target -o ORG -s SPACE",
     " target -o ",
     "spaces",
-	
+
 	"invalid_token",
 	"Authorization",
 	"Authorization: ",
@@ -70,7 +70,7 @@
 	"X-Cf-Warnings",
 	"content-type",
 	"User-Agent",
-	
+
 	"api",
 	"apps",
 	"auth",
@@ -137,7 +137,7 @@
 	"rename",
 	"rename-buildpack",
 	"rename-org",
-	"rename-service", 
+	"rename-service",
 	"rename-service-broker",
 	"rename-space",
 
@@ -182,7 +182,7 @@
 
 	"app",
 	"bind-service",
-	"scale",	
+	"scale",
 	"start",
 	"stop",
 	"restart",

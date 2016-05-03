@@ -67,6 +67,16 @@ type FakeUserRepository struct {
 	createReturns struct {
 		result1 error
 	}
+	CreateExternalStub        func(username, origin, externalID string) (apiErr error)
+	createExternalMutex       sync.RWMutex
+	createExternalArgsForCall []struct {
+		username   string
+		origin     string
+		externalID string
+	}
+	createExternalReturns struct {
+		result1 error
+	}
 	DeleteStub        func(userGUID string) (apiErr error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
@@ -357,6 +367,40 @@ func (fake *FakeUserRepository) CreateArgsForCall(i int) (string, string) {
 func (fake *FakeUserRepository) CreateReturns(result1 error) {
 	fake.CreateStub = nil
 	fake.createReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeUserRepository) CreateExternal(username string, origin string, externalID string) (apiErr error) {
+	fake.createExternalMutex.Lock()
+	fake.createExternalArgsForCall = append(fake.createExternalArgsForCall, struct {
+		username   string
+		origin     string
+		externalID string
+	}{username, origin, externalID})
+	fake.createExternalMutex.Unlock()
+	if fake.CreateExternalStub != nil {
+		return fake.CreateExternalStub(username, origin, externalID)
+	} else {
+		return fake.createExternalReturns.result1
+	}
+}
+
+func (fake *FakeUserRepository) CreateExternalCallCount() int {
+	fake.createExternalMutex.RLock()
+	defer fake.createExternalMutex.RUnlock()
+	return len(fake.createExternalArgsForCall)
+}
+
+func (fake *FakeUserRepository) CreateExternalArgsForCall(i int) (string, string, string) {
+	fake.createExternalMutex.RLock()
+	defer fake.createExternalMutex.RUnlock()
+	return fake.createExternalArgsForCall[i].username, fake.createExternalArgsForCall[i].origin, fake.createExternalArgsForCall[i].externalID
+}
+
+func (fake *FakeUserRepository) CreateExternalReturns(result1 error) {
+	fake.CreateExternalStub = nil
+	fake.createExternalReturns = struct {
 		result1 error
 	}{result1}
 }

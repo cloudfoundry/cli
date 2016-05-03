@@ -560,10 +560,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME create-user USERNAME PASSWORD",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": ""
   },
@@ -1184,6 +1180,10 @@
     "translation": ""
   },
   {
+    "id": "Create a UAA authenticated user",
+    "translation": ""
+  },
+  {
     "id": "Create a buildpack",
     "translation": "创建 buildpack"
   },
@@ -1238,6 +1238,10 @@
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
     "translation": "为已成功推送的应用程序创建应用程序清单"
+  },
+  {
+    "id": "Create an externally authenticated user",
+    "translation": ""
   },
   {
     "id": "Create an org",
@@ -4426,6 +4430,10 @@
   {
     "id": "Use a one-time password to login",
     "translation": "使用一次性密码登录"
+  },
+  {
+    "id": "User origin for externally (non-UAA) authenticated users. EXTERNAL_ID must be supplied",
+    "translation": ""
   },
   {
     "id": "User provided tags",
