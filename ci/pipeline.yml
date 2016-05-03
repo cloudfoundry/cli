@@ -151,10 +151,8 @@ jobs:
       tags: ["non-check-worker"]
     - task: units-osx
       file: cli-ci/ci/tasks/units-osx.yml
-      tags: ["non-check-worker"]
     - task: units-windows
       file: cli-ci/ci/tasks/units-windows.yml
-      tags: ["non-check-worker"]
 
 - name: build-binaries
   serial: true
@@ -175,7 +173,6 @@ jobs:
       tags: ["non-check-worker"]
     - task: build-osx
       file: cli-ci/ci/tasks/build-osx-binary.yml
-      tags: ["non-check-worker"]
   - task: combine-binaries
     file: cli-ci/ci/tasks/combine-binaries.yml
     tags: ["non-check-worker"]
