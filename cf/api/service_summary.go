@@ -25,6 +25,7 @@ func (resource ServiceInstancesSummaries) ToModels() []models.ServiceInstance {
 
 		offeringSummary := planSummary.ServiceOffering
 		serviceOffering := models.ServiceOfferingFields{}
+		serviceOffering.GUID = offeringSummary.GUID
 		serviceOffering.Label = offeringSummary.Label
 		serviceOffering.Provider = offeringSummary.Provider
 		serviceOffering.Version = offeringSummary.Version
@@ -81,6 +82,7 @@ type ServicePlanSummary struct {
 }
 
 type ServiceOfferingSummary struct {
+	GUID     string
 	Label    string
 	Provider string
 	Version  string
