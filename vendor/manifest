@@ -115,6 +115,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/cloudfoundry/dropsonde",
+			"repository": "https://github.com/cloudfoundry/dropsonde",
+			"vcs": "git",
+			"revision": "00385820dd1849bea823c7bbd78cb0b99b577f40",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/cloudfoundry/go-ccapi/v3/client",
 			"repository": "https://github.com/cloudfoundry/go-ccapi",
 			"vcs": "git",
@@ -151,6 +159,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/cloudfoundry/gosteno",
+			"repository": "https://github.com/cloudfoundry/gosteno",
+			"vcs": "git",
+			"revision": "0c8581caea35ac903728230e447792e2365dcc34",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/cloudfoundry/loggregator_consumer",
 			"repository": "https://github.com/cloudfoundry/loggregator_consumer",
 			"vcs": "git",
@@ -178,10 +194,10 @@
 		},
 		{
 			"importpath": "github.com/cloudfoundry/noaa",
-			"repository": "https://github.com/challiwill/noaa",
+			"repository": "https://github.com/cloudfoundry/noaa",
 			"vcs": "git",
-			"revision": "0891e6c79f535515ecea05f26eea7ff0da28980a",
-			"branch": "cli-temp",
+			"revision": "8c9fd92c47a3ef39993b2f0496cc25992f87c01a",
+			"branch": "master",
 			"notests": true
 		},
 		{
