@@ -31,6 +31,7 @@ var _ = Describe("update-service command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *apifakes.FakeServiceRepository
 		planBuilder         *planbuilderfakes.FakePlanBuilder
+		serviceSummaryRepo  *apifakes.FakeServiceSummaryRepository
 		offering1           models.ServiceOffering
 		deps                commandregistry.Dependency
 	)
@@ -38,8 +39,10 @@ var _ = Describe("update-service command", func() {
 	updateCommandDependency := func(pluginCall bool) {
 		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetServiceRepository(serviceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetServiceSummaryRepository(serviceSummaryRepo)
 		deps.Config = config
 		deps.PlanBuilder = planBuilder
+		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("update-service").SetDependency(deps, pluginCall))
 	}
 
@@ -56,6 +59,7 @@ var _ = Describe("update-service command", func() {
 
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		planBuilder = new(planbuilderfakes.FakePlanBuilder)
+		serviceSummaryRepo = new(apifakes.FakeServiceSummaryRepository)
 
 		offering1 = models.ServiceOffering{}
 		offering1.Label = "cleardb"
@@ -492,6 +496,54 @@ var _ = Describe("update-service command", func() {
 				})
 			})
 		})
+	})
 
+	Context("when service instance has a plan that is currently private", func() {
+		BeforeEach(func() {
+			serviceInstance := models.ServiceInstance{
+				ServiceInstanceFields: models.ServiceInstanceFields{
+					Name: "my-service-instance",
+					GUID: "my-service-instance-guid",
+				},
+				ServiceOffering: models.ServiceOfferingFields{},
+				// In this example, when a service plan is private,
+				// the service offering will not be present
+			}
+
+			servicePlans := []models.ServicePlanFields{{
+				Name: "personal",
+				GUID: "personal-guid",
+			}, {
+				Name: "professional",
+				GUID: "professional-guid",
+			},
+			}
+
+			serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
+			serviceInstances := []models.ServiceInstance{
+				{
+					ServiceOffering: models.ServiceOfferingFields{
+						GUID: "abc",
+					},
+				},
+			}
+			serviceSummaryRepo.GetSummariesInCurrentSpaceReturns(serviceInstances, nil)
+			planBuilder.GetPlansForServiceForOrgReturns(servicePlans, nil)
+		})
+
+		It("still allows service instance plan to be updated", func() {
+			callUpdateService([]string{"my-service-instance", "-p", "professional"})
+
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"Updating service", "my-service", "as", "my-user", "..."},
+				[]string{"OK"},
+			))
+			Expect(serviceRepo.FindInstanceByNameArgsForCall(0)).To(Equal("my-service-instance"))
+			Expect(serviceSummaryRepo.GetSummariesInCurrentSpaceCallCount()).To(Equal(1))
+
+			instanceGUID, planGUID, _, _ := serviceRepo.UpdateServiceInstanceArgsForCall(0)
+			Expect(instanceGUID).To(Equal("my-service-instance-guid"))
+			Expect(planGUID).To(Equal("professional-guid"))
+		})
 	})
 })
