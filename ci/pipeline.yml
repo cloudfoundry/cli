@@ -41,6 +41,13 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
+- name: cli-acceptance-tests-verbose
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-acceptance-tests
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: verbose-debugging
+
 - name: cf-release-repo
   type: git
   source:
@@ -205,6 +212,36 @@ jobs:
       tags: ["non-check-worker"]
   - task: gats
     file: cli-ci/ci/tasks/gats-linux.yml
+    tags: ["non-check-worker"]
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: gats-linux-verbose
+  serial: true
+  plan:
+  - aggregate:
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [build-binaries]
+      tags: ["non-check-worker"]
+    - get: final-cli
+      passed: [build-binaries]
+      tags: ["non-check-worker"]
+    - get: cli
+      passed: [build-binaries]
+      tags: ["non-check-worker"]
+    - get: cli-acceptance-tests-verbose
+      tags: ["non-check-worker"]
+    - get: cli-ci
+      tags: ["non-check-worker"]
+    - put: bosh-lite-lock
+      params:
+        acquire: true
+      tags: ["non-check-worker"]
+  - task: gats
+    file: cli-ci/ci/tasks/gats-linux-verbose.yml
     tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
