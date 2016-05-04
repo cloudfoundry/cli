@@ -81,11 +81,11 @@ var _ = Describe("org-users command", func() {
 
 		Context("shows friendly messaage when no users in ORG_MANAGER role", func() {
 			It("shows the special users in the given org", func() {
-				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     {},
-						models.BILLING_MANAGER: {user1},
-						models.ORG_AUDITOR:     {user2},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleOrgManager:     {},
+						models.RoleBillingManager: {user1},
+						models.RoleOrgAuditor:     {user2},
 					}[roleName]
 					return userFields, nil
 				}
@@ -93,7 +93,7 @@ var _ = Describe("org-users command", func() {
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
-				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
+				for i, expectedRole := range []models.Role{models.RoleOrgManager, models.RoleBillingManager, models.RoleOrgAuditor} {
 					orgGUID, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
 					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
@@ -113,11 +113,11 @@ var _ = Describe("org-users command", func() {
 
 		Context("shows friendly messaage when no users in BILLING_MANAGER role", func() {
 			It("shows the special users in the given org", func() {
-				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     {user1},
-						models.BILLING_MANAGER: {},
-						models.ORG_AUDITOR:     {user2},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleOrgManager:     {user1},
+						models.RoleBillingManager: {},
+						models.RoleOrgAuditor:     {user2},
 					}[roleName]
 					return userFields, nil
 				}
@@ -125,7 +125,7 @@ var _ = Describe("org-users command", func() {
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
-				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
+				for i, expectedRole := range []models.Role{models.RoleOrgManager, models.RoleBillingManager, models.RoleOrgAuditor} {
 					orgGUID, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
 					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
@@ -145,11 +145,11 @@ var _ = Describe("org-users command", func() {
 
 		Context("shows friendly messaage when no users in ORG_AUDITOR role", func() {
 			It("shows the special users in the given org", func() {
-				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     {user1},
-						models.BILLING_MANAGER: {user2},
-						models.ORG_AUDITOR:     {},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleOrgManager:     {user1},
+						models.RoleBillingManager: {user2},
+						models.RoleOrgAuditor:     {},
 					}[roleName]
 					return userFields, nil
 				}
@@ -157,7 +157,7 @@ var _ = Describe("org-users command", func() {
 				runCommand("the-org")
 
 				Expect(userRepo.ListUsersInOrgForRoleCallCount()).To(Equal(3))
-				for i, expectedRole := range []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR} {
+				for i, expectedRole := range []models.Role{models.RoleOrgManager, models.RoleBillingManager, models.RoleOrgAuditor} {
 					orgGUID, actualRole := userRepo.ListUsersInOrgForRoleArgsForCall(i)
 					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
@@ -186,11 +186,11 @@ var _ = Describe("org-users command", func() {
 			user2 := models.UserFields{Username: "user2"}
 			user3 := models.UserFields{Username: "user3"}
 			user4 := models.UserFields{Username: "user4"}
-			userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-				userFields := map[string][]models.UserFields{
-					models.ORG_MANAGER:     {user, user2},
-					models.BILLING_MANAGER: {user4},
-					models.ORG_AUDITOR:     {user3},
+			userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+				userFields := map[models.Role][]models.UserFields{
+					models.RoleOrgManager:     {user, user2},
+					models.RoleBillingManager: {user4},
+					models.RoleOrgAuditor:     {user3},
 				}[roleName]
 				return userFields, nil
 			}
@@ -220,9 +220,9 @@ var _ = Describe("org-users command", func() {
 			BeforeEach(func() {
 				user := models.UserFields{Username: "user1"}
 				user2 := models.UserFields{Username: "user2"}
-				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.ORG_USER: {user, user2},
+				userRepo.ListUsersInOrgForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleOrgUser: {user, user2},
 					}[roleName]
 					return userFields, nil
 				}
@@ -298,12 +298,12 @@ var _ = Describe("org-users command", func() {
 				user4.Username = "user4"
 				user4.GUID = "4444"
 
-				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     {user, user2},
-						models.BILLING_MANAGER: {user4},
-						models.ORG_AUDITOR:     {user3},
-						models.ORG_USER:        {user3},
+				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleOrgManager:     {user, user2},
+						models.RoleBillingManager: {user4},
+						models.RoleOrgAuditor:     {user3},
+						models.RoleOrgUser:        {user3},
 					}[roleName]
 					return userFields, nil
 				}
@@ -322,16 +322,16 @@ var _ = Describe("org-users command", func() {
 					switch u.Username {
 					case "user1":
 						Expect(u.Guid).To(Equal("1111"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgManager"}))
 					case "user2":
 						Expect(u.Guid).To(Equal("2222"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgManager"}))
 					case "user3":
 						Expect(u.Guid).To(Equal("3333"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_AUDITOR}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgAuditor"}))
 					case "user4":
 						Expect(u.Guid).To(Equal("4444"))
-						Expect(u.Roles).To(ConsistOf([]string{models.BILLING_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleBillingManager"}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}
@@ -344,7 +344,7 @@ var _ = Describe("org-users command", func() {
 				Expect(pluginUserModel).To(HaveLen(1))
 				Expect(pluginUserModel[0].Username).To(Equal("user3"))
 				Expect(pluginUserModel[0].Guid).To(Equal("3333"))
-				Expect(pluginUserModel[0].Roles[0]).To(Equal(models.ORG_USER))
+				Expect(pluginUserModel[0].Roles[0]).To(Equal("RoleOrgUser"))
 			})
 
 		})
@@ -376,12 +376,12 @@ var _ = Describe("org-users command", func() {
 				user4.Username = "user4"
 				user4.GUID = "4444"
 
-				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.ORG_MANAGER:     {user, user2, user3, user4},
-						models.BILLING_MANAGER: {user2, user4},
-						models.ORG_AUDITOR:     {user, user3},
-						models.ORG_USER:        {user, user2, user3, user4},
+				userRepo.ListUsersInOrgForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleOrgManager:     {user, user2, user3, user4},
+						models.RoleBillingManager: {user2, user4},
+						models.RoleOrgAuditor:     {user, user3},
+						models.RoleOrgUser:        {user, user2, user3, user4},
 					}[roleName]
 					return userFields, nil
 				}
@@ -400,17 +400,17 @@ var _ = Describe("org-users command", func() {
 					switch u.Username {
 					case "user1":
 						Expect(u.Guid).To(Equal("1111"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER, models.ORG_AUDITOR}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgManager", "RoleOrgAuditor"}))
 						Expect(u.IsAdmin).To(BeTrue())
 					case "user2":
 						Expect(u.Guid).To(Equal("2222"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_MANAGER, models.BILLING_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgManager", "RoleBillingManager"}))
 					case "user3":
 						Expect(u.Guid).To(Equal("3333"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_AUDITOR, models.ORG_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgAuditor", "RoleOrgManager"}))
 					case "user4":
 						Expect(u.Guid).To(Equal("4444"))
-						Expect(u.Roles).To(ConsistOf([]string{models.BILLING_MANAGER, models.ORG_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleBillingManager", "RoleOrgManager"}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}
@@ -426,16 +426,16 @@ var _ = Describe("org-users command", func() {
 					switch u.Username {
 					case "user1":
 						Expect(u.Guid).To(Equal("1111"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgUser"}))
 					case "user2":
 						Expect(u.Guid).To(Equal("2222"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgUser"}))
 					case "user3":
 						Expect(u.Guid).To(Equal("3333"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgUser"}))
 					case "user4":
 						Expect(u.Guid).To(Equal("4444"))
-						Expect(u.Roles).To(ConsistOf([]string{models.ORG_USER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleOrgUser"}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}

@@ -94,11 +94,11 @@ var _ = Describe("space-users command", func() {
 			user3.Username = "user3"
 			user4 := models.UserFields{}
 			user4.Username = "user4"
-			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-				userFields := map[string][]models.UserFields{
-					models.SPACE_MANAGER:   {user, user2},
-					models.SPACE_DEVELOPER: {user4},
-					models.SPACE_AUDITOR:   {user3},
+			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+				userFields := map[models.Role][]models.UserFields{
+					models.RoleSpaceManager:   {user, user2},
+					models.RoleSpaceDeveloper: {user4},
+					models.RoleSpaceAuditor:   {user3},
 				}[roleName]
 				return userFields, nil
 			}
@@ -112,7 +112,7 @@ var _ = Describe("space-users command", func() {
 			Expect(actualOrgGUID).To(Equal("org1-guid"))
 
 			Expect(userRepo.ListUsersInSpaceForRoleCallCount()).To(Equal(3))
-			for i, expectedRole := range []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR} {
+			for i, expectedRole := range []models.Role{models.RoleSpaceManager, models.RoleSpaceDeveloper, models.RoleSpaceAuditor} {
 				spaceGUID, actualRole := userRepo.ListUsersInSpaceForRoleArgsForCall(i)
 				Expect(spaceGUID).To(Equal("space1-guid"))
 				Expect(actualRole).To(Equal(expectedRole))
@@ -143,8 +143,8 @@ var _ = Describe("space-users command", func() {
 			})
 
 			It("fails with an error when user network call fails", func() {
-				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(string, role string) ([]models.UserFields, error) {
-					if role == "SpaceManager" {
+				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, role models.Role) ([]models.UserFields, error) {
+					if role == models.RoleSpaceManager {
 						return []models.UserFields{}, errors.New("internet badness occurred")
 					}
 					return []models.UserFields{}, nil
@@ -184,11 +184,11 @@ var _ = Describe("space-users command", func() {
 
 			user := models.UserFields{}
 			user.Username = "mr-pointy-hair"
-			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName string) ([]models.UserFields, error) {
-				userFields := map[string][]models.UserFields{
-					models.SPACE_MANAGER:   {user},
-					models.SPACE_DEVELOPER: {},
-					models.SPACE_AUDITOR:   {},
+			userRepo.ListUsersInSpaceForRoleStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+				userFields := map[models.Role][]models.UserFields{
+					models.RoleSpaceManager:   {user},
+					models.RoleSpaceDeveloper: {},
+					models.RoleSpaceAuditor:   {},
 				}[roleName]
 				return userFields, nil
 			}
@@ -247,11 +247,11 @@ var _ = Describe("space-users command", func() {
 				user4.Username = "user4"
 				user4.GUID = "4444"
 
-				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.SPACE_MANAGER:   {user, user2},
-						models.SPACE_DEVELOPER: {user4},
-						models.SPACE_AUDITOR:   {user3},
+				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleSpaceManager:   {user, user2},
+						models.RoleSpaceDeveloper: {user4},
+						models.RoleSpaceAuditor:   {user3},
 					}[roleName]
 					return userFields, nil
 				}
@@ -271,16 +271,16 @@ var _ = Describe("space-users command", func() {
 					switch u.Username {
 					case "user1":
 						Expect(u.Guid).To(Equal("1111"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceManager"}))
 					case "user2":
 						Expect(u.Guid).To(Equal("2222"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceManager"}))
 					case "user3":
 						Expect(u.Guid).To(Equal("3333"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_AUDITOR}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceAuditor"}))
 					case "user4":
 						Expect(u.Guid).To(Equal("4444"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_DEVELOPER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceDeveloper"}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}
@@ -317,11 +317,11 @@ var _ = Describe("space-users command", func() {
 				user4.Username = "user4"
 				user4.GUID = "4444"
 
-				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName string) ([]models.UserFields, error) {
-					userFields := map[string][]models.UserFields{
-						models.SPACE_MANAGER:   {user, user2, user3, user4},
-						models.SPACE_DEVELOPER: {user2, user4},
-						models.SPACE_AUDITOR:   {user, user3},
+				userRepo.ListUsersInSpaceForRoleWithNoUAAStub = func(_ string, roleName models.Role) ([]models.UserFields, error) {
+					userFields := map[models.Role][]models.UserFields{
+						models.RoleSpaceManager:   {user, user2, user3, user4},
+						models.RoleSpaceDeveloper: {user2, user4},
+						models.RoleSpaceAuditor:   {user, user3},
 					}[roleName]
 					return userFields, nil
 				}
@@ -341,16 +341,16 @@ var _ = Describe("space-users command", func() {
 					switch u.Username {
 					case "user1":
 						Expect(u.Guid).To(Equal("1111"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceManager", "RoleSpaceAuditor"}))
 					case "user2":
 						Expect(u.Guid).To(Equal("2222"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceManager", "RoleSpaceDeveloper"}))
 					case "user3":
 						Expect(u.Guid).To(Equal("3333"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_AUDITOR}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceManager", "RoleSpaceAuditor"}))
 					case "user4":
 						Expect(u.Guid).To(Equal("4444"))
-						Expect(u.Roles).To(ConsistOf([]string{models.SPACE_MANAGER, models.SPACE_DEVELOPER}))
+						Expect(u.Roles).To(ConsistOf([]string{"RoleSpaceManager", "RoleSpaceDeveloper"}))
 					default:
 						Fail("unexpected user: " + u.Username)
 					}

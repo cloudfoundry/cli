@@ -250,7 +250,7 @@ var _ = Describe("SetSpaceRole", func() {
 					Expect(actualUserGUID).To(Equal("the-user-guid"))
 					Expect(actualSpaceGUID).To(Equal("the-space-guid"))
 					Expect(actualOrgGUID).To(Equal("the-org-guid"))
-					Expect(actualRole).To(Equal("SpaceManager"))
+					Expect(actualRole).To(Equal(models.RoleSpaceManager))
 				})
 
 				Context("when the call to CC fails", func() {
@@ -279,7 +279,7 @@ var _ = Describe("SetSpaceRole", func() {
 					Expect(username).To(Equal("the-user-name"))
 					Expect(spaceGUID).To(Equal("the-space-guid"))
 					Expect(orgGUID).To(Equal("the-org-guid"))
-					Expect(role).To(Equal("SpaceManager"))
+					Expect(role).To(Equal(models.RoleSpaceManager))
 				})
 
 				It("tells the user it assigned the role", func() {

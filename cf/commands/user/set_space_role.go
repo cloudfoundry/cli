@@ -21,7 +21,7 @@ import (
 
 type SpaceRoleSetter interface {
 	commandregistry.Command
-	SetSpaceRole(space models.Space, role, userGUID, userName string) (err error)
+	SetSpaceRole(space models.Space, role models.Role, userGUID, userName string) (err error)
 }
 
 type SetSpaceRole struct {
@@ -88,8 +88,13 @@ func (cmd *SetSpaceRole) SetDependency(deps commandregistry.Dependency, pluginCa
 
 func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[2]
-	role := models.UserInputToSpaceRole[c.Args()[3]]
-	user := cmd.userReq.GetUser()
+	roleStr := c.Args()[3]
+	role, err := models.RoleFromString(roleStr)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
+
+	userFields := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
@@ -97,27 +102,28 @@ func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.SetSpaceRole(space, role, user.GUID, user.Username)
+	err = cmd.SetSpaceRole(space, role, userFields.GUID, userFields.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 }
 
-func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGUID, userName string) error {
+func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role models.Role, userGUID, username string) error {
+	var err error
+
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"Role":        terminal.EntityNameColor(role),
-			"TargetUser":  terminal.EntityNameColor(userName),
+			"Role":        terminal.EntityNameColor(role.ToString()),
+			"TargetUser":  terminal.EntityNameColor(username),
 			"TargetOrg":   terminal.EntityNameColor(space.Organization.Name),
 			"TargetSpace": terminal.EntityNameColor(space.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	var err error
 	if len(userGUID) > 0 {
 		err = cmd.userRepo.SetSpaceRoleByGUID(userGUID, space.GUID, space.Organization.GUID, role)
 	} else {
-		err = cmd.userRepo.SetSpaceRoleByUsername(userName, space.GUID, space.Organization.GUID, role)
+		err = cmd.userRepo.SetSpaceRoleByUsername(username, space.GUID, space.Organization.GUID, role)
 	}
 	if err != nil {
 		return err

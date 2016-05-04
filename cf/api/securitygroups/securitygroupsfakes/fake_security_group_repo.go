@@ -54,11 +54,16 @@ type FakeSecurityGroupRepo struct {
 }
 
 func (fake *FakeSecurityGroupRepo) Create(name string, rules []map[string]interface{}) error {
+	var rulesCopy []map[string]interface{}
+	if rules != nil {
+		rulesCopy = make([]map[string]interface{}, len(rules))
+		copy(rulesCopy, rules)
+	}
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		name  string
 		rules []map[string]interface{}
-	}{name, rules})
+	}{name, rulesCopy})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(name, rules)
@@ -87,11 +92,16 @@ func (fake *FakeSecurityGroupRepo) CreateReturns(result1 error) {
 }
 
 func (fake *FakeSecurityGroupRepo) Update(guid string, rules []map[string]interface{}) error {
+	var rulesCopy []map[string]interface{}
+	if rules != nil {
+		rulesCopy = make([]map[string]interface{}, len(rules))
+		copy(rulesCopy, rules)
+	}
 	fake.updateMutex.Lock()
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		guid  string
 		rules []map[string]interface{}
-	}{guid, rules})
+	}{guid, rulesCopy})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(guid, rules)

@@ -80,7 +80,11 @@ func (cmd *UnsetSpaceRole) SetDependency(deps commandregistry.Dependency, plugin
 
 func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 	spaceName := c.Args()[2]
-	role := models.UserInputToSpaceRole[c.Args()[3]]
+	roleStr := c.Args()[3]
+	role, err := models.RoleFromString(roleStr)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
@@ -90,7 +94,7 @@ func (cmd *UnsetSpaceRole) Execute(c flags.FlagContext) {
 
 	cmd.ui.Say(T("Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"Role":        terminal.EntityNameColor(role),
+			"Role":        terminal.EntityNameColor(roleStr),
 			"TargetUser":  terminal.EntityNameColor(user.Username),
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
 			"TargetSpace": terminal.EntityNameColor(space.Name),

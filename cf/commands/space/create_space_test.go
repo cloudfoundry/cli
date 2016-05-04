@@ -118,8 +118,8 @@ var _ = Describe("create-space command", func() {
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating space", "my-space", "my-org", "my-user"},
 			[]string{"OK"},
-			[]string{"Assigning", models.SpaceRoleToUserInput[models.SPACE_MANAGER], "my-user", "my-space"},
-			[]string{"Assigning", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER], "my-user", "my-space"},
+			[]string{"Assigning", "SpaceManager", "my-user", "my-space"},
+			[]string{"Assigning", "SpaceDeveloper", "my-user", "my-space"},
 			[]string{"TIP"},
 		))
 
@@ -131,7 +131,7 @@ var _ = Describe("create-space command", func() {
 		Expect(userGUID).To(Equal("my-user-guid"))
 		Expect(spaceGUID).To(Equal("my-space-guid"))
 		Expect(orgGUID).To(Equal("my-org-guid"))
-		Expect(role).To(Equal(models.SPACE_MANAGER))
+		Expect(role).To(Equal(models.RoleSpaceManager))
 	})
 
 	It("warns the user when a space with that name already exists", func() {
@@ -144,7 +144,7 @@ var _ = Describe("create-space command", func() {
 		))
 		Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-space", "already exists"}))
 		Expect(ui.Outputs).ToNot(ContainSubstrings(
-			[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
+			[]string{"Assigning", "my-user", "my-space", "SpaceManager"},
 		))
 
 		Expect(spaceRepo.CreateCallCount()).To(Equal(1))
@@ -167,8 +167,8 @@ var _ = Describe("create-space command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating space", "my-space", "other-org", "my-user"},
 				[]string{"OK"},
-				[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
-				[]string{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
+				[]string{"Assigning", "my-user", "my-space", "SpaceManager"},
+				[]string{"Assigning", "my-user", "my-space", "SpaceDeveloper"},
 				[]string{"TIP"},
 			))
 
@@ -180,7 +180,7 @@ var _ = Describe("create-space command", func() {
 			Expect(userGUID).To(Equal("my-user-guid"))
 			Expect(spaceGUID).To(Equal("my-space-guid"))
 			Expect(orgGUID).To(Equal("my-org-guid"))
-			Expect(role).To(Equal(models.SPACE_MANAGER))
+			Expect(role).To(Equal(models.RoleSpaceManager))
 		})
 
 		It("fails when the org provided does not exist", func() {

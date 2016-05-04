@@ -135,13 +135,13 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	}
 	cmd.ui.Ok()
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGUID(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.RoleSpaceManager, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_DEVELOPER, cmd.config.UserGUID(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.RoleSpaceDeveloper, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

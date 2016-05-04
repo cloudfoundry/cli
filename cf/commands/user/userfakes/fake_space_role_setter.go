@@ -41,11 +41,11 @@ type FakeSpaceRoleSetter struct {
 	executeArgsForCall []struct {
 		context flags.FlagContext
 	}
-	SetSpaceRoleStub        func(space models.Space, role, userGUID, userName string) (err error)
+	SetSpaceRoleStub        func(space models.Space, role models.Role, userGUID, userName string) (err error)
 	setSpaceRoleMutex       sync.RWMutex
 	setSpaceRoleArgsForCall []struct {
 		space    models.Space
-		role     string
+		role     models.Role
 		userGUID string
 		userName string
 	}
@@ -167,11 +167,11 @@ func (fake *FakeSpaceRoleSetter) ExecuteArgsForCall(i int) flags.FlagContext {
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeSpaceRoleSetter) SetSpaceRole(space models.Space, role string, userGUID string, userName string) (err error) {
+func (fake *FakeSpaceRoleSetter) SetSpaceRole(space models.Space, role models.Role, userGUID string, userName string) (err error) {
 	fake.setSpaceRoleMutex.Lock()
 	fake.setSpaceRoleArgsForCall = append(fake.setSpaceRoleArgsForCall, struct {
 		space    models.Space
-		role     string
+		role     models.Role
 		userGUID string
 		userName string
 	}{space, role, userGUID, userName})
@@ -189,7 +189,7 @@ func (fake *FakeSpaceRoleSetter) SetSpaceRoleCallCount() int {
 	return len(fake.setSpaceRoleArgsForCall)
 }
 
-func (fake *FakeSpaceRoleSetter) SetSpaceRoleArgsForCall(i int) (models.Space, string, string, string) {
+func (fake *FakeSpaceRoleSetter) SetSpaceRoleArgsForCall(i int) (models.Space, models.Role, string, string) {
 	fake.setSpaceRoleMutex.RLock()
 	defer fake.setSpaceRoleMutex.RUnlock()
 	return fake.setSpaceRoleArgsForCall[i].space, fake.setSpaceRoleArgsForCall[i].role, fake.setSpaceRoleArgsForCall[i].userGUID, fake.setSpaceRoleArgsForCall[i].userName

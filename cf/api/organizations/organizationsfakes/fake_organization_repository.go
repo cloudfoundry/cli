@@ -115,10 +115,15 @@ func (fake *FakeOrganizationRepository) ListOrgsReturns(result1 []models.Organiz
 }
 
 func (fake *FakeOrganizationRepository) GetManyOrgsByGUID(orgGUIDs []string) (orgs []models.Organization, apiErr error) {
+	var orgGUIDsCopy []string
+	if orgGUIDs != nil {
+		orgGUIDsCopy = make([]string, len(orgGUIDs))
+		copy(orgGUIDsCopy, orgGUIDs)
+	}
 	fake.getManyOrgsByGUIDMutex.Lock()
 	fake.getManyOrgsByGUIDArgsForCall = append(fake.getManyOrgsByGUIDArgsForCall, struct {
 		orgGUIDs []string
-	}{orgGUIDs})
+	}{orgGUIDsCopy})
 	fake.getManyOrgsByGUIDMutex.Unlock()
 	if fake.GetManyOrgsByGUIDStub != nil {
 		return fake.GetManyOrgsByGUIDStub(orgGUIDs)

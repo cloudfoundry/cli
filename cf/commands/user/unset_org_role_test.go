@@ -216,7 +216,7 @@ var _ = Describe("UnsetOrgRole", func() {
 				actualUserGUID, actualOrgGUID, actualRole := userRepo.UnsetOrgRoleByGUIDArgsForCall(0)
 				Expect(actualUserGUID).To(Equal("the-user-guid"))
 				Expect(actualOrgGUID).To(Equal("the-org-guid"))
-				Expect(actualRole).To(Equal("OrgManager"))
+				Expect(actualRole).To(Equal(models.RoleOrgManager))
 			})
 
 			Context("when the call to CC fails", func() {
@@ -245,7 +245,7 @@ var _ = Describe("UnsetOrgRole", func() {
 				username, orgGUID, role := userRepo.UnsetOrgRoleByUsernameArgsForCall(0)
 				Expect(username).To(Equal("the-user-name"))
 				Expect(orgGUID).To(Equal("the-org-guid"))
-				Expect(role).To(Equal("OrgManager"))
+				Expect(role).To(Equal(models.RoleOrgManager))
 			})
 
 			It("tells the user it is removing the role", func() {

@@ -85,17 +85,21 @@ func (cmd *SetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCall
 func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
-	role := models.UserInputToOrgRole[c.Args()[2]]
+	roleStr := c.Args()[2]
+	role, err := models.RoleFromString(roleStr)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"Role":        terminal.EntityNameColor(role),
+			"Role":        terminal.EntityNameColor(roleStr),
 			"TargetUser":  terminal.EntityNameColor(user.Username),
 			"TargetOrg":   terminal.EntityNameColor(org.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	err := cmd.SetOrgRole(org.GUID, role, user.GUID, user.Username)
+	err = cmd.SetOrgRole(org.GUID, role, user.GUID, user.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
@@ -103,7 +107,7 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 }
 
-func (cmd *SetOrgRole) SetOrgRole(orgGUID string, role, userGUID, userName string) error {
+func (cmd *SetOrgRole) SetOrgRole(orgGUID string, role models.Role, userGUID, userName string) error {
 	if len(userGUID) > 0 {
 		return cmd.userRepo.SetOrgRoleByGUID(userGUID, orgGUID, role)
 	}

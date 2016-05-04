@@ -216,7 +216,7 @@ var _ = Describe("SetOrgRole", func() {
 				actualUserGUID, actualOrgGUID, actualRole := userRepo.SetOrgRoleByGUIDArgsForCall(0)
 				Expect(actualUserGUID).To(Equal("the-user-guid"))
 				Expect(actualOrgGUID).To(Equal("the-org-guid"))
-				Expect(actualRole).To(Equal("OrgManager"))
+				Expect(actualRole).To(Equal(models.RoleOrgManager))
 			})
 
 			Context("when the call to CC fails", func() {
@@ -244,7 +244,7 @@ var _ = Describe("SetOrgRole", func() {
 				username, orgGUID, role := userRepo.SetOrgRoleByUsernameArgsForCall(0)
 				Expect(username).To(Equal("the-user-name"))
 				Expect(orgGUID).To(Equal("the-org-guid"))
-				Expect(role).To(Equal("OrgManager"))
+				Expect(role).To(Equal(models.RoleOrgManager))
 			})
 
 			It("tells the user it assigned the role", func() {

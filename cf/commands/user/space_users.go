@@ -79,7 +79,7 @@ func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
 }
 
 func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, username string) userprint.UserPrinter {
-	var roles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
+	var roles = []models.Role{models.RoleSpaceManager, models.RoleSpaceDeveloper, models.RoleSpaceAuditor}
 
 	if cmd.pluginCall {
 		return userprint.NewSpaceUsersPluginPrinter(
@@ -100,15 +100,15 @@ func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, user
 		UI:         cmd.ui,
 		UserLister: cmd.userLister(),
 		Roles:      roles,
-		RoleDisplayNames: map[string]string{
-			models.SPACE_MANAGER:   T("SPACE MANAGER"),
-			models.SPACE_DEVELOPER: T("SPACE DEVELOPER"),
-			models.SPACE_AUDITOR:   T("SPACE AUDITOR"),
+		RoleDisplayNames: map[models.Role]string{
+			models.RoleSpaceManager:   T("SPACE MANAGER"),
+			models.RoleSpaceDeveloper: T("SPACE DEVELOPER"),
+			models.RoleSpaceAuditor:   T("SPACE AUDITOR"),
 		},
 	}
 }
 
-func (cmd *SpaceUsers) userLister() func(spaceGUID string, role string) ([]models.UserFields, error) {
+func (cmd *SpaceUsers) userLister() func(spaceGUID string, role models.Role) ([]models.UserFields, error) {
 	if cmd.config.IsMinAPIVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion) {
 		return cmd.userRepo.ListUsersInSpaceForRoleWithNoUAA
 	}
