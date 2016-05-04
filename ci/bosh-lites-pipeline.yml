@@ -80,18 +80,13 @@ jobs:
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cli-private
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: bosh-lite
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -99,7 +94,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         AWS_REGION: {{lite-aws-region}}
         LITE_INSTANCE_NAME: bosh-lite-1
-      tags: ["non-check-worker"]
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -113,12 +107,10 @@ jobs:
         LITE_NAME: {{lite-1-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
-      tags: ["non-check-worker"]
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -129,33 +121,23 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-1]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: etcd-release
-        tags: ["non-check-worker"]
       - get: garden-linux-release
-        tags: ["non-check-worker"]
       - get: diego-release
-        tags: ["non-check-worker"]
       - get: diego-repo
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cflinuxfs2-rootfs-release
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -166,32 +148,24 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-1]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-1-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cf-routing-release
-        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
-        tags: ["non-check-worker"]
       - get: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
-      tags: ["non-check-worker"]
     - task: test-routing
       file: cli/ci/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -203,18 +177,13 @@ jobs:
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cli-private
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: bosh-lite
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -222,7 +191,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         AWS_REGION: {{lite-aws-region}}
         LITE_INSTANCE_NAME: bosh-lite-2
-      tags: ["non-check-worker"]
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -236,12 +204,10 @@ jobs:
         LITE_NAME: {{lite-2-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
-      tags: ["non-check-worker"]
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -252,33 +218,23 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-2]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: etcd-release
-        tags: ["non-check-worker"]
       - get: garden-linux-release
-        tags: ["non-check-worker"]
       - get: diego-release
-        tags: ["non-check-worker"]
       - get: diego-repo
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cflinuxfs2-rootfs-release
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -289,32 +245,24 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-2]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-2-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cf-routing-release
-        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
-        tags: ["non-check-worker"]
       - get: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
-      tags: ["non-check-worker"]
     - task: test-routing
       file: cli/ci/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -327,18 +275,13 @@ jobs:
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cli-private
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: bosh-lite
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -346,7 +289,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         AWS_REGION: {{lite-aws-region}}
         LITE_INSTANCE_NAME: bosh-lite-3
-      tags: ["non-check-worker"]
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -360,12 +302,10 @@ jobs:
         LITE_NAME: {{lite-3-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
-      tags: ["non-check-worker"]
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -376,33 +316,23 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-3]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: etcd-release
-        tags: ["non-check-worker"]
       - get: garden-linux-release
-        tags: ["non-check-worker"]
       - get: diego-release
-        tags: ["non-check-worker"]
       - get: diego-repo
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cflinuxfs2-rootfs-release
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -413,32 +343,24 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-3]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-3-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cf-routing-release
-        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
-        tags: ["non-check-worker"]
       - get: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
-      tags: ["non-check-worker"]
     - task: test-routing
       file: cli/ci/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -450,18 +372,13 @@ jobs:
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cli-private
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: bosh-lite
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -469,7 +386,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         AWS_REGION: {{lite-aws-region}}
         LITE_INSTANCE_NAME: bosh-lite-4
-      tags: ["non-check-worker"]
     - task: provision
       privileged: true
       file: cli/ci/tasks/provision-cf-lite.yml
@@ -483,12 +399,10 @@ jobs:
         LITE_NAME: {{lite-4-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
         LITE_HOSTNAME: {{lite-4-hostname}}
-      tags: ["non-check-worker"]
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -499,33 +413,23 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-boshlite-4]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: etcd-release
-        tags: ["non-check-worker"]
       - get: garden-linux-release
-        tags: ["non-check-worker"]
       - get: diego-release
-        tags: ["non-check-worker"]
       - get: diego-repo
-        tags: ["non-check-worker"]
       - get: cf-release
         resource: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cflinuxfs2-rootfs-release
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-diego
       file: cli/ci/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
@@ -536,32 +440,24 @@ jobs:
   - get: bosh-lite-lock
     passed: [deploy-diego-release-4]
     trigger: true
-    tags: ["non-check-worker"]
   - put: bosh-lite-lock
     params:
       claim: {{lite-4-hostname}}
-    tags: ["non-check-worker"]
   - do:
     - aggregate:
       - get: cf-routing-release
-        tags: ["non-check-worker"]
       - get: cf-routing-release-repo
-        tags: ["non-check-worker"]
       - get: cf-release-repo
-        tags: ["non-check-worker"]
       - get: cli
-        tags: ["non-check-worker"]
     - task: deploy-routing
       file: cli/ci/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
         LITE_HOSTNAME: {{lite-4-hostname}}
-      tags: ["non-check-worker"]
     - task: test-routing
       file: cli/ci/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-      tags: ["non-check-worker"]
     ensure:
       put: bosh-lite-lock
       params:
