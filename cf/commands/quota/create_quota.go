@@ -50,7 +50,7 @@ func (cmd *CreateQuota) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
 			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
 			"[--allow-paid-service-plans] ",
-			"[--reserved-route-ports]",
+			fmt.Sprintf("[--reserved-route-ports %s] ", T("RESERVED_ROUTE_PORTS")),
 		},
 		Flags: fs,
 	}
