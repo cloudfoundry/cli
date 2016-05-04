@@ -83,6 +83,11 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 		appInstanceLimit = T("unlimited")
 	}
 
+	reservedRoutePorts := strconv.Itoa(quota.ReservedRoutePorts)
+	if reservedRoutePorts == "-1" {
+		reservedRoutePorts = T("unlimited")
+	}
+
 	table := cmd.ui.Table([]string{"", ""})
 	table.Add(T("Total Memory"), formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE))
 	table.Add(T("Instance Memory"), megabytes)
@@ -90,5 +95,6 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 	table.Add(T("Services"), servicesLimit)
 	table.Add(T("Paid service plans"), formatters.Allowed(quota.NonBasicServicesAllowed))
 	table.Add(T("App instance limit"), appInstanceLimit)
+	table.Add(T("Reserved Route Ports"), reservedRoutePorts)
 	table.Print()
 }
