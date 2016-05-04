@@ -61,7 +61,7 @@ var _ = Describe("create-quota command", func() {
 		It("has a reserved route ports flag", func() {
 			Expect(usage).To(MatchRegexp(`--reserved-route-ports\s+Maximum number of routes that may be created with reserved ports \(Default: 0\)`))
 
-			Expect(usage).To(MatchRegexp(`cf create-quota.*\[--reserved-route-ports\]`))
+			Expect(usage).To(MatchRegexp(`cf create-quota.*\[--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
 		})
 
 		It("has an instance memory flag", func() {
