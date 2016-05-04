@@ -880,6 +880,10 @@
     "translation": "QUOTA"
   },
   {
+    "id": "RESERVED_ROUTE_PORTS",
+    "translation": "RESERVED_ROUTE_PORTS"
+  },
+  {
     "id": "ROLES:\n",
     "translation": "ROLES:\n"
   },

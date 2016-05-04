@@ -3364,6 +3364,10 @@
     "translation": "RICHIESTA:"
   },
   {
+    "id": "RESERVED_ROUTE_PORTS",
+    "translation": ""
+  },
+  {
     "id": "RESPONSE:",
     "translation": "RISPOSTA:"
   },

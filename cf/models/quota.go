@@ -23,4 +23,5 @@ type QuotaResponse struct {
 	ServicesLimit           int         `json:"total_services"`
 	NonBasicServicesAllowed bool        `json:"non_basic_services_allowed"`
 	AppInstanceLimit        json.Number `json:"app_instance_limit"`
+	ReservedRoutePorts      int         `json:"total_reserved_route_ports"`
 }

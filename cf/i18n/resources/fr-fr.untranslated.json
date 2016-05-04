@@ -484,6 +484,10 @@
     "translation": "Port used to identify the TCP route"
   },
   {
+    "id": "RESERVED_ROUTE_PORTS",
+    "translation": "RESERVED_ROUTE_PORTS"
+  },
+  {
     "id": "ROUTES",
     "translation": "ROUTES"
   },
