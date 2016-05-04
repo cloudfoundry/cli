@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
 )
@@ -40,11 +41,11 @@ type FakeOrgRoleSetter struct {
 	executeArgsForCall []struct {
 		context flags.FlagContext
 	}
-	SetOrgRoleStub        func(orgGUID string, role, userGUID, userName string) error
+	SetOrgRoleStub        func(orgGUID string, role models.Role, userGUID, userName string) error
 	setOrgRoleMutex       sync.RWMutex
 	setOrgRoleArgsForCall []struct {
 		orgGUID  string
-		role     string
+		role     models.Role
 		userGUID string
 		userName string
 	}
@@ -166,11 +167,11 @@ func (fake *FakeOrgRoleSetter) ExecuteArgsForCall(i int) flags.FlagContext {
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeOrgRoleSetter) SetOrgRole(orgGUID string, role string, userGUID string, userName string) error {
+func (fake *FakeOrgRoleSetter) SetOrgRole(orgGUID string, role models.Role, userGUID string, userName string) error {
 	fake.setOrgRoleMutex.Lock()
 	fake.setOrgRoleArgsForCall = append(fake.setOrgRoleArgsForCall, struct {
 		orgGUID  string
-		role     string
+		role     models.Role
 		userGUID string
 		userName string
 	}{orgGUID, role, userGUID, userName})
@@ -188,7 +189,7 @@ func (fake *FakeOrgRoleSetter) SetOrgRoleCallCount() int {
 	return len(fake.setOrgRoleArgsForCall)
 }
 
-func (fake *FakeOrgRoleSetter) SetOrgRoleArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeOrgRoleSetter) SetOrgRoleArgsForCall(i int) (string, models.Role, string, string) {
 	fake.setOrgRoleMutex.RLock()
 	defer fake.setOrgRoleMutex.RUnlock()
 	return fake.setOrgRoleArgsForCall[i].orgGUID, fake.setOrgRoleArgsForCall[i].role, fake.setOrgRoleArgsForCall[i].userGUID, fake.setOrgRoleArgsForCall[i].userName

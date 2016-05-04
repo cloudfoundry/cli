@@ -137,7 +137,7 @@ var _ = Describe("create-org command", func() {
 
 				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
 				Expect(orgGUID).To(Equal("my-org-guid"))
-				Expect(role).To(Equal("OrgManager"))
+				Expect(role).To(Equal(models.RoleOrgManager))
 				Expect(userGUID).To(Equal(""))
 				Expect(userName).To(Equal("my-user"))
 			})

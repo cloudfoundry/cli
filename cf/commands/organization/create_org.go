@@ -124,7 +124,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 					"TargetOrg":   terminal.EntityNameColor(name),
 				}))
 
-			err = cmd.orgRoleSetter.SetOrgRole(org.GUID, "OrgManager", "", cmd.config.Username())
+			err = cmd.orgRoleSetter.SetOrgRole(org.GUID, models.RoleOrgManager, "", cmd.config.Username())
 			if err != nil {
 				cmd.ui.Failed(T("Failed assigning org role to user: ") + err.Error())
 			}
