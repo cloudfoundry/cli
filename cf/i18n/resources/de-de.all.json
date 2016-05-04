@@ -2888,6 +2888,10 @@
     "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z.B. 1024M, 1G, 10G). -1 steht für eine unbegrenzte Menge. (Standard: unbegrenzt)"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
     "translation": "Maximale Zeitdauer (in Sekunden), die die CLI auf den Start der Anwendung wartet. Es können andere Zeitlimitüberschreitung seitens des Servers auftreten. "
   },

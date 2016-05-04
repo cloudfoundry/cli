@@ -2888,6 +2888,10 @@
     "translation": "应用程序实例可以具有的最大内存量（例如，1024M、1G、10G）。-1 表示内存量无限制。（缺省值：无限制）"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
     "translation": "CLI 等待应用程序启动的最长时间（秒），其他服务器端超时可能适用"
   },

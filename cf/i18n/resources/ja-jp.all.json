@@ -2888,6 +2888,10 @@
     "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)。-1 は量に制限がないことを表します。(デフォルト: 制限なし)"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
     "translation": "CLI がアプリケーションの開始を待つ最大時間 (秒)、他のサーバー・サイド・タイムアウトが適用されることもあります"
   },

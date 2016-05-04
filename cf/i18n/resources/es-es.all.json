@@ -2888,6 +2888,10 @@
     "translation": "Cantidad de memoria máxima que puede tener una instancia de aplicación (p. ej. 1024M, 1G, 10G). -1 representa una cantidad ilimitada. (Valor predeterminado: ilimitado)"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
+    "translation": ""
+  },
+  {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
     "translation": "Tiempo máximo (en segundos) para que el CLI espere el inicio de la aplicación; se pueden aplicar otros tiempos de espera del lado del servidor"
   },
