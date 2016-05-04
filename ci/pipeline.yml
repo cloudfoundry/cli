@@ -225,7 +225,6 @@ jobs:
   plan:
   - aggregate:
     - get: cf-cli-binaries
-      trigger: true
       passed: [build-binaries]
       tags: ["non-check-worker"]
     - get: final-cli
@@ -310,7 +309,6 @@ jobs:
   plan:
   - aggregate:
     - get: cf-cli-binaries
-      trigger: true
       passed: [build-binaries]
     - get: final-cli
       passed: [build-binaries]
