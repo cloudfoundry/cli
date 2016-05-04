@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+golint ./... \
+  | awk " \
+            !/vendor/ \
+        &&  !/cf\/resources/ \
+        &&  !/words\// \
+        &&  !/plugin\// \
+        &&  !/plugin_examples\// \
+        &&  !/fakes/ \
+        " \
+  | awk " \
+            !/should have comment or be unexported/ \
+        "
