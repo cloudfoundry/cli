@@ -35,6 +35,7 @@ func (cmd *CreateQuota) MetaData() commandregistry.CommandMetadata {
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
+	fs["reserved-route-ports"] = &flags.IntFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports (Default: 0)")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "create-quota",
@@ -48,7 +49,8 @@ func (cmd *CreateQuota) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[-r %s] ", T("ROUTES")),
 			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
 			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
-			"[--allow-paid-service-plans]",
+			"[--allow-paid-service-plans] ",
+			"[--reserved-route-ports]",
 		},
 		Flags: fs,
 	}

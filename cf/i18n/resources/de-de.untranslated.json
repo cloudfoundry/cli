@@ -812,6 +812,10 @@
     "translation": "Map an HTTP route"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
+    "translation": "Maximum number of routes that may be created with reserved ports (Default: 0)"
+  },
+  {
     "id": "NAME",
     "translation": "NAME"
   },
