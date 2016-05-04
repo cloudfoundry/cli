@@ -11,7 +11,7 @@
 [Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
 This README discusses how to develop a cf CLI plugin.
-For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.org/devguide/installcf/use-cli-plugins.html).
+For user-focused documentation, see [Using the cf CLI](http://docs.cloudfoundry.org/cf-cli/use-cli-plugins.html).
 
 *If you wish to share your plugin with the community, see [here](http://github.com/cloudfoundry-incubator/cli-plugin-repo) for plugin submission.
 
