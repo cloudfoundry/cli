@@ -134,6 +134,10 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 		quota.NonBasicServicesAllowed = true
 	}
 
+	if context.IsSet("reserved-route-ports") {
+		quota.ReservedRoutePorts = context.Int("reserved-route-ports")
+	}
+
 	err := cmd.quotaRepo.Create(quota)
 
 	httpErr, ok := err.(errors.HTTPError)
