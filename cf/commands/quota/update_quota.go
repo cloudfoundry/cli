@@ -14,17 +14,17 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type updateQuota struct {
+type UpdateQuota struct {
 	ui        terminal.UI
 	config    coreconfig.Reader
 	quotaRepo quotas.QuotaRepository
 }
 
 func init() {
-	commandregistry.Register(&updateQuota{})
+	commandregistry.Register(&UpdateQuota{})
 }
 
-func (cmd *updateQuota) MetaData() commandregistry.CommandMetadata {
+func (cmd *UpdateQuota) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
 	fs["disallow-paid-service-plans"] = &flags.BoolFlag{Name: "disallow-paid-service-plans", Usage: T("Cannot provision instances of paid service plans")}
@@ -54,7 +54,7 @@ func (cmd *updateQuota) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *updateQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UpdateQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-quota"))
 	}
@@ -70,14 +70,14 @@ func (cmd *updateQuota) Requirements(requirementsFactory requirements.Factory, f
 	return reqs
 }
 
-func (cmd *updateQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+func (cmd *UpdateQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetQuotaRepository()
 	return cmd
 }
 
-func (cmd *updateQuota) Execute(c flags.FlagContext) {
+func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
 	oldQuotaName := c.Args()[0]
 	quota, err := cmd.quotaRepo.FindByName(oldQuotaName)
 
