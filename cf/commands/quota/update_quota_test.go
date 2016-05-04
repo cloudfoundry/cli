@@ -114,45 +114,35 @@ var _ = Describe("app Command", func() {
 		})
 	})
 
-	Describe("requirements", func() {
-		Context("login requirement", func() {
-			It("fails if not logged in", func() {
-				requirementsFactory.LoginSuccess = false
-
-				Expect(runCommand("cf-plays-dwarf-fortress")).To(BeFalse())
-			})
+	Context("when the user is not logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = false
 		})
 
-		Context("usage requirement", func() {
-			It("fails with usage when no arguments are given", func() {
-				passed := runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Incorrect Usage", "Requires an argument"},
-				))
-				Expect(passed).To(BeFalse())
-			})
-		})
-
-		Context("the minimum API version requirement", func() {
-			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.MinAPIVersionSuccess = false
-			})
-
-			It("fails when the -a option is provided", func() {
-				Expect(runCommand("quota-name", "-a", "10")).To(BeFalse())
-
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.OrgAppInstanceLimitMinimumAPIVersion))
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
-			})
-
-			It("does not fail when the -a option is not provided", func() {
-				Expect(runCommand("quota-name", "-m", "10G")).To(BeTrue())
-			})
+		It("fails requirements", func() {
+			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
 		})
 	})
 
-	Describe("updating quota fields", func() {
+	Context("the minimum API version requirement", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+			requirementsFactory.MinAPIVersionSuccess = false
+		})
+
+		It("fails when the -a option is provided", func() {
+			Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
+
+			Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.OrgAppInstanceLimitMinimumAPIVersion))
+			Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+		})
+
+		It("does not fail when the -a option is not provided", func() {
+			Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
+		})
+	})
+
+	Context("when the user is logged in", func() {
 		BeforeEach(func() {
 			quota = models.QuotaFields{
 				GUID:             "quota-guid",
@@ -296,12 +286,11 @@ var _ = Describe("app Command", func() {
 			))
 		})
 
-	})
+		It("shows the user an error when finding the quota fails", func() {
+			quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("i can't believe it's not quotas!"))
 
-	It("shows the user an error when finding the quota fails", func() {
-		quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("i can't believe it's not quotas!"))
-
-		runCommand("-m", "50Somethings", "what-could-possibly-go-wrong?")
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			runCommand("-m", "50Somethings", "what-could-possibly-go-wrong?")
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+		})
 	})
 })
