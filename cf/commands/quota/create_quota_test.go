@@ -15,6 +15,7 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"github.com/cloudfoundry/cli/cf/commands/quota"
 )
 
 var _ = Describe("create-quota command", func() {
@@ -43,6 +44,46 @@ var _ = Describe("create-quota command", func() {
 	runCommand := func(args ...string) bool {
 		return testcmd.RunCLICommand("create-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
+
+	Describe("Help text", func() {
+		var usage string
+
+		BeforeEach(func() {
+			cq := &quota.CreateQuota{}
+			up := commandregistry.CLICommandUsagePresenter(cq)
+			usage = up.Usage()
+		})
+
+		It("has an instance memory flag", func() {
+			Expect(usage).To(MatchRegexp(`-i\s+Maximum amount of memory an application instance can have \(e.g. 1024M, 1G, 10G\). -1 represents an unlimited amount.`))
+
+			Expect(usage).To(MatchRegexp(`cf create-quota.*\[-i INSTANCE_MEMORY\]`))
+		})
+
+		It("has a total memory flag", func() {
+			Expect(usage).To(MatchRegexp(`-m\s+Total amount of memory \(e.g. 1024M, 1G, 10G\)`))
+
+			Expect(usage).To(MatchRegexp(`cf create-quota.*\[-m TOTAL_MEMORY\]`))
+		})
+
+		It("has a routes flag", func() {
+			Expect(usage).To(MatchRegexp(`-r\s+Total number of routes`))
+
+			Expect(usage).To(MatchRegexp(`cf create-quota.*\[-r ROUTES\]`))
+		})
+
+		It("has a service instances flag", func() {
+			Expect(usage).To(MatchRegexp(`-s\s+Total number of service instances`))
+
+			Expect(usage).To(MatchRegexp(`cf create-quota.*\[-s SERVICE_INSTANCES\]`))
+		})
+
+		It("has an app instances flag", func() {
+			Expect(usage).To(MatchRegexp(`-a\s+Total number of application instances. -1 represents an unlimited amount. \(Default: unlimited\)`))
+
+			Expect(usage).To(MatchRegexp(`cf create-quota.*\[-a APP_INSTANCES\]`))
+		})
+	})
 
 	Context("when the user is not logged in", func() {
 		BeforeEach(func() {
