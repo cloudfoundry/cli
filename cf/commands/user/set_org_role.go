@@ -19,7 +19,7 @@ import (
 
 type OrgRoleSetter interface {
 	commandregistry.Command
-	SetOrgRole(orgGUID string, role, userGUID, userName string) error
+	SetOrgRole(orgGUID string, role models.Role, userGUID, userName string) error
 }
 
 type SetOrgRole struct {
