@@ -1,7 +1,6 @@
 package quota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/flags"
@@ -102,24 +101,6 @@ var _ = Describe("create-quota command", func() {
 
 		It("fails requirements", func() {
 			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
-		})
-	})
-
-	Context("the minimum API version requirement", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.MinAPIVersionSuccess = false
-		})
-
-		It("fails when the -a option is provided", func() {
-			Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
-
-			Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.OrgAppInstanceLimitMinimumAPIVersion))
-			Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
-		})
-
-		It("does not fail when the -a option is not provided", func() {
-			Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
 		})
 	})
 
