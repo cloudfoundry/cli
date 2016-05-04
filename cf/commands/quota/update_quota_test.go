@@ -4,6 +4,7 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
+	cmdsQuota "github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -48,6 +49,64 @@ var _ = Describe("app Command", func() {
 	runCommand := func(args ...string) bool {
 		return testcmd.RunCLICommand("update-quota", args, requirementsFactory, updateCommandDependency, false)
 	}
+
+	Describe("Help text", func() {
+		var usage string
+
+		BeforeEach(func() {
+			uq := &cmdsQuota.UpdateQuota{}
+			up := commandregistry.CLICommandUsagePresenter(uq)
+			usage = up.Usage()
+		})
+
+		It("has an instance memory flag", func() {
+			Expect(usage).To(MatchRegexp(`-i\s+Maximum amount of memory an application instance can have \(e.g. 1024M, 1G, 10G\)`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-i INSTANCE_MEMORY\]`))
+		})
+
+		It("has a total memory flag", func() {
+			Expect(usage).To(MatchRegexp(`-m\s+Total amount of memory \(e.g. 1024M, 1G, 10G\)`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-m TOTAL_MEMORY\]`))
+		})
+
+		It("has a new name flag", func() {
+			Expect(usage).To(MatchRegexp(`-n\s+New name`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-n NEW_NAME\]`))
+		})
+
+		It("has a routes flag", func() {
+			Expect(usage).To(MatchRegexp(`-r\s+Total number of routes`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-r ROUTES\]`))
+		})
+
+		It("has a service instances flag", func() {
+			Expect(usage).To(MatchRegexp(`-s\s+Total number of service instances`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-s SERVICE_INSTANCES\]`))
+		})
+
+		It("has an app instances flag", func() {
+			Expect(usage).To(MatchRegexp(`-a\s+Total number of application instances. -1 represents an unlimited amount. \(Default: unlimited\)`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-a APP_INSTANCES\]`))
+		})
+
+		It("has an allow-paid-service-plans flag", func() {
+			Expect(usage).To(MatchRegexp(`--allow-paid-service-plans\s+Can provision instances of paid service plans`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\[--allow-paid-service-plans`))
+		})
+
+		It("has a disallow-paid-service-plans flag", func() {
+			Expect(usage).To(MatchRegexp(`--disallow-paid-service-plans\s+Cannot provision instances of paid service plans`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\--disallow-paid-service-plans\]`))
+		})
+	})
 
 	Describe("requirements", func() {
 		Context("login requirement", func() {
