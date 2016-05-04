@@ -1,7 +1,6 @@
 package quota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -14,7 +13,11 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -121,24 +124,6 @@ var _ = Describe("app Command", func() {
 
 		It("fails requirements", func() {
 			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
-		})
-	})
-
-	Context("the minimum API version requirement", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.MinAPIVersionSuccess = false
-		})
-
-		It("fails when the -a option is provided", func() {
-			Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
-
-			Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.OrgAppInstanceLimitMinimumAPIVersion))
-			Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
-		})
-
-		It("does not fail when the -a option is not provided", func() {
-			Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
 		})
 	})
 
@@ -291,6 +276,121 @@ var _ = Describe("app Command", func() {
 
 			runCommand("-m", "50Somethings", "what-could-possibly-go-wrong?")
 			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+		})
+	})
+
+	Describe("Requirements", func() {
+		var (
+			requirementsFactory *requirementsfakes.FakeFactory
+
+			ui   *testterm.FakeUI
+			cmd  commandregistry.Command
+			deps commandregistry.Dependency
+
+			quotaRepo   *quotasfakes.FakeQuotaRepository
+			flagContext flags.FlagContext
+
+			loginRequirement         requirements.Requirement
+			minAPIVersionRequirement requirements.Requirement
+		)
+
+		BeforeEach(func() {
+			ui = &testterm.FakeUI{}
+
+			configRepo = testconfig.NewRepositoryWithDefaults()
+			quotaRepo = new(quotasfakes.FakeQuotaRepository)
+			repoLocator := deps.RepoLocator.SetQuotaRepository(quotaRepo)
+
+			deps = commandregistry.Dependency{
+				UI:          ui,
+				Config:      configRepo,
+				RepoLocator: repoLocator,
+			}
+
+			requirementsFactory = new(requirementsfakes.FakeFactory)
+
+			cmd = &cmdsQuota.UpdateQuota{}
+			cmd.SetDependency(deps, false)
+
+			flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+			loginRequirement = &passingRequirement{Name: "login-requirement"}
+			requirementsFactory.NewLoginRequirementReturns(loginRequirement)
+
+			minAPIVersionRequirement = &passingRequirement{Name: "min-api-version-requirement"}
+			requirementsFactory.NewMinAPIVersionRequirementReturns(minAPIVersionRequirement)
+		})
+
+		Context("when not provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("quota", "extra-arg")
+			})
+
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires an argument"},
+				))
+			})
+		})
+
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("quota")
+			})
+
+			It("returns a LoginRequirement", func() {
+				actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("does not return a MinAPIVersionRequirement", func() {
+				actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
+				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
+			})
+
+			Context("when an app instance limit is passed", func() {
+				BeforeEach(func() {
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+					flagContext.Parse("domain-name", "-a", "2")
+				})
+
+				It("returns a MinAPIVersionRequirement as the second requirement", func() {
+					actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+
+					expectedVersion, err := semver.Make("2.33.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := requirementsFactory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '-a'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements[1]).To(Equal(minAPIVersionRequirement))
+				})
+			})
+
+			Context("when reserved route ports limit is passed", func() {
+				BeforeEach(func() {
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+					flagContext.Parse("domain-name", "--reserved-route-ports", "3")
+				})
+
+				It("returns a MinAPIVersionRequirement as the second requirement", func() {
+					actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+
+					expectedVersion, err := semver.Make("2.55.0")
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					feature, requiredVersion := requirementsFactory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(feature).To(Equal("Option '--reserved-route-ports'"))
+					Expect(requiredVersion).To(Equal(expectedVersion))
+					Expect(actualRequirements[1]).To(Equal(minAPIVersionRequirement))
+				})
+			})
 		})
 	})
 })
