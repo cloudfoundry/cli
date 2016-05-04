@@ -200,6 +200,20 @@ var _ = Describe("create-quota command", func() {
 			})
 		})
 
+		Context("when the --reserved-route-ports flag is provided", func() {
+			It("sets route port limit", func() {
+				runCommand("my-quota", "--reserved-route-ports", "5")
+
+				Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePorts).To(Equal(5))
+			})
+
+			It("defaults to 0", func() {
+				runCommand("my-quota")
+
+				Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePorts).To(Equal(0))
+			})
+		})
+
 		It("sets the route limit", func() {
 			runCommand("-r", "12", "ecstatic")
 

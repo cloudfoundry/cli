@@ -34,7 +34,8 @@ var _ = Describe("V3 Config files", func() {
 				"total_routes":0,
 				"total_services":0,
 				"non_basic_services_allowed": false,
-				"app_instance_limit":0
+				"app_instance_limit":0,
+				"total_reserved_route_ports":0
 			}
 		},
 		"SpaceFields": {

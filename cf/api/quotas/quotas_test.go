@@ -193,7 +193,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"total_routes": 12,
 					"memory_limit": 123,
 					"app_instance_limit": 42,
-					"instance_memory_limit": 0
+					"instance_memory_limit": 0,
+					"total_reserved_route_ports": 10
 				}`),
 					ghttp.RespondWith(http.StatusCreated, nil),
 				),
@@ -202,11 +203,12 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("creates a new quota with the given name", func() {
 			quota := models.QuotaFields{
-				Name:             "not-so-strict",
-				ServicesLimit:    1,
-				RoutesLimit:      12,
-				MemoryLimit:      123,
-				AppInstanceLimit: 42,
+				Name:               "not-so-strict",
+				ServicesLimit:      1,
+				RoutesLimit:        12,
+				MemoryLimit:        123,
+				AppInstanceLimit:   42,
+				ReservedRoutePorts: 10,
 			}
 
 			err := repo.Create(quota)
@@ -229,7 +231,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					"total_routes": 12,
 					"memory_limit": 123,
 					"app_instance_limit": 42,
-					"instance_memory_limit": 0
+					"instance_memory_limit": 0,
+					"total_reserved_route_ports": 10
 				}`),
 					ghttp.RespondWith(http.StatusOK, nil),
 				),
@@ -238,12 +241,13 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("updates an existing quota", func() {
 			quota := models.QuotaFields{
-				GUID:             "my-quota-guid",
-				Name:             "amazing-quota",
-				ServicesLimit:    1,
-				RoutesLimit:      12,
-				MemoryLimit:      123,
-				AppInstanceLimit: 42,
+				GUID:               "my-quota-guid",
+				Name:               "amazing-quota",
+				ServicesLimit:      1,
+				RoutesLimit:        12,
+				MemoryLimit:        123,
+				AppInstanceLimit:   42,
+				ReservedRoutePorts: 10,
 			}
 
 			err := repo.Update(quota)
