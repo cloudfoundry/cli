@@ -149,6 +149,10 @@ func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
 		quota.RoutesLimit = c.Int("r")
 	}
 
+	if c.IsSet("reserved-route-ports") {
+		quota.ReservedRoutePorts = c.Int("reserved-route-ports")
+	}
+
 	cmd.ui.Say(T("Updating quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{
 		"QuotaName": terminal.EntityNameColor(oldQuotaName),
 		"Username":  terminal.EntityNameColor(cmd.config.Username()),

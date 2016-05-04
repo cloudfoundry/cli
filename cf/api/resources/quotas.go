@@ -29,5 +29,6 @@ func (resource QuotaResource) ToFields() models.QuotaFields {
 		ServicesLimit:           resource.Entity.ServicesLimit,
 		NonBasicServicesAllowed: resource.Entity.NonBasicServicesAllowed,
 		AppInstanceLimit:        appInstanceLimit,
+		ReservedRoutePorts:      resource.Entity.ReservedRoutePorts,
 	}
 }

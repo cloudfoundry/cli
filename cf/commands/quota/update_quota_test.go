@@ -177,7 +177,7 @@ var _ = Describe("app Command", func() {
 				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
 			})
 
-			It("does not override the value if it's not provided", func() {
+			It("does not override the value if a different field is updated", func() {
 				runCommand("-s", "5", "quota-name")
 				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(333))
@@ -209,6 +209,22 @@ var _ = Describe("app Command", func() {
 					[]string{"Updating quota", "quota-name", "as", "my-user"},
 					[]string{"OK"},
 				))
+			})
+		})
+
+		Context("when the --reserved-route-ports flag is provided", func() {
+			It("updates the route port limit", func() {
+				runCommand("--reserved-route-ports", "5", "quota-name")
+
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePorts).To(Equal(5))
+			})
+
+			It("can update the route port limit to be -1, infinity", func() {
+				runCommand("--reserved-route-ports", "-1", "quota-name")
+
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+				Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePorts).To(Equal(-1))
 			})
 		})
 

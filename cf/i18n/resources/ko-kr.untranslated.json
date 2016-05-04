@@ -844,6 +844,10 @@
     "translation": "QUOTA"
   },
   {
+    "id": "RESERVED_ROUTE_PORTS",
+    "translation": "RESERVED_ROUTE_PORTS"
+  },
+  {
     "id": "ROUTE_PATH",
     "translation": "ROUTE_PATH"
   },
