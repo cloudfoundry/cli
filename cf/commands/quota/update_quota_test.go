@@ -4,8 +4,8 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
-	cmdsQuota "github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	cmdsQuota "github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
@@ -105,6 +105,12 @@ var _ = Describe("app Command", func() {
 			Expect(usage).To(MatchRegexp(`--disallow-paid-service-plans\s+Cannot provision instances of paid service plans`))
 
 			Expect(usage).To(MatchRegexp(`cf update-quota.*\--disallow-paid-service-plans\]`))
+		})
+
+		It("has a --reserved-route-ports flag", func() {
+			Expect(usage).To(MatchRegexp(`--reserved-route-ports\s+Maximum number of routes that may be created with reserved ports \(Default: 0\)`))
+
+			Expect(usage).To(MatchRegexp(`cf update-quota.*\--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
 		})
 	})
 
