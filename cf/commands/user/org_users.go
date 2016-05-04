@@ -79,11 +79,11 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 }
 
 func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
-	var roles []string
+	var roles []models.Role
 	if c.Bool("a") {
-		roles = []string{models.ORG_USER}
+		roles = []models.Role{models.RoleOrgUser}
 	} else {
-		roles = []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR}
+		roles = []models.Role{models.RoleOrgManager, models.RoleBillingManager, models.RoleOrgAuditor}
 	}
 
 	if cmd.pluginCall {
@@ -97,16 +97,16 @@ func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {
 		UI:         cmd.ui,
 		UserLister: cmd.userLister(),
 		Roles:      roles,
-		RoleDisplayNames: map[string]string{
-			models.ORG_USER:        T("USERS"),
-			models.ORG_MANAGER:     T("ORG MANAGER"),
-			models.BILLING_MANAGER: T("BILLING MANAGER"),
-			models.ORG_AUDITOR:     T("ORG AUDITOR"),
+		RoleDisplayNames: map[models.Role]string{
+			models.RoleOrgUser:        T("USERS"),
+			models.RoleOrgManager:     T("ORG MANAGER"),
+			models.RoleBillingManager: T("BILLING MANAGER"),
+			models.RoleOrgAuditor:     T("ORG AUDITOR"),
 		},
 	}
 }
 
-func (cmd *OrgUsers) userLister() func(orgGUID string, role string) ([]models.UserFields, error) {
+func (cmd *OrgUsers) userLister() func(orgGUID string, role models.Role) ([]models.UserFields, error) {
 	if cmd.config.IsMinAPIVersion(cf.ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion) {
 		return cmd.userRepo.ListUsersInOrgForRoleWithNoUAA
 	}

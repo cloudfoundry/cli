@@ -18,41 +18,41 @@ type FakeUserRepository struct {
 		result1 models.UserFields
 		result2 error
 	}
-	ListUsersInOrgForRoleStub        func(orgGUID string, role string) ([]models.UserFields, error)
+	ListUsersInOrgForRoleStub        func(orgGUID string, role models.Role) ([]models.UserFields, error)
 	listUsersInOrgForRoleMutex       sync.RWMutex
 	listUsersInOrgForRoleArgsForCall []struct {
 		orgGUID string
-		role    string
+		role    models.Role
 	}
 	listUsersInOrgForRoleReturns struct {
 		result1 []models.UserFields
 		result2 error
 	}
-	ListUsersInOrgForRoleWithNoUAAStub        func(orgGUID string, role string) ([]models.UserFields, error)
+	ListUsersInOrgForRoleWithNoUAAStub        func(orgGUID string, role models.Role) ([]models.UserFields, error)
 	listUsersInOrgForRoleWithNoUAAMutex       sync.RWMutex
 	listUsersInOrgForRoleWithNoUAAArgsForCall []struct {
 		orgGUID string
-		role    string
+		role    models.Role
 	}
 	listUsersInOrgForRoleWithNoUAAReturns struct {
 		result1 []models.UserFields
 		result2 error
 	}
-	ListUsersInSpaceForRoleStub        func(spaceGUID string, role string) ([]models.UserFields, error)
+	ListUsersInSpaceForRoleStub        func(spaceGUID string, role models.Role) ([]models.UserFields, error)
 	listUsersInSpaceForRoleMutex       sync.RWMutex
 	listUsersInSpaceForRoleArgsForCall []struct {
 		spaceGUID string
-		role      string
+		role      models.Role
 	}
 	listUsersInSpaceForRoleReturns struct {
 		result1 []models.UserFields
 		result2 error
 	}
-	ListUsersInSpaceForRoleWithNoUAAStub        func(spaceGUID string, role string) ([]models.UserFields, error)
+	ListUsersInSpaceForRoleWithNoUAAStub        func(spaceGUID string, role models.Role) ([]models.UserFields, error)
 	listUsersInSpaceForRoleWithNoUAAMutex       sync.RWMutex
 	listUsersInSpaceForRoleWithNoUAAArgsForCall []struct {
 		spaceGUID string
-		role      string
+		role      models.Role
 	}
 	listUsersInSpaceForRoleWithNoUAAReturns struct {
 		result1 []models.UserFields
@@ -75,84 +75,84 @@ type FakeUserRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
-	SetOrgRoleByGUIDStub        func(userGUID, orgGUID, role string) (apiErr error)
+	SetOrgRoleByGUIDStub        func(userGUID, orgGUID string, role models.Role) (apiErr error)
 	setOrgRoleByGUIDMutex       sync.RWMutex
 	setOrgRoleByGUIDArgsForCall []struct {
 		userGUID string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}
 	setOrgRoleByGUIDReturns struct {
 		result1 error
 	}
-	SetOrgRoleByUsernameStub        func(username, orgGUID, role string) (apiErr error)
+	SetOrgRoleByUsernameStub        func(username, orgGUID string, role models.Role) (apiErr error)
 	setOrgRoleByUsernameMutex       sync.RWMutex
 	setOrgRoleByUsernameArgsForCall []struct {
 		username string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}
 	setOrgRoleByUsernameReturns struct {
 		result1 error
 	}
-	UnsetOrgRoleByGUIDStub        func(userGUID, orgGUID, role string) (apiErr error)
+	UnsetOrgRoleByGUIDStub        func(userGUID, orgGUID string, role models.Role) (apiErr error)
 	unsetOrgRoleByGUIDMutex       sync.RWMutex
 	unsetOrgRoleByGUIDArgsForCall []struct {
 		userGUID string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}
 	unsetOrgRoleByGUIDReturns struct {
 		result1 error
 	}
-	UnsetOrgRoleByUsernameStub        func(username, orgGUID, role string) (apiErr error)
+	UnsetOrgRoleByUsernameStub        func(username, orgGUID string, role models.Role) (apiErr error)
 	unsetOrgRoleByUsernameMutex       sync.RWMutex
 	unsetOrgRoleByUsernameArgsForCall []struct {
 		username string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}
 	unsetOrgRoleByUsernameReturns struct {
 		result1 error
 	}
-	SetSpaceRoleByGUIDStub        func(userGUID, spaceGUID, orgGUID, role string) (apiErr error)
+	SetSpaceRoleByGUIDStub        func(userGUID, spaceGUID, orgGUID string, role models.Role) (apiErr error)
 	setSpaceRoleByGUIDMutex       sync.RWMutex
 	setSpaceRoleByGUIDArgsForCall []struct {
 		userGUID  string
 		spaceGUID string
 		orgGUID   string
-		role      string
+		role      models.Role
 	}
 	setSpaceRoleByGUIDReturns struct {
 		result1 error
 	}
-	SetSpaceRoleByUsernameStub        func(username, spaceGUID, orgGUID, role string) (apiErr error)
+	SetSpaceRoleByUsernameStub        func(username, spaceGUID, orgGUID string, role models.Role) (apiErr error)
 	setSpaceRoleByUsernameMutex       sync.RWMutex
 	setSpaceRoleByUsernameArgsForCall []struct {
 		username  string
 		spaceGUID string
 		orgGUID   string
-		role      string
+		role      models.Role
 	}
 	setSpaceRoleByUsernameReturns struct {
 		result1 error
 	}
-	UnsetSpaceRoleByGUIDStub        func(userGUID, spaceGUID, role string) (apiErr error)
+	UnsetSpaceRoleByGUIDStub        func(userGUID, spaceGUID string, role models.Role) (apiErr error)
 	unsetSpaceRoleByGUIDMutex       sync.RWMutex
 	unsetSpaceRoleByGUIDArgsForCall []struct {
 		userGUID  string
 		spaceGUID string
-		role      string
+		role      models.Role
 	}
 	unsetSpaceRoleByGUIDReturns struct {
 		result1 error
 	}
-	UnsetSpaceRoleByUsernameStub        func(userGUID, spaceGUID, role string) (apiErr error)
+	UnsetSpaceRoleByUsernameStub        func(userGUID, spaceGUID string, role models.Role) (apiErr error)
 	unsetSpaceRoleByUsernameMutex       sync.RWMutex
 	unsetSpaceRoleByUsernameArgsForCall []struct {
 		userGUID  string
 		spaceGUID string
-		role      string
+		role      models.Role
 	}
 	unsetSpaceRoleByUsernameReturns struct {
 		result1 error
@@ -192,11 +192,11 @@ func (fake *FakeUserRepository) FindByUsernameReturns(result1 models.UserFields,
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepository) ListUsersInOrgForRole(orgGUID string, role string) ([]models.UserFields, error) {
+func (fake *FakeUserRepository) ListUsersInOrgForRole(orgGUID string, role models.Role) ([]models.UserFields, error) {
 	fake.listUsersInOrgForRoleMutex.Lock()
 	fake.listUsersInOrgForRoleArgsForCall = append(fake.listUsersInOrgForRoleArgsForCall, struct {
 		orgGUID string
-		role    string
+		role    models.Role
 	}{orgGUID, role})
 	fake.listUsersInOrgForRoleMutex.Unlock()
 	if fake.ListUsersInOrgForRoleStub != nil {
@@ -212,7 +212,7 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleCallCount() int {
 	return len(fake.listUsersInOrgForRoleArgsForCall)
 }
 
-func (fake *FakeUserRepository) ListUsersInOrgForRoleArgsForCall(i int) (string, string) {
+func (fake *FakeUserRepository) ListUsersInOrgForRoleArgsForCall(i int) (string, models.Role) {
 	fake.listUsersInOrgForRoleMutex.RLock()
 	defer fake.listUsersInOrgForRoleMutex.RUnlock()
 	return fake.listUsersInOrgForRoleArgsForCall[i].orgGUID, fake.listUsersInOrgForRoleArgsForCall[i].role
@@ -226,11 +226,11 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleReturns(result1 []models.Us
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGUID string, role string) ([]models.UserFields, error) {
+func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGUID string, role models.Role) ([]models.UserFields, error) {
 	fake.listUsersInOrgForRoleWithNoUAAMutex.Lock()
 	fake.listUsersInOrgForRoleWithNoUAAArgsForCall = append(fake.listUsersInOrgForRoleWithNoUAAArgsForCall, struct {
 		orgGUID string
-		role    string
+		role    models.Role
 	}{orgGUID, role})
 	fake.listUsersInOrgForRoleWithNoUAAMutex.Unlock()
 	if fake.ListUsersInOrgForRoleWithNoUAAStub != nil {
@@ -246,7 +246,7 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAACallCount() int {
 	return len(fake.listUsersInOrgForRoleWithNoUAAArgsForCall)
 }
 
-func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAAArgsForCall(i int) (string, string) {
+func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAAArgsForCall(i int) (string, models.Role) {
 	fake.listUsersInOrgForRoleWithNoUAAMutex.RLock()
 	defer fake.listUsersInOrgForRoleWithNoUAAMutex.RUnlock()
 	return fake.listUsersInOrgForRoleWithNoUAAArgsForCall[i].orgGUID, fake.listUsersInOrgForRoleWithNoUAAArgsForCall[i].role
@@ -260,11 +260,11 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAAReturns(result1 []
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepository) ListUsersInSpaceForRole(spaceGUID string, role string) ([]models.UserFields, error) {
+func (fake *FakeUserRepository) ListUsersInSpaceForRole(spaceGUID string, role models.Role) ([]models.UserFields, error) {
 	fake.listUsersInSpaceForRoleMutex.Lock()
 	fake.listUsersInSpaceForRoleArgsForCall = append(fake.listUsersInSpaceForRoleArgsForCall, struct {
 		spaceGUID string
-		role      string
+		role      models.Role
 	}{spaceGUID, role})
 	fake.listUsersInSpaceForRoleMutex.Unlock()
 	if fake.ListUsersInSpaceForRoleStub != nil {
@@ -280,7 +280,7 @@ func (fake *FakeUserRepository) ListUsersInSpaceForRoleCallCount() int {
 	return len(fake.listUsersInSpaceForRoleArgsForCall)
 }
 
-func (fake *FakeUserRepository) ListUsersInSpaceForRoleArgsForCall(i int) (string, string) {
+func (fake *FakeUserRepository) ListUsersInSpaceForRoleArgsForCall(i int) (string, models.Role) {
 	fake.listUsersInSpaceForRoleMutex.RLock()
 	defer fake.listUsersInSpaceForRoleMutex.RUnlock()
 	return fake.listUsersInSpaceForRoleArgsForCall[i].spaceGUID, fake.listUsersInSpaceForRoleArgsForCall[i].role
@@ -294,11 +294,11 @@ func (fake *FakeUserRepository) ListUsersInSpaceForRoleReturns(result1 []models.
 	}{result1, result2}
 }
 
-func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGUID string, role string) ([]models.UserFields, error) {
+func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGUID string, role models.Role) ([]models.UserFields, error) {
 	fake.listUsersInSpaceForRoleWithNoUAAMutex.Lock()
 	fake.listUsersInSpaceForRoleWithNoUAAArgsForCall = append(fake.listUsersInSpaceForRoleWithNoUAAArgsForCall, struct {
 		spaceGUID string
-		role      string
+		role      models.Role
 	}{spaceGUID, role})
 	fake.listUsersInSpaceForRoleWithNoUAAMutex.Unlock()
 	if fake.ListUsersInSpaceForRoleWithNoUAAStub != nil {
@@ -314,7 +314,7 @@ func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAACallCount() int 
 	return len(fake.listUsersInSpaceForRoleWithNoUAAArgsForCall)
 }
 
-func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAAArgsForCall(i int) (string, string) {
+func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAAArgsForCall(i int) (string, models.Role) {
 	fake.listUsersInSpaceForRoleWithNoUAAMutex.RLock()
 	defer fake.listUsersInSpaceForRoleWithNoUAAMutex.RUnlock()
 	return fake.listUsersInSpaceForRoleWithNoUAAArgsForCall[i].spaceGUID, fake.listUsersInSpaceForRoleWithNoUAAArgsForCall[i].role
@@ -393,12 +393,12 @@ func (fake *FakeUserRepository) DeleteReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) SetOrgRoleByGUID(userGUID string, orgGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) SetOrgRoleByGUID(userGUID string, orgGUID string, role models.Role) (apiErr error) {
 	fake.setOrgRoleByGUIDMutex.Lock()
 	fake.setOrgRoleByGUIDArgsForCall = append(fake.setOrgRoleByGUIDArgsForCall, struct {
 		userGUID string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}{userGUID, orgGUID, role})
 	fake.setOrgRoleByGUIDMutex.Unlock()
 	if fake.SetOrgRoleByGUIDStub != nil {
@@ -414,7 +414,7 @@ func (fake *FakeUserRepository) SetOrgRoleByGUIDCallCount() int {
 	return len(fake.setOrgRoleByGUIDArgsForCall)
 }
 
-func (fake *FakeUserRepository) SetOrgRoleByGUIDArgsForCall(i int) (string, string, string) {
+func (fake *FakeUserRepository) SetOrgRoleByGUIDArgsForCall(i int) (string, string, models.Role) {
 	fake.setOrgRoleByGUIDMutex.RLock()
 	defer fake.setOrgRoleByGUIDMutex.RUnlock()
 	return fake.setOrgRoleByGUIDArgsForCall[i].userGUID, fake.setOrgRoleByGUIDArgsForCall[i].orgGUID, fake.setOrgRoleByGUIDArgsForCall[i].role
@@ -427,12 +427,12 @@ func (fake *FakeUserRepository) SetOrgRoleByGUIDReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) SetOrgRoleByUsername(username string, orgGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) SetOrgRoleByUsername(username string, orgGUID string, role models.Role) (apiErr error) {
 	fake.setOrgRoleByUsernameMutex.Lock()
 	fake.setOrgRoleByUsernameArgsForCall = append(fake.setOrgRoleByUsernameArgsForCall, struct {
 		username string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}{username, orgGUID, role})
 	fake.setOrgRoleByUsernameMutex.Unlock()
 	if fake.SetOrgRoleByUsernameStub != nil {
@@ -448,7 +448,7 @@ func (fake *FakeUserRepository) SetOrgRoleByUsernameCallCount() int {
 	return len(fake.setOrgRoleByUsernameArgsForCall)
 }
 
-func (fake *FakeUserRepository) SetOrgRoleByUsernameArgsForCall(i int) (string, string, string) {
+func (fake *FakeUserRepository) SetOrgRoleByUsernameArgsForCall(i int) (string, string, models.Role) {
 	fake.setOrgRoleByUsernameMutex.RLock()
 	defer fake.setOrgRoleByUsernameMutex.RUnlock()
 	return fake.setOrgRoleByUsernameArgsForCall[i].username, fake.setOrgRoleByUsernameArgsForCall[i].orgGUID, fake.setOrgRoleByUsernameArgsForCall[i].role
@@ -461,12 +461,12 @@ func (fake *FakeUserRepository) SetOrgRoleByUsernameReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) UnsetOrgRoleByGUID(userGUID string, orgGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) UnsetOrgRoleByGUID(userGUID string, orgGUID string, role models.Role) (apiErr error) {
 	fake.unsetOrgRoleByGUIDMutex.Lock()
 	fake.unsetOrgRoleByGUIDArgsForCall = append(fake.unsetOrgRoleByGUIDArgsForCall, struct {
 		userGUID string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}{userGUID, orgGUID, role})
 	fake.unsetOrgRoleByGUIDMutex.Unlock()
 	if fake.UnsetOrgRoleByGUIDStub != nil {
@@ -482,7 +482,7 @@ func (fake *FakeUserRepository) UnsetOrgRoleByGUIDCallCount() int {
 	return len(fake.unsetOrgRoleByGUIDArgsForCall)
 }
 
-func (fake *FakeUserRepository) UnsetOrgRoleByGUIDArgsForCall(i int) (string, string, string) {
+func (fake *FakeUserRepository) UnsetOrgRoleByGUIDArgsForCall(i int) (string, string, models.Role) {
 	fake.unsetOrgRoleByGUIDMutex.RLock()
 	defer fake.unsetOrgRoleByGUIDMutex.RUnlock()
 	return fake.unsetOrgRoleByGUIDArgsForCall[i].userGUID, fake.unsetOrgRoleByGUIDArgsForCall[i].orgGUID, fake.unsetOrgRoleByGUIDArgsForCall[i].role
@@ -495,12 +495,12 @@ func (fake *FakeUserRepository) UnsetOrgRoleByGUIDReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) UnsetOrgRoleByUsername(username string, orgGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) UnsetOrgRoleByUsername(username string, orgGUID string, role models.Role) (apiErr error) {
 	fake.unsetOrgRoleByUsernameMutex.Lock()
 	fake.unsetOrgRoleByUsernameArgsForCall = append(fake.unsetOrgRoleByUsernameArgsForCall, struct {
 		username string
 		orgGUID  string
-		role     string
+		role     models.Role
 	}{username, orgGUID, role})
 	fake.unsetOrgRoleByUsernameMutex.Unlock()
 	if fake.UnsetOrgRoleByUsernameStub != nil {
@@ -516,7 +516,7 @@ func (fake *FakeUserRepository) UnsetOrgRoleByUsernameCallCount() int {
 	return len(fake.unsetOrgRoleByUsernameArgsForCall)
 }
 
-func (fake *FakeUserRepository) UnsetOrgRoleByUsernameArgsForCall(i int) (string, string, string) {
+func (fake *FakeUserRepository) UnsetOrgRoleByUsernameArgsForCall(i int) (string, string, models.Role) {
 	fake.unsetOrgRoleByUsernameMutex.RLock()
 	defer fake.unsetOrgRoleByUsernameMutex.RUnlock()
 	return fake.unsetOrgRoleByUsernameArgsForCall[i].username, fake.unsetOrgRoleByUsernameArgsForCall[i].orgGUID, fake.unsetOrgRoleByUsernameArgsForCall[i].role
@@ -529,13 +529,13 @@ func (fake *FakeUserRepository) UnsetOrgRoleByUsernameReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) SetSpaceRoleByGUID(userGUID string, spaceGUID string, orgGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) SetSpaceRoleByGUID(userGUID string, spaceGUID string, orgGUID string, role models.Role) (apiErr error) {
 	fake.setSpaceRoleByGUIDMutex.Lock()
 	fake.setSpaceRoleByGUIDArgsForCall = append(fake.setSpaceRoleByGUIDArgsForCall, struct {
 		userGUID  string
 		spaceGUID string
 		orgGUID   string
-		role      string
+		role      models.Role
 	}{userGUID, spaceGUID, orgGUID, role})
 	fake.setSpaceRoleByGUIDMutex.Unlock()
 	if fake.SetSpaceRoleByGUIDStub != nil {
@@ -551,7 +551,7 @@ func (fake *FakeUserRepository) SetSpaceRoleByGUIDCallCount() int {
 	return len(fake.setSpaceRoleByGUIDArgsForCall)
 }
 
-func (fake *FakeUserRepository) SetSpaceRoleByGUIDArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeUserRepository) SetSpaceRoleByGUIDArgsForCall(i int) (string, string, string, models.Role) {
 	fake.setSpaceRoleByGUIDMutex.RLock()
 	defer fake.setSpaceRoleByGUIDMutex.RUnlock()
 	return fake.setSpaceRoleByGUIDArgsForCall[i].userGUID, fake.setSpaceRoleByGUIDArgsForCall[i].spaceGUID, fake.setSpaceRoleByGUIDArgsForCall[i].orgGUID, fake.setSpaceRoleByGUIDArgsForCall[i].role
@@ -564,13 +564,13 @@ func (fake *FakeUserRepository) SetSpaceRoleByGUIDReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) SetSpaceRoleByUsername(username string, spaceGUID string, orgGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) SetSpaceRoleByUsername(username string, spaceGUID string, orgGUID string, role models.Role) (apiErr error) {
 	fake.setSpaceRoleByUsernameMutex.Lock()
 	fake.setSpaceRoleByUsernameArgsForCall = append(fake.setSpaceRoleByUsernameArgsForCall, struct {
 		username  string
 		spaceGUID string
 		orgGUID   string
-		role      string
+		role      models.Role
 	}{username, spaceGUID, orgGUID, role})
 	fake.setSpaceRoleByUsernameMutex.Unlock()
 	if fake.SetSpaceRoleByUsernameStub != nil {
@@ -586,7 +586,7 @@ func (fake *FakeUserRepository) SetSpaceRoleByUsernameCallCount() int {
 	return len(fake.setSpaceRoleByUsernameArgsForCall)
 }
 
-func (fake *FakeUserRepository) SetSpaceRoleByUsernameArgsForCall(i int) (string, string, string, string) {
+func (fake *FakeUserRepository) SetSpaceRoleByUsernameArgsForCall(i int) (string, string, string, models.Role) {
 	fake.setSpaceRoleByUsernameMutex.RLock()
 	defer fake.setSpaceRoleByUsernameMutex.RUnlock()
 	return fake.setSpaceRoleByUsernameArgsForCall[i].username, fake.setSpaceRoleByUsernameArgsForCall[i].spaceGUID, fake.setSpaceRoleByUsernameArgsForCall[i].orgGUID, fake.setSpaceRoleByUsernameArgsForCall[i].role
@@ -599,12 +599,12 @@ func (fake *FakeUserRepository) SetSpaceRoleByUsernameReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) UnsetSpaceRoleByGUID(userGUID string, spaceGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) UnsetSpaceRoleByGUID(userGUID string, spaceGUID string, role models.Role) (apiErr error) {
 	fake.unsetSpaceRoleByGUIDMutex.Lock()
 	fake.unsetSpaceRoleByGUIDArgsForCall = append(fake.unsetSpaceRoleByGUIDArgsForCall, struct {
 		userGUID  string
 		spaceGUID string
-		role      string
+		role      models.Role
 	}{userGUID, spaceGUID, role})
 	fake.unsetSpaceRoleByGUIDMutex.Unlock()
 	if fake.UnsetSpaceRoleByGUIDStub != nil {
@@ -620,7 +620,7 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByGUIDCallCount() int {
 	return len(fake.unsetSpaceRoleByGUIDArgsForCall)
 }
 
-func (fake *FakeUserRepository) UnsetSpaceRoleByGUIDArgsForCall(i int) (string, string, string) {
+func (fake *FakeUserRepository) UnsetSpaceRoleByGUIDArgsForCall(i int) (string, string, models.Role) {
 	fake.unsetSpaceRoleByGUIDMutex.RLock()
 	defer fake.unsetSpaceRoleByGUIDMutex.RUnlock()
 	return fake.unsetSpaceRoleByGUIDArgsForCall[i].userGUID, fake.unsetSpaceRoleByGUIDArgsForCall[i].spaceGUID, fake.unsetSpaceRoleByGUIDArgsForCall[i].role
@@ -633,12 +633,12 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByGUIDReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeUserRepository) UnsetSpaceRoleByUsername(userGUID string, spaceGUID string, role string) (apiErr error) {
+func (fake *FakeUserRepository) UnsetSpaceRoleByUsername(userGUID string, spaceGUID string, role models.Role) (apiErr error) {
 	fake.unsetSpaceRoleByUsernameMutex.Lock()
 	fake.unsetSpaceRoleByUsernameArgsForCall = append(fake.unsetSpaceRoleByUsernameArgsForCall, struct {
 		userGUID  string
 		spaceGUID string
-		role      string
+		role      models.Role
 	}{userGUID, spaceGUID, role})
 	fake.unsetSpaceRoleByUsernameMutex.Unlock()
 	if fake.UnsetSpaceRoleByUsernameStub != nil {
@@ -654,7 +654,7 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByUsernameCallCount() int {
 	return len(fake.unsetSpaceRoleByUsernameArgsForCall)
 }
 
-func (fake *FakeUserRepository) UnsetSpaceRoleByUsernameArgsForCall(i int) (string, string, string) {
+func (fake *FakeUserRepository) UnsetSpaceRoleByUsernameArgsForCall(i int) (string, string, models.Role) {
 	fake.unsetSpaceRoleByUsernameMutex.RLock()
 	defer fake.unsetSpaceRoleByUsernameMutex.RUnlock()
 	return fake.unsetSpaceRoleByUsernameArgsForCall[i].userGUID, fake.unsetSpaceRoleByUsernameArgsForCall[i].spaceGUID, fake.unsetSpaceRoleByUsernameArgsForCall[i].role

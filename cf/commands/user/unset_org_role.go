@@ -78,17 +78,20 @@ func (cmd *UnsetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCa
 func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
-	role := models.UserInputToOrgRole[c.Args()[2]]
+	roleStr := c.Args()[2]
+	role, err := models.RoleFromString(roleStr)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+	}
 
 	cmd.ui.Say(T("Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
-			"Role":        terminal.EntityNameColor(role),
+			"Role":        terminal.EntityNameColor(roleStr),
 			"TargetUser":  terminal.EntityNameColor(c.Args()[0]),
 			"TargetOrg":   terminal.EntityNameColor(c.Args()[1]),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	var err error
 	if len(user.GUID) > 0 {
 		err = cmd.userRepo.UnsetOrgRoleByGUID(user.GUID, org.GUID, role)
 	} else {

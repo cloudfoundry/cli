@@ -32,10 +32,15 @@ type FakeApplicationBitsRepository struct {
 }
 
 func (fake *FakeApplicationBitsRepository) GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error) {
+	var appFilesRequestCopy []resources.AppFileResource
+	if appFilesRequest != nil {
+		appFilesRequestCopy = make([]resources.AppFileResource, len(appFilesRequest))
+		copy(appFilesRequestCopy, appFilesRequest)
+	}
 	fake.getApplicationFilesMutex.Lock()
 	fake.getApplicationFilesArgsForCall = append(fake.getApplicationFilesArgsForCall, struct {
 		appFilesRequest []resources.AppFileResource
-	}{appFilesRequest})
+	}{appFilesRequestCopy})
 	fake.getApplicationFilesMutex.Unlock()
 	if fake.GetApplicationFilesStub != nil {
 		return fake.GetApplicationFilesStub(appFilesRequest)
@@ -65,12 +70,17 @@ func (fake *FakeApplicationBitsRepository) GetApplicationFilesReturns(result1 []
 }
 
 func (fake *FakeApplicationBitsRepository) UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
+	var presentFilesCopy []resources.AppFileResource
+	if presentFiles != nil {
+		presentFilesCopy = make([]resources.AppFileResource, len(presentFiles))
+		copy(presentFilesCopy, presentFiles)
+	}
 	fake.uploadBitsMutex.Lock()
 	fake.uploadBitsArgsForCall = append(fake.uploadBitsArgsForCall, struct {
 		appGUID      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
-	}{appGUID, zipFile, presentFiles})
+	}{appGUID, zipFile, presentFilesCopy})
 	fake.uploadBitsMutex.Unlock()
 	if fake.UploadBitsStub != nil {
 		return fake.UploadBitsStub(appGUID, zipFile, presentFiles)

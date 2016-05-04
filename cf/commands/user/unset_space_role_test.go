@@ -249,7 +249,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 					actualUserGUID, actualSpaceGUID, actualRole := userRepo.UnsetSpaceRoleByGUIDArgsForCall(0)
 					Expect(actualUserGUID).To(Equal("the-user-guid"))
 					Expect(actualSpaceGUID).To(Equal("the-space-guid"))
-					Expect(actualRole).To(Equal("SpaceManager"))
+					Expect(actualRole).To(Equal(models.RoleSpaceManager))
 				})
 
 				Context("when the call to CC fails", func() {
@@ -278,7 +278,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 					actualUsername, actualSpaceGUID, actualRole := userRepo.UnsetSpaceRoleByUsernameArgsForCall(0)
 					Expect(actualUsername).To(Equal("the-user-name"))
 					Expect(actualSpaceGUID).To(Equal("the-space-guid"))
-					Expect(actualRole).To(Equal("SpaceManager"))
+					Expect(actualRole).To(Equal(models.RoleSpaceManager))
 				})
 
 				It("tells the user it is removing the role", func() {

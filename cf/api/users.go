@@ -17,17 +17,17 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-var orgRoleToPathMap = map[string]string{
-	models.ORG_USER:        "users",
-	models.ORG_MANAGER:     "managers",
-	models.BILLING_MANAGER: "billing_managers",
-	models.ORG_AUDITOR:     "auditors",
+var orgRoleToPathMap = map[models.Role]string{
+	models.RoleOrgUser:        "users",
+	models.RoleOrgManager:     "managers",
+	models.RoleBillingManager: "billing_managers",
+	models.RoleOrgAuditor:     "auditors",
 }
 
-var spaceRoleToPathMap = map[string]string{
-	models.SPACE_MANAGER:   "managers",
-	models.SPACE_DEVELOPER: "developers",
-	models.SPACE_AUDITOR:   "auditors",
+var spaceRoleToPathMap = map[models.Role]string{
+	models.RoleSpaceManager:   "managers",
+	models.RoleSpaceDeveloper: "developers",
+	models.RoleSpaceAuditor:   "auditors",
 }
 
 type apiErrResponse struct {
@@ -40,20 +40,20 @@ type apiErrResponse struct {
 
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)
-	ListUsersInOrgForRole(orgGUID string, role string) ([]models.UserFields, error)
-	ListUsersInOrgForRoleWithNoUAA(orgGUID string, role string) ([]models.UserFields, error)
-	ListUsersInSpaceForRole(spaceGUID string, role string) ([]models.UserFields, error)
-	ListUsersInSpaceForRoleWithNoUAA(spaceGUID string, role string) ([]models.UserFields, error)
+	ListUsersInOrgForRole(orgGUID string, role models.Role) ([]models.UserFields, error)
+	ListUsersInOrgForRoleWithNoUAA(orgGUID string, role models.Role) ([]models.UserFields, error)
+	ListUsersInSpaceForRole(spaceGUID string, role models.Role) ([]models.UserFields, error)
+	ListUsersInSpaceForRoleWithNoUAA(spaceGUID string, role models.Role) ([]models.UserFields, error)
 	Create(username, password string) (apiErr error)
 	Delete(userGUID string) (apiErr error)
-	SetOrgRoleByGUID(userGUID, orgGUID, role string) (apiErr error)
-	SetOrgRoleByUsername(username, orgGUID, role string) (apiErr error)
-	UnsetOrgRoleByGUID(userGUID, orgGUID, role string) (apiErr error)
-	UnsetOrgRoleByUsername(username, orgGUID, role string) (apiErr error)
-	SetSpaceRoleByGUID(userGUID, spaceGUID, orgGUID, role string) (apiErr error)
-	SetSpaceRoleByUsername(username, spaceGUID, orgGUID, role string) (apiErr error)
-	UnsetSpaceRoleByGUID(userGUID, spaceGUID, role string) (apiErr error)
-	UnsetSpaceRoleByUsername(userGUID, spaceGUID, role string) (apiErr error)
+	SetOrgRoleByGUID(userGUID, orgGUID string, role models.Role) (apiErr error)
+	SetOrgRoleByUsername(username, orgGUID string, role models.Role) (apiErr error)
+	UnsetOrgRoleByGUID(userGUID, orgGUID string, role models.Role) (apiErr error)
+	UnsetOrgRoleByUsername(username, orgGUID string, role models.Role) (apiErr error)
+	SetSpaceRoleByGUID(userGUID, spaceGUID, orgGUID string, role models.Role) (apiErr error)
+	SetSpaceRoleByUsername(username, spaceGUID, orgGUID string, role models.Role) (apiErr error)
+	UnsetSpaceRoleByGUID(userGUID, spaceGUID string, role models.Role) (apiErr error)
+	UnsetSpaceRoleByUsername(userGUID, spaceGUID string, role models.Role) (apiErr error)
 }
 
 type CloudControllerUserRepository struct {
@@ -95,19 +95,19 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (model
 	return users[0], apiErr
 }
 
-func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGUID string, roleName string) (users []models.UserFields, apiErr error) {
+func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGUID string, roleName models.Role) (users []models.UserFields, apiErr error) {
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/organizations/%s/%s", orgGUID, orgRoleToPathMap[roleName]))
 }
 
-func (repo CloudControllerUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGUID string, roleName string) (users []models.UserFields, apiErr error) {
+func (repo CloudControllerUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGUID string, roleName models.Role) (users []models.UserFields, apiErr error) {
 	return repo.listUsersWithPathWithNoUAA(fmt.Sprintf("/v2/organizations/%s/%s", orgGUID, orgRoleToPathMap[roleName]))
 }
 
-func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGUID string, roleName string) (users []models.UserFields, apiErr error) {
+func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGUID string, roleName models.Role) (users []models.UserFields, apiErr error) {
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/spaces/%s/%s", spaceGUID, spaceRoleToPathMap[roleName]))
 }
 
-func (repo CloudControllerUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGUID string, roleName string) (users []models.UserFields, apiErr error) {
+func (repo CloudControllerUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGUID string, roleName models.Role) (users []models.UserFields, apiErr error) {
 	return repo.listUsersWithPathWithNoUAA(fmt.Sprintf("/v2/spaces/%s/%s", spaceGUID, spaceRoleToPathMap[roleName]))
 }
 
@@ -242,7 +242,7 @@ func (repo CloudControllerUserRepository) Delete(userGUID string) (apiErr error)
 	return repo.uaaGateway.DeleteResource(uaaEndpoint, path)
 }
 
-func (repo CloudControllerUserRepository) SetOrgRoleByGUID(userGUID string, orgGUID string, role string) (err error) {
+func (repo CloudControllerUserRepository) SetOrgRoleByGUID(userGUID string, orgGUID string, role models.Role) (err error) {
 	path, err := userGUIDPath(repo.config.APIEndpoint(), userGUID, orgGUID, role)
 	if err != nil {
 		return
@@ -254,7 +254,7 @@ func (repo CloudControllerUserRepository) SetOrgRoleByGUID(userGUID string, orgG
 	return repo.assocUserWithOrgByUserGUID(userGUID, orgGUID)
 }
 
-func (repo CloudControllerUserRepository) UnsetOrgRoleByGUID(userGUID, orgGUID, role string) (err error) {
+func (repo CloudControllerUserRepository) UnsetOrgRoleByGUID(userGUID, orgGUID string, role models.Role) (err error) {
 	path, err := userGUIDPath(repo.config.APIEndpoint(), userGUID, orgGUID, role)
 	if err != nil {
 		return
@@ -262,7 +262,7 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByGUID(userGUID, orgGUID, 
 	return repo.callApi("DELETE", path, nil)
 }
 
-func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGUID, role string) error {
+func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGUID string, role models.Role) error {
 	rolePath, err := rolePath(role)
 	if err != nil {
 		return err
@@ -273,14 +273,14 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGU
 	return repo.callApi("DELETE", path, usernamePayload(username))
 }
 
-func (repo CloudControllerUserRepository) UnsetSpaceRoleByUsername(username, spaceGUID, role string) error {
+func (repo CloudControllerUserRepository) UnsetSpaceRoleByUsername(username, spaceGUID string, role models.Role) error {
 	rolePath := spaceRoleToPathMap[role]
 	path := fmt.Sprintf("%s/v2/spaces/%s/%s", repo.config.APIEndpoint(), spaceGUID, rolePath)
 
 	return repo.callApi("DELETE", path, usernamePayload(username))
 }
 
-func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, orgGUID string, role string) error {
+func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, orgGUID string, role models.Role) error {
 	rolePath, err := rolePath(role)
 	if err != nil {
 		return err
@@ -306,7 +306,7 @@ func (repo CloudControllerUserRepository) callApi(verb, path string, body io.Rea
 	return
 }
 
-func userGUIDPath(apiEndpoint, userGUID, orgGUID, role string) (string, error) {
+func userGUIDPath(apiEndpoint, userGUID, orgGUID string, role models.Role) (string, error) {
 	rolePath, err := rolePath(role)
 	if err != nil {
 		return "", err
@@ -315,7 +315,7 @@ func userGUIDPath(apiEndpoint, userGUID, orgGUID, role string) (string, error) {
 	return fmt.Sprintf("%s/v2/organizations/%s/%s/%s", apiEndpoint, orgGUID, rolePath, userGUID), nil
 }
 
-func (repo CloudControllerUserRepository) SetSpaceRoleByGUID(userGUID, spaceGUID, orgGUID, role string) error {
+func (repo CloudControllerUserRepository) SetSpaceRoleByGUID(userGUID, spaceGUID, orgGUID string, role models.Role) error {
 	rolePath, found := spaceRoleToPathMap[role]
 	if !found {
 		return fmt.Errorf(T("Invalid Role {{.Role}}", map[string]interface{}{"Role": role}))
@@ -331,7 +331,7 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByGUID(userGUID, spaceGUID
 	return repo.ccGateway.UpdateResource(repo.config.APIEndpoint(), path, nil)
 }
 
-func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, spaceGUID, orgGUID, role string) (apiErr error) {
+func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, spaceGUID, orgGUID string, role models.Role) (apiErr error) {
 	rolePath, apiErr := repo.checkSpaceRole(spaceGUID, role)
 	if apiErr != nil {
 		return
@@ -355,7 +355,7 @@ func (repo CloudControllerUserRepository) SetSpaceRoleByUsername(username, space
 	return apiErr
 }
 
-func (repo CloudControllerUserRepository) UnsetSpaceRoleByGUID(userGUID, spaceGUID, role string) error {
+func (repo CloudControllerUserRepository) UnsetSpaceRoleByGUID(userGUID, spaceGUID string, role models.Role) error {
 	rolePath, found := spaceRoleToPathMap[role]
 	if !found {
 		return fmt.Errorf(T("Invalid Role {{.Role}}", map[string]interface{}{"Role": role}))
@@ -364,7 +364,7 @@ func (repo CloudControllerUserRepository) UnsetSpaceRoleByGUID(userGUID, spaceGU
 	return repo.ccGateway.DeleteResource(repo.config.APIEndpoint(), rolePath)
 }
 
-func (repo CloudControllerUserRepository) checkSpaceRole(spaceGUID, role string) (string, error) {
+func (repo CloudControllerUserRepository) checkSpaceRole(spaceGUID string, role models.Role) (string, error) {
 	var apiErr error
 
 	rolePath, found := spaceRoleToPathMap[role]
@@ -396,7 +396,7 @@ func (repo CloudControllerUserRepository) getAuthEndpoint() (string, error) {
 	return uaaEndpoint, nil
 }
 
-func rolePath(role string) (string, error) {
+func rolePath(role models.Role) (string, error) {
 	path, found := orgRoleToPathMap[role]
 
 	if !found {

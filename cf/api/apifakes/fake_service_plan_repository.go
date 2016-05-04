@@ -107,10 +107,15 @@ func (fake *FakeServicePlanRepository) UpdateReturns(result1 error) {
 }
 
 func (fake *FakeServicePlanRepository) ListPlansFromManyServices(serviceGUIDs []string) ([]models.ServicePlanFields, error) {
+	var serviceGUIDsCopy []string
+	if serviceGUIDs != nil {
+		serviceGUIDsCopy = make([]string, len(serviceGUIDs))
+		copy(serviceGUIDsCopy, serviceGUIDs)
+	}
 	fake.listPlansFromManyServicesMutex.Lock()
 	fake.listPlansFromManyServicesArgsForCall = append(fake.listPlansFromManyServicesArgsForCall, struct {
 		serviceGUIDs []string
-	}{serviceGUIDs})
+	}{serviceGUIDsCopy})
 	fake.listPlansFromManyServicesMutex.Unlock()
 	if fake.ListPlansFromManyServicesStub != nil {
 		return fake.ListPlansFromManyServicesStub(serviceGUIDs)

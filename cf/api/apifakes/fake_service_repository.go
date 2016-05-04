@@ -466,13 +466,18 @@ func (fake *FakeServiceRepository) PurgeServiceInstanceReturns(result1 error) {
 }
 
 func (fake *FakeServiceRepository) CreateServiceInstance(name string, planGUID string, params map[string]interface{}, tags []string) (apiErr error) {
+	var tagsCopy []string
+	if tags != nil {
+		tagsCopy = make([]string, len(tags))
+		copy(tagsCopy, tags)
+	}
 	fake.createServiceInstanceMutex.Lock()
 	fake.createServiceInstanceArgsForCall = append(fake.createServiceInstanceArgsForCall, struct {
 		name     string
 		planGUID string
 		params   map[string]interface{}
 		tags     []string
-	}{name, planGUID, params, tags})
+	}{name, planGUID, params, tagsCopy})
 	fake.createServiceInstanceMutex.Unlock()
 	if fake.CreateServiceInstanceStub != nil {
 		return fake.CreateServiceInstanceStub(name, planGUID, params, tags)
@@ -501,13 +506,18 @@ func (fake *FakeServiceRepository) CreateServiceInstanceReturns(result1 error) {
 }
 
 func (fake *FakeServiceRepository) UpdateServiceInstance(instanceGUID string, planGUID string, params map[string]interface{}, tags []string) (apiErr error) {
+	var tagsCopy []string
+	if tags != nil {
+		tagsCopy = make([]string, len(tags))
+		copy(tagsCopy, tags)
+	}
 	fake.updateServiceInstanceMutex.Lock()
 	fake.updateServiceInstanceArgsForCall = append(fake.updateServiceInstanceArgsForCall, struct {
 		instanceGUID string
 		planGUID     string
 		params       map[string]interface{}
 		tags         []string
-	}{instanceGUID, planGUID, params, tags})
+	}{instanceGUID, planGUID, params, tagsCopy})
 	fake.updateServiceInstanceMutex.Unlock()
 	if fake.UpdateServiceInstanceStub != nil {
 		return fake.UpdateServiceInstanceStub(instanceGUID, planGUID, params, tags)
@@ -667,10 +677,15 @@ func (fake *FakeServiceRepository) ListServicesFromBrokerReturns(result1 []model
 }
 
 func (fake *FakeServiceRepository) ListServicesFromManyBrokers(brokerGUIDs []string) (services []models.ServiceOffering, err error) {
+	var brokerGUIDsCopy []string
+	if brokerGUIDs != nil {
+		brokerGUIDsCopy = make([]string, len(brokerGUIDs))
+		copy(brokerGUIDsCopy, brokerGUIDs)
+	}
 	fake.listServicesFromManyBrokersMutex.Lock()
 	fake.listServicesFromManyBrokersArgsForCall = append(fake.listServicesFromManyBrokersArgsForCall, struct {
 		brokerGUIDs []string
-	}{brokerGUIDs})
+	}{brokerGUIDsCopy})
 	fake.listServicesFromManyBrokersMutex.Unlock()
 	if fake.ListServicesFromManyBrokersStub != nil {
 		return fake.ListServicesFromManyBrokersStub(brokerGUIDs)
