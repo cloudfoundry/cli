@@ -828,6 +828,10 @@
     "translation": "Map an HTTP route"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports",
+    "translation": "Maximum number of routes that may be created with reserved ports"
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
     "translation": "Maximum number of routes that may be created with reserved ports (Default: 0)"
   },
@@ -982,6 +986,10 @@
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "This command requires the Routing API. Your targeted endpoint reports it is not enabled."
+  },
+  {
+    "id": "Total number of application instances. -1 represents an unlimited amount.",
+    "translation": "Total number of application instances. -1 represents an unlimited amount."
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",

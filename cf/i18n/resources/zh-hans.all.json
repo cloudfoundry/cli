@@ -2888,6 +2888,10 @@
     "translation": "应用程序实例可以具有的最大内存量（例如，1024M、1G、10G）。-1 表示内存量无限制。（缺省值：无限制）"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports",
+    "translation": ""
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
     "translation": ""
   },
@@ -4166,6 +4170,10 @@
   {
     "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
     "translation": "空间可以具有的内存总量（例如，1024M、1G、10G）"
+  },
+  {
+    "id": "Total number of application instances. -1 represents an unlimited amount.",
+    "translation": ""
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",

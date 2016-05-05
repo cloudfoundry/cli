@@ -2888,6 +2888,10 @@
     "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)。-1 は量に制限がないことを表します。(デフォルト: 制限なし)"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports",
+    "translation": ""
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
     "translation": ""
   },
@@ -4166,6 +4170,10 @@
   {
     "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
     "translation": "1 つのスペースが占有できる合計メモリー量 (例: 1024M、1G、10G)"
+  },
+  {
+    "id": "Total number of application instances. -1 represents an unlimited amount.",
+    "translation": ""
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
