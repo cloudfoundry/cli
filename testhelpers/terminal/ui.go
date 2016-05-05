@@ -42,9 +42,7 @@ func (ui *FakeUI) PrintPaginator(rows []string, err error) {
 	}
 }
 
-func (ui FakeUI) Writer() io.Writer {
-	ui.sayMutex.Lock()
-	defer ui.sayMutex.Unlock()
+func (ui *FakeUI) Writer() io.Writer {
 	return os.Stdout
 }
 
