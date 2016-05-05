@@ -41,13 +41,6 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
-- name: cli-acceptance-tests-verbose
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/cli-acceptance-tests
-    private_key: {{cf-cli-eng-github-private-key}}
-    branch: verbose-debugging
-
 - name: cf-release-repo
   type: git
   source:
@@ -130,8 +123,6 @@ groups:
   - units
   - build-binaries
   - gats-linux
-  - gats-linux-verbose
-  - gats-windows-verbose
   - gats-windows
   - cats-linux
   - cats-windows
@@ -203,28 +194,6 @@ jobs:
       params:
         release: bosh-lite-lock
 
-- name: gats-linux-verbose
-  serial: true
-  plan:
-  - aggregate:
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-    - get: final-cli
-      passed: [build-binaries]
-    - get: cli
-      passed: [build-binaries]
-    - get: cli-acceptance-tests-verbose
-    - get: cli-ci
-    - put: bosh-lite-lock
-      params:
-        acquire: true
-  - task: gats
-    file: cli-ci/ci/tasks/gats-linux-verbose.yml
-    ensure:
-      put: bosh-lite-lock
-      params:
-        release: bosh-lite-lock
-
 - name: cats-windows
   serial: true
   plan:
@@ -272,31 +241,6 @@ jobs:
         acquire: true
   - task: gats
     file: cli-ci/ci/tasks/gats-windows.yml
-    params:
-      ADMIN_USER: {{bosh-lite-admin-username}}
-      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
-    ensure:
-      put: bosh-lite-lock
-      params:
-        release: bosh-lite-lock
-
-- name: gats-windows-verbose
-  serial: true
-  plan:
-  - aggregate:
-    - get: cf-cli-binaries
-      passed: [build-binaries]
-    - get: final-cli
-      passed: [build-binaries]
-    - get: cli
-      passed: [build-binaries]
-    - get: cli-acceptance-tests-verbose
-    - get: cli-ci
-    - put: bosh-lite-lock
-      params:
-        acquire: true
-  - task: gats
-    file: cli-ci/ci/tasks/gats-windows-verbose.yml
     params:
       ADMIN_USER: {{bosh-lite-admin-username}}
       ADMIN_PASSWORD: {{bosh-lite-admin-password}}
