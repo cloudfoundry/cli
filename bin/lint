@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ ! $(which golint) ];then
+  echo -e "\n Installing golint..."
+  go get -u github.com/golang/lint/golint
+fi
+
 golint ./... \
   | awk " \
             !/vendor/ \
@@ -7,8 +12,12 @@ golint ./... \
         &&  !/words\// \
         &&  !/plugin\// \
         &&  !/plugin_examples\// \
-        &&  !/fakes/ \
+        &&  !/fakes\// \
         " \
   | awk " \
-            !/should have comment or be unexported/ \
-        "
+               !/should have comment or be unexported/ \
+            && !/should have comment \(or a comment on this block\) or be unexported/ \
+            && !/comment on exported type .+ should be of the form/ \
+            && !/returns unexported type/ \
+            && !/should not use dot imports/ \
+        " # https://www.pivotaltracker.com/story/show/105609756

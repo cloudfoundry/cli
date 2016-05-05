@@ -1,0 +1,94 @@
+cf/minimum_api_versions.go:6:2: var TcpRoutingMinimumAPIVersion should be TCPRoutingMinimumAPIVersion
+cf/actors/plugininstaller/plugin_installer.go:17:6: type name will be used as plugininstaller.PluginInstallerContext by other packages, and that stutters; consider calling this Context
+cf/actors/plugininstaller/plugin_installer_with_repo.go:15:6: type name will be used as plugininstaller.PluginInstallerWithRepo by other packages, and that stutters; consider calling this WithRepo
+cf/actors/plugininstaller/plugin_installer_without_repo.go:12:6: type name will be used as plugininstaller.PluginInstallerWithoutRepo by other packages, and that stutters; consider calling this WithoutRepo
+cf/api/buildpacks.go:118:7: don't use underscores in Go names; const buildpacks_path should be buildpacksPath
+cf/api/route_service_binding_repository.go:37:2: don't use underscores in Go names; method parameter opaque_params should be opaqueParams
+cf/api/routes.go:146:6: don't use underscores in Go names; var raw_response should be rawResponse
+cf/api/users.go:297:43: method callApi should be callAPI
+cf/api/appevents/app_events.go:13:6: type name will be used as appevents.AppEventsRepository by other packages, and that stutters; consider calling this Repository
+cf/api/appfiles/app_files.go:12:6: type name will be used as appfiles.AppFilesRepository by other packages, and that stutters; consider calling this Repository
+cf/api/appinstances/app_instances.go:38:6: type name will be used as appinstances.AppInstancesRepository by other packages, and that stutters; consider calling this Repository
+cf/api/applicationbits/application_bits.go:26:6: type name will be used as applicationbits.ApplicationBitsRepository by other packages, and that stutters; consider calling this Repository
+cf/api/authentication/authentication.go:26:6: type name will be used as authentication.AuthenticationRepository by other packages, and that stutters; consider calling this Repository
+cf/api/copyapplicationsource/copy_application_source.go:13:6: type name will be used as copyapplicationsource.CopyApplicationSourceRepository by other packages, and that stutters; consider calling this Repository
+cf/api/environmentvariablegroups/environment_variable_groups.go:14:6: type name will be used as environmentvariablegroups.EnvironmentVariableGroupsRepository by other packages, and that stutters; consider calling this Repository
+cf/api/environmentvariablegroups/environment_variable_groups.go:33:6: don't use underscores in Go names; var raw_response should be rawResponse
+cf/api/environmentvariablegroups/environment_variable_groups.go:49:6: don't use underscores in Go names; var raw_response should be rawResponse
+cf/api/environmentvariablegroups/environment_variable_groups.go:64:75: don't use underscores in Go names; method parameter staging_vars should be stagingVars
+cf/api/environmentvariablegroups/environment_variable_groups.go:68:75: don't use underscores in Go names; method parameter running_vars should be runningVars
+cf/api/environmentvariablegroups/environment_variable_groups.go:72:94: don't use underscores in Go names; method parameter raw_response should be rawResponse
+cf/api/logs/loggregator_consumer.go:11:7: interface method parameter appGuid should be appGUID
+cf/api/logs/loggregator_consumer.go:12:9: interface method parameter appGuid should be appGUID
+cf/api/logs/logs_repository.go:13:6: type name will be used as logs.LogsRepository by other packages, and that stutters; consider calling this Repository
+cf/api/logs/logs_repository.go:14:16: interface method parameter appGuid should be appGUID
+cf/api/logs/logs_repository.go:15:14: interface method parameter appGuid should be appGUID
+cf/api/logs/noaa_consumer.go:12:13: interface method parameter appGuid should be appGUID
+cf/api/logs/noaa_logs_repository.go:49:47: method parameter appGuid should be appGUID
+cf/api/logs/noaa_logs_repository.go:64:45: method parameter appGuid should be appGUID
+cf/api/password/password.go:15:6: type name will be used as password.PasswordRepository by other packages, and that stutters; consider calling this Repository
+cf/api/resources/quotas.go:15:23: should omit type int from declaration of var appInstanceLimit; it will be inferred from the right-hand side
+cf/api/securitygroups/security_groups.go:1:1: don't use an underscore in package name
+cf/api/securitygroups/defaults/running/running.go:15:6: type name will be used as running.RunningSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
+cf/api/securitygroups/defaults/staging/staging.go:15:6: type name will be used as staging.StagingSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
+cf/commands/api.go:17:6: type Api should be API
+cf/commands/application/app.go:25:6: type name will be used as application.ApplicationDisplayer by other packages, and that stutters; consider calling this Displayer
+cf/commands/application/push.go:338:6: func isTcp should be isTCP
+cf/commands/application/restart.go:15:6: type name will be used as application.ApplicationRestarter by other packages, and that stutters; consider calling this Restarter
+cf/commands/application/start.go:36:6: type name will be used as application.ApplicationStagingWatcher by other packages, and that stutters; consider calling this StagingWatcher
+cf/commands/application/start.go:42:6: type name will be used as application.ApplicationStarter by other packages, and that stutters; consider calling this Starter
+cf/commands/application/stop.go:19:6: type name will be used as application.ApplicationStopper by other packages, and that stutters; consider calling this Stopper
+cf/commands/pluginrepo/repo_plugins.go:63:9: should omit 2nd value from range; this loop is equivalent to `for i := range ...`
+cf/commands/route/create_route.go:20:6: type name will be used as route.RouteCreator by other packages, and that stutters; consider calling this Creator
+cf/commands/securitygroup/security_groups.go:96:2: don't use underscores in Go names; var outputted_index should be outputtedIndex
+cf/commands/service/bind_service.go:21:6: type name will be used as service.ServiceBinder by other packages, and that stutters; consider calling this Binder
+cf/commands/service/service.go:130:6: func name will be used as service.ServiceInstanceStateToStatus by other packages, and that stutters; consider calling this InstanceStateToStatus
+cf/commands/space/space_ssh_allowed.go:15:6: type name will be used as space.SpaceSSHAllowed by other packages, and that stutters; consider calling this SSHAllowed
+cf/configuration/pluginconfig/plugin_config.go:41:1: comment on exported method PluginConfig.GetPluginPath should be of the form "GetPluginPath ..."
+cf/configuration/pluginconfig/plugin_config.go:51:1: comment on exported method PluginConfig.SetPlugin should be of the form "SetPlugin ..."
+cf/configuration/pluginconfig/plugin_config.go:97:1: comment on exported method PluginConfig.Close should be of the form "Close ..."
+cf/formatters/bytes.go:77:15: should omit type *regexp.Regexp from declaration of var bytesPattern; it will be inferred from the right-hand side
+cf/manifest/generate_manifest.go:34:6: type name will be used as manifest.ManifestApplication by other packages, and that stutters; consider calling this Application
+cf/manifest/generate_manifest.go:54:6: type name will be used as manifest.ManifestApplications by other packages, and that stutters; consider calling this Applications
+cf/manifest/manifest_disk_repository.go:18:6: type name will be used as manifest.ManifestRepository by other packages, and that stutters; consider calling this Repository
+cf/manifest/manifest_disk_repository.go:22:6: type name will be used as manifest.ManifestDiskRepository by other packages, and that stutters; consider calling this DiskRepository
+cf/net/gateway.go:27:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/net/gateway.go:28:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/net/gateway.go:29:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/net/gateway.go:445:2: don't use underscores in Go names; var raw_warnings should be rawWarnings
+cf/net/gateway.go:446:9: don't use underscores in Go names; range var raw_warning should be rawWarning
+cf/net/http_client.go:4:2: a blank import should be only in a main or test package, or have a comment justifying it
+cf/net/warnings_collector.go:14:2: don't use underscores in Go names; struct field warning_producers should be warningProducers
+cf/net/warnings_collector.go:23:43: don't use underscores in Go names; func parameter warning_producers should be warningProducers
+cf/net/warnings_collector.go:23:82: don't use underscores in Go names; func result warnings_collector should be warningsCollector
+cf/net/warnings_collector.go:31:9: don't use underscores in Go names; range var warning_producer should be warningProducer
+cf/requirements/config_refreshing_requirement.go:33:9: if block ends with a return statement, so drop this else and outdent its block
+cf/ssh/options/ssh_options.go:13:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/ssh/options/ssh_options.go:14:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/ssh/options/ssh_options.go:15:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/ssh/options/ssh_options.go:16:2: don't use ALL_CAPS in Go names; use CamelCase
+cf/terminal/table.go:294:1: comment on exported method Table.Transform should be of the form "Transform ..."
+cf/terminal/table.go:337:4: should replace size += 1 with size++
+cf/terminal/ui_unix.go:20:2: don't use underscores in Go names; const exec_cwdir should be execCwdir
+cf/terminal/ui_unix.go:24:18: should omit type []string from declaration of var sttyArgvEOff; it will be inferred from the right-hand side
+cf/terminal/ui_unix.go:27:17: should omit type []string from declaration of var sttyArgvEOn; it will be inferred from the right-hand side
+cf/trace/logger_provider.go:11:30: don't use underscores in Go names; func parameter cf_trace should be cfTrace
+cf/trace/logger_provider.go:11:40: don't use underscores in Go names; func parameter config_trace should be configTrace
+cf/trace/trace.go:42:6: don't use ALL_CAPS in Go names; use CamelCase
+downloader/file_download.go:74:9: if block ends with a return statement, so drop this else and outdent its block
+downloader/file_download.go:87:6: don't use underscores in Go names; func get_filename_from_header should be getFilenameFromHeader
+downloader/file_download.go:103:6: don't use underscores in Go names; func get_filename_from_url should be getFilenameFromURL
+fixtures/plugins/test_1.go:54:3: var userGuid should be userGUID
+generic/map.go:62:1: comment on exported method ConcreteMap.IsEmpty should be of the form "IsEmpty ..."
+generic/map.go:121:1: comment on exported function IsMappable should be of the form "IsMappable ..."
+glob/glob.go:100:6: type name will be used as glob.GlobError by other packages, and that stutters; consider calling this Error
+main/main.go:161:2: don't use ALL_CAPS in Go names; use CamelCase
+main/main.go:186:10: if block ends with a return statement, so drop this else and outdent its block
+testhelpers/assert/helpers.go:53:1: comment on exported function AssertNoErrors should be of the form "AssertNoErrors ..."
+testhelpers/assert/helpers.go:56:6: func name will be used as assert.AssertNoErrors by other packages, and that stutters; consider calling this NoErrors
+testhelpers/assert/helpers.go:66:6: func name will be used as assert.AssertPanic by other packages, and that stutters; consider calling this Panic
+testhelpers/logs/log_messages.go:34:33: func parameter appGuid should be appGUID
+testhelpers/maker/domains.go:5:16: should omit type func() string from declaration of var domainGUID; it will be inferred from the right-hand side
+testhelpers/matchers/all_requests_called_matcher.go:27:9: if block ends with a return statement, so drop this else and outdent its block
+testhelpers/net/warning_producer.go:7:45: don't use underscores in Go names; func result warning_producer should be warningProducer
+testhelpers/rpcserver/server.go:58:6: func NewTestRpcServer should be NewTestRPCServer
