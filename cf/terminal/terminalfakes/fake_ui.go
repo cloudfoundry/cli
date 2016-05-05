@@ -2,6 +2,7 @@
 package terminalfakes
 
 import (
+	"io"
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -108,14 +109,25 @@ type FakeUI struct {
 	notifyUpdateIfNeededArgsForCall []struct {
 		arg1 coreconfig.Reader
 	}
+	WriterStub        func() io.Writer
+	writerMutex       sync.RWMutex
+	writerArgsForCall []struct{}
+	writerReturns     struct {
+		result1 io.Writer
+	}
 }
 
 func (fake *FakeUI) PrintPaginator(rows []string, err error) {
+	var rowsCopy []string
+	if rows != nil {
+		rowsCopy = make([]string, len(rows))
+		copy(rowsCopy, rows)
+	}
 	fake.printPaginatorMutex.Lock()
 	fake.printPaginatorArgsForCall = append(fake.printPaginatorArgsForCall, struct {
 		rows []string
 		err  error
-	}{rows, err})
+	}{rowsCopy, err})
 	fake.printPaginatorMutex.Unlock()
 	if fake.PrintPaginatorStub != nil {
 		fake.PrintPaginatorStub(rows, err)
@@ -461,10 +473,15 @@ func (fake *FakeUI) LoadingIndicationCallCount() int {
 }
 
 func (fake *FakeUI) Table(headers []string) *terminal.UITable {
+	var headersCopy []string
+	if headers != nil {
+		headersCopy = make([]string, len(headers))
+		copy(headersCopy, headers)
+	}
 	fake.tableMutex.Lock()
 	fake.tableArgsForCall = append(fake.tableArgsForCall, struct {
 		headers []string
-	}{headers})
+	}{headersCopy})
 	fake.tableMutex.Unlock()
 	if fake.TableStub != nil {
 		return fake.TableStub(headers)
@@ -513,6 +530,30 @@ func (fake *FakeUI) NotifyUpdateIfNeededArgsForCall(i int) coreconfig.Reader {
 	fake.notifyUpdateIfNeededMutex.RLock()
 	defer fake.notifyUpdateIfNeededMutex.RUnlock()
 	return fake.notifyUpdateIfNeededArgsForCall[i].arg1
+}
+
+func (fake *FakeUI) Writer() io.Writer {
+	fake.writerMutex.Lock()
+	fake.writerArgsForCall = append(fake.writerArgsForCall, struct{}{})
+	fake.writerMutex.Unlock()
+	if fake.WriterStub != nil {
+		return fake.WriterStub()
+	} else {
+		return fake.writerReturns.result1
+	}
+}
+
+func (fake *FakeUI) WriterCallCount() int {
+	fake.writerMutex.RLock()
+	defer fake.writerMutex.RUnlock()
+	return len(fake.writerArgsForCall)
+}
+
+func (fake *FakeUI) WriterReturns(result1 io.Writer) {
+	fake.WriterStub = nil
+	fake.writerReturns = struct {
+		result1 io.Writer
+	}{result1}
 }
 
 var _ terminal.UI = new(FakeUI)
