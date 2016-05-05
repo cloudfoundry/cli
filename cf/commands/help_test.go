@@ -2,18 +2,18 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/plugin"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	"github.com/cloudfoundry/cli/testhelpers/io"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("Help", func() {
@@ -21,51 +21,69 @@ var _ = Describe("Help", func() {
 	commandsloader.Load()
 
 	var (
-		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
-		config              *pluginconfigfakes.FakePluginConfiguration
-		deps                commandregistry.Dependency
+		fakeFactory *testreq.FakeReqFactory
+		fakeUI      *terminalfakes.FakeUI
+		fakeConfig  *pluginconfigfakes.FakePluginConfiguration
+		deps        commandregistry.Dependency
+
+		cmd         *commands.Help
+		flagContext flags.FlagContext
+		buffer      *gbytes.Buffer
 	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.UI = ui
-		deps.PluginConfig = config
-		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("help").SetDependency(deps, pluginCall))
-	}
-
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
-		config = new(pluginconfigfakes.FakePluginConfiguration)
+		buffer = gbytes.NewBuffer()
+		fakeUI = new(terminalfakes.FakeUI)
+		fakeUI.WriterReturns(buffer)
+
+		fakeConfig = new(pluginconfigfakes.FakePluginConfiguration)
+
+		deps = commandregistry.Dependency{
+			UI:           fakeUI,
+			PluginConfig: fakeConfig,
+		}
+
+		cmd = &commands.Help{}
+		cmd.SetDependency(deps, false)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+		fakeFactory = &testreq.FakeReqFactory{}
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("help", args, requirementsFactory, updateCommandDependency, false)
-	}
+	AfterEach(func() {
+		buffer.Close()
+	})
 
 	Context("when no argument is provided", func() {
 		It("prints the main help menu of the 'cf' app", func() {
-			outputs := io.CaptureOutput(func() { runCommand() })
+			flagContext.Parse()
+			cmd.Execute(flagContext)
 
-			Eventually(outputs).Should(ContainSubstrings([]string{"A command line tool to interact with Cloud Foundry"}))
-			Eventually(outputs).Should(ContainSubstrings([]string{"CF_TRACE=true"}))
+			Eventually(buffer.Contents()).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(buffer).Should(gbytes.Say("CF_TRACE=true"))
 		})
 	})
 
 	Context("when a command name is provided as an argument", func() {
 		Context("When the command exists", func() {
 			It("prints the usage help for the command", func() {
-				runCommand("target")
+				flagContext.Parse("target")
+				cmd.Execute(flagContext)
 
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"target - Set or view the targeted org or space"}))
+				Expect(fakeUI.SayCallCount()).To(Equal(1))
+				output, _ := fakeUI.SayArgsForCall(0)
+				Expect(output).To(ContainSubstring("target - Set or view the targeted org or space"))
 			})
 		})
 
-		Context("When the command exists", func() {
+		Context("When the command does not exists", func() {
 			It("prints the usage help for the command", func() {
-				runCommand("bad-command")
+				flagContext.Parse("bad-command")
+				cmd.Execute(flagContext)
 
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"'bad-command' is not a registered command. See 'cf help'"}))
+				Expect(fakeUI.FailedCallCount()).To(Equal(1))
+				output, _ := fakeUI.FailedArgsForCall(0)
+				Expect(output).To(ContainSubstring("'bad-command' is not a registered command. See 'cf help'"))
 			})
 		})
 	})
@@ -89,34 +107,44 @@ var _ = Describe("Help", func() {
 				},
 			}
 
-			config.PluginsReturns(m)
+			fakeConfig.PluginsReturns(m)
 		})
 
 		Context("command is a plugin command name", func() {
 			It("prints the usage help for the command", func() {
-				runCommand("fakePluginCmd1")
+				flagContext.Parse("fakePluginCmd1")
+				cmd.Execute(flagContext)
 
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"fakePluginCmd1", "help text here"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"ALIAS"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"fpc1"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"USAGE"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"Usage for fpc1"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"OPTIONS"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"-f", "test flag"}))
+				Expect(fakeUI.SayCallCount()).To(Equal(1))
+				output, _ := fakeUI.SayArgsForCall(0)
+				Expect(output).To(ContainSubstring("fakePluginCmd1"))
+				Expect(output).To(ContainSubstring("help text here"))
+				Expect(output).To(ContainSubstring("ALIAS"))
+				Expect(output).To(ContainSubstring("fpc1"))
+				Expect(output).To(ContainSubstring("USAGE"))
+				Expect(output).To(ContainSubstring("Usage for fpc1"))
+				Expect(output).To(ContainSubstring("OPTIONS"))
+				Expect(output).To(ContainSubstring("-f"))
+				Expect(output).To(ContainSubstring("test flag"))
 			})
 		})
 
 		Context("command is a plugin command alias", func() {
 			It("prints the usage help for the command alias", func() {
-				runCommand("fpc1")
+				flagContext.Parse("fpc1")
+				cmd.Execute(flagContext)
 
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"fakePluginCmd1", "help text here"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"ALIAS"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"fpc1"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"USAGE"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"Usage for fpc1"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"OPTIONS"}))
-				Eventually(ui.Outputs).Should(ContainSubstrings([]string{"-f", "test flag"}))
+				Expect(fakeUI.SayCallCount()).To(Equal(1))
+				output, _ := fakeUI.SayArgsForCall(0)
+				Expect(output).To(ContainSubstring("fakePluginCmd1"))
+				Expect(output).To(ContainSubstring("help text here"))
+				Expect(output).To(ContainSubstring("ALIAS"))
+				Expect(output).To(ContainSubstring("fpc1"))
+				Expect(output).To(ContainSubstring("USAGE"))
+				Expect(output).To(ContainSubstring("Usage for fpc1"))
+				Expect(output).To(ContainSubstring("OPTIONS"))
+				Expect(output).To(ContainSubstring("-f"))
+				Expect(output).To(ContainSubstring("test flag"))
 			})
 		})
 
