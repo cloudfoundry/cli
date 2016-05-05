@@ -1,6 +1,8 @@
 package service_test
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -31,7 +33,7 @@ var _ = Describe("service command", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

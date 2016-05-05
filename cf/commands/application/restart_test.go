@@ -1,6 +1,8 @@
 package application_test
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -46,7 +48,7 @@ var _ = Describe("restart command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 		requirementsFactory = &testreq.FakeReqFactory{}
 		starter = new(applicationfakes.FakeApplicationStarter)
 		stopper = new(applicationfakes.FakeApplicationStopper)

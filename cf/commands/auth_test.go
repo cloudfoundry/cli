@@ -17,6 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"os"
 )
 
 var _ = Describe("auth command", func() {
@@ -48,7 +49,7 @@ var _ = Describe("auth command", func() {
 		}
 
 		fakeLogger = new(tracefakes.FakePrinter)
-		deps = commandregistry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
 	})
 
 	Describe("requirements", func() {

@@ -1,6 +1,8 @@
 package space_test
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -39,7 +41,7 @@ var _ = Describe("space command", func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

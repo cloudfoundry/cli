@@ -64,7 +64,7 @@ func main() {
 
 	traceLogger = trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
 
-	deps := commandregistry.NewDependency(traceLogger)
+	deps := commandregistry.NewDependency(Writer, traceLogger)
 	defer handlePanics(deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 
@@ -123,7 +123,7 @@ func main() {
 	}
 
 	//non core command, try plugin command
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger)
+	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, Writer)
 	if err != nil {
 		deps.UI.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)

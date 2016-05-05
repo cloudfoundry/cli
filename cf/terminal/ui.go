@@ -9,6 +9,8 @@ import (
 
 	"bytes"
 
+	"bufio"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/trace"
@@ -101,6 +103,17 @@ func (ui *terminalUI) Warn(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	ui.Say(WarningColor(message))
 	return
+}
+
+func (ui *terminalUI) Ask(prompt string) string {
+	fmt.Fprintf(ui.stdout, "\n%s%s ", prompt, PromptColor(">"))
+
+	rd := bufio.NewReader(ui.stdin)
+	line, err := rd.ReadString('\n')
+	if err == nil {
+		return strings.TrimSpace(line)
+	}
+	return ""
 }
 
 func (ui *terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {

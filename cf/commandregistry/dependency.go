@@ -2,6 +2,7 @@ package commandregistry
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -63,10 +64,10 @@ type PluginModels struct {
 	OauthToken    *plugin_models.GetOauthToken_Model
 }
 
-func NewDependency(logger trace.Printer) Dependency {
+func NewDependency(writer io.Writer, logger trace.Printer) Dependency {
 	deps := Dependency{}
-	deps.TeePrinter = terminal.NewTeePrinter(terminal.Writer)
-	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, deps.TeePrinter, logger)
+	deps.TeePrinter = terminal.NewTeePrinter(writer)
+	deps.UI = terminal.NewUI(os.Stdin, writer, deps.TeePrinter, logger)
 
 	errorHandler := func(err error) {
 		if err != nil {

@@ -14,6 +14,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"os"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -39,7 +41,7 @@ var _ = Describe("org-users command", func() {
 		userRepo = new(apifakes.FakeUserRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

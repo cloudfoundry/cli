@@ -1,6 +1,8 @@
 package organization_test
 
 import (
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -45,7 +47,7 @@ var _ = Describe("orgs command", func() {
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	Describe("requirements", func() {
