@@ -12,12 +12,14 @@ removed_lint_debt_lines=$(wc -w <<< "$removed_lint_debt")
 
 if [ "$added_lint_debt_lines" -ne "0" ]; then
     cat <<END
+==RATCHET===============================
 Please do not create any new lintdebt.
 The added lint debt between the current code and the lintdebt file:
 
 END
 
     echo "$added_lint_debt"
+    echo -e "==RATCHET===============================\n"
 
     exit 1
 fi
@@ -26,11 +28,14 @@ fi
 
 if [ "$removed_lint_debt_lines" -ne "0" ]; then
     cat <<END
+==RATCHET===============================
 It looks like you've removed some lint debt! YAY!!!
 Please update & commit the new lintdebt to reflect your fixes.
 
   ./bin/lint > lintdebt
   git add lintdebt
+
+==RATCHET===============================
 
 END
 
