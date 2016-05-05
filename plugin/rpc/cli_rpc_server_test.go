@@ -210,7 +210,7 @@ var _ = Describe("Server", func() {
 	Describe(".GetOutputAndReset", func() {
 		Context("success", func() {
 			BeforeEach(func() {
-				outputCapture := terminal.NewTeePrinter()
+				outputCapture := terminal.NewTeePrinter(os.Stdout)
 				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewCommandRunner(), nil)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -280,8 +280,8 @@ var _ = Describe("Server", func() {
 		var runner *rpcfakes.FakeCommandRunner
 
 		BeforeEach(func() {
-			outputCapture := terminal.NewTeePrinter()
-			terminalOutputSwitch := terminal.NewTeePrinter()
+			outputCapture := terminal.NewTeePrinter(os.Stdout)
+			terminalOutputSwitch := terminal.NewTeePrinter(os.Stdout)
 
 			runner = new(rpcfakes.FakeCommandRunner)
 			rpcService, err = NewRpcService(outputCapture, terminalOutputSwitch, nil, api.RepositoryLocator{}, runner, nil)
@@ -427,7 +427,7 @@ var _ = Describe("Server", func() {
 		Context("success", func() {
 			BeforeEach(func() {
 
-				outputCapture := terminal.NewTeePrinter()
+				outputCapture := terminal.NewTeePrinter(os.Stdout)
 				runner = new(rpcfakes.FakeCommandRunner)
 
 				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, runner, nil)
@@ -748,7 +748,7 @@ var _ = Describe("Server", func() {
 
 		Context("fail", func() {
 			BeforeEach(func() {
-				outputCapture := terminal.NewTeePrinter()
+				outputCapture := terminal.NewTeePrinter(os.Stdout)
 				rpcService, err = NewRpcService(outputCapture, nil, nil, api.RepositoryLocator{}, cmdRunner.NewCommandRunner(), nil)
 				Expect(err).ToNot(HaveOccurred())
 

@@ -65,8 +65,8 @@ type PluginModels struct {
 
 func NewDependency(logger trace.Printer) Dependency {
 	deps := Dependency{}
-	deps.TeePrinter = terminal.NewTeePrinter()
-	deps.UI = terminal.NewUI(os.Stdin, deps.TeePrinter, logger)
+	deps.TeePrinter = terminal.NewTeePrinter(terminal.Writer)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, deps.TeePrinter, logger)
 
 	errorHandler := func(err error) {
 		if err != nil {

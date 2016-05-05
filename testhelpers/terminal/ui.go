@@ -2,9 +2,12 @@ package terminal
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"sync"
 	"time"
+
+	"os"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -37,6 +40,10 @@ func (ui *FakeUI) PrintPaginator(rows []string, err error) {
 	for _, row := range rows {
 		ui.Say(row)
 	}
+}
+
+func (ui FakeUI) Writer() io.Writer {
+	return os.Stdout
 }
 
 func (ui *FakeUI) PrintCapturingNoOutput(message string, args ...interface{}) {

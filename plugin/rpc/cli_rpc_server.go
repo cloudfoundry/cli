@@ -173,7 +173,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 		deps.RepoLocator = cmd.repoLocator
 
 		//set command ui's TeePrinter to be the one used by RpcService, for output to be captured
-		deps.UI = terminal.NewUI(os.Stdin, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
+		deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.outputCapture.(*terminal.TeePrinter), cmd.logger)
 
 		err = cmd.newCmdRunner.Command(args, deps, false)
 	} else {
@@ -305,7 +305,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Application = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"app", appName}, deps, true)
 }
@@ -323,7 +323,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.AppsSummary = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"apps"}, deps, true)
 }
@@ -341,7 +341,7 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organizations = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"orgs"}, deps, true)
 }
@@ -359,7 +359,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Spaces = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"spaces"}, deps, true)
 }
@@ -378,7 +378,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Services = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"services"}, deps, true)
 }
@@ -396,7 +396,7 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.OrgUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command(append([]string{"org-users"}, args...), deps, true)
 }
@@ -414,7 +414,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.SpaceUsers = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command(append([]string{"space-users"}, args...), deps, true)
 }
@@ -432,7 +432,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Organization = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"org", orgName}, deps, true)
 }
@@ -450,7 +450,7 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Space = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"space", spaceName}, deps, true)
 }
@@ -468,7 +468,7 @@ func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.G
 	deps.RepoLocator = cmd.repoLocator
 	deps.PluginModels.Service = retVal
 	cmd.terminalOutputSwitch.DisableTerminalOutput(true)
-	deps.UI = terminal.NewUI(os.Stdin, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
+	deps.UI = terminal.NewUI(os.Stdin, terminal.Writer, cmd.terminalOutputSwitch.(*terminal.TeePrinter), cmd.logger)
 
 	return cmd.newCmdRunner.Command([]string{"service", serviceInstance}, deps, true)
 }

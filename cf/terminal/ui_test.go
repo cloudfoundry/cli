@@ -34,12 +34,12 @@ var _ = Describe("UI", func() {
 		It("prints strings without using the TeePrinter", func() {
 			bucket := gbytes.NewBuffer()
 
-			printer := NewTeePrinter()
+			printer := NewTeePrinter(os.Stdout)
 			printer.SetOutputBucket(bucket)
 
 			io_helpers.SimulateStdin("", func(reader io.Reader) {
 				output := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, printer, fakeLogger)
+					ui := NewUI(reader, os.Stdout, printer, fakeLogger)
 					ui.PrintCapturingNoOutput("Hello")
 				})
 
@@ -53,7 +53,7 @@ var _ = Describe("UI", func() {
 		It("prints strings", func() {
 			io_helpers.SimulateStdin("", func(reader io.Reader) {
 				output := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					ui.Say("Hello")
 				})
 
@@ -64,7 +64,7 @@ var _ = Describe("UI", func() {
 		It("prints formatted strings", func() {
 			io_helpers.SimulateStdin("", func(reader io.Reader) {
 				output := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					ui.Say("Hello %s", "World!")
 				})
 
@@ -74,7 +74,7 @@ var _ = Describe("UI", func() {
 
 		It("does not format strings when provided no args", func() {
 			output := io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.Say("Hello %s World!") // whoops
 			})
 
@@ -86,7 +86,7 @@ var _ = Describe("UI", func() {
 		It("allows string with whitespaces", func() {
 			io_helpers.CaptureOutput(func() {
 				io_helpers.SimulateStdin("foo bar\n", func(reader io.Reader) {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Ask("?")).To(Equal("foo bar"))
 				})
 			})
@@ -95,7 +95,7 @@ var _ = Describe("UI", func() {
 		It("returns empty string if an error occured while reading string", func() {
 			io_helpers.CaptureOutput(func() {
 				io_helpers.SimulateStdin("string without expected delimiter", func(reader io.Reader) {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Ask("?")).To(Equal(""))
 				})
 			})
@@ -104,9 +104,9 @@ var _ = Describe("UI", func() {
 		It("always outputs the prompt, even when output is disabled", func() {
 			output := io_helpers.CaptureOutput(func() {
 				io_helpers.SimulateStdin("things are great\n", func(reader io.Reader) {
-					printer := NewTeePrinter()
+					printer := NewTeePrinter(os.Stdout)
 					printer.DisableTerminalOutput(true)
-					ui := NewUI(reader, printer, fakeLogger)
+					ui := NewUI(reader, os.Stdout, printer, fakeLogger)
 					ui.Ask("You like things?")
 				})
 			})
@@ -118,7 +118,7 @@ var _ = Describe("UI", func() {
 		It("treats 'y' as an affirmative confirmation", func() {
 			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Confirm("Hello World?")).To(BeTrue())
 				})
 
@@ -142,7 +142,7 @@ var _ = Describe("UI", func() {
 
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Confirm("Hello World?")).To(BeTrue())
 				})
 				Expect(out).To(ContainSubstrings([]string{"Hello World?"}))
@@ -152,7 +152,7 @@ var _ = Describe("UI", func() {
 		It("treats 'yes' as an affirmative confirmation", func() {
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Confirm("Hello World?")).To(BeTrue())
 				})
 
@@ -163,7 +163,7 @@ var _ = Describe("UI", func() {
 		It("treats other input as a negative confirmation", func() {
 			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Confirm("Hello World?")).To(BeFalse())
 				})
 
@@ -176,7 +176,7 @@ var _ = Describe("UI", func() {
 		It("formats a nice output string with exactly one prompt", func() {
 			io_helpers.SimulateStdin("y\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.ConfirmDelete("fizzbuzz", "bizzbump")).To(BeTrue())
 				})
 
@@ -191,7 +191,7 @@ var _ = Describe("UI", func() {
 		It("treats 'yes' as an affirmative confirmation", func() {
 			io_helpers.SimulateStdin("yes\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
 				})
 
@@ -202,7 +202,7 @@ var _ = Describe("UI", func() {
 		It("treats other input as a negative confirmation and warns the user", func() {
 			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeFalse())
 				})
 
@@ -215,7 +215,7 @@ var _ = Describe("UI", func() {
 		It("warns the user that associated objects will also be deleted", func() {
 			io_helpers.SimulateStdin("wat\n", func(reader io.Reader) {
 				out := io_helpers.CaptureOutput(func() {
-					ui := NewUI(reader, NewTeePrinter(), fakeLogger)
+					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.ConfirmDeleteWithAssociations("modelType", "modelName")).To(BeFalse())
 				})
 
@@ -233,7 +233,7 @@ var _ = Describe("UI", func() {
 
 		It("prompts the user to login", func() {
 			output := io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.ShowConfiguration(config)
 			})
 
@@ -261,7 +261,7 @@ var _ = Describe("UI", func() {
 
 			JustBeforeEach(func() {
 				output = io_helpers.CaptureOutput(func() {
-					ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+					ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					ui.ShowConfiguration(config)
 				})
 			})
@@ -307,7 +307,7 @@ var _ = Describe("UI", func() {
 
 		It("prompts the user to target an org and space when no org or space is targeted", func() {
 			output := io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.ShowConfiguration(config)
 			})
 
@@ -320,7 +320,7 @@ var _ = Describe("UI", func() {
 			sf.Name = "name"
 
 			output := io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.ShowConfiguration(config)
 			})
 
@@ -333,7 +333,7 @@ var _ = Describe("UI", func() {
 			of.Name = "of-name"
 
 			output := io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.ShowConfiguration(config)
 			})
 
@@ -345,7 +345,7 @@ var _ = Describe("UI", func() {
 		It("panics with a specific string", func() {
 			io_helpers.CaptureOutput(func() {
 				testassert.AssertPanic(QuietPanic, func() {
-					NewUI(os.Stdin, NewTeePrinter(), fakeLogger).Failed("uh oh")
+					NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
 				})
 			})
 		})
@@ -364,7 +364,7 @@ var _ = Describe("UI", func() {
 			It("does not use 'T' func to translate", func() {
 				io_helpers.CaptureOutput(func() {
 					testassert.AssertPanic(QuietPanic, func() {
-						NewUI(os.Stdin, NewTeePrinter(), fakeLogger).Failed("uh oh")
+						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
 					})
 				})
 			})
@@ -373,7 +373,7 @@ var _ = Describe("UI", func() {
 				output := io_helpers.CaptureOutput(func() {
 					testassert.AssertPanic(QuietPanic, func() {
 						logger := trace.NewWriterPrinter(os.Stdout, true)
-						NewUI(os.Stdin, NewTeePrinter(), logger).Failed("this should print only once")
+						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
 					})
 				})
 
@@ -389,7 +389,7 @@ var _ = Describe("UI", func() {
 				output := io_helpers.CaptureOutput(func() {
 					testassert.AssertPanic(QuietPanic, func() {
 						logger := trace.NewWriterPrinter(os.Stdout, true)
-						NewUI(os.Stdin, NewTeePrinter(), logger).Failed("this should print only once")
+						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
 					})
 				})
 
@@ -418,7 +418,7 @@ var _ = Describe("UI", func() {
 			config.SetAPIVersion("2.15.1")
 			cf.Version = "5.0.0"
 			output = io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.NotifyUpdateIfNeeded(config)
 			})
 
@@ -435,7 +435,7 @@ var _ = Describe("UI", func() {
 			config.SetAPIVersion("2.15.1")
 			cf.Version = "6.0.0"
 			output = io_helpers.CaptureOutput(func() {
-				ui := NewUI(os.Stdin, NewTeePrinter(), fakeLogger)
+				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.NotifyUpdateIfNeeded(config)
 			})
 

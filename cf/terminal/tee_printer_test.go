@@ -1,6 +1,8 @@
 package terminal_test
 
 import (
+	"os"
+
 	. "github.com/cloudfoundry/cli/cf/terminal"
 
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
@@ -22,7 +24,7 @@ var _ = Describe("TeePrinter", func() {
 			bucket = gbytes.NewBuffer()
 
 			output = io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
+				printer = NewTeePrinter(os.Stdout)
 				printer.SetOutputBucket(bucket)
 				printer.Print("Hello ")
 				printer.Print("Mom!")
@@ -40,7 +42,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should decolorize text", func() {
 			io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
+				printer = NewTeePrinter(os.Stdout)
 				printer.SetOutputBucket(bucket)
 				printer.Print("hi " + EntityNameColor("foo"))
 			})
@@ -56,7 +58,7 @@ var _ = Describe("TeePrinter", func() {
 			bucket = gbytes.NewBuffer()
 
 			output = io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
+				printer = NewTeePrinter(os.Stdout)
 				printer.SetOutputBucket(bucket)
 				printer.Printf("Hello %s", "everybody")
 			})
@@ -72,7 +74,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should decolorize text", func() {
 			io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
+				printer = NewTeePrinter(os.Stdout)
 				printer.SetOutputBucket(bucket)
 				printer.Printf("hi %s", EntityNameColor("foo"))
 			})
@@ -87,7 +89,7 @@ var _ = Describe("TeePrinter", func() {
 			bucket = gbytes.NewBuffer()
 
 			output = io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
+				printer = NewTeePrinter(os.Stdout)
 				printer.SetOutputBucket(bucket)
 				printer.Println("Hello ", "everybody")
 			})
@@ -103,7 +105,7 @@ var _ = Describe("TeePrinter", func() {
 
 		It("should decolorize text", func() {
 			io_helpers.CaptureOutput(func() {
-				printer = NewTeePrinter()
+				printer = NewTeePrinter(os.Stdout)
 				printer.SetOutputBucket(bucket)
 				printer.Println("hi " + EntityNameColor("foo"))
 			})
@@ -118,7 +120,7 @@ var _ = Describe("TeePrinter", func() {
 
 			Expect(func() {
 				io_helpers.CaptureOutput(func() {
-					printer = NewTeePrinter()
+					printer = NewTeePrinter(os.Stdout)
 					printer.SetOutputBucket(bucket)
 					printer.Printf("Hello %s", "everybody")
 				})
@@ -130,7 +132,7 @@ var _ = Describe("TeePrinter", func() {
 		It("disables the output saving when set to nil", func() {
 			Expect(func() {
 				io_helpers.CaptureOutput(func() {
-					printer = NewTeePrinter()
+					printer = NewTeePrinter(os.Stdout)
 					printer.SetOutputBucket(nil)
 					printer.Printf("Hello %s", "everybody")
 				})

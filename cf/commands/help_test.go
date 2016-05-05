@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
+	"github.com/cloudfoundry/cli/testhelpers/io"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
@@ -45,7 +45,7 @@ var _ = Describe("Help", func() {
 
 	Context("when no argument is provided", func() {
 		It("prints the main help menu of the 'cf' app", func() {
-			outputs := io_helpers.CaptureOutput(func() { runCommand() })
+			outputs := io.CaptureOutput(func() { runCommand() })
 
 			Eventually(outputs).Should(ContainSubstrings([]string{"A command line tool to interact with Cloud Foundry"}))
 			Eventually(outputs).Should(ContainSubstrings([]string{"CF_TRACE=true"}))
