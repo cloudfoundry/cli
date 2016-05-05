@@ -93,7 +93,7 @@ var _ = Describe("app Command", func() {
 		})
 
 		It("has an app instances flag", func() {
-			Expect(usage).To(MatchRegexp(`-a\s+Total number of application instances. -1 represents an unlimited amount. \(Default: unlimited\)`))
+			Expect(usage).To(MatchRegexp(`-a\s+Total number of application instances. -1 represents an unlimited amount.`))
 
 			Expect(usage).To(MatchRegexp(`cf update-quota.*\[-a APP_INSTANCES\]`))
 		})
@@ -111,7 +111,7 @@ var _ = Describe("app Command", func() {
 		})
 
 		It("has a --reserved-route-ports flag", func() {
-			Expect(usage).To(MatchRegexp(`--reserved-route-ports\s+Maximum number of routes that may be created with reserved ports \(Default: 0\)`))
+			Expect(usage).To(MatchRegexp(`--reserved-route-ports\s+Maximum number of routes that may be created with reserved ports`))
 
 			Expect(usage).To(MatchRegexp(`cf update-quota.*\--reserved-route-ports RESERVED_ROUTE_PORTS\]`))
 		})

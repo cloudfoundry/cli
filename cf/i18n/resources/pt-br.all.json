@@ -2888,6 +2888,10 @@
     "translation": "Quantia máxima de memória que uma instância de aplicativo pode ter (por exemplo, 1024 M, 1 G, 10 G). -1 representa uma quantia ilimitada. (Padrão: ilimitado)"
   },
   {
+    "id": "Maximum number of routes that may be created with reserved ports",
+    "translation": ""
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
     "translation": ""
   },
@@ -4166,6 +4170,10 @@
   {
     "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
     "translation": "Quantia total de memória que um espaço pode ter (por exemplo, 1024 M, 1 G, 10 G)"
+  },
+  {
+    "id": "Total number of application instances. -1 represents an unlimited amount.",
+    "translation": ""
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
