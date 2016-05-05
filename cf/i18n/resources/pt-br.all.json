@@ -3536,6 +3536,10 @@
     "translation": "Solicitar alocação de pseudo-tty"
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "Remontar um app"
   },

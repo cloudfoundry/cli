@@ -3536,6 +3536,10 @@
     "translation": "请求伪 tty 分配"
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "重新编译打包应用程序"
   },

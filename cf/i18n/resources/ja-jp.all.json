@@ -3536,6 +3536,10 @@
     "translation": "pseudo-tty 割り振りを要求します"
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "アプリを再ステージングします"
   },

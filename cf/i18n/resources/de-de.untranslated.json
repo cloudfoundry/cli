@@ -900,6 +900,10 @@
     "translation": "Repository: "
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": "Reserved Route Ports"
+  },
+  {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
     "translation": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}"
   },

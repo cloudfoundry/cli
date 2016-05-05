@@ -84,7 +84,7 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 	}
 
 	reservedRoutePorts := strconv.Itoa(quota.ReservedRoutePorts)
-	if reservedRoutePorts == "-1" {
+	if quota.ReservedRoutePorts == resources.UnlimitedReservedRoutePorts {
 		reservedRoutePorts = T("unlimited")
 	}
 

@@ -52,7 +52,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_routes": 123,
 									"total_services": 321,
 									"non_basic_services_allowed": true,
-									"app_instance_limit": 7
+									"app_instance_limit": 7,
+									"total_reserved_route_ports": 5
 								}
 							}
 						]
@@ -89,6 +90,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
 				AppInstanceLimit:        7,
+				ReservedRoutePorts:      5,
 			}))
 		})
 	})
@@ -115,7 +117,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_routes": 123,
 									"total_services": 321,
 									"non_basic_services_allowed": true,
-									"app_instance_limit": 7
+									"app_instance_limit": 7,
+									"total_reserved_route_ports": 3
 								}
 							}
 						]
@@ -153,6 +156,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
 			Expect(quotas[0].AppInstanceLimit).To(Equal(7))
+			Expect(quotas[0].ReservedRoutePorts).To(Equal(3))
 
 			Expect(quotas[1].GUID).To(Equal("my-quota-guid2"))
 			Expect(quotas[2].GUID).To(Equal("my-quota-guid3"))
@@ -160,6 +164,10 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("defaults missing app instance limit to -1 (unlimited)", func() {
 			Expect(quotas[1].AppInstanceLimit).To(Equal(-1))
+		})
+
+		It("defaults missing reserved route ports to 0", func() {
+			Expect(quotas[1].ReservedRoutePorts).To(Equal(0))
 		})
 	})
 
