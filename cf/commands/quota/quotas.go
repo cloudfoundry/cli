@@ -71,7 +71,7 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := cmd.ui.Table([]string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans"), T("app instance limit")})
+	table := cmd.ui.Table([]string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans"), T("app instance limit"), T("route ports")})
 
 	var megabytes string
 	for _, quota := range quotas {
@@ -91,6 +91,11 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 			appInstanceLimit = T("unlimited")
 		}
 
+		reservedRoutePorts := strconv.Itoa(quota.ReservedRoutePorts)
+		if quota.ReservedRoutePorts == resources.UnlimitedReservedRoutePorts {
+			reservedRoutePorts = T("unlimited")
+		}
+
 		table.Add(
 			quota.Name,
 			formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE),
@@ -99,6 +104,7 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 			fmt.Sprint(servicesLimit),
 			formatters.Allowed(quota.NonBasicServicesAllowed),
 			fmt.Sprint(appInstanceLimit),
+			fmt.Sprint(reservedRoutePorts),
 		)
 	}
 

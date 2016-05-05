@@ -1016,6 +1016,10 @@
     "translation": "required attribute 'stack' missing"
   },
   {
+    "id": "route ports",
+    "translation": "route ports"
+  },
+  {
     "id": "{{.AppInstanceLimit}} app instance limit",
     "translation": "{{.AppInstanceLimit}} app instance limit"
   },

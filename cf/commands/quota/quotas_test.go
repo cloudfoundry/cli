@@ -85,6 +85,7 @@ var _ = Describe("quotas command", func() {
 					ServicesLimit:           222,
 					NonBasicServicesAllowed: true,
 					AppInstanceLimit:        -1,
+					ReservedRoutePorts:      4,
 				},
 				{
 					Name:                    "quota-non-basic-not-allowed",
@@ -94,6 +95,7 @@ var _ = Describe("quotas command", func() {
 					ServicesLimit:           2,
 					NonBasicServicesAllowed: false,
 					AppInstanceLimit:        10,
+					ReservedRoutePorts:      4,
 				},
 			}, nil)
 		})
@@ -103,9 +105,9 @@ var _ = Describe("quotas command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans", "app instance limit"},
-				[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "unlimited"},
-				[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "10"},
+				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans", "app instance limit", "route ports"},
+				[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "unlimited", "4"},
+				[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "10", "4"},
 			))
 		})
 
@@ -140,6 +142,23 @@ var _ = Describe("quotas command", func() {
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"quota-with-no-limit-to-app-instance", "434M", "1M", "2", "7", "disallowed", "unlimited"},
+			))
+
+			quotaRepo.FindAllReturns([]models.QuotaFields{
+				{
+					Name:                    "quota-with-no-limit-to-reserved-route-ports",
+					MemoryLimit:             434,
+					InstanceMemoryLimit:     1,
+					RoutesLimit:             2,
+					ServicesLimit:           7,
+					NonBasicServicesAllowed: false,
+					AppInstanceLimit:        7,
+					ReservedRoutePorts:      -1,
+				},
+			}, nil)
+			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"quota-with-no-limit-to-app-instance", "434M", "1M", "2", "7", "disallowed", "7", "unlimited"},
 			))
 		})
 	})
