@@ -112,10 +112,4 @@ func (ui *terminalUI) Ask(prompt string) string {
 	return ""
 }
 
-func PrintToTerminal(str string) (int, error) {
-	return fmt.Print(str)
-}
-
-func PrintlnToTerminal(str string) (int, error) {
-	return fmt.Println(str)
-}
+var Writer = os.Stdout

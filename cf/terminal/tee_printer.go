@@ -9,11 +9,13 @@ import (
 type TeePrinter struct {
 	disableTerminalOutput bool
 	outputBucket          io.Writer
+	stdout                io.Writer
 }
 
-func NewTeePrinter() *TeePrinter {
+func NewTeePrinter(w io.Writer) *TeePrinter {
 	return &TeePrinter{
 		outputBucket: ioutil.Discard,
+		stdout:       w,
 	}
 }
 
@@ -29,7 +31,7 @@ func (t *TeePrinter) Print(values ...interface{}) (int, error) {
 	str := fmt.Sprint(values...)
 	t.saveOutputToBucket(str)
 	if !t.disableTerminalOutput {
-		return PrintToTerminal(str)
+		return fmt.Fprint(t.stdout, str)
 	}
 	return 0, nil
 }
@@ -38,7 +40,7 @@ func (t *TeePrinter) Printf(format string, a ...interface{}) (int, error) {
 	str := fmt.Sprintf(format, a...)
 	t.saveOutputToBucket(str)
 	if !t.disableTerminalOutput {
-		return PrintToTerminal(str)
+		return fmt.Fprint(t.stdout, str)
 	}
 	return 0, nil
 }
@@ -47,7 +49,7 @@ func (t *TeePrinter) Println(values ...interface{}) (int, error) {
 	str := fmt.Sprint(values...)
 	t.saveOutputToBucket(str)
 	if !t.disableTerminalOutput {
-		return PrintlnToTerminal(str)
+		return fmt.Fprintln(t.stdout, str)
 	}
 	return 0, nil
 }

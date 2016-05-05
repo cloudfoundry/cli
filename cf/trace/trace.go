@@ -4,19 +4,10 @@ import (
 	"fmt"
 	"regexp"
 
-	"io"
-	"os"
-
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
-var stdout io.Writer = os.Stdout
-
 var LoggingToStdout bool
-
-func SetStdout(s io.Writer) {
-	stdout = s
-}
 
 func Sanitize(input string) string {
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)

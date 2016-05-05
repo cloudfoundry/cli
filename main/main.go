@@ -25,7 +25,7 @@ var cmdRegistry = commandregistry.Commands
 
 func main() {
 	traceEnv := os.Getenv("CF_TRACE")
-	traceLogger := trace.NewLogger(false, traceEnv, "")
+	traceLogger := trace.NewLogger(Writer, false, traceEnv, "")
 
 	//handle `cf -v` for cf version
 	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
@@ -43,11 +43,11 @@ func main() {
 
 	newArgs, isVerbose := handleVerbose(os.Args)
 	os.Args = newArgs
-	traceLogger = trace.NewLogger(isVerbose, traceEnv, "")
+	traceLogger = trace.NewLogger(Writer, isVerbose, traceEnv, "")
 
 	errFunc := func(err error) {
 		if err != nil {
-			ui := terminal.NewUI(os.Stdin, terminal.NewTeePrinter(), traceLogger)
+			ui := terminal.NewUI(os.Stdin, Writer, terminal.NewTeePrinter(Writer), traceLogger)
 			ui.Failed(fmt.Sprintf("Config error: %s", err))
 		}
 	}
@@ -62,7 +62,7 @@ func main() {
 
 	traceConfigVal := config.Trace()
 
-	traceLogger = trace.NewLogger(isVerbose, traceEnv, traceConfigVal)
+	traceLogger = trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
 
 	deps := commandregistry.NewDependency(traceLogger)
 	defer handlePanics(deps.TeePrinter, deps.Logger)
@@ -143,7 +143,7 @@ func main() {
 }
 
 func handlePanics(printer terminal.Printer, logger trace.Printer) {
-	panicprinter.UI = terminal.NewUI(os.Stdin, printer, logger)
+	panicprinter.UI = terminal.NewUI(os.Stdin, Writer, printer, logger)
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()

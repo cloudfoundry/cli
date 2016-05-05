@@ -2,6 +2,7 @@ package help
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"text/tabwriter"
@@ -33,17 +34,17 @@ type cmdPresenter struct {
 	Description string
 }
 
-func ShowHelp(helpTemplate string) {
+func ShowHelp(writer io.Writer, helpTemplate string) {
 	translatedTemplatedHelp := T(strings.Replace(helpTemplate, "{{", "[[", -1))
 	translatedTemplatedHelp = strings.Replace(translatedTemplatedHelp, "[[", "{{", -1)
 
-	showAppHelp(translatedTemplatedHelp)
+	showAppHelp(writer, translatedTemplatedHelp)
 }
 
-func showAppHelp(helpTemplate string) {
+func showAppHelp(writer io.Writer, helpTemplate string) {
 	presenter := newAppPresenter()
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+	w := tabwriter.NewWriter(writer, 0, 8, 1, '\t', 0)
 	t := template.Must(template.New("help").Parse(helpTemplate))
 	err := t.Execute(w, presenter)
 	if err != nil {
@@ -52,7 +53,9 @@ func showAppHelp(helpTemplate string) {
 	w.Flush()
 }
 
-func newAppPresenter() (presenter appPresenter) {
+func newAppPresenter() appPresenter {
+	var presenter appPresenter
+
 	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
 		//fail silently when running help
 	})
@@ -391,7 +394,7 @@ func newAppPresenter() (presenter appPresenter) {
 		},
 	}
 
-	return
+	return presenter
 }
 
 func (p appPresenter) Title(name string) string {

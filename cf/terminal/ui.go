@@ -40,6 +40,8 @@ type UI interface {
 	LoadingIndication()
 	Table(headers []string) *UITable
 	NotifyUpdateIfNeeded(coreconfig.Reader)
+
+	Writer() io.Writer
 }
 
 type Printer interface {
@@ -50,16 +52,22 @@ type Printer interface {
 
 type terminalUI struct {
 	stdin   io.Reader
+	stdout  io.Writer
 	printer Printer
 	logger  trace.Printer
 }
 
-func NewUI(r io.Reader, printer Printer, logger trace.Printer) UI {
+func NewUI(r io.Reader, w io.Writer, printer Printer, logger trace.Printer) UI {
 	return &terminalUI{
 		stdin:   r,
+		stdout:  w,
 		printer: printer,
 		logger:  logger,
 	}
+}
+
+func (ui terminalUI) Writer() io.Writer {
+	return ui.stdout
 }
 
 func (ui *terminalUI) PrintPaginator(rows []string, err error) {
@@ -75,9 +83,9 @@ func (ui *terminalUI) PrintPaginator(rows []string, err error) {
 
 func (ui *terminalUI) PrintCapturingNoOutput(message string, args ...interface{}) {
 	if len(args) == 0 {
-		fmt.Printf("%s", message)
+		fmt.Fprintf(ui.stdout, "%s", message)
 	} else {
-		fmt.Printf(message, args...)
+		fmt.Fprintf(ui.stdout, message, args...)
 	}
 }
 

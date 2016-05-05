@@ -60,10 +60,4 @@ func (ui *terminalUI) Ask(prompt string) string {
 	return ""
 }
 
-func PrintToTerminal(str string) (int, error) {
-	return fmt.Fprint(color.Output, str)
-}
-
-func PrintlnToTerminal(str string) (int, error) {
-	return fmt.Fprintln(color.Output, str)
-}
+var Writer = color.Output

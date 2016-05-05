@@ -46,7 +46,7 @@ func (cmd *Help) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 
 func (cmd *Help) Execute(c flags.FlagContext) {
 	if len(c.Args()) == 0 {
-		help.ShowHelp(help.GetHelpTemplate())
+		help.ShowHelp(cmd.ui.Writer(), help.GetHelpTemplate())
 	} else {
 		cmdName := c.Args()[0]
 		if commandregistry.Commands.CommandExists(cmdName) {
