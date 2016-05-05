@@ -38,6 +38,9 @@ do
   go tool vet -all -shadow=true $file
 done
 
+echo -e "\n Ratcheting down our debt..."
+$(pwd)/bin/ratchet
+
 echo -e "\n Verifying total commands registered..."
 ginkgo commandsloader
 
