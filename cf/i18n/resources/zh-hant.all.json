@@ -3536,6 +3536,10 @@
     "translation": "要求 pseudo-tty 配置"
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "重新編譯打包應用程式"
   },

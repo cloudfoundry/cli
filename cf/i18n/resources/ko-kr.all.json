@@ -3536,6 +3536,10 @@
     "translation": "pseudo-tty 할당 요청"
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "앱 다시 스테이징"
   },

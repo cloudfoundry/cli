@@ -3536,6 +3536,10 @@
     "translation": "Pseudo-TTY-Zuordnung anfordern"
   },
   {
+    "id": "Reserved Route Ports",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "Eine App erneut aktivieren"
   },
