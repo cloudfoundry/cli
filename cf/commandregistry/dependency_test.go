@@ -6,6 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 )
 
 var _ = Describe("Dependency", func() {
@@ -13,7 +14,7 @@ var _ = Describe("Dependency", func() {
 
 	It("populates all fields by calling all the dependency contructors", func() {
 		fakeLogger := new(tracefakes.FakePrinter)
-		dependency = commandregistry.NewDependency(fakeLogger)
+		dependency = commandregistry.NewDependency(os.Stdout, fakeLogger)
 
 		Expect(dependency.UI).ToNot(BeNil())
 		Expect(dependency.Config).ToNot(BeNil())

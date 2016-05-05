@@ -17,6 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"os"
 )
 
 var _ = Describe("list-apps command", func() {
@@ -90,7 +91,7 @@ var _ = Describe("list-apps command", func() {
 
 		appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app, app2}
 
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

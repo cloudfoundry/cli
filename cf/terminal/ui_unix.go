@@ -100,16 +100,3 @@ func catchSignal(fd []uintptr, sig chan os.Signal) {
 		os.Exit(2)
 	}
 }
-
-func (ui *terminalUI) Ask(prompt string) string {
-	fmt.Printf("\n%s%s ", prompt, PromptColor(">"))
-
-	rd := bufio.NewReader(ui.stdin)
-	line, err := rd.ReadString('\n')
-	if err == nil {
-		return strings.TrimSpace(line)
-	}
-	return ""
-}
-
-var Writer = os.Stdout

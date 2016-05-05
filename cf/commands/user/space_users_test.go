@@ -16,6 +16,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"os"
+
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
@@ -44,7 +46,7 @@ var _ = Describe("space-users command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		userRepo = new(apifakes.FakeUserRepository)
-		deps = commandregistry.NewDependency(new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	runCommand := func(args ...string) bool {

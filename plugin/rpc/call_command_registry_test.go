@@ -10,6 +10,7 @@ import (
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 )
 
 var _ = Describe("calling commands in commandregistry", func() {
@@ -24,7 +25,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 
 	BeforeEach(func() {
 		fakeLogger = new(tracefakes.FakePrinter)
-		deps = commandregistry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
 		ui = &testterm.FakeUI{}
 		deps.UI = ui
 

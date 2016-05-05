@@ -16,6 +16,7 @@ import (
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 )
 
 var _ = Describe("OauthToken", func() {
@@ -40,7 +41,7 @@ var _ = Describe("OauthToken", func() {
 		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		deps = commandregistry.NewDependency(fakeLogger)
+		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
 	})
 
 	runCommand := func() bool {
