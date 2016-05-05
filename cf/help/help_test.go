@@ -23,6 +23,10 @@ var _ = Describe("Help", func() {
 		buffer = gbytes.NewBuffer()
 	})
 
+	AfterEach(func() {
+		buffer.Close()
+	})
+
 	It("shows help for all commands", func() {
 		dummyTemplate := `
 {{range .Commands}}{{range .CommandSubGroups}}{{range .}}
@@ -51,10 +55,10 @@ var _ = Describe("Help", func() {
 {{end}}{{end}}{{end}}
 `
 		help.ShowHelp(buffer, dummyTemplate)
-		Expect(buffer).To(gbytes.Say("test1_cmd2"))
-		Expect(buffer).To(gbytes.Say("test2_cmd1"))
-		Expect(buffer).To(gbytes.Say("test2_cmd2"))
-		Expect(buffer).To(gbytes.Say("test2_really_long_really_long_really_long_command_name"))
+		Expect(buffer.Contents()).To(ContainSubstring("test1_cmd2"))
+		Expect(buffer.Contents()).To(ContainSubstring("test2_cmd1"))
+		Expect(buffer.Contents()).To(ContainSubstring("test2_cmd2"))
+		Expect(buffer.Contents()).To(ContainSubstring("test2_really_long_really_long_really_long_command_name"))
 	})
 
 	It("adjusts the output format to the longest length of plugin command name", func() {
