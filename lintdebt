@@ -72,9 +72,9 @@ cf/terminal/table.go:337:4: should replace size += 1 with size++
 cf/terminal/ui_unix.go:20:2: don't use underscores in Go names; const exec_cwdir should be execCwdir
 cf/terminal/ui_unix.go:24:18: should omit type []string from declaration of var sttyArgvEOff; it will be inferred from the right-hand side
 cf/terminal/ui_unix.go:27:17: should omit type []string from declaration of var sttyArgvEOn; it will be inferred from the right-hand side
-cf/trace/logger_provider.go:11:30: don't use underscores in Go names; func parameter cf_trace should be cfTrace
-cf/trace/logger_provider.go:11:40: don't use underscores in Go names; func parameter config_trace should be configTrace
-cf/trace/trace.go:42:6: don't use ALL_CAPS in Go names; use CamelCase
+cf/trace/logger_provider.go:12:48: don't use underscores in Go names; func parameter cf_trace should be cfTrace
+cf/trace/logger_provider.go:12:58: don't use underscores in Go names; func parameter config_trace should be configTrace
+cf/trace/trace.go:33:6: don't use ALL_CAPS in Go names; use CamelCase
 downloader/file_download.go:74:9: if block ends with a return statement, so drop this else and outdent its block
 downloader/file_download.go:87:6: don't use underscores in Go names; func get_filename_from_header should be getFilenameFromHeader
 downloader/file_download.go:103:6: don't use underscores in Go names; func get_filename_from_url should be getFilenameFromURL
