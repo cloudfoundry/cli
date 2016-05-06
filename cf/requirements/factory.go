@@ -75,7 +75,7 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 
 func (f apiRequirementFactory) NewRoutingAPIRequirement() Requirement {
 	req := Requirements{
-		f.NewMinAPIVersionRequirement(T("This command"), cf.TcpRoutingMinimumAPIVersion),
+		f.NewMinAPIVersionRequirement(T("This command"), cf.TCPRoutingMinimumAPIVersion),
 		NewRoutingAPIRequirement(
 			f.config,
 		),
