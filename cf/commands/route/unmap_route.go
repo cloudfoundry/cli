@@ -83,7 +83,7 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 	}
 
 	if fc.IsSet("port") {
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TcpRoutingMinimumAPIVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--port'", cf.TCPRoutingMinimumAPIVersion))
 	}
 
 	reqs = append(reqs, []requirements.Requirement{

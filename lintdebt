@@ -1,4 +1,3 @@
-cf/minimum_api_versions.go:6:2: var TcpRoutingMinimumAPIVersion should be TCPRoutingMinimumAPIVersion
 cf/actors/plugininstaller/plugin_installer.go:17:6: type name will be used as plugininstaller.PluginInstallerContext by other packages, and that stutters; consider calling this Context
 cf/actors/plugininstaller/plugin_installer_with_repo.go:15:6: type name will be used as plugininstaller.PluginInstallerWithRepo by other packages, and that stutters; consider calling this WithRepo
 cf/actors/plugininstaller/plugin_installer_without_repo.go:12:6: type name will be used as plugininstaller.PluginInstallerWithoutRepo by other packages, and that stutters; consider calling this WithoutRepo
