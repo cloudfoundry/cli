@@ -4604,6 +4604,10 @@
     "translation": ""
   },
   {
+    "id": "app instances",
+    "translation": ""
+  },
+  {
     "id": "apps",
     "translation": "Apps"
   },
@@ -4724,6 +4728,10 @@
     "translation": "Host"
   },
   {
+    "id": "instance memory",
+    "translation": "Instanzspeiche"
+  },
+  {
     "id": "instance memory limit",
     "translation": "Grenzwert für Instanzspeicher"
   },
@@ -4806,6 +4814,10 @@
   {
     "id": "owned",
     "translation": "eigen"
+  },
+  {
+    "id": "paid plans",
+    "translation": "bezahlte Plane"
   },
   {
     "id": "paid service plans",
@@ -5006,6 +5018,10 @@
   {
     "id": "time",
     "translation": "Zeit"
+  },
+  {
+    "id": "total memory",
+    "translation": "Gesamtspeicher"
   },
   {
     "id": "total memory limit",

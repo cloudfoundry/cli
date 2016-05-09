@@ -4604,6 +4604,10 @@
     "translation": ""
   },
   {
+    "id": "app instances",
+    "translation": ""
+  },
+  {
     "id": "apps",
     "translation": "앱"
   },
@@ -4724,6 +4728,10 @@
     "translation": "호스트"
   },
   {
+    "id": "instance memory",
+    "translation": "인스턴스 메모리 한계"
+  },
+  {
     "id": "instance memory limit",
     "translation": "인스턴스 메모리 한계"
   },
@@ -4806,6 +4814,10 @@
   {
     "id": "owned",
     "translation": "소유"
+  },
+  {
+    "id": "paid plans",
+    "translation": "유료 서비스 플랜"
   },
   {
     "id": "paid service plans",
@@ -5006,6 +5018,10 @@
   {
     "id": "time",
     "translation": "시간"
+  },
+  {
+    "id": "total memory",
+    "translation": "총 메모리 한계"
   },
   {
     "id": "total memory limit",

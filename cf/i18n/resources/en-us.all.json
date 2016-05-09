@@ -4604,6 +4604,10 @@
     "translation": "app instance limit"
   },
   {
+    "id": "app instances",
+    "translation": "app instances"
+  },
+  {
     "id": "apps",
     "translation": "apps"
   },
@@ -4724,6 +4728,10 @@
     "translation": "host"
   },
   {
+    "id": "instance memory",
+    "translation": "instance memory"
+  },
+  {
     "id": "instance memory limit",
     "translation": "instance memory limit"
   },
@@ -4806,6 +4814,10 @@
   {
     "id": "owned",
     "translation": "owned"
+  },
+  {
+    "id": "paid plans",
+    "translation": "paid plans"
   },
   {
     "id": "paid service plans",
@@ -5006,6 +5018,10 @@
   {
     "id": "time",
     "translation": "time"
+  },
+  {
+    "id": "total memory",
+    "translation": "total memory"
   },
   {
     "id": "total memory limit",

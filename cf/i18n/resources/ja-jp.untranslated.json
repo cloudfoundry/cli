@@ -928,6 +928,10 @@
     "translation": "app instance limit"
   },
   {
+    "id": "app instances",
+    "translation": "app instances"
+  },
+  {
     "id": "path",
     "translation": "path"
   },
