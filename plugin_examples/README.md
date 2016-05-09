@@ -83,7 +83,7 @@ The `Run(...)` method accepts the command line arguments and flags that you defi
 #### Global Flags
 There are several global flags that will not be passed to the plugin. These are:
 - `-v`: equivalent to `CF_TRACE=true`, will display any API calls/responses to the user
-- `-h`: will call `help` on your command
+- `-h`: will process the return from the plugin's `GetMetadata` function to produce a help display
 
 ### Calling CLI Commands
 
