@@ -648,6 +648,10 @@
     "translation": "app instance limit"
   },
   {
+    "id": "app instances",
+    "translation": "app instances"
+  },
+  {
     "id": "description",
     "translation": "description"
   },

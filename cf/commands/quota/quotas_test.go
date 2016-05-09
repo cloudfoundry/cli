@@ -105,7 +105,7 @@ var _ = Describe("quotas command", func() {
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"OK"},
-				[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans", "app instance limit", "route ports"},
+				[]string{"name", "total memory", "instance memory", "routes", "service instances", "paid plans", "app instances", "route ports"},
 				[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "unlimited", "4"},
 				[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "10", "4"},
 			))

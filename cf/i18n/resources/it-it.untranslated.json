@@ -1036,6 +1036,10 @@
     "translation": "app instance limit"
   },
   {
+    "id": "app instances",
+    "translation": "app instances"
+  },
+  {
     "id": "broker: {{.Name}}",
     "translation": "broker: {{.Name}}"
   },

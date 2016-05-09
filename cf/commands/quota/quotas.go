@@ -71,7 +71,16 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table := cmd.ui.Table([]string{T("name"), T("total memory limit"), T("instance memory limit"), T("routes"), T("service instances"), T("paid service plans"), T("app instance limit"), T("route ports")})
+	table := cmd.ui.Table([]string{
+		T("name"),
+		T("total memory"),
+		T("instance memory"),
+		T("routes"),
+		T("service instances"),
+		T("paid plans"),
+		T("app instances"),
+		T("route ports"),
+	})
 
 	var megabytes string
 	for _, quota := range quotas {

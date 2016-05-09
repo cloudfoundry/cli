@@ -1024,6 +1024,10 @@
     "translation": "app instance limit"
   },
   {
+    "id": "app instances",
+    "translation": "app instances"
+  },
+  {
     "id": "cpu",
     "translation": "cpu"
   },

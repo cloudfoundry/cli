@@ -4604,6 +4604,10 @@
     "translation": ""
   },
   {
+    "id": "app instances",
+    "translation": ""
+  },
+  {
     "id": "apps",
     "translation": "應用程式"
   },
@@ -4724,6 +4728,10 @@
     "translation": "主機"
   },
   {
+    "id": "instance memory",
+    "translation": "實例記憶體限制"
+  },
+  {
     "id": "instance memory limit",
     "translation": "實例記憶體限制"
   },
@@ -4806,6 +4814,10 @@
   {
     "id": "owned",
     "translation": "專屬"
+  },
+  {
+    "id": "paid plans",
+    "translation": "付費服務方案"
   },
   {
     "id": "paid service plans",
@@ -5006,6 +5018,10 @@
   {
     "id": "time",
     "translation": "時間"
+  },
+  {
+    "id": "total memory",
+    "translation": "總記憶體限制"
   },
   {
     "id": "total memory limit",

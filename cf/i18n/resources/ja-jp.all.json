@@ -4604,6 +4604,10 @@
     "translation": ""
   },
   {
+    "id": "app instances",
+    "translation": ""
+  },
+  {
     "id": "apps",
     "translation": "アプリ"
   },
@@ -4724,6 +4728,10 @@
     "translation": "ホスト"
   },
   {
+    "id": "instance memory",
+    "translation": "インスタンス・メモリー"
+  },
+  {
     "id": "instance memory limit",
     "translation": "インスタンス・メモリー制限"
   },
@@ -4806,6 +4814,10 @@
   {
     "id": "owned",
     "translation": "所有"
+  },
+  {
+    "id": "paid plans",
+    "translation": "有料プラン"
   },
   {
     "id": "paid service plans",
@@ -5006,6 +5018,10 @@
   {
     "id": "time",
     "translation": "時刻"
+  },
+  {
+    "id": "total memory",
+    "translation": "合計メモリー"
   },
   {
     "id": "total memory limit",

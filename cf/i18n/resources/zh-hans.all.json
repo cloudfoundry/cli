@@ -4604,6 +4604,10 @@
     "translation": ""
   },
   {
+    "id": "app instances",
+    "translation": ""
+  },
+  {
     "id": "apps",
     "translation": "应用程序"
   },
@@ -4724,6 +4728,10 @@
     "translation": "主机"
   },
   {
+    "id": "instance memory",
+    "translation": "实例内存限制"
+  },
+  {
     "id": "instance memory limit",
     "translation": "实例内存限制"
   },
@@ -4806,6 +4814,10 @@
   {
     "id": "owned",
     "translation": "自有"
+  },
+  {
+    "id": "paid plans",
+    "translation": "已付费服务套餐"
   },
   {
     "id": "paid service plans",
@@ -5006,6 +5018,10 @@
   {
     "id": "time",
     "translation": "时间"
+  },
+  {
+    "id": "total memory",
+    "translation": "内存限制总量"
   },
   {
     "id": "total memory limit",
