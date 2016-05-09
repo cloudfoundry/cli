@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"encoding/json"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -185,13 +186,13 @@ var _ = Describe("create-quota command", func() {
 			It("sets route port limit", func() {
 				runCommand("my-quota", "--reserved-route-ports", "5")
 
-				Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePorts).To(Equal(5))
+				Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePorts).To(Equal(json.Number("5")))
 			})
 
-			It("defaults to 0", func() {
+			It("defaults be empty", func() {
 				runCommand("my-quota")
 
-				Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePorts).To(Equal(0))
+				Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePorts).To(BeEmpty())
 			})
 		})
 

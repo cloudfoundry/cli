@@ -13,6 +13,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"encoding/json"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -217,14 +218,14 @@ var _ = Describe("app Command", func() {
 				runCommand("--reserved-route-ports", "5", "quota-name")
 
 				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
-				Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePorts).To(Equal(5))
+				Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePorts).To(Equal(json.Number("5")))
 			})
 
 			It("can update the route port limit to be -1, infinity", func() {
 				runCommand("--reserved-route-ports", "-1", "quota-name")
 
 				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
-				Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePorts).To(Equal(-1))
+				Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePorts).To(Equal(json.Number("-1")))
 			})
 		})
 

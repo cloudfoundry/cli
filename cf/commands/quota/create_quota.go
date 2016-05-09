@@ -3,6 +3,7 @@ package quota
 import (
 	"fmt"
 
+	"encoding/json"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -35,7 +36,7 @@ func (cmd *CreateQuota) MetaData() commandregistry.CommandMetadata {
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
-	fs["reserved-route-ports"] = &flags.IntFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports (Default: 0)")}
+	fs["reserved-route-ports"] = &flags.StringFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports (Default: 0)")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "create-quota",
@@ -135,7 +136,7 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 	}
 
 	if context.IsSet("reserved-route-ports") {
-		quota.ReservedRoutePorts = context.Int("reserved-route-ports")
+		quota.ReservedRoutePorts = json.Number(context.String("reserved-route-ports"))
 	}
 
 	err := cmd.quotaRepo.Create(quota)

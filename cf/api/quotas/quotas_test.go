@@ -12,6 +12,7 @@ import (
 
 	"github.com/onsi/gomega/ghttp"
 
+	"encoding/json"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -90,7 +91,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				ServicesLimit:           321,
 				NonBasicServicesAllowed: true,
 				AppInstanceLimit:        7,
-				ReservedRoutePorts:      5,
+				ReservedRoutePorts:      "5",
 			}))
 		})
 	})
@@ -156,7 +157,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
 			Expect(quotas[0].AppInstanceLimit).To(Equal(7))
-			Expect(quotas[0].ReservedRoutePorts).To(Equal(3))
+			Expect(quotas[0].ReservedRoutePorts).To(Equal(json.Number("3")))
 
 			Expect(quotas[1].GUID).To(Equal("my-quota-guid2"))
 			Expect(quotas[2].GUID).To(Equal("my-quota-guid3"))
@@ -166,8 +167,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(quotas[1].AppInstanceLimit).To(Equal(-1))
 		})
 
-		It("defaults missing reserved route ports to 0", func() {
-			Expect(quotas[1].ReservedRoutePorts).To(Equal(0))
+		It("defaults missing reserved route ports to be empty", func() {
+			Expect(quotas[1].ReservedRoutePorts).To(BeEmpty())
 		})
 	})
 
@@ -216,7 +217,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				RoutesLimit:        12,
 				MemoryLimit:        123,
 				AppInstanceLimit:   42,
-				ReservedRoutePorts: 10,
+				ReservedRoutePorts: "10",
 			}
 
 			err := repo.Create(quota)
@@ -255,7 +256,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				RoutesLimit:        12,
 				MemoryLimit:        123,
 				AppInstanceLimit:   42,
-				ReservedRoutePorts: 10,
+				ReservedRoutePorts: "10",
 			}
 
 			err := repo.Update(quota)

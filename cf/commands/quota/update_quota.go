@@ -3,6 +3,7 @@ package quota
 import (
 	"fmt"
 
+	"encoding/json"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -34,7 +35,7 @@ func (cmd *UpdateQuota) MetaData() commandregistry.CommandMetadata {
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount.")}
-	fs["reserved-route-ports"] = &flags.IntFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports")}
+	fs["reserved-route-ports"] = &flags.StringFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "update-quota",
@@ -150,7 +151,7 @@ func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
 	}
 
 	if c.IsSet("reserved-route-ports") {
-		quota.ReservedRoutePorts = c.Int("reserved-route-ports")
+		quota.ReservedRoutePorts = json.Number(c.String("reserved-route-ports"))
 	}
 
 	cmd.ui.Say(T("Updating quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{

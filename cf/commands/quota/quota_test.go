@@ -76,7 +76,7 @@ var _ = Describe("quota", func() {
 						ServicesLimit:           47,
 						NonBasicServicesAllowed: true,
 						AppInstanceLimit:        7,
-						ReservedRoutePorts:      5,
+						ReservedRoutePorts:      "5",
 					}, nil)
 				})
 
@@ -127,7 +127,7 @@ var _ = Describe("quota", func() {
 				})
 			})
 
-			Context("when the reserved route ports limit is -1", func() {
+			Context("when the reserved route ports is -1", func() {
 				BeforeEach(func() {
 					quotaRepo.FindByNameReturns(models.QuotaFields{
 						GUID:                    "my-quota-guid",
@@ -137,7 +137,7 @@ var _ = Describe("quota", func() {
 						RoutesLimit:             2000,
 						ServicesLimit:           47,
 						NonBasicServicesAllowed: true,
-						ReservedRoutePorts:      -1,
+						ReservedRoutePorts:      "-1",
 					}, nil)
 				})
 
@@ -153,6 +153,28 @@ var _ = Describe("quota", func() {
 						[]string{"Services", "47"},
 						[]string{"Paid service plans", "allowed"},
 						[]string{"Reserved Route Ports", "unlimited"},
+					))
+				})
+			})
+
+			Context("when the reserved route ports is not provided by the API", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByNameReturns(models.QuotaFields{
+						GUID:                    "my-quota-guid",
+						Name:                    "muh-muh-muh-my-qua-quota",
+						MemoryLimit:             512,
+						InstanceMemoryLimit:     5,
+						RoutesLimit:             2000,
+						ServicesLimit:           47,
+						NonBasicServicesAllowed: true,
+					}, nil)
+				})
+
+				It("does not show reserved route ports", func() {
+					runCommand("muh-muh-muh-my-qua-quota")
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Reserved Route Ports"},
 					))
 				})
 			})

@@ -3,6 +3,7 @@ package resources_test
 import (
 	. "github.com/cloudfoundry/cli/cf/api/resources"
 
+	"encoding/json"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -41,14 +42,14 @@ var _ = Describe("Quotas", func() {
 
 				It("returns back the value", func() {
 					fields := resource.ToFields()
-					Expect(fields.ReservedRoutePorts).To(Equal(5))
+					Expect(fields.ReservedRoutePorts).To(Equal(json.Number("5")))
 				})
 			})
 
 			Context("when it is *not* provided by the API", func() {
-				It("should equal 0", func() {
+				It("should be empty", func() {
 					fields := resource.ToFields()
-					Expect(fields.ReservedRoutePorts).To(Equal(0))
+					Expect(fields.ReservedRoutePorts).To(BeEmpty())
 				})
 			})
 		})
