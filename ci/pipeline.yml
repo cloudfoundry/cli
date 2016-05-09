@@ -194,30 +194,31 @@ jobs:
       params:
         release: bosh-lite-lock
 
-- name: cats-windows
+- name: cats-linux
   serial: true
   plan:
   - aggregate:
-    - get: cf-cli-binaries
-      trigger: true
-      passed: [gats-windows]
     - get: final-cli
-      passed: [gats-windows]
+      passed: [build-binaries]
     - get: cli
-      passed: [gats-windows]
+      passed: [build-binaries]
+    - get: cli
+    - get: cli
     - get: cf-release-repo
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
+    - get: cli
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [build-binaries]
     - get: cli-ci
     - put: bosh-lite-lock
       params:
         acquire: true
-  - task: cats
-    file: cli-ci/ci/tasks/cats-windows.yml
-    params:
-      ADMIN_USER: {{bosh-lite-admin-username}}
-      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+  - aggregate:
+    - task: cats-dea
+      file: cli-ci/ci/tasks/cats-linux.yml
     ensure:
       put: bosh-lite-lock
       params:
@@ -249,31 +250,30 @@ jobs:
       params:
         release: bosh-lite-lock
 
-- name: cats-linux
+- name: cats-windows
   serial: true
   plan:
   - aggregate:
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [build-binaries]
     - get: final-cli
-      passed: [gats-linux]
+      passed: [build-binaries]
     - get: cli
-      passed: [gats-linux]
-    - get: cli
-    - get: cli
+      passed: [build-binaries]
     - get: cf-release-repo
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
-    - get: cli
-    - get: cf-cli-binaries
-      trigger: true
-      passed: [gats-linux]
     - get: cli-ci
     - put: bosh-lite-lock
       params:
         acquire: true
-  - aggregate:
-    - task: cats-dea
-      file: cli-ci/ci/tasks/cats-linux.yml
+  - task: cats
+    file: cli-ci/ci/tasks/cats-windows.yml
+    params:
+      ADMIN_USER: {{bosh-lite-admin-username}}
+      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -284,12 +284,12 @@ jobs:
   plan:
   - aggregate:
     - get: final-cli
-      passed: [cats-linux, cats-windows]
+      passed: [cats-linux, cats-windows, gats-linux, gats-windows]
     - get: cli
-      passed: [cats-linux, cats-windows]
+      passed: [cats-linux, cats-windows, gats-linux, gats-windows]
     - get: cf-cli-binaries
       trigger: true
-      passed: [cats-linux, cats-windows]
+      passed: [cats-linux, cats-windows, gats-linux, gats-windows]
     - get: cli-private
     - get: cli-ci
   - aggregate:
