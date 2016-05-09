@@ -4820,10 +4820,6 @@
     "translation": "piani a pagamento"
   },
   {
-    "id": "paid service plans",
-    "translation": "piani di servizio a pagamento"
-  },
-  {
     "id": "paid services {{.NonBasicServicesAllowed}}",
     "translation": "servizi a pagamento {{.NonBasicServicesAllowed}}"
   },

@@ -127,7 +127,7 @@ var _ = Describe("quotas command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting space quotas as", "my-user"},
 					[]string{"OK"},
-					[]string{"name", "total memory limit", "instance memory limit", "routes", "service instances", "paid service plans", "app instance limit"},
+					[]string{"name", "total memory", "instance memory", "routes", "service instances", "paid plans", "app instances"},
 					[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "7"},
 					[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "1"},
 					[]string{"quota-app-instances", "434M", "512M", "1", "2", "disallowed", "unlimited"},
@@ -178,7 +178,7 @@ var _ = Describe("quotas command", func() {
 				It("should not contain app instance limit column", func() {
 					Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"app instance limit"},
+						[]string{"app instances"},
 						[]string{"unlimited"},
 					))
 				})

@@ -4820,10 +4820,6 @@
     "translation": "已付费服务套餐"
   },
   {
-    "id": "paid service plans",
-    "translation": "已付费服务套餐"
-  },
-  {
     "id": "paid services {{.NonBasicServicesAllowed}}",
     "translation": "已付费服务 {{.NonBasicServicesAllowed}}"
   },
