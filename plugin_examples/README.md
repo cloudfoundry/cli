@@ -1,3 +1,6 @@
+# Changes in v6.17.0
+- `-v` is now a global flag to enable verbose logging of API calls, equivalent to `CF_TRACE=true`. This means that the `-v` flag will no longer be passed to plugins.
+
 # Changes in v6.14.0
 - API `AccessToken()` now provides a refreshed o-auth token.
 - [Examples](https://github.com/cloudfoundry/cli/tree/master/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
@@ -5,9 +8,9 @@
 - Fix bug where some CLI versions does not respect `PluginMetadata.MinCliVersion`.
 - The field `PackageUpdatedAt` returned by `GetApp()` API is now populated.
 
-[Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md) 
+[Complete change log ...](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/CHANGELOG.md)
 
-# Developing a Plugin 
+# Developing a Plugin
 [Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
 This README discusses how to develop a cf CLI plugin.
@@ -49,24 +52,22 @@ Here is an illustration of the workflow when a plugin command is being invoked.
 
 [Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
-To write a plugin for the cf CLI, implement the 
-[predefined plugin interface](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin.go).
+To write a plugin for the cf CLI, implement the [predefined plugin interface](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin.go).
 
-The interface uses a `Run(...)` method as the main entry point between the CLI 
-and a plugin. This method receives the following arguments:
+The interface uses a `Run(...)` method as the main entry point between the CLI and a plugin. This method receives the following arguments:
 
   - A struct `plugin.CliConnection` that contains methods for invoking cf CLI commands
   - A string array that contains the arguments passed from the `cf` process
 
-The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), minimum Cli version required (optional), the commands it implements, and help text for each command that users can display 
-with `cf help`.
+The `GetMetadata()` function informs the CLI of the name of a plugin, plugin version (optional), minimum Cli version required (optional), the commands it implements, and help text for each command that users can display with `cf help`.
 
   To initialize a plugin, call `plugin.Start(new(MyPluginStruct))` from within the `main()` method of your plugin. The `plugin.Start(...)` function requires a new reference to the struct that implements the defined interface.
 
-***Note*** Uninstall of the plugin needs to be explicitly handled. When a user calls the `cf uninstall-plugin` command, CLI notifies the plugin via a call with 'CLI-MESSAGE-UNINSTALL' as the first item in `[]args` from within the plugin's `Run(...)` method.
-
 This repo contains a basic plugin example [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/basic_plugin.go).<br>
 To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/).
+
+### Uninstalling A Plugin
+Uninstall of the plugin needs to be explicitly handled. When a user calls the `cf uninstall-plugin` command, CLI notifies the plugin via a call with `CLI-MESSAGE-UNINSTALL` as the first item in `[]args` from within the plugin's `Run(...)` method.
 
 ### Test Driven Development (TDD)
 2 libraries are available for TDD
@@ -75,26 +76,26 @@ To see more examples, go [here](https://github.com/cloudfoundry/cli/blob/master/
 
 ### Using Command Line Arguments
 
-The `Run(...)` method accepts the command line arguments and flags that you 
-define for a plugin. 
+The `Run(...)` method accepts the command line arguments and flags that you define for a plugin.
 
   See the [command line arguments example] (https://github.com/cloudfoundry/cli/blob/master/plugin_examples/echo.go) included in this repo.
 
+#### Global Flags
+There are several global flags that will not be passed to the plugin. These are:
+- `-v`: equivalent to `CF_TRACE=true`, will display any API calls/responses to the user
+- `-h`: will call `help` on your command
+
 ### Calling CLI Commands
 
-You can invoke CLI commands with `cliConnection.CliCommand([]args)` from
- within a plugin's `Run(...)` method. The `Run(...)` method receives the 
-`cliConnection` as its first argument.
+You can invoke CLI commands with `cliConnection.CliCommand([]args)` from within a plugin's `Run(...)` method. The `Run(...)` method receives the `cliConnection` as its first argument.
 
-The `cliConnection.CliCommand([]args)` returns the output printed by the command and an error. The output is returned as a slice of strings. The error 
-will be present if the call to the CLI command fails.
+The `cliConnection.CliCommand([]args)` returns the output printed by the command and an error. The output is returned as a slice of strings. The error will be present if the call to the CLI command fails.
 
 See the [calling CLI commands example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/call_cli_cmd/main/call_cli_cmd.go) included in this repo.
 
 ### Creating Interactive Plugins
 
-Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/interactive.go)
- included in this repo. 
+Because a plugin has access to stdin during a call to the `Run(...)` method, you can create interactive plugins. See the [interactive plugin example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/interactive.go) included in this repo.
 
 ### Creating Plugins with multiple commands
 
@@ -117,8 +118,7 @@ func (c *cmd) GetMetadata() plugin.PluginMetadata {
 
 ## Compiling Plugin Source Code
 
-The cf CLI requires an executable file to install the plugin. You must compile the source code with the `go build` command before distributing the plugin, or instruct your users to compile the plugin source code before 
-installing the plugin. For information about compiling Go source code, see [Compile packages and dependencies](https://golang.org/cmd/go/).  
+The cf CLI requires an executable file to install the plugin. You must compile the source code with the `go build` command before distributing the plugin, or instruct your users to compile the plugin source code before installing the plugin. For information about compiling Go source code, see [Compile packages and dependencies](https://golang.org/cmd/go/).
 
 ## Using Plugins
 
