@@ -4820,10 +4820,6 @@
     "translation": "plans de service payants"
   },
   {
-    "id": "paid service plans",
-    "translation": "plans de service payants "
-  },
-  {
     "id": "paid services {{.NonBasicServicesAllowed}}",
     "translation": "services payants {{.NonBasicServicesAllowed}}"
   },

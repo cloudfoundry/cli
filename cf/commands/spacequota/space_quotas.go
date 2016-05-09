@@ -73,12 +73,12 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{
 		T("name"),
-		T("total memory limit"),
-		T("instance memory limit"),
+		T("total memory"),
+		T("instance memory"),
 		T("routes"),
 		T("service instances"),
-		T("paid service plans"),
-		T("app instance limit"),
+		T("paid plans"),
+		T("app instances"),
 	})
 
 	var megabytes string

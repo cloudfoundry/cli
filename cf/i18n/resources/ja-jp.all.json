@@ -4820,10 +4820,6 @@
     "translation": "有料プラン"
   },
   {
-    "id": "paid service plans",
-    "translation": "有料サービス・プラン"
-  },
-  {
     "id": "paid services {{.NonBasicServicesAllowed}}",
     "translation": "有料サービス {{.NonBasicServicesAllowed}}"
   },
