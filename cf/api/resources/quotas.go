@@ -20,14 +20,6 @@ func (resource QuotaResource) ToFields() models.QuotaFields {
 		}
 	}
 
-	var reservedRoutePorts int
-	if resource.Entity.ReservedRoutePorts != "" {
-		i, err := resource.Entity.ReservedRoutePorts.Int64()
-		if err == nil {
-			reservedRoutePorts = int(i)
-		}
-	}
-
 	return models.QuotaFields{
 		GUID:                    resource.Metadata.GUID,
 		Name:                    resource.Entity.Name,
@@ -37,6 +29,6 @@ func (resource QuotaResource) ToFields() models.QuotaFields {
 		ServicesLimit:           resource.Entity.ServicesLimit,
 		NonBasicServicesAllowed: resource.Entity.NonBasicServicesAllowed,
 		AppInstanceLimit:        appInstanceLimit,
-		ReservedRoutePorts:      reservedRoutePorts,
+		ReservedRoutePorts:      resource.Entity.ReservedRoutePorts,
 	}
 }

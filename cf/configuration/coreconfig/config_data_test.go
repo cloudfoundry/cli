@@ -1,8 +1,6 @@
 package coreconfig_test
 
 import (
-	"regexp"
-
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -34,8 +32,7 @@ var _ = Describe("V3 Config files", func() {
 				"total_routes":0,
 				"total_services":0,
 				"non_basic_services_allowed": false,
-				"app_instance_limit":0,
-				"total_reserved_route_ports":0
+				"app_instance_limit":0
 			}
 		},
 		"SpaceFields": {
@@ -143,10 +140,7 @@ var _ = Describe("V3 Config files", func() {
 			jsonData, err := data.JSONMarshalV3()
 			Expect(err).NotTo(HaveOccurred())
 
-			re := regexp.MustCompile(`\s+`)
-			actual := re.ReplaceAll(jsonData, []byte{})
-			expected := re.ReplaceAll([]byte(exampleV3JSON), []byte{})
-			Expect(actual).To(Equal(expected))
+			Expect(jsonData).To(MatchJSON(exampleV3JSON))
 		})
 	})
 

@@ -83,8 +83,8 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 		appInstanceLimit = T("unlimited")
 	}
 
-	reservedRoutePorts := strconv.Itoa(quota.ReservedRoutePorts)
-	if quota.ReservedRoutePorts == resources.UnlimitedReservedRoutePorts {
+	reservedRoutePorts := string(quota.ReservedRoutePorts)
+	if reservedRoutePorts == resources.UnlimitedReservedRoutePorts {
 		reservedRoutePorts = T("unlimited")
 	}
 
@@ -95,6 +95,8 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 	table.Add(T("Services"), servicesLimit)
 	table.Add(T("Paid service plans"), formatters.Allowed(quota.NonBasicServicesAllowed))
 	table.Add(T("App instance limit"), appInstanceLimit)
-	table.Add(T("Reserved Route Ports"), reservedRoutePorts)
+	if reservedRoutePorts != "" {
+		table.Add(T("Reserved Route Ports"), reservedRoutePorts)
+	}
 	table.Print()
 }

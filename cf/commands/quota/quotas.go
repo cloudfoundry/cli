@@ -100,8 +100,8 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 			appInstanceLimit = T("unlimited")
 		}
 
-		reservedRoutePorts := strconv.Itoa(quota.ReservedRoutePorts)
-		if quota.ReservedRoutePorts == resources.UnlimitedReservedRoutePorts {
+		reservedRoutePorts := string(quota.ReservedRoutePorts)
+		if reservedRoutePorts == resources.UnlimitedReservedRoutePorts {
 			reservedRoutePorts = T("unlimited")
 		}
 

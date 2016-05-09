@@ -85,7 +85,7 @@ var _ = Describe("quotas command", func() {
 					ServicesLimit:           222,
 					NonBasicServicesAllowed: true,
 					AppInstanceLimit:        -1,
-					ReservedRoutePorts:      4,
+					ReservedRoutePorts:      "4",
 				},
 				{
 					Name:                    "quota-non-basic-not-allowed",
@@ -95,7 +95,7 @@ var _ = Describe("quotas command", func() {
 					ServicesLimit:           2,
 					NonBasicServicesAllowed: false,
 					AppInstanceLimit:        10,
-					ReservedRoutePorts:      4,
+					ReservedRoutePorts:      "4",
 				},
 			}, nil)
 		})
@@ -153,7 +153,7 @@ var _ = Describe("quotas command", func() {
 					ServicesLimit:           7,
 					NonBasicServicesAllowed: false,
 					AppInstanceLimit:        7,
-					ReservedRoutePorts:      -1,
+					ReservedRoutePorts:      "-1",
 				},
 			}, nil)
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
