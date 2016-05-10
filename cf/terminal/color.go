@@ -140,5 +140,5 @@ func LogSysHeaderColor(message string) string {
 }
 
 func isTerminal() bool {
-	return terminal.IsTerminal(1)
+	return terminal.IsTerminal(int(os.Stdout.Fd()))
 }
