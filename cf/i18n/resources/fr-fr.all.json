@@ -4817,7 +4817,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "plans de service payants"
+    "translation": "plans payants"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
