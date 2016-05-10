@@ -235,7 +235,6 @@ jobs:
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
-    - get: cli
     - get: cf-cli-binaries
       trigger: true
       passed: [build-binaries]
