@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+
+set -ex
+
 component=$1
 
-version=$(cat VERSION)
-major=$(echo $version | cut -d'.' -f 1)
-minor=$(echo $version | cut -d'.' -f 2)
-patch=$(echo $version | cut -d'.' -f 3)
+old_version=$(cat VERSION)
+major=$(echo $old_version | cut -d'.' -f 1)
+minor=$(echo $old_version | cut -d'.' -f 2)
+patch=$(echo $old_version | cut -d'.' -f 3)
 
 case "$component" in
   major )
@@ -35,9 +39,13 @@ echo $version > VERSION
 echo "Committing change"
 git reset .
 git add VERSION
+
 git commit -m "Bump version to $version"
 
 echo "Creating v$version tag"
 git tag v$version
+
+$ROOT_DIR/bin/generate-changelog $old_version $version
+$ROOT_DIR/bin/commit-version-bump
 
 echo -e "All Done! You should go update \033[0;37;41mThe CLAW\033[m"
