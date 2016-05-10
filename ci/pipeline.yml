@@ -125,6 +125,7 @@ groups:
   - gats-linux
   - gats-windows
   - cats-linux
+  - cats-linux-diego
   - cats-windows
   - create-installers
   - publish-edge-archives
@@ -202,8 +203,6 @@ jobs:
       passed: [build-binaries]
     - get: cli
       passed: [build-binaries]
-    - get: cli
-    - get: cli
     - get: cf-release-repo
       params:
         submodules:
@@ -219,6 +218,34 @@ jobs:
   - aggregate:
     - task: cats-dea
       file: cli-ci/ci/tasks/cats-linux.yml
+    ensure:
+      put: bosh-lite-lock
+      params:
+        release: bosh-lite-lock
+
+- name: cats-linux-diego
+  serial: true
+  plan:
+  - aggregate:
+    - get: final-cli
+      passed: [build-binaries]
+    - get: cli
+      passed: [build-binaries]
+    - get: cf-release-repo
+      params:
+        submodules:
+        - src/github.com/cloudfoundry/cf-acceptance-tests
+    - get: cli
+    - get: cf-cli-binaries
+      trigger: true
+      passed: [build-binaries]
+    - get: cli-ci
+    - put: bosh-lite-lock
+      params:
+        acquire: true
+  - aggregate:
+    - task: cats-diego
+      file: cli-ci/ci/tasks/cats-linux-diego.yml
     ensure:
       put: bosh-lite-lock
       params:
