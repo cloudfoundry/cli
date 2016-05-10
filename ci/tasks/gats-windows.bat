@@ -21,4 +21,4 @@ popd
 go get -v github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-ginkgo.exe -r -slowSpecThreshold=120 ./gats
+ginkgo.exe -r -p -nodes=4 -slowSpecThreshold=120 ./gats
