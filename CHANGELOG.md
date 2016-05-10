@@ -1,3 +1,66 @@
+## 6.18.0
+* Bump version to 6.18.0
+* Aggregate gats-linux + gats-windows into gats
+* Run GATS in parallel
+* Default windows to use colors
+* Add cats-windows-diego job
+* once, only once
+* Run new cats-linux-diego job
+* stop lying about the help
+* Readme documents plugins not being passed the -p/-h flags
+* Parallelize gats and cats
+* Remove default from -a help in `cf update-space-quota`
+* Shorten header names of `cf space-quotas`
+* Hide ReservedRoutePorts for quota if not in API call
+* run with two nodes, so half the time?
+* Shorten header names for `cf quota`
+* Make plugin uninstall description more prominent
+* Ratcheting is somehow failing on CI
+* Fix some lintdebt
+* Update lintdebt
+* Check for gofmt in pre-commit hook
+* Add ratcheting to our pre-commit hook
+* Update ratchet command output
+* Automate ratcheting during bin/test
+* Add bootstrap script and generic pre-commit hook
+* Update lint ratchet
+* Remove defaults for flags on update quota
+* Add route ports column to quotas table
+* Oops, it was complaining about not being a pointer
+* Fix linter error
+* Fix flaky test
+* Eliminate RunCliCommand in help_test
+* Limit OS specific Writers to main
+* Inject OS specific writer
+* Support reserved route ports flag on cf quota
+* small things are better
+* Add minor support for a team custom linter
+* updated link to http://docs.cloudfoundry.org/cf-cli/use-cli-plugins.html
+* add reserved route ports line to cf quota table
+* Implement reserved route ports flag on route quota
+* Add requirement for the new flag.
+* Move flag and function tests to when user is logged in
+* Add reserved-route-ports flag help messages to update quota
+* export UpdateQuota to backfill help message tests
+* Add required arg for --reserved-route-ports help message
+* Update interface to use new type
+* Convert role const to Role type
+* Fill in --reserved-route-ports functionality for create-quota
+* Add minimum API requirement for --reserved-route-ports
+* Backfill requirements tests to CreateQuota
+* Add flag & help text for --reserved-route-ports
+* Backfill command help text tests
+* adding verbose version for windows too
+* Adding a verbose-debugging pipeline for gats
+* Use official routing release instead of building ourselves
+* Force all jobs to occur on non-check-worker.
+* Return to Loggregator team's NOAA library
+* Simplify color logic
+* Fix display of tcp routes in delete-orphaned-routes
+* Use https to fetch from final-cli repo instead
+* Fetch tags for publish-final-release
+* Login first, it helps!
+
 ## 6.17.1
 * Bump version to 6.17.1
 * Set the deployment prior to running smoketest
