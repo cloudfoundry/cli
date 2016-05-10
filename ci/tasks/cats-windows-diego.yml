@@ -1,0 +1,16 @@
+---
+platform: windows
+
+params:
+  ADMIN_USER:
+  ADMIN_PASSWORD:
+
+inputs:
+- name: cf-release-repo
+- name: cf-cli-binaries
+- name: bosh-lite-lock
+- name: cli
+- name: cli-ci
+
+run:
+  path: cli-ci/ci/tasks/cats-windows-diego.bat
