@@ -122,8 +122,7 @@ groups:
   jobs:
   - units
   - build-binaries
-  - gats-linux
-  - gats-windows
+  - gats
   - cats-linux
   - cats-linux-diego
   - cats-windows
@@ -173,7 +172,7 @@ jobs:
     params:
       file: compiled/cf-cli-binaries.tgz
 
-- name: gats-linux
+- name: gats
   serial: true
   plan:
   - aggregate:
@@ -189,8 +188,14 @@ jobs:
     - put: bosh-lite-lock
       params:
         acquire: true
-  - task: gats
-    file: cli-ci/ci/tasks/gats-linux.yml
+  - aggregate:
+    - task: linux
+      file: cli-ci/ci/tasks/gats-linux.yml
+    - task: windows
+      file: cli-ci/ci/tasks/gats-windows.yml
+      params:
+        ADMIN_USER: {{bosh-lite-admin-username}}
+        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -208,7 +213,6 @@ jobs:
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
-    - get: cli
     - get: cf-cli-binaries
       trigger: true
       passed: [build-binaries]
@@ -246,32 +250,6 @@ jobs:
   - aggregate:
     - task: cats-diego
       file: cli-ci/ci/tasks/cats-linux-diego.yml
-    ensure:
-      put: bosh-lite-lock
-      params:
-        release: bosh-lite-lock
-
-- name: gats-windows
-  serial: true
-  plan:
-  - aggregate:
-    - get: cf-cli-binaries
-      trigger: true
-      passed: [build-binaries]
-    - get: final-cli
-      passed: [build-binaries]
-    - get: cli
-      passed: [build-binaries]
-    - get: cli-acceptance-tests
-    - get: cli-ci
-    - put: bosh-lite-lock
-      params:
-        acquire: true
-  - task: gats
-    file: cli-ci/ci/tasks/gats-windows.yml
-    params:
-      ADMIN_USER: {{bosh-lite-admin-username}}
-      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
       put: bosh-lite-lock
       params:
@@ -340,12 +318,12 @@ jobs:
   plan:
   - aggregate:
     - get: final-cli
-      passed: [cats-linux, cats-windows, gats-linux, gats-windows]
+      passed: [cats-linux, cats-windows, gats]
     - get: cli
-      passed: [cats-linux, cats-windows, gats-linux, gats-windows]
+      passed: [cats-linux, cats-windows, gats]
     - get: cf-cli-binaries
       trigger: true
-      passed: [cats-linux, cats-windows, gats-linux, gats-windows]
+      passed: [cats-linux, cats-windows, gats]
     - get: cli-private
     - get: cli-ci
   - aggregate:
