@@ -409,7 +409,7 @@
   },
   {
     "id": "Bind cancelled",
-    "translation": ""
+    "translation": "バインドがキャンセルされました"
   },
   {
     "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
@@ -1289,7 +1289,7 @@
   },
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
+    "translation": "{{.Username}} として経路 {{.URL}} を組織 {{.OrgName}} / スペース {{.SpaceName}} 内に作成しています..."
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -1305,7 +1305,7 @@
   },
   {
     "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
-    "translation": ""
+    "translation": "{{.Username}} としてサービス・ブローカー {{.Name}} を組織 {{.Org}} / スペース {{.Space}} 内に作成しています..."
   },
   {
     "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -2425,11 +2425,11 @@
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
-    "translation": ""
+    "translation": "誤った使用法。引数として DOMAIN、SERVICE_INSTANCE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
-    "translation": ""
+    "translation": "誤った使用法。DOMAIN が引数として必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
@@ -2453,7 +2453,7 @@
   },
   {
     "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
-    "translation": ""
+    "translation": "誤った使用法。引数として REPO_NAME、URL が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
