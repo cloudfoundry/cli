@@ -34,7 +34,7 @@ var _ = Describe("Organization Repository", func() {
 				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/organizations"),
+						ghttp.VerifyRequest("GET", "/v2/organizations", "order-by=name"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -42,15 +42,15 @@ var _ = Describe("Organization Repository", func() {
 						"total_results": 3,
 						"total_pages": 2,
 						"prev_url": null,
-						"next_url": "/v2/organizations?page=2",
+						"next_url": "/v2/organizations?order-by=name&page=2",
 						"resources": [
 							{
-								"metadata": { "guid": "org1-guid" },
-								"entity": { "name": "Org1" }
+								"metadata": { "guid": "org3-guid" },
+								"entity": { "name": "Alpha" }
 							},
 							{
 								"metadata": { "guid": "org2-guid" },
-								"entity": { "name": "Org2" }
+								"entity": { "name": "Beta" }
 							}
 						]
 					}`),
@@ -59,7 +59,7 @@ var _ = Describe("Organization Repository", func() {
 
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/organizations"),
+						ghttp.VerifyRequest("GET", "/v2/organizations", "order-by=name&page=2"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -70,8 +70,8 @@ var _ = Describe("Organization Repository", func() {
 						"next_url": null,
 						"resources": [
 							{
-								"metadata": { "guid": "org3-guid" },
-								"entity": { "name": "Org3" }
+								"metadata": { "guid": "org1-guid" },
+								"entity": { "name": "Gamma" }
 							}
 						]
 					}`),
@@ -104,13 +104,17 @@ var _ = Describe("Organization Repository", func() {
 					Expect(len(orgs)).To(Equal(3))
 				})
 
-				It("lists the orgs from the the /v2/orgs endpoint", func() {
+				It("lists the orgs from the the /v2/orgs endpoint in alphabetical order", func() {
 					orgs, apiErr := repo.ListOrgs(0)
 
 					Expect(len(orgs)).To(Equal(3))
-					Expect(orgs[0].GUID).To(Equal("org1-guid"))
+					Expect(orgs[0].GUID).To(Equal("org3-guid"))
 					Expect(orgs[1].GUID).To(Equal("org2-guid"))
-					Expect(orgs[2].GUID).To(Equal("org3-guid"))
+					Expect(orgs[2].GUID).To(Equal("org1-guid"))
+
+					Expect(orgs[0].Name).To(Equal("Alpha"))
+					Expect(orgs[1].Name).To(Equal("Beta"))
+					Expect(orgs[2].Name).To(Equal("Gamma"))
 					Expect(apiErr).NotTo(HaveOccurred())
 				})
 			})
