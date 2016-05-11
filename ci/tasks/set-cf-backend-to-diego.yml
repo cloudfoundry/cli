@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-image: docker:///cloudfoundry/cli-ci
+image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
   LITE_PRIVATE_IP_ADDRESS:
