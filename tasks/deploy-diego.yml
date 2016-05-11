@@ -28,15 +28,19 @@ run:
     bosh upload release garden-linux-release/release.tgz --skip-if-exists
     bosh upload release diego-release/release.tgz --skip-if-exists
 
-    mkdir -p cf-warden
-    export CF_MANIFESTS_DIR=$PWD/cf-warden
-    bosh download manifest cf-warden $CF_MANIFESTS_DIR/cf.yml
-
     pushd diego-repo
-      ./scripts/generate-bosh-lite-manifests
+      bosh download manifest cf-warden cf.yml
+
+      scripts/generate-deployment-manifest \
+          -c cf.yml \
+          -i manifest-generation/bosh-lite-stubs/iaas-settings.yml \
+          -p manifest-generation/bosh-lite-stubs/property-overrides.yml \
+          -n manifest-generation/bosh-lite-stubs/instance-count-overrides.yml \
+          -v manifest-generation/bosh-lite-stubs/release-versions.yml \
+          > diego.yml
     popd
 
-    bosh deployment diego-repo/bosh-lite/deployments/diego.yml
+    bosh deployment diego-repo/diego.yml
     bosh -n deploy
 
     export DOMAIN=`cat cli-pools/name`
