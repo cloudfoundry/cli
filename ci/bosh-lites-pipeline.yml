@@ -44,6 +44,16 @@ resources:
     uri: https://github.com/cloudfoundry/cf-release.git
     branch: master
 
+- name: bosh-lite-stemcell
+  type: bosh-io-stemcell
+  source:
+    name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+
+- name: cf-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/cf-release
+
 - name: etcd-release
   type: bosh-io-release
   source:
@@ -81,6 +91,38 @@ resources:
     uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
     branch: release-candidate
 
+- name: bosh-lite-1-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-1-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+- name: bosh-lite-2-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-2-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+- name: bosh-lite-3-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-3-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+- name: bosh-lite-4-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-4-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
 jobs:
 - name: deploy-boshlite-1
   serial: true
@@ -90,11 +132,12 @@ jobs:
       claim: {{lite-1-hostname}}
   - do:
     - aggregate:
-      - get: cli-private
-      - get: cf-release
-        resource: cf-release-repo
       - get: bosh-lite
+      - get: bosh-lite-stemcell
+      - get: cf-release
+      - get: cf-release-repo
       - get: cli
+      - get: cli-private
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -115,6 +158,13 @@ jobs:
         LITE_NAME: {{lite-1-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
+    - put: bosh-lite-1-deploy-cf
+      params:
+        manifest: provision-cf-lite/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
@@ -138,8 +188,6 @@ jobs:
       - get: garden-linux-release
       - get: diego-release
       - get: diego-repo
-      - get: cf-release
-        resource: cf-release-repo
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
@@ -187,11 +235,12 @@ jobs:
       claim: {{lite-2-hostname}}
   - do:
     - aggregate:
-      - get: cli-private
-      - get: cf-release
-        resource: cf-release-repo
       - get: bosh-lite
+      - get: bosh-lite-stemcell
+      - get: cf-release
+      - get: cf-release-repo
       - get: cli
+      - get: cli-private
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -212,6 +261,13 @@ jobs:
         LITE_NAME: {{lite-2-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
+    - put: bosh-lite-2-deploy-cf
+      params:
+        manifest: provision-cf-lite/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
@@ -235,8 +291,6 @@ jobs:
       - get: garden-linux-release
       - get: diego-release
       - get: diego-repo
-      - get: cf-release
-        resource: cf-release-repo
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
@@ -285,11 +339,12 @@ jobs:
       claim: {{lite-3-hostname}}
   - do:
     - aggregate:
-      - get: cli-private
-      - get: cf-release
-        resource: cf-release-repo
       - get: bosh-lite
+      - get: bosh-lite-stemcell
+      - get: cf-release
+      - get: cf-release-repo
       - get: cli
+      - get: cli-private
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -310,6 +365,13 @@ jobs:
         LITE_NAME: {{lite-3-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
+    - put: bosh-lite-3-deploy-cf
+      params:
+        manifest: provision-cf-lite/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
@@ -333,8 +395,6 @@ jobs:
       - get: garden-linux-release
       - get: diego-release
       - get: diego-repo
-      - get: cf-release
-        resource: cf-release-repo
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
@@ -382,11 +442,12 @@ jobs:
       claim: {{lite-4-hostname}}
   - do:
     - aggregate:
-      - get: cli-private
-      - get: cf-release
-        resource: cf-release-repo
       - get: bosh-lite
+      - get: bosh-lite-stemcell
+      - get: cf-release
+      - get: cf-release-repo
       - get: cli
+      - get: cli-private
     - task: destroy
       file: cli/ci/tasks/destroy-cf-lite.yml
       params:
@@ -407,6 +468,13 @@ jobs:
         LITE_NAME: {{lite-4-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
         LITE_HOSTNAME: {{lite-4-hostname}}
+    - put: bosh-lite-4-deploy-cf
+      params:
+        manifest: provision-cf-lite/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     - task: run-smoke-tests
       file: cli/ci/tasks/run-smoke-tests.yml
       params:
@@ -430,8 +498,6 @@ jobs:
       - get: garden-linux-release
       - get: diego-release
       - get: diego-repo
-      - get: cf-release
-        resource: cf-release-repo
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
