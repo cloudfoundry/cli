@@ -17,7 +17,10 @@ params:
 inputs:
   - name: cli-private
   - name: bosh-lite
-  - name: cf-release
+  - name: cf-release-repo
+
+outputs:
+  - name: provision-cf-lite
 
 run:
   path: bash
@@ -39,18 +42,25 @@ run:
     mkdir scratch
 
     pushd scratch
-      cat > property-overrides.yml << EOF
-    properties:
-      domain: ${LITE_HOSTNAME}
-    EOF
-
       vagrant init cloudfoundry/bosh-lite
 
       sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.instance_type = 'm3.2xlarge'\n    aws.private_ip_address = '${LITE_PRIVATE_IP_ADDRESS}'\n  end/" \
         Vagrantfile
 
       vagrant up --provider aws
-
-      $BOSH_LITE_ROOT/bin/provision_cf $SCRATCH_ROOT/property-overrides.yml
     popd
 
+    pushd cf-release-repo
+      cat > property-overrides.yml << EOF
+      properties:
+        domain: ${LITE_HOSTNAME}
+      EOF
+
+      echo "Updating cf-release sub modules"
+      ./scripts/update > /dev/null
+      echo "Generating bosh lite manifest from cf-release-repo/scripts/generate-bosh-lite-dev-manifest"
+      ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
+    popd
+
+    mkdir -p provision-cf-lite
+    cp cf-release-repo/bosh-lite/deployments/cf.yml provision-cf-lite
