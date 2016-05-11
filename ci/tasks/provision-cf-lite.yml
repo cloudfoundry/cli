@@ -56,6 +56,8 @@ run:
       domain: ${LITE_HOSTNAME}
     EOF
 
+      sleep 10
+
       bosh target $LITE_PRIVATE_IP_ADDRESS
       bosh login admin admin
 
