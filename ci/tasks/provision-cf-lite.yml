@@ -51,19 +51,19 @@ run:
     popd
 
     pushd cf-release-repo
-      cat > property-overrides.yml << EOF
-    properties:
-      domain: ${LITE_HOSTNAME}
-    EOF
-
-      sleep 20
+      sleep 10
 
       bosh -n target $LITE_PRIVATE_IP_ADDRESS
       bosh -n login admin admin
 
       echo "Updating cf-release sub modules"
       ./scripts/update > /dev/null
+
       echo "Generating bosh lite manifest from cf-release-repo/scripts/generate-bosh-lite-dev-manifest"
+      cat > property-overrides.yml << EOF
+    properties:
+      domain: ${LITE_HOSTNAME}
+    EOF
       ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
     popd
 
