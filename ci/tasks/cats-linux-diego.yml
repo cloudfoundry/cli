@@ -5,7 +5,7 @@ image: docker:///cloudfoundry/cli-ci
 inputs:
 - name: cf-release-repo
 - name: cf-cli-binaries
-- name: bosh-lite-lock
+- name: cli-pools
 
 run:
   path: bash
@@ -14,7 +14,7 @@ run:
   - |
     set -ex
 
-    export DOMAIN=`cat bosh-lite-lock/name`
+    export DOMAIN=`cat cli-pools/name`
 
     export ADMIN_USER=admin
     export ADMIN_PASSWORD=admin
