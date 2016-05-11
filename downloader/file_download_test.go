@@ -82,13 +82,13 @@ var _ = Describe("Downloader", func() {
 					ghttp.CombineHandlers(
 						ghttp.VerifyRequest("GET", "/abc.zip"),
 						ghttp.RespondWith(http.StatusOK, "abc123", http.Header{
-							"Content-Disposition": []string{"attachment;filename=header.zip"},
+							"Content-Disposition": []string{"attachment; filename=header.zip"},
 						}),
 					),
 				)
 			})
 
-			It("downloads the file named in the header to the provided dir", func() {
+			It("downloads the file named in the header to the provided dir, and trims spaces appropriately", func() {
 				_, _, err := d.DownloadFile(server.URL() + "/abc.zip")
 				Expect(err).NotTo(HaveOccurred())
 
