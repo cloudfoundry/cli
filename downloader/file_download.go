@@ -51,10 +51,10 @@ func (d *downloader) DownloadFile(url string) (int64, string, error) {
 	defer r.Body.Close()
 
 	if r.StatusCode == 200 {
-		d.filename = get_filename_from_header(r.Header.Get("Content-Disposition"))
+		d.filename = getFilenameFromHeader(r.Header.Get("Content-Disposition"))
 
 		if d.filename == "" {
-			d.filename = get_filename_from_url(url)
+			d.filename = getFilenameFromURL(url)
 		}
 
 		f, err := os.Create(filepath.Join(d.saveDir, d.filename))
@@ -84,7 +84,7 @@ func (d *downloader) RemoveFile() error {
 	return os.Remove(filepath.Join(d.saveDir, d.filename))
 }
 
-func get_filename_from_header(h string) string {
+func getFilenameFromHeader(h string) string {
 	if h == "" {
 		return ""
 	}
@@ -92,6 +92,7 @@ func get_filename_from_header(h string) string {
 	contents := strings.Split(h, ";")
 	for _, content := range contents {
 		if strings.Contains(content, "filename=") {
+			content = strings.TrimSpace(content)
 			name := strings.TrimLeft(content, "filename=")
 			return strings.Trim(name, `"`)
 		}
@@ -100,7 +101,7 @@ func get_filename_from_header(h string) string {
 	return ""
 }
 
-func get_filename_from_url(url string) string {
+func getFilenameFromURL(url string) string {
 	tmp := strings.Split(url, "/")
 	token := tmp[len(tmp)-1]
 
