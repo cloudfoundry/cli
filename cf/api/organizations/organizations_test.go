@@ -19,86 +19,26 @@ import (
 )
 
 var _ = Describe("Organization Repository", func() {
-	Describe("listing organizations", func() {
-		It("lists the orgs from the the /v2/orgs endpoint", func() {
-			firstPageOrgsRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/organizations",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
-	"next_url": "/v2/organizations?page=2",
-	"resources": [
-		{
-		  "metadata": { "guid": "org1-guid" },
-		  "entity": { "name": "Org1" }
-		},
-		{
-		  "metadata": { "guid": "org2-guid" },
-		  "entity": { "name": "Org2" }
-		}
-	]}`},
-			})
-
-			secondPageOrgsRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/organizations?page=2",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-		{
-		  "metadata": { "guid": "org3-guid" },
-		  "entity": { "name": "Org3" }
-		}
-	]}`},
-			})
-
-			testserver, handler, repo := createOrganizationRepo(firstPageOrgsRequest, secondPageOrgsRequest)
-			defer testserver.Close()
-
-			orgs := []models.Organization{}
-			orgs, apiErr := repo.ListOrgs(0)
-
-			Expect(len(orgs)).To(Equal(3))
-			Expect(orgs[0].GUID).To(Equal("org1-guid"))
-			Expect(orgs[1].GUID).To(Equal("org2-guid"))
-			Expect(orgs[2].GUID).To(Equal("org3-guid"))
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(HaveAllRequestsCalled())
-		})
-
-		It("does not call the provided function when there are no orgs found", func() {
-			emptyOrgsRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/organizations",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
-
-			testserver, handler, repo := createOrganizationRepo(emptyOrgsRequest)
-			defer testserver.Close()
-
-			_, apiErr := repo.ListOrgs(0)
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(HaveAllRequestsCalled())
-		})
-	})
-
 	Describe("ListOrgs", func() {
 		var (
 			ccServer *ghttp.Server
 			repo     CloudControllerOrganizationRepository
 		)
 
-		BeforeEach(func() {
-			ccServer = ghttp.NewServer()
-			configRepo := testconfig.NewRepositoryWithDefaults()
-			configRepo.SetAPIEndpoint(ccServer.URL())
-			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-			repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
-			ccServer.AppendHandlers(
-				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/v2/organizations"),
-					ghttp.VerifyHeader(http.Header{
-						"accept": []string{"application/json"},
-					}),
-					ghttp.RespondWith(http.StatusOK, `{
+		Context("when there are orgs", func() {
+			BeforeEach(func() {
+				ccServer = ghttp.NewServer()
+				configRepo := testconfig.NewRepositoryWithDefaults()
+				configRepo.SetAPIEndpoint(ccServer.URL())
+				gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/organizations"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusOK, `{
 						"total_results": 3,
 						"total_pages": 2,
 						"prev_url": null,
@@ -114,16 +54,16 @@ var _ = Describe("Organization Repository", func() {
 							}
 						]
 					}`),
-				),
-			)
+					),
+				)
 
-			ccServer.AppendHandlers(
-				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/v2/organizations"),
-					ghttp.VerifyHeader(http.Header{
-						"accept": []string{"application/json"},
-					}),
-					ghttp.RespondWith(http.StatusOK, `{
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/organizations"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusOK, `{
 						"total_results": 3,
 						"total_pages": 2,
 						"prev_url": null,
@@ -135,33 +75,73 @@ var _ = Describe("Organization Repository", func() {
 							}
 						]
 					}`),
-				),
-			)
-		})
-
-		AfterEach(func() {
-			ccServer.Close()
-		})
-
-		Context("when given a non-zero positive limit", func() {
-			It("should return no more than the limit number of organizations", func() {
-				orgs, err := repo.ListOrgs(2)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(len(orgs)).To(Equal(2))
+					),
+				)
 			})
 
-			It("should not make more requests than necessary to retrieve the requested number of orgs", func() {
-				_, err := repo.ListOrgs(2)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(ccServer.ReceivedRequests()).Should(HaveLen(1))
+			AfterEach(func() {
+				ccServer.Close()
+			})
+
+			Context("when given a non-zero positive limit", func() {
+				It("should return no more than the limit number of organizations", func() {
+					orgs, err := repo.ListOrgs(2)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(len(orgs)).To(Equal(2))
+				})
+
+				It("should not make more requests than necessary to retrieve the requested number of orgs", func() {
+					_, err := repo.ListOrgs(2)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(ccServer.ReceivedRequests()).Should(HaveLen(1))
+				})
+			})
+
+			Context("when given a zero limit", func() {
+				It("should return all organizations", func() {
+					orgs, err := repo.ListOrgs(0)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(len(orgs)).To(Equal(3))
+				})
+
+				It("lists the orgs from the the /v2/orgs endpoint", func() {
+					orgs, apiErr := repo.ListOrgs(0)
+
+					Expect(len(orgs)).To(Equal(3))
+					Expect(orgs[0].GUID).To(Equal("org1-guid"))
+					Expect(orgs[1].GUID).To(Equal("org2-guid"))
+					Expect(orgs[2].GUID).To(Equal("org3-guid"))
+					Expect(apiErr).NotTo(HaveOccurred())
+				})
 			})
 		})
 
-		Context("when given a zero limit", func() {
-			It("should return all organizations", func() {
-				orgs, err := repo.ListOrgs(0)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(len(orgs)).To(Equal(3))
+		Context("when there are no orgs", func() {
+			BeforeEach(func() {
+				ccServer = ghttp.NewServer()
+				configRepo := testconfig.NewRepositoryWithDefaults()
+				configRepo.SetAPIEndpoint(ccServer.URL())
+				gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
+				ccServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/organizations"),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusOK, `{"resources": []}`),
+					),
+				)
+			})
+
+			AfterEach(func() {
+				ccServer.Close()
+			})
+
+			It("does not call the provided function", func() {
+				_, apiErr := repo.ListOrgs(0)
+
+				Expect(apiErr).NotTo(HaveOccurred())
 			})
 		})
 	})
