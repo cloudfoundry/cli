@@ -7,7 +7,6 @@ params:
   LITE_PRIVATE_IP_ADDRESS:
 
 inputs:
-- name: bosh-lite-lock
 
 run:
   path: bash
@@ -16,11 +15,8 @@ run:
   - |
     set -eux
 
-    export DOMAIN=`cat bosh-lite-lock/name`
-
     export ADMIN_USER=admin
     export ADMIN_PASSWORD=admin
-    export API_ENDPOINT="https://api.${DOMAIN}"
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
     bosh login $ADMIN_USER $ADMIN_PASSWORD
