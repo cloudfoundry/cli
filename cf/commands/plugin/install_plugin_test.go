@@ -320,7 +320,7 @@ var _ = Describe("Install", func() {
 						[]string{"download binary file from internet"},
 					))
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Installing plugin", "./install_plugin.go"},
+						[]string{"Installing plugin install_plugin.go"},
 					))
 				})
 
@@ -596,7 +596,7 @@ var _ = Describe("Install", func() {
 			Expect(pluginMetadata.Commands[1].Name).To(Equal("test_1_cmd2"))
 			Expect(pluginMetadata.Commands[1].HelpText).To(Equal("help text for test_1_cmd2"))
 			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Installing plugin", test_1},
+				[]string{"Installing plugin test_1.exe"},
 				[]string{"OK"},
 				[]string{"Plugin", "Test1", "v1.2.4", "successfully installed"},
 			))
