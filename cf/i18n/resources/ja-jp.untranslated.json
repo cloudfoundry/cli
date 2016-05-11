@@ -32,10 +32,6 @@
     "translation": "Bind a service instance to an HTTP route"
   },
   {
-    "id": "Bind cancelled",
-    "translation": "Bind cancelled"
-  },
-  {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
@@ -612,14 +608,6 @@
     "translation": "Creating random route for {{.Domain}}"
   },
   {
-    "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}..."
-  },
-  {
-    "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
-    "translation": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}..."
-  },
-  {
     "id": "DISK",
     "translation": "DISK"
   },
@@ -702,18 +690,6 @@
   {
     "id": "INSTANCE_MEMORY",
     "translation": "INSTANCE_MEMORY"
-  },
-  {
-    "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
-    "translation": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
-    "translation": "Incorrect Usage. Requires DOMAIN as an argument\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
-    "translation": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n"
   },
   {
     "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
