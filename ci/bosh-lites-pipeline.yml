@@ -14,6 +14,14 @@ resources:
     branch: locks
     pool: bosh-lites
 
+- name: cli-pools
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: {{cli-pools-github-private-key}}
+    branch: master
+    pool: bosh-lites-diego
+
 - name: cli
   type: git
   source:
@@ -369,7 +377,7 @@ jobs:
 - name: deploy-boshlite-4
   serial: true
   plan:
-  - put: bosh-lite-lock
+  - put: cli-pools
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -404,16 +412,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: cli-pools
       params:
-        release: bosh-lite-lock
+        release: cli-pools
 
 - name: deploy-diego-release-4
   plan:
-  - get: bosh-lite-lock
+  - get: cli-pools
     passed: [deploy-boshlite-4]
     trigger: true
-  - put: bosh-lite-lock
+  - put: cli-pools
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -430,17 +438,21 @@ jobs:
       file: cli/ci/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-    ensure:
-      put: bosh-lite-lock
+    - task: default-to-diego
+      file: cli/ci/tasks/set-cf-backend-to-diego.yml
       params:
-        release: bosh-lite-lock
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: cli-pools
+      params:
+        release: cli-pools
 
 - name: deploy-routing-release-4
   plan:
-  - get: bosh-lite-lock
+  - get: cli-pools
     passed: [deploy-diego-release-4]
     trigger: true
-  - put: bosh-lite-lock
+  - put: cli-pools
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -459,6 +471,6 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: cli-pools
       params:
-        release: bosh-lite-lock
+        release: cli-pools
