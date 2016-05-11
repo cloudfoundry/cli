@@ -188,83 +188,55 @@ var _ = Describe("BindRouteService", func() {
 					serviceInstanceRequirement.GetServiceInstanceReturns(serviceInstance)
 				})
 
-				It("asks the user to confirm", func() {
-					ui.Inputs = []string{"n"}
+				It("does not warn", func() {
 					cmd.Execute(flagContext)
-					Expect(ui.Prompts).To(ContainSubstrings(
-						[]string{"Binding may cause requests for route", "Do you want to proceed?"},
+					Expect(ui.Outputs).NotTo(ContainSubstrings(
+						[]string{"Bind cancelled"},
 					))
 				})
 
-				Context("when the user confirms", func() {
-					JustBeforeEach(func() {
-						defer func() { recover() }()
-						ui.Inputs = []string{"y"}
+				It("tries to bind the route service", func() {
+					cmd.Execute(flagContext)
+					Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(1))
+				})
+
+				Context("when binding the route service succeeds", func() {
+					BeforeEach(func() {
+						routeServiceBindingRepo.BindReturns(nil)
+					})
+
+					It("says OK", func() {
 						cmd.Execute(flagContext)
-					})
-
-					It("does not warn", func() {
-						Expect(func() []string { return ui.Outputs }).NotTo(ContainSubstrings(
-							[]string{"Bind cancelled"},
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"OK"},
 						))
-					})
-
-					It("tries to bind the route service", func() {
-						Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(1))
-					})
-
-					Context("when binding the route service succeeds", func() {
-						BeforeEach(func() {
-							routeServiceBindingRepo.BindReturns(nil)
-						})
-
-						It("says OK", func() {
-							Expect(ui.Outputs).To(ContainSubstrings(
-								[]string{"OK"},
-							))
-						})
-					})
-
-					Context("when binding the route service fails because it is already bound", func() {
-						BeforeEach(func() {
-							routeServiceBindingRepo.BindReturns(errors.NewHTTPError(http.StatusOK, errors.ServiceInstanceAlreadyBoundToSameRoute, "http-err"))
-						})
-
-						It("says OK", func() {
-							Expect(ui.Outputs).To(ContainSubstrings(
-								[]string{"OK"},
-							))
-						})
-					})
-
-					Context("when binding the route service fails for any other reason", func() {
-						BeforeEach(func() {
-							routeServiceBindingRepo.BindReturns(errors.New("bind-err"))
-						})
-
-						It("fails with the error", func() {
-							Expect(ui.Outputs).To(ContainSubstrings(
-								[]string{"FAILED"},
-								[]string{"bind-err"},
-							))
-						})
 					})
 				})
 
-				Context("when the user does not confirm", func() {
+				Context("when binding the route service fails because it is already bound", func() {
 					BeforeEach(func() {
-						ui.Inputs = []string{"n"}
-						cmd.Execute(flagContext)
+						routeServiceBindingRepo.BindReturns(errors.NewHTTPError(http.StatusOK, errors.ServiceInstanceAlreadyBoundToSameRoute, "http-err"))
 					})
 
-					It("warns", func() {
+					It("says OK", func() {
+						cmd.Execute(flagContext)
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Bind cancelled"},
+							[]string{"OK"},
 						))
 					})
+				})
 
-					It("does not bind the route service", func() {
-						Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(0))
+				Context("when binding the route service fails for any other reason", func() {
+					BeforeEach(func() {
+						routeServiceBindingRepo.BindReturns(errors.New("bind-err"))
+					})
+
+					It("fails with the error", func() {
+						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"FAILED"},
+							[]string{"bind-err"},
+						))
 					})
 				})
 
@@ -274,10 +246,10 @@ var _ = Describe("BindRouteService", func() {
 						flagContext.Parse("domain-name", "-f")
 					})
 
-					It("does not ask the user to confirm", func() {
+					It("does not alter the behavior", func() {
 						cmd.Execute(flagContext)
-						Expect(ui.Prompts).NotTo(ContainSubstrings(
-							[]string{"Binding may cause requests for route", "Do you want to proceed?"},
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"OK"},
 						))
 					})
 				})

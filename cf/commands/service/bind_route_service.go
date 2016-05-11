@@ -28,7 +28,6 @@ func init() {
 
 func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["force"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force binding without confirmation")}
 	fs["hostname"] = &flags.StringFlag{
 		Name:      "hostname",
 		ShortName: "n",
@@ -44,7 +43,7 @@ func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 		ShortName:   "brs",
 		Description: T("Bind a service instance to an HTTP route"),
 		Usage: []string{
-			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]`),
+			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]`),
 		},
 		Examples: []string{
 			`CF_NAME bind-route-service example.com myratelimiter --hostname myapp`,
@@ -119,29 +118,6 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 	}
 
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
-	if !serviceInstance.IsUserProvided() {
-		var requiresRouteForwarding bool
-		for _, requirement := range serviceInstance.ServiceOffering.Requires {
-			if requirement == "route_forwarding" {
-				requiresRouteForwarding = true
-				break
-			}
-		}
-
-		confirmed := c.Bool("force")
-		if requiresRouteForwarding && !confirmed {
-			confirmed = cmd.ui.Confirm(T("Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
-				map[string]interface{}{
-					"URL": route.URL(),
-					"ServiceInstanceName": serviceInstance.Name,
-				}))
-
-			if !confirmed {
-				cmd.ui.Warn(T("Bind cancelled"))
-				return
-			}
-		}
-	}
 
 	cmd.ui.Say(T("Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{

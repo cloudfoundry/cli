@@ -44,10 +44,6 @@
     "translation": "Bind a service instance to an HTTP route"
   },
   {
-    "id": "Bind cancelled",
-    "translation": "Bind cancelled"
-  },
-  {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
@@ -80,8 +76,8 @@
     "translation": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
-    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -702,10 +698,6 @@
   {
     "id": "Features",
     "translation": "Features"
-  },
-  {
-    "id": "Force binding without confirmation",
-    "translation": "Force binding without confirmation"
   },
   {
     "id": "Force install of plugin without confirmation",
