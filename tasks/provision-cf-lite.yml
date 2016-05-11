@@ -56,6 +56,9 @@ run:
       domain: ${LITE_HOSTNAME}
     EOF
 
+      bosh target $LITE_PRIVATE_IP_ADDRESS
+      bosh login admin admin
+
       echo "Updating cf-release sub modules"
       ./scripts/update > /dev/null
       echo "Generating bosh lite manifest from cf-release-repo/scripts/generate-bosh-lite-dev-manifest"
