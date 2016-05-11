@@ -56,10 +56,10 @@ run:
       domain: ${LITE_HOSTNAME}
     EOF
 
-      sleep 10
+      sleep 20
 
-      bosh target $LITE_PRIVATE_IP_ADDRESS
-      bosh login admin admin
+      bosh -n target $LITE_PRIVATE_IP_ADDRESS
+      bosh -n login admin admin
 
       echo "Updating cf-release sub modules"
       ./scripts/update > /dev/null
