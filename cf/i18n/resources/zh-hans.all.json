@@ -408,16 +408,8 @@
     "translation": "将服务实例绑定到应用程序"
   },
   {
-    "id": "Bind cancelled",
-    "translation": ""
-  },
-  {
     "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
     "translation": "{{.InstanceName}} 与 {{.AppName}} 之间的绑定不存在"
-  },
-  {
-    "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
-    "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)"
   },
   {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -484,7 +476,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
     "translation": ""
   },
   {
@@ -2074,10 +2066,6 @@
   {
     "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
     "translation": "在本地找不到文件，请确保该文件在给定路径 {{.filepath}} 中存在"
-  },
-  {
-    "id": "Force binding without confirmation",
-    "translation": ""
   },
   {
     "id": "Force delete (do not prompt for confirmation)",

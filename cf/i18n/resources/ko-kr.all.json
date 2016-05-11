@@ -408,16 +408,8 @@
     "translation": "앱에 서비스 인스턴스 바인드"
   },
   {
-    "id": "Bind cancelled",
-    "translation": ""
-  },
-  {
     "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
     "translation": "{{.InstanceName}}과(와) {{.AppName}} 간 바인딩이 없음"
-  },
-  {
-    "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
-    "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed? (y/n)"
   },
   {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -484,7 +476,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
     "translation": ""
   },
   {
@@ -2074,10 +2066,6 @@
   {
     "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
     "translation": "파일을 로컬로 찾을 수 없습니다. 파일이 주어진 경로 {{.filepath}}에 있는지 확인하십시오."
-  },
-  {
-    "id": "Force binding without confirmation",
-    "translation": ""
   },
   {
     "id": "Force delete (do not prompt for confirmation)",

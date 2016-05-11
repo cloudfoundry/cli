@@ -408,16 +408,8 @@
     "translation": "Bind a service instance to an app"
   },
   {
-    "id": "Bind cancelled",
-    "translation": "Bind cancelled"
-  },
-  {
     "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
     "translation": "Binding between {{.InstanceName}} and {{.AppName}} did not exist"
-  },
-  {
-    "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
-    "translation": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?"
   },
   {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -484,8 +476,8 @@
     "translation": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
-    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -2074,10 +2066,6 @@
   {
     "id": "File not found locally, make sure the file exists at given path {{.filepath}}",
     "translation": "File not found locally, make sure the file exists at given path {{.filepath}}"
-  },
-  {
-    "id": "Force binding without confirmation",
-    "translation": "Force binding without confirmation"
   },
   {
     "id": "Force delete (do not prompt for confirmation)",
