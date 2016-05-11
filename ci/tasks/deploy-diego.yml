@@ -13,7 +13,6 @@ inputs:
 - name: diego-release
 - name: diego-repo
 - name: cflinuxfs2-rootfs-release
-- name: cf-release # needed for diego-repo/generate-bosh-lite-manifests
 
 run:
   path: bash
@@ -22,26 +21,29 @@ run:
   - |
     set -eux
 
-    export DOMAIN=`cat bosh-lite-lock/name`
-
-    export ADMIN_USER=admin
-    export ADMIN_PASSWORD=admin
-    export API_ENDPOINT="https://api.${DOMAIN}"
-
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
-    bosh -n -u admin -p admin upload release cflinuxfs2-rootfs-release/release.tgz --skip-if-exists
-    bosh -n -u admin -p admin upload release etcd-release/release.tgz --skip-if-exists
-    bosh -n -u admin -p admin upload release garden-linux-release/release.tgz --skip-if-exists
-    bosh -n -u admin -p admin upload release diego-release/release.tgz --skip-if-exists
+    bosh login admin admin
+    bosh upload release cflinuxfs2-rootfs-release/release.tgz --skip-if-exists
+    bosh upload release etcd-release/release.tgz --skip-if-exists
+    bosh upload release garden-linux-release/release.tgz --skip-if-exists
+    bosh upload release diego-release/release.tgz --skip-if-exists
+
+    mkdir -p cf-warden
+    export CF_MANIFESTS_DIR=$PWD/cf-warden
+    bosh download manifest cf-warden $CF_MANIFESTS_DIR/cf.yml
 
     pushd diego-repo
       ./scripts/generate-bosh-lite-manifests
-      bosh deployment bosh-lite/deployments/diego.yml
-      bosh -n -u admin -p admin deploy
     popd
 
+    bosh deployment diego-repo/bosh-lite/deployments/diego.yml
+    bosh -n deploy
+
+    export DOMAIN=`cat bosh-lite-lock/name`
+
     curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
-    ./cf api $API_ENDPOINT --skip-ssl-validation
-    ./cf auth $ADMIN_USER $ADMIN_PASSWORD
+    ./cf api "https://api.${DOMAIN}" --skip-ssl-validation
+    ./cf auth admin admin
+    # This feature flag only affects the diego acceptance tests
     ./cf enable-feature-flag diego_docker
 
