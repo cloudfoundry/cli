@@ -119,9 +119,9 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	installer := plugininstaller.NewPluginInstaller(deps)
 	pluginSourceFilepath := installer.Install(c.Args()[0])
 
-	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginSourceFilepath})))
-
 	_, pluginExecutableName := filepath.Split(pluginSourceFilepath)
+
+	cmd.ui.Say(fmt.Sprintf(T("Installing plugin {{.PluginPath}}...", map[string]interface{}{"PluginPath": pluginExecutableName})))
 
 	pluginDestinationFilepath := filepath.Join(cmd.pluginConfig.GetPluginPath(), pluginExecutableName)
 
