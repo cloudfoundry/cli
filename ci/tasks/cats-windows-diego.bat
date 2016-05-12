@@ -4,7 +4,7 @@ SET GOPATH=%GOPATH%;%GATSPATH%\Godeps\_workspace
 
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%
-SET PATH=%GOPATH%\bin;%PATH
+SET PATH=%GOPATH%\bin;%PATH%
 SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=%CD%;%PATH%
