@@ -13,8 +13,6 @@ SET /p DOMAIN=<%CD%\cli-pools\name
 call %CD%\cli\ci\tasks\create-cats-config.bat
 SET CONFIG=%CD%\config.json
 
-go get -v github.com/onsi/ginkgo/ginkgo
-
 pushd %CD%\cf-cli-binaries
 	gzip -d cf-cli-binaries.tgz
 	tar -xvf cf-cli-binaries.tar
