@@ -69,7 +69,8 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGUID string)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name, orgGUID, spaceQuotaGUID string) (space models.Space, apiErr error) {
+func (repo CloudControllerSpaceRepository) Create(name, orgGUID, spaceQuotaGUID string) (models.Space, error) {
+	var space models.Space
 	path := "/v2/spaces"
 
 	bodyMap := map[string]string{"name": name, "organization_guid": orgGUID}
@@ -77,18 +78,18 @@ func (repo CloudControllerSpaceRepository) Create(name, orgGUID, spaceQuotaGUID 
 		bodyMap["space_quota_definition_guid"] = spaceQuotaGUID
 	}
 
-	body, apiErr := json.Marshal(bodyMap)
-	if apiErr != nil {
-		return
+	body, err := json.Marshal(bodyMap)
+	if err != nil {
+		return models.Space{}, err
 	}
 
 	resource := new(resources.SpaceResource)
-	apiErr = repo.gateway.CreateResource(repo.config.APIEndpoint(), path, strings.NewReader(string(body)), resource)
-	if apiErr != nil {
-		return
+	err = repo.gateway.CreateResource(repo.config.APIEndpoint(), path, strings.NewReader(string(body)), resource)
+	if err != nil {
+		return models.Space{}, err
 	}
 	space = resource.ToModel()
-	return
+	return space, nil
 }
 
 func (repo CloudControllerSpaceRepository) Rename(spaceGUID, newName string) (apiErr error) {
