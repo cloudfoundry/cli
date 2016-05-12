@@ -9,7 +9,7 @@ SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
 SET /p DOMAIN=<%CD%\bosh-lite-lock\name
-call %CD%\cli\ci\tasks\create-cats-config.bat
+call %CD%\cli-ci\ci\tasks\create-cats-config.bat
 SET CONFIG=%CD%\config.json
 
 pushd %CD%\cf-cli-binaries
