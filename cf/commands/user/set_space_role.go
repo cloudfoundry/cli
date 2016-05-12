@@ -21,7 +21,7 @@ import (
 
 type SpaceRoleSetter interface {
 	commandregistry.Command
-	SetSpaceRole(space models.Space, role models.Role, userGUID, userName string) (err error)
+	SetSpaceRole(space models.Space, orgGUID, orgName string, role models.Role, userGUID, userName string) (err error)
 }
 
 type SetSpaceRole struct {
@@ -102,28 +102,28 @@ func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 		cmd.ui.Failed(err.Error())
 	}
 
-	err = cmd.SetSpaceRole(space, role, userFields.GUID, userFields.Username)
+	err = cmd.SetSpaceRole(space, org.GUID, org.Name, role, userFields.GUID, userFields.Username)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
 }
 
-func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role models.Role, userGUID, username string) error {
+func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, orgGUID, orgName string, role models.Role, userGUID, username string) error {
 	var err error
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"Role":        terminal.EntityNameColor(role.ToString()),
 			"TargetUser":  terminal.EntityNameColor(username),
-			"TargetOrg":   terminal.EntityNameColor(space.Organization.Name),
+			"TargetOrg":   terminal.EntityNameColor(orgName),
 			"TargetSpace": terminal.EntityNameColor(space.Name),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
 	if len(userGUID) > 0 {
-		err = cmd.userRepo.SetSpaceRoleByGUID(userGUID, space.GUID, space.Organization.GUID, role)
+		err = cmd.userRepo.SetSpaceRoleByGUID(userGUID, space.GUID, orgGUID, role)
 	} else {
-		err = cmd.userRepo.SetSpaceRoleByUsername(username, space.GUID, space.Organization.GUID, role)
+		err = cmd.userRepo.SetSpaceRoleByUsername(username, space.GUID, orgGUID, role)
 	}
 	if err != nil {
 		return err

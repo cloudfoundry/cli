@@ -225,7 +225,6 @@ var _ = Describe("SetSpaceRole", func() {
 				space := models.Space{}
 				space.GUID = "the-space-guid"
 				space.Name = "the-space-name"
-				space.Organization = org.OrganizationFields
 				spaceRepo.FindByNameInOrgReturns(space, nil)
 			})
 

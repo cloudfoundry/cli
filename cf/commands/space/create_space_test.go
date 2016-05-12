@@ -76,7 +76,7 @@ var _ = Describe("create-space command", func() {
 		OriginalCommand = commandregistry.Commands.FindCommand("set-space-role")
 
 		spaceRepo = new(apifakes.FakeSpaceRepository)
-		space := maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid", "organization": configOrg})
+		space := maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid"})
 		spaceRepo.CreateReturns(space, nil)
 	})
 
@@ -179,7 +179,7 @@ var _ = Describe("create-space command", func() {
 			userGUID, spaceGUID, orgGUID, role := userRepo.SetSpaceRoleByGUIDArgsForCall(0)
 			Expect(userGUID).To(Equal("my-user-guid"))
 			Expect(spaceGUID).To(Equal("my-space-guid"))
-			Expect(orgGUID).To(Equal("my-org-guid"))
+			Expect(orgGUID).To(Equal("org-guid-1"))
 			Expect(role).To(Equal(models.RoleSpaceManager))
 		})
 
