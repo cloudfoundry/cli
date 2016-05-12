@@ -243,10 +243,12 @@ var _ = Describe("BindRouteService", func() {
 				Context("when the -f flag has been passed", func() {
 					BeforeEach(func() {
 						flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-						flagContext.Parse("domain-name", "-f")
 					})
 
 					It("does not alter the behavior", func() {
+						err := flagContext.Parse("-f", "domain-name")
+						Expect(err).NotTo(HaveOccurred())
+
 						cmd.Execute(flagContext)
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},

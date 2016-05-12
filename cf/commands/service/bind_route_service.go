@@ -37,6 +37,7 @@ func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 		ShortName: "c",
 		Usage:     T("Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."),
 	}
+	fs["f"] = &flags.BackwardsCompatibilityFlag{}
 
 	return commandregistry.CommandMetadata{
 		Name:        "bind-route-service",
