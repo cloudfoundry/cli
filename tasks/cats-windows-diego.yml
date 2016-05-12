@@ -8,7 +8,7 @@ params:
 inputs:
 - name: cf-release-repo
 - name: cf-cli-binaries
-- name: cli-pool
+- name: cli-pools
 - name: cli
 - name: cli-ci
 
