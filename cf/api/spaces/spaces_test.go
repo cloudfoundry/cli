@@ -22,12 +22,12 @@ var _ = Describe("Space Repository", func() {
 	It("lists all the spaces", func() {
 		firstPageSpacesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1",
+			Path:   "/v2/organizations/my-org-guid/spaces",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
 				Body: `
 				{
-					"next_url": "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1&page=2",
+					"next_url": "/v2/organizations/my-org-guid/spaces?page=2",
 					"resources": [
 						{
 							"metadata": {
@@ -53,7 +53,7 @@ var _ = Describe("Space Repository", func() {
 
 		secondPageSpacesRequest := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/organizations/my-org-guid/spaces?inline-relations-depth=1&page=2",
+			Path:   "/v2/organizations/my-org-guid/spaces?page=2",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
 				Body: `
@@ -289,7 +289,7 @@ func testSpacesFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository
 }`}
 	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
-		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGUID),
+		Path:     fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1", orgGUID),
 		Response: findSpaceByNameResponse,
 	})
 
@@ -321,7 +321,7 @@ func testSpacesFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository
 func testSpacesDidNotFindByNameWithOrg(orgGUID string, findByName func(SpaceRepository, string) (models.Space, error)) {
 	request := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
-		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGUID),
+		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1", orgGUID),
 		Response: testnet.TestResponse{
 			Status: http.StatusOK,
 			Body:   ` { "resources": [ ] }`,

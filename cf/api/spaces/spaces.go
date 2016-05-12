@@ -39,7 +39,7 @@ func NewCloudControllerSpaceRepository(config coreconfig.Reader, gateway net.Gat
 func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		fmt.Sprintf("/v2/organizations/%s/spaces?inline-relations-depth=1", repo.config.OrganizationFields().GUID),
+		fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields().GUID),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			return callback(resource.(resources.SpaceResource).ToModel())
@@ -54,7 +54,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGUID string)
 	foundSpace := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGUID, url.QueryEscape("name:"+strings.ToLower(name))),
+		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s", orgGUID, url.QueryEscape("name:"+strings.ToLower(name))),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			space = resource.(resources.SpaceResource).ToModel()
@@ -70,7 +70,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGUID string)
 }
 
 func (repo CloudControllerSpaceRepository) Create(name, orgGUID, spaceQuotaGUID string) (space models.Space, apiErr error) {
-	path := "/v2/spaces?inline-relations-depth=1"
+	path := "/v2/spaces"
 
 	bodyMap := map[string]string{"name": name, "organization_guid": orgGUID}
 	if spaceQuotaGUID != "" {
