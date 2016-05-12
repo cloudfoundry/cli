@@ -39,7 +39,7 @@ func NewCloudControllerSpaceRepository(config coreconfig.Reader, gateway net.Gat
 func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields().GUID),
+		fmt.Sprintf("/v2/organizations/%s/spaces?order-by=name", repo.config.OrganizationFields().GUID),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			return callback(resource.(resources.SpaceResource).ToModel())
