@@ -143,7 +143,11 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
 				return err
 			}
 
-			io.Copy(w, r)
+			_, err = io.Copy(w, r)
+			if err != nil {
+				return err
+			}
+
 			err = r.Close()
 			if err != nil {
 				return err
@@ -151,8 +155,16 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
 		}
 	}
 
-	writer.Close()
-	outputFile.Seek(0, 0)
+	err = writer.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = outputFile.Seek(0, 0)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -207,8 +219,18 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 		}
 		defer response.Body.Close()
 
-		io.Copy(tempfile, response.Body)
-		tempfile.Seek(0, 0)
+		_, err = io.Copy(tempfile, response.Body)
+		if err != nil {
+			cb(nil, err)
+			return
+		}
+
+		_, err = tempfile.Seek(0, 0)
+		if err != nil {
+			cb(nil, err)
+			return
+		}
+
 		cb(tempfile, nil)
 	})
 }
