@@ -84,7 +84,7 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 	var err error
 	var service models.ServiceOffering
 
-	service, err = actor.serviceBuilder.GetServiceByNameForOrg(serviceName, orgName)
+	service, err = actor.serviceBuilder.GetServiceByNameWithPlans(serviceName)
 	if err != nil {
 		return false, err
 	}
