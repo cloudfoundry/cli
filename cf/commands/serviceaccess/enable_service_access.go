@@ -81,7 +81,14 @@ func (cmd *EnableServiceAccess) Execute(c flags.FlagContext) {
 }
 
 func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, planName string, orgName string) {
-	cmd.ui.Say(T("Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"PlanName": terminal.EntityNameColor(planName), "ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
+	cmd.ui.Say(
+		T("Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...",
+			map[string]interface{}{
+				"PlanName":    terminal.EntityNameColor(planName),
+				"ServiceName": terminal.EntityNameColor(serviceName),
+				"OrgName":     terminal.EntityNameColor(orgName),
+				"Username":    terminal.EntityNameColor(cmd.config.Username()),
+			}))
 	planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -93,7 +100,12 @@ func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, p
 }
 
 func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planName string) {
-	cmd.ui.Say(T("Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...", map[string]interface{}{"PlanName": terminal.EntityNameColor(planName), "ServiceName": terminal.EntityNameColor(serviceName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
+	cmd.ui.Say(T("Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
+		map[string]interface{}{
+			"PlanName":    terminal.EntityNameColor(planName),
+			"ServiceName": terminal.EntityNameColor(serviceName),
+			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+		}))
 	planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -105,7 +117,11 @@ func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planNam
 }
 
 func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) {
-	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
+	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...",
+		map[string]interface{}{
+			"ServiceName": terminal.EntityNameColor(serviceName),
+			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+		}))
 	allPlansInServicePublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -117,7 +133,12 @@ func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) {
 }
 
 func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName string, orgName string) {
-	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName), "OrgName": terminal.EntityNameColor(orgName), "Username": terminal.EntityNameColor(cmd.config.Username())}))
+	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...",
+		map[string]interface{}{
+			"ServiceName": terminal.EntityNameColor(serviceName),
+			"OrgName":     terminal.EntityNameColor(orgName),
+			"Username":    terminal.EntityNameColor(cmd.config.Username()),
+		}))
 	allPlansWereSet, err := cmd.actor.UpdateOrgForService(serviceName, orgName, true)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
