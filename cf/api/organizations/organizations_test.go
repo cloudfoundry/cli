@@ -186,7 +186,7 @@ var _ = Describe("Organization Repository", func() {
 		It("returns the org with that name", func() {
 			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
-				Path:   "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+				Path:   "/v2/organizations?q=name%3Aorg1",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [{
 	  "metadata": { "guid": "org1-guid" },
 	  "entity": {
@@ -241,7 +241,7 @@ var _ = Describe("Organization Repository", func() {
 		It("returns a ModelNotFoundError when the org cannot be found", func() {
 			req := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+				Path:     "/v2/organizations?q=name%3Aorg1",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 			})
 
@@ -256,7 +256,7 @@ var _ = Describe("Organization Repository", func() {
 		It("returns an api error when the response is not successful", func() {
 			requestHandler := apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
-				Path:     "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+				Path:     "/v2/organizations?q=name%3Aorg1",
 				Response: testnet.TestResponse{Status: http.StatusBadGateway, Body: `{"resources": []}`},
 			})
 
