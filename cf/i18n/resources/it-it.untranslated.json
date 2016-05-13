@@ -696,6 +696,10 @@
     "translation": "Expected {{.PropertyName}} to be a list of integers."
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": "Failed to make plugin executable: {{.Error}}"
+  },
+  {
     "id": "Force install of plugin without confirmation",
     "translation": "Force install of plugin without confirmation"
   },

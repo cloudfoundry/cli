@@ -2044,6 +2044,10 @@
     "translation": "No se ha podido crear el manifiesto, no se ha podido analizar la variable de entorno: "
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "No se han podido crear paquetes de JSON"
   },

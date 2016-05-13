@@ -81,6 +81,9 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 func (routeActor RouteActor) UnbindAll(app models.Application) {
 	for _, route := range app.Routes {
 		routeActor.ui.Say(T("Removing route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL())}))
-		routeActor.routeRepo.Unbind(route.GUID, app.GUID)
+		apiErr := routeActor.routeRepo.Unbind(route.GUID, app.GUID)
+		if apiErr != nil {
+			routeActor.ui.Failed(apiErr.Error())
+		}
 	}
 }

@@ -28,7 +28,10 @@ func (downloader *PluginDownloader) downloadFromPath(pluginSourceFilepath string
 	downloader.UI.Say(fmt.Sprintf("%d "+T("bytes downloaded")+"...", size))
 
 	executablePath := filepath.Join(downloader.FileDownloader.SavePath(), filename)
-	os.Chmod(executablePath, 0700)
+	err = os.Chmod(executablePath, 0700)
+	if err != nil {
+		downloader.UI.Failed(fmt.Sprintf(T("Failed to make plugin executable: {{.Error}}", map[string]interface{}{"Error": err.Error()})))
+	}
 
 	return executablePath
 }

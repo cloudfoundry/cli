@@ -73,7 +73,6 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tempDir)
 
 	err = actor.zipper.Unzip(dirOrZipFile, tempDir)
 	if err != nil {
@@ -81,6 +80,11 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 	}
 
 	f(tempDir)
+
+	err = os.RemoveAll(tempDir)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

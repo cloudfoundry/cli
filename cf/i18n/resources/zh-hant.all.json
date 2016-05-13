@@ -2044,6 +2044,10 @@
     "translation": "無法建立資訊清單，無法剖析環境變數："
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "無法配置 JSON"
   },

@@ -1,6 +1,3 @@
-cf/actors/plugininstaller/plugin_installer.go:17:6: type name will be used as plugininstaller.PluginInstallerContext by other packages, and that stutters; consider calling this Context
-cf/actors/plugininstaller/plugin_installer_with_repo.go:15:6: type name will be used as plugininstaller.PluginInstallerWithRepo by other packages, and that stutters; consider calling this WithRepo
-cf/actors/plugininstaller/plugin_installer_without_repo.go:12:6: type name will be used as plugininstaller.PluginInstallerWithoutRepo by other packages, and that stutters; consider calling this WithoutRepo
 cf/api/buildpacks.go:118:7: don't use underscores in Go names; const buildpacks_path should be buildpacksPath
 cf/api/route_service_binding_repository.go:37:2: don't use underscores in Go names; method parameter opaque_params should be opaqueParams
 cf/api/routes.go:146:6: don't use underscores in Go names; var raw_response should be rawResponse

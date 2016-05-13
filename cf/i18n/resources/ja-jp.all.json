@@ -2044,6 +2044,10 @@
     "translation": "マニフェストを作成できませんでした、環境変数を解析できません: "
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "JSON をマーシャルできませんでした"
   },

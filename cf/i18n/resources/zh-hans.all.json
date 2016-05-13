@@ -2044,6 +2044,10 @@
     "translation": "创建清单失败，无法解析环境变量："
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "对 JSON 编组失败"
   },

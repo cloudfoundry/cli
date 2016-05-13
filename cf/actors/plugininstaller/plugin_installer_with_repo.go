@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/utils"
 )
 
-type PluginInstallerWithRepo struct {
+type pluginInstallerWithRepo struct {
 	UI               terminal.UI
 	PluginDownloader *PluginDownloader
 	DownloadFromPath downloadFromPath
@@ -22,7 +22,7 @@ type PluginInstallerWithRepo struct {
 	GetPluginRepos   pluginReposFetcher
 }
 
-func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) string {
+func (installer *pluginInstallerWithRepo) Install(inputSourceFilepath string) string {
 	var outputSourceFilepath string
 
 	targetPluginName := strings.ToLower(inputSourceFilepath)
@@ -60,7 +60,7 @@ func (installer *PluginInstallerWithRepo) Install(inputSourceFilepath string) st
 	return outputSourceFilepath
 }
 
-func (installer *PluginInstallerWithRepo) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
+func (installer *pluginInstallerWithRepo) getRepoFromConfig(repoName string) (models.PluginRepo, error) {
 	targetRepo := strings.ToLower(repoName)
 	list := installer.GetPluginRepos()
 
