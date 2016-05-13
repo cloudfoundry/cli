@@ -114,7 +114,7 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 }
 
 func (actor ServicePlanHandler) UpdatePlanAndOrgForService(serviceName, planName, orgName string, setPlanVisibility bool) (PlanAccess, error) {
-	service, err := actor.serviceBuilder.GetServiceByNameForOrg(serviceName, orgName)
+	service, err := actor.serviceBuilder.GetServiceByNameWithPlans(serviceName)
 	if err != nil {
 		return PlanAccessError, err
 	}
