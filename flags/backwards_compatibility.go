@@ -1,5 +1,7 @@
 package flags
 
+type backwardsCompatibilityType int
+
 type BackwardsCompatibilityFlag struct{}
 
 func (f *BackwardsCompatibilityFlag) Set(v string) {}
@@ -17,7 +19,7 @@ func (f *BackwardsCompatibilityFlag) GetShortName() string {
 }
 
 func (f *BackwardsCompatibilityFlag) GetValue() interface{} {
-	return ""
+	return backwardsCompatibilityType(1)
 }
 
 func (f *BackwardsCompatibilityFlag) Visible() bool {

@@ -246,7 +246,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("does not alter the behavior", func() {
-						err := flagContext.Parse("-f", "domain-name")
+						err := flagContext.Parse("domain-name", "-f")
 						Expect(err).NotTo(HaveOccurred())
 
 						cmd.Execute(flagContext)

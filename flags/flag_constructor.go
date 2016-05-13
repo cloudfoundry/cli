@@ -35,3 +35,7 @@ func (c *flagContext) NewStringSliceFlag(name string, shortName string, usage st
 func (c *flagContext) NewStringSliceFlagWithDefault(name string, shortName string, usage string, value []string) {
 	c.cmdFlags[name] = &StringSliceFlag{Name: name, ShortName: shortName, Value: value, Usage: usage}
 }
+
+func (c *flagContext) NewBackwardsCompatibilityFlag(name string, shortName string, usage string) {
+	c.cmdFlags["name"] = &BackwardsCompatibilityFlag{}
+}

@@ -120,6 +120,8 @@ func (c *flagContext) Parse(args ...string) error {
 				} else {
 					c.flagsets[flg].Set(v)
 				}
+			case backwardsCompatibilityType:
+				// do nothing
 			}
 		} else {
 			c.args = append(c.args, args[c.cursor])
