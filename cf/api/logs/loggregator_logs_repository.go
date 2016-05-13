@@ -32,7 +32,7 @@ func NewLoggregatorLogsRepository(config coreconfig.Reader, consumer consumer.Lo
 }
 
 func (repo *LoggregatorLogsRepository) Close() {
-	repo.consumer.Close()
+	_ = repo.consumer.Close()
 }
 
 func loggableMessagesFromLoggregatorMessages(messages []*logmessage.LogMessage) []Loggable {
@@ -51,7 +51,7 @@ func (repo *LoggregatorLogsRepository) RecentLogsFor(appGUID string) ([]Loggable
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
-		repo.tokenRefresher.RefreshAuthToken()
+		_, _ = repo.tokenRefresher.RefreshAuthToken()
 		return repo.RecentLogsFor(appGUID)
 	default:
 		return loggableMessagesFromLoggregatorMessages(messages), err
@@ -76,7 +76,7 @@ func (repo *LoggregatorLogsRepository) TailLogsFor(appGUID string, onConnect fun
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
-		repo.tokenRefresher.RefreshAuthToken()
+		_, _ = repo.tokenRefresher.RefreshAuthToken()
 		c, err = repo.consumer.Tail(appGUID, repo.config.AccessToken())
 	default:
 		errChan <- err

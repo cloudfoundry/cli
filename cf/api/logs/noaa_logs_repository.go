@@ -33,7 +33,7 @@ func NewNoaaLogsRepository(config coreconfig.Reader, consumer NoaaConsumer, tr a
 }
 
 func (repo *NoaaLogsRepository) Close() {
-	repo.consumer.Close()
+	_ = repo.consumer.Close()
 }
 
 func loggableMessagesFromNoaaMessages(messages []*events.LogMessage) []Loggable {
@@ -52,7 +52,7 @@ func (repo *NoaaLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
-		repo.tokenRefresher.RefreshAuthToken()
+		_, _ = repo.tokenRefresher.RefreshAuthToken()
 		return repo.RecentLogsFor(appGuid)
 	default:
 		return loggableMessagesFromNoaaMessages(logs), err
@@ -89,7 +89,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 				switch err.(type) {
 				case nil:
 				case *noaa_errors.UnauthorizedError:
-					repo.tokenRefresher.RefreshAuthToken()
+					_, _ = repo.tokenRefresher.RefreshAuthToken()
 					ticker.Stop()
 					repo.TailLogsFor(appGuid, onConnect, logChan, errChan)
 					return
