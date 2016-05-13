@@ -2044,6 +2044,10 @@
     "translation": "Manifest 작성 실패, 환경 변수를 구문 분석할 수 없음: "
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "JSON 마샬링 실패"
   },

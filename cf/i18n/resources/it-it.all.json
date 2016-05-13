@@ -2044,6 +2044,10 @@
     "translation": "Creazione del manifest non riuscita, impossibile analizzare la variabile di ambiente: "
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "Impossibile eseguire il marshalling del JSON"
   },

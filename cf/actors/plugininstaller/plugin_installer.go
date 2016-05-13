@@ -14,7 +14,7 @@ type PluginInstaller interface {
 	Install(inputSourceFilepath string) string
 }
 
-type PluginInstallerContext struct {
+type Context struct {
 	Checksummer    utils.Sha1Checksum
 	FileDownloader downloader.Downloader
 	GetPluginRepos pluginReposFetcher
@@ -25,18 +25,18 @@ type PluginInstallerContext struct {
 
 type pluginReposFetcher func() []models.PluginRepo
 
-func NewPluginInstaller(context *PluginInstallerContext) PluginInstaller {
+func NewPluginInstaller(context *Context) PluginInstaller {
 	var installer PluginInstaller
 
 	pluginDownloader := &PluginDownloader{UI: context.UI, FileDownloader: context.FileDownloader}
 	if context.RepoName == "" {
-		installer = &PluginInstallerWithoutRepo{
+		installer = &pluginInstallerWithoutRepo{
 			UI:               context.UI,
 			PluginDownloader: pluginDownloader,
 			RepoName:         context.RepoName,
 		}
 	} else {
-		installer = &PluginInstallerWithRepo{
+		installer = &pluginInstallerWithRepo{
 			UI:               context.UI,
 			PluginDownloader: pluginDownloader,
 			RepoName:         context.RepoName,

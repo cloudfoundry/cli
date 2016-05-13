@@ -2044,6 +2044,10 @@
     "translation": "Failed to create manifest, unable to parse environment variable: "
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": "Failed to make plugin executable: {{.Error}}"
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "Failed to marshal JSON"
   },

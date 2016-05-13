@@ -108,7 +108,7 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 	}
 	defer removeTmpFile()
 
-	deps := &plugininstaller.PluginInstallerContext{
+	deps := &plugininstaller.Context{
 		Checksummer:    cmd.checksum,
 		GetPluginRepos: cmd.config.PluginRepos,
 		FileDownloader: fileDownloader,

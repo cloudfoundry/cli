@@ -9,14 +9,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-type PluginInstallerWithoutRepo struct {
+type pluginInstallerWithoutRepo struct {
 	UI               terminal.UI
 	PluginDownloader *PluginDownloader
 	DownloadFromPath downloadFromPath
 	RepoName         string
 }
 
-func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
+func (installer *pluginInstallerWithoutRepo) Install(inputSourceFilepath string) (outputSourceFilepath string) {
 	if filepath.Dir(inputSourceFilepath) == "." {
 		outputSourceFilepath = "./" + filepath.Clean(inputSourceFilepath)
 	} else {
@@ -35,7 +35,7 @@ func (installer *PluginInstallerWithoutRepo) Install(inputSourceFilepath string)
 	return outputSourceFilepath
 }
 
-func (installer *PluginInstallerWithoutRepo) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
+func (installer *pluginInstallerWithoutRepo) ensureCandidatePluginBinaryExistsAtGivenPath(pluginSourceFilepath string) bool {
 	_, err := os.Stat(pluginSourceFilepath)
 	if err != nil && os.IsNotExist(err) {
 		return false

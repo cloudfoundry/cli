@@ -100,7 +100,10 @@ func (actor ServicePlanHandler) UpdateOrgForService(serviceName string, orgName 
 		if plan.Public || visibilityExists == setPlanVisibility {
 			continue
 		} else if visibilityExists && !setPlanVisibility {
-			actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.GUID, "service_plan_guid": plan.GUID})
+			err = actor.deleteServicePlanVisibilities(map[string]string{"organization_guid": org.GUID, "service_plan_guid": plan.GUID})
+			if err != nil {
+				return false, err
+			}
 		} else if !visibilityExists && setPlanVisibility {
 			err = actor.servicePlanVisibilityRepo.Create(plan.GUID, org.GUID)
 			if err != nil {

@@ -2044,6 +2044,10 @@
     "translation": "Erstellen von Manifest ist fehlgeschlagen; Umgebungsvariable konnte nicht geparst werden: "
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Failed to marshal JSON",
     "translation": "Ausführen des Marshalling für JSON ist fehlgeschlagen."
   },

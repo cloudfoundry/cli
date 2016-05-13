@@ -664,6 +664,10 @@
     "translation": "Expected {{.PropertyName}} to be a list of integers."
   },
   {
+    "id": "Failed to make plugin executable: {{.Error}}",
+    "translation": "Failed to make plugin executable: {{.Error}}"
+  },
+  {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
     "translation": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n"
   },
