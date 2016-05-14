@@ -3,7 +3,9 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
+	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
@@ -12,8 +14,9 @@ import (
 //go:generate counterfeiter . ServiceBindingRepository
 
 type ServiceBindingRepository interface {
-	Create(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error)
-	Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error)
+	Create(instanceGUID string, appGUID string, paramsMap map[string]interface{}) error
+	Delete(instance models.ServiceInstance, appGUID string) (bool, error)
+	ListAllForService(instanceGUID string) ([]models.ServiceBindingFields, error)
 }
 
 type CloudControllerServiceBindingRepository struct {
@@ -57,4 +60,20 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 	}
 
 	return true, repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
+}
+
+func (repo CloudControllerServiceBindingRepository) ListAllForService(instanceGUID string) ([]models.ServiceBindingFields, error) {
+	serviceBindings := []models.ServiceBindingFields{}
+	err := repo.gateway.ListPaginatedResources(
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("/v2/service_instances/%s/service_bindings", instanceGUID),
+		resources.ServiceBindingResource{},
+		func(resource interface{}) bool {
+			if serviceBindingResource, ok := resource.(resources.ServiceBindingResource); ok {
+				serviceBindings = append(serviceBindings, serviceBindingResource.ToFields())
+			}
+			return true
+		},
+	)
+	return serviceBindings, err
 }

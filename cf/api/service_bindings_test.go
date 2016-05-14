@@ -168,4 +168,77 @@ var _ = Describe("ServiceBindingsRepository", func() {
 			})
 		})
 	})
+
+	Describe("ListAllForService", func() {
+		Context("when binding does exist", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/service_instances/service-instance-guid/service_bindings"),
+						ghttp.RespondWith(http.StatusOK, `{
+						"total_results": 2,
+						"total_pages": 2,
+						"next_url": "/v2/service_instances/service-instance-guid/service_bindings?page=2",
+						"resources": [
+							{
+								"metadata": {
+									"guid": "service-binding-1-guid",
+									"url": "/v2/service_bindings/service-binding-1-guid",
+									"created_at": "2016-04-22T19:33:31Z",
+									"updated_at": null
+								},
+								"entity": {
+									"app_guid": "app-guid-1"
+								}
+							}
+						]
+					}`)),
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/v2/service_instances/service-instance-guid/service_bindings", "page=2"),
+						ghttp.RespondWith(http.StatusOK, `{
+						"total_results": 2,
+						"total_pages": 2,
+						"resources": [
+							{
+								"metadata": {
+									"guid": "service-binding-2-guid",
+									"url": "/v2/service_bindings/service-binding-2-guid",
+									"created_at": "2016-04-22T19:33:31Z",
+									"updated_at": null
+								},
+								"entity": {
+									"app_guid": "app-guid-2"
+								}
+							}
+						]
+					}`)),
+				)
+			})
+
+			It("returns the list of service instances", func() {
+				bindings, err := repo.ListAllForService("service-instance-guid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(bindings).To(HaveLen(2))
+				Expect(bindings[0].AppGUID).To(Equal("app-guid-1"))
+				Expect(bindings[1].AppGUID).To(Equal("app-guid-2"))
+			})
+		})
+
+		Context("when the service does not exist", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/service_instances/service-instance-guid/service_bindings"),
+					ghttp.RespondWith(http.StatusGatewayTimeout, nil),
+				))
+			})
+
+			It("returns an error", func() {
+				_, err := repo.ListAllForService("service-instance-guid")
+				Expect(err).To(HaveOccurred())
+
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
+			})
+		})
+	})
 })

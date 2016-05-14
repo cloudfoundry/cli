@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
@@ -24,7 +25,7 @@ var _ = Describe("bind-service command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		config              coreconfig.Repository
-		serviceBindingRepo  *apifakes.OldFakeServiceBindingRepo
+		serviceBindingRepo  *apifakes.FakeServiceBindingRepository
 		deps                commandregistry.Dependency
 	)
 
@@ -38,8 +39,8 @@ var _ = Describe("bind-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
-		serviceBindingRepo = new(apifakes.OldFakeServiceBindingRepo)
+		requirementsFactory = new(testreq.FakeReqFactory)
+		serviceBindingRepo = new(apifakes.FakeServiceBindingRepository)
 	})
 
 	var callBindService = func(args []string) bool {
@@ -51,19 +52,32 @@ var _ = Describe("bind-service command", func() {
 	})
 
 	Context("when logged in", func() {
+		var (
+			app             models.Application
+			serviceInstance models.ServiceInstance
+		)
+
 		BeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
+
+			app = models.Application{
+				ApplicationFields: models.ApplicationFields{
+					Name: "my-app",
+					GUID: "my-app-guid",
+				},
+			}
+			serviceInstance = models.ServiceInstance{
+				ServiceInstanceFields: models.ServiceInstanceFields{
+					Name: "my-service",
+					GUID: "my-service-guid",
+				},
+			}
+
+			requirementsFactory.Application = app
+			requirementsFactory.ServiceInstance = serviceInstance
 		})
 
 		It("binds a service instance to an app", func() {
-			app := models.Application{}
-			app.Name = "my-app"
-			app.GUID = "my-app-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "my-service"
-			serviceInstance.GUID = "my-service-guid"
-			requirementsFactory.Application = app
-			requirementsFactory.ServiceInstance = serviceInstance
 			callBindService([]string{"my-app", "my-service"})
 
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
@@ -74,20 +88,15 @@ var _ = Describe("bind-service command", func() {
 				[]string{"OK"},
 				[]string{"TIP", "my-app"},
 			))
-			Expect(serviceBindingRepo.CreateServiceInstanceGUID).To(Equal("my-service-guid"))
-			Expect(serviceBindingRepo.CreateApplicationGUID).To(Equal("my-app-guid"))
+
+			Expect(serviceBindingRepo.CreateCallCount()).To(Equal(1))
+			serviceInstanceGUID, applicationGUID, _ := serviceBindingRepo.CreateArgsForCall(0)
+			Expect(serviceInstanceGUID).To(Equal("my-service-guid"))
+			Expect(applicationGUID).To(Equal("my-app-guid"))
 		})
 
 		It("warns the user when the service instance is already bound to the given app", func() {
-			app := models.Application{}
-			app.Name = "my-app"
-			app.GUID = "my-app-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "my-service"
-			serviceInstance.GUID = "my-service-guid"
-			requirementsFactory.Application = app
-			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo = &apifakes.OldFakeServiceBindingRepo{CreateErrorCode: errors.ServiceBindingAppServiceTaken}
+			serviceBindingRepo.CreateReturns(errors.NewHTTPError(http.StatusBadRequest, errors.ServiceBindingAppServiceTaken, ""))
 			callBindService([]string{"my-app", "my-service"})
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -98,15 +107,7 @@ var _ = Describe("bind-service command", func() {
 		})
 
 		It("warns the user when the error is non HTTPError ", func() {
-			app := models.Application{}
-			app.Name = "my-app1"
-			app.GUID = "my-app1-guid1"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "my-service1"
-			serviceInstance.GUID = "my-service1-guid1"
-			requirementsFactory.Application = app
-			requirementsFactory.ServiceInstance = serviceInstance
-			serviceBindingRepo = &apifakes.OldFakeServiceBindingRepo{CreateNonHTTPErrCode: "1001"}
+			serviceBindingRepo.CreateReturns(errors.New("1001"))
 			callBindService([]string{"my-app1", "my-service1"})
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
@@ -135,24 +136,6 @@ var _ = Describe("bind-service command", func() {
 		})
 
 		Context("when passing arbitrary params", func() {
-			var (
-				app             models.Application
-				serviceInstance models.ServiceInstance
-			)
-
-			BeforeEach(func() {
-				app = models.Application{}
-				app.Name = "my-app"
-				app.GUID = "my-app-guid"
-
-				serviceInstance = models.ServiceInstance{}
-				serviceInstance.Name = "my-service"
-				serviceInstance.GUID = "my-service-guid"
-
-				requirementsFactory.Application = app
-				requirementsFactory.ServiceInstance = serviceInstance
-			})
-
 			Context("as a json string", func() {
 				It("successfully creates a service and passes the params as a json string", func() {
 					callBindService([]string{"my-app", "my-service", "-c", `{"foo": "bar"}`})
@@ -162,9 +145,12 @@ var _ = Describe("bind-service command", func() {
 						[]string{"OK"},
 						[]string{"TIP"},
 					))
-					Expect(serviceBindingRepo.CreateServiceInstanceGUID).To(Equal("my-service-guid"))
-					Expect(serviceBindingRepo.CreateApplicationGUID).To(Equal("my-app-guid"))
-					Expect(serviceBindingRepo.CreateParams).To(Equal(map[string]interface{}{"foo": "bar"}))
+
+					Expect(serviceBindingRepo.CreateCallCount()).To(Equal(1))
+					serviceInstanceGUID, applicationGUID, createParams := serviceBindingRepo.CreateArgsForCall(0)
+					Expect(serviceInstanceGUID).To(Equal("my-service-guid"))
+					Expect(applicationGUID).To(Equal("my-app-guid"))
+					Expect(createParams).To(Equal(map[string]interface{}{"foo": "bar"}))
 				})
 
 				Context("that are not valid json", func() {
@@ -211,9 +197,12 @@ var _ = Describe("bind-service command", func() {
 						[]string{"OK"},
 						[]string{"TIP"},
 					))
-					Expect(serviceBindingRepo.CreateServiceInstanceGUID).To(Equal("my-service-guid"))
-					Expect(serviceBindingRepo.CreateApplicationGUID).To(Equal("my-app-guid"))
-					Expect(serviceBindingRepo.CreateParams).To(Equal(map[string]interface{}{"foo": "bar"}))
+
+					Expect(serviceBindingRepo.CreateCallCount()).To(Equal(1))
+					serviceInstanceGUID, applicationGUID, createParams := serviceBindingRepo.CreateArgsForCall(0)
+					Expect(serviceInstanceGUID).To(Equal("my-service-guid"))
+					Expect(applicationGUID).To(Equal("my-app-guid"))
+					Expect(createParams).To(Equal(map[string]interface{}{"foo": "bar"}))
 				})
 
 				Context("that are not valid json", func() {
