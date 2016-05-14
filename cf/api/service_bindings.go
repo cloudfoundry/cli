@@ -27,7 +27,7 @@ func NewCloudControllerServiceBindingRepository(config coreconfig.Reader, gatewa
 	return
 }
 
-func (repo CloudControllerServiceBindingRepository) Create(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error) {
+func (repo CloudControllerServiceBindingRepository) Create(instanceGUID, appGUID string, paramsMap map[string]interface{}) error {
 	path := "/v2/service_bindings"
 	request := models.ServiceBindingRequest{
 		AppGUID:             appGUID,
@@ -43,9 +43,8 @@ func (repo CloudControllerServiceBindingRepository) Create(instanceGUID, appGUID
 	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, bytes.NewReader(jsonBytes))
 }
 
-func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error) {
+func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (bool, error) {
 	var path string
-
 	for _, binding := range instance.ServiceBindings {
 		if binding.AppGUID == appGUID {
 			path = binding.URL
@@ -54,11 +53,8 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 	}
 
 	if path == "" {
-		return
+		return false, nil
 	}
 
-	found = true
-
-	apiErr = repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
-	return
+	return true, repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
