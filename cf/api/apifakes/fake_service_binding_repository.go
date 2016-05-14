@@ -9,7 +9,7 @@ import (
 )
 
 type FakeServiceBindingRepository struct {
-	CreateStub        func(instanceGUID, appGUID string, paramsMap map[string]interface{}) (apiErr error)
+	CreateStub        func(instanceGUID string, appGUID string, paramsMap map[string]interface{}) error
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		instanceGUID string
@@ -19,7 +19,7 @@ type FakeServiceBindingRepository struct {
 	createReturns struct {
 		result1 error
 	}
-	DeleteStub        func(instance models.ServiceInstance, appGUID string) (found bool, apiErr error)
+	DeleteStub        func(instance models.ServiceInstance, appGUID string) (bool, error)
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
 		instance models.ServiceInstance
@@ -29,9 +29,18 @@ type FakeServiceBindingRepository struct {
 		result1 bool
 		result2 error
 	}
+	ListAllForServiceStub        func(instanceGUID string) ([]models.ServiceBindingFields, error)
+	listAllForServiceMutex       sync.RWMutex
+	listAllForServiceArgsForCall []struct {
+		instanceGUID string
+	}
+	listAllForServiceReturns struct {
+		result1 []models.ServiceBindingFields
+		result2 error
+	}
 }
 
-func (fake *FakeServiceBindingRepository) Create(instanceGUID string, appGUID string, paramsMap map[string]interface{}) (apiErr error) {
+func (fake *FakeServiceBindingRepository) Create(instanceGUID string, appGUID string, paramsMap map[string]interface{}) error {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		instanceGUID string
@@ -65,7 +74,7 @@ func (fake *FakeServiceBindingRepository) CreateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (found bool, apiErr error) {
+func (fake *FakeServiceBindingRepository) Delete(instance models.ServiceInstance, appGUID string) (bool, error) {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		instance models.ServiceInstance
@@ -95,6 +104,39 @@ func (fake *FakeServiceBindingRepository) DeleteReturns(result1 bool, result2 er
 	fake.DeleteStub = nil
 	fake.deleteReturns = struct {
 		result1 bool
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeServiceBindingRepository) ListAllForService(instanceGUID string) ([]models.ServiceBindingFields, error) {
+	fake.listAllForServiceMutex.Lock()
+	fake.listAllForServiceArgsForCall = append(fake.listAllForServiceArgsForCall, struct {
+		instanceGUID string
+	}{instanceGUID})
+	fake.listAllForServiceMutex.Unlock()
+	if fake.ListAllForServiceStub != nil {
+		return fake.ListAllForServiceStub(instanceGUID)
+	} else {
+		return fake.listAllForServiceReturns.result1, fake.listAllForServiceReturns.result2
+	}
+}
+
+func (fake *FakeServiceBindingRepository) ListAllForServiceCallCount() int {
+	fake.listAllForServiceMutex.RLock()
+	defer fake.listAllForServiceMutex.RUnlock()
+	return len(fake.listAllForServiceArgsForCall)
+}
+
+func (fake *FakeServiceBindingRepository) ListAllForServiceArgsForCall(i int) string {
+	fake.listAllForServiceMutex.RLock()
+	defer fake.listAllForServiceMutex.RUnlock()
+	return fake.listAllForServiceArgsForCall[i].instanceGUID
+}
+
+func (fake *FakeServiceBindingRepository) ListAllForServiceReturns(result1 []models.ServiceBindingFields, result2 error) {
+	fake.ListAllForServiceStub = nil
+	fake.listAllForServiceReturns = struct {
+		result1 []models.ServiceBindingFields
 		result2 error
 	}{result1, result2}
 }

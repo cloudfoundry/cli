@@ -22,7 +22,7 @@ var _ = Describe("unbind-service command", func() {
 		config              coreconfig.Repository
 		serviceInstance     models.ServiceInstance
 		requirementsFactory *testreq.FakeReqFactory
-		serviceBindingRepo  *apifakes.OldFakeServiceBindingRepo
+		serviceBindingRepo  *apifakes.FakeServiceBindingRepository
 		deps                commandregistry.Dependency
 	)
 
@@ -34,19 +34,28 @@ var _ = Describe("unbind-service command", func() {
 	}
 
 	BeforeEach(func() {
-		app.Name = "my-app"
-		app.GUID = "my-app-guid"
+		ui = new(testterm.FakeUI)
+		serviceBindingRepo = new(apifakes.FakeServiceBindingRepository)
 
-		ui = &testterm.FakeUI{}
-		serviceInstance.Name = "my-service"
-		serviceInstance.GUID = "my-service-guid"
+		app = models.Application{
+			ApplicationFields: models.ApplicationFields{
+				Name: "my-app",
+				GUID: "my-app-guid",
+			},
+		}
+
+		serviceInstance = models.ServiceInstance{
+			ServiceInstanceFields: models.ServiceInstanceFields{
+				Name: "my-service",
+				GUID: "my-service-guid",
+			},
+		}
 
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
-		requirementsFactory.Application = app
-		requirementsFactory.ServiceInstance = serviceInstance
-
-		serviceBindingRepo = new(apifakes.OldFakeServiceBindingRepo)
+		requirementsFactory = &testreq.FakeReqFactory{
+			Application:     app,
+			ServiceInstance: serviceInstance,
+		}
 	})
 
 	callUnbindService := func(args []string) bool {
@@ -75,14 +84,17 @@ var _ = Describe("unbind-service command", func() {
 					[]string{"Unbinding app", "my-service", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
-				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
-				Expect(serviceBindingRepo.DeleteApplicationGUID).To(Equal("my-app-guid"))
+
+				Expect(serviceBindingRepo.DeleteCallCount()).To(Equal(1))
+				serviceInstance, applicationGUID := serviceBindingRepo.DeleteArgsForCall(0)
+				Expect(serviceInstance).To(Equal(serviceInstance))
+				Expect(applicationGUID).To(Equal("my-app-guid"))
 			})
 		})
 
 		Context("when the service instance does not exist", func() {
 			BeforeEach(func() {
-				serviceBindingRepo.DeleteBindingNotFound = true
+				serviceBindingRepo.DeleteReturns(false, nil)
 			})
 
 			It("warns the user the the service instance does not exist", func() {
@@ -96,8 +108,11 @@ var _ = Describe("unbind-service command", func() {
 					[]string{"OK"},
 					[]string{"my-service", "my-app", "did not exist"},
 				))
-				Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
-				Expect(serviceBindingRepo.DeleteApplicationGUID).To(Equal("my-app-guid"))
+
+				Expect(serviceBindingRepo.DeleteCallCount()).To(Equal(1))
+				serviceInstance, applicationGUID := serviceBindingRepo.DeleteArgsForCall(0)
+				Expect(serviceInstance).To(Equal(serviceInstance))
+				Expect(applicationGUID).To(Equal("my-app-guid"))
 			})
 		})
 
