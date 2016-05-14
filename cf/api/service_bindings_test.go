@@ -2,80 +2,86 @@ package api_test
 
 import (
 	"net/http"
-	"net/http/httptest"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("ServiceBindingsRepository", func() {
 	var (
-		testServer  *httptest.Server
-		testHandler *testnet.TestHandler
-		configRepo  coreconfig.ReadWriter
-		repo        CloudControllerServiceBindingRepository
+		server     *ghttp.Server
+		configRepo coreconfig.ReadWriter
+		repo       CloudControllerServiceBindingRepository
 	)
 
-	setupTestServer := func(reqs ...testnet.TestRequest) {
-		testServer, testHandler = testnet.NewServer(reqs)
-		configRepo.SetAPIEndpoint(testServer.URL)
-	}
-
 	BeforeEach(func() {
+		server = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
-
+		configRepo.SetAPIEndpoint(server.URL())
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
 		repo = NewCloudControllerServiceBindingRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {
-		testServer.Close()
+		server.Close()
 	})
 
 	Describe("Create", func() {
-		var requestMatcher testnet.RequestMatcher
+		var requestBody string
+
 		Context("when the service binding can be created", func() {
-			BeforeEach(func() {
-				requestMatcher = testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`)
-			})
-
 			JustBeforeEach(func() {
-				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "POST",
-					Path:     "/v2/service_bindings",
-					Matcher:  requestMatcher,
-					Response: testnet.TestResponse{Status: http.StatusCreated},
-				}))
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/service_bindings"),
+						ghttp.VerifyJSON(requestBody),
+						ghttp.RespondWith(http.StatusCreated, nil),
+					),
+				)
 			})
 
-			It("creates the service binding", func() {
-				apiErr := repo.Create("my-service-instance-guid", "my-app-guid", nil)
+			Context("no parameters passed", func() {
+				BeforeEach(func() {
+					requestBody = `{
+						"app_guid":"my-app-guid",
+						"service_instance_guid":"my-service-instance-guid"
+					}`
+				})
 
-				Expect(testHandler).To(HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(HaveOccurred())
+				It("creates the service binding", func() {
+					err := repo.Create("my-service-instance-guid", "my-app-guid", nil)
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
+				})
 			})
 
 			Context("when there are arbitrary parameters", func() {
 				BeforeEach(func() {
-					requestMatcher = testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid", "parameters": { "foo": "bar"}}`)
+					requestBody = `{
+						"app_guid":"my-app-guid",
+						"service_instance_guid":"my-service-instance-guid",
+						"parameters": { "foo": "bar" }
+					}`
 				})
 
 				It("send the parameters as part of the request body", func() {
-					paramsMap := map[string]interface{}{"foo": "bar"}
-					apiErr := repo.Create("my-service-instance-guid", "my-app-guid", paramsMap)
+					err := repo.Create(
+						"my-service-instance-guid",
+						"my-app-guid",
+						map[string]interface{}{"foo": "bar"},
+					)
+					Expect(err).NotTo(HaveOccurred())
 
-					Expect(testHandler).To(HaveAllRequestsCalled())
-					Expect(apiErr).NotTo(HaveOccurred())
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
 				})
 
 				Context("and there is a failure during serialization", func() {
@@ -92,72 +98,73 @@ var _ = Describe("ServiceBindingsRepository", func() {
 
 		Context("when an API error occurs", func() {
 			BeforeEach(func() {
-				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/service_bindings",
-					Matcher: testnet.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
-					Response: testnet.TestResponse{
-						Status: http.StatusBadRequest,
-						Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
-					},
-				}))
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("POST", "/v2/service_bindings"),
+						ghttp.VerifyJSON(`{
+							"app_guid":"my-app-guid",
+							"service_instance_guid":"my-service-instance-guid"
+						}`),
+						ghttp.RespondWith(http.StatusBadRequest, `{
+							"code":90003,
+							"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"
+						}`),
+					),
+				)
 			})
 
 			It("returns an error", func() {
-				apiErr := repo.Create("my-service-instance-guid", "my-app-guid", nil)
-
-				Expect(testHandler).To(HaveAllRequestsCalled())
-				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.(errors.HTTPError).ErrorCode()).To(Equal("90003"))
+				err := repo.Create("my-service-instance-guid", "my-app-guid", nil)
+				Expect(err).To(HaveOccurred())
+				Expect(err.(errors.HTTPError).ErrorCode()).To(Equal("90003"))
 			})
 		})
 	})
 
 	Describe("Delete", func() {
+		var serviceInstance models.ServiceInstance
+
+		BeforeEach(func() {
+			serviceInstance.GUID = "my-service-instance-guid"
+		})
+
 		Context("when binding does exist", func() {
-			var serviceInstance models.ServiceInstance
-
 			BeforeEach(func() {
-				setupTestServer(apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "DELETE",
-					Path:     "/v2/service_bindings/service-binding-2-guid",
-					Response: testnet.TestResponse{Status: http.StatusOK},
-				}))
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("DELETE", "/v2/service_bindings/service-binding-2-guid"),
+						ghttp.RespondWith(http.StatusOK, nil),
+					),
+				)
 
-				serviceInstance.GUID = "my-service-instance-guid"
-
-				binding := models.ServiceBindingFields{}
-				binding.URL = "/v2/service_bindings/service-binding-1-guid"
-				binding.AppGUID = "app-1-guid"
-				binding2 := models.ServiceBindingFields{}
-				binding2.URL = "/v2/service_bindings/service-binding-2-guid"
-				binding2.AppGUID = "app-2-guid"
-				serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
+				serviceInstance.ServiceBindings = []models.ServiceBindingFields{
+					{
+						URL:     "/v2/service_bindings/service-binding-1-guid",
+						AppGUID: "app-1-guid",
+					},
+					{
+						URL:     "/v2/service_bindings/service-binding-2-guid",
+						AppGUID: "app-2-guid",
+					},
+				}
 			})
 
 			It("deletes the service binding with the given guid", func() {
-				found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
-
-				Expect(testHandler).To(HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(HaveOccurred())
+				found, err := repo.Delete(serviceInstance, "app-2-guid")
+				Expect(err).NotTo(HaveOccurred())
 				Expect(found).To(BeTrue())
+
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
 			})
 		})
 
 		Context("when binding does not exist", func() {
-			var serviceInstance models.ServiceInstance
-
-			BeforeEach(func() {
-				setupTestServer()
-				serviceInstance.GUID = "my-service-instance-guid"
-			})
-
 			It("does not return an error", func() {
-				found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
-
-				Expect(testHandler.CallCount).To(Equal(0))
-				Expect(apiErr).NotTo(HaveOccurred())
+				found, err := repo.Delete(serviceInstance, "app-3-guid")
+				Expect(err).NotTo(HaveOccurred())
 				Expect(found).To(BeFalse())
+
+				Expect(server.ReceivedRequests()).To(HaveLen(0))
 			})
 		})
 	})
