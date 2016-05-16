@@ -43,7 +43,10 @@ func (zipper ApplicationZipper) Zip(dirOrZipFilePath string, targetFile *os.File
 		}
 	}
 
-	targetFile.Seek(0, os.SEEK_SET)
+	_, err := targetFile.Seek(0, os.SEEK_SET)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -265,7 +268,10 @@ func (zipper ApplicationZipper) isZipWithOffsetFileHeaderLocation(name string) b
 
 func (zipper ApplicationZipper) extractFile(f *zip.File, destDir string) error {
 	if f.FileInfo().IsDir() {
-		os.MkdirAll(filepath.Join(destDir, f.Name), os.ModeDir|os.ModePerm)
+		err := os.MkdirAll(filepath.Join(destDir, f.Name), os.ModeDir|os.ModePerm)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 

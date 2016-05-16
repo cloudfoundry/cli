@@ -111,7 +111,10 @@ func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, from
 			}
 			defer dst.Close()
 
-			dst.Chmod(srcFileInfo.Mode())
+			err = dst.Chmod(srcFileInfo.Mode())
+			if err != nil {
+				return err
+			}
 
 			src, err := os.Open(fromPath)
 			if err != nil {
