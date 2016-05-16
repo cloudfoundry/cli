@@ -68,4 +68,5 @@ run:
 
     export CONFIG=$PWD/config.json
 
-    ginkgo -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites ./gats
+    ginkgo -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites ./gats/application
+    ginkgo -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites -skpPackage application ./gats
