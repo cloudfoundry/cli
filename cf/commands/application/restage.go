@@ -76,7 +76,16 @@ func (cmd *Restage) Execute(c flags.FlagContext) {
 
 	app.PackageState = ""
 
-	cmd.appStagingWatcher.ApplicationWatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
+	_, err = cmd.appStagingWatcher.ApplicationWatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
 		return app, cmd.appRepo.CreateRestageRequest(app.GUID)
 	})
+	if err != nil {
+		cmd.ui.Say(T("Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+			map[string]interface{}{
+				"AppName":     terminal.EntityNameColor(app.Name),
+				"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
+			}))
+	}
 }

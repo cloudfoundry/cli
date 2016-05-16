@@ -676,6 +676,10 @@
     "translation": "Error requesting one time code from server: {{.Error}}"
   },
   {
+    "id": "Error restarting application: {{.Error}}",
+    "translation": "Error restarting application: {{.Error}}"
+  },
+  {
     "id": "Error retrieving stack: ",
     "translation": "Error retrieving stack: "
   },
@@ -696,8 +700,16 @@
     "translation": "Expected {{.PropertyName}} to be a list of integers."
   },
   {
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Failed fetching domains for organization %s.\n{{.Err}}"
+  },
+  {
     "id": "Failed to make plugin executable: {{.Error}}",
     "translation": "Failed to make plugin executable: {{.Error}}"
+  },
+  {
+    "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
     "id": "Features",

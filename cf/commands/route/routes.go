@@ -87,10 +87,13 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 	table := cmd.ui.Table([]string{T("space"), T("host"), T("domain"), T("port"), T("path"), T("type"), T("apps"), T("service")})
 
 	d := make(map[string]models.DomainFields)
-	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().GUID, func(domain models.DomainFields) bool {
+	err := cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().GUID, func(domain models.DomainFields) bool {
 		d[domain.GUID] = domain
 		return true
 	})
+	if err != nil {
+		cmd.ui.Failed(T("Failed fetching domains for organization %s.\n{{.Err}}", cmd.config.OrganizationFields().Name, map[string]interface{}{"Err": err.Error()}))
+	}
 
 	var routesFound bool
 	cb := func(route models.Route) bool {
@@ -120,7 +123,6 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 		return true
 	}
 
-	var err error
 	if orglevel {
 		err = cmd.routeRepo.ListAllRoutes(cb)
 	} else {

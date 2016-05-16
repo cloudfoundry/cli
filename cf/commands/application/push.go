@@ -265,7 +265,15 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 			cmd.bindAppToServices(*appParams.ServicesToBind, app)
 		}
 
-		cmd.restart(app, appParams, c)
+		err = cmd.restart(app, appParams, c)
+		if err != nil {
+			cmd.ui.Failed(
+				T("Error restarting application: {{.Error}}",
+					map[string]interface{}{
+						"Error": err.Error(),
+					}),
+			)
+		}
 	}
 }
 
@@ -321,12 +329,12 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 	if routeDefined || defaultRouteAcceptable {
 		if appParams.Domains == nil {
 			domain := cmd.findDomain(nil)
-			appParams.UseRandomPort = isTcp(domain)
+			appParams.UseRandomPort = isTCP(domain)
 			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 		} else {
 			for _, d := range *(appParams.Domains) {
 				domain := cmd.findDomain(&d)
-				appParams.UseRandomPort = isTcp(domain)
+				appParams.UseRandomPort = isTCP(domain)
 				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 			}
 		}
@@ -335,7 +343,7 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 
 const TCP = "tcp"
 
-func isTcp(domain models.DomainFields) bool {
+func isTCP(domain models.DomainFields) bool {
 	return domain.RouterGroupType == TCP
 }
 
@@ -479,7 +487,7 @@ func (cmd *Push) fetchStackGUID(appParams *models.AppParams) {
 	appParams.StackGUID = &stack.GUID
 }
 
-func (cmd *Push) restart(app models.Application, params models.AppParams, c flags.FlagContext) {
+func (cmd *Push) restart(app models.Application, params models.AppParams, c flags.FlagContext) error {
 	if app.State != T("stopped") {
 		cmd.ui.Say("")
 		app, _ = cmd.appStopper.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
@@ -488,14 +496,19 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c flag
 	cmd.ui.Say("")
 
 	if c.Bool("no-start") {
-		return
+		return nil
 	}
 
 	if params.HealthCheckTimeout != nil {
 		cmd.appStarter.SetStartTimeoutInSeconds(*params.HealthCheckTimeout)
 	}
 
-	cmd.appStarter.ApplicationStart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+	_, err := cmd.appStarter.ApplicationStart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParams {
@@ -564,7 +577,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 			for _, appParams := range manifestApps {
 				if appParams.Name != nil && *appParams.Name == *selectedAppName {
 					foundApp = true
-					addApp(&apps, appParams)
+					err = addApp(&apps, appParams)
 				}
 			}
 
@@ -573,7 +586,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 			}
 		} else {
 			for _, manifestApp := range manifestApps {
-				addApp(&apps, manifestApp)
+				err = addApp(&apps, manifestApp)
 			}
 		}
 	}
@@ -729,7 +742,6 @@ func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles [
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(uploadDir)
 
 	remoteFiles, hasFileToUpload, err := cmd.actor.GatherFiles(localFiles, appDir, uploadDir)
 	if err != nil {
@@ -754,7 +766,8 @@ func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles [
 			return fmt.Errorf("%s: %s", T("Error zipping application"), err.Error())
 		}
 
-		zipFileSize, err := cmd.zipper.GetZipSize(zipFile)
+		var zipFileSize int64
+		zipFileSize, err = cmd.zipper.GetZipSize(zipFile)
 		if err != nil {
 			return err
 		}
@@ -767,6 +780,11 @@ func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles [
 					"ZipFileBytes": formatters.ByteSize(zipFileSize),
 					"FileCount":    zipFileCount}))
 		}
+	}
+
+	err = os.RemoveAll(uploadDir)
+	if err != nil {
+		return err
 	}
 
 	return cmd.actor.UploadApp(appGUID, zipFile, remoteFiles)
