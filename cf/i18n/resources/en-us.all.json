@@ -1900,6 +1900,10 @@
     "translation": "Error resolving route:\n{{.Err}}"
   },
   {
+    "id": "Error restarting application: {{.Error}}",
+    "translation": "Error restarting application: {{.Error}}"
+  },
+  {
     "id": "Error retrieving stack: ",
     "translation": "Error retrieving stack: "
   },
@@ -2004,6 +2008,10 @@
     "translation": "Failed fetching buildpacks.\n{{.Error}}"
   },
   {
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Failed fetching domains for organization %s.\n{{.Err}}"
+  },
+  {
     "id": "Failed fetching domains.\n{{.Error}}",
     "translation": "Failed fetching domains.\n{{.Error}}"
   },
@@ -2054,6 +2062,10 @@
   {
     "id": "Failed to start oauth request",
     "translation": "Failed to start oauth request"
+  },
+  {
+    "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
     "id": "Feature {{.FeatureFlag}} Disabled.",

@@ -1900,6 +1900,10 @@
     "translation": "라우트 분석 중에 오류 발생:\n{{.Err}}"
   },
   {
+    "id": "Error restarting application: {{.Error}}",
+    "translation": ""
+  },
+  {
     "id": "Error retrieving stack: ",
     "translation": ""
   },
@@ -2004,6 +2008,10 @@
     "translation": "빌드팩 페치에 실패했습니다.\n{{.Error}}"
   },
   {
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "Failed fetching domains.\n{{.Error}}",
     "translation": "도메인 페치에 실패했습니다.\n{{.Error}}"
   },
@@ -2054,6 +2062,10 @@
   {
     "id": "Failed to start oauth request",
     "translation": "OAuth 요청 시작 실패"
+  },
+  {
+    "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "Feature {{.FeatureFlag}} Disabled.",

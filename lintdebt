@@ -29,7 +29,6 @@ cf/api/securitygroups/defaults/running/running.go:15:6: type name will be used a
 cf/api/securitygroups/defaults/staging/staging.go:15:6: type name will be used as staging.StagingSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
 cf/commands/api.go:17:6: type Api should be API
 cf/commands/application/app.go:25:6: type name will be used as application.ApplicationDisplayer by other packages, and that stutters; consider calling this Displayer
-cf/commands/application/push.go:338:6: func isTcp should be isTCP
 cf/commands/application/restart.go:15:6: type name will be used as application.ApplicationRestarter by other packages, and that stutters; consider calling this Restarter
 cf/commands/application/start.go:36:6: type name will be used as application.ApplicationStagingWatcher by other packages, and that stutters; consider calling this StagingWatcher
 cf/commands/application/start.go:42:6: type name will be used as application.ApplicationStarter by other packages, and that stutters; consider calling this Starter
