@@ -1,7 +1,7 @@
 [
   {
     "id": "\n\nTIP:\n",
-    "translation": "\n\n提示:\n"
+    "translation": "\n\n提示：\n"
   },
   {
     "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
@@ -53,7 +53,7 @@
   },
   {
     "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
-    "translation": ""
+    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
@@ -137,7 +137,7 @@
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
-    "translation": ""
+    "translation": "也接受 '{{.VersionShort}}' 和 '{{.VersionLong}}'。"
   },
   {
     "id": ") already exists.",
@@ -197,11 +197,11 @@
   },
   {
     "id": "APP_INSTANCES",
-    "translation": ""
+    "translation": "APP_INSTANCES"
   },
   {
     "id": "APP_NAME",
-    "translation": ""
+    "translation": "APP_NAME"
   },
   {
     "id": "Access for plans of a particular broker",
@@ -273,7 +273,7 @@
   },
   {
     "id": "App instance limit",
-    "translation": ""
+    "translation": "應用程式實例限制"
   },
   {
     "id": "App name is a required field",
@@ -333,11 +333,11 @@
   },
   {
     "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
-    "translation": "正在以 {{.CurrentUser}} 身分將角色 {{.Role}} 指派給組織 {{.TargetOrg}}/空間 {{.TargetSpace}} 中的使用者 {{.TargetUser}}..."
+    "translation": "正在以 {{.CurrentUser}} 身分，指派角色 {{.Role}} 給組織 {{.TargetOrg}} / 空間 {{.TargetSpace}} 中的使用者 {{.TargetUser}}..."
   },
   {
     "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-    "translation": "正在以 {{.CurrentUser}} 身分將角色 {{.Role}} 指派給組織 {{.TargetOrg}} 中的使用者 {{.TargetUser}}..."
+    "translation": "正在以 {{.CurrentUser}} 身分，指派角色 {{.Role}} 給組織 {{.TargetOrg}} 中的使用者 {{.TargetUser}}..."
   },
   {
     "id": "Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
@@ -377,7 +377,7 @@
   },
   {
     "id": "BILLING MANAGER",
-    "translation": "計費管理員"
+    "translation": "帳單管理員"
   },
   {
     "id": "BUILDPACKS",
@@ -385,7 +385,7 @@
   },
   {
     "id": "BUILDPACK_NAME",
-    "translation": ""
+    "translation": "BUILDPACK_NAME"
   },
   {
     "id": "Bind a security group to a space",
@@ -401,19 +401,27 @@
   },
   {
     "id": "Bind a service instance to an HTTP route",
-    "translation": ""
+    "translation": "將服務實例連結至 HTTP 路徑"
   },
   {
     "id": "Bind a service instance to an app",
     "translation": "將服務實例連結至應用程式"
   },
   {
+    "id": "Bind cancelled",
+    "translation": "已取消連結"
+  },
+  {
     "id": "Binding between {{.InstanceName}} and {{.AppName}} did not exist",
     "translation": "{{.InstanceName}} 與 {{.AppName}} 之間的連結不存在"
   },
   {
+    "id": "Binding may cause requests for route {{.URL}} to be altered by service instance {{.ServiceInstanceName}}. Do you want to proceed?",
+    "translation": "連結可能會導致服務實例 {{.ServiceInstanceName}} 變更路徑 {{.URL}} 的要求。您要繼續進行嗎？"
+  },
+  {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "正在以 {{.CurrentUser}} 身分將路徑 {{.URL}} 新增至組織 {{.OrgName}}/空間 {{.SpaceName}} 中的服務實例 {{.ServiceInstanceName}}..."
   },
   {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
@@ -449,551 +457,551 @@
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL",
-    "translation": ""
+    "translation": "CF_NAME add-plugin-repo REPO_NAME URL"
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",
-    "translation": ""
+    "translation": "CF_NAME allow-space-ssh SPACE_NAME"
   },
   {
     "id": "CF_NAME api [URL]",
-    "translation": ""
+    "translation": "CF_NAME api [URL]"
   },
   {
     "id": "CF_NAME app APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME app APP_NAME"
   },
   {
     "id": "CF_NAME auth USERNAME PASSWORD\n\n",
-    "translation": ""
+    "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
   },
   {
     "id": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
-    "translation": ""
+    "translation": "CF_NAME auth name@example.com \"\\\"password\\\"\"（如果在密碼中使用引號，請跳出引號）"
   },
   {
     "id": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)",
-    "translation": ""
+    "translation": "CF_NAME auth name@example.com \"my password\"（如果密碼含有空格，請使用引號）"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [-f] [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
-    "translation": ""
+    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME buildpacks",
-    "translation": ""
+    "translation": "CF_NAME buildpacks"
   },
   {
     "id": "CF_NAME check-route HOST DOMAIN [--path PATH]",
-    "translation": ""
+    "translation": "CF_NAME check-route HOST DOMAIN [--path PATH]"
   },
   {
     "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]",
-    "translation": ""
+    "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"
   },
   {
     "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
-    "translation": ""
+    "translation": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]"
   },
   {
     "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
-    "translation": ""
+    "translation": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]"
   },
   {
     "id": "CF_NAME create-domain ORG DOMAIN",
-    "translation": ""
+    "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
     "id": "CF_NAME create-org ORG",
-    "translation": ""
+    "translation": "CF_NAME create-org ORG"
   },
   {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
-    "translation": ""
+    "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
   {
     "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]",
-    "translation": ""
+    "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]"
   },
   {
     "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
-    "translation": ""
+    "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
   },
   {
     "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]",
-    "translation": ""
+    "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": ""
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  選擇性地在有效的行內 JSON 物件中提供服務特定配置參數。\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  選擇性地在有效的 JSON 物件中提供包含服務特定配置參數的檔案。參數檔案的路徑可以是某個檔案的絕對或相對路徑。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   有效的 JSON 物件範例：\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
-    "translation": ""
+    "translation": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"
   },
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
-    "translation": ""
+    "translation": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"
   },
   {
     "id": "CF_NAME create-user USERNAME PASSWORD",
-    "translation": ""
+    "translation": "CF_NAME create-user USERNAME PASSWORD"
   },
   {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
-    "translation": ""
+    "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   傳遞 comma separated credential parameter names 來啟用互動模式：\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   將認證參數傳遞為 JSON，以非互動方式建立服務：\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   指定包含 JSON 的檔案的路徑：\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
   {
     "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   By default 'CF_NAME curl' will perform a GET to the specified PATH. If data\n   is provided via -d, a POST will be performed instead, and the Content-Type\n   will be set to application/json. You may override headers with -H and the\n   request method with -X.\n\n   For API documentation, please visit http://apidocs.cloudfoundry.org.",
-    "translation": ""
+    "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   依預設，'CF_NAME curl' 將會對指定的 PATH 執行 GET。如果透過 -d 提供資料，\n   將會改為執行 POST，而且 Content-Type\n   將會設為 application/json。您可能會將標頭置換為 -H，並將\n   要求方法置換為 -X。\n\n   如需 API 文件，請造訪 http://apidocs.cloudfoundry.org。"
   },
   {
     "id": "CF_NAME delete APP_NAME [-f -r]",
-    "translation": ""
+    "translation": "CF_NAME delete APP_NAME [-f -r]"
   },
   {
     "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-buildpack BUILDPACK [-f]"
   },
   {
     "id": "CF_NAME delete-domain DOMAIN [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-domain DOMAIN [-f]"
   },
   {
     "id": "CF_NAME delete-org ORG [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-org ORG [-f]"
   },
   {
     "id": "CF_NAME delete-orphaned-routes [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-orphaned-routes [-f]"
   },
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-quota QUOTA [-f]"
   },
   {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
   },
   {
     "id": "CF_NAME delete-service SERVICE_INSTANCE [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service SERVICE_INSTANCE [-f]"
   },
   {
     "id": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"
   },
   {
     "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service-broker SERVICE_BROKER [-f]"
   },
   {
     "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"
   },
   {
     "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
   },
   {
     "id": "CF_NAME delete-space SPACE [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-space SPACE [-f]"
   },
   {
     "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"
   },
   {
     "id": "CF_NAME delete-user USERNAME [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-user USERNAME [-f]"
   },
   {
     "id": "CF_NAME disable-feature-flag FEATURE_NAME",
-    "translation": ""
+    "translation": "CF_NAME disable-feature-flag FEATURE_NAME"
   },
   {
     "id": "CF_NAME disable-ssh APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME disable-ssh APP_NAME"
   },
   {
     "id": "CF_NAME disallow-space-ssh SPACE_NAME",
-    "translation": ""
+    "translation": "CF_NAME disallow-space-ssh SPACE_NAME"
   },
   {
     "id": "CF_NAME enable-feature-flag FEATURE_NAME",
-    "translation": ""
+    "translation": "CF_NAME enable-feature-flag FEATURE_NAME"
   },
   {
     "id": "CF_NAME enable-ssh APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME enable-ssh APP_NAME"
   },
   {
     "id": "CF_NAME env APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME env APP_NAME"
   },
   {
     "id": "CF_NAME events APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME events APP_NAME"
   },
   {
     "id": "CF_NAME feature-flag FEATURE_NAME",
-    "translation": ""
+    "translation": "CF_NAME feature-flag FEATURE_NAME"
   },
   {
     "id": "CF_NAME feature-flags",
-    "translation": ""
+    "translation": "CF_NAME feature-flags"
   },
   {
     "id": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\nTIP:\n  To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'",
-    "translation": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\nTIP:\n  To list and inspect files of an app running on the Diego backend, use 'cf ssh'"
+    "translation": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\n提示：\n  若要列出和檢查在 Diego 後端上執行的應用程式的檔案，請使用 'CF_NAME ssh'"
   },
   {
     "id": "CF_NAME get-health-check APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME get-health-check APP_NAME"
   },
   {
     "id": "CF_NAME help [COMMAND]",
-    "translation": ""
+    "translation": "CF_NAME help [COMMAND]"
   },
   {
     "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.",
-    "translation": ""
+    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   除非提供 '-f'，否則會提示進行確認。"
   },
   {
     "id": "CF_NAME list-plugin-repos",
-    "translation": ""
+    "translation": "CF_NAME list-plugin-repos"
   },
   {
     "id": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)",
-    "translation": ""
+    "translation": "CF_NAME login（省略使用者名稱和密碼，以互動方式登入 -- CF_NAME 將提示輸入兩者）"
   },
   {
     "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
-    "translation": ""
+    "translation": "CF_NAME login --sso（CF_NAME 將提供 URL，來取得一次性密碼以進行登入）"
   },
   {
     "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
-    "translation": ""
+    "translation": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\"（如果在密碼中使用引號，請跳出引號）"
   },
   {
     "id": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)",
-    "translation": ""
+    "translation": "CF_NAME login -u name@example.com -p \"my password\"（如果密碼含有空格，請使用引號）"
   },
   {
     "id": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)",
-    "translation": ""
+    "translation": "CF_NAME login -u name@example.com -p pa55woRD（指定使用者名稱和密碼作為引數）"
   },
   {
     "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
-    "translation": ""
+    "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
   },
   {
     "id": "CF_NAME logout",
-    "translation": ""
+    "translation": "CF_NAME logout"
   },
   {
     "id": "CF_NAME logs APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME logs APP_NAME"
   },
   {
     "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
-    "translation": ""
+    "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"
   },
   {
     "id": "CF_NAME oauth-token",
-    "translation": ""
+    "translation": "CF_NAME oauth-token"
   },
   {
     "id": "CF_NAME org ORG",
-    "translation": ""
+    "translation": "CF_NAME org ORG"
   },
   {
     "id": "CF_NAME org-users ORG",
-    "translation": ""
+    "translation": "CF_NAME org-users ORG"
   },
   {
     "id": "CF_NAME passwd",
-    "translation": ""
+    "translation": "CF_NAME passwd"
   },
   {
     "id": "CF_NAME plugins",
-    "translation": ""
+    "translation": "CF_NAME plugins"
   },
   {
     "id": "CF_NAME purge-service-instance SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME purge-service-instance SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
-    "translation": ""
+    "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]"
   },
   {
     "id": "CF_NAME quota QUOTA",
-    "translation": ""
+    "translation": "CF_NAME quota QUOTA"
   },
   {
     "id": "CF_NAME quotas",
-    "translation": ""
+    "translation": "CF_NAME quotas"
   },
   {
     "id": "CF_NAME remove-plugin-repo REPO_NAME",
-    "translation": ""
+    "translation": "CF_NAME remove-plugin-repo REPO_NAME"
   },
   {
     "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME rename APP_NAME NEW_APP_NAME"
   },
   {
     "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
-    "translation": ""
+    "translation": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"
   },
   {
     "id": "CF_NAME rename-org ORG NEW_ORG",
-    "translation": ""
+    "translation": "CF_NAME rename-org ORG NEW_ORG"
   },
   {
     "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
-    "translation": ""
+    "translation": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"
   },
   {
     "id": "CF_NAME rename-space SPACE NEW_SPACE",
-    "translation": ""
+    "translation": "CF_NAME rename-space SPACE NEW_SPACE"
   },
   {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]",
-    "translation": ""
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]"
   },
   {
     "id": "CF_NAME restage APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME restage APP_NAME"
   },
   {
     "id": "CF_NAME restart APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME restart APP_NAME"
   },
   {
     "id": "CF_NAME restart-app-instance APP_NAME INDEX",
-    "translation": ""
+    "translation": "CF_NAME restart-app-instance APP_NAME INDEX"
   },
   {
     "id": "CF_NAME running-environment-variable-group",
-    "translation": ""
+    "translation": "CF_NAME running-environment-variable-group"
   },
   {
     "id": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
-    "translation": ""
+    "translation": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"
   },
   {
     "id": "CF_NAME security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME service SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME service SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME service-auth-tokens",
-    "translation": ""
+    "translation": "CF_NAME service-auth-tokens"
   },
   {
     "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY",
-    "translation": ""
+    "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY"
   },
   {
     "id": "CF_NAME service-keys SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME service-keys SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
-    "translation": ""
+    "translation": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"
   },
   {
     "id": "CF_NAME set-health-check APP_NAME 'port'|'none'",
-    "translation": ""
+    "translation": "CF_NAME set-health-check APP_NAME 'port'|'none'"
   },
   {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME set-org-role USERNAME ORG ROLE\n\n"
   },
   {
     "id": "CF_NAME set-quota ORG QUOTA\n\n",
-    "translation": ""
+    "translation": "CF_NAME set-quota ORG QUOTA\n\n"
   },
   {
     "id": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": ""
+    "translation": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",
-    "translation": ""
+    "translation": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"
   },
   {
     "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n"
   },
   {
     "id": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": ""
+    "translation": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "CF_NAME share-private-domain ORG DOMAIN",
-    "translation": ""
+    "translation": "CF_NAME share-private-domain ORG DOMAIN"
   },
   {
     "id": "CF_NAME space SPACE",
-    "translation": ""
+    "translation": "CF_NAME space SPACE"
   },
   {
     "id": "CF_NAME space-quota SPACE_QUOTA_NAME",
-    "translation": ""
+    "translation": "CF_NAME space-quota SPACE_QUOTA_NAME"
   },
   {
     "id": "CF_NAME space-quotas",
-    "translation": ""
+    "translation": "CF_NAME space-quotas"
   },
   {
     "id": "CF_NAME space-ssh-allowed SPACE_NAME",
-    "translation": ""
+    "translation": "CF_NAME space-ssh-allowed SPACE_NAME"
   },
   {
     "id": "CF_NAME space-users ORG SPACE",
-    "translation": ""
+    "translation": "CF_NAME space-users ORG SPACE"
   },
   {
     "id": "CF_NAME spaces",
-    "translation": ""
+    "translation": "CF_NAME spaces"
   },
   {
     "id": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
-    "translation": ""
+    "translation": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]"
   },
   {
     "id": "CF_NAME ssh-code",
-    "translation": ""
+    "translation": "CF_NAME ssh-code"
   },
   {
     "id": "CF_NAME ssh-enabled APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME ssh-enabled APP_NAME"
   },
   {
     "id": "CF_NAME stack STACK_NAME",
-    "translation": ""
+    "translation": "CF_NAME stack STACK_NAME"
   },
   {
     "id": "CF_NAME stacks",
-    "translation": ""
+    "translation": "CF_NAME stacks"
   },
   {
     "id": "CF_NAME staging-environment-variable-group",
-    "translation": ""
+    "translation": "CF_NAME staging-environment-variable-group"
   },
   {
     "id": "CF_NAME start APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME start APP_NAME"
   },
   {
     "id": "CF_NAME stop APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME stop APP_NAME"
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
-    "translation": ""
+    "translation": "CF_NAME target [-o ORG] [-s SPACE]"
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]",
-    "translation": ""
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE",
-    "translation": ""
+    "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
     "id": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME uninstall-plugin PLUGIN-NAME",
-    "translation": ""
+    "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
-    "translation": ""
+    "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
   {
     "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n"
   },
   {
     "id": "CF_NAME unset-space-quota SPACE QUOTA\n\n",
-    "translation": ""
+    "translation": "CF_NAME unset-space-quota SPACE QUOTA\n\n"
   },
   {
     "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n"
   },
   {
     "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-    "translation": ""
+    "translation": "CF_NAME unshare-private-domain ORG DOMAIN"
   },
   {
     "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
-    "translation": ""
+    "translation": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"
   },
   {
     "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
-    "translation": ""
+    "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
   {
     "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]",
-    "translation": ""
+    "translation": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]"
   },
   {
     "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
-    "translation": ""
+    "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"
   },
   {
     "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-    "translation": ""
+    "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
   },
   {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
-    "translation": ""
+    "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   傳遞 comma separated credential parameter names 來啟用互動模式：\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   將認證參數傳遞為 JSON，以非互動方式建立服務：\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   指定包含 JSON 的檔案的路徑：\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
-    "translation": ""
+    "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
   },
   {
     "id": "COMMAND",
-    "translation": ""
+    "translation": "COMMAND"
   },
   {
     "id": "Can not provision instances of paid service plans",
@@ -1037,11 +1045,11 @@
   },
   {
     "id": "Cannot specify port together with hostname and/or path.",
-    "translation": ""
+    "translation": "不能同時指定埠與主機名稱和（或）路徑。"
   },
   {
     "id": "Cannot specify random-port together with port, hostname and/or path.",
-    "translation": ""
+    "translation": "不能同時指定隨機埠與埠、主機名稱和（或）路徑。"
   },
   {
     "id": "Change or view the instance count, disk space limit, and memory limit for an app",
@@ -1069,7 +1077,7 @@
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
-    "translation": ""
+    "translation": "應用程式可能會在其上接聽的埠清單（以逗點區隔）"
   },
   {
     "id": "Command Help",
@@ -1093,7 +1101,7 @@
   },
   {
     "id": "Compute and show the sha1 value of the plugin binary file",
-    "translation": "計算和顯示外掛程式二進位檔的 sha1 值"
+    "translation": "計算並顯示外掛程式二進位檔的 sha1 值"
   },
   {
     "id": "Computing sha1 for installed plugins, this may take a while ...",
@@ -1133,7 +1141,7 @@
   },
   {
     "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
-    "translation": ""
+    "translation": "找不到語言環境 '{{.UnsupportedLocale}}'。已知的語言環境如下：\n"
   },
   {
     "id": "Could not find plan with name {{.ServicePlanName}}",
@@ -1173,7 +1181,7 @@
   },
   {
     "id": "Create a TCP route",
-    "translation": ""
+    "translation": "建立 TCP 路徑"
   },
   {
     "id": "Create a buildpack",
@@ -1193,7 +1201,7 @@
   },
   {
     "id": "Create a random port for the TCP route",
-    "translation": ""
+    "translation": "建立 TCP 路徑的隨機埠"
   },
   {
     "id": "Create a random route for this app",
@@ -1221,11 +1229,11 @@
   },
   {
     "id": "Create a url route in a space for later use",
-    "translation": "在空間中建立 URL 路徑以供稍後使用"
+    "translation": "在空間中建立 URL 路徑，以供稍後使用"
   },
   {
     "id": "Create an HTTP route",
-    "translation": ""
+    "translation": "建立 HTTP 路徑"
   },
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
@@ -1273,7 +1281,7 @@
   },
   {
     "id": "Creating random route for {{.Domain}}",
-    "translation": ""
+    "translation": "正在建立 {{.Domain}} 的隨機路徑"
   },
   {
     "id": "Creating route {{.Hostname}}...",
@@ -1281,7 +1289,7 @@
   },
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
+    "translation": "正在以 {{.Username}} 身分建立組織 {{.OrgName}}/空間 {{.SpaceName}} 的路徑 {{.URL}}..."
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -1297,7 +1305,7 @@
   },
   {
     "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
-    "translation": ""
+    "translation": "正在以 {{.Username}} 身分於組織 {{.Org}}/空間 {{.Space}} 中建立服務分配管理系統 {{.Name}}..."
   },
   {
     "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -1333,7 +1341,7 @@
   },
   {
     "id": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications",
-    "translation": ""
+    "translation": "針對已連結的應用程式，要公開在 VCAP_SERVICES 環境變數中的認證（透過行內或檔案提供）"
   },
   {
     "id": "Current Password",
@@ -1345,7 +1353,7 @@
   },
   {
     "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
-    "translation": ""
+    "translation": "依名稱的自訂建置套件（例如 my-buildpack）、Git URL（例如 'https://github.com/cloudfoundry/java-buildpack.git'），或含分支或標籤的 Git URL（例如 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' 表示 'v3.3.0' 標籤）。若只要使用內建建置套件，請指定 'default' 或 'null'"
   },
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
@@ -1353,15 +1361,15 @@
   },
   {
     "id": "DISK",
-    "translation": ""
+    "translation": "DISK"
   },
   {
     "id": "DOCKER_IMAGE",
-    "translation": ""
+    "translation": "DOCKER_IMAGE"
   },
   {
     "id": "DOMAIN",
-    "translation": ""
+    "translation": "DOMAIN"
   },
   {
     "id": "DOMAINS",
@@ -1381,7 +1389,7 @@
   },
   {
     "id": "Delete a TCP route",
-    "translation": ""
+    "translation": "刪除 TCP 路徑"
   },
   {
     "id": "Delete a buildpack",
@@ -1433,11 +1441,11 @@
   },
   {
     "id": "Delete all orphaned routes (i.e. those that are not mapped to an app)",
-    "translation": "刪除所有遺留的路徑（例如：未對映至應用程式的路徑）"
+    "translation": "刪除所有遺留的路徑（亦即，未對映至應用程式的路徑）"
   },
   {
     "id": "Delete an HTTP route",
-    "translation": ""
+    "translation": "刪除 HTTP 路徑"
   },
   {
     "id": "Delete an app",
@@ -1633,11 +1641,11 @@
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
-    "translation": "環境變數:"
+    "translation": "環境變數："
   },
   {
     "id": "EXAMPLES",
-    "translation": ""
+    "translation": "範例"
   },
   {
     "id": "Enable HTTP proxying for API requests",
@@ -1669,7 +1677,7 @@
   },
   {
     "id": "Enable the use of a feature so that users have access to and can use the feature",
-    "translation": "允許使用特性，讓使用者可以存取和使用特性"
+    "translation": "啟用特性，讓使用者可以存取和使用特性"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1793,7 +1801,7 @@
   },
   {
     "id": "Error getting SSH code: ",
-    "translation": ""
+    "translation": "取得 SSH 程式碼時發生錯誤："
   },
   {
     "id": "Error getting SSH info:",
@@ -1821,7 +1829,7 @@
   },
   {
     "id": "Error getting the redirected location: {{.Error}}",
-    "translation": ""
+    "translation": "取得重新導向的位置時發生錯誤：{{.Error}}"
   },
   {
     "id": "Error initializing RPC service: ",
@@ -1853,11 +1861,11 @@
   },
   {
     "id": "Error processing app files in '{{.Path}}': {{.Error}}",
-    "translation": ""
+    "translation": "處理 '{{.Path}}' 中的應用程式檔案時發生錯誤：{{.Error}}"
   },
   {
     "id": "Error processing app files: {{.Error}}",
-    "translation": ""
+    "translation": "處理應用程式檔案時發生錯誤：{{.Error}}"
   },
   {
     "id": "Error processing data from server: ",
@@ -1893,7 +1901,7 @@
   },
   {
     "id": "Error requesting one time code from server: {{.Error}}",
-    "translation": ""
+    "translation": "從伺服器要求一次性程式碼時發生錯誤：{{.Error}}"
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -1901,15 +1909,15 @@
   },
   {
     "id": "Error retrieving stack: ",
-    "translation": ""
+    "translation": "擷取堆疊時發生錯誤："
   },
   {
     "id": "Error retrieving stacks: {{.Error}}",
-    "translation": ""
+    "translation": "擷取堆疊時發生錯誤：{{.Error}}"
   },
   {
     "id": "Error saving manifest: {{.Error}}",
-    "translation": ""
+    "translation": "儲存資訊清單時發生錯誤：{{.Error}}"
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
@@ -1957,7 +1965,7 @@
   },
   {
     "id": "Executes a request to the targeted API endpoint",
-    "translation": ""
+    "translation": "向已設定目標的 API 端點執行要求"
   },
   {
     "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
@@ -1977,7 +1985,7 @@
   },
   {
     "id": "Expected {{.PropertyName}} to be a list of integers.",
-    "translation": ""
+    "translation": "預期 {{.PropertyName}} 為整數清單。"
   },
   {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
@@ -2068,6 +2076,10 @@
     "translation": "在本端找不到檔案，請確定檔案存在於給定的路徑 {{.filepath}}"
   },
   {
+    "id": "Force binding without confirmation",
+    "translation": "強制連結，而不進行確認"
+  },
+  {
     "id": "Force delete (do not prompt for confirmation)",
     "translation": "強制刪除（不提示進行確認）"
   },
@@ -2077,7 +2089,7 @@
   },
   {
     "id": "Force install of plugin without confirmation",
-    "translation": ""
+    "translation": "強制安裝外掛程式，而不進行確認"
   },
   {
     "id": "Force migration without confirmation",
@@ -2093,7 +2105,7 @@
   },
   {
     "id": "Force unbinding without confirmation",
-    "translation": ""
+    "translation": "強制取消連結，而不進行確認"
   },
   {
     "id": "GETTING STARTED",
@@ -2101,7 +2113,7 @@
   },
   {
     "id": "GLOBAL OPTIONS:",
-    "translation": "廣域選項:"
+    "translation": "廣域選項："
   },
   {
     "id": "Get a one time password for ssh clients",
@@ -2193,11 +2205,11 @@
   },
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
-    "translation": ""
+    "translation": "正在以 {{.Username}} 身分取得組織 {{.OrgName}}/空間 {{.SpaceName}} 的路徑...\n"
   },
   {
     "id": "Getting routes for org {{.OrgName}} as {{.Username}} ...\n",
-    "translation": "Getting routes for org {{.OrgName}}  as {{.Username}} ...\n"
+    "translation": "正在以 {{.Username}} 身分取得組織 {{.OrgName}} 的路徑...\n"
   },
   {
     "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
@@ -2293,19 +2305,19 @@
   },
   {
     "id": "HEALTH_CHECK_TYPE",
-    "translation": ""
+    "translation": "HEALTH_CHECK_TYPE"
   },
   {
     "id": "HOST",
-    "translation": ""
+    "translation": "HOST"
   },
   {
     "id": "HOSTNAME",
-    "translation": ""
+    "translation": "HOSTNAME"
   },
   {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
-    "translation": ""
+    "translation": "要併入要求內文中的 HTTP 資料，或是 '@'，其後面接著要從中讀取資料的檔名"
   },
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
@@ -2317,19 +2329,19 @@
   },
   {
     "id": "Hostname for the HTTP route (required for shared domains)",
-    "translation": ""
+    "translation": "HTTP 路徑的主機名稱（共用網域的必要項目）"
   },
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
-    "translation": ""
+    "translation": "與 DOMAIN 一起使用的主機名稱，以指定要連結的路徑"
   },
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
-    "translation": ""
+    "translation": "與 DOMAIN 一起使用的主機名稱，以指定要取消連結的路徑"
   },
   {
     "id": "Hostname used to identify the HTTP route",
-    "translation": ""
+    "translation": "用來識別 HTTP 路徑 (route) 的主機名稱"
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -2337,7 +2349,7 @@
   },
   {
     "id": "INSTANCE_MEMORY",
-    "translation": ""
+    "translation": "INSTANCE_MEMORY"
   },
   {
     "id": "Ignore manifest file",
@@ -2345,11 +2357,11 @@
   },
   {
     "id": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
-    "translation": ""
+    "translation": "在「Windows 指令行」中，使用單引號跳出的 JSON：'{\\\"valid\\\":\\\"json\\\"}'"
   },
   {
     "id": "In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"",
-    "translation": ""
+    "translation": "在 Windows PowerShell 中，使用雙引號跳出的 JSON：\"{\\\"valid\\\":\\\"json\\\"}\""
   },
   {
     "id": "Include response headers in the output",
@@ -2389,7 +2401,7 @@
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
-    "translation": ""
+    "translation": "用法不正確。需要 APP_NAME 和 DOMAIN 作為引數\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n",
@@ -2413,11 +2425,11 @@
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
-    "translation": ""
+    "translation": "用法不正確。需要 DOMAIN 和 SERVICE_INSTANCE 作為引數\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
-    "translation": ""
+    "translation": "用法不正確。需要 DOMAIN 作為引數\n\n"
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
@@ -2441,7 +2453,7 @@
   },
   {
     "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
-    "translation": ""
+    "translation": "用法不正確。需要 REPO_NAME 和 URL 作為引數\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2561,7 +2573,7 @@
   },
   {
     "id": "Install CLI plugin",
-    "translation": ""
+    "translation": "安裝 CLI 外掛程式"
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -2593,7 +2605,7 @@
   },
   {
     "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
-    "translation": ""
+    "translation": "無效的應用程式埠：{{.AppPort}}\n應用程式埠必須是數字"
   },
   {
     "id": "Invalid async response from server",
@@ -2681,7 +2693,7 @@
   },
   {
     "id": "Linux/Mac",
-    "translation": ""
+    "translation": "Linux/Mac"
   },
   {
     "id": "List all apps in the target space",
@@ -2693,7 +2705,7 @@
   },
   {
     "id": "List all available plugins in specified repository or in all added repositories",
-    "translation": ""
+    "translation": "列出所指定儲存庫或所有已新增儲存庫中的所有可用外掛程式"
   },
   {
     "id": "List all buildpacks",
@@ -2817,11 +2829,11 @@
   },
   {
     "id": "MANIFEST_PATH",
-    "translation": ""
+    "translation": "MANIFEST_PATH"
   },
   {
     "id": "MEMORY",
-    "translation": ""
+    "translation": "MEMORY"
   },
   {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
@@ -2833,7 +2845,7 @@
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
-    "translation": ""
+    "translation": "設為只能在已設定目標的空間內看到分配管理系統的服務方案"
   },
   {
     "id": "Manifest file created successfully at ",
@@ -2845,11 +2857,11 @@
   },
   {
     "id": "Map a TCP route",
-    "translation": ""
+    "translation": "對映 TCP 路徑"
   },
   {
     "id": "Map an HTTP route",
-    "translation": ""
+    "translation": "對映 HTTP 路徑"
   },
   {
     "id": "Map the root domain to this app",
@@ -2876,14 +2888,6 @@
     "translation": "應用程式實例可以具有的記憶體數量上限（例如 1024M、1G、10G）。-1 代表無限制數量。（預設值：無限制）"
   },
   {
-    "id": "Maximum number of routes that may be created with reserved ports",
-    "translation": ""
-  },
-  {
-    "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
-    "translation": ""
-  },
-  {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
     "translation": "CLI 等待應用程式啟動的時間上限（以秒為單位），可能會套用其他伺服器端逾時"
   },
@@ -2905,15 +2909,15 @@
   },
   {
     "id": "NAME:",
-    "translation": "名稱:"
+    "translation": "名稱："
   },
   {
     "id": "NEW_NAME",
-    "translation": ""
+    "translation": "NEW_NAME"
   },
   {
     "id": "NUM_INSTANCES",
-    "translation": ""
+    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name",
@@ -2921,11 +2925,11 @@
   },
   {
     "id": "Name of a registered repository",
-    "translation": ""
+    "translation": "已登錄儲存庫的名稱"
   },
   {
     "id": "Name of a registered repository where the specified plugin is located",
-    "translation": ""
+    "translation": "所指定外掛程式所在的已登錄儲存庫名稱"
   },
   {
     "id": "New Password",
@@ -2957,7 +2961,7 @@
   },
   {
     "id": "No app files found in '{{.Path}}'",
-    "translation": ""
+    "translation": "在 '{{.Path}}' 中找不到應用程式檔案"
   },
   {
     "id": "No apps found",
@@ -3157,11 +3161,11 @@
   },
   {
     "id": "PATH",
-    "translation": ""
+    "translation": "PATH"
   },
   {
     "id": "PORT",
-    "translation": ""
+    "translation": "PORT"
   },
   {
     "id": "Paid service plans",
@@ -3185,11 +3189,11 @@
   },
   {
     "id": "Path for the HTTP route",
-    "translation": ""
+    "translation": "HTTP 路徑 (route) 的路徑 (path)"
   },
   {
     "id": "Path for the route",
-    "translation": ""
+    "translation": "路徑 (route) 的路徑 (path)"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3205,7 +3209,7 @@
   },
   {
     "id": "Path used to identify the HTTP route",
-    "translation": ""
+    "translation": "用來識別 HTTP 路徑 (route) 的路徑 (path)"
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
@@ -3277,11 +3281,11 @@
   },
   {
     "id": "Port for the TCP route",
-    "translation": ""
+    "translation": "TCP 路徑的埠"
   },
   {
     "id": "Port used to identify the TCP route",
-    "translation": ""
+    "translation": "用來識別 TCP 路徑 (route) 的埠"
   },
   {
     "id": "Print API request diagnostics to stdout",
@@ -3289,7 +3293,7 @@
   },
   {
     "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
-    "translation": "印出目錄中的檔案清單或特定檔案的內容"
+    "translation": "印出目錄中的檔案清單，或 DEA 後端上執行的應用程式的特定檔案內容"
   },
   {
     "id": "Print the version",
@@ -3333,7 +3337,7 @@
   },
   {
     "id": "QUOTA",
-    "translation": ""
+    "translation": "QUOTA"
   },
   {
     "id": "Quota Definition {{.QuotaName}} already exists",
@@ -3356,10 +3360,6 @@
     "translation": "要求："
   },
   {
-    "id": "RESERVED_ROUTE_PORTS",
-    "translation": ""
-  },
-  {
     "id": "RESPONSE:",
     "translation": "回應："
   },
@@ -3373,11 +3373,11 @@
   },
   {
     "id": "ROUTE_PATH",
-    "translation": ""
+    "translation": "ROUTE_PATH"
   },
   {
     "id": "Read-only access to org info and reports\n",
-    "translation": "組織資訊和報告的唯讀權\n"
+    "translation": "唯讀存取組織資訊及報告\n"
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
@@ -3385,11 +3385,11 @@
   },
   {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
-    "translation": "真的要刪除 {{.ModelType}} {{.ModelName}} 以及與其相關聯的所有項目嗎？"
+    "translation": "真的要刪除{{.ModelType}} {{.ModelName}} 以及與其相關聯的所有項目嗎？"
   },
   {
     "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
-    "translation": "真的要刪除 {{.ModelType}} {{.ModelName}} 嗎？"
+    "translation": "真的要刪除{{.ModelType}} {{.ModelName}} 嗎？"
   },
   {
     "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e",
@@ -3528,10 +3528,6 @@
     "translation": "要求 pseudo-tty 配置"
   },
   {
-    "id": "Reserved Route Ports",
-    "translation": ""
-  },
-  {
     "id": "Restage an app",
     "translation": "重新編譯打包應用程式"
   },
@@ -3613,15 +3609,15 @@
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
-    "translation": ""
+    "translation": "路徑 {{.HostName}}.{{.DomainName}} {{.Existence}}"
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}",
-    "translation": ""
+    "translation": "路徑 {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
-    "translation": ""
+    "translation": "路徑 {{.Route}} 未連結至服務實例 {{.ServiceInstance}}。"
   },
   {
     "id": "Route {{.URL}} already exists",
@@ -3629,11 +3625,11 @@
   },
   {
     "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
-    "translation": ""
+    "translation": "路徑 {{.URL}} 已連結至服務實例 {{.ServiceInstanceName}}。"
   },
   {
     "id": "Router group {{.RouterGroup}} not found",
-    "translation": ""
+    "translation": "找不到路由器群組 {{.RouterGroup}}"
   },
   {
     "id": "Routes",
@@ -3641,7 +3637,7 @@
   },
   {
     "id": "Routes for this domain will be configured only on the specified router group",
-    "translation": ""
+    "translation": "此網域的路徑只會配置在指定的路由器群組上"
   },
   {
     "id": "Rules",
@@ -3665,11 +3661,11 @@
   },
   {
     "id": "SERVICE_INSTANCES",
-    "translation": ""
+    "translation": "SERVICE_INSTANCES"
   },
   {
     "id": "SPACE",
-    "translation": ""
+    "translation": "SPACE"
   },
   {
     "id": "SPACE ADMIN",
@@ -3697,7 +3693,7 @@
   },
   {
     "id": "STACK",
-    "translation": ""
+    "translation": "STACK"
   },
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -3725,7 +3721,7 @@
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
-    "translation": ""
+    "translation": "伺服器錯誤，錯誤碼：1002，訊息：無法設定空間角色，因為使用者不屬於組織"
   },
   {
     "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
@@ -3809,7 +3805,7 @@
   },
   {
     "id": "Set or view the targeted org or space",
-    "translation": "設定或檢視已設定目標的組織或空間"
+    "translation": "設定或檢視目標組織或空間"
   },
   {
     "id": "Setting api endpoint to {{.Endpoint}}...",
@@ -3917,7 +3913,7 @@
   },
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
-    "translation": ""
+    "translation": "跳過驗證 API 端點。不建議使用！"
   },
   {
     "id": "Space",
@@ -4001,15 +3997,15 @@
   },
   {
     "id": "TIMEOUT",
-    "translation": ""
+    "translation": "TIMEOUT"
   },
   {
     "id": "TIP:\n",
-    "translation": "提示:\n"
+    "translation": "提示：\n"
   },
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
-    "translation": "提示:\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 CF 應用程式使用"
+    "translation": "提示：\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 CF 應用程式使用"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4017,7 +4013,7 @@
   },
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
-    "translation": ""
+    "translation": "提示：如果您有防火牆保護，而且需要 HTTP Proxy，請驗證已正確設定 https_proxy 環境變數。否則，請檢查您的網路連線。"
   },
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
@@ -4045,11 +4041,11 @@
   },
   {
     "id": "TOTAL_MEMORY",
-    "translation": ""
+    "translation": "TOTAL_MEMORY"
   },
   {
     "id": "Tags: {{.Tags}}",
-    "translation": ""
+    "translation": "標籤：{{.Tags}}"
   },
   {
     "id": "Tail or show recent logs for an app",
@@ -4057,11 +4053,11 @@
   },
   {
     "id": "Targeted org {{.OrgName}}\n",
-    "translation": "已將目標設為組織 {{.OrgName}}\n"
+    "translation": "已將目標組織設為 {{.OrgName}}\n"
   },
   {
     "id": "Targeted space {{.SpaceName}}\n",
-    "translation": "已將目標設為空間 {{.SpaceName}}\n"
+    "translation": "已將目標空間設為 {{.SpaceName}}\n"
   },
   {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
@@ -4097,7 +4093,7 @@
   },
   {
     "id": "The targeted API endpoint could not be reached.",
-    "translation": ""
+    "translation": "無法連接已設定目標的 API 端點。"
   },
   {
     "id": "There are no running instances of this app.",
@@ -4109,19 +4105,19 @@
   },
   {
     "id": "There is an error performing request on '{{.RepoURL}}': ",
-    "translation": "在 '{{.repoURL}}' 上執行要求時發生錯誤："
+    "translation": "在 '{{.RepoURL}}' 上執行要求時發生錯誤："
   },
   {
     "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
+    "translation": "在 '{{.RepoURL}}' 上執行要求時發生錯誤：{{.Error}}\n{{.Tip}}"
   },
   {
     "id": "This command",
-    "translation": ""
+    "translation": "這個指令"
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
-    "translation": ""
+    "translation": "這個指令需要「遞送 API」。您的目標端點回報它尚未啟用。"
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4160,12 +4156,8 @@
     "translation": "空間可以具有的總記憶體數量（例如 1024M、1G、10G）"
   },
   {
-    "id": "Total number of application instances. -1 represents an unlimited amount.",
-    "translation": ""
-  },
-  {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": ""
+    "translation": "應用程式實例總數。-1 代表無限制數量。（預設值：無限制）"
   },
   {
     "id": "Total number of routes",
@@ -4189,11 +4181,11 @@
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
-    "translation": ""
+    "translation": "將串流已連結應用程式的日誌的 URL"
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": ""
+    "translation": "將轉遞已連結路徑的要求的 URL。此 URL 的架構必須是 https"
   },
   {
     "id": "USAGE",
@@ -4201,7 +4193,7 @@
   },
   {
     "id": "USAGE:",
-    "translation": "用法:"
+    "translation": "用法："
   },
   {
     "id": "USER ADMIN",
@@ -4229,7 +4221,7 @@
   },
   {
     "id": "Unable to determine CC API Version. Please log in again.",
-    "translation": ""
+    "translation": "無法判斷 CC API 版本。請重新登入。"
   },
   {
     "id": "Unable to obtain plugin name for executable {{.Executable}}",
@@ -4237,7 +4229,7 @@
   },
   {
     "id": "Unable to parse CC API Version '{{.APIVersion}}'",
-    "translation": ""
+    "translation": "無法剖析 CC API 版本 '{{.APIVersion}}'"
   },
   {
     "id": "Unassign a quota from a space",
@@ -4261,7 +4253,7 @@
   },
   {
     "id": "Unbind a service instance from an HTTP route",
-    "translation": ""
+    "translation": "取消服務實例與 HTTP 路徑的連結"
   },
   {
     "id": "Unbind a service instance from an app",
@@ -4269,7 +4261,7 @@
   },
   {
     "id": "Unbind cancelled",
-    "translation": ""
+    "translation": "已取消取消連結"
   },
   {
     "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -4277,11 +4269,11 @@
   },
   {
     "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed?",
-    "translation": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)"
+    "translation": "取消連結可能會導致對映至路徑 {{.URL}} 的應用程式出現漏洞；例如，服務實例 {{.ServiceInstanceName}} 提供鑑別時。您要繼續進行嗎？"
   },
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "正在以 {{.CurrentUser}} 身分取消路徑 {{.URL}} 與組織 {{.OrgName}}/空間 {{.SpaceName}} 中的服務實例 {{.ServiceInstanceName}} 的連結..."
   },
   {
     "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
@@ -4313,11 +4305,11 @@
   },
   {
     "id": "Unmap a TCP route",
-    "translation": ""
+    "translation": "取消對映 TCP 路徑"
   },
   {
     "id": "Unmap an HTTP route",
-    "translation": ""
+    "translation": "取消對映 HTTP 路徑"
   },
   {
     "id": "Unsetting api endpoint...",
@@ -4361,7 +4353,7 @@
   },
   {
     "id": "Update user-provided service instance",
-    "translation": ""
+    "translation": "更新使用者提供的服務實例"
   },
   {
     "id": "Updated: {{.Updated}}",
@@ -4469,7 +4461,7 @@
   },
   {
     "id": "VERSION:",
-    "translation": "版本:"
+    "translation": "版本："
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
@@ -4477,7 +4469,7 @@
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": ""
+    "translation": "包含服務特定配置參數的有效 JSON 物件（透過行內或檔案所提供）。如需所支援配置參數的清單，請參閱文件以取得特定服務供應項目。"
   },
   {
     "id": "Value for flag 'app-instance-index' cannot be negative",
@@ -4501,7 +4493,7 @@
   },
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
-    "translation": ""
+    "translation": "警告：\n   強烈建議不要提供您的密碼作為指令行選項\n   其他人可能會看到您的密碼，而且可能會將其記錄在 Shell 歷程中"
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
@@ -4533,15 +4525,15 @@
   },
   {
     "id": "Windows PowerShell",
-    "translation": ""
+    "translation": "Windows PowerShell"
   },
   {
     "id": "Write curl body to FILE instead of stdout",
-    "translation": "將 curl 主體寫入至 FILE，而非 stdout"
+    "translation": "將 curl 主體寫入檔案，而非標準輸出"
   },
   {
     "id": "Write default values to the config",
-    "translation": "將預設值寫入至配置"
+    "translation": "將預設值寫入配置"
   },
   {
     "id": "Zip archive does not contain a buildpack",
@@ -4549,15 +4541,15 @@
   },
   {
     "id": "[MULTIPART/FORM-DATA CONTENT HIDDEN]",
-    "translation": ""
+    "translation": "[MULTIPART/FORM-DATA CONTENT HIDDEN]"
   },
   {
     "id": "[PRIVATE DATA HIDDEN]",
-    "translation": ""
+    "translation": "[PRIVATE DATA HIDDEN]"
   },
   {
     "id": "[global options] command [arguments...] [command options]",
-    "translation": ""
+    "translation": "[global options] command [arguments...] [command options]"
   },
   {
     "id": "access",
@@ -4585,15 +4577,11 @@
   },
   {
     "id": "app crashed",
-    "translation": "應用程式毀損"
+    "translation": "應用程式損毀"
   },
   {
     "id": "app instance limit",
-    "translation": ""
-  },
-  {
-    "id": "app instances",
-    "translation": ""
+    "translation": "應用程式實例限制"
   },
   {
     "id": "apps",
@@ -4621,11 +4609,11 @@
   },
   {
     "id": "cpu",
-    "translation": ""
+    "translation": "cpu"
   },
   {
     "id": "crashed",
-    "translation": "損毀"
+    "translation": "已損毀"
   },
   {
     "id": "crashing",
@@ -4661,11 +4649,11 @@
   },
   {
     "id": "domain {{.DomainName}} is a shared domain, not an owned domain.",
-    "translation": "網域 {{.DomainName}} 是共用網域，而非專屬網域。\n\n提示:\n使用 'cf delete-shared-domain'，刪除共用網域。"
+    "translation": "網域 {{.DomainName}} 是共用網域，而非專屬網域。\n\n提示：\n使用 'cf delete-shared-domain'，刪除共用網域。"
   },
   {
     "id": "domain {{.DomainName}} is an owned domain, not a shared domain.",
-    "translation": "網域 {{.DomainName}} 是專屬網域，而非共用網域。\n\n提示:\n使用 'cf delete-domain'，刪除專屬網域。"
+    "translation": "網域 {{.DomainName}} 是專屬網域，而非共用網域。\n\n提示：\n使用 'cf delete-domain'，刪除專屬網域。"
   },
   {
     "id": "domains:",
@@ -4716,10 +4704,6 @@
     "translation": "主機"
   },
   {
-    "id": "instance memory",
-    "translation": "實例記憶體限制"
-  },
-  {
     "id": "instance memory limit",
     "translation": "實例記憶體限制"
   },
@@ -4761,7 +4745,7 @@
   },
   {
     "id": "limited",
-    "translation": "限制"
+    "translation": "有限"
   },
   {
     "id": "locked",
@@ -4804,16 +4788,16 @@
     "translation": "專屬"
   },
   {
-    "id": "paid plans",
+    "id": "paid service plans",
     "translation": "付費服務方案"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
-    "translation": "付費服務 {{.NonBasicServicesAllowed}}"
+    "translation": "已付費服務 {{.NonBasicServicesAllowed}}"
   },
   {
     "id": "path",
-    "translation": ""
+    "translation": "路徑"
   },
   {
     "id": "plan",
@@ -4825,7 +4809,7 @@
   },
   {
     "id": "port",
-    "translation": ""
+    "translation": "埠"
   },
   {
     "id": "position",
@@ -4841,7 +4825,7 @@
   },
   {
     "id": "repo-plugins",
-    "translation": ""
+    "translation": "repo-plugins"
   },
   {
     "id": "requested state",
@@ -4853,23 +4837,19 @@
   },
   {
     "id": "required attribute 'disk_quota' missing",
-    "translation": ""
+    "translation": "遺漏必要屬性 'disk_quota'"
   },
   {
     "id": "required attribute 'instances' missing",
-    "translation": ""
+    "translation": "遺漏必要屬性 'instances'"
   },
   {
     "id": "required attribute 'memory' missing",
-    "translation": ""
+    "translation": "遺漏必要屬性 'memory'"
   },
   {
     "id": "required attribute 'stack' missing",
-    "translation": ""
-  },
-  {
-    "id": "route ports",
-    "translation": ""
+    "translation": "遺漏必要屬性 'stack'"
   },
   {
     "id": "routes",
@@ -4877,7 +4857,7 @@
   },
   {
     "id": "running",
-    "translation": "執行"
+    "translation": "執行中"
   },
   {
     "id": "security group",
@@ -4909,7 +4889,7 @@
   },
   {
     "id": "service-broker",
-    "translation": ""
+    "translation": "service-broker"
   },
   {
     "id": "services",
@@ -4981,7 +4961,7 @@
   },
   {
     "id": "starting",
-    "translation": "啟動"
+    "translation": "啟動中"
   },
   {
     "id": "state",
@@ -5002,10 +4982,6 @@
   {
     "id": "time",
     "translation": "時間"
-  },
-  {
-    "id": "total memory",
-    "translation": "總記憶體限制"
   },
   {
     "id": "total memory limit",
@@ -5061,19 +5037,19 @@
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
-    "translation": ""
+    "translation": "{{.AppInstanceLimit}} 應用程式實例限制"
   },
   {
     "id": "{{.CFName}} api",
-    "translation": ""
+    "translation": "{{.CFName}} api"
   },
   {
     "id": "{{.CFName}} login",
-    "translation": ""
+    "translation": "{{.CFName}} login"
   },
   {
     "id": "{{.CFName}} was built with Go version: {{.GoVersion}}",
-    "translation": "{{.CFName}} 是使用 Go {{.GoVersion}} 版建置的"
+    "translation": "{{.CFName}} 是使用 Go {{.GoVersion}} 版建置"
   },
   {
     "id": "{{.CountOfServices}} migrated.",
@@ -5081,7 +5057,7 @@
   },
   {
     "id": "{{.CrashedCount}} crashed",
-    "translation": "{{.CrashedCount}} 損毀"
+    "translation": "{{.CrashedCount}} 已損毀"
   },
   {
     "id": "{{.DiskUsage}} of {{.DiskQuota}}",
@@ -5089,7 +5065,7 @@
   },
   {
     "id": "{{.DownCount}} down",
-    "translation": ""
+    "translation": "{{.DownCount}} down"
   },
   {
     "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
@@ -5105,11 +5081,11 @@
   },
   {
     "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
-    "translation": ""
+    "translation": "{{.Feature}} 最多僅作用到 CF API 版本 {{.MaximumVersion}}。您的目標是 {{.APIVersion}}。"
   },
   {
     "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
-    "translation": "現行 CF CLI 版本 {{.Version}}\n\t現行 CF API 版本 {{.APIVersion}}\n\t若要使用 {{.CommandName}} 特性，您需要將 CF API 升級為至少 {{.RequiredVersion}}"
+    "translation": "{{.Feature}} 需要 CF API 版本 {{.RequiredVersion}}+。您的目標是 {{.APIVersion}}。"
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5157,7 +5133,7 @@
   },
   {
     "id": "{{.RoutesLimit}} routes",
-    "translation": "{{.RoutesLimit}} 個路徑"
+    "translation": "{{.RoutesLimit}} 路徑"
   },
   {
     "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
@@ -5165,15 +5141,15 @@
   },
   {
     "id": "{{.ServicesLimit}} services",
-    "translation": "{{.ServicesLimit}} 個服務"
+    "translation": "{{.ServicesLimit}} 服務"
   },
   {
     "id": "{{.StartingCount}} starting",
-    "translation": "{{.StartingCount}} 啟動"
+    "translation": "{{.StartingCount}} 個啟動中"
   },
   {
     "id": "{{.StartingCount}} starting ({{.Details}})",
-    "translation": "{{.StartingCount}} 啟動 ({{.Details}})"
+    "translation": "{{.StartingCount}} 個啟動中 ({{.Details}})"
   },
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
@@ -5188,3 +5164,4 @@
     "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} 個實例"
   }
 ]
+
