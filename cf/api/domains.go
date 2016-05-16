@@ -168,10 +168,13 @@ func (repo CloudControllerDomainRepository) FirstOrDefault(orgGUID string, name 
 
 func (repo CloudControllerDomainRepository) defaultDomain(orgGUID string) (models.DomainFields, error) {
 	var foundDomain *models.DomainFields
-	repo.ListDomainsForOrg(orgGUID, func(domain models.DomainFields) bool {
+	err := repo.ListDomainsForOrg(orgGUID, func(domain models.DomainFields) bool {
 		foundDomain = &domain
 		return !domain.Shared
 	})
+	if err != nil {
+		return models.DomainFields{}, err
+	}
 
 	if foundDomain == nil {
 		return models.DomainFields{}, errors.New(T("Could not find a default domain"))
