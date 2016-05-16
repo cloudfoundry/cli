@@ -262,21 +262,26 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		}
 
 		_, err = io.Copy(part, body)
-		_ = writer.Close()
-
 		if err != nil {
 			capturedErr = fmt.Errorf("%s: %s", T("Error creating upload"), err.Error())
 			return
 		}
 
-		var request *net.Request
-		request, err = repo.gateway.NewRequestForFile("PUT", url, repo.config.AccessToken(), requestFile)
-		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
-		request.HTTPReq.Header.Set("Content-Type", contentType)
+		err = writer.Close()
 		if err != nil {
 			capturedErr = err
 			return
 		}
+
+		var request *net.Request
+		request, err = repo.gateway.NewRequestForFile("PUT", url, repo.config.AccessToken(), requestFile)
+		if err != nil {
+			capturedErr = err
+			return
+		}
+
+		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
+		request.HTTPReq.Header.Set("Content-Type", contentType)
 
 		_, err = repo.gateway.PerformRequest(request)
 		if err != nil {
