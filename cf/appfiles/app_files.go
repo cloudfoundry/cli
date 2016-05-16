@@ -26,13 +26,15 @@ type AppFiles interface {
 
 type ApplicationFiles struct{}
 
-func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
-	dir, err = filepath.Abs(dir)
-	if err != nil {
-		return
+func (appfiles ApplicationFiles) AppFilesInDir(dir string) ([]models.AppFileFields, error) {
+	appFiles := []models.AppFileFields{}
+
+	fullDirPath, toplevelErr := filepath.Abs(dir)
+	if toplevelErr != nil {
+		return appFiles, toplevelErr
 	}
 
-	err = appfiles.WalkAppFiles(dir, func(fileName string, fullPath string) error {
+	toplevelErr = appfiles.WalkAppFiles(fullDirPath, func(fileName string, fullPath string) error {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			return err
@@ -47,19 +49,11 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 			appFile.Sha1 = "0"
 			appFile.Size = 0
 		} else {
-			hash := sha1.New()
-			file, err := os.Open(fullPath)
+			sha, err := appfiles.shaFile(fullPath)
 			if err != nil {
 				return err
 			}
-			defer file.Close()
-
-			_, err = io.Copy(hash, file)
-			if err != nil {
-				return err
-			}
-
-			appFile.Sha1 = fmt.Sprintf("%x", hash.Sum(nil))
+			appFile.Sha1 = sha
 		}
 
 		appFiles = append(appFiles, appFile)
@@ -67,7 +61,23 @@ func (appfiles ApplicationFiles) AppFilesInDir(dir string) (appFiles []models.Ap
 		return nil
 	})
 
-	return
+	return appFiles, toplevelErr
+}
+
+func (appfiles ApplicationFiles) shaFile(fullPath string) (string, error) {
+	hash := sha1.New()
+	file, err := os.Open(fullPath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(hash, file)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
 func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) error {
@@ -104,35 +114,40 @@ func (appfiles ApplicationFiles) CopyFiles(appFiles []models.AppFileFields, from
 				return nil
 			}
 
-			var dst *os.File
-			dst, err = fileutils.Create(toPath)
-			if err != nil {
-				return err
-			}
-			defer dst.Close()
-
-			err = dst.Chmod(srcFileInfo.Mode())
-			if err != nil {
-				return err
-			}
-
-			src, err := os.Open(fromPath)
-			if err != nil {
-				return err
-			}
-			defer src.Close()
-
-			_, err = io.Copy(dst, src)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return appfiles.copyFile(fromPath, toPath, srcFileInfo.Mode())
 		}()
 
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (appfiles ApplicationFiles) copyFile(srcPath string, dstPath string, fileMode os.FileMode) error {
+	dst, err := fileutils.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	if runtime.GOOS != "windows" {
+		err = dst.Chmod(fileMode)
+		if err != nil {
+			return err
+		}
+	}
+
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
 	}
 
 	return nil

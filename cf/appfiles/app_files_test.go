@@ -224,12 +224,6 @@ var _ = Describe("AppFiles", func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			It("returns an error", func() {
-				Skip("This isn't a reliable test as root can still traverse a non-executable directory")
-				err := appFiles.WalkAppFiles(tmpDir, cb)
-				Expect(err).To(HaveOccurred())
-			})
-
 			Context("when the untraversable dir is .cfignored", func() {
 				var cfIgnorePath string
 
