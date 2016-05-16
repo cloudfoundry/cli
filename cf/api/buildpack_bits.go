@@ -98,14 +98,14 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 }
 
 func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
-	stats, err := inputFile.Stat()
-	if err != nil {
-		return err
+	stats, toplevelErr := inputFile.Stat()
+	if toplevelErr != nil {
+		return toplevelErr
 	}
 
-	reader, err := zip.NewReader(inputFile, stats.Size())
-	if err != nil {
-		return err
+	reader, toplevelErr := zip.NewReader(inputFile, stats.Size())
+	if toplevelErr != nil {
+		return toplevelErr
 	}
 
 	contents := reader.File
@@ -155,14 +155,14 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
 		}
 	}
 
-	err = writer.Close()
-	if err != nil {
-		return err
+	toplevelErr = writer.Close()
+	if toplevelErr != nil {
+		return toplevelErr
 	}
 
-	_, err = outputFile.Seek(0, 0)
-	if err != nil {
-		return err
+	_, toplevelErr = outputFile.Seek(0, 0)
+	if toplevelErr != nil {
+		return toplevelErr
 	}
 
 	return nil
@@ -243,10 +243,12 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.B
 		body)
 }
 
-func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) (apiErr error) {
+func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) error {
+	var capturedErr error
+
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
-			apiErr = err
+			capturedErr = err
 			return
 		}
 
@@ -254,28 +256,33 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		part, err := writer.CreateFormFile(fieldName, fileName)
 
 		if err != nil {
-			writer.Close()
+			_ = writer.Close()
+			capturedErr = err
 			return
 		}
 
 		_, err = io.Copy(part, body)
-		writer.Close()
+		_ = writer.Close()
 
 		if err != nil {
-			apiErr = fmt.Errorf("%s: %s", T("Error creating upload"), err.Error())
+			capturedErr = fmt.Errorf("%s: %s", T("Error creating upload"), err.Error())
 			return
 		}
 
 		var request *net.Request
-		request, apiErr = repo.gateway.NewRequestForFile("PUT", url, repo.config.AccessToken(), requestFile)
+		request, err = repo.gateway.NewRequestForFile("PUT", url, repo.config.AccessToken(), requestFile)
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
 		request.HTTPReq.Header.Set("Content-Type", contentType)
-		if apiErr != nil {
+		if err != nil {
+			capturedErr = err
 			return
 		}
 
-		_, apiErr = repo.gateway.PerformRequest(request)
+		_, err = repo.gateway.PerformRequest(request)
+		if err != nil {
+			capturedErr = err
+		}
 	})
 
-	return
+	return capturedErr
 }
