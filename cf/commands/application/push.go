@@ -249,7 +249,7 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 		cmd.updateRoutes(routeActor, app, appParams)
 
 		if c.String("docker-image") == "" {
-			err := cmd.actor.ProcessPath(*appParams.Path, cmd.processPathCallback(*appParams.Path, app))
+			err = cmd.actor.ProcessPath(*appParams.Path, cmd.processPathCallback(*appParams.Path, app))
 			if err != nil {
 				cmd.ui.Failed(
 					T("Error processing app files: {{.Error}}",
