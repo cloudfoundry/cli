@@ -53,7 +53,7 @@
   },
   {
     "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
-    "translation": ""
+    "translation": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"
   },
   {
     "id": "   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.",
@@ -137,7 +137,7 @@
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
-    "translation": ""
+    "translation": "'{{.VersionShort}}' 및 '{{.VersionLong}}'도 허용됩니다. "
   },
   {
     "id": ") already exists.",
@@ -197,19 +197,19 @@
   },
   {
     "id": "APP_INSTANCES",
-    "translation": ""
+    "translation": "APP_INSTANCES"
   },
   {
     "id": "APP_NAME",
-    "translation": ""
+    "translation": "APP_NAME"
   },
   {
     "id": "Access for plans of a particular broker",
-    "translation": "특정 브로커의 플랜에 액세스"
+    "translation": "특정 브로커의 플랜에 대한 액세스"
   },
   {
     "id": "Access for service name of a particular service offering",
-    "translation": "특정 서비스 오퍼링의 서비스 이름에 액세스"
+    "translation": "특정 서비스 오퍼링의 서비스 이름에 대한 액세스"
   },
   {
     "id": "Acquiring running security groups as '{{.username}}'",
@@ -273,7 +273,7 @@
   },
   {
     "id": "App instance limit",
-    "translation": ""
+    "translation": "앱 인스턴스 한계"
   },
   {
     "id": "App name is a required field",
@@ -297,7 +297,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "애플리케이션 상태 검사 유형(예: 포트 또는 없음)"
+    "translation": "애플리케이션 상태 확인 유형(예: '포트' 또는 '없음')"
   },
   {
     "id": "Application instance index",
@@ -385,7 +385,7 @@
   },
   {
     "id": "BUILDPACK_NAME",
-    "translation": ""
+    "translation": "BUILDPACK_NAME"
   },
   {
     "id": "Bind a security group to a space",
@@ -401,7 +401,7 @@
   },
   {
     "id": "Bind a service instance to an HTTP route",
-    "translation": ""
+    "translation": "서비스 인스턴스를 HTTP 라우트에 바인드"
   },
   {
     "id": "Bind a service instance to an app",
@@ -413,7 +413,7 @@
   },
   {
     "id": "Binding route {{.URL}} to service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.ServiceInstanceName}} 서비스 인스턴스에 {{.URL}} 라우트 바인드 중..."
   },
   {
     "id": "Binding security group {{.security_group}} to defaults for running as {{.username}}",
@@ -449,31 +449,31 @@
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL",
-    "translation": ""
+    "translation": "CF_NAME add-plugin-repo REPO_NAME URL"
   },
   {
     "id": "CF_NAME allow-space-ssh SPACE_NAME",
-    "translation": ""
+    "translation": "CF_NAME allow-space-ssh SPACE_NAME"
   },
   {
     "id": "CF_NAME api [URL]",
-    "translation": ""
+    "translation": "CF_NAME api [URL]"
   },
   {
     "id": "CF_NAME app APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME app APP_NAME"
   },
   {
     "id": "CF_NAME auth USERNAME PASSWORD\n\n",
-    "translation": ""
+    "translation": "CF_NAME auth USERNAME PASSWORD\n\n"
   },
   {
     "id": "CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)",
-    "translation": ""
+    "translation": "CF_NAME auth name@example.com \"\\\"password\\\"\"(비밀번호에서 사용되는 경우 따옴표 이스케이프)"
   },
   {
     "id": "CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)",
-    "translation": ""
+    "translation": "CF_NAME auth name@example.com \"my password\"(공백을 포함하는 비밀번호의 경우 따옴표 사용)"
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
@@ -481,519 +481,519 @@
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
-    "translation": ""
+    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "translation": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-staging-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME bind-staging-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME buildpacks",
-    "translation": ""
+    "translation": "CF_NAME buildpacks"
   },
   {
     "id": "CF_NAME check-route HOST DOMAIN [--path PATH]",
-    "translation": ""
+    "translation": "CF_NAME check-route HOST DOMAIN [--path PATH]"
   },
   {
     "id": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]",
-    "translation": ""
+    "translation": "CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"
   },
   {
     "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
-    "translation": ""
+    "translation": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]"
   },
   {
     "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
-    "translation": ""
+    "translation": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]"
   },
   {
     "id": "CF_NAME create-domain ORG DOMAIN",
-    "translation": ""
+    "translation": "CF_NAME create-domain ORG DOMAIN"
   },
   {
     "id": "CF_NAME create-org ORG",
-    "translation": ""
+    "translation": "CF_NAME create-org ORG"
   },
   {
     "id": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
-    "translation": ""
+    "translation": "CF_NAME create-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
   {
     "id": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]",
-    "translation": ""
+    "translation": "CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE [-c PARAMETERS_AS_JSON] [-t TAGS]"
   },
   {
     "id": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN",
-    "translation": ""
+    "translation": "CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"
   },
   {
     "id": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]",
-    "translation": ""
+    "translation": "CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": ""
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  선택적으로 올바른 JSON 오브젝트 인라인에 서비스별 구성 매개변수를 제공하십시오.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  선택적으로 올바른 JSON 오브젝트에 서비스별 구성 매개변수를 포함하는 파일을 제공하십시오. 매개변수 파일의 경로는 파일의 절대 또는 상대 경로입니다.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   올바른 JSON 오브젝트의 예:\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
-    "translation": ""
+    "translation": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"
   },
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
-    "translation": ""
+    "translation": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"
   },
   {
     "id": "CF_NAME create-user USERNAME PASSWORD",
-    "translation": ""
+    "translation": "CF_NAME create-user USERNAME PASSWORD"
   },
   {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
-    "translation": ""
+    "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   쉼표로 구분된 신임 정보 매개변수 이름을 전달하여 대화식 모드 사용:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   신임 정보 매개변수를 JSON으로 전달하여 비대화식으로 서비스 작성:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   JSON을 포함하는 파일에 대한 경로 지정:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
   {
     "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   By default 'CF_NAME curl' will perform a GET to the specified PATH. If data\n   is provided via -d, a POST will be performed instead, and the Content-Type\n   will be set to application/json. You may override headers with -H and the\n   request method with -X.\n\n   For API documentation, please visit http://apidocs.cloudfoundry.org.",
-    "translation": ""
+    "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   기본적으로 'CF_NAME curl'이 지정된 PATH에 GET을 수행합니다. 데이터가\n   -d를 통해 제공되면, POST가 그 대신 수행되고 Content-Type이\n application/json으로 설정됩니다. -H로 헤더를 대체하고\n   -X로 요청 메소드를 대체할 수 있습니다.\n\n   API 문서를 보려면 http://apidocs.cloudfoundry.org를 방문하십시오."
   },
   {
     "id": "CF_NAME delete APP_NAME [-f -r]",
-    "translation": ""
+    "translation": "CF_NAME delete APP_NAME [-f -r]"
   },
   {
     "id": "CF_NAME delete-buildpack BUILDPACK [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-buildpack BUILDPACK [-f]"
   },
   {
     "id": "CF_NAME delete-domain DOMAIN [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-domain DOMAIN [-f]"
   },
   {
     "id": "CF_NAME delete-org ORG [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-org ORG [-f]"
   },
   {
     "id": "CF_NAME delete-orphaned-routes [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-orphaned-routes [-f]"
   },
   {
     "id": "CF_NAME delete-quota QUOTA [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-quota QUOTA [-f]"
   },
   {
     "id": "CF_NAME delete-security-group SECURITY_GROUP [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-security-group SECURITY_GROUP [-f]"
   },
   {
     "id": "CF_NAME delete-service SERVICE_INSTANCE [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service SERVICE_INSTANCE [-f]"
   },
   {
     "id": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"
   },
   {
     "id": "CF_NAME delete-service-broker SERVICE_BROKER [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service-broker SERVICE_BROKER [-f]"
   },
   {
     "id": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]"
   },
   {
     "id": "CF_NAME delete-shared-domain DOMAIN [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
   },
   {
     "id": "CF_NAME delete-space SPACE [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-space SPACE [-f]"
   },
   {
     "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"
   },
   {
     "id": "CF_NAME delete-user USERNAME [-f]",
-    "translation": ""
+    "translation": "CF_NAME delete-user USERNAME [-f]"
   },
   {
     "id": "CF_NAME disable-feature-flag FEATURE_NAME",
-    "translation": ""
+    "translation": "CF_NAME disable-feature-flag FEATURE_NAME"
   },
   {
     "id": "CF_NAME disable-ssh APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME disable-ssh APP_NAME"
   },
   {
     "id": "CF_NAME disallow-space-ssh SPACE_NAME",
-    "translation": ""
+    "translation": "CF_NAME disallow-space-ssh SPACE_NAME"
   },
   {
     "id": "CF_NAME enable-feature-flag FEATURE_NAME",
-    "translation": ""
+    "translation": "CF_NAME enable-feature-flag FEATURE_NAME"
   },
   {
     "id": "CF_NAME enable-ssh APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME enable-ssh APP_NAME"
   },
   {
     "id": "CF_NAME env APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME env APP_NAME"
   },
   {
     "id": "CF_NAME events APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME events APP_NAME"
   },
   {
     "id": "CF_NAME feature-flag FEATURE_NAME",
-    "translation": ""
+    "translation": "CF_NAME feature-flag FEATURE_NAME"
   },
   {
     "id": "CF_NAME feature-flags",
-    "translation": ""
+    "translation": "CF_NAME feature-flags"
   },
   {
     "id": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\nTIP:\n  To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'",
-    "translation": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\nTIP:\n  To list and inspect files of an app running on the Diego backend, use 'cf ssh'"
+    "translation": "CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\t\t\t\n팁:\n  Diego 백엔드에서 실행되는 앱의 파일을 나열하고 검사하려면 'CF_NAME ssh'를 사용하십시오."
   },
   {
     "id": "CF_NAME get-health-check APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME get-health-check APP_NAME"
   },
   {
     "id": "CF_NAME help [COMMAND]",
-    "translation": ""
+    "translation": "CF_NAME help [COMMAND]"
   },
   {
     "id": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.",
-    "translation": ""
+    "translation": "CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   '-f'를 제공하지 않으면 확인을 위해 프롬프트가 표시됩니다."
   },
   {
     "id": "CF_NAME list-plugin-repos",
-    "translation": ""
+    "translation": "CF_NAME list-plugin-repos"
   },
   {
     "id": "CF_NAME login (omit username and password to login interactively -- CF_NAME will prompt for both)",
-    "translation": ""
+    "translation": "CF_NAME login(대화식으로 로그인하려면 사용자 이름 및 비밀번호 생략 -- CF_NAME이 두 항목에 대한 프롬프트 표시)"
   },
   {
     "id": "CF_NAME login --sso (CF_NAME will provide a url to obtain a one-time password to login)",
-    "translation": ""
+    "translation": "CF_NAME login --sso(CF_NAME이 로그인하기 위해 일회성 비밀번호를 얻을 URL을 제공함)"
   },
   {
     "id": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)",
-    "translation": ""
+    "translation": "CF_NAME login -u name@example.com -p \"\\\"password\\\"\"(비밀번호에서 사용되는 경우 따옴표 이스케이프)"
   },
   {
     "id": "CF_NAME login -u name@example.com -p \"my password\" (use quotes for passwords with a space)",
-    "translation": ""
+    "translation": "CF_NAME login -u name@example.com -p \"my password\"(공백을 포함하는 비밀번호의 경우 따옴표 사용)"
   },
   {
     "id": "CF_NAME login -u name@example.com -p pa55woRD (specify username and password as arguments)",
-    "translation": ""
+    "translation": "CF_NAME login -u name@example.com -p pa55woRD(사용자 이름과 비밀번호를 인수로 지정)"
   },
   {
     "id": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n",
-    "translation": ""
+    "translation": "CF_NAME login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n"
   },
   {
     "id": "CF_NAME logout",
-    "translation": ""
+    "translation": "CF_NAME logout"
   },
   {
     "id": "CF_NAME logs APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME logs APP_NAME"
   },
   {
     "id": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n",
-    "translation": ""
+    "translation": "CF_NAME migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"
   },
   {
     "id": "CF_NAME oauth-token",
-    "translation": ""
+    "translation": "CF_NAME oauth-token"
   },
   {
     "id": "CF_NAME org ORG",
-    "translation": ""
+    "translation": "CF_NAME org ORG"
   },
   {
     "id": "CF_NAME org-users ORG",
-    "translation": ""
+    "translation": "CF_NAME org-users ORG"
   },
   {
     "id": "CF_NAME passwd",
-    "translation": ""
+    "translation": "CF_NAME passwd"
   },
   {
     "id": "CF_NAME plugins",
-    "translation": ""
+    "translation": "CF_NAME plugins"
   },
   {
     "id": "CF_NAME purge-service-instance SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME purge-service-instance SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]",
-    "translation": ""
+    "translation": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]"
   },
   {
     "id": "CF_NAME quota QUOTA",
-    "translation": ""
+    "translation": "CF_NAME quota QUOTA"
   },
   {
     "id": "CF_NAME quotas",
-    "translation": ""
+    "translation": "CF_NAME quotas"
   },
   {
     "id": "CF_NAME remove-plugin-repo REPO_NAME",
-    "translation": ""
+    "translation": "CF_NAME remove-plugin-repo REPO_NAME"
   },
   {
     "id": "CF_NAME rename APP_NAME NEW_APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME rename APP_NAME NEW_APP_NAME"
   },
   {
     "id": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME",
-    "translation": ""
+    "translation": "CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"
   },
   {
     "id": "CF_NAME rename-org ORG NEW_ORG",
-    "translation": ""
+    "translation": "CF_NAME rename-org ORG NEW_ORG"
   },
   {
     "id": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER",
-    "translation": ""
+    "translation": "CF_NAME rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER"
   },
   {
     "id": "CF_NAME rename-space SPACE NEW_SPACE",
-    "translation": ""
+    "translation": "CF_NAME rename-space SPACE NEW_SPACE"
   },
   {
     "id": "CF_NAME repo-plugins [-r REPO_NAME]",
-    "translation": ""
+    "translation": "CF_NAME repo-plugins [-r REPO_NAME]"
   },
   {
     "id": "CF_NAME restage APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME restage APP_NAME"
   },
   {
     "id": "CF_NAME restart APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME restart APP_NAME"
   },
   {
     "id": "CF_NAME restart-app-instance APP_NAME INDEX",
-    "translation": ""
+    "translation": "CF_NAME restart-app-instance APP_NAME INDEX"
   },
   {
     "id": "CF_NAME running-environment-variable-group",
-    "translation": ""
+    "translation": "CF_NAME running-environment-variable-group"
   },
   {
     "id": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]",
-    "translation": ""
+    "translation": "CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"
   },
   {
     "id": "CF_NAME security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME service SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME service SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME service-auth-tokens",
-    "translation": ""
+    "translation": "CF_NAME service-auth-tokens"
   },
   {
     "id": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY",
-    "translation": ""
+    "translation": "CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY"
   },
   {
     "id": "CF_NAME service-keys SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME service-keys SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE",
-    "translation": ""
+    "translation": "CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"
   },
   {
     "id": "CF_NAME set-health-check APP_NAME 'port'|'none'",
-    "translation": ""
+    "translation": "CF_NAME set-health-check APP_NAME 'port'|'none'"
   },
   {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME set-org-role USERNAME ORG ROLE\n\n"
   },
   {
     "id": "CF_NAME set-quota ORG QUOTA\n\n",
-    "translation": ""
+    "translation": "CF_NAME set-quota ORG QUOTA\n\n"
   },
   {
     "id": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": ""
+    "translation": "CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",
-    "translation": ""
+    "translation": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"
   },
   {
     "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n"
   },
   {
     "id": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": ""
+    "translation": "CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "CF_NAME share-private-domain ORG DOMAIN",
-    "translation": ""
+    "translation": "CF_NAME share-private-domain ORG DOMAIN"
   },
   {
     "id": "CF_NAME space SPACE",
-    "translation": ""
+    "translation": "CF_NAME space SPACE"
   },
   {
     "id": "CF_NAME space-quota SPACE_QUOTA_NAME",
-    "translation": ""
+    "translation": "CF_NAME space-quota SPACE_QUOTA_NAME"
   },
   {
     "id": "CF_NAME space-quotas",
-    "translation": ""
+    "translation": "CF_NAME space-quotas"
   },
   {
     "id": "CF_NAME space-ssh-allowed SPACE_NAME",
-    "translation": ""
+    "translation": "CF_NAME space-ssh-allowed SPACE_NAME"
   },
   {
     "id": "CF_NAME space-users ORG SPACE",
-    "translation": ""
+    "translation": "CF_NAME space-users ORG SPACE"
   },
   {
     "id": "CF_NAME spaces",
-    "translation": ""
+    "translation": "CF_NAME spaces"
   },
   {
     "id": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]",
-    "translation": ""
+    "translation": "CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]"
   },
   {
     "id": "CF_NAME ssh-code",
-    "translation": ""
+    "translation": "CF_NAME ssh-code"
   },
   {
     "id": "CF_NAME ssh-enabled APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME ssh-enabled APP_NAME"
   },
   {
     "id": "CF_NAME stack STACK_NAME",
-    "translation": ""
+    "translation": "CF_NAME stack STACK_NAME"
   },
   {
     "id": "CF_NAME stacks",
-    "translation": ""
+    "translation": "CF_NAME stacks"
   },
   {
     "id": "CF_NAME staging-environment-variable-group",
-    "translation": ""
+    "translation": "CF_NAME staging-environment-variable-group"
   },
   {
     "id": "CF_NAME start APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME start APP_NAME"
   },
   {
     "id": "CF_NAME stop APP_NAME",
-    "translation": ""
+    "translation": "CF_NAME stop APP_NAME"
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
-    "translation": ""
+    "translation": "CF_NAME target [-o ORG] [-s SPACE]"
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]",
-    "translation": ""
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME unbind-running-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE",
-    "translation": ""
+    "translation": "CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
     "id": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE",
-    "translation": ""
+    "translation": "CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"
   },
   {
     "id": "CF_NAME unbind-staging-security-group SECURITY_GROUP",
-    "translation": ""
+    "translation": "CF_NAME unbind-staging-security-group SECURITY_GROUP"
   },
   {
     "id": "CF_NAME uninstall-plugin PLUGIN-NAME",
-    "translation": ""
+    "translation": "CF_NAME uninstall-plugin PLUGIN-NAME"
   },
   {
     "id": "CF_NAME unset-env APP_NAME ENV_VAR_NAME",
-    "translation": ""
+    "translation": "CF_NAME unset-env APP_NAME ENV_VAR_NAME"
   },
   {
     "id": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME unset-org-role USERNAME ORG ROLE\n\n"
   },
   {
     "id": "CF_NAME unset-space-quota SPACE QUOTA\n\n",
-    "translation": ""
+    "translation": "CF_NAME unset-space-quota SPACE QUOTA\n\n"
   },
   {
     "id": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n",
-    "translation": ""
+    "translation": "CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\n"
   },
   {
     "id": "CF_NAME unshare-private-domain ORG DOMAIN",
-    "translation": ""
+    "translation": "CF_NAME unshare-private-domain ORG DOMAIN"
   },
   {
     "id": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]",
-    "translation": ""
+    "translation": "CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]"
   },
   {
     "id": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE",
-    "translation": ""
+    "translation": "CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE"
   },
   {
     "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]",
-    "translation": ""
+    "translation": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]"
   },
   {
     "id": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN",
-    "translation": ""
+    "translation": "CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"
   },
   {
     "id": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL",
-    "translation": ""
+    "translation": "CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"
   },
   {
     "id": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
-    "translation": ""
+    "translation": "CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   쉼표로 구분된 신임 정보 매개변수 이름을 전달하여 대화식 모드 사용:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   신임 정보 매개변수를 JSON으로 전달하여 비대화식으로 서비스 작성:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   JSON을 포함하는 파일에 대한 경로 지정:\n   CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
   {
     "id": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}",
-    "translation": ""
+    "translation": "CF_TRACE ERROR CREATING LOG FILE {{.Path}}:\n{{.Err}}"
   },
   {
     "id": "COMMAND",
-    "translation": ""
+    "translation": "명령"
   },
   {
     "id": "Can not provision instances of paid service plans",
@@ -1037,11 +1037,11 @@
   },
   {
     "id": "Cannot specify port together with hostname and/or path.",
-    "translation": ""
+    "translation": "호스트 이름 및/또는 경로와 함께 포트를 지정할 수 없습니다."
   },
   {
     "id": "Cannot specify random-port together with port, hostname and/or path.",
-    "translation": ""
+    "translation": "포트, 호스트 이름 및/또는 경로와 함께 랜덤 포트를 지정할 수 없습니다."
   },
   {
     "id": "Change or view the instance count, disk space limit, and memory limit for an app",
@@ -1069,7 +1069,7 @@
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
-    "translation": ""
+    "translation": "애플리케이션이 청취할 수 있는 포트를 쉼표로 구분한 목록"
   },
   {
     "id": "Command Help",
@@ -1133,7 +1133,7 @@
   },
   {
     "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
-    "translation": ""
+    "translation": "'{{.UnsupportedLocale}}' 로케일을 찾을 수 없습니다. 알려진 로케일은 다음과 같습니다.\n"
   },
   {
     "id": "Could not find plan with name {{.ServicePlanName}}",
@@ -1173,7 +1173,7 @@
   },
   {
     "id": "Create a TCP route",
-    "translation": ""
+    "translation": "TCP 라우트 작성"
   },
   {
     "id": "Create a buildpack",
@@ -1181,7 +1181,7 @@
   },
   {
     "id": "Create a domain in an org for later use",
-    "translation": "나중에 사용하도록 조직에 도메인 작성"
+    "translation": "나중에 사용하기 위해 조직에 도메인 작성"
   },
   {
     "id": "Create a domain that can be used by all orgs (admin-only)",
@@ -1193,7 +1193,7 @@
   },
   {
     "id": "Create a random port for the TCP route",
-    "translation": ""
+    "translation": "TCP 라우트에 대한 랜덤 포트 작성"
   },
   {
     "id": "Create a random route for this app",
@@ -1225,11 +1225,11 @@
   },
   {
     "id": "Create an HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트 작성"
   },
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
-    "translation": "푸시된 앱의 앱 Manifest를 작성합니다"
+    "translation": "성공적으로 푸시된 앱에 대한 앱 Manifest 작성"
   },
   {
     "id": "Create an org",
@@ -1237,11 +1237,11 @@
   },
   {
     "id": "Create and manage apps and services, and see logs and reports\n",
-    "translation": "앱과 서비스를 작성하고 관리하며 로그와 보고서 표시\n"
+    "translation": "앱 및 서비스 작성 및 관리, 로그 및 보고서 확인\n"
   },
   {
     "id": "Create and manage the billing account and payment info\n",
-    "translation": "청구 계정과 지불 정보를 작성하고 관리합니다.\n"
+    "translation": "청구 계정 및 지불 정보 작성 및 관리\n"
   },
   {
     "id": "Create key for a service instance",
@@ -1273,7 +1273,7 @@
   },
   {
     "id": "Creating random route for {{.Domain}}",
-    "translation": ""
+    "translation": "{{.Domain}}에 대한 랜덤 라우트 작성"
   },
   {
     "id": "Creating route {{.Hostname}}...",
@@ -1281,7 +1281,7 @@
   },
   {
     "id": "Creating route {{.URL}} for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": ""
+    "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 {{.URL}} 라우트 작성 중..."
   },
   {
     "id": "Creating security group {{.security_group}} as {{.username}}",
@@ -1297,7 +1297,7 @@
   },
   {
     "id": "Creating service broker {{.Name}} in org {{.Org}} / space {{.Space}} as {{.Username}}...",
-    "translation": ""
+    "translation": "{{.Username}}(으)로 {{.Org}} 조직/{{.Space}} 영역에 서비스 브로커 {{.Name}} 작성 중..."
   },
   {
     "id": "Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -1333,7 +1333,7 @@
   },
   {
     "id": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications",
-    "translation": ""
+    "translation": "바운드 애플리케이션에 대한 VCAP_SERVICES 환경 변수에서 노출되는 신임 정보(인라인 또는 파일 내에서 제공)"
   },
   {
     "id": "Current Password",
@@ -1345,7 +1345,7 @@
   },
   {
     "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
-    "translation": "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git') or GIT BRANCH URL (e.g. 'https://github.com/heroku/heroku-buildpack-play.git#develop' for 'develop' branch). Use built-in buildpacks only by setting value to 'null' or 'default'"
+    "translation": "이름별 사용자 정의 빌드팩(예: my-buildpack), Git URL(예: 'https://github.com/cloudfoundry/java-buildpack.git'), 또는 분기나 태그가 있는 Git URL(예: 'v3.3.0' 태그의 경우 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0'). 기본 제공 빌드팩만 사용하려면 'default' 또는 'null'을 지정하십시오. "
   },
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
@@ -1353,15 +1353,15 @@
   },
   {
     "id": "DISK",
-    "translation": ""
+    "translation": "디스크"
   },
   {
     "id": "DOCKER_IMAGE",
-    "translation": ""
+    "translation": "DOCKER_IMAGE"
   },
   {
     "id": "DOMAIN",
-    "translation": ""
+    "translation": "도메인"
   },
   {
     "id": "DOMAINS",
@@ -1381,7 +1381,7 @@
   },
   {
     "id": "Delete a TCP route",
-    "translation": ""
+    "translation": "TCP 라우트 삭제"
   },
   {
     "id": "Delete a buildpack",
@@ -1437,7 +1437,7 @@
   },
   {
     "id": "Delete an HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트 삭제"
   },
   {
     "id": "Delete an app",
@@ -1537,7 +1537,7 @@
   },
   {
     "id": "Disable ssh for the application",
-    "translation": "애플리케이션에 SSH 사용 안함"
+    "translation": "애플리케이션에 ssh 사용 안함"
   },
   {
     "id": "Disable the buildpack from being used for staging",
@@ -1545,7 +1545,7 @@
   },
   {
     "id": "Disable the use of a feature so that users have access to and can use the feature",
-    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용 안함으로 설정합니다"
+    "translation": "사용자가 액세스하여 기능을 사용할 수 있도록 기능을 사용 안함으로 설정"
   },
   {
     "id": "Disabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1593,7 +1593,7 @@
   },
   {
     "id": "Do not map a route to this app and remove routes from previous pushes of this app",
-    "translation": "이 앱에 라우트를 맵핑하지 말고 이 앱의 이전 푸시에서 라우트를 제거하십시오"
+    "translation": "이 앱에 라우트를 맵핑하지 않고 이 앱의 이전 푸시에서 라우트를 제거"
   },
   {
     "id": "Do not start an app after pushing",
@@ -1601,7 +1601,7 @@
   },
   {
     "id": "Docker-image to be used (e.g. user/docker-image-name)",
-    "translation": "사용할 Docker 이미지(예: 사용자/Docker 이미지 이름)"
+    "translation": "사용할 Docker 이미지(예: user/docker-image-name)"
   },
   {
     "id": "Documentation url: {{.URL}}",
@@ -1637,7 +1637,7 @@
   },
   {
     "id": "EXAMPLES",
-    "translation": ""
+    "translation": "예제"
   },
   {
     "id": "Enable HTTP proxying for API requests",
@@ -1661,7 +1661,7 @@
   },
   {
     "id": "Enable ssh for the application",
-    "translation": "애플리케이션에 SSH 사용"
+    "translation": "애플리케이션에 ssh 사용"
   },
   {
     "id": "Enable the buildpack to be used for staging",
@@ -1669,7 +1669,7 @@
   },
   {
     "id": "Enable the use of a feature so that users have access to and can use the feature",
-    "translation": "사용자가 기능에 액세스하여 사용할 수 있도록 기능의 사용을 사용으로 설정합니다"
+    "translation": "사용자가 액세스하여 기능을 사용할 수 있도록 기능을 사용으로 설정"
   },
   {
     "id": "Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
@@ -1793,7 +1793,7 @@
   },
   {
     "id": "Error getting SSH code: ",
-    "translation": ""
+    "translation": "SSH 코드를 가져오는 중에 오류 발생: "
   },
   {
     "id": "Error getting SSH info:",
@@ -1821,7 +1821,7 @@
   },
   {
     "id": "Error getting the redirected location: {{.Error}}",
-    "translation": ""
+    "translation": "경로 재지정된 위치를 가져오는 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error initializing RPC service: ",
@@ -1853,11 +1853,11 @@
   },
   {
     "id": "Error processing app files in '{{.Path}}': {{.Error}}",
-    "translation": "Error processing app files at {{.Path}}: {{.Error}}"
+    "translation": "'{{.Path}}'에서 앱 파일을 처리하는 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error processing app files: {{.Error}}",
-    "translation": ""
+    "translation": "앱 파일을 처리하는 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error processing data from server: ",
@@ -1893,7 +1893,7 @@
   },
   {
     "id": "Error requesting one time code from server: {{.Error}}",
-    "translation": ""
+    "translation": "서버에서 일회성 코드를 요청하는 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -1905,15 +1905,15 @@
   },
   {
     "id": "Error retrieving stack: ",
-    "translation": ""
+    "translation": "스택을 검색하는 중에 오류 발생: "
   },
   {
     "id": "Error retrieving stacks: {{.Error}}",
-    "translation": ""
+    "translation": "스택을 검색하는 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error saving manifest: {{.Error}}",
-    "translation": ""
+    "translation": "Manifest 저장 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
@@ -1961,7 +1961,7 @@
   },
   {
     "id": "Executes a request to the targeted API endpoint",
-    "translation": ""
+    "translation": "대상 API 엔드포인트에 대한 요청 실행"
   },
   {
     "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
@@ -1981,7 +1981,7 @@
   },
   {
     "id": "Expected {{.PropertyName}} to be a list of integers.",
-    "translation": ""
+    "translation": "{{.PropertyName}}이(가) 정수의 목록일 것으로 예상했습니다."
   },
   {
     "id": "Expected {{.PropertyName}} to be a list of strings.",
@@ -2093,7 +2093,7 @@
   },
   {
     "id": "Force install of plugin without confirmation",
-    "translation": ""
+    "translation": "확인 없이 플러그인 설치 강제 실행"
   },
   {
     "id": "Force migration without confirmation",
@@ -2109,7 +2109,7 @@
   },
   {
     "id": "Force unbinding without confirmation",
-    "translation": ""
+    "translation": "확인 없이 바인딩 해제 강제 실행"
   },
   {
     "id": "GETTING STARTED",
@@ -2209,11 +2209,11 @@
   },
   {
     "id": "Getting routes for org {{.OrgName}} / space {{.SpaceName}} as {{.Username}} ...\n",
-    "translation": ""
+    "translation": "{{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 대한 라우트를 가져오는 중...\n "
   },
   {
     "id": "Getting routes for org {{.OrgName}} as {{.Username}} ...\n",
-    "translation": "Getting routes for org {{.OrgName}}  as {{.Username}} ...\n"
+    "translation": "{{.Username}}(으)로 {{.OrgName}} 조직에 대한 라우트를 가져오는 중...\n "
   },
   {
     "id": "Getting rules for the security group  : {{.SecurityGroupName}}...",
@@ -2309,19 +2309,19 @@
   },
   {
     "id": "HEALTH_CHECK_TYPE",
-    "translation": ""
+    "translation": "HEALTH_CHECK_TYPE"
   },
   {
     "id": "HOST",
-    "translation": ""
+    "translation": "호스트"
   },
   {
     "id": "HOSTNAME",
-    "translation": ""
+    "translation": "호스트 이름"
   },
   {
     "id": "HTTP data to include in the request body, or '@' followed by a file name to read the data from",
-    "translation": ""
+    "translation": "요청 본문에 포함할 HTTP 데이터, 또는 데이터를 읽어 올 파일 이름이 뒤에 오는 '@'"
   },
   {
     "id": "HTTP method (GET,POST,PUT,DELETE,etc)",
@@ -2333,19 +2333,19 @@
   },
   {
     "id": "Hostname for the HTTP route (required for shared domains)",
-    "translation": ""
+    "translation": "HTTP 라우트에 대한 호스트 이름(공유 도메인의 경우 필수)"
   },
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to bind",
-    "translation": ""
+    "translation": "바인드할 라우트를 지정하기 위해 DOMAIN과 조합하여 사용되는 호스트 이름"
   },
   {
     "id": "Hostname used in combination with DOMAIN to specify the route to unbind",
-    "translation": ""
+    "translation": "바인드 해제할 라우트를 지정하기 위해 DOMAIN과 조합하여 사용되는 호스트 이름"
   },
   {
     "id": "Hostname used to identify the HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트를 식별하는 데 사용되는 호스트 이름"
   },
   {
     "id": "INSTALLED PLUGIN COMMANDS",
@@ -2353,7 +2353,7 @@
   },
   {
     "id": "INSTANCE_MEMORY",
-    "translation": ""
+    "translation": "INSTANCE_MEMORY"
   },
   {
     "id": "Ignore manifest file",
@@ -2361,11 +2361,11 @@
   },
   {
     "id": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
-    "translation": ""
+    "translation": "Windows 명령행에서 작은따옴표, 이스케이프된 JSON을 사용: '{\\\"valid\\\":\\\"json\\\"}'"
   },
   {
     "id": "In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"",
-    "translation": ""
+    "translation": "Windows PowerShell에서 큰따옴표, 이스케이프된 JSON을 사용: \"{\\\"valid\\\":\\\"json\\\"}\""
   },
   {
     "id": "Include response headers in the output",
@@ -2429,11 +2429,11 @@
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
-    "translation": ""
+    "translation": "올바르지 않은 사용법입니다. 인수로 DOMAIN과 SERVICE_INSTANCE가 필요합니다.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
-    "translation": ""
+    "translation": "올바르지 않은 사용법입니다. 인수로 DOMAIN이 필요합니다.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
@@ -2457,7 +2457,7 @@
   },
   {
     "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
-    "translation": ""
+    "translation": "올바르지 않은 사용법입니다. 인수로 REPO_NAME과 URL이 필요합니다.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2577,7 +2577,7 @@
   },
   {
     "id": "Install CLI plugin",
-    "translation": ""
+    "translation": "CLI 플러그인 설치"
   },
   {
     "id": "Installing plugin {{.PluginPath}}...",
@@ -2609,7 +2609,7 @@
   },
   {
     "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
-    "translation": ""
+    "translation": "올바르지 않은 앱 포트: {{.AppPort}}\n앱 포트는 숫자여야 함"
   },
   {
     "id": "Invalid async response from server",
@@ -2685,11 +2685,11 @@
   },
   {
     "id": "Invite and manage users, and enable features for a given space\n",
-    "translation": "사용자 초대와 관리, 주어진 영역에 대한 기능 사용 설정\n"
+    "translation": "사용자 초대 및 관리, 지정된 영역에 대한 기능 사용\n"
   },
   {
     "id": "Invite and manage users, select and change plans, and set spending limits\n",
-    "translation": "사용자 초대와 관리, 플랜 선택과 변경, 지출 한계 설정\n"
+    "translation": "사용자 초대 및 관리, 플랜 선택 및 변경, 지출 한계 설정\n"
   },
   {
     "id": "Last Operation",
@@ -2697,7 +2697,7 @@
   },
   {
     "id": "Linux/Mac",
-    "translation": ""
+    "translation": "Linux/Mac"
   },
   {
     "id": "List all apps in the target space",
@@ -2709,7 +2709,7 @@
   },
   {
     "id": "List all available plugins in specified repository or in all added repositories",
-    "translation": ""
+    "translation": "지정된 저장소 또는 추가된 모든 저장소에서 사용 가능한 모든 플러그인 나열"
   },
   {
     "id": "List all buildpacks",
@@ -2833,11 +2833,11 @@
   },
   {
     "id": "MANIFEST_PATH",
-    "translation": ""
+    "translation": "MANIFEST_PATH"
   },
   {
     "id": "MEMORY",
-    "translation": ""
+    "translation": "메모리"
   },
   {
     "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
@@ -2845,11 +2845,11 @@
   },
   {
     "id": "Make a user-provided service instance available to CF apps",
-    "translation": "CF 앱에서 사용자 제공 서비스 인스턴스를 사용 가능하도록 작성"
+    "translation": "사용자 제공 서비스 인스턴스를 CF 앱에 사용할 수 있도록 설정"
   },
   {
     "id": "Make the broker's service plans only visible within the targeted space",
-    "translation": ""
+    "translation": "브로커의 서비스 플랜이 대상 영역에만 표시되도록 설정"
   },
   {
     "id": "Manifest file created successfully at ",
@@ -2861,11 +2861,11 @@
   },
   {
     "id": "Map a TCP route",
-    "translation": ""
+    "translation": "TCP 라우트 맵핑"
   },
   {
     "id": "Map an HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트 맵핑"
   },
   {
     "id": "Map the root domain to this app",
@@ -2925,11 +2925,11 @@
   },
   {
     "id": "NEW_NAME",
-    "translation": ""
+    "translation": "NEW_NAME"
   },
   {
     "id": "NUM_INSTANCES",
-    "translation": ""
+    "translation": "NUM_INSTANCES"
   },
   {
     "id": "Name",
@@ -2937,11 +2937,11 @@
   },
   {
     "id": "Name of a registered repository",
-    "translation": ""
+    "translation": "등록된 저장소 이름"
   },
   {
     "id": "Name of a registered repository where the specified plugin is located",
-    "translation": ""
+    "translation": "지정된 플러그인이 위치한 등록된 저장소 이름"
   },
   {
     "id": "New Password",
@@ -2973,7 +2973,7 @@
   },
   {
     "id": "No app files found in '{{.Path}}'",
-    "translation": ""
+    "translation": "'{{.Path}}'에서 앱 파일을 찾을 수 없음"
   },
   {
     "id": "No apps found",
@@ -2981,7 +2981,7 @@
   },
   {
     "id": "No argument required",
-    "translation": "인수가 필요하지 않습니다"
+    "translation": "인수가 필요하지 않음"
   },
   {
     "id": "No buildpacks found",
@@ -3173,11 +3173,11 @@
   },
   {
     "id": "PATH",
-    "translation": ""
+    "translation": "경로"
   },
   {
     "id": "PORT",
-    "translation": ""
+    "translation": "포트"
   },
   {
     "id": "Paid service plans",
@@ -3201,11 +3201,11 @@
   },
   {
     "id": "Path for the HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트에 대한 경로"
   },
   {
     "id": "Path for the route",
-    "translation": "Context path must include at least one character following a leading forward slash (/). Trailing slashes will be stripped, but requests received with a trailing slash will match."
+    "translation": " 라우트에 대한 경로"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3221,11 +3221,11 @@
   },
   {
     "id": "Path used to identify the HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트를 식별하는 데 사용되는 경로"
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
-    "translation": "단순 검사를 수행하여 라우트가 현재 있는지 여부를 판별합니다"
+    "translation": "단순 검사를 수행하여 라우트가 현재 있는지 여부 판별"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3293,11 +3293,11 @@
   },
   {
     "id": "Port for the TCP route",
-    "translation": ""
+    "translation": "TCP 라우트에 대한 포트"
   },
   {
     "id": "Port used to identify the TCP route",
-    "translation": ""
+    "translation": "TCP 라우트를 식별하는 데 사용되는 포트"
   },
   {
     "id": "Print API request diagnostics to stdout",
@@ -3305,7 +3305,7 @@
   },
   {
     "id": "Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend",
-    "translation": "디렉토리에 있는 파일의 목록 또는 특정 파일의 컨텐츠 인쇄"
+    "translation": "DEA 백엔드에서 실행 중인 앱의 특정 파일 컨텐츠 또는 디렉토리에 있는 파일의 목록을 인쇄"
   },
   {
     "id": "Print the version",
@@ -3341,15 +3341,15 @@
   },
   {
     "id": "Push a single app (with or without a manifest)",
-    "translation": "단일 앱(Manifest 포함 또는 포함 안 함) 푸시"
+    "translation": "단일 앱 푸시(Manifest 사용 또는 사용 안 함)"
   },
   {
     "id": "Push multiple apps with a manifest",
-    "translation": "Manifest로 여러 앱 푸시"
+    "translation": "Manifest를 사용하여 여러 개의 앱 푸시"
   },
   {
     "id": "QUOTA",
-    "translation": ""
+    "translation": "할당량"
   },
   {
     "id": "Quota Definition {{.QuotaName}} already exists",
@@ -3389,11 +3389,11 @@
   },
   {
     "id": "ROUTE_PATH",
-    "translation": ""
+    "translation": "ROUTE_PATH"
   },
   {
     "id": "Read-only access to org info and reports\n",
-    "translation": "조직 정보와 보고서에 대한 읽기 전용 액세스 권한\n"
+    "translation": "조직 정보 및 보고서에 대한 읽기 전용 액세스\n"
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
@@ -3445,7 +3445,7 @@
   },
   {
     "id": "Remove all api endpoint targeting",
-    "translation": "모든 API 엔드포인트 대상 지정 제거"
+    "translation": "모든 api 엔드포인트 대상 지정 제거"
   },
   {
     "id": "Remove an env variable",
@@ -3629,15 +3629,15 @@
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}} {{.Existence}}",
-    "translation": ""
+    "translation": "라우트 {{.HostName}}.{{.DomainName}} {{.Existence}}"
   },
   {
     "id": "Route {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}",
-    "translation": ""
+    "translation": "라우트 {{.HostName}}.{{.DomainName}}/{{.Path}} {{.Existence}}"
   },
   {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
-    "translation": ""
+    "translation": "{{.Route}} 라우트가 서비스 인스턴스 {{.ServiceInstance}}에 바인드되지 않았습니다."
   },
   {
     "id": "Route {{.URL}} already exists",
@@ -3645,11 +3645,11 @@
   },
   {
     "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
-    "translation": ""
+    "translation": "{{.URL}} 라우트가 서비스 인스턴스 {{.ServiceInstanceName}}에 이미 바인드되어 있습니다. "
   },
   {
     "id": "Router group {{.RouterGroup}} not found",
-    "translation": ""
+    "translation": "라우트 그룹 {{.RouterGroup}}을(를) 찾을 수 없음"
   },
   {
     "id": "Routes",
@@ -3657,7 +3657,7 @@
   },
   {
     "id": "Routes for this domain will be configured only on the specified router group",
-    "translation": ""
+    "translation": "이 도메인에 대한 라우트는 지정된 라우트 그룹에서만 구성됨"
   },
   {
     "id": "Rules",
@@ -3681,11 +3681,11 @@
   },
   {
     "id": "SERVICE_INSTANCES",
-    "translation": ""
+    "translation": "SERVICE_INSTANCES"
   },
   {
     "id": "SPACE",
-    "translation": ""
+    "translation": "영역"
   },
   {
     "id": "SPACE ADMIN",
@@ -3713,7 +3713,7 @@
   },
   {
     "id": "STACK",
-    "translation": ""
+    "translation": "스택"
   },
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -3741,7 +3741,7 @@
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
-    "translation": ""
+    "translation": "서버 오류, 오류 코드: 1002, 메시지: 사용자가 조직에 속하지 않아 영역 역할을 설정할 수 없습니다."
   },
   {
     "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
@@ -3933,7 +3933,7 @@
   },
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
-    "translation": ""
+    "translation": "API 엔드포인트 유효성 검증 건너뛰기. 권장하지 않음!"
   },
   {
     "id": "Space",
@@ -4017,7 +4017,7 @@
   },
   {
     "id": "TIMEOUT",
-    "translation": ""
+    "translation": "제한시간"
   },
   {
     "id": "TIP:\n",
@@ -4025,7 +4025,7 @@
   },
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
-    "translation": "팁:\n CF 앱에서 사용자 제공 서비스를 사용할 수 있게 하려면 'CF_NAME create-user-provided-service'를 사용하십시오."
+    "translation": "팁:\n  'CF_NAME create-user-provided-service'를 사용하여 CF 앱에서 사용자 제공 서비스를 사용할 수 있도록 설정하십시오."
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4033,7 +4033,7 @@
   },
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
-    "translation": ""
+    "translation": "팁: 방화벽 뒤에 있고 HTTP 프록시가 필요한 경우 https_proxy 환경 변수가 올바르게 설정되었는지 확인하십시오. 그렇지 않은 경우, 네트워크 연결을 확인하십시오. "
   },
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
@@ -4061,11 +4061,11 @@
   },
   {
     "id": "TOTAL_MEMORY",
-    "translation": ""
+    "translation": "TOTAL_MEMORY"
   },
   {
     "id": "Tags: {{.Tags}}",
-    "translation": ""
+    "translation": "태그: {{.Tags}}"
   },
   {
     "id": "Tail or show recent logs for an app",
@@ -4113,7 +4113,7 @@
   },
   {
     "id": "The targeted API endpoint could not be reached.",
-    "translation": ""
+    "translation": "대상 API 엔드포인트에 도달할 수 없습니다. "
   },
   {
     "id": "There are no running instances of this app.",
@@ -4125,19 +4125,19 @@
   },
   {
     "id": "There is an error performing request on '{{.RepoURL}}': ",
-    "translation": "'{{.repoURL}}'에 대한 요청 수행 중에 오류가 발생했습니다. "
+    "translation": "'{{.RepoURL}}'에 대한 요청 수행 중에 오류가 발생했습니다. "
   },
   {
     "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
-    "translation": "There is an error performing request on '{{.repoURL}}': {{.Error}}%s"
+    "translation": "'{{.RepoURL}}'에 대한 요청 수행 중에 오류가 발생함: {{.Error}}\n{{.Tip}}"
   },
   {
     "id": "This command",
-    "translation": ""
+    "translation": "이 명령"
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
-    "translation": ""
+    "translation": "이 명령에는 라우팅 API가 필요합니다. 대상 엔드포인트에서 해당 항목이 사용으로 설정되지 않았음을 보고합니다."
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4181,7 +4181,7 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": ""
+    "translation": "애플리케이션 인스턴스의 총계입니다. -1은 무제한 크기를 나타냅니다(기본값: 무제한)."
   },
   {
     "id": "Total number of routes",
@@ -4205,11 +4205,11 @@
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
-    "translation": ""
+    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다. "
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": ""
+    "translation": "바인딩된 라우트에 대한 요청을 전달한 URL입니다. 이 URL에 대한 스킴은 https이어야 합니다. "
   },
   {
     "id": "USAGE",
@@ -4245,7 +4245,7 @@
   },
   {
     "id": "Unable to determine CC API Version. Please log in again.",
-    "translation": ""
+    "translation": "CC API 버전을 판별할 수 없습니다.  다시 로그인하십시오."
   },
   {
     "id": "Unable to obtain plugin name for executable {{.Executable}}",
@@ -4253,7 +4253,7 @@
   },
   {
     "id": "Unable to parse CC API Version '{{.APIVersion}}'",
-    "translation": ""
+    "translation": "CC API 버전 '{{.APIVersion}}'을(를) 구문 분석할 수 없습니다. "
   },
   {
     "id": "Unassign a quota from a space",
@@ -4277,7 +4277,7 @@
   },
   {
     "id": "Unbind a service instance from an HTTP route",
-    "translation": ""
+    "translation": "서비스 인스턴스를 HTTP 라우트에서 바인드 해제"
   },
   {
     "id": "Unbind a service instance from an app",
@@ -4285,7 +4285,7 @@
   },
   {
     "id": "Unbind cancelled",
-    "translation": ""
+    "translation": "바인드 해제 취소됨"
   },
   {
     "id": "Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -4293,11 +4293,11 @@
   },
   {
     "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed?",
-    "translation": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed? (y/n)"
+    "translation": "바인딩 해제는 {{.URL}} 라우트에 맵핑된 앱을 취약하게 만들 수 있습니다(예: 서비스 인스턴스 {{.ServiceInstanceName}}이(가) 인증을 제공하는 경우). 계속 진행하시겠습니까?"
   },
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역의 서비스 인스턴스 {{.ServiceInstanceName}}에서 {{.URL}} 라우트 바인드 해제 중..."
   },
   {
     "id": "Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
@@ -4329,11 +4329,11 @@
   },
   {
     "id": "Unmap a TCP route",
-    "translation": ""
+    "translation": "TCP 라우트 맵핑 해제"
   },
   {
     "id": "Unmap an HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트 맵핑 해제"
   },
   {
     "id": "Unsetting api endpoint...",
@@ -4377,7 +4377,7 @@
   },
   {
     "id": "Update user-provided service instance",
-    "translation": ""
+    "translation": "사용자 제공 서비스 인스턴스 업데이트"
   },
   {
     "id": "Updated: {{.Updated}}",
@@ -4489,11 +4489,11 @@
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": "인라인 또는 파일로 제공되는 서비스별 구성 매개변수가 포함된 올바른 JSON 오브젝트. 지원되는 구성 매개변수의 목록은 특정 서비스 오퍼링 관련 문서를 참조하십시오."
+    "translation": "인라인 또는 파일로 제공되는, 서비스별 구성 매개변수를 포함하는 올바른 JSON 오브젝트. 지원되는 구성 매개변수의 목록은 특정 서비스 오퍼링 관련 문서를 참조하십시오."
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": ""
+    "translation": "인라인 또는 파일로 제공되는, 서비스별 구성 매개변수를 포함하는 올바른 JSON 오브젝트. 지원되는 구성 매개변수의 목록은 특정 서비스 오퍼링 관련 문서를 참조하십시오."
   },
   {
     "id": "Value for flag 'app-instance-index' cannot be negative",
@@ -4513,11 +4513,11 @@
   },
   {
     "id": "View logs, reports, and settings on this space\n",
-    "translation": "이 영역에 대한 설정, 보고서, 로그 보기\n"
+    "translation": "이 영역에서 로그, 보고서, 설정 보기\n"
   },
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
-    "translation": ""
+    "translation": "경고:\n   비밀번호를 명령행 옵션으로 제공하는 것을 피하십시오.\n   비밀번호가 다른 사람에게 표시되거나 쉘 히스토리에 기록될 수 있습니다. "
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
@@ -4549,7 +4549,7 @@
   },
   {
     "id": "Windows PowerShell",
-    "translation": ""
+    "translation": "Windows PowerShell"
   },
   {
     "id": "Write curl body to FILE instead of stdout",
@@ -4605,7 +4605,7 @@
   },
   {
     "id": "app instance limit",
-    "translation": ""
+    "translation": "앱 인스턴스 한계"
   },
   {
     "id": "app instances",
@@ -4733,7 +4733,7 @@
   },
   {
     "id": "instance memory",
-    "translation": "인스턴스 메모리 한계"
+    "translation": ""
   },
   {
     "id": "instance memory limit",
@@ -4821,7 +4821,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "유료 서비스 플랜"
+    "translation": ""
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -4829,7 +4829,7 @@
   },
   {
     "id": "path",
-    "translation": ""
+    "translation": "경로"
   },
   {
     "id": "plan",
@@ -4841,7 +4841,7 @@
   },
   {
     "id": "port",
-    "translation": ""
+    "translation": "포트"
   },
   {
     "id": "position",
@@ -4857,7 +4857,7 @@
   },
   {
     "id": "repo-plugins",
-    "translation": ""
+    "translation": "repo-plugins"
   },
   {
     "id": "requested state",
@@ -4869,19 +4869,19 @@
   },
   {
     "id": "required attribute 'disk_quota' missing",
-    "translation": ""
+    "translation": "필수 속성 'disk_quota'가 누락됨"
   },
   {
     "id": "required attribute 'instances' missing",
-    "translation": ""
+    "translation": "필수 속성 'instances'가 누락됨"
   },
   {
     "id": "required attribute 'memory' missing",
-    "translation": ""
+    "translation": "필수 속성 'memory'가 누락됨"
   },
   {
     "id": "required attribute 'stack' missing",
-    "translation": ""
+    "translation": "필수 속성 'stack'이 누락됨"
   },
   {
     "id": "route ports",
@@ -5021,7 +5021,7 @@
   },
   {
     "id": "total memory",
-    "translation": "총 메모리 한계"
+    "translation": ""
   },
   {
     "id": "total memory limit",
@@ -5077,7 +5077,7 @@
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
-    "translation": ""
+    "translation": "{{.AppInstanceLimit}} 앱 인스턴스 한계"
   },
   {
     "id": "{{.CFName}} api",
@@ -5121,11 +5121,11 @@
   },
   {
     "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
-    "translation": ""
+    "translation": "{{.Feature}}은(는) CF API 버전 {{.MaximumVersion}}까지에서만 작동합니다. 사용자의 대상은 {{.APIVersion}}입니다."
   },
   {
     "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
-    "translation": "현재 CF CLI 버전 {{.Version}}\n\tCurrent CF API version {{.APIVersion}}\n\t{{.CommandName}} 기능을 사용하려면 CF API를 최소한 {{.RequiredVersion}}(으)로 업그레이드해야 합니다."
+    "translation": "{{.Feature}}에는 CF API 버전 {{.RequiredVersion}} 이상이 필요합니다. 사용자의 대상은 {{.APIVersion}}입니다."
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5197,7 +5197,7 @@
   },
   {
     "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
-    "translation": "{{.URL}} 올바른 URL이 아닙니다. https://your_repo.com과 같은 URL을 제공하십시오."
+    "translation": "{{.URL}}은(는) 올바른 URL이 아닙니다. https://your_repo.com과 같은 URL을 제공하십시오."
   },
   {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
