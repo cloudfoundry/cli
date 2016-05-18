@@ -13,7 +13,8 @@ type ServiceInstancesSummaries struct {
 	ServiceInstances []ServiceInstanceSummary `json:"services"`
 }
 
-func (resource ServiceInstancesSummaries) ToModels() (instances []models.ServiceInstance) {
+func (resource ServiceInstancesSummaries) ToModels() []models.ServiceInstance {
+	var instances []models.ServiceInstance
 	for _, instanceSummary := range resource.ServiceInstances {
 		applicationNames := resource.findApplicationNamesForInstance(instanceSummary.Name)
 
@@ -40,10 +41,11 @@ func (resource ServiceInstancesSummaries) ToModels() (instances []models.Service
 		instances = append(instances, instance)
 	}
 
-	return
+	return instances
 }
 
-func (resource ServiceInstancesSummaries) findApplicationNamesForInstance(instanceName string) (applicationNames []string) {
+func (resource ServiceInstancesSummaries) findApplicationNamesForInstance(instanceName string) []string {
+	var applicationNames []string
 	for _, app := range resource.Apps {
 		for _, name := range app.ServiceNames {
 			if name == instanceName {
@@ -52,7 +54,7 @@ func (resource ServiceInstancesSummaries) findApplicationNamesForInstance(instan
 		}
 	}
 
-	return
+	return applicationNames
 }
 
 type ServiceInstanceSummaryApp struct {
@@ -87,7 +89,7 @@ type ServiceOfferingSummary struct {
 //go:generate counterfeiter . ServiceSummaryRepository
 
 type ServiceSummaryRepository interface {
-	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error)
+	GetSummariesInCurrentSpace() ([]models.ServiceInstance, error)
 }
 
 type CloudControllerServiceSummaryRepository struct {
@@ -95,22 +97,24 @@ type CloudControllerServiceSummaryRepository struct {
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceSummaryRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerServiceSummaryRepository) {
-	repo.config = config
-	repo.gateway = gateway
-	return
+func NewCloudControllerServiceSummaryRepository(config coreconfig.Reader, gateway net.Gateway) CloudControllerServiceSummaryRepository {
+	return CloudControllerServiceSummaryRepository{
+		config:  config,
+		gateway: gateway,
+	}
 }
 
-func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr error) {
+func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() ([]models.ServiceInstance, error) {
+	var instances []models.ServiceInstance
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.APIEndpoint(), repo.config.SpaceFields().GUID)
 	resource := new(ServiceInstancesSummaries)
 
-	apiErr = repo.gateway.GetResource(path, resource)
-	if apiErr != nil {
-		return
+	err := repo.gateway.GetResource(path, resource)
+	if err != nil {
+		return nil, err
 	}
 
 	instances = resource.ToModels()
 
-	return
+	return instances, nil
 }
