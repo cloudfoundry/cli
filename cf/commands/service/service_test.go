@@ -1,17 +1,16 @@
 package service_test
 
 import (
-	"os"
-
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	"github.com/cloudfoundry/cli/plugin/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/flags"
+
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/cf/commands/service"
+	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,91 +18,134 @@ import (
 
 var _ = Describe("service command", func() {
 	var (
-		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
-		deps                commandregistry.Dependency
-	)
+		ui                         *testterm.FakeUI
+		deps                       commandregistry.Dependency
+		flagContext                flags.FlagContext
+		reqFactory                 *requirementsfakes.FakeFactory
+		loginRequirement           requirements.Requirement
+		targetedSpaceRequirement   requirements.Requirement
+		serviceInstanceRequirement *requirementsfakes.FakeServiceInstanceRequirement
+		pluginCall                 bool
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.UI = ui
-		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("service").SetDependency(deps, pluginCall))
-	}
+		cmd *service.ShowService
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		pluginCall = false
 
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
-	})
-
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("service", args, requirementsFactory, updateCommandDependency, false)
-	}
-
-	Describe("requirements", func() {
-		It("fails when not provided the name of the service to show", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
-			runCommand()
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
-			))
-		})
-
-		It("fails when not logged in", func() {
-			requirementsFactory.TargetedSpaceSuccess = true
-
-			Expect(runCommand("come-ON")).To(BeFalse())
-		})
-
-		It("fails when a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-
-			Expect(runCommand("okay-this-time-please??")).To(BeFalse())
-		})
-	})
-
-	Describe("After Requirement", func() {
-		createServiceInstanceWithState := func(state string) {
-			offering := models.ServiceOfferingFields{Label: "mysql", DocumentationURL: "http://documentation.url", Description: "the-description"}
-			plan := models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
-
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "service1"
-			serviceInstance.GUID = "service1-guid"
-			serviceInstance.LastOperation.Type = "create"
-			serviceInstance.LastOperation.State = "in progress"
-			serviceInstance.LastOperation.Description = "creating resource - step 1"
-			serviceInstance.ServicePlan = plan
-			serviceInstance.ServiceOffering = offering
-			serviceInstance.DashboardURL = "some-url"
-			serviceInstance.LastOperation.State = state
-			serviceInstance.LastOperation.CreatedAt = "created-date"
-			serviceInstance.LastOperation.UpdatedAt = "updated-date"
-			requirementsFactory.ServiceInstance = serviceInstance
+		deps = commandregistry.Dependency{
+			UI:           ui,
+			PluginModels: &commandregistry.PluginModels{},
 		}
 
-		createServiceInstance := func() {
-			createServiceInstanceWithState("")
-		}
+		cmd = &service.ShowService{}
 
-		Describe("when invoked by a plugin", func() {
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+		reqFactory = &requirementsfakes.FakeFactory{}
+
+		loginRequirement = &passingRequirement{Name: "login-requirement"}
+		reqFactory.NewLoginRequirementReturns(loginRequirement)
+		targetedSpaceRequirement = &passingRequirement{Name: "targeted-space-requirement"}
+		reqFactory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
+		serviceInstanceRequirement = &requirementsfakes.FakeServiceInstanceRequirement{}
+		reqFactory.NewServiceInstanceRequirementReturns(serviceInstanceRequirement)
+	})
+
+	Describe("Requirements", func() {
+		BeforeEach(func() {
+			cmd.SetDependency(deps, pluginCall)
+		})
+
+		Context("when not provided exactly 1 argument", func() {
+			It("fails", func() {
+				err := flagContext.Parse("too", "many")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Incorrect Usage", "Requires an argument"},
+				))
+			})
+		})
+
+		Context("when provided exactly one arg", func() {
+			var actualRequirements []requirements.Requirement
+
+			BeforeEach(func() {
+				err := flagContext.Parse("service-name")
+				Expect(err).NotTo(HaveOccurred())
+				actualRequirements = cmd.Requirements(reqFactory, flagContext)
+			})
+
+			It("returns a LoginRequirement", func() {
+				Expect(reqFactory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
+
+			It("returns a TargetedSpaceRequirement", func() {
+				Expect(reqFactory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
+
+			It("returns a ServiceInstanceRequirement", func() {
+				Expect(reqFactory.NewServiceInstanceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(serviceInstanceRequirement))
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		var (
+			serviceInstance models.ServiceInstance
+		)
+
+		BeforeEach(func() {
+			serviceInstance = models.ServiceInstance{
+				ServiceInstanceFields: models.ServiceInstanceFields{
+					GUID: "service1-guid",
+					Name: "service1",
+					LastOperation: models.LastOperationFields{
+						Type:        "create",
+						State:       "in progress",
+						Description: "creating resource - step 1",
+						CreatedAt:   "created-date",
+						UpdatedAt:   "updated-date",
+					},
+					DashboardURL: "some-url",
+				},
+				ServicePlan: models.ServicePlanFields{
+					GUID: "plan-guid",
+					Name: "plan-name",
+				},
+				ServiceOffering: models.ServiceOfferingFields{
+					Label:            "mysql",
+					DocumentationURL: "http://documentation.url",
+					Description:      "the-description",
+				},
+			}
+		})
+
+		JustBeforeEach(func() {
+			serviceInstanceRequirement.GetServiceInstanceReturns(serviceInstance)
+			cmd.SetDependency(deps, pluginCall)
+			cmd.Requirements(reqFactory, flagContext)
+			cmd.Execute(flagContext)
+		})
+
+		Context("when invoked by a plugin", func() {
 			var (
 				pluginModel *plugin_models.GetService_Model
 			)
 
 			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedSpaceSuccess = true
-
 				pluginModel = &plugin_models.GetService_Model{}
 				deps.PluginModels.Service = pluginModel
+				pluginCall = true
+				err := flagContext.Parse("service1")
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("populates the plugin model upon execution", func() {
-				createServiceInstanceWithState("in progress")
-				testcmd.RunCLICommand("service", []string{"service1"}, requirementsFactory, updateCommandDependency, true)
 				Expect(pluginModel.Name).To(Equal("service1"))
 				Expect(pluginModel.Guid).To(Equal("service1-guid"))
 				Expect(pluginModel.LastOperation.Type).To(Equal("create"))
@@ -119,18 +161,14 @@ var _ = Describe("service command", func() {
 			})
 		})
 
-		Context("when logged in, a space is targeted, and provided the name of a service that exists", func() {
-			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedSpaceSuccess = true
-			})
-
-			Context("when the service is externally provided", func() {
+		Context("when the service is externally provided", func() {
+			Context("when only the service name is specified", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("service1")
+					Expect(err).NotTo(HaveOccurred())
+				})
 
 				It("shows the service", func() {
-					createServiceInstanceWithState("in progress")
-					runCommand("service1")
-
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Service instance:", "service1"},
 						[]string{"Service: ", "mysql"},
@@ -144,15 +182,14 @@ var _ = Describe("service command", func() {
 						[]string{"Started: ", "created-date"},
 						[]string{"Updated: ", "updated-date"},
 					))
-					Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
 				})
 
 				Context("when the service instance CreatedAt is empty", func() {
-					It("does not output the Started line", func() {
-						createServiceInstanceWithState("in progress")
-						requirementsFactory.ServiceInstance.LastOperation.CreatedAt = ""
-						runCommand("service1")
+					BeforeEach(func() {
+						serviceInstance.LastOperation.CreatedAt = ""
+					})
 
+					It("does not output the Started line", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Service instance:", "service1"},
 							[]string{"Service: ", "mysql"},
@@ -171,97 +208,111 @@ var _ = Describe("service command", func() {
 					})
 				})
 
-				Context("shows correct status information based on service instance state", func() {
-					It("shows status: `create in progress` when state is `in progress`", func() {
-						createServiceInstanceWithState("in progress")
-						runCommand("service1")
+				Context("when the state is 'in progress'", func() {
+					BeforeEach(func() {
+						serviceInstance.LastOperation.State = "in progress"
+					})
 
+					It("shows status: `create in progress`", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Status: ", "create in progress"},
 						))
-						Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
+					})
+				})
+
+				Context("when the state is 'succeeded'", func() {
+					BeforeEach(func() {
+						serviceInstance.LastOperation.State = "succeeded"
 					})
 
-					It("shows status: `create succeeded` when state is `succeeded`", func() {
-						createServiceInstanceWithState("succeeded")
-						runCommand("service1")
-
+					It("shows status: `create succeeded`", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Status: ", "create succeeded"},
 						))
-						Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
+					})
+				})
+
+				Context("when the state is 'failed'", func() {
+					BeforeEach(func() {
+						serviceInstance.LastOperation.State = "failed"
 					})
 
-					It("shows status: `create failed` when state is `failed`", func() {
-						createServiceInstanceWithState("failed")
-						runCommand("service1")
-
+					It("shows status: `create failed`", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Status: ", "create failed"},
 						))
-						Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
+					})
+				})
+
+				Context("when the state is empty", func() {
+					BeforeEach(func() {
+						serviceInstance.LastOperation.State = ""
 					})
 
-					It("shows status: `` when state is ``", func() {
-						createServiceInstanceWithState("")
-						runCommand("service1")
-
+					It("shows status: ``", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Status: ", ""},
 						))
-						Expect(requirementsFactory.ServiceInstanceName).To(Equal("service1"))
-					})
-				})
-
-				Context("when the guid flag is provided", func() {
-					It("shows only the service guid", func() {
-						createServiceInstance()
-						runCommand("--guid", "service1")
-
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"service1-guid"},
-						))
-
-						Expect(ui.Outputs).ToNot(ContainSubstrings(
-							[]string{"Service instance:", "service1"},
-						))
 					})
 				})
 			})
 
-			Context("when the service is user provided", func() {
+			Context("when the guid flag is provided", func() {
 				BeforeEach(func() {
-					serviceInstance := models.ServiceInstance{}
-					serviceInstance.Name = "service1"
-					serviceInstance.GUID = "service1-guid"
-					requirementsFactory.ServiceInstance = serviceInstance
+					err := flagContext.Parse("--guid", "service1")
+					Expect(err).NotTo(HaveOccurred())
 				})
 
-				It("shows user provided services", func() {
-					runCommand("service1")
-
+				It("shows only the service guid", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Service instance: ", "service1"},
-						[]string{"Service: ", "user-provided"},
+						[]string{"service1-guid"},
+					))
+
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Service instance:", "service1"},
 					))
 				})
 			})
+		})
 
-			Context("when the service has tags", func() {
-				BeforeEach(func() {
-					serviceInstance := models.ServiceInstance{}
-					serviceInstance.Tags = []string{"tag1", "tag2"}
-					serviceInstance.ServicePlan = models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"}
-					requirementsFactory.ServiceInstance = serviceInstance
-				})
+		Context("when the service is user provided", func() {
+			BeforeEach(func() {
+				serviceInstance = models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Name: "service1",
+						GUID: "service1-guid",
+					},
+				}
 
-				It("includes the tags in the output", func() {
-					runCommand("service1")
+				err := flagContext.Parse("service1")
+				Expect(err).NotTo(HaveOccurred())
+			})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Tags: ", "tag1, tag2"},
-					))
-				})
+			It("shows user provided services", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Service instance: ", "service1"},
+					[]string{"Service: ", "user-provided"},
+				))
+			})
+		})
+
+		Context("when the service has tags", func() {
+			BeforeEach(func() {
+				serviceInstance = models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Tags: []string{"tag1", "tag2"},
+					},
+					ServicePlan: models.ServicePlanFields{GUID: "plan-guid", Name: "plan-name"},
+				}
+
+				err := flagContext.Parse("service1")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("includes the tags in the output", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Tags: ", "tag1, tag2"},
+				))
 			})
 		})
 	})
@@ -276,22 +327,22 @@ var _ = Describe("ServiceInstanceStateToStatus", func() {
 			BeforeEach(func() { operationType = "create" })
 
 			It("returns status: `create in progress` when state: `in progress`", func() {
-				status := ServiceInstanceStateToStatus(operationType, "in progress", isUserProvided)
+				status := service.ServiceInstanceStateToStatus(operationType, "in progress", isUserProvided)
 				Expect(status).To(Equal("create in progress"))
 			})
 
 			It("returns status: `create succeeded` when state: `succeeded`", func() {
-				status := ServiceInstanceStateToStatus(operationType, "succeeded", isUserProvided)
+				status := service.ServiceInstanceStateToStatus(operationType, "succeeded", isUserProvided)
 				Expect(status).To(Equal("create succeeded"))
 			})
 
 			It("returns status: `create failed` when state: `failed`", func() {
-				status := ServiceInstanceStateToStatus(operationType, "failed", isUserProvided)
+				status := service.ServiceInstanceStateToStatus(operationType, "failed", isUserProvided)
 				Expect(status).To(Equal("create failed"))
 			})
 
 			It("returns status: `` when state: ``", func() {
-				status := ServiceInstanceStateToStatus(operationType, "", isUserProvided)
+				status := service.ServiceInstanceStateToStatus(operationType, "", isUserProvided)
 				Expect(status).To(Equal(""))
 			})
 		})
@@ -301,7 +352,7 @@ var _ = Describe("ServiceInstanceStateToStatus", func() {
 		isUserProvided := true
 
 		It("returns status: `` when state: ``", func() {
-			status := ServiceInstanceStateToStatus(operationType, "", isUserProvided)
+			status := service.ServiceInstanceStateToStatus(operationType, "", isUserProvided)
 			Expect(status).To(Equal(""))
 		})
 	})
