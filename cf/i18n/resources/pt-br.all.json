@@ -4737,7 +4737,7 @@
   },
   {
     "id": "instance memory",
-    "translation": ""
+    "translation": "memória de instância"
   },
   {
     "id": "instance memory limit",
@@ -4825,7 +4825,7 @@
   },
   {
     "id": "paid plans",
-    "translation": ""
+    "translation": "planos pagos"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -5025,7 +5025,7 @@
   },
   {
     "id": "total memory",
-    "translation": ""
+    "translation": "total de memória"
   },
   {
     "id": "total memory limit",

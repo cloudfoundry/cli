@@ -48,19 +48,7 @@
     "translation": "app instances"
   },
   {
-    "id": "instance memory",
-    "translation": "instance memory"
-  },
-  {
-    "id": "paid plans",
-    "translation": "paid plans"
-  },
-  {
     "id": "route ports",
     "translation": "route ports"
-  },
-  {
-    "id": "total memory",
-    "translation": "total memory"
   }
 ]
