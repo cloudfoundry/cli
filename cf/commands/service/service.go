@@ -3,6 +3,7 @@ package service
 import (
 	"strings"
 
+	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -17,6 +18,7 @@ type ShowService struct {
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 	pluginModel        *plugin_models.GetService_Model
 	pluginCall         bool
+	appRepo            applications.ApplicationRepository
 }
 
 func init() {
@@ -58,12 +60,22 @@ func (cmd *ShowService) SetDependency(deps commandregistry.Dependency, pluginCal
 
 	cmd.pluginCall = pluginCall
 	cmd.pluginModel = deps.PluginModels.Service
+	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 
 	return cmd
 }
 
 func (cmd *ShowService) Execute(c flags.FlagContext) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
+
+	boundApps := []string{}
+	for _, serviceBinding := range serviceInstance.ServiceBindings {
+		app, err := cmd.appRepo.GetApp(serviceBinding.AppGUID)
+		if err != nil {
+			cmd.ui.Warn(T("Unable to retrieve information for bound application GUID " + serviceBinding.AppGUID))
+		}
+		boundApps = append(boundApps, app.ApplicationFields.Name)
+	}
 
 	if cmd.pluginCall {
 		cmd.populatePluginModel(serviceInstance)
@@ -86,6 +98,10 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 				map[string]interface{}{
 					"ServiceDescription": terminal.EntityNameColor(serviceInstance.ServiceOffering.Label),
 				}))
+			cmd.ui.Say(T("Bound apps: {{.BoundApplications}}",
+				map[string]interface{}{
+					"BoundApplications": terminal.EntityNameColor(strings.Join(boundApps, ",")),
+				}))
 			cmd.ui.Say(T("Tags: {{.Tags}}",
 				map[string]interface{}{
 					"Tags": terminal.EntityNameColor(strings.Join(serviceInstance.Tags, ", ")),
@@ -107,7 +123,7 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 			cmd.ui.Say(T("Last Operation"))
 			cmd.ui.Say(T("Status: {{.State}}",
 				map[string]interface{}{
-					"State": terminal.EntityNameColor(ServiceInstanceStateToStatus(serviceInstance.LastOperation.Type, serviceInstance.LastOperation.State, serviceInstance.IsUserProvided())),
+					"State": terminal.EntityNameColor(InstanceStateToStatus(serviceInstance.LastOperation.Type, serviceInstance.LastOperation.State, serviceInstance.IsUserProvided())),
 				}))
 			cmd.ui.Say(T("Message: {{.Message}}",
 				map[string]interface{}{
@@ -127,7 +143,7 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 	}
 }
 
-func ServiceInstanceStateToStatus(operationType string, state string, isUserProvidedService bool) string {
+func InstanceStateToStatus(operationType string, state string, isUserProvidedService bool) string {
 	if isUserProvidedService {
 		return ""
 	}

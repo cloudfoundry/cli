@@ -436,6 +436,10 @@
     "translation": "{{.AppName}}에 {{.URL}} 바인드 중..."
   },
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": ""
+  },
+  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "{{.BuildpackName}} 빌드팩이 이미 있음"
   },

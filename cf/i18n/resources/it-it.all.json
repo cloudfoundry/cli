@@ -436,6 +436,10 @@
     "translation": "Esecuzione del bind di {{.URL}} a {{.AppName}} in corso..."
   },
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": ""
+  },
+  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "Il pacchetto di build {{.BuildpackName}} esiste già"
   },

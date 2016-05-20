@@ -436,6 +436,10 @@
     "translation": "正在將 {{.URL}} 連結至 {{.AppName}}..."
   },
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": ""
+  },
+  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "建置套件 {{.BuildpackName}} 已存在"
   },

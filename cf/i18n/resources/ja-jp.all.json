@@ -436,6 +436,10 @@
     "translation": "{{.URL}} を {{.AppName}} にバインドしています..."
   },
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": ""
+  },
+  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "ビルドパック {{.BuildpackName}} は既に存在しています"
   },

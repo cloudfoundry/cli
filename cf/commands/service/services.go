@@ -97,7 +97,7 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) {
 		} else {
 			serviceColumn = instance.ServiceOffering.Label
 		}
-		serviceStatus = ServiceInstanceStateToStatus(instance.LastOperation.Type, instance.LastOperation.State, instance.IsUserProvided())
+		serviceStatus = InstanceStateToStatus(instance.LastOperation.Type, instance.LastOperation.State, instance.IsUserProvided())
 
 		table.Add(
 			instance.Name,

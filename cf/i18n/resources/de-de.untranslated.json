@@ -1,5 +1,9 @@
 [
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": "Bound apps: {{.BoundApplications}}"
+  },
+  {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },

@@ -37,7 +37,6 @@ cf/commands/pluginrepo/repo_plugins.go:63:9: should omit 2nd value from range; t
 cf/commands/route/create_route.go:20:6: type name will be used as route.RouteCreator by other packages, and that stutters; consider calling this Creator
 cf/commands/securitygroup/security_groups.go:96:2: don't use underscores in Go names; var outputted_index should be outputtedIndex
 cf/commands/service/bind_service.go:21:6: type name will be used as service.ServiceBinder by other packages, and that stutters; consider calling this Binder
-cf/commands/service/service.go:130:6: func name will be used as service.ServiceInstanceStateToStatus by other packages, and that stutters; consider calling this InstanceStateToStatus
 cf/commands/space/space_ssh_allowed.go:15:6: type name will be used as space.SpaceSSHAllowed by other packages, and that stutters; consider calling this SSHAllowed
 cf/configuration/pluginconfig/plugin_config.go:41:1: comment on exported method PluginConfig.GetPluginPath should be of the form "GetPluginPath ..."
 cf/configuration/pluginconfig/plugin_config.go:51:1: comment on exported method PluginConfig.SetPlugin should be of the form "SetPlugin ..."

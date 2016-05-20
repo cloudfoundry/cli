@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -10,6 +11,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"fmt"
+
+	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
@@ -34,9 +38,22 @@ var _ = Describe("service command", func() {
 		ui = &testterm.FakeUI{}
 		pluginCall = false
 
+		appRepo := new(applicationsfakes.FakeApplicationRepository)
+		appRepo.GetAppStub = func(appGUID string) (models.Application, error) {
+			if appGUID == "app1-guid" {
+				return models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name: "app1",
+					},
+				}, nil
+			}
+			return models.Application{}, fmt.Errorf("Called stubbed applications repo GetApp with incorrect app GUID\nExpected \"app1-guid\"\nGot \"%s\"\n", appGUID)
+		}
+
 		deps = commandregistry.Dependency{
 			UI:           ui,
 			PluginModels: &commandregistry.PluginModels{},
+			RepoLocator:  api.RepositoryLocator{}.SetApplicationRepository(appRepo),
 		}
 
 		cmd = &service.ShowService{}
@@ -95,9 +112,7 @@ var _ = Describe("service command", func() {
 	})
 
 	Describe("Execute", func() {
-		var (
-			serviceInstance models.ServiceInstance
-		)
+		var serviceInstance models.ServiceInstance
 
 		BeforeEach(func() {
 			serviceInstance = models.ServiceInstance{
@@ -112,6 +127,11 @@ var _ = Describe("service command", func() {
 						UpdatedAt:   "updated-date",
 					},
 					DashboardURL: "some-url",
+				},
+				ServiceBindings: []models.ServiceBindingFields{
+					models.ServiceBindingFields{
+						AppGUID: "app1-guid",
+					},
 				},
 				ServicePlan: models.ServicePlanFields{
 					GUID: "plan-guid",
@@ -172,6 +192,7 @@ var _ = Describe("service command", func() {
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Service instance:", "service1"},
 						[]string{"Service: ", "mysql"},
+						[]string{"Bound apps: ", "app1"},
 						[]string{"Plan: ", "plan-name"},
 						[]string{"Description: ", "the-description"},
 						[]string{"Documentation url: ", "http://documentation.url"},
@@ -193,6 +214,7 @@ var _ = Describe("service command", func() {
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Service instance:", "service1"},
 							[]string{"Service: ", "mysql"},
+							[]string{"Bound apps: ", "app1"},
 							[]string{"Plan: ", "plan-name"},
 							[]string{"Description: ", "the-description"},
 							[]string{"Documentation url: ", "http://documentation.url"},
@@ -327,22 +349,22 @@ var _ = Describe("ServiceInstanceStateToStatus", func() {
 			BeforeEach(func() { operationType = "create" })
 
 			It("returns status: `create in progress` when state: `in progress`", func() {
-				status := service.ServiceInstanceStateToStatus(operationType, "in progress", isUserProvided)
+				status := service.InstanceStateToStatus(operationType, "in progress", isUserProvided)
 				Expect(status).To(Equal("create in progress"))
 			})
 
 			It("returns status: `create succeeded` when state: `succeeded`", func() {
-				status := service.ServiceInstanceStateToStatus(operationType, "succeeded", isUserProvided)
+				status := service.InstanceStateToStatus(operationType, "succeeded", isUserProvided)
 				Expect(status).To(Equal("create succeeded"))
 			})
 
 			It("returns status: `create failed` when state: `failed`", func() {
-				status := service.ServiceInstanceStateToStatus(operationType, "failed", isUserProvided)
+				status := service.InstanceStateToStatus(operationType, "failed", isUserProvided)
 				Expect(status).To(Equal("create failed"))
 			})
 
 			It("returns status: `` when state: ``", func() {
-				status := service.ServiceInstanceStateToStatus(operationType, "", isUserProvided)
+				status := service.InstanceStateToStatus(operationType, "", isUserProvided)
 				Expect(status).To(Equal(""))
 			})
 		})
@@ -352,7 +374,7 @@ var _ = Describe("ServiceInstanceStateToStatus", func() {
 		isUserProvided := true
 
 		It("returns status: `` when state: ``", func() {
-			status := service.ServiceInstanceStateToStatus(operationType, "", isUserProvided)
+			status := service.InstanceStateToStatus(operationType, "", isUserProvided)
 			Expect(status).To(Equal(""))
 		})
 	})
