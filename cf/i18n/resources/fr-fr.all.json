@@ -164,8 +164,8 @@
     "translation": "AVANCE"
   },
   {
-    "id": "ALIAS",
-    "translation": "ALIAS"
+    "id": "ALIAS:",
+    "translation": "ALIAS:"
   },
   {
     "id": "API endpoint",
@@ -3116,8 +3116,8 @@
     "translation": "OK"
   },
   {
-    "id": "OPTIONS",
-    "translation": "OPTIONS"
+    "id": "OPTIONS:",
+    "translation": "OPTIONS:"
   },
   {
     "id": "ORG ADMIN",
@@ -4214,10 +4214,6 @@
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
     "translation": "Adresse URL à laquelle les demandes pour les routes liées doivent être envoyées. Le schéma de cette adresse URL doit être https."
-  },
-  {
-    "id": "USAGE",
-    "translation": "SYNTAXE"
   },
   {
     "id": "USAGE:",

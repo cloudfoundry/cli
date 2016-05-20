@@ -1,10 +1,13 @@
 package commands_test
 
 import (
+	"strings"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
+	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/plugin"
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
@@ -73,6 +76,49 @@ var _ = Describe("Help", func() {
 				Expect(fakeUI.SayCallCount()).To(Equal(1))
 				output, _ := fakeUI.SayArgsForCall(0)
 				Expect(output).To(ContainSubstring("target - Set or view the targeted org or space"))
+			})
+
+			Context("i18n translations", func() {
+				var originalT func(string, ...interface{}) string
+
+				BeforeEach(func() {
+					originalT = i18n.T
+				})
+
+				AfterEach(func() {
+					i18n.T = originalT
+				})
+
+				It("includes ':' in caption translation strings for language like French to be translated correctly", func() {
+					nameCaption := "NAME:"
+					aliasCaption := "ALIAS:"
+					usageCaption := "USAGE:"
+					optionsCaption := "OPTIONS:"
+					captionCheckCount := 0
+
+					i18n.T = func(translationID string, args ...interface{}) string {
+						if strings.HasPrefix(translationID, "NAME") {
+							Expect(translationID).To(Equal(nameCaption))
+							captionCheckCount += 1
+						} else if strings.HasPrefix(translationID, "ALIAS") {
+							Expect(translationID).To(Equal(aliasCaption))
+							captionCheckCount += 1
+						} else if strings.HasPrefix(translationID, "USAGE") {
+							Expect(translationID).To(Equal(usageCaption))
+							captionCheckCount += 1
+						} else if strings.HasPrefix(translationID, "OPTIONS") {
+							Expect(translationID).To(Equal(optionsCaption))
+							captionCheckCount += 1
+						}
+
+						return translationID
+					}
+
+					flagContext.Parse("target")
+					cmd.Execute(flagContext)
+
+					Expect(captionCheckCount).To(Equal(4))
+				})
 			})
 		})
 
