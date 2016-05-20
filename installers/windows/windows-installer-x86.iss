@@ -14,7 +14,6 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 Source: CF_SOURCE; DestDir: "{app}"
 
 [Code]
-
 function NeedsAddPath(Param: string): boolean;
 var
   OrigPath: string;
