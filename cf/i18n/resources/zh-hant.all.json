@@ -4737,7 +4737,7 @@
   },
   {
     "id": "instance memory",
-    "translation": ""
+    "translation": "實例記憶體限制"
   },
   {
     "id": "instance memory limit",
@@ -4825,7 +4825,7 @@
   },
   {
     "id": "paid plans",
-    "translation": ""
+    "translation": "付費服務方案"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -5025,7 +5025,7 @@
   },
   {
     "id": "total memory",
-    "translation": ""
+    "translation": "總記憶體限制"
   },
   {
     "id": "total memory limit",
