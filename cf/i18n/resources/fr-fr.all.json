@@ -436,6 +436,10 @@
     "translation": "Liaison de {{.URL}} à {{.AppName}}..."
   },
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": ""
+  },
+  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "Le pack de construction {{.BuildpackName}} existe déjà"
   },

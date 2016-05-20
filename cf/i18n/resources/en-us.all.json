@@ -436,6 +436,10 @@
     "translation": "Binding {{.URL}} to {{.AppName}}..."
   },
   {
+    "id": "Bound apps: {{.BoundApplications}}",
+    "translation": "Bound apps: {{.BoundApplications}}"
+  },
+  {
     "id": "Buildpack {{.BuildpackName}} already exists",
     "translation": "Buildpack {{.BuildpackName}} already exists"
   },
