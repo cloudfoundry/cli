@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeReadWriter struct {
+type FakeRepository struct {
 	APIEndpointStub        func() string
 	aPIEndpointMutex       sync.RWMutex
 	aPIEndpointArgsForCall []struct{}
@@ -296,9 +296,12 @@ type FakeReadWriter struct {
 	unSetPluginRepoArgsForCall []struct {
 		arg1 int
 	}
+	CloseStub        func()
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct{}
 }
 
-func (fake *FakeReadWriter) APIEndpoint() string {
+func (fake *FakeRepository) APIEndpoint() string {
 	fake.aPIEndpointMutex.Lock()
 	fake.aPIEndpointArgsForCall = append(fake.aPIEndpointArgsForCall, struct{}{})
 	fake.aPIEndpointMutex.Unlock()
@@ -309,20 +312,20 @@ func (fake *FakeReadWriter) APIEndpoint() string {
 	}
 }
 
-func (fake *FakeReadWriter) APIEndpointCallCount() int {
+func (fake *FakeRepository) APIEndpointCallCount() int {
 	fake.aPIEndpointMutex.RLock()
 	defer fake.aPIEndpointMutex.RUnlock()
 	return len(fake.aPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) APIEndpointReturns(result1 string) {
+func (fake *FakeRepository) APIEndpointReturns(result1 string) {
 	fake.APIEndpointStub = nil
 	fake.aPIEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) APIVersion() string {
+func (fake *FakeRepository) APIVersion() string {
 	fake.aPIVersionMutex.Lock()
 	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
 	fake.aPIVersionMutex.Unlock()
@@ -333,20 +336,20 @@ func (fake *FakeReadWriter) APIVersion() string {
 	}
 }
 
-func (fake *FakeReadWriter) APIVersionCallCount() int {
+func (fake *FakeRepository) APIVersionCallCount() int {
 	fake.aPIVersionMutex.RLock()
 	defer fake.aPIVersionMutex.RUnlock()
 	return len(fake.aPIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) APIVersionReturns(result1 string) {
+func (fake *FakeRepository) APIVersionReturns(result1 string) {
 	fake.APIVersionStub = nil
 	fake.aPIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) HasAPIEndpoint() bool {
+func (fake *FakeRepository) HasAPIEndpoint() bool {
 	fake.hasAPIEndpointMutex.Lock()
 	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct{}{})
 	fake.hasAPIEndpointMutex.Unlock()
@@ -357,20 +360,20 @@ func (fake *FakeReadWriter) HasAPIEndpoint() bool {
 	}
 }
 
-func (fake *FakeReadWriter) HasAPIEndpointCallCount() int {
+func (fake *FakeRepository) HasAPIEndpointCallCount() int {
 	fake.hasAPIEndpointMutex.RLock()
 	defer fake.hasAPIEndpointMutex.RUnlock()
 	return len(fake.hasAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) HasAPIEndpointReturns(result1 bool) {
+func (fake *FakeRepository) HasAPIEndpointReturns(result1 bool) {
 	fake.HasAPIEndpointStub = nil
 	fake.hasAPIEndpointReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) AuthenticationEndpoint() string {
+func (fake *FakeRepository) AuthenticationEndpoint() string {
 	fake.authenticationEndpointMutex.Lock()
 	fake.authenticationEndpointArgsForCall = append(fake.authenticationEndpointArgsForCall, struct{}{})
 	fake.authenticationEndpointMutex.Unlock()
@@ -381,20 +384,20 @@ func (fake *FakeReadWriter) AuthenticationEndpoint() string {
 	}
 }
 
-func (fake *FakeReadWriter) AuthenticationEndpointCallCount() int {
+func (fake *FakeRepository) AuthenticationEndpointCallCount() int {
 	fake.authenticationEndpointMutex.RLock()
 	defer fake.authenticationEndpointMutex.RUnlock()
 	return len(fake.authenticationEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) AuthenticationEndpointReturns(result1 string) {
+func (fake *FakeRepository) AuthenticationEndpointReturns(result1 string) {
 	fake.AuthenticationEndpointStub = nil
 	fake.authenticationEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) LoggregatorEndpoint() string {
+func (fake *FakeRepository) LoggregatorEndpoint() string {
 	fake.loggregatorEndpointMutex.Lock()
 	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
 	fake.loggregatorEndpointMutex.Unlock()
@@ -405,20 +408,20 @@ func (fake *FakeReadWriter) LoggregatorEndpoint() string {
 	}
 }
 
-func (fake *FakeReadWriter) LoggregatorEndpointCallCount() int {
+func (fake *FakeRepository) LoggregatorEndpointCallCount() int {
 	fake.loggregatorEndpointMutex.RLock()
 	defer fake.loggregatorEndpointMutex.RUnlock()
 	return len(fake.loggregatorEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) LoggregatorEndpointReturns(result1 string) {
+func (fake *FakeRepository) LoggregatorEndpointReturns(result1 string) {
 	fake.LoggregatorEndpointStub = nil
 	fake.loggregatorEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) DopplerEndpoint() string {
+func (fake *FakeRepository) DopplerEndpoint() string {
 	fake.dopplerEndpointMutex.Lock()
 	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
 	fake.dopplerEndpointMutex.Unlock()
@@ -429,20 +432,20 @@ func (fake *FakeReadWriter) DopplerEndpoint() string {
 	}
 }
 
-func (fake *FakeReadWriter) DopplerEndpointCallCount() int {
+func (fake *FakeRepository) DopplerEndpointCallCount() int {
 	fake.dopplerEndpointMutex.RLock()
 	defer fake.dopplerEndpointMutex.RUnlock()
 	return len(fake.dopplerEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) DopplerEndpointReturns(result1 string) {
+func (fake *FakeRepository) DopplerEndpointReturns(result1 string) {
 	fake.DopplerEndpointStub = nil
 	fake.dopplerEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) UaaEndpoint() string {
+func (fake *FakeRepository) UaaEndpoint() string {
 	fake.uaaEndpointMutex.Lock()
 	fake.uaaEndpointArgsForCall = append(fake.uaaEndpointArgsForCall, struct{}{})
 	fake.uaaEndpointMutex.Unlock()
@@ -453,20 +456,20 @@ func (fake *FakeReadWriter) UaaEndpoint() string {
 	}
 }
 
-func (fake *FakeReadWriter) UaaEndpointCallCount() int {
+func (fake *FakeRepository) UaaEndpointCallCount() int {
 	fake.uaaEndpointMutex.RLock()
 	defer fake.uaaEndpointMutex.RUnlock()
 	return len(fake.uaaEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) UaaEndpointReturns(result1 string) {
+func (fake *FakeRepository) UaaEndpointReturns(result1 string) {
 	fake.UaaEndpointStub = nil
 	fake.uaaEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) RoutingAPIEndpoint() string {
+func (fake *FakeRepository) RoutingAPIEndpoint() string {
 	fake.routingAPIEndpointMutex.Lock()
 	fake.routingAPIEndpointArgsForCall = append(fake.routingAPIEndpointArgsForCall, struct{}{})
 	fake.routingAPIEndpointMutex.Unlock()
@@ -477,20 +480,20 @@ func (fake *FakeReadWriter) RoutingAPIEndpoint() string {
 	}
 }
 
-func (fake *FakeReadWriter) RoutingAPIEndpointCallCount() int {
+func (fake *FakeRepository) RoutingAPIEndpointCallCount() int {
 	fake.routingAPIEndpointMutex.RLock()
 	defer fake.routingAPIEndpointMutex.RUnlock()
 	return len(fake.routingAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) RoutingAPIEndpointReturns(result1 string) {
+func (fake *FakeRepository) RoutingAPIEndpointReturns(result1 string) {
 	fake.RoutingAPIEndpointStub = nil
 	fake.routingAPIEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) AccessToken() string {
+func (fake *FakeRepository) AccessToken() string {
 	fake.accessTokenMutex.Lock()
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
 	fake.accessTokenMutex.Unlock()
@@ -501,20 +504,20 @@ func (fake *FakeReadWriter) AccessToken() string {
 	}
 }
 
-func (fake *FakeReadWriter) AccessTokenCallCount() int {
+func (fake *FakeRepository) AccessTokenCallCount() int {
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
 	return len(fake.accessTokenArgsForCall)
 }
 
-func (fake *FakeReadWriter) AccessTokenReturns(result1 string) {
+func (fake *FakeRepository) AccessTokenReturns(result1 string) {
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) SSHOAuthClient() string {
+func (fake *FakeRepository) SSHOAuthClient() string {
 	fake.sSHOAuthClientMutex.Lock()
 	fake.sSHOAuthClientArgsForCall = append(fake.sSHOAuthClientArgsForCall, struct{}{})
 	fake.sSHOAuthClientMutex.Unlock()
@@ -525,20 +528,20 @@ func (fake *FakeReadWriter) SSHOAuthClient() string {
 	}
 }
 
-func (fake *FakeReadWriter) SSHOAuthClientCallCount() int {
+func (fake *FakeRepository) SSHOAuthClientCallCount() int {
 	fake.sSHOAuthClientMutex.RLock()
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	return len(fake.sSHOAuthClientArgsForCall)
 }
 
-func (fake *FakeReadWriter) SSHOAuthClientReturns(result1 string) {
+func (fake *FakeRepository) SSHOAuthClientReturns(result1 string) {
 	fake.SSHOAuthClientStub = nil
 	fake.sSHOAuthClientReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) RefreshToken() string {
+func (fake *FakeRepository) RefreshToken() string {
 	fake.refreshTokenMutex.Lock()
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
 	fake.refreshTokenMutex.Unlock()
@@ -549,20 +552,20 @@ func (fake *FakeReadWriter) RefreshToken() string {
 	}
 }
 
-func (fake *FakeReadWriter) RefreshTokenCallCount() int {
+func (fake *FakeRepository) RefreshTokenCallCount() int {
 	fake.refreshTokenMutex.RLock()
 	defer fake.refreshTokenMutex.RUnlock()
 	return len(fake.refreshTokenArgsForCall)
 }
 
-func (fake *FakeReadWriter) RefreshTokenReturns(result1 string) {
+func (fake *FakeRepository) RefreshTokenReturns(result1 string) {
 	fake.RefreshTokenStub = nil
 	fake.refreshTokenReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) OrganizationFields() models.OrganizationFields {
+func (fake *FakeRepository) OrganizationFields() models.OrganizationFields {
 	fake.organizationFieldsMutex.Lock()
 	fake.organizationFieldsArgsForCall = append(fake.organizationFieldsArgsForCall, struct{}{})
 	fake.organizationFieldsMutex.Unlock()
@@ -573,20 +576,20 @@ func (fake *FakeReadWriter) OrganizationFields() models.OrganizationFields {
 	}
 }
 
-func (fake *FakeReadWriter) OrganizationFieldsCallCount() int {
+func (fake *FakeRepository) OrganizationFieldsCallCount() int {
 	fake.organizationFieldsMutex.RLock()
 	defer fake.organizationFieldsMutex.RUnlock()
 	return len(fake.organizationFieldsArgsForCall)
 }
 
-func (fake *FakeReadWriter) OrganizationFieldsReturns(result1 models.OrganizationFields) {
+func (fake *FakeRepository) OrganizationFieldsReturns(result1 models.OrganizationFields) {
 	fake.OrganizationFieldsStub = nil
 	fake.organizationFieldsReturns = struct {
 		result1 models.OrganizationFields
 	}{result1}
 }
 
-func (fake *FakeReadWriter) HasOrganization() bool {
+func (fake *FakeRepository) HasOrganization() bool {
 	fake.hasOrganizationMutex.Lock()
 	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct{}{})
 	fake.hasOrganizationMutex.Unlock()
@@ -597,20 +600,20 @@ func (fake *FakeReadWriter) HasOrganization() bool {
 	}
 }
 
-func (fake *FakeReadWriter) HasOrganizationCallCount() int {
+func (fake *FakeRepository) HasOrganizationCallCount() int {
 	fake.hasOrganizationMutex.RLock()
 	defer fake.hasOrganizationMutex.RUnlock()
 	return len(fake.hasOrganizationArgsForCall)
 }
 
-func (fake *FakeReadWriter) HasOrganizationReturns(result1 bool) {
+func (fake *FakeRepository) HasOrganizationReturns(result1 bool) {
 	fake.HasOrganizationStub = nil
 	fake.hasOrganizationReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) SpaceFields() models.SpaceFields {
+func (fake *FakeRepository) SpaceFields() models.SpaceFields {
 	fake.spaceFieldsMutex.Lock()
 	fake.spaceFieldsArgsForCall = append(fake.spaceFieldsArgsForCall, struct{}{})
 	fake.spaceFieldsMutex.Unlock()
@@ -621,20 +624,20 @@ func (fake *FakeReadWriter) SpaceFields() models.SpaceFields {
 	}
 }
 
-func (fake *FakeReadWriter) SpaceFieldsCallCount() int {
+func (fake *FakeRepository) SpaceFieldsCallCount() int {
 	fake.spaceFieldsMutex.RLock()
 	defer fake.spaceFieldsMutex.RUnlock()
 	return len(fake.spaceFieldsArgsForCall)
 }
 
-func (fake *FakeReadWriter) SpaceFieldsReturns(result1 models.SpaceFields) {
+func (fake *FakeRepository) SpaceFieldsReturns(result1 models.SpaceFields) {
 	fake.SpaceFieldsStub = nil
 	fake.spaceFieldsReturns = struct {
 		result1 models.SpaceFields
 	}{result1}
 }
 
-func (fake *FakeReadWriter) HasSpace() bool {
+func (fake *FakeRepository) HasSpace() bool {
 	fake.hasSpaceMutex.Lock()
 	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct{}{})
 	fake.hasSpaceMutex.Unlock()
@@ -645,20 +648,20 @@ func (fake *FakeReadWriter) HasSpace() bool {
 	}
 }
 
-func (fake *FakeReadWriter) HasSpaceCallCount() int {
+func (fake *FakeRepository) HasSpaceCallCount() int {
 	fake.hasSpaceMutex.RLock()
 	defer fake.hasSpaceMutex.RUnlock()
 	return len(fake.hasSpaceArgsForCall)
 }
 
-func (fake *FakeReadWriter) HasSpaceReturns(result1 bool) {
+func (fake *FakeRepository) HasSpaceReturns(result1 bool) {
 	fake.HasSpaceStub = nil
 	fake.hasSpaceReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) Username() string {
+func (fake *FakeRepository) Username() string {
 	fake.usernameMutex.Lock()
 	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct{}{})
 	fake.usernameMutex.Unlock()
@@ -669,20 +672,20 @@ func (fake *FakeReadWriter) Username() string {
 	}
 }
 
-func (fake *FakeReadWriter) UsernameCallCount() int {
+func (fake *FakeRepository) UsernameCallCount() int {
 	fake.usernameMutex.RLock()
 	defer fake.usernameMutex.RUnlock()
 	return len(fake.usernameArgsForCall)
 }
 
-func (fake *FakeReadWriter) UsernameReturns(result1 string) {
+func (fake *FakeRepository) UsernameReturns(result1 string) {
 	fake.UsernameStub = nil
 	fake.usernameReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) UserGUID() string {
+func (fake *FakeRepository) UserGUID() string {
 	fake.userGUIDMutex.Lock()
 	fake.userGUIDArgsForCall = append(fake.userGUIDArgsForCall, struct{}{})
 	fake.userGUIDMutex.Unlock()
@@ -693,20 +696,20 @@ func (fake *FakeReadWriter) UserGUID() string {
 	}
 }
 
-func (fake *FakeReadWriter) UserGUIDCallCount() int {
+func (fake *FakeRepository) UserGUIDCallCount() int {
 	fake.userGUIDMutex.RLock()
 	defer fake.userGUIDMutex.RUnlock()
 	return len(fake.userGUIDArgsForCall)
 }
 
-func (fake *FakeReadWriter) UserGUIDReturns(result1 string) {
+func (fake *FakeRepository) UserGUIDReturns(result1 string) {
 	fake.UserGUIDStub = nil
 	fake.userGUIDReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) UserEmail() string {
+func (fake *FakeRepository) UserEmail() string {
 	fake.userEmailMutex.Lock()
 	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct{}{})
 	fake.userEmailMutex.Unlock()
@@ -717,20 +720,20 @@ func (fake *FakeReadWriter) UserEmail() string {
 	}
 }
 
-func (fake *FakeReadWriter) UserEmailCallCount() int {
+func (fake *FakeRepository) UserEmailCallCount() int {
 	fake.userEmailMutex.RLock()
 	defer fake.userEmailMutex.RUnlock()
 	return len(fake.userEmailArgsForCall)
 }
 
-func (fake *FakeReadWriter) UserEmailReturns(result1 string) {
+func (fake *FakeRepository) UserEmailReturns(result1 string) {
 	fake.UserEmailStub = nil
 	fake.userEmailReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsLoggedIn() bool {
+func (fake *FakeRepository) IsLoggedIn() bool {
 	fake.isLoggedInMutex.Lock()
 	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct{}{})
 	fake.isLoggedInMutex.Unlock()
@@ -741,20 +744,20 @@ func (fake *FakeReadWriter) IsLoggedIn() bool {
 	}
 }
 
-func (fake *FakeReadWriter) IsLoggedInCallCount() int {
+func (fake *FakeRepository) IsLoggedInCallCount() int {
 	fake.isLoggedInMutex.RLock()
 	defer fake.isLoggedInMutex.RUnlock()
 	return len(fake.isLoggedInArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsLoggedInReturns(result1 bool) {
+func (fake *FakeRepository) IsLoggedInReturns(result1 bool) {
 	fake.IsLoggedInStub = nil
 	fake.isLoggedInReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsSSLDisabled() bool {
+func (fake *FakeRepository) IsSSLDisabled() bool {
 	fake.isSSLDisabledMutex.Lock()
 	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct{}{})
 	fake.isSSLDisabledMutex.Unlock()
@@ -765,20 +768,20 @@ func (fake *FakeReadWriter) IsSSLDisabled() bool {
 	}
 }
 
-func (fake *FakeReadWriter) IsSSLDisabledCallCount() int {
+func (fake *FakeRepository) IsSSLDisabledCallCount() int {
 	fake.isSSLDisabledMutex.RLock()
 	defer fake.isSSLDisabledMutex.RUnlock()
 	return len(fake.isSSLDisabledArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsSSLDisabledReturns(result1 bool) {
+func (fake *FakeRepository) IsSSLDisabledReturns(result1 bool) {
 	fake.IsSSLDisabledStub = nil
 	fake.isSSLDisabledReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsMinAPIVersion(arg1 semver.Version) bool {
+func (fake *FakeRepository) IsMinAPIVersion(arg1 semver.Version) bool {
 	fake.isMinAPIVersionMutex.Lock()
 	fake.isMinAPIVersionArgsForCall = append(fake.isMinAPIVersionArgsForCall, struct {
 		arg1 semver.Version
@@ -791,26 +794,26 @@ func (fake *FakeReadWriter) IsMinAPIVersion(arg1 semver.Version) bool {
 	}
 }
 
-func (fake *FakeReadWriter) IsMinAPIVersionCallCount() int {
+func (fake *FakeRepository) IsMinAPIVersionCallCount() int {
 	fake.isMinAPIVersionMutex.RLock()
 	defer fake.isMinAPIVersionMutex.RUnlock()
 	return len(fake.isMinAPIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsMinAPIVersionArgsForCall(i int) semver.Version {
+func (fake *FakeRepository) IsMinAPIVersionArgsForCall(i int) semver.Version {
 	fake.isMinAPIVersionMutex.RLock()
 	defer fake.isMinAPIVersionMutex.RUnlock()
 	return fake.isMinAPIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) IsMinAPIVersionReturns(result1 bool) {
+func (fake *FakeRepository) IsMinAPIVersionReturns(result1 bool) {
 	fake.IsMinAPIVersionStub = nil
 	fake.isMinAPIVersionReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) IsMinCLIVersion(arg1 string) bool {
+func (fake *FakeRepository) IsMinCLIVersion(arg1 string) bool {
 	fake.isMinCLIVersionMutex.Lock()
 	fake.isMinCLIVersionArgsForCall = append(fake.isMinCLIVersionArgsForCall, struct {
 		arg1 string
@@ -823,26 +826,26 @@ func (fake *FakeReadWriter) IsMinCLIVersion(arg1 string) bool {
 	}
 }
 
-func (fake *FakeReadWriter) IsMinCLIVersionCallCount() int {
+func (fake *FakeRepository) IsMinCLIVersionCallCount() int {
 	fake.isMinCLIVersionMutex.RLock()
 	defer fake.isMinCLIVersionMutex.RUnlock()
 	return len(fake.isMinCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) IsMinCLIVersionArgsForCall(i int) string {
+func (fake *FakeRepository) IsMinCLIVersionArgsForCall(i int) string {
 	fake.isMinCLIVersionMutex.RLock()
 	defer fake.isMinCLIVersionMutex.RUnlock()
 	return fake.isMinCLIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) IsMinCLIVersionReturns(result1 bool) {
+func (fake *FakeRepository) IsMinCLIVersionReturns(result1 bool) {
 	fake.IsMinCLIVersionStub = nil
 	fake.isMinCLIVersionReturns = struct {
 		result1 bool
 	}{result1}
 }
 
-func (fake *FakeReadWriter) MinCLIVersion() string {
+func (fake *FakeRepository) MinCLIVersion() string {
 	fake.minCLIVersionMutex.Lock()
 	fake.minCLIVersionArgsForCall = append(fake.minCLIVersionArgsForCall, struct{}{})
 	fake.minCLIVersionMutex.Unlock()
@@ -853,20 +856,20 @@ func (fake *FakeReadWriter) MinCLIVersion() string {
 	}
 }
 
-func (fake *FakeReadWriter) MinCLIVersionCallCount() int {
+func (fake *FakeRepository) MinCLIVersionCallCount() int {
 	fake.minCLIVersionMutex.RLock()
 	defer fake.minCLIVersionMutex.RUnlock()
 	return len(fake.minCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) MinCLIVersionReturns(result1 string) {
+func (fake *FakeRepository) MinCLIVersionReturns(result1 string) {
 	fake.MinCLIVersionStub = nil
 	fake.minCLIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) MinRecommendedCLIVersion() string {
+func (fake *FakeRepository) MinRecommendedCLIVersion() string {
 	fake.minRecommendedCLIVersionMutex.Lock()
 	fake.minRecommendedCLIVersionArgsForCall = append(fake.minRecommendedCLIVersionArgsForCall, struct{}{})
 	fake.minRecommendedCLIVersionMutex.Unlock()
@@ -877,20 +880,20 @@ func (fake *FakeReadWriter) MinRecommendedCLIVersion() string {
 	}
 }
 
-func (fake *FakeReadWriter) MinRecommendedCLIVersionCallCount() int {
+func (fake *FakeRepository) MinRecommendedCLIVersionCallCount() int {
 	fake.minRecommendedCLIVersionMutex.RLock()
 	defer fake.minRecommendedCLIVersionMutex.RUnlock()
 	return len(fake.minRecommendedCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) MinRecommendedCLIVersionReturns(result1 string) {
+func (fake *FakeRepository) MinRecommendedCLIVersionReturns(result1 string) {
 	fake.MinRecommendedCLIVersionStub = nil
 	fake.minRecommendedCLIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) AsyncTimeout() uint {
+func (fake *FakeRepository) AsyncTimeout() uint {
 	fake.asyncTimeoutMutex.Lock()
 	fake.asyncTimeoutArgsForCall = append(fake.asyncTimeoutArgsForCall, struct{}{})
 	fake.asyncTimeoutMutex.Unlock()
@@ -901,20 +904,20 @@ func (fake *FakeReadWriter) AsyncTimeout() uint {
 	}
 }
 
-func (fake *FakeReadWriter) AsyncTimeoutCallCount() int {
+func (fake *FakeRepository) AsyncTimeoutCallCount() int {
 	fake.asyncTimeoutMutex.RLock()
 	defer fake.asyncTimeoutMutex.RUnlock()
 	return len(fake.asyncTimeoutArgsForCall)
 }
 
-func (fake *FakeReadWriter) AsyncTimeoutReturns(result1 uint) {
+func (fake *FakeRepository) AsyncTimeoutReturns(result1 uint) {
 	fake.AsyncTimeoutStub = nil
 	fake.asyncTimeoutReturns = struct {
 		result1 uint
 	}{result1}
 }
 
-func (fake *FakeReadWriter) Trace() string {
+func (fake *FakeRepository) Trace() string {
 	fake.traceMutex.Lock()
 	fake.traceArgsForCall = append(fake.traceArgsForCall, struct{}{})
 	fake.traceMutex.Unlock()
@@ -925,20 +928,20 @@ func (fake *FakeReadWriter) Trace() string {
 	}
 }
 
-func (fake *FakeReadWriter) TraceCallCount() int {
+func (fake *FakeRepository) TraceCallCount() int {
 	fake.traceMutex.RLock()
 	defer fake.traceMutex.RUnlock()
 	return len(fake.traceArgsForCall)
 }
 
-func (fake *FakeReadWriter) TraceReturns(result1 string) {
+func (fake *FakeRepository) TraceReturns(result1 string) {
 	fake.TraceStub = nil
 	fake.traceReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) ColorEnabled() string {
+func (fake *FakeRepository) ColorEnabled() string {
 	fake.colorEnabledMutex.Lock()
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct{}{})
 	fake.colorEnabledMutex.Unlock()
@@ -949,20 +952,20 @@ func (fake *FakeReadWriter) ColorEnabled() string {
 	}
 }
 
-func (fake *FakeReadWriter) ColorEnabledCallCount() int {
+func (fake *FakeRepository) ColorEnabledCallCount() int {
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	return len(fake.colorEnabledArgsForCall)
 }
 
-func (fake *FakeReadWriter) ColorEnabledReturns(result1 string) {
+func (fake *FakeRepository) ColorEnabledReturns(result1 string) {
 	fake.ColorEnabledStub = nil
 	fake.colorEnabledReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) Locale() string {
+func (fake *FakeRepository) Locale() string {
 	fake.localeMutex.Lock()
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
 	fake.localeMutex.Unlock()
@@ -973,20 +976,20 @@ func (fake *FakeReadWriter) Locale() string {
 	}
 }
 
-func (fake *FakeReadWriter) LocaleCallCount() int {
+func (fake *FakeRepository) LocaleCallCount() int {
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
 	return len(fake.localeArgsForCall)
 }
 
-func (fake *FakeReadWriter) LocaleReturns(result1 string) {
+func (fake *FakeRepository) LocaleReturns(result1 string) {
 	fake.LocaleStub = nil
 	fake.localeReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeReadWriter) PluginRepos() []models.PluginRepo {
+func (fake *FakeRepository) PluginRepos() []models.PluginRepo {
 	fake.pluginReposMutex.Lock()
 	fake.pluginReposArgsForCall = append(fake.pluginReposArgsForCall, struct{}{})
 	fake.pluginReposMutex.Unlock()
@@ -997,20 +1000,20 @@ func (fake *FakeReadWriter) PluginRepos() []models.PluginRepo {
 	}
 }
 
-func (fake *FakeReadWriter) PluginReposCallCount() int {
+func (fake *FakeRepository) PluginReposCallCount() int {
 	fake.pluginReposMutex.RLock()
 	defer fake.pluginReposMutex.RUnlock()
 	return len(fake.pluginReposArgsForCall)
 }
 
-func (fake *FakeReadWriter) PluginReposReturns(result1 []models.PluginRepo) {
+func (fake *FakeRepository) PluginReposReturns(result1 []models.PluginRepo) {
 	fake.PluginReposStub = nil
 	fake.pluginReposReturns = struct {
 		result1 []models.PluginRepo
 	}{result1}
 }
 
-func (fake *FakeReadWriter) ClearSession() {
+func (fake *FakeRepository) ClearSession() {
 	fake.clearSessionMutex.Lock()
 	fake.clearSessionArgsForCall = append(fake.clearSessionArgsForCall, struct{}{})
 	fake.clearSessionMutex.Unlock()
@@ -1019,13 +1022,13 @@ func (fake *FakeReadWriter) ClearSession() {
 	}
 }
 
-func (fake *FakeReadWriter) ClearSessionCallCount() int {
+func (fake *FakeRepository) ClearSessionCallCount() int {
 	fake.clearSessionMutex.RLock()
 	defer fake.clearSessionMutex.RUnlock()
 	return len(fake.clearSessionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetAPIEndpoint(arg1 string) {
+func (fake *FakeRepository) SetAPIEndpoint(arg1 string) {
 	fake.setAPIEndpointMutex.Lock()
 	fake.setAPIEndpointArgsForCall = append(fake.setAPIEndpointArgsForCall, struct {
 		arg1 string
@@ -1036,19 +1039,19 @@ func (fake *FakeReadWriter) SetAPIEndpoint(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetAPIEndpointCallCount() int {
+func (fake *FakeRepository) SetAPIEndpointCallCount() int {
 	fake.setAPIEndpointMutex.RLock()
 	defer fake.setAPIEndpointMutex.RUnlock()
 	return len(fake.setAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetAPIEndpointArgsForCall(i int) string {
+func (fake *FakeRepository) SetAPIEndpointArgsForCall(i int) string {
 	fake.setAPIEndpointMutex.RLock()
 	defer fake.setAPIEndpointMutex.RUnlock()
 	return fake.setAPIEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetAPIVersion(arg1 string) {
+func (fake *FakeRepository) SetAPIVersion(arg1 string) {
 	fake.setAPIVersionMutex.Lock()
 	fake.setAPIVersionArgsForCall = append(fake.setAPIVersionArgsForCall, struct {
 		arg1 string
@@ -1059,19 +1062,19 @@ func (fake *FakeReadWriter) SetAPIVersion(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetAPIVersionCallCount() int {
+func (fake *FakeRepository) SetAPIVersionCallCount() int {
 	fake.setAPIVersionMutex.RLock()
 	defer fake.setAPIVersionMutex.RUnlock()
 	return len(fake.setAPIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetAPIVersionArgsForCall(i int) string {
+func (fake *FakeRepository) SetAPIVersionArgsForCall(i int) string {
 	fake.setAPIVersionMutex.RLock()
 	defer fake.setAPIVersionMutex.RUnlock()
 	return fake.setAPIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetMinCLIVersion(arg1 string) {
+func (fake *FakeRepository) SetMinCLIVersion(arg1 string) {
 	fake.setMinCLIVersionMutex.Lock()
 	fake.setMinCLIVersionArgsForCall = append(fake.setMinCLIVersionArgsForCall, struct {
 		arg1 string
@@ -1082,19 +1085,19 @@ func (fake *FakeReadWriter) SetMinCLIVersion(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetMinCLIVersionCallCount() int {
+func (fake *FakeRepository) SetMinCLIVersionCallCount() int {
 	fake.setMinCLIVersionMutex.RLock()
 	defer fake.setMinCLIVersionMutex.RUnlock()
 	return len(fake.setMinCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetMinCLIVersionArgsForCall(i int) string {
+func (fake *FakeRepository) SetMinCLIVersionArgsForCall(i int) string {
 	fake.setMinCLIVersionMutex.RLock()
 	defer fake.setMinCLIVersionMutex.RUnlock()
 	return fake.setMinCLIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetMinRecommendedCLIVersion(arg1 string) {
+func (fake *FakeRepository) SetMinRecommendedCLIVersion(arg1 string) {
 	fake.setMinRecommendedCLIVersionMutex.Lock()
 	fake.setMinRecommendedCLIVersionArgsForCall = append(fake.setMinRecommendedCLIVersionArgsForCall, struct {
 		arg1 string
@@ -1105,19 +1108,19 @@ func (fake *FakeReadWriter) SetMinRecommendedCLIVersion(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetMinRecommendedCLIVersionCallCount() int {
+func (fake *FakeRepository) SetMinRecommendedCLIVersionCallCount() int {
 	fake.setMinRecommendedCLIVersionMutex.RLock()
 	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
 	return len(fake.setMinRecommendedCLIVersionArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetMinRecommendedCLIVersionArgsForCall(i int) string {
+func (fake *FakeRepository) SetMinRecommendedCLIVersionArgsForCall(i int) string {
 	fake.setMinRecommendedCLIVersionMutex.RLock()
 	defer fake.setMinRecommendedCLIVersionMutex.RUnlock()
 	return fake.setMinRecommendedCLIVersionArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetAuthenticationEndpoint(arg1 string) {
+func (fake *FakeRepository) SetAuthenticationEndpoint(arg1 string) {
 	fake.setAuthenticationEndpointMutex.Lock()
 	fake.setAuthenticationEndpointArgsForCall = append(fake.setAuthenticationEndpointArgsForCall, struct {
 		arg1 string
@@ -1128,19 +1131,19 @@ func (fake *FakeReadWriter) SetAuthenticationEndpoint(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetAuthenticationEndpointCallCount() int {
+func (fake *FakeRepository) SetAuthenticationEndpointCallCount() int {
 	fake.setAuthenticationEndpointMutex.RLock()
 	defer fake.setAuthenticationEndpointMutex.RUnlock()
 	return len(fake.setAuthenticationEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetAuthenticationEndpointArgsForCall(i int) string {
+func (fake *FakeRepository) SetAuthenticationEndpointArgsForCall(i int) string {
 	fake.setAuthenticationEndpointMutex.RLock()
 	defer fake.setAuthenticationEndpointMutex.RUnlock()
 	return fake.setAuthenticationEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetLoggregatorEndpoint(arg1 string) {
+func (fake *FakeRepository) SetLoggregatorEndpoint(arg1 string) {
 	fake.setLoggregatorEndpointMutex.Lock()
 	fake.setLoggregatorEndpointArgsForCall = append(fake.setLoggregatorEndpointArgsForCall, struct {
 		arg1 string
@@ -1151,19 +1154,19 @@ func (fake *FakeReadWriter) SetLoggregatorEndpoint(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetLoggregatorEndpointCallCount() int {
+func (fake *FakeRepository) SetLoggregatorEndpointCallCount() int {
 	fake.setLoggregatorEndpointMutex.RLock()
 	defer fake.setLoggregatorEndpointMutex.RUnlock()
 	return len(fake.setLoggregatorEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetLoggregatorEndpointArgsForCall(i int) string {
+func (fake *FakeRepository) SetLoggregatorEndpointArgsForCall(i int) string {
 	fake.setLoggregatorEndpointMutex.RLock()
 	defer fake.setLoggregatorEndpointMutex.RUnlock()
 	return fake.setLoggregatorEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetDopplerEndpoint(arg1 string) {
+func (fake *FakeRepository) SetDopplerEndpoint(arg1 string) {
 	fake.setDopplerEndpointMutex.Lock()
 	fake.setDopplerEndpointArgsForCall = append(fake.setDopplerEndpointArgsForCall, struct {
 		arg1 string
@@ -1174,19 +1177,19 @@ func (fake *FakeReadWriter) SetDopplerEndpoint(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetDopplerEndpointCallCount() int {
+func (fake *FakeRepository) SetDopplerEndpointCallCount() int {
 	fake.setDopplerEndpointMutex.RLock()
 	defer fake.setDopplerEndpointMutex.RUnlock()
 	return len(fake.setDopplerEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetDopplerEndpointArgsForCall(i int) string {
+func (fake *FakeRepository) SetDopplerEndpointArgsForCall(i int) string {
 	fake.setDopplerEndpointMutex.RLock()
 	defer fake.setDopplerEndpointMutex.RUnlock()
 	return fake.setDopplerEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetUaaEndpoint(arg1 string) {
+func (fake *FakeRepository) SetUaaEndpoint(arg1 string) {
 	fake.setUaaEndpointMutex.Lock()
 	fake.setUaaEndpointArgsForCall = append(fake.setUaaEndpointArgsForCall, struct {
 		arg1 string
@@ -1197,19 +1200,19 @@ func (fake *FakeReadWriter) SetUaaEndpoint(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetUaaEndpointCallCount() int {
+func (fake *FakeRepository) SetUaaEndpointCallCount() int {
 	fake.setUaaEndpointMutex.RLock()
 	defer fake.setUaaEndpointMutex.RUnlock()
 	return len(fake.setUaaEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetUaaEndpointArgsForCall(i int) string {
+func (fake *FakeRepository) SetUaaEndpointArgsForCall(i int) string {
 	fake.setUaaEndpointMutex.RLock()
 	defer fake.setUaaEndpointMutex.RUnlock()
 	return fake.setUaaEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetRoutingAPIEndpoint(arg1 string) {
+func (fake *FakeRepository) SetRoutingAPIEndpoint(arg1 string) {
 	fake.setRoutingAPIEndpointMutex.Lock()
 	fake.setRoutingAPIEndpointArgsForCall = append(fake.setRoutingAPIEndpointArgsForCall, struct {
 		arg1 string
@@ -1220,19 +1223,19 @@ func (fake *FakeReadWriter) SetRoutingAPIEndpoint(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetRoutingAPIEndpointCallCount() int {
+func (fake *FakeRepository) SetRoutingAPIEndpointCallCount() int {
 	fake.setRoutingAPIEndpointMutex.RLock()
 	defer fake.setRoutingAPIEndpointMutex.RUnlock()
 	return len(fake.setRoutingAPIEndpointArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetRoutingAPIEndpointArgsForCall(i int) string {
+func (fake *FakeRepository) SetRoutingAPIEndpointArgsForCall(i int) string {
 	fake.setRoutingAPIEndpointMutex.RLock()
 	defer fake.setRoutingAPIEndpointMutex.RUnlock()
 	return fake.setRoutingAPIEndpointArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetAccessToken(arg1 string) {
+func (fake *FakeRepository) SetAccessToken(arg1 string) {
 	fake.setAccessTokenMutex.Lock()
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
 		arg1 string
@@ -1243,19 +1246,19 @@ func (fake *FakeReadWriter) SetAccessToken(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetAccessTokenCallCount() int {
+func (fake *FakeRepository) SetAccessTokenCallCount() int {
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	return len(fake.setAccessTokenArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetAccessTokenArgsForCall(i int) string {
+func (fake *FakeRepository) SetAccessTokenArgsForCall(i int) string {
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	return fake.setAccessTokenArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetSSHOAuthClient(arg1 string) {
+func (fake *FakeRepository) SetSSHOAuthClient(arg1 string) {
 	fake.setSSHOAuthClientMutex.Lock()
 	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
 		arg1 string
@@ -1266,19 +1269,19 @@ func (fake *FakeReadWriter) SetSSHOAuthClient(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetSSHOAuthClientCallCount() int {
+func (fake *FakeRepository) SetSSHOAuthClientCallCount() int {
 	fake.setSSHOAuthClientMutex.RLock()
 	defer fake.setSSHOAuthClientMutex.RUnlock()
 	return len(fake.setSSHOAuthClientArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetSSHOAuthClientArgsForCall(i int) string {
+func (fake *FakeRepository) SetSSHOAuthClientArgsForCall(i int) string {
 	fake.setSSHOAuthClientMutex.RLock()
 	defer fake.setSSHOAuthClientMutex.RUnlock()
 	return fake.setSSHOAuthClientArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetRefreshToken(arg1 string) {
+func (fake *FakeRepository) SetRefreshToken(arg1 string) {
 	fake.setRefreshTokenMutex.Lock()
 	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
 		arg1 string
@@ -1289,19 +1292,19 @@ func (fake *FakeReadWriter) SetRefreshToken(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetRefreshTokenCallCount() int {
+func (fake *FakeRepository) SetRefreshTokenCallCount() int {
 	fake.setRefreshTokenMutex.RLock()
 	defer fake.setRefreshTokenMutex.RUnlock()
 	return len(fake.setRefreshTokenArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetRefreshTokenArgsForCall(i int) string {
+func (fake *FakeRepository) SetRefreshTokenArgsForCall(i int) string {
 	fake.setRefreshTokenMutex.RLock()
 	defer fake.setRefreshTokenMutex.RUnlock()
 	return fake.setRefreshTokenArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetOrganizationFields(arg1 models.OrganizationFields) {
+func (fake *FakeRepository) SetOrganizationFields(arg1 models.OrganizationFields) {
 	fake.setOrganizationFieldsMutex.Lock()
 	fake.setOrganizationFieldsArgsForCall = append(fake.setOrganizationFieldsArgsForCall, struct {
 		arg1 models.OrganizationFields
@@ -1312,19 +1315,19 @@ func (fake *FakeReadWriter) SetOrganizationFields(arg1 models.OrganizationFields
 	}
 }
 
-func (fake *FakeReadWriter) SetOrganizationFieldsCallCount() int {
+func (fake *FakeRepository) SetOrganizationFieldsCallCount() int {
 	fake.setOrganizationFieldsMutex.RLock()
 	defer fake.setOrganizationFieldsMutex.RUnlock()
 	return len(fake.setOrganizationFieldsArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetOrganizationFieldsArgsForCall(i int) models.OrganizationFields {
+func (fake *FakeRepository) SetOrganizationFieldsArgsForCall(i int) models.OrganizationFields {
 	fake.setOrganizationFieldsMutex.RLock()
 	defer fake.setOrganizationFieldsMutex.RUnlock()
 	return fake.setOrganizationFieldsArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetSpaceFields(arg1 models.SpaceFields) {
+func (fake *FakeRepository) SetSpaceFields(arg1 models.SpaceFields) {
 	fake.setSpaceFieldsMutex.Lock()
 	fake.setSpaceFieldsArgsForCall = append(fake.setSpaceFieldsArgsForCall, struct {
 		arg1 models.SpaceFields
@@ -1335,19 +1338,19 @@ func (fake *FakeReadWriter) SetSpaceFields(arg1 models.SpaceFields) {
 	}
 }
 
-func (fake *FakeReadWriter) SetSpaceFieldsCallCount() int {
+func (fake *FakeRepository) SetSpaceFieldsCallCount() int {
 	fake.setSpaceFieldsMutex.RLock()
 	defer fake.setSpaceFieldsMutex.RUnlock()
 	return len(fake.setSpaceFieldsArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetSpaceFieldsArgsForCall(i int) models.SpaceFields {
+func (fake *FakeRepository) SetSpaceFieldsArgsForCall(i int) models.SpaceFields {
 	fake.setSpaceFieldsMutex.RLock()
 	defer fake.setSpaceFieldsMutex.RUnlock()
 	return fake.setSpaceFieldsArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetSSLDisabled(arg1 bool) {
+func (fake *FakeRepository) SetSSLDisabled(arg1 bool) {
 	fake.setSSLDisabledMutex.Lock()
 	fake.setSSLDisabledArgsForCall = append(fake.setSSLDisabledArgsForCall, struct {
 		arg1 bool
@@ -1358,19 +1361,19 @@ func (fake *FakeReadWriter) SetSSLDisabled(arg1 bool) {
 	}
 }
 
-func (fake *FakeReadWriter) SetSSLDisabledCallCount() int {
+func (fake *FakeRepository) SetSSLDisabledCallCount() int {
 	fake.setSSLDisabledMutex.RLock()
 	defer fake.setSSLDisabledMutex.RUnlock()
 	return len(fake.setSSLDisabledArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetSSLDisabledArgsForCall(i int) bool {
+func (fake *FakeRepository) SetSSLDisabledArgsForCall(i int) bool {
 	fake.setSSLDisabledMutex.RLock()
 	defer fake.setSSLDisabledMutex.RUnlock()
 	return fake.setSSLDisabledArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetAsyncTimeout(arg1 uint) {
+func (fake *FakeRepository) SetAsyncTimeout(arg1 uint) {
 	fake.setAsyncTimeoutMutex.Lock()
 	fake.setAsyncTimeoutArgsForCall = append(fake.setAsyncTimeoutArgsForCall, struct {
 		arg1 uint
@@ -1381,19 +1384,19 @@ func (fake *FakeReadWriter) SetAsyncTimeout(arg1 uint) {
 	}
 }
 
-func (fake *FakeReadWriter) SetAsyncTimeoutCallCount() int {
+func (fake *FakeRepository) SetAsyncTimeoutCallCount() int {
 	fake.setAsyncTimeoutMutex.RLock()
 	defer fake.setAsyncTimeoutMutex.RUnlock()
 	return len(fake.setAsyncTimeoutArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetAsyncTimeoutArgsForCall(i int) uint {
+func (fake *FakeRepository) SetAsyncTimeoutArgsForCall(i int) uint {
 	fake.setAsyncTimeoutMutex.RLock()
 	defer fake.setAsyncTimeoutMutex.RUnlock()
 	return fake.setAsyncTimeoutArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetTrace(arg1 string) {
+func (fake *FakeRepository) SetTrace(arg1 string) {
 	fake.setTraceMutex.Lock()
 	fake.setTraceArgsForCall = append(fake.setTraceArgsForCall, struct {
 		arg1 string
@@ -1404,19 +1407,19 @@ func (fake *FakeReadWriter) SetTrace(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetTraceCallCount() int {
+func (fake *FakeRepository) SetTraceCallCount() int {
 	fake.setTraceMutex.RLock()
 	defer fake.setTraceMutex.RUnlock()
 	return len(fake.setTraceArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetTraceArgsForCall(i int) string {
+func (fake *FakeRepository) SetTraceArgsForCall(i int) string {
 	fake.setTraceMutex.RLock()
 	defer fake.setTraceMutex.RUnlock()
 	return fake.setTraceArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetColorEnabled(arg1 string) {
+func (fake *FakeRepository) SetColorEnabled(arg1 string) {
 	fake.setColorEnabledMutex.Lock()
 	fake.setColorEnabledArgsForCall = append(fake.setColorEnabledArgsForCall, struct {
 		arg1 string
@@ -1427,19 +1430,19 @@ func (fake *FakeReadWriter) SetColorEnabled(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetColorEnabledCallCount() int {
+func (fake *FakeRepository) SetColorEnabledCallCount() int {
 	fake.setColorEnabledMutex.RLock()
 	defer fake.setColorEnabledMutex.RUnlock()
 	return len(fake.setColorEnabledArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetColorEnabledArgsForCall(i int) string {
+func (fake *FakeRepository) SetColorEnabledArgsForCall(i int) string {
 	fake.setColorEnabledMutex.RLock()
 	defer fake.setColorEnabledMutex.RUnlock()
 	return fake.setColorEnabledArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetLocale(arg1 string) {
+func (fake *FakeRepository) SetLocale(arg1 string) {
 	fake.setLocaleMutex.Lock()
 	fake.setLocaleArgsForCall = append(fake.setLocaleArgsForCall, struct {
 		arg1 string
@@ -1450,19 +1453,19 @@ func (fake *FakeReadWriter) SetLocale(arg1 string) {
 	}
 }
 
-func (fake *FakeReadWriter) SetLocaleCallCount() int {
+func (fake *FakeRepository) SetLocaleCallCount() int {
 	fake.setLocaleMutex.RLock()
 	defer fake.setLocaleMutex.RUnlock()
 	return len(fake.setLocaleArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetLocaleArgsForCall(i int) string {
+func (fake *FakeRepository) SetLocaleArgsForCall(i int) string {
 	fake.setLocaleMutex.RLock()
 	defer fake.setLocaleMutex.RUnlock()
 	return fake.setLocaleArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) SetPluginRepo(arg1 models.PluginRepo) {
+func (fake *FakeRepository) SetPluginRepo(arg1 models.PluginRepo) {
 	fake.setPluginRepoMutex.Lock()
 	fake.setPluginRepoArgsForCall = append(fake.setPluginRepoArgsForCall, struct {
 		arg1 models.PluginRepo
@@ -1473,19 +1476,19 @@ func (fake *FakeReadWriter) SetPluginRepo(arg1 models.PluginRepo) {
 	}
 }
 
-func (fake *FakeReadWriter) SetPluginRepoCallCount() int {
+func (fake *FakeRepository) SetPluginRepoCallCount() int {
 	fake.setPluginRepoMutex.RLock()
 	defer fake.setPluginRepoMutex.RUnlock()
 	return len(fake.setPluginRepoArgsForCall)
 }
 
-func (fake *FakeReadWriter) SetPluginRepoArgsForCall(i int) models.PluginRepo {
+func (fake *FakeRepository) SetPluginRepoArgsForCall(i int) models.PluginRepo {
 	fake.setPluginRepoMutex.RLock()
 	defer fake.setPluginRepoMutex.RUnlock()
 	return fake.setPluginRepoArgsForCall[i].arg1
 }
 
-func (fake *FakeReadWriter) UnSetPluginRepo(arg1 int) {
+func (fake *FakeRepository) UnSetPluginRepo(arg1 int) {
 	fake.unSetPluginRepoMutex.Lock()
 	fake.unSetPluginRepoArgsForCall = append(fake.unSetPluginRepoArgsForCall, struct {
 		arg1 int
@@ -1496,16 +1499,31 @@ func (fake *FakeReadWriter) UnSetPluginRepo(arg1 int) {
 	}
 }
 
-func (fake *FakeReadWriter) UnSetPluginRepoCallCount() int {
+func (fake *FakeRepository) UnSetPluginRepoCallCount() int {
 	fake.unSetPluginRepoMutex.RLock()
 	defer fake.unSetPluginRepoMutex.RUnlock()
 	return len(fake.unSetPluginRepoArgsForCall)
 }
 
-func (fake *FakeReadWriter) UnSetPluginRepoArgsForCall(i int) int {
+func (fake *FakeRepository) UnSetPluginRepoArgsForCall(i int) int {
 	fake.unSetPluginRepoMutex.RLock()
 	defer fake.unSetPluginRepoMutex.RUnlock()
 	return fake.unSetPluginRepoArgsForCall[i].arg1
 }
 
-var _ coreconfig.ReadWriter = new(FakeReadWriter)
+func (fake *FakeRepository) Close() {
+	fake.closeMutex.Lock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.closeMutex.Unlock()
+	if fake.CloseStub != nil {
+		fake.CloseStub()
+	}
+}
+
+func (fake *FakeRepository) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
+}
+
+var _ coreconfig.Repository = new(FakeRepository)

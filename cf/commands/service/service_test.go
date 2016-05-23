@@ -59,7 +59,7 @@ var _ = Describe("service command", func() {
 		cmd = &service.ShowService{}
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-		reqFactory = &requirementsfakes.FakeFactory{}
+		reqFactory = new(requirementsfakes.FakeFactory)
 
 		loginRequirement = &passingRequirement{Name: "login-requirement"}
 		reqFactory.NewLoginRequirementReturns(loginRequirement)

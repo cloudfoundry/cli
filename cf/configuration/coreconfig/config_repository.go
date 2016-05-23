@@ -94,6 +94,7 @@ type Reader interface {
 }
 
 //go:generate counterfeiter . ReadWriter
+
 type ReadWriter interface {
 	Reader
 	ClearSession()
@@ -119,6 +120,8 @@ type ReadWriter interface {
 	SetPluginRepo(models.PluginRepo)
 	UnSetPluginRepo(int)
 }
+
+//go:generate counterfeiter . Repository
 
 type Repository interface {
 	ReadWriter
