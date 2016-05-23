@@ -652,10 +652,6 @@
     "translation": "CF_NAME env APP_NAME"
   },
   {
-    "id": "CF_NAME events APP_NAME",
-    "translation": "CF_NAME events APP_NAME"
-  },
-  {
     "id": "CF_NAME feature-flag FEATURE_NAME",
     "translation": "CF_NAME feature-flag FEATURE_NAME"
   },
