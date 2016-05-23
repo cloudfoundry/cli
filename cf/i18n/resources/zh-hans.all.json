@@ -3676,6 +3676,10 @@
     "translation": "安全组"
   },
   {
+    "id": "SERVICE",
+    "translation": ""
+  },
+  {
     "id": "SERVICE ADMIN",
     "translation": "服务管理员"
   },

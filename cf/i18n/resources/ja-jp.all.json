@@ -3676,6 +3676,10 @@
     "translation": "セキュリティー・グループ"
   },
   {
+    "id": "SERVICE",
+    "translation": ""
+  },
+  {
     "id": "SERVICE ADMIN",
     "translation": "サービス管理者"
   },
