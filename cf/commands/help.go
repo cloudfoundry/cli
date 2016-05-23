@@ -57,19 +57,19 @@ func (cmd *Help) Execute(c flags.FlagContext) {
 			for _, meta := range cmd.config.Plugins() {
 				for _, c := range meta.Commands {
 					if c.Name == cmdName || c.Alias == cmdName {
-						output := T("NAME") + ":" + "\n"
+						output := T("NAME:") + "\n"
 						output += "   " + c.Name + " - " + c.HelpText + "\n"
 
 						if c.Alias != "" {
-							output += "\n" + T("ALIAS") + ":" + "\n"
+							output += "\n" + T("ALIAS:") + "\n"
 							output += "   " + c.Alias + "\n"
 						}
 
-						output += "\n" + T("USAGE") + ":" + "\n"
+						output += "\n" + T("USAGE:") + "\n"
 						output += "   " + c.UsageDetails.Usage + "\n"
 
 						if len(c.UsageDetails.Options) > 0 {
-							output += "\n" + T("OPTIONS") + ":" + "\n"
+							output += "\n" + T("OPTIONS:") + "\n"
 
 							//find longest name length
 							l := 0
