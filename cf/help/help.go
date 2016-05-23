@@ -50,7 +50,7 @@ func showAppHelp(writer io.Writer, helpTemplate string) {
 	if err != nil {
 		fmt.Println("error", err)
 	}
-	w.Flush()
+	_ = w.Flush()
 }
 
 func newAppPresenter() appPresenter {
