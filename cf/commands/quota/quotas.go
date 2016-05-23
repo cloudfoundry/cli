@@ -105,11 +105,16 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 			reservedRoutePorts = T("unlimited")
 		}
 
+		routesLimit := fmt.Sprintf("%d", quota.RoutesLimit)
+		if routesLimit == resources.UnlimitedRoutes {
+			routesLimit = T("unlimited")
+		}
+
 		table.Add(
 			quota.Name,
 			formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE),
 			megabytes,
-			fmt.Sprintf("%d", quota.RoutesLimit),
+			routesLimit,
 			fmt.Sprint(servicesLimit),
 			formatters.Allowed(quota.NonBasicServicesAllowed),
 			fmt.Sprint(appInstanceLimit),

@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/quota"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -97,18 +98,27 @@ var _ = Describe("quotas command", func() {
 					AppInstanceLimit:        10,
 					ReservedRoutePorts:      "4",
 				},
+				{
+					Name:                    "quota-unlimited-routes",
+					MemoryLimit:             434,
+					InstanceMemoryLimit:     1,
+					RoutesLimit:             -1,
+					ServicesLimit:           2,
+					NonBasicServicesAllowed: false,
+					AppInstanceLimit:        10,
+					ReservedRoutePorts:      "4",
+				},
 			}, nil)
 		})
 
 		It("lists quotas", func() {
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting quotas as", "my-user"},
-				[]string{"OK"},
-				[]string{"name", "total memory", "instance memory", "routes", "service instances", "paid plans", "app instances", "route ports"},
-				[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "unlimited", "4"},
-				[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "10", "4"},
-			))
+			Expect(terminal.Decolorize(ui.Outputs[0])).To(Equal("Getting quotas as my-user..."))
+			Expect(terminal.Decolorize(ui.Outputs[1])).To(Equal("OK"))
+			Expect(terminal.Decolorize(ui.Outputs[3])).To(MatchRegexp("name\\s*total memory\\s*instance memory\\s*routes\\s*service instances\\s*paid plans\\s*app instances\\s*route ports\\s*"))
+			Expect(terminal.Decolorize(ui.Outputs[4])).To(MatchRegexp("quota-name\\s*1G\\s*512M\\s*111\\s*222\\s*allowed\\s*unlimited\\s*4"))
+			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp("quota-non-basic-not-allowed\\s*434M\\s*unlimited\\s*1\\s*2\\s*disallowed\\s*10\\s*4"))
+			Expect(terminal.Decolorize(ui.Outputs[6])).To(MatchRegexp("quota-unlimited-routes\\s*434M\\s*1M\\s*unlimited\\s*2\\s*disallowed\\s*10\\s*4"))
 		})
 
 		It("displays unlimited services properly", func() {
