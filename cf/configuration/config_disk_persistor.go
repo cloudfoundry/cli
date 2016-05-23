@@ -45,7 +45,7 @@ func (dp DiskPersistor) Exists() bool {
 }
 
 func (dp DiskPersistor) Delete() {
-	os.Remove(dp.filePath)
+	_ = os.Remove(dp.filePath)
 }
 
 func (dp DiskPersistor) Load(data DataInterface) error {
@@ -65,7 +65,10 @@ func (dp DiskPersistor) Save(data DataInterface) (err error) {
 }
 
 func (dp DiskPersistor) read(data DataInterface) error {
-	dp.makeDirectory()
+	err := dp.makeDirectory()
+	if err != nil {
+		return err
+	}
 
 	jsonBytes, err := ioutil.ReadFile(dp.filePath)
 	if err != nil {
