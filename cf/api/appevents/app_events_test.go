@@ -58,6 +58,7 @@ var _ = Describe("App Events Repo", func() {
 					Name:        "audit.app.update",
 					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
 					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
+					Actor:       "cf-1-client",
 					ActorName:   "somebody@pivotallabs.com",
 				},
 				{
@@ -65,6 +66,7 @@ var _ = Describe("App Events Repo", func() {
 					Name:        "audit.app.update",
 					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
 					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
+					Actor:       "cf-2-client",
 					ActorName:   "nobody@pivotallabs.com",
 				},
 			}))
@@ -92,6 +94,7 @@ var eventsRequest = testnet.TestRequest{
 			  "entity": {
 				"type": "audit.app.update",
 				"timestamp": "2014-01-21T00:20:11+00:00",
+				"actor": "cf-1-client",
 				"actor_name": "somebody@pivotallabs.com",
 				"metadata": {
 				  "request": {
@@ -110,6 +113,7 @@ var eventsRequest = testnet.TestRequest{
 			  },
 			  "entity": {
 				"type": "audit.app.update",
+				"actor": "cf-2-client",
 				"actor_name": "nobody@pivotallabs.com",
 				"timestamp": "2014-01-21T00:20:11+00:00",
 				"metadata": {
