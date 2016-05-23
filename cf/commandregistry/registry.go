@@ -135,10 +135,10 @@ func CLICommandUsagePresenter(cmd Command) *usagePresenter {
 func (u *usagePresenter) Usage() string {
 	metadata := u.cmd.MetaData()
 
-	output := T("NAME") + ":" + "\n"
+	output := T("NAME:") + "\n"
 	output += "   " + metadata.Name + " - " + metadata.Description + "\n\n"
 
-	output += T("USAGE") + ":" + "\n"
+	output += T("USAGE:") + "\n"
 	output += "   " + strings.Replace(strings.Join(metadata.Usage, ""), "CF_NAME", cf.Name, -1) + "\n"
 
 	if len(metadata.Examples) > 0 {
@@ -150,12 +150,12 @@ func (u *usagePresenter) Usage() string {
 	}
 
 	if metadata.ShortName != "" {
-		output += "\n" + T("ALIAS") + ":" + "\n"
+		output += "\n" + T("ALIAS:") + "\n"
 		output += "   " + metadata.ShortName + "\n"
 	}
 
 	if metadata.Flags != nil {
-		output += "\n" + T("OPTIONS") + ":" + "\n"
+		output += "\n" + T("OPTIONS:") + "\n"
 		output += flags.NewFlagContext(metadata.Flags).ShowUsage(3)
 	}
 

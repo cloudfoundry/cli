@@ -164,8 +164,8 @@
     "translation": "高级"
   },
   {
-    "id": "ALIAS",
-    "translation": "别名"
+    "id": "ALIAS:",
+    "translation": "别名:"
   },
   {
     "id": "API endpoint",
@@ -3116,8 +3116,8 @@
     "translation": "确定"
   },
   {
-    "id": "OPTIONS",
-    "translation": "选项"
+    "id": "OPTIONS:",
+    "translation": "选项:"
   },
   {
     "id": "ORG ADMIN",
@@ -4214,10 +4214,6 @@
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
     "translation": "将绑定路径的请求转发到的目标 URL。此 URL 的方案必须是 https"
-  },
-  {
-    "id": "USAGE",
-    "translation": "用法"
   },
   {
     "id": "USAGE:",
