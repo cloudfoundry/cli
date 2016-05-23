@@ -26,7 +26,8 @@ func (cmd *Events) MetaData() commandregistry.CommandMetadata {
 		Name:        "events",
 		Description: T("Show recent app events"),
 		Usage: []string{
-			T("CF_NAME events APP_NAME"),
+			"CF_NAME events ",
+			T("APP_NAME"),
 		},
 	}
 }
