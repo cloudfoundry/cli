@@ -201,6 +201,46 @@ var _ = Describe("CommandRegistry", func() {
 			))
 		})
 
+		Context("i18n translations", func() {
+			var originalT func(string, ...interface{}) string
+
+			BeforeEach(func() {
+				originalT = T
+			})
+
+			AfterEach(func() {
+				T = originalT
+			})
+
+			It("includes ':' in caption translation strings for language like French to be translated correctly", func() {
+				nameCaption := "NAME:"
+				aliasCaption := "ALIAS:"
+				usageCaption := "USAGE:"
+				optionsCaption := "OPTIONS:"
+				captionCheckCount := 0
+
+				T = func(translationID string, args ...interface{}) string {
+					if strings.HasPrefix(translationID, "NAME") {
+						Expect(translationID).To(Equal(nameCaption))
+						captionCheckCount += 1
+					} else if strings.HasPrefix(translationID, "ALIAS") {
+						Expect(translationID).To(Equal(aliasCaption))
+						captionCheckCount += 1
+					} else if strings.HasPrefix(translationID, "USAGE") {
+						Expect(translationID).To(Equal(usageCaption))
+						captionCheckCount += 1
+					} else if strings.HasPrefix(translationID, "OPTIONS") {
+						Expect(translationID).To(Equal(optionsCaption))
+						captionCheckCount += 1
+					}
+
+					return translationID
+				}
+
+				commandregistry.Commands.CommandUsage("fake-command")
+			})
+		})
+
 		It("prints the flag options", func() {
 			o := commandregistry.Commands.CommandUsage("fake-command")
 			outputs := strings.Split(o, "\n")
