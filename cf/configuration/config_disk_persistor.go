@@ -30,7 +30,7 @@ type DiskPersistor struct {
 	filePath string
 }
 
-func NewDiskPersistor(path string) (dp DiskPersistor) {
+func NewDiskPersistor(path string) DiskPersistor {
 	return DiskPersistor{
 		filePath: path,
 	}
@@ -60,7 +60,7 @@ func (dp DiskPersistor) Load(data DataInterface) error {
 	return err
 }
 
-func (dp DiskPersistor) Save(data DataInterface) (err error) {
+func (dp DiskPersistor) Save(data DataInterface) error {
 	return dp.write(data)
 }
 
