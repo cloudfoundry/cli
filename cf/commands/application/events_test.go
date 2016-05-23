@@ -161,6 +161,7 @@ var _ = Describe("events command", func() {
 						Name:        "app crashed",
 						Timestamp:   earlierTimestamp,
 						Description: "reason: app instance exited, exit_status: 78",
+						Actor:       "george-clooney",
 						ActorName:   "George Clooney",
 					},
 					{
@@ -168,7 +169,7 @@ var _ = Describe("events command", func() {
 						Name:        "app crashed",
 						Timestamp:   timestamp,
 						Description: "reason: app instance was stopped, exit_status: 77",
-						ActorName:   "Marcel Marceau",
+						Actor:       "marcel-marceau",
 					},
 				}, nil)
 
@@ -187,7 +188,7 @@ var _ = Describe("events command", func() {
 					[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"time", "event", "actor", "description"},
 					[]string{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "George Clooney", "app instance exited", "78"},
-					[]string{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "Marcel Marceau", "app instance was stopped", "77"},
+					[]string{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "marcel-marceau", "app instance was stopped", "77"},
 				))
 			})
 		})

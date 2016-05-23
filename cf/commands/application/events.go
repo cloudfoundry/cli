@@ -75,10 +75,15 @@ func (cmd *Events) Execute(c flags.FlagContext) {
 	}
 
 	for _, event := range events {
+		actor := event.ActorName
+		if actor == "" {
+			actor = event.Actor
+		}
+
 		table.Add(
 			event.Timestamp.Local().Format("2006-01-02T15:04:05.00-0700"),
 			event.Name,
-			event.ActorName,
+			actor,
 			event.Description,
 		)
 	}
