@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -34,7 +35,8 @@ func (cmd *MarketplaceServices) MetaData() commandregistry.CommandMetadata {
 		ShortName:   "m",
 		Description: T("List available offerings in the marketplace"),
 		Usage: []string{
-			"CF_NAME marketplace",
+			"CF_NAME marketplace ",
+			fmt.Sprintf("[-s %s] ", T("SERVICE")),
 		},
 		Flags: fs,
 	}

@@ -3676,6 +3676,10 @@
     "translation": "GRUPO DE SEGURANÇA"
   },
   {
+    "id": "SERVICE",
+    "translation": ""
+  },
+  {
     "id": "SERVICE ADMIN",
     "translation": "ADMINISTRADOR DE SERVIÇO"
   },
