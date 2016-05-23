@@ -304,6 +304,11 @@ var _ = Describe("service command", func() {
 						Name: "service1",
 						GUID: "service1-guid",
 					},
+					ServiceBindings: []models.ServiceBindingFields{
+						models.ServiceBindingFields{
+							AppGUID: "app1-guid",
+						},
+					},
 				}
 
 				err := flagContext.Parse("service1")
@@ -314,6 +319,7 @@ var _ = Describe("service command", func() {
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Service instance: ", "service1"},
 					[]string{"Service: ", "user-provided"},
+					[]string{"Bound apps: ", "app1"},
 				))
 			})
 		})

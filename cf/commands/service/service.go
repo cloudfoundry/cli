@@ -93,6 +93,10 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 				map[string]interface{}{
 					"ServiceDescription": terminal.EntityNameColor(T("user-provided")),
 				}))
+			cmd.ui.Say(T("Bound apps: {{.BoundApplications}}",
+				map[string]interface{}{
+					"BoundApplications": terminal.EntityNameColor(strings.Join(boundApps, ",")),
+				}))
 		} else {
 			cmd.ui.Say(T("Service: {{.ServiceDescription}}",
 				map[string]interface{}{
