@@ -61,7 +61,7 @@ func (ui terminalUI) AskForPassword(prompt string) (passwd string) {
 
 func readPassword(pid int) string {
 	rd := bufio.NewReader(os.Stdin)
-	syscall.Wait4(pid, &ws, 0, nil)
+	_, _ = syscall.Wait4(pid, &ws, 0, nil)
 
 	line, err := rd.ReadString('\n')
 	if err == nil {
@@ -86,7 +86,7 @@ func echoOn(fd []uintptr) {
 	pid, e := syscall.ForkExec(sttyArg0, sttyArgvEOn, &syscall.ProcAttr{Dir: exec_cwdir, Files: fd})
 
 	if e == nil {
-		syscall.Wait4(pid, &ws, 0, nil)
+		_, _ = syscall.Wait4(pid, &ws, 0, nil)
 	}
 }
 

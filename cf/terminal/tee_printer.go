@@ -59,5 +59,5 @@ func (t *TeePrinter) DisableTerminalOutput(disable bool) {
 }
 
 func (t *TeePrinter) saveOutputToBucket(output string) {
-	t.outputBucket.Write([]byte(Decolorize(output)))
+	_, _ = t.outputBucket.Write([]byte(Decolorize(output)))
 }
