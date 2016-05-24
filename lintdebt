@@ -49,8 +49,6 @@ cf/manifest/manifest_disk_repository.go:22:6: type name will be used as manifest
 cf/net/gateway.go:27:2: don't use ALL_CAPS in Go names; use CamelCase
 cf/net/gateway.go:28:2: don't use ALL_CAPS in Go names; use CamelCase
 cf/net/gateway.go:29:2: don't use ALL_CAPS in Go names; use CamelCase
-cf/net/gateway.go:445:2: don't use underscores in Go names; var raw_warnings should be rawWarnings
-cf/net/gateway.go:446:9: don't use underscores in Go names; range var raw_warning should be rawWarning
 cf/net/http_client.go:4:2: a blank import should be only in a main or test package, or have a comment justifying it
 cf/net/warnings_collector.go:14:2: don't use underscores in Go names; struct field warning_producers should be warningProducers
 cf/net/warnings_collector.go:23:43: don't use underscores in Go names; func parameter warning_producers should be warningProducers
