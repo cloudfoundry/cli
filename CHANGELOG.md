@@ -1,3 +1,85 @@
+## 6.18.1
+* Bump version to 6.18.1
+* Ignore errors from printing/syscalls in cf/terminal package
+* Explicitly ignore errors in cf/ssh package
+* Handle errors in cf/net package
+* Handle errors and remove named return values
+* Explicitly ignore failed Flush
+* Remove named return values
+* Explicitly handle errors
+* Display 'unlimited' instead of -1 for org quotas
+* Remove multi-byte colons
+* Use actor when actor_name is empty in `cf events`
+* Remove RunCliCommand in application/events_test.go
+* Parse actor from events fields
+* Translate APP_NAME
+* Display flags in marketplace help text
+* Merge branch 'master' of https://github.com/simonleung8/cli into simonleung8-master
+* Display bound apps for user provided services
+* Do not hardcode ':' for some languages to be translated correctly
+* Add back translations that were deleted
+* 64bit windows installer now installs in correct directory
+* Running cf service service-name now displays 'Bound apps: '
+* Remove RunCliCommand from service_test
+* Remove naked returns
+* Merge branch 'master' of https://github.com/simonleung8/cli into wip/#119616001-ibmtranslations
+* Remove shadow
+* Skip chmod for windows because it is not supported
+* I TAKE FULL RESPONSIBILITY FOR MY ACTIONS
+* Order these tests to prevent test conflits
+* Fix gometalinter issues in cf/commands
+* Handle writer.Close errors in cf/api
+* Remove named return from performMultiPartUpload
+* Fix gometalinter issues in cf/actors
+* Update i18n languages
+* List service instance bindings by instance guid
+* Remove named returns and use ghttp in tests
+* Simplify lookup for all of service's plans
+* Formatting
+* Simplify service plan lookup
+* Remove inline-relations-depth from cf organizations
+* BackwardsCompatibility flags do not require args
+* Missed a spot
+* Use cli-ci to run tests in windows gats
+* Randomizes the GATS test suites
+* Diego tests now run as part of the pipeline
+* Remove dependence on org returned from space api calls
+* Remove Comments
+* Fix Path
+* Backwards compatible `cf bind-route-service -f`
+* Request spaces to be ordered alphabeticaly
+* Rename cc_fake to old_cc_fake
+* Remove inline-relations-depth query from cf spaces
+* ignore the actual work for now and lets see if the basics work
+* Remove duplicate ginkgo install
+* Switch diego tests to use cli-pool resource
+* bosh-lite pipeline now uses bosh-deployment resource
+* Use the cli-pools resource for realz
+* Revert "Use the cli-pools resource"
+* Use the cli-pools resource
+* Use docker image with bosh cli
+* Use only what we need from the generate-deployment-manifest
+* Display only plugin filename upon install of remote plugin
+* Handle extra spaces in download file headers
+* Deploy diego task uses cli-pools
+* Removes diego deploy dependency on cf-release repo
+* Generate stub file after git clean
+* Make bosh commands non-interactive
+* Add sleep since the network might not be up
+* bish bosh borsh
+* Fix heredoc in provision-cf-lite task
+* Changes the provision task to generate a bosh-lite manifest
+* Get organizations alphabetically
+* Refactor org tests to no longer use old handlers
+* Bosh-lite 4 now uses new diego pool
+* Add default to diego bosh-lite script
+* Remove -f flag from binding route service
+* Merge pull request #839 from fujitsu-cf/update-ja_jp-files
+* Japanized Bind cancelled, Creating route, Creating service broker and some incorrect usage mesages.
+* Merge pull request #838 from MarkKropf/master
+* Update bump-version script
+* reduce the promiscuity of our random words
+
 ## 6.18.0
 * Bump version to 6.18.0
 * Aggregate gats-linux + gats-windows into gats
