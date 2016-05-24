@@ -93,9 +93,9 @@ func (ui *terminalUI) PrintCapturingNoOutput(message string, args ...interface{}
 
 func (ui *terminalUI) Say(message string, args ...interface{}) {
 	if len(args) == 0 {
-		ui.printer.Printf("%s\n", message)
+		_, _ = ui.printer.Printf("%s\n", message)
 	} else {
-		ui.printer.Printf(message+"\n", args...)
+		_, _ = ui.printer.Printf(message+"\n", args...)
 	}
 }
 
@@ -245,7 +245,7 @@ func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) {
 }
 
 func (ui *terminalUI) LoadingIndication() {
-	ui.printer.Print(".")
+	_, _ = ui.printer.Print(".")
 }
 
 func (ui *terminalUI) Table(headers []string) *UITable {
