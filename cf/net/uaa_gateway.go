@@ -16,7 +16,7 @@ type uaaErrorResponse struct {
 
 var uaaErrorHandler = func(statusCode int, body []byte) error {
 	response := uaaErrorResponse{}
-	json.Unmarshal(body, &response)
+	_ = json.Unmarshal(body, &response)
 
 	if response.Code == "invalid_token" {
 		return errors.NewInvalidTokenError(response.Description)

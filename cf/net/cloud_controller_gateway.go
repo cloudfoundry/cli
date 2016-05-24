@@ -20,7 +20,7 @@ const invalidTokenCode = 1000
 
 func cloudControllerErrorHandler(statusCode int, body []byte) error {
 	response := ccErrorResponse{}
-	json.Unmarshal(body, &response)
+	_ = json.Unmarshal(body, &response)
 
 	if response.Code == invalidTokenCode {
 		return errors.NewInvalidTokenError(response.Description)
