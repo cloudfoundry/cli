@@ -139,7 +139,7 @@ func (c *secureShell) Connect(opts *options.SSHOptions) error {
 
 func (c *secureShell) Close() error {
 	for _, listener := range c.localListeners {
-		listener.Close()
+		_ = listener.Close()
 	}
 	return c.secureClient.Close()
 }
@@ -194,15 +194,15 @@ func (c *secureShell) handleForwardConnection(conn net.Conn, targetAddr string) 
 }
 
 func copyAndClose(wg *sync.WaitGroup, dest io.WriteCloser, src io.Reader) {
-	io.Copy(dest, src)
-	dest.Close()
+	_, _ = io.Copy(dest, src)
+	_ = dest.Close()
 	if wg != nil {
 		wg.Done()
 	}
 }
 
 func copyAndDone(wg *sync.WaitGroup, dest io.Writer, src io.Reader) {
-	io.Copy(dest, src)
+	_, _ = io.Copy(dest, src)
 	wg.Done()
 }
 
@@ -407,7 +407,7 @@ func (c *secureShell) resize(resized <-chan os.Signal, session SecureSession, te
 			Height: uint32(height),
 		}
 
-		session.SendRequest("window-change", false, ssh.Marshal(message))
+		_, _ = session.SendRequest("window-change", false, ssh.Marshal(message))
 
 		previousWidth = width
 		previousHeight = height
@@ -418,7 +418,7 @@ func keepalive(conn ssh.Conn, ticker *time.Ticker, stopCh chan struct{}) {
 	for {
 		select {
 		case <-ticker.C:
-			conn.SendRequest("keepalive@cloudfoundry.org", true, nil)
+			_, _, _ = conn.SendRequest("keepalive@cloudfoundry.org", true, nil)
 		case <-stopCh:
 			ticker.Stop()
 			return
