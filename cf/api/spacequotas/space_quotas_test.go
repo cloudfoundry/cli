@@ -404,7 +404,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 						"memory_limit": 123,
 						"instance_memory_limit": 0,
 						"organization_guid": "my-org-guid",
-						"app_instance_limit": 10
+						"app_instance_limit": 10,
+						"total_reserved_route_ports": 5
 					}`),
 					ghttp.RespondWith(http.StatusNoContent, nil),
 				),
@@ -419,6 +420,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				MemoryLimit:      123,
 				OrgGUID:          "my-org-guid",
 				AppInstanceLimit: 10,
+				ReservedRoutePortsLimit: 5,
 			}
 			err := repo.Create(quota)
 			Expect(err).NotTo(HaveOccurred())
@@ -440,7 +442,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 						"memory_limit": 123,
 						"instance_memory_limit": 1234,
 						"organization_guid": "myorgguid",
-						"app_instance_limit": 23
+						"app_instance_limit": 23,
+						"total_reserved_route_ports": 5
 					}`),
 					ghttp.RespondWith(http.StatusOK, nil),
 				),
@@ -458,6 +461,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				InstanceMemoryLimit:     1234,
 				AppInstanceLimit:        23,
 				OrgGUID:                 "myorgguid",
+				ReservedRoutePortsLimit: 5,
 			}
 
 			err := repo.Update(quota)

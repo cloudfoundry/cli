@@ -17,6 +17,7 @@ type SpaceQuota struct {
 	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
 	OrgGUID                 string `json:"organization_guid"`
 	AppInstanceLimit        int    `json:"app_instance_limit"`
+	ReservedRoutePortsLimit int    `json:"total_reserved_route_ports"`
 }
 
 func (q SpaceQuota) FormattedMemoryLimit() string {
