@@ -2,212 +2,299 @@ package spacequota_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+
+	"github.com/cloudfoundry/cli/cf/api/resources"
+	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+
+	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/commands/spacequota"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
-	"github.com/cloudfoundry/cli/cf/errors"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
 
-var _ = Describe("create-space-quota command", func() {
+var _ = Describe("create-space-quota", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		requirementsFactory *testreq.FakeReqFactory
-		configRepo          coreconfig.Repository
-		deps                commandregistry.Dependency
-	)
+		requirementsFactory *requirementsfakes.FakeFactory
+		config              *coreconfigfakes.FakeRepository
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.UI = ui
-		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
-		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("create-space-quota").SetDependency(deps, pluginCall))
-	}
+		loginReq         *requirementsfakes.FakeRequirement
+		targetedOrgReq   *requirementsfakes.FakeTargetedOrgRequirement
+		minApiVersionReq *requirementsfakes.FakeRequirement
+		reqFactory       *requirementsfakes.FakeFactory
+
+		deps        commandregistry.Dependency
+		cmd         spacequota.CreateSpaceQuota
+		flagContext flags.FlagContext
+	)
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		configRepo = testconfig.NewRepositoryWithDefaults()
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
-		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		config = new(coreconfigfakes.FakeRepository)
 
-		org := models.Organization{}
-		org.Name = "my-org"
-		org.GUID = "my-org-guid"
-		orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
-		orgRepo.FindByNameReturns(org, nil)
+		repoLocator := api.RepositoryLocator{}
+		repoLocator = repoLocator.SetSpaceQuotaRepository(quotaRepo)
+
+		deps = commandregistry.Dependency{
+			UI:          ui,
+			Config:      config,
+			RepoLocator: repoLocator,
+		}
+
+		reqFactory = new(requirementsfakes.FakeFactory)
+
+		loginReq = new(requirementsfakes.FakeRequirement)
+		loginReq.ExecuteReturns(nil)
+		reqFactory.NewLoginRequirementReturns(loginReq)
+
+		targetedOrgReq = new(requirementsfakes.FakeTargetedOrgRequirement)
+		targetedOrgReq.ExecuteReturns(nil)
+		reqFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
+
+		minApiVersionReq = new(requirementsfakes.FakeRequirement)
+		minApiVersionReq.ExecuteReturns(nil)
+		reqFactory.NewMinAPIVersionRequirementReturns(minApiVersionReq)
+
+		cmd = spacequota.CreateSpaceQuota{}
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("create-space-quota", args, requirementsFactory, updateCommandDependency, false)
-	}
-
-	Context("requirements", func() {
-		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
-
-			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
-		})
-
-		It("requires the user to target an org", func() {
-			requirementsFactory.TargetedOrgSuccess = false
-
-			Expect(runCommand("my-quota", "-m", "50G")).To(BeFalse())
-		})
-
-		Context("the minimum API version requirement", func() {
-			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedOrgSuccess = true
-				requirementsFactory.MinAPIVersionSuccess = false
-			})
-
-			It("fails when the -a option is provided", func() {
-				Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
-
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumAPIVersion))
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
-			})
-
-			It("does not fail when the -a option is not provided", func() {
-				Expect(runCommand("my-quota", "-m", "10G")).To(BeTrue())
-			})
-		})
-	})
-
-	Context("when requirements have been met", func() {
+	Describe("Requirements", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.MinAPIVersionSuccess = true
+			cmd.SetDependency(deps, false)
 		})
-
-		It("fails requirements when called without a quota name", func() {
-			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
-			))
-		})
-
-		It("creates a quota with a given name", func() {
-			runCommand("my-quota")
-			Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
-			Expect(quotaRepo.CreateArgsForCall(0).OrgGUID).To(Equal("my-org-guid"))
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Creating space quota", "my-org", "my-quota", "my-user", "..."},
-				[]string{"OK"},
-			))
-		})
-
-		Context("when the -i flag is not provided", func() {
-			It("sets the instance memory limit to unlimiited", func() {
-				runCommand("my-quota")
-
-				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
-			})
-		})
-
-		Context("when the -m flag is provided", func() {
-			It("sets the memory limit", func() {
-				runCommand("-m", "50G", "erryday makin fitty jeez")
-				Expect(quotaRepo.CreateArgsForCall(0).MemoryLimit).To(Equal(int64(51200)))
-			})
-
-			It("alerts the user when parsing the memory limit fails", func() {
-				runCommand("-m", "whoops", "wit mah hussle")
-
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-			})
-		})
-
-		Context("when the -i flag is provided", func() {
-			It("sets the memory limit", func() {
-				runCommand("-i", "50G", "erryday makin fitty jeez")
-				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(51200)))
-			})
-
-			It("accepts -1 without units as an appropriate value", func() {
-				runCommand("-i", "-1", "wit mah hussle")
-				Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
-			})
-
-			It("alerts the user when parsing the memory limit fails", func() {
-				runCommand("-i", "whoops", "yo", "12")
-
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-			})
-		})
-
-		Context("when the -a flag is provided", func() {
-			It("sets the instance limit", func() {
-				runCommand("-a", "50", "my special quota")
-				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(50))
-			})
-
-			It("defaults to unlimited", func() {
-				runCommand("my special quota")
-				Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
-			})
-		})
-
-		It("sets the route limit", func() {
-			runCommand("-r", "12", "ecstatic")
-
-			Expect(quotaRepo.CreateArgsForCall(0).RoutesLimit).To(Equal(12))
-		})
-
-		It("sets the service instance limit", func() {
-			runCommand("-s", "42", "black star")
-			Expect(quotaRepo.CreateArgsForCall(0).ServicesLimit).To(Equal(42))
-		})
-
-		It("defaults to not allowing paid service plans", func() {
-			runCommand("my-pro-bono-quota")
-			Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
-		})
-
-		Context("when requesting to allow paid service plans", func() {
-			It("creates the quota with paid service plans allowed", func() {
-				runCommand("--allow-paid-service-plans", "my-for-profit-quota")
-				Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeTrue())
-			})
-		})
-
-		Context("when creating a quota returns an error", func() {
-			It("alerts the user when creating the quota fails", func() {
-				quotaRepo.CreateReturns(errors.New("WHOOP THERE IT IS"))
-				runCommand("my-quota")
-
+		Context("when not exactly one arg is provided", func() {
+			It("fails", func() {
+				flagContext.Parse()
+				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Creating space quota", "my-quota", "my-org"},
 					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires an argument"},
 				))
 			})
+		})
 
-			It("warns the user when quota already exists", func() {
-				quotaRepo.CreateReturns(errors.NewHTTPError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
-				runCommand("Banana")
+		Context("when provided exactly one arg", func() {
+			var actualRequirements []requirements.Requirement
 
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
+			Context("when no flags are provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("myquota")
+					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+				})
+
+				It("returns a login requirement", func() {
+					Expect(reqFactory.NewLoginRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(loginReq))
+				})
+
+				It("returns a targeted org requirement", func() {
+					Expect(reqFactory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(targetedOrgReq))
+				})
+
+				It("does not return a min api requirement", func() {
+					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the -a flag is provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("myquota", "-a", "2")
+					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+				})
+
+				It("fails when the -a option is provided", func() {
+					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					commandName, requiredVersion := reqFactory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(commandName).To(Equal("Option '-a'"))
+					expectVersion, _ := semver.Make("2.40.0")
+					Expect(requiredVersion).To(Equal(expectVersion))
+					Expect(actualRequirements).To(ContainElement(minApiVersionReq))
+				})
+			})
+		})
+	})
+
+	Describe("Execute", func() {
+		BeforeEach(func() {
+			orgFields := models.OrganizationFields{
+				Name: "my-org",
+				GUID: "my-org-guid",
+			}
+
+			config.OrganizationFieldsReturns(orgFields)
+			config.UsernameReturns("my-user")
+		})
+
+		Context("when creating a quota succeeds", func() {
+			JustBeforeEach(func() {
+				cmd.SetDependency(deps, false)
+				cmd.Execute(flagContext)
+			})
+
+			Context("without any flags", func() {
+				BeforeEach(func() {
+					flagContext.Parse("my-quota")
+				})
+
+				It("creates a quota with a given name", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
+					Expect(quotaRepo.CreateArgsForCall(0).OrgGUID).To(Equal("my-org-guid"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Creating space quota", "my-quota", "my-org", "my-user", "..."},
+						[]string{"OK"},
+					))
+				})
+
+				It("sets the instance memory limit to unlimiited", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
+				})
+
+				It("sets the instance limit to unlimited", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(resources.UnlimitedAppInstances))
+				})
+
+				It("defaults to not allowing paid service plans", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
+				})
+			})
+
+			Context("when the -m flag is provided with valid value", func() {
+				BeforeEach(func() {
+					flagContext.Parse("-m", "50G", "erryday makin fitty jeez")
+				})
+
+				It("sets the memory limit", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).MemoryLimit).To(Equal(int64(51200)))
+				})
+			})
+
+			Context("when the -i flag is provided with positive value", func() {
+				BeforeEach(func() {
+					flagContext.Parse("-i", "50G", "erryday makin fitty jeez")
+				})
+
+				It("sets the memory limit", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(51200)))
+				})
+			})
+
+			Context("when the -i flag is provided with -1", func() {
+				BeforeEach(func() {
+					flagContext.Parse("-i", "-1", "wit mah hussle")
+				})
+
+				It("accepts it as an appropriate value", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
+				})
+			})
+
+			Context("when the -a flag is provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("-a", "50", "my special quota")
+				})
+
+				It("sets the instance limit", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).AppInstanceLimit).To(Equal(50))
+				})
+			})
+
+			Context("when the -r flag is provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("-r", "12", "ecstatic")
+				})
+
+				It("sets the route limit", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).RoutesLimit).To(Equal(12))
+				})
+			})
+
+			Context("when the -s flag is provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("-s", "42", "black star")
+				})
+
+				It("sets the service instance limit", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).ServicesLimit).To(Equal(42))
+				})
+			})
+
+			Context("when requesting to allow paid service plans", func() {
+				BeforeEach(func() {
+					flagContext.Parse("--allow-paid-service-plans", "my-for-profit-quota")
+				})
+
+				It("creates the quota with paid service plans allowed", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).NonBasicServicesAllowed).To(BeTrue())
+				})
+			})
+		})
+
+		Context("when the -i flag is provided with invalid value", func() {
+			BeforeEach(func() {
+				flagContext.Parse("-i", "whoops", "yo", "12")
+				cmd.SetDependency(deps, false)
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+			})
+
+			It("alerts the user when parsing the memory limit fails", func() {
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
+		})
+
+		Context("when the -m flag is provided with invalid value", func() {
+			BeforeEach(func() {
+				flagContext.Parse("-m", "whoops", "wit mah hussle")
+				cmd.SetDependency(deps, false)
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+			})
+
+			It("alerts the user when parsing the memory limit fails", func() {
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
+		})
+
+		Context("when the request fails", func() {
+			BeforeEach(func() {
+				flagContext.Parse("my-quota")
+				quotaRepo.CreateReturns(errors.New("WHOOP THERE IT IS"))
+				cmd.SetDependency(deps, false)
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+			})
+
+			It("alerts the user when creating the quota fails", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
+					[]string{"Creating space quota", "my-quota", "my-org"},
 				))
+			})
+		})
+
+		Context("when the quota already exists", func() {
+			BeforeEach(func() {
+				flagContext.Parse("my-quota")
+				quotaRepo.CreateReturns(errors.NewHTTPError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
+				cmd.SetDependency(deps, false)
+				cmd.Execute(flagContext)
+			})
+
+			It("warns the user", func() {
+				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
 			})
-
 		})
 	})
 })
