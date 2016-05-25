@@ -35,6 +35,7 @@ func (cmd *CreateSpaceQuota) MetaData() commandregistry.CommandMetadata {
 	fs["r"] = &flags.IntFlag{ShortName: "r", Usage: T("Total number of routes")}
 	fs["s"] = &flags.IntFlag{ShortName: "s", Usage: T("Total number of service instances")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)")}
+	fs["reserved-route-ports"] = &flags.IntFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports (Default: 0)")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "create-space-quota",
@@ -48,7 +49,8 @@ func (cmd *CreateSpaceQuota) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[-r %s] ", T("ROUTES")),
 			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
 			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
-			"[--allow-paid-service-plans]",
+			"[--allow-paid-service-plans] ",
+			fmt.Sprintf("[--reserved-route-ports %s]", T("RESERVED_ROUTE_PORTS")),
 		},
 		Flags: fs,
 	}
@@ -66,6 +68,10 @@ func (cmd *CreateSpaceQuota) Requirements(requirementsFactory requirements.Facto
 
 	if fc.IsSet("a") {
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-a'", cf.SpaceAppInstanceLimitMinimumAPIVersion))
+	}
+
+	if fc.IsSet("reserved-route-ports") {
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--reserved-route-ports'", cf.ReservedRoutePortsMinimumAPIVersion))
 	}
 
 	return reqs
@@ -133,6 +139,14 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 		quota.AppInstanceLimit = context.Int("a")
 	} else {
 		quota.AppInstanceLimit = resources.UnlimitedAppInstances
+	}
+
+	if context.IsSet("reserved-route-ports") {
+		instanceReservedRoutePorts := context.Int("reserved-route-ports")
+		if instanceReservedRoutePorts < -1 {
+			cmd.ui.Failed(T("Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.", map[string]interface{}{"ReservedRoutePorts": instanceReservedRoutePorts}))
+		}
+		quota.ReservedRoutePortsLimit = instanceReservedRoutePorts
 	}
 
 	err = cmd.quotaRepo.Create(quota)

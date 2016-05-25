@@ -116,11 +116,27 @@ var _ = Describe("create-space-quota", func() {
 					actualRequirements = cmd.Requirements(reqFactory, flagContext)
 				})
 
-				It("fails when the -a option is provided", func() {
+				It("returns a min api version requirement", func() {
 					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 					commandName, requiredVersion := reqFactory.NewMinAPIVersionRequirementArgsForCall(0)
 					Expect(commandName).To(Equal("Option '-a'"))
 					expectVersion, _ := semver.Make("2.40.0")
+					Expect(requiredVersion).To(Equal(expectVersion))
+					Expect(actualRequirements).To(ContainElement(minApiVersionReq))
+				})
+			})
+
+			Context("when the --reserved-route-ports is provided", func (){
+				BeforeEach(func(){
+					flagContext.Parse("myquota", "--reserved-route-ports", "2")
+					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+				})
+
+				It("return a minimum api version requirement", func (){
+					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+					commandName, requiredVersion := reqFactory.NewMinAPIVersionRequirementArgsForCall(0)
+					Expect(commandName).To(Equal("Option '--reserved-route-ports'"))
+					expectVersion, _ := semver.Make("2.55.0")
 					Expect(requiredVersion).To(Equal(expectVersion))
 					Expect(actualRequirements).To(ContainElement(minApiVersionReq))
 				})
@@ -232,6 +248,16 @@ var _ = Describe("create-space-quota", func() {
 				})
 			})
 
+			Context("when the --reserved-route-ports flag is provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("--reserved-route-ports", "5", "square quota")
+				})
+
+				It("sets the quotas TCP route limit", func() {
+					Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePortsLimit).To(Equal(5))
+				})
+			})
+
 			Context("when requesting to allow paid service plans", func() {
 				BeforeEach(func() {
 					flagContext.Parse("--allow-paid-service-plans", "my-for-profit-quota")
@@ -263,6 +289,18 @@ var _ = Describe("create-space-quota", func() {
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {
+				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			})
+		})
+
+		Context("when the --reserved-route-ports flag is provided with invalid value", func() {
+			BeforeEach(func() {
+				flagContext.Parse("--reserved-route-ports", "-2", "ski is life")
+				cmd.SetDependency(deps, false)
+				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+			})
+
+			It("alerts the user when reserved route ports limit failed", func() {
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
