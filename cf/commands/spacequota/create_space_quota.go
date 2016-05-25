@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -22,7 +21,6 @@ type CreateSpaceQuota struct {
 	ui        terminal.UI
 	config    coreconfig.Reader
 	quotaRepo spacequotas.SpaceQuotaRepository
-	orgRepo   organizations.OrganizationRepository
 }
 
 func init() {
@@ -77,7 +75,6 @@ func (cmd *CreateSpaceQuota) SetDependency(deps commandregistry.Dependency, plug
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.quotaRepo = deps.RepoLocator.GetSpaceQuotaRepository()
-	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	return cmd
 }
 
