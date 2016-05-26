@@ -126,13 +126,13 @@ var _ = Describe("create-space-quota", func() {
 				})
 			})
 
-			Context("when the --reserved-route-ports is provided", func (){
-				BeforeEach(func(){
+			Context("when the --reserved-route-ports is provided", func() {
+				BeforeEach(func() {
 					flagContext.Parse("myquota", "--reserved-route-ports", "2")
 					actualRequirements = cmd.Requirements(reqFactory, flagContext)
 				})
 
-				It("return a minimum api version requirement", func (){
+				It("return a minimum api version requirement", func() {
 					Expect(reqFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 					commandName, requiredVersion := reqFactory.NewMinAPIVersionRequirementArgsForCall(0)
 					Expect(commandName).To(Equal("Option '--reserved-route-ports'"))

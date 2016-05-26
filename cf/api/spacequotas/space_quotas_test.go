@@ -414,12 +414,12 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 
 		It("creates a new quota with the given name", func() {
 			quota := models.SpaceQuota{
-				Name:             "not-so-strict",
-				ServicesLimit:    1,
-				RoutesLimit:      12,
-				MemoryLimit:      123,
-				OrgGUID:          "my-org-guid",
-				AppInstanceLimit: 10,
+				Name:                    "not-so-strict",
+				ServicesLimit:           1,
+				RoutesLimit:             12,
+				MemoryLimit:             123,
+				OrgGUID:                 "my-org-guid",
+				AppInstanceLimit:        10,
 				ReservedRoutePortsLimit: 5,
 			}
 			err := repo.Create(quota)
