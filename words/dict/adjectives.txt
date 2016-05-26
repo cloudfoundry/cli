@@ -389,10 +389,6 @@ adsorbable
 adsorbent
 adsorptive
 adularescent
-adulatory
-adult
-adulterine
-adulterous
 adumbral
 adumbrative
 adunc
@@ -1048,7 +1044,6 @@ angiomatous
 angiospermous
 angrier
 angriest
-angry
 anguilliform
 anguine
 anguished
@@ -2301,7 +2296,6 @@ bacillary
 backboned
 backboneless
 backbreaking
-backdoor
 backed
 backgeared
 backhanded
@@ -2622,7 +2616,6 @@ bespectacled
 bespoke
 besprent
 best
-bestial
 betrothed
 better
 betulaceous
@@ -2698,11 +2691,9 @@ biforate
 biforked
 biform
 bifunctional
-big
 bigamistic
 bigamous
 bigeneric
-bigger
 biggest
 biggish
 bigheaded
@@ -2821,7 +2812,6 @@ biscuitlike
 bisectional
 biserial
 biserrate
-bisexual
 bishopless
 bishoplike
 bismuthal
@@ -2837,7 +2827,6 @@ bisymmetrical
 bitable
 bitchier
 bitchiest
-bitchy
 biteable
 biting
 bitless
@@ -2856,10 +2845,8 @@ biweekly
 biyearly
 bizarre
 bizonal
-black
 blackberrylike
 blackguardly
-blackish
 bladdery
 bladeless
 blae
@@ -2905,7 +2892,6 @@ blepharitic
 blessed
 blier
 blightingly
-blind
 blinking
 blissful
 blissless
@@ -2935,7 +2921,6 @@ bloodshot
 bloodstained
 bloodsucking
 bloodthirsty
-bloody
 bloodying
 bloomed
 bloomier
@@ -3004,7 +2989,6 @@ bolometric
 bolshie
 boltless
 boltlike
-bomb
 bomba
 bombable
 bombacaceous
@@ -3833,7 +3817,6 @@ cathedrallike
 catheptic
 cathodic
 cathodoluminescent
-catholic
 cationic
 catkinate
 catlike
@@ -4169,7 +4152,6 @@ chilopodous
 chimerical
 chimneyless
 chimneylike
-chin
 chinchier
 chinchiest
 chinchy
@@ -4648,7 +4630,6 @@ cocklike
 cockneyish
 cockneylike
 cocksure
-cocky
 coconscious
 codeless
 codicillary
@@ -4738,7 +4719,6 @@ colonnaded
 colorable
 colorado
 colorational
-colored
 colorfast
 colorful
 colorific
@@ -4751,7 +4731,6 @@ colossal
 colostral
 colourable
 colourational
-coloured
 colourful
 colouristic
 colourless
@@ -5121,7 +5100,6 @@ consequential
 conservable
 conservant
 conservational
-conservative
 considerable
 considerate
 considered
@@ -5572,7 +5550,6 @@ creamiest
 creamlaid
 creamless
 creamlike
-creamy
 creaseless
 creasy
 creatable
@@ -6026,7 +6003,6 @@ daydreamy
 daylong
 dclass
 dcollet
-dead
 deadlier
 deadliest
 deadly
@@ -6607,7 +6583,6 @@ dineric
 dingier
 dingiest
 dingy
-dink
 dinkier
 dinkies
 dinkiest
@@ -6679,7 +6654,6 @@ dirigible
 diriment
 dirtier
 dirtiest
-dirty
 disadvantaged
 disadvantageous
 disagreeable
@@ -6873,7 +6847,6 @@ distributable
 distributional
 distributive
 distrustful
-disturbed
 disturbing
 distyle
 disubstituted
@@ -7158,8 +7131,6 @@ druidical
 drumlier
 drumliest
 drumly
-drunk
-drunken
 drupaceous
 dry
 dryable
@@ -7186,7 +7157,6 @@ dulcet
 dull
 dullish
 dulotic
-dumb
 dumbstruck
 dumpier
 dumpiest
@@ -7934,10 +7904,6 @@ eradicant
 eradicative
 erasable
 erased
-erect
-erectable
-erectile
-erective
 eremitic
 eremophilous
 erethismic
@@ -8029,7 +7995,6 @@ ethereal
 ethereous
 ethical
 ethmoid
-ethnic
 ethnocentric
 ethnogenic
 ethnographic
@@ -9644,7 +9609,6 @@ gawkier
 gawkiest
 gawky
 gawsy
-gay
 gazeless
 gazellelike
 geanticlinal
@@ -9689,8 +9653,6 @@ genetic
 genial
 genic
 geniculate
-genital
-genitalic
 genitival
 genitive
 genitourinary
@@ -10241,7 +10203,6 @@ grooviest
 groovy
 groping
 grosgrained
-gross
 grotesque
 grottoed
 grottolike
@@ -10545,7 +10506,6 @@ harborless
 harborous
 harbourless
 harbourous
-hard
 hardbound
 hardcovered
 hardenable
@@ -11197,11 +11157,9 @@ hormonic
 hornblendic
 horned
 hornier
-horniest
 hornish
 hornless
 hornlike
-horny
 horologic
 horopteric
 horoscopic
@@ -11323,7 +11281,6 @@ hushful
 huskier
 huskiest
 husklike
-husky
 hutlike
 hyacinthine
 hyaenic
@@ -11796,7 +11753,6 @@ ilka
 ill
 illative
 illaudable
-illegal
 illegible
 illegitimate
 illhumored
@@ -12870,7 +12826,6 @@ interpubic
 interpulmonary
 interpupillary
 interrace
-interracial
 interradial
 interrailway
 interramal
@@ -13533,7 +13488,6 @@ kickless
 kidlike
 kidneylike
 killable
-killing
 kilometric
 kilometrical
 kilted
@@ -14021,8 +13975,6 @@ lianoid
 libational
 libationary
 libelous
-liberal
-liberalistic
 liberative
 liberatory
 liberticidal
@@ -14108,7 +14060,6 @@ limonitic
 limpid
 limpsy
 limuloid
-limy
 linable
 lineable
 lineal
@@ -14293,7 +14244,6 @@ loony
 looped
 loopy
 loose
-looser
 lophobranchiate
 lophodont
 lophophoral
@@ -15795,7 +15745,6 @@ nailless
 naillike
 naissant
 naive
-naked
 nameless
 nanoid
 naphthalic
@@ -15825,7 +15774,6 @@ nasopalatine
 nasopharyngeal
 nastier
 nastiest
-nasty
 natal
 natant
 natational
@@ -16030,8 +15978,6 @@ niftier
 nifties
 niftiest
 nifty
-niggardly
-niggling
 nigh
 nightcapped
 nightless
@@ -19771,7 +19717,6 @@ optometrical
 opulent
 opuscular
 oracular
-oral
 orangy
 oratorical
 oratorlike
@@ -21006,7 +20951,6 @@ penetrant
 penetrating
 penetrative
 penicillate
-penile
 peninsular
 penitent
 penitential
@@ -21590,7 +21534,6 @@ piscine
 piscivorous
 pisiform
 pisolitic
-pissed
 pistillate
 pistollike
 pistonlike
@@ -22656,7 +22599,6 @@ premaniacal
 premarital
 prematerial
 prematrimonial
-premature
 premaxillary
 premed
 premedical
@@ -23779,7 +23721,6 @@ ptomainic
 ptotic
 puberulent
 pubescent
-pubic
 public
 pucka
 puckery
@@ -24066,8 +24007,6 @@ rachidial
 rachidian
 rachiform
 rachitic
-racial
-racialistic
 racier
 raciest
 racing
@@ -24150,7 +24089,6 @@ rancid
 rancorous
 randie
 random
-randy
 ranged
 rangier
 rangiest
@@ -24526,7 +24464,6 @@ reptant
 reptilelike
 reptilian
 reptiloid
-republican
 republishable
 repudiatory
 repugnant
@@ -24609,7 +24546,6 @@ resuscitative
 retaliative
 retaliatory
 retardative
-retarded
 retentive
 retial
 retiary
@@ -26039,8 +25975,6 @@ sextern
 sextic
 sextillionth
 sextus
-sexual
-sexy
 sforzando
 shabbier
 shabbiest
@@ -26189,15 +26123,6 @@ sibilant
 sibilation
 sibylic
 sibyllic
-sick
-sickening
-sicker
-sicklemic
-sicklied
-sicklier
-sickliest
-sickly
-sicklying
 sideless
 sidelong
 sidereal
@@ -26682,7 +26607,6 @@ sonorous
 sonsy
 soony
 soothfast
-sooty
 sophistic
 sophisticated
 sophomoric
@@ -27472,7 +27396,6 @@ stunning
 stunty
 stupefactive
 stupendous
-stupid
 stuporous
 sturdied
 sturdier
@@ -28867,7 +28790,6 @@ tabarded
 tabby
 tabernacular
 tabescent
-taboo
 tabu
 tabulable
 tabular
@@ -29915,7 +29837,6 @@ triphthongal
 triphyllous
 tripinnate
 triple
-triplex
 triplicate
 triploblastic
 triploid
