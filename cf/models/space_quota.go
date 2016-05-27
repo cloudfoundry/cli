@@ -8,16 +8,16 @@ import (
 )
 
 type SpaceQuota struct {
-	GUID                    string `json:"guid,omitempty"`
-	Name                    string `json:"name"`
-	MemoryLimit             int64  `json:"memory_limit"`          // in Megabytes
-	InstanceMemoryLimit     int64  `json:"instance_memory_limit"` // in Megabytes
-	RoutesLimit             int    `json:"total_routes"`
-	ServicesLimit           int    `json:"total_services"`
-	NonBasicServicesAllowed bool   `json:"non_basic_services_allowed"`
-	OrgGUID                 string `json:"organization_guid"`
-	AppInstanceLimit        int    `json:"app_instance_limit"`
-	ReservedRoutePortsLimit int    `json:"total_reserved_route_ports"`
+	GUID                    string      `json:"guid,omitempty"`
+	Name                    string      `json:"name"`
+	MemoryLimit             int64       `json:"memory_limit"`          // in Megabytes
+	InstanceMemoryLimit     int64       `json:"instance_memory_limit"` // in Megabytes
+	RoutesLimit             int         `json:"total_routes"`
+	ServicesLimit           int         `json:"total_services"`
+	NonBasicServicesAllowed bool        `json:"non_basic_services_allowed"`
+	OrgGUID                 string      `json:"organization_guid"`
+	AppInstanceLimit        int         `json:"app_instance_limit"`
+	ReservedRoutePortsLimit json.Number `json:"total_reserved_route_ports,omitempty"`
 }
 
 func (q SpaceQuota) FormattedMemoryLimit() string {
@@ -50,4 +50,5 @@ type SpaceQuotaResponse struct {
 	NonBasicServicesAllowed bool        `json:"non_basic_services_allowed"`
 	OrgGUID                 string      `json:"organization_guid"`
 	AppInstanceLimit        json.Number `json:"app_instance_limit"`
+	ReservedRoutePortsLimit json.Number `json:"total_reserved_route_ports"`
 }

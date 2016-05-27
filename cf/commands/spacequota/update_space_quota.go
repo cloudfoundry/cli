@@ -1,7 +1,9 @@
 package spacequota
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/spacequotas"
@@ -34,6 +36,7 @@ func (cmd *UpdateSpaceQuota) MetaData() commandregistry.CommandMetadata {
 	fs["allow-paid-service-plans"] = &flags.BoolFlag{Name: "allow-paid-service-plans", Usage: T("Can provision instances of paid service plans")}
 	fs["disallow-paid-service-plans"] = &flags.BoolFlag{Name: "disallow-paid-service-plans", Usage: T("Can not provision instances of paid service plans")}
 	fs["a"] = &flags.IntFlag{ShortName: "a", Usage: T("Total number of application instances. -1 represents an unlimited amount.")}
+	fs["reserved-route-ports"] = &flags.IntFlag{Name: "reserved-route-ports", Usage: T("Maximum number of routes that may be created with reserved ports")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "update-space-quota",
@@ -48,7 +51,8 @@ func (cmd *UpdateSpaceQuota) MetaData() commandregistry.CommandMetadata {
 			fmt.Sprintf("[-r %s] ", T("ROUTES")),
 			fmt.Sprintf("[-s %s] ", T("SERVICE_INSTANCES")),
 			fmt.Sprintf("[-a %s] ", T("APP_INSTANCES")),
-			"[--allow-paid-service-plans | --disallow-paid-service-plans]",
+			"[--allow-paid-service-plans | --disallow-paid-service-plans] ",
+			fmt.Sprintf("[--reserved-route-ports %s] ", T("RESERVED_ROUTE_PORTS")),
 		},
 		Flags: fs,
 	}
@@ -143,6 +147,10 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 
 	if c.IsSet("a") {
 		spaceQuota.AppInstanceLimit = c.Int("a")
+	}
+
+	if c.IsSet("reserved-route-ports") {
+		spaceQuota.ReservedRoutePortsLimit = json.Number(strconv.Itoa(c.Int("reserved-route-ports")))
 	}
 
 	cmd.ui.Say(T("Updating space quota {{.Quota}} as {{.Username}}...",

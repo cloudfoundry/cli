@@ -1,6 +1,8 @@
 package spacequota_test
 
 import (
+	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -254,7 +256,7 @@ var _ = Describe("create-space-quota", func() {
 				})
 
 				It("sets the quotas TCP route limit", func() {
-					Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePortsLimit).To(Equal(5))
+					Expect(quotaRepo.CreateArgsForCall(0).ReservedRoutePortsLimit).To(Equal(json.Number("5")))
 				})
 			})
 

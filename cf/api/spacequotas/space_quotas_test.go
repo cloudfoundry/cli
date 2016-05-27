@@ -1,6 +1,7 @@
 package spacequotas_test
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/cloudfoundry/cli/cf/api/spacequotas"
@@ -52,7 +53,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_services": 321,
 									"non_basic_services_allowed": true,
 									"organization_guid": "my-org-guid",
-									"app_instance_limit": 333
+									"app_instance_limit": 333,
+									"total_reserved_route_ports": 14
 								}
 							}
 						]
@@ -89,6 +91,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				NonBasicServicesAllowed: true,
 				OrgGUID:                 "my-org-guid",
 				AppInstanceLimit:        333,
+				ReservedRoutePortsLimit: "14",
 			}))
 		})
 
@@ -117,7 +120,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_services": 321,
 									"non_basic_services_allowed": true,
 									"organization_guid": "other-org-guid",
-									"app_instance_limit": 333
+									"app_instance_limit": 333,
+									"total_reserved_route_ports": 14
 								}
 							}
 						]
@@ -154,6 +158,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 						NonBasicServicesAllowed: true,
 						OrgGUID:                 "other-org-guid",
 						AppInstanceLimit:        333,
+						ReservedRoutePortsLimit: "14",
 					}))
 				})
 
@@ -163,7 +168,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				})
 			})
 
-			Context("when the app_instance_limit is not provided", func() {
+			Context("when the app_instance_limit and total_reserved_route_ports are not provided", func() {
 				BeforeEach(func() {
 					ccServer.AppendHandlers(
 						ghttp.CombineHandlers(
@@ -203,7 +208,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 					)
 				})
 
-				It("sets app instance limit to -1", func() {
+				It("sets app instance limit to -1 and ReservedRoutePortsLimit is left blank", func() {
 					quota, err := repo.FindByNameAndOrgGUID("my-remote-quota", "other-org-guid")
 					Expect(err).NotTo(HaveOccurred())
 					Expect(ccServer.ReceivedRequests()).To(HaveLen(2))
@@ -216,6 +221,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 						NonBasicServicesAllowed: true,
 						OrgGUID:                 "other-org-guid",
 						AppInstanceLimit:        -1,
+						ReservedRoutePortsLimit: "",
 					}))
 				})
 			})
@@ -254,7 +260,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_routes": 123,
 									"total_services": 321,
 									"non_basic_services_allowed": true,
-									"organization_guid": "my-org-guid"
+									"organization_guid": "my-org-guid",
+									"total_reserved_route_ports": 14
 								}
 							}
 						]
@@ -289,6 +296,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			Expect(quotas[0].RoutesLimit).To(Equal(123))
 			Expect(quotas[0].ServicesLimit).To(Equal(321))
 			Expect(quotas[0].OrgGUID).To(Equal("my-org-guid"))
+			Expect(quotas[0].ReservedRoutePortsLimit).To(Equal(json.Number("14")))
 
 			Expect(quotas[1].GUID).To(Equal("my-quota-guid2"))
 			Expect(quotas[1].OrgGUID).To(Equal("my-org-guid"))
@@ -313,7 +321,8 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 									"total_routes": 123,
 									"total_services": 321,
 									"non_basic_services_allowed": true,
-									"organization_guid": "my-org-guid"
+									"organization_guid": "my-org-guid",
+									"total_reserved_route_ports": 14
 								}
 							}
 						]
@@ -349,6 +358,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				NonBasicServicesAllowed: true,
 				OrgGUID:                 "my-org-guid",
 				AppInstanceLimit:        -1,
+				ReservedRoutePortsLimit: "14",
 			}))
 		})
 
@@ -420,7 +430,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				MemoryLimit:             123,
 				OrgGUID:                 "my-org-guid",
 				AppInstanceLimit:        10,
-				ReservedRoutePortsLimit: 5,
+				ReservedRoutePortsLimit: "5",
 			}
 			err := repo.Create(quota)
 			Expect(err).NotTo(HaveOccurred())
@@ -461,7 +471,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				InstanceMemoryLimit:     1234,
 				AppInstanceLimit:        23,
 				OrgGUID:                 "myorgguid",
-				ReservedRoutePortsLimit: 5,
+				ReservedRoutePortsLimit: "5",
 			}
 
 			err := repo.Update(quota)
