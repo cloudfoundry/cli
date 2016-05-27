@@ -1,6 +1,8 @@
 package spacequota_test
 
 import (
+	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -13,6 +15,7 @@ import (
 	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -132,11 +135,13 @@ var _ = Describe("update-space-quota command", func() {
 		Context("when the -i flag is provided", func() {
 			It("sets the memory limit", func() {
 				runCommand("-i", "50G", "my-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(51200)))
 			})
 
 			It("sets the memory limit to -1", func() {
 				runCommand("-i", "-1", "my-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).InstanceMemoryLimit).To(Equal(int64(-1)))
 			})
 
@@ -149,6 +154,7 @@ var _ = Describe("update-space-quota command", func() {
 		Context("when the -a flag is provided", func() {
 			It("sets the instance limit", func() {
 				runCommand("-a", "50", "my-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).AppInstanceLimit).To(Equal(50))
 			})
 
@@ -162,6 +168,7 @@ var _ = Describe("update-space-quota command", func() {
 		Context("when the -r flag is provided", func() {
 			It("sets the route limit", func() {
 				runCommand("-r", "12", "ecstatic")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).RoutesLimit).To(Equal(12))
 			})
 		})
@@ -169,6 +176,7 @@ var _ = Describe("update-space-quota command", func() {
 		Context("when the -s flag is provided", func() {
 			It("sets the service instance limit", func() {
 				runCommand("-s", "42", "my-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).ServicesLimit).To(Equal(42))
 			})
 		})
@@ -176,6 +184,7 @@ var _ = Describe("update-space-quota command", func() {
 		Context("when the -n flag is provided", func() {
 			It("sets the service instance name", func() {
 				runCommand("-n", "foo", "my-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).Name).To(Equal("foo"))
 			})
 		})
@@ -183,6 +192,7 @@ var _ = Describe("update-space-quota command", func() {
 		Context("when --allow-non-basic-services is provided", func() {
 			It("updates the quota to allow paid service plans", func() {
 				runCommand("--allow-paid-service-plans", "my-for-profit-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).NonBasicServicesAllowed).To(BeTrue())
 			})
 		})
@@ -192,8 +202,24 @@ var _ = Describe("update-space-quota command", func() {
 				quotaRepo.FindByNameReturns(quotaPaidService, nil)
 
 				runCommand("--disallow-paid-service-plans", "my-for-profit-quota")
+				Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
 				Expect(quotaRepo.UpdateArgsForCall(0).NonBasicServicesAllowed).To(BeFalse())
 			})
+		})
+
+		Context("when --reserved-route-ports is provided", func() {
+			DescribeTable("updates the quota to the given number of reserved route ports",
+				func(numberOfReservedRoutes string) {
+					quotaRepo.FindByNameReturns(quotaPaidService, nil)
+
+					runCommand("--reserved-route-ports", numberOfReservedRoutes, "my-for-profit-quota")
+					Expect(quotaRepo.UpdateCallCount()).To(Equal(1))
+					Expect(quotaRepo.UpdateArgsForCall(0).ReservedRoutePortsLimit).To(Equal(json.Number(numberOfReservedRoutes)))
+				},
+				Entry("for positive values", "42"),
+				Entry("for 0", "0"),
+				Entry("for -1", "-1"),
+			)
 		})
 
 		Context("when updating a quota returns an error", func() {

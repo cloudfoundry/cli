@@ -1,7 +1,9 @@
 package spacequota
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -146,7 +148,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 		if instanceReservedRoutePorts < -1 {
 			cmd.ui.Failed(T("Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.", map[string]interface{}{"ReservedRoutePorts": instanceReservedRoutePorts}))
 		}
-		quota.ReservedRoutePortsLimit = instanceReservedRoutePorts
+		quota.ReservedRoutePortsLimit = json.Number(strconv.Itoa(instanceReservedRoutePorts))
 	}
 
 	err = cmd.quotaRepo.Create(quota)
