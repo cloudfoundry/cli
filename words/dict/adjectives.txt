@@ -11078,7 +11078,6 @@ homodyne
 homoeomorphic
 homoeomorphous
 homoeopathic
-homoerotic
 homofermentative
 homogamous
 homogeneous
@@ -11156,7 +11155,6 @@ hormonal
 hormonic
 hornblendic
 horned
-hornier
 hornish
 hornless
 hornlike
@@ -17226,7 +17224,6 @@ noneroded
 nonerodent
 noneroding
 nonerosive
-nonerotic
 nonerrant
 nonerratic
 nonerroneous
@@ -23503,7 +23500,6 @@ pseudoencephalitic
 pseudoenthusiastic
 pseudoepiscopal
 pseudoequalitarian
-pseudoerotic
 pseudoerysipelatous
 pseudoethical
 pseudoetymological
@@ -24644,7 +24640,6 @@ rheumy
 rhinal
 rhinencephalic
 rhinencephalous
-rhinocerotic
 rhinologic
 rhinological
 rhinoplastic
@@ -32980,7 +32975,6 @@ uneroded
 unerodent
 uneroding
 unerosive
-unerotic
 unerrant
 unerratic
 unerring
