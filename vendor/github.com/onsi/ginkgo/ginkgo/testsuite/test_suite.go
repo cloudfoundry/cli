@@ -47,6 +47,11 @@ func PrecompiledTestSuite(path string) (TestSuite, error) {
 
 func SuitesInDir(dir string, recurse bool) []TestSuite {
 	suites := []TestSuite{}
+
+	if vendorExperimentCheck(dir) {
+		return suites
+	}
+
 	files, _ := ioutil.ReadDir(dir)
 	re := regexp.MustCompile(`_test\.go$`)
 	for _, file := range files {

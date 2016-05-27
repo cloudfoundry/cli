@@ -10,15 +10,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/Azure/go-ansiterm/winterm",
-			"repository": "https://github.com/Azure/go-ansiterm",
-			"vcs": "git",
-			"revision": "70b2c90b260171e829f1ebd7c17f600c11858dbe",
-			"branch": "HEAD",
-			"path": "/winterm",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
@@ -70,48 +61,12 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/server/fakes",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/server/fakes",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/test_helpers",
 			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
 			"vcs": "git",
 			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
 			"branch": "HEAD",
 			"path": "/test_helpers",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/test_helpers/fake_io",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/test_helpers/fake_io",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/test_helpers/fake_net",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/test_helpers/fake_net",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/test_helpers/fake_ssh",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/test_helpers/fake_ssh",
 			"notests": true
 		},
 		{
@@ -129,15 +84,6 @@
 			"revision": "fb58b1b516bba4daa255b3f504df95d6ddfde045",
 			"branch": "HEAD",
 			"path": "/v3/client",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry/go-ccapi/v3/client/fakes",
-			"repository": "https://github.com/cloudfoundry/go-ccapi",
-			"vcs": "git",
-			"revision": "fb58b1b516bba4daa255b3f504df95d6ddfde045",
-			"branch": "HEAD",
-			"path": "/v3/client/fakes",
 			"notests": true
 		},
 		{
@@ -216,15 +162,6 @@
 			"revision": "6d9a84bcd04cd178033309859eb7bf386a8db85d",
 			"branch": "HEAD",
 			"path": "/pkg/term",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/docker/docker/pkg/term/windows",
-			"repository": "https://github.com/docker/docker",
-			"vcs": "git",
-			"revision": "6d9a84bcd04cd178033309859eb7bf386a8db85d",
-			"branch": "HEAD",
-			"path": "/pkg/term/windows",
 			"notests": true
 		},
 		{
@@ -322,33 +259,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/nicksnyder/go-i18n/i18n/bundle",
-			"repository": "https://github.com/nicksnyder/go-i18n",
-			"vcs": "git",
-			"revision": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3",
-			"branch": "HEAD",
-			"path": "/i18n/bundle",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/nicksnyder/go-i18n/i18n/language",
-			"repository": "https://github.com/nicksnyder/go-i18n",
-			"vcs": "git",
-			"revision": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3",
-			"branch": "HEAD",
-			"path": "/i18n/language",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/nicksnyder/go-i18n/i18n/translation",
-			"repository": "https://github.com/nicksnyder/go-i18n",
-			"vcs": "git",
-			"revision": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3",
-			"branch": "HEAD",
-			"path": "/i18n/translation",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/nu7hatch/gouuid",
 			"repository": "https://github.com/nu7hatch/gouuid",
 			"vcs": "git",
@@ -360,259 +270,16 @@
 			"importpath": "github.com/onsi/ginkgo",
 			"repository": "https://github.com/onsi/ginkgo",
 			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/config",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/config",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/codelocation",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/codelocation",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/containernode",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/containernode",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/failer",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/failer",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/leafnodes",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/leafnodes",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/remote",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/remote",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/spec",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/spec",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/specrunner",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/specrunner",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/suite",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/suite",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/testingtproxy",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/testingtproxy",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/internal/writer",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/internal/writer",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/reporters",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/reporters",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/reporters/stenographer",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/reporters/stenographer",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/ginkgo/types",
-			"repository": "https://github.com/onsi/ginkgo",
-			"vcs": "git",
-			"revision": "d94e2f4000332f62b356ecb2840c98f4218f5358",
-			"branch": "HEAD",
-			"path": "/types",
+			"revision": "5437a97bf824dec14e58d68c56ee36e772670c2e",
+			"branch": "master",
 			"notests": true
 		},
 		{
 			"importpath": "github.com/onsi/gomega",
 			"repository": "https://github.com/onsi/gomega",
 			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/format",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/format",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/gbytes",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/gbytes",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/gexec",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/gexec",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/ghttp",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/ghttp",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/internal/assertion",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/internal/assertion",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/internal/asyncassertion",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/internal/asyncassertion",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/internal/testingtsupport",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/internal/testingtsupport",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/matchers",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/matchers",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/matchers/support/goraph/bipartitegraph",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/matchers/support/goraph/bipartitegraph",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/matchers/support/goraph/edge",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/matchers/support/goraph/edge",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/matchers/support/goraph/node",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/matchers/support/goraph/node",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/matchers/support/goraph/util",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/matchers/support/goraph/util",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/onsi/gomega/types",
-			"repository": "https://github.com/onsi/gomega",
-			"vcs": "git",
-			"revision": "0652f5f3ba4e1226d4e7811215d3c2f80d37f919",
-			"branch": "HEAD",
-			"path": "/types",
+			"revision": "c73e51675ad2455a4515b6213eb7145eaade4824",
+			"branch": "master",
 			"notests": true
 		},
 		{
@@ -621,15 +288,6 @@
 			"vcs": "git",
 			"revision": "24bc7249ba26ad2f1493363b9dcedf86023f47d7",
 			"branch": "HEAD",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/pivotal-golang/lager/lagertest",
-			"repository": "https://github.com/pivotal-golang/lager",
-			"vcs": "git",
-			"revision": "24bc7249ba26ad2f1493363b9dcedf86023f47d7",
-			"branch": "HEAD",
-			"path": "/lagertest",
 			"notests": true
 		},
 		{
@@ -647,15 +305,6 @@
 			"revision": "c10c31b5e94b6f7a0283272dc2bb27163dcea24b",
 			"branch": "HEAD",
 			"path": "/ssh",
-			"notests": true
-		},
-		{
-			"importpath": "golang.org/x/crypto/ssh/terminal",
-			"repository": "https://go.googlesource.com/crypto",
-			"vcs": "git",
-			"revision": "c10c31b5e94b6f7a0283272dc2bb27163dcea24b",
-			"branch": "HEAD",
-			"path": "/ssh/terminal",
 			"notests": true
 		},
 		{
