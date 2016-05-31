@@ -22,9 +22,9 @@ func (model Application) HasRoute(route Route) bool {
 	return false
 }
 
-func (model Application) ToParams() (params AppParams) {
+func (model Application) ToParams() AppParams {
 	state := strings.ToUpper(model.State)
-	params = AppParams{
+	params := AppParams{
 		GUID:            &model.GUID,
 		Name:            &model.Name,
 		BuildpackURL:    &model.BuildpackURL,
@@ -43,7 +43,7 @@ func (model Application) ToParams() (params AppParams) {
 		params.StackGUID = &model.Stack.GUID
 	}
 
-	return
+	return params
 }
 
 type ApplicationFields struct {
