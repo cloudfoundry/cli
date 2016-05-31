@@ -40,6 +40,15 @@ func (q SpaceQuota) FormattedAppInstanceLimit() string {
 	return appInstanceLimit
 }
 
+func (q SpaceQuota) FormattedServicesLimit() string {
+	servicesLimit := "unlimited"
+	if q.ServicesLimit != -1 {
+		servicesLimit = strconv.Itoa(q.ServicesLimit)
+	}
+
+	return servicesLimit
+}
+
 type SpaceQuotaResponse struct {
 	GUID                    string      `json:"guid,omitempty"`
 	Name                    string      `json:"name"`
