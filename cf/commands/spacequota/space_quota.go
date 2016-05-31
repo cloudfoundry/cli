@@ -2,7 +2,6 @@ package spacequota
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -81,14 +80,11 @@ func (cmd *SpaceQuota) Execute(c flags.FlagContext) error {
 		megabytes = formatters.ByteSize(spaceQuota.InstanceMemoryLimit * formatters.MEGABYTE)
 	}
 
-	servicesLimit := strconv.Itoa(spaceQuota.ServicesLimit)
-	if servicesLimit == "-1" {
-		servicesLimit = T("unlimited")
 	}
 
 	table.Add(T("instance memory limit"), megabytes)
 	table.Add(T("routes"), fmt.Sprintf("%d", spaceQuota.RoutesLimit))
-	table.Add(T("services"), servicesLimit)
+	table.Add(T("services"), T(spaceQuota.FormattedServicesLimit()))
 	table.Add(T("non basic services"), formatters.Allowed(spaceQuota.NonBasicServicesAllowed))
 	table.Add(T("app instance limit"), T(spaceQuota.FormattedAppInstanceLimit()))
 
