@@ -18,6 +18,14 @@ var _ = Describe("CF Ignore", func() {
 		Expect(ignore.FileShouldBeIgnored("dir1/dir2/dir3/the-file")).To(BeTrue())
 	})
 
+	It("excludes the directories based on relative path matches", func() {
+		ignore := NewCfIgnore(`dir1`)
+		Expect(ignore.FileShouldBeIgnored("dir1")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("dir2/dir1")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("dir3/dir2/dir1")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("dir3/dir1/dir2")).To(BeTrue())
+	})
+
 	It("excludes files based on star patterns", func() {
 		ignore := NewCfIgnore(`dir1/*.so`)
 		Expect(ignore.FileShouldBeIgnored("dir1/file1.so")).To(BeTrue())
