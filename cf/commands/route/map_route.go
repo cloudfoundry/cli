@@ -1,6 +1,7 @@
 package route
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/blang/semver"
@@ -127,7 +128,7 @@ func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd *MapRoute) Execute(c flags.FlagContext) {
+func (cmd *MapRoute) Execute(c flags.FlagContext) error {
 	hostName := c.String("n")
 	path := c.String("path")
 	domain := cmd.domainReq.GetDomain()
@@ -135,9 +136,9 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) {
 
 	port := c.Int("port")
 	randomPort := c.Bool("random-port")
-	route, apiErr := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields())
-	if apiErr != nil {
-		cmd.ui.Failed(T("Error resolving route:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
+	route, err := cmd.routeCreator.CreateRoute(hostName, path, port, randomPort, domain, cmd.config.SpaceFields())
+	if err != nil {
+		return errors.New(T("Error resolving route:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 	cmd.ui.Say(T("Adding route {{.URL}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
@@ -147,11 +148,11 @@ func (cmd *MapRoute) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.routeRepo.Bind(route.GUID, app.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.routeRepo.Bind(route.GUID, app.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

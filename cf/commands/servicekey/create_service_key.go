@@ -81,14 +81,14 @@ func (cmd *CreateServiceKey) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *CreateServiceKey) Execute(c flags.FlagContext) {
+func (cmd *CreateServiceKey) Execute(c flags.FlagContext) error {
 	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
 	serviceKeyName := c.Args()[1]
 	params := c.String("c")
 
 	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+		return errors.New(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
 	cmd.ui.Say(T("Creating service key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -106,6 +106,7 @@ func (cmd *CreateServiceKey) Execute(c flags.FlagContext) {
 		cmd.ui.Ok()
 		cmd.ui.Warn(err.Error())
 	default:
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+	return nil
 }

@@ -53,7 +53,7 @@ var _ = Describe("unbind-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("unbind-security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("unbind-security-group", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

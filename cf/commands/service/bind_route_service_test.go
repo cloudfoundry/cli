@@ -139,14 +139,20 @@ var _ = Describe("BindRouteService", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("domain-name", "service-instance")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 		})
 
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
+		})
+
 		It("tries to find the route", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(routeRepo.FindCallCount()).To(Equal(1))
 			host, domain, path, port := routeRepo.FindArgsForCall(0)
 			Expect(host).To(Equal(""))
@@ -163,7 +169,7 @@ var _ = Describe("BindRouteService", func() {
 			})
 
 			It("tries to find the route with the given hostname", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("the-hostname"))
@@ -189,14 +195,14 @@ var _ = Describe("BindRouteService", func() {
 				})
 
 				It("does not warn", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).NotTo(ContainSubstrings(
 						[]string{"Bind cancelled"},
 					))
 				})
 
 				It("tries to bind the route service", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(1))
 				})
 
@@ -206,7 +212,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -219,7 +225,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -232,11 +238,8 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("fails with the error", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"bind-err"},
-						))
+						Expect(runCLIErr).To(HaveOccurred())
+						Expect(runCLIErr.Error()).To(Equal("bind-err"))
 					})
 				})
 
@@ -249,7 +252,7 @@ var _ = Describe("BindRouteService", func() {
 						err := flagContext.Parse("domain-name", "-f")
 						Expect(err).NotTo(HaveOccurred())
 
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -268,21 +271,21 @@ var _ = Describe("BindRouteService", func() {
 				})
 
 				It("does not ask the user to confirm", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Prompts).NotTo(ContainSubstrings(
 						[]string{"Binding may cause requests for route", "Do you want to proceed?"},
 					))
 				})
 
 				It("tells the user it is binding the route service", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Binding route", "to service instance"},
 					))
 				})
 
 				It("tries to bind the route service", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(1))
 				})
 
@@ -292,7 +295,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -305,7 +308,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -318,13 +321,8 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("fails with the error", func() {
-						defer func() { recover() }()
-						cmd.Execute(flagContext)
-
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"bind-err"},
-						))
+						Expect(runCLIErr).To(HaveOccurred())
+						Expect(runCLIErr.Error()).To(Equal("bind-err"))
 					})
 				})
 			})
@@ -340,14 +338,14 @@ var _ = Describe("BindRouteService", func() {
 				})
 
 				It("does not ask the user to confirm", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Prompts).NotTo(ContainSubstrings(
 						[]string{"Binding may cause requests for route", "Do you want to proceed?"},
 					))
 				})
 
 				It("tries to bind the route service", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(routeServiceBindingRepo.BindCallCount()).To(Equal(1))
 					serviceInstanceGUID, routeGUID, isUserProvided, parameters := routeServiceBindingRepo.BindArgsForCall(0)
 					Expect(serviceInstanceGUID).To(Equal("service-instance-guid"))
@@ -364,7 +362,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("tries to find the route with the given parameters", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(routeRepo.FindCallCount()).To(Equal(1))
 						_, _, _, parameters := routeServiceBindingRepo.BindArgsForCall(0)
 						Expect(parameters).To(Equal(`{"some":"json"}`))
@@ -383,7 +381,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("tries to find the route with the given parameters", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(routeRepo.FindCallCount()).To(Equal(1))
 						_, _, _, parameters := routeServiceBindingRepo.BindArgsForCall(0)
 						Expect(parameters).To(Equal(`{"some":"json"}`))
@@ -396,7 +394,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -409,7 +407,7 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -422,12 +420,8 @@ var _ = Describe("BindRouteService", func() {
 					})
 
 					It("fails with the error", func() {
-						defer func() { recover() }()
-						cmd.Execute(flagContext)
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"bind-err"},
-						))
+						Expect(runCLIErr).To(HaveOccurred())
+						Expect(runCLIErr.Error()).To(Equal("bind-err"))
 					})
 				})
 			})
@@ -439,12 +433,8 @@ var _ = Describe("BindRouteService", func() {
 			})
 
 			It("fails with error", func() {
-				defer func() { recover() }()
-				cmd.Execute(flagContext)
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"find-err"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("find-err"))
 			})
 		})
 	})

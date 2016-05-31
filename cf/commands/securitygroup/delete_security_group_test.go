@@ -40,7 +40,7 @@ var _ = Describe("delete-security-group command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("delete-security-group", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-security-group", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

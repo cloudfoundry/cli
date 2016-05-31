@@ -51,7 +51,7 @@ func (cmd Api) SetDependency(deps commandregistry.Dependency, _ bool) commandreg
 	return cmd
 }
 
-func (cmd Api) Execute(c flags.FlagContext) {
+func (cmd Api) Execute(c flags.FlagContext) error {
 	if c.Bool("unset") {
 		cmd.ui.Say(T("Unsetting api endpoint..."))
 		cmd.config.SetAPIEndpoint("")
@@ -73,15 +73,19 @@ func (cmd Api) Execute(c flags.FlagContext) {
 
 		cmd.ui.Say(T("Setting api endpoint to {{.Endpoint}}...",
 			map[string]interface{}{"Endpoint": terminal.EntityNameColor(endpoint)}))
-		cmd.setAPIEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.MetaData().Name)
+		err := cmd.setAPIEndpoint(endpoint, c.Bool("skip-ssl-validation"), cmd.MetaData().Name)
+		if err != nil {
+			return err
+		}
 		cmd.ui.Ok()
 
 		cmd.ui.Say("")
 		cmd.ui.ShowConfiguration(cmd.config)
 	}
+	return nil
 }
 
-func (cmd Api) setAPIEndpoint(endpoint string, skipSSL bool, cmdName string) {
+func (cmd Api) setAPIEndpoint(endpoint string, skipSSL bool, cmdName string) error {
 	if strings.HasSuffix(endpoint, "/") {
 		endpoint = strings.TrimSuffix(endpoint, "/")
 	}
@@ -104,16 +108,15 @@ func (cmd Api) setAPIEndpoint(endpoint string, skipSSL bool, cmdName string) {
 			cfAPICommand := terminal.CommandColor(fmt.Sprintf("%s %s --skip-ssl-validation", cf.Name, cmdName))
 			tipMessage := fmt.Sprintf(T("TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
 				map[string]interface{}{"APICommand": cfAPICommand}))
-			cmd.ui.Failed(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
+			return errors.New(T("Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
 				map[string]interface{}{"URL": typedErr.URL, "TipMessage": tipMessage}))
-			return
 		default:
-			cmd.ui.Failed(typedErr.Error())
-			return
+			return typedErr
 		}
 	}
 
 	if warning != nil {
 		cmd.ui.Say(terminal.WarningColor(warning.Warn()))
 	}
+	return nil
 }

@@ -60,8 +60,10 @@ func (cmd *UnbindSecurityGroup) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *UnbindSecurityGroup) Execute(context flags.FlagContext) {
+func (cmd *UnbindSecurityGroup) Execute(context flags.FlagContext) error {
 	var spaceGUID string
+	var err error
+
 	secName := context.Args()[0]
 
 	if len(context.Args()) == 1 {
@@ -76,23 +78,27 @@ func (cmd *UnbindSecurityGroup) Execute(context flags.FlagContext) {
 
 		cmd.flavorText(secName, orgName, spaceName)
 
-		spaceGUID = cmd.lookupSpaceGUID(orgName, spaceName)
+		spaceGUID, err = cmd.lookupSpaceGUID(orgName, spaceName)
+		if err != nil {
+			return err
+		}
 	}
 
 	securityGroup, err := cmd.securityGroupRepo.Read(secName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	secGUID := securityGroup.GUID
 
 	err = cmd.secBinder.UnbindSpace(secGUID, spaceGUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
+	return nil
 }
 
 func (cmd UnbindSecurityGroup) flavorText(secName string, orgName string, spaceName string) {
@@ -105,16 +111,16 @@ func (cmd UnbindSecurityGroup) flavorText(secName string, orgName string, spaceN
 		}))
 }
 
-func (cmd UnbindSecurityGroup) lookupSpaceGUID(orgName string, spaceName string) string {
+func (cmd UnbindSecurityGroup) lookupSpaceGUID(orgName string, spaceName string) (string, error) {
 	organization, err := cmd.orgRepo.FindByName(orgName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return "", err
 	}
 	orgGUID := organization.GUID
 
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, orgGUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return "", err
 	}
-	return space.GUID
+	return space.GUID, nil
 }

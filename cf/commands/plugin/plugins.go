@@ -55,7 +55,7 @@ func (cmd *Plugins) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	return cmd
 }
 
-func (cmd *Plugins) Execute(c flags.FlagContext) {
+func (cmd *Plugins) Execute(c flags.FlagContext) error {
 	var version string
 
 	cmd.ui.Say(T("Listing Installed Plugins..."))
@@ -105,4 +105,5 @@ func (cmd *Plugins) Execute(c flags.FlagContext) {
 	cmd.ui.Say("")
 
 	table.Print()
+	return nil
 }

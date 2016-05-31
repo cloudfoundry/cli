@@ -13,12 +13,10 @@ import (
 type RunCommandResult int
 
 const (
-	RunCommandResultSuccess            = iota
-	RunCommandResultFailed             = iota
-	RunCommandResultRequirementsFailed = iota
+	RunCommandResultSuccess = iota
 )
 
-func RunCLICommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool) (passedRequirements bool) {
+func RunCLICommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool, ui *testterm.FakeUI) bool {
 	updateFunc(pluginCall)
 	cmd := commandregistry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -37,21 +35,21 @@ func RunCLICommand(cmdName string, args []string, requirementsFactory *testreq.F
 		}
 	}()
 	requirements := cmd.Requirements(requirementsFactory, context)
-
 	for _, requirement := range requirements {
 		if err = requirement.Execute(); err != nil {
 			return false
 		}
 	}
 
-	passedRequirements = true
+	err = cmd.Execute(context)
+	if err != nil {
+		ui.Failed(err.Error())
+	}
 
-	cmd.Execute(context)
-
-	return
+	return true
 }
 
-func RunCLICommandWithoutDependency(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory) (passedRequirements bool) {
+func RunCLICommandWithoutDependency(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, ui *testterm.FakeUI) bool {
 	cmd := commandregistry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
 	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)
@@ -77,7 +75,10 @@ func RunCLICommandWithoutDependency(cmdName string, args []string, requirementsF
 		}
 	}
 
-	cmd.Execute(context)
+	err = cmd.Execute(context)
+	if err != nil {
+		ui.Failed(err.Error())
+	}
 
 	return true
 }

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -129,14 +130,15 @@ func (cmd *Start) SetDependency(deps commandregistry.Dependency, pluginCall bool
 	return cmd
 }
 
-func (cmd *Start) Execute(c flags.FlagContext) {
-	cmd.ApplicationStart(cmd.appReq.GetApplication(), cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+func (cmd *Start) Execute(c flags.FlagContext) error {
+	_, err := cmd.ApplicationStart(cmd.appReq.GetApplication(), cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+	return err
 }
 
-func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName string) (updatedApp models.Application, err error) {
+func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName string) (models.Application, error) {
 	if app.State == "started" {
 		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already started")))
-		return
+		return models.Application{}, nil
 	}
 
 	return cmd.ApplicationWatchStaging(app, orgName, spaceName, func(app models.Application) (models.Application, error) {
@@ -152,7 +154,7 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 	})
 }
 
-func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
+func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (models.Application, error) {
 	stopChan := make(chan bool, 1)
 
 	loggingStartedWait := &sync.WaitGroup{}
@@ -165,13 +167,15 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 
 	loggingStartedWait.Wait()
 
-	updatedApp, apiErr := start(app)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	updatedApp, err := start(app)
+	if err != nil {
+		return models.Application{}, err
 	}
 
-	isStaged := cmd.waitForInstancesToStage(updatedApp)
+	isStaged, err := cmd.waitForInstancesToStage(updatedApp)
+	if err != nil {
+		return models.Application{}, err
+	}
 
 	stopChan <- true
 
@@ -180,19 +184,21 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	cmd.ui.Say("")
 
 	if !isStaged {
-		cmd.ui.Failed(fmt.Sprintf("%s failed to stage within %f minutes", app.Name, cmd.StagingTimeout.Minutes()))
+		return models.Application{}, fmt.Errorf("%s failed to stage within %f minutes", app.Name, cmd.StagingTimeout.Minutes())
 	}
 
-	cmd.waitForOneRunningInstance(updatedApp)
+	err = cmd.waitForOneRunningInstance(updatedApp)
+	if err != nil {
+		return models.Application{}, err
+	}
 	cmd.ui.Say(terminal.HeaderColor(T("\nApp started\n")))
 	cmd.ui.Say("")
 	cmd.ui.Ok()
 
 	//detectedstartcommand on first push is not present until starting completes
-	startedApp, apiErr := cmd.appRepo.GetApp(updatedApp.GUID)
+	startedApp, err := cmd.appRepo.GetApp(updatedApp.GUID)
 	if err != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return models.Application{}, err
 	}
 
 	var appStartCommand string
@@ -208,9 +214,12 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 			"Command": appStartCommand,
 		}))
 
-	cmd.appDisplayer.ShowApp(startedApp, orgName, spaceName)
+	err = cmd.appDisplayer.ShowApp(startedApp, orgName, spaceName)
+	if err != nil {
+		return models.Application{}, err
+	}
 
-	return
+	return updatedApp, nil
 }
 
 func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
@@ -274,7 +283,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, st
 	}
 }
 
-func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
+func (cmd *Start) waitForInstancesToStage(app models.Application) (bool, error) {
 	stagingStartTime := time.Now()
 
 	var err error
@@ -293,13 +302,13 @@ func (cmd *Start) waitForInstancesToStage(app models.Application) bool {
 	}
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return false, err
 	}
 
 	if app.PackageState == "FAILED" {
 		cmd.ui.Say("")
 		if app.StagingFailedReason == "NoAppDetectedError" {
-			cmd.ui.Failed(T(`{{.Err}}
+			return false, errors.New(T(`{{.Err}}
 			
 TIP: Buildpacks are detected when the "{{.PushCommand}}" is executed from within the directory that contains the app source code.
 
@@ -311,22 +320,21 @@ Use '{{.Command}}' for more in depth log information.`,
 					"PushCommand":      terminal.CommandColor(fmt.Sprintf("%s push", cf.Name)),
 					"BuildpackCommand": terminal.CommandColor(fmt.Sprintf("%s buildpacks", cf.Name)),
 					"Command":          terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
-		} else {
-			cmd.ui.Failed(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-				map[string]interface{}{
-					"Err":     app.StagingFailedReason,
-					"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
 		}
+		return false, errors.New(T("{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
+			map[string]interface{}{
+				"Err":     app.StagingFailedReason,
+				"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
 	}
 
 	if time.Since(stagingStartTime) >= cmd.StagingTimeout {
-		return false
+		return false, nil
 	}
 
-	return true
+	return true, nil
 }
 
-func (cmd *Start) waitForOneRunningInstance(app models.Application) {
+func (cmd *Start) waitForOneRunningInstance(app models.Application) error {
 	timer := time.NewTimer(cmd.StartupTimeout)
 
 	for {
@@ -335,8 +343,7 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 			tipMsg := T("Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.") + "\n\n"
 			tipMsg += T("Use '{{.Command}}' for more information", map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})
 
-			cmd.ui.Failed(tipMsg)
-			return
+			return errors.New(tipMsg)
 
 		default:
 			count, err := cmd.fetchInstanceCount(app.GUID)
@@ -349,13 +356,12 @@ func (cmd *Start) waitForOneRunningInstance(app models.Application) {
 			cmd.ui.Say(instancesDetails(count))
 
 			if count.running > 0 {
-				return
+				return nil
 			}
 
 			if count.flapping > 0 || count.crashed > 0 {
-				cmd.ui.Failed(fmt.Sprintf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-					map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))})))
-				return
+				return fmt.Errorf(T("Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
+					map[string]interface{}{"Command": terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name, app.Name))}))
 			}
 
 			time.Sleep(cmd.PingerThrottle)

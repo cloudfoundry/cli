@@ -223,18 +223,29 @@ var _ = Describe("DeleteRoute", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("domain-name")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 		})
 
-		It("asks the user if they would like to proceed", func() {
-			ui.Inputs = []string{"n"}
-			cmd.Execute(flagContext)
-			Eventually(func() []string { return ui.Prompts }).Should(ContainSubstrings(
-				[]string{"Really delete the route"},
-			))
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
+		Context("when passed -n flag", func() {
+			BeforeEach(func() {
+				ui.Inputs = []string{"n"}
+			})
+
+			It("asks the user if they would like to proceed", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Eventually(func() []string { return ui.Prompts }).Should(ContainSubstrings(
+					[]string{"Really delete the route"},
+				))
+			})
 		})
 
 		Context("when the response is to proceed", func() {
@@ -243,7 +254,7 @@ var _ = Describe("DeleteRoute", func() {
 			})
 
 			It("tries to find the route", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Eventually(routeRepo.FindCallCount()).Should(Equal(1))
 				host, domain, path, port := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal(""))
@@ -260,7 +271,7 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("tries to find the route with the path", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
 					_, _, path, _ := routeRepo.FindArgsForCall(0)
 					Expect(path).To(Equal("the-path"))
@@ -275,7 +286,7 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("tries to find the route with the port", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.FindCallCount()).To(Equal(1))
 					_, _, _, port := routeRepo.FindArgsForCall(0)
 					Expect(port).To(Equal(60000))
@@ -290,7 +301,7 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("tries to delete the route", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.DeleteCallCount()).To(Equal(1))
 					Expect(routeRepo.DeleteArgsForCall(0)).To(Equal("route-guid"))
 				})
@@ -301,7 +312,7 @@ var _ = Describe("DeleteRoute", func() {
 					})
 
 					It("tells the user that it succeeded", func() {
-						cmd.Execute(flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -314,11 +325,8 @@ var _ = Describe("DeleteRoute", func() {
 					})
 
 					It("fails with error", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"delete-err"},
-						))
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(Equal("delete-err"))
 					})
 				})
 			})
@@ -329,15 +337,12 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"find-err"},
-					))
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("find-err"))
 				})
 
 				It("does not try to delete the route", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
+					Expect(err).To(HaveOccurred())
 					Expect(routeRepo.DeleteCallCount()).To(BeZero())
 				})
 			})
@@ -348,14 +353,14 @@ var _ = Describe("DeleteRoute", func() {
 				})
 
 				It("tells the user that it could not delete the route", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Unable to delete, route", "does not exist"},
 					))
 				})
 
 				It("does not try to delete the route", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.DeleteCallCount()).To(BeZero())
 				})
 			})
@@ -368,7 +373,7 @@ var _ = Describe("DeleteRoute", func() {
 			})
 
 			It("does not try to delete the route", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(routeRepo.DeleteCallCount()).To(Equal(0))
 			})
 		})
@@ -380,7 +385,7 @@ var _ = Describe("DeleteRoute", func() {
 			})
 
 			It("does not ask the user if they would like to proceed", func() {
-				go cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Consistently(func() []string { return ui.Prompts }).ShouldNot(ContainSubstrings(
 					[]string{"Really delete the route"},
 				))

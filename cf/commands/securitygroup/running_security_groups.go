@@ -52,14 +52,14 @@ func (cmd *listRunningSecurityGroups) SetDependency(deps commandregistry.Depende
 	return cmd
 }
 
-func (cmd *listRunningSecurityGroups) Execute(context flags.FlagContext) {
+func (cmd *listRunningSecurityGroups) Execute(context flags.FlagContext) error {
 	cmd.ui.Say(T("Acquiring running security groups as '{{.username}}'", map[string]interface{}{
 		"username": terminal.EntityNameColor(cmd.configRepo.Username()),
 	}))
 
 	defaultSecurityGroupsFields, err := cmd.runningSecurityGroupRepo.List()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -72,4 +72,5 @@ func (cmd *listRunningSecurityGroups) Execute(context flags.FlagContext) {
 	} else {
 		cmd.ui.Say(T("No running security groups set"))
 	}
+	return nil
 }

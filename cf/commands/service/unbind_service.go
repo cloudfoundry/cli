@@ -58,7 +58,7 @@ func (cmd *UnbindService) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *UnbindService) Execute(c flags.FlagContext) {
+func (cmd *UnbindService) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
@@ -71,10 +71,9 @@ func (cmd *UnbindService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	found, apiErr := cmd.serviceBindingRepo.Delete(instance, app.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	found, err := cmd.serviceBindingRepo.Delete(instance, app.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -83,5 +82,5 @@ func (cmd *UnbindService) Execute(c flags.FlagContext) {
 		cmd.ui.Warn(T("Binding between {{.InstanceName}} and {{.AppName}} did not exist",
 			map[string]interface{}{"InstanceName": instance.Name, "AppName": app.Name}))
 	}
-
+	return nil
 }

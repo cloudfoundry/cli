@@ -56,12 +56,12 @@ func (cmd *DeleteOrg) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *DeleteOrg) Execute(c flags.FlagContext) {
+func (cmd *DeleteOrg) Execute(c flags.FlagContext) error {
 	orgName := c.Args()[0]
 
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDeleteWithAssociations(T("org"), orgName) {
-			return
+			return nil
 		}
 	}
 
@@ -70,24 +70,22 @@ func (cmd *DeleteOrg) Execute(c flags.FlagContext) {
 			"OrgName":  terminal.EntityNameColor(orgName),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	org, apiErr := cmd.orgRepo.FindByName(orgName)
+	org, err := cmd.orgRepo.FindByName(orgName)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Org {{.OrgName}} does not exist.",
 			map[string]interface{}{"OrgName": orgName}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 	}
 
-	apiErr = cmd.orgRepo.Delete(org.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.orgRepo.Delete(org.GUID)
+	if err != nil {
+		return err
 	}
 
 	if org.GUID == cmd.config.OrganizationFields().GUID {
@@ -96,5 +94,5 @@ func (cmd *DeleteOrg) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
-	return
+	return nil
 }

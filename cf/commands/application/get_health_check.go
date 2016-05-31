@@ -58,8 +58,9 @@ func (cmd *GetHealthCheck) SetDependency(deps commandregistry.Dependency, plugin
 	return cmd
 }
 
-func (cmd *GetHealthCheck) Execute(fc flags.FlagContext) {
+func (cmd *GetHealthCheck) Execute(fc flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	cmd.ui.Say(T("health_check_type is ") + terminal.HeaderColor(app.HealthCheckType))
+	return nil
 }

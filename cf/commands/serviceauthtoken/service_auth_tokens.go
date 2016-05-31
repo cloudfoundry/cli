@@ -60,15 +60,14 @@ func (cmd *ListServiceAuthTokens) SetDependency(deps commandregistry.Dependency,
 	return cmd
 }
 
-func (cmd *ListServiceAuthTokens) Execute(c flags.FlagContext) {
+func (cmd *ListServiceAuthTokens) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting service auth tokens as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
-	authTokens, apiErr := cmd.authTokenRepo.FindAll()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	authTokens, err := cmd.authTokenRepo.FindAll()
+	if err != nil {
+		return err
 	}
 	cmd.ui.Ok()
 	cmd.ui.Say("")
@@ -80,4 +79,5 @@ func (cmd *ListServiceAuthTokens) Execute(c flags.FlagContext) {
 	}
 
 	table.Print()
+	return nil
 }

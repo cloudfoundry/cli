@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -65,21 +66,25 @@ func (cmd *MarketplaceServices) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *MarketplaceServices) Execute(c flags.FlagContext) {
+func (cmd *MarketplaceServices) Execute(c flags.FlagContext) error {
 	serviceName := c.String("s")
 
+	var err error
 	if serviceName != "" {
-		cmd.marketplaceByService(serviceName)
+		err = cmd.marketplaceByService(serviceName)
 	} else {
-		cmd.marketplace()
+		err = cmd.marketplace()
 	}
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
-	var (
-		serviceOffering models.ServiceOffering
-		apiErr          error
-	)
+func (cmd MarketplaceServices) marketplaceByService(serviceName string) error {
+	var serviceOffering models.ServiceOffering
+	var err error
 
 	if cmd.config.HasSpace() {
 		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}} as {{.CurrentUser}}...",
@@ -87,18 +92,16 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
 				"ServiceName": terminal.EntityNameColor(serviceName),
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 			}))
-		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().GUID)
+		serviceOffering, err = cmd.serviceBuilder.GetServiceByNameForSpaceWithPlans(serviceName, cmd.config.SpaceFields().GUID)
 	} else if !cmd.config.IsLoggedIn() {
 		cmd.ui.Say(T("Getting service plan information for service {{.ServiceName}}...", map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
-		serviceOffering, apiErr = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
+		serviceOffering, err = cmd.serviceBuilder.GetServiceByNameWithPlans(serviceName)
 	} else {
-		cmd.ui.Failed(T("Cannot list plan information for {{.ServiceName}} without a targeted space",
+		err = errors.New(T("Cannot list plan information for {{.ServiceName}} without a targeted space",
 			map[string]interface{}{"ServiceName": terminal.EntityNameColor(serviceName)}))
 	}
-
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -106,7 +109,7 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
 
 	if serviceOffering.GUID == "" {
 		cmd.ui.Say(T("Service offering not found"))
-		return
+		return nil
 	}
 
 	table := cmd.ui.Table([]string{T("service plan"), T("description"), T("free or paid")})
@@ -121,13 +124,12 @@ func (cmd MarketplaceServices) marketplaceByService(serviceName string) {
 	}
 
 	table.Print()
+	return nil
 }
 
-func (cmd MarketplaceServices) marketplace() {
-	var (
-		serviceOfferings models.ServiceOfferings
-		apiErr           error
-	)
+func (cmd MarketplaceServices) marketplace() error {
+	var serviceOfferings models.ServiceOfferings
+	var err error
 
 	if cmd.config.HasSpace() {
 		cmd.ui.Say(T("Getting services from marketplace in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -136,17 +138,15 @@ func (cmd MarketplaceServices) marketplace() {
 				"SpaceName":   terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 			}))
-		serviceOfferings, apiErr = cmd.serviceBuilder.GetServicesForSpaceWithPlans(cmd.config.SpaceFields().GUID)
+		serviceOfferings, err = cmd.serviceBuilder.GetServicesForSpaceWithPlans(cmd.config.SpaceFields().GUID)
 	} else if !cmd.config.IsLoggedIn() {
 		cmd.ui.Say(T("Getting all services from marketplace..."))
-		serviceOfferings, apiErr = cmd.serviceBuilder.GetAllServicesWithPlans()
+		serviceOfferings, err = cmd.serviceBuilder.GetAllServicesWithPlans()
 	} else {
-		cmd.ui.Failed(T("Cannot list marketplace services without a targeted space"))
+		err = errors.New(T("Cannot list marketplace services without a targeted space"))
 	}
-
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -154,7 +154,7 @@ func (cmd MarketplaceServices) marketplace() {
 
 	if len(serviceOfferings) == 0 {
 		cmd.ui.Say(T("No service offerings found"))
-		return
+		return nil
 	}
 
 	table := cmd.ui.Table([]string{T("service"), T("plans"), T("description")})
@@ -186,4 +186,5 @@ func (cmd MarketplaceServices) marketplace() {
 		cmd.ui.Say(T("\n* These service plans have an associated cost. Creating a service instance will incur this cost."))
 	}
 	cmd.ui.Say(T("\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service."))
+	return nil
 }

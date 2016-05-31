@@ -55,7 +55,7 @@ func (cmd *RenameApp) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *RenameApp) Execute(c flags.FlagContext) {
+func (cmd *RenameApp) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 	newName := c.Args()[1]
 
@@ -69,10 +69,10 @@ func (cmd *RenameApp) Execute(c flags.FlagContext) {
 
 	params := models.AppParams{Name: &newName}
 
-	_, apiErr := cmd.appRepo.Update(app.GUID, params)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	_, err := cmd.appRepo.Update(app.GUID, params)
+	if err != nil {
+		return err
 	}
 	cmd.ui.Ok()
+	return err
 }

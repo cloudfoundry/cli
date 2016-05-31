@@ -47,7 +47,7 @@ var _ = Describe("delete-user command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("delete-user", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-user", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

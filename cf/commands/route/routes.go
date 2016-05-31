@@ -1,6 +1,7 @@
 package route
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -66,7 +67,7 @@ func (cmd *ListRoutes) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *ListRoutes) Execute(c flags.FlagContext) {
+func (cmd *ListRoutes) Execute(c flags.FlagContext) error {
 	orglevel := c.Bool("orglevel")
 
 	if orglevel {
@@ -92,7 +93,7 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 		return true
 	})
 	if err != nil {
-		cmd.ui.Failed(T("Failed fetching domains for organization %s.\n{{.Err}}", cmd.config.OrganizationFields().Name, map[string]interface{}{"Err": err.Error()}))
+		return errors.New(T("Failed fetching domains for organization %s.\n{{.Err}}", cmd.config.OrganizationFields().Name, map[string]interface{}{"Err": err.Error()}))
 	}
 
 	var routesFound bool
@@ -131,10 +132,11 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) {
 
 	table.Print()
 	if err != nil {
-		cmd.ui.Failed(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
+		return errors.New(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
 	if !routesFound {
 		cmd.ui.Say(T("No routes found"))
 	}
+	return nil
 }

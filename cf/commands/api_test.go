@@ -30,13 +30,14 @@ var _ = Describe("Api", func() {
 		cmd                 commands.Api
 		flagContext         flags.FlagContext
 		repoLocator         api.RepositoryLocator
+		runCLIErr           error
 	)
 
 	callApi := func(args []string) {
 		err := flagContext.Parse(args...)
 		Expect(err).NotTo(HaveOccurred())
 
-		cmd.Execute(flagContext)
+		runCLIErr = cmd.Execute(flagContext)
 	}
 
 	BeforeEach(func() {
@@ -73,18 +74,11 @@ var _ = Describe("Api", func() {
 		It("warns the user and prints out a tip", func() {
 			endpointRepo.GetCCInfoReturns(nil, "", errors.NewInvalidSSLCert("https://buttontomatoes.org", "why? no. go away"))
 
-			err := flagContext.Parse("https://buttontomatoes.org")
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(func() {
-				cmd.Execute(flagContext)
-			}).To(Panic())
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"FAILED"},
-				[]string{"SSL Cert", "https://buttontomatoes.org"},
-				[]string{"TIP", "--skip-ssl-validation"},
-			))
+			callApi([]string{"https://buttontomatoes.org"})
+			Expect(runCLIErr).To(HaveOccurred())
+			Expect(runCLIErr.Error()).To(ContainSubstring("Invalid SSL Cert for https://buttontomatoes.org"))
+			Expect(runCLIErr.Error()).To(ContainSubstring("TIP"))
+			Expect(runCLIErr.Error()).To(ContainSubstring("--skip-ssl-validation"))
 		})
 	})
 
@@ -209,18 +203,13 @@ var _ = Describe("Api", func() {
 			})
 
 			It("fails and gives the user a helpful message about skipping", func() {
-				err := flagContext.Parse("https://example.com")
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(func() {
-					cmd.Execute(flagContext)
-				}).To(Panic())
+				callApi([]string{"https://example.com"})
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(ContainSubstring("Invalid SSL Cert"))
+				Expect(runCLIErr.Error()).To(ContainSubstring("https://example.com"))
+				Expect(runCLIErr.Error()).To(ContainSubstring("TIP"))
 
 				Expect(config.APIEndpoint()).To(Equal(""))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Invalid SSL Cert", "https://example.com"},
-					[]string{"TIP", "api"},
-				))
 			})
 		})
 

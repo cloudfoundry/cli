@@ -39,7 +39,7 @@ var _ = Describe("rename-space command", func() {
 	})
 
 	var callRenameSpace = func(args []string) bool {
-		return testcmd.RunCLICommand("rename-space", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-space", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("when the user is not logged in", func() {

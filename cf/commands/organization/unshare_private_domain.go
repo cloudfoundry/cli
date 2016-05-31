@@ -56,14 +56,13 @@ func (cmd *UnsharePrivateDomain) SetDependency(deps commandregistry.Dependency, 
 	return cmd
 }
 
-func (cmd *UnsharePrivateDomain) Execute(c flags.FlagContext) {
+func (cmd *UnsharePrivateDomain) Execute(c flags.FlagContext) error {
 	org := cmd.orgReq.GetOrganization()
 	domainName := c.Args()[1]
 	domain, err := cmd.domainRepo.FindPrivateByName(domainName)
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Say(T("Unsharing domain {{.DomainName}} from org {{.OrgName}} as {{.Username}}...",
@@ -74,9 +73,9 @@ func (cmd *UnsharePrivateDomain) Execute(c flags.FlagContext) {
 
 	err = cmd.orgRepo.UnsharePrivateDomain(org.GUID, domain.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

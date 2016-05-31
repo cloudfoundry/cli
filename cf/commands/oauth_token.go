@@ -50,10 +50,10 @@ func (cmd *OAuthToken) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *OAuthToken) Execute(c flags.FlagContext) {
+func (cmd *OAuthToken) Execute(c flags.FlagContext) error {
 	token, err := cmd.authRepo.RefreshAuthToken()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	if cmd.pluginCall {
@@ -61,4 +61,5 @@ func (cmd *OAuthToken) Execute(c flags.FlagContext) {
 	} else {
 		cmd.ui.Say(token)
 	}
+	return nil
 }

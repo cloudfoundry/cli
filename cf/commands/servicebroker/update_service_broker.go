@@ -49,11 +49,10 @@ func (cmd *UpdateServiceBroker) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *UpdateServiceBroker) Execute(c flags.FlagContext) {
-	serviceBroker, apiErr := cmd.repo.FindByName(c.Args()[0])
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+func (cmd *UpdateServiceBroker) Execute(c flags.FlagContext) error {
+	serviceBroker, err := cmd.repo.FindByName(c.Args()[0])
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say(T("Updating service broker {{.Name}} as {{.Username}}...",
@@ -65,12 +64,12 @@ func (cmd *UpdateServiceBroker) Execute(c flags.FlagContext) {
 	serviceBroker.Password = c.Args()[2]
 	serviceBroker.URL = c.Args()[3]
 
-	apiErr = cmd.repo.Update(serviceBroker)
+	err = cmd.repo.Update(serviceBroker)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

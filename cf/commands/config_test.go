@@ -34,7 +34,7 @@ var _ = Describe("config command", func() {
 	})
 
 	runCommand := func(args ...string) {
-		testcmd.RunCLICommand("config", args, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("config", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 	It("fails requirements when no flags are provided", func() {
 		runCommand()

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -44,7 +45,7 @@ func (cmd *Help) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	return cmd
 }
 
-func (cmd *Help) Execute(c flags.FlagContext) {
+func (cmd *Help) Execute(c flags.FlagContext) error {
 	if len(c.Args()) == 0 {
 		help.ShowHelp(cmd.ui.Writer(), help.GetHelpTemplate())
 	} else {
@@ -92,8 +93,9 @@ func (cmd *Help) Execute(c flags.FlagContext) {
 			}
 
 			if !found {
-				cmd.ui.Failed("'" + cmdName + "' is not a registered command. See 'cf help'")
+				return errors.New("'" + cmdName + "' is not a registered command. See 'cf help'")
 			}
 		}
 	}
+	return nil
 }

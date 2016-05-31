@@ -39,7 +39,7 @@ var _ = Describe("update-service-broker command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("update-service-broker", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-service-broker", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

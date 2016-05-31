@@ -96,7 +96,7 @@ func (cmd *BindRouteService) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *BindRouteService) Execute(c flags.FlagContext) {
+func (cmd *BindRouteService) Execute(c flags.FlagContext) error {
 	var path string
 	var port int
 
@@ -108,14 +108,14 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 	if c.IsSet("parameters") {
 		jsonBytes, err := util.GetContentsFromFlagValue(c.String("parameters"))
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		parameters = string(jsonBytes)
 	}
 
 	route, err := cmd.routeRepo.Find(host, domain, path, port)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
@@ -138,9 +138,10 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) {
 					"ServiceInstanceName": serviceInstance.Name,
 				}))
 		} else {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

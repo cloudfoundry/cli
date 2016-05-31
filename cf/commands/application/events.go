@@ -1,6 +1,8 @@
 package application
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/appevents"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -55,7 +57,7 @@ func (cmd *Events) SetDependency(deps commandregistry.Dependency, pluginCall boo
 	return cmd
 }
 
-func (cmd *Events) Execute(c flags.FlagContext) {
+func (cmd *Events) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	cmd.ui.Say(T("Getting events for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
@@ -67,11 +69,10 @@ func (cmd *Events) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{T("time"), T("event"), T("actor"), T("description")})
 
-	events, apiErr := cmd.eventsRepo.RecentEvents(app.GUID, 50)
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching events.\n{{.APIErr}}",
-			map[string]interface{}{"APIErr": apiErr.Error()}))
-		return
+	events, err := cmd.eventsRepo.RecentEvents(app.GUID, 50)
+	if err != nil {
+		return errors.New(T("Failed fetching events.\n{{.APIErr}}",
+			map[string]interface{}{"APIErr": err.Error()}))
 	}
 
 	for _, event := range events {
@@ -93,6 +94,7 @@ func (cmd *Events) Execute(c flags.FlagContext) {
 	if len(events) == 0 {
 		cmd.ui.Say(T("No events for app {{.AppName}}",
 			map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
-		return
+		return nil
 	}
+	return nil
 }

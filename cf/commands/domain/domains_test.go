@@ -146,22 +146,28 @@ var _ = Describe("ListDomains", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		It("prints getting domains message", func() {
-			cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Getting domains in org my-org"},
 			))
 		})
 
 		It("tries to get the list of domains for org", func() {
-			cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(domainRepo.ListDomainsForOrgCallCount()).To(Equal(1))
 			orgGUID, _ := domainRepo.ListDomainsForOrgArgsForCall(0)
 			Expect(orgGUID).To(Equal("my-org-guid"))
 		})
 
 		It("prints no domains found message", func() {
-			cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(ui.Outputs).To(BeInDisplayOrder(
 				[]string{"name", "status"},
 				[]string{"No domains found"},
@@ -174,12 +180,9 @@ var _ = Describe("ListDomains", func() {
 			})
 
 			It("fails with message", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Failed fetching domains."},
-					[]string{"org-domain-err"},
-				))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Failed fetching domains."))
+				Expect(err.Error()).To(ContainSubstring("org-domain-err"))
 			})
 		})
 
@@ -198,14 +201,14 @@ var _ = Describe("ListDomains", func() {
 			})
 
 			It("does not print no domains found message", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).NotTo(ContainSubstrings(
 					[]string{"No domains found"},
 				))
 			})
 
 			It("prints the domain information", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(BeInDisplayOrder(
 					[]string{"name", "status", "type"},
 					[]string{"Shared-domain1", "shared"},

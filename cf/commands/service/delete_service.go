@@ -56,12 +56,12 @@ func (cmd *DeleteService) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *DeleteService) Execute(c flags.FlagContext) {
+func (cmd *DeleteService) Execute(c flags.FlagContext) error {
 	serviceName := c.Args()[0]
 
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDelete(T("service"), serviceName) {
-			return
+			return nil
 		}
 	}
 
@@ -73,27 +73,26 @@ func (cmd *DeleteService) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
+	instance, err := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Service {{.ServiceName}} does not exist.", map[string]interface{}{"ServiceName": serviceName}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 	}
 
-	apiErr = cmd.serviceRepo.DeleteService(instance)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.serviceRepo.DeleteService(instance)
+	if err != nil {
+		return err
 	}
 
-	apiErr = printSuccessMessageForServiceInstance(serviceName, cmd.serviceRepo, cmd.ui)
-	if apiErr != nil {
+	err = printSuccessMessageForServiceInstance(serviceName, cmd.serviceRepo, cmd.ui)
+	if err != nil {
 		cmd.ui.Ok()
 	}
+	return nil
 }

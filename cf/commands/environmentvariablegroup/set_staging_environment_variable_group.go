@@ -1,6 +1,8 @@
 package environmentvariablegroup
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -50,7 +52,7 @@ func (cmd *SetStagingEnvironmentVariableGroup) SetDependency(deps commandregistr
 	return cmd
 }
 
-func (cmd *SetStagingEnvironmentVariableGroup) Execute(c flags.FlagContext) {
+func (cmd *SetStagingEnvironmentVariableGroup) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Setting the contents of the staging environment variable group as {{.Username}}...", map[string]interface{}{
 		"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
@@ -64,8 +66,9 @@ func (cmd *SetStagingEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 
 Your JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{"name":"value","name":"value"}'`)
 		}
-		cmd.ui.Failed(err.Error() + suggestionText)
+		return errors.New(err.Error() + suggestionText)
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

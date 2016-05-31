@@ -95,7 +95,7 @@ var _ = Describe("list-apps command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("apps", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("apps", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {
@@ -158,7 +158,7 @@ var _ = Describe("list-apps command", func() {
 		})
 
 		It("populates the plugin models upon execution", func() {
-			testcmd.RunCLICommand("apps", []string{}, requirementsFactory, updateCommandDependency, true)
+			testcmd.RunCLICommand("apps", []string{}, requirementsFactory, updateCommandDependency, true, ui)
 
 			Expect(pluginAppModels[0].Name).To(Equal("Application-1"))
 			Expect(pluginAppModels[0].Guid).To(Equal("Application-1-guid"))

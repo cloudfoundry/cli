@@ -37,4 +37,6 @@ func (binder *OldFakeAppBinder) Requirements(_ requirements.Factory, _ flags.Fla
 	return []requirements.Requirement{}
 }
 
-func (binder *OldFakeAppBinder) Execute(_ flags.FlagContext) {}
+func (binder *OldFakeAppBinder) Execute(_ flags.FlagContext) error {
+	return nil
+}

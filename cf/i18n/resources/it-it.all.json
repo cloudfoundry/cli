@@ -1736,6 +1736,10 @@
     "translation": "Errore durante l'eliminazione del dominio {{.DomainName}}\n{{.APIErr}}"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "Errore durante la disabilitazione del supporto ssh per "
   },
@@ -1770,6 +1774,10 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
     "translation": "Errore durante la ricerca del dominio {{.DomainName}}\n{{.APIErr}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
+    "translation": ""
   },
   {
     "id": "Error finding manifest",

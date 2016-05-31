@@ -66,10 +66,10 @@ func (cmd *ServiceAccess) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *ServiceAccess) Execute(c flags.FlagContext) {
+func (cmd *ServiceAccess) Execute(c flags.FlagContext) error {
 	_, err := cmd.tokenRefresher.RefreshAuthToken()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	brokerName := c.String("b")
@@ -116,10 +116,10 @@ func (cmd *ServiceAccess) Execute(c flags.FlagContext) {
 
 	brokers, err := cmd.actor.FilterBrokers(brokerName, serviceName, orgName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 	cmd.printTable(brokers)
+	return nil
 }
 
 func (cmd ServiceAccess) printTable(brokers []models.ServiceBroker) {

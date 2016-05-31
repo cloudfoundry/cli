@@ -53,13 +53,13 @@ func (cmd *RunningEnvironmentVariableGroup) SetDependency(deps commandregistry.D
 	return cmd
 }
 
-func (cmd *RunningEnvironmentVariableGroup) Execute(c flags.FlagContext) {
+func (cmd *RunningEnvironmentVariableGroup) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Retrieving the contents of the running environment variable group as {{.Username}}...", map[string]interface{}{
 		"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	runningEnvVars, err := cmd.environmentVariableGroupRepo.ListRunning()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -69,4 +69,5 @@ func (cmd *RunningEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 		table.Add(envVar.Name, envVar.Value)
 	}
 	table.Print()
+	return nil
 }

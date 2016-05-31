@@ -137,15 +137,21 @@ var _ = Describe("UnbindRouteService", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("domain-name", "service-instance")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
+			ui.Inputs = []string{"n"}
+		})
+
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
 		})
 
 		It("tries to find the route", func() {
-			ui.Inputs = []string{"n"}
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(routeRepo.FindCallCount()).To(Equal(1))
 			host, domain, path, port := routeRepo.FindArgsForCall(0)
 			Expect(host).To(Equal(""))
@@ -159,11 +165,11 @@ var _ = Describe("UnbindRouteService", func() {
 				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 				err := flagContext.Parse("domain-name", "service-instance", "-n", "the-hostname")
 				Expect(err).NotTo(HaveOccurred())
+				ui.Inputs = []string{"n"}
 			})
 
 			It("tries to find the route with the given hostname", func() {
-				ui.Inputs = []string{"n"}
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("the-hostname"))
@@ -173,36 +179,37 @@ var _ = Describe("UnbindRouteService", func() {
 		Context("when the route can be found", func() {
 			BeforeEach(func() {
 				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)
+				ui.Inputs = []string{"n"}
 			})
 
 			It("asks the user to confirm", func() {
-				ui.Inputs = []string{"n"}
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Prompts).To(ContainSubstrings(
 					[]string{"Unbinding may leave apps mapped to route", "Do you want to proceed?"},
 				))
 			})
 
 			Context("when the user confirms", func() {
-				JustBeforeEach(func() {
-					defer func() { recover() }()
+				BeforeEach(func() {
 					ui.Inputs = []string{"y"}
-					cmd.Execute(flagContext)
 				})
 
 				It("does not warn", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(func() []string { return ui.Outputs }).NotTo(ContainSubstrings(
 						[]string{"Unbind cancelled"},
 					))
 				})
 
 				It("tells the user it is unbinding the route service", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Unbinding route", "from service instance"},
 					))
 				})
 
 				It("tries to unbind the route service", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(1))
 				})
 
@@ -212,6 +219,7 @@ var _ = Describe("UnbindRouteService", func() {
 					})
 
 					It("says OK", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
@@ -224,12 +232,14 @@ var _ = Describe("UnbindRouteService", func() {
 					})
 
 					It("says OK", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"OK"},
 						))
 					})
 
 					It("warns", func() {
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"Route", "was not bound to service instance"},
 						))
@@ -242,10 +252,8 @@ var _ = Describe("UnbindRouteService", func() {
 					})
 
 					It("fails with the error", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"unbind-err"},
-						))
+						Expect(runCLIErr).To(HaveOccurred())
+						Expect(runCLIErr.Error()).To(Equal("unbind-err"))
 					})
 				})
 			})
@@ -253,16 +261,17 @@ var _ = Describe("UnbindRouteService", func() {
 			Context("when the user does not confirm", func() {
 				BeforeEach(func() {
 					ui.Inputs = []string{"n"}
-					cmd.Execute(flagContext)
 				})
 
 				It("warns", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Unbind cancelled"},
 					))
 				})
 
 				It("does not bind the route service", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(routeServiceBindingRepo.UnbindCallCount()).To(Equal(0))
 				})
 			})
@@ -274,7 +283,7 @@ var _ = Describe("UnbindRouteService", func() {
 				})
 
 				It("does not ask the user to confirm", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Prompts).NotTo(ContainSubstrings(
 						[]string{"Unbinding may leave apps mapped to route", "Do you want to proceed?"},
 					))
@@ -288,12 +297,8 @@ var _ = Describe("UnbindRouteService", func() {
 			})
 
 			It("fails with error", func() {
-				defer func() { recover() }()
-				cmd.Execute(flagContext)
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"find-err"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("find-err"))
 			})
 		})
 	})

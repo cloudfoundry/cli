@@ -54,10 +54,10 @@ func (cmd *DeleteServiceBroker) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *DeleteServiceBroker) Execute(c flags.FlagContext) {
+func (cmd *DeleteServiceBroker) Execute(c flags.FlagContext) error {
 	brokerName := c.Args()[0]
 	if !c.Bool("f") && !cmd.ui.ConfirmDelete(T("service-broker"), brokerName) {
-		return
+		return nil
 	}
 
 	cmd.ui.Say(T("Deleting service broker {{.Name}} as {{.Username}}...",
@@ -66,25 +66,23 @@ func (cmd *DeleteServiceBroker) Execute(c flags.FlagContext) {
 			"Username": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	broker, apiErr := cmd.repo.FindByName(brokerName)
+	broker, err := cmd.repo.FindByName(brokerName)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Service Broker {{.Name}} does not exist.", map[string]interface{}{"Name": brokerName}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 	}
 
-	apiErr = cmd.repo.Delete(broker.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.repo.Delete(broker.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
-	return
+	return nil
 }

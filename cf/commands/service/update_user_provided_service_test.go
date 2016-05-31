@@ -114,10 +114,16 @@ var _ = Describe("UpdateUserProvidedService", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("service-instance")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
+		})
+
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
 		})
 
 		Context("when the service instance is not user-provided", func() {
@@ -130,43 +136,42 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Service Instance is not user provided"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
 			})
 		})
 
 		Context("when the service instance is user-provided", func() {
 			var serviceInstance models.ServiceInstance
+
 			BeforeEach(func() {
 				serviceInstance = models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{
+						Name:   "service-instance",
+						Params: map[string]interface{}{},
+					},
 					ServicePlan: models.ServicePlanFields{
 						GUID:        "",
 						Description: "service-plan-description",
 					},
 				}
-				serviceInstance.Name = "service-instance"
-				serviceInstance.Params = map[string]interface{}{}
 				serviceInstanceRequirement.GetServiceInstanceReturns(serviceInstance)
 			})
 
 			It("tells the user it is updating the user provided service", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Updating user provided service service-instance in org"},
 				))
 			})
 
 			It("tries to update the service instance", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
 				Expect(serviceInstanceRepo.UpdateArgsForCall(0)).To(Equal(serviceInstance.ServiceInstanceFields))
 			})
 
 			It("tells the user no changes were made", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"No flags specified. No changes were made."},
 				))
@@ -178,7 +183,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 				})
 
 				It("tries to update the user provided service instance with the credentials", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
 					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
 					Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
@@ -197,7 +202,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 				})
 
 				It("tries to update the user provided service instance with the credentials", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
 					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
 					Expect(serviceInstanceFields.Params).To(Equal(map[string]interface{}{
@@ -209,11 +214,11 @@ var _ = Describe("UpdateUserProvidedService", func() {
 			Context("when the -p flag is passed with inline JSON", func() {
 				BeforeEach(func() {
 					flagContext.Parse("service-instance", "-p", `key1,key2`)
+					ui.Inputs = []string{"value1", "value2"}
 				})
 
 				It("prompts the user for the values", func() {
-					ui.Inputs = []string{"value1", "value2"}
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Prompts).To(ContainSubstrings(
 						[]string{"key1"},
 						[]string{"key2"},
@@ -221,8 +226,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 				})
 
 				It("tries to update the user provided service instance with the credentials", func() {
-					ui.Inputs = []string{"value1", "value2"}
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 
 					Expect(serviceInstanceRepo.UpdateCallCount()).To(Equal(1))
 					serviceInstanceFields := serviceInstanceRepo.UpdateArgsForCall(0)
@@ -239,14 +243,14 @@ var _ = Describe("UpdateUserProvidedService", func() {
 				})
 
 				It("tells the user OK", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 				})
 
 				It("prints a tip", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"TIP"},
 					))
@@ -259,11 +263,8 @@ var _ = Describe("UpdateUserProvidedService", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"update-err"},
-					))
+					Expect(runCLIErr).To(HaveOccurred())
+					Expect(runCLIErr.Error()).To(Equal("update-err"))
 				})
 			})
 		})

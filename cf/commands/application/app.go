@@ -23,7 +23,7 @@ import (
 //go:generate counterfeiter . ApplicationDisplayer
 
 type ApplicationDisplayer interface {
-	ShowApp(app models.Application, orgName string, spaceName string)
+	ShowApp(app models.Application, orgName string, spaceName string) error
 }
 
 type ShowApp struct {
@@ -82,17 +82,21 @@ func (cmd *ShowApp) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	return cmd
 }
 
-func (cmd *ShowApp) Execute(c flags.FlagContext) {
+func (cmd *ShowApp) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	if c.Bool("guid") {
 		cmd.ui.Say(app.GUID)
 	} else {
-		cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+		err := cmd.ShowApp(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
+func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) error {
 	cmd.ui.Say(T("Showing health and status for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"AppName":   terminal.EntityNameColor(app.Name),
@@ -100,30 +104,27 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 			"SpaceName": terminal.EntityNameColor(spaceName),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	application, apiErr := cmd.appSummaryRepo.GetSummary(app.GUID)
+	application, err := cmd.appSummaryRepo.GetSummary(app.GUID)
 
 	appIsStopped := (application.State == "stopped")
-	if err, ok := apiErr.(errors.HTTPError); ok {
+	if err, ok := err.(errors.HTTPError); ok {
 		if err.ErrorCode() == errors.InstancesError || err.ErrorCode() == errors.NotStaged {
 			appIsStopped = true
 		}
 	}
 
-	if apiErr != nil && !appIsStopped {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil && !appIsStopped {
+		return err
 	}
 
 	var instances []models.AppInstanceFields
-	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.GUID)
-	if apiErr != nil && !appIsStopped {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	instances, err = cmd.appInstancesRepo.GetInstances(app.GUID)
+	if err != nil && !appIsStopped {
+		return err
 	}
 
-	if apiErr != nil && !appIsStopped {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil && !appIsStopped {
+		return err
 	}
 
 	if cmd.pluginCall {
@@ -179,7 +180,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 
 	if appIsStopped {
 		cmd.ui.Say(T("There are no running instances of this app."))
-		return
+		return nil
 	}
 
 	table := cmd.ui.Table([]string{"", T("state"), T("since"), T("cpu"), T("memory"), T("disk"), T("details")})
@@ -203,6 +204,7 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) {
 	}
 
 	table.Print()
+	return nil
 }
 
 func (cmd *ShowApp) populatePluginModel(

@@ -54,12 +54,12 @@ func (cmd *DeleteUser) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *DeleteUser) Execute(c flags.FlagContext) {
+func (cmd *DeleteUser) Execute(c flags.FlagContext) error {
 	username := c.Args()[0]
 	force := c.Bool("f")
 
 	if !force && !cmd.ui.ConfirmDelete(T("user"), username) {
-		return
+		return nil
 	}
 
 	cmd.ui.Say(T("Deleting user {{.TargetUser}} as {{.CurrentUser}}...",
@@ -68,23 +68,22 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	user, apiErr := cmd.userRepo.FindByUsername(username)
-	switch apiErr.(type) {
+	user, err := cmd.userRepo.FindByUsername(username)
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("User {{.TargetUser}} does not exist.", map[string]interface{}{"TargetUser": username}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 	}
 
-	apiErr = cmd.userRepo.Delete(user.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.userRepo.Delete(user.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

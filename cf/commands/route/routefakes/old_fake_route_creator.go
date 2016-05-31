@@ -78,6 +78,8 @@ func (cmd *OldFakeRouteCreator) Requirements(_ requirements.Factory, _ flags.Fla
 	return []requirements.Requirement{}
 }
 
-func (cmd *OldFakeRouteCreator) Execute(_ flags.FlagContext) {}
+func (cmd *OldFakeRouteCreator) Execute(_ flags.FlagContext) error {
+	return nil
+}
 
 var _ route.RouteCreator = new(OldFakeRouteCreator)

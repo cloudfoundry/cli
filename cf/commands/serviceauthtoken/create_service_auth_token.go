@@ -57,7 +57,7 @@ func (cmd *CreateServiceAuthTokenFields) SetDependency(deps commandregistry.Depe
 	return cmd
 }
 
-func (cmd *CreateServiceAuthTokenFields) Execute(c flags.FlagContext) {
+func (cmd *CreateServiceAuthTokenFields) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Creating service auth token as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
@@ -69,11 +69,11 @@ func (cmd *CreateServiceAuthTokenFields) Execute(c flags.FlagContext) {
 		Token:    c.Args()[2],
 	}
 
-	apiErr := cmd.authTokenRepo.Create(serviceAuthTokenRepo)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err := cmd.authTokenRepo.Create(serviceAuthTokenRepo)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

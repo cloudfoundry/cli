@@ -43,7 +43,7 @@ var _ = Describe("unset-space-quota command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("unset-space-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("unset-space-quota", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("fails with usage when provided too many or two few args", func() {

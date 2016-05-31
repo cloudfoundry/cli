@@ -51,12 +51,12 @@ func (cmd *bindToStagingGroup) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *bindToStagingGroup) Execute(context flags.FlagContext) {
+func (cmd *bindToStagingGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Binding security group {{.security_group}} to staging as {{.username}}",
@@ -67,8 +67,9 @@ func (cmd *bindToStagingGroup) Execute(context flags.FlagContext) {
 
 	err = cmd.stagingGroupRepo.BindToStagingSet(securityGroup.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

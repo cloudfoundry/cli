@@ -18,7 +18,6 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -96,14 +95,20 @@ var _ = Describe("V3Apps", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			cmd.Requirements(factory, flagContext)
 			repository.GetProcessesReturns([]models.V3Process{{Type: "web"}, {Type: "web"}}, nil)
 			repository.GetRoutesReturns([]models.V3Route{{}, {}}, nil)
 		})
 
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
+		})
+
 		It("attemps to get applications for the targeted space", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(repository.GetApplicationsCallCount()).To(Equal(1))
 		})
 
@@ -140,7 +145,7 @@ var _ = Describe("V3Apps", func() {
 			})
 
 			It("tries to get the processes for each application", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(repository.GetProcessesCallCount()).To(Equal(2))
 				calls := make([]string, repository.GetProcessesCallCount())
 				for i := range calls {
@@ -176,7 +181,7 @@ var _ = Describe("V3Apps", func() {
 				})
 
 				It("tries to get the routes for each application", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(repository.GetRoutesCallCount()).To(Equal(2))
 					calls := make([]string, repository.GetRoutesCallCount())
 					for i := range calls {
@@ -212,7 +217,7 @@ var _ = Describe("V3Apps", func() {
 					})
 
 					It("prints a table of the results", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						outputs := make([]string, len(ui.Outputs))
 						for i := range ui.Outputs {
 							outputs[i] = terminal.Decolorize(ui.Outputs[i])
@@ -231,11 +236,8 @@ var _ = Describe("V3Apps", func() {
 					})
 
 					It("fails with error", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"get-routes-err"},
-						))
+						Expect(runCLIErr).To(HaveOccurred())
+						Expect(runCLIErr.Error()).To(Equal("get-routes-err"))
 					})
 				})
 			})
@@ -259,11 +261,8 @@ var _ = Describe("V3Apps", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"get-processes-err"},
-					))
+					Expect(runCLIErr).To(HaveOccurred())
+					Expect(runCLIErr.Error()).To(Equal("get-processes-err"))
 				})
 			})
 		})
@@ -274,11 +273,8 @@ var _ = Describe("V3Apps", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"get-applications-err"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("get-applications-err"))
 			})
 		})
 	})

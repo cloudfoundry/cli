@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
@@ -78,7 +79,7 @@ func (cmd *CopySource) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *CopySource) Execute(c flags.FlagContext) {
+func (cmd *CopySource) Execute(c flags.FlagContext) error {
 	sourceAppName := c.Args()[0]
 	targetAppName := c.Args()[1]
 
@@ -86,28 +87,33 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 	targetSpace := c.String("s")
 
 	if targetOrg != "" && targetSpace == "" {
-		cmd.ui.Failed(T("Please provide the space within the organization containing the target application"))
+		return errors.New(T("Please provide the space within the organization containing the target application"))
 	}
 
-	_, apiErr := cmd.authRepo.RefreshAuthToken()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	_, err := cmd.authRepo.RefreshAuthToken()
+	if err != nil {
+		return err
 	}
 
-	sourceApp, apiErr := cmd.appRepo.Read(sourceAppName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	sourceApp, err := cmd.appRepo.Read(sourceAppName)
+	if err != nil {
+		return err
 	}
 
 	var targetOrgName, targetSpaceName, spaceGUID, copyStr string
 	if targetOrg != "" && targetSpace != "" {
-		spaceGUID = cmd.findSpaceGUID(targetOrg, targetSpace)
+		spaceGUID, err = cmd.findSpaceGUID(targetOrg, targetSpace)
+		if err != nil {
+			return err
+		}
+
 		targetOrgName = targetOrg
 		targetSpaceName = targetSpace
 	} else if targetSpace != "" {
-		space, err := cmd.spaceRepo.FindByName(targetSpace)
+		var space models.Space
+		space, err = cmd.spaceRepo.FindByName(targetSpace)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		spaceGUID = space.GUID
 		targetOrgName = cmd.config.OrganizationFields().Name
@@ -120,18 +126,18 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 
 	copyStr = buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, cmd.config.Username())
 
-	targetApp, apiErr := cmd.appRepo.ReadFromSpace(targetAppName, spaceGUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	targetApp, err := cmd.appRepo.ReadFromSpace(targetAppName, spaceGUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say(copyStr)
 	cmd.ui.Say(T("Note: this may take some time"))
 	cmd.ui.Say("")
 
-	apiErr = cmd.copyAppSourceRepo.CopyApplication(sourceApp.GUID, targetApp.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err = cmd.copyAppSourceRepo.CopyApplication(sourceApp.GUID, targetApp.GUID)
+	if err != nil {
+		return err
 	}
 
 	if !c.Bool("no-restart") {
@@ -139,12 +145,13 @@ func (cmd *CopySource) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
+	return nil
 }
 
-func (cmd *CopySource) findSpaceGUID(targetOrg, targetSpace string) string {
+func (cmd *CopySource) findSpaceGUID(targetOrg, targetSpace string) (string, error) {
 	org, err := cmd.orgRepo.FindByName(targetOrg)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return "", err
 	}
 
 	var space models.SpaceFields
@@ -157,15 +164,15 @@ func (cmd *CopySource) findSpaceGUID(targetOrg, targetSpace string) string {
 	}
 
 	if !foundSpace {
-		cmd.ui.Failed(fmt.Sprintf(T("Could not find space {{.Space}} in organization {{.Org}}",
+		return "", fmt.Errorf(T("Could not find space {{.Space}} in organization {{.Org}}",
 			map[string]interface{}{
 				"Space": terminal.EntityNameColor(targetSpace),
 				"Org":   terminal.EntityNameColor(targetOrg),
 			},
-		)))
+		))
 	}
 
-	return space.GUID
+	return space.GUID, nil
 }
 
 func buildCopyString(sourceAppName, targetAppName, targetOrgName, targetSpaceName, username string) string {

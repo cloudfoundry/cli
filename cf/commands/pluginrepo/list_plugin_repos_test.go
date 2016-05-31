@@ -37,7 +37,7 @@ var _ = Describe("list-plugin-repo", func() {
 	})
 
 	var callListPluginRepos = func(args ...string) bool {
-		return testcmd.RunCLICommand("list-plugin-repos", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("list-plugin-repos", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("lists all added plugin repo in a table", func() {

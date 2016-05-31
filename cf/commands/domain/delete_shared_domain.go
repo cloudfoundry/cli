@@ -59,7 +59,7 @@ func (cmd *DeleteSharedDomain) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) {
+func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) error {
 	domainName := c.Args()[0]
 	force := c.Bool("f")
 
@@ -68,40 +68,38 @@ func (cmd *DeleteSharedDomain) Execute(c flags.FlagContext) {
 			"DomainName": terminal.EntityNameColor(domainName),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().GUID)
-	switch apiErr.(type) {
+	domain, err := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().GUID)
+	switch err.(type) {
 	case nil:
 		if !domain.Shared {
-			cmd.ui.Failed(T("domain {{.DomainName}} is an owned domain, not a shared domain.",
+			return errors.New(T("domain {{.DomainName}} is an owned domain, not a shared domain.",
 				map[string]interface{}{"DomainName": domainName}))
-			return
 		}
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
-		cmd.ui.Warn(apiErr.Error())
-		return
+		cmd.ui.Warn(err.Error())
+		return nil
 	default:
-		cmd.ui.Failed(T("Error finding domain {{.DomainName}}\n{{.APIErr}}",
+		return errors.New(T("Error finding domain {{.DomainName}}\n{{.Err}}",
 			map[string]interface{}{
 				"DomainName": domainName,
-				"APIErr":     apiErr.Error()}))
-		return
+				"Err":        err.Error()}))
 	}
 
 	if !force {
 		answer := cmd.ui.Confirm(T("This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ", map[string]interface{}{"DomainName": domainName}))
 
 		if !answer {
-			return
+			return nil
 		}
 	}
 
-	apiErr = cmd.domainRepo.DeleteSharedDomain(domain.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(T("Error deleting domain {{.DomainName}}\n{{.APIErr}}",
-			map[string]interface{}{"DomainName": domainName, "APIErr": apiErr.Error()}))
-		return
+	err = cmd.domainRepo.DeleteSharedDomain(domain.GUID)
+	if err != nil {
+		return errors.New(T("Error deleting domain {{.DomainName}}\n{{.Err}}",
+			map[string]interface{}{"DomainName": domainName, "Err": err.Error()}))
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

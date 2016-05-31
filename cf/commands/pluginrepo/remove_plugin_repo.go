@@ -1,6 +1,7 @@
 package pluginrepo
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -50,7 +51,7 @@ func (cmd *RemovePluginRepo) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *RemovePluginRepo) Execute(c flags.FlagContext) {
+func (cmd *RemovePluginRepo) Execute(c flags.FlagContext) error {
 	cmd.ui.Say("")
 	repoName := strings.Trim(c.Args()[0], " ")
 
@@ -60,8 +61,9 @@ func (cmd *RemovePluginRepo) Execute(c flags.FlagContext) {
 		cmd.ui.Say(repoName + T(" removed from list of repositories"))
 		cmd.ui.Say("")
 	} else {
-		cmd.ui.Failed(repoName + T(" does not exist as a repo"))
+		return errors.New(repoName + T(" does not exist as a repo"))
 	}
+	return nil
 }
 
 func (cmd RemovePluginRepo) findRepoIndex(repoName string) int {

@@ -62,17 +62,22 @@ func (cmd *Logs) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	return cmd
 }
 
-func (cmd *Logs) Execute(c flags.FlagContext) {
+func (cmd *Logs) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
+	var err error
 	if c.Bool("recent") {
-		cmd.recentLogsFor(app)
+		err = cmd.recentLogsFor(app)
 	} else {
-		cmd.tailLogsFor(app)
+		err = cmd.tailLogsFor(app)
 	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (cmd *Logs) recentLogsFor(app models.Application) {
+func (cmd *Logs) recentLogsFor(app models.Application) error {
 	cmd.ui.Say(T("Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
 		map[string]interface{}{
 			"AppName":   terminal.EntityNameColor(app.Name),
@@ -82,15 +87,16 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 
 	messages, err := cmd.logsRepo.RecentLogsFor(app.GUID)
 	if err != nil {
-		cmd.handleError(err)
+		return cmd.handleError(err)
 	}
 
 	for _, msg := range messages {
 		cmd.ui.Say("%s", msg.ToLog(time.Local))
 	}
+	return nil
 }
 
-func (cmd *Logs) tailLogsFor(app models.Application) {
+func (cmd *Logs) tailLogsFor(app models.Application) error {
 	onConnect := func() {
 		cmd.ui.Say(T("Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
 			map[string]interface{}{
@@ -109,21 +115,22 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 		select {
 		case msg, ok := <-c:
 			if !ok {
-				return
+				return nil
 			}
 			cmd.ui.Say("%s", msg.ToLog(time.Local))
 		case err := <-e:
-			cmd.handleError(err)
+			return cmd.handleError(err)
 		}
 	}
 }
 
-func (cmd *Logs) handleError(err error) {
+func (cmd *Logs) handleError(err error) error {
 	switch err.(type) {
 	case nil:
 	case *errors.InvalidSSLCert:
-		cmd.ui.Failed(err.Error() + T("\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error"))
+		return errors.New(err.Error() + T("\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error"))
 	default:
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+	return nil
 }

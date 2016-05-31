@@ -56,7 +56,7 @@ func (cmd *UnsetEnv) Requirements(requirementsFactory requirements.Factory, fc f
 	return reqs
 }
 
-func (cmd *UnsetEnv) Execute(c flags.FlagContext) {
+func (cmd *UnsetEnv) Execute(c flags.FlagContext) error {
 	varName := c.Args()[1]
 	app := cmd.appReq.GetApplication()
 
@@ -73,18 +73,18 @@ func (cmd *UnsetEnv) Execute(c flags.FlagContext) {
 	if _, ok := envParams[varName]; !ok {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Env variable {{.VarName}} was not set.", map[string]interface{}{"VarName": varName}))
-		return
+		return nil
 	}
 
 	delete(envParams, varName)
 
-	_, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	_, err := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
 		map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " restage")}))
+	return nil
 }

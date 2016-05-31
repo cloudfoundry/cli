@@ -49,7 +49,7 @@ func (cmd *ShowFeatureFlag) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *ShowFeatureFlag) Execute(c flags.FlagContext) {
+func (cmd *ShowFeatureFlag) Execute(c flags.FlagContext) error {
 	flagName := c.Args()[0]
 
 	cmd.ui.Say(T("Retrieving status of {{.FeatureFlag}} as {{.Username}}...", map[string]interface{}{
@@ -58,8 +58,7 @@ func (cmd *ShowFeatureFlag) Execute(c flags.FlagContext) {
 
 	flag, err := cmd.flagRepo.FindByName(flagName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -69,7 +68,7 @@ func (cmd *ShowFeatureFlag) Execute(c flags.FlagContext) {
 	table.Add(flag.Name, cmd.flagBoolToString(flag.Enabled))
 
 	table.Print()
-	return
+	return nil
 }
 
 func (cmd ShowFeatureFlag) flagBoolToString(enabled bool) string {

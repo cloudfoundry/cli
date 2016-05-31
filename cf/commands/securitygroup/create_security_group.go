@@ -68,12 +68,12 @@ func (cmd *CreateSecurityGroup) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *CreateSecurityGroup) Execute(context flags.FlagContext) {
+func (cmd *CreateSecurityGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 	pathToJSONFile := context.Args()[1]
 	rules, err := json.ParseJSONArray(pathToJSONFile)
 	if err != nil {
-		cmd.ui.Failed(T(`Incorrect json format: file: {{.JSONFile}}
+		return errors.New(T(`Incorrect json format: file: {{.JSONFile}}
 		
 Valid json file example:
 [
@@ -101,12 +101,13 @@ Valid json file example:
 				"security_group": terminal.EntityNameColor(name),
 				"error_message":  terminal.WarningColor(T("already exists")),
 			}))
-		return
+		return nil
 	}
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

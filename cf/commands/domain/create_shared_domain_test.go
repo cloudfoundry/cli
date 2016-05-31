@@ -172,6 +172,12 @@ var _ = Describe("CreateSharedDomain", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		Context("when router-group flag is set", func() {
 			BeforeEach(func() {
 				routerGroups = models.RouterGroups{
@@ -185,19 +191,19 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("tries to retrieve the router group", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(routingAPIRepo.ListRouterGroupsCallCount()).To(Equal(1))
 			})
 
 			It("prints a message", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating shared domain domain-name"},
 				))
 			})
 
 			It("tries to create a shared domain with router group", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
 				domainName, routerGroupGUID := domainRepo.CreateSharedDomainArgsForCall(0)
 				Expect(domainName).To(Equal("domain-name"))
@@ -205,7 +211,7 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("prints success message", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"OK"},
 				))
@@ -217,11 +223,8 @@ var _ = Describe("CreateSharedDomain", func() {
 				})
 
 				It("fails with error message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"router-group-error"},
-					))
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("router-group-error"))
 				})
 			})
 
@@ -231,11 +234,8 @@ var _ = Describe("CreateSharedDomain", func() {
 				})
 
 				It("fails with a message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"Router group router-group-name not found"},
-					))
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("Router group router-group-name not found"))
 				})
 			})
 		})
@@ -246,19 +246,19 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("does not try to retrieve the router group", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(routingAPIRepo.ListRouterGroupsCallCount()).To(Equal(0))
 			})
 
 			It("prints a message", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating shared domain domain-name"},
 				))
 			})
 
 			It("tries to create a shared domain without router group", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(domainRepo.CreateSharedDomainCallCount()).To(Equal(1))
 				domainName, routerGroupGUID := domainRepo.CreateSharedDomainArgsForCall(0)
 				Expect(domainName).To(Equal("domain-name"))
@@ -266,7 +266,7 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("prints success message", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"OK"},
 				))
@@ -280,11 +280,8 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"create-domain-error"},
-				))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("create-domain-error"))
 			})
 		})
 	})

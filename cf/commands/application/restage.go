@@ -60,10 +60,10 @@ func (cmd *Restage) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	return cmd
 }
 
-func (cmd *Restage) Execute(c flags.FlagContext) {
+func (cmd *Restage) Execute(c flags.FlagContext) error {
 	app, err := cmd.appRepo.Read(c.Args()[0])
 	if notFound, ok := err.(*errors.ModelNotFoundError); ok {
-		cmd.ui.Failed(notFound.Error())
+		return notFound
 	}
 
 	cmd.ui.Say(T("Restaging app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -88,4 +88,5 @@ func (cmd *Restage) Execute(c flags.FlagContext) {
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 			}))
 	}
+	return nil
 }

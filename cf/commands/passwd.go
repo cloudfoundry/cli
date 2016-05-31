@@ -47,32 +47,31 @@ func (cmd *Password) SetDependency(deps commandregistry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd *Password) Execute(c flags.FlagContext) {
+func (cmd *Password) Execute(c flags.FlagContext) error {
 	oldPassword := cmd.ui.AskForPassword(T("Current Password"))
 	newPassword := cmd.ui.AskForPassword(T("New Password"))
 	verifiedPassword := cmd.ui.AskForPassword(T("Verify Password"))
 
 	if verifiedPassword != newPassword {
-		cmd.ui.Failed(T("Password verification does not match"))
-		return
+		return errors.New(T("Password verification does not match"))
 	}
 
 	cmd.ui.Say(T("Changing password..."))
-	apiErr := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
+	err := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
-	switch typedErr := apiErr.(type) {
+	switch typedErr := err.(type) {
 	case nil:
 	case errors.HTTPError:
 		if typedErr.StatusCode() == 401 {
-			cmd.ui.Failed(T("Current password did not match"))
-		} else {
-			cmd.ui.Failed(apiErr.Error())
+			return errors.New(T("Current password did not match"))
 		}
+		return err
 	default:
-		cmd.ui.Failed(apiErr.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.config.ClearSession()
 	cmd.ui.Say(T("Please log in again"))
+	return nil
 }

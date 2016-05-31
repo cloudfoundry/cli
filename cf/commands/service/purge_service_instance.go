@@ -64,17 +64,17 @@ func (cmd *PurgeServiceInstance) scaryWarningMessage() string {
 	return T(`WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.`)
 }
 
-func (cmd *PurgeServiceInstance) Execute(c flags.FlagContext) {
+func (cmd *PurgeServiceInstance) Execute(c flags.FlagContext) error {
 	instanceName := c.Args()[0]
 
 	instance, err := cmd.serviceRepo.FindInstanceByName(instanceName)
 	if err != nil {
 		if _, ok := err.(*errors.ModelNotFoundError); ok {
 			cmd.ui.Warn(T("Service instance {{.InstanceName}} not found", map[string]interface{}{"InstanceName": instanceName}))
-			return
+			return nil
 		}
 
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	force := c.Bool("f")
@@ -85,15 +85,16 @@ func (cmd *PurgeServiceInstance) Execute(c flags.FlagContext) {
 		))
 
 		if !confirmed {
-			return
+			return nil
 		}
 	}
 
 	cmd.ui.Say(T("Purging service {{.InstanceName}}...", map[string]interface{}{"InstanceName": instanceName}))
 	err = cmd.serviceRepo.PurgeServiceInstance(instance)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"net/rpc"
 	"os"
@@ -63,7 +64,7 @@ func (cmd *PluginUninstall) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *PluginUninstall) Execute(c flags.FlagContext) {
+func (cmd *PluginUninstall) Execute(c flags.FlagContext) error {
 	pluginName := c.Args()[0]
 	pluginNameMap := map[string]interface{}{"PluginName": pluginName}
 
@@ -72,14 +73,17 @@ func (cmd *PluginUninstall) Execute(c flags.FlagContext) {
 	plugins := cmd.config.Plugins()
 
 	if _, ok := plugins[pluginName]; !ok {
-		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} does not exist", pluginNameMap)))
+		return errors.New(fmt.Sprintf(T("Plugin name {{.PluginName}} does not exist", pluginNameMap)))
 	}
 
 	pluginMetadata := plugins[pluginName]
 
-	err := cmd.notifyPluginUninstalling(pluginMetadata)
+	warn, err := cmd.notifyPluginUninstalling(pluginMetadata)
 	if err != nil {
-		cmd.ui.Say("Error invoking plugin: " + err.Error() + ". Process to uninstall ...")
+		return err
+	}
+	if warn != nil {
+		cmd.ui.Say("Error invoking plugin: " + warn.Error() + ". Process to uninstall ...")
 	}
 
 	time.Sleep(500 * time.Millisecond) //prevent 'process being used' error in Windows
@@ -93,17 +97,18 @@ func (cmd *PluginUninstall) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully uninstalled.", pluginNameMap)))
+	return nil
 }
 
-func (cmd *PluginUninstall) notifyPluginUninstalling(meta pluginconfig.PluginMetadata) error {
+func (cmd *PluginUninstall) notifyPluginUninstalling(meta pluginconfig.PluginMetadata) (error, error) {
 	err := cmd.rpcService.Start()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return nil, err
 	}
 	defer cmd.rpcService.Stop()
 
 	pluginInvocation := exec.Command(meta.Location, cmd.rpcService.Port(), "CLI-MESSAGE-UNINSTALL")
 	pluginInvocation.Stdout = os.Stdout
 
-	return pluginInvocation.Run()
+	return pluginInvocation.Run(), nil
 }

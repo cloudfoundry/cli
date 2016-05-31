@@ -49,7 +49,7 @@ func (cmd *ListPluginRepos) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *ListPluginRepos) Execute(c flags.FlagContext) {
+func (cmd *ListPluginRepos) Execute(c flags.FlagContext) error {
 	repos := cmd.config.PluginRepos()
 
 	table := cmd.ui.Table([]string{T("Repo Name"), T("URL")})
@@ -64,4 +64,5 @@ func (cmd *ListPluginRepos) Execute(c flags.FlagContext) {
 	table.Print()
 
 	cmd.ui.Say("")
+	return nil
 }

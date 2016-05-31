@@ -99,16 +99,22 @@ var _ = Describe("PurgeServiceOffering", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("service-name")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
+			ui.Inputs = []string{"n"}
+			serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{{}}, nil)
+		})
+
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
 		})
 
 		It("tries to find the service offering by label", func() {
-			ui.Inputs = []string{"n"}
-			serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{{}}, nil)
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(serviceRepo.FindServiceOfferingsByLabelCallCount()).To(Equal(1))
 			name := serviceRepo.FindServiceOfferingsByLabelArgsForCall(0)
 			Expect(name).To(Equal("service-name"))
@@ -119,11 +125,11 @@ var _ = Describe("PurgeServiceOffering", func() {
 				serviceOffering := models.ServiceOffering{}
 				serviceOffering.GUID = "service-offering-guid"
 				serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{serviceOffering}, nil)
+				ui.Inputs = []string{"n"}
 			})
 
 			It("asks the user to confirm", func() {
-				ui.Inputs = []string{"n"}
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service-name from Cloud Foundry?"}))
 			})
@@ -134,12 +140,12 @@ var _ = Describe("PurgeServiceOffering", func() {
 				})
 
 				It("tells the user it will purge the service offering", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service service-name..."}))
 				})
 
 				It("tries to purge the service offering", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(Equal(1))
 				})
 
@@ -149,7 +155,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 					})
 
 					It("says OK", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 					})
 				})
@@ -160,11 +166,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 					})
 
 					It("fails with error", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"purge-err"},
-						))
+						Expect(runCLIErr).To(HaveOccurred())
+						Expect(runCLIErr.Error()).To(Equal("purge-err"))
 					})
 				})
 			})
@@ -175,7 +178,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 				})
 
 				It("does not try to purge the service offering", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 				})
 			})
@@ -187,8 +190,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("find-err"))
 			})
 		})
 
@@ -201,20 +204,21 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("warns the user", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Service offering does not exist"},
 				))
 			})
 
 			It("does not try to purge the service offering", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 			})
 		})
 
 		Context("when the -p flag is passed", func() {
 			var origAPIVersion string
+
 			BeforeEach(func() {
 				origAPIVersion = configRepo.APIVersion()
 				configRepo.SetAPIVersion("2.46.0")
@@ -223,6 +227,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 				err := flagContext.Parse("service-name", "-p", "provider-name")
 				Expect(err).NotTo(HaveOccurred())
 				cmd.Requirements(factory, flagContext)
+				ui.Inputs = []string{"n"}
 			})
 
 			AfterEach(func() {
@@ -230,8 +235,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("tries to find the service offering by label and provider", func() {
-				ui.Inputs = []string{"n"}
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceRepo.FindServiceOfferingByLabelAndProviderCallCount()).To(Equal(1))
 				name, provider := serviceRepo.FindServiceOfferingByLabelAndProviderArgsForCall(0)
 				Expect(name).To(Equal("service-name"))
@@ -243,11 +247,11 @@ var _ = Describe("PurgeServiceOffering", func() {
 					serviceOffering := models.ServiceOffering{}
 					serviceOffering.GUID = "service-offering-guid"
 					serviceRepo.FindServiceOfferingByLabelAndProviderReturns(serviceOffering, nil)
+					ui.Inputs = []string{"n"}
 				})
 
 				It("asks the user to confirm", func() {
-					ui.Inputs = []string{"n"}
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
 					Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service-name from Cloud Foundry?"}))
 				})
@@ -258,12 +262,12 @@ var _ = Describe("PurgeServiceOffering", func() {
 					})
 
 					It("tells the user it will purge the service offering", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service service-name..."}))
 					})
 
 					It("tries to purge the service offering", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(Equal(1))
 					})
 
@@ -273,7 +277,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 						})
 
 						It("says OK", func() {
-							cmd.Execute(flagContext)
+							Expect(runCLIErr).NotTo(HaveOccurred())
 							Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 						})
 					})
@@ -284,11 +288,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 						})
 
 						It("fails with error", func() {
-							Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-							Expect(ui.Outputs).To(ContainSubstrings(
-								[]string{"FAILED"},
-								[]string{"purge-err"},
-							))
+							Expect(runCLIErr).To(HaveOccurred())
+							Expect(runCLIErr.Error()).To(Equal("purge-err"))
 						})
 					})
 				})
@@ -299,7 +300,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 					})
 
 					It("does not try to purge the service offering", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIErr).NotTo(HaveOccurred())
 						Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 					})
 				})
@@ -311,8 +312,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+					Expect(runCLIErr).To(HaveOccurred())
+					Expect(runCLIErr.Error()).To(Equal("find-err"))
 				})
 			})
 
@@ -325,14 +326,14 @@ var _ = Describe("PurgeServiceOffering", func() {
 				})
 
 				It("warns the user", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Service offering does not exist"},
 					))
 				})
 
 				It("does not try to purge the service offering", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(serviceRepo.PurgeServiceOfferingCallCount()).To(BeZero())
 				})
 			})

@@ -239,14 +239,20 @@ var _ = Describe("UnmapRoute", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("app-name", "domain-name")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 		})
 
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		It("tries to find the route", func() {
-			cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(routeRepo.FindCallCount()).To(Equal(1))
 			hostname, domain, path, port := routeRepo.FindArgsForCall(0)
 			Expect(hostname).To(Equal(""))
@@ -263,7 +269,7 @@ var _ = Describe("UnmapRoute", func() {
 			})
 
 			It("tries to find the route with the path", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				_, _, path, _ := routeRepo.FindArgsForCall(0)
 				Expect(path).To(Equal("the-path"))
@@ -278,7 +284,7 @@ var _ = Describe("UnmapRoute", func() {
 			})
 
 			It("tries to find the route with the port", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				_, _, _, port := routeRepo.FindArgsForCall(0)
 				Expect(port).To(Equal(60000))
@@ -291,7 +297,7 @@ var _ = Describe("UnmapRoute", func() {
 			})
 
 			It("tells the user that it is removing the route", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Removing route", "from app", "in org"},
 				))
@@ -309,7 +315,7 @@ var _ = Describe("UnmapRoute", func() {
 				})
 
 				It("tries to unbind the route from the app", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.UnbindCallCount()).To(Equal(1))
 					routeGUID, appGUID := routeRepo.UnbindArgsForCall(0)
 					Expect(routeGUID).To(Equal("route-guid"))
@@ -321,12 +327,9 @@ var _ = Describe("UnmapRoute", func() {
 						routeRepo.UnbindReturns(errors.New("unbind-err"))
 					})
 
-					It("panics and prints a failure message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(BeInDisplayOrder(
-							[]string{"FAILED"},
-							[]string{"unbind-err"},
-						))
+					It("returns an error", func() {
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(Equal("unbind-err"))
 					})
 				})
 
@@ -336,7 +339,7 @@ var _ = Describe("UnmapRoute", func() {
 					})
 
 					It("tells the user it succeeded", func() {
-						cmd.Execute(flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(BeInDisplayOrder(
 							[]string{"OK"},
 						))
@@ -356,19 +359,19 @@ var _ = Describe("UnmapRoute", func() {
 				})
 
 				It("does not unbind the route from the app", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.UnbindCallCount()).To(Equal(0))
 				})
 
 				It("tells the user 'OK'", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 				})
 
 				It("warns the user the route was not mapped to the application", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Route to be unmapped is not currently mapped to the application."},
 					))
@@ -381,12 +384,9 @@ var _ = Describe("UnmapRoute", func() {
 				routeRepo.FindReturns(models.Route{}, errors.New("find-by-host-and-domain-err"))
 			})
 
-			It("panics and prints a failure message", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"FAILED"},
-					[]string{"find-by-host-and-domain-err"},
-				))
+			It("returns an error", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("find-by-host-and-domain-err"))
 			})
 		})
 

@@ -52,7 +52,7 @@ func (cmd *listStagingSecurityGroups) SetDependency(deps commandregistry.Depende
 	return cmd
 }
 
-func (cmd *listStagingSecurityGroups) Execute(context flags.FlagContext) {
+func (cmd *listStagingSecurityGroups) Execute(context flags.FlagContext) error {
 	cmd.ui.Say(T("Acquiring staging security group as {{.username}}",
 		map[string]interface{}{
 			"username": terminal.EntityNameColor(cmd.configRepo.Username()),
@@ -60,7 +60,7 @@ func (cmd *listStagingSecurityGroups) Execute(context flags.FlagContext) {
 
 	SecurityGroupsFields, err := cmd.stagingSecurityGroupRepo.List()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -73,4 +73,5 @@ func (cmd *listStagingSecurityGroups) Execute(context flags.FlagContext) {
 	} else {
 		cmd.ui.Say(T("No staging security group set"))
 	}
+	return nil
 }

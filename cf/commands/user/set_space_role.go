@@ -86,12 +86,12 @@ func (cmd *SetSpaceRole) SetDependency(deps commandregistry.Dependency, pluginCa
 	return cmd
 }
 
-func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
+func (cmd *SetSpaceRole) Execute(c flags.FlagContext) error {
 	spaceName := c.Args()[2]
 	roleStr := c.Args()[3]
 	role, err := models.RoleFromString(roleStr)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	userFields := cmd.userReq.GetUser()
@@ -99,13 +99,14 @@ func (cmd *SetSpaceRole) Execute(c flags.FlagContext) {
 
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	err = cmd.SetSpaceRole(space, org.GUID, org.Name, role, userFields.GUID, userFields.Username)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+	return nil
 }
 
 func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, orgGUID, orgName string, role models.Role, userGUID, username string) error {

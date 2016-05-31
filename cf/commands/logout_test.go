@@ -38,7 +38,7 @@ var _ = Describe("logout command", func() {
 		config.SetSpaceFields(space)
 		ui = &testterm.FakeUI{}
 
-		testcmd.RunCLICommand("logout", []string{}, nil, updateCommandDependency, false)
+		testcmd.RunCLICommand("logout", []string{}, nil, updateCommandDependency, false, ui)
 	})
 
 	It("clears access token from the config", func() {

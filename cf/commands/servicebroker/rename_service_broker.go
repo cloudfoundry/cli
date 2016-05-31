@@ -49,11 +49,10 @@ func (cmd *RenameServiceBroker) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *RenameServiceBroker) Execute(c flags.FlagContext) {
-	serviceBroker, apiErr := cmd.repo.FindByName(c.Args()[0])
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+func (cmd *RenameServiceBroker) Execute(c flags.FlagContext) error {
+	serviceBroker, err := cmd.repo.FindByName(c.Args()[0])
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say(T("Renaming service broker {{.OldName}} to {{.NewName}} as {{.Username}}",
@@ -64,12 +63,12 @@ func (cmd *RenameServiceBroker) Execute(c flags.FlagContext) {
 
 	newName := c.Args()[1]
 
-	apiErr = cmd.repo.Rename(serviceBroker.GUID, newName)
+	err = cmd.repo.Rename(serviceBroker.GUID, newName)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

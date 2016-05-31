@@ -41,7 +41,7 @@ var _ = Describe("Running-security-groups command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("running-security-groups", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("running-security-groups", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

@@ -40,7 +40,7 @@ var _ = Describe("delete-quota command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("delete-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-quota", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Context("when the user is not logged in", func() {

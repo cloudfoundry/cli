@@ -41,7 +41,7 @@ var _ = Describe("set-health-check command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("set-health-check", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("set-health-check", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

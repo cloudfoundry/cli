@@ -1,6 +1,8 @@
 package routergroups
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -52,7 +54,7 @@ func (cmd *RouterGroups) SetDependency(deps commandregistry.Dependency, pluginCa
 	return cmd
 }
 
-func (cmd *RouterGroups) Execute(c flags.FlagContext) {
+func (cmd *RouterGroups) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting router groups as {{.Username}} ...\n",
 		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
@@ -67,8 +69,7 @@ func (cmd *RouterGroups) Execute(c flags.FlagContext) {
 
 	apiErr := cmd.routingAPIRepo.ListRouterGroups(cb)
 	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
-		return
+		return errors.New(T("Failed fetching router groups.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 	}
 
 	if noRouterGroups {
@@ -76,4 +77,5 @@ func (cmd *RouterGroups) Execute(c flags.FlagContext) {
 	}
 
 	table.Print()
+	return nil
 }

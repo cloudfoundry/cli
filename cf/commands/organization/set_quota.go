@@ -55,14 +55,13 @@ func (cmd *SetQuota) SetDependency(deps commandregistry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd *SetQuota) Execute(c flags.FlagContext) {
+func (cmd *SetQuota) Execute(c flags.FlagContext) error {
 	org := cmd.orgReq.GetOrganization()
 	quotaName := c.Args()[1]
-	quota, apiErr := cmd.quotaRepo.FindByName(quotaName)
+	quota, err := cmd.quotaRepo.FindByName(quotaName)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say(T("Setting quota {{.QuotaName}} to org {{.OrgName}} as {{.Username}}...",
@@ -71,11 +70,11 @@ func (cmd *SetQuota) Execute(c flags.FlagContext) {
 			"OrgName":   terminal.EntityNameColor(org.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.quotaRepo.AssignQuotaToOrg(org.GUID, quota.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.quotaRepo.AssignQuotaToOrg(org.GUID, quota.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

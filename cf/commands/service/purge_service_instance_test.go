@@ -196,16 +196,18 @@ var _ = Describe("PurgeServiceInstance", func() {
 		})
 
 		Context("when an error occurs fetching the instance", func() {
+			var runCLIErr error
+
 			BeforeEach(func() {
 				serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.New("an-error"))
 			})
 
+			JustBeforeEach(func() {
+				runCLIErr = cmd.Execute(flagContext)
+			})
+
 			It("panics and prints a message with the error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"an-error"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
 			})
 		})
 	})

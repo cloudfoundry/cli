@@ -186,6 +186,8 @@ var _ = Describe("UnsetOrgRole", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
 			flagContext.Parse("the-user-name", "the-org-name", "OrgManager")
 			cmd.Requirements(factory, flagContext)
@@ -196,6 +198,10 @@ var _ = Describe("UnsetOrgRole", func() {
 			organizationRequirement.GetOrganizationReturns(org)
 		})
 
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		Context("when the UserRequirement returns a user with a GUID", func() {
 			BeforeEach(func() {
 				userFields := models.UserFields{GUID: "the-user-guid", Username: "the-user-name"}
@@ -203,7 +209,7 @@ var _ = Describe("UnsetOrgRole", func() {
 			})
 
 			It("tells the user it is removing the role", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Removing role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
 					[]string{"OK"},
@@ -211,7 +217,7 @@ var _ = Describe("UnsetOrgRole", func() {
 			})
 
 			It("removes the role using the GUID", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(userRepo.UnsetOrgRoleByGUIDCallCount()).To(Equal(1))
 				actualUserGUID, actualOrgGUID, actualRole := userRepo.UnsetOrgRoleByGUIDArgsForCall(0)
 				Expect(actualUserGUID).To(Equal("the-user-guid"))
@@ -224,12 +230,9 @@ var _ = Describe("UnsetOrgRole", func() {
 					userRepo.UnsetOrgRoleByGUIDReturns(errors.New("user-repo-error"))
 				})
 
-				It("panics and prints a failure message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(BeInDisplayOrder(
-						[]string{"FAILED"},
-						[]string{"user-repo-error"},
-					))
+				It("returns an error", func() {
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("user-repo-error"))
 				})
 			})
 		})
@@ -240,7 +243,7 @@ var _ = Describe("UnsetOrgRole", func() {
 			})
 
 			It("removes the role using the given username", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(userRepo.UnsetOrgRoleByUsernameCallCount()).To(Equal(1))
 				username, orgGUID, role := userRepo.UnsetOrgRoleByUsernameArgsForCall(0)
 				Expect(username).To(Equal("the-user-name"))
@@ -249,7 +252,7 @@ var _ = Describe("UnsetOrgRole", func() {
 			})
 
 			It("tells the user it is removing the role", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Removing role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
 					[]string{"OK"},
@@ -261,12 +264,9 @@ var _ = Describe("UnsetOrgRole", func() {
 					userRepo.UnsetOrgRoleByUsernameReturns(errors.New("user-repo-error"))
 				})
 
-				It("panics and prints a failure message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(BeInDisplayOrder(
-						[]string{"FAILED"},
-						[]string{"user-repo-error"},
-					))
+				It("returns an error", func() {
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("user-repo-error"))
 				})
 			})
 		})

@@ -138,6 +138,8 @@ var _ = Describe("CheckRoute", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("host-name", "domain-name")
 			Expect(err).NotTo(HaveOccurred())
@@ -148,15 +150,19 @@ var _ = Describe("CheckRoute", func() {
 			})
 		})
 
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		It("tells the user that it is checking for the route", func() {
-			cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Checking for route"},
 			))
 		})
 
 		It("tries to find the domain", func() {
-			cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(domainRepo.FindByNameInOrgCallCount()).To(Equal(1))
 
 			domainName, orgGUID := domainRepo.FindByNameInOrgArgsForCall(0)
@@ -176,7 +182,7 @@ var _ = Describe("CheckRoute", func() {
 			})
 
 			It("checks if the route exists", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(routeRepo.CheckIfExistsCallCount()).To(Equal(1))
 				hostName, domain, path := routeRepo.CheckIfExistsArgsForCall(0)
 				Expect(hostName).To(Equal("host-name"))
@@ -193,7 +199,7 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("checks if the route exists", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(routeRepo.CheckIfExistsCallCount()).To(Equal(1))
 					_, _, path := routeRepo.CheckIfExistsArgsForCall(0)
 					Expect(path).To(Equal("the-path"))
@@ -205,7 +211,7 @@ var _ = Describe("CheckRoute", func() {
 					})
 
 					It("tells the user the route exists", func() {
-						cmd.Execute(flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does exist"}))
 					})
 				})
@@ -216,7 +222,7 @@ var _ = Describe("CheckRoute", func() {
 					})
 
 					It("tells the user the route exists", func() {
-						cmd.Execute(flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does not exist"}))
 					})
 				})
@@ -228,12 +234,12 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("tells the user OK", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 
 				It("tells the user the route exists", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"Route", "does exist"}))
 				})
 			})
@@ -244,12 +250,12 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("tells the user OK", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 
 				It("tells the user the route does not exist", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"Route", "does not exist"}))
 				})
 			})
@@ -260,11 +266,8 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"check-if-exists-err"},
-					))
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("check-if-exists-err"))
 				})
 			})
 		})
@@ -275,11 +278,8 @@ var _ = Describe("CheckRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"find-by-name-in-org-err"},
-				))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("find-by-name-in-org-err"))
 			})
 		})
 	})

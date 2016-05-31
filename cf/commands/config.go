@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"sort"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -49,16 +50,15 @@ func (cmd *ConfigCommands) SetDependency(deps commandregistry.Dependency, plugin
 	return cmd
 }
 
-func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
+func (cmd *ConfigCommands) Execute(context flags.FlagContext) error {
 	if !context.IsSet("trace") && !context.IsSet("async-timeout") && !context.IsSet("color") && !context.IsSet("locale") {
-		cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("config"))
-		return
+		return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("config"))
 	}
 
 	if context.IsSet("async-timeout") {
 		asyncTimeout := context.Int("async-timeout")
 		if asyncTimeout < 0 {
-			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("config"))
+			return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("config"))
 		}
 
 		cmd.config.SetAsyncTimeout(uint(asyncTimeout))
@@ -76,7 +76,7 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 		case "false":
 			cmd.config.SetColorEnabled("false")
 		default:
-			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("config"))
+			return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("config"))
 		}
 	}
 
@@ -85,12 +85,12 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 
 		if locale == "CLEAR" {
 			cmd.config.SetLocale("")
-			return
+			return nil
 		}
 
 		if IsSupportedLocale(locale) {
 			cmd.config.SetLocale(locale)
-			return
+			return nil
 		}
 
 		unsupportedLocaleMessage := T("Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n", map[string]interface{}{
@@ -102,6 +102,7 @@ func (cmd *ConfigCommands) Execute(context flags.FlagContext) {
 			unsupportedLocaleMessage = unsupportedLocaleMessage + "\n" + supportedLocales[i]
 		}
 
-		cmd.ui.Failed(unsupportedLocaleMessage)
+		return errors.New(unsupportedLocaleMessage)
 	}
+	return nil
 }

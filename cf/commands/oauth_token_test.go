@@ -45,7 +45,7 @@ var _ = Describe("OauthToken", func() {
 	})
 
 	runCommand := func() bool {
-		return testcmd.RunCLICommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {
@@ -90,7 +90,7 @@ var _ = Describe("OauthToken", func() {
 
 			It("populates the plugin model upon execution", func() {
 				authRepo.RefreshAuthTokenReturns("911999111", nil)
-				testcmd.RunCLICommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("oauth-token", []string{}, requirementsFactory, updateCommandDependency, true, ui)
 				Expect(pluginModel.Token).To(Equal("911999111"))
 			})
 		})

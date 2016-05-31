@@ -118,7 +118,7 @@ func (cmd *CreateRoute) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *CreateRoute) Execute(c flags.FlagContext) {
+func (cmd *CreateRoute) Execute(c flags.FlagContext) error {
 	hostName := c.String("n")
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
@@ -127,10 +127,11 @@ func (cmd *CreateRoute) Execute(c flags.FlagContext) {
 	randomPort := c.Bool("random-port")
 
 	_, err := cmd.CreateRoute(hostName, path, port, randomPort, domain, space.SpaceFields)
-
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+
+	return nil
 }
 
 func (cmd *CreateRoute) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (models.Route, error) {

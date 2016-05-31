@@ -65,7 +65,7 @@ func (cmd *OrgUsers) SetDependency(deps commandregistry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd *OrgUsers) Execute(c flags.FlagContext) {
+func (cmd *OrgUsers) Execute(c flags.FlagContext) error {
 	org := cmd.orgReq.GetOrganization()
 
 	cmd.ui.Say(T("Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
@@ -76,6 +76,7 @@ func (cmd *OrgUsers) Execute(c flags.FlagContext) {
 
 	printer := cmd.printer(c)
 	printer.PrintUsers(org.GUID, cmd.config.Username())
+	return nil
 }
 
 func (cmd *OrgUsers) printer(c flags.FlagContext) userprint.UserPrinter {

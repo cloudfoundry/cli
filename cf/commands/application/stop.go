@@ -1,8 +1,6 @@
 package application
 
 import (
-	"errors"
-
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -66,10 +64,12 @@ func (cmd *Stop) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	return cmd
 }
 
-func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName string) (updatedApp models.Application, err error) {
+func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName string) (models.Application, error) {
+	var updatedApp models.Application
+
 	if app.State == "stopped" {
 		updatedApp = app
-		return
+		return updatedApp, nil
 	}
 
 	cmd.ui.Say(T("Stopping app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -80,22 +80,24 @@ func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName stri
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
 	state := "STOPPED"
-	updatedApp, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
-		cmd.ui.Failed(apiErr.Error())
-		return
+	updatedApp, err := cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
+	if err != nil {
+		return models.Application{}, err
 	}
 
 	cmd.ui.Ok()
-	return
+	return updatedApp, nil
 }
 
-func (cmd *Stop) Execute(c flags.FlagContext) {
+func (cmd *Stop) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 	if app.State == "stopped" {
 		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already stopped")))
 	} else {
-		cmd.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+		_, err := cmd.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }

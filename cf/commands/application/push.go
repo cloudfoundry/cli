@@ -176,25 +176,38 @@ func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	return cmd
 }
 
-func (cmd *Push) Execute(c flags.FlagContext) {
-	appsFromManifest := cmd.getAppParamsFromManifest(c)
-	appFromContext := cmd.getAppParamsFromContext(c)
-	appSet := cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
-
-	_, err := cmd.authRepo.RefreshAuthToken()
+func (cmd *Push) Execute(c flags.FlagContext) error {
+	appsFromManifest, err := cmd.getAppParamsFromManifest(c)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
+	}
+
+	appFromContext, err := cmd.getAppParamsFromContext(c)
+	if err != nil {
+		return err
+	}
+
+	appSet, err := cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
+	if err != nil {
+		return err
+	}
+
+	_, err = cmd.authRepo.RefreshAuthToken()
+	if err != nil {
+		return err
 	}
 
 	routeActor := actors.NewRouteActor(cmd.ui, cmd.routeRepo)
 
 	for _, appParams := range appSet {
 		if appParams.Name == nil {
-			cmd.ui.Failed(T("Error: No name found for app"))
+			return errors.New(T("Error: No name found for app"))
 		}
 
-		cmd.fetchStackGUID(&appParams)
+		err := cmd.fetchStackGUID(&appParams)
+		if err != nil {
+			return err
+		}
 
 		if c.IsSet("docker-image") {
 			diego := true
@@ -222,7 +235,7 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 
 			app, err = cmd.appRepo.Update(existingApp.GUID, appParams)
 			if err != nil {
-				cmd.ui.Failed(err.Error())
+				return err
 			}
 		case *errors.ModelNotFoundError:
 			spaceGUID := cmd.config.SpaceFields().GUID
@@ -237,37 +250,42 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 
 			app, err = cmd.appRepo.Create(appParams)
 			if err != nil {
-				cmd.ui.Failed(err.Error())
+				return err
 			}
 		default:
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 
-		cmd.updateRoutes(routeActor, app, appParams)
+		err = cmd.updateRoutes(routeActor, app, appParams)
+		if err != nil {
+			return err
+		}
 
 		if c.String("docker-image") == "" {
 			err = cmd.actor.ProcessPath(*appParams.Path, cmd.processPathCallback(*appParams.Path, app))
 			if err != nil {
-				cmd.ui.Failed(
+				return errors.New(
 					T("Error processing app files: {{.Error}}",
 						map[string]interface{}{
 							"Error": err.Error(),
 						}),
 				)
-				return
 			}
 		}
 
 		if appParams.ServicesToBind != nil {
-			cmd.bindAppToServices(*appParams.ServicesToBind, app)
+			err := cmd.bindAppToServices(*appParams.ServicesToBind, app)
+			if err != nil {
+				return err
+			}
 		}
 
 		err = cmd.restart(app, appParams, c)
 		if err != nil {
-			cmd.ui.Failed(
+			return errors.New(
 				T("Error restarting application: {{.Error}}",
 					map[string]interface{}{
 						"Error": err.Error(),
@@ -275,6 +293,7 @@ func (cmd *Push) Execute(c flags.FlagContext) {
 			)
 		}
 	}
+	return nil
 }
 
 func (cmd *Push) processPathCallback(path string, app models.Application) func(string) {
@@ -312,7 +331,7 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 	}
 }
 
-func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams) {
+func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams) error {
 	defaultRouteAcceptable := len(app.Routes) == 0
 	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.NoHostname
 
@@ -323,22 +342,29 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 		} else {
 			routeActor.UnbindAll(app)
 		}
-		return
+		return nil
 	}
 
 	if routeDefined || defaultRouteAcceptable {
 		if appParams.Domains == nil {
-			domain := cmd.findDomain(nil)
+			domain, err := cmd.findDomain(nil)
+			if err != nil {
+				return err
+			}
 			appParams.UseRandomPort = isTCP(domain)
 			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 		} else {
 			for _, d := range *(appParams.Domains) {
-				domain := cmd.findDomain(&d)
+				domain, err := cmd.findDomain(&d)
+				if err != nil {
+					return err
+				}
 				appParams.UseRandomPort = isTCP(domain)
 				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
 			}
 		}
 	}
+	return nil
 }
 
 const TCP = "tcp"
@@ -423,23 +449,22 @@ func hostNameForString(name string) string {
 	return name
 }
 
-func (cmd *Push) findDomain(domainName *string) models.DomainFields {
+func (cmd *Push) findDomain(domainName *string) (models.DomainFields, error) {
 	domain, err := cmd.domainRepo.FirstOrDefault(cmd.config.OrganizationFields().GUID, domainName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return models.DomainFields{}, err
 	}
 
-	return domain
+	return domain, nil
 }
 
-func (cmd *Push) bindAppToServices(services []string, app models.Application) {
+func (cmd *Push) bindAppToServices(services []string, app models.Application) error {
 	for _, serviceName := range services {
 		serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceName)
 
 		if err != nil {
-			cmd.ui.Failed(T("Could not find service {{.ServiceName}} to bind to {{.AppName}}",
+			return errors.New(T("Could not find service {{.ServiceName}} to bind to {{.AppName}}",
 				map[string]interface{}{"ServiceName": serviceName, "AppName": app.Name}))
-			return
 		}
 
 		cmd.ui.Say(T("Binding service {{.ServiceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -460,17 +485,18 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		}
 
 		if err != nil {
-			cmd.ui.Failed(T("Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
+			return errors.New(T("Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
 				map[string]interface{}{"ServiceName": serviceName, "Err": err.Error()}))
 		}
 
 		cmd.ui.Ok()
 	}
+	return nil
 }
 
-func (cmd *Push) fetchStackGUID(appParams *models.AppParams) {
+func (cmd *Push) fetchStackGUID(appParams *models.AppParams) error {
 	if appParams.StackName == nil {
-		return
+		return nil
 	}
 
 	stackName := *appParams.StackName
@@ -479,12 +505,12 @@ func (cmd *Push) fetchStackGUID(appParams *models.AppParams) {
 
 	stack, err := cmd.stackRepo.FindByName(stackName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
 	appParams.StackGUID = &stack.GUID
+	return nil
 }
 
 func (cmd *Push) restart(app models.Application, params models.AppParams, c flags.FlagContext) error {
@@ -511,9 +537,9 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c flag
 	return nil
 }
 
-func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParams {
+func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) ([]models.AppParams, error) {
 	if c.Bool("no-manifest") {
-		return []models.AppParams{}
+		return []models.AppParams{}, nil
 	}
 
 	var path string
@@ -523,7 +549,7 @@ func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParam
 		var err error
 		path, err = os.Getwd()
 		if err != nil {
-			cmd.ui.Failed(T("Could not determine the current working directory!"), err)
+			return nil, errors.New(fmt.Sprint(T("Could not determine the current working directory!"), err))
 		}
 	}
 
@@ -531,36 +557,35 @@ func (cmd *Push) getAppParamsFromManifest(c flags.FlagContext) []models.AppParam
 
 	if err != nil {
 		if m.Path == "" && c.String("f") == "" {
-			return []models.AppParams{}
+			return []models.AppParams{}, nil
 		}
-		cmd.ui.Failed(T("Error reading manifest file:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
+		return nil, errors.New(T("Error reading manifest file:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
 	apps, err := m.Applications()
 	if err != nil {
-		cmd.ui.Failed("Error reading manifest file:\n%s", err)
+		return nil, errors.New(T("Error reading manifest file:\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
 	cmd.ui.Say(T("Using manifest file {{.Path}}\n",
 		map[string]interface{}{"Path": terminal.EntityNameColor(m.Path)}))
-	return apps
+	return apps, nil
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams, manifestApps []models.AppParams) []models.AppParams {
+func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams, manifestApps []models.AppParams) ([]models.AppParams, error) {
 	var err error
 	var apps []models.AppParams
 
 	switch len(manifestApps) {
 	case 0:
 		if contextApp.Name == nil {
-			cmd.ui.Failed(
+			return nil, errors.New(
 				T("Manifest file is not found in the current directory, please provide either an app name or manifest") +
 					"\n\n" +
 					commandregistry.Commands.CommandUsage("push"),
 			)
-		} else {
-			err = addApp(&apps, contextApp)
 		}
+		err = addApp(&apps, contextApp)
 	case 1:
 		manifestApps[0].Merge(&contextApp)
 		err = addApp(&apps, manifestApps[0])
@@ -569,7 +594,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 		contextApp.Name = nil
 
 		if !contextApp.IsEmpty() {
-			cmd.ui.Failed("%s", T("Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file."))
+			return nil, errors.New(T("Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file."))
 		}
 
 		if selectedAppName != nil {
@@ -592,10 +617,10 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 	}
 
 	if err != nil {
-		cmd.ui.Failed(T("Error: {{.Err}}", map[string]interface{}{"Err": err.Error()}))
+		return nil, errors.New(T("Error: {{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 
-	return apps
+	return apps, nil
 }
 
 func addApp(apps *[]models.AppParams, app models.AppParams) error {
@@ -616,7 +641,7 @@ func addApp(apps *[]models.AppParams, app models.AppParams) error {
 	return nil
 }
 
-func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
+func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams, error) {
 	appParams := models.AppParams{
 		NoRoute:        c.Bool("no-route"),
 		UseRandomRoute: c.Bool("random-route"),
@@ -643,7 +668,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 		for i, s := range appPortStrings {
 			p, err := strconv.Atoi(s)
 			if err != nil {
-				cmd.ui.Failed(T("Invalid app port: {{.AppPort}}\nApp port must be a number", map[string]interface{}{
+				return models.AppParams{}, errors.New(T("Invalid app port: {{.AppPort}}\nApp port must be a number", map[string]interface{}{
 					"AppPort": s,
 				}))
 			}
@@ -676,7 +701,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	if c.IsSet("i") {
 		instances := c.Int("i")
 		if instances < 1 {
-			cmd.ui.Failed(T("Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
+			return models.AppParams{}, errors.New(T("Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
 				map[string]interface{}{"InstancesCount": instances}))
 		}
 		appParams.InstanceCount = &instances
@@ -685,7 +710,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	if c.String("k") != "" {
 		diskQuota, err := formatters.ToMegabytes(c.String("k"))
 		if err != nil {
-			cmd.ui.Failed(T("Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
+			return models.AppParams{}, errors.New(T("Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
 				map[string]interface{}{"DiskQuota": c.String("k"), "Err": err.Error()}))
 		}
 		appParams.DiskQuota = &diskQuota
@@ -694,7 +719,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
-			cmd.ui.Failed(T("Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
+			return models.AppParams{}, errors.New(T("Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
 				map[string]interface{}{"MemLimit": c.String("m"), "Err": err.Error()}))
 		}
 		appParams.Memory = &memory
@@ -718,7 +743,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 	if c.String("t") != "" {
 		timeout, err := strconv.Atoi(c.String("t"))
 		if err != nil {
-			cmd.ui.Failed("Error: %s", fmt.Errorf(T("Invalid timeout param: {{.Timeout}}\n{{.Err}}",
+			return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid timeout param: {{.Timeout}}\n{{.Err}}",
 				map[string]interface{}{"Timeout": c.String("t"), "Err": err.Error()})))
 		}
 
@@ -727,14 +752,14 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) models.AppParams {
 
 	if healthCheckType := c.String("u"); healthCheckType != "" {
 		if healthCheckType != "port" && healthCheckType != "none" {
-			cmd.ui.Failed("Error: %s", fmt.Errorf(T("Invalid health-check-type param: {{.healthCheckType}}",
+			return models.AppParams{}, fmt.Errorf("Error: %s", fmt.Errorf(T("Invalid health-check-type param: {{.healthCheckType}}",
 				map[string]interface{}{"healthCheckType": healthCheckType})))
 		}
 
 		appParams.HealthCheckType = &healthCheckType
 	}
 
-	return appParams
+	return appParams, nil
 }
 
 func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {

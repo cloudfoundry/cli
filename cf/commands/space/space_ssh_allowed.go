@@ -53,7 +53,7 @@ func (cmd *SpaceSSHAllowed) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *SpaceSSHAllowed) Execute(fc flags.FlagContext) {
+func (cmd *SpaceSSHAllowed) Execute(fc flags.FlagContext) error {
 	space := cmd.spaceReq.GetSpace()
 
 	if space.AllowSSH {
@@ -61,4 +61,5 @@ func (cmd *SpaceSSHAllowed) Execute(fc flags.FlagContext) {
 	} else {
 		cmd.ui.Say(fmt.Sprintf(T("ssh support is disabled in space ")+"'%s'", space.Name))
 	}
+	return nil
 }

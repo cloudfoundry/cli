@@ -30,12 +30,12 @@ cf/api/securitygroups/defaults/staging/staging.go:15:6: type name will be used a
 cf/commands/api.go:17:6: type Api should be API
 cf/commands/application/app.go:25:6: type name will be used as application.ApplicationDisplayer by other packages, and that stutters; consider calling this Displayer
 cf/commands/application/restart.go:15:6: type name will be used as application.ApplicationRestarter by other packages, and that stutters; consider calling this Restarter
-cf/commands/application/start.go:36:6: type name will be used as application.ApplicationStagingWatcher by other packages, and that stutters; consider calling this StagingWatcher
-cf/commands/application/start.go:42:6: type name will be used as application.ApplicationStarter by other packages, and that stutters; consider calling this Starter
-cf/commands/application/stop.go:19:6: type name will be used as application.ApplicationStopper by other packages, and that stutters; consider calling this Stopper
-cf/commands/pluginrepo/repo_plugins.go:63:9: should omit 2nd value from range; this loop is equivalent to `for i := range ...`
+cf/commands/application/start.go:37:6: type name will be used as application.ApplicationStagingWatcher by other packages, and that stutters; consider calling this StagingWatcher
+cf/commands/application/start.go:43:6: type name will be used as application.ApplicationStarter by other packages, and that stutters; consider calling this Starter
+cf/commands/application/stop.go:17:6: type name will be used as application.ApplicationStopper by other packages, and that stutters; consider calling this Stopper
+cf/commands/pluginrepo/repo_plugins.go:64:9: should omit 2nd value from range; this loop is equivalent to `for i := range ...`
 cf/commands/route/create_route.go:20:6: type name will be used as route.RouteCreator by other packages, and that stutters; consider calling this Creator
-cf/commands/securitygroup/security_groups.go:96:2: don't use underscores in Go names; var outputted_index should be outputtedIndex
+cf/commands/securitygroup/security_groups.go:97:2: don't use underscores in Go names; var outputted_index should be outputtedIndex
 cf/commands/service/bind_service.go:21:6: type name will be used as service.ServiceBinder by other packages, and that stutters; consider calling this Binder
 cf/commands/space/space_ssh_allowed.go:15:6: type name will be used as space.SpaceSSHAllowed by other packages, and that stutters; consider calling this SSHAllowed
 cf/configuration/pluginconfig/plugin_config.go:41:1: comment on exported method PluginConfig.GetPluginPath should be of the form "GetPluginPath ..."
@@ -72,8 +72,6 @@ fixtures/plugins/test_1.go:54:3: var userGuid should be userGUID
 generic/map.go:62:1: comment on exported method ConcreteMap.IsEmpty should be of the form "IsEmpty ..."
 generic/map.go:121:1: comment on exported function IsMappable should be of the form "IsMappable ..."
 glob/glob.go:100:6: type name will be used as glob.GlobError by other packages, and that stutters; consider calling this Error
-main/main.go:161:2: don't use ALL_CAPS in Go names; use CamelCase
-main/main.go:186:10: if block ends with a return statement, so drop this else and outdent its block
 testhelpers/assert/helpers.go:53:1: comment on exported function AssertNoErrors should be of the form "AssertNoErrors ..."
 testhelpers/assert/helpers.go:56:6: func name will be used as assert.AssertNoErrors by other packages, and that stutters; consider calling this NoErrors
 testhelpers/assert/helpers.go:66:6: func name will be used as assert.AssertPanic by other packages, and that stutters; consider calling this Panic

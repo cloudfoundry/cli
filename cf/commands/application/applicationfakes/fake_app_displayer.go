@@ -13,8 +13,9 @@ type FakeAppDisplayer struct {
 	SpaceName    string
 }
 
-func (displayer *FakeAppDisplayer) ShowApp(app models.Application, orgName, spaceName string) {
+func (displayer *FakeAppDisplayer) ShowApp(app models.Application, orgName, spaceName string) error {
 	displayer.AppToDisplay = app
+	return nil
 }
 
 func (displayer *FakeAppDisplayer) MetaData() commandregistry.CommandMetadata {
@@ -29,4 +30,6 @@ func (displayer *FakeAppDisplayer) Requirements(_ requirements.Factory, _ flags.
 	return []requirements.Requirement{}
 }
 
-func (displayer *FakeAppDisplayer) Execute(_ flags.FlagContext) {}
+func (displayer *FakeAppDisplayer) Execute(_ flags.FlagContext) error {
+	return nil
+}

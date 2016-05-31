@@ -54,7 +54,7 @@ func (cmd *SpaceQuota) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *SpaceQuota) Execute(c flags.FlagContext) {
+func (cmd *SpaceQuota) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 
 	cmd.ui.Say(T("Getting space quota {{.Quota}} info as {{.Username}}...",
@@ -63,11 +63,10 @@ func (cmd *SpaceQuota) Execute(c flags.FlagContext) {
 			"Username": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	spaceQuota, apiErr := cmd.spaceQuotaRepo.FindByName(name)
+	spaceQuota, err := cmd.spaceQuotaRepo.FindByName(name)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -94,5 +93,5 @@ func (cmd *SpaceQuota) Execute(c flags.FlagContext) {
 	table.Add(T("app instance limit"), T(spaceQuota.FormattedAppInstanceLimit()))
 
 	table.Print()
-
+	return nil
 }

@@ -1,6 +1,8 @@
 package route
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -58,21 +60,21 @@ func (cmd *DeleteOrphanedRoutes) SetDependency(deps commandregistry.Dependency, 
 	return cmd
 }
 
-func (cmd *DeleteOrphanedRoutes) Execute(c flags.FlagContext) {
+func (cmd *DeleteOrphanedRoutes) Execute(c flags.FlagContext) error {
 	force := c.Bool("f")
 	if !force {
 		response := cmd.ui.Confirm(T("Really delete orphaned routes?{{.Prompt}}",
 			map[string]interface{}{"Prompt": terminal.PromptColor(">")}))
 
 		if !response {
-			return
+			return nil
 		}
 	}
 
 	cmd.ui.Say(T("Getting routes as {{.Username}} ...\n",
 		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
+	err := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
 
 		if len(route.Apps) == 0 {
 			cmd.ui.Say(T("Deleting route {{.Route}}...",
@@ -86,9 +88,9 @@ func (cmd *DeleteOrphanedRoutes) Execute(c flags.FlagContext) {
 		return true
 	})
 
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
-		return
+	if err != nil {
+		return errors.New(T("Failed fetching routes.\n{{.Err}}", map[string]interface{}{"Err": err.Error()}))
 	}
 	cmd.ui.Ok()
+	return nil
 }

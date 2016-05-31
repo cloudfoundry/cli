@@ -1736,6 +1736,10 @@
     "translation": "{{.DomainName}} 도메인 삭제 중에 오류 발생\n{{.APIErr}}"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "대상에 대한 SSH 지원 사용 안함 설정 중에 오류가 발생한 대상 "
   },
@@ -1770,6 +1774,10 @@
   {
     "id": "Error finding domain {{.DomainName}}\n{{.APIErr}}",
     "translation": "{{.DomainName}} 도메인을 찾는 중에 오류 발생\n{{.APIErr}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
+    "translation": ""
   },
   {
     "id": "Error finding manifest",

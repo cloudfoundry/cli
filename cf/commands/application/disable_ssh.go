@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
@@ -57,12 +58,12 @@ func (cmd *DisableSSH) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *DisableSSH) Execute(fc flags.FlagContext) {
+func (cmd *DisableSSH) Execute(fc flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	if !app.EnableSSH {
 		cmd.ui.Say(fmt.Sprintf(T("ssh support is already disabled")+" for '%s'", app.Name))
-		return
+		return nil
 	}
 
 	cmd.ui.Say(fmt.Sprintf(T("Disabling ssh support for '%s'..."), app.Name))
@@ -71,12 +72,13 @@ func (cmd *DisableSSH) Execute(fc flags.FlagContext) {
 	enable := false
 	updatedApp, err := cmd.appRepo.Update(app.GUID, models.AppParams{EnableSSH: &enable})
 	if err != nil {
-		cmd.ui.Failed(T("Error disabling ssh support for ") + app.Name + ": " + err.Error())
+		return errors.New(T("Error disabling ssh support for ") + app.Name + ": " + err.Error())
 	}
 
 	if !updatedApp.EnableSSH {
 		cmd.ui.Ok()
 	} else {
-		cmd.ui.Failed(T("ssh support is not disabled for ") + app.Name)
+		return errors.New(T("ssh support is not disabled for ") + app.Name)
 	}
+	return nil
 }

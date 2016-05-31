@@ -98,7 +98,7 @@ func (cmd *CreateUserProvidedService) SetDependency(deps commandregistry.Depende
 	return cmd
 }
 
-func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
+func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 	drainURL := c.String("l")
 	routeServiceURL := c.String("r")
@@ -108,7 +108,7 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 	if c.IsSet("p") {
 		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 
 		err = json.Unmarshal(jsonBytes, &credentialsMap)
@@ -130,9 +130,9 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) {
 
 	err := cmd.userProvidedServiceInstanceRepo.Create(name, drainURL, routeServiceURL, credentialsMap)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

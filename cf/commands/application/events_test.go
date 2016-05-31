@@ -111,6 +111,8 @@ var _ = Describe("events command", func() {
 	})
 
 	Describe("Execute", func() {
+		var executeCmdErr error
+
 		BeforeEach(func() {
 			applicationRequirement.GetApplicationReturns(models.Application{
 				ApplicationFields: models.ApplicationFields{
@@ -123,16 +125,20 @@ var _ = Describe("events command", func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
+		JustBeforeEach(func() {
+			executeCmdErr = cmd.Execute(flagContext)
+		})
+
 		Context("when no events exist", func() {
 			BeforeEach(func() {
 				eventsRepo.RecentEventsReturns([]models.EventFields{}, nil)
 
 				cmd.SetDependency(deps, false)
 				cmd.Requirements(reqFactory, flagContext)
-				cmd.Execute(flagContext)
 			})
 
 			It("tells the user", func() {
+				Expect(executeCmdErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"events", "my-app"},
 					[]string{"No events", "my-app"},
@@ -175,10 +181,10 @@ var _ = Describe("events command", func() {
 
 				cmd.SetDependency(deps, false)
 				cmd.Requirements(reqFactory, flagContext)
-				cmd.Execute(flagContext)
 			})
 
 			It("lists events given an app name", func() {
+				Expect(executeCmdErr).NotTo(HaveOccurred())
 				Expect(eventsRepo.RecentEventsCallCount()).To(Equal(1))
 				appGUID, limit := eventsRepo.RecentEventsArgsForCall(0)
 				Expect(limit).To(Equal(int64(50)))
@@ -199,15 +205,15 @@ var _ = Describe("events command", func() {
 
 				cmd.SetDependency(deps, false)
 				cmd.Requirements(reqFactory, flagContext)
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 			})
 
 			It("tells the user when an error occurs", func() {
+				Expect(executeCmdErr).To(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"events", "my-app"},
-					[]string{"FAILED"},
-					[]string{"welp"},
 				))
+				errStr := executeCmdErr.Error()
+				Expect(errStr).To(ContainSubstring("welp"))
 			})
 		})
 	})

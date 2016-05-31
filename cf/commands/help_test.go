@@ -60,7 +60,8 @@ var _ = Describe("Help", func() {
 	Context("when no argument is provided", func() {
 		It("prints the main help menu of the 'cf' app", func() {
 			flagContext.Parse()
-			cmd.Execute(flagContext)
+			err := cmd.Execute(flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
 			Eventually(buffer.Contents()).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(buffer).Should(gbytes.Say("CF_TRACE=true"))
@@ -71,7 +72,8 @@ var _ = Describe("Help", func() {
 		Context("When the command exists", func() {
 			It("prints the usage help for the command", func() {
 				flagContext.Parse("target")
-				cmd.Execute(flagContext)
+				err := cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeUI.SayCallCount()).To(Equal(1))
 				output, _ := fakeUI.SayArgsForCall(0)
@@ -115,7 +117,8 @@ var _ = Describe("Help", func() {
 					}
 
 					flagContext.Parse("target")
-					cmd.Execute(flagContext)
+					err := cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 
 					Expect(captionCheckCount).To(Equal(4))
 				})
@@ -125,11 +128,8 @@ var _ = Describe("Help", func() {
 		Context("When the command does not exists", func() {
 			It("prints the usage help for the command", func() {
 				flagContext.Parse("bad-command")
-				cmd.Execute(flagContext)
-
-				Expect(fakeUI.FailedCallCount()).To(Equal(1))
-				output, _ := fakeUI.FailedArgsForCall(0)
-				Expect(output).To(ContainSubstring("'bad-command' is not a registered command. See 'cf help'"))
+				err := cmd.Execute(flagContext)
+				Expect(err.Error()).To(Equal("'bad-command' is not a registered command. See 'cf help'"))
 			})
 		})
 	})
@@ -159,7 +159,8 @@ var _ = Describe("Help", func() {
 		Context("command is a plugin command name", func() {
 			It("prints the usage help for the command", func() {
 				flagContext.Parse("fakePluginCmd1")
-				cmd.Execute(flagContext)
+				err := cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeUI.SayCallCount()).To(Equal(1))
 				output, _ := fakeUI.SayArgsForCall(0)
@@ -178,7 +179,8 @@ var _ = Describe("Help", func() {
 		Context("command is a plugin command alias", func() {
 			It("prints the usage help for the command alias", func() {
 				flagContext.Parse("fpc1")
-				cmd.Execute(flagContext)
+				err := cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeUI.SayCallCount()).To(Equal(1))
 				output, _ := fakeUI.SayArgsForCall(0)

@@ -71,7 +71,7 @@ func (cmd *CreateOrg) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *CreateOrg) Execute(c flags.FlagContext) {
+func (cmd *CreateOrg) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 	cmd.ui.Say(T("Creating org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{
@@ -84,7 +84,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 	if quotaName != "" {
 		quota, err := cmd.quotaRepo.FindByName(quotaName)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 
 		org.QuotaDefinition.GUID = quota.GUID
@@ -96,10 +96,10 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Org {{.OrgName}} already exists",
 				map[string]interface{}{"OrgName": name}))
-			return
+			return nil
 		}
 
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -113,7 +113,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 		if setRolesByUsernameFlag.Enabled {
 			org, err := cmd.orgRepo.FindByName(name)
 			if err != nil {
-				cmd.ui.Failed(T("Error accessing org {{.OrgName}} for GUID': ", map[string]interface{}{"Orgname": name}) + err.Error() + "\n" + T("Skip assigning org role to user"))
+				return errors.New(T("Error accessing org {{.OrgName}} for GUID': ", map[string]interface{}{"Orgname": name}) + err.Error() + "\n" + T("Skip assigning org role to user"))
 			}
 
 			cmd.ui.Say("")
@@ -126,7 +126,7 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 
 			err = cmd.orgRoleSetter.SetOrgRole(org.GUID, models.RoleOrgManager, "", cmd.config.Username())
 			if err != nil {
-				cmd.ui.Failed(T("Failed assigning org role to user: ") + err.Error())
+				return errors.New(T("Failed assigning org role to user: ") + err.Error())
 			}
 
 			cmd.ui.Ok()
@@ -135,4 +135,5 @@ func (cmd *CreateOrg) Execute(c flags.FlagContext) {
 
 	cmd.ui.Say(T("\nTIP: Use '{{.Command}}' to target new org",
 		map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " target -o " + name)}))
+	return nil
 }

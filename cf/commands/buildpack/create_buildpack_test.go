@@ -40,18 +40,18 @@ var _ = Describe("create-buildpack command", func() {
 
 	It("fails requirements when the user is not logged in", func() {
 		requirementsFactory.LoginSuccess = false
-		Expect(testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my-dir", "0"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+		Expect(testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my-dir", "0"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 	})
 
 	It("fails with usage when given fewer than three arguments", func() {
-		testcmd.RunCLICommand("create-buildpack", []string{}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("create-buildpack", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 	})
 
 	It("creates and uploads buildpacks", func() {
-		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
 		Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "my.war")).To(Equal(true))
@@ -66,7 +66,7 @@ var _ = Describe("create-buildpack command", func() {
 
 	It("warns the user when the buildpack already exists", func() {
 		repo.CreateBuildpackExists = true
-		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},
@@ -78,20 +78,20 @@ var _ = Describe("create-buildpack command", func() {
 	})
 
 	It("enables the buildpack when given the --enabled flag", func() {
-		testcmd.RunCLICommand("create-buildpack", []string{"--enable", "my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("create-buildpack", []string{"--enable", "my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(true))
 	})
 
 	It("disables the buildpack when given the --disable flag", func() {
-		testcmd.RunCLICommand("create-buildpack", []string{"--disable", "my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("create-buildpack", []string{"--disable", "my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(false))
 	})
 
 	It("alerts the user when uploading the buildpack bits fails", func() {
 		bitsRepo.UploadBuildpackErr = true
-		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "bogus/path", "5"}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "bogus/path", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},

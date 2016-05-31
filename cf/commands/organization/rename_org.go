@@ -53,7 +53,7 @@ func (cmd *RenameOrg) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *RenameOrg) Execute(c flags.FlagContext) {
+func (cmd *RenameOrg) Execute(c flags.FlagContext) error {
 	org := cmd.orgReq.GetOrganization()
 	newName := c.Args()[1]
 
@@ -63,10 +63,9 @@ func (cmd *RenameOrg) Execute(c flags.FlagContext) {
 			"NewName":  terminal.EntityNameColor(newName),
 			"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr := cmd.orgRepo.Rename(org.GUID, newName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err := cmd.orgRepo.Rename(org.GUID, newName)
+	if err != nil {
+		return err
 	}
 	cmd.ui.Ok()
 
@@ -74,4 +73,5 @@ func (cmd *RenameOrg) Execute(c flags.FlagContext) {
 		org.Name = newName
 		cmd.config.SetOrganizationFields(org.OrganizationFields)
 	}
+	return nil
 }

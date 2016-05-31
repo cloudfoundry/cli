@@ -58,7 +58,7 @@ func (cmd *SetEnv) SetDependency(deps commandregistry.Dependency, pluginCall boo
 	return cmd
 }
 
-func (cmd *SetEnv) Execute(c flags.FlagContext) {
+func (cmd *SetEnv) Execute(c flags.FlagContext) error {
 	varName := c.Args()[1]
 	varValue := c.Args()[2]
 	app := cmd.appReq.GetApplication()
@@ -78,14 +78,14 @@ func (cmd *SetEnv) Execute(c flags.FlagContext) {
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue
 
-	_, apiErr := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
+	_, err := cmd.appRepo.Update(app.GUID, models.AppParams{EnvironmentVars: &envParams})
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
 		map[string]interface{}{"Command": terminal.CommandColor(cf.Name + " restage")}))
+	return nil
 }

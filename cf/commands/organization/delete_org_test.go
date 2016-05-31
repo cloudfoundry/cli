@@ -51,7 +51,7 @@ var _ = Describe("delete-org command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("delete-org", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("delete-org", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("fails requirements when not logged in", func() {

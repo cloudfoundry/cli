@@ -189,7 +189,10 @@ var _ = Describe("SetSpaceRole", func() {
 	})
 
 	Describe("Execute", func() {
-		var org models.Organization
+		var (
+			org models.Organization
+			err error
+		)
 
 		BeforeEach(func() {
 			flagContext.Parse("the-user-name", "the-org-name", "the-space-name", "SpaceManager")
@@ -199,6 +202,10 @@ var _ = Describe("SetSpaceRole", func() {
 			org.GUID = "the-org-guid"
 			org.Name = "the-org-name"
 			organizationRequirement.GetOrganizationReturns(org)
+		})
+
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
 		})
 
 		Context("when the space is not found", func() {
@@ -211,12 +218,9 @@ var _ = Describe("SetSpaceRole", func() {
 				Expect(userRepo.SetSpaceRoleByUsernameCallCount()).To(BeZero())
 			})
 
-			It("panics and prints a failure message", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"FAILED"},
-					[]string{"space-repo-error"},
-				))
+			It("returns an error", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("space-repo-error"))
 			})
 		})
 
@@ -235,7 +239,7 @@ var _ = Describe("SetSpaceRole", func() {
 				})
 
 				It("tells the user it is assigning the role", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Assigning role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
 						[]string{"OK"},
@@ -243,7 +247,7 @@ var _ = Describe("SetSpaceRole", func() {
 				})
 
 				It("sets the role using the GUID", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(userRepo.SetSpaceRoleByGUIDCallCount()).To(Equal(1))
 					actualUserGUID, actualSpaceGUID, actualOrgGUID, actualRole := userRepo.SetSpaceRoleByGUIDArgsForCall(0)
 					Expect(actualUserGUID).To(Equal("the-user-guid"))
@@ -257,12 +261,9 @@ var _ = Describe("SetSpaceRole", func() {
 						userRepo.SetSpaceRoleByGUIDReturns(errors.New("user-repo-error"))
 					})
 
-					It("panics and prints a failure message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(BeInDisplayOrder(
-							[]string{"FAILED"},
-							[]string{"user-repo-error"},
-						))
+					It("returns an error", func() {
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(Equal("user-repo-error"))
 					})
 				})
 			})
@@ -273,7 +274,7 @@ var _ = Describe("SetSpaceRole", func() {
 				})
 
 				It("sets the role using the given username", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					username, spaceGUID, orgGUID, role := userRepo.SetSpaceRoleByUsernameArgsForCall(0)
 					Expect(username).To(Equal("the-user-name"))
 					Expect(spaceGUID).To(Equal("the-space-guid"))
@@ -282,7 +283,7 @@ var _ = Describe("SetSpaceRole", func() {
 				})
 
 				It("tells the user it assigned the role", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Assigning role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
 						[]string{"OK"},
@@ -294,12 +295,9 @@ var _ = Describe("SetSpaceRole", func() {
 						userRepo.SetSpaceRoleByUsernameReturns(errors.New("user-repo-error"))
 					})
 
-					It("panics and prints a failure message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(BeInDisplayOrder(
-							[]string{"FAILED"},
-							[]string{"user-repo-error"},
-						))
+					It("returns an error", func() {
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(Equal("user-repo-error"))
 					})
 				})
 			})

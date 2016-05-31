@@ -52,7 +52,7 @@ func (cmd *CreateUser) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *CreateUser) Execute(c flags.FlagContext) {
+func (cmd *CreateUser) Execute(c flags.FlagContext) error {
 	username := c.Args()[0]
 	password := c.Args()[1]
 
@@ -68,7 +68,7 @@ func (cmd *CreateUser) Execute(c flags.FlagContext) {
 	case *errors.ModelAlreadyExistsError:
 		cmd.ui.Warn("%s", err.Error())
 	default:
-		cmd.ui.Failed(T("Error creating user {{.TargetUser}}.\n{{.Error}}",
+		return errors.New(T("Error creating user {{.TargetUser}}.\n{{.Error}}",
 			map[string]interface{}{
 				"TargetUser": terminal.EntityNameColor(username),
 				"Error":      err.Error(),
@@ -77,4 +77,5 @@ func (cmd *CreateUser) Execute(c flags.FlagContext) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'", map[string]interface{}{"CurrentUser": cf.Name}))
+	return nil
 }

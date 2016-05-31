@@ -1,6 +1,8 @@
 package spacequota
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/spacequotas"
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -53,7 +55,7 @@ func (cmd *SetSpaceQuota) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *SetSpaceQuota) Execute(c flags.FlagContext) {
+func (cmd *SetSpaceQuota) Execute(c flags.FlagContext) error {
 
 	spaceName := c.Args()[0]
 	quotaName := c.Args()[1]
@@ -66,22 +68,23 @@ func (cmd *SetSpaceQuota) Execute(c flags.FlagContext) {
 
 	space, err := cmd.spaceRepo.FindByName(spaceName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	if space.SpaceQuotaGUID != "" {
-		cmd.ui.Failed(T("This space already has an assigned space quota."))
+		return errors.New(T("This space already has an assigned space quota."))
 	}
 
 	quota, err := cmd.quotaRepo.FindByName(quotaName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	err = cmd.quotaRepo.AssociateSpaceWithQuota(space.GUID, quota.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

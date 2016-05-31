@@ -36,17 +36,23 @@ type FakeApplicationRestarter struct {
 	requirementsReturns struct {
 		result1 []requirements.Requirement
 	}
-	ExecuteStub        func(context flags.FlagContext)
+	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct {
 		context flags.FlagContext
 	}
-	ApplicationRestartStub        func(app models.Application, orgName string, spaceName string)
+	executeReturns struct {
+		result1 error
+	}
+	ApplicationRestartStub        func(app models.Application, orgName string, spaceName string) error
 	applicationRestartMutex       sync.RWMutex
 	applicationRestartArgsForCall []struct {
 		app       models.Application
 		orgName   string
 		spaceName string
+	}
+	applicationRestartReturns struct {
+		result1 error
 	}
 }
 
@@ -140,14 +146,16 @@ func (fake *FakeApplicationRestarter) RequirementsReturns(result1 []requirements
 	}{result1}
 }
 
-func (fake *FakeApplicationRestarter) Execute(context flags.FlagContext) {
+func (fake *FakeApplicationRestarter) Execute(context flags.FlagContext) error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
-		fake.ExecuteStub(context)
+		return fake.ExecuteStub(context)
+	} else {
+		return fake.executeReturns.result1
 	}
 }
 
@@ -163,7 +171,14 @@ func (fake *FakeApplicationRestarter) ExecuteArgsForCall(i int) flags.FlagContex
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeApplicationRestarter) ApplicationRestart(app models.Application, orgName string, spaceName string) {
+func (fake *FakeApplicationRestarter) ExecuteReturns(result1 error) {
+	fake.ExecuteStub = nil
+	fake.executeReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeApplicationRestarter) ApplicationRestart(app models.Application, orgName string, spaceName string) error {
 	fake.applicationRestartMutex.Lock()
 	fake.applicationRestartArgsForCall = append(fake.applicationRestartArgsForCall, struct {
 		app       models.Application
@@ -172,7 +187,9 @@ func (fake *FakeApplicationRestarter) ApplicationRestart(app models.Application,
 	}{app, orgName, spaceName})
 	fake.applicationRestartMutex.Unlock()
 	if fake.ApplicationRestartStub != nil {
-		fake.ApplicationRestartStub(app, orgName, spaceName)
+		return fake.ApplicationRestartStub(app, orgName, spaceName)
+	} else {
+		return fake.applicationRestartReturns.result1
 	}
 }
 
@@ -186,6 +203,13 @@ func (fake *FakeApplicationRestarter) ApplicationRestartArgsForCall(i int) (mode
 	fake.applicationRestartMutex.RLock()
 	defer fake.applicationRestartMutex.RUnlock()
 	return fake.applicationRestartArgsForCall[i].app, fake.applicationRestartArgsForCall[i].orgName, fake.applicationRestartArgsForCall[i].spaceName
+}
+
+func (fake *FakeApplicationRestarter) ApplicationRestartReturns(result1 error) {
+	fake.ApplicationRestartStub = nil
+	fake.applicationRestartReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ application.ApplicationRestarter = new(FakeApplicationRestarter)

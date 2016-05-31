@@ -1,6 +1,8 @@
 package space
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/spaces"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -62,7 +64,7 @@ func (cmd *ListSpaces) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *ListSpaces) Execute(c flags.FlagContext) {
+func (cmd *ListSpaces) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting spaces in org {{.TargetOrgName}} as {{.CurrentUser}}...\n",
 		map[string]interface{}{
 			"TargetOrgName": terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -71,7 +73,7 @@ func (cmd *ListSpaces) Execute(c flags.FlagContext) {
 
 	foundSpaces := false
 	table := cmd.ui.Table([]string{T("name")})
-	apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
+	err := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
 		table.Add(space.Name)
 		foundSpaces = true
 
@@ -86,15 +88,15 @@ func (cmd *ListSpaces) Execute(c flags.FlagContext) {
 	})
 	table.Print()
 
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching spaces.\n{{.ErrorDescription}}",
+	if err != nil {
+		return errors.New(T("Failed fetching spaces.\n{{.ErrorDescription}}",
 			map[string]interface{}{
-				"ErrorDescription": apiErr.Error(),
+				"ErrorDescription": err.Error(),
 			}))
-		return
 	}
 
 	if !foundSpaces {
 		cmd.ui.Say(T("No spaces found"))
 	}
+	return nil
 }

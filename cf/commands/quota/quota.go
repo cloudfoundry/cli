@@ -55,13 +55,13 @@ func (cmd *showQuota) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *showQuota) Execute(c flags.FlagContext) {
+func (cmd *showQuota) Execute(c flags.FlagContext) error {
 	quotaName := c.Args()[0]
 	cmd.ui.Say(T("Getting quota {{.QuotaName}} info as {{.Username}}...", map[string]interface{}{"QuotaName": quotaName, "Username": cmd.config.Username()}))
 
 	quota, err := cmd.quotaRepo.FindByName(quotaName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -99,4 +99,5 @@ func (cmd *showQuota) Execute(c flags.FlagContext) {
 		table.Add(T("Reserved Route Ports"), reservedRoutePorts)
 	}
 	table.Print()
+	return nil
 }

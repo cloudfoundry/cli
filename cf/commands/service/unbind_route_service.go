@@ -89,7 +89,7 @@ func (cmd *UnbindRouteService) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
+func (cmd *UnbindRouteService) Execute(c flags.FlagContext) error {
 	var path string
 	var port int
 
@@ -98,7 +98,7 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 
 	route, err := cmd.routeRepo.Find(host, domain, path, port)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
@@ -112,7 +112,7 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 
 		if !confirmed {
 			cmd.ui.Warn(T("Unbind cancelled"))
-			return
+			return nil
 		}
 	}
 
@@ -131,11 +131,12 @@ func (cmd *UnbindRouteService) Execute(c flags.FlagContext) {
 		if ok && httpError.ErrorCode() == errors.InvalidRelation {
 			cmd.ui.Warn(T("Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.", map[string]interface{}{"Route": route.URL(), "ServiceInstance": serviceInstance.Name}))
 		} else {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 	}
 
 	cmd.ui.Ok()
+	return nil
 }
 
 func (cmd *UnbindRouteService) UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error {

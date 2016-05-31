@@ -45,7 +45,7 @@ var _ = Describe("enable-service-access command", func() {
 	})
 
 	runCommand := func(args []string) bool {
-		return testcmd.RunCLICommand("enable-service-access", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("enable-service-access", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {
@@ -115,7 +115,7 @@ var _ = Describe("enable-service-access command", func() {
 			It("prints an error if updating one of the plans fails", func() {
 				actor.UpdateAllPlansForServiceReturns(true, errors.New("Kaboom!"))
 
-				Expect(runCommand([]string{"service"})).To(BeTrue())
+				Expect(runCommand([]string{"service"})).To(BeFalse())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Kaboom!"},
 				))
@@ -125,7 +125,7 @@ var _ = Describe("enable-service-access command", func() {
 				It("prints an error if the service does not exist", func() {
 					actor.UpdateSinglePlanForServiceReturns(actors.All, errors.New("could not find service"))
 
-					Expect(runCommand([]string{"-p", "service-plan", "service"})).To(BeTrue())
+					Expect(runCommand([]string{"-p", "service-plan", "service"})).To(BeFalse())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"could not find service"},
 					))
@@ -156,7 +156,7 @@ var _ = Describe("enable-service-access command", func() {
 				It("fails if the org does not exist", func() {
 					actor.UpdatePlanAndOrgForServiceReturns(actors.All, errors.New("could not find org"))
 
-					Expect(runCommand([]string{"-p", "service-plan", "-o", "not-findable-org", "service"})).To(BeTrue())
+					Expect(runCommand([]string{"-p", "service-plan", "-o", "not-findable-org", "service"})).To(BeFalse())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"could not find org"},
 					))
@@ -187,7 +187,7 @@ var _ = Describe("enable-service-access command", func() {
 				It("fails if the org does not exist", func() {
 					actor.UpdateOrgForServiceReturns(false, errors.New("could not find org"))
 
-					Expect(runCommand([]string{"-o", "not-findable-org", "service"})).To(BeTrue())
+					Expect(runCommand([]string{"-o", "not-findable-org", "service"})).To(BeFalse())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"could not find org"},
 					))

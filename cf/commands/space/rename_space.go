@@ -54,7 +54,7 @@ func (cmd *RenameSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *RenameSpace) Execute(c flags.FlagContext) {
+func (cmd *RenameSpace) Execute(c flags.FlagContext) error {
 	space := cmd.spaceReq.GetSpace()
 	newName := c.Args()[1]
 	cmd.ui.Say(T("Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}...",
@@ -65,10 +65,9 @@ func (cmd *RenameSpace) Execute(c flags.FlagContext) {
 			"CurrentUser":  terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr := cmd.spaceRepo.Rename(space.GUID, newName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err := cmd.spaceRepo.Rename(space.GUID, newName)
+	if err != nil {
+		return err
 	}
 
 	if cmd.config.SpaceFields().GUID == space.GUID {
@@ -77,4 +76,5 @@ func (cmd *RenameSpace) Execute(c flags.FlagContext) {
 	}
 
 	cmd.ui.Ok()
+	return err
 }

@@ -39,7 +39,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 	)
 
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
+		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		serviceInstanceRepo = new(apifakes.FakeUserProvidedServiceInstanceRepository)
 		repoLocator := deps.RepoLocator.SetUserProvidedServiceInstanceRepository(serviceInstanceRepo)
@@ -119,21 +119,27 @@ var _ = Describe("CreateUserProvidedService", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("service-instance")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 		})
 
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
+		})
+
 		It("tells the user it will create the user provided service", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating user provided service service-instance in org"},
 			))
 		})
 
 		It("tries to create the user provided service instance", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 			name, drainURL, routeServiceURL, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
 			Expect(name).To(Equal("service-instance"))
@@ -148,7 +154,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("tells the user OK", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"OK"},
 				))
@@ -161,11 +167,8 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"create-err"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("create-err"))
 			})
 		})
 
@@ -175,7 +178,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("tries to create the user provided service instance with the drain url", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, drainURL, _, _ := serviceInstanceRepo.CreateArgsForCall(0)
 				Expect(drainURL).To(Equal("drain-url"))
@@ -188,7 +191,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("tries to create the user provided service instance with the route service url", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, _, routeServiceURL, _ := serviceInstanceRepo.CreateArgsForCall(0)
 				Expect(routeServiceURL).To(Equal("route-service-url"))
@@ -201,7 +204,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("tries to create the user provided service instance with the credentials", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, _, _, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
 				Expect(credentialsMap).To(Equal(map[string]interface{}{
@@ -220,7 +223,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("tries to create the user provided service instance with the credentials", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, _, _, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)
 				Expect(credentialsMap).To(Equal(map[string]interface{}{
@@ -232,11 +235,11 @@ var _ = Describe("CreateUserProvidedService", func() {
 		Context("when the -p flag is passed with inline JSON", func() {
 			BeforeEach(func() {
 				flagContext.Parse("service-instance", "-p", `key1,key2`)
+				ui.Inputs = []string{"value1", "value2"}
 			})
 
 			It("prompts the user for the values", func() {
-				ui.Inputs = []string{"value1", "value2"}
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Prompts).To(ContainSubstrings(
 					[]string{"key1"},
 					[]string{"key2"},
@@ -244,8 +247,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 			})
 
 			It("tries to create the user provided service instance with the credentials", func() {
-				ui.Inputs = []string{"value1", "value2"}
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 
 				Expect(serviceInstanceRepo.CreateCallCount()).To(Equal(1))
 				_, _, _, credentialsMap := serviceInstanceRepo.CreateArgsForCall(0)

@@ -62,10 +62,10 @@ func (c *V3Apps) SetDependency(deps commandregistry.Dependency, _ bool) commandr
 	return c
 }
 
-func (c *V3Apps) Execute(fc flags.FlagContext) {
+func (c *V3Apps) Execute(fc flags.FlagContext) error {
 	applications, err := c.repository.GetApplications()
 	if err != nil {
-		c.ui.Failed(err.Error())
+		return err
 	}
 
 	processes := make([][]models.V3Process, len(applications))
@@ -74,13 +74,13 @@ func (c *V3Apps) Execute(fc flags.FlagContext) {
 	for i, app := range applications {
 		ps, err := c.repository.GetProcesses(app.Links.Processes.Href)
 		if err != nil {
-			c.ui.Failed(err.Error())
+			return err
 		}
 		processes[i] = ps
 
 		rs, err := c.repository.GetRoutes(app.Links.Routes.Href)
 		if err != nil {
-			c.ui.Failed(err.Error())
+			return err
 		}
 		routes[i] = rs
 	}
@@ -92,6 +92,7 @@ func (c *V3Apps) Execute(fc flags.FlagContext) {
 	}
 
 	table.Print()
+	return nil
 }
 
 type table interface {

@@ -45,7 +45,7 @@ var _ = Describe("space command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("space", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("space", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {
@@ -280,7 +280,7 @@ var _ = Describe("space command", func() {
 			})
 
 			It("Fills in the PluginModel", func() {
-				testcmd.RunCLICommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true)
+				testcmd.RunCLICommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true, ui)
 				Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
 				Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
 

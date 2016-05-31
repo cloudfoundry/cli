@@ -53,7 +53,7 @@ func (cmd *SSHEnabled) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *SSHEnabled) Execute(fc flags.FlagContext) {
+func (cmd *SSHEnabled) Execute(fc flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	if app.EnableSSH {
@@ -63,4 +63,5 @@ func (cmd *SSHEnabled) Execute(fc flags.FlagContext) {
 	}
 
 	cmd.ui.Say("")
+	return nil
 }

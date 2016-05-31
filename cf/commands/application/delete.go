@@ -61,13 +61,13 @@ func (cmd *DeleteApp) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *DeleteApp) Execute(c flags.FlagContext) {
+func (cmd *DeleteApp) Execute(c flags.FlagContext) error {
 	appName := c.Args()[0]
 
 	if !c.Bool("f") {
 		response := cmd.ui.ConfirmDelete(T("app"), appName)
 		if !response {
-			return
+			return nil
 		}
 	}
 
@@ -78,31 +78,32 @@ func (cmd *DeleteApp) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	app, apiErr := cmd.appRepo.Read(appName)
+	app, err := cmd.appRepo.Read(appName)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil: // no error
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("App {{.AppName}} does not exist.", map[string]interface{}{"AppName": appName}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
+		return err
 	}
 
 	if c.Bool("r") {
 		for _, route := range app.Routes {
-			apiErr = cmd.routeRepo.Delete(route.GUID)
-			if apiErr != nil {
-				cmd.ui.Failed(apiErr.Error())
+			err = cmd.routeRepo.Delete(route.GUID)
+			if err != nil {
+				return err
 			}
 		}
 	}
 
-	apiErr = cmd.appRepo.Delete(app.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err = cmd.appRepo.Delete(app.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }
