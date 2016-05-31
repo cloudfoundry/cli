@@ -84,7 +84,7 @@ func (cmd *CreateQuota) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *CreateQuota) Execute(context flags.FlagContext) {
+func (cmd *CreateQuota) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 
 	cmd.ui.Say(T("Creating quota {{.QuotaName}} as {{.Username}}...", map[string]interface{}{
@@ -100,7 +100,7 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 	if memoryLimit != "" {
 		parsedMemory, err := formatters.ToMegabytes(memoryLimit)
 		if err != nil {
-			cmd.ui.Failed(T("Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": memoryLimit, "Err": err}))
+			return errors.New(T("Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": memoryLimit, "Err": err}))
 		}
 
 		quota.MemoryLimit = parsedMemory
@@ -112,7 +112,7 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 	} else {
 		parsedMemory, errr := formatters.ToMegabytes(instanceMemoryLimit)
 		if errr != nil {
-			cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": errr}))
+			return errors.New(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": errr}))
 		}
 		quota.InstanceMemoryLimit = parsedMemory
 	}
@@ -145,12 +145,13 @@ func (cmd *CreateQuota) Execute(context flags.FlagContext) {
 	if ok && httpErr.ErrorCode() == errors.QuotaDefinitionNameTaken {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Quota Definition {{.QuotaName}} already exists", map[string]interface{}{"QuotaName": quota.Name}))
-		return
+		return nil
 	}
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

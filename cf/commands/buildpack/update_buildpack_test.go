@@ -52,7 +52,7 @@ var _ = Describe("Updating buildpack command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("update-buildpack", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-buildpack", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Context("is only successful on login and buildpack success", func() {

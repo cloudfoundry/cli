@@ -1,6 +1,8 @@
 package organization
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -62,16 +64,16 @@ func (cmd *ListOrgs) SetDependency(deps commandregistry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd ListOrgs) Execute(fc flags.FlagContext) {
+func (cmd ListOrgs) Execute(fc flags.FlagContext) error {
 	cmd.ui.Say(T("Getting orgs as {{.Username}}...\n",
 		map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	noOrgs := true
 	table := cmd.ui.Table([]string{T("name")})
 
-	orgs, apiErr := cmd.orgRepo.ListOrgs(orgLimit)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	orgs, err := cmd.orgRepo.ListOrgs(orgLimit)
+	if err != nil {
+		return err
 	}
 	for _, org := range orgs {
 		table.Add(org.Name)
@@ -80,10 +82,9 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) {
 
 	table.Print()
 
-	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching orgs.\n{{.APIErr}}",
-			map[string]interface{}{"APIErr": apiErr}))
-		return
+	if err != nil {
+		return errors.New(T("Failed fetching orgs.\n{{.APIErr}}",
+			map[string]interface{}{"APIErr": err}))
 	}
 
 	if noOrgs {
@@ -93,7 +94,7 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) {
 	if cmd.pluginCall {
 		cmd.populatePluginModel(orgs)
 	}
-
+	return nil
 }
 
 func (cmd *ListOrgs) populatePluginModel(orgs []models.Organization) {

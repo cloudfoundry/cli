@@ -65,7 +65,7 @@ func (cmd *ShowService) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *ShowService) Execute(c flags.FlagContext) {
+func (cmd *ShowService) Execute(c flags.FlagContext) error {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
 	boundApps := []string{}
@@ -79,7 +79,7 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 
 	if cmd.pluginCall {
 		cmd.populatePluginModel(serviceInstance)
-		return
+		return nil
 	}
 
 	if c.Bool("guid") {
@@ -145,6 +145,7 @@ func (cmd *ShowService) Execute(c flags.FlagContext) {
 				}))
 		}
 	}
+	return nil
 }
 
 func InstanceStateToStatus(operationType string, state string, isUserProvidedService bool) string {

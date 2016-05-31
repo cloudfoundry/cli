@@ -185,22 +185,22 @@ var _ = Describe("Push Command", func() {
 	})
 
 	callPush := func(args ...string) bool {
-		return testcmd.RunCLICommand("push", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("push", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {
 		It("passes when logged in and a space is targeted", func() {
-			Expect(callPush()).To(BeTrue())
+			Expect(callPush("app-name")).To(BeTrue())
 		})
 
 		It("fails when not logged in", func() {
 			requirementsFactory.LoginSuccess = false
-			Expect(callPush()).To(BeFalse())
+			Expect(callPush("app-name")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
 			requirementsFactory.TargetedSpaceSuccess = false
-			Expect(callPush()).To(BeFalse())
+			Expect(callPush("app-name")).To(BeFalse())
 		})
 
 		// yes, we're aware that the args here should probably be provided in a different order

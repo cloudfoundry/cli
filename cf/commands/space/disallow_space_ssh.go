@@ -1,6 +1,7 @@
 package space
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/spaces"
@@ -56,12 +57,12 @@ func (cmd *DisallowSpaceSSH) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *DisallowSpaceSSH) Execute(fc flags.FlagContext) {
+func (cmd *DisallowSpaceSSH) Execute(fc flags.FlagContext) error {
 	space := cmd.spaceReq.GetSpace()
 
 	if !space.AllowSSH {
 		cmd.ui.Say(fmt.Sprintf(T("ssh support is already disabled in space ")+"'%s'", space.Name))
-		return
+		return nil
 	}
 
 	cmd.ui.Say(fmt.Sprintf(T("Disabling ssh support for space '%s'..."), space.Name))
@@ -69,8 +70,9 @@ func (cmd *DisallowSpaceSSH) Execute(fc flags.FlagContext) {
 
 	err := cmd.spaceRepo.SetAllowSSH(space.GUID, false)
 	if err != nil {
-		cmd.ui.Failed(T("Error disabling ssh support for space ") + space.Name + ": " + err.Error())
+		return errors.New(T("Error disabling ssh support for space ") + space.Name + ": " + err.Error())
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

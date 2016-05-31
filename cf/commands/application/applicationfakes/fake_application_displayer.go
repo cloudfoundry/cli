@@ -9,16 +9,19 @@ import (
 )
 
 type FakeApplicationDisplayer struct {
-	ShowAppStub        func(app models.Application, orgName string, spaceName string)
+	ShowAppStub        func(app models.Application, orgName string, spaceName string) error
 	showAppMutex       sync.RWMutex
 	showAppArgsForCall []struct {
 		app       models.Application
 		orgName   string
 		spaceName string
 	}
+	showAppReturns struct {
+		result1 error
+	}
 }
 
-func (fake *FakeApplicationDisplayer) ShowApp(app models.Application, orgName string, spaceName string) {
+func (fake *FakeApplicationDisplayer) ShowApp(app models.Application, orgName string, spaceName string) error {
 	fake.showAppMutex.Lock()
 	fake.showAppArgsForCall = append(fake.showAppArgsForCall, struct {
 		app       models.Application
@@ -27,7 +30,9 @@ func (fake *FakeApplicationDisplayer) ShowApp(app models.Application, orgName st
 	}{app, orgName, spaceName})
 	fake.showAppMutex.Unlock()
 	if fake.ShowAppStub != nil {
-		fake.ShowAppStub(app, orgName, spaceName)
+		return fake.ShowAppStub(app, orgName, spaceName)
+	} else {
+		return fake.showAppReturns.result1
 	}
 }
 
@@ -41,6 +46,13 @@ func (fake *FakeApplicationDisplayer) ShowAppArgsForCall(i int) (models.Applicat
 	fake.showAppMutex.RLock()
 	defer fake.showAppMutex.RUnlock()
 	return fake.showAppArgsForCall[i].app, fake.showAppArgsForCall[i].orgName, fake.showAppArgsForCall[i].spaceName
+}
+
+func (fake *FakeApplicationDisplayer) ShowAppReturns(result1 error) {
+	fake.ShowAppStub = nil
+	fake.showAppReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ application.ApplicationDisplayer = new(FakeApplicationDisplayer)

@@ -54,7 +54,7 @@ var _ = Describe("auth command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when given too few arguments", func() {
-			testcmd.RunCLICommand("auth", []string{}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -62,7 +62,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
-			Expect(testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 	})
 
@@ -74,7 +74,7 @@ var _ = Describe("auth command", func() {
 
 		It("authenticates successfully", func() {
 			requirementsFactory.APIEndpointSuccess = true
-			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -93,7 +93,7 @@ var _ = Describe("auth command", func() {
 			config.SetMinRecommendedCLIVersion("5.5.0")
 			cf.Version = "4.5.0"
 
-			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"To upgrade your CLI"},
@@ -103,14 +103,14 @@ var _ = Describe("auth command", func() {
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
 			requirementsFactory.APIEndpointSuccess = true
-			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false)
+			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 			Expect(authRepo.GetLoginPromptsAndSaveUAAServerURLCallCount()).To(Equal(1))
 		})
 
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
 				authRepo.AuthenticateReturns(errors.New("Error authenticating."))
-				testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 			})
 
 			It("does not prompt the user when provided username and password", func() {

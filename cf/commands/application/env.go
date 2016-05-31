@@ -56,10 +56,10 @@ func (cmd *Env) SetDependency(deps commandregistry.Dependency, pluginCall bool) 
 	return cmd
 }
 
-func (cmd *Env) Execute(c flags.FlagContext) {
+func (cmd *Env) Execute(c flags.FlagContext) error {
 	app, err := cmd.appRepo.Read(c.Args()[0])
 	if notFound, ok := err.(*errors.ModelNotFoundError); ok {
-		cmd.ui.Failed(notFound.Error())
+		return notFound
 	}
 
 	cmd.ui.Say(T("Getting env variables for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -71,13 +71,16 @@ func (cmd *Env) Execute(c flags.FlagContext) {
 
 	env, err := cmd.appRepo.ReadEnv(app.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	cmd.displaySystemiAndAppProvidedEnvironment(env.System, env.Application)
+	err = cmd.displaySystemiAndAppProvidedEnvironment(env.System, env.Application)
+	if err != nil {
+		return err
+	}
 	cmd.ui.Say("")
 	cmd.displayUserProvidedEnvironment(env.Environment)
 	cmd.ui.Say("")
@@ -85,9 +88,10 @@ func (cmd *Env) Execute(c flags.FlagContext) {
 	cmd.ui.Say("")
 	cmd.displayStagingEnvironment(env.Staging)
 	cmd.ui.Say("")
+	return nil
 }
 
-func (cmd *Env) displaySystemiAndAppProvidedEnvironment(env map[string]interface{}, app map[string]interface{}) {
+func (cmd *Env) displaySystemiAndAppProvidedEnvironment(env map[string]interface{}, app map[string]interface{}) error {
 	var vcapServices string
 	var vcapApplication string
 
@@ -95,7 +99,7 @@ func (cmd *Env) displaySystemiAndAppProvidedEnvironment(env map[string]interface
 	if ok && len(servicesAsMap) > 0 {
 		jsonBytes, err := json.MarshalIndent(env, "", " ")
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		vcapServices = string(jsonBytes)
 	}
@@ -104,14 +108,14 @@ func (cmd *Env) displaySystemiAndAppProvidedEnvironment(env map[string]interface
 	if ok && len(applicationAsMap) > 0 {
 		jsonBytes, err := json.MarshalIndent(app, "", " ")
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		vcapApplication = string(jsonBytes)
 	}
 
 	if len(vcapServices) == 0 && len(vcapApplication) == 0 {
 		cmd.ui.Say(T("No system-provided env variables have been set"))
-		return
+		return nil
 	}
 
 	cmd.ui.Say(terminal.EntityNameColor(T("System-Provided:")))
@@ -119,6 +123,7 @@ func (cmd *Env) displaySystemiAndAppProvidedEnvironment(env map[string]interface
 	cmd.ui.Say(vcapServices)
 	cmd.ui.Say("")
 	cmd.ui.Say(vcapApplication)
+	return nil
 }
 
 func (cmd *Env) displayUserProvidedEnvironment(envVars map[string]interface{}) {

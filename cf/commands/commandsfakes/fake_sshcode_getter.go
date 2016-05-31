@@ -35,10 +35,13 @@ type FakeSSHCodeGetter struct {
 	requirementsReturns struct {
 		result1 []requirements.Requirement
 	}
-	ExecuteStub        func(context flags.FlagContext)
+	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct {
 		context flags.FlagContext
+	}
+	executeReturns struct {
+		result1 error
 	}
 	GetStub        func() (string, error)
 	getMutex       sync.RWMutex
@@ -139,14 +142,16 @@ func (fake *FakeSSHCodeGetter) RequirementsReturns(result1 []requirements.Requir
 	}{result1}
 }
 
-func (fake *FakeSSHCodeGetter) Execute(context flags.FlagContext) {
+func (fake *FakeSSHCodeGetter) Execute(context flags.FlagContext) error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
-		fake.ExecuteStub(context)
+		return fake.ExecuteStub(context)
+	} else {
+		return fake.executeReturns.result1
 	}
 }
 
@@ -160,6 +165,13 @@ func (fake *FakeSSHCodeGetter) ExecuteArgsForCall(i int) flags.FlagContext {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
 	return fake.executeArgsForCall[i].context
+}
+
+func (fake *FakeSSHCodeGetter) ExecuteReturns(result1 error) {
+	fake.ExecuteStub = nil
+	fake.executeReturns = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeSSHCodeGetter) Get() (string, error) {

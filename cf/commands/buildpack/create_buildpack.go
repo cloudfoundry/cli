@@ -64,7 +64,7 @@ func (cmd *CreateBuildpack) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
+func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 	buildpackName := c.Args()[0]
 
 	cmd.ui.Say(T("Creating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
@@ -77,9 +77,9 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
 			cmd.ui.Warn(T("Buildpack {{.BuildpackName}} already exists", map[string]interface{}{"BuildpackName": buildpackName}))
 			cmd.ui.Say(T("TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack", map[string]interface{}{"CfUpdateBuildpackCommand": terminal.CommandColor(cf.Name + " " + "update-buildpack")}))
 		} else {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
-		return
+		return nil
 	}
 	cmd.ui.Ok()
 	cmd.ui.Say("")
@@ -88,17 +88,16 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) {
 
 	dir, err := filepath.Abs(c.Args()[1])
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }
 
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c flags.FlagContext) (buildpack models.Buildpack, apiErr error) {

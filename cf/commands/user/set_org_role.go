@@ -82,13 +82,13 @@ func (cmd *SetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
+func (cmd *SetOrgRole) Execute(c flags.FlagContext) error {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 	roleStr := c.Args()[2]
 	role, err := models.RoleFromString(roleStr)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
@@ -101,10 +101,11 @@ func (cmd *SetOrgRole) Execute(c flags.FlagContext) {
 
 	err = cmd.SetOrgRole(org.GUID, role, user.GUID, user.Username)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }
 
 func (cmd *SetOrgRole) SetOrgRole(orgGUID string, role models.Role, userGUID, userName string) error {

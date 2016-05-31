@@ -61,13 +61,13 @@ func (cmd *DeleteServiceKey) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
+func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) error {
 	serviceInstanceName := c.Args()[0]
 	serviceKeyName := c.Args()[1]
 
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDelete(T("service key"), serviceKeyName) {
-			return
+			return nil
 		}
 	}
 
@@ -85,7 +85,7 @@ func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
 			map[string]interface{}{
 				"ServiceInstanceName": serviceInstanceName,
 			}))
-		return
+		return nil
 	}
 
 	serviceKey, err := cmd.serviceKeyRepo.GetServiceKey(serviceInstance.GUID, serviceKeyName)
@@ -96,7 +96,7 @@ func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
 				map[string]interface{}{
 					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
 					"ServiceInstanceName": terminal.EntityNameColor(serviceInstanceName)}))
-			return
+			return nil
 		default:
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
@@ -104,15 +104,15 @@ func (cmd *DeleteServiceKey) Execute(c flags.FlagContext) {
 					"ServiceKeyName":      serviceKeyName,
 					"ServiceInstanceName": serviceInstanceName,
 				}))
-			return
+			return nil
 		}
 	}
 
 	err = cmd.serviceKeyRepo.DeleteServiceKey(serviceKey.Fields.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

@@ -39,7 +39,7 @@ var _ = Describe("rename-org command", func() {
 	})
 
 	var callRenameOrg = func(args []string) bool {
-		return testcmd.RunCLICommand("rename-org", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("rename-org", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("fails with usage when given less than two args", func() {

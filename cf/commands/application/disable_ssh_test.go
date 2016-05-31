@@ -41,7 +41,7 @@ var _ = Describe("disable-ssh command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("disable-ssh", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("disable-ssh", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

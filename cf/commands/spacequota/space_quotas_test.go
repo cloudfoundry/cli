@@ -42,7 +42,7 @@ var _ = Describe("quotas command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("space-quotas", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("space-quotas", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {
@@ -83,7 +83,7 @@ var _ = Describe("quotas command", func() {
 		JustBeforeEach(func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedOrgSuccess = true
-			Expect(runCommand()).To(HavePassedRequirements())
+			runCommand()
 		})
 
 		Context("when quotas exist", func() {

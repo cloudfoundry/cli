@@ -63,7 +63,7 @@ func (cmd *ListServices) SetDependency(deps commandregistry.Dependency, pluginCa
 	return cmd
 }
 
-func (cmd *ListServices) Execute(fc flags.FlagContext) {
+func (cmd *ListServices) Execute(fc flags.FlagContext) error {
 	cmd.ui.Say(T("Getting services in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"OrgName":     terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -71,11 +71,10 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	serviceInstances, apiErr := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
+	serviceInstances, err := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -83,7 +82,7 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) {
 
 	if len(serviceInstances) == 0 {
 		cmd.ui.Say(T("No services found"))
-		return
+		return nil
 	}
 
 	table := cmd.ui.Table([]string{T("name"), T("service"), T("plan"), T("bound apps"), T("last operation")})
@@ -131,4 +130,5 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) {
 	}
 
 	table.Print()
+	return nil
 }

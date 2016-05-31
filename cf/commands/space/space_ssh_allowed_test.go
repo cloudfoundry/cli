@@ -24,7 +24,7 @@ var _ = Describe("space-ssh-allowed command", func() {
 	}
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("space-ssh-allowed", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("space-ssh-allowed", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	BeforeEach(func() {

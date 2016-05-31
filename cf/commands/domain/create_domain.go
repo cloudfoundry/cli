@@ -53,7 +53,7 @@ func (cmd *CreateDomain) SetDependency(deps commandregistry.Dependency, pluginCa
 	return cmd
 }
 
-func (cmd *CreateDomain) Execute(c flags.FlagContext) {
+func (cmd *CreateDomain) Execute(c flags.FlagContext) error {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 
@@ -63,11 +63,11 @@ func (cmd *CreateDomain) Execute(c flags.FlagContext) {
 			"OrgName":    terminal.EntityNameColor(owningOrg.Name),
 			"Username":   terminal.EntityNameColor(cmd.config.Username())}))
 
-	_, apiErr := cmd.domainRepo.Create(domainName, owningOrg.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	_, err := cmd.domainRepo.Create(domainName, owningOrg.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

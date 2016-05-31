@@ -68,7 +68,7 @@ func (cmd *CreateServiceBroker) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *CreateServiceBroker) Execute(c flags.FlagContext) {
+func (cmd *CreateServiceBroker) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 	username := c.Args()[1]
 	password := c.Args()[2]
@@ -92,8 +92,9 @@ func (cmd *CreateServiceBroker) Execute(c flags.FlagContext) {
 	}
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return err
 }

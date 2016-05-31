@@ -47,7 +47,7 @@ var _ = Describe("curl command", func() {
 	})
 
 	runCurlWithInputs := func(args []string) bool {
-		return testcmd.RunCLICommand("curl", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("curl", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("fails with usage when not given enough input", func() {

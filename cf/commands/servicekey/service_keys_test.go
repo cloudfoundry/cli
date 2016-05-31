@@ -49,7 +49,7 @@ var _ = Describe("service-keys command", func() {
 	})
 
 	var callListServiceKeys = func(args []string) bool {
-		return testcmd.RunCLICommand("service-keys", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("service-keys", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

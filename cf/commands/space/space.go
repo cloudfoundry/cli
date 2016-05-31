@@ -69,11 +69,11 @@ func (cmd *ShowSpace) SetDependency(deps commandregistry.Dependency, pluginCall 
 	return cmd
 }
 
-func (cmd *ShowSpace) Execute(c flags.FlagContext) {
+func (cmd *ShowSpace) Execute(c flags.FlagContext) error {
 	space := cmd.spaceReq.GetSpace()
 	if cmd.pluginCall {
 		cmd.populatePluginModel(space)
-		return
+		return nil
 	}
 	if c.Bool("guid") {
 		cmd.ui.Say(space.GUID)
@@ -85,7 +85,11 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 			}))
 
-		quotaString := cmd.quotaString(space)
+		quotaString, err := cmd.quotaString(space)
+		if err != nil {
+			return err
+		}
+
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 		table := cmd.ui.Table([]string{terminal.EntityNameColor(space.Name), "", ""})
@@ -135,17 +139,17 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) {
 		}
 	}
 
+	return nil
 }
 
-func (cmd *ShowSpace) quotaString(space models.Space) string {
+func (cmd *ShowSpace) quotaString(space models.Space) (string, error) {
 	if space.SpaceQuotaGUID == "" {
-		return ""
+		return "", nil
 	}
 
 	quota, err := cmd.quotaRepo.FindByGUID(space.SpaceQuotaGUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return ""
+		return "", err
 	}
 
 	spaceQuota := fmt.Sprintf(
@@ -159,7 +163,7 @@ func (cmd *ShowSpace) quotaString(space models.Space) string {
 		T(quota.FormattedAppInstanceLimit()),
 	)
 
-	return spaceQuota
+	return spaceQuota, nil
 }
 
 func (cmd *ShowSpace) populatePluginModel(space models.Space) {

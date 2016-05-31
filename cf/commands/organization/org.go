@@ -65,7 +65,7 @@ func (cmd *ShowOrg) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	return cmd
 }
 
-func (cmd *ShowOrg) Execute(c flags.FlagContext) {
+func (cmd *ShowOrg) Execute(c flags.FlagContext) error {
 	org := cmd.orgReq.GetOrganization()
 
 	if c.Bool("guid") {
@@ -123,6 +123,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) {
 			table.Print()
 		}
 	}
+	return nil
 }
 
 func (cmd *ShowOrg) populatePluginModel(org models.Organization, quota models.QuotaFields) {

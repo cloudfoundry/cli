@@ -44,7 +44,7 @@ var _ = Describe("stacks command", func() {
 		It("fails if the user is not logged in", func() {
 			requirementsFactory.LoginSuccess = false
 
-			Expect(testcmd.RunCLICommand("stacks", []string{}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("stacks", []string{}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 
 		Context("when arguments are provided", func() {
@@ -81,7 +81,7 @@ var _ = Describe("stacks command", func() {
 		}
 
 		repo.FindAllReturns([]models.Stack{stack1, stack2}, nil)
-		testcmd.RunCLICommand("stacks", []string{}, requirementsFactory, updateCommandDependency, false)
+		testcmd.RunCLICommand("stacks", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Getting stacks in org", "my-org", "my-space", "my-user"},

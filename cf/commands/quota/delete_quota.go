@@ -55,13 +55,13 @@ func (cmd *DeleteQuota) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *DeleteQuota) Execute(c flags.FlagContext) {
+func (cmd *DeleteQuota) Execute(c flags.FlagContext) error {
 	quotaName := c.Args()[0]
 
 	if !c.Bool("f") {
 		response := cmd.ui.ConfirmDelete("quota", quotaName)
 		if !response {
-			return
+			return nil
 		}
 	}
 
@@ -70,22 +70,23 @@ func (cmd *DeleteQuota) Execute(c flags.FlagContext) {
 		"Username":  terminal.EntityNameColor(cmd.config.Username()),
 	}))
 
-	quota, apiErr := cmd.quotaRepo.FindByName(quotaName)
+	quota, err := cmd.quotaRepo.FindByName(quotaName)
 
-	switch (apiErr).(type) {
+	switch (err).(type) {
 	case nil: // no error
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Quota {{.QuotaName}} does not exist", map[string]interface{}{"QuotaName": quotaName}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
+		return err
 	}
 
-	apiErr = cmd.quotaRepo.Delete(quota.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err = cmd.quotaRepo.Delete(quota.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return err
 }

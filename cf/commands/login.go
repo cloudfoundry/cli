@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -76,16 +77,20 @@ func (cmd *Login) SetDependency(deps commandregistry.Dependency, pluginCall bool
 	return cmd
 }
 
-func (cmd *Login) Execute(c flags.FlagContext) {
+func (cmd *Login) Execute(c flags.FlagContext) error {
 	cmd.config.ClearSession()
 
 	endpoint, skipSSL := cmd.decideEndpoint(c)
 
-	Api{
+	api := Api{
 		ui:           cmd.ui,
 		config:       cmd.config,
 		endpointRepo: cmd.endpointRepo,
-	}.setAPIEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
+	}
+	err := api.setAPIEndpoint(endpoint, skipSSL, cmd.MetaData().Name)
+	if err != nil {
+		return err
+	}
 
 	defer func() {
 		cmd.ui.Say("")
@@ -103,17 +108,30 @@ func (cmd *Login) Execute(c flags.FlagContext) {
 	//   OR       a one-time passcode
 
 	if c.Bool("sso") {
-		cmd.authenticateSSO(c)
+		err = cmd.authenticateSSO(c)
+		if err != nil {
+			return err
+		}
 	} else {
-		cmd.authenticate(c)
+		err = cmd.authenticate(c)
+		if err != nil {
+			return err
+		}
 	}
 
-	orgIsSet := cmd.setOrganization(c)
+	orgIsSet, err := cmd.setOrganization(c)
+	if err != nil {
+		return err
+	}
 
 	if orgIsSet {
-		cmd.setSpace(c)
+		err = cmd.setSpace(c)
+		if err != nil {
+			return err
+		}
 	}
 	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
+	return nil
 }
 
 func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
@@ -133,10 +151,10 @@ func (cmd Login) decideEndpoint(c flags.FlagContext) (string, bool) {
 	return endpoint, skipSSL
 }
 
-func (cmd Login) authenticateSSO(c flags.FlagContext) {
+func (cmd Login) authenticateSSO(c flags.FlagContext) error {
 	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	credentials := make(map[string]string)
@@ -158,17 +176,18 @@ func (cmd Login) authenticateSSO(c flags.FlagContext) {
 	}
 
 	if err != nil {
-		cmd.ui.Failed(T("Unable to authenticate."))
+		return errors.New(T("Unable to authenticate."))
 	}
+	return nil
 }
 
-func (cmd Login) authenticate(c flags.FlagContext) {
+func (cmd Login) authenticate(c flags.FlagContext) error {
 	usernameFlagValue := c.String("u")
 	passwordFlagValue := c.String("p")
 
 	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 	passwordKeys := []string{}
 	credentials := make(map[string]string)
@@ -223,43 +242,44 @@ func (cmd Login) authenticate(c flags.FlagContext) {
 	}
 
 	if err != nil {
-		cmd.ui.Failed(T("Unable to authenticate."))
+		return errors.New(T("Unable to authenticate."))
 	}
+	return nil
 }
 
-func (cmd Login) setOrganization(c flags.FlagContext) (isOrgSet bool) {
+func (cmd Login) setOrganization(c flags.FlagContext) (bool, error) {
 	orgName := c.String("o")
 
 	if orgName == "" {
 		orgs, err := cmd.orgRepo.ListOrgs(maxChoices)
 		if err != nil {
-			cmd.ui.Failed(T("Error finding available orgs\n{{.APIErr}}",
+			return false, errors.New(T("Error finding available orgs\n{{.APIErr}}",
 				map[string]interface{}{"APIErr": err.Error()}))
 		}
 
 		switch len(orgs) {
 		case 0:
-			return false
+			return false, nil
 		case 1:
 			cmd.targetOrganization(orgs[0])
-			return true
+			return true, nil
 		default:
 			orgName = cmd.promptForOrgName(orgs)
 			if orgName == "" {
 				cmd.ui.Say("")
-				return false
+				return false, nil
 			}
 		}
 	}
 
 	org, err := cmd.orgRepo.FindByName(orgName)
 	if err != nil {
-		cmd.ui.Failed(T("Error finding org {{.OrgName}}\n{{.Err}}",
+		return false, errors.New(T("Error finding org {{.OrgName}}\n{{.Err}}",
 			map[string]interface{}{"OrgName": terminal.EntityNameColor(orgName), "Err": err.Error()}))
 	}
 
 	cmd.targetOrganization(org)
-	return true
+	return true, nil
 }
 
 func (cmd Login) promptForOrgName(orgs []models.Organization) string {
@@ -277,7 +297,7 @@ func (cmd Login) targetOrganization(org models.Organization) {
 		map[string]interface{}{"OrgName": terminal.EntityNameColor(org.Name)}))
 }
 
-func (cmd Login) setSpace(c flags.FlagContext) {
+func (cmd Login) setSpace(c flags.FlagContext) error {
 	spaceName := c.String("s")
 
 	if spaceName == "" {
@@ -287,31 +307,32 @@ func (cmd Login) setSpace(c flags.FlagContext) {
 			return (len(availableSpaces) < maxChoices)
 		})
 		if err != nil {
-			cmd.ui.Failed(T("Error finding available spaces\n{{.Err}}",
+			return errors.New(T("Error finding available spaces\n{{.Err}}",
 				map[string]interface{}{"Err": err.Error()}))
 		}
 
 		if len(availableSpaces) == 0 {
-			return
+			return nil
 		} else if len(availableSpaces) == 1 {
 			cmd.targetSpace(availableSpaces[0])
-			return
+			return nil
 		} else {
 			spaceName = cmd.promptForSpaceName(availableSpaces)
 			if spaceName == "" {
 				cmd.ui.Say("")
-				return
+				return nil
 			}
 		}
 	}
 
 	space, err := cmd.spaceRepo.FindByName(spaceName)
 	if err != nil {
-		cmd.ui.Failed(T("Error finding space {{.SpaceName}}\n{{.Err}}",
+		return errors.New(T("Error finding space {{.SpaceName}}\n{{.Err}}",
 			map[string]interface{}{"SpaceName": terminal.EntityNameColor(spaceName), "Err": err.Error()}))
 	}
 
 	cmd.targetSpace(space)
+	return nil
 }
 
 func (cmd Login) promptForSpaceName(spaces []models.Space) string {

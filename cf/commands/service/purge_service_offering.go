@@ -68,7 +68,7 @@ func scaryWarningMessage() string {
 	return T(`WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.`)
 }
 
-func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) {
+func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) error {
 	serviceName := c.Args()[0]
 
 	var offering models.ServiceOffering
@@ -78,18 +78,18 @@ func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) {
 		if err != nil {
 			if _, ok := err.(*errors.ModelNotFoundError); ok {
 				cmd.ui.Warn(T("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag."))
-				return
+				return nil
 			}
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 	} else {
 		offerings, err := cmd.serviceRepo.FindServiceOfferingsByLabel(serviceName)
 		if err != nil {
 			if _, ok := err.(*errors.ModelNotFoundError); ok {
 				cmd.ui.Warn(T("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag."))
-				return
+				return nil
 			}
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		offering = offerings[0]
 	}
@@ -103,15 +103,16 @@ func (cmd *PurgeServiceOffering) Execute(c flags.FlagContext) {
 	}
 
 	if !confirmed {
-		return
+		return nil
 	}
 
 	cmd.ui.Say(T("Purging service {{.ServiceName}}...", map[string]interface{}{"ServiceName": serviceName}))
 
 	err := cmd.serviceRepo.PurgeServiceOffering(offering)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

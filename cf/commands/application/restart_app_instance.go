@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/api/appinstances"
@@ -59,13 +60,13 @@ func (cmd *RestartAppInstance) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *RestartAppInstance) Execute(fc flags.FlagContext) {
+func (cmd *RestartAppInstance) Execute(fc flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	instance, err := strconv.Atoi(fc.Args()[1])
 
 	if err != nil {
-		cmd.ui.Failed(T("Instance must be a non-negative integer"))
+		return errors.New(T("Instance must be a non-negative integer"))
 	}
 
 	cmd.ui.Say(T("Restarting instance {{.Instance}} of application {{.AppName}} as {{.Username}}",
@@ -77,9 +78,10 @@ func (cmd *RestartAppInstance) Execute(fc flags.FlagContext) {
 
 	err = cmd.appInstancesRepo.DeleteInstance(app.GUID, instance)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
+	return nil
 }

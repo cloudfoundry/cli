@@ -56,22 +56,21 @@ func (cmd *UpdateServiceAuthTokenFields) SetDependency(deps commandregistry.Depe
 	return cmd
 }
 
-func (cmd *UpdateServiceAuthTokenFields) Execute(c flags.FlagContext) {
+func (cmd *UpdateServiceAuthTokenFields) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Updating service auth token as {{.CurrentUser}}...", map[string]interface{}{"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
-	serviceAuthToken, apiErr := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	serviceAuthToken, err := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
+	if err != nil {
+		return err
 	}
 
 	serviceAuthToken.Token = c.Args()[2]
 
-	apiErr = cmd.authTokenRepo.Update(serviceAuthToken)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.authTokenRepo.Update(serviceAuthToken)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

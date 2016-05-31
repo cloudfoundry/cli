@@ -55,7 +55,7 @@ func (cmd *Authenticate) SetDependency(deps commandregistry.Dependency, pluginCa
 	return cmd
 }
 
-func (cmd *Authenticate) Execute(c flags.FlagContext) {
+func (cmd *Authenticate) Execute(c flags.FlagContext) error {
 	cmd.config.ClearSession()
 	cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 
@@ -63,10 +63,9 @@ func (cmd *Authenticate) Execute(c flags.FlagContext) {
 		map[string]interface{}{"APIEndpoint": terminal.EntityNameColor(cmd.config.APIEndpoint())}))
 	cmd.ui.Say(T("Authenticating..."))
 
-	apiErr := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]})
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err := cmd.authenticator.Authenticate(map[string]string{"username": c.Args()[0], "password": c.Args()[1]})
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -75,5 +74,5 @@ func (cmd *Authenticate) Execute(c flags.FlagContext) {
 
 	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
 
-	return
+	return nil
 }

@@ -43,6 +43,7 @@ func (cmd *Version) Requirements(requirementsFactory requirements.Factory, conte
 	return reqs
 }
 
-func (cmd *Version) Execute(context flags.FlagContext) {
+func (cmd *Version) Execute(context flags.FlagContext) error {
 	cmd.ui.Say(fmt.Sprintf("%s version %s-%s", cf.Name, cf.Version, cf.BuiltOnDate))
+	return nil
 }

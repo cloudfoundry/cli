@@ -53,13 +53,13 @@ func (cmd *StagingEnvironmentVariableGroup) SetDependency(deps commandregistry.D
 	return cmd
 }
 
-func (cmd *StagingEnvironmentVariableGroup) Execute(c flags.FlagContext) {
+func (cmd *StagingEnvironmentVariableGroup) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Retrieving the contents of the staging environment variable group as {{.Username}}...", map[string]interface{}{
 		"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	stagingEnvVars, err := cmd.environmentVariableGroupRepo.ListStaging()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -69,4 +69,5 @@ func (cmd *StagingEnvironmentVariableGroup) Execute(c flags.FlagContext) {
 		table.Add(envVar.Name, envVar.Value)
 	}
 	table.Print()
+	return nil
 }

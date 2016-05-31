@@ -349,14 +349,20 @@ var _ = Describe("MapRoute", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("app-name", "domain-name")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 		})
 
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		It("tries to create the route", func() {
-			cmd.Execute(flagContext)
+			Expect(err).ToNot(HaveOccurred())
 			fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 			Expect(ok).To(BeTrue())
 
@@ -384,7 +390,7 @@ var _ = Describe("MapRoute", func() {
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				_, _, port, _, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(port).To(Equal(60000))
@@ -402,7 +408,7 @@ var _ = Describe("MapRoute", func() {
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
 				_, _, _, randomPort, _, _ := fakeRouteCreator.CreateRouteArgsForCall(0)
 				Expect(randomPort).To(BeTrue())
@@ -416,12 +422,9 @@ var _ = Describe("MapRoute", func() {
 				fakeRouteCreator.CreateRouteReturns(models.Route{}, errors.New("create-route-err"))
 			})
 
-			It("panics and prints a failure message", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"FAILED"},
-					[]string{"create-route-err"},
-				))
+			It("returns an error", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("create-route-err"))
 			})
 		})
 
@@ -433,14 +436,14 @@ var _ = Describe("MapRoute", func() {
 			})
 
 			It("tells the user that it is adding the route", func() {
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Adding route", "to app", "in org"},
 				))
 			})
 
 			It("tries to bind the route", func() {
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				Expect(routeRepo.BindCallCount()).To(Equal(1))
 				routeGUID, appGUID := routeRepo.BindArgsForCall(0)
 				Expect(routeGUID).To(Equal("fake-route-guid"))
@@ -453,7 +456,7 @@ var _ = Describe("MapRoute", func() {
 				})
 
 				It("tells the user that it succeeded", func() {
-					cmd.Execute(flagContext)
+					Expect(err).ToNot(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"OK"},
 					))
@@ -465,12 +468,9 @@ var _ = Describe("MapRoute", func() {
 					routeRepo.BindReturns(errors.New("bind-error"))
 				})
 
-				It("panics and prints a failure message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(BeInDisplayOrder(
-						[]string{"FAILED"},
-						[]string{"bind-error"},
-					))
+				It("returns an error", func() {
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("bind-error"))
 				})
 			})
 		})
@@ -483,7 +483,7 @@ var _ = Describe("MapRoute", func() {
 			})
 
 			It("tries to create the route with the hostname", func() {
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
@@ -500,7 +500,7 @@ var _ = Describe("MapRoute", func() {
 			})
 
 			It("tries to create the route without a hostname", func() {
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))
@@ -517,7 +517,7 @@ var _ = Describe("MapRoute", func() {
 			})
 
 			It("tries to create the route with the path", func() {
-				cmd.Execute(flagContext)
+				Expect(err).ToNot(HaveOccurred())
 				fakeRouteCreator, ok := fakeCreateRouteCmd.(*routefakes.OldFakeRouteCreator)
 				Expect(ok).To(BeTrue())
 				Expect(fakeRouteCreator.CreateRouteCallCount()).To(Equal(1))

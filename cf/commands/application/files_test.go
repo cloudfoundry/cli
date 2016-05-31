@@ -140,12 +140,16 @@ var _ = Describe("Files", func() {
 	})
 
 	Describe("Execute", func() {
-		var args []string
+		var (
+			args []string
+			err  error
+		)
 
 		JustBeforeEach(func() {
-			err := flagContext.Parse(args...)
+			err = flagContext.Parse(args...)
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
+			err = cmd.Execute(flagContext)
 		})
 
 		Context("when given a valid instance", func() {
@@ -154,14 +158,14 @@ var _ = Describe("Files", func() {
 			})
 
 			It("tells the user it is getting the files", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Getting files for app app-name"},
 				))
 			})
 
 			It("tries to list the files", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(appFilesRepo.ListFilesCallCount()).To(Equal(1))
 				appGUID, instance, path := appFilesRepo.ListFilesArgsForCall(0)
 				Expect(appGUID).To(Equal("app-guid"))
@@ -175,7 +179,7 @@ var _ = Describe("Files", func() {
 				})
 
 				It("tells the user OK", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 				})
 
@@ -185,7 +189,7 @@ var _ = Describe("Files", func() {
 					})
 
 					It("tells the user no files were found", func() {
-						cmd.Execute(flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"No files found"}))
 					})
 				})
@@ -196,7 +200,7 @@ var _ = Describe("Files", func() {
 					})
 
 					It("tells the user which files were found", func() {
-						cmd.Execute(flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings([]string{"the-files"}))
 					})
 				})
@@ -208,11 +212,8 @@ var _ = Describe("Files", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"list-files-err"},
-					))
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("list-files-err"))
 				})
 			})
 		})
@@ -223,11 +224,8 @@ var _ = Describe("Files", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Instance must be a positive integer"},
-				))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Instance must be a positive integer"))
 			})
 		})
 
@@ -237,12 +235,10 @@ var _ = Describe("Files", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Invalid instance: 2"},
-					[]string{"Instance must be less than 1"},
-				))
+				Expect(err).To(HaveOccurred())
+				errStr := err.Error()
+				Expect(errStr).To(ContainSubstring("Invalid instance: 2"))
+				Expect(errStr).To(ContainSubstring("Instance must be less than 1"))
 			})
 		})
 
@@ -252,7 +248,7 @@ var _ = Describe("Files", func() {
 			})
 
 			It("lists the files with the given path", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				_, _, path := appFilesRepo.ListFilesArgsForCall(0)
 				Expect(path).To(Equal("the-path"))
 			})

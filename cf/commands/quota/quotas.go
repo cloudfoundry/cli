@@ -59,14 +59,13 @@ func (cmd *ListQuotas) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *ListQuotas) Execute(c flags.FlagContext) {
+func (cmd *ListQuotas) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting quotas as {{.Username}}...", map[string]interface{}{"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
-	quotas, apiErr := cmd.quotaRepo.FindAll()
+	quotas, err := cmd.quotaRepo.FindAll()
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 	cmd.ui.Ok()
 	cmd.ui.Say("")
@@ -123,4 +122,5 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) {
 	}
 
 	table.Print()
+	return nil
 }

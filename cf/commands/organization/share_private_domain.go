@@ -56,14 +56,13 @@ func (cmd *SharePrivateDomain) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *SharePrivateDomain) Execute(c flags.FlagContext) {
+func (cmd *SharePrivateDomain) Execute(c flags.FlagContext) error {
 	org := cmd.orgReq.GetOrganization()
 	domainName := c.Args()[1]
 	domain, err := cmd.domainRepo.FindPrivateByName(domainName)
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Say(T("Sharing domain {{.DomainName}} with org {{.OrgName}} as {{.Username}}...",
@@ -74,9 +73,9 @@ func (cmd *SharePrivateDomain) Execute(c flags.FlagContext) {
 
 	err = cmd.orgRepo.SharePrivateDomain(org.GUID, domain.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

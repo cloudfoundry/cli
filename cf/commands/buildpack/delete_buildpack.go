@@ -56,7 +56,7 @@ func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factor
 	return reqs
 }
 
-func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) {
+func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {
 	buildpackName := c.Args()[0]
 
 	force := c.Bool("f")
@@ -64,32 +64,32 @@ func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) {
 	if !force {
 		answer := cmd.ui.ConfirmDelete("buildpack", buildpackName)
 		if !answer {
-			return
+			return nil
 		}
 	}
 
 	cmd.ui.Say(T("Deleting buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
-	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
+	buildpack, err := cmd.buildpackRepo.FindByName(buildpackName)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil: //do nothing
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Buildpack {{.BuildpackName}} does not exist.", map[string]interface{}{"BuildpackName": buildpackName}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 
 	}
 
-	apiErr = cmd.buildpackRepo.Delete(buildpack.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(T("Error deleting buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
+	err = cmd.buildpackRepo.Delete(buildpack.GUID)
+	if err != nil {
+		return errors.New(T("Error deleting buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 			"Name":  terminal.EntityNameColor(buildpack.Name),
-			"Error": apiErr.Error(),
+			"Error": err.Error(),
 		}))
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

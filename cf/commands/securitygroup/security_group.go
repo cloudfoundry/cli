@@ -53,7 +53,7 @@ func (cmd *ShowSecurityGroup) SetDependency(deps commandregistry.Dependency, plu
 	return cmd
 }
 
-func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) {
+func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 
 	cmd.ui.Say(T("Getting info for security group {{.security_group}} as {{.username}}",
@@ -64,12 +64,12 @@ func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) {
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
-	jsonEncodedBytes, encodingErr := json.MarshalIndent(securityGroup.Rules, "\t", "\t")
-	if encodingErr != nil {
-		cmd.ui.Failed(encodingErr.Error())
+	jsonEncodedBytes, err := json.MarshalIndent(securityGroup.Rules, "\t", "\t")
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -91,4 +91,5 @@ func (cmd *ShowSecurityGroup) Execute(c flags.FlagContext) {
 	} else {
 		cmd.ui.Say(T("No spaces assigned"))
 	}
+	return nil
 }

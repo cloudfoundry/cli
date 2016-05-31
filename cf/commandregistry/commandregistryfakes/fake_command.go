@@ -34,10 +34,13 @@ type FakeCommand struct {
 	requirementsReturns struct {
 		result1 []requirements.Requirement
 	}
-	ExecuteStub        func(context flags.FlagContext)
+	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
 	executeArgsForCall []struct {
 		context flags.FlagContext
+	}
+	executeReturns struct {
+		result1 error
 	}
 }
 
@@ -131,14 +134,16 @@ func (fake *FakeCommand) RequirementsReturns(result1 []requirements.Requirement)
 	}{result1}
 }
 
-func (fake *FakeCommand) Execute(context flags.FlagContext) {
+func (fake *FakeCommand) Execute(context flags.FlagContext) error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
-		fake.ExecuteStub(context)
+		return fake.ExecuteStub(context)
+	} else {
+		return fake.executeReturns.result1
 	}
 }
 
@@ -152,6 +157,13 @@ func (fake *FakeCommand) ExecuteArgsForCall(i int) flags.FlagContext {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
 	return fake.executeArgsForCall[i].context
+}
+
+func (fake *FakeCommand) ExecuteReturns(result1 error) {
+	fake.ExecuteStub = nil
+	fake.executeReturns = struct {
+		result1 error
+	}{result1}
 }
 
 var _ commandregistry.Command = new(FakeCommand)

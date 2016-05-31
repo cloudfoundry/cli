@@ -1,6 +1,8 @@
 package application
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/appfiles"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -62,20 +64,20 @@ func (cmd *Files) SetDependency(deps commandregistry.Dependency, pluginCall bool
 	return cmd
 }
 
-func (cmd *Files) Execute(c flags.FlagContext) {
+func (cmd *Files) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	var instance int
 	if c.IsSet("i") {
 		instance = c.Int("i")
 		if instance < 0 {
-			cmd.ui.Failed(T("Invalid instance: {{.Instance}}\nInstance must be a positive integer",
+			return errors.New(T("Invalid instance: {{.Instance}}\nInstance must be a positive integer",
 				map[string]interface{}{
 					"Instance": instance,
 				}))
 		}
 		if instance >= app.InstanceCount {
-			cmd.ui.Failed(T("Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
+			return errors.New(T("Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
 				map[string]interface{}{
 					"Instance":      instance,
 					"InstanceCount": app.InstanceCount,
@@ -95,10 +97,9 @@ func (cmd *Files) Execute(c flags.FlagContext) {
 		path = c.Args()[1]
 	}
 
-	list, apiErr := cmd.appFilesRepo.ListFiles(app.GUID, instance, path)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	list, err := cmd.appFilesRepo.ListFiles(app.GUID, instance, path)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -109,4 +110,5 @@ func (cmd *Files) Execute(c flags.FlagContext) {
 	} else {
 		cmd.ui.Say("%s", list)
 	}
+	return nil
 }

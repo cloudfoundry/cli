@@ -115,7 +115,11 @@ func main() {
 			}
 		}
 
-		cmd.Execute(flagContext)
+		err = cmd.Execute(flagContext)
+		if err != nil {
+			ui := terminal.NewUI(os.Stdin, Writer, terminal.NewTeePrinter(Writer), traceLogger)
+			ui.Failed(err.Error())
+		}
 
 		warningsCollector.PrintWarnings()
 
@@ -158,9 +162,9 @@ func handlePanics(printer terminal.Printer, logger trace.Printer) {
 
 func generateBacktrace() string {
 	stackByteCount := 0
-	STACK_SIZE_LIMIT := 1024 * 1024
+	stackSizeLimit := 1024 * 1024
 	var bytes []byte
-	for stackSize := 1024; (stackByteCount == 0 || stackByteCount == stackSize) && stackSize < STACK_SIZE_LIMIT; stackSize = 2 * stackSize {
+	for stackSize := 1024; (stackByteCount == 0 || stackByteCount == stackSize) && stackSize < stackSizeLimit; stackSize = 2 * stackSize {
 		bytes = make([]byte, stackSize)
 		stackByteCount = runtime.Stack(bytes, true)
 	}
@@ -183,9 +187,8 @@ func handleHelp(args []string) []string {
 	} else if len(args) > 1 {
 		if hIndex == 0 {
 			return []string{"help", args[1]}
-		} else {
-			return []string{"help", args[0]}
 		}
+		return []string{"help", args[0]}
 	} else {
 		return []string{"help"}
 	}

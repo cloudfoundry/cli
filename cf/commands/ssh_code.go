@@ -66,13 +66,14 @@ func (cmd *OneTimeSSHCode) SetDependency(deps commandregistry.Dependency, _ bool
 	return cmd
 }
 
-func (cmd *OneTimeSSHCode) Execute(c flags.FlagContext) {
+func (cmd *OneTimeSSHCode) Execute(c flags.FlagContext) error {
 	code, err := cmd.Get()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(code)
+	return nil
 }
 
 func (cmd *OneTimeSSHCode) Get() (string, error) {

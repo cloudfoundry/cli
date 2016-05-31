@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -72,15 +73,15 @@ func (cmd *CreateAppManifest) SetDependency(deps commandregistry.Dependency, plu
 	return cmd
 }
 
-func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
+func (cmd *CreateAppManifest) Execute(c flags.FlagContext) error {
 	application, apiErr := cmd.appSummaryRepo.GetSummary(cmd.appReq.GetApplication().GUID)
 	if apiErr != nil {
-		cmd.ui.Failed(T("Error getting application summary: ") + apiErr.Error())
+		return errors.New(T("Error getting application summary: ") + apiErr.Error())
 	}
 
 	stack, err := cmd.stackRepo.FindByGUID(application.StackGUID)
 	if err != nil {
-		cmd.ui.Failed(T("Error retrieving stack: ") + err.Error())
+		return errors.New(T("Error retrieving stack: ") + err.Error())
 	}
 
 	application.Stack = &stack
@@ -96,22 +97,26 @@ func (cmd *CreateAppManifest) Execute(c flags.FlagContext) {
 
 	f, err := os.Create(savePath)
 	if err != nil {
-		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())
+		return errors.New(T("Error creating manifest file: ") + err.Error())
 	}
 	defer f.Close()
 
-	cmd.createManifest(application)
+	err = cmd.createManifest(application)
+	if err != nil {
+		return err
+	}
 	err = cmd.manifest.Save(f)
 	if err != nil {
-		cmd.ui.Failed(T("Error creating manifest file: ") + err.Error())
+		return errors.New(T("Error creating manifest file: ") + err.Error())
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("Manifest file created successfully at ") + savePath)
 	cmd.ui.Say("")
+	return nil
 }
 
-func (cmd *CreateAppManifest) createManifest(app models.Application) {
+func (cmd *CreateAppManifest) createManifest(app models.Application) error {
 	cmd.manifest.Memory(app.Name, app.Memory)
 	cmd.manifest.Instances(app.Name, app.InstanceCount)
 	cmd.manifest.Stack(app.Name, app.Stack.Name)
@@ -143,7 +148,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) {
 		for _, envVarKey := range sorted {
 			switch app.EnvironmentVars[envVarKey].(type) {
 			default:
-				cmd.ui.Failed(T("Failed to create manifest, unable to parse environment variable: ") + envVarKey)
+				return errors.New(T("Failed to create manifest, unable to parse environment variable: ") + envVarKey)
 			case float64:
 				//json.Unmarshal turn all numbers to float64
 				value := int(app.EnvironmentVars[envVarKey].(float64))
@@ -166,6 +171,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) {
 		cmd.manifest.DiskQuota(app.Name, app.DiskQuota)
 	}
 
+	return nil
 }
 
 func sortEnvVar(vars map[string]interface{}) []string {

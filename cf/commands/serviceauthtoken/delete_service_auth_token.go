@@ -64,13 +64,13 @@ func (cmd *DeleteServiceAuthTokenFields) SetDependency(deps commandregistry.Depe
 	return cmd
 }
 
-func (cmd *DeleteServiceAuthTokenFields) Execute(c flags.FlagContext) {
+func (cmd *DeleteServiceAuthTokenFields) Execute(c flags.FlagContext) error {
 	tokenLabel := c.Args()[0]
 	tokenProvider := c.Args()[1]
 
 	if c.Bool("f") == false {
 		if !cmd.ui.ConfirmDelete(T("service auth token"), fmt.Sprintf("%s %s", tokenLabel, tokenProvider)) {
-			return
+			return nil
 		}
 	}
 
@@ -78,23 +78,23 @@ func (cmd *DeleteServiceAuthTokenFields) Execute(c flags.FlagContext) {
 		map[string]interface{}{
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
-	token, apiErr := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
+	token, err := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Service Auth Token {{.Label}} {{.Provider}} does not exist.", map[string]interface{}{"Label": tokenLabel, "Provider": tokenProvider}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(apiErr.Error())
+		return err
 	}
 
-	apiErr = cmd.authTokenRepo.Delete(token)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.authTokenRepo.Delete(token)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

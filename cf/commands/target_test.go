@@ -62,7 +62,7 @@ var _ = Describe("target command", func() {
 	})
 
 	var callTarget = func(args []string) bool {
-		return testcmd.RunCLICommand("target", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("target", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Context("when there are too many arguments given", func() {

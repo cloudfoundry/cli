@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -58,7 +60,7 @@ func (cmd *ListDomains) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *ListDomains) Execute(c flags.FlagContext) {
+func (cmd *ListDomains) Execute(c flags.FlagContext) error {
 	org := cmd.config.OrganizationFields()
 
 	cmd.ui.Say(T("Getting domains in org {{.OrgName}} as {{.Username}}...",
@@ -68,7 +70,7 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 
 	domains, err := cmd.getDomains(org.GUID)
 	if err != nil {
-		cmd.ui.Failed(T("Failed fetching domains.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
+		return errors.New(T("Failed fetching domains.\n{{.Error}}", map[string]interface{}{"Error": err.Error()}))
 	}
 
 	table := cmd.ui.Table([]string{T("name"), T("status"), T("type")})
@@ -90,6 +92,7 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) {
 	if len(domains) == 0 {
 		cmd.ui.Say(T("No domains found"))
 	}
+	return nil
 }
 
 func (cmd *ListDomains) getDomains(orgGUID string) ([]models.DomainFields, error) {

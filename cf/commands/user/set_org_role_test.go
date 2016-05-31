@@ -186,6 +186,8 @@ var _ = Describe("SetOrgRole", func() {
 	})
 
 	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
 			flagContext.Parse("the-user-name", "the-org-name", "OrgManager")
 			cmd.Requirements(factory, flagContext)
@@ -196,6 +198,10 @@ var _ = Describe("SetOrgRole", func() {
 			organizationRequirement.GetOrganizationReturns(org)
 		})
 
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
 		Context("when the UserRequirement returns a user with a GUID", func() {
 			BeforeEach(func() {
 				userFields := models.UserFields{GUID: "the-user-guid", Username: "the-user-name"}
@@ -203,7 +209,7 @@ var _ = Describe("SetOrgRole", func() {
 			})
 
 			It("tells the user it is assigning the role", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Assigning role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
 					[]string{"OK"},
@@ -211,7 +217,7 @@ var _ = Describe("SetOrgRole", func() {
 			})
 
 			It("sets the role using the GUID", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(userRepo.SetOrgRoleByGUIDCallCount()).To(Equal(1))
 				actualUserGUID, actualOrgGUID, actualRole := userRepo.SetOrgRoleByGUIDArgsForCall(0)
 				Expect(actualUserGUID).To(Equal("the-user-guid"))
@@ -224,12 +230,9 @@ var _ = Describe("SetOrgRole", func() {
 					userRepo.SetOrgRoleByGUIDReturns(errors.New("user-repo-error"))
 				})
 
-				It("panics and prints a failure message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(BeInDisplayOrder(
-						[]string{"FAILED"},
-						[]string{"user-repo-error"},
-					))
+				It("returns an error", func() {
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("user-repo-error"))
 				})
 			})
 		})
@@ -240,7 +243,7 @@ var _ = Describe("SetOrgRole", func() {
 			})
 
 			It("sets the role using the given username", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				username, orgGUID, role := userRepo.SetOrgRoleByUsernameArgsForCall(0)
 				Expect(username).To(Equal("the-user-name"))
 				Expect(orgGUID).To(Equal("the-org-guid"))
@@ -248,7 +251,7 @@ var _ = Describe("SetOrgRole", func() {
 			})
 
 			It("tells the user it assigned the role", func() {
-				cmd.Execute(flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Assigning role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
 					[]string{"OK"},
@@ -260,12 +263,9 @@ var _ = Describe("SetOrgRole", func() {
 					userRepo.SetOrgRoleByUsernameReturns(errors.New("user-repo-error"))
 				})
 
-				It("panics and prints a failure message", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(BeInDisplayOrder(
-						[]string{"FAILED"},
-						[]string{"user-repo-error"},
-					))
+				It("returns an error", func() {
+					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(Equal("user-repo-error"))
 				})
 			})
 		})

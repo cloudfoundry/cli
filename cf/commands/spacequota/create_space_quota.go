@@ -86,7 +86,7 @@ func (cmd *CreateSpaceQuota) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
+func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 	org := cmd.config.OrganizationFields()
 
@@ -105,7 +105,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 	if memoryLimit != "" {
 		parsedMemory, errr := formatters.ToMegabytes(memoryLimit)
 		if errr != nil {
-			cmd.ui.Failed(T("Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": memoryLimit, "Err": errr}))
+			return errors.New(T("Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": memoryLimit, "Err": errr}))
 		}
 
 		quota.MemoryLimit = parsedMemory
@@ -119,7 +119,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 	} else {
 		parsedMemory, err = formatters.ToMegabytes(instanceMemoryLimit)
 		if err != nil {
-			cmd.ui.Failed(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": err}))
+			return errors.New(T("Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}", map[string]interface{}{"MemoryLimit": instanceMemoryLimit, "Err": err}))
 		}
 	}
 
@@ -146,7 +146,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 	if context.IsSet("reserved-route-ports") {
 		instanceReservedRoutePorts := context.Int("reserved-route-ports")
 		if instanceReservedRoutePorts < -1 {
-			cmd.ui.Failed(T("Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.", map[string]interface{}{"ReservedRoutePorts": instanceReservedRoutePorts}))
+			return errors.New(T("Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.", map[string]interface{}{"ReservedRoutePorts": instanceReservedRoutePorts}))
 		}
 		quota.ReservedRoutePortsLimit = json.Number(strconv.Itoa(instanceReservedRoutePorts))
 	}
@@ -157,12 +157,13 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) {
 	if ok && httpErr.ErrorCode() == errors.QuotaDefinitionNameTaken {
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Space Quota Definition {{.QuotaName}} already exists", map[string]interface{}{"QuotaName": quota.Name}))
-		return
+		return nil
 	}
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

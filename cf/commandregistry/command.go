@@ -11,7 +11,7 @@ type Command interface {
 	MetaData() CommandMetadata
 	SetDependency(deps Dependency, pluginCall bool) Command
 	Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
-	Execute(context flags.FlagContext)
+	Execute(context flags.FlagContext) error
 }
 
 type CommandMetadata struct {

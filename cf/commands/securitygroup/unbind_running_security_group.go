@@ -56,7 +56,7 @@ func (cmd *unbindFromRunningGroup) SetDependency(deps commandregistry.Dependency
 	return cmd
 }
 
-func (cmd *unbindFromRunningGroup) Execute(context flags.FlagContext) {
+func (cmd *unbindFromRunningGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
@@ -69,9 +69,9 @@ func (cmd *unbindFromRunningGroup) Execute(context flags.FlagContext) {
 				"security_group": terminal.EntityNameColor(name),
 				"error_message":  terminal.WarningColor(T("does not exist.")),
 			}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Unbinding security group {{.security_group}} from defaults for running as {{.username}}",
@@ -81,9 +81,10 @@ func (cmd *unbindFromRunningGroup) Execute(context flags.FlagContext) {
 		}))
 	err = cmd.runningGroupRepo.UnbindFromRunningSet(securityGroup.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
+	return nil
 }

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"net/rpc"
 	"os"
@@ -90,12 +91,12 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *PluginInstall) Execute(c flags.FlagContext) {
+func (cmd *PluginInstall) Execute(c flags.FlagContext) error {
 	if !cmd.confirmWithUser(
 		c,
 		T("**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)", map[string]interface{}{"Plugin": c.Args()[0]}),
 	) {
-		cmd.ui.Failed(T("Plugin installation cancelled"))
+		return errors.New(T("Plugin installation cancelled"))
 	}
 
 	fileDownloader := downloader.NewDownloader(os.TempDir())
@@ -125,59 +126,73 @@ func (cmd *PluginInstall) Execute(c flags.FlagContext) {
 
 	pluginDestinationFilepath := filepath.Join(cmd.pluginConfig.GetPluginPath(), pluginExecutableName)
 
-	cmd.ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName)
+	err := cmd.ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName)
+	if err != nil {
+		return err
+	}
 
-	pluginMetadata := cmd.runBinaryAndObtainPluginMetadata(pluginSourceFilepath)
+	pluginMetadata, err := cmd.runBinaryAndObtainPluginMetadata(pluginSourceFilepath)
+	if err != nil {
+		return err
+	}
 
-	cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+	err = cmd.ensurePluginIsSafeForInstallation(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+	if err != nil {
+		return err
+	}
 
-	cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+	err = cmd.installPlugin(pluginMetadata, pluginDestinationFilepath, pluginSourceFilepath)
+	if err != nil {
+		return err
+	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} v{{.Version}} successfully installed.", map[string]interface{}{"PluginName": pluginMetadata.Name, "Version": fmt.Sprintf("%d.%d.%d", pluginMetadata.Version.Major, pluginMetadata.Version.Minor, pluginMetadata.Version.Build)})))
+	return nil
 }
 
 func (cmd *PluginInstall) confirmWithUser(c flags.FlagContext, prompt string) bool {
 	return c.Bool("f") || cmd.ui.Confirm(prompt)
 }
 
-func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName string) {
+func (cmd *PluginInstall) ensurePluginBinaryWithSameFileNameDoesNotAlreadyExist(pluginDestinationFilepath, pluginExecutableName string) error {
 	_, err := os.Stat(pluginDestinationFilepath)
 	if err == nil || os.IsExist(err) {
-		cmd.ui.Failed(fmt.Sprintf(T("The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
+		return errors.New(fmt.Sprintf(T("The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
 			map[string]interface{}{
 				"PluginExecutableName": pluginExecutableName,
 			})))
 	} else if !os.IsNotExist(err) {
-		cmd.ui.Failed(fmt.Sprintf(T("Unexpected error has occurred:\n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
+		return errors.New(fmt.Sprintf(T("Unexpected error has occurred:\n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
+	return nil
 }
 
-func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath string, pluginSourceFilepath string) {
+func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath string, pluginSourceFilepath string) error {
 	plugins := cmd.pluginConfig.Plugins()
 	if pluginMetadata.Name == "" {
-		cmd.ui.Failed(fmt.Sprintf(T("Unable to obtain plugin name for executable {{.Executable}}", map[string]interface{}{"Executable": pluginSourceFilepath})))
+		return errors.New(fmt.Sprintf(T("Unable to obtain plugin name for executable {{.Executable}}", map[string]interface{}{"Executable": pluginSourceFilepath})))
 	}
 
 	if _, ok := plugins[pluginMetadata.Name]; ok {
-		cmd.ui.Failed(fmt.Sprintf(T("Plugin name {{.PluginName}} is already taken", map[string]interface{}{"PluginName": pluginMetadata.Name})))
+		return errors.New(fmt.Sprintf(T("Plugin name {{.PluginName}} is already taken", map[string]interface{}{"PluginName": pluginMetadata.Name})))
 	}
 
 	if pluginMetadata.Commands == nil {
-		cmd.ui.Failed(fmt.Sprintf(T("Error getting command list from plugin {{.FilePath}}", map[string]interface{}{"FilePath": pluginSourceFilepath})))
+		return errors.New(fmt.Sprintf(T("Error getting command list from plugin {{.FilePath}}", map[string]interface{}{"FilePath": pluginSourceFilepath})))
 	}
 
 	for _, pluginCmd := range pluginMetadata.Commands {
 
 		//check for command conflicting core commands/alias
 		if pluginCmd.Name == "help" || commandregistry.Commands.CommandExists(pluginCmd.Name) {
-			cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+			return errors.New(fmt.Sprintf(T("Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Name})))
 		}
 
 		//check for alias conflicting core command/alias
 		if pluginCmd.Alias == "help" || commandregistry.Commands.CommandExists(pluginCmd.Alias) {
-			cmd.ui.Failed(fmt.Sprintf(T("Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
+			return errors.New(fmt.Sprintf(T("Alias `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
 				map[string]interface{}{"Command": pluginCmd.Alias})))
 		}
 
@@ -186,25 +201,25 @@ func (cmd *PluginInstall) ensurePluginIsSafeForInstallation(pluginMetadata *plug
 
 				//check for command conflicting other plugin commands/alias
 				if installedPluginCmd.Name == pluginCmd.Name || installedPluginCmd.Alias == pluginCmd.Name {
-					cmd.ui.Failed(fmt.Sprintf(T("Command `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+					return errors.New(fmt.Sprintf(T("Command `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
 						map[string]interface{}{"Command": pluginCmd.Name, "PluginName": installedPluginName})))
 				}
 
 				//check for alias conflicting other plugin commands/alias
 				if pluginCmd.Alias != "" && (installedPluginCmd.Name == pluginCmd.Alias || installedPluginCmd.Alias == pluginCmd.Alias) {
-					cmd.ui.Failed(fmt.Sprintf(T("Alias `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
+					return errors.New(fmt.Sprintf(T("Alias `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
 						map[string]interface{}{"Command": pluginCmd.Alias, "PluginName": installedPluginName})))
 				}
 			}
 		}
 	}
-
+	return nil
 }
 
-func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath, pluginSourceFilepath string) {
+func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, pluginDestinationFilepath, pluginSourceFilepath string) error {
 	err := fileutils.CopyPathToPath(pluginSourceFilepath, pluginDestinationFilepath)
 	if err != nil {
-		cmd.ui.Failed(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
+		return errors.New(fmt.Sprintf(T("Could not copy plugin binary: \n{{.Error}}", map[string]interface{}{"Error": err.Error()})))
 	}
 
 	configMetadata := pluginconfig.PluginMetadata{
@@ -214,25 +229,30 @@ func (cmd *PluginInstall) installPlugin(pluginMetadata *plugin.PluginMetadata, p
 	}
 
 	cmd.pluginConfig.SetPlugin(pluginMetadata.Name, configMetadata)
+	return nil
 }
 
-func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) *plugin.PluginMetadata {
+func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath string) (*plugin.PluginMetadata, error) {
 	err := cmd.rpcService.Start()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return nil, err
 	}
 	defer cmd.rpcService.Stop()
 
-	cmd.runPluginBinary(pluginSourceFilepath, cmd.rpcService.Port())
+	err = cmd.runPluginBinary(pluginSourceFilepath, cmd.rpcService.Port())
+	if err != nil {
+		return nil, err
+	}
 
-	return cmd.rpcService.RpcCmd.PluginMetadata
+	return cmd.rpcService.RpcCmd.PluginMetadata, nil
 }
 
-func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) {
+func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) error {
 	pluginInvocation := exec.Command(location, servicePort, "SendMetadata")
 
 	err := pluginInvocation.Run()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+	return nil
 }

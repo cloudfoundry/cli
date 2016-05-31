@@ -46,7 +46,7 @@ var _ = Describe("create-quota command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("create-quota", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-quota", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("Help text", func() {

@@ -56,7 +56,7 @@ func (cmd *RenameService) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *RenameService) Execute(c flags.FlagContext) {
+func (cmd *RenameService) Execute(c flags.FlagContext) error {
 	newName := c.Args()[1]
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
@@ -72,15 +72,15 @@ func (cmd *RenameService) Execute(c flags.FlagContext) {
 
 	if err != nil {
 		if httpError, ok := err.(errors.HTTPError); ok && httpError.ErrorCode() == errors.ServiceInstanceNameTaken {
-			cmd.ui.Failed(T("{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
+			return errors.New(T("{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
 				map[string]interface{}{
 					"ErrorDescription":  httpError.Error(),
 					"CFServicesCommand": cf.Name + " " + "services",
 				}))
-		} else {
-			cmd.ui.Failed(err.Error())
 		}
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

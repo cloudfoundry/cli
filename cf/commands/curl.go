@@ -3,6 +3,7 @@ package commands
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -75,7 +76,7 @@ func (cmd *Curl) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	return cmd
 }
 
-func (cmd *Curl) Execute(c flags.FlagContext) {
+func (cmd *Curl) Execute(c flags.FlagContext) error {
 	path := c.Args()[0]
 	headers := c.StringSlice("H")
 
@@ -87,7 +88,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 
 		jsonBytes, err := util.GetContentsFromOptionalFlagValue(c.String("d"))
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		body = string(jsonBytes)
 	}
@@ -100,11 +101,11 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 
 	responseHeader, responseBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
 	if apiErr != nil {
-		cmd.ui.Failed(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
+		return errors.New(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 	}
 
 	if trace.LoggingToStdout {
-		return
+		return nil
 	}
 
 	if c.Bool("i") {
@@ -114,7 +115,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 	if c.String("output") != "" {
 		err := cmd.writeToFile(responseBody, c.String("output"))
 		if err != nil {
-			cmd.ui.Failed(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": err}))
+			return errors.New(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": err}))
 		}
 	} else {
 		if strings.Contains(responseHeader, "application/json") {
@@ -127,7 +128,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) {
 
 		cmd.ui.Say(responseBody)
 	}
-	return
+	return nil
 }
 
 func (cmd Curl) writeToFile(responseBody, filePath string) (err error) {

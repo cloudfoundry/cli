@@ -71,7 +71,7 @@ var _ = Describe("update-service command", func() {
 	})
 
 	var callUpdateService = func(args []string) bool {
-		return testcmd.RunCLICommand("update-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("update-service", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

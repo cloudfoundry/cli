@@ -1,6 +1,8 @@
 package application
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -72,7 +74,7 @@ func (cmd *Scale) SetDependency(deps commandregistry.Dependency, pluginCall bool
 
 var bytesInAMegabyte int64 = 1024 * 1024
 
-func (cmd *Scale) Execute(c flags.FlagContext) {
+func (cmd *Scale) Execute(c flags.FlagContext) error {
 	currentApp := cmd.appReq.GetApplication()
 	if !anyFlagsSet(c) {
 		cmd.ui.Say(T("Showing current scale of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -89,7 +91,7 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 		cmd.ui.Say("%s %s", terminal.HeaderColor(T("disk:")), formatters.ByteSize(currentApp.DiskQuota*bytesInAMegabyte))
 		cmd.ui.Say("%s %d", terminal.HeaderColor(T("instances:")), currentApp.InstanceCount)
 
-		return
+		return nil
 	}
 
 	params := models.AppParams{}
@@ -98,7 +100,7 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
-			cmd.ui.Failed(T("Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
+			return errors.New(T("Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
 				map[string]interface{}{
 					"Memory":           c.String("m"),
 					"ErrorDescription": err,
@@ -111,7 +113,7 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 	if c.String("k") != "" {
 		diskQuota, err := formatters.ToMegabytes(c.String("k"))
 		if err != nil {
-			cmd.ui.Failed(T("Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
+			return errors.New(T("Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
 				map[string]interface{}{
 					"DiskQuota":        c.String("k"),
 					"ErrorDescription": err,
@@ -127,7 +129,7 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 	}
 
 	if shouldRestart && !cmd.confirmRestart(c, currentApp.Name) {
-		return
+		return nil
 	}
 
 	cmd.ui.Say(T("Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -138,17 +140,20 @@ func (cmd *Scale) Execute(c flags.FlagContext) {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	updatedApp, apiErr := cmd.appRepo.Update(currentApp.GUID, params)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	updatedApp, err := cmd.appRepo.Update(currentApp.GUID, params)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
 
 	if shouldRestart {
-		cmd.restarter.ApplicationRestart(updatedApp, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+		err = cmd.restarter.ApplicationRestart(updatedApp, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func (cmd *Scale) confirmRestart(context flags.FlagContext, appName string) bool {

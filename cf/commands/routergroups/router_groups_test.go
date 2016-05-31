@@ -61,17 +61,7 @@ var _ = Describe("RouterGroups", func() {
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 	})
 
-	runCommand := func(args ...string) error {
-		err := flagContext.Parse(args...)
-		if err != nil {
-			return err
-		}
-
-		cmd.Execute(flagContext)
-		return nil
-	}
-
-	Describe("login requirements", func() {
+	Describe("Requirements", func() {
 		It("fails if the user is not logged in", func() {
 			cmd.Requirements(requirementsFactory, flagContext)
 
@@ -92,62 +82,74 @@ var _ = Describe("RouterGroups", func() {
 		})
 	})
 
-	Context("when there are router groups", func() {
+	Describe("Execute", func() {
+		var err error
+
 		BeforeEach(func() {
-			routerGroups := models.RouterGroups{
-				models.RouterGroup{
-					GUID: "guid-0001",
-					Name: "default-router-group",
-					Type: "tcp",
-				},
-			}
-			routingAPIRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
-				for _, r := range routerGroups {
-					if !cb(r) {
-						break
-					}
+			err := flagContext.Parse()
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
+		})
+
+		Context("when there are router groups", func() {
+			BeforeEach(func() {
+				routerGroups := models.RouterGroups{
+					models.RouterGroup{
+						GUID: "guid-0001",
+						Name: "default-router-group",
+						Type: "tcp",
+					},
 				}
-				return nil
-			}
+				routingAPIRepo.ListRouterGroupsStub = func(cb func(models.RouterGroup) bool) (apiErr error) {
+					for _, r := range routerGroups {
+						if !cb(r) {
+							break
+						}
+					}
+					return nil
+				}
+			})
+
+			It("lists router groups", func() {
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting router groups", "my-user"},
+					[]string{"name", "type"},
+					[]string{"default-router-group", "tcp"},
+				))
+			})
 		})
 
-		It("lists router groups", func() {
-			runCommand()
+		Context("when there are no router groups", func() {
+			It("tells the user when no router groups were found", func() {
+				Expect(err).NotTo(HaveOccurred())
 
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting router groups", "my-user"},
-				[]string{"name", "type"},
-				[]string{"default-router-group", "tcp"},
-			))
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting router groups"},
+					[]string{"No router groups found"},
+				))
+			})
+		})
+
+		Context("when there is an error listing router groups", func() {
+			BeforeEach(func() {
+				routingAPIRepo.ListRouterGroupsReturns(errors.New("BOOM"))
+			})
+
+			It("returns an error to the user", func() {
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"Getting router groups"},
+				))
+
+				Expect(err).To(HaveOccurred())
+				errStr := err.Error()
+				Expect(errStr).To(ContainSubstring("BOOM"))
+				Expect(errStr).To(ContainSubstring("Failed fetching router groups"))
+			})
 		})
 	})
-
-	Context("when there are no router groups", func() {
-		It("tells the user when no router groups were found", func() {
-			runCommand()
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting router groups"},
-				[]string{"No router groups found"},
-			))
-		})
-	})
-
-	Context("when there is an error listing router groups", func() {
-		BeforeEach(func() {
-			routingAPIRepo.ListRouterGroupsReturns(errors.New("BOOM"))
-		})
-
-		It("returns an error to the user", func() {
-			Expect(func() {
-				runCommand()
-			}).To(Panic())
-
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Getting router groups"},
-				[]string{"Failed fetching router groups"},
-			))
-		})
-	})
-
 })

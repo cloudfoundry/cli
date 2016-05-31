@@ -1,6 +1,8 @@
 package buildpack
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -46,26 +48,27 @@ func (cmd *RenameBuildpack) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *RenameBuildpack) Execute(c flags.FlagContext) {
+func (cmd *RenameBuildpack) Execute(c flags.FlagContext) error {
 	buildpackName := c.Args()[0]
 	newBuildpackName := c.Args()[1]
 
 	cmd.ui.Say(T("Renaming buildpack {{.OldBuildpackName}} to {{.NewBuildpackName}}...", map[string]interface{}{"OldBuildpackName": terminal.EntityNameColor(buildpackName), "NewBuildpackName": terminal.EntityNameColor(newBuildpackName)}))
 
-	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
+	buildpack, err := cmd.buildpackRepo.FindByName(buildpackName)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	if err != nil {
+		return err
 	}
 
 	buildpack.Name = newBuildpackName
-	buildpack, apiErr = cmd.buildpackRepo.Update(buildpack)
-	if apiErr != nil {
-		cmd.ui.Failed(T("Error renaming buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
+	buildpack, err = cmd.buildpackRepo.Update(buildpack)
+	if err != nil {
+		return errors.New(T("Error renaming buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 			"Name":  terminal.EntityNameColor(buildpack.Name),
-			"Error": apiErr.Error(),
+			"Error": err.Error(),
 		}))
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

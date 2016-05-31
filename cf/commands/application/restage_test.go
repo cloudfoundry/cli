@@ -63,7 +63,7 @@ var _ = Describe("restage command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("restage", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("restage", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("Requirements", func() {
@@ -151,4 +151,6 @@ func (cmd *fakeStagingWatcher) Requirements(_ requirements.Factory, _ flags.Flag
 	return []requirements.Requirement{}
 }
 
-func (cmd *fakeStagingWatcher) Execute(_ flags.FlagContext) {}
+func (cmd *fakeStagingWatcher) Execute(_ flags.FlagContext) error {
+	return nil
+}

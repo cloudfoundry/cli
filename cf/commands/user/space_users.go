@@ -65,17 +65,18 @@ func (cmd *SpaceUsers) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *SpaceUsers) Execute(c flags.FlagContext) {
+func (cmd *SpaceUsers) Execute(c flags.FlagContext) error {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	printer := cmd.printer(org, space, cmd.config.Username())
 	printer.PrintUsers(space.GUID, cmd.config.Username())
+	return nil
 }
 
 func (cmd *SpaceUsers) printer(org models.Organization, space models.Space, username string) userprint.UserPrinter {

@@ -73,7 +73,7 @@ func (cmd *CheckRoute) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *CheckRoute) Execute(c flags.FlagContext) {
+func (cmd *CheckRoute) Execute(c flags.FlagContext) error {
 	hostName := c.Args()[0]
 	domainName := c.Args()[1]
 	path := c.String("path")
@@ -82,7 +82,7 @@ func (cmd *CheckRoute) Execute(c flags.FlagContext) {
 
 	exists, err := cmd.CheckRoute(hostName, domainName, path)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -112,6 +112,7 @@ func (cmd *CheckRoute) Execute(c flags.FlagContext) {
 			},
 		))
 	}
+	return nil
 }
 
 func (cmd *CheckRoute) CheckRoute(hostName, domainName, path string) (bool, error) {

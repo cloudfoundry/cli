@@ -99,7 +99,7 @@ func (cmd *DeleteRoute) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
+func (cmd *DeleteRoute) Execute(c flags.FlagContext) error {
 	host := c.String("n")
 	path := c.String("path")
 	domainName := c.Args()[0]
@@ -114,7 +114,7 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDelete("route", url) {
-			return
+			return nil
 		}
 	}
 
@@ -126,17 +126,16 @@ func (cmd *DeleteRoute) Execute(c flags.FlagContext) {
 		if _, ok := err.(*errors.ModelNotFoundError); ok {
 			cmd.ui.Warn(T("Unable to delete, route '{{.URL}}' does not exist.",
 				map[string]interface{}{"URL": url}))
-			return
+			return nil
 		}
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	err = cmd.routeRepo.Delete(route.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

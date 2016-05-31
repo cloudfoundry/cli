@@ -53,20 +53,18 @@ func (cmd *UnsetSpaceQuota) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *UnsetSpaceQuota) Execute(c flags.FlagContext) {
+func (cmd *UnsetSpaceQuota) Execute(c flags.FlagContext) error {
 	spaceName := c.Args()[0]
 	quotaName := c.Args()[1]
 
-	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	space, err := cmd.spaceRepo.FindByName(spaceName)
+	if err != nil {
+		return err
 	}
 
-	quota, apiErr := cmd.quotaRepo.FindByName(quotaName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	quota, err := cmd.quotaRepo.FindByName(quotaName)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say(T("Unassigning space quota {{.QuotaName}} from space {{.SpaceName}} as {{.Username}}...",
@@ -75,11 +73,11 @@ func (cmd *UnsetSpaceQuota) Execute(c flags.FlagContext) {
 			"SpaceName": terminal.EntityNameColor(space.Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr = cmd.quotaRepo.UnassignQuotaFromSpace(space.GUID, quota.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.quotaRepo.UnassignQuotaFromSpace(space.GUID, quota.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

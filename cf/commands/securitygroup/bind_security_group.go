@@ -60,7 +60,7 @@ func (cmd *BindSecurityGroup) SetDependency(deps commandregistry.Dependency, plu
 	return cmd
 }
 
-func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) {
+func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) error {
 	securityGroupName := context.Args()[0]
 	orgName := context.Args()[1]
 	spaceName := context.Args()[2]
@@ -76,27 +76,28 @@ func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) {
 	securityGroup, err := cmd.securityGroupRepo.Read(securityGroupName)
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	org, err := cmd.orgRepo.FindByName(orgName)
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	err = cmd.spaceBinder.BindSpace(securityGroup.GUID, space.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
+	return nil
 }

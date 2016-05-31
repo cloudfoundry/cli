@@ -40,7 +40,7 @@ var _ = Describe("create domain command", func() {
 
 	runCommand := func(args ...string) bool {
 		ui = new(testterm.FakeUI)
-		return testcmd.RunCLICommand("create-domain", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("create-domain", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("fails with usage", func() {

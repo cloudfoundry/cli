@@ -41,6 +41,7 @@ func (cmd FakeCommand1) SetDependency(deps commandregistry.Dependency, _ bool) c
 	return cmd
 }
 
-func (cmd FakeCommand1) Execute(c flags.FlagContext) {
+func (cmd FakeCommand1) Execute(c flags.FlagContext) error {
 	fmt.Println("This is fake-command")
+	return nil
 }

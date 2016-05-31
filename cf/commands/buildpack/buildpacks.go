@@ -1,6 +1,7 @@
 package buildpack
 
 import (
+	"errors"
 	"strconv"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
@@ -54,7 +55,7 @@ func (cmd *ListBuildpacks) SetDependency(deps commandregistry.Dependency, plugin
 	return cmd
 }
 
-func (cmd *ListBuildpacks) Execute(c flags.FlagContext) {
+func (cmd *ListBuildpacks) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting buildpacks...\n"))
 
 	table := cmd.ui.Table([]string{"buildpack", T("position"), T("enabled"), T("locked"), T("filename")})
@@ -86,10 +87,11 @@ func (cmd *ListBuildpacks) Execute(c flags.FlagContext) {
 	table.Print()
 
 	if apiErr != nil {
-		cmd.ui.Failed(T("Failed fetching buildpacks.\n{{.Error}}", map[string]interface{}{"Error": apiErr.Error()}))
+		return errors.New(T("Failed fetching buildpacks.\n{{.Error}}", map[string]interface{}{"Error": apiErr.Error()}))
 	}
 
 	if noBuildpacks {
 		cmd.ui.Say(T("No buildpacks found"))
 	}
+	return nil
 }

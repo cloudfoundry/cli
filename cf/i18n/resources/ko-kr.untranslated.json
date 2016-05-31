@@ -8,6 +8,14 @@
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },
   {
+    "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
+    "translation": "Error deleting domain {{.DomainName}}\n{{.Err}}"
+  },
+  {
+    "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
+    "translation": "Error finding domain {{.DomainName}}\n{{.Err}}"
+  },
+  {
     "id": "Error restarting application: {{.Error}}",
     "translation": "Error restarting application: {{.Error}}"
   },

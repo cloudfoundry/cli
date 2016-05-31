@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
@@ -62,14 +63,14 @@ func (cmd *SetHealthCheck) SetDependency(deps commandregistry.Dependency, plugin
 	return cmd
 }
 
-func (cmd *SetHealthCheck) Execute(fc flags.FlagContext) {
+func (cmd *SetHealthCheck) Execute(fc flags.FlagContext) error {
 	healthCheckType := fc.Args()[1]
 
 	app := cmd.appReq.GetApplication()
 
 	if app.HealthCheckType == healthCheckType {
 		cmd.ui.Say(fmt.Sprintf("%s "+T("health_check_type is already set")+" to '%s'", app.Name, app.HealthCheckType))
-		return
+		return nil
 	}
 
 	cmd.ui.Say(fmt.Sprintf(T("Updating %s health_check_type to '%s'"), app.Name, healthCheckType))
@@ -77,12 +78,13 @@ func (cmd *SetHealthCheck) Execute(fc flags.FlagContext) {
 
 	updatedApp, err := cmd.appRepo.Update(app.GUID, models.AppParams{HealthCheckType: &healthCheckType})
 	if err != nil {
-		cmd.ui.Failed(T("Error updating health_check_type for ") + app.Name + ": " + err.Error())
+		return errors.New(T("Error updating health_check_type for ") + app.Name + ": " + err.Error())
 	}
 
 	if updatedApp.HealthCheckType == healthCheckType {
 		cmd.ui.Ok()
 	} else {
-		cmd.ui.Failed(T("health_check_type is not set to ") + healthCheckType + T(" for ") + app.Name)
+		return errors.New(T("health_check_type is not set to ") + healthCheckType + T(" for ") + app.Name)
 	}
+	return nil
 }

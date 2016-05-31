@@ -70,14 +70,14 @@ func (cmd *Target) SetDependency(deps commandregistry.Dependency, _ bool) comman
 	return cmd
 }
 
-func (cmd *Target) Execute(c flags.FlagContext) {
+func (cmd *Target) Execute(c flags.FlagContext) error {
 	orgName := c.String("o")
 	spaceName := c.String("s")
 
 	if orgName != "" {
 		err := cmd.setOrganization(orgName)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		} else if spaceName == "" {
 			spaceList, apiErr := cmd.getSpaceList()
 			if apiErr == nil && len(spaceList) == 1 {
@@ -89,7 +89,7 @@ func (cmd *Target) Execute(c flags.FlagContext) {
 	if spaceName != "" {
 		err := cmd.setSpace(spaceName)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 	}
 
@@ -98,7 +98,7 @@ func (cmd *Target) Execute(c flags.FlagContext) {
 		cmd.ui.PanicQuietly()
 	}
 	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
-	return
+	return nil
 }
 
 func (cmd Target) setOrganization(orgName string) error {

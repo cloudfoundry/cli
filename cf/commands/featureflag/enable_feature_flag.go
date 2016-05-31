@@ -49,16 +49,16 @@ func (cmd *EnableFeatureFlag) SetDependency(deps commandregistry.Dependency, plu
 	return cmd
 }
 
-func (cmd *EnableFeatureFlag) Execute(c flags.FlagContext) {
+func (cmd *EnableFeatureFlag) Execute(c flags.FlagContext) error {
 	flag := c.Args()[0]
 
 	cmd.ui.Say(T("Setting status of {{.FeatureFlag}} as {{.Username}}...", map[string]interface{}{
 		"FeatureFlag": terminal.EntityNameColor(flag),
 		"Username":    terminal.EntityNameColor(cmd.config.Username())}))
 
-	apiErr := cmd.flagRepo.Update(flag, true)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err := cmd.flagRepo.Update(flag, true)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say("")
@@ -66,5 +66,5 @@ func (cmd *EnableFeatureFlag) Execute(c flags.FlagContext) {
 	cmd.ui.Say("")
 	cmd.ui.Say(T("Feature {{.FeatureFlag}} Enabled.", map[string]interface{}{
 		"FeatureFlag": terminal.EntityNameColor(flag)}))
-	return
+	return nil
 }

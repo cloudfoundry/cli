@@ -103,14 +103,14 @@ func (cmd *BindService) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *BindService) Execute(c flags.FlagContext) {
+func (cmd *BindService) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	params := c.String("c")
 
 	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+		return errors.New(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
 	cmd.ui.Say(T("Binding service {{.ServiceInstanceName}} to app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -131,18 +131,18 @@ func (cmd *BindService) Execute(c flags.FlagContext) {
 					"AppName":     app.Name,
 					"ServiceName": serviceInstance.Name,
 				}))
-			return
+			return nil
 		}
 
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say(T("TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
 		map[string]interface{}{"CFCommand": terminal.CommandColor(cf.Name + " restage"), "AppName": app.Name}))
+	return nil
 }
 
-func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {
-	apiErr = cmd.serviceBindingRepo.Create(serviceInstance.GUID, app.GUID, paramsMap)
-	return
+func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) error {
+	return cmd.serviceBindingRepo.Create(serviceInstance.GUID, app.GUID, paramsMap)
 }

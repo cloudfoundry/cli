@@ -53,16 +53,15 @@ func (cmd *ListStacks) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *ListStacks) Execute(c flags.FlagContext) {
+func (cmd *ListStacks) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting stacks in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{"OrganizationName": terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	stacks, apiErr := cmd.stacksRepo.FindAll()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	stacks, err := cmd.stacksRepo.FindAll()
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -75,4 +74,5 @@ func (cmd *ListStacks) Execute(c flags.FlagContext) {
 	}
 
 	table.Print()
+	return nil
 }

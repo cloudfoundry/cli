@@ -53,14 +53,13 @@ func (cmd *ListFeatureFlags) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *ListFeatureFlags) Execute(c flags.FlagContext) {
+func (cmd *ListFeatureFlags) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Retrieving status of all flagged features as {{.Username}}...", map[string]interface{}{
 		"Username": terminal.EntityNameColor(cmd.config.Username())}))
 
 	flags, err := cmd.flagRepo.List()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -76,7 +75,7 @@ func (cmd *ListFeatureFlags) Execute(c flags.FlagContext) {
 	}
 
 	table.Print()
-	return
+	return nil
 }
 
 func (cmd ListFeatureFlags) flagBoolToString(enabled bool) string {

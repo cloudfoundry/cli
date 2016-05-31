@@ -55,17 +55,17 @@ func (cmd *UpdateSecurityGroup) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *UpdateSecurityGroup) Execute(context flags.FlagContext) {
+func (cmd *UpdateSecurityGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	pathToJSONFile := context.Args()[1]
 	rules, err := json.ParseJSONArray(pathToJSONFile)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Updating security group {{.security_group}} as {{.username}}",
@@ -75,10 +75,11 @@ func (cmd *UpdateSecurityGroup) Execute(context flags.FlagContext) {
 		}))
 	err = cmd.securityGroupRepo.Update(securityGroup.GUID, rules)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
+	return nil
 }

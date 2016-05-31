@@ -40,8 +40,9 @@ func (cmd *Logout) SetDependency(deps commandregistry.Dependency, _ bool) comman
 	return cmd
 }
 
-func (cmd *Logout) Execute(c flags.FlagContext) {
+func (cmd *Logout) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Logging out..."))
 	cmd.config.ClearSession()
 	cmd.ui.Ok()
+	return nil
 }

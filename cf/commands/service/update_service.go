@@ -98,7 +98,7 @@ func (cmd *UpdateService) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *UpdateService) Execute(c flags.FlagContext) {
+func (cmd *UpdateService) Execute(c flags.FlagContext) error {
 	planName := c.String("p")
 	params := c.String("c")
 
@@ -108,18 +108,18 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 	if planName == "" && params == "" && tagsSet == false {
 		cmd.ui.Ok()
 		cmd.ui.Say(T("No changes were made"))
-		return
+		return nil
 	}
 
 	serviceInstanceName := c.Args()[0]
 	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceInstanceName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+		return errors.New(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
 	tags := uihelpers.ParseTags(tagsList)
@@ -128,7 +128,7 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 	if planName != "" {
 		plan, err = cmd.findPlan(serviceInstance, planName)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 	}
 
@@ -136,12 +136,13 @@ func (cmd *UpdateService) Execute(c flags.FlagContext) {
 
 	err = cmd.serviceRepo.UpdateServiceInstance(serviceInstance.GUID, plan.GUID, paramsMap, tags)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 	err = printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+	return nil
 }
 
 func (cmd *UpdateService) findPlan(serviceInstance models.ServiceInstance, planName string) (plan models.ServicePlanFields, err error) {

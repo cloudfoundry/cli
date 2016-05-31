@@ -115,14 +115,20 @@ var _ = Describe("CreateServiceBroker", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			err := flagContext.Parse("service-broker", "username", "password", "url")
 			Expect(err).NotTo(HaveOccurred())
 			cmd.Requirements(factory, flagContext)
 		})
 
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
+		})
+
 		It("tells the user it is creating the service broker", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Creating service broker", "service-broker", "my-user"},
 				[]string{"OK"},
@@ -130,7 +136,7 @@ var _ = Describe("CreateServiceBroker", func() {
 		})
 
 		It("tries to create the service broker", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIErr).NotTo(HaveOccurred())
 			Expect(serviceBrokerRepo.CreateCallCount()).To(Equal(1))
 			name, url, username, password, spaceGUID := serviceBrokerRepo.CreateArgsForCall(0)
 			Expect(name).To(Equal("service-broker"))
@@ -147,7 +153,7 @@ var _ = Describe("CreateServiceBroker", func() {
 			})
 
 			It("tries to create the service broker with the targeted space guid", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(serviceBrokerRepo.CreateCallCount()).To(Equal(1))
 				name, url, username, password, spaceGUID := serviceBrokerRepo.CreateArgsForCall(0)
 				Expect(name).To(Equal("service-broker"))
@@ -158,7 +164,7 @@ var _ = Describe("CreateServiceBroker", func() {
 			})
 
 			It("tells the user it is creating the service broker in the targeted org and space", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Creating service broker service-broker in org my-org / space my-space as my-user"},
 					[]string{"OK"},
@@ -172,7 +178,7 @@ var _ = Describe("CreateServiceBroker", func() {
 			})
 
 			It("says OK", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
 			})
 		})
@@ -182,12 +188,9 @@ var _ = Describe("CreateServiceBroker", func() {
 				serviceBrokerRepo.CreateReturns(errors.New("create-err"))
 			})
 
-			It("says OK", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"create-err"},
-				))
+			It("returns an error", func() {
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("create-err"))
 			})
 		})
 	})

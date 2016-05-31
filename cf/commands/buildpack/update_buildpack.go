@@ -1,6 +1,7 @@
 package buildpack
 
 import (
+	"errors"
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -66,7 +67,7 @@ func (cmd *UpdateBuildpack) SetDependency(deps commandregistry.Dependency, plugi
 	return cmd
 }
 
-func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) {
+func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 	buildpack := cmd.buildpackReq.GetBuildpack()
 
 	cmd.ui.Say(T("Updating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpack.Name)}))
@@ -83,7 +84,7 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) {
 	enabled := c.Bool("enable")
 	disabled := c.Bool("disable")
 	if enabled && disabled {
-		cmd.ui.Failed(T("Cannot specify both {{.Enabled}} and {{.Disabled}}.", map[string]interface{}{
+		return errors.New(T("Cannot specify both {{.Enabled}} and {{.Disabled}}.", map[string]interface{}{
 			"Enabled":  "enabled",
 			"Disabled": "disabled",
 		}))
@@ -102,8 +103,7 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) {
 	lock := c.Bool("lock")
 	unlock := c.Bool("unlock")
 	if lock && unlock {
-		cmd.ui.Failed(T("Cannot specify both lock and unlock options."))
-		return
+		return errors.New(T("Cannot specify both lock and unlock options."))
 	}
 
 	path := c.String("p")
@@ -112,13 +112,12 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) {
 	if path != "" {
 		dir, err = filepath.Abs(path)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
-			return
+			return err
 		}
 	}
 
 	if dir != "" && (lock || unlock) {
-		cmd.ui.Failed(T("Cannot specify buildpack bits and lock/unlock."))
+		return errors.New(T("Cannot specify buildpack bits and lock/unlock."))
 	}
 
 	if lock {
@@ -132,24 +131,25 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) {
 	}
 
 	if updateBuildpack {
-		newBuildpack, apiErr := cmd.buildpackRepo.Update(buildpack)
-		if apiErr != nil {
-			cmd.ui.Failed(T("Error updating buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
+		newBuildpack, err := cmd.buildpackRepo.Update(buildpack)
+		if err != nil {
+			return errors.New(T("Error updating buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 				"Name":  terminal.EntityNameColor(buildpack.Name),
-				"Error": apiErr.Error(),
+				"Error": err.Error(),
 			}))
 		}
 		buildpack = newBuildpack
 	}
 
 	if dir != "" {
-		apiErr := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
-		if apiErr != nil {
-			cmd.ui.Failed(T("Error uploading buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
+		err := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
+		if err != nil {
+			return errors.New(T("Error uploading buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 				"Name":  terminal.EntityNameColor(buildpack.Name),
-				"Error": apiErr.Error(),
+				"Error": err.Error(),
 			}))
 		}
 	}
 	cmd.ui.Ok()
+	return nil
 }

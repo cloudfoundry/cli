@@ -59,7 +59,7 @@ func (cmd *ServiceKeys) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
+func (cmd *ServiceKeys) Execute(c flags.FlagContext) error {
 	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
 
 	cmd.ui.Say(T("Getting keys for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}...",
@@ -70,8 +70,7 @@ func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
 
 	serviceKeys, err := cmd.serviceKeyRepo.ListServiceKeys(serviceInstance.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	table := cmd.ui.Table([]string{T("name")})
@@ -83,9 +82,10 @@ func (cmd *ServiceKeys) Execute(c flags.FlagContext) {
 	if len(serviceKeys) == 0 {
 		cmd.ui.Say(T("No service key for service instance {{.ServiceInstanceName}}",
 			map[string]interface{}{"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
-		return
+		return nil
 	}
 
 	cmd.ui.Say("")
 	table.Print()
+	return nil
 }

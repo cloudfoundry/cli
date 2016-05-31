@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"errors"
+
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -68,7 +70,7 @@ func (cmd *CreateSharedDomain) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) {
+func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) error {
 	var routerGroup models.RouterGroup
 	domainName := c.Args()[0]
 	routerGroupName := c.String("router-group")
@@ -86,10 +88,10 @@ func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) {
 		})
 
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		if !routerGroupFound {
-			cmd.ui.Failed(T("Router group {{.RouterGroup}} not found", map[string]interface{}{
+			return errors.New(T("Router group {{.RouterGroup}} not found", map[string]interface{}{
 				"RouterGroup": routerGroupName,
 			}))
 		}
@@ -102,9 +104,9 @@ func (cmd *CreateSharedDomain) Execute(c flags.FlagContext) {
 
 	err := cmd.domainRepo.CreateSharedDomain(domainName, routerGroup.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

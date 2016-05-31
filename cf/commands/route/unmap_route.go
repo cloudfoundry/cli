@@ -102,7 +102,7 @@ func (cmd *UnmapRoute) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
+func (cmd *UnmapRoute) Execute(c flags.FlagContext) error {
 	hostName := c.String("n")
 	path := c.String("path")
 	port := c.Int("port")
@@ -111,7 +111,7 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 
 	route, err := cmd.routeRepo.Find(hostName, domain, path, port)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -128,7 +128,7 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 			routeFound = true
 			err = cmd.routeRepo.Unbind(route.GUID, app.GUID)
 			if err != nil {
-				cmd.ui.Failed(err.Error())
+				return err
 			}
 			break
 		}
@@ -139,4 +139,5 @@ func (cmd *UnmapRoute) Execute(c flags.FlagContext) {
 	if !routeFound {
 		cmd.ui.Warn(T("\nRoute to be unmapped is not currently mapped to the application."))
 	}
+	return nil
 }

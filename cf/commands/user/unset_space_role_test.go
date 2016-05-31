@@ -189,7 +189,10 @@ var _ = Describe("UnsetSpaceRole", func() {
 	})
 
 	Describe("Execute", func() {
-		var org models.Organization
+		var (
+			org models.Organization
+			err error
+		)
 
 		BeforeEach(func() {
 			flagContext.Parse("the-user-name", "the-org-name", "the-space-name", "SpaceManager")
@@ -199,6 +202,10 @@ var _ = Describe("UnsetSpaceRole", func() {
 			org.GUID = "the-org-guid"
 			org.Name = "the-org-name"
 			organizationRequirement.GetOrganizationReturns(org)
+		})
+
+		JustBeforeEach(func() {
+			err = cmd.Execute(flagContext)
 		})
 
 		Context("when the space is not found", func() {
@@ -211,12 +218,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 				Expect(userRepo.UnsetSpaceRoleByUsernameCallCount()).To(BeZero())
 			})
 
-			It("panics and prints a failure message", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(BeInDisplayOrder(
-					[]string{"FAILED"},
-					[]string{"space-repo-error"},
-				))
+			It("return an error", func() {
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("space-repo-error"))
 			})
 		})
 
@@ -236,7 +240,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 				})
 
 				It("tells the user it is removing the role", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Removing role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
 						[]string{"OK"},
@@ -244,7 +248,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 				})
 
 				It("removes the role using the GUID", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(userRepo.UnsetSpaceRoleByGUIDCallCount()).To(Equal(1))
 					actualUserGUID, actualSpaceGUID, actualRole := userRepo.UnsetSpaceRoleByGUIDArgsForCall(0)
 					Expect(actualUserGUID).To(Equal("the-user-guid"))
@@ -257,12 +261,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 						userRepo.UnsetSpaceRoleByGUIDReturns(errors.New("user-repo-error"))
 					})
 
-					It("panics and prints a failure message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(BeInDisplayOrder(
-							[]string{"FAILED"},
-							[]string{"user-repo-error"},
-						))
+					It("return an error", func() {
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(Equal("user-repo-error"))
 					})
 				})
 			})
@@ -273,7 +274,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 				})
 
 				It("removes the role using the given username", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(userRepo.UnsetSpaceRoleByUsernameCallCount()).To(Equal(1))
 					actualUsername, actualSpaceGUID, actualRole := userRepo.UnsetSpaceRoleByUsernameArgsForCall(0)
 					Expect(actualUsername).To(Equal("the-user-name"))
@@ -282,7 +283,7 @@ var _ = Describe("UnsetSpaceRole", func() {
 				})
 
 				It("tells the user it is removing the role", func() {
-					cmd.Execute(flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Removing role", "SpaceManager", "the-user-name", "the-org", "the-user-name"},
 						[]string{"OK"},
@@ -294,12 +295,9 @@ var _ = Describe("UnsetSpaceRole", func() {
 						userRepo.UnsetSpaceRoleByUsernameReturns(errors.New("user-repo-error"))
 					})
 
-					It("panics and prints a failure message", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(BeInDisplayOrder(
-							[]string{"FAILED"},
-							[]string{"user-repo-error"},
-						))
+					It("return an error", func() {
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(Equal("user-repo-error"))
 					})
 				})
 			})

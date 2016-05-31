@@ -1,6 +1,7 @@
 package pluginrepo
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
@@ -55,7 +56,7 @@ func (cmd *RepoPlugins) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *RepoPlugins) Execute(c flags.FlagContext) {
+func (cmd *RepoPlugins) Execute(c flags.FlagContext) error {
 	var repos []models.PluginRepo
 	repoName := c.String("r")
 
@@ -74,7 +75,7 @@ func (cmd *RepoPlugins) Execute(c flags.FlagContext) {
 			cmd.ui.Say(T("Getting plugins from repository '") + repoName + "' ...")
 			repos = []models.PluginRepo{repos[index]}
 		} else {
-			cmd.ui.Failed(repoName + T(" does not exist as an available plugin repo."+"\nTip: use `add-plugin-repo` command to add repos."))
+			return errors.New(repoName + T(" does not exist as an available plugin repo."+"\nTip: use `add-plugin-repo` command to add repos."))
 		}
 	}
 
@@ -85,6 +86,7 @@ func (cmd *RepoPlugins) Execute(c flags.FlagContext) {
 	cmd.printTable(repoPlugins)
 
 	cmd.printErrors(repoError)
+	return nil
 }
 
 func (cmd RepoPlugins) printTable(repoPlugins map[string][]clipr.Plugin) {

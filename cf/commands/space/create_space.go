@@ -78,7 +78,7 @@ func (cmd *CreateSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *CreateSpace) Execute(c flags.FlagContext) {
+func (cmd *CreateSpace) Execute(c flags.FlagContext) error {
 	spaceName := c.Args()[0]
 	orgName := c.String("o")
 	spaceQuotaName := c.String("q")
@@ -96,19 +96,17 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 		}))
 
 	if orgGUID == "" {
-		org, apiErr := cmd.orgRepo.FindByName(orgName)
-		switch apiErr.(type) {
+		org, err := cmd.orgRepo.FindByName(orgName)
+		switch err.(type) {
 		case nil:
 		case *errors.ModelNotFoundError:
-			cmd.ui.Failed(T("Org {{.OrgName}} does not exist or is not accessible", map[string]interface{}{"OrgName": orgName}))
-			return
+			return errors.New(T("Org {{.OrgName}} does not exist or is not accessible", map[string]interface{}{"OrgName": orgName}))
 		default:
-			cmd.ui.Failed(T("Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
+			return errors.New(T("Error finding org {{.OrgName}}\n{{.ErrorDescription}}",
 				map[string]interface{}{
 					"OrgName":          orgName,
-					"ErrorDescription": apiErr.Error(),
+					"ErrorDescription": err.Error(),
 				}))
-			return
 		}
 
 		orgGUID = org.GUID
@@ -118,7 +116,7 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 	if spaceQuotaName != "" {
 		spaceQuota, err := cmd.spaceQuotaRepo.FindByNameAndOrgGUID(spaceQuotaName, orgGUID)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 		spaceQuotaGUID = spaceQuota.GUID
 	}
@@ -128,27 +126,25 @@ func (cmd *CreateSpace) Execute(c flags.FlagContext) {
 		if httpErr, ok := err.(errors.HTTPError); ok && httpErr.ErrorCode() == errors.SpaceNameTaken {
 			cmd.ui.Ok()
 			cmd.ui.Warn(T("Space {{.SpaceName}} already exists", map[string]interface{}{"SpaceName": spaceName}))
-			return
+			return nil
 		}
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 	cmd.ui.Ok()
 
 	err = cmd.spaceRoleSetter.SetSpaceRole(space, orgGUID, orgName, models.RoleSpaceManager, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	err = cmd.spaceRoleSetter.SetSpaceRole(space, orgGUID, orgName, models.RoleSpaceDeveloper, cmd.config.UserGUID(), cmd.config.Username())
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Say(T("\nTIP: Use '{{.CFTargetCommand}}' to target new space",
 		map[string]interface{}{
 			"CFTargetCommand": terminal.CommandColor(cf.Name + " target -o \"" + orgName + "\" -s \"" + space.Name + "\""),
 		}))
+	return nil
 }

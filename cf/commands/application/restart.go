@@ -14,7 +14,7 @@ import (
 
 type ApplicationRestarter interface {
 	commandregistry.Command
-	ApplicationRestart(app models.Application, orgName string, spaceName string)
+	ApplicationRestart(app models.Application, orgName string, spaceName string) error
 }
 
 type Restart struct {
@@ -73,23 +73,22 @@ func (cmd *Restart) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	return cmd
 }
 
-func (cmd *Restart) Execute(c flags.FlagContext) {
+func (cmd *Restart) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
-	cmd.ApplicationRestart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
+	return cmd.ApplicationRestart(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)
 }
 
-func (cmd *Restart) ApplicationRestart(app models.Application, orgName, spaceName string) {
+func (cmd *Restart) ApplicationRestart(app models.Application, orgName, spaceName string) error {
 	stoppedApp, err := cmd.stopper.ApplicationStop(app, orgName, spaceName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
 
 	cmd.ui.Say("")
 
 	_, err = cmd.starter.ApplicationStart(stoppedApp, orgName, spaceName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		return err
 	}
+	return nil
 }

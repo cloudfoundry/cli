@@ -43,8 +43,9 @@ func (cmd FakeCommand2) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd FakeCommand2) Execute(c flags.FlagContext) {
+func (cmd FakeCommand2) Execute(c flags.FlagContext) error {
 	cmd.ui.Say("Command Executed")
+	return nil
 }
 
 type fakeReq2 struct {

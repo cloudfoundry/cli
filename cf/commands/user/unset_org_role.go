@@ -75,13 +75,13 @@ func (cmd *UnsetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCa
 	return cmd
 }
 
-func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
+func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) error {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 	roleStr := c.Args()[2]
 	role, err := models.RoleFromString(roleStr)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
@@ -99,8 +99,9 @@ func (cmd *UnsetOrgRole) Execute(c flags.FlagContext) {
 	}
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

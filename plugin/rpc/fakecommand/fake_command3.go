@@ -33,6 +33,6 @@ func (cmd FakeCommand3) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd FakeCommand3) Execute(c flags.FlagContext) {
+func (cmd FakeCommand3) Execute(c flags.FlagContext) error {
 	panic("this is a test panic for cli_rpc_server_test (panic recovery)")
 }

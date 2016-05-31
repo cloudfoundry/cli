@@ -68,18 +68,17 @@ func (cmd *ListApps) SetDependency(deps commandregistry.Dependency, pluginCall b
 	return cmd
 }
 
-func (cmd *ListApps) Execute(c flags.FlagContext) {
+func (cmd *ListApps) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting apps in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
 
-	apps, apiErr := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
+	apps, err := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -87,7 +86,7 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 
 	if len(apps) == 0 {
 		cmd.ui.Say(T("No apps found"))
-		return
+		return nil
 	}
 
 	table := cmd.ui.Table([]string{
@@ -129,6 +128,7 @@ func (cmd *ListApps) Execute(c flags.FlagContext) {
 	if cmd.pluginCall {
 		cmd.populatePluginModel(apps)
 	}
+	return nil
 }
 
 func (cmd *ListApps) populatePluginModel(apps []models.Application) {

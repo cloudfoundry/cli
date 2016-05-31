@@ -69,16 +69,16 @@ var _ = Describe("scale command", func() {
 			requirementsFactory.LoginSuccess = false
 			requirementsFactory.TargetedSpaceSuccess = true
 
-			Expect(testcmd.RunCLICommand("scale", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("scale", args, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = false
 
-			Expect(testcmd.RunCLICommand("scale", args, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("scale", args, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 
 		It("requires an app to be specified", func() {
-			passed := testcmd.RunCLICommand("scale", []string{"-m", "1G"}, requirementsFactory, updateCommandDependency, false)
+			passed := testcmd.RunCLICommand("scale", []string{"-m", "1G"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
@@ -90,7 +90,7 @@ var _ = Describe("scale command", func() {
 			requirementsFactory.LoginSuccess = true
 			requirementsFactory.TargetedSpaceSuccess = true
 
-			Expect(testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false)).To(BeTrue())
+			Expect(testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeTrue())
 		})
 	})
 
@@ -107,7 +107,7 @@ var _ = Describe("scale command", func() {
 
 		Context("when no flags are specified", func() {
 			It("prints a description of the app's limits", func() {
-				testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Showing", "my-app", "my-org", "my-space", "my-user"},
@@ -124,7 +124,7 @@ var _ = Describe("scale command", func() {
 		Context("when the user does not confirm 'yes'", func() {
 			It("does not restart the app", func() {
 				ui.Inputs = []string{"whatever"}
-				testcmd.RunCLICommand("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
 				Expect(restarter.ApplicationRestartCallCount()).To(Equal(0))
 			})
@@ -132,7 +132,7 @@ var _ = Describe("scale command", func() {
 
 		Context("when the user provides the -f flag", func() {
 			It("does not prompt the user", func() {
-				testcmd.RunCLICommand("scale", []string{"-f", "-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("scale", []string{"-f", "-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
 				application, orgName, spaceName := restarter.ApplicationRestartArgsForCall(0)
 				Expect(application).To(Equal(app))
@@ -147,7 +147,7 @@ var _ = Describe("scale command", func() {
 			})
 
 			It("can set an app's instance count, memory limit and disk limit", func() {
-				testcmd.RunCLICommand("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"Scaling", "my-app", "my-org", "my-space", "my-user"},
@@ -169,7 +169,7 @@ var _ = Describe("scale command", func() {
 			})
 
 			It("does not scale the memory and disk limits if they are not specified", func() {
-				testcmd.RunCLICommand("scale", []string{"-i", "5", "my-app"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("scale", []string{"-i", "5", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
 				Expect(restarter.ApplicationRestartCallCount()).To(Equal(0))
 
@@ -181,7 +181,7 @@ var _ = Describe("scale command", func() {
 			})
 
 			It("does not scale the app's instance count if it is not specified", func() {
-				testcmd.RunCLICommand("scale", []string{"-m", "512M", "my-app"}, requirementsFactory, updateCommandDependency, false)
+				testcmd.RunCLICommand("scale", []string{"-m", "512M", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
 				application, orgName, spaceName := restarter.ApplicationRestartArgsForCall(0)
 				Expect(application).To(Equal(app))

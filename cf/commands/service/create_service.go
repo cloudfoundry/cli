@@ -102,7 +102,7 @@ func (cmd *CreateService) SetDependency(deps commandregistry.Dependency, pluginC
 	return cmd
 }
 
-func (cmd *CreateService) Execute(c flags.FlagContext) {
+func (cmd *CreateService) Execute(c flags.FlagContext) error {
 	serviceName := c.Args()[0]
 	planName := c.Args()[1]
 	serviceInstanceName := c.Args()[2]
@@ -113,7 +113,7 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 
 	paramsMap, err := json.ParseJSONFromFileOrString(params)
 	if err != nil {
-		cmd.ui.Failed(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
+		return errors.New(T("Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."))
 	}
 
 	cmd.ui.Say(T("Creating service instance {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -130,7 +130,7 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 	case nil:
 		err := printSuccessMessageForServiceInstance(serviceInstanceName, cmd.serviceRepo, cmd.ui)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 
 		if !plan.Free {
@@ -147,8 +147,9 @@ func (cmd *CreateService) Execute(c flags.FlagContext) {
 		cmd.ui.Ok()
 		cmd.ui.Warn(err.Error())
 	default:
-		cmd.ui.Failed(err.Error())
+		return err
 	}
+	return nil
 }
 
 func (cmd CreateService) CreateService(serviceName, planName, serviceInstanceName string, params map[string]interface{}, tags []string) (models.ServicePlanFields, error) {

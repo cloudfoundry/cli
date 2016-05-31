@@ -117,7 +117,10 @@ var _ = Describe("CreateAppManifest", func() {
 	})
 
 	Describe("Execute", func() {
-		var application models.Application
+		var (
+			application models.Application
+			runCLIErr   error
+		)
 
 		BeforeEach(func() {
 			err := flagContext.Parse("app-name")
@@ -128,15 +131,23 @@ var _ = Describe("CreateAppManifest", func() {
 			application.Name = "app-name"
 		})
 
+		JustBeforeEach(func() {
+			runCLIErr = cmd.Execute(flagContext)
+		})
+
 		AfterEach(func() {
 			os.Remove("app-name_manifest.yml")
 		})
 
-		It("tries to get the app summary", func() {
-			appSummaryRepo.GetSummaryReturns(application, nil)
+		Context("when there is an app summary", func() {
+			BeforeEach(func() {
+				appSummaryRepo.GetSummaryReturns(application, nil)
+			})
 
-			cmd.Execute(flagContext)
-			Expect(appSummaryRepo.GetSummaryCallCount()).To(Equal(1))
+			It("tries to get the app summary", func() {
+				Expect(runCLIErr).NotTo(HaveOccurred())
+				Expect(appSummaryRepo.GetSummaryCallCount()).To(Equal(1))
+			})
 		})
 
 		Context("when there is an error getting the app summary", func() {
@@ -145,10 +156,8 @@ var _ = Describe("CreateAppManifest", func() {
 			})
 
 			It("prints an error", func() {
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Error getting application summary: get-summary-err"},
-				))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(Equal("Error getting application summary: get-summary-err"))
 			})
 		})
 
@@ -157,14 +166,11 @@ var _ = Describe("CreateAppManifest", func() {
 				application.Memory = 1024
 				application.InstanceCount = 2
 				application.StackGUID = "the-stack-guid"
-			})
-
-			JustBeforeEach(func() {
 				appSummaryRepo.GetSummaryReturns(application, nil)
 			})
 
 			It("sets memory", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(fakeManifest.MemoryCallCount()).To(Equal(1))
 				name, memory := fakeManifest.MemoryArgsForCall(0)
 				Expect(name).To(Equal("app-name"))
@@ -172,7 +178,7 @@ var _ = Describe("CreateAppManifest", func() {
 			})
 
 			It("sets instances", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(fakeManifest.InstancesCallCount()).To(Equal(1))
 				name, instances := fakeManifest.InstancesArgsForCall(0)
 				Expect(name).To(Equal("app-name"))
@@ -182,10 +188,11 @@ var _ = Describe("CreateAppManifest", func() {
 			Context("when there are app ports specified", func() {
 				BeforeEach(func() {
 					application.AppPorts = []int{1111, 2222}
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets app ports", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.AppPortsCallCount()).To(Equal(1))
 					name, appPorts := fakeManifest.AppPortsArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
@@ -195,13 +202,13 @@ var _ = Describe("CreateAppManifest", func() {
 
 			Context("when app ports are not specified", func() {
 				It("does not set app ports", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.AppPortsCallCount()).To(Equal(0))
 				})
 			})
 
 			It("tries to get stacks", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(stackRepo.FindByGUIDCallCount()).To(Equal(1))
 				Expect(stackRepo.FindByGUIDArgsForCall(0)).To(Equal("the-stack-guid"))
 			})
@@ -215,7 +222,7 @@ var _ = Describe("CreateAppManifest", func() {
 				})
 
 				It("sets the stacks", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.StackCallCount()).To(Equal(1))
 					name, stackName := fakeManifest.StackArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
@@ -229,16 +236,13 @@ var _ = Describe("CreateAppManifest", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"find-by-guid-err"},
-					))
+					Expect(runCLIErr).To(HaveOccurred())
+					Expect(runCLIErr.Error()).To(Equal("Error retrieving stack: find-by-guid-err"))
 				})
 			})
 
 			It("tries to save the manifest", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(fakeManifest.SaveCallCount()).To(Equal(1))
 			})
 
@@ -248,7 +252,7 @@ var _ = Describe("CreateAppManifest", func() {
 				})
 
 				It("says OK", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Manifest file created successfully at ./app-name_manifest.yml"},
@@ -262,21 +266,19 @@ var _ = Describe("CreateAppManifest", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"Error creating manifest file: save-err"},
-					))
+					Expect(runCLIErr).To(HaveOccurred())
+					Expect(runCLIErr.Error()).To(Equal("Error creating manifest file: save-err"))
 				})
 			})
 
 			Context("when the app has a command", func() {
 				BeforeEach(func() {
 					application.Command = "app-command"
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the start command", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.StartCommandCallCount()).To(Equal(1))
 					name, command := fakeManifest.StartCommandArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
@@ -287,10 +289,11 @@ var _ = Describe("CreateAppManifest", func() {
 			Context("when the app has a buildpack", func() {
 				BeforeEach(func() {
 					application.BuildpackURL = "buildpack"
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the buildpack", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.BuildpackURLCallCount()).To(Equal(1))
 					name, buildpack := fakeManifest.BuildpackURLArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
@@ -308,10 +311,11 @@ var _ = Describe("CreateAppManifest", func() {
 							Name: "sp2-name",
 						},
 					}
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the services", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.ServiceCallCount()).To(Equal(2))
 
 					name, service := fakeManifest.ServiceArgsForCall(0)
@@ -327,10 +331,11 @@ var _ = Describe("CreateAppManifest", func() {
 			Context("when the app has a health check timeout", func() {
 				BeforeEach(func() {
 					application.HealthCheckTimeout = 5
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the health check timeout", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.HealthCheckTimeoutCallCount()).To(Equal(1))
 					name, timeout := fakeManifest.HealthCheckTimeoutArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
@@ -345,10 +350,11 @@ var _ = Describe("CreateAppManifest", func() {
 						"bool-key":    true,
 						"string-key":  "string",
 					}
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the env vars", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.EnvironmentVarsCallCount()).To(Equal(3))
 					actuals := map[string]interface{}{}
 
@@ -369,14 +375,12 @@ var _ = Describe("CreateAppManifest", func() {
 					application.EnvironmentVars = map[string]interface{}{
 						"key": int(1),
 					}
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"Failed to create manifest, unable to parse environment variable: key"},
-					))
+					Expect(runCLIErr).To(HaveOccurred())
+					Expect(runCLIErr.Error()).To(Equal("Failed to create manifest, unable to parse environment variable: key"))
 				})
 			})
 
@@ -396,10 +400,11 @@ var _ = Describe("CreateAppManifest", func() {
 							},
 						},
 					}
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the domains", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.DomainCallCount()).To(Equal(2))
 
 					name, host, domainName := fakeManifest.DomainArgsForCall(0)
@@ -417,10 +422,11 @@ var _ = Describe("CreateAppManifest", func() {
 			Context("when the app has a disk quota", func() {
 				BeforeEach(func() {
 					application.DiskQuota = 1024
+					appSummaryRepo.GetSummaryReturns(application, nil)
 				})
 
 				It("sets the disk quota", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIErr).NotTo(HaveOccurred())
 					Expect(fakeManifest.DiskQuotaCallCount()).To(Equal(1))
 					name, quota := fakeManifest.DiskQuotaArgsForCall(0)
 					Expect(name).To(Equal("app-name"))

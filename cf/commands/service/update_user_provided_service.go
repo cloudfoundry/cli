@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
 
 	"github.com/blang/semver"
@@ -91,11 +92,10 @@ func (cmd *UpdateUserProvidedService) SetDependency(deps commandregistry.Depende
 	return cmd
 }
 
-func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
+func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) error {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	if !serviceInstance.IsUserProvided() {
-		cmd.ui.Failed(T("Service Instance is not user provided"))
-		return
+		return errors.New(T("Service Instance is not user provided"))
 	}
 
 	drainURL := c.String("l")
@@ -107,7 +107,7 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	if c.IsSet("p") {
 		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
 		if err != nil {
-			cmd.ui.Failed(err.Error())
+			return err
 		}
 
 		err = json.Unmarshal(jsonBytes, &credentialsMap)
@@ -131,10 +131,9 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	serviceInstance.SysLogDrainURL = drainURL
 	serviceInstance.RouteServiceURL = routeServiceURL
 
-	apiErr := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance.ServiceInstanceFields)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance.ServiceInstanceFields)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -146,4 +145,5 @@ func (cmd *UpdateUserProvidedService) Execute(c flags.FlagContext) {
 	if routeServiceURL == "" && credentials == "" && drainURL == "" {
 		cmd.ui.Warn(T("No flags specified. No changes were made."))
 	}
+	return nil
 }

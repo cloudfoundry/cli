@@ -2,6 +2,7 @@ package spacequota
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -82,19 +83,18 @@ func (cmd *UpdateSpaceQuota) SetDependency(deps commandregistry.Dependency, plug
 	return cmd
 }
 
-func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
+func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) error {
 	name := c.Args()[0]
 
-	spaceQuota, apiErr := cmd.spaceQuotaRepo.FindByName(name)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	spaceQuota, err := cmd.spaceQuotaRepo.FindByName(name)
+	if err != nil {
+		return err
 	}
 
 	allowPaidServices := c.Bool("allow-paid-service-plans")
 	disallowPaidServices := c.Bool("disallow-paid-service-plans")
 	if allowPaidServices && disallowPaidServices {
-		cmd.ui.Failed(T("Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."))
+		return errors.New(T("Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."))
 	}
 
 	if allowPaidServices {
@@ -116,7 +116,7 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 		} else {
 			memory, formatError = formatters.ToMegabytes(memFlag)
 			if formatError != nil {
-				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-space-quota"))
+				return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-space-quota"))
 			}
 		}
 
@@ -127,7 +127,7 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {
-			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-space-quota"))
+			return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-space-quota"))
 		}
 
 		spaceQuota.MemoryLimit = memory
@@ -159,11 +159,11 @@ func (cmd *UpdateSpaceQuota) Execute(c flags.FlagContext) {
 			"Username": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	apiErr = cmd.spaceQuotaRepo.Update(spaceQuota)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err = cmd.spaceQuotaRepo.Update(spaceQuota)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

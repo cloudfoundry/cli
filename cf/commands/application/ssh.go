@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -104,16 +105,16 @@ func (cmd *SSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) 
 	return cmd
 }
 
-func (cmd *SSH) Execute(fc flags.FlagContext) {
+func (cmd *SSH) Execute(fc flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 	info, err := cmd.getSSHEndpointInfo()
 	if err != nil {
-		cmd.ui.Failed(T("Error getting SSH info:") + err.Error())
+		return errors.New(T("Error getting SSH info:") + err.Error())
 	}
 
 	sshAuthCode, err := cmd.sshCodeGetter.Get()
 	if err != nil {
-		cmd.ui.Failed(T("Error getting one time auth code: ") + err.Error())
+		return errors.New(T("Error getting one time auth code: ") + err.Error())
 	}
 
 	//init secureShell if it is not already set by SetDependency() with fakes
@@ -132,13 +133,13 @@ func (cmd *SSH) Execute(fc flags.FlagContext) {
 
 	err = cmd.secureShell.Connect(cmd.opts)
 	if err != nil {
-		cmd.ui.Failed(T("Error opening SSH connection: ") + err.Error())
+		return errors.New(T("Error opening SSH connection: ") + err.Error())
 	}
 	defer cmd.secureShell.Close()
 
 	err = cmd.secureShell.LocalPortForward()
 	if err != nil {
-		cmd.ui.Failed(T("Error forwarding port: ") + err.Error())
+		return errors.New(T("Error forwarding port: ") + err.Error())
 	}
 
 	if cmd.opts.SkipRemoteExecution {
@@ -147,23 +148,22 @@ func (cmd *SSH) Execute(fc flags.FlagContext) {
 		err = cmd.secureShell.InteractiveSession()
 	}
 
-	if err == nil {
-		return
-	}
-
-	if exitError, ok := err.(*ssh.ExitError); ok {
-		exitStatus := exitError.ExitStatus()
-		if sig := exitError.Signal(); sig != "" {
-			cmd.ui.Say(fmt.Sprintf(T("Process terminated by signal: %s. Exited with")+" %d.\n", sig, exitStatus))
+	if err != nil {
+		if exitError, ok := err.(*ssh.ExitError); ok {
+			exitStatus := exitError.ExitStatus()
+			if sig := exitError.Signal(); sig != "" {
+				cmd.ui.Say(fmt.Sprintf(T("Process terminated by signal: %s. Exited with")+" %d.\n", sig, exitStatus))
+			}
+			os.Exit(exitStatus)
+		} else {
+			return errors.New(T("Error: ") + err.Error())
 		}
-		os.Exit(exitStatus)
-	} else {
-		cmd.ui.Failed(T("Error: ") + err.Error())
 	}
+	return nil
 }
 
 func (cmd *SSH) getSSHEndpointInfo() (sshInfo, error) {
 	info := sshInfo{}
-	apiErr := cmd.gateway.GetResource(cmd.config.APIEndpoint()+"/v2/info", &info)
-	return info, apiErr
+	err := cmd.gateway.GetResource(cmd.config.APIEndpoint()+"/v2/info", &info)
+	return info, err
 }

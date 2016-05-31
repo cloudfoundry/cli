@@ -70,7 +70,7 @@ func migrateServiceInstanceWarning() string {
 	return T("WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.")
 }
 
-func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
+func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) error {
 	v1 := resources.ServicePlanDescription{
 		ServiceLabel:    c.Args()[0],
 		ServiceProvider: c.Args()[1],
@@ -82,41 +82,35 @@ func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 	}
 	force := c.Bool("f")
 
-	v1GUID, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v1)
-	switch apiErr.(type) {
+	v1GUID, err := cmd.serviceRepo.FindServicePlanByDescription(v1)
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
-		cmd.ui.Failed(T("Plan {{.ServicePlanName}} cannot be found",
+		return errors.New(T("Plan {{.ServicePlanName}} cannot be found",
 			map[string]interface{}{
 				"ServicePlanName": terminal.EntityNameColor(v1.String()),
 			}))
-		return
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 	}
 
-	v2GUID, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v2)
-	switch apiErr.(type) {
+	v2GUID, err := cmd.serviceRepo.FindServicePlanByDescription(v2)
+	switch err.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
-		cmd.ui.Failed(T("Plan {{.ServicePlanName}} cannot be found",
+		return errors.New(T("Plan {{.ServicePlanName}} cannot be found",
 			map[string]interface{}{
 				"ServicePlanName": terminal.EntityNameColor(v2.String()),
 			}))
-		return
 	default:
-		cmd.ui.Failed(apiErr.Error())
-		return
+		return err
 	}
 
-	count, apiErr := cmd.serviceRepo.GetServiceInstanceCountForServicePlan(v1GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	count, err := cmd.serviceRepo.GetServiceInstanceCountForServicePlan(v1GUID)
+	if err != nil {
+		return err
 	} else if count == 0 {
-		cmd.ui.Failed(T("Plan {{.ServicePlanName}} has no service instances to migrate", map[string]interface{}{"ServicePlanName": terminal.EntityNameColor(v1.String())}))
-		return
+		return errors.New(T("Plan {{.ServicePlanName}} has no service instances to migrate", map[string]interface{}{"ServicePlanName": terminal.EntityNameColor(v1.String())}))
 	}
 
 	cmd.ui.Warn(migrateServiceInstanceWarning())
@@ -132,21 +126,21 @@ func (cmd *MigrateServiceInstances) Execute(c flags.FlagContext) {
 					"NewServicePlanName":         terminal.EntityNameColor(v2.String()),
 				}))
 		if !response {
-			return
+			return nil
 		}
 	}
 
 	cmd.ui.Say(T("Attempting to migrate {{.ServiceInstanceDescription}}...", map[string]interface{}{"ServiceInstanceDescription": serviceInstancesPhrase}))
 
-	changedCount, apiErr := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1GUID, v2GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	changedCount, err := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1GUID, v2GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Say(T("{{.CountOfServices}} migrated.", map[string]interface{}{"CountOfServices": pluralizeServiceInstances(changedCount)}))
 	cmd.ui.Ok()
 
-	return
+	return nil
 }
 
 func pluralizeServiceInstances(count int) string {

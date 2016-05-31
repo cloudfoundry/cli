@@ -45,7 +45,7 @@ var _ = Describe("unset-env command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("unset-env", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("unset-env", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Describe("requirements", func() {

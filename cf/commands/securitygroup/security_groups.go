@@ -56,7 +56,7 @@ func (cmd *SecurityGroups) SetDependency(deps commandregistry.Dependency, plugin
 	return cmd
 }
 
-func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
+func (cmd *SecurityGroups) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Getting security groups as {{.username}}",
 		map[string]interface{}{
 			"username": terminal.EntityNameColor(cmd.configRepo.Username()),
@@ -64,7 +64,7 @@ func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
 
 	securityGroups, err := cmd.securityGroupRepo.FindAll()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -72,7 +72,7 @@ func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
 
 	if len(securityGroups) == 0 {
 		cmd.ui.Say(T("No security groups"))
-		return
+		return nil
 	}
 
 	table := cmd.ui.Table([]string{"", T("Name"), T("Organization"), T("Space")})
@@ -85,6 +85,7 @@ func (cmd *SecurityGroups) Execute(c flags.FlagContext) {
 		}
 	}
 	table.Print()
+	return nil
 }
 
 type table interface {

@@ -147,6 +147,8 @@ var _ = Describe("create-space-quota", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIErr error
+
 		BeforeEach(func() {
 			orgFields := models.OrganizationFields{
 				Name: "my-org",
@@ -157,12 +159,12 @@ var _ = Describe("create-space-quota", func() {
 			config.UsernameReturns("my-user")
 		})
 
-		Context("when creating a quota succeeds", func() {
-			JustBeforeEach(func() {
-				cmd.SetDependency(deps, false)
-				cmd.Execute(flagContext)
-			})
+		JustBeforeEach(func() {
+			cmd.SetDependency(deps, false)
+			runCLIErr = cmd.Execute(flagContext)
+		})
 
+		Context("when creating a quota succeeds", func() {
 			Context("without any flags", func() {
 				BeforeEach(func() {
 					flagContext.Parse("my-quota")
@@ -275,11 +277,13 @@ var _ = Describe("create-space-quota", func() {
 			BeforeEach(func() {
 				flagContext.Parse("-i", "whoops", "yo", "12")
 				cmd.SetDependency(deps, false)
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(runCLIErr).To(HaveOccurred())
+				runCLIErrStr := runCLIErr.Error()
+				Expect(runCLIErrStr).To(ContainSubstring("Invalid instance memory limit: whoops"))
+				Expect(runCLIErrStr).To(ContainSubstring("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
 			})
 		})
 
@@ -287,11 +291,13 @@ var _ = Describe("create-space-quota", func() {
 			BeforeEach(func() {
 				flagContext.Parse("-m", "whoops", "wit mah hussle")
 				cmd.SetDependency(deps, false)
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 			})
 
 			It("alerts the user when parsing the memory limit fails", func() {
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(runCLIErr).To(HaveOccurred())
+				runCLIErrStr := runCLIErr.Error()
+				Expect(runCLIErrStr).To(ContainSubstring("Invalid memory limit: whoops"))
+				Expect(runCLIErrStr).To(ContainSubstring("Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB"))
 			})
 		})
 
@@ -299,11 +305,11 @@ var _ = Describe("create-space-quota", func() {
 			BeforeEach(func() {
 				flagContext.Parse("--reserved-route-ports", "-2", "ski is life")
 				cmd.SetDependency(deps, false)
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 			})
 
 			It("alerts the user when reserved route ports limit failed", func() {
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(runCLIErr).To(HaveOccurred())
+				Expect(runCLIErr.Error()).To(ContainSubstring("Quota Definition is invalid: -2 Total reserved ports must be less than or equal to total routes."))
 			})
 		})
 
@@ -312,14 +318,14 @@ var _ = Describe("create-space-quota", func() {
 				flagContext.Parse("my-quota")
 				quotaRepo.CreateReturns(errors.New("WHOOP THERE IT IS"))
 				cmd.SetDependency(deps, false)
-				Expect(func() { cmd.Execute(flagContext) }).To(Panic())
 			})
 
-			It("alerts the user when creating the quota fails", func() {
+			It("alets the user when creating the quota fails", func() {
+				Expect(runCLIErr).To(HaveOccurred())
 				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
 					[]string{"Creating space quota", "my-quota", "my-org"},
 				))
+				Expect(runCLIErr.Error()).To(Equal("WHOOP THERE IT IS"))
 			})
 		})
 
@@ -327,11 +333,10 @@ var _ = Describe("create-space-quota", func() {
 			BeforeEach(func() {
 				flagContext.Parse("my-quota")
 				quotaRepo.CreateReturns(errors.NewHTTPError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
-				cmd.SetDependency(deps, false)
-				cmd.Execute(flagContext)
 			})
 
 			It("warns the user", func() {
+				Expect(runCLIErr).NotTo(HaveOccurred())
 				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
 				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
 			})

@@ -63,7 +63,7 @@ func (cmd *ListServiceBrokers) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *ListServiceBrokers) Execute(c flags.FlagContext) {
+func (cmd *ListServiceBrokers) Execute(c flags.FlagContext) error {
 	sbTable := serviceBrokerTable{}
 
 	cmd.ui.Say(T("Getting service brokers as {{.Username}}...\n",
@@ -73,7 +73,7 @@ func (cmd *ListServiceBrokers) Execute(c flags.FlagContext) {
 
 	table := cmd.ui.Table([]string{T("name"), T("url")})
 	foundBrokers := false
-	apiErr := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
+	err := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
 		sbTable = append(sbTable, serviceBrokerRow{
 			name: serviceBroker.Name,
 			url:  serviceBroker.URL,
@@ -90,14 +90,14 @@ func (cmd *ListServiceBrokers) Execute(c flags.FlagContext) {
 
 	table.Print()
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	if err != nil {
+		return err
 	}
 
 	if !foundBrokers {
 		cmd.ui.Say(T("No service brokers found"))
 	}
+	return nil
 }
 
 func (a serviceBrokerTable) Len() int           { return len(a) }

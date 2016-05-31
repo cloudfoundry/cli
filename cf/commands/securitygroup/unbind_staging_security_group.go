@@ -56,7 +56,7 @@ func (cmd *unbindFromStagingGroup) SetDependency(deps commandregistry.Dependency
 	return cmd
 }
 
-func (cmd *unbindFromStagingGroup) Execute(context flags.FlagContext) {
+func (cmd *unbindFromStagingGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 
 	cmd.ui.Say(T("Unbinding security group {{.security_group}} from defaults for staging as {{.username}}",
@@ -75,17 +75,18 @@ func (cmd *unbindFromStagingGroup) Execute(context flags.FlagContext) {
 				"security_group": terminal.EntityNameColor(name),
 				"error_message":  terminal.WarningColor(T("does not exist.")),
 			}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	err = cmd.stagingGroupRepo.UnbindFromStagingSet(securityGroup.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
+	return nil
 }

@@ -58,10 +58,10 @@ func (cmd *EnableServiceAccess) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *EnableServiceAccess) Execute(c flags.FlagContext) {
+func (cmd *EnableServiceAccess) Execute(c flags.FlagContext) error {
 	_, err := cmd.tokenRefresher.RefreshAuthToken()
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	serviceName := c.Args()[0]
@@ -69,18 +69,23 @@ func (cmd *EnableServiceAccess) Execute(c flags.FlagContext) {
 	orgName := c.String("o")
 
 	if planName != "" && orgName != "" {
-		cmd.enablePlanAndOrgForService(serviceName, planName, orgName)
+		err = cmd.enablePlanAndOrgForService(serviceName, planName, orgName)
 	} else if planName != "" {
-		cmd.enablePlanForService(serviceName, planName)
+		err = cmd.enablePlanForService(serviceName, planName)
 	} else if orgName != "" {
-		cmd.enableAllPlansForSingleOrgForService(serviceName, orgName)
+		err = cmd.enableAllPlansForSingleOrgForService(serviceName, orgName)
 	} else {
-		cmd.enableAllPlansForService(serviceName)
+		err = cmd.enableAllPlansForService(serviceName)
 	}
+	if err != nil {
+		return err
+	}
+
 	cmd.ui.Ok()
+	return nil
 }
 
-func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, planName string, orgName string) {
+func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, planName string, orgName string) error {
 	cmd.ui.Say(
 		T("Enabling access to plan {{.PlanName}} of service {{.ServiceName}} for org {{.OrgName}} as {{.Username}}...",
 			map[string]interface{}{
@@ -91,15 +96,16 @@ func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, p
 			}))
 	planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	if planOriginalAccess == actors.All {
 		cmd.ui.Say(T("The plan is already accessible for this org"))
 	}
+	return nil
 }
 
-func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planName string) {
+func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planName string) error {
 	cmd.ui.Say(T("Enabling access of plan {{.PlanName}} for service {{.ServiceName}} as {{.Username}}...",
 		map[string]interface{}{
 			"PlanName":    terminal.EntityNameColor(planName),
@@ -108,15 +114,16 @@ func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planNam
 		}))
 	planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	if planOriginalAccess == actors.All {
 		cmd.ui.Say(T("The plan is already accessible for all orgs"))
 	}
+	return nil
 }
 
-func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) {
+func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) error {
 	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for all orgs as {{.Username}}...",
 		map[string]interface{}{
 			"ServiceName": terminal.EntityNameColor(serviceName),
@@ -124,15 +131,16 @@ func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) {
 		}))
 	allPlansInServicePublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	if allPlansInServicePublic {
 		cmd.ui.Say(T("All plans of the service are already accessible for all orgs"))
 	}
+	return nil
 }
 
-func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName string, orgName string) {
+func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName string, orgName string) error {
 	cmd.ui.Say(T("Enabling access to all plans of service {{.ServiceName}} for the org {{.OrgName}} as {{.Username}}...",
 		map[string]interface{}{
 			"ServiceName": terminal.EntityNameColor(serviceName),
@@ -141,10 +149,11 @@ func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName
 		}))
 	allPlansWereSet, err := cmd.actor.UpdateOrgForService(serviceName, orgName, true)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	if allPlansWereSet {
 		cmd.ui.Say(T("All plans of the service are already accessible for this org"))
 	}
+	return nil
 }

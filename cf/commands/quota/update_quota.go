@@ -1,9 +1,11 @@
 package quota
 
 import (
+	"errors"
 	"fmt"
 
 	"encoding/json"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -84,18 +86,18 @@ func (cmd *UpdateQuota) SetDependency(deps commandregistry.Dependency, pluginCal
 	return cmd
 }
 
-func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
+func (cmd *UpdateQuota) Execute(c flags.FlagContext) error {
 	oldQuotaName := c.Args()[0]
 	quota, err := cmd.quotaRepo.FindByName(oldQuotaName)
 
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	allowPaidServices := c.Bool("allow-paid-service-plans")
 	disallowPaidServices := c.Bool("disallow-paid-service-plans")
 	if allowPaidServices && disallowPaidServices {
-		cmd.ui.Failed(T("Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."))
+		return errors.New(T("Please choose either allow or disallow. Both flags are not permitted to be passed in the same command."))
 	}
 
 	if allowPaidServices {
@@ -117,7 +119,7 @@ func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
 			memory, formatError = formatters.ToMegabytes(c.String("i"))
 
 			if formatError != nil {
-				cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-quota"))
+				return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-quota"))
 			}
 		}
 
@@ -132,7 +134,7 @@ func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
 		memory, formatError := formatters.ToMegabytes(c.String("m"))
 
 		if formatError != nil {
-			cmd.ui.Failed(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-quota"))
+			return errors.New(T("Incorrect Usage") + "\n\n" + commandregistry.Commands.CommandUsage("update-quota"))
 		}
 
 		quota.MemoryLimit = memory
@@ -161,7 +163,8 @@ func (cmd *UpdateQuota) Execute(c flags.FlagContext) {
 
 	err = cmd.quotaRepo.Update(quota)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 	cmd.ui.Ok()
+	return nil
 }

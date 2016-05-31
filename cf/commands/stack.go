@@ -54,17 +54,16 @@ func (cmd *ListStack) SetDependency(deps commandregistry.Dependency, _ bool) com
 	return cmd
 }
 
-func (cmd *ListStack) Execute(c flags.FlagContext) {
+func (cmd *ListStack) Execute(c flags.FlagContext) error {
 	stackName := c.Args()[0]
 
-	stack, apiErr := cmd.stacksRepo.FindByName(stackName)
+	stack, err := cmd.stacksRepo.FindByName(stackName)
 
 	if c.Bool("guid") {
 		cmd.ui.Say(stack.GUID)
 	} else {
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-			return
+		if err != nil {
+			return err
 		}
 
 		cmd.ui.Say(T("Getting stack '{{.Stack}}' in org {{.OrganizationName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -79,4 +78,5 @@ func (cmd *ListStack) Execute(c flags.FlagContext) {
 		table.Add(stack.Name, stack.Description)
 		table.Print()
 	}
+	return nil
 }

@@ -43,7 +43,7 @@ var _ = Describe("stop command", func() {
 	})
 
 	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("stop", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("stop", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	It("fails requirements when not logged in", func() {

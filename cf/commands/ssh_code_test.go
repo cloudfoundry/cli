@@ -93,6 +93,8 @@ var _ = Describe("OneTimeSSHCode", func() {
 	})
 
 	Describe("Execute", func() {
+		var runCLIerr error
+
 		BeforeEach(func() {
 			cmd.Requirements(factory, flagContext)
 
@@ -105,8 +107,12 @@ var _ = Describe("OneTimeSSHCode", func() {
 			)
 		})
 
+		JustBeforeEach(func() {
+			runCLIerr = cmd.Execute(flagContext)
+		})
+
 		It("tries to update the endpoint", func() {
-			cmd.Execute(flagContext)
+			Expect(runCLIerr).NotTo(HaveOccurred())
 			Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
 			Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("fake-api-endpoint"))
 		})
@@ -130,7 +136,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 			})
 
 			It("tries to refresh the auth token", func() {
-				cmd.Execute(flagContext)
+				Expect(runCLIerr).NotTo(HaveOccurred())
 				Expect(authRepo.RefreshAuthTokenCallCount()).To(Equal(1))
 			})
 
@@ -140,11 +146,8 @@ var _ = Describe("OneTimeSSHCode", func() {
 				})
 
 				It("fails with error", func() {
-					Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"FAILED"},
-						[]string{"Error refreshing oauth token"},
-					))
+					Expect(runCLIerr).To(HaveOccurred())
+					Expect(runCLIerr.Error()).To(Equal("Error refreshing oauth token: auth-error"))
 				})
 			})
 
@@ -154,7 +157,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 				})
 
 				It("tries to get the ssh-code", func() {
-					cmd.Execute(flagContext)
+					Expect(runCLIerr).NotTo(HaveOccurred())
 					Expect(authRepo.AuthorizeCallCount()).To(Equal(1))
 					Expect(authRepo.AuthorizeArgsForCall(0)).To(Equal("auth-token"))
 				})
@@ -165,7 +168,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 					})
 
 					It("displays the token", func() {
-						cmd.Execute(flagContext)
+						Expect(runCLIerr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"some-code"},
 						))
@@ -178,11 +181,8 @@ var _ = Describe("OneTimeSSHCode", func() {
 					})
 
 					It("fails with error", func() {
-						Expect(func() { cmd.Execute(flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"FAILED"},
-							[]string{"Error getting SSH code: auth-err"},
-						))
+						Expect(runCLIerr).To(HaveOccurred())
+						Expect(runCLIerr.Error()).To(Equal("Error getting SSH code: auth-err"))
 					})
 				})
 			})

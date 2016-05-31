@@ -64,7 +64,7 @@ func (cmd *ServiceKey) SetDependency(deps commandregistry.Dependency, pluginCall
 	return cmd
 }
 
-func (cmd *ServiceKey) Execute(c flags.FlagContext) {
+func (cmd *ServiceKey) Execute(c flags.FlagContext) error {
 	serviceInstance := cmd.serviceInstanceRequirement.GetServiceInstance()
 	serviceKeyName := c.Args()[1]
 
@@ -85,10 +85,9 @@ func (cmd *ServiceKey) Execute(c flags.FlagContext) {
 				map[string]interface{}{
 					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
 					"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
-			return
+			return nil
 		default:
-			cmd.ui.Failed(err.Error())
-			return
+			return err
 		}
 	}
 
@@ -100,16 +99,16 @@ func (cmd *ServiceKey) Execute(c flags.FlagContext) {
 				map[string]interface{}{
 					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
 					"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
-			return
+			return nil
 		}
 
 		jsonBytes, err := json.MarshalIndent(serviceKey.Credentials, "", " ")
 		if err != nil {
-			cmd.ui.Failed(err.Error())
-			return
+			return err
 		}
 
 		cmd.ui.Say("")
 		cmd.ui.Say(string(jsonBytes))
 	}
+	return nil
 }

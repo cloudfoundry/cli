@@ -59,12 +59,12 @@ var _ = Describe("unbind-service command", func() {
 	})
 
 	callUnbindService := func(args []string) bool {
-		return testcmd.RunCLICommand("unbind-service", args, requirementsFactory, updateCommandDependency, false)
+		return testcmd.RunCLICommand("unbind-service", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
 	Context("when not logged in", func() {
 		It("fails requirements when not logged in", func() {
-			Expect(testcmd.RunCLICommand("unbind-service", []string{"my-service", "my-app"}, requirementsFactory, updateCommandDependency, false)).To(BeFalse())
+			Expect(testcmd.RunCLICommand("unbind-service", []string{"my-service", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 	})
 

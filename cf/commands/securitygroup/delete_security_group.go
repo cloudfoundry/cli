@@ -51,7 +51,7 @@ func (cmd *DeleteSecurityGroup) SetDependency(deps commandregistry.Dependency, p
 	return cmd
 }
 
-func (cmd *DeleteSecurityGroup) Execute(context flags.FlagContext) {
+func (cmd *DeleteSecurityGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 	cmd.ui.Say(T("Deleting security group {{.security_group}} as {{.username}}",
 		map[string]interface{}{
@@ -62,7 +62,7 @@ func (cmd *DeleteSecurityGroup) Execute(context flags.FlagContext) {
 	if !context.Bool("f") {
 		response := cmd.ui.ConfirmDelete(T("security group"), name)
 		if !response {
-			return
+			return nil
 		}
 	}
 
@@ -72,15 +72,16 @@ func (cmd *DeleteSecurityGroup) Execute(context flags.FlagContext) {
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("Security group {{.security_group}} does not exist", map[string]interface{}{"security_group": name}))
-		return
+		return nil
 	default:
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	err = cmd.securityGroupRepo.Delete(group.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
+	return nil
 }

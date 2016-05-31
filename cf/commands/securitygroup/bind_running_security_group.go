@@ -55,12 +55,12 @@ func (cmd *bindToRunningGroup) SetDependency(deps commandregistry.Dependency, pl
 	return cmd
 }
 
-func (cmd *bindToRunningGroup) Execute(context flags.FlagContext) {
+func (cmd *bindToRunningGroup) Execute(context flags.FlagContext) error {
 	name := context.Args()[0]
 
 	securityGroup, err := cmd.securityGroupRepo.Read(name)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Say(T("Binding security group {{.security_group}} to defaults for running as {{.username}}",
@@ -71,10 +71,11 @@ func (cmd *bindToRunningGroup) Execute(context flags.FlagContext) {
 
 	err = cmd.runningGroupRepo.BindToRunningSet(securityGroup.GUID)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		return err
 	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
+	return nil
 }

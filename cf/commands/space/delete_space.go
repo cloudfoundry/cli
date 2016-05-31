@@ -59,12 +59,12 @@ func (cmd *DeleteSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
 	return cmd
 }
-func (cmd *DeleteSpace) Execute(c flags.FlagContext) {
+func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
 	spaceName := c.Args()[0]
 
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDelete(T("space"), spaceName) {
-			return
+			return nil
 		}
 	}
 
@@ -77,10 +77,9 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) {
 
 	space := cmd.spaceReq.GetSpace()
 
-	apiErr := cmd.spaceRepo.Delete(space.GUID)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	err := cmd.spaceRepo.Delete(space.GUID)
+	if err != nil {
+		return err
 	}
 
 	cmd.ui.Ok()
@@ -91,5 +90,5 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) {
 			map[string]interface{}{"CfTargetCommand": cf.Name + " target -s"}))
 	}
 
-	return
+	return nil
 }
