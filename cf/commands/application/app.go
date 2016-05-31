@@ -107,8 +107,8 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) e
 	application, err := cmd.appSummaryRepo.GetSummary(app.GUID)
 
 	appIsStopped := (application.State == "stopped")
-	if err, ok := err.(errors.HTTPError); ok {
-		if err.ErrorCode() == errors.InstancesError || err.ErrorCode() == errors.NotStaged {
+	if assertionErr, ok := err.(errors.HTTPError); ok {
+		if assertionErr.ErrorCode() == errors.InstancesError || assertionErr.ErrorCode() == errors.NotStaged {
 			appIsStopped = true
 		}
 	}
