@@ -157,10 +157,10 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (models.Application, error) {
 	stopChan := make(chan bool, 1)
 
-	loggingStartedWait := &sync.WaitGroup{}
+	loggingStartedWait := new(sync.WaitGroup)
 	loggingStartedWait.Add(1)
 
-	loggingDoneWait := &sync.WaitGroup{}
+	loggingDoneWait := new(sync.WaitGroup)
 	loggingDoneWait.Add(1)
 
 	go cmd.tailStagingLogs(app, stopChan, loggingStartedWait, loggingDoneWait)
