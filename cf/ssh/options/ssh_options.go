@@ -10,10 +10,10 @@ import (
 type TTYRequest int
 
 const (
-	REQUEST_TTY_AUTO TTYRequest = iota
-	REQUEST_TTY_NO
-	REQUEST_TTY_YES
-	REQUEST_TTY_FORCE
+	RequestTTYAuto TTYRequest = iota
+	RequestTTYNo
+	RequestTTYYes
+	RequestTTYForce
 )
 
 type ForwardSpec struct {
@@ -51,15 +51,15 @@ func NewSSHOptions(fc flags.FlagContext) (*SSHOptions, error) {
 	}
 
 	if fc.IsSet("t") && fc.Bool("t") {
-		sshOptions.TerminalRequest = REQUEST_TTY_YES
+		sshOptions.TerminalRequest = RequestTTYYes
 	}
 
 	if fc.IsSet("tt") && fc.Bool("tt") {
-		sshOptions.TerminalRequest = REQUEST_TTY_FORCE
+		sshOptions.TerminalRequest = RequestTTYForce
 	}
 
 	if fc.Bool("T") {
-		sshOptions.TerminalRequest = REQUEST_TTY_NO
+		sshOptions.TerminalRequest = RequestTTYNo
 	}
 
 	return sshOptions, nil

@@ -11,10 +11,10 @@ var LoggingToStdout bool
 
 func Sanitize(input string) string {
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)
-	sanitized := re.ReplaceAllString(input, "Authorization: "+PRIVATE_DATA_PLACEHOLDER())
+	sanitized := re.ReplaceAllString(input, "Authorization: "+PrivateDataPlaceholder())
 
 	re = regexp.MustCompile(`password=[^&]*&`)
-	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER()+"&")
+	sanitized = re.ReplaceAllString(sanitized, "password="+PrivateDataPlaceholder()+"&")
 
 	sanitized = sanitizeJSON("access_token", sanitized)
 	sanitized = sanitizeJSON("refresh_token", sanitized)
@@ -27,9 +27,9 @@ func Sanitize(input string) string {
 
 func sanitizeJSON(propertyName string, json string) string {
 	regex := regexp.MustCompile(fmt.Sprintf(`"%s":\s*"[^\,]*"`, propertyName))
-	return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER()))
+	return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PrivateDataPlaceholder()))
 }
 
-func PRIVATE_DATA_PLACEHOLDER() string {
+func PrivateDataPlaceholder() string {
 	return T("[PRIVATE DATA HIDDEN]")
 }

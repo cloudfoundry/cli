@@ -467,7 +467,7 @@ var _ = Describe("SSH", func() {
 
 				Context("when a terminal is requested", func() {
 					BeforeEach(func() {
-						opts.TerminalRequest = options.REQUEST_TTY_YES
+						opts.TerminalRequest = options.RequestTTYYes
 					})
 
 					It("requests a pty", func() {
@@ -507,7 +507,7 @@ var _ = Describe("SSH", func() {
 
 			Context("when a terminal is requested", func() {
 				BeforeEach(func() {
-					opts.TerminalRequest = options.REQUEST_TTY_YES
+					opts.TerminalRequest = options.RequestTTYYes
 				})
 
 				It("does not request a pty", func() {
@@ -518,7 +518,7 @@ var _ = Describe("SSH", func() {
 
 		Context("when a terminal is forced", func() {
 			BeforeEach(func() {
-				opts.TerminalRequest = options.REQUEST_TTY_FORCE
+				opts.TerminalRequest = options.RequestTTYForce
 			})
 
 			It("requests a pty", func() {
@@ -528,7 +528,7 @@ var _ = Describe("SSH", func() {
 
 		Context("when a terminal is disabled", func() {
 			BeforeEach(func() {
-				opts.TerminalRequest = options.REQUEST_TTY_NO
+				opts.TerminalRequest = options.RequestTTYNo
 			})
 
 			It("does not request a pty", func() {

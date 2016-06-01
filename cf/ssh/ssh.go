@@ -372,13 +372,13 @@ func fingerprintCallback(opts *options.SSHOptions, expectedFingerprint string) h
 
 func (c *secureShell) shouldAllocateTerminal(opts *options.SSHOptions, stdinIsTerminal bool) bool {
 	switch opts.TerminalRequest {
-	case options.REQUEST_TTY_FORCE:
+	case options.RequestTTYForce:
 		return true
-	case options.REQUEST_TTY_NO:
+	case options.RequestTTYNo:
 		return false
-	case options.REQUEST_TTY_YES:
+	case options.RequestTTYYes:
 		return stdinIsTerminal
-	case options.REQUEST_TTY_AUTO:
+	case options.RequestTTYAuto:
 		return len(opts.Command) == 0 && stdinIsTerminal
 	default:
 		return false
