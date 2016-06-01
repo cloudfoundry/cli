@@ -19,10 +19,10 @@ type FakeNoaaConsumer struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}
-	RecentLogsStub        func(appGuid string, authToken string) ([]*events.LogMessage, error)
+	RecentLogsStub        func(appGUID string, authToken string) ([]*events.LogMessage, error)
 	recentLogsMutex       sync.RWMutex
 	recentLogsArgsForCall []struct {
-		appGuid   string
+		appGUID   string
 		authToken string
 	}
 	recentLogsReturns struct {
@@ -76,15 +76,15 @@ func (fake *FakeNoaaConsumer) TailingLogsReturns(result1 <-chan *events.LogMessa
 	}{result1, result2}
 }
 
-func (fake *FakeNoaaConsumer) RecentLogs(appGuid string, authToken string) ([]*events.LogMessage, error) {
+func (fake *FakeNoaaConsumer) RecentLogs(appGUID string, authToken string) ([]*events.LogMessage, error) {
 	fake.recentLogsMutex.Lock()
 	fake.recentLogsArgsForCall = append(fake.recentLogsArgsForCall, struct {
-		appGuid   string
+		appGUID   string
 		authToken string
-	}{appGuid, authToken})
+	}{appGUID, authToken})
 	fake.recentLogsMutex.Unlock()
 	if fake.RecentLogsStub != nil {
-		return fake.RecentLogsStub(appGuid, authToken)
+		return fake.RecentLogsStub(appGUID, authToken)
 	} else {
 		return fake.recentLogsReturns.result1, fake.recentLogsReturns.result2
 	}
@@ -99,7 +99,7 @@ func (fake *FakeNoaaConsumer) RecentLogsCallCount() int {
 func (fake *FakeNoaaConsumer) RecentLogsArgsForCall(i int) (string, string) {
 	fake.recentLogsMutex.RLock()
 	defer fake.recentLogsMutex.RUnlock()
-	return fake.recentLogsArgsForCall[i].appGuid, fake.recentLogsArgsForCall[i].authToken
+	return fake.recentLogsArgsForCall[i].appGUID, fake.recentLogsArgsForCall[i].authToken
 }
 
 func (fake *FakeNoaaConsumer) RecentLogsReturns(result1 []*events.LogMessage, result2 error) {

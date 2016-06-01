@@ -46,14 +46,14 @@ func loggableMessagesFromNoaaMessages(messages []*events.LogMessage) []Loggable 
 	return loggableMessages
 }
 
-func (repo *NoaaLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error) {
-	logs, err := repo.consumer.RecentLogs(appGuid, repo.config.AccessToken())
+func (repo *NoaaLogsRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
+	logs, err := repo.consumer.RecentLogs(appGUID, repo.config.AccessToken())
 
 	switch err.(type) {
 	case nil: // do nothing
 	case *noaa_errors.UnauthorizedError:
 		_, _ = repo.tokenRefresher.RefreshAuthToken()
-		return repo.RecentLogsFor(appGuid)
+		return repo.RecentLogsFor(appGUID)
 	default:
 		return loggableMessagesFromNoaaMessages(logs), err
 	}
@@ -61,7 +61,7 @@ func (repo *NoaaLogsRepository) RecentLogsFor(appGuid string) ([]Loggable, error
 	return loggableMessagesFromNoaaMessages(noaa.SortRecent(logs)), err
 }
 
-func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
+func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
 	ticker := time.NewTicker(repo.BufferTime)
 	endpoint := repo.config.DopplerEndpoint()
 	if endpoint == "" {
@@ -70,7 +70,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
-	c, e := repo.consumer.TailingLogs(appGuid, repo.config.AccessToken())
+	c, e := repo.consumer.TailingLogs(appGUID, repo.config.AccessToken())
 
 	go func() {
 		for {
@@ -91,7 +91,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGuid string, onConnect func(), lo
 				case *noaa_errors.UnauthorizedError:
 					_, _ = repo.tokenRefresher.RefreshAuthToken()
 					ticker.Stop()
-					repo.TailLogsFor(appGuid, onConnect, logChan, errChan)
+					repo.TailLogsFor(appGUID, onConnect, logChan, errChan)
 					return
 				default:
 					errChan <- err
