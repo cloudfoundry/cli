@@ -10,8 +10,8 @@ import (
 const DeprecatedEndpointWarning = "Endpoint deprecated"
 
 type WarningsCollector struct {
-	ui                terminal.UI
-	warning_producers []WarningProducer
+	ui               terminal.UI
+	warningProducers []WarningProducer
 }
 
 //go:generate counterfeiter . WarningProducer
@@ -20,16 +20,17 @@ type WarningProducer interface {
 	Warnings() []string
 }
 
-func NewWarningsCollector(ui terminal.UI, warning_producers ...WarningProducer) (warnings_collector WarningsCollector) {
-	warnings_collector.ui = ui
-	warnings_collector.warning_producers = warning_producers
-	return
+func NewWarningsCollector(ui terminal.UI, warningsProducers ...WarningProducer) WarningsCollector {
+	return WarningsCollector{
+		ui:               ui,
+		warningProducers: warningsProducers,
+	}
 }
 
-func (warnings_collector WarningsCollector) PrintWarnings() {
+func (warningsCollector WarningsCollector) PrintWarnings() {
 	warnings := []string{}
-	for _, warning_producer := range warnings_collector.warning_producers {
-		for _, warning := range warning_producer.Warnings() {
+	for _, warningProducer := range warningsCollector.warningProducers {
+		for _, warning := range warningProducer.Warnings() {
 			if warning == DeprecatedEndpointWarning {
 				continue
 			}
@@ -43,14 +44,14 @@ func (warnings_collector WarningsCollector) PrintWarnings() {
 		}
 	}
 
-	warnings = warnings_collector.removeDuplicates(warnings)
+	warnings = warningsCollector.removeDuplicates(warnings)
 
 	for _, warning := range warnings {
-		warnings_collector.ui.Warn(warning)
+		warningsCollector.ui.Warn(warning)
 	}
 }
 
-func (warnings_collector WarningsCollector) removeDuplicates(stringArray []string) []string {
+func (warningsCollector WarningsCollector) removeDuplicates(stringArray []string) []string {
 	length := len(stringArray) - 1
 	for i := 0; i < length; i++ {
 		for j := i + 1; j <= length; j++ {

@@ -9,14 +9,14 @@ import (
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 
-func NewLogger(writer io.Writer, verbose bool, cf_trace, config_trace string) Printer {
+func NewLogger(writer io.Writer, verbose bool, cfTrace, configTrace string) Printer {
 	LoggingToStdout = verbose
 
 	var printers []Printer
 
 	stdoutLogger := NewWriterPrinter(writer, true)
 
-	for _, path := range []string{cf_trace, config_trace} {
+	for _, path := range []string{cfTrace, configTrace} {
 		b, err := strconv.ParseBool(path)
 		LoggingToStdout = LoggingToStdout || b
 

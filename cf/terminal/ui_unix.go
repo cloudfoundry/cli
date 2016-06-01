@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	sttyArg0   = "/bin/stty"
-	exec_cwdir = ""
+	sttyArg0  = "/bin/stty"
+	execCWDir = ""
 )
 
 // Tells the terminal to turn echo off.
@@ -71,7 +71,7 @@ func readPassword(pid int) string {
 }
 
 func echoOff(fd []uintptr) (int, error) {
-	pid, err := syscall.ForkExec(sttyArg0, sttyArgvEOff, &syscall.ProcAttr{Dir: exec_cwdir, Files: fd})
+	pid, err := syscall.ForkExec(sttyArg0, sttyArgvEOff, &syscall.ProcAttr{Dir: execCWDir, Files: fd})
 
 	if err != nil {
 		return 0, fmt.Errorf(T("failed turning off console echo for password entry:\n{{.ErrorDescription}}", map[string]interface{}{"ErrorDescription": err}))
@@ -83,7 +83,7 @@ func echoOff(fd []uintptr) (int, error) {
 // echoOn turns back on the terminal echo.
 func echoOn(fd []uintptr) {
 	// Turn on the terminal echo.
-	pid, e := syscall.ForkExec(sttyArg0, sttyArgvEOn, &syscall.ProcAttr{Dir: exec_cwdir, Files: fd})
+	pid, e := syscall.ForkExec(sttyArg0, sttyArgvEOn, &syscall.ProcAttr{Dir: execCWDir, Files: fd})
 
 	if e == nil {
 		_, _ = syscall.Wait4(pid, &ws, 0, nil)
