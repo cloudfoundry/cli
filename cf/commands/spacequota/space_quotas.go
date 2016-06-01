@@ -78,6 +78,7 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) error {
 		T("service instances"),
 		T("paid plans"),
 		T("app instances"),
+		T("route ports"),
 	})
 
 	var megabytes string
@@ -102,6 +103,7 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) error {
 			T(quota.FormattedServicesLimit()),
 			formatters.Allowed(quota.NonBasicServicesAllowed),
 			T(quota.FormattedAppInstanceLimit()),
+			T(quota.FormattedRoutePortsLimit()),
 		)
 	}
 

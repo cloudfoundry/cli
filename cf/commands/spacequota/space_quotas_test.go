@@ -98,6 +98,7 @@ var _ = Describe("quotas command", func() {
 						NonBasicServicesAllowed: true,
 						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        7,
+						ReservedRoutePortsLimit: "6",
 					},
 					{
 						Name:                    "quota-non-basic-not-allowed",
@@ -108,6 +109,7 @@ var _ = Describe("quotas command", func() {
 						NonBasicServicesAllowed: false,
 						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        1,
+						ReservedRoutePortsLimit: "3",
 					},
 					{
 						Name:                    "quota-app-instances",
@@ -118,6 +120,7 @@ var _ = Describe("quotas command", func() {
 						NonBasicServicesAllowed: false,
 						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        -1,
+						ReservedRoutePortsLimit: "0",
 					},
 				}, nil)
 			})
@@ -128,9 +131,9 @@ var _ = Describe("quotas command", func() {
 					[]string{"Getting space quotas as", "my-user"},
 					[]string{"OK"},
 					[]string{"name", "total memory", "instance memory", "routes", "service instances", "paid plans", "app instances"},
-					[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "7"},
-					[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "1"},
-					[]string{"quota-app-instances", "434M", "512M", "1", "2", "disallowed", "unlimited"},
+					[]string{"quota-name", "1G", "512M", "111", "222", "allowed", "7", "6"},
+					[]string{"quota-non-basic-not-allowed", "434M", "unlimited", "1", "2", "disallowed", "1", "3"},
+					[]string{"quota-app-instances", "434M", "512M", "1", "2", "disallowed", "unlimited", "0"},
 				))
 			})
 
@@ -157,6 +160,31 @@ var _ = Describe("quotas command", func() {
 					))
 				})
 
+			})
+
+			Context("when reserved route ports are unlimited", func() {
+				BeforeEach(func() {
+					quotaRepo.FindByOrgReturns([]models.SpaceQuota{
+						{
+							Name:                    "quota-non-basic-not-allowed",
+							MemoryLimit:             434,
+							InstanceMemoryLimit:     57,
+							RoutesLimit:             1,
+							ServicesLimit:           6,
+							NonBasicServicesAllowed: false,
+							OrgGUID:                 "my-org-guid",
+							ReservedRoutePortsLimit: "-1",
+						},
+					}, nil)
+				})
+
+				It("replaces -1 with unlimited", func() {
+					Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+
+						[]string{"quota-non-basic-not-allowed", "434M", "57M ", "1", "6", "disallowed", "unlimited"},
+					))
+				})
 			})
 
 			Context("when app instances are not provided", func() {
