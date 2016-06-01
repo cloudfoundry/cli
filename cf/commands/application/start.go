@@ -226,12 +226,20 @@ func (cmd *Start) SetStartTimeoutInSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
+type ConnectionType int
+
+const (
+	NoConnection ConnectionType = iota
+	ConnectionWasEstablished
+	ConnectionWasClosed
+)
+
 func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, startWait, doneWait *sync.WaitGroup) {
-	var isConnected bool
-	var isDisconnected bool
+	var connectionStatus ConnectionType
+	connectionStatus = NoConnection
 
 	onConnect := func() {
-		isConnected = true
+		connectionStatus = ConnectionWasEstablished
 		startWait.Done()
 	}
 
@@ -247,7 +255,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, st
 	for {
 		select {
 		case <-timer.C:
-			if !isConnected {
+			if connectionStatus == NoConnection {
 				cmd.ui.Warn("timeout connecting to log server, no log will be shown")
 				startWait.Done()
 				return
@@ -261,20 +269,19 @@ func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, st
 
 		case err, ok := <-e:
 			if ok {
-				if !isConnected {
-					startWait.Done()
-				}
-
-				if !isDisconnected {
+				if connectionStatus != ConnectionWasClosed {
 					cmd.ui.Warn(T("Warning: error tailing logs"))
 					cmd.ui.Say("%s", err)
+					if connectionStatus == NoConnection {
+						startWait.Done()
+					}
 					return
 				}
 			}
 
 		case <-stopChan:
-			if isConnected {
-				isDisconnected = true
+			if connectionStatus == ConnectionWasEstablished {
+				connectionStatus = ConnectionWasClosed
 				cmd.logRepo.Close()
 			} else {
 				return
