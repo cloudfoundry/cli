@@ -169,5 +169,12 @@ var _ = Describe("set-env command", func() {
 				))
 			})
 		})
+
+		It("gives the appropriate tip", func() {
+			runCommand("my-app", "DATABASE_URL", "mysql://new-example.com/my-db")
+			Expect(ui.Outputs).To(ContainSubstrings(
+				[]string{"TIP: Use 'cf restage my-app' to ensure your env variable changes take effect"},
+			))
+		})
 	})
 })
