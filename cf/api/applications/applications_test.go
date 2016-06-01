@@ -511,46 +511,6 @@ var createApplicationResponse = `
     }
 }`
 
-var createApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "POST",
-	Path:   "/v2/apps",
-	Matcher: testnet.RequestBodyMatcher(`{
-		"name":"my-cool-app",
-		"instances":3,
-		"buildpack":"buildpack-url",
-		"memory":2048,
-		"disk_quota": 512,
-		"space_guid":"some-space-guid",
-		"stack_guid":"some-stack-guid",
-		"command":"some-command"
-	}`),
-	Response: testnet.TestResponse{
-		Status: http.StatusCreated,
-		Body:   createApplicationResponse},
-})
-
-func defaultAppParams() models.AppParams {
-	name := "my-cool-app"
-	buildpackURL := "buildpack-url"
-	spaceGUID := "some-space-guid"
-	stackGUID := "some-stack-guid"
-	command := "some-command"
-	memory := int64(2048)
-	diskQuota := int64(512)
-	instanceCount := 3
-
-	return models.AppParams{
-		Name:          &name,
-		BuildpackURL:  &buildpackURL,
-		SpaceGUID:     &spaceGUID,
-		StackGUID:     &stackGUID,
-		Command:       &command,
-		Memory:        &memory,
-		DiskQuota:     &diskQuota,
-		InstanceCount: &instanceCount,
-	}
-}
-
 var updateApplicationResponse = `
 {
     "metadata": {
