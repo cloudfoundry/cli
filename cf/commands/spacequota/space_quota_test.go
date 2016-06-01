@@ -80,6 +80,7 @@ var _ = Describe("quotas command", func() {
 						NonBasicServicesAllowed: true,
 						OrgGUID:                 "my-org-guid",
 						AppInstanceLimit:        5,
+						ReservedRoutePortsLimit: "4",
 					}, nil)
 			})
 
@@ -94,6 +95,7 @@ var _ = Describe("quotas command", func() {
 					[]string{"service", "222"},
 					[]string{"non basic services", "allowed"},
 					[]string{"app instance limit", "5"},
+					[]string{"reserved route ports", "4"},
 				))
 			})
 

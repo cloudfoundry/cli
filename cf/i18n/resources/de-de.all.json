@@ -4896,6 +4896,10 @@
     "translation": "Erforderliches Attribut 'stack' fehlt"
   },
   {
+    "id": "reserved route ports",
+    "translation": ""
+  },
+  {
     "id": "route ports",
     "translation": ""
   },
