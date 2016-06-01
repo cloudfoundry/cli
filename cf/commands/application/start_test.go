@@ -279,6 +279,33 @@ var _ = Describe("start command", func() {
 				))
 			})
 		})
+
+		Context("when the timeout happens exactly when the connection is established", func() {
+			var startWait *sync.WaitGroup
+
+			BeforeEach(func() {
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.TargetedSpaceSuccess = true
+				configRepo = testconfig.NewRepositoryWithDefaults()
+				logRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
+					startWait.Wait()
+					onConnect()
+				}
+			})
+
+			It("times out gracefully", func() {
+				updateCommandDependency(logRepo)
+				cmd := commandregistry.Commands.FindCommand("start").(*Start)
+				cmd.LogServerConnectionTimeout = 10 * time.Millisecond
+				startWait = new(sync.WaitGroup)
+				startWait.Add(1)
+				doneWait := new(sync.WaitGroup)
+				doneWait.Add(1)
+				Expect(func() {
+					cmd.TailStagingLogs(defaultAppForStart, make(chan bool, 1), startWait, doneWait)
+				}).NotTo(Panic())
+			})
+		})
 	})
 
 	Context("when logged in", func() {
