@@ -8,8 +8,8 @@ import (
 //go:generate counterfeiter . LoggregatorConsumer
 
 type LoggregatorConsumer interface {
-	Tail(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error)
-	Recent(appGuid string, authToken string) ([]*logmessage.LogMessage, error)
+	Tail(appGUID string, authToken string) (<-chan *logmessage.LogMessage, error)
+	Recent(appGUID string, authToken string) ([]*logmessage.LogMessage, error)
 	Close() error
 	SetOnConnectCallback(func())
 	SetDebugPrinter(loggregator_consumer.DebugPrinter)

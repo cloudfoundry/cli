@@ -10,20 +10,20 @@ import (
 )
 
 type FakeLoggregatorConsumer struct {
-	TailStub        func(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error)
+	TailStub        func(appGUID string, authToken string) (<-chan *logmessage.LogMessage, error)
 	tailMutex       sync.RWMutex
 	tailArgsForCall []struct {
-		appGuid   string
+		appGUID   string
 		authToken string
 	}
 	tailReturns struct {
 		result1 <-chan *logmessage.LogMessage
 		result2 error
 	}
-	RecentStub        func(appGuid string, authToken string) ([]*logmessage.LogMessage, error)
+	RecentStub        func(appGUID string, authToken string) ([]*logmessage.LogMessage, error)
 	recentMutex       sync.RWMutex
 	recentArgsForCall []struct {
-		appGuid   string
+		appGUID   string
 		authToken string
 	}
 	recentReturns struct {
@@ -48,15 +48,15 @@ type FakeLoggregatorConsumer struct {
 	}
 }
 
-func (fake *FakeLoggregatorConsumer) Tail(appGuid string, authToken string) (<-chan *logmessage.LogMessage, error) {
+func (fake *FakeLoggregatorConsumer) Tail(appGUID string, authToken string) (<-chan *logmessage.LogMessage, error) {
 	fake.tailMutex.Lock()
 	fake.tailArgsForCall = append(fake.tailArgsForCall, struct {
-		appGuid   string
+		appGUID   string
 		authToken string
-	}{appGuid, authToken})
+	}{appGUID, authToken})
 	fake.tailMutex.Unlock()
 	if fake.TailStub != nil {
-		return fake.TailStub(appGuid, authToken)
+		return fake.TailStub(appGUID, authToken)
 	} else {
 		return fake.tailReturns.result1, fake.tailReturns.result2
 	}
@@ -71,7 +71,7 @@ func (fake *FakeLoggregatorConsumer) TailCallCount() int {
 func (fake *FakeLoggregatorConsumer) TailArgsForCall(i int) (string, string) {
 	fake.tailMutex.RLock()
 	defer fake.tailMutex.RUnlock()
-	return fake.tailArgsForCall[i].appGuid, fake.tailArgsForCall[i].authToken
+	return fake.tailArgsForCall[i].appGUID, fake.tailArgsForCall[i].authToken
 }
 
 func (fake *FakeLoggregatorConsumer) TailReturns(result1 <-chan *logmessage.LogMessage, result2 error) {
@@ -82,15 +82,15 @@ func (fake *FakeLoggregatorConsumer) TailReturns(result1 <-chan *logmessage.LogM
 	}{result1, result2}
 }
 
-func (fake *FakeLoggregatorConsumer) Recent(appGuid string, authToken string) ([]*logmessage.LogMessage, error) {
+func (fake *FakeLoggregatorConsumer) Recent(appGUID string, authToken string) ([]*logmessage.LogMessage, error) {
 	fake.recentMutex.Lock()
 	fake.recentArgsForCall = append(fake.recentArgsForCall, struct {
-		appGuid   string
+		appGUID   string
 		authToken string
-	}{appGuid, authToken})
+	}{appGUID, authToken})
 	fake.recentMutex.Unlock()
 	if fake.RecentStub != nil {
-		return fake.RecentStub(appGuid, authToken)
+		return fake.RecentStub(appGUID, authToken)
 	} else {
 		return fake.recentReturns.result1, fake.recentReturns.result2
 	}
@@ -105,7 +105,7 @@ func (fake *FakeLoggregatorConsumer) RecentCallCount() int {
 func (fake *FakeLoggregatorConsumer) RecentArgsForCall(i int) (string, string) {
 	fake.recentMutex.RLock()
 	defer fake.recentMutex.RUnlock()
-	return fake.recentArgsForCall[i].appGuid, fake.recentArgsForCall[i].authToken
+	return fake.recentArgsForCall[i].appGUID, fake.recentArgsForCall[i].authToken
 }
 
 func (fake *FakeLoggregatorConsumer) RecentReturns(result1 []*logmessage.LogMessage, result2 error) {

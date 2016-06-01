@@ -9,7 +9,7 @@ import (
 
 type NoaaConsumer interface {
 	TailingLogs(string, string) (<-chan *events.LogMessage, <-chan error)
-	RecentLogs(appGuid string, authToken string) ([]*events.LogMessage, error)
+	RecentLogs(appGUID string, authToken string) ([]*events.LogMessage, error)
 	Close() error
 	SetOnConnectCallback(cb func())
 }

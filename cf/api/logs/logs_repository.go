@@ -11,8 +11,8 @@ type Loggable interface {
 //go:generate counterfeiter . LogsRepository
 
 type LogsRepository interface {
-	RecentLogsFor(appGuid string) ([]Loggable, error)
-	TailLogsFor(appGuid string, onConnect func(), logChan chan<- Loggable, errChan chan<- error)
+	RecentLogsFor(appGUID string) ([]Loggable, error)
+	TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error)
 	Close()
 }
 

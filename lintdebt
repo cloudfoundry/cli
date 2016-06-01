@@ -5,14 +5,7 @@ cf/api/applicationbits/application_bits.go:26:6: type name will be used as appli
 cf/api/authentication/authentication.go:26:6: type name will be used as authentication.AuthenticationRepository by other packages, and that stutters; consider calling this Repository
 cf/api/copyapplicationsource/copy_application_source.go:13:6: type name will be used as copyapplicationsource.CopyApplicationSourceRepository by other packages, and that stutters; consider calling this Repository
 cf/api/environmentvariablegroups/environment_variable_groups.go:14:6: type name will be used as environmentvariablegroups.EnvironmentVariableGroupsRepository by other packages, and that stutters; consider calling this Repository
-cf/api/logs/loggregator_consumer.go:11:7: interface method parameter appGuid should be appGUID
-cf/api/logs/loggregator_consumer.go:12:9: interface method parameter appGuid should be appGUID
 cf/api/logs/logs_repository.go:13:6: type name will be used as logs.LogsRepository by other packages, and that stutters; consider calling this Repository
-cf/api/logs/logs_repository.go:14:16: interface method parameter appGuid should be appGUID
-cf/api/logs/logs_repository.go:15:14: interface method parameter appGuid should be appGUID
-cf/api/logs/noaa_consumer.go:12:13: interface method parameter appGuid should be appGUID
-cf/api/logs/noaa_logs_repository.go:49:47: method parameter appGuid should be appGUID
-cf/api/logs/noaa_logs_repository.go:64:45: method parameter appGuid should be appGUID
 cf/api/password/password.go:15:6: type name will be used as password.PasswordRepository by other packages, and that stutters; consider calling this Repository
 cf/api/resources/quotas.go:15:23: should omit type int from declaration of var appInstanceLimit; it will be inferred from the right-hand side
 cf/api/securitygroups/security_groups.go:1:1: don't use an underscore in package name
