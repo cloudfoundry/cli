@@ -70,7 +70,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		fmt.Sprintf("/v2/organizations?q=%s", url.QueryEscape("name:"+strings.ToLower(name))),
+		fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name))),
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
 			org = resource.(resources.OrganizationResource).ToModel()
