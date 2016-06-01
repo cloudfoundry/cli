@@ -247,7 +247,7 @@ func (repo CloudControllerUserRepository) SetOrgRoleByGUID(userGUID string, orgG
 	if err != nil {
 		return
 	}
-	err = repo.callApi("PUT", path, nil)
+	err = repo.callAPI("PUT", path, nil)
 	if err != nil {
 		return
 	}
@@ -259,7 +259,7 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByGUID(userGUID, orgGUID s
 	if err != nil {
 		return
 	}
-	return repo.callApi("DELETE", path, nil)
+	return repo.callAPI("DELETE", path, nil)
 }
 
 func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGUID string, role models.Role) error {
@@ -270,14 +270,14 @@ func (repo CloudControllerUserRepository) UnsetOrgRoleByUsername(username, orgGU
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.APIEndpoint(), orgGUID, rolePath)
 
-	return repo.callApi("DELETE", path, usernamePayload(username))
+	return repo.callAPI("DELETE", path, usernamePayload(username))
 }
 
 func (repo CloudControllerUserRepository) UnsetSpaceRoleByUsername(username, spaceGUID string, role models.Role) error {
 	rolePath := spaceRoleToPathMap[role]
 	path := fmt.Sprintf("%s/v2/spaces/%s/%s", repo.config.APIEndpoint(), spaceGUID, rolePath)
 
-	return repo.callApi("DELETE", path, usernamePayload(username))
+	return repo.callAPI("DELETE", path, usernamePayload(username))
 }
 
 func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, orgGUID string, role models.Role) error {
@@ -287,14 +287,14 @@ func (repo CloudControllerUserRepository) SetOrgRoleByUsername(username string, 
 	}
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.APIEndpoint(), orgGUID, rolePath)
-	err = repo.callApi("PUT", path, usernamePayload(username))
+	err = repo.callAPI("PUT", path, usernamePayload(username))
 	if err != nil {
 		return err
 	}
 	return repo.assocUserWithOrgByUsername(username, orgGUID, nil)
 }
 
-func (repo CloudControllerUserRepository) callApi(verb, path string, body io.ReadSeeker) (err error) {
+func (repo CloudControllerUserRepository) callAPI(verb, path string, body io.ReadSeeker) (err error) {
 	request, err := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken(), body)
 	if err != nil {
 		return

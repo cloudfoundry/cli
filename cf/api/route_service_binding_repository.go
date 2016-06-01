@@ -34,11 +34,11 @@ func (repo CloudControllerRouteServiceBindingRepository) Bind(
 	instanceGUID string,
 	routeGUID string,
 	userProvided bool,
-	opaque_params string,
+	opaqueParams string,
 ) error {
 	var rs io.ReadSeeker
-	if opaque_params != "" {
-		opaqueJSON := json.RawMessage(opaque_params)
+	if opaqueParams != "" {
+		opaqueJSON := json.RawMessage(opaqueParams)
 		s := struct {
 			Parameters *json.RawMessage `json:"parameters"`
 		}{

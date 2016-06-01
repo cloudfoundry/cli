@@ -30,14 +30,14 @@ func NewCloudControllerEnvironmentVariableGroupsRepository(config coreconfig.Rea
 }
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
-	var raw_response interface{}
+	var rawResponse interface{}
 	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/running", repo.config.APIEndpoint())
-	apiErr = repo.gateway.GetResource(url, &raw_response)
+	apiErr = repo.gateway.GetResource(url, &rawResponse)
 	if apiErr != nil {
 		return
 	}
 
-	variables, err := repo.marshalToEnvironmentVariables(raw_response)
+	variables, err := repo.marshalToEnvironmentVariables(rawResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -46,14 +46,14 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListRunning() (va
 }
 
 func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
-	var raw_response interface{}
+	var rawResponse interface{}
 	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/staging", repo.config.APIEndpoint())
-	apiErr = repo.gateway.GetResource(url, &raw_response)
+	apiErr = repo.gateway.GetResource(url, &rawResponse)
 	if apiErr != nil {
 		return
 	}
 
-	variables, err := repo.marshalToEnvironmentVariables(raw_response)
+	variables, err := repo.marshalToEnvironmentVariables(rawResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -61,17 +61,17 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (va
 	return variables, nil
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) SetStaging(staging_vars string) error {
-	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/staging", strings.NewReader(staging_vars))
+func (repo CloudControllerEnvironmentVariableGroupsRepository) SetStaging(stagingVars string) error {
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/staging", strings.NewReader(stagingVars))
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) SetRunning(running_vars string) error {
-	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/running", strings.NewReader(running_vars))
+func (repo CloudControllerEnvironmentVariableGroupsRepository) SetRunning(runningVars string) error {
+	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/running", strings.NewReader(runningVars))
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironmentVariables(raw_response interface{}) ([]models.EnvironmentVariable, error) {
+func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironmentVariables(rawResponse interface{}) ([]models.EnvironmentVariable, error) {
 	var variables []models.EnvironmentVariable
-	for key, value := range raw_response.(map[string]interface{}) {
+	for key, value := range rawResponse.(map[string]interface{}) {
 		stringvalue, err := repo.convertValueToString(value)
 		if err != nil {
 			return nil, err

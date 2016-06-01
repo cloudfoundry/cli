@@ -38,7 +38,7 @@ func NewCloudControllerBuildpackRepository(config coreconfig.Reader, gateway net
 func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		buildpacks_path,
+		buildpacksPath,
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
 			return cb(resource.(resources.BuildpackResource).ToFields())
@@ -49,7 +49,7 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 	foundIt := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:"+name)),
+		fmt.Sprintf("%s?q=%s", buildpacksPath, url.QueryEscape("name:"+name)),
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
 			buildpack = resource.(resources.BuildpackResource).ToFields()
@@ -72,7 +72,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.CreateResource(repo.config.APIEndpoint(), buildpacks_path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(repo.config.APIEndpoint(), buildpacksPath, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
@@ -82,13 +82,13 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 }
 
 func (repo CloudControllerBuildpackRepository) Delete(buildpackGUID string) (apiErr error) {
-	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpackGUID)
+	path := fmt.Sprintf("%s/%s", buildpacksPath, buildpackGUID)
 	apiErr = repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 	return
 }
 
 func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
-	path := fmt.Sprintf("%s/%s", buildpacks_path, buildpack.GUID)
+	path := fmt.Sprintf("%s/%s", buildpacksPath, buildpack.GUID)
 
 	entity := resources.BuildpackEntity{
 		Name:     buildpack.Name,
@@ -115,4 +115,4 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	return
 }
 
-const buildpacks_path = "/v2/buildpacks"
+const buildpacksPath = "/v2/buildpacks"

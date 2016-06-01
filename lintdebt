@@ -1,7 +1,3 @@
-cf/api/buildpacks.go:118:7: don't use underscores in Go names; const buildpacks_path should be buildpacksPath
-cf/api/route_service_binding_repository.go:37:2: don't use underscores in Go names; method parameter opaque_params should be opaqueParams
-cf/api/routes.go:146:6: don't use underscores in Go names; var raw_response should be rawResponse
-cf/api/users.go:297:43: method callApi should be callAPI
 cf/api/appevents/app_events.go:13:6: type name will be used as appevents.AppEventsRepository by other packages, and that stutters; consider calling this Repository
 cf/api/appfiles/app_files.go:12:6: type name will be used as appfiles.AppFilesRepository by other packages, and that stutters; consider calling this Repository
 cf/api/appinstances/app_instances.go:38:6: type name will be used as appinstances.AppInstancesRepository by other packages, and that stutters; consider calling this Repository
@@ -9,11 +5,6 @@ cf/api/applicationbits/application_bits.go:26:6: type name will be used as appli
 cf/api/authentication/authentication.go:26:6: type name will be used as authentication.AuthenticationRepository by other packages, and that stutters; consider calling this Repository
 cf/api/copyapplicationsource/copy_application_source.go:13:6: type name will be used as copyapplicationsource.CopyApplicationSourceRepository by other packages, and that stutters; consider calling this Repository
 cf/api/environmentvariablegroups/environment_variable_groups.go:14:6: type name will be used as environmentvariablegroups.EnvironmentVariableGroupsRepository by other packages, and that stutters; consider calling this Repository
-cf/api/environmentvariablegroups/environment_variable_groups.go:33:6: don't use underscores in Go names; var raw_response should be rawResponse
-cf/api/environmentvariablegroups/environment_variable_groups.go:49:6: don't use underscores in Go names; var raw_response should be rawResponse
-cf/api/environmentvariablegroups/environment_variable_groups.go:64:75: don't use underscores in Go names; method parameter staging_vars should be stagingVars
-cf/api/environmentvariablegroups/environment_variable_groups.go:68:75: don't use underscores in Go names; method parameter running_vars should be runningVars
-cf/api/environmentvariablegroups/environment_variable_groups.go:72:94: don't use underscores in Go names; method parameter raw_response should be rawResponse
 cf/api/logs/loggregator_consumer.go:11:7: interface method parameter appGuid should be appGUID
 cf/api/logs/loggregator_consumer.go:12:9: interface method parameter appGuid should be appGUID
 cf/api/logs/logs_repository.go:13:6: type name will be used as logs.LogsRepository by other packages, and that stutters; consider calling this Repository

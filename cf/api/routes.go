@@ -143,8 +143,8 @@ func (repo CloudControllerRouteRepository) CheckIfExists(host string, domain mod
 		u.RawQuery = q.Encode()
 	}
 
-	var raw_response interface{}
-	err = repo.gateway.GetResource(u.String(), &raw_response)
+	var rawResponse interface{}
+	err = repo.gateway.GetResource(u.String(), &rawResponse)
 	if err != nil {
 		if _, ok := err.(*errors.HTTPNotFoundError); ok {
 			return false, nil
