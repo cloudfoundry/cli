@@ -163,7 +163,7 @@ func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, space
 	loggingDoneWait := new(sync.WaitGroup)
 	loggingDoneWait.Add(1)
 
-	go cmd.tailStagingLogs(app, stopChan, loggingStartedWait, loggingDoneWait)
+	go cmd.TailStagingLogs(app, stopChan, loggingStartedWait, loggingDoneWait)
 
 	loggingStartedWait.Wait()
 
@@ -232,15 +232,18 @@ const (
 	NoConnection ConnectionType = iota
 	ConnectionWasEstablished
 	ConnectionWasClosed
+	StoppedTrying
 )
 
-func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, startWait, doneWait *sync.WaitGroup) {
+func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, startWait, doneWait *sync.WaitGroup) {
 	var connectionStatus ConnectionType
 	connectionStatus = NoConnection
 
 	onConnect := func() {
-		connectionStatus = ConnectionWasEstablished
-		startWait.Done()
+		if connectionStatus != StoppedTrying {
+			connectionStatus = ConnectionWasEstablished
+			startWait.Done()
+		}
 	}
 
 	timer := time.NewTimer(cmd.LogServerConnectionTimeout)
@@ -256,6 +259,7 @@ func (cmd *Start) tailStagingLogs(app models.Application, stopChan chan bool, st
 		select {
 		case <-timer.C:
 			if connectionStatus == NoConnection {
+				connectionStatus = StoppedTrying
 				cmd.ui.Warn("timeout connecting to log server, no log will be shown")
 				startWait.Done()
 				return
