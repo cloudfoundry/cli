@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+# Redirect output to stderr.
+exec 1>&2
+ROOT_DIR=$(cd $(dirname $(dirname $0)/)/.. && pwd)
+
+# Copyright 2012 The Go Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# git gofmt pre-commit hook
+#
+# To use, store as .git/hooks/ratchet inside your repository and make sure
+# it has execute permissions.
+#
+# This script does not handle file names that contain spaces.
+
+set +e
+gofiles=$(git diff --cached --name-only --diff-filter=ACM | grep '.go$')
+set -e
+[ -z "$gofiles" ] && exit 0
+
+set +e
+unformatted=$(gofmt -l $gofiles)
+set -e
+[ -z "$unformatted" ] && exit 0
+
+# Some files are not gofmt'd. Print message and fail.
+
+echo "Go files must be formatted with gofmt. Please run:"
+for fn in $unformatted; do
+    echo "  gofmt -w $PWD/$fn"
+done
+
+exit 1

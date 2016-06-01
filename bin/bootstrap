@@ -16,6 +16,3 @@ go get -u github.com/krishicks/i18n4go/i18n4go
 
 echo "Installing go-bindata..."
 go get -u github.com/jteeuwen/go-bindata/...
-
-echo "Symlinking our team githooks..."
-ln -s -f $ROOT_DIR/bin/githooks/* $ROOT_DIR/.git/hooks/

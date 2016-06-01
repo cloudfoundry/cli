@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+# Redirect output to stderr.
+exec 1>&2
+ROOT_DIR=$(cd $(dirname $(dirname $0)/)/.. && pwd)
+
+$ROOT_DIR/bin/ratchet
