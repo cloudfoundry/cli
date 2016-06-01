@@ -64,6 +64,10 @@
     "translation": "app instances"
   },
   {
+    "id": "reserved route ports",
+    "translation": "reserved route ports"
+  },
+  {
     "id": "route ports",
     "translation": "route ports"
   }

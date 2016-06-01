@@ -4896,6 +4896,10 @@
     "translation": "缺少必需属性“stack”"
   },
   {
+    "id": "reserved route ports",
+    "translation": ""
+  },
+  {
     "id": "route ports",
     "translation": ""
   },

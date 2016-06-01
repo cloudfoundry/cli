@@ -49,6 +49,15 @@ func (q SpaceQuota) FormattedServicesLimit() string {
 	return servicesLimit
 }
 
+func (q SpaceQuota) FormattedRoutePortsLimit() string {
+	reservedRoutePortsLimit := "unlimited"
+	if q.ReservedRoutePortsLimit != "-1" {
+		reservedRoutePortsLimit = string(q.ReservedRoutePortsLimit)
+	}
+
+	return reservedRoutePortsLimit
+}
+
 type SpaceQuotaResponse struct {
 	GUID                    string      `json:"guid,omitempty"`
 	Name                    string      `json:"name"`
