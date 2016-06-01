@@ -99,7 +99,7 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) error {
 			formatters.ByteSize(quota.MemoryLimit*formatters.MEGABYTE),
 			megabytes,
 			fmt.Sprintf("%d", quota.RoutesLimit),
-			fmt.Sprintf(servicesLimit),
+			T(quota.FormattedServicesLimit()),
 			formatters.Allowed(quota.NonBasicServicesAllowed),
 			T(quota.FormattedAppInstanceLimit()),
 		)
