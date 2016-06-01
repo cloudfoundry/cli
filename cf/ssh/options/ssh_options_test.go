@@ -93,7 +93,7 @@ var _ = Describe("SSHOptions", func() {
 			})
 
 			It("requests auto tty allocation", func() {
-				Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_AUTO))
+				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYAuto))
 			})
 		})
 
@@ -103,7 +103,7 @@ var _ = Describe("SSHOptions", func() {
 			})
 
 			It("disables tty allocation", func() {
-				Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_NO))
+				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYNo))
 			})
 		})
 
@@ -113,7 +113,7 @@ var _ = Describe("SSHOptions", func() {
 			})
 
 			It("requests tty allocation", func() {
-				Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_YES))
+				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYYes))
 			})
 		})
 
@@ -122,7 +122,7 @@ var _ = Describe("SSHOptions", func() {
 				args = append(args, "app-name", "-tt")
 			})
 			It("foces tty allocation", func() {
-				Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_FORCE))
+				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYForce))
 			})
 		})
 
@@ -132,7 +132,7 @@ var _ = Describe("SSHOptions", func() {
 			})
 
 			It("forces tty allocation", func() {
-				Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_FORCE))
+				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYForce))
 			})
 		})
 
@@ -142,7 +142,7 @@ var _ = Describe("SSHOptions", func() {
 			})
 
 			It("disables tty allocation", func() {
-				Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_NO))
+				Expect(opts.TerminalRequest).To(Equal(options.RequestTTYNo))
 			})
 		})
 
@@ -154,7 +154,7 @@ var _ = Describe("SSHOptions", func() {
 
 				It("handles the app and command correctly", func() {
 					Expect(opts.SkipHostValidation).To(BeTrue())
-					Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_YES))
+					Expect(opts.TerminalRequest).To(Equal(options.RequestTTYYes))
 					Expect(opts.AppName).To(Equal("app-name"))
 					Expect(opts.Command).To(ConsistOf("true"))
 				})
@@ -167,7 +167,7 @@ var _ = Describe("SSHOptions", func() {
 
 				It("handles the app and command correctly", func() {
 					Expect(opts.SkipHostValidation).To(BeTrue())
-					Expect(opts.TerminalRequest).To(Equal(options.REQUEST_TTY_YES))
+					Expect(opts.TerminalRequest).To(Equal(options.RequestTTYYes))
 					Expect(opts.AppName).To(Equal("app-name"))
 					Expect(opts.Command).To(ConsistOf("echo", "-n", "hello!"))
 				})

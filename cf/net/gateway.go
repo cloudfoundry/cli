@@ -24,9 +24,9 @@ import (
 )
 
 const (
-	JOB_FINISHED             = "finished"
-	JOB_FAILED               = "failed"
-	DEFAULT_POLLING_THROTTLE = 5 * time.Second
+	JobFinished            = "finished"
+	JobFailed              = "failed"
+	DefaultPollingThrottle = 5 * time.Second
 )
 
 type JobResource struct {
@@ -73,7 +73,7 @@ func newGateway(errHandler apiErrorHandler, config coreconfig.Reader, ui termina
 	return Gateway{
 		errHandler:      errHandler,
 		config:          config,
-		PollingThrottle: DEFAULT_POLLING_THROTTLE,
+		PollingThrottle: DefaultPollingThrottle,
 		warnings:        &[]string{},
 		Clock:           time.Now,
 		ui:              ui,
@@ -351,9 +351,9 @@ func (gateway Gateway) waitForJob(jobURL, accessToken string, timeout time.Durat
 		}
 
 		switch response.Entity.Status {
-		case JOB_FINISHED:
+		case JobFinished:
 			return nil
-		case JOB_FAILED:
+		case JobFailed:
 			return errors.New(response.Entity.ErrorDetails.Description)
 		}
 
