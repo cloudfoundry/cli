@@ -34,7 +34,7 @@ var _ = Describe("Space Repository", func() {
 			repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/spaces", "order-by=name"),
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/spaces", "order-by=name&inline-relations-depth=1"),
 					ghttp.VerifyHeader(http.Header{
 						"accept": []string{"application/json"},
 					}),
@@ -42,7 +42,7 @@ var _ = Describe("Space Repository", func() {
 						"total_results": 3,
 						"total_pages": 2,
 						"prev_url": null,
-						"next_url": "/v2/organizations/my-org-guid/spaces?order-by=name&page=2",
+						"next_url": "/v2/organizations/my-org-guid/spaces?order-by=name&page=2&inline-relations-depth=1",
 						"resources": [
 							{
 								"metadata": { "guid": "space3-guid" },
@@ -68,7 +68,7 @@ var _ = Describe("Space Repository", func() {
 
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/spaces", "order-by=name&page=2"),
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/spaces", "order-by=name&page=2&inline-relations-depth=1"),
 					ghttp.VerifyHeader(http.Header{
 						"accept": []string{"application/json"},
 					}),
