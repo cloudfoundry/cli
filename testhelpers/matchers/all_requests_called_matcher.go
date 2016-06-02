@@ -24,15 +24,15 @@ func (matcher *allRequestsCalledMatcher) Match(actual interface{}) (bool, error)
 	if testHandler.AllRequestsCalled() {
 		matcher.failureMessage = "Expected all requests to not be called, but they were all called"
 		return true, nil
-	} else {
-		message := fmt.Sprint("Failed to call requests:\n")
-		for i := testHandler.CallCount; i < len(testHandler.Requests); i++ {
-			message += fmt.Sprintf("%#v\n", testHandler.Requests[i])
-		}
-		message += "\n"
-		matcher.failureMessage = message
-		return false, nil
 	}
+
+	message := fmt.Sprint("Failed to call requests:\n")
+	for i := testHandler.CallCount; i < len(testHandler.Requests); i++ {
+		message += fmt.Sprintf("%#v\n", testHandler.Requests[i])
+	}
+	message += "\n"
+	matcher.failureMessage = message
+	return false, nil
 }
 
 func (matcher *allRequestsCalledMatcher) FailureMessage(actual interface{}) string {
