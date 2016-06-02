@@ -3360,10 +3360,6 @@
     "translation": "QUOTA"
   },
   {
-    "id": "Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.",
-    "translation": ""
-  },
-  {
     "id": "Quota Definition {{.QuotaName}} already exists",
     "translation": "La definizione della quota {{.QuotaName}} esiste già"
   },

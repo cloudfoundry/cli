@@ -40,10 +40,6 @@
     "translation": "Maximum number of routes that may be created with reserved ports (Default: 0)"
   },
   {
-    "id": "Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.",
-    "translation": "Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes."
-  },
-  {
     "id": "RESERVED_ROUTE_PORTS",
     "translation": "RESERVED_ROUTE_PORTS"
   },

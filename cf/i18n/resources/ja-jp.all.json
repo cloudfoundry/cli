@@ -3360,10 +3360,6 @@
     "translation": "割り当て量"
   },
   {
-    "id": "Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.",
-    "translation": ""
-  },
-  {
     "id": "Quota Definition {{.QuotaName}} already exists",
     "translation": "割り当て量定義 {{.QuotaName}} は既に存在しています"
   },
