@@ -18,7 +18,7 @@ type BindSecurityGroup struct {
 	configRepo        coreconfig.Reader
 	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	spaceBinder       sgbinder.SecurityGroupSpaceBinder
 }
 

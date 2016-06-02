@@ -1,4 +1,4 @@
-package security_groups_test
+package securitygroups_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/i18n"

@@ -15,7 +15,7 @@ import (
 type unbindFromStagingGroup struct {
 	ui                terminal.UI
 	configRepo        coreconfig.Reader
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	stagingGroupRepo  staging.StagingSecurityGroupsRepo
 }
 

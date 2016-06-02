@@ -14,7 +14,7 @@ import (
 type bindToRunningGroup struct {
 	ui                terminal.UI
 	configRepo        coreconfig.Reader
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	runningGroupRepo  running.RunningSecurityGroupsRepo
 }
 

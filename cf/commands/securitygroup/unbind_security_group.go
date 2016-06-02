@@ -16,7 +16,7 @@ import (
 type UnbindSecurityGroup struct {
 	ui                terminal.UI
 	configRepo        coreconfig.Reader
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
 	secBinder         sgbinder.SecurityGroupSpaceBinder

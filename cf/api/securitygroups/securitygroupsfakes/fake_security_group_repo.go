@@ -219,4 +219,4 @@ func (fake *FakeSecurityGroupRepo) FindAllReturns(result1 []models.SecurityGroup
 	}{result1, result2}
 }
 
-var _ security_groups.SecurityGroupRepo = new(FakeSecurityGroupRepo)
+var _ securitygroups.SecurityGroupRepo = new(FakeSecurityGroupRepo)

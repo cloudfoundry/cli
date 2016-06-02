@@ -16,7 +16,7 @@ import (
 
 type SecurityGroups struct {
 	ui                terminal.UI
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	configRepo        coreconfig.Reader
 }
 
@@ -94,12 +94,12 @@ type table interface {
 }
 
 func (cmd SecurityGroups) printSpaces(table table, securityGroup models.SecurityGroup, index int) {
-	outputted_index := false
+	outputtedIndex := false
 
 	for _, space := range securityGroup.Spaces {
-		if !outputted_index {
+		if !outputtedIndex {
 			table.Add(fmt.Sprintf("#%d", index), securityGroup.Name, space.Organization.Name, space.Name)
-			outputted_index = true
+			outputtedIndex = true
 		} else {
 			table.Add("", securityGroup.Name, space.Organization.Name, space.Name)
 		}
