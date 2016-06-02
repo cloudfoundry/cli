@@ -291,7 +291,7 @@ func (th *transformHeader) Transform(column int, s string) string {
 	return HeaderColor(s)
 }
 
-// This Transform makes a PrintableTable an implementation of
+// Transform makes a PrintableTable an implementation of
 // rowTransformer. It performs the per-column transformation for table
 // content, as specified during construction and/or overridden by the
 // user of the table, see SetTransformer.
@@ -334,7 +334,7 @@ func visibleSize(s string) int {
 		if runeSize == 3 {
 			size += 2 // Kanji and Katakana characters appear as double-width
 		} else {
-			size += 1
+			size++
 		}
 	}
 

@@ -7,17 +7,14 @@ cf/api/copyapplicationsource/copy_application_source.go:13:6: type name will be 
 cf/api/environmentvariablegroups/environment_variable_groups.go:14:6: type name will be used as environmentvariablegroups.EnvironmentVariableGroupsRepository by other packages, and that stutters; consider calling this Repository
 cf/api/logs/logs_repository.go:13:6: type name will be used as logs.LogsRepository by other packages, and that stutters; consider calling this Repository
 cf/api/password/password.go:15:6: type name will be used as password.PasswordRepository by other packages, and that stutters; consider calling this Repository
-cf/api/resources/quotas.go:15:23: should omit type int from declaration of var appInstanceLimit; it will be inferred from the right-hand side
 cf/api/securitygroups/security_groups.go:1:1: don't use an underscore in package name
 cf/api/securitygroups/defaults/running/running.go:15:6: type name will be used as running.RunningSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
 cf/api/securitygroups/defaults/staging/staging.go:15:6: type name will be used as staging.StagingSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
-cf/commands/api.go:17:6: type Api should be API
 cf/commands/application/app.go:25:6: type name will be used as application.ApplicationDisplayer by other packages, and that stutters; consider calling this Displayer
 cf/commands/application/restart.go:15:6: type name will be used as application.ApplicationRestarter by other packages, and that stutters; consider calling this Restarter
 cf/commands/application/start.go:37:6: type name will be used as application.ApplicationStagingWatcher by other packages, and that stutters; consider calling this StagingWatcher
 cf/commands/application/start.go:43:6: type name will be used as application.ApplicationStarter by other packages, and that stutters; consider calling this Starter
 cf/commands/application/stop.go:17:6: type name will be used as application.ApplicationStopper by other packages, and that stutters; consider calling this Stopper
-cf/commands/pluginrepo/repo_plugins.go:64:9: should omit 2nd value from range; this loop is equivalent to `for i := range ...`
 cf/commands/route/create_route.go:20:6: type name will be used as route.RouteCreator by other packages, and that stutters; consider calling this Creator
 cf/commands/securitygroup/security_groups.go:97:2: don't use underscores in Go names; var outputted_index should be outputtedIndex
 cf/commands/service/bind_service.go:21:6: type name will be used as service.ServiceBinder by other packages, and that stutters; consider calling this Binder
@@ -32,14 +29,7 @@ cf/manifest/manifest_disk_repository.go:18:6: type name will be used as manifest
 cf/manifest/manifest_disk_repository.go:22:6: type name will be used as manifest.ManifestDiskRepository by other packages, and that stutters; consider calling this DiskRepository
 cf/net/http_client.go:4:2: a blank import should be only in a main or test package, or have a comment justifying it
 cf/requirements/config_refreshing_requirement.go:33:9: if block ends with a return statement, so drop this else and outdent its block
-cf/terminal/table.go:294:1: comment on exported method Table.Transform should be of the form "Transform ..."
-cf/terminal/table.go:337:4: should replace size += 1 with size++
-cf/terminal/ui_unix.go:24:18: should omit type []string from declaration of var sttyArgvEOff; it will be inferred from the right-hand side
-cf/terminal/ui_unix.go:27:17: should omit type []string from declaration of var sttyArgvEOn; it will be inferred from the right-hand side
-downloader/file_download.go:74:9: if block ends with a return statement, so drop this else and outdent its block
 fixtures/plugins/test_1.go:54:3: var userGuid should be userGUID
-generic/map.go:62:1: comment on exported method ConcreteMap.IsEmpty should be of the form "IsEmpty ..."
-generic/map.go:121:1: comment on exported function IsMappable should be of the form "IsMappable ..."
 glob/glob.go:100:6: type name will be used as glob.GlobError by other packages, and that stutters; consider calling this Error
 testhelpers/assert/helpers.go:53:1: comment on exported function AssertNoErrors should be of the form "AssertNoErrors ..."
 testhelpers/assert/helpers.go:56:6: func name will be used as assert.AssertNoErrors by other packages, and that stutters; consider calling this NoErrors

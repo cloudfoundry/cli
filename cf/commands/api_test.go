@@ -27,7 +27,7 @@ var _ = Describe("Api", func() {
 		deps                commandregistry.Dependency
 		requirementsFactory *testreq.FakeReqFactory
 		ui                  *testterm.FakeUI
-		cmd                 commands.Api
+		cmd                 commands.API
 		flagContext         flags.FlagContext
 		repoLocator         api.RepositoryLocator
 		runCLIErr           error
@@ -66,7 +66,7 @@ var _ = Describe("Api", func() {
 			RepoLocator: repoLocator,
 		}
 
-		cmd = commands.Api{}.SetDependency(deps, false).(commands.Api)
+		cmd = commands.API{}.SetDependency(deps, false).(commands.API)
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
 	})
 

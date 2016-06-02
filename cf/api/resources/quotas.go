@@ -12,7 +12,7 @@ type QuotaResource struct {
 }
 
 func (resource QuotaResource) ToFields() models.QuotaFields {
-	var appInstanceLimit int = UnlimitedAppInstances
+	appInstanceLimit := UnlimitedAppInstances
 	if resource.Entity.AppInstanceLimit != "" {
 		i, err := resource.Entity.AppInstanceLimit.Int64()
 		if err == nil {

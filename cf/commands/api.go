@@ -14,17 +14,17 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type Api struct {
+type API struct {
 	ui           terminal.UI
 	endpointRepo coreconfig.EndpointRepository
 	config       coreconfig.ReadWriter
 }
 
 func init() {
-	commandregistry.Register(Api{})
+	commandregistry.Register(API{})
 }
 
-func (cmd Api) MetaData() commandregistry.CommandMetadata {
+func (cmd API) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["unset"] = &flags.BoolFlag{Name: "unset", Usage: T("Remove all api endpoint targeting")}
 	fs["skip-ssl-validation"] = &flags.BoolFlag{Name: "skip-ssl-validation", Usage: T("Skip verification of the API endpoint. Not recommended!")}
@@ -39,19 +39,19 @@ func (cmd Api) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd Api) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd API) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	reqs := []requirements.Requirement{}
 	return reqs
 }
 
-func (cmd Api) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
+func (cmd API) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.endpointRepo = deps.RepoLocator.GetEndpointRepository()
 	return cmd
 }
 
-func (cmd Api) Execute(c flags.FlagContext) error {
+func (cmd API) Execute(c flags.FlagContext) error {
 	if c.Bool("unset") {
 		cmd.ui.Say(T("Unsetting api endpoint..."))
 		cmd.config.SetAPIEndpoint("")
@@ -85,7 +85,7 @@ func (cmd Api) Execute(c flags.FlagContext) error {
 	return nil
 }
 
-func (cmd Api) setAPIEndpoint(endpoint string, skipSSL bool, cmdName string) error {
+func (cmd API) setAPIEndpoint(endpoint string, skipSSL bool, cmdName string) error {
 	if strings.HasSuffix(endpoint, "/") {
 		endpoint = strings.TrimSuffix(endpoint, "/")
 	}

@@ -71,9 +71,8 @@ func (d *downloader) DownloadFile(url string) (int64, string, error) {
 		d.downloaded = true
 		return size, d.filename, nil
 
-	} else {
-		return 0, "", fmt.Errorf("Error downloading file from %s", url)
 	}
+	return 0, "", fmt.Errorf("Error downloading file from %s", url)
 }
 
 func (d *downloader) RemoveFile() error {

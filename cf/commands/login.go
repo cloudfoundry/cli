@@ -82,7 +82,7 @@ func (cmd *Login) Execute(c flags.FlagContext) error {
 
 	endpoint, skipSSL := cmd.decideEndpoint(c)
 
-	api := Api{
+	api := API{
 		ui:           cmd.ui,
 		config:       cmd.config,
 		endpointRepo: cmd.endpointRepo,
