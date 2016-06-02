@@ -73,6 +73,8 @@ var _ = Describe("space command", func() {
 
 	Describe("execute", func() {
 		Context("when logged in and an org is targeted", func() {
+			var quota models.SpaceQuota
+
 			BeforeEach(func() {
 				org := models.OrganizationFields{
 					Name: "my-org",
@@ -120,7 +122,7 @@ var _ = Describe("space command", func() {
 					SpaceQuotaGUID:   "runaway-guid",
 				}
 
-				quota := models.SpaceQuota{
+				quota = models.SpaceQuota{
 					Name:                    "runaway",
 					GUID:                    "runaway-guid",
 					MemoryLimit:             102400,
@@ -129,6 +131,7 @@ var _ = Describe("space command", func() {
 					ServicesLimit:           222,
 					NonBasicServicesAllowed: false,
 					AppInstanceLimit:        7,
+					ReservedRoutePortsLimit: "7",
 				}
 
 				requirementsFactory.LoginSuccess = true
@@ -182,74 +185,38 @@ var _ = Describe("space command", func() {
 						[]string{"Domains", "domain1"},
 						[]string{"Services", "service1"},
 						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
+						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit, 7 route ports)"},
 					))
+				})
+
+				Context("when the route ports limit is -1", func() {
+					BeforeEach(func() {
+						quota.ReservedRoutePortsLimit = "-1"
+						quotaRepo.FindByGUIDReturns(quota, nil)
+					})
+
+					It("displays unlimited as the route ports limit", func() {
+						runCommand("whose-space-is-it-anyway")
+
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"unlimited route ports"},
+						))
+					})
 				})
 
 				Context("when the app instance limit is -1", func() {
 					BeforeEach(func() {
-						quota := models.SpaceQuota{
-							Name:                    "runaway",
-							GUID:                    "runaway-guid",
-							MemoryLimit:             102400,
-							InstanceMemoryLimit:     -1,
-							RoutesLimit:             111,
-							ServicesLimit:           222,
-							NonBasicServicesAllowed: false,
-							AppInstanceLimit:        -1,
-						}
-
+						quota.AppInstanceLimit = -1
 						quotaRepo.FindByGUIDReturns(quota, nil)
 					})
 
 					It("displays unlimited as the app instance limit", func() {
 						runCommand("whose-space-is-it-anyway")
 						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-							[]string{"OK"},
-							[]string{"whose-space-is-it-anyway"},
-							[]string{"Org", "my-org"},
-							[]string{"Apps", "app1"},
-							[]string{"Domains", "domain1"},
-							[]string{"Services", "service1"},
-							[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-							[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+							[]string{"unlimited app instance limit"},
 						))
 					})
 				})
-
-				Context("when the app instance limit is not provided", func() {
-					BeforeEach(func() {
-						quota := models.SpaceQuota{
-							Name:                    "runaway",
-							GUID:                    "runaway-guid",
-							MemoryLimit:             102400,
-							InstanceMemoryLimit:     -1,
-							RoutesLimit:             111,
-							ServicesLimit:           222,
-							NonBasicServicesAllowed: false,
-							AppInstanceLimit:        -1,
-						}
-
-						quotaRepo.FindByGUIDReturns(quota, nil)
-					})
-
-					It("displays unlimited as the app instance limit", func() {
-						runCommand("whose-space-is-it-anyway")
-						Expect(ui.Outputs).To(ContainSubstrings(
-							[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-							[]string{"OK"},
-							[]string{"whose-space-is-it-anyway"},
-							[]string{"Org", "my-org"},
-							[]string{"Apps", "app1"},
-							[]string{"Domains", "domain1"},
-							[]string{"Services", "service1"},
-							[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-							[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
-						))
-					})
-				})
-
 			})
 
 			Context("when the space does not have a space quota", func() {
