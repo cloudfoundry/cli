@@ -5184,6 +5184,10 @@
     "translation": "{{.PropertyName}} should not be null"
   },
   {
+    "id": "{{.ReservedRoutePorts}} route ports",
+    "translation": "{{.ReservedRoutePorts}} route ports"
+  },
+  {
     "id": "{{.RoutesLimit}} routes",
     "translation": "{{.RoutesLimit}} routes"
   },

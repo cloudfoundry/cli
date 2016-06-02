@@ -5184,6 +5184,10 @@
     "translation": "{{.PropertyName}} 不應該是空值"
   },
   {
+    "id": "{{.ReservedRoutePorts}} route ports",
+    "translation": ""
+  },
+  {
     "id": "{{.RoutesLimit}} routes",
     "translation": "{{.RoutesLimit}} 路徑"
   },

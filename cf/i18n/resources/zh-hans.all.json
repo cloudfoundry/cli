@@ -5184,6 +5184,10 @@
     "translation": "{{.PropertyName}} 不应为空"
   },
   {
+    "id": "{{.ReservedRoutePorts}} route ports",
+    "translation": ""
+  },
+  {
     "id": "{{.RoutesLimit}} routes",
     "translation": "{{.RoutesLimit}} 条路径"
   },

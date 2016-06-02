@@ -60,6 +60,8 @@ var _ = Describe("org command", func() {
 
 	Describe("execute", func() {
 		Context("when logged in, and provided the name of an org", func() {
+			var org *models.Organization
+
 			BeforeEach(func() {
 				developmentSpaceFields := models.SpaceFields{}
 				developmentSpaceFields.Name = "development"
@@ -78,7 +80,7 @@ var _ = Describe("org command", func() {
 				cfAppDomainFields.OwningOrganizationGUID = "my-org-guid"
 				cfAppDomainFields.Shared = false
 
-				org := models.Organization{}
+				org = &models.Organization{}
 				org.Name = "my-org"
 				org.GUID = "my-org-guid"
 				org.QuotaDefinition = models.QuotaFields{
@@ -89,6 +91,7 @@ var _ = Describe("org command", func() {
 					ServicesLimit:           5,
 					NonBasicServicesAllowed: true,
 					AppInstanceLimit:        7,
+					ReservedRoutePorts:      "7",
 				}
 				org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 				org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
@@ -98,7 +101,7 @@ var _ = Describe("org command", func() {
 				}
 
 				requirementsFactory.LoginSuccess = true
-				requirementsFactory.Organization = org
+				requirementsFactory.Organization = *org
 			})
 
 			It("shows the org with the given name", func() {
@@ -110,9 +113,20 @@ var _ = Describe("org command", func() {
 					[]string{"OK"},
 					[]string{"my-org"},
 					[]string{"domains:", "cfapps.io", "cf-app.com"},
-					[]string{"quota: ", "cantina-quota", "512M", "256M instance memory limit", "2 routes", "5 services", "paid services allowed", "7 app instance limit"},
+					[]string{"quota: ", "cantina-quota", "512M", "256M instance memory limit", "2 routes", "5 services", "paid services allowed", "7 app instance limit", "7 route ports"},
 					[]string{"spaces:", "development", "staging"},
 					[]string{"space quotas:", "space-quota-1", "space-quota-2"},
+				))
+			})
+
+			It("shows unlimited route ports when a limit is not set (-1)", func() {
+				org.QuotaDefinition.ReservedRoutePorts = "-1"
+				requirementsFactory.Organization = *org
+
+				runCommand("my-org")
+
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"unlimited route ports"},
 				))
 			})
 

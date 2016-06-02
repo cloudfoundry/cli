@@ -5184,6 +5184,10 @@
     "translation": "{{.PropertyName}}은(는) 널이 아니어야 합니다."
   },
   {
+    "id": "{{.ReservedRoutePorts}} route ports",
+    "translation": ""
+  },
+  {
     "id": "{{.RoutesLimit}} routes",
     "translation": "{{.RoutesLimit}} 라우트"
   },
