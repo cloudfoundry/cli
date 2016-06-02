@@ -301,18 +301,6 @@ var _ = Describe("create-space-quota", func() {
 			})
 		})
 
-		Context("when the --reserved-route-ports flag is provided with invalid value", func() {
-			BeforeEach(func() {
-				flagContext.Parse("--reserved-route-ports", "-2", "ski is life")
-				cmd.SetDependency(deps, false)
-			})
-
-			It("alerts the user when reserved route ports limit failed", func() {
-				Expect(runCLIErr).To(HaveOccurred())
-				Expect(runCLIErr.Error()).To(ContainSubstring("Quota Definition is invalid: -2 Total reserved ports must be less than or equal to total routes."))
-			})
-		})
-
 		Context("when the request fails", func() {
 			BeforeEach(func() {
 				flagContext.Parse("my-quota")

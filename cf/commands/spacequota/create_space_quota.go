@@ -144,11 +144,7 @@ func (cmd *CreateSpaceQuota) Execute(context flags.FlagContext) error {
 	}
 
 	if context.IsSet("reserved-route-ports") {
-		instanceReservedRoutePorts := context.Int("reserved-route-ports")
-		if instanceReservedRoutePorts < -1 {
-			return errors.New(T("Quota Definition is invalid: {{.ReservedRoutePorts}} Total reserved ports must be less than or equal to total routes.", map[string]interface{}{"ReservedRoutePorts": instanceReservedRoutePorts}))
-		}
-		quota.ReservedRoutePortsLimit = json.Number(strconv.Itoa(instanceReservedRoutePorts))
+		quota.ReservedRoutePortsLimit = json.Number(strconv.Itoa(context.Int("reserved-route-ports")))
 	}
 
 	err = cmd.quotaRepo.Create(quota)
