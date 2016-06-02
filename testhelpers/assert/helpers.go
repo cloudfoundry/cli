@@ -50,19 +50,6 @@ func CallerInfo() string {
 	return fmt.Sprintf("%s:%d", file, line)
 }
 
-// Takes a slice of errors and asserts that there were none provided
-// When failing, appends error messages together on newlines and
-// provides a count of how many errors were passed in
-func AssertNoErrors(errs []error) {
-	if len(errs) > 0 {
-		var concatErrors string
-		for _, err := range errs {
-			concatErrors = concatErrors + err.Error() + "\n"
-		}
-		ginkgo.Fail(fmt.Sprintf("Expected no errors, but there were %d.\n%s", len(errs), concatErrors))
-	}
-}
-
 func AssertPanic(panicValue interface{}, callback func()) {
 	defer func() {
 		value := recover()

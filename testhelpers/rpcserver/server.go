@@ -55,7 +55,7 @@ type TestServer struct {
 	server   *rpc.Server
 }
 
-func NewTestRpcServer(handlers Handlers) (*TestServer, error) {
+func NewTestRPCServer(handlers Handlers) (*TestServer, error) {
 	ts := &TestServer{
 		Handlers: handlers,
 	}

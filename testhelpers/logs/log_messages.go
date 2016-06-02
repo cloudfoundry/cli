@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 )
 
@@ -29,16 +28,4 @@ func NewLogMessage(
 			SourceName:  proto.String(sourceName),
 		},
 	)
-}
-
-func NewNoaaLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *events.LogMessage {
-	messageType := events.LogMessage_ERR
-
-	return &events.LogMessage{
-		Message:     []byte(msgText),
-		AppId:       proto.String(appGuid),
-		MessageType: &messageType,
-		SourceType:  proto.String(sourceName),
-		Timestamp:   proto.Int64(timestamp.UnixNano()),
-	}
 }
