@@ -71,262 +71,263 @@ var _ = Describe("space command", func() {
 		})
 	})
 
-	Context("when logged in and an org is targeted", func() {
-		BeforeEach(func() {
-			org := models.OrganizationFields{
-				Name: "my-org",
-				GUID: "my-org-guid",
-			}
-
-			app := models.ApplicationFields{
-				Name: "app1",
-				GUID: "app1-guid",
-			}
-
-			apps := []models.ApplicationFields{app}
-
-			domain := models.DomainFields{
-				Name: "domain1",
-				GUID: "domain1-guid",
-			}
-
-			domains := []models.DomainFields{domain}
-
-			serviceInstance := models.ServiceInstanceFields{
-				Name: "service1",
-				GUID: "service1-guid",
-			}
-			services := []models.ServiceInstanceFields{serviceInstance}
-
-			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
-				{"protocol": "all", "destination": "0.0.0.0-9.255.255.255", "log": true, "IntTest": 1000},
-			}}
-			securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime", Rules: []map[string]interface{}{
-				{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
-			}}
-			securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
-
-			space := models.Space{
-				SpaceFields: models.SpaceFields{
-					Name: "whose-space-is-it-anyway",
-					GUID: "whose-space-is-it-anyway-guid",
-				},
-				Organization:     org,
-				Applications:     apps,
-				Domains:          domains,
-				ServiceInstances: services,
-				SecurityGroups:   securityGroups,
-				SpaceQuotaGUID:   "runaway-guid",
-			}
-
-			quota := models.SpaceQuota{
-				Name:                    "runaway",
-				GUID:                    "runaway-guid",
-				MemoryLimit:             102400,
-				InstanceMemoryLimit:     -1,
-				RoutesLimit:             111,
-				ServicesLimit:           222,
-				NonBasicServicesAllowed: false,
-				AppInstanceLimit:        7,
-			}
-
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.Space = space
-
-			quotaRepo.FindByGUIDReturns(quota, nil)
-		})
-
-		Context("when the guid flag is passed", func() {
-			It("shows only the space guid", func() {
-				runCommand("--guid", "whose-space-is-it-anyway")
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"whose-space-is-it-anyway-guid"},
-				))
-
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
-					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-				))
-			})
-		})
-
-		Context("when the security-group-rules flag is passed", func() {
-			It("it shows space information and security group rules", func() {
-				runCommand("--security-group-rules", "whose-space-is-it-anyway")
-
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting rules for the security group", "Nacho Security"},
-					[]string{"protocol", "all"},
-					[]string{"destination", "0.0.0.0-9.255.255.255"},
-					[]string{"Getting rules for the security group", "Nacho Prime"},
-					[]string{"protocol", "udp"},
-					[]string{"log", "true"},
-					[]string{"IntTest", "1000"},
-					[]string{"ports", "8080-9090"},
-					[]string{"destination", "198.41.191.47/1"},
-				))
-			})
-		})
-
-		Context("when the space has a space quota", func() {
-			It("shows information about the given space", func() {
-				runCommand("whose-space-is-it-anyway")
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-					[]string{"OK"},
-					[]string{"whose-space-is-it-anyway"},
-					[]string{"Org", "my-org"},
-					[]string{"Apps", "app1"},
-					[]string{"Domains", "domain1"},
-					[]string{"Services", "service1"},
-					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-					[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
-				))
-			})
-
-			Context("when the app instance limit is -1", func() {
-				BeforeEach(func() {
-					quota := models.SpaceQuota{
-						Name:                    "runaway",
-						GUID:                    "runaway-guid",
-						MemoryLimit:             102400,
-						InstanceMemoryLimit:     -1,
-						RoutesLimit:             111,
-						ServicesLimit:           222,
-						NonBasicServicesAllowed: false,
-						AppInstanceLimit:        -1,
-					}
-
-					quotaRepo.FindByGUIDReturns(quota, nil)
-				})
-
-				It("displays unlimited as the app instance limit", func() {
-					runCommand("whose-space-is-it-anyway")
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-						[]string{"OK"},
-						[]string{"whose-space-is-it-anyway"},
-						[]string{"Org", "my-org"},
-						[]string{"Apps", "app1"},
-						[]string{"Domains", "domain1"},
-						[]string{"Services", "service1"},
-						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
-					))
-				})
-			})
-
-			Context("when the app instance limit is not provided", func() {
-				BeforeEach(func() {
-					quota := models.SpaceQuota{
-						Name:                    "runaway",
-						GUID:                    "runaway-guid",
-						MemoryLimit:             102400,
-						InstanceMemoryLimit:     -1,
-						RoutesLimit:             111,
-						ServicesLimit:           222,
-						NonBasicServicesAllowed: false,
-						AppInstanceLimit:        -1,
-					}
-
-					quotaRepo.FindByGUIDReturns(quota, nil)
-				})
-
-				It("displays unlimited as the app instance limit", func() {
-					runCommand("whose-space-is-it-anyway")
-					Expect(ui.Outputs).To(ContainSubstrings(
-						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-						[]string{"OK"},
-						[]string{"whose-space-is-it-anyway"},
-						[]string{"Org", "my-org"},
-						[]string{"Apps", "app1"},
-						[]string{"Domains", "domain1"},
-						[]string{"Services", "service1"},
-						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
-					))
-				})
-			})
-
-		})
-
-		Context("when the space does not have a space quota", func() {
-			It("shows information without a space quota", func() {
-				requirementsFactory.Space.SpaceQuotaGUID = ""
-				runCommand("whose-space-is-it-anyway")
-				Expect(quotaRepo.FindByGUIDCallCount()).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
-					[]string{"OK"},
-					[]string{"whose-space-is-it-anyway"},
-					[]string{"Org", "my-org"},
-					[]string{"Apps", "app1"},
-					[]string{"Domains", "domain1"},
-					[]string{"Services", "service1"},
-					[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
-					[]string{"Space Quota"},
-				))
-			})
-		})
-
-		Context("When called as a plugin", func() {
-			var (
-				pluginModel plugin_models.GetSpace_Model
-			)
+	Describe("execute", func() {
+		Context("when logged in and an org is targeted", func() {
 			BeforeEach(func() {
-				pluginModel = plugin_models.GetSpace_Model{}
-				deps.PluginModels.Space = &pluginModel
+				org := models.OrganizationFields{
+					Name: "my-org",
+					GUID: "my-org-guid",
+				}
+
+				app := models.ApplicationFields{
+					Name: "app1",
+					GUID: "app1-guid",
+				}
+
+				apps := []models.ApplicationFields{app}
+
+				domain := models.DomainFields{
+					Name: "domain1",
+					GUID: "domain1-guid",
+				}
+
+				domains := []models.DomainFields{domain}
+
+				serviceInstance := models.ServiceInstanceFields{
+					Name: "service1",
+					GUID: "service1-guid",
+				}
+				services := []models.ServiceInstanceFields{serviceInstance}
+
+				securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
+					{"protocol": "all", "destination": "0.0.0.0-9.255.255.255", "log": true, "IntTest": 1000},
+				}}
+				securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime", Rules: []map[string]interface{}{
+					{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
+				}}
+				securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
+
+				space := models.Space{
+					SpaceFields: models.SpaceFields{
+						Name: "whose-space-is-it-anyway",
+						GUID: "whose-space-is-it-anyway-guid",
+					},
+					Organization:     org,
+					Applications:     apps,
+					Domains:          domains,
+					ServiceInstances: services,
+					SecurityGroups:   securityGroups,
+					SpaceQuotaGUID:   "runaway-guid",
+				}
+
+				quota := models.SpaceQuota{
+					Name:                    "runaway",
+					GUID:                    "runaway-guid",
+					MemoryLimit:             102400,
+					InstanceMemoryLimit:     -1,
+					RoutesLimit:             111,
+					ServicesLimit:           222,
+					NonBasicServicesAllowed: false,
+					AppInstanceLimit:        7,
+				}
+
+				requirementsFactory.LoginSuccess = true
+				requirementsFactory.TargetedOrgSuccess = true
+				requirementsFactory.Space = space
+
+				quotaRepo.FindByGUIDReturns(quota, nil)
 			})
 
-			It("Fills in the PluginModel", func() {
-				testcmd.RunCLICommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true, ui)
-				Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
-				Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
+			Context("when the guid flag is passed", func() {
+				It("shows only the space guid", func() {
+					runCommand("--guid", "whose-space-is-it-anyway")
 
-				Expect(pluginModel.Organization.Name).To(Equal("my-org"))
-				Expect(pluginModel.Organization.Guid).To(Equal("my-org-guid"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"whose-space-is-it-anyway-guid"},
+					))
 
-				Expect(pluginModel.Applications).To(HaveLen(1))
-				Expect(pluginModel.Applications[0].Name).To(Equal("app1"))
-				Expect(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
+					Expect(ui.Outputs).ToNot(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+					))
+				})
+			})
 
-				Expect(pluginModel.Domains).To(HaveLen(1))
-				Expect(pluginModel.Domains[0].Name).To(Equal("domain1"))
-				Expect(pluginModel.Domains[0].Guid).To(Equal("domain1-guid"))
+			Context("when the security-group-rules flag is passed", func() {
+				It("it shows space information and security group rules", func() {
+					runCommand("--security-group-rules", "whose-space-is-it-anyway")
 
-				Expect(pluginModel.ServiceInstances).To(HaveLen(1))
-				Expect(pluginModel.ServiceInstances[0].Name).To(Equal("service1"))
-				Expect(pluginModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting rules for the security group", "Nacho Security"},
+						[]string{"protocol", "all"},
+						[]string{"destination", "0.0.0.0-9.255.255.255"},
+						[]string{"Getting rules for the security group", "Nacho Prime"},
+						[]string{"protocol", "udp"},
+						[]string{"log", "true"},
+						[]string{"IntTest", "1000"},
+						[]string{"ports", "8080-9090"},
+						[]string{"destination", "198.41.191.47/1"},
+					))
+				})
+			})
 
-				Expect(pluginModel.SecurityGroups).To(HaveLen(2))
-				Expect(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
-				Expect(pluginModel.SecurityGroups[0].Rules).To(HaveLen(1))
-				Expect(pluginModel.SecurityGroups[0].Rules[0]).To(HaveLen(4))
-				val := pluginModel.SecurityGroups[0].Rules[0]["protocol"]
-				Expect(val).To(Equal("all"))
-				val = pluginModel.SecurityGroups[0].Rules[0]["destination"]
-				Expect(val).To(Equal("0.0.0.0-9.255.255.255"))
+			Context("when the space has a space quota", func() {
+				It("shows information about the given space", func() {
+					runCommand("whose-space-is-it-anyway")
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+						[]string{"OK"},
+						[]string{"whose-space-is-it-anyway"},
+						[]string{"Org", "my-org"},
+						[]string{"Apps", "app1"},
+						[]string{"Domains", "domain1"},
+						[]string{"Services", "service1"},
+						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+						[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, 7 app instance limit)"},
+					))
+				})
 
-				Expect(pluginModel.SecurityGroups[1].Name).To(Equal("Nacho Prime"))
-				Expect(pluginModel.SecurityGroups[1].Rules).To(HaveLen(1))
-				Expect(pluginModel.SecurityGroups[1].Rules[0]).To(HaveLen(3))
-				val = pluginModel.SecurityGroups[1].Rules[0]["protocol"]
-				Expect(val).To(Equal("udp"))
-				val = pluginModel.SecurityGroups[1].Rules[0]["destination"]
-				Expect(val).To(Equal("198.41.191.47/1"))
-				val = pluginModel.SecurityGroups[1].Rules[0]["ports"]
-				Expect(val).To(Equal("8080-9090"))
+				Context("when the app instance limit is -1", func() {
+					BeforeEach(func() {
+						quota := models.SpaceQuota{
+							Name:                    "runaway",
+							GUID:                    "runaway-guid",
+							MemoryLimit:             102400,
+							InstanceMemoryLimit:     -1,
+							RoutesLimit:             111,
+							ServicesLimit:           222,
+							NonBasicServicesAllowed: false,
+							AppInstanceLimit:        -1,
+						}
 
-				Expect(pluginModel.SpaceQuota.Name).To(Equal("runaway"))
-				Expect(pluginModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
-				Expect(pluginModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
-				Expect(pluginModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
-				Expect(pluginModel.SpaceQuota.RoutesLimit).To(Equal(111))
-				Expect(pluginModel.SpaceQuota.ServicesLimit).To(Equal(222))
-				Expect(pluginModel.SpaceQuota.NonBasicServicesAllowed).To(BeFalse())
+						quotaRepo.FindByGUIDReturns(quota, nil)
+					})
+
+					It("displays unlimited as the app instance limit", func() {
+						runCommand("whose-space-is-it-anyway")
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+							[]string{"OK"},
+							[]string{"whose-space-is-it-anyway"},
+							[]string{"Org", "my-org"},
+							[]string{"Apps", "app1"},
+							[]string{"Domains", "domain1"},
+							[]string{"Services", "service1"},
+							[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+							[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+						))
+					})
+				})
+
+				Context("when the app instance limit is not provided", func() {
+					BeforeEach(func() {
+						quota := models.SpaceQuota{
+							Name:                    "runaway",
+							GUID:                    "runaway-guid",
+							MemoryLimit:             102400,
+							InstanceMemoryLimit:     -1,
+							RoutesLimit:             111,
+							ServicesLimit:           222,
+							NonBasicServicesAllowed: false,
+							AppInstanceLimit:        -1,
+						}
+
+						quotaRepo.FindByGUIDReturns(quota, nil)
+					})
+
+					It("displays unlimited as the app instance limit", func() {
+						runCommand("whose-space-is-it-anyway")
+						Expect(ui.Outputs).To(ContainSubstrings(
+							[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+							[]string{"OK"},
+							[]string{"whose-space-is-it-anyway"},
+							[]string{"Org", "my-org"},
+							[]string{"Apps", "app1"},
+							[]string{"Domains", "domain1"},
+							[]string{"Services", "service1"},
+							[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+							[]string{"Space Quota", "runaway (100G memory limit, unlimited instance memory limit, 111 routes, 222 services, paid services disallowed, unlimited app instance limit)"},
+						))
+					})
+				})
+
+			})
+
+			Context("when the space does not have a space quota", func() {
+				It("shows information without a space quota", func() {
+					requirementsFactory.Space.SpaceQuotaGUID = ""
+					runCommand("whose-space-is-it-anyway")
+					Expect(quotaRepo.FindByGUIDCallCount()).To(Equal(0))
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
+						[]string{"OK"},
+						[]string{"whose-space-is-it-anyway"},
+						[]string{"Org", "my-org"},
+						[]string{"Apps", "app1"},
+						[]string{"Domains", "domain1"},
+						[]string{"Services", "service1"},
+						[]string{"Security Groups", "Nacho Security", "Nacho Prime"},
+						[]string{"Space Quota"},
+					))
+				})
+			})
+
+			Context("When called as a plugin", func() {
+				var (
+					pluginModel plugin_models.GetSpace_Model
+				)
+				BeforeEach(func() {
+					pluginModel = plugin_models.GetSpace_Model{}
+					deps.PluginModels.Space = &pluginModel
+				})
+
+				It("Fills in the PluginModel", func() {
+					testcmd.RunCLICommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true, ui)
+					Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
+					Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
+
+					Expect(pluginModel.Organization.Name).To(Equal("my-org"))
+					Expect(pluginModel.Organization.Guid).To(Equal("my-org-guid"))
+
+					Expect(pluginModel.Applications).To(HaveLen(1))
+					Expect(pluginModel.Applications[0].Name).To(Equal("app1"))
+					Expect(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
+
+					Expect(pluginModel.Domains).To(HaveLen(1))
+					Expect(pluginModel.Domains[0].Name).To(Equal("domain1"))
+					Expect(pluginModel.Domains[0].Guid).To(Equal("domain1-guid"))
+
+					Expect(pluginModel.ServiceInstances).To(HaveLen(1))
+					Expect(pluginModel.ServiceInstances[0].Name).To(Equal("service1"))
+					Expect(pluginModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+
+					Expect(pluginModel.SecurityGroups).To(HaveLen(2))
+					Expect(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
+					Expect(pluginModel.SecurityGroups[0].Rules).To(HaveLen(1))
+					Expect(pluginModel.SecurityGroups[0].Rules[0]).To(HaveLen(4))
+					val := pluginModel.SecurityGroups[0].Rules[0]["protocol"]
+					Expect(val).To(Equal("all"))
+					val = pluginModel.SecurityGroups[0].Rules[0]["destination"]
+					Expect(val).To(Equal("0.0.0.0-9.255.255.255"))
+
+					Expect(pluginModel.SecurityGroups[1].Name).To(Equal("Nacho Prime"))
+					Expect(pluginModel.SecurityGroups[1].Rules).To(HaveLen(1))
+					Expect(pluginModel.SecurityGroups[1].Rules[0]).To(HaveLen(3))
+					val = pluginModel.SecurityGroups[1].Rules[0]["protocol"]
+					Expect(val).To(Equal("udp"))
+					val = pluginModel.SecurityGroups[1].Rules[0]["destination"]
+					Expect(val).To(Equal("198.41.191.47/1"))
+					val = pluginModel.SecurityGroups[1].Rules[0]["ports"]
+					Expect(val).To(Equal("8080-9090"))
+
+					Expect(pluginModel.SpaceQuota.Name).To(Equal("runaway"))
+					Expect(pluginModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
+					Expect(pluginModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
+					Expect(pluginModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
+					Expect(pluginModel.SpaceQuota.RoutesLimit).To(Equal(111))
+					Expect(pluginModel.SpaceQuota.ServicesLimit).To(Equal(222))
+					Expect(pluginModel.SpaceQuota.NonBasicServicesAllowed).To(BeFalse())
+				})
 			})
 		})
 	})
-
 })
