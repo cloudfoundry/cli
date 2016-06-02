@@ -50,7 +50,7 @@ func CallerInfo() string {
 	return fmt.Sprintf("%s:%d", file, line)
 }
 
-func Panic(panicValue interface{}, callback func()) {
+func DoesPanic(panicValue interface{}, callback func()) {
 	defer func() {
 		value := recover()
 		if value != panicValue {
