@@ -1,7 +1,7 @@
 package net
 
 import (
-	_ "crypto/sha512"
+	_ "crypto/sha512" // #82254112: http://bridge.grumpy-troll.org/2014/05/golang-tls-comodo/
 	"crypto/x509"
 	"fmt"
 	"net"

@@ -30,7 +30,7 @@ func (c configRefreshingRequirement) Execute() error {
 		}
 
 		return c.requirement.Execute()
-	} else {
-		return nil
 	}
+
+	return nil
 }
