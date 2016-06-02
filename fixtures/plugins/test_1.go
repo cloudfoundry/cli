@@ -51,8 +51,8 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 
 		user, _ := cliConnection.Username()
 		fmt.Println("Current user:", user)
-		userGuid, _ := cliConnection.UserGuid()
-		fmt.Println("Current user guid:", userGuid)
+		userGUID, _ := cliConnection.UserGuid()
+		fmt.Println("Current user guid:", userGUID)
 		email, _ := cliConnection.UserEmail()
 		fmt.Println("Current user email:", email)
 

@@ -74,7 +74,7 @@ func ToMegabytes(s string) (int64, error) {
 }
 
 var (
-	bytesPattern *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
+	bytesPattern = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
 )
 
 func invalidByteQuantityError() error {
