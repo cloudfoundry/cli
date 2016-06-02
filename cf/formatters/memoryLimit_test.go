@@ -7,8 +7,8 @@ import (
 )
 
 var _ = Describe("memoryLimit formatting", func() {
-	It("returns 'Unlimited' when limit is -1", func() {
-		Expect(InstanceMemoryLimit(-1)).To(Equal("Unlimited"))
+	It("returns 'unlimited' when limit is -1", func() {
+		Expect(InstanceMemoryLimit(-1)).To(Equal("unlimited"))
 	})
 
 	It("formats original value to <val>M when limit is not -1", func() {
