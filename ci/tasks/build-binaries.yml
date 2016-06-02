@@ -26,13 +26,13 @@ run:
       bin/replace-sha
 
       echo "Building 32-bit Linux"
-      GOARCH=386 GOOS=linux go build -ldflags '-extldflags "-static"' -o out/cf-cli_linux_i686 ./main
+      CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_i686 ./main
 
       echo "Building 32-bit Windows"
       GOARCH=386 GOOS=windows go build -o out/cf-cli_win32.exe ./main
 
       echo "Building 64-bit Linux"
-      GOARCH=amd64 GOOS=linux go build -ldflags '-extldflags "-static"' -o out/cf-cli_linux_x86-64 ./main
+      CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_x86-64 ./main
 
       echo "Building 64-bit Windows"
       GOARCH=amd64 GOOS=windows go build -o out/cf-cli_winx64.exe ./main
