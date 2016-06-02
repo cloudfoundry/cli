@@ -25,9 +25,9 @@ type CreateAppManifest struct {
 	config           coreconfig.Reader
 	appSummaryRepo   api.AppSummaryRepository
 	stackRepo        stacks.StackRepository
-	appInstancesRepo appinstances.AppInstancesRepository
+	appInstancesRepo appinstances.Repository
 	appReq           requirements.ApplicationRequirement
-	manifest         manifest.AppManifest
+	manifest         manifest.App
 }
 
 func init() {

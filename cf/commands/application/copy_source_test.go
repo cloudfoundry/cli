@@ -28,12 +28,12 @@ var _ = Describe("CopySource", func() {
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
-		authRepo            *authenticationfakes.FakeAuthenticationRepository
-		appRepo             *applicationsfakes.FakeApplicationRepository
-		copyAppSourceRepo   *copyapplicationsourcefakes.FakeCopyApplicationSourceRepository
+		authRepo            *authenticationfakes.FakeRepository
+		appRepo             *applicationsfakes.FakeRepository
+		copyAppSourceRepo   *copyapplicationsourcefakes.FakeRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		appRestarter        *applicationfakes.FakeApplicationRestarter
+		appRestarter        *applicationfakes.FakeRestarter
 		OriginalCommand     commandregistry.Command
 		deps                commandregistry.Dependency
 	)
@@ -56,9 +56,9 @@ var _ = Describe("CopySource", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
-		copyAppSourceRepo = new(copyapplicationsourcefakes.FakeCopyApplicationSourceRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
+		copyAppSourceRepo = new(copyapplicationsourcefakes.FakeRepository)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		config = testconfig.NewRepositoryWithDefaults()
@@ -66,7 +66,7 @@ var _ = Describe("CopySource", func() {
 		//save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("restart")
 
-		appRestarter = new(applicationfakes.FakeApplicationRestarter)
+		appRestarter = new(applicationfakes.FakeRestarter)
 		//setup fakes to correctly interact with commandregistry
 		appRestarter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return appRestarter

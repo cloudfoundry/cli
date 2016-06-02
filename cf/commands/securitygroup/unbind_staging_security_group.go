@@ -16,7 +16,7 @@ type unbindFromStagingGroup struct {
 	ui                terminal.UI
 	configRepo        coreconfig.Reader
 	securityGroupRepo securitygroups.SecurityGroupRepo
-	stagingGroupRepo  staging.StagingSecurityGroupsRepo
+	stagingGroupRepo  staging.SecurityGroupsRepo
 }
 
 func init() {

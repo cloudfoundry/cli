@@ -14,7 +14,7 @@ import (
 type Authenticate struct {
 	ui            terminal.UI
 	config        coreconfig.ReadWriter
-	authenticator authentication.AuthenticationRepository
+	authenticator authentication.Repository
 }
 
 func init() {

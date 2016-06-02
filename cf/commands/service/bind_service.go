@@ -16,9 +16,9 @@ import (
 	"github.com/cloudfoundry/cli/json"
 )
 
-//go:generate counterfeiter . ServiceBinder
+//go:generate counterfeiter . Binder
 
-type ServiceBinder interface {
+type Binder interface {
 	BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error)
 }
 

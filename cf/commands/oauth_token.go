@@ -14,7 +14,7 @@ import (
 type OAuthToken struct {
 	ui          terminal.UI
 	config      coreconfig.ReadWriter
-	authRepo    authentication.AuthenticationRepository
+	authRepo    authentication.Repository
 	pluginModel *plugin_models.GetOauthToken_Model
 	pluginCall  bool
 }

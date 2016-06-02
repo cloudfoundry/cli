@@ -12,7 +12,7 @@ import (
 
 type listStagingSecurityGroups struct {
 	ui                       terminal.UI
-	stagingSecurityGroupRepo staging.StagingSecurityGroupsRepo
+	stagingSecurityGroupRepo staging.SecurityGroupsRepo
 	configRepo               coreconfig.Reader
 }
 

@@ -21,12 +21,12 @@ import (
 type CopySource struct {
 	ui                terminal.UI
 	config            coreconfig.Reader
-	authRepo          authentication.AuthenticationRepository
-	appRepo           applications.ApplicationRepository
+	authRepo          authentication.Repository
+	appRepo           applications.Repository
 	orgRepo           organizations.OrganizationRepository
 	spaceRepo         spaces.SpaceRepository
-	copyAppSourceRepo copyapplicationsource.CopyApplicationSourceRepository
-	appRestart        ApplicationRestarter
+	copyAppSourceRepo copyapplicationsource.Repository
+	appRestart        Restarter
 }
 
 func init() {
@@ -74,7 +74,7 @@ func (cmd *CopySource) SetDependency(deps commandregistry.Dependency, pluginCall
 	//get command from registry for dependency
 	commandDep := commandregistry.Commands.FindCommand("restart")
 	commandDep = commandDep.SetDependency(deps, false)
-	cmd.appRestart = commandDep.(ApplicationRestarter)
+	cmd.appRestart = commandDep.(Restarter)
 
 	return cmd
 }

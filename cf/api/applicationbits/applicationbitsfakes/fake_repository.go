@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/resources"
 )
 
-type FakeApplicationBitsRepository struct {
+type FakeRepository struct {
 	GetApplicationFilesStub        func(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error)
 	getApplicationFilesMutex       sync.RWMutex
 	getApplicationFilesArgsForCall []struct {
@@ -31,7 +31,7 @@ type FakeApplicationBitsRepository struct {
 	}
 }
 
-func (fake *FakeApplicationBitsRepository) GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error) {
+func (fake *FakeRepository) GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error) {
 	var appFilesRequestCopy []resources.AppFileResource
 	if appFilesRequest != nil {
 		appFilesRequestCopy = make([]resources.AppFileResource, len(appFilesRequest))
@@ -49,19 +49,19 @@ func (fake *FakeApplicationBitsRepository) GetApplicationFiles(appFilesRequest [
 	}
 }
 
-func (fake *FakeApplicationBitsRepository) GetApplicationFilesCallCount() int {
+func (fake *FakeRepository) GetApplicationFilesCallCount() int {
 	fake.getApplicationFilesMutex.RLock()
 	defer fake.getApplicationFilesMutex.RUnlock()
 	return len(fake.getApplicationFilesArgsForCall)
 }
 
-func (fake *FakeApplicationBitsRepository) GetApplicationFilesArgsForCall(i int) []resources.AppFileResource {
+func (fake *FakeRepository) GetApplicationFilesArgsForCall(i int) []resources.AppFileResource {
 	fake.getApplicationFilesMutex.RLock()
 	defer fake.getApplicationFilesMutex.RUnlock()
 	return fake.getApplicationFilesArgsForCall[i].appFilesRequest
 }
 
-func (fake *FakeApplicationBitsRepository) GetApplicationFilesReturns(result1 []resources.AppFileResource, result2 error) {
+func (fake *FakeRepository) GetApplicationFilesReturns(result1 []resources.AppFileResource, result2 error) {
 	fake.GetApplicationFilesStub = nil
 	fake.getApplicationFilesReturns = struct {
 		result1 []resources.AppFileResource
@@ -69,7 +69,7 @@ func (fake *FakeApplicationBitsRepository) GetApplicationFilesReturns(result1 []
 	}{result1, result2}
 }
 
-func (fake *FakeApplicationBitsRepository) UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
+func (fake *FakeRepository) UploadBits(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) (apiErr error) {
 	var presentFilesCopy []resources.AppFileResource
 	if presentFiles != nil {
 		presentFilesCopy = make([]resources.AppFileResource, len(presentFiles))
@@ -89,23 +89,23 @@ func (fake *FakeApplicationBitsRepository) UploadBits(appGUID string, zipFile *o
 	}
 }
 
-func (fake *FakeApplicationBitsRepository) UploadBitsCallCount() int {
+func (fake *FakeRepository) UploadBitsCallCount() int {
 	fake.uploadBitsMutex.RLock()
 	defer fake.uploadBitsMutex.RUnlock()
 	return len(fake.uploadBitsArgsForCall)
 }
 
-func (fake *FakeApplicationBitsRepository) UploadBitsArgsForCall(i int) (string, *os.File, []resources.AppFileResource) {
+func (fake *FakeRepository) UploadBitsArgsForCall(i int) (string, *os.File, []resources.AppFileResource) {
 	fake.uploadBitsMutex.RLock()
 	defer fake.uploadBitsMutex.RUnlock()
 	return fake.uploadBitsArgsForCall[i].appGUID, fake.uploadBitsArgsForCall[i].zipFile, fake.uploadBitsArgsForCall[i].presentFiles
 }
 
-func (fake *FakeApplicationBitsRepository) UploadBitsReturns(result1 error) {
+func (fake *FakeRepository) UploadBitsReturns(result1 error) {
 	fake.UploadBitsStub = nil
 	fake.uploadBitsReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ applicationbits.Repository = new(FakeApplicationBitsRepository)
+var _ applicationbits.Repository = new(FakeRepository)

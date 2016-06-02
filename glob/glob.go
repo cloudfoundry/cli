@@ -32,7 +32,7 @@ var globRe = mustBuildRe(`(` + charPat + `|[\*\?])`)
 //  - `**` matches zero or more chars in zero or more components
 func translateGlob(pat string) (string, error) {
 	if !globRe.MatchString(pat) {
-		return "", GlobError(pat)
+		return "", Error(pat)
 	}
 
 	outs := make([]string, len(pat))
@@ -97,9 +97,9 @@ func (g Glob) Match(path string) bool {
 	return g.regexp.MatchString(toSlash(path))
 }
 
-type GlobError string
+type Error string
 
-func (e GlobError) Error() string {
+func (e Error) Error() string {
 	return "invalid glob pattern: " + string(e)
 }
 

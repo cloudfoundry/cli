@@ -24,7 +24,7 @@ var _ = Describe("auth command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
-		authRepo            *authenticationfakes.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                commandregistry.Dependency
 		fakeLogger          *tracefakes.FakePrinter
@@ -41,7 +41,7 @@ var _ = Describe("auth command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			config.SetAccessToken("my-access-token")
 			config.SetRefreshToken("my-refresh-token")

@@ -24,7 +24,7 @@ var _ = Describe("enable-service-access command", func() {
 		actor               *actorsfakes.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
-		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
+		tokenRefresher      *authenticationfakes.FakeRepository
 		deps                commandregistry.Dependency
 	)
 
@@ -41,7 +41,7 @@ var _ = Describe("enable-service-access command", func() {
 		actor = new(actorsfakes.FakeServicePlanActor)
 		configRepo = configuration.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		tokenRefresher = new(authenticationfakes.FakeAuthenticationRepository)
+		tokenRefresher = new(authenticationfakes.FakeRepository)
 	})
 
 	runCommand := func(args []string) bool {

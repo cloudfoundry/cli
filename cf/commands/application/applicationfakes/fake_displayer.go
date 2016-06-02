@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeApplicationDisplayer struct {
+type FakeDisplayer struct {
 	ShowAppStub        func(app models.Application, orgName string, spaceName string) error
 	showAppMutex       sync.RWMutex
 	showAppArgsForCall []struct {
@@ -21,7 +21,7 @@ type FakeApplicationDisplayer struct {
 	}
 }
 
-func (fake *FakeApplicationDisplayer) ShowApp(app models.Application, orgName string, spaceName string) error {
+func (fake *FakeDisplayer) ShowApp(app models.Application, orgName string, spaceName string) error {
 	fake.showAppMutex.Lock()
 	fake.showAppArgsForCall = append(fake.showAppArgsForCall, struct {
 		app       models.Application
@@ -36,23 +36,23 @@ func (fake *FakeApplicationDisplayer) ShowApp(app models.Application, orgName st
 	}
 }
 
-func (fake *FakeApplicationDisplayer) ShowAppCallCount() int {
+func (fake *FakeDisplayer) ShowAppCallCount() int {
 	fake.showAppMutex.RLock()
 	defer fake.showAppMutex.RUnlock()
 	return len(fake.showAppArgsForCall)
 }
 
-func (fake *FakeApplicationDisplayer) ShowAppArgsForCall(i int) (models.Application, string, string) {
+func (fake *FakeDisplayer) ShowAppArgsForCall(i int) (models.Application, string, string) {
 	fake.showAppMutex.RLock()
 	defer fake.showAppMutex.RUnlock()
 	return fake.showAppArgsForCall[i].app, fake.showAppArgsForCall[i].orgName, fake.showAppArgsForCall[i].spaceName
 }
 
-func (fake *FakeApplicationDisplayer) ShowAppReturns(result1 error) {
+func (fake *FakeDisplayer) ShowAppReturns(result1 error) {
 	fake.ShowAppStub = nil
 	fake.showAppReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ application.ApplicationDisplayer = new(FakeApplicationDisplayer)
+var _ application.Displayer = new(FakeDisplayer)

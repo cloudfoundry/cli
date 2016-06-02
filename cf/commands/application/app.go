@@ -20,9 +20,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/uihelpers"
 )
 
-//go:generate counterfeiter . ApplicationDisplayer
+//go:generate counterfeiter . Displayer
 
-type ApplicationDisplayer interface {
+type Displayer interface {
 	ShowApp(app models.Application, orgName string, spaceName string) error
 }
 
@@ -30,7 +30,7 @@ type ShowApp struct {
 	ui               terminal.UI
 	config           coreconfig.Reader
 	appSummaryRepo   api.AppSummaryRepository
-	appInstancesRepo appinstances.AppInstancesRepository
+	appInstancesRepo appinstances.Repository
 	appReq           requirements.ApplicationRequirement
 	pluginAppModel   *plugin_models.GetAppModel
 	pluginCall       bool

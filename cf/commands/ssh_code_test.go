@@ -24,7 +24,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 	var (
 		ui           *testterm.FakeUI
 		configRepo   coreconfig.Repository
-		authRepo     *authenticationfakes.FakeAuthenticationRepository
+		authRepo     *authenticationfakes.FakeRepository
 		endpointRepo *coreconfigfakes.FakeEndpointRepository
 
 		cmd         commandregistry.Command
@@ -42,7 +42,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 		configRepo.SetAPIEndpoint("fake-api-endpoint")
 		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 		repoLocator := deps.RepoLocator.SetEndpointRepository(endpointRepo)
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
 		repoLocator = repoLocator.SetAuthenticationRepository(authRepo)
 
 		deps = commandregistry.Dependency{

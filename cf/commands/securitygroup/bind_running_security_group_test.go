@@ -24,7 +24,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		configRepo                   coreconfig.Repository
 		requirementsFactory          *testreq.FakeReqFactory
 		fakeSecurityGroupRepo        *securitygroupsfakes.FakeSecurityGroupRepo
-		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo
+		fakeRunningSecurityGroupRepo *runningfakes.FakeSecurityGroupsRepo
 		deps                         commandregistry.Dependency
 	)
 
@@ -41,7 +41,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
-		fakeRunningSecurityGroupRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
+		fakeRunningSecurityGroupRepo = new(runningfakes.FakeSecurityGroupsRepo)
 	})
 
 	runCommand := func(args ...string) bool {

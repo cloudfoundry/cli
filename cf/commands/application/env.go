@@ -18,7 +18,7 @@ import (
 type Env struct {
 	ui      terminal.UI
 	config  coreconfig.Reader
-	appRepo applications.ApplicationRepository
+	appRepo applications.Repository
 }
 
 func init() {

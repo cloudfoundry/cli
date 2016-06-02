@@ -23,7 +23,7 @@ var _ = Describe("unbind-staging-security-group command", func() {
 		configRepo                    coreconfig.Repository
 		requirementsFactory           *testreq.FakeReqFactory
 		fakeSecurityGroupRepo         *securitygroupsfakes.FakeSecurityGroupRepo
-		fakeStagingSecurityGroupsRepo *stagingfakes.FakeStagingSecurityGroupsRepo
+		fakeStagingSecurityGroupsRepo *stagingfakes.FakeSecurityGroupsRepo
 		deps                          commandregistry.Dependency
 	)
 
@@ -40,7 +40,7 @@ var _ = Describe("unbind-staging-security-group command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
-		fakeStagingSecurityGroupsRepo = new(stagingfakes.FakeStagingSecurityGroupsRepo)
+		fakeStagingSecurityGroupsRepo = new(stagingfakes.FakeSecurityGroupsRepo)
 	})
 
 	runCommand := func(args ...string) bool {

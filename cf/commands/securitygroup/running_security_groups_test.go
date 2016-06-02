@@ -21,7 +21,7 @@ var _ = Describe("Running-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   coreconfig.Repository
-		fakeRunningSecurityGroupRepo *runningfakes.FakeRunningSecurityGroupsRepo
+		fakeRunningSecurityGroupRepo *runningfakes.FakeSecurityGroupsRepo
 		requirementsFactory          *testreq.FakeReqFactory
 		deps                         commandregistry.Dependency
 	)
@@ -36,7 +36,7 @@ var _ = Describe("Running-security-groups command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		fakeRunningSecurityGroupRepo = new(runningfakes.FakeRunningSecurityGroupsRepo)
+		fakeRunningSecurityGroupRepo = new(runningfakes.FakeSecurityGroupsRepo)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

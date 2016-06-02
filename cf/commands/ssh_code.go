@@ -23,7 +23,7 @@ type SSHCodeGetter interface {
 type OneTimeSSHCode struct {
 	ui           terminal.UI
 	config       coreconfig.ReadWriter
-	authRepo     authentication.AuthenticationRepository
+	authRepo     authentication.Repository
 	endpointRepo coreconfig.EndpointRepository
 }
 

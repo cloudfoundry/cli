@@ -10,9 +10,9 @@ import (
 
 const urlPath = "/v2/config/staging_security_groups"
 
-//go:generate counterfeiter . StagingSecurityGroupsRepo
+//go:generate counterfeiter . SecurityGroupsRepo
 
-type StagingSecurityGroupsRepo interface {
+type SecurityGroupsRepo interface {
 	BindToStagingSet(string) error
 	List() ([]models.SecurityGroupFields, error)
 	UnbindFromStagingSet(string) error
@@ -22,7 +22,7 @@ type cloudControllerStagingSecurityGroupRepo struct {
 	repoBase DefaultSecurityGroupsRepoBase
 }
 
-func NewStagingSecurityGroupsRepo(configRepo coreconfig.Reader, gateway net.Gateway) StagingSecurityGroupsRepo {
+func NewSecurityGroupsRepo(configRepo coreconfig.Reader, gateway net.Gateway) SecurityGroupsRepo {
 	return &cloudControllerStagingSecurityGroupRepo{
 		repoBase: DefaultSecurityGroupsRepoBase{
 			ConfigRepo: configRepo,

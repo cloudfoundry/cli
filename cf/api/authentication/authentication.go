@@ -21,9 +21,9 @@ type TokenRefresher interface {
 	RefreshAuthToken() (updatedToken string, apiErr error)
 }
 
-//go:generate counterfeiter . AuthenticationRepository
+//go:generate counterfeiter . Repository
 
-type AuthenticationRepository interface {
+type Repository interface {
 	net.RequestDumperInterface
 
 	RefreshAuthToken() (updatedToken string, apiErr error)
@@ -32,7 +32,7 @@ type AuthenticationRepository interface {
 	GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error)
 }
 
-type UAAAuthenticationRepository struct {
+type UAARepository struct {
 	config  coreconfig.ReadWriter
 	gateway net.Gateway
 	dumper  net.RequestDumper
@@ -40,15 +40,15 @@ type UAAAuthenticationRepository struct {
 
 var ErrPreventRedirect = errors.New("prevent-redirect")
 
-func NewUAAAuthenticationRepository(gateway net.Gateway, config coreconfig.ReadWriter, dumper net.RequestDumper) UAAAuthenticationRepository {
-	return UAAAuthenticationRepository{
+func NewUAARepository(gateway net.Gateway, config coreconfig.ReadWriter, dumper net.RequestDumper) UAARepository {
+	return UAARepository{
 		config:  config,
 		gateway: gateway,
 		dumper:  dumper,
 	}
 }
 
-func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
+func (uaa UAARepository) Authorize(token string) (string, error) {
 	httpClient := &http.Client{
 		CheckRedirect: func(req *http.Request, _ []*http.Request) error {
 			uaa.DumpRequest(req)
@@ -110,7 +110,7 @@ func (uaa UAAAuthenticationRepository) Authorize(token string) (string, error) {
 	return codes[0], nil
 }
 
-func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) error {
+func (uaa UAARepository) Authenticate(credentials map[string]string) error {
 	data := url.Values{
 		"grant_type": {"password"},
 		"scope":      {""},
@@ -137,11 +137,11 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	return nil
 }
 
-func (uaa UAAAuthenticationRepository) DumpRequest(req *http.Request) {
+func (uaa UAARepository) DumpRequest(req *http.Request) {
 	uaa.dumper.DumpRequest(req)
 }
 
-func (uaa UAAAuthenticationRepository) DumpResponse(res *http.Response) {
+func (uaa UAARepository) DumpResponse(res *http.Response) {
 	uaa.dumper.DumpResponse(res)
 }
 
@@ -166,7 +166,7 @@ func (r *LoginResource) parsePrompts() (prompts map[string]coreconfig.AuthPrompt
 	return
 }
 
-func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]coreconfig.AuthPrompt, apiErr error) {
+func (uaa UAARepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]coreconfig.AuthPrompt, apiErr error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthenticationEndpoint())
 	resource := &LoginResource{}
 	apiErr = uaa.gateway.GetResource(url, resource)
@@ -180,7 +180,7 @@ func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (pro
 	return
 }
 
-func (uaa UAAAuthenticationRepository) RefreshAuthToken() (string, error) {
+func (uaa UAARepository) RefreshAuthToken() (string, error) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
@@ -193,7 +193,7 @@ func (uaa UAAAuthenticationRepository) RefreshAuthToken() (string, error) {
 	return updatedToken, apiErr
 }
 
-func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
+func (uaa UAARepository) getAuthToken(data url.Values) error {
 	type uaaErrorResponse struct {
 		Code        string `json:"error"`
 		Description string `json:"error_description"`

@@ -21,7 +21,7 @@ var _ = Describe("App Events Repo", func() {
 		server  *httptest.Server
 		handler *testnet.TestHandler
 		config  coreconfig.ReadWriter
-		repo    AppEventsRepository
+		repo    Repository
 	)
 
 	BeforeEach(func() {

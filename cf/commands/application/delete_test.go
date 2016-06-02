@@ -22,7 +22,7 @@ var _ = Describe("delete app command", func() {
 		ui                  *testterm.FakeUI
 		app                 models.Application
 		configRepo          coreconfig.Repository
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		routeRepo           *apifakes.FakeRouteRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                commandregistry.Dependency
@@ -42,7 +42,7 @@ var _ = Describe("delete app command", func() {
 		app.GUID = "app-to-delete-guid"
 
 		ui = &testterm.FakeUI{}
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		routeRepo = new(apifakes.FakeRouteRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 

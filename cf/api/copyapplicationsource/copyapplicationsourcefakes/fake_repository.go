@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource"
 )
 
-type FakeCopyApplicationSourceRepository struct {
+type FakeRepository struct {
 	CopyApplicationStub        func(sourceAppGUID, targetAppGUID string) error
 	copyApplicationMutex       sync.RWMutex
 	copyApplicationArgsForCall []struct {
@@ -19,7 +19,7 @@ type FakeCopyApplicationSourceRepository struct {
 	}
 }
 
-func (fake *FakeCopyApplicationSourceRepository) CopyApplication(sourceAppGUID string, targetAppGUID string) error {
+func (fake *FakeRepository) CopyApplication(sourceAppGUID string, targetAppGUID string) error {
 	fake.copyApplicationMutex.Lock()
 	fake.copyApplicationArgsForCall = append(fake.copyApplicationArgsForCall, struct {
 		sourceAppGUID string
@@ -33,23 +33,23 @@ func (fake *FakeCopyApplicationSourceRepository) CopyApplication(sourceAppGUID s
 	}
 }
 
-func (fake *FakeCopyApplicationSourceRepository) CopyApplicationCallCount() int {
+func (fake *FakeRepository) CopyApplicationCallCount() int {
 	fake.copyApplicationMutex.RLock()
 	defer fake.copyApplicationMutex.RUnlock()
 	return len(fake.copyApplicationArgsForCall)
 }
 
-func (fake *FakeCopyApplicationSourceRepository) CopyApplicationArgsForCall(i int) (string, string) {
+func (fake *FakeRepository) CopyApplicationArgsForCall(i int) (string, string) {
 	fake.copyApplicationMutex.RLock()
 	defer fake.copyApplicationMutex.RUnlock()
 	return fake.copyApplicationArgsForCall[i].sourceAppGUID, fake.copyApplicationArgsForCall[i].targetAppGUID
 }
 
-func (fake *FakeCopyApplicationSourceRepository) CopyApplicationReturns(result1 error) {
+func (fake *FakeRepository) CopyApplicationReturns(result1 error) {
 	fake.CopyApplicationStub = nil
 	fake.copyApplicationReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ copyapplicationsource.CopyApplicationSourceRepository = new(FakeCopyApplicationSourceRepository)
+var _ copyapplicationsource.Repository = new(FakeRepository)

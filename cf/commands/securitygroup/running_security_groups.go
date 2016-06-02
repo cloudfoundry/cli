@@ -12,7 +12,7 @@ import (
 
 type listRunningSecurityGroups struct {
 	ui                       terminal.UI
-	runningSecurityGroupRepo running.RunningSecurityGroupsRepo
+	runningSecurityGroupRepo running.SecurityGroupsRepo
 	configRepo               coreconfig.Reader
 }
 

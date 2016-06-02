@@ -25,7 +25,7 @@ var _ = Describe("logs with noaa repository", func() {
 	var (
 		fakeNoaaConsumer   *testapi.FakeNoaaConsumer
 		config             coreconfig.ReadWriter
-		fakeTokenRefresher *authenticationfakes.FakeAuthenticationRepository
+		fakeTokenRefresher *authenticationfakes.FakeRepository
 		repo               *logs.NoaaLogsRepository
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("logs with noaa repository", func() {
 		config.SetLoggregatorEndpoint("loggregator.test.com")
 		config.SetDopplerEndpoint("doppler.test.com")
 		config.SetAccessToken("the-access-token")
-		fakeTokenRefresher = &authenticationfakes.FakeAuthenticationRepository{}
+		fakeTokenRefresher = &authenticationfakes.FakeRepository{}
 		repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
 	})
 

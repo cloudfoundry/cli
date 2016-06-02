@@ -16,9 +16,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter . ApplicationRepository
+//go:generate counterfeiter . Repository
 
-type ApplicationRepository interface {
+type Repository interface {
 	Create(params models.AppParams) (createdApp models.Application, apiErr error)
 	GetApp(appGUID string) (models.Application, error)
 	Read(name string) (app models.Application, apiErr error)
@@ -29,18 +29,18 @@ type ApplicationRepository interface {
 	CreateRestageRequest(guid string) (apiErr error)
 }
 
-type CloudControllerApplicationRepository struct {
+type CloudControllerRepository struct {
 	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerApplicationRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
+func NewCloudControllerRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (models.Application, error) {
+func (repo CloudControllerRepository) Create(params models.AppParams) (models.Application, error) {
 	appResource := resources.NewApplicationEntityFromAppParams(params)
 	data, err := json.Marshal(appResource)
 	if err != nil {
@@ -56,7 +56,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 	return resource.ToModel(), nil
 }
 
-func (repo CloudControllerApplicationRepository) GetApp(appGUID string) (app models.Application, apiErr error) {
+func (repo CloudControllerRepository) GetApp(appGUID string) (app models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.APIEndpoint(), appGUID)
 	appResources := new(resources.ApplicationResource)
 
@@ -69,11 +69,11 @@ func (repo CloudControllerApplicationRepository) GetApp(appGUID string) (app mod
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiErr error) {
+func (repo CloudControllerRepository) Read(name string) (app models.Application, apiErr error) {
 	return repo.ReadFromSpace(name, repo.config.SpaceFields().GUID)
 }
 
-func (repo CloudControllerApplicationRepository) ReadFromSpace(name string, spaceGUID string) (app models.Application, apiErr error) {
+func (repo CloudControllerRepository) ReadFromSpace(name string, spaceGUID string) (app models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.APIEndpoint(), spaceGUID, url.QueryEscape("name:"+name))
 	appResources := new(resources.PaginatedApplicationResources)
 	apiErr = repo.gateway.GetResource(path, appResources)
@@ -91,7 +91,7 @@ func (repo CloudControllerApplicationRepository) ReadFromSpace(name string, spac
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Update(appGUID string, params models.AppParams) (updatedApp models.Application, apiErr error) {
+func (repo CloudControllerRepository) Update(appGUID string, params models.AppParams) (updatedApp models.Application, apiErr error) {
 	appResource := resources.NewApplicationEntityFromAppParams(params)
 	data, err := json.Marshal(appResource)
 	if err != nil {
@@ -109,12 +109,12 @@ func (repo CloudControllerApplicationRepository) Update(appGUID string, params m
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Delete(appGUID string) (apiErr error) {
+func (repo CloudControllerRepository) Delete(appGUID string) (apiErr error) {
 	path := fmt.Sprintf("/v2/apps/%s?recursive=true", appGUID)
 	return repo.gateway.DeleteResource(repo.config.APIEndpoint(), path)
 }
 
-func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.Environment, error) {
+func (repo CloudControllerRepository) ReadEnv(guid string) (*models.Environment, error) {
 	var (
 		err error
 	)
@@ -130,7 +130,7 @@ func (repo CloudControllerApplicationRepository) ReadEnv(guid string) (*models.E
 	return appResource, err
 }
 
-func (repo CloudControllerApplicationRepository) CreateRestageRequest(guid string) error {
+func (repo CloudControllerRepository) CreateRestageRequest(guid string) error {
 	path := fmt.Sprintf("/v2/apps/%s/restage", guid)
 	return repo.gateway.CreateResource(repo.config.APIEndpoint(), path, strings.NewReader(""), nil)
 }

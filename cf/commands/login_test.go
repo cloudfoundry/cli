@@ -26,7 +26,7 @@ var _ = Describe("Login Command", func() {
 		Flags        []string
 		Config       coreconfig.Repository
 		ui           *testterm.FakeUI
-		authRepo     *authenticationfakes.FakeAuthenticationRepository
+		authRepo     *authenticationfakes.FakeRepository
 		endpointRepo *coreconfigfakes.FakeEndpointRepository
 		orgRepo      *organizationsfakes.FakeOrganizationRepository
 		spaceRepo    *apifakes.FakeSpaceRepository
@@ -65,7 +65,7 @@ var _ = Describe("Login Command", func() {
 		Flags = []string{}
 		Config = testconfig.NewRepository()
 		ui = &testterm.FakeUI{}
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			Config.SetAccessToken("my_access_token")
 			Config.SetRefreshToken("my_refresh_token")

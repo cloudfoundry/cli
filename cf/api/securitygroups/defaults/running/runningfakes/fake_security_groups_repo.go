@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeRunningSecurityGroupsRepo struct {
+type FakeSecurityGroupsRepo struct {
 	BindToRunningSetStub        func(string) error
 	bindToRunningSetMutex       sync.RWMutex
 	bindToRunningSetArgsForCall []struct {
@@ -35,7 +35,7 @@ type FakeRunningSecurityGroupsRepo struct {
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSet(arg1 string) error {
+func (fake *FakeSecurityGroupsRepo) BindToRunningSet(arg1 string) error {
 	fake.bindToRunningSetMutex.Lock()
 	fake.bindToRunningSetArgsForCall = append(fake.bindToRunningSetArgsForCall, struct {
 		arg1 string
@@ -48,26 +48,26 @@ func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSet(arg1 string) error {
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSetCallCount() int {
+func (fake *FakeSecurityGroupsRepo) BindToRunningSetCallCount() int {
 	fake.bindToRunningSetMutex.RLock()
 	defer fake.bindToRunningSetMutex.RUnlock()
 	return len(fake.bindToRunningSetArgsForCall)
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSetArgsForCall(i int) string {
+func (fake *FakeSecurityGroupsRepo) BindToRunningSetArgsForCall(i int) string {
 	fake.bindToRunningSetMutex.RLock()
 	defer fake.bindToRunningSetMutex.RUnlock()
 	return fake.bindToRunningSetArgsForCall[i].arg1
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) BindToRunningSetReturns(result1 error) {
+func (fake *FakeSecurityGroupsRepo) BindToRunningSetReturns(result1 error) {
 	fake.BindToRunningSetStub = nil
 	fake.bindToRunningSetReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error) {
+func (fake *FakeSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error) {
 	fake.listMutex.Lock()
 	fake.listArgsForCall = append(fake.listArgsForCall, struct{}{})
 	fake.listMutex.Unlock()
@@ -78,13 +78,13 @@ func (fake *FakeRunningSecurityGroupsRepo) List() ([]models.SecurityGroupFields,
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) ListCallCount() int {
+func (fake *FakeSecurityGroupsRepo) ListCallCount() int {
 	fake.listMutex.RLock()
 	defer fake.listMutex.RUnlock()
 	return len(fake.listArgsForCall)
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) ListReturns(result1 []models.SecurityGroupFields, result2 error) {
+func (fake *FakeSecurityGroupsRepo) ListReturns(result1 []models.SecurityGroupFields, result2 error) {
 	fake.ListStub = nil
 	fake.listReturns = struct {
 		result1 []models.SecurityGroupFields
@@ -92,7 +92,7 @@ func (fake *FakeRunningSecurityGroupsRepo) ListReturns(result1 []models.Security
 	}{result1, result2}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSet(arg1 string) error {
+func (fake *FakeSecurityGroupsRepo) UnbindFromRunningSet(arg1 string) error {
 	fake.unbindFromRunningSetMutex.Lock()
 	fake.unbindFromRunningSetArgsForCall = append(fake.unbindFromRunningSetArgsForCall, struct {
 		arg1 string
@@ -105,23 +105,23 @@ func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSet(arg1 string) err
 	}
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSetCallCount() int {
+func (fake *FakeSecurityGroupsRepo) UnbindFromRunningSetCallCount() int {
 	fake.unbindFromRunningSetMutex.RLock()
 	defer fake.unbindFromRunningSetMutex.RUnlock()
 	return len(fake.unbindFromRunningSetArgsForCall)
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSetArgsForCall(i int) string {
+func (fake *FakeSecurityGroupsRepo) UnbindFromRunningSetArgsForCall(i int) string {
 	fake.unbindFromRunningSetMutex.RLock()
 	defer fake.unbindFromRunningSetMutex.RUnlock()
 	return fake.unbindFromRunningSetArgsForCall[i].arg1
 }
 
-func (fake *FakeRunningSecurityGroupsRepo) UnbindFromRunningSetReturns(result1 error) {
+func (fake *FakeSecurityGroupsRepo) UnbindFromRunningSetReturns(result1 error) {
 	fake.UnbindFromRunningSetStub = nil
 	fake.unbindFromRunningSetReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ running.RunningSecurityGroupsRepo = new(FakeRunningSecurityGroupsRepo)
+var _ running.SecurityGroupsRepo = new(FakeSecurityGroupsRepo)

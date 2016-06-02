@@ -8,9 +8,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter . AppEventsRepository
+//go:generate counterfeiter . Repository
 
-type AppEventsRepository interface {
+type Repository interface {
 	RecentEvents(appGUID string, limit int64) ([]models.EventFields, error)
 }
 

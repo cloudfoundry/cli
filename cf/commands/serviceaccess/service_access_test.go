@@ -28,7 +28,7 @@ var _ = Describe("service-access command", func() {
 		requirementsFactory *testreq.FakeReqFactory
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
-		authRepo            *authenticationfakes.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -45,7 +45,7 @@ var _ = Describe("service-access command", func() {
 		ui = &testterm.FakeUI{}
 		actor = new(actorsfakes.FakeServiceActor)
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 

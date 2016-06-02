@@ -21,7 +21,7 @@ var _ = Describe("unset-env command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                commandregistry.Dependency
@@ -39,7 +39,7 @@ var _ = Describe("unset-env command", func() {
 		app = models.Application{}
 		app.Name = "my-app"
 		app.GUID = "my-app-guid"
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})

@@ -433,7 +433,7 @@ var _ = Describe("CreateRoute", func() {
 	Describe("CreateRoute", func() {
 		var domainFields models.DomainFields
 		var spaceFields models.SpaceFields
-		var rc route.RouteCreator
+		var rc route.Creator
 
 		BeforeEach(func() {
 			domainFields = models.DomainFields{
@@ -446,7 +446,7 @@ var _ = Describe("CreateRoute", func() {
 			}
 
 			var ok bool
-			rc, ok = cmd.(route.RouteCreator)
+			rc, ok = cmd.(route.Creator)
 			Expect(ok).To(BeTrue())
 		})
 

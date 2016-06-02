@@ -89,7 +89,7 @@ var _ = Describe("ApplicationsRepository", func() {
 	Describe("Create", func() {
 		var (
 			ccServer  *ghttp.Server
-			repo      CloudControllerApplicationRepository
+			repo      CloudControllerRepository
 			appParams models.AppParams
 		)
 
@@ -98,7 +98,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(ccServer.URL())
 			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-			repo = NewCloudControllerApplicationRepository(configRepo, gateway)
+			repo = NewCloudControllerRepository(configRepo, gateway)
 
 			name := "my-cool-app"
 			buildpackURL := "buildpack-url"
@@ -200,7 +200,7 @@ var _ = Describe("ApplicationsRepository", func() {
 				userEnv    *models.Environment
 				err        error
 				handler    *testnet.TestHandler
-				repo       ApplicationRepository
+				repo       Repository
 			)
 
 			AfterEach(func() {
@@ -544,11 +544,11 @@ var updateApplicationRequest = apifakes.NewCloudControllerTestRequest(testnet.Te
 		Body:   updateApplicationResponse},
 })
 
-func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
+func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo Repository) {
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
+	repo = NewCloudControllerRepository(configRepo, gateway)
 	return
 }

@@ -21,7 +21,7 @@ var _ = Describe("staging-security-groups command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   coreconfig.Repository
-		fakeStagingSecurityGroupRepo *stagingfakes.FakeStagingSecurityGroupsRepo
+		fakeStagingSecurityGroupRepo *stagingfakes.FakeSecurityGroupsRepo
 		requirementsFactory          *testreq.FakeReqFactory
 		deps                         commandregistry.Dependency
 	)
@@ -36,7 +36,7 @@ var _ = Describe("staging-security-groups command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		fakeStagingSecurityGroupRepo = new(stagingfakes.FakeStagingSecurityGroupsRepo)
+		fakeStagingSecurityGroupRepo = new(stagingfakes.FakeSecurityGroupsRepo)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

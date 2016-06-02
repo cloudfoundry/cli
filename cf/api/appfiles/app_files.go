@@ -7,9 +7,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter . AppFilesRepository
+//go:generate counterfeiter . Repository
 
-type AppFilesRepository interface {
+type Repository interface {
 	ListFiles(appGUID string, instance int, path string) (files string, apiErr error)
 }
 

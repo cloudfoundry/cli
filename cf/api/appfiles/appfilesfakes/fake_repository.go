@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/appfiles"
 )
 
-type FakeAppFilesRepository struct {
+type FakeRepository struct {
 	ListFilesStub        func(appGUID string, instance int, path string) (files string, apiErr error)
 	listFilesMutex       sync.RWMutex
 	listFilesArgsForCall []struct {
@@ -21,7 +21,7 @@ type FakeAppFilesRepository struct {
 	}
 }
 
-func (fake *FakeAppFilesRepository) ListFiles(appGUID string, instance int, path string) (files string, apiErr error) {
+func (fake *FakeRepository) ListFiles(appGUID string, instance int, path string) (files string, apiErr error) {
 	fake.listFilesMutex.Lock()
 	fake.listFilesArgsForCall = append(fake.listFilesArgsForCall, struct {
 		appGUID  string
@@ -36,19 +36,19 @@ func (fake *FakeAppFilesRepository) ListFiles(appGUID string, instance int, path
 	}
 }
 
-func (fake *FakeAppFilesRepository) ListFilesCallCount() int {
+func (fake *FakeRepository) ListFilesCallCount() int {
 	fake.listFilesMutex.RLock()
 	defer fake.listFilesMutex.RUnlock()
 	return len(fake.listFilesArgsForCall)
 }
 
-func (fake *FakeAppFilesRepository) ListFilesArgsForCall(i int) (string, int, string) {
+func (fake *FakeRepository) ListFilesArgsForCall(i int) (string, int, string) {
 	fake.listFilesMutex.RLock()
 	defer fake.listFilesMutex.RUnlock()
 	return fake.listFilesArgsForCall[i].appGUID, fake.listFilesArgsForCall[i].instance, fake.listFilesArgsForCall[i].path
 }
 
-func (fake *FakeAppFilesRepository) ListFilesReturns(result1 string, result2 error) {
+func (fake *FakeRepository) ListFilesReturns(result1 string, result2 error) {
 	fake.ListFilesStub = nil
 	fake.listFilesReturns = struct {
 		result1 string
@@ -56,4 +56,4 @@ func (fake *FakeAppFilesRepository) ListFilesReturns(result1 string, result2 err
 	}{result1, result2}
 }
 
-var _ appfiles.Repository = new(FakeAppFilesRepository)
+var _ appfiles.Repository = new(FakeRepository)

@@ -22,7 +22,7 @@ var _ = Describe("stop command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
 		config              coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("stop command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type FakeApplicationStopper struct {
+type FakeStopper struct {
 	MetaDataStub        func() commandregistry.CommandMetadata
 	metaDataMutex       sync.RWMutex
 	metaDataArgsForCall []struct{}
@@ -57,7 +57,7 @@ type FakeApplicationStopper struct {
 	}
 }
 
-func (fake *FakeApplicationStopper) MetaData() commandregistry.CommandMetadata {
+func (fake *FakeStopper) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
 	fake.metaDataMutex.Unlock()
@@ -68,20 +68,20 @@ func (fake *FakeApplicationStopper) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (fake *FakeApplicationStopper) MetaDataCallCount() int {
+func (fake *FakeStopper) MetaDataCallCount() int {
 	fake.metaDataMutex.RLock()
 	defer fake.metaDataMutex.RUnlock()
 	return len(fake.metaDataArgsForCall)
 }
 
-func (fake *FakeApplicationStopper) MetaDataReturns(result1 commandregistry.CommandMetadata) {
+func (fake *FakeStopper) MetaDataReturns(result1 commandregistry.CommandMetadata) {
 	fake.MetaDataStub = nil
 	fake.metaDataReturns = struct {
 		result1 commandregistry.CommandMetadata
 	}{result1}
 }
 
-func (fake *FakeApplicationStopper) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+func (fake *FakeStopper) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	fake.setDependencyMutex.Lock()
 	fake.setDependencyArgsForCall = append(fake.setDependencyArgsForCall, struct {
 		deps       commandregistry.Dependency
@@ -95,26 +95,26 @@ func (fake *FakeApplicationStopper) SetDependency(deps commandregistry.Dependenc
 	}
 }
 
-func (fake *FakeApplicationStopper) SetDependencyCallCount() int {
+func (fake *FakeStopper) SetDependencyCallCount() int {
 	fake.setDependencyMutex.RLock()
 	defer fake.setDependencyMutex.RUnlock()
 	return len(fake.setDependencyArgsForCall)
 }
 
-func (fake *FakeApplicationStopper) SetDependencyArgsForCall(i int) (commandregistry.Dependency, bool) {
+func (fake *FakeStopper) SetDependencyArgsForCall(i int) (commandregistry.Dependency, bool) {
 	fake.setDependencyMutex.RLock()
 	defer fake.setDependencyMutex.RUnlock()
 	return fake.setDependencyArgsForCall[i].deps, fake.setDependencyArgsForCall[i].pluginCall
 }
 
-func (fake *FakeApplicationStopper) SetDependencyReturns(result1 commandregistry.Command) {
+func (fake *FakeStopper) SetDependencyReturns(result1 commandregistry.Command) {
 	fake.SetDependencyStub = nil
 	fake.setDependencyReturns = struct {
 		result1 commandregistry.Command
 	}{result1}
 }
 
-func (fake *FakeApplicationStopper) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (fake *FakeStopper) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
@@ -128,26 +128,26 @@ func (fake *FakeApplicationStopper) Requirements(requirementsFactory requirement
 	}
 }
 
-func (fake *FakeApplicationStopper) RequirementsCallCount() int {
+func (fake *FakeStopper) RequirementsCallCount() int {
 	fake.requirementsMutex.RLock()
 	defer fake.requirementsMutex.RUnlock()
 	return len(fake.requirementsArgsForCall)
 }
 
-func (fake *FakeApplicationStopper) RequirementsArgsForCall(i int) (requirements.Factory, flags.FlagContext) {
+func (fake *FakeStopper) RequirementsArgsForCall(i int) (requirements.Factory, flags.FlagContext) {
 	fake.requirementsMutex.RLock()
 	defer fake.requirementsMutex.RUnlock()
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeApplicationStopper) RequirementsReturns(result1 []requirements.Requirement) {
+func (fake *FakeStopper) RequirementsReturns(result1 []requirements.Requirement) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
 	}{result1}
 }
 
-func (fake *FakeApplicationStopper) Execute(context flags.FlagContext) error {
+func (fake *FakeStopper) Execute(context flags.FlagContext) error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
@@ -160,26 +160,26 @@ func (fake *FakeApplicationStopper) Execute(context flags.FlagContext) error {
 	}
 }
 
-func (fake *FakeApplicationStopper) ExecuteCallCount() int {
+func (fake *FakeStopper) ExecuteCallCount() int {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeApplicationStopper) ExecuteArgsForCall(i int) flags.FlagContext {
+func (fake *FakeStopper) ExecuteArgsForCall(i int) flags.FlagContext {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeApplicationStopper) ExecuteReturns(result1 error) {
+func (fake *FakeStopper) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeApplicationStopper) ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error) {
+func (fake *FakeStopper) ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error) {
 	fake.applicationStopMutex.Lock()
 	fake.applicationStopArgsForCall = append(fake.applicationStopArgsForCall, struct {
 		app       models.Application
@@ -194,19 +194,19 @@ func (fake *FakeApplicationStopper) ApplicationStop(app models.Application, orgN
 	}
 }
 
-func (fake *FakeApplicationStopper) ApplicationStopCallCount() int {
+func (fake *FakeStopper) ApplicationStopCallCount() int {
 	fake.applicationStopMutex.RLock()
 	defer fake.applicationStopMutex.RUnlock()
 	return len(fake.applicationStopArgsForCall)
 }
 
-func (fake *FakeApplicationStopper) ApplicationStopArgsForCall(i int) (models.Application, string, string) {
+func (fake *FakeStopper) ApplicationStopArgsForCall(i int) (models.Application, string, string) {
 	fake.applicationStopMutex.RLock()
 	defer fake.applicationStopMutex.RUnlock()
 	return fake.applicationStopArgsForCall[i].app, fake.applicationStopArgsForCall[i].orgName, fake.applicationStopArgsForCall[i].spaceName
 }
 
-func (fake *FakeApplicationStopper) ApplicationStopReturns(result1 models.Application, result2 error) {
+func (fake *FakeStopper) ApplicationStopReturns(result1 models.Application, result2 error) {
 	fake.ApplicationStopStub = nil
 	fake.applicationStopReturns = struct {
 		result1 models.Application
@@ -214,4 +214,4 @@ func (fake *FakeApplicationStopper) ApplicationStopReturns(result1 models.Applic
 	}{result1, result2}
 }
 
-var _ application.ApplicationStopper = new(FakeApplicationStopper)
+var _ application.Stopper = new(FakeStopper)

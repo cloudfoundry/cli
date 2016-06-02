@@ -16,7 +16,7 @@ import (
 type SetRunningEnvironmentVariableGroup struct {
 	ui                           terminal.UI
 	config                       coreconfig.ReadWriter
-	environmentVariableGroupRepo environmentvariablegroups.EnvironmentVariableGroupsRepository
+	environmentVariableGroupRepo environmentvariablegroups.Repository
 }
 
 func init() {

@@ -19,7 +19,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		ui                           *testterm.FakeUI
 		requirementsFactory          *testreq.FakeReqFactory
 		configRepo                   coreconfig.Repository
-		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository
+		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeRepository
 		deps                         commandregistry.Dependency
 	)
 
@@ -34,7 +34,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-		environmentVariableGroupRepo = new(environmentvariablegroupsfakes.FakeEnvironmentVariableGroupsRepository)
+		environmentVariableGroupRepo = new(environmentvariablegroupsfakes.FakeRepository)
 	})
 
 	runCommand := func(args ...string) bool {

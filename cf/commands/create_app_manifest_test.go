@@ -40,7 +40,7 @@ var _ = Describe("CreateAppManifest", func() {
 		targetedSpaceRequirement requirements.Requirement
 		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
 
-		fakeManifest *manifestfakes.FakeAppManifest
+		fakeManifest *manifestfakes.FakeApp
 	)
 
 	BeforeEach(func() {
@@ -51,7 +51,7 @@ var _ = Describe("CreateAppManifest", func() {
 		stackRepo = new(stacksfakes.FakeStackRepository)
 		repoLocator = repoLocator.SetStackRepository(stackRepo)
 
-		fakeManifest = new(manifestfakes.FakeAppManifest)
+		fakeManifest = new(manifestfakes.FakeApp)
 
 		deps = commandregistry.Dependency{
 			UI:          ui,

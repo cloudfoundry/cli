@@ -82,4 +82,4 @@ func (cmd *OldFakeRouteCreator) Execute(_ flags.FlagContext) error {
 	return nil
 }
 
-var _ route.RouteCreator = new(OldFakeRouteCreator)
+var _ route.Creator = new(OldFakeRouteCreator)

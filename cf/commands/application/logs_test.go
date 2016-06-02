@@ -24,7 +24,7 @@ import (
 var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		logsRepo            *logsfakes.FakeLogsRepository
+		logsRepo            *logsfakes.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -40,7 +40,7 @@ var _ = Describe("logs command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		logsRepo = new(logsfakes.FakeLogsRepository)
+		logsRepo = new(logsfakes.FakeRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 

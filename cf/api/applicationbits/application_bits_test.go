@@ -28,7 +28,7 @@ import (
 var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 	var (
 		fixturesDir string
-		repo        ApplicationBitsRepository
+		repo        Repository
 		file1       resources.AppFileResource
 		file2       resources.AppFileResource
 		file3       resources.AppFileResource
