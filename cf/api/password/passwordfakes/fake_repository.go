@@ -5,9 +5,10 @@ import (
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/api/password"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
-type FakePasswordRepository struct {
+type FakeRepository struct {
 	UpdatePasswordStub        func(old string, new string) error
 	updatePasswordMutex       sync.RWMutex
 	updatePasswordArgsForCall []struct {
@@ -19,7 +20,7 @@ type FakePasswordRepository struct {
 	}
 }
 
-func (fake *FakePasswordRepository) UpdatePassword(old string, new string) error {
+func (fake *FakeRepository) UpdatePassword(old string, new string) error {
 	fake.updatePasswordMutex.Lock()
 	fake.updatePasswordArgsForCall = append(fake.updatePasswordArgsForCall, struct {
 		old string
@@ -33,23 +34,23 @@ func (fake *FakePasswordRepository) UpdatePassword(old string, new string) error
 	}
 }
 
-func (fake *FakePasswordRepository) UpdatePasswordCallCount() int {
+func (fake *FakeRepository) UpdatePasswordCallCount() int {
 	fake.updatePasswordMutex.RLock()
 	defer fake.updatePasswordMutex.RUnlock()
 	return len(fake.updatePasswordArgsForCall)
 }
 
-func (fake *FakePasswordRepository) UpdatePasswordArgsForCall(i int) (string, string) {
+func (fake *FakeRepository) UpdatePasswordArgsForCall(i int) (string, string) {
 	fake.updatePasswordMutex.RLock()
 	defer fake.updatePasswordMutex.RUnlock()
 	return fake.updatePasswordArgsForCall[i].old, fake.updatePasswordArgsForCall[i].new
 }
 
-func (fake *FakePasswordRepository) UpdatePasswordReturns(result1 error) {
+func (fake *FakeRepository) UpdatePasswordReturns(result1 error) {
 	fake.UpdatePasswordStub = nil
 	fake.updatePasswordReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ password.PasswordRepository = new(FakePasswordRepository)
+var _ password.Repository = new(FakeRepository)

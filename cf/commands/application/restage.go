@@ -15,8 +15,8 @@ import (
 type Restage struct {
 	ui                terminal.UI
 	config            coreconfig.Reader
-	appRepo           applications.ApplicationRepository
-	appStagingWatcher ApplicationStagingWatcher
+	appRepo           applications.Repository
+	appStagingWatcher StagingWatcher
 }
 
 func init() {
@@ -55,7 +55,7 @@ func (cmd *Restage) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	//get command from registry for dependency
 	commandDep := commandregistry.Commands.FindCommand("start")
 	commandDep = commandDep.SetDependency(deps, false)
-	cmd.appStagingWatcher = commandDep.(ApplicationStagingWatcher)
+	cmd.appStagingWatcher = commandDep.(StagingWatcher)
 
 	return cmd
 }
@@ -76,7 +76,7 @@ func (cmd *Restage) Execute(c flags.FlagContext) error {
 
 	app.PackageState = ""
 
-	_, err = cmd.appStagingWatcher.ApplicationWatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
+	_, err = cmd.appStagingWatcher.WatchStaging(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, func(app models.Application) (models.Application, error) {
 		return app, cmd.appRepo.CreateRestageRequest(app.GUID)
 	})
 	if err != nil {

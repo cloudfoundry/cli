@@ -33,16 +33,16 @@ import (
 type Push struct {
 	ui            terminal.UI
 	config        coreconfig.Reader
-	manifestRepo  manifest.ManifestRepository
-	appStarter    ApplicationStarter
-	appStopper    ApplicationStopper
-	serviceBinder service.ServiceBinder
-	appRepo       applications.ApplicationRepository
+	manifestRepo  manifest.Repository
+	appStarter    Starter
+	appStopper    Stopper
+	serviceBinder service.Binder
+	appRepo       applications.Repository
 	domainRepo    api.DomainRepository
 	routeRepo     api.RouteRepository
 	serviceRepo   api.ServiceRepository
 	stackRepo     stacks.StackRepository
-	authRepo      authentication.AuthenticationRepository
+	authRepo      authentication.Repository
 	wordGenerator generator.WordGenerator
 	actor         actors.PushActor
 	zipper        appfiles.Zipper
@@ -150,17 +150,17 @@ func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	//set appStarter
 	appCommand := commandregistry.Commands.FindCommand("start")
 	appCommand = appCommand.SetDependency(deps, false)
-	cmd.appStarter = appCommand.(ApplicationStarter)
+	cmd.appStarter = appCommand.(Starter)
 
 	//set appStopper
 	appCommand = commandregistry.Commands.FindCommand("stop")
 	appCommand = appCommand.SetDependency(deps, false)
-	cmd.appStopper = appCommand.(ApplicationStopper)
+	cmd.appStopper = appCommand.(Stopper)
 
 	//set serviceBinder
 	appCommand = commandregistry.Commands.FindCommand("bind-service")
 	appCommand = appCommand.SetDependency(deps, false)
-	cmd.serviceBinder = appCommand.(service.ServiceBinder)
+	cmd.serviceBinder = appCommand.(service.Binder)
 
 	cmd.appRepo = deps.RepoLocator.GetApplicationRepository()
 	cmd.domainRepo = deps.RepoLocator.GetDomainRepository()

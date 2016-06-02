@@ -132,7 +132,7 @@ var deleteInstanceFromUnkownApp = apifakes.NewCloudControllerTestRequest(testnet
 	Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{}`},
 })
 
-func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
+func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo Repository) {
 	ts, handler = testnet.NewServer(requests)
 	space := models.SpaceFields{}
 	space.GUID = "my-space-guid"

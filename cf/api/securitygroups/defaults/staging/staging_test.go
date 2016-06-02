@@ -21,13 +21,13 @@ var _ = Describe("StagingSecurityGroupsRepo", func() {
 		testServer  *httptest.Server
 		testHandler *testnet.TestHandler
 		configRepo  coreconfig.ReadWriter
-		repo        StagingSecurityGroupsRepo
+		repo        SecurityGroupsRepo
 	)
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-		repo = NewStagingSecurityGroupsRepo(configRepo, gateway)
+		repo = NewSecurityGroupsRepo(configRepo, gateway)
 	})
 
 	AfterEach(func() {

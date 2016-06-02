@@ -13,7 +13,7 @@ import (
 
 type Password struct {
 	ui      terminal.UI
-	pwdRepo password.PasswordRepository
+	pwdRepo password.Repository
 	config  coreconfig.ReadWriter
 }
 

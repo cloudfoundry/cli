@@ -10,9 +10,9 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-//go:generate counterfeiter . ApplicationRestarter
+//go:generate counterfeiter . Restarter
 
-type ApplicationRestarter interface {
+type Restarter interface {
 	commandregistry.Command
 	ApplicationRestart(app models.Application, orgName string, spaceName string) error
 }
@@ -20,8 +20,8 @@ type ApplicationRestarter interface {
 type Restart struct {
 	ui      terminal.UI
 	config  coreconfig.Reader
-	starter ApplicationStarter
-	stopper ApplicationStopper
+	starter Starter
+	stopper Stopper
 	appReq  requirements.ApplicationRequirement
 }
 
@@ -63,12 +63,12 @@ func (cmd *Restart) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	//get start for dependency
 	starter := commandregistry.Commands.FindCommand("start")
 	starter = starter.SetDependency(deps, false)
-	cmd.starter = starter.(ApplicationStarter)
+	cmd.starter = starter.(Starter)
 
 	//get stop for dependency
 	stopper := commandregistry.Commands.FindCommand("stop")
 	stopper = stopper.SetDependency(deps, false)
-	cmd.stopper = stopper.(ApplicationStopper)
+	cmd.stopper = stopper.(Stopper)
 
 	return cmd
 }

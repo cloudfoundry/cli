@@ -19,7 +19,7 @@ var _ = Describe("set-health-check command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -28,7 +28,7 @@ var _ = Describe("set-health-check command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {

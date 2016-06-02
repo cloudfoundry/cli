@@ -27,7 +27,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			testServer  *httptest.Server
 			handler     *testnet.TestHandler
 			config      coreconfig.ReadWriter
-			auth        AuthenticationRepository
+			auth        Repository
 			dumper      net.RequestDumper
 			fakePrinter *tracefakes.FakePrinter
 		)
@@ -37,7 +37,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			fakePrinter = new(tracefakes.FakePrinter)
 			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, fakePrinter)
 			dumper = net.NewRequestDumper(fakePrinter)
-			auth = NewUAAAuthenticationRepository(gateway, config, dumper)
+			auth = NewUAARepository(gateway, config, dumper)
 		})
 
 		AfterEach(func() {
@@ -228,7 +228,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			uaaServer   *ghttp.Server
 			gateway     net.Gateway
 			config      coreconfig.ReadWriter
-			authRepo    AuthenticationRepository
+			authRepo    Repository
 			dumper      net.RequestDumper
 			fakePrinter *tracefakes.FakePrinter
 		)
@@ -242,7 +242,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			fakePrinter = new(tracefakes.FakePrinter)
 			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, fakePrinter)
 			dumper = net.NewRequestDumper(fakePrinter)
-			authRepo = NewUAAAuthenticationRepository(gateway, config, dumper)
+			authRepo = NewUAARepository(gateway, config, dumper)
 
 			uaaServer.AppendHandlers(
 				ghttp.CombineHandlers(

@@ -38,7 +38,7 @@ var _ = Describe("service command", func() {
 		ui = &testterm.FakeUI{}
 		pluginCall = false
 
-		appRepo := new(applicationsfakes.FakeApplicationRepository)
+		appRepo := new(applicationsfakes.FakeRepository)
 		appRepo.GetAppStub = func(appGUID string) (models.Application, error) {
 			if appGUID == "app1-guid" {
 				return models.Application{

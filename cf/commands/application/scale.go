@@ -17,9 +17,9 @@ import (
 type Scale struct {
 	ui        terminal.UI
 	config    coreconfig.Reader
-	restarter ApplicationRestarter
+	restarter Restarter
 	appReq    requirements.ApplicationRequirement
-	appRepo   applications.ApplicationRepository
+	appRepo   applications.Repository
 }
 
 func init() {
@@ -67,7 +67,7 @@ func (cmd *Scale) SetDependency(deps commandregistry.Dependency, pluginCall bool
 	//get command from registry for dependency
 	commandDep := commandregistry.Commands.FindCommand("restart")
 	commandDep = commandDep.SetDependency(deps, false)
-	cmd.restarter = commandDep.(ApplicationRestarter)
+	cmd.restarter = commandDep.(Restarter)
 
 	return cmd
 }

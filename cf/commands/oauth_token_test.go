@@ -22,7 +22,7 @@ import (
 var _ = Describe("OauthToken", func() {
 	var (
 		ui                  *testterm.FakeUI
-		authRepo            *authenticationfakes.FakeAuthenticationRepository
+		authRepo            *authenticationfakes.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("OauthToken", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		fakeLogger := new(tracefakes.FakePrinter)
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
 		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)

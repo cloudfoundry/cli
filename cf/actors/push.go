@@ -25,12 +25,12 @@ type PushActor interface {
 }
 
 type PushActorImpl struct {
-	appBitsRepo applicationbits.ApplicationBitsRepository
+	appBitsRepo applicationbits.Repository
 	appfiles    appfiles.AppFiles
 	zipper      appfiles.Zipper
 }
 
-func NewPushActor(appBitsRepo applicationbits.ApplicationBitsRepository, zipper appfiles.Zipper, appfiles appfiles.AppFiles) PushActor {
+func NewPushActor(appBitsRepo applicationbits.Repository, zipper appfiles.Zipper, appfiles appfiles.AppFiles) PushActor {
 	return PushActorImpl{
 		appBitsRepo: appBitsRepo,
 		appfiles:    appfiles,

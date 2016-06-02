@@ -16,7 +16,7 @@ type Events struct {
 	ui         terminal.UI
 	config     coreconfig.Reader
 	appReq     requirements.ApplicationRequirement
-	eventsRepo appevents.AppEventsRepository
+	eventsRepo appevents.Repository
 }
 
 func init() {

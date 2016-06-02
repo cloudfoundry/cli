@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("CopyApplicationSource", func() {
 	var (
-		repo       CopyApplicationSourceRepository
+		repo       Repository
 		testServer *httptest.Server
 		configRepo coreconfig.ReadWriter
 	)

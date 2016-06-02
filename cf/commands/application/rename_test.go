@@ -20,7 +20,7 @@ var _ = Describe("Rename command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		configRepo          coreconfig.Repository
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		deps                commandregistry.Dependency
 	)
 
@@ -35,7 +35,7 @@ var _ = Describe("Rename command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 	})
 
 	runCommand := func(args ...string) bool {

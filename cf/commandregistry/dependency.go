@@ -30,8 +30,8 @@ type Dependency struct {
 	Config             coreconfig.Repository
 	RepoLocator        api.RepositoryLocator
 	PluginConfig       pluginconfig.PluginConfiguration
-	ManifestRepo       manifest.ManifestRepository
-	AppManifest        manifest.AppManifest
+	ManifestRepo       manifest.Repository
+	AppManifest        manifest.App
 	Gateways           map[string]net.Gateway
 	TeePrinter         *terminal.TeePrinter
 	PluginRepo         pluginrepo.PluginRepo
@@ -81,7 +81,7 @@ func NewDependency(writer io.Writer, logger trace.Printer) Dependency {
 	}
 	deps.Config = coreconfig.NewRepositoryFromFilepath(configPath, errorHandler)
 
-	deps.ManifestRepo = manifest.NewManifestDiskRepository()
+	deps.ManifestRepo = manifest.NewDiskRepository()
 	deps.AppManifest = manifest.NewGenerator()
 	deps.PluginConfig = pluginconfig.NewPluginConfig(errorHandler)
 

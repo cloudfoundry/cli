@@ -695,10 +695,10 @@ var _ = Describe("Server", func() {
 			})
 
 			Context(".AccessToken", func() {
-				var authRepo *authenticationfakes.FakeAuthenticationRepository
+				var authRepo *authenticationfakes.FakeRepository
 
 				BeforeEach(func() {
-					authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+					authRepo = new(authenticationfakes.FakeRepository)
 					locator := api.RepositoryLocator{}
 					locator = locator.SetAuthenticationRepository(authRepo)
 

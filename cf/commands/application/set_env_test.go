@@ -22,7 +22,7 @@ var _ = Describe("set-env command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		app                 models.Application
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                commandregistry.Dependency
 	)
@@ -39,7 +39,7 @@ var _ = Describe("set-env command", func() {
 		app = models.Application{}
 		app.Name = "my-app"
 		app.GUID = "my-app-guid"
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		requirementsFactory = &testreq.FakeReqFactory{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})

@@ -43,17 +43,17 @@ var _ = Describe("Push Command", func() {
 		ui                         *testterm.FakeUI
 		configRepo                 coreconfig.Repository
 		manifestRepo               *testmanifest.FakeManifestRepository
-		starter                    *applicationfakes.FakeApplicationStarter
-		stopper                    *applicationfakes.FakeApplicationStopper
+		starter                    *applicationfakes.FakeStarter
+		stopper                    *applicationfakes.FakeStopper
 		serviceBinder              *servicefakes.OldFakeAppBinder
-		appRepo                    *applicationsfakes.FakeApplicationRepository
+		appRepo                    *applicationsfakes.FakeRepository
 		domainRepo                 *apifakes.FakeDomainRepository
 		routeRepo                  *apifakes.FakeRouteRepository
 		stackRepo                  *stacksfakes.FakeStackRepository
 		serviceRepo                *apifakes.FakeServiceRepository
 		wordGenerator              *generatorfakes.FakeWordGenerator
 		requirementsFactory        *testreq.FakeReqFactory
-		authRepo                   *authenticationfakes.FakeAuthenticationRepository
+		authRepo                   *authenticationfakes.FakeRepository
 		actor                      *actorsfakes.FakePushActor
 		appfiles                   *appfilesfakes.FakeAppFiles
 		zipper                     *appfilesfakes.FakeZipper
@@ -89,8 +89,8 @@ var _ = Describe("Push Command", func() {
 	BeforeEach(func() {
 		manifestRepo = &testmanifest.FakeManifestRepository{}
 
-		starter = new(applicationfakes.FakeApplicationStarter)
-		stopper = new(applicationfakes.FakeApplicationStopper)
+		starter = new(applicationfakes.FakeStarter)
+		stopper = new(applicationfakes.FakeStopper)
 		serviceBinder = new(servicefakes.OldFakeAppBinder)
 
 		//setup fake commands (counterfeiter) to correctly interact with commandregistry
@@ -104,7 +104,7 @@ var _ = Describe("Push Command", func() {
 		}
 		stopper.MetaDataReturns(commandregistry.CommandMetadata{Name: "stop"})
 
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 
 		domainRepo = new(apifakes.FakeDomainRepository)
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
@@ -151,7 +151,7 @@ var _ = Describe("Push Command", func() {
 
 		stackRepo = new(stacksfakes.FakeStackRepository)
 		serviceRepo = new(apifakes.FakeServiceRepository)
-		authRepo = new(authenticationfakes.FakeAuthenticationRepository)
+		authRepo = new(authenticationfakes.FakeRepository)
 		wordGenerator = new(generatorfakes.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
 

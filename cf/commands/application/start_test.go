@@ -41,16 +41,16 @@ var _ = Describe("start command", func() {
 		defaultInstanceErrorCodes []string
 		requirementsFactory       *testreq.FakeReqFactory
 		logMessages               []logs.Loggable
-		logRepo                   *logsfakes.FakeLogsRepository
+		logRepo                   *logsfakes.FakeRepository
 
 		appInstancesRepo   *appinstancesfakes.FakeAppInstancesRepository
-		appRepo            *applicationsfakes.FakeApplicationRepository
+		appRepo            *applicationsfakes.FakeRepository
 		originalAppCommand commandregistry.Command
 		deps               commandregistry.Dependency
 		displayApp         *applicationfakes.FakeAppDisplayer
 	)
 
-	updateCommandDependency := func(logsRepo logs.LogsRepository) {
+	updateCommandDependency := func(logsRepo logs.Repository) {
 		deps.UI = ui
 		deps.Config = configRepo
 		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
@@ -94,7 +94,7 @@ var _ = Describe("start command", func() {
 		configRepo = testconfig.NewRepository()
 
 		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 
 		displayApp = new(applicationfakes.FakeAppDisplayer)
 
@@ -143,7 +143,7 @@ var _ = Describe("start command", func() {
 			{instance3, instance4},
 		}
 
-		logRepo = new(logsfakes.FakeLogsRepository)
+		logRepo = new(logsfakes.FakeRepository)
 		logMessages = []logs.Loggable{}
 
 		closeWait := sync.WaitGroup{}
@@ -192,7 +192,7 @@ var _ = Describe("start command", func() {
 		return testcmd.RunCLICommandWithoutDependency("start", args, requirementsFactory, ui)
 	}
 
-	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *applicationsfakes.FakeApplicationRepository, *appinstancesfakes.FakeAppInstancesRepository) {
+	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *applicationsfakes.FakeRepository, *appinstancesfakes.FakeAppInstancesRepository) {
 		appRepo.UpdateReturns(app, nil)
 		appRepo.ReadReturns(app, nil)
 		appRepo.GetAppReturns(app, nil)
@@ -672,7 +672,7 @@ var _ = Describe("start command", func() {
 			app.Name = "my-app"
 			app.GUID = "my-app-guid"
 			app.State = "started"
-			appRepo := new(applicationsfakes.FakeApplicationRepository)
+			appRepo := new(applicationsfakes.FakeRepository)
 			appRepo.ReadReturns(app, nil)
 
 			requirementsFactory.Application = app

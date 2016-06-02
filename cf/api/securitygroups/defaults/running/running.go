@@ -10,9 +10,9 @@ import (
 
 const urlPath = "/v2/config/running_security_groups"
 
-//go:generate counterfeiter . RunningSecurityGroupsRepo
+//go:generate counterfeiter . SecurityGroupsRepo
 
-type RunningSecurityGroupsRepo interface {
+type SecurityGroupsRepo interface {
 	BindToRunningSet(string) error
 	List() ([]models.SecurityGroupFields, error)
 	UnbindFromRunningSet(string) error
@@ -22,7 +22,7 @@ type cloudControllerRunningSecurityGroupRepo struct {
 	repoBase DefaultSecurityGroupsRepoBase
 }
 
-func NewRunningSecurityGroupsRepo(configRepo coreconfig.Reader, gateway net.Gateway) RunningSecurityGroupsRepo {
+func NewSecurityGroupsRepo(configRepo coreconfig.Reader, gateway net.Gateway) SecurityGroupsRepo {
 	return &cloudControllerRunningSecurityGroupRepo{
 		repoBase: DefaultSecurityGroupsRepoBase{
 			ConfigRepo: configRepo,

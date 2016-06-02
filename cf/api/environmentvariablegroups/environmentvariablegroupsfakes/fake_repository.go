@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeEnvironmentVariableGroupsRepository struct {
+type FakeRepository struct {
 	ListRunningStub        func() (variables []models.EnvironmentVariable, apiErr error)
 	listRunningMutex       sync.RWMutex
 	listRunningArgsForCall []struct{}
@@ -41,7 +41,7 @@ type FakeEnvironmentVariableGroupsRepository struct {
 	}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
+func (fake *FakeRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
 	fake.listRunningMutex.Lock()
 	fake.listRunningArgsForCall = append(fake.listRunningArgsForCall, struct{}{})
 	fake.listRunningMutex.Unlock()
@@ -52,13 +52,13 @@ func (fake *FakeEnvironmentVariableGroupsRepository) ListRunning() (variables []
 	}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) ListRunningCallCount() int {
+func (fake *FakeRepository) ListRunningCallCount() int {
 	fake.listRunningMutex.RLock()
 	defer fake.listRunningMutex.RUnlock()
 	return len(fake.listRunningArgsForCall)
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) ListRunningReturns(result1 []models.EnvironmentVariable, result2 error) {
+func (fake *FakeRepository) ListRunningReturns(result1 []models.EnvironmentVariable, result2 error) {
 	fake.ListRunningStub = nil
 	fake.listRunningReturns = struct {
 		result1 []models.EnvironmentVariable
@@ -66,7 +66,7 @@ func (fake *FakeEnvironmentVariableGroupsRepository) ListRunningReturns(result1 
 	}{result1, result2}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
+func (fake *FakeRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
 	fake.listStagingMutex.Lock()
 	fake.listStagingArgsForCall = append(fake.listStagingArgsForCall, struct{}{})
 	fake.listStagingMutex.Unlock()
@@ -77,13 +77,13 @@ func (fake *FakeEnvironmentVariableGroupsRepository) ListStaging() (variables []
 	}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) ListStagingCallCount() int {
+func (fake *FakeRepository) ListStagingCallCount() int {
 	fake.listStagingMutex.RLock()
 	defer fake.listStagingMutex.RUnlock()
 	return len(fake.listStagingArgsForCall)
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) ListStagingReturns(result1 []models.EnvironmentVariable, result2 error) {
+func (fake *FakeRepository) ListStagingReturns(result1 []models.EnvironmentVariable, result2 error) {
 	fake.ListStagingStub = nil
 	fake.listStagingReturns = struct {
 		result1 []models.EnvironmentVariable
@@ -91,7 +91,7 @@ func (fake *FakeEnvironmentVariableGroupsRepository) ListStagingReturns(result1 
 	}{result1, result2}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetStaging(arg1 string) error {
+func (fake *FakeRepository) SetStaging(arg1 string) error {
 	fake.setStagingMutex.Lock()
 	fake.setStagingArgsForCall = append(fake.setStagingArgsForCall, struct {
 		arg1 string
@@ -104,26 +104,26 @@ func (fake *FakeEnvironmentVariableGroupsRepository) SetStaging(arg1 string) err
 	}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetStagingCallCount() int {
+func (fake *FakeRepository) SetStagingCallCount() int {
 	fake.setStagingMutex.RLock()
 	defer fake.setStagingMutex.RUnlock()
 	return len(fake.setStagingArgsForCall)
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetStagingArgsForCall(i int) string {
+func (fake *FakeRepository) SetStagingArgsForCall(i int) string {
 	fake.setStagingMutex.RLock()
 	defer fake.setStagingMutex.RUnlock()
 	return fake.setStagingArgsForCall[i].arg1
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetStagingReturns(result1 error) {
+func (fake *FakeRepository) SetStagingReturns(result1 error) {
 	fake.SetStagingStub = nil
 	fake.setStagingReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetRunning(arg1 string) error {
+func (fake *FakeRepository) SetRunning(arg1 string) error {
 	fake.setRunningMutex.Lock()
 	fake.setRunningArgsForCall = append(fake.setRunningArgsForCall, struct {
 		arg1 string
@@ -136,23 +136,23 @@ func (fake *FakeEnvironmentVariableGroupsRepository) SetRunning(arg1 string) err
 	}
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetRunningCallCount() int {
+func (fake *FakeRepository) SetRunningCallCount() int {
 	fake.setRunningMutex.RLock()
 	defer fake.setRunningMutex.RUnlock()
 	return len(fake.setRunningArgsForCall)
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetRunningArgsForCall(i int) string {
+func (fake *FakeRepository) SetRunningArgsForCall(i int) string {
 	fake.setRunningMutex.RLock()
 	defer fake.setRunningMutex.RUnlock()
 	return fake.setRunningArgsForCall[i].arg1
 }
 
-func (fake *FakeEnvironmentVariableGroupsRepository) SetRunningReturns(result1 error) {
+func (fake *FakeRepository) SetRunningReturns(result1 error) {
 	fake.SetRunningStub = nil
 	fake.setRunningReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ environmentvariablegroups.EnvironmentVariableGroupsRepository = new(FakeEnvironmentVariableGroupsRepository)
+var _ environmentvariablegroups.Repository = new(FakeRepository)

@@ -14,11 +14,11 @@ type ApplicationRequirement interface {
 
 type applicationAPIRequirement struct {
 	name        string
-	appRepo     applications.ApplicationRepository
+	appRepo     applications.Repository
 	application models.Application
 }
 
-func NewApplicationRequirement(name string, aR applications.ApplicationRepository) *applicationAPIRequirement {
+func NewApplicationRequirement(name string, aR applications.Repository) *applicationAPIRequirement {
 	req := &applicationAPIRequirement{}
 	req.name = name
 	req.appRepo = aR

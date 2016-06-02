@@ -13,9 +13,9 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
-//go:generate counterfeiter . AppManifest
+//go:generate counterfeiter . App
 
-type AppManifest interface {
+type App interface {
 	BuildpackURL(string, string)
 	DiskQuota(string, int64)
 	Memory(string, int64)
@@ -31,7 +31,7 @@ type AppManifest interface {
 	Save(f io.Writer) error
 }
 
-type ManifestApplication struct {
+type Application struct {
 	Name       string                 `yaml:"name"`
 	Instances  int                    `yaml:"instances,omitempty"`
 	Memory     string                 `yaml:"memory,omitempty"`
@@ -51,15 +51,15 @@ type ManifestApplication struct {
 	Timeout    int                    `yaml:"timeout,omitempty"`
 }
 
-type ManifestApplications struct {
-	Applications []ManifestApplication `yaml:"applications"`
+type Applications struct {
+	Applications []Application `yaml:"applications"`
 }
 
 type appManifest struct {
 	contents []models.Application
 }
 
-func NewGenerator() AppManifest {
+func NewGenerator() App {
 	return &appManifest{}
 }
 
@@ -132,21 +132,21 @@ func (m *appManifest) GetContents() []models.Application {
 	return m.contents
 }
 
-func generateAppMap(app models.Application) (ManifestApplication, error) {
+func generateAppMap(app models.Application) (Application, error) {
 	if app.Stack == nil {
-		return ManifestApplication{}, errors.New(T("required attribute 'stack' missing"))
+		return Application{}, errors.New(T("required attribute 'stack' missing"))
 	}
 
 	if app.Memory == 0 {
-		return ManifestApplication{}, errors.New(T("required attribute 'memory' missing"))
+		return Application{}, errors.New(T("required attribute 'memory' missing"))
 	}
 
 	if app.DiskQuota == 0 {
-		return ManifestApplication{}, errors.New(T("required attribute 'disk_quota' missing"))
+		return Application{}, errors.New(T("required attribute 'disk_quota' missing"))
 	}
 
 	if app.InstanceCount == 0 {
-		return ManifestApplication{}, errors.New(T("required attribute 'instances' missing"))
+		return Application{}, errors.New(T("required attribute 'instances' missing"))
 	}
 
 	var services []string
@@ -154,7 +154,7 @@ func generateAppMap(app models.Application) (ManifestApplication, error) {
 		services = append(services, s.Name)
 	}
 
-	m := ManifestApplication{
+	m := Application{
 		Name:      app.Name,
 		Services:  services,
 		Buildpack: app.BuildpackURL,
@@ -206,7 +206,7 @@ func generateAppMap(app models.Application) (ManifestApplication, error) {
 }
 
 func (m *appManifest) Save(f io.Writer) error {
-	apps := ManifestApplications{}
+	apps := Applications{}
 
 	for _, app := range m.contents {
 		appMap, mapErr := generateAppMap(app)

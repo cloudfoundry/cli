@@ -18,7 +18,7 @@ type DisableSSH struct {
 	ui      terminal.UI
 	config  coreconfig.Reader
 	appReq  requirements.ApplicationRequirement
-	appRepo applications.ApplicationRepository
+	appRepo applications.Repository
 }
 
 func init() {

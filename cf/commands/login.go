@@ -23,7 +23,7 @@ const maxChoices = 50
 type Login struct {
 	ui            terminal.UI
 	config        coreconfig.ReadWriter
-	authenticator authentication.AuthenticationRepository
+	authenticator authentication.Repository
 	endpointRepo  coreconfig.EndpointRepository
 	orgRepo       organizations.OrganizationRepository
 	spaceRepo     spaces.SpaceRepository

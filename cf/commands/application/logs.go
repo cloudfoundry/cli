@@ -16,7 +16,7 @@ import (
 
 type Logs struct {
 	ui       terminal.UI
-	logsRepo logs.LogsRepository
+	logsRepo logs.Repository
 	config   coreconfig.Reader
 	appReq   requirements.ApplicationRequirement
 }

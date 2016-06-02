@@ -33,9 +33,9 @@ type InstanceStatsAPIResponse struct {
 	}
 }
 
-//go:generate counterfeiter . AppInstancesRepository
+//go:generate counterfeiter . Repository
 
-type AppInstancesRepository interface {
+type Repository interface {
 	GetInstances(appGUID string) (instances []models.AppInstanceFields, apiErr error)
 	DeleteInstance(appGUID string, instance int) error
 }

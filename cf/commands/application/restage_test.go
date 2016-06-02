@@ -21,7 +21,7 @@ var _ = Describe("restage command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		stagingWatcher      *fakeStagingWatcher
@@ -46,7 +46,7 @@ var _ = Describe("restage command", func() {
 		app = models.Application{}
 		app.Name = "my-app"
 		app.PackageState = "STAGED"
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -133,7 +133,7 @@ type fakeStagingWatcher struct {
 	spaceName string
 }
 
-func (f *fakeStagingWatcher) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
+func (f *fakeStagingWatcher) WatchStaging(app models.Application, orgName, spaceName string, start func(models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
 	f.watched = app
 	f.orgName = orgName
 	f.spaceName = spaceName

@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeStagingSecurityGroupsRepo struct {
+type FakeSecurityGroupsRepo struct {
 	BindToStagingSetStub        func(string) error
 	bindToStagingSetMutex       sync.RWMutex
 	bindToStagingSetArgsForCall []struct {
@@ -35,7 +35,7 @@ type FakeStagingSecurityGroupsRepo struct {
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSet(arg1 string) error {
+func (fake *FakeSecurityGroupsRepo) BindToStagingSet(arg1 string) error {
 	fake.bindToStagingSetMutex.Lock()
 	fake.bindToStagingSetArgsForCall = append(fake.bindToStagingSetArgsForCall, struct {
 		arg1 string
@@ -48,26 +48,26 @@ func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSet(arg1 string) error {
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSetCallCount() int {
+func (fake *FakeSecurityGroupsRepo) BindToStagingSetCallCount() int {
 	fake.bindToStagingSetMutex.RLock()
 	defer fake.bindToStagingSetMutex.RUnlock()
 	return len(fake.bindToStagingSetArgsForCall)
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSetArgsForCall(i int) string {
+func (fake *FakeSecurityGroupsRepo) BindToStagingSetArgsForCall(i int) string {
 	fake.bindToStagingSetMutex.RLock()
 	defer fake.bindToStagingSetMutex.RUnlock()
 	return fake.bindToStagingSetArgsForCall[i].arg1
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) BindToStagingSetReturns(result1 error) {
+func (fake *FakeSecurityGroupsRepo) BindToStagingSetReturns(result1 error) {
 	fake.BindToStagingSetStub = nil
 	fake.bindToStagingSetReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error) {
+func (fake *FakeSecurityGroupsRepo) List() ([]models.SecurityGroupFields, error) {
 	fake.listMutex.Lock()
 	fake.listArgsForCall = append(fake.listArgsForCall, struct{}{})
 	fake.listMutex.Unlock()
@@ -78,13 +78,13 @@ func (fake *FakeStagingSecurityGroupsRepo) List() ([]models.SecurityGroupFields,
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) ListCallCount() int {
+func (fake *FakeSecurityGroupsRepo) ListCallCount() int {
 	fake.listMutex.RLock()
 	defer fake.listMutex.RUnlock()
 	return len(fake.listArgsForCall)
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) ListReturns(result1 []models.SecurityGroupFields, result2 error) {
+func (fake *FakeSecurityGroupsRepo) ListReturns(result1 []models.SecurityGroupFields, result2 error) {
 	fake.ListStub = nil
 	fake.listReturns = struct {
 		result1 []models.SecurityGroupFields
@@ -92,7 +92,7 @@ func (fake *FakeStagingSecurityGroupsRepo) ListReturns(result1 []models.Security
 	}{result1, result2}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSet(arg1 string) error {
+func (fake *FakeSecurityGroupsRepo) UnbindFromStagingSet(arg1 string) error {
 	fake.unbindFromStagingSetMutex.Lock()
 	fake.unbindFromStagingSetArgsForCall = append(fake.unbindFromStagingSetArgsForCall, struct {
 		arg1 string
@@ -105,23 +105,23 @@ func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSet(arg1 string) err
 	}
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSetCallCount() int {
+func (fake *FakeSecurityGroupsRepo) UnbindFromStagingSetCallCount() int {
 	fake.unbindFromStagingSetMutex.RLock()
 	defer fake.unbindFromStagingSetMutex.RUnlock()
 	return len(fake.unbindFromStagingSetArgsForCall)
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSetArgsForCall(i int) string {
+func (fake *FakeSecurityGroupsRepo) UnbindFromStagingSetArgsForCall(i int) string {
 	fake.unbindFromStagingSetMutex.RLock()
 	defer fake.unbindFromStagingSetMutex.RUnlock()
 	return fake.unbindFromStagingSetArgsForCall[i].arg1
 }
 
-func (fake *FakeStagingSecurityGroupsRepo) UnbindFromStagingSetReturns(result1 error) {
+func (fake *FakeSecurityGroupsRepo) UnbindFromStagingSetReturns(result1 error) {
 	fake.UnbindFromStagingSetStub = nil
 	fake.unbindFromStagingSetReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ staging.StagingSecurityGroupsRepo = new(FakeStagingSecurityGroupsRepo)
+var _ staging.SecurityGroupsRepo = new(FakeSecurityGroupsRepo)

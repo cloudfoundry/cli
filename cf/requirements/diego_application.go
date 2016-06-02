@@ -17,12 +17,12 @@ type DiegoApplicationRequirement interface {
 type diegoApplicationRequirement struct {
 	appName string
 	ui      terminal.UI
-	appRepo applications.ApplicationRepository
+	appRepo applications.Repository
 
 	application models.Application
 }
 
-func NewDiegoApplicationRequirement(name string, applicationRepo applications.ApplicationRepository) DiegoApplicationRequirement {
+func NewDiegoApplicationRequirement(name string, applicationRepo applications.Repository) DiegoApplicationRequirement {
 	return &diegoApplicationRequirement{
 		appName: name,
 		appRepo: applicationRepo,

@@ -15,13 +15,13 @@ import (
 var _ = Describe("DiegoApplication", func() {
 	var (
 		req     requirements.DiegoApplicationRequirement
-		appRepo *applicationsfakes.FakeApplicationRepository
+		appRepo *applicationsfakes.FakeRepository
 		appName string
 	)
 
 	BeforeEach(func() {
 		appName = "fake-app-name"
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		req = requirements.NewDiegoApplicationRequirement(appName, appRepo)
 	})
 

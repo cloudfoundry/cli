@@ -20,7 +20,7 @@ var _ = Describe("env command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		app                 models.Application
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		appRepo             *applicationsfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		requirementsFactory *testreq.FakeReqFactory
 		deps                commandregistry.Dependency
@@ -38,7 +38,7 @@ var _ = Describe("env command", func() {
 
 		app = models.Application{}
 		app.Name = "my-app"
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		appRepo.ReadReturns(app, nil)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()

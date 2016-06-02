@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 )
 
-type FakeAuthenticationRepository struct {
+type FakeRepository struct {
 	DumpRequestStub        func(*http.Request)
 	dumpRequestMutex       sync.RWMutex
 	dumpRequestArgsForCall []struct {
@@ -53,7 +53,7 @@ type FakeAuthenticationRepository struct {
 	}
 }
 
-func (fake *FakeAuthenticationRepository) DumpRequest(arg1 *http.Request) {
+func (fake *FakeRepository) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestMutex.Lock()
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
@@ -64,19 +64,19 @@ func (fake *FakeAuthenticationRepository) DumpRequest(arg1 *http.Request) {
 	}
 }
 
-func (fake *FakeAuthenticationRepository) DumpRequestCallCount() int {
+func (fake *FakeRepository) DumpRequestCallCount() int {
 	fake.dumpRequestMutex.RLock()
 	defer fake.dumpRequestMutex.RUnlock()
 	return len(fake.dumpRequestArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) DumpRequestArgsForCall(i int) *http.Request {
+func (fake *FakeRepository) DumpRequestArgsForCall(i int) *http.Request {
 	fake.dumpRequestMutex.RLock()
 	defer fake.dumpRequestMutex.RUnlock()
 	return fake.dumpRequestArgsForCall[i].arg1
 }
 
-func (fake *FakeAuthenticationRepository) DumpResponse(arg1 *http.Response) {
+func (fake *FakeRepository) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseMutex.Lock()
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
@@ -87,19 +87,19 @@ func (fake *FakeAuthenticationRepository) DumpResponse(arg1 *http.Response) {
 	}
 }
 
-func (fake *FakeAuthenticationRepository) DumpResponseCallCount() int {
+func (fake *FakeRepository) DumpResponseCallCount() int {
 	fake.dumpResponseMutex.RLock()
 	defer fake.dumpResponseMutex.RUnlock()
 	return len(fake.dumpResponseArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) DumpResponseArgsForCall(i int) *http.Response {
+func (fake *FakeRepository) DumpResponseArgsForCall(i int) *http.Response {
 	fake.dumpResponseMutex.RLock()
 	defer fake.dumpResponseMutex.RUnlock()
 	return fake.dumpResponseArgsForCall[i].arg1
 }
 
-func (fake *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
+func (fake *FakeRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
 	fake.refreshAuthTokenMutex.Lock()
 	fake.refreshAuthTokenArgsForCall = append(fake.refreshAuthTokenArgsForCall, struct{}{})
 	fake.refreshAuthTokenMutex.Unlock()
@@ -110,13 +110,13 @@ func (fake *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken strin
 	}
 }
 
-func (fake *FakeAuthenticationRepository) RefreshAuthTokenCallCount() int {
+func (fake *FakeRepository) RefreshAuthTokenCallCount() int {
 	fake.refreshAuthTokenMutex.RLock()
 	defer fake.refreshAuthTokenMutex.RUnlock()
 	return len(fake.refreshAuthTokenArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) RefreshAuthTokenReturns(result1 string, result2 error) {
+func (fake *FakeRepository) RefreshAuthTokenReturns(result1 string, result2 error) {
 	fake.RefreshAuthTokenStub = nil
 	fake.refreshAuthTokenReturns = struct {
 		result1 string
@@ -124,7 +124,7 @@ func (fake *FakeAuthenticationRepository) RefreshAuthTokenReturns(result1 string
 	}{result1, result2}
 }
 
-func (fake *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr error) {
+func (fake *FakeRepository) Authenticate(credentials map[string]string) (apiErr error) {
 	fake.authenticateMutex.Lock()
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
 		credentials map[string]string
@@ -137,26 +137,26 @@ func (fake *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 	}
 }
 
-func (fake *FakeAuthenticationRepository) AuthenticateCallCount() int {
+func (fake *FakeRepository) AuthenticateCallCount() int {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
 	return len(fake.authenticateArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) AuthenticateArgsForCall(i int) map[string]string {
+func (fake *FakeRepository) AuthenticateArgsForCall(i int) map[string]string {
 	fake.authenticateMutex.RLock()
 	defer fake.authenticateMutex.RUnlock()
 	return fake.authenticateArgsForCall[i].credentials
 }
 
-func (fake *FakeAuthenticationRepository) AuthenticateReturns(result1 error) {
+func (fake *FakeRepository) AuthenticateReturns(result1 error) {
 	fake.AuthenticateStub = nil
 	fake.authenticateReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeAuthenticationRepository) Authorize(token string) (string, error) {
+func (fake *FakeRepository) Authorize(token string) (string, error) {
 	fake.authorizeMutex.Lock()
 	fake.authorizeArgsForCall = append(fake.authorizeArgsForCall, struct {
 		token string
@@ -169,19 +169,19 @@ func (fake *FakeAuthenticationRepository) Authorize(token string) (string, error
 	}
 }
 
-func (fake *FakeAuthenticationRepository) AuthorizeCallCount() int {
+func (fake *FakeRepository) AuthorizeCallCount() int {
 	fake.authorizeMutex.RLock()
 	defer fake.authorizeMutex.RUnlock()
 	return len(fake.authorizeArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) AuthorizeArgsForCall(i int) string {
+func (fake *FakeRepository) AuthorizeArgsForCall(i int) string {
 	fake.authorizeMutex.RLock()
 	defer fake.authorizeMutex.RUnlock()
 	return fake.authorizeArgsForCall[i].token
 }
 
-func (fake *FakeAuthenticationRepository) AuthorizeReturns(result1 string, result2 error) {
+func (fake *FakeRepository) AuthorizeReturns(result1 string, result2 error) {
 	fake.AuthorizeStub = nil
 	fake.authorizeReturns = struct {
 		result1 string
@@ -189,7 +189,7 @@ func (fake *FakeAuthenticationRepository) AuthorizeReturns(result1 string, resul
 	}{result1, result2}
 }
 
-func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error) {
+func (fake *FakeRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error) {
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Lock()
 	fake.getLoginPromptsAndSaveUAAServerURLArgsForCall = append(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall, struct{}{})
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Unlock()
@@ -200,13 +200,13 @@ func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (
 	}
 }
 
-func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURLCallCount() int {
+func (fake *FakeRepository) GetLoginPromptsAndSaveUAAServerURLCallCount() int {
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.RLock()
 	defer fake.getLoginPromptsAndSaveUAAServerURLMutex.RUnlock()
 	return len(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall)
 }
 
-func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURLReturns(result1 map[string]coreconfig.AuthPrompt, result2 error) {
+func (fake *FakeRepository) GetLoginPromptsAndSaveUAAServerURLReturns(result1 map[string]coreconfig.AuthPrompt, result2 error) {
 	fake.GetLoginPromptsAndSaveUAAServerURLStub = nil
 	fake.getLoginPromptsAndSaveUAAServerURLReturns = struct {
 		result1 map[string]coreconfig.AuthPrompt
@@ -214,4 +214,4 @@ func (fake *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURLRetu
 	}{result1, result2}
 }
 
-var _ authentication.AuthenticationRepository = new(FakeAuthenticationRepository)
+var _ authentication.Repository = new(FakeRepository)

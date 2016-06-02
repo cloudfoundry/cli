@@ -10,10 +10,10 @@ import (
 )
 
 var _ = Describe("ApplicationRequirement", func() {
-	var appRepo *applicationsfakes.FakeApplicationRepository
+	var appRepo *applicationsfakes.FakeRepository
 
 	BeforeEach(func() {
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 	})
 
 	It("succeeds when an app with the given name exists", func() {

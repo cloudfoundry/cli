@@ -9,27 +9,27 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter . EnvironmentVariableGroupsRepository
+//go:generate counterfeiter . Repository
 
-type EnvironmentVariableGroupsRepository interface {
+type Repository interface {
 	ListRunning() (variables []models.EnvironmentVariable, apiErr error)
 	ListStaging() (variables []models.EnvironmentVariable, apiErr error)
 	SetStaging(string) error
 	SetRunning(string) error
 }
 
-type CloudControllerEnvironmentVariableGroupsRepository struct {
+type CloudControllerRepository struct {
 	config  coreconfig.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerEnvironmentVariableGroupsRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerEnvironmentVariableGroupsRepository) {
+func NewCloudControllerRepository(config coreconfig.Reader, gateway net.Gateway) (repo CloudControllerRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
+func (repo CloudControllerRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
 	var rawResponse interface{}
 	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/running", repo.config.APIEndpoint())
 	apiErr = repo.gateway.GetResource(url, &rawResponse)
@@ -45,7 +45,7 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListRunning() (va
 	return variables, nil
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
+func (repo CloudControllerRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
 	var rawResponse interface{}
 	url := fmt.Sprintf("%s/v2/config/environment_variable_groups/staging", repo.config.APIEndpoint())
 	apiErr = repo.gateway.GetResource(url, &rawResponse)
@@ -61,15 +61,15 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) ListStaging() (va
 	return variables, nil
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) SetStaging(stagingVars string) error {
+func (repo CloudControllerRepository) SetStaging(stagingVars string) error {
 	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/staging", strings.NewReader(stagingVars))
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) SetRunning(runningVars string) error {
+func (repo CloudControllerRepository) SetRunning(runningVars string) error {
 	return repo.gateway.UpdateResource(repo.config.APIEndpoint(), "/v2/config/environment_variable_groups/running", strings.NewReader(runningVars))
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironmentVariables(rawResponse interface{}) ([]models.EnvironmentVariable, error) {
+func (repo CloudControllerRepository) marshalToEnvironmentVariables(rawResponse interface{}) ([]models.EnvironmentVariable, error) {
 	var variables []models.EnvironmentVariable
 	for key, value := range rawResponse.(map[string]interface{}) {
 		stringvalue, err := repo.convertValueToString(value)
@@ -82,7 +82,7 @@ func (repo CloudControllerEnvironmentVariableGroupsRepository) marshalToEnvironm
 	return variables, nil
 }
 
-func (repo CloudControllerEnvironmentVariableGroupsRepository) convertValueToString(value interface{}) (string, error) {
+func (repo CloudControllerRepository) convertValueToString(value interface{}) (string, error) {
 	stringvalue, ok := value.(string)
 	if !ok {
 		floatvalue, ok := value.(float64)

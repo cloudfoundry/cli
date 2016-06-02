@@ -35,7 +35,7 @@ var _ = Describe("Gateway", func() {
 		ccGateway   Gateway
 		uaaGateway  Gateway
 		config      coreconfig.ReadWriter
-		authRepo    authentication.AuthenticationRepository
+		authRepo    authentication.Repository
 		currentTime time.Time
 		clock       func() time.Time
 
@@ -673,7 +673,7 @@ func refreshTokenAPIEndPoint(unauthorizedBody string, secondReqResp testnet.Test
 	}
 }
 
-func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (coreconfig.ReadWriter, authentication.AuthenticationRepository) {
+func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (coreconfig.ReadWriter, authentication.Repository) {
 	config := testconfig.NewRepository()
 	config.SetAuthenticationEndpoint(authServer.URL)
 	config.SetAPIEndpoint(apiServer.URL)
@@ -685,7 +685,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 
 	fakePrinter := new(tracefakes.FakePrinter)
 	dumper := NewRequestDumper(fakePrinter)
-	authenticator := authentication.NewUAAAuthenticationRepository(authGateway, config, dumper)
+	authenticator := authentication.NewUAARepository(authGateway, config, dumper)
 
 	return config, authenticator
 }

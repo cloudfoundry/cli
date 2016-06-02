@@ -17,7 +17,7 @@ type RestartAppInstance struct {
 	ui               terminal.UI
 	config           coreconfig.Reader
 	appReq           requirements.ApplicationRequirement
-	appInstancesRepo appinstances.AppInstancesRepository
+	appInstancesRepo appinstances.Repository
 }
 
 func init() {

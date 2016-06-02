@@ -15,7 +15,7 @@ import (
 type SetEnv struct {
 	ui      terminal.UI
 	config  coreconfig.Reader
-	appRepo applications.ApplicationRepository
+	appRepo applications.Repository
 	appReq  requirements.ApplicationRequirement
 }
 

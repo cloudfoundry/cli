@@ -15,7 +15,7 @@ import (
 type Files struct {
 	ui           terminal.UI
 	config       coreconfig.Reader
-	appFilesRepo appfiles.AppFilesRepository
+	appFilesRepo appfiles.Repository
 	appReq       requirements.DEAApplicationRequirement
 }
 

@@ -18,7 +18,7 @@ type ShowService struct {
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 	pluginModel        *plugin_models.GetService_Model
 	pluginCall         bool
-	appRepo            applications.ApplicationRepository
+	appRepo            applications.Repository
 }
 
 func init() {

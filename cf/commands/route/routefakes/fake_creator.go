@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeRouteCreator struct {
+type FakeCreator struct {
 	CreateRouteStub        func(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 	createRouteMutex       sync.RWMutex
 	createRouteArgsForCall []struct {
@@ -25,7 +25,7 @@ type FakeRouteCreator struct {
 	}
 }
 
-func (fake *FakeRouteCreator) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
+func (fake *FakeCreator) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
 	fake.createRouteMutex.Lock()
 	fake.createRouteArgsForCall = append(fake.createRouteArgsForCall, struct {
 		hostName   string
@@ -43,19 +43,19 @@ func (fake *FakeRouteCreator) CreateRoute(hostName string, path string, port int
 	}
 }
 
-func (fake *FakeRouteCreator) CreateRouteCallCount() int {
+func (fake *FakeCreator) CreateRouteCallCount() int {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	return len(fake.createRouteArgsForCall)
 }
 
-func (fake *FakeRouteCreator) CreateRouteArgsForCall(i int) (string, string, int, bool, models.DomainFields, models.SpaceFields) {
+func (fake *FakeCreator) CreateRouteArgsForCall(i int) (string, string, int, bool, models.DomainFields, models.SpaceFields) {
 	fake.createRouteMutex.RLock()
 	defer fake.createRouteMutex.RUnlock()
 	return fake.createRouteArgsForCall[i].hostName, fake.createRouteArgsForCall[i].path, fake.createRouteArgsForCall[i].port, fake.createRouteArgsForCall[i].randomPort, fake.createRouteArgsForCall[i].domain, fake.createRouteArgsForCall[i].space
 }
 
-func (fake *FakeRouteCreator) CreateRouteReturns(result1 models.Route, result2 error) {
+func (fake *FakeCreator) CreateRouteReturns(result1 models.Route, result2 error) {
 	fake.CreateRouteStub = nil
 	fake.createRouteReturns = struct {
 		result1 models.Route
@@ -63,4 +63,4 @@ func (fake *FakeRouteCreator) CreateRouteReturns(result1 models.Route, result2 e
 	}{result1, result2}
 }
 
-var _ route.RouteCreator = new(FakeRouteCreator)
+var _ route.Creator = new(FakeCreator)

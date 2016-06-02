@@ -16,11 +16,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
+var _ = Describe("CloudControllerRepository", func() {
 	var (
 		ccServer   *ghttp.Server
 		configRepo coreconfig.ReadWriter
-		repo       environmentvariablegroups.CloudControllerEnvironmentVariableGroupsRepository
+		repo       environmentvariablegroups.CloudControllerRepository
 	)
 
 	BeforeEach(func() {
@@ -28,7 +28,7 @@ var _ = Describe("CloudControllerEnvironmentVariableGroupsRepository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAPIEndpoint(ccServer.URL())
 		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-		repo = environmentvariablegroups.NewCloudControllerEnvironmentVariableGroupsRepository(configRepo, gateway)
+		repo = environmentvariablegroups.NewCloudControllerRepository(configRepo, gateway)
 	})
 
 	AfterEach(func() {

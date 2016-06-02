@@ -22,7 +22,7 @@ var _ = Describe("disable-service-access command", func() {
 		ui                  *testterm.FakeUI
 		actor               *actorsfakes.FakeServicePlanActor
 		requirementsFactory *testreq.FakeReqFactory
-		tokenRefresher      *authenticationfakes.FakeAuthenticationRepository
+		tokenRefresher      *authenticationfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -42,7 +42,7 @@ var _ = Describe("disable-service-access command", func() {
 		configRepo = configuration.NewRepositoryWithDefaults()
 		actor = new(actorsfakes.FakeServicePlanActor)
 		requirementsFactory = &testreq.FakeReqFactory{}
-		tokenRefresher = new(authenticationfakes.FakeAuthenticationRepository)
+		tokenRefresher = new(authenticationfakes.FakeRepository)
 	})
 
 	runCommand := func(args []string) bool {

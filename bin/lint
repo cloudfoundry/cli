@@ -20,5 +20,4 @@ golint ./... \
             && !/comment on exported type .+ should be of the form/ \
             && !/returns unexported type/ \
             && !/should not use dot imports/ \
-            && !/and that stutters/ \
         " # https://www.pivotaltracker.com/story/show/105609756

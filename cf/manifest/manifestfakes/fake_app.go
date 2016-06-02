@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeAppManifest struct {
+type FakeApp struct {
 	BuildpackURLStub        func(string, string)
 	buildpackURLMutex       sync.RWMutex
 	buildpackURLArgsForCall []struct {
@@ -94,7 +94,7 @@ type FakeAppManifest struct {
 	}
 }
 
-func (fake *FakeAppManifest) BuildpackURL(arg1 string, arg2 string) {
+func (fake *FakeApp) BuildpackURL(arg1 string, arg2 string) {
 	fake.buildpackURLMutex.Lock()
 	fake.buildpackURLArgsForCall = append(fake.buildpackURLArgsForCall, struct {
 		arg1 string
@@ -106,19 +106,19 @@ func (fake *FakeAppManifest) BuildpackURL(arg1 string, arg2 string) {
 	}
 }
 
-func (fake *FakeAppManifest) BuildpackURLCallCount() int {
+func (fake *FakeApp) BuildpackURLCallCount() int {
 	fake.buildpackURLMutex.RLock()
 	defer fake.buildpackURLMutex.RUnlock()
 	return len(fake.buildpackURLArgsForCall)
 }
 
-func (fake *FakeAppManifest) BuildpackURLArgsForCall(i int) (string, string) {
+func (fake *FakeApp) BuildpackURLArgsForCall(i int) (string, string) {
 	fake.buildpackURLMutex.RLock()
 	defer fake.buildpackURLMutex.RUnlock()
 	return fake.buildpackURLArgsForCall[i].arg1, fake.buildpackURLArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) DiskQuota(arg1 string, arg2 int64) {
+func (fake *FakeApp) DiskQuota(arg1 string, arg2 int64) {
 	fake.diskQuotaMutex.Lock()
 	fake.diskQuotaArgsForCall = append(fake.diskQuotaArgsForCall, struct {
 		arg1 string
@@ -130,19 +130,19 @@ func (fake *FakeAppManifest) DiskQuota(arg1 string, arg2 int64) {
 	}
 }
 
-func (fake *FakeAppManifest) DiskQuotaCallCount() int {
+func (fake *FakeApp) DiskQuotaCallCount() int {
 	fake.diskQuotaMutex.RLock()
 	defer fake.diskQuotaMutex.RUnlock()
 	return len(fake.diskQuotaArgsForCall)
 }
 
-func (fake *FakeAppManifest) DiskQuotaArgsForCall(i int) (string, int64) {
+func (fake *FakeApp) DiskQuotaArgsForCall(i int) (string, int64) {
 	fake.diskQuotaMutex.RLock()
 	defer fake.diskQuotaMutex.RUnlock()
 	return fake.diskQuotaArgsForCall[i].arg1, fake.diskQuotaArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) Memory(arg1 string, arg2 int64) {
+func (fake *FakeApp) Memory(arg1 string, arg2 int64) {
 	fake.memoryMutex.Lock()
 	fake.memoryArgsForCall = append(fake.memoryArgsForCall, struct {
 		arg1 string
@@ -154,19 +154,19 @@ func (fake *FakeAppManifest) Memory(arg1 string, arg2 int64) {
 	}
 }
 
-func (fake *FakeAppManifest) MemoryCallCount() int {
+func (fake *FakeApp) MemoryCallCount() int {
 	fake.memoryMutex.RLock()
 	defer fake.memoryMutex.RUnlock()
 	return len(fake.memoryArgsForCall)
 }
 
-func (fake *FakeAppManifest) MemoryArgsForCall(i int) (string, int64) {
+func (fake *FakeApp) MemoryArgsForCall(i int) (string, int64) {
 	fake.memoryMutex.RLock()
 	defer fake.memoryMutex.RUnlock()
 	return fake.memoryArgsForCall[i].arg1, fake.memoryArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) Service(arg1 string, arg2 string) {
+func (fake *FakeApp) Service(arg1 string, arg2 string) {
 	fake.serviceMutex.Lock()
 	fake.serviceArgsForCall = append(fake.serviceArgsForCall, struct {
 		arg1 string
@@ -178,19 +178,19 @@ func (fake *FakeAppManifest) Service(arg1 string, arg2 string) {
 	}
 }
 
-func (fake *FakeAppManifest) ServiceCallCount() int {
+func (fake *FakeApp) ServiceCallCount() int {
 	fake.serviceMutex.RLock()
 	defer fake.serviceMutex.RUnlock()
 	return len(fake.serviceArgsForCall)
 }
 
-func (fake *FakeAppManifest) ServiceArgsForCall(i int) (string, string) {
+func (fake *FakeApp) ServiceArgsForCall(i int) (string, string) {
 	fake.serviceMutex.RLock()
 	defer fake.serviceMutex.RUnlock()
 	return fake.serviceArgsForCall[i].arg1, fake.serviceArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) StartCommand(arg1 string, arg2 string) {
+func (fake *FakeApp) StartCommand(arg1 string, arg2 string) {
 	fake.startCommandMutex.Lock()
 	fake.startCommandArgsForCall = append(fake.startCommandArgsForCall, struct {
 		arg1 string
@@ -202,19 +202,19 @@ func (fake *FakeAppManifest) StartCommand(arg1 string, arg2 string) {
 	}
 }
 
-func (fake *FakeAppManifest) StartCommandCallCount() int {
+func (fake *FakeApp) StartCommandCallCount() int {
 	fake.startCommandMutex.RLock()
 	defer fake.startCommandMutex.RUnlock()
 	return len(fake.startCommandArgsForCall)
 }
 
-func (fake *FakeAppManifest) StartCommandArgsForCall(i int) (string, string) {
+func (fake *FakeApp) StartCommandArgsForCall(i int) (string, string) {
 	fake.startCommandMutex.RLock()
 	defer fake.startCommandMutex.RUnlock()
 	return fake.startCommandArgsForCall[i].arg1, fake.startCommandArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) EnvironmentVars(arg1 string, arg2 string, arg3 string) {
+func (fake *FakeApp) EnvironmentVars(arg1 string, arg2 string, arg3 string) {
 	fake.environmentVarsMutex.Lock()
 	fake.environmentVarsArgsForCall = append(fake.environmentVarsArgsForCall, struct {
 		arg1 string
@@ -227,19 +227,19 @@ func (fake *FakeAppManifest) EnvironmentVars(arg1 string, arg2 string, arg3 stri
 	}
 }
 
-func (fake *FakeAppManifest) EnvironmentVarsCallCount() int {
+func (fake *FakeApp) EnvironmentVarsCallCount() int {
 	fake.environmentVarsMutex.RLock()
 	defer fake.environmentVarsMutex.RUnlock()
 	return len(fake.environmentVarsArgsForCall)
 }
 
-func (fake *FakeAppManifest) EnvironmentVarsArgsForCall(i int) (string, string, string) {
+func (fake *FakeApp) EnvironmentVarsArgsForCall(i int) (string, string, string) {
 	fake.environmentVarsMutex.RLock()
 	defer fake.environmentVarsMutex.RUnlock()
 	return fake.environmentVarsArgsForCall[i].arg1, fake.environmentVarsArgsForCall[i].arg2, fake.environmentVarsArgsForCall[i].arg3
 }
 
-func (fake *FakeAppManifest) HealthCheckTimeout(arg1 string, arg2 int) {
+func (fake *FakeApp) HealthCheckTimeout(arg1 string, arg2 int) {
 	fake.healthCheckTimeoutMutex.Lock()
 	fake.healthCheckTimeoutArgsForCall = append(fake.healthCheckTimeoutArgsForCall, struct {
 		arg1 string
@@ -251,19 +251,19 @@ func (fake *FakeAppManifest) HealthCheckTimeout(arg1 string, arg2 int) {
 	}
 }
 
-func (fake *FakeAppManifest) HealthCheckTimeoutCallCount() int {
+func (fake *FakeApp) HealthCheckTimeoutCallCount() int {
 	fake.healthCheckTimeoutMutex.RLock()
 	defer fake.healthCheckTimeoutMutex.RUnlock()
 	return len(fake.healthCheckTimeoutArgsForCall)
 }
 
-func (fake *FakeAppManifest) HealthCheckTimeoutArgsForCall(i int) (string, int) {
+func (fake *FakeApp) HealthCheckTimeoutArgsForCall(i int) (string, int) {
 	fake.healthCheckTimeoutMutex.RLock()
 	defer fake.healthCheckTimeoutMutex.RUnlock()
 	return fake.healthCheckTimeoutArgsForCall[i].arg1, fake.healthCheckTimeoutArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) Instances(arg1 string, arg2 int) {
+func (fake *FakeApp) Instances(arg1 string, arg2 int) {
 	fake.instancesMutex.Lock()
 	fake.instancesArgsForCall = append(fake.instancesArgsForCall, struct {
 		arg1 string
@@ -275,19 +275,19 @@ func (fake *FakeAppManifest) Instances(arg1 string, arg2 int) {
 	}
 }
 
-func (fake *FakeAppManifest) InstancesCallCount() int {
+func (fake *FakeApp) InstancesCallCount() int {
 	fake.instancesMutex.RLock()
 	defer fake.instancesMutex.RUnlock()
 	return len(fake.instancesArgsForCall)
 }
 
-func (fake *FakeAppManifest) InstancesArgsForCall(i int) (string, int) {
+func (fake *FakeApp) InstancesArgsForCall(i int) (string, int) {
 	fake.instancesMutex.RLock()
 	defer fake.instancesMutex.RUnlock()
 	return fake.instancesArgsForCall[i].arg1, fake.instancesArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) Domain(arg1 string, arg2 string, arg3 string) {
+func (fake *FakeApp) Domain(arg1 string, arg2 string, arg3 string) {
 	fake.domainMutex.Lock()
 	fake.domainArgsForCall = append(fake.domainArgsForCall, struct {
 		arg1 string
@@ -300,19 +300,19 @@ func (fake *FakeAppManifest) Domain(arg1 string, arg2 string, arg3 string) {
 	}
 }
 
-func (fake *FakeAppManifest) DomainCallCount() int {
+func (fake *FakeApp) DomainCallCount() int {
 	fake.domainMutex.RLock()
 	defer fake.domainMutex.RUnlock()
 	return len(fake.domainArgsForCall)
 }
 
-func (fake *FakeAppManifest) DomainArgsForCall(i int) (string, string, string) {
+func (fake *FakeApp) DomainArgsForCall(i int) (string, string, string) {
 	fake.domainMutex.RLock()
 	defer fake.domainMutex.RUnlock()
 	return fake.domainArgsForCall[i].arg1, fake.domainArgsForCall[i].arg2, fake.domainArgsForCall[i].arg3
 }
 
-func (fake *FakeAppManifest) GetContents() []models.Application {
+func (fake *FakeApp) GetContents() []models.Application {
 	fake.getContentsMutex.Lock()
 	fake.getContentsArgsForCall = append(fake.getContentsArgsForCall, struct{}{})
 	fake.getContentsMutex.Unlock()
@@ -323,20 +323,20 @@ func (fake *FakeAppManifest) GetContents() []models.Application {
 	}
 }
 
-func (fake *FakeAppManifest) GetContentsCallCount() int {
+func (fake *FakeApp) GetContentsCallCount() int {
 	fake.getContentsMutex.RLock()
 	defer fake.getContentsMutex.RUnlock()
 	return len(fake.getContentsArgsForCall)
 }
 
-func (fake *FakeAppManifest) GetContentsReturns(result1 []models.Application) {
+func (fake *FakeApp) GetContentsReturns(result1 []models.Application) {
 	fake.GetContentsStub = nil
 	fake.getContentsReturns = struct {
 		result1 []models.Application
 	}{result1}
 }
 
-func (fake *FakeAppManifest) Stack(arg1 string, arg2 string) {
+func (fake *FakeApp) Stack(arg1 string, arg2 string) {
 	fake.stackMutex.Lock()
 	fake.stackArgsForCall = append(fake.stackArgsForCall, struct {
 		arg1 string
@@ -348,43 +348,48 @@ func (fake *FakeAppManifest) Stack(arg1 string, arg2 string) {
 	}
 }
 
-func (fake *FakeAppManifest) StackCallCount() int {
+func (fake *FakeApp) StackCallCount() int {
 	fake.stackMutex.RLock()
 	defer fake.stackMutex.RUnlock()
 	return len(fake.stackArgsForCall)
 }
 
-func (fake *FakeAppManifest) StackArgsForCall(i int) (string, string) {
+func (fake *FakeApp) StackArgsForCall(i int) (string, string) {
 	fake.stackMutex.RLock()
 	defer fake.stackMutex.RUnlock()
 	return fake.stackArgsForCall[i].arg1, fake.stackArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) AppPorts(arg1 string, arg2 []int) {
+func (fake *FakeApp) AppPorts(arg1 string, arg2 []int) {
+	var arg2Copy []int
+	if arg2 != nil {
+		arg2Copy = make([]int, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.appPortsMutex.Lock()
 	fake.appPortsArgsForCall = append(fake.appPortsArgsForCall, struct {
 		arg1 string
 		arg2 []int
-	}{arg1, arg2})
+	}{arg1, arg2Copy})
 	fake.appPortsMutex.Unlock()
 	if fake.AppPortsStub != nil {
 		fake.AppPortsStub(arg1, arg2)
 	}
 }
 
-func (fake *FakeAppManifest) AppPortsCallCount() int {
+func (fake *FakeApp) AppPortsCallCount() int {
 	fake.appPortsMutex.RLock()
 	defer fake.appPortsMutex.RUnlock()
 	return len(fake.appPortsArgsForCall)
 }
 
-func (fake *FakeAppManifest) AppPortsArgsForCall(i int) (string, []int) {
+func (fake *FakeApp) AppPortsArgsForCall(i int) (string, []int) {
 	fake.appPortsMutex.RLock()
 	defer fake.appPortsMutex.RUnlock()
 	return fake.appPortsArgsForCall[i].arg1, fake.appPortsArgsForCall[i].arg2
 }
 
-func (fake *FakeAppManifest) Save(f io.Writer) error {
+func (fake *FakeApp) Save(f io.Writer) error {
 	fake.saveMutex.Lock()
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
 		f io.Writer
@@ -397,23 +402,23 @@ func (fake *FakeAppManifest) Save(f io.Writer) error {
 	}
 }
 
-func (fake *FakeAppManifest) SaveCallCount() int {
+func (fake *FakeApp) SaveCallCount() int {
 	fake.saveMutex.RLock()
 	defer fake.saveMutex.RUnlock()
 	return len(fake.saveArgsForCall)
 }
 
-func (fake *FakeAppManifest) SaveArgsForCall(i int) io.Writer {
+func (fake *FakeApp) SaveArgsForCall(i int) io.Writer {
 	fake.saveMutex.RLock()
 	defer fake.saveMutex.RUnlock()
 	return fake.saveArgsForCall[i].f
 }
 
-func (fake *FakeAppManifest) SaveReturns(result1 error) {
+func (fake *FakeApp) SaveReturns(result1 error) {
 	fake.SaveStub = nil
 	fake.saveReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ manifest.AppManifest = new(FakeAppManifest)
+var _ manifest.App = new(FakeApp)

@@ -21,7 +21,7 @@ type MapRoute struct {
 	routeRepo    api.RouteRepository
 	appReq       requirements.ApplicationRequirement
 	domainReq    requirements.DomainRequirement
-	routeCreator RouteCreator
+	routeCreator Creator
 }
 
 func init() {
@@ -123,7 +123,7 @@ func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall b
 	//get create-route for dependency
 	createRoute := commandregistry.Commands.FindCommand("create-route")
 	createRoute = createRoute.SetDependency(deps, false)
-	cmd.routeCreator = createRoute.(RouteCreator)
+	cmd.routeCreator = createRoute.(Creator)
 
 	return cmd
 }

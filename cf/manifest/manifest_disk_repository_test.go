@@ -9,10 +9,10 @@ import (
 )
 
 var _ = Describe("ManifestDiskRepository", func() {
-	var repo ManifestRepository
+	var repo Repository
 
 	BeforeEach(func() {
-		repo = NewManifestDiskRepository()
+		repo = NewDiskRepository()
 	})
 
 	Describe("given a directory containing a file called 'manifest.yml'", func() {

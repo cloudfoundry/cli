@@ -22,7 +22,7 @@ var _ = Describe("loggregator logs repository", func() {
 		fakeConsumer *logsfakes.FakeLoggregatorConsumer
 		logsRepo     *LoggregatorLogsRepository
 		configRepo   coreconfig.ReadWriter
-		authRepo     *authenticationfakes.FakeAuthenticationRepository
+		authRepo     *authenticationfakes.FakeRepository
 	)
 
 	BeforeEach(func() {
@@ -30,7 +30,7 @@ var _ = Describe("loggregator logs repository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
-		authRepo = &authenticationfakes.FakeAuthenticationRepository{}
+		authRepo = &authenticationfakes.FakeRepository{}
 	})
 
 	JustBeforeEach(func() {

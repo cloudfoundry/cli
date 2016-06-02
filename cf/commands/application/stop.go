@@ -12,9 +12,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-//go:generate counterfeiter . ApplicationStopper
+//go:generate counterfeiter . Stopper
 
-type ApplicationStopper interface {
+type Stopper interface {
 	commandregistry.Command
 	ApplicationStop(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
 }
@@ -22,7 +22,7 @@ type ApplicationStopper interface {
 type Stop struct {
 	ui      terminal.UI
 	config  coreconfig.Reader
-	appRepo applications.ApplicationRepository
+	appRepo applications.Repository
 	appReq  requirements.ApplicationRequirement
 }
 

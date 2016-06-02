@@ -15,7 +15,7 @@ type bindToRunningGroup struct {
 	ui                terminal.UI
 	configRepo        coreconfig.Reader
 	securityGroupRepo securitygroups.SecurityGroupRepo
-	runningGroupRepo  running.RunningSecurityGroupsRepo
+	runningGroupRepo  running.SecurityGroupsRepo
 }
 
 func init() {

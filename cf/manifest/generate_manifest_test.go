@@ -13,7 +13,7 @@ import (
 var _ = Describe("generate_manifest", func() {
 	Describe("Save", func() {
 		var (
-			m AppManifest
+			m App
 			f *bytes.Buffer
 		)
 

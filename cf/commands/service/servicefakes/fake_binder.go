@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 )
 
-type FakeServiceBinder struct {
+type FakeBinder struct {
 	BindApplicationStub        func(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error)
 	bindApplicationMutex       sync.RWMutex
 	bindApplicationArgsForCall []struct {
@@ -21,7 +21,7 @@ type FakeServiceBinder struct {
 	}
 }
 
-func (fake *FakeServiceBinder) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {
+func (fake *FakeBinder) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {
 	fake.bindApplicationMutex.Lock()
 	fake.bindApplicationArgsForCall = append(fake.bindApplicationArgsForCall, struct {
 		app             models.Application
@@ -36,23 +36,23 @@ func (fake *FakeServiceBinder) BindApplication(app models.Application, serviceIn
 	}
 }
 
-func (fake *FakeServiceBinder) BindApplicationCallCount() int {
+func (fake *FakeBinder) BindApplicationCallCount() int {
 	fake.bindApplicationMutex.RLock()
 	defer fake.bindApplicationMutex.RUnlock()
 	return len(fake.bindApplicationArgsForCall)
 }
 
-func (fake *FakeServiceBinder) BindApplicationArgsForCall(i int) (models.Application, models.ServiceInstance, map[string]interface{}) {
+func (fake *FakeBinder) BindApplicationArgsForCall(i int) (models.Application, models.ServiceInstance, map[string]interface{}) {
 	fake.bindApplicationMutex.RLock()
 	defer fake.bindApplicationMutex.RUnlock()
 	return fake.bindApplicationArgsForCall[i].app, fake.bindApplicationArgsForCall[i].serviceInstance, fake.bindApplicationArgsForCall[i].paramsMap
 }
 
-func (fake *FakeServiceBinder) BindApplicationReturns(result1 error) {
+func (fake *FakeBinder) BindApplicationReturns(result1 error) {
 	fake.BindApplicationStub = nil
 	fake.bindApplicationReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ service.ServiceBinder = new(FakeServiceBinder)
+var _ service.Binder = new(FakeBinder)

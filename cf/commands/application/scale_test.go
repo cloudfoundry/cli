@@ -20,8 +20,8 @@ import (
 var _ = Describe("scale command", func() {
 	var (
 		requirementsFactory *testreq.FakeReqFactory
-		restarter           *applicationfakes.FakeApplicationRestarter
-		appRepo             *applicationsfakes.FakeApplicationRepository
+		restarter           *applicationfakes.FakeRestarter
+		appRepo             *applicationsfakes.FakeRepository
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		app                 models.Application
@@ -46,14 +46,14 @@ var _ = Describe("scale command", func() {
 		//save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("restart")
 
-		restarter = new(applicationfakes.FakeApplicationRestarter)
+		restarter = new(applicationfakes.FakeRestarter)
 		//setup fakes to correctly interact with commandregistry
 		restarter.SetDependencyStub = func(_ commandregistry.Dependency, _ bool) commandregistry.Command {
 			return restarter
 		}
 		restarter.MetaDataReturns(commandregistry.CommandMetadata{Name: "restart"})
 
-		appRepo = new(applicationsfakes.FakeApplicationRepository)
+		appRepo = new(applicationsfakes.FakeRepository)
 		ui = new(testterm.FakeUI)
 		config = testconfig.NewRepositoryWithDefaults()
 	})

@@ -8,9 +8,9 @@ type Loggable interface {
 	GetSourceName() string
 }
 
-//go:generate counterfeiter . LogsRepository
+//go:generate counterfeiter . Repository
 
-type LogsRepository interface {
+type Repository interface {
 	RecentLogsFor(appGUID string) ([]Loggable, error)
 	TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error)
 	Close()

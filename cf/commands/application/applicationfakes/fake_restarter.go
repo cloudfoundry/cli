@@ -11,7 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-type FakeApplicationRestarter struct {
+type FakeRestarter struct {
 	MetaDataStub        func() commandregistry.CommandMetadata
 	metaDataMutex       sync.RWMutex
 	metaDataArgsForCall []struct{}
@@ -56,7 +56,7 @@ type FakeApplicationRestarter struct {
 	}
 }
 
-func (fake *FakeApplicationRestarter) MetaData() commandregistry.CommandMetadata {
+func (fake *FakeRestarter) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
 	fake.metaDataMutex.Unlock()
@@ -67,20 +67,20 @@ func (fake *FakeApplicationRestarter) MetaData() commandregistry.CommandMetadata
 	}
 }
 
-func (fake *FakeApplicationRestarter) MetaDataCallCount() int {
+func (fake *FakeRestarter) MetaDataCallCount() int {
 	fake.metaDataMutex.RLock()
 	defer fake.metaDataMutex.RUnlock()
 	return len(fake.metaDataArgsForCall)
 }
 
-func (fake *FakeApplicationRestarter) MetaDataReturns(result1 commandregistry.CommandMetadata) {
+func (fake *FakeRestarter) MetaDataReturns(result1 commandregistry.CommandMetadata) {
 	fake.MetaDataStub = nil
 	fake.metaDataReturns = struct {
 		result1 commandregistry.CommandMetadata
 	}{result1}
 }
 
-func (fake *FakeApplicationRestarter) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
+func (fake *FakeRestarter) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
 	fake.setDependencyMutex.Lock()
 	fake.setDependencyArgsForCall = append(fake.setDependencyArgsForCall, struct {
 		deps       commandregistry.Dependency
@@ -94,26 +94,26 @@ func (fake *FakeApplicationRestarter) SetDependency(deps commandregistry.Depende
 	}
 }
 
-func (fake *FakeApplicationRestarter) SetDependencyCallCount() int {
+func (fake *FakeRestarter) SetDependencyCallCount() int {
 	fake.setDependencyMutex.RLock()
 	defer fake.setDependencyMutex.RUnlock()
 	return len(fake.setDependencyArgsForCall)
 }
 
-func (fake *FakeApplicationRestarter) SetDependencyArgsForCall(i int) (commandregistry.Dependency, bool) {
+func (fake *FakeRestarter) SetDependencyArgsForCall(i int) (commandregistry.Dependency, bool) {
 	fake.setDependencyMutex.RLock()
 	defer fake.setDependencyMutex.RUnlock()
 	return fake.setDependencyArgsForCall[i].deps, fake.setDependencyArgsForCall[i].pluginCall
 }
 
-func (fake *FakeApplicationRestarter) SetDependencyReturns(result1 commandregistry.Command) {
+func (fake *FakeRestarter) SetDependencyReturns(result1 commandregistry.Command) {
 	fake.SetDependencyStub = nil
 	fake.setDependencyReturns = struct {
 		result1 commandregistry.Command
 	}{result1}
 }
 
-func (fake *FakeApplicationRestarter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (fake *FakeRestarter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
@@ -127,26 +127,26 @@ func (fake *FakeApplicationRestarter) Requirements(requirementsFactory requireme
 	}
 }
 
-func (fake *FakeApplicationRestarter) RequirementsCallCount() int {
+func (fake *FakeRestarter) RequirementsCallCount() int {
 	fake.requirementsMutex.RLock()
 	defer fake.requirementsMutex.RUnlock()
 	return len(fake.requirementsArgsForCall)
 }
 
-func (fake *FakeApplicationRestarter) RequirementsArgsForCall(i int) (requirements.Factory, flags.FlagContext) {
+func (fake *FakeRestarter) RequirementsArgsForCall(i int) (requirements.Factory, flags.FlagContext) {
 	fake.requirementsMutex.RLock()
 	defer fake.requirementsMutex.RUnlock()
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeApplicationRestarter) RequirementsReturns(result1 []requirements.Requirement) {
+func (fake *FakeRestarter) RequirementsReturns(result1 []requirements.Requirement) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
 	}{result1}
 }
 
-func (fake *FakeApplicationRestarter) Execute(context flags.FlagContext) error {
+func (fake *FakeRestarter) Execute(context flags.FlagContext) error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
@@ -159,26 +159,26 @@ func (fake *FakeApplicationRestarter) Execute(context flags.FlagContext) error {
 	}
 }
 
-func (fake *FakeApplicationRestarter) ExecuteCallCount() int {
+func (fake *FakeRestarter) ExecuteCallCount() int {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
 	return len(fake.executeArgsForCall)
 }
 
-func (fake *FakeApplicationRestarter) ExecuteArgsForCall(i int) flags.FlagContext {
+func (fake *FakeRestarter) ExecuteArgsForCall(i int) flags.FlagContext {
 	fake.executeMutex.RLock()
 	defer fake.executeMutex.RUnlock()
 	return fake.executeArgsForCall[i].context
 }
 
-func (fake *FakeApplicationRestarter) ExecuteReturns(result1 error) {
+func (fake *FakeRestarter) ExecuteReturns(result1 error) {
 	fake.ExecuteStub = nil
 	fake.executeReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *FakeApplicationRestarter) ApplicationRestart(app models.Application, orgName string, spaceName string) error {
+func (fake *FakeRestarter) ApplicationRestart(app models.Application, orgName string, spaceName string) error {
 	fake.applicationRestartMutex.Lock()
 	fake.applicationRestartArgsForCall = append(fake.applicationRestartArgsForCall, struct {
 		app       models.Application
@@ -193,23 +193,23 @@ func (fake *FakeApplicationRestarter) ApplicationRestart(app models.Application,
 	}
 }
 
-func (fake *FakeApplicationRestarter) ApplicationRestartCallCount() int {
+func (fake *FakeRestarter) ApplicationRestartCallCount() int {
 	fake.applicationRestartMutex.RLock()
 	defer fake.applicationRestartMutex.RUnlock()
 	return len(fake.applicationRestartArgsForCall)
 }
 
-func (fake *FakeApplicationRestarter) ApplicationRestartArgsForCall(i int) (models.Application, string, string) {
+func (fake *FakeRestarter) ApplicationRestartArgsForCall(i int) (models.Application, string, string) {
 	fake.applicationRestartMutex.RLock()
 	defer fake.applicationRestartMutex.RUnlock()
 	return fake.applicationRestartArgsForCall[i].app, fake.applicationRestartArgsForCall[i].orgName, fake.applicationRestartArgsForCall[i].spaceName
 }
 
-func (fake *FakeApplicationRestarter) ApplicationRestartReturns(result1 error) {
+func (fake *FakeRestarter) ApplicationRestartReturns(result1 error) {
 	fake.ApplicationRestartStub = nil
 	fake.applicationRestartReturns = struct {
 		result1 error
 	}{result1}
 }
 
-var _ application.ApplicationRestarter = new(FakeApplicationRestarter)
+var _ application.Restarter = new(FakeRestarter)

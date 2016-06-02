@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/manifest"
 )
 
-type FakeManifestRepository struct {
+type FakeRepository struct {
 	ReadManifestStub        func(string) (*manifest.Manifest, error)
 	readManifestMutex       sync.RWMutex
 	readManifestArgsForCall []struct {
@@ -19,7 +19,7 @@ type FakeManifestRepository struct {
 	}
 }
 
-func (fake *FakeManifestRepository) ReadManifest(arg1 string) (*manifest.Manifest, error) {
+func (fake *FakeRepository) ReadManifest(arg1 string) (*manifest.Manifest, error) {
 	fake.readManifestMutex.Lock()
 	fake.readManifestArgsForCall = append(fake.readManifestArgsForCall, struct {
 		arg1 string
@@ -32,19 +32,19 @@ func (fake *FakeManifestRepository) ReadManifest(arg1 string) (*manifest.Manifes
 	}
 }
 
-func (fake *FakeManifestRepository) ReadManifestCallCount() int {
+func (fake *FakeRepository) ReadManifestCallCount() int {
 	fake.readManifestMutex.RLock()
 	defer fake.readManifestMutex.RUnlock()
 	return len(fake.readManifestArgsForCall)
 }
 
-func (fake *FakeManifestRepository) ReadManifestArgsForCall(i int) string {
+func (fake *FakeRepository) ReadManifestArgsForCall(i int) string {
 	fake.readManifestMutex.RLock()
 	defer fake.readManifestMutex.RUnlock()
 	return fake.readManifestArgsForCall[i].arg1
 }
 
-func (fake *FakeManifestRepository) ReadManifestReturns(result1 *manifest.Manifest, result2 error) {
+func (fake *FakeRepository) ReadManifestReturns(result1 *manifest.Manifest, result2 error) {
 	fake.ReadManifestStub = nil
 	fake.readManifestReturns = struct {
 		result1 *manifest.Manifest
@@ -52,4 +52,4 @@ func (fake *FakeManifestRepository) ReadManifestReturns(result1 *manifest.Manife
 	}{result1, result2}
 }
 
-var _ manifest.ManifestRepository = new(FakeManifestRepository)
+var _ manifest.Repository = new(FakeRepository)

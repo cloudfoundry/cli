@@ -17,12 +17,12 @@ type DEAApplicationRequirement interface {
 type deaApplicationRequirement struct {
 	appName string
 	ui      terminal.UI
-	appRepo applications.ApplicationRepository
+	appRepo applications.Repository
 
 	application models.Application
 }
 
-func NewDEAApplicationRequirement(name string, applicationRepo applications.ApplicationRepository) DEAApplicationRequirement {
+func NewDEAApplicationRequirement(name string, applicationRepo applications.Repository) DEAApplicationRequirement {
 	return &deaApplicationRequirement{
 		appName: name,
 		appRepo: applicationRepo,

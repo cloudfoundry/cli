@@ -15,7 +15,7 @@ import (
 type DeleteApp struct {
 	ui        terminal.UI
 	config    coreconfig.Reader
-	appRepo   applications.ApplicationRepository
+	appRepo   applications.Repository
 	routeRepo api.RouteRepository
 	appReq    requirements.ApplicationRequirement
 }

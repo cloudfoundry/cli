@@ -8,9 +8,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
-//go:generate counterfeiter . CopyApplicationSourceRepository
+//go:generate counterfeiter . Repository
 
-type CopyApplicationSourceRepository interface {
+type Repository interface {
 	CopyApplication(sourceAppGUID, targetAppGUID string) error
 }
 

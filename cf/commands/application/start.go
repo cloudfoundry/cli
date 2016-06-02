@@ -32,15 +32,15 @@ const (
 
 const LogMessageTypeStaging = "STG"
 
-//go:generate counterfeiter . ApplicationStagingWatcher
+//go:generate counterfeiter . StagingWatcher
 
-type ApplicationStagingWatcher interface {
-	ApplicationWatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
+type StagingWatcher interface {
+	WatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error)
 }
 
-//go:generate counterfeiter . ApplicationStarter
+//go:generate counterfeiter . Starter
 
-type ApplicationStarter interface {
+type Starter interface {
 	commandregistry.Command
 	SetStartTimeoutInSeconds(timeout int)
 	ApplicationStart(app models.Application, orgName string, spaceName string) (updatedApp models.Application, err error)
@@ -49,11 +49,11 @@ type ApplicationStarter interface {
 type Start struct {
 	ui               terminal.UI
 	config           coreconfig.Reader
-	appDisplayer     ApplicationDisplayer
+	appDisplayer     Displayer
 	appReq           requirements.ApplicationRequirement
-	appRepo          applications.ApplicationRepository
-	logRepo          logs.LogsRepository
-	appInstancesRepo appinstances.AppInstancesRepository
+	appRepo          applications.Repository
+	logRepo          logs.Repository
+	appInstancesRepo appinstances.Repository
 
 	LogServerConnectionTimeout time.Duration
 	StartupTimeout             time.Duration
@@ -125,7 +125,7 @@ func (cmd *Start) SetDependency(deps commandregistry.Dependency, pluginCall bool
 
 	appCommand := commandregistry.Commands.FindCommand("app")
 	appCommand = appCommand.SetDependency(deps, false)
-	cmd.appDisplayer = appCommand.(ApplicationDisplayer)
+	cmd.appDisplayer = appCommand.(Displayer)
 
 	return cmd
 }
@@ -141,7 +141,7 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 		return models.Application{}, nil
 	}
 
-	return cmd.ApplicationWatchStaging(app, orgName, spaceName, func(app models.Application) (models.Application, error) {
+	return cmd.WatchStaging(app, orgName, spaceName, func(app models.Application) (models.Application, error) {
 		cmd.ui.Say(T("Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 			map[string]interface{}{
 				"AppName":     terminal.EntityNameColor(app.Name),
@@ -154,7 +154,7 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 	})
 }
 
-func (cmd *Start) ApplicationWatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (models.Application, error) {
+func (cmd *Start) WatchStaging(app models.Application, orgName, spaceName string, start func(app models.Application) (models.Application, error)) (models.Application, error) {
 	stopChan := make(chan bool, 1)
 
 	loggingStartedWait := new(sync.WaitGroup)

@@ -33,12 +33,12 @@ var _ = Describe("CloudControllerPasswordRepository", func() {
 	})
 })
 
-func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Server, handler *testnet.TestHandler, repo PasswordRepository) {
+func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Server, handler *testnet.TestHandler, repo Repository) {
 	passwordServer, handler = testnet.NewServer([]testnet.TestRequest{req})
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetUaaEndpoint(passwordServer.URL)
 	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
-	repo = NewCloudControllerPasswordRepository(configRepo, gateway)
+	repo = NewCloudControllerRepository(configRepo, gateway)
 	return
 }
