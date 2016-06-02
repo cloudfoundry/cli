@@ -56,7 +56,7 @@ func Init(config LocalReader) go_i18n.TranslateFunc {
 				if strings.HasPrefix(assetLocale, l.Tag) {
 					loadAsset(assetName)
 
-					t := go_i18n.MustTfunc(source)
+					t := go_i18n.MustTfunc(l.Tag)
 
 					return func(translationID string, args ...interface{}) string {
 						if translated := t(translationID, args...); translated != translationID {
