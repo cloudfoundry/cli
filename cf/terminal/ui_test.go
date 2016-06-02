@@ -10,7 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
+	"github.com/cloudfoundry/cli/testhelpers/assert"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
@@ -344,7 +344,7 @@ var _ = Describe("UI", func() {
 	Describe("failing", func() {
 		It("panics with a specific string", func() {
 			io_helpers.CaptureOutput(func() {
-				testassert.Panic(QuietPanic, func() {
+				assert.DoesPanic(QuietPanic, func() {
 					NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
 				})
 			})
@@ -363,7 +363,7 @@ var _ = Describe("UI", func() {
 
 			It("does not use 'T' func to translate", func() {
 				io_helpers.CaptureOutput(func() {
-					testassert.Panic(QuietPanic, func() {
+					assert.DoesPanic(QuietPanic, func() {
 						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
 					})
 				})
@@ -371,7 +371,7 @@ var _ = Describe("UI", func() {
 
 			It("does not duplicate output if logger is set to stdout", func() {
 				output := io_helpers.CaptureOutput(func() {
-					testassert.Panic(QuietPanic, func() {
+					assert.DoesPanic(QuietPanic, func() {
 						logger := trace.NewWriterPrinter(os.Stdout, true)
 						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
 					})
@@ -387,7 +387,7 @@ var _ = Describe("UI", func() {
 		Context("when 'T' func is initialized", func() {
 			It("does not duplicate output if logger is set to stdout", func() {
 				output := io_helpers.CaptureOutput(func() {
-					testassert.Panic(QuietPanic, func() {
+					assert.DoesPanic(QuietPanic, func() {
 						logger := trace.NewWriterPrinter(os.Stdout, true)
 						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
 					})
