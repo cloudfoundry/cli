@@ -119,7 +119,7 @@ func (cmd *ShowSpace) Execute(c flags.FlagContext) error {
 		}
 		table.Add("", T("Security Groups:"), strings.Join(securityGroups, ", "))
 
-		table.Add("", T("Space Quota:"), quotaString)
+		table.Add("", T("Space Quota:"), terminal.EntityNameColor(quotaString))
 
 		table.Print()
 	}
