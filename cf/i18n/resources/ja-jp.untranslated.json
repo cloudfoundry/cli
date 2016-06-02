@@ -66,5 +66,9 @@
   {
     "id": "route ports",
     "translation": "route ports"
+  },
+  {
+    "id": "{{.ReservedRoutePorts}} route ports",
+    "translation": "{{.ReservedRoutePorts}} route ports"
   }
 ]
