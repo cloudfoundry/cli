@@ -70,7 +70,7 @@ type RepositoryLocator struct {
 	userProvidedServiceInstanceRepo UserProvidedServiceInstanceRepository
 	buildpackRepo                   BuildpackRepository
 	buildpackBitsRepo               BuildpackBitsRepository
-	securityGroupRepo               security_groups.SecurityGroupRepo
+	securityGroupRepo               securitygroups.SecurityGroupRepo
 	stagingSecurityGroupRepo        staging.StagingSecurityGroupsRepo
 	runningSecurityGroupRepo        running.RunningSecurityGroupsRepo
 	securityGroupSpaceBinder        securitygroupspaces.SecurityGroupSpaceBinder
@@ -138,7 +138,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
 	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, appfiles.ApplicationZipper{})
-	loc.securityGroupRepo = security_groups.NewSecurityGroupRepo(config, cloudControllerGateway)
+	loc.securityGroupRepo = securitygroups.NewSecurityGroupRepo(config, cloudControllerGateway)
 	loc.stagingSecurityGroupRepo = staging.NewStagingSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.runningSecurityGroupRepo = running.NewRunningSecurityGroupsRepo(config, cloudControllerGateway)
 	loc.securityGroupSpaceBinder = securitygroupspaces.NewSecurityGroupSpaceBinder(config, cloudControllerGateway)
@@ -412,12 +412,12 @@ func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepos
 	return locator.buildpackBitsRepo
 }
 
-func (locator RepositoryLocator) SetSecurityGroupRepository(repo security_groups.SecurityGroupRepo) RepositoryLocator {
+func (locator RepositoryLocator) SetSecurityGroupRepository(repo securitygroups.SecurityGroupRepo) RepositoryLocator {
 	locator.securityGroupRepo = repo
 	return locator
 }
 
-func (locator RepositoryLocator) GetSecurityGroupRepository() security_groups.SecurityGroupRepo {
+func (locator RepositoryLocator) GetSecurityGroupRepository() securitygroups.SecurityGroupRepo {
 	return locator.securityGroupRepo
 }
 

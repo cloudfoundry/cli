@@ -1,4 +1,4 @@
-package security_groups_test
+package securitygroups_test
 
 import (
 	"net/http"

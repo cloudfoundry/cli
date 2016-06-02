@@ -15,7 +15,7 @@ import (
 
 type CreateSecurityGroup struct {
 	ui                terminal.UI
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	configRepo        coreconfig.Reader
 }
 

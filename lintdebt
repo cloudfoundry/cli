@@ -7,7 +7,6 @@ cf/api/copyapplicationsource/copy_application_source.go:13:6: type name will be 
 cf/api/environmentvariablegroups/environment_variable_groups.go:14:6: type name will be used as environmentvariablegroups.EnvironmentVariableGroupsRepository by other packages, and that stutters; consider calling this Repository
 cf/api/logs/logs_repository.go:13:6: type name will be used as logs.LogsRepository by other packages, and that stutters; consider calling this Repository
 cf/api/password/password.go:15:6: type name will be used as password.PasswordRepository by other packages, and that stutters; consider calling this Repository
-cf/api/securitygroups/security_groups.go:1:1: don't use an underscore in package name
 cf/api/securitygroups/defaults/running/running.go:15:6: type name will be used as running.RunningSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
 cf/api/securitygroups/defaults/staging/staging.go:15:6: type name will be used as staging.StagingSecurityGroupsRepo by other packages, and that stutters; consider calling this SecurityGroupsRepo
 cf/commands/application/app.go:25:6: type name will be used as application.ApplicationDisplayer by other packages, and that stutters; consider calling this Displayer
@@ -16,12 +15,8 @@ cf/commands/application/start.go:37:6: type name will be used as application.App
 cf/commands/application/start.go:43:6: type name will be used as application.ApplicationStarter by other packages, and that stutters; consider calling this Starter
 cf/commands/application/stop.go:17:6: type name will be used as application.ApplicationStopper by other packages, and that stutters; consider calling this Stopper
 cf/commands/route/create_route.go:20:6: type name will be used as route.RouteCreator by other packages, and that stutters; consider calling this Creator
-cf/commands/securitygroup/security_groups.go:97:2: don't use underscores in Go names; var outputted_index should be outputtedIndex
 cf/commands/service/bind_service.go:21:6: type name will be used as service.ServiceBinder by other packages, and that stutters; consider calling this Binder
 cf/commands/space/space_ssh_allowed.go:15:6: type name will be used as space.SpaceSSHAllowed by other packages, and that stutters; consider calling this SSHAllowed
-cf/configuration/pluginconfig/plugin_config.go:41:1: comment on exported method PluginConfig.GetPluginPath should be of the form "GetPluginPath ..."
-cf/configuration/pluginconfig/plugin_config.go:51:1: comment on exported method PluginConfig.SetPlugin should be of the form "SetPlugin ..."
-cf/configuration/pluginconfig/plugin_config.go:97:1: comment on exported method PluginConfig.Close should be of the form "Close ..."
 cf/manifest/generate_manifest.go:34:6: type name will be used as manifest.ManifestApplication by other packages, and that stutters; consider calling this Application
 cf/manifest/generate_manifest.go:54:6: type name will be used as manifest.ManifestApplications by other packages, and that stutters; consider calling this Applications
 cf/manifest/manifest_disk_repository.go:18:6: type name will be used as manifest.ManifestRepository by other packages, and that stutters; consider calling this Repository

@@ -14,7 +14,7 @@ import (
 
 type UpdateSecurityGroup struct {
 	ui                terminal.UI
-	securityGroupRepo security_groups.SecurityGroupRepo
+	securityGroupRepo securitygroups.SecurityGroupRepo
 	configRepo        coreconfig.Reader
 }
 

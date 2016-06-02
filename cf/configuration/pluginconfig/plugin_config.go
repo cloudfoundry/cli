@@ -38,7 +38,6 @@ func NewPluginConfig(errorHandler func(error)) *PluginConfig {
 	}
 }
 
-/* getter methods */
 func (c *PluginConfig) GetPluginPath() string {
 	return c.pluginPath
 }
@@ -48,7 +47,6 @@ func (c *PluginConfig) Plugins() map[string]PluginMetadata {
 	return c.data.Plugins
 }
 
-/* setter methods */
 func (c *PluginConfig) SetPlugin(name string, metadata PluginMetadata) {
 	if c.data.Plugins == nil {
 		c.data.Plugins = make(map[string]PluginMetadata)
@@ -64,7 +62,6 @@ func (c *PluginConfig) RemovePlugin(name string) {
 	})
 }
 
-/* Functions that handel locking */
 func (c *PluginConfig) init() {
 	//only read from disk if it was never read
 	c.initOnce.Do(func() {
@@ -94,7 +91,6 @@ func (c *PluginConfig) write(cb func()) {
 	}
 }
 
-// CLOSERS
 func (c *PluginConfig) Close() {
 	c.read()
 	// perform a read to ensure write lock has been cleared
