@@ -61,7 +61,7 @@ func (cmd *RepoPlugins) Execute(c flags.FlagContext) error {
 	repoName := c.String("r")
 
 	repos = cmd.config.PluginRepos()
-	for i, _ := range repos {
+	for i := range repos {
 		if repos[i].URL == "http://plugins.cloudfoundry.org" {
 			repos[i].URL = "https://plugins.cloudfoundry.org"
 		}

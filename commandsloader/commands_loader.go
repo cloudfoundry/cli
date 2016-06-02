@@ -33,7 +33,7 @@ get initialized
 ********************/
 
 func Load() {
-	_ = commands.Api{}
+	_ = commands.API{}
 	_ = application.ListApps{}
 	_ = buildpack.ListBuildpacks{}
 	_ = domain.CreateDomain{}

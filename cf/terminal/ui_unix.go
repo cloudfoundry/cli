@@ -21,10 +21,10 @@ const (
 )
 
 // Tells the terminal to turn echo off.
-var sttyArgvEOff []string = []string{"stty", "-echo"}
+var sttyArgvEOff = []string{"stty", "-echo"}
 
 // Tells the terminal to turn echo on.
-var sttyArgvEOn []string = []string{"stty", "echo"}
+var sttyArgvEOn = []string{"stty", "echo"}
 
 var ws syscall.WaitStatus
 

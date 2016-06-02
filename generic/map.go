@@ -5,7 +5,6 @@ import (
 	"reflect"
 )
 
-// interface declaration
 type Map interface {
 	IsEmpty() bool
 	Count() int
@@ -20,10 +19,8 @@ type Map interface {
 	String() string
 }
 
-// concrete map type
 type ConcreteMap map[interface{}]interface{}
 
-// constructors
 func newEmptyMap() Map {
 	return &ConcreteMap{}
 }
@@ -59,7 +56,6 @@ func NewMap(data ...interface{}) Map {
 	panic("NewMap called with unexpected argument")
 }
 
-// implementing interface methods
 func (data *ConcreteMap) IsEmpty() bool {
 	return data.Count() == 0
 }
@@ -118,7 +114,6 @@ func (data *ConcreteMap) String() string {
 	return fmt.Sprintf("% v", *data)
 }
 
-// helper functions
 func IsMappable(value interface{}) bool {
 	switch value.(type) {
 	case Map:
