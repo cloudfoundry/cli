@@ -2576,6 +2576,10 @@
     "translation": "誤った使用法。引数として v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN 必要です\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires {{.Arguments}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect Usage:",
     "translation": "誤った使用法:"
   },

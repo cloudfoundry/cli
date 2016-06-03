@@ -32,6 +32,10 @@
     "translation": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Incorrect Usage. Requires {{.Arguments}}",
+    "translation": "Incorrect Usage. Requires {{.Arguments}}"
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports",
     "translation": "Maximum number of routes that may be created with reserved ports"
   },
