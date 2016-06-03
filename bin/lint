@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
-if [ ! $(which golint) ];then
-  echo -e "\n Installing golint..."
-  go get -u github.com/golang/lint/golint
+if [ ! $(which gometalinter) ];then
+  echo -e "\n Installing gometalinter..."
+  go get -u github.com/alecthomas/gometalinter
+  gometalinter --install --update
 fi
 
-golint ./... \
+gometalinter --disable-all \
+    --enable=golint \
+    ./... \
   | awk " \
             !/vendor/ \
         &&  !/cf\/resources/ \
@@ -21,3 +24,13 @@ golint ./... \
             && !/returns unexported type/ \
             && !/should not use dot imports/ \
         " # https://www.pivotaltracker.com/story/show/105609756
+
+#gometalinter --disable-all \
+#    --enable=gotype \
+#    ./... \
+#    | awk " \
+#            !/vendor/ \
+#        &&  !/fixtures/ \
+#        &&  !/fakes\// \
+#        &&  !/plugin_examples\// \
+#        "
