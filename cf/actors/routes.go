@@ -17,46 +17,40 @@ func NewRouteActor(ui terminal.UI, routeRepo api.RouteRepository) RouteActor {
 	return RouteActor{ui: ui, routeRepo: routeRepo}
 }
 
-func (routeActor RouteActor) CreateRandomTCPRoute(domain models.DomainFields) models.Route {
+func (routeActor RouteActor) CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error) {
 	routeActor.ui.Say(T("Creating random route for {{.Domain}}", map[string]interface{}{
 		"Domain": terminal.EntityNameColor(domain.Name),
 	}) + "...")
 
 	route, err := routeActor.routeRepo.Create("", domain, "", true)
 	if err != nil {
-		routeActor.ui.Failed(err.Error())
-		return models.Route{}
+		return models.Route{}, err
 	}
 
-	return route
+	return route, nil
 }
 
-func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (route models.Route) {
+func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
 	var port int
-	route, apiErr := routeActor.routeRepo.Find(hostname, domain, path, port)
+	route, err := routeActor.routeRepo.Find(hostname, domain, path, port)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case nil:
 		routeActor.ui.Say(T("Using route {{.RouteURL}}", map[string]interface{}{"RouteURL": terminal.EntityNameColor(route.URL())}))
 	case *errors.ModelNotFoundError:
 		if useRandomPort {
-			route = routeActor.CreateRandomTCPRoute(domain)
+			route, err = routeActor.CreateRandomTCPRoute(domain)
 		} else {
 			routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.URLForHostAndPath(hostname, path, port))}))
 
-			route, apiErr = routeActor.routeRepo.Create(hostname, domain, path, useRandomPort)
-			if apiErr != nil {
-				routeActor.ui.Failed(apiErr.Error())
-			}
+			route, err = routeActor.routeRepo.Create(hostname, domain, path, useRandomPort)
 		}
 
 		routeActor.ui.Ok()
 		routeActor.ui.Say("")
-	default:
-		routeActor.ui.Failed(apiErr.Error())
 	}
 
-	return
+	return route, err
 }
 
 func (routeActor RouteActor) BindRoute(app models.Application, route models.Route) {
