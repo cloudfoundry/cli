@@ -1,0 +1,6 @@
+cf/commands/quota/create_quota.go:110:28:warning: 2 other occurrence(s) of "-1" found in: quota.go:77:22 update_quota.go:114:23 (goconst)
+cf/commands/quota/quota.go:77:22:warning: 2 other occurrence(s) of "-1" found in: create_quota.go:110:28 update_quota.go:114:23 (goconst)
+cf/commands/quota/update_quota.go:114:23:warning: 2 other occurrence(s) of "-1" found in: create_quota.go:110:28 quota.go:77:22 (goconst)
+cf/commands/spacequota/space_quotas.go:94:23:warning: 2 other occurrence(s) of "-1" found in: update_space_quota.go:114:17 create_space_quota.go:117:28 (goconst)
+cf/commands/spacequota/update_space_quota.go:114:17:warning: 2 other occurrence(s) of "-1" found in: space_quotas.go:94:23 create_space_quota.go:117:28 (goconst)
+cf/commands/spacequota/create_space_quota.go:117:28:warning: 2 other occurrence(s) of "-1" found in: space_quotas.go:94:23 update_space_quota.go:114:17 (goconst)

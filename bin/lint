@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ROOT_DIR=$(cd $(dirname $(dirname $0)) && pwd)
+
 if [ ! $(which gometalinter) ];then
   echo -e "\n Installing gometalinter..."
   go get -u github.com/alecthomas/gometalinter
@@ -8,61 +10,7 @@ fi
 
 gometalinter --disable-all \
     --enable=golint \
+    --enable=goconst \
     ./... \
-  | awk " \
-            !/vendor.*\(golint\)/ \
-        &&  !/cf\/resources.*\(golint\)/ \
-        &&  !/words\/.*\(golint\)/ \
-        &&  !/plugin\/.*\(golint\)/ \
-        &&  !/plugin_examples\/.*\(golint\)/ \
-        &&  !/fakes\/.*\(golint\)/ \
-        " \
-  | awk " \
-           !/should have comment or be unexported.*\(golint\)/ \
-        && !/should have comment \(or a comment on this block\) or be unexported.*\(golint\)/ \
-        && !/comment on exported type .+ should be of the form.*\(golint\)/ \
-        && !/returns unexported type.*\(golint\)/ \
-        && !/should not use dot imports.*\(golint\)/ \
-        " # https://www.pivotaltracker.com/story/show/105609756
-
-#gometalinter --disable-all \
-#    --enable=goconst \
-#    ./... \
-#  | awk " \
-#            !/vendor/ \
-#        " \
-#  | awk " \
-#           !/\"windows\"/ \
-#        "
-
-#gometalinter --disable-all \
-#    --enable=dupl \
-#    --deadline=120s \
-#    ./... \
-#  | awk " \
-#            !/vendor/ \
-#        &&  !/cf\/resources/ \
-#        &&  !/words\// \
-#        &&  !/plugin\// \
-#        &&  !/plugin_examples\// \
-#        &&  !/fakes\// \
-#        &&  !/_test.go/ \
-#        "
-
-#gometalinter --disable-all \
-#    --enable=goimports \
-#    --deadline=120s \
-#    ./... \
-#  | awk " \
-#            !/vendor/ \
-#        "
-
-#gometalinter --disable-all \
-#    --enable=gotype \
-#    ./... \
-#    | awk " \
-#            !/vendor/ \
-#        &&  !/fixtures/ \
-#        &&  !/fakes\// \
-#        &&  !/plugin_examples\// \
-#        "
+  | awk -f $ROOT_DIR/bin/lint-files.awk \
+  | awk -f $ROOT_DIR/bin/lint-linters.awk # https://www.pivotaltracker.com/story/show/105609756
