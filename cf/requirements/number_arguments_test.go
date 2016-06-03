@@ -10,7 +10,7 @@ import (
 var _ = Describe("NumberArguments", func() {
 	It("returns an error if the number of arguments doesn't match", func() {
 		args := []string{"one", "two"}
-		numberArgumentsRequirement := NewNumberArguments(args, "SPACE")
+		numberArgumentsRequirement := NewNumberArguments(args, []string{"SPACE"})
 
 		err := numberArgumentsRequirement.Execute()
 		Expect(err).To(MatchError(NumberArgumentsError{ExpectedArgs: []string{"SPACE"}}))
@@ -18,7 +18,7 @@ var _ = Describe("NumberArguments", func() {
 
 	It("returns nil if the number of arguments matches", func() {
 		args := []string{"one"}
-		numberArgumentsRequirement := NewNumberArguments(args, "SPACE")
+		numberArgumentsRequirement := NewNumberArguments(args, []string{"SPACE"})
 
 		err := numberArgumentsRequirement.Execute()
 		Expect(err).NotTo(HaveOccurred())

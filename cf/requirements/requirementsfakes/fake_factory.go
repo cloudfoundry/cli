@@ -140,6 +140,15 @@ type FakeFactory struct {
 	newUsageRequirementReturns struct {
 		result1 requirements.Requirement
 	}
+	NewNumberArgumentsStub        func([]string, ...string) requirements.Requirement
+	newNumberArgumentsMutex       sync.RWMutex
+	newNumberArgumentsArgsForCall []struct {
+		arg1 []string
+		arg2 []string
+	}
+	newNumberArgumentsReturns struct {
+		result1 requirements.Requirement
+	}
 }
 
 func (fake *FakeFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -647,6 +656,44 @@ func (fake *FakeFactory) NewUsageRequirementArgsForCall(i int) (requirements.Usa
 func (fake *FakeFactory) NewUsageRequirementReturns(result1 requirements.Requirement) {
 	fake.NewUsageRequirementStub = nil
 	fake.newUsageRequirementReturns = struct {
+		result1 requirements.Requirement
+	}{result1}
+}
+
+func (fake *FakeFactory) NewNumberArguments(arg1 []string, arg2 ...string) requirements.Requirement {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.newNumberArgumentsMutex.Lock()
+	fake.newNumberArgumentsArgsForCall = append(fake.newNumberArgumentsArgsForCall, struct {
+		arg1 []string
+		arg2 []string
+	}{arg1Copy, arg2})
+	fake.newNumberArgumentsMutex.Unlock()
+	if fake.NewNumberArgumentsStub != nil {
+		return fake.NewNumberArgumentsStub(arg1, arg2...)
+	} else {
+		return fake.newNumberArgumentsReturns.result1
+	}
+}
+
+func (fake *FakeFactory) NewNumberArgumentsCallCount() int {
+	fake.newNumberArgumentsMutex.RLock()
+	defer fake.newNumberArgumentsMutex.RUnlock()
+	return len(fake.newNumberArgumentsArgsForCall)
+}
+
+func (fake *FakeFactory) NewNumberArgumentsArgsForCall(i int) ([]string, []string) {
+	fake.newNumberArgumentsMutex.RLock()
+	defer fake.newNumberArgumentsMutex.RUnlock()
+	return fake.newNumberArgumentsArgsForCall[i].arg1, fake.newNumberArgumentsArgsForCall[i].arg2
+}
+
+func (fake *FakeFactory) NewNumberArgumentsReturns(result1 requirements.Requirement) {
+	fake.NewNumberArgumentsStub = nil
+	fake.newNumberArgumentsReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
 }
