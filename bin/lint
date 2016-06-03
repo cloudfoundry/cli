@@ -14,8 +14,8 @@ gometalinter --disable-all \
     --enable=vet \
     --enable=vetshadow \
     --enable=gofmt \
-    --enable=gocyclo \
-    --cyclo-over=10 \
+    --enable=gocyclo --cyclo-over=10 \
+    --enable=deadcode \
     --deadline=15s \
     ./... \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
