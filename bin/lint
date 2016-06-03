@@ -12,6 +12,7 @@ gometalinter --disable-all \
     --enable=golint \
     --enable=goconst \
     --enable=vet \
+    --enable=gofmt \
     --deadline=10s \
     ./... \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
