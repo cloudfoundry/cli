@@ -53,31 +53,33 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 	return route, err
 }
 
-func (routeActor RouteActor) BindRoute(app models.Application, route models.Route) {
+func (routeActor RouteActor) BindRoute(app models.Application, route models.Route) error {
 	if !app.HasRoute(route) {
 		routeActor.ui.Say(T("Binding {{.URL}} to {{.AppName}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL()), "AppName": terminal.EntityNameColor(app.Name)}))
 
-		apiErr := routeActor.routeRepo.Bind(route.GUID, app.GUID)
-		switch apiErr := apiErr.(type) {
+		err := routeActor.routeRepo.Bind(route.GUID, app.GUID)
+		switch err := err.(type) {
 		case nil:
 			routeActor.ui.Ok()
 			routeActor.ui.Say("")
-			return
+			return nil
 		case errors.HTTPError:
-			if apiErr.ErrorCode() == errors.InvalidRelation {
-				routeActor.ui.Failed(T("The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", map[string]interface{}{"URL": route.URL()}))
+			if err.ErrorCode() == errors.InvalidRelation {
+				return errors.New(T("The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", map[string]interface{}{"URL": route.URL()}))
 			}
 		}
-		routeActor.ui.Failed(apiErr.Error())
+		return err
 	}
+	return nil
 }
 
-func (routeActor RouteActor) UnbindAll(app models.Application) {
+func (routeActor RouteActor) UnbindAll(app models.Application) error {
 	for _, route := range app.Routes {
 		routeActor.ui.Say(T("Removing route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL())}))
-		apiErr := routeActor.routeRepo.Unbind(route.GUID, app.GUID)
-		if apiErr != nil {
-			routeActor.ui.Failed(apiErr.Error())
+		err := routeActor.routeRepo.Unbind(route.GUID, app.GUID)
+		if err != nil {
+			return err
 		}
 	}
+	return nil
 }
