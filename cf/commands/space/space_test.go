@@ -1,150 +1,200 @@
 package space_test
 
 import (
-	"os"
-
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
+	//"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+
 	"github.com/cloudfoundry/cli/plugin/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	//testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
+	//testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/commands/space"
+	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
+	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
 var _ = Describe("space command", func() {
 	var (
-		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
-		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		configRepo          coreconfig.Repository
-		deps                commandregistry.Dependency
+		ui               *testterm.FakeUI
+		loginReq         *requirementsfakes.FakeRequirement
+		targetedOrgReq   *requirementsfakes.FakeTargetedOrgRequirement
+		reqFactory       *requirementsfakes.FakeFactory
+		deps             commandregistry.Dependency
+		cmd              space.ShowSpace
+		flagContext      flags.FlagContext
+		getSpaceModel    *plugin_models.GetSpace_Model
+		spaceRequirement *requirementsfakes.FakeSpaceRequirement
+		quotaRepo        *spacequotasfakes.FakeSpaceQuotaRepository
 	)
 
-	updateCommandDependency := func(pluginCall bool) {
-		deps.UI = ui
-		deps.Config = configRepo
-		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("space").SetDependency(deps, pluginCall))
-	}
-
 	BeforeEach(func() {
-		configRepo = testconfig.NewRepositoryWithDefaults()
+		ui = new(testterm.FakeUI)
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
-		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		repoLocator := api.RepositoryLocator{}
+		repoLocator = repoLocator.SetSpaceQuotaRepository(quotaRepo)
+		getSpaceModel = new(plugin_models.GetSpace_Model)
 
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.Dependency{
+			UI:          ui,
+			Config:      testconfig.NewRepositoryWithDefaults(),
+			RepoLocator: repoLocator,
+			PluginModels: &commandregistry.PluginModels{
+				Space: getSpaceModel,
+			},
+		}
+
+		reqFactory = new(requirementsfakes.FakeFactory)
+
+		loginReq = new(requirementsfakes.FakeRequirement)
+		loginReq.ExecuteReturns(nil)
+		reqFactory.NewLoginRequirementReturns(loginReq)
+
+		targetedOrgReq = new(requirementsfakes.FakeTargetedOrgRequirement)
+		targetedOrgReq.ExecuteReturns(nil)
+		reqFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
+
+		spaceRequirement = new(requirementsfakes.FakeSpaceRequirement)
+		spaceRequirement.ExecuteReturns(nil)
+		reqFactory.NewSpaceRequirementReturns(spaceRequirement)
+
+		cmd = space.ShowSpace{}
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+		cmd.SetDependency(deps, false)
 	})
 
-	runCommand := func(args ...string) bool {
-		return testcmd.RunCLICommand("space", args, requirementsFactory, updateCommandDependency, false, ui)
-	}
-
-	Describe("requirements", func() {
-		It("fails when not logged in", func() {
-			requirementsFactory.TargetedOrgSuccess = true
-
-			Expect(runCommand("some-space")).To(BeFalse())
+	Describe("Requirements", func() {
+		Context("when the wrong number of args are provided", func() {
+			It("fails with no args", func() {
+				flagContext.Parse()
+				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
+				Expect(ui.Outputs).To(ContainSubstrings(
+					[]string{"FAILED"},
+					[]string{"Incorrect Usage. Requires an argument"},
+				))
+			})
 		})
 
-		It("fails when an org is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
+		Context("when provided exactly one arg", func() {
+			var actualRequirements []requirements.Requirement
 
-			Expect(runCommand("some-space")).To(BeFalse())
-		})
+			Context("when no flags are provided", func() {
+				BeforeEach(func() {
+					flagContext.Parse("my-space")
+					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+				})
 
-		It("Shows usage when called incorrectly", func() {
-			requirementsFactory.LoginSuccess = true
+				It("returns a login requirement", func() {
+					Expect(reqFactory.NewLoginRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(loginReq))
+				})
 
-			runCommand("some-space", "much")
-			Expect(ui.Outputs).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires an argument"},
-			))
+				It("returns a targeted org requirement", func() {
+					Expect(reqFactory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(targetedOrgReq))
+				})
+			})
 		})
 	})
 
-	Describe("execute", func() {
+	Describe("Execute", func() {
+		var (
+			space      models.Space
+			spaceQuota models.SpaceQuota
+			executeErr error
+		)
+
+		BeforeEach(func() {
+			org := models.OrganizationFields{
+				Name: "my-org",
+				GUID: "my-org-guid",
+			}
+
+			app := models.ApplicationFields{
+				Name: "app1",
+				GUID: "app1-guid",
+			}
+
+			apps := []models.ApplicationFields{app}
+
+			domain := models.DomainFields{
+				Name: "domain1",
+				GUID: "domain1-guid",
+			}
+
+			domains := []models.DomainFields{domain}
+
+			serviceInstance := models.ServiceInstanceFields{
+				Name: "service1",
+				GUID: "service1-guid",
+			}
+			services := []models.ServiceInstanceFields{serviceInstance}
+
+			securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
+				{"protocol": "all", "destination": "0.0.0.0-9.255.255.255", "log": true, "IntTest": 1000},
+			}}
+			securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime", Rules: []map[string]interface{}{
+				{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
+			}}
+			securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
+
+			space = models.Space{
+				SpaceFields: models.SpaceFields{
+					Name: "whose-space-is-it-anyway",
+					GUID: "whose-space-is-it-anyway-guid",
+				},
+				Organization:     org,
+				Applications:     apps,
+				Domains:          domains,
+				ServiceInstances: services,
+				SecurityGroups:   securityGroups,
+				SpaceQuotaGUID:   "runaway-guid",
+			}
+
+			spaceRequirement.GetSpaceReturns(space)
+
+			spaceQuota = models.SpaceQuota{
+				Name:                    "runaway",
+				GUID:                    "runaway-guid",
+				MemoryLimit:             102400,
+				InstanceMemoryLimit:     -1,
+				RoutesLimit:             111,
+				ServicesLimit:           222,
+				NonBasicServicesAllowed: false,
+				AppInstanceLimit:        7,
+				ReservedRoutePortsLimit: "7",
+			}
+
+			quotaRepo.FindByGUIDReturns(spaceQuota, nil)
+		})
+
+		JustBeforeEach(func() {
+			executeErr = cmd.Execute(flagContext)
+		})
+
 		Context("when logged in and an org is targeted", func() {
-			var quota models.SpaceQuota
-
 			BeforeEach(func() {
-				org := models.OrganizationFields{
-					Name: "my-org",
-					GUID: "my-org-guid",
-				}
-
-				app := models.ApplicationFields{
-					Name: "app1",
-					GUID: "app1-guid",
-				}
-
-				apps := []models.ApplicationFields{app}
-
-				domain := models.DomainFields{
-					Name: "domain1",
-					GUID: "domain1-guid",
-				}
-
-				domains := []models.DomainFields{domain}
-
-				serviceInstance := models.ServiceInstanceFields{
-					Name: "service1",
-					GUID: "service1-guid",
-				}
-				services := []models.ServiceInstanceFields{serviceInstance}
-
-				securityGroup1 := models.SecurityGroupFields{Name: "Nacho Security", Rules: []map[string]interface{}{
-					{"protocol": "all", "destination": "0.0.0.0-9.255.255.255", "log": true, "IntTest": 1000},
-				}}
-				securityGroup2 := models.SecurityGroupFields{Name: "Nacho Prime", Rules: []map[string]interface{}{
-					{"protocol": "udp", "ports": "8080-9090", "destination": "198.41.191.47/1"},
-				}}
-				securityGroups := []models.SecurityGroupFields{securityGroup1, securityGroup2}
-
-				space := models.Space{
-					SpaceFields: models.SpaceFields{
-						Name: "whose-space-is-it-anyway",
-						GUID: "whose-space-is-it-anyway-guid",
-					},
-					Organization:     org,
-					Applications:     apps,
-					Domains:          domains,
-					ServiceInstances: services,
-					SecurityGroups:   securityGroups,
-					SpaceQuotaGUID:   "runaway-guid",
-				}
-
-				quota = models.SpaceQuota{
-					Name:                    "runaway",
-					GUID:                    "runaway-guid",
-					MemoryLimit:             102400,
-					InstanceMemoryLimit:     -1,
-					RoutesLimit:             111,
-					ServicesLimit:           222,
-					NonBasicServicesAllowed: false,
-					AppInstanceLimit:        7,
-					ReservedRoutePortsLimit: "7",
-				}
-
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedOrgSuccess = true
-				requirementsFactory.Space = space
-
-				quotaRepo.FindByGUIDReturns(quota, nil)
+				err := flagContext.Parse("my-space")
+				Expect(err).NotTo(HaveOccurred())
+				cmd.Requirements(reqFactory, flagContext)
 			})
 
 			Context("when the guid flag is passed", func() {
-				It("shows only the space guid", func() {
-					runCommand("--guid", "whose-space-is-it-anyway")
+				BeforeEach(func() {
+					err := flagContext.Parse("my-space", "--guid")
+					Expect(err).NotTo(HaveOccurred())
+				})
 
+				It("shows only the space guid", func() {
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"whose-space-is-it-anyway-guid"},
 					))
@@ -156,9 +206,12 @@ var _ = Describe("space command", func() {
 			})
 
 			Context("when the security-group-rules flag is passed", func() {
+				BeforeEach(func() {
+					err := flagContext.Parse("my-space", "--security-group-rules")
+					Expect(err).NotTo(HaveOccurred())
+				})
 				It("it shows space information and security group rules", func() {
-					runCommand("--security-group-rules", "whose-space-is-it-anyway")
-
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Getting rules for the security group", "Nacho Security"},
 						[]string{"protocol", "all"},
@@ -175,7 +228,7 @@ var _ = Describe("space command", func() {
 
 			Context("when the space has a space quota", func() {
 				It("shows information about the given space", func() {
-					runCommand("whose-space-is-it-anyway")
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 						[]string{"OK"},
@@ -191,13 +244,12 @@ var _ = Describe("space command", func() {
 
 				Context("when the route ports limit is -1", func() {
 					BeforeEach(func() {
-						quota.ReservedRoutePortsLimit = "-1"
-						quotaRepo.FindByGUIDReturns(quota, nil)
+						spaceQuota.ReservedRoutePortsLimit = "-1"
+						quotaRepo.FindByGUIDReturns(spaceQuota, nil)
 					})
 
 					It("displays unlimited as the route ports limit", func() {
-						runCommand("whose-space-is-it-anyway")
-
+						Expect(executeErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"unlimited route ports"},
 						))
@@ -206,14 +258,12 @@ var _ = Describe("space command", func() {
 
 				Context("when the reserved route ports field is not provided by the CC API", func() {
 					BeforeEach(func() {
-						quota.ReservedRoutePortsLimit = ""
-						quotaRepo.FindByGUIDReturns(quota, nil)
+						spaceQuota.ReservedRoutePortsLimit = ""
+						quotaRepo.FindByGUIDReturns(spaceQuota, nil)
 					})
 
 					It("should not display route ports", func() {
-						success := runCommand("whose-space-is-it-anyway")
-						Expect(success).To(BeTrue())
-
+						Expect(executeErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).NotTo(ContainSubstrings(
 							[]string{"route ports"},
 						))
@@ -222,12 +272,12 @@ var _ = Describe("space command", func() {
 
 				Context("when the app instance limit is -1", func() {
 					BeforeEach(func() {
-						quota.AppInstanceLimit = -1
-						quotaRepo.FindByGUIDReturns(quota, nil)
+						spaceQuota.AppInstanceLimit = -1
+						quotaRepo.FindByGUIDReturns(spaceQuota, nil)
 					})
 
 					It("displays unlimited as the app instance limit", func() {
-						runCommand("whose-space-is-it-anyway")
+						Expect(executeErr).NotTo(HaveOccurred())
 						Expect(ui.Outputs).To(ContainSubstrings(
 							[]string{"unlimited app instance limit"},
 						))
@@ -236,9 +286,13 @@ var _ = Describe("space command", func() {
 			})
 
 			Context("when the space does not have a space quota", func() {
+				BeforeEach(func() {
+					space.SpaceQuotaGUID = ""
+					spaceRequirement.GetSpaceReturns(space)
+				})
+
 				It("shows information without a space quota", func() {
-					requirementsFactory.Space.SpaceQuotaGUID = ""
-					runCommand("whose-space-is-it-anyway")
+					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(quotaRepo.FindByGUIDCallCount()).To(Equal(0))
 					Expect(ui.Outputs).To(ContainSubstrings(
 						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
@@ -255,60 +309,57 @@ var _ = Describe("space command", func() {
 			})
 
 			Context("When called as a plugin", func() {
-				var (
-					pluginModel plugin_models.GetSpace_Model
-				)
 				BeforeEach(func() {
-					pluginModel = plugin_models.GetSpace_Model{}
-					deps.PluginModels.Space = &pluginModel
+					cmd.SetDependency(deps, true)
 				})
 
 				It("Fills in the PluginModel", func() {
-					testcmd.RunCLICommand("space", []string{"whose-space-is-it-anyway"}, requirementsFactory, updateCommandDependency, true, ui)
-					Expect(pluginModel.Name).To(Equal("whose-space-is-it-anyway"))
-					Expect(pluginModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
+					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(pluginModel.Organization.Name).To(Equal("my-org"))
-					Expect(pluginModel.Organization.Guid).To(Equal("my-org-guid"))
+					Expect(getSpaceModel.Name).To(Equal("whose-space-is-it-anyway"))
+					Expect(getSpaceModel.Guid).To(Equal("whose-space-is-it-anyway-guid"))
 
-					Expect(pluginModel.Applications).To(HaveLen(1))
-					Expect(pluginModel.Applications[0].Name).To(Equal("app1"))
-					Expect(pluginModel.Applications[0].Guid).To(Equal("app1-guid"))
+					Expect(getSpaceModel.Organization.Name).To(Equal("my-org"))
+					Expect(getSpaceModel.Organization.Guid).To(Equal("my-org-guid"))
 
-					Expect(pluginModel.Domains).To(HaveLen(1))
-					Expect(pluginModel.Domains[0].Name).To(Equal("domain1"))
-					Expect(pluginModel.Domains[0].Guid).To(Equal("domain1-guid"))
+					Expect(getSpaceModel.Applications).To(HaveLen(1))
+					Expect(getSpaceModel.Applications[0].Name).To(Equal("app1"))
+					Expect(getSpaceModel.Applications[0].Guid).To(Equal("app1-guid"))
 
-					Expect(pluginModel.ServiceInstances).To(HaveLen(1))
-					Expect(pluginModel.ServiceInstances[0].Name).To(Equal("service1"))
-					Expect(pluginModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+					Expect(getSpaceModel.Domains).To(HaveLen(1))
+					Expect(getSpaceModel.Domains[0].Name).To(Equal("domain1"))
+					Expect(getSpaceModel.Domains[0].Guid).To(Equal("domain1-guid"))
 
-					Expect(pluginModel.SecurityGroups).To(HaveLen(2))
-					Expect(pluginModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
-					Expect(pluginModel.SecurityGroups[0].Rules).To(HaveLen(1))
-					Expect(pluginModel.SecurityGroups[0].Rules[0]).To(HaveLen(4))
-					val := pluginModel.SecurityGroups[0].Rules[0]["protocol"]
+					Expect(getSpaceModel.ServiceInstances).To(HaveLen(1))
+					Expect(getSpaceModel.ServiceInstances[0].Name).To(Equal("service1"))
+					Expect(getSpaceModel.ServiceInstances[0].Guid).To(Equal("service1-guid"))
+
+					Expect(getSpaceModel.SecurityGroups).To(HaveLen(2))
+					Expect(getSpaceModel.SecurityGroups[0].Name).To(Equal("Nacho Security"))
+					Expect(getSpaceModel.SecurityGroups[0].Rules).To(HaveLen(1))
+					Expect(getSpaceModel.SecurityGroups[0].Rules[0]).To(HaveLen(4))
+					val := getSpaceModel.SecurityGroups[0].Rules[0]["protocol"]
 					Expect(val).To(Equal("all"))
-					val = pluginModel.SecurityGroups[0].Rules[0]["destination"]
+					val = getSpaceModel.SecurityGroups[0].Rules[0]["destination"]
 					Expect(val).To(Equal("0.0.0.0-9.255.255.255"))
 
-					Expect(pluginModel.SecurityGroups[1].Name).To(Equal("Nacho Prime"))
-					Expect(pluginModel.SecurityGroups[1].Rules).To(HaveLen(1))
-					Expect(pluginModel.SecurityGroups[1].Rules[0]).To(HaveLen(3))
-					val = pluginModel.SecurityGroups[1].Rules[0]["protocol"]
+					Expect(getSpaceModel.SecurityGroups[1].Name).To(Equal("Nacho Prime"))
+					Expect(getSpaceModel.SecurityGroups[1].Rules).To(HaveLen(1))
+					Expect(getSpaceModel.SecurityGroups[1].Rules[0]).To(HaveLen(3))
+					val = getSpaceModel.SecurityGroups[1].Rules[0]["protocol"]
 					Expect(val).To(Equal("udp"))
-					val = pluginModel.SecurityGroups[1].Rules[0]["destination"]
+					val = getSpaceModel.SecurityGroups[1].Rules[0]["destination"]
 					Expect(val).To(Equal("198.41.191.47/1"))
-					val = pluginModel.SecurityGroups[1].Rules[0]["ports"]
+					val = getSpaceModel.SecurityGroups[1].Rules[0]["ports"]
 					Expect(val).To(Equal("8080-9090"))
 
-					Expect(pluginModel.SpaceQuota.Name).To(Equal("runaway"))
-					Expect(pluginModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
-					Expect(pluginModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
-					Expect(pluginModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
-					Expect(pluginModel.SpaceQuota.RoutesLimit).To(Equal(111))
-					Expect(pluginModel.SpaceQuota.ServicesLimit).To(Equal(222))
-					Expect(pluginModel.SpaceQuota.NonBasicServicesAllowed).To(BeFalse())
+					Expect(getSpaceModel.SpaceQuota.Name).To(Equal("runaway"))
+					Expect(getSpaceModel.SpaceQuota.Guid).To(Equal("runaway-guid"))
+					Expect(getSpaceModel.SpaceQuota.MemoryLimit).To(Equal(int64(102400)))
+					Expect(getSpaceModel.SpaceQuota.InstanceMemoryLimit).To(Equal(int64(-1)))
+					Expect(getSpaceModel.SpaceQuota.RoutesLimit).To(Equal(111))
+					Expect(getSpaceModel.SpaceQuota.ServicesLimit).To(Equal(222))
+					Expect(getSpaceModel.SpaceQuota.NonBasicServicesAllowed).To(BeFalse())
 				})
 			})
 		})
