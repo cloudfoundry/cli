@@ -130,6 +130,16 @@ var _ = Describe("org command", func() {
 				))
 			})
 
+			It("should not display route ports if the CC API does not provide it", func() {
+				org.QuotaDefinition.ReservedRoutePorts = ""
+				requirementsFactory.Organization = *org
+
+				success := runCommand("my-org")
+				Expect(success).To(BeTrue())
+
+				Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"route ports"}))
+			})
+
 			Context("when the guid flag is provided", func() {
 				It("shows only the org guid", func() {
 					runCommand("--guid", "my-org")

@@ -100,7 +100,7 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) error {
 		var reservedPortLimit string
 		switch string(quota.ReservedRoutePorts) {
 		case "":
-			return fmt.Errorf("CC API did not return ReservedRoutePorts")
+			break
 		case resources.UnlimitedReservedRoutePorts:
 			reservedPortLimit = T("unlimited")
 		default:
@@ -122,8 +122,12 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) error {
 			T("{{.ServicesLimit}} services", map[string]interface{}{"ServicesLimit": quota.ServicesLimit}),
 			T("paid services {{.NonBasicServicesAllowed}}", map[string]interface{}{"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}),
 			T("{{.AppInstanceLimit}} app instance limit", map[string]interface{}{"AppInstanceLimit": appInstanceLimit}),
-			T("{{.ReservedRoutePorts}} route ports", map[string]interface{}{"ReservedRoutePorts": reservedPortLimit}),
 		}
+
+		if reservedPortLimit != "" {
+			orgQuotaFields = append(orgQuotaFields, T("{{.ReservedRoutePorts}} route ports", map[string]interface{}{"ReservedRoutePorts": reservedPortLimit}))
+		}
+
 		orgQuota := fmt.Sprintf("%s (%s)", quota.Name, strings.Join(orgQuotaFields, ", "))
 
 		if cmd.pluginCall {
