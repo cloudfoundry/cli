@@ -11,6 +11,8 @@ fi
 gometalinter --disable-all \
     --enable=golint \
     --enable=goconst \
+    --enable=vet \
+    --deadline=10s \
     ./... \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
   | awk -f $ROOT_DIR/bin/lint-linters.awk # https://www.pivotaltracker.com/story/show/105609756
