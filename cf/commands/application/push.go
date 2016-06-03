@@ -340,7 +340,10 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 			cmd.ui.Say(T("App {{.AppName}} is a worker, skipping route creation",
 				map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 		} else {
-			routeActor.UnbindAll(app)
+			err := routeActor.UnbindAll(app)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	}
@@ -453,9 +456,7 @@ func (cmd *Push) createAndBindRoute(
 	if err != nil {
 		return err
 	}
-	routeActor.BindRoute(app, route)
-
-	return nil
+	return routeActor.BindRoute(app, route)
 }
 
 var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
