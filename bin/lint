@@ -13,7 +13,10 @@ gometalinter --disable-all \
     --enable=goconst \
     --enable=vet \
     --enable=gofmt \
+    --enable=gocyclo \
+    --cyclo-over=10 \
     --deadline=10s \
     ./... \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
-  | awk -f $ROOT_DIR/bin/lint-linters.awk # https://www.pivotaltracker.com/story/show/105609756
+  | awk -f $ROOT_DIR/bin/lint-linters.awk \
+  | sort # https://www.pivotaltracker.com/story/show/105609756
