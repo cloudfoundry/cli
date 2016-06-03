@@ -204,6 +204,22 @@ var _ = Describe("space command", func() {
 					})
 				})
 
+				Context("when the reserved route ports field is not provided by the CC API", func() {
+					BeforeEach(func() {
+						quota.ReservedRoutePortsLimit = ""
+						quotaRepo.FindByGUIDReturns(quota, nil)
+					})
+
+					It("should not display route ports", func() {
+						success := runCommand("whose-space-is-it-anyway")
+						Expect(success).To(BeTrue())
+
+						Expect(ui.Outputs).NotTo(ContainSubstrings(
+							[]string{"route ports"},
+						))
+					})
+				})
+
 				Context("when the app instance limit is -1", func() {
 					BeforeEach(func() {
 						quota.AppInstanceLimit = -1

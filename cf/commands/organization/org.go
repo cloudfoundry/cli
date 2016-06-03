@@ -115,14 +115,13 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) error {
 			appInstanceLimit = T("unlimited")
 		}
 
-		orgQuotaFields := []string{
-			T("{{.MemoryLimit}}M memory limit", map[string]interface{}{"MemoryLimit": quota.MemoryLimit}),
-			T("{{.InstanceMemoryLimit}} instance memory limit", map[string]interface{}{"InstanceMemoryLimit": formatters.InstanceMemoryLimit(quota.InstanceMemoryLimit)}),
-			T("{{.RoutesLimit}} routes", map[string]interface{}{"RoutesLimit": quota.RoutesLimit}),
-			T("{{.ServicesLimit}} services", map[string]interface{}{"ServicesLimit": quota.ServicesLimit}),
-			T("paid services {{.NonBasicServicesAllowed}}", map[string]interface{}{"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}),
-			T("{{.AppInstanceLimit}} app instance limit", map[string]interface{}{"AppInstanceLimit": appInstanceLimit}),
-		}
+		orgQuotaFields := []string{}
+		orgQuotaFields = append(orgQuotaFields, T("{{.MemoryLimit}}M memory limit", map[string]interface{}{"MemoryLimit": quota.MemoryLimit}))
+		orgQuotaFields = append(orgQuotaFields, T("{{.InstanceMemoryLimit}} instance memory limit", map[string]interface{}{"InstanceMemoryLimit": formatters.InstanceMemoryLimit(quota.InstanceMemoryLimit)}))
+		orgQuotaFields = append(orgQuotaFields, T("{{.RoutesLimit}} routes", map[string]interface{}{"RoutesLimit": quota.RoutesLimit}))
+		orgQuotaFields = append(orgQuotaFields, T("{{.ServicesLimit}} services", map[string]interface{}{"ServicesLimit": quota.ServicesLimit}))
+		orgQuotaFields = append(orgQuotaFields, T("paid services {{.NonBasicServicesAllowed}}", map[string]interface{}{"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
+		orgQuotaFields = append(orgQuotaFields, T("{{.AppInstanceLimit}} app instance limit", map[string]interface{}{"AppInstanceLimit": appInstanceLimit}))
 
 		if reservedPortLimit != "" {
 			orgQuotaFields = append(orgQuotaFields, T("{{.ReservedRoutePorts}} route ports", map[string]interface{}{"ReservedRoutePorts": reservedPortLimit}))

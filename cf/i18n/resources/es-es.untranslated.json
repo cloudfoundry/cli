@@ -68,6 +68,10 @@
     "translation": "route ports"
   },
   {
+    "id": "{{.MemoryLimit}} memory limit",
+    "translation": "{{.MemoryLimit}} memory limit"
+  },
+  {
     "id": "{{.ReservedRoutePorts}} route ports",
     "translation": "{{.ReservedRoutePorts}} route ports"
   }

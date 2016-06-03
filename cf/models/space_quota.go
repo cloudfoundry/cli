@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/formatters"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
 type SpaceQuota struct {
@@ -20,7 +21,7 @@ type SpaceQuota struct {
 	ReservedRoutePortsLimit json.Number `json:"total_reserved_route_ports,omitempty"`
 }
 
-const UnlimitedDisplay = "unlimited"
+const UnlimitedDisplay = T("unlimited")
 
 func (q SpaceQuota) FormattedMemoryLimit() string {
 	return formatters.ByteSize(q.MemoryLimit * formatters.MEGABYTE)

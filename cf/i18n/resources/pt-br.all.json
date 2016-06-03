@@ -5152,6 +5152,10 @@
     "translation": "{{.MemUsage}} de {{.MemQuota}}"
   },
   {
+    "id": "{{.MemoryLimit}} memory limit",
+    "translation": ""
+  },
+  {
     "id": "{{.MemoryLimit}}M memory limit",
     "translation": "{{.MemoryLimit}} limite de memória"
   },

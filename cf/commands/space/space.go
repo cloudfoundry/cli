@@ -152,17 +152,20 @@ func (cmd *ShowSpace) quotaString(space models.Space) (string, error) {
 		return "", err
 	}
 
-	spaceQuota := fmt.Sprintf(
-		"%s (%s memory limit, %s instance memory limit, %d routes, %d services, paid services %s, %s app instance limit, %s route ports)",
-		quota.Name,
-		quota.FormattedMemoryLimit(),
-		quota.FormattedInstanceMemoryLimit(),
-		quota.RoutesLimit,
-		quota.ServicesLimit,
-		formatters.Allowed(quota.NonBasicServicesAllowed),
-		T(quota.FormattedAppInstanceLimit()),
-		quota.FormattedRoutePortsLimit(),
-	)
+	spaceQuotaFields := []string{}
+	spaceQuotaFields = append(spaceQuotaFields, T("{{.MemoryLimit}} memory limit", map[string]interface{}{"MemoryLimit": quota.FormattedMemoryLimit()}))
+	spaceQuotaFields = append(spaceQuotaFields, T("{{.InstanceMemoryLimit}} instance memory limit", map[string]interface{}{"InstanceMemoryLimit": quota.FormattedInstanceMemoryLimit()}))
+	spaceQuotaFields = append(spaceQuotaFields, T("{{.RoutesLimit}} routes", map[string]interface{}{"RoutesLimit": quota.RoutesLimit}))
+	spaceQuotaFields = append(spaceQuotaFields, T("{{.ServicesLimit}} services", map[string]interface{}{"ServicesLimit": quota.ServicesLimit}))
+	spaceQuotaFields = append(spaceQuotaFields, T("paid services {{.NonBasicServicesAllowed}}", map[string]interface{}{"NonBasicServicesAllowed": formatters.Allowed(quota.NonBasicServicesAllowed)}))
+	spaceQuotaFields = append(spaceQuotaFields, T("{{.AppInstanceLimit}} app instance limit", map[string]interface{}{"AppInstanceLimit": quota.FormattedAppInstanceLimit()}))
+
+	routePorts := quota.FormattedRoutePortsLimit()
+	if routePorts != "" {
+		spaceQuotaFields = append(spaceQuotaFields, T("{{.ReservedRoutePorts}} route ports", map[string]interface{}{"ReservedRoutePorts": routePorts}))
+	}
+
+	spaceQuota := fmt.Sprintf("%s (%s)", quota.Name, strings.Join(spaceQuotaFields, ", "))
 
 	return spaceQuota, nil
 }
