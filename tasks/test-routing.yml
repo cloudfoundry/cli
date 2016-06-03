@@ -23,4 +23,4 @@ run:
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $routing_deployment_name $routing_deployment_file
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deployment $routing_deployment_file
-    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD run errand router_acceptance_tests
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD run errand routing_acceptance_tests
