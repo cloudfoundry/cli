@@ -5,5 +5,6 @@
     /plugin\/.*\(golint\)/ || \
     /plugin_examples\/.*\(golint\)/ || \
     /fakes\/.*\(golint\)/ || \
-    /^vendor.*\(goconst\)/ \
+    /^vendor.*\(goconst\)/ || \
+    /^vendor.*\(vet\)/ \
 )
