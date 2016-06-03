@@ -14,7 +14,7 @@ func ColoredAppState(app models.ApplicationFields) string {
 	appState := strings.ToLower(app.State)
 
 	if app.RunningInstances == 0 {
-		if appState == "stopped" {
+		if appState == models.ApplicationStateStopped {
 			return appState
 		}
 		return terminal.CrashedColor(appState)
@@ -35,7 +35,7 @@ func ColoredAppInstances(app models.ApplicationFields) string {
 	}
 
 	if app.RunningInstances == 0 {
-		if strings.ToLower(app.State) == "stopped" {
+		if strings.ToLower(app.State) == models.ApplicationStateStopped {
 			return healthString
 		}
 		return terminal.CrashedColor(healthString)
@@ -51,17 +51,17 @@ func ColoredAppInstances(app models.ApplicationFields) string {
 func ColoredInstanceState(instance models.AppInstanceFields) (colored string) {
 	state := string(instance.State)
 	switch state {
-	case "started", "running":
+	case models.ApplicationStateStarted, models.ApplicationStateRunning:
 		colored = T("running")
-	case "stopped":
+	case models.ApplicationStateStopped:
 		colored = terminal.StoppedColor(T("stopped"))
-	case "crashed":
+	case models.ApplicationStateCrashed:
 		colored = terminal.CrashedColor(T("crashed"))
-	case "flapping":
+	case models.ApplicationStateFlapping:
 		colored = terminal.CrashedColor(T("crashing"))
-	case "down":
+	case models.ApplicationStateDown:
 		colored = terminal.CrashedColor(T("down"))
-	case "starting":
+	case models.ApplicationStateStarting:
 		colored = terminal.AdvisoryColor(T("starting"))
 	default:
 		colored = terminal.WarningColor(state)

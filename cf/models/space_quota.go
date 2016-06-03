@@ -20,19 +20,21 @@ type SpaceQuota struct {
 	ReservedRoutePortsLimit json.Number `json:"total_reserved_route_ports,omitempty"`
 }
 
+const UnlimitedDisplay = "unlimited"
+
 func (q SpaceQuota) FormattedMemoryLimit() string {
 	return formatters.ByteSize(q.MemoryLimit * formatters.MEGABYTE)
 }
 
 func (q SpaceQuota) FormattedInstanceMemoryLimit() string {
 	if q.InstanceMemoryLimit == -1 {
-		return "unlimited"
+		return UnlimitedDisplay
 	}
 	return formatters.ByteSize(q.InstanceMemoryLimit * formatters.MEGABYTE)
 }
 
 func (q SpaceQuota) FormattedAppInstanceLimit() string {
-	appInstanceLimit := "unlimited"
+	appInstanceLimit := UnlimitedDisplay
 	if q.AppInstanceLimit != -1 { //TODO - figure out how to use resources.UnlimitedAppInstances
 		appInstanceLimit = strconv.Itoa(q.AppInstanceLimit)
 	}
@@ -41,7 +43,7 @@ func (q SpaceQuota) FormattedAppInstanceLimit() string {
 }
 
 func (q SpaceQuota) FormattedServicesLimit() string {
-	servicesLimit := "unlimited"
+	servicesLimit := UnlimitedDisplay
 	if q.ServicesLimit != -1 {
 		servicesLimit = strconv.Itoa(q.ServicesLimit)
 	}
@@ -50,7 +52,7 @@ func (q SpaceQuota) FormattedServicesLimit() string {
 }
 
 func (q SpaceQuota) FormattedRoutePortsLimit() string {
-	reservedRoutePortsLimit := "unlimited"
+	reservedRoutePortsLimit := UnlimitedDisplay
 	if q.ReservedRoutePortsLimit != "-1" {
 		reservedRoutePortsLimit = string(q.ReservedRoutePortsLimit)
 	}

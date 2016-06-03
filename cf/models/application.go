@@ -73,6 +73,16 @@ type ApplicationFields struct {
 	AppPorts             []int
 }
 
+const (
+	ApplicationStateStopped  = "stopped"
+	ApplicationStateStarted  = "started"
+	ApplicationStateRunning  = "running"
+	ApplicationStateCrashed  = "crashed"
+	ApplicationStateFlapping = "flapping"
+	ApplicationStateDown     = "down"
+	ApplicationStateStarting = "starting"
+)
+
 type AppParams struct {
 	BuildpackURL       *string
 	Command            *string

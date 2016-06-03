@@ -67,7 +67,7 @@ func (cmd *Stop) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName string) (models.Application, error) {
 	var updatedApp models.Application
 
-	if app.State == "stopped" {
+	if app.State == models.ApplicationStateStopped {
 		updatedApp = app
 		return updatedApp, nil
 	}
@@ -91,7 +91,7 @@ func (cmd *Stop) ApplicationStop(app models.Application, orgName, spaceName stri
 
 func (cmd *Stop) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
-	if app.State == "stopped" {
+	if app.State == models.ApplicationStateStopped {
 		cmd.ui.Say(terminal.WarningColor(T("App ") + app.Name + T(" is already stopped")))
 	} else {
 		_, err := cmd.ApplicationStop(app, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name)

@@ -25,6 +25,37 @@ gometalinter --disable-all \
             && !/should not use dot imports/ \
         " # https://www.pivotaltracker.com/story/show/105609756
 
+gometalinter --disable-all \
+    --enable=goconst \
+    ./... \
+  | awk " \
+            !/vendor/ \
+        " \
+  | awk " \
+           !/\"windows\"/ \
+        "
+#gometalinter --disable-all \
+#    --enable=dupl \
+#    --deadline=120s \
+#    ./... \
+#  | awk " \
+#            !/vendor/ \
+#        &&  !/cf\/resources/ \
+#        &&  !/words\// \
+#        &&  !/plugin\// \
+#        &&  !/plugin_examples\// \
+#        &&  !/fakes\// \
+#        &&  !/_test.go/ \
+#        "
+
+#gometalinter --disable-all \
+#    --enable=goimports \
+#    --deadline=120s \
+#    ./... \
+#  | awk " \
+#            !/vendor/ \
+#        "
+
 #gometalinter --disable-all \
 #    --enable=gotype \
 #    ./... \
