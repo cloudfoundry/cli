@@ -38,3 +38,6 @@ configure_pipeline bosh-lites \
 
 configure_pipeline concourse-redeploy \
   $pipelines_path/concourse-redeploy.yml
+
+configure_pipeline dies-lite \
+  $pipelines_path/dies-lite-pipeline.yml
