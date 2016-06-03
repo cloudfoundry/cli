@@ -10,5 +10,6 @@
     /should not use dot imports.*\(golint\)/ || \
     /\"windows\".*\(goconst\)/ || \
     /commands\/.*"-1".*\(goconst\)/ || \
-    /models\.RouterGroups composite literal uses unkeyed fields \(vet\)/ \
+    /models\.RouterGroups composite literal uses unkeyed fields \(vet\)/ || \
+    /cf\/commands\/service\/service_test\.go:1::warning: file is not gofmted \(gofmt\)/ \
 )
