@@ -139,6 +139,10 @@ func (f *FakeReqFactory) NewMaxAPIVersionRequirement(featureName string, maximum
 	return FakeRequirement{f, f.MaxAPIVersionSuccess}
 }
 
+func (f *FakeReqFactory) NewNumberArguments(thing1 []string, thing2 ...string) requirements.Requirement {
+	return FakeRequirement{f, true}
+}
+
 type FakeRequirement struct {
 	factory *FakeReqFactory
 	success bool

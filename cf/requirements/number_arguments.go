@@ -11,7 +11,7 @@ type NumberArguments struct {
 	expectedArgs []string
 }
 
-func NewNumberArguments(passedArgs []string, expectedArgs ...string) NumberArguments {
+func NewNumberArguments(passedArgs []string, expectedArgs []string) Requirement {
 	return NumberArguments{
 		passedArgs:   passedArgs,
 		expectedArgs: expectedArgs,

@@ -28,6 +28,7 @@ type Factory interface {
 	NewMinAPIVersionRequirement(commandName string, requiredVersion semver.Version) Requirement
 	NewMaxAPIVersionRequirement(commandName string, maximumVersion semver.Version) Requirement
 	NewUsageRequirement(Usable, string, func() bool) Requirement
+	NewNumberArguments([]string, ...string) Requirement
 }
 
 type apiRequirementFactory struct {
@@ -165,4 +166,8 @@ func (f apiRequirementFactory) NewMaxAPIVersionRequirement(commandName string, m
 
 func (f apiRequirementFactory) NewUsageRequirement(cmd Usable, errorMessage string, pred func() bool) Requirement {
 	return NewUsageRequirement(cmd, errorMessage, pred)
+}
+
+func (f apiRequirementFactory) NewNumberArguments(passedArgs []string, expectedArgs ...string) Requirement {
+	return NewNumberArguments(passedArgs, expectedArgs)
 }
