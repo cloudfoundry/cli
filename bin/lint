@@ -10,30 +10,31 @@ gometalinter --disable-all \
     --enable=golint \
     ./... \
   | awk " \
-            !/vendor/ \
-        &&  !/cf\/resources/ \
-        &&  !/words\// \
-        &&  !/plugin\// \
-        &&  !/plugin_examples\// \
-        &&  !/fakes\// \
+            !/vendor.*\(golint\)/ \
+        &&  !/cf\/resources.*\(golint\)/ \
+        &&  !/words\/.*\(golint\)/ \
+        &&  !/plugin\/.*\(golint\)/ \
+        &&  !/plugin_examples\/.*\(golint\)/ \
+        &&  !/fakes\/.*\(golint\)/ \
         " \
   | awk " \
-               !/should have comment or be unexported/ \
-            && !/should have comment \(or a comment on this block\) or be unexported/ \
-            && !/comment on exported type .+ should be of the form/ \
-            && !/returns unexported type/ \
-            && !/should not use dot imports/ \
+           !/should have comment or be unexported.*\(golint\)/ \
+        && !/should have comment \(or a comment on this block\) or be unexported.*\(golint\)/ \
+        && !/comment on exported type .+ should be of the form.*\(golint\)/ \
+        && !/returns unexported type.*\(golint\)/ \
+        && !/should not use dot imports.*\(golint\)/ \
         " # https://www.pivotaltracker.com/story/show/105609756
 
-gometalinter --disable-all \
-    --enable=goconst \
-    ./... \
-  | awk " \
-            !/vendor/ \
-        " \
-  | awk " \
-           !/\"windows\"/ \
-        "
+#gometalinter --disable-all \
+#    --enable=goconst \
+#    ./... \
+#  | awk " \
+#            !/vendor/ \
+#        " \
+#  | awk " \
+#           !/\"windows\"/ \
+#        "
+
 #gometalinter --disable-all \
 #    --enable=dupl \
 #    --deadline=120s \
