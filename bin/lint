@@ -12,10 +12,11 @@ gometalinter --disable-all \
     --enable=golint \
     --enable=goconst \
     --enable=vet \
+    --enable=vetshadow \
     --enable=gofmt \
     --enable=gocyclo \
     --cyclo-over=10 \
-    --deadline=10s \
+    --deadline=15s \
     ./... \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
   | awk -f $ROOT_DIR/bin/lint-linters.awk \

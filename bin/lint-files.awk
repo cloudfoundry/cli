@@ -7,6 +7,7 @@
     || /fakes\/.*\(golint\)/ \
     || /^vendor.*\(goconst\)/ \
     || /^vendor.*\(vet\)/ \
+    || /^vendor.*\(vetshadow\)/ \
     || /^vendor.*\(gofmt\)/ \
     || /cf\/resources.*\(gofmt\)/ \
     || /words\/.*\(gofmt\)/ \
