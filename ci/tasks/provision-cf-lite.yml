@@ -51,7 +51,7 @@ run:
     popd
 
     pushd cf-release-repo
-      sleep 10
+      sleep 30
 
       bosh -n target $LITE_PRIVATE_IP_ADDRESS
       bosh -n login admin admin
