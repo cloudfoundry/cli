@@ -21,3 +21,14 @@ gometalinter --disable-all \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
   | awk -f $ROOT_DIR/bin/lint-linters.awk \
   | sort # https://www.pivotaltracker.com/story/show/105609756
+
+if [ -n "$LINT_SLOW" ]; then
+    echo -e "\n\n Running slow linters..."
+    gometalinter --disable-all \
+        --enable=unconvert \
+        --deadline=120s \
+        ./... \
+      | awk -f $ROOT_DIR/bin/lint-files.awk \
+      | awk -f $ROOT_DIR/bin/lint-linters.awk \
+      | sort
+fi
