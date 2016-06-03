@@ -65,23 +65,18 @@ var _ = Describe("Routes", func() {
 		})
 
 		It("returns the route retrieved from the repository", func() {
-			actualRoute := routeActor.CreateRandomTCPRoute(domain)
+			actualRoute, err := routeActor.CreateRandomTCPRoute(domain)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(actualRoute).To(Equal(route))
 		})
 
 		It("prints an error when creating the route fails", func() {
-			fakeRouteRepository.CreateReturns(models.Route{}, errors.New("big bad error message"))
+			expectedError := errors.New("big bad error message")
+			fakeRouteRepository.CreateReturns(models.Route{}, expectedError)
 
-			var actualRoute models.Route
-			Expect(func() {
-				actualRoute = routeActor.CreateRandomTCPRoute(domain)
-			}).To(Panic())
-
-			Expect(fakeUI.Outputs).To(ContainSubstrings(
-				[]string{"big bad error message"},
-			))
-
+			actualRoute, err := routeActor.CreateRandomTCPRoute(domain)
+			Expect(err).To(Equal(expectedError))
 			Expect(actualRoute).To(Equal(models.Route{}))
 		})
 	})

@@ -352,7 +352,10 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 				return err
 			}
 			appParams.UseRandomPort = isTCP(domain)
-			cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
+			err = cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
+			if err != nil {
+				return err
+			}
 		} else {
 			for _, d := range *(appParams.Domains) {
 				domain, err := cmd.findDomain(&d)
@@ -360,7 +363,10 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 					return err
 				}
 				appParams.UseRandomPort = isTCP(domain)
-				cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
+				err = cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -378,9 +384,9 @@ func (cmd *Push) processDomainsAndBindRoutes(
 	routeActor actors.RouteActor,
 	app models.Application,
 	domain models.DomainFields,
-) {
+) error {
 	if appParams.IsHostEmpty() {
-		cmd.createAndBindRoute(
+		err := cmd.createAndBindRoute(
 			nil,
 			appParams.UseRandomRoute,
 			appParams.UseRandomPort,
@@ -390,9 +396,12 @@ func (cmd *Push) processDomainsAndBindRoutes(
 			domain,
 			appParams.RoutePath,
 		)
+		if err != nil {
+			return err
+		}
 	} else {
 		for _, host := range *(appParams.Hosts) {
-			cmd.createAndBindRoute(
+			err := cmd.createAndBindRoute(
 				&host,
 				appParams.UseRandomRoute,
 				appParams.UseRandomPort,
@@ -402,8 +411,12 @@ func (cmd *Push) processDomainsAndBindRoutes(
 				domain,
 				appParams.RoutePath,
 			)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
 func (cmd *Push) createAndBindRoute(
@@ -415,7 +428,7 @@ func (cmd *Push) createAndBindRoute(
 	noHostName bool,
 	domain models.DomainFields,
 	routePath *string,
-) {
+) error {
 	var hostname string
 	if !noHostName {
 		switch {
@@ -431,12 +444,18 @@ func (cmd *Push) createAndBindRoute(
 	}
 
 	var route models.Route
+	var err error
 	if routePath != nil {
-		route = routeActor.FindOrCreateRoute(hostname, domain, *routePath, UseRandomPort)
+		route, err = routeActor.FindOrCreateRoute(hostname, domain, *routePath, UseRandomPort)
 	} else {
-		route = routeActor.FindOrCreateRoute(hostname, domain, "", UseRandomPort)
+		route, err = routeActor.FindOrCreateRoute(hostname, domain, "", UseRandomPort)
+	}
+	if err != nil {
+		return err
 	}
 	routeActor.BindRoute(app, route)
+
+	return nil
 }
 
 var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
