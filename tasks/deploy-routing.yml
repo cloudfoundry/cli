@@ -33,7 +33,7 @@ run:
 
     bosh -n target $LITE_PRIVATE_IP_ADDRESS
 
-    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release cf-routing-release/release.tgz
+    bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release cf-routing-release/release.tgz --skip-if-exists
 
     cd cf-routing-release-repo
 
