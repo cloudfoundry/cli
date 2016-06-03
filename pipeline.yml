@@ -157,6 +157,8 @@ jobs:
       file: cli-ci/ci/tasks/units-osx.yml
     - task: units-windows
       file: cli-ci/ci/tasks/units-windows.yml
+    - task: lint
+      file: cli-ci/ci/tasks/lint.yml
 
 - name: build-binaries
   serial: true
