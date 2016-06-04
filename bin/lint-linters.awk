@@ -13,4 +13,5 @@
     || /models\.RouterGroups composite literal uses unkeyed fields \(vet\)/ \
     || /cf\/commands\/service\/service_test\.go:1::warning: file is not gofmted \(gofmt\)/ \
     || /cf\/minimum_api_versions\.go:5:1:warning: _ is unused \(deadcode\)/ \
+    || /error return value not checked \(defer .*\) \(errcheck\)/ \
 )
