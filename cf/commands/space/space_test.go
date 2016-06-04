@@ -3,11 +3,8 @@ package space_test
 import (
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
-	//"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 
 	"github.com/cloudfoundry/cli/plugin/models"
-	//testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	//testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
@@ -100,6 +97,11 @@ var _ = Describe("space command", func() {
 				It("returns a targeted org requirement", func() {
 					Expect(reqFactory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(targetedOrgReq))
+				})
+
+				It("returns a space requirement", func() {
+					Expect(reqFactory.NewSpaceRequirementCallCount()).To(Equal(1))
+					Expect(actualRequirements).To(ContainElement(spaceRequirement))
 				})
 			})
 		})
