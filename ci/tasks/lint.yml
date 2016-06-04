@@ -8,6 +8,8 @@ inputs:
 
 params:
   LINT_SLOW: true
+  LINT_DEADLINE: 30s
+  LINT_SLOW_DEADLINE: 240s
 
 run:
   path: bash
