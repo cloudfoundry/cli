@@ -16,7 +16,7 @@ gometalinter --disable-all \
     --enable=gofmt \
     --enable=gocyclo --cyclo-over=10 \
     --enable=deadcode \
-    --deadline=15s \
+    --deadline=${LINT_DEADLINE:-"15s"} \
     ./... \
   | awk -f $ROOT_DIR/bin/lint-files.awk \
   | awk -f $ROOT_DIR/bin/lint-linters.awk \
@@ -26,7 +26,7 @@ if [ -n "$LINT_SLOW" ]; then
     echo -e "\n\n Running slow linters..."
     gometalinter --disable-all \
         --enable=unconvert \
-        --deadline=120s \
+        --deadline=${LINT_SLOW_DEADLINE:-"120s"} \
         ./... \
       | awk -f $ROOT_DIR/bin/lint-files.awk \
       | awk -f $ROOT_DIR/bin/lint-linters.awk \
