@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -23,7 +24,7 @@ var _ = Describe("stop command", func() {
 		ui                  *testterm.FakeUI
 		app                 models.Application
 		appRepo             *applicationsfakes.FakeRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		config              coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -39,7 +40,7 @@ var _ = Describe("stop command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		appRepo = new(applicationsfakes.FakeRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -47,18 +48,20 @@ var _ = Describe("stop command", func() {
 	}
 
 	It("fails requirements when not logged in", func() {
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(runCommand("some-app-name")).To(BeFalse())
 	})
+
 	It("fails requirements when a space is not targeted", func() {
-		requirementsFactory.LoginSuccess = true
-		requirementsFactory.TargetedSpaceSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 		Expect(runCommand("some-app-name")).To(BeFalse())
 	})
 
 	Context("when logged in and an app exists", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			app = models.Application{}
 			app.Name = "my-app"
@@ -68,7 +71,9 @@ var _ = Describe("stop command", func() {
 
 		JustBeforeEach(func() {
 			appRepo.ReadReturns(app, nil)
-			requirementsFactory.Application = app
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 		})
 
 		It("fails with usage when the app name is not given", func() {
@@ -86,7 +91,6 @@ var _ = Describe("stop command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			appGUID, _ := appRepo.UpdateArgsForCall(0)
 			Expect(appGUID).To(Equal("my-app-guid"))
 		})

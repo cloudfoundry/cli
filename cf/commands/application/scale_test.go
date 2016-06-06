@@ -6,10 +6,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +20,7 @@ import (
 
 var _ = Describe("scale command", func() {
 	var (
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		restarter           *applicationfakes.FakeRestarter
 		appRepo             *applicationsfakes.FakeRepository
 		ui                  *testterm.FakeUI
@@ -41,7 +42,9 @@ var _ = Describe("scale command", func() {
 	}
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 		//save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("restart")
@@ -56,6 +59,16 @@ var _ = Describe("scale command", func() {
 		appRepo = new(applicationsfakes.FakeRepository)
 		ui = new(testterm.FakeUI)
 		config = testconfig.NewRepositoryWithDefaults()
+
+		app = maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
+		app.InstanceCount = 42
+		app.DiskQuota = 1024
+		app.Memory = 256
+
+		applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+		applicationReq.GetApplicationReturns(app)
+		requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+		appRepo.UpdateReturns(app, nil)
 	})
 
 	AfterEach(func() {
@@ -66,13 +79,12 @@ var _ = Describe("scale command", func() {
 		It("requires the user to be logged in with a targed space", func() {
 			args := []string{"-m", "1G", "my-app"}
 
-			requirementsFactory.LoginSuccess = false
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(testcmd.RunCLICommand("scale", args, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 
 			Expect(testcmd.RunCLICommand("scale", args, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
@@ -87,24 +99,11 @@ var _ = Describe("scale command", func() {
 		})
 
 		It("does not require any flags", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
-
 			Expect(testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeTrue())
 		})
 	})
 
 	Describe("scaling an app", func() {
-		BeforeEach(func() {
-			app = maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-			app.InstanceCount = 42
-			app.DiskQuota = 1024
-			app.Memory = 256
-
-			requirementsFactory.Application = app
-			appRepo.UpdateReturns(app, nil)
-		})
-
 		Context("when no flags are specified", func() {
 			It("prints a description of the app's limits", func() {
 				testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false, ui)

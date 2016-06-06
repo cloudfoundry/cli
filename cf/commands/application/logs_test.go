@@ -8,10 +8,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testlogs "github.com/cloudfoundry/cli/testhelpers/logs"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 
@@ -25,7 +26,7 @@ var _ = Describe("logs command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		logsRepo            *logsfakes.FakeRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -41,7 +42,7 @@ var _ = Describe("logs command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		logsRepo = new(logsfakes.FakeRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -50,7 +51,7 @@ var _ = Describe("logs command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when called without one argument", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -59,11 +60,14 @@ var _ = Describe("logs command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{})
+
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
+
 		It("fails if a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("--recent", "my-app")).To(BeFalse())
 		})
 
@@ -75,8 +79,8 @@ var _ = Describe("logs command", func() {
 		)
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			app = models.Application{}
 			app.Name = "my-app"
@@ -92,7 +96,10 @@ var _ = Describe("logs command", func() {
 				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 			}
 
-			requirementsFactory.Application = app
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+
 			logsRepo.RecentLogsForReturns(recentLogs, nil)
 			logsRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 				onConnect()
@@ -109,7 +116,6 @@ var _ = Describe("logs command", func() {
 		It("shows the recent logs when the --recent flag is provided", func() {
 			runCommand("--recent", "my-app")
 
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(app.GUID).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
@@ -134,7 +140,6 @@ var _ = Describe("logs command", func() {
 		It("tails the app's logs when no flags are given", func() {
 			runCommand("my-app")
 
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			appGUID, _, _, _ := logsRepo.TailLogsForArgsForCall(0)
 			Expect(app.GUID).To(Equal(appGUID))
 			Expect(ui.Outputs).To(ContainSubstrings(

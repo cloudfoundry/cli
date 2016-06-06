@@ -21,18 +21,18 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/manifest"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/generic"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/cli/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -52,7 +52,7 @@ var _ = Describe("Push Command", func() {
 		stackRepo                  *stacksfakes.FakeStackRepository
 		serviceRepo                *apifakes.FakeServiceRepository
 		wordGenerator              *generatorfakes.FakeWordGenerator
-		requirementsFactory        *testreq.FakeReqFactory
+		requirementsFactory        *requirementsfakes.FakeFactory
 		authRepo                   *authenticationfakes.FakeRepository
 		actor                      *actorsfakes.FakePushActor
 		appfiles                   *appfilesfakes.FakeAppFiles
@@ -158,11 +158,10 @@ var _ = Describe("Push Command", func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:         true,
-			TargetedSpaceSuccess: true,
-			MinAPIVersionSuccess: true,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Passing{})
 
 		zipper = new(appfilesfakes.FakeZipper)
 		appfiles = new(appfilesfakes.FakeAppFiles)
@@ -194,12 +193,12 @@ var _ = Describe("Push Command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(callPush("app-name")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(callPush("app-name")).To(BeFalse())
 		})
 
@@ -212,7 +211,7 @@ var _ = Describe("Push Command", func() {
 
 		Context("when the CC API version is too low", func() {
 			BeforeEach(func() {
-				requirementsFactory.MinAPIVersionSuccess = false
+				requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Failing{Message: "not min version"})
 			})
 
 			It("fails when provided the --route-path option", func() {
@@ -221,10 +220,6 @@ var _ = Describe("Push Command", func() {
 		})
 
 		Context("when the CC API version is not too low", func() {
-			BeforeEach(func() {
-				requirementsFactory.MinAPIVersionSuccess = true
-			})
-
 			It("does not fail when provided the --route-path option", func() {
 				Expect(callPush("--route-path", "the-path", "app-name")).To(BeTrue())
 			})
@@ -236,12 +231,11 @@ var _ = Describe("Push Command", func() {
 
 				fc := flags.NewFlagContext(cmd.MetaData().Flags)
 
-				reqs := cmd.Requirements(requirementsFactory, fc)
-				Expect(reqs).NotTo(BeEmpty())
+				minAPIVersionReq := new(requirementsfakes.FakeRequirement)
+				requirementsFactory.NewMinAPIVersionRequirementReturns(minAPIVersionReq)
 
-				var s semver.Version
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal(""))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(s))
+				reqs := cmd.Requirements(requirementsFactory, fc)
+				Expect(reqs).NotTo(ContainElement(minAPIVersionReq))
 			})
 
 			It("requires cf.MultipleAppPortsMinimumAPIVersion when provided", func() {
@@ -251,10 +245,7 @@ var _ = Describe("Push Command", func() {
 				fc.Parse("--app-ports", "8080,9090")
 
 				reqs := cmd.Requirements(requirementsFactory, fc)
-				Expect(reqs).NotTo(BeEmpty())
-
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '--app-ports'"))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.MultipleAppPortsMinimumAPIVersion))
+				Expect(reqs).To(ContainElement(requirementsFactory.NewMinAPIVersionRequirement("Option '--app-ports'", cf.MultipleAppPortsMinimumAPIVersion)))
 			})
 		})
 	})

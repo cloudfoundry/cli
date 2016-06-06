@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/appinstances/appinstancesfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -22,25 +23,27 @@ var _ = Describe("restart-app-instance", func() {
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		appInstancesRepo    *appinstancesfakes.FakeAppInstancesRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		application         models.Application
 		deps                commandregistry.Dependency
 	)
 
 	BeforeEach(func() {
-		application = models.Application{}
-		application.Name = "my-app"
-		application.GUID = "my-app-guid"
-		application.InstanceCount = 1
 
 		ui = &testterm.FakeUI{}
 		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:         true,
-			TargetedSpaceSuccess: true,
-			Application:          application,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+
+		application = models.Application{}
+		application.Name = "my-app"
+		application.GUID = "my-app-guid"
+		application.InstanceCount = 1
+		applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+		applicationReq.GetApplicationReturns(application)
+		requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -56,12 +59,12 @@ var _ = Describe("restart-app-instance", func() {
 
 	Describe("requirements", func() {
 		It("fails if not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-app", "0")).To(BeFalse())
 		})
 
 		It("fails if a space is not targeted", func() {
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("my-app", "0")).To(BeFalse())
 		})
 

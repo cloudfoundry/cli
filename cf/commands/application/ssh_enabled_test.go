@@ -4,9 +4,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -17,7 +18,7 @@ import (
 var _ = Describe("disable-ssh command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -25,7 +26,7 @@ var _ = Describe("disable-ssh command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -40,7 +41,7 @@ var _ = Describe("disable-ssh command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when called without enough arguments", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -54,8 +55,8 @@ var _ = Describe("disable-ssh command", func() {
 		})
 
 		It("fails if a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 	})
@@ -66,8 +67,8 @@ var _ = Describe("disable-ssh command", func() {
 		)
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			app = models.Application{}
 			app.Name = "my-app"
@@ -77,7 +78,9 @@ var _ = Describe("disable-ssh command", func() {
 		Context("when enable_ssh is set to the true", func() {
 			BeforeEach(func() {
 				app.EnableSSH = true
-				requirementsFactory.Application = app
+				applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+				applicationReq.GetApplicationReturns(app)
+				requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 			})
 
 			It("notifies the user", func() {
@@ -90,7 +93,9 @@ var _ = Describe("disable-ssh command", func() {
 		Context("when enable_ssh is set to the false", func() {
 			BeforeEach(func() {
 				app.EnableSSH = false
-				requirementsFactory.Application = app
+				applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+				applicationReq.GetApplicationReturns(app)
+				requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 			})
 
 			It("notifies the user", func() {

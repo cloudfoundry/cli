@@ -5,19 +5,21 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"os"
+
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	"os"
 )
 
 var _ = Describe("list-apps command", func() {
@@ -25,7 +27,7 @@ var _ = Describe("list-apps command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		appSummaryRepo      *apifakes.OldFakeAppSummaryRepo
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -40,10 +42,10 @@ var _ = Describe("list-apps command", func() {
 		ui = &testterm.FakeUI{}
 		appSummaryRepo = new(apifakes.OldFakeAppSummaryRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:         true,
-			TargetedSpaceSuccess: true,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 		app1Routes := []models.RouteSummary{
 			{
@@ -110,22 +112,22 @@ var _ = Describe("list-apps command", func() {
 		})
 
 		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			reqs := cmd.Requirements(requirementsFactory, flagContext)
 
 			Expect(testcmd.RunRequirements(reqs)).To(HaveOccurred())
 		})
 
 		It("requires the user to have a space targeted", func() {
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			reqs := cmd.Requirements(requirementsFactory, flagContext)
 
 			Expect(testcmd.RunRequirements(reqs)).To(HaveOccurred())
 		})
 
 		It("should fail with usage when provided any arguments", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			flagContext.Parse("blahblah")
 
@@ -138,8 +140,8 @@ var _ = Describe("list-apps command", func() {
 		})
 
 		It("succeeds with all", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			reqs := cmd.Requirements(requirementsFactory, flagContext)
 

@@ -18,8 +18,8 @@ func NewLoginRequirement(config coreconfig.Reader) LoginRequirement {
 
 func (req LoginRequirement) Execute() error {
 
-	if apiErr := req.apiEndpointRequirement.Execute(); apiErr != nil {
-		return apiErr
+	if err := req.apiEndpointRequirement.Execute(); err != nil {
+		return err
 	}
 
 	if !req.config.IsLoggedIn() {

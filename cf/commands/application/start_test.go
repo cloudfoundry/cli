@@ -6,6 +6,8 @@ import (
 
 	. "github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -21,7 +23,6 @@ import (
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testlogs "github.com/cloudfoundry/cli/testhelpers/logs"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -39,7 +40,7 @@ var _ = Describe("start command", func() {
 		defaultAppForStart        models.Application
 		defaultInstanceResponses  [][]models.AppInstanceFields
 		defaultInstanceErrorCodes []string
-		requirementsFactory       *testreq.FakeReqFactory
+		requirementsFactory       *requirementsfakes.FakeFactory
 		logMessages               []logs.Loggable
 		logRepo                   *logsfakes.FakeRepository
 
@@ -89,7 +90,7 @@ var _ = Describe("start command", func() {
 	BeforeEach(func() {
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 		ui = new(testterm.FakeUI)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 
 		configRepo = testconfig.NewRepository()
 
@@ -192,7 +193,7 @@ var _ = Describe("start command", func() {
 		return testcmd.RunCLICommandWithoutDependency("start", args, requirementsFactory, ui)
 	}
 
-	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *testreq.FakeReqFactory) (*testterm.FakeUI, *applicationsfakes.FakeRepository, *appinstancesfakes.FakeAppInstancesRepository) {
+	startAppWithInstancesAndErrors := func(app models.Application, requirementsFactory *requirementsfakes.FakeFactory) (*testterm.FakeUI, *applicationsfakes.FakeRepository, *appinstancesfakes.FakeAppInstancesRepository) {
 		appRepo.UpdateReturns(app, nil)
 		appRepo.ReadReturns(app, nil)
 		appRepo.GetAppReturns(app, nil)
@@ -200,20 +201,22 @@ var _ = Describe("start command", func() {
 
 		args := []string{"my-app"}
 
-		requirementsFactory.Application = app
+		applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+		applicationReq.GetApplicationReturns(app)
+		requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 		callStart(args)
 		return ui, appRepo, appInstancesRepo
 	}
 
 	It("fails requirements when not logged in", func() {
-		requirementsFactory.LoginSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 		Expect(callStart([]string{"some-app-name"})).To(BeFalse())
 	})
 
 	It("fails requirements when a space is not targeted", func() {
-		requirementsFactory.LoginSuccess = true
-		requirementsFactory.TargetedSpaceSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 
 		Expect(callStart([]string{"some-app-name"})).To(BeFalse())
 	})
@@ -257,9 +260,11 @@ var _ = Describe("start command", func() {
 				app.StagingFailedReason = "BLAH, FAILED"
 				appRepo.GetAppReturns(app, nil)
 
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedSpaceSuccess = true
-				requirementsFactory.Application = app
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+				applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+				applicationReq.GetApplicationReturns(app)
+				requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 
 				updateCommandDependency(logRepo)
 				cmd := commandregistry.Commands.FindCommand("start").(*Start)
@@ -284,8 +289,8 @@ var _ = Describe("start command", func() {
 			var startWait *sync.WaitGroup
 
 			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedSpaceSuccess = true
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 				configRepo = testconfig.NewRepositoryWithDefaults()
 				logRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 					startWait.Wait()
@@ -310,8 +315,8 @@ var _ = Describe("start command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 			configRepo = testconfig.NewRepositoryWithDefaults()
 		})
 
@@ -350,7 +355,6 @@ var _ = Describe("start command", func() {
 				[]string{"started"},
 			))
 
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			appGUID, _ := appRepo.UpdateArgsForCall(0)
 			Expect(appGUID).To(Equal("my-app-guid"))
 			Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
@@ -381,7 +385,9 @@ var _ = Describe("start command", func() {
 		})
 
 		It("handles timeouts gracefully", func() {
-			requirementsFactory.Application = defaultAppForStart
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(defaultAppForStart)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 			appRepo.UpdateReturns(defaultAppForStart, nil)
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
@@ -392,7 +398,9 @@ var _ = Describe("start command", func() {
 		})
 
 		It("only displays staging logs when an app is starting", func() {
-			requirementsFactory.Application = defaultAppForStart
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(defaultAppForStart)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 			appRepo.UpdateReturns(defaultAppForStart, nil)
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
@@ -655,7 +663,9 @@ var _ = Describe("start command", func() {
 			appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 			appRepo.ReadReturns(app, nil)
 			args := []string{"my-app"}
-			requirementsFactory.Application = app
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 			callStart(args)
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -675,7 +685,9 @@ var _ = Describe("start command", func() {
 			appRepo := new(applicationsfakes.FakeRepository)
 			appRepo.ReadReturns(app, nil)
 
-			requirementsFactory.Application = app
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 
 			args := []string{"my-app"}
 			callStart(args)
@@ -692,7 +704,9 @@ var _ = Describe("start command", func() {
 				errChan <- errors.New("Ooops")
 			}
 
-			requirementsFactory.Application = defaultAppForStart
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(defaultAppForStart)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 
 			callStart([]string{"my-app"})
 

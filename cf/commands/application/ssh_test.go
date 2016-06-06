@@ -11,12 +11,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -31,7 +32,7 @@ var _ = Describe("SSH command", func() {
 		sshCodeGetter         *commandsfakes.FakeSSHCodeGetter
 		originalSSHCodeGetter commandregistry.Command
 
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 		ccGateway           net.Gateway
@@ -42,7 +43,7 @@ var _ = Describe("SSH command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		deps.Gateways = make(map[string]net.Gateway)
 
 		//save original command and restore later
@@ -78,7 +79,7 @@ var _ = Describe("SSH command", func() {
 
 	Describe("Requirements", func() {
 		It("fails with usage when not provided exactly one arg", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -88,19 +89,22 @@ var _ = Describe("SSH command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
 		It("fails if a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
 
 		It("fails if a application is not found", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
-			requirementsFactory.ApplicationFails = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.ExecuteReturns(errors.New("no app"))
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 
 			Expect(runCommand("my-app")).To(BeFalse())
 		})
@@ -109,8 +113,8 @@ var _ = Describe("SSH command", func() {
 			var args []string
 
 			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedSpaceSuccess = true
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 			})
 
 			Context("when an -i flag is provided", func() {
@@ -155,8 +159,8 @@ var _ = Describe("SSH command", func() {
 		)
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 			currentApp = models.Application{}
 			currentApp.Name = "my-app"
 			currentApp.State = "started"
@@ -164,7 +168,9 @@ var _ = Describe("SSH command", func() {
 			currentApp.EnableSSH = true
 			currentApp.Diego = true
 
-			requirementsFactory.Application = currentApp
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(currentApp)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 		})
 
 		Describe("Error getting required info to run ssh", func() {
