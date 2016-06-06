@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,7 +21,7 @@ var _ = Describe("quotas command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -36,7 +37,8 @@ var _ = Describe("quotas command", func() {
 		ui = &testterm.FakeUI{}
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 	})
 
 	runCommand := func(args ...string) bool {
@@ -45,26 +47,26 @@ var _ = Describe("quotas command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("foo")).ToNot(HavePassedRequirements())
 		})
 
 		It("requires the user to target an org", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			orgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			orgReq.ExecuteReturns(errors.New("not targeting org"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(orgReq)
 			Expect(runCommand("bar")).ToNot(HavePassedRequirements())
 		})
 
 		It("fails when a quota name is not provided", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 	})
 
 	Context("when logged in", func() {
 		JustBeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			runCommand("quota-name")
 		})
 

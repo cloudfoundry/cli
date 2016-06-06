@@ -7,9 +7,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -22,7 +23,7 @@ var _ = Describe("delete-space-quota command", func() {
 		ui                  *testterm.FakeUI
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -40,7 +41,7 @@ var _ = Describe("delete-space-quota command", func() {
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 
 		org := models.Organization{}
 		org.Name = "my-org"
@@ -55,7 +56,7 @@ var _ = Describe("delete-space-quota command", func() {
 
 	Context("when the user is not logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		})
 
 		It("fails requirements", func() {
@@ -65,7 +66,7 @@ var _ = Describe("delete-space-quota command", func() {
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		It("fails requirements when called without a quota name", func() {
@@ -76,7 +77,7 @@ var _ = Describe("delete-space-quota command", func() {
 		})
 
 		It("fails requirements when an org is not targeted", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand()).To(BeFalse())
 		})
 

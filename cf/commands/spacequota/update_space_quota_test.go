@@ -9,10 +9,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -23,7 +24,7 @@ var _ = Describe("update-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 
 		quota            models.SpaceQuota
 		quotaPaidService models.SpaceQuota
@@ -46,26 +47,27 @@ var _ = Describe("update-space-quota command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
-			requirementsFactory.LoginSuccess = false
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-quota", "-m", "50G")).NotTo(HavePassedRequirements())
 		})
 
 		It("fails when the user does not have an org targeted", func() {
-			requirementsFactory.TargetedOrgSuccess = false
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			orgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			orgReq.ExecuteReturns(errors.New("not targeting org"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(orgReq)
 			Expect(runCommand()).NotTo(HavePassedRequirements())
 			Expect(runCommand("my-quota", "-m", "50G")).NotTo(HavePassedRequirements())
 		})
 
 		It("fails with usage if space quota name is not provided", func() {
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			runCommand()
 
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -75,16 +77,17 @@ var _ = Describe("update-space-quota command", func() {
 
 		Context("the minimum API version requirement", func() {
 			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.TargetedOrgSuccess = true
-				requirementsFactory.MinAPIVersionSuccess = false
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+				requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Failing{Message: "not min api"})
 			})
 
 			It("fails when the -a option is provided", func() {
 				Expect(runCommand("my-quota", "-a", "10")).To(BeFalse())
-
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.SpaceAppInstanceLimitMinimumAPIVersion))
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Option '-a'"))
+				Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
+				option, version := requirementsFactory.NewMinAPIVersionRequirementArgsForCall(0)
+				Expect(option).To(Equal("Option '-a'"))
+				Expect(version).To(Equal(cf.SpaceAppInstanceLimitMinimumAPIVersion))
 			})
 
 			It("does not fail when the -a option is not provided", func() {
@@ -109,9 +112,9 @@ var _ = Describe("update-space-quota command", func() {
 
 			quotaPaidService = models.SpaceQuota{NonBasicServicesAllowed: true}
 
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.MinAPIVersionSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+			requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Passing{})
 		})
 
 		JustBeforeEach(func() {
