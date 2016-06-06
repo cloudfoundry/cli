@@ -70,8 +70,12 @@ var _ = Describe("space command", func() {
 
 	Describe("Requirements", func() {
 		Context("when the wrong number of args are provided", func() {
+			BeforeEach(func() {
+				err := flagContext.Parse()
+				Expect(err).NotTo(HaveOccurred())
+			})
+
 			It("fails with no args", func() {
-				flagContext.Parse()
 				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
 				Expect(ui.Outputs).To(ContainSubstrings(
 					[]string{"FAILED"},
@@ -85,7 +89,8 @@ var _ = Describe("space command", func() {
 
 			Context("when no flags are provided", func() {
 				BeforeEach(func() {
-					flagContext.Parse("my-space")
+					err := flagContext.Parse("my-space")
+					Expect(err).NotTo(HaveOccurred())
 					actualRequirements = cmd.Requirements(reqFactory, flagContext)
 				})
 
