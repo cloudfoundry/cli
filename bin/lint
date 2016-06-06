@@ -13,7 +13,6 @@ gometalinter --disable-all \
     --enable=goconst \
     --enable=vet \
     --enable=vetshadow \
-    --enable=gofmt \
     --enable=gocyclo --cyclo-over=10 \
     --enable=deadcode \
     --deadline=${LINT_DEADLINE:-"15s"} \
