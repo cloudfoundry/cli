@@ -8,7 +8,5 @@
     || /cf\/resources.*\(golint\)/ \
     || /words\/.*\(golint\)/ \
     || /plugin\/.*\(golint\)/ \
-    || /cf\/resources.*\(gofmt\)/ \
-    || /words\/.*\(gofmt\)/ \
     || /_test\.go.*\(errcheck\)/ \
 )
