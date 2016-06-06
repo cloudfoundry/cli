@@ -8,9 +8,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -27,7 +28,7 @@ var _ = Describe("CopySource", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		authRepo            *authenticationfakes.FakeRepository
 		appRepo             *applicationsfakes.FakeRepository
 		copyAppSourceRepo   *copyapplicationsourcefakes.FakeRepository
@@ -55,7 +56,7 @@ var _ = Describe("CopySource", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		authRepo = new(authenticationfakes.FakeRepository)
 		appRepo = new(applicationsfakes.FakeRepository)
 		copyAppSourceRepo = new(copyapplicationsourcefakes.FakeRepository)
@@ -84,12 +85,13 @@ var _ = Describe("CopySource", func() {
 
 	Describe("requirement failures", func() {
 		It("when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("source-app", "target-app")).ToNot(HavePassedRequirements())
 		})
 
 		It("when a space is not targeted", func() {
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("source-app", "target-app")).ToNot(HavePassedRequirements())
 		})
 
@@ -100,8 +102,8 @@ var _ = Describe("CopySource", func() {
 
 	Describe("Passing requirements", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		})
 
 		Context("refreshing the auth token", func() {

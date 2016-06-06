@@ -5,10 +5,11 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -21,7 +22,7 @@ import (
 var _ = Describe("restart command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		starter             *applicationfakes.FakeStarter
 		stopper             *applicationfakes.FakeStopper
 		config              coreconfig.Repository
@@ -29,6 +30,7 @@ var _ = Describe("restart command", func() {
 		originalStop        commandregistry.Command
 		originalStart       commandregistry.Command
 		deps                commandregistry.Dependency
+		applicationReq      *requirementsfakes.FakeApplicationRequirement
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -49,7 +51,7 @@ var _ = Describe("restart command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		starter = new(applicationfakes.FakeStarter)
 		stopper = new(applicationfakes.FakeStopper)
 		config = testconfig.NewRepositoryWithDefaults()
@@ -57,6 +59,9 @@ var _ = Describe("restart command", func() {
 		app = models.Application{}
 		app.Name = "my-app"
 		app.GUID = "my-app-guid"
+
+		applicationReq = new(requirementsfakes.FakeApplicationRequirement)
+		applicationReq.GetApplicationReturns(app)
 
 		//save original command and restore later
 		originalStart = commandregistry.Commands.FindCommand("start")
@@ -81,7 +86,7 @@ var _ = Describe("restart command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when not provided exactly one arg", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
@@ -89,15 +94,14 @@ var _ = Describe("restart command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			requirementsFactory.Application = app
-			requirementsFactory.TargetedSpaceSuccess = true
-
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			requirementsFactory.Application = app
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			Expect(runCommand()).To(BeFalse())
 		})
@@ -105,9 +109,9 @@ var _ = Describe("restart command", func() {
 
 	Context("when logged in, targeting a space, and an app name is provided", func() {
 		BeforeEach(func() {
-			requirementsFactory.Application = app
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			stopper.ApplicationStopReturns(app, nil)
 		})
@@ -124,8 +128,6 @@ var _ = Describe("restart command", func() {
 			Expect(application).To(Equal(app))
 			Expect(orgName).To(Equal(config.OrganizationFields().Name))
 			Expect(spaceName).To(Equal(config.SpaceFields().Name))
-
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 		})
 	})
 })

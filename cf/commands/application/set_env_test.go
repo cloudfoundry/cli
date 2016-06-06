@@ -7,9 +7,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -23,7 +24,7 @@ var _ = Describe("set-env command", func() {
 		configRepo          coreconfig.Repository
 		app                 models.Application
 		appRepo             *applicationsfakes.FakeRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -40,7 +41,7 @@ var _ = Describe("set-env command", func() {
 		app.Name = "my-app"
 		app.GUID = "my-app-guid"
 		appRepo = new(applicationsfakes.FakeRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -49,24 +50,28 @@ var _ = Describe("set-env command", func() {
 	}
 
 	Describe("requirements", func() {
+		BeforeEach(func() {
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+		})
+
 		It("fails when login is not successful", func() {
-			requirementsFactory.Application = app
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand("hey", "gabba", "gabba")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			requirementsFactory.Application = app
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 
 			Expect(runCommand("hey", "gabba", "gabba")).To(BeFalse())
 		})
 
 		It("fails with usage when not provided with exactly three args", func() {
-			requirementsFactory.Application = app
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			runCommand("zomg", "too", "many", "args")
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -78,9 +83,11 @@ var _ = Describe("set-env command", func() {
 	Context("when logged in, a space is targeted and given enough args", func() {
 		BeforeEach(func() {
 			app.EnvironmentVars = map[string]interface{}{"foo": "bar"}
-			requirementsFactory.Application = app
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when it is new", func() {
@@ -101,7 +108,6 @@ var _ = Describe("set-env command", func() {
 					[]string{"TIP"},
 				))
 
-				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				appGUID, params := appRepo.UpdateArgsForCall(0)
 				Expect(appGUID).To(Equal(app.GUID))
 				Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{

@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -18,7 +19,7 @@ import (
 var _ = Describe("Rename command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		appRepo             *applicationsfakes.FakeRepository
 		deps                commandregistry.Dependency
@@ -34,7 +35,7 @@ var _ = Describe("Rename command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		appRepo = new(applicationsfakes.FakeRepository)
 	})
 
@@ -44,7 +45,7 @@ var _ = Describe("Rename command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when not invoked with an old name and a new name", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("foo")
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -52,22 +53,28 @@ var _ = Describe("Rename command", func() {
 		})
 
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-app", "my-new-app")).To(BeFalse())
 		})
+
 		It("fails if a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("my-app", "my-new-app")).To(BeFalse())
 		})
 	})
 
 	It("renames an application", func() {
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+
 		app := models.Application{}
 		app.Name = "my-app"
 		app.GUID = "my-app-guid"
-		requirementsFactory.LoginSuccess = true
-		requirementsFactory.TargetedSpaceSuccess = true
-		requirementsFactory.Application = app
+		applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+		applicationReq.GetApplicationReturns(app)
+		requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+
 		runCommand("my-app", "my-new-app")
 
 		appGUID, params := appRepo.UpdateArgsForCall(0)

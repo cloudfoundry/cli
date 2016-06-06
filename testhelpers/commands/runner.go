@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
 
@@ -16,7 +16,7 @@ const (
 	RunCommandResultSuccess = iota
 )
 
-func RunCLICommand(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, updateFunc func(bool), pluginCall bool, ui *testterm.FakeUI) bool {
+func RunCLICommand(cmdName string, args []string, requirementsFactory requirements.Factory, updateFunc func(bool), pluginCall bool, ui *testterm.FakeUI) bool {
 	updateFunc(pluginCall)
 	cmd := commandregistry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
@@ -49,7 +49,7 @@ func RunCLICommand(cmdName string, args []string, requirementsFactory *testreq.F
 	return true
 }
 
-func RunCLICommandWithoutDependency(cmdName string, args []string, requirementsFactory *testreq.FakeReqFactory, ui *testterm.FakeUI) bool {
+func RunCLICommandWithoutDependency(cmdName string, args []string, requirementsFactory requirements.Factory, ui *testterm.FakeUI) bool {
 	cmd := commandregistry.Commands.FindCommand(cmdName)
 	context := flags.NewFlagContext(cmd.MetaData().Flags)
 	context.SkipFlagParsing(cmd.MetaData().SkipFlagParsing)

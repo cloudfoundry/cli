@@ -7,8 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -25,7 +25,7 @@ var _ = Describe("Api", func() {
 		config              coreconfig.Repository
 		endpointRepo        *coreconfigfakes.FakeEndpointRepository
 		deps                commandregistry.Dependency
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		ui                  *testterm.FakeUI
 		cmd                 commands.API
 		flagContext         flags.FlagContext
@@ -42,7 +42,7 @@ var _ = Describe("Api", func() {
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		config = testconfig.NewRepository()
 		endpointRepo = new(coreconfigfakes.FakeEndpointRepository)
 

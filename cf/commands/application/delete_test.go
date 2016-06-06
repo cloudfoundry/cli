@@ -7,9 +7,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +25,7 @@ var _ = Describe("delete app command", func() {
 		configRepo          coreconfig.Repository
 		appRepo             *applicationsfakes.FakeRepository
 		routeRepo           *apifakes.FakeRouteRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -44,7 +45,7 @@ var _ = Describe("delete app command", func() {
 		ui = &testterm.FakeUI{}
 		appRepo = new(applicationsfakes.FakeRepository)
 		routeRepo = new(apifakes.FakeRouteRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
@@ -54,19 +55,19 @@ var _ = Describe("delete app command", func() {
 	}
 
 	It("fails requirements when not logged in", func() {
-		requirementsFactory.LoginSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
 	})
 	It("fails if a space is not targeted", func() {
-		requirementsFactory.LoginSuccess = true
-		requirementsFactory.TargetedSpaceSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		})
 
 		It("fails with usage when not provided exactly one arg", func() {

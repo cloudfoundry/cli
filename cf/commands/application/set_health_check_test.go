@@ -7,9 +7,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,7 +21,7 @@ import (
 var _ = Describe("set-health-check command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		appRepo             *applicationsfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -29,7 +30,7 @@ var _ = Describe("set-health-check command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		appRepo = new(applicationsfakes.FakeRepository)
 	})
 
@@ -46,7 +47,7 @@ var _ = Describe("set-health-check command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when called without enough arguments", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand("FAKE_APP")
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -55,7 +56,7 @@ var _ = Describe("set-health-check command", func() {
 		})
 
 		It("fails with usage when health_check_type is not provided with 'none' or 'port'", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand("FAKE_APP", "bad_type")
 			Expect(ui.Outputs).To(ContainSubstrings(
@@ -64,12 +65,13 @@ var _ = Describe("set-health-check command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 
 		It("fails if a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("my-app", "none")).To(BeFalse())
 		})
 	})
@@ -80,15 +82,17 @@ var _ = Describe("set-health-check command", func() {
 		)
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			app = models.Application{}
 			app.Name = "my-app"
 			app.GUID = "my-app-guid"
 			app.HealthCheckType = "none"
 
-			requirementsFactory.Application = app
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 		})
 
 		Context("when health_check_type is already set to the desired state", func() {
