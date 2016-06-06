@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -22,7 +23,7 @@ var _ = Describe("set-space-quota command", func() {
 		ui                  *testterm.FakeUI
 		spaceRepo           *apifakes.FakeSpaceRepository
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -40,7 +41,8 @@ var _ = Describe("set-space-quota command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 	})
 
 	runCommand := func(args ...string) bool {
@@ -49,18 +51,20 @@ var _ = Describe("set-space-quota command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("space", "space-quota")).ToNot(HavePassedRequirements())
 		})
 
 		It("requires the user to target an org", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			orgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			orgReq.ExecuteReturns(errors.New("not targeting org"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(orgReq)
 			Expect(runCommand("space", "space-quota")).ToNot(HavePassedRequirements())
 		})
 
 		It("fails with usage if the user does not provide a quota and space", func() {
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -70,8 +74,8 @@ var _ = Describe("set-space-quota command", func() {
 
 	Context("when logged in", func() {
 		JustBeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			runCommand("my-space", "quota-name")
 		})
 
