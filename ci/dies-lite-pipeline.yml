@@ -6,7 +6,7 @@ resources:
     uri: https://github.com/cloudfoundry/bosh-lite.git
     branch: master
 
-- name: bosh-lite-lock
+- name: cli-pools
   type: pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
@@ -95,7 +95,7 @@ jobs:
 - name: deploy-boshlite
   serial: true
   plan:
-  - put: bosh-lite-lock
+  - put: cli-pools
     params:
       claim: {{lite-acceptance-hostname}}
   - do:
@@ -138,6 +138,59 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: cli-pools
       params:
-        release: bosh-lite-lock
+        release: cli-pools
+
+- name: deploy-diego-release
+  plan:
+  - get: cli-pools
+    passed: [deploy-boshlite]
+    trigger: true
+  - put: cli-pools
+    params:
+      claim: {{lite-acceptance-hostname}}
+  - do:
+    - aggregate:
+      - get: etcd-release
+      - get: garden-linux-release
+      - get: diego-release
+      - get: diego-repo
+      - get: cflinuxfs2-rootfs-release
+      - get: cli
+    - task: deploy-diego
+      file: cli/ci/tasks/deploy-diego.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+    ensure:
+      put: cli-pools
+      params:
+        release: cli-pools
+
+- name: deploy-routing-release
+  plan:
+  - get: cli-pools
+    passed: [deploy-diego-release]
+    trigger: true
+  - put: cli-pools
+    params:
+      claim: {{lite-acceptance-hostname}}
+  - do:
+    - aggregate:
+      - get: cf-routing-release
+      - get: cf-routing-release-repo
+      - get: cf-release-repo
+      - get: cli
+    - task: deploy-routing
+      file: cli/ci/tasks/deploy-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+        LITE_HOSTNAME: {{lite-acceptance-hostname}}
+    - task: test-routing
+      file: cli/ci/tasks/test-routing.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+    ensure:
+      put: cli-pools
+      params:
+        release: cli-pools
