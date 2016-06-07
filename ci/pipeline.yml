@@ -88,7 +88,7 @@ resources:
     branch: locks
     pool: bosh-lites
 
-- name: cli-pools
+- name: bosh-lites-diego-pool
   type: pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
@@ -253,7 +253,8 @@ jobs:
       trigger: true
       passed: [build-binaries]
     - get: cli-ci
-    - put: cli-pools
+    - put: bosh-lite-lock
+      resource: bosh-lites-diego-pool
       params:
         acquire: true
   - aggregate:
@@ -265,9 +266,9 @@ jobs:
         ADMIN_USER: {{bosh-lite-admin-username}}
         ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-diego-pool
       params:
-        release: cli-pools
+        release: bosh-lite-lock
 
 - name: cats-windows
   serial: true
