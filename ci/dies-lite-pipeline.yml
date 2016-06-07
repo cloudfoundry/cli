@@ -6,13 +6,13 @@ resources:
     uri: https://github.com/cloudfoundry/bosh-lite.git
     branch: master
 
-- name: cli-pools
+- name: bosh-lites-acceptance-pool
   type: pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
     private_key: {{cli-pools-github-private-key}}
     branch: master
-    pool: dies-lite
+    pool: bosh-lites-acceptance
 
 - name: cli
   type: git
@@ -95,7 +95,8 @@ jobs:
 - name: deploy-boshlite
   serial: true
   plan:
-  - put: cli-pools
+  - put: bosh-lite-lock
+    resource: bosh-lites-acceptance-pool
     params:
       claim: {{lite-acceptance-hostname}}
   - do:
@@ -138,16 +139,17 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-acceptance-pool
       params:
-        release: cli-pools
+        release: bosh-lite-lock
 
 - name: deploy-diego-release
   plan:
-  - get: cli-pools
+  - get: bosh-lites-acceptance-pool
     passed: [deploy-boshlite]
     trigger: true
-  - put: cli-pools
+  - put: bosh-lite-lock
+    resource: bosh-lites-acceptance-pool
     params:
       claim: {{lite-acceptance-hostname}}
   - do:
@@ -163,16 +165,17 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-acceptance-pool
       params:
-        release: cli-pools
+        release: bosh-lite-lock
 
 - name: deploy-routing-release
   plan:
-  - get: cli-pools
+  - get: bosh-lites-acceptance-pool
     passed: [deploy-diego-release]
     trigger: true
-  - put: cli-pools
+  - put: bosh-lite-lock
+    resource: bosh-lites-acceptance-pool
     params:
       claim: {{lite-acceptance-hostname}}
   - do:
@@ -191,6 +194,6 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-acceptance-pool
       params:
-        release: cli-pools
+        release: bosh-lite-lock
