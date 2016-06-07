@@ -127,7 +127,8 @@ jobs:
 - name: deploy-boshlite-1
   serial: true
   plan:
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-1-hostname}}
   - do:
@@ -172,14 +173,15 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-diego-release-1
   plan:
   - get: bosh-lites-dea-pool
     passed: [deploy-boshlite-1]
     trigger: true
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-1-hostname}}
   - do:
@@ -197,14 +199,15 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-routing-release-1
   plan:
   - get: bosh-lites-dea-pool
     passed: [deploy-diego-release-1]
     trigger: true
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-1-hostname}}
   - do:
@@ -225,12 +228,13 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-boshlite-2
   serial: true
   plan:
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-2-hostname}}
   - do:
@@ -275,14 +279,15 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-diego-release-2
   plan:
   - get: bosh-lites-dea-pool
     passed: [deploy-boshlite-2]
     trigger: true
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-2-hostname}}
   - do:
@@ -300,14 +305,15 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-routing-release-2
   plan:
   - get: bosh-lites-dea-pool
     passed: [deploy-diego-release-2]
     trigger: true
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-2-hostname}}
   - do:
@@ -328,13 +334,14 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 
 - name: deploy-boshlite-3
   serial: true
   plan:
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-3-hostname}}
   - do:
@@ -379,14 +386,15 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-diego-release-3
   plan:
   - get: bosh-lites-dea-pool
     passed: [deploy-boshlite-3]
     trigger: true
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-3-hostname}}
   - do:
@@ -404,14 +412,15 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-routing-release-3
   plan:
   - get: bosh-lites-dea-pool
     passed: [deploy-diego-release-3]
     trigger: true
-  - put: bosh-lites-dea-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-dea-pool
     params:
       claim: {{lite-3-hostname}}
   - do:
@@ -432,12 +441,13 @@ jobs:
     ensure:
       put: bosh-lites-dea-pool
       params:
-        release: bosh-lites-dea-pool
+        release: bosh-lite-lock
 
 - name: deploy-boshlite-4
   serial: true
   plan:
-  - put: bosh-lites-diego-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-diego-pool
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -482,14 +492,15 @@ jobs:
     ensure:
       put: bosh-lites-diego-pool
       params:
-        release: bosh-lites-diego-pool
+        release: bosh-lite-lock
 
 - name: deploy-diego-release-4
   plan:
   - get: bosh-lites-diego-pool
     passed: [deploy-boshlite-4]
     trigger: true
-  - put: bosh-lites-diego-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-diego-pool
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -511,14 +522,15 @@ jobs:
     ensure:
       put: bosh-lites-diego-pool
       params:
-        release: bosh-lites-diego-pool
+        release: bosh-lite-lock
 
 - name: deploy-routing-release-4
   plan:
   - get: bosh-lites-diego-pool
     passed: [deploy-diego-release-4]
     trigger: true
-  - put: bosh-lites-diego-pool
+  - put: bosh-lite-lock
+    resource: bosh-lites-diego-pool
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -539,4 +551,4 @@ jobs:
     ensure:
       put: bosh-lites-diego-pool
       params:
-        release: bosh-lites-diego-pool
+        release: bosh-lite-lock
