@@ -1520,6 +1520,10 @@
     "translation": "Description: {{.ServiceDescription}}"
   },
   {
+    "id": "Did you mean?",
+    "translation": "Did you mean?"
+  },
+  {
     "id": "Disable access for a specified organization",
     "translation": "Disable access for a specified organization"
   },

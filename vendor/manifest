@@ -291,6 +291,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/sajari/fuzzy",
+			"repository": "https://github.com/sajari/fuzzy",
+			"vcs": "git",
+			"revision": "243c923763cac789d1196949a834ca698dbd7a28",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/tedsuo/rata",
 			"repository": "https://github.com/tedsuo/rata",
 			"vcs": "git",

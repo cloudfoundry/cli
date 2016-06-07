@@ -42,6 +42,6 @@ cf/models/application.go:117::warning: cyclomatic complexity 26 of function (*Ap
 cf/ssh/ssh.go:209::warning: cyclomatic complexity 14 of function (*secureShell).InteractiveSession() is high (> 10) (gocyclo)
 flags/flags.go:244::warning: cyclomatic complexity 12 of function (*flagContext).setDefaultFlagValueIfAny() is high (> 10) (gocyclo)
 flags/flags.go:65::warning: cyclomatic complexity 20 of function (*flagContext).Parse() is high (> 10) (gocyclo)
-main/main.go:26::warning: cyclomatic complexity 18 of function main() is high (> 10) (gocyclo)
+main/main.go:27::warning: cyclomatic complexity 18 of function main() is high (> 10) (gocyclo)
 plugin_examples/test_rpc_server_example/test_rpc_server_example.go:55::warning: cyclomatic complexity 13 of function (*DemoCmd).Run() is high (> 10) (gocyclo)
 testhelpers/net/server.go:72::warning: cyclomatic complexity 14 of function (*TestHandler).ServeHTTP() is high (> 10) (gocyclo)

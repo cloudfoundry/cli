@@ -8,6 +8,10 @@
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },
   {
+    "id": "Did you mean?",
+    "translation": "Did you mean?"
+  },
+  {
     "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
     "translation": "Error deleting domain {{.DomainName}}\n{{.Err}}"
   },

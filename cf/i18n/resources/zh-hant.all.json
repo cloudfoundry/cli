@@ -1520,6 +1520,10 @@
     "translation": "說明: {{.ServiceDescription}}"
   },
   {
+    "id": "Did you mean?",
+    "translation": ""
+  },
+  {
     "id": "Disable access for a specified organization",
     "translation": "停用所指定組織的存取權"
   },

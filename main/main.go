@@ -19,6 +19,7 @@ import (
 	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
+	"github.com/cloudfoundry/cli/spellcheck"
 )
 
 var cmdRegistry = commandregistry.Commands
@@ -141,9 +142,21 @@ func main() {
 	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
 	if !ran {
 		deps.UI.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
+		suggestCommands(cmdName, deps.UI, cmdRegistry.ListCommands())
 		os.Exit(1)
 	}
 
+}
+
+func suggestCommands(cmdName string, ui terminal.UI, cmdsList []string) {
+	cmdSuggester := spellcheck.NewCommandSuggester(cmdsList)
+	recommendedCmds := cmdSuggester.Recommend(cmdName)
+	if len(recommendedCmds) != 0 {
+		ui.Say("\n" + T("Did you mean?"))
+		for _, suggestion := range recommendedCmds {
+			ui.Say("      " + suggestion)
+		}
+	}
 }
 
 func handlePanics(printer terminal.Printer, logger trace.Printer) {
