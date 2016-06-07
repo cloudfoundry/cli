@@ -81,7 +81,7 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
-    branch: release-candidate
+    branch: master
 
 - name: bosh-lite-deploy-cf
   type: bosh-deployment
