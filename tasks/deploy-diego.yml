@@ -7,7 +7,7 @@ params:
   LITE_PRIVATE_IP_ADDRESS:
 
 inputs:
-- name: cli-pools
+- name: bosh-lite-lock
 - name: etcd-release
 - name: garden-linux-release
 - name: diego-release
@@ -43,7 +43,7 @@ run:
     bosh deployment diego-repo/diego.yml
     bosh -n deploy
 
-    export DOMAIN=`cat cli-pools/name`
+    export DOMAIN=`cat bosh-lite-lock/name`
 
     curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
     ./cf api "https://api.${DOMAIN}" --skip-ssl-validation
