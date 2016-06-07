@@ -42,26 +42,25 @@ type Data struct {
 	MinRecommendedCLIVersion string
 }
 
-func NewData() (data *Data) {
-	data = new(Data)
-	return
+func NewData() *Data {
+	return new(Data)
 }
 
-func (d *Data) JSONMarshalV3() (output []byte, err error) {
+func (d *Data) JSONMarshalV3() ([]byte, error) {
 	d.ConfigVersion = 3
 	return json.MarshalIndent(d, "", "  ")
 }
 
-func (d *Data) JSONUnmarshalV3(input []byte) (err error) {
-	err = json.Unmarshal(input, d)
+func (d *Data) JSONUnmarshalV3(input []byte) error {
+	err := json.Unmarshal(input, d)
 	if err != nil {
-		return
+		return err
 	}
 
 	if d.ConfigVersion != 3 {
 		*d = Data{}
-		return
+		return nil
 	}
 
-	return
+	return nil
 }
