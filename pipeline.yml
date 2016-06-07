@@ -80,13 +80,13 @@ resources:
     secret_access_key: {{staging-bucket-secret-access-key}}
     versioned_file: cf-cli-installer_winx64.zip
 
-- name: bosh-lite-lock
+- name: bosh-lites-dea-pool
   type: pool
   source:
-    uri: git@github.com:cloudfoundry/cli-private
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: {{cli-pools-github-private-key}}
     branch: locks
-    pool: bosh-lites
+    pool: bosh-lites-dea
 
 - name: bosh-lites-diego-pool
   type: pool
@@ -195,6 +195,7 @@ jobs:
     - get: cli-acceptance-tests
     - get: cli-ci
     - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
       params:
         acquire: true
   - aggregate:
@@ -206,7 +207,7 @@ jobs:
         ADMIN_USER: {{bosh-lite-admin-username}}
         ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
         release: bosh-lite-lock
 
@@ -227,13 +228,14 @@ jobs:
       passed: [build-binaries]
     - get: cli-ci
     - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
       params:
         acquire: true
   - aggregate:
     - task: cats-dea
       file: cli-ci/ci/tasks/cats-linux.yml
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
         release: bosh-lite-lock
 
@@ -287,6 +289,7 @@ jobs:
         - src/github.com/cloudfoundry/cf-acceptance-tests
     - get: cli-ci
     - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
       params:
         acquire: true
   - task: cats
@@ -295,7 +298,7 @@ jobs:
       ADMIN_USER: {{bosh-lite-admin-username}}
       ADMIN_PASSWORD: {{bosh-lite-admin-password}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
         release: bosh-lite-lock
 
