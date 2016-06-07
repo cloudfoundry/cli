@@ -190,6 +190,18 @@ var _ = Describe("main", func() {
 			Eventually(output.Out).Should(Say("You called cmd1 in test_2"))
 		})
 
+		It("show user suggested commands for typos", func() {
+			output := Cf("hlp")
+			Eventually(output.Out, 3*time.Second).Should(Say("'hlp' is not a registered command. See 'cf help'"))
+			Eventually(output.Out, 3*time.Second).Should(Say("Did you mean?"))
+		})
+
+		It("hide suggetsions for commands that aren't close to anything", func() {
+			output := Cf("this-does-not-match-any-command")
+			Eventually(output.Out, 3*time.Second).Should(Say("'this-does-not-match-any-command' is not a registered command. See 'cf help'"))
+			Consistently(output.Out, 3*time.Second).ShouldNot(Say("Did you mean?\n help"))
+		})
+
 		It("informs user for any invalid commands", func() {
 			output := Cf("foo-bar")
 			Eventually(output.Out, 3*time.Second).Should(Say("'foo-bar' is not a registered command"))

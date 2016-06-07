@@ -98,6 +98,27 @@ var _ = Describe("CommandRegistry", func() {
 		})
 	})
 
+	Describe("ShowAllCommands()", func() {
+		BeforeEach(func() {
+			commandregistry.Register(FakeCommand1{})
+			commandregistry.Register(FakeCommand2{})
+			commandregistry.Register(FakeCommand3{})
+		})
+
+		AfterEach(func() {
+			commandregistry.Commands.RemoveCommand("fake-command")
+			commandregistry.Commands.RemoveCommand("fake-command2")
+			commandregistry.Commands.RemoveCommand("this-is-a-really-long-command-name-123123123123123123123") // fake-command3
+		})
+
+		It("show all the commands in registry", func() {
+			cmds := commandregistry.Commands.ListCommands()
+			Expect(cmds).To(ContainElement("fake-command2"))
+			Expect(cmds).To(ContainElement("this-is-a-really-long-command-name-123123123123123123123"))
+			Expect(cmds).To(ContainElement("fake-command"))
+		})
+	})
+
 	Describe("SetCommand()", func() {
 		It("replaces the command in registry with command provided", func() {
 			updatedCmd := FakeCommand1{Data: "This is new data"}
@@ -110,7 +131,7 @@ var _ = Describe("CommandRegistry", func() {
 		})
 	})
 
-	Describe("Commands()", func() {
+	Describe("TotalCommands()", func() {
 		Context("when there are commands registered", func() {
 			BeforeEach(func() {
 				commandregistry.Register(FakeCommand1{})
@@ -119,7 +140,7 @@ var _ = Describe("CommandRegistry", func() {
 			})
 
 			AfterEach(func() {
-				commandregistry.Commands.RemoveCommand("fake-command1")
+				commandregistry.Commands.RemoveCommand("fake-command")
 				commandregistry.Commands.RemoveCommand("fake-command2")
 				commandregistry.Commands.RemoveCommand("this-is-a-really-long-command-name-123123123123123123123") // fake-command3
 			})

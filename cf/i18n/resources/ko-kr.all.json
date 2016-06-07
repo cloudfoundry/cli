@@ -1520,6 +1520,10 @@
     "translation": "설명: {{.ServiceDescription}}"
   },
   {
+    "id": "Did you mean?",
+    "translation": ""
+  },
+  {
     "id": "Disable access for a specified organization",
     "translation": "지정된 조직의 액세스 사용 안함"
   },

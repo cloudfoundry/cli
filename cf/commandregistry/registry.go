@@ -84,6 +84,18 @@ func (r *registry) CommandExists(name string) bool {
 	return ok
 }
 
+func (r *registry) ListCommands() []string {
+	keys := make([]string, len(r.cmd))
+
+	i := 0
+	for k := range r.cmd {
+		keys[i] = k
+		i++
+	}
+
+	return keys
+}
+
 func (r *registry) SetCommand(cmd Command) {
 	r.cmd[cmd.MetaData().Name] = cmd
 }

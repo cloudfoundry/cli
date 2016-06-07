@@ -1520,6 +1520,10 @@
     "translation": "説明: {{.ServiceDescription}}"
   },
   {
+    "id": "Did you mean?",
+    "translation": ""
+  },
+  {
     "id": "Disable access for a specified organization",
     "translation": "特定の組織に対するアクセスを無効にします"
   },
