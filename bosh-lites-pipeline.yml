@@ -6,15 +6,15 @@ resources:
     uri: https://github.com/cloudfoundry/bosh-lite.git
     branch: master
 
-- name: bosh-lite-lock
+- name: bosh-lites-dea-pool
   type: pool
   source:
-    uri: git@github.com:cloudfoundry/cli-private
-    private_key: {{cf-cli-eng-github-private-key}}
-    branch: locks
-    pool: bosh-lites
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: {{cli-pools-github-private-key}}
+    branch: master
+    pool: bosh-lites-dea
 
-- name: cli-pools
+- name: bosh-lites-diego-pool
   type: pool
   source:
     uri: git@github.com:cloudfoundry/cli-pools
@@ -127,7 +127,7 @@ jobs:
 - name: deploy-boshlite-1
   serial: true
   plan:
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-1-hostname}}
   - do:
@@ -170,16 +170,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-diego-release-1
   plan:
-  - get: bosh-lite-lock
+  - get: bosh-lites-dea-pool
     passed: [deploy-boshlite-1]
     trigger: true
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-1-hostname}}
   - do:
@@ -195,16 +195,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-routing-release-1
   plan:
-  - get: bosh-lite-lock
+  - get: bosh-lites-dea-pool
     passed: [deploy-diego-release-1]
     trigger: true
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-1-hostname}}
   - do:
@@ -223,14 +223,14 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-boshlite-2
   serial: true
   plan:
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-2-hostname}}
   - do:
@@ -273,16 +273,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-diego-release-2
   plan:
-  - get: bosh-lite-lock
+  - get: bosh-lites-dea-pool
     passed: [deploy-boshlite-2]
     trigger: true
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-2-hostname}}
   - do:
@@ -298,16 +298,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-routing-release-2
   plan:
-  - get: bosh-lite-lock
+  - get: bosh-lites-dea-pool
     passed: [deploy-diego-release-2]
     trigger: true
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-2-hostname}}
   - do:
@@ -326,15 +326,15 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 
 - name: deploy-boshlite-3
   serial: true
   plan:
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-3-hostname}}
   - do:
@@ -377,16 +377,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-diego-release-3
   plan:
-  - get: bosh-lite-lock
+  - get: bosh-lites-dea-pool
     passed: [deploy-boshlite-3]
     trigger: true
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-3-hostname}}
   - do:
@@ -402,16 +402,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-routing-release-3
   plan:
-  - get: bosh-lite-lock
+  - get: bosh-lites-dea-pool
     passed: [deploy-diego-release-3]
     trigger: true
-  - put: bosh-lite-lock
+  - put: bosh-lites-dea-pool
     params:
       claim: {{lite-3-hostname}}
   - do:
@@ -430,14 +430,14 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
-      put: bosh-lite-lock
+      put: bosh-lites-dea-pool
       params:
-        release: bosh-lite-lock
+        release: bosh-lites-dea-pool
 
 - name: deploy-boshlite-4
   serial: true
   plan:
-  - put: cli-pools
+  - put: bosh-lites-diego-pool
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -480,16 +480,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-diego-pool
       params:
-        release: cli-pools
+        release: bosh-lites-diego-pool
 
 - name: deploy-diego-release-4
   plan:
-  - get: cli-pools
+  - get: bosh-lites-diego-pool
     passed: [deploy-boshlite-4]
     trigger: true
-  - put: cli-pools
+  - put: bosh-lites-diego-pool
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -509,16 +509,16 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-diego-pool
       params:
-        release: cli-pools
+        release: bosh-lites-diego-pool
 
 - name: deploy-routing-release-4
   plan:
-  - get: cli-pools
+  - get: bosh-lites-diego-pool
     passed: [deploy-diego-release-4]
     trigger: true
-  - put: cli-pools
+  - put: bosh-lites-diego-pool
     params:
       claim: {{lite-4-hostname}}
   - do:
@@ -537,6 +537,6 @@ jobs:
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
-      put: cli-pools
+      put: bosh-lites-diego-pool
       params:
-        release: cli-pools
+        release: bosh-lites-diego-pool
