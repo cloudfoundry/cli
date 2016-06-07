@@ -63,11 +63,6 @@ func NewFlagContext(cmdFlags map[string]FlagSet) FlagContext {
 }
 
 func (c *flagContext) Parse(args ...string) error {
-	var flagset FlagSet
-	var ok bool
-	var v string
-	var err error
-
 	c.setDefaultFlagValueIfAny()
 
 	for c.cursor <= len(args)-1 {
@@ -78,7 +73,8 @@ func (c *flagContext) Parse(args ...string) error {
 
 			c.extractEqualSignIfAny(&flg, &args)
 
-			if flagset, ok = c.cmdFlags[flg]; !ok {
+			flagset, ok := c.cmdFlags[flg]
+			if !ok {
 				flg = c.getFlagNameWithShortName(flg)
 				if flagset, ok = c.cmdFlags[flg]; !ok {
 					return errors.New("Invalid flag: " + arg)
@@ -89,7 +85,8 @@ func (c *flagContext) Parse(args ...string) error {
 			case bool:
 				c.flagsets[flg] = &BoolFlag{Name: flg, Value: c.getBoolFlagValue(args)}
 			case int:
-				if v, err = c.getFlagValue(args); err != nil {
+				v, err := c.getFlagValue(args)
+				if err != nil {
 					return err
 				}
 				i, err := strconv.ParseInt(v, 10, 32)
@@ -98,7 +95,8 @@ func (c *flagContext) Parse(args ...string) error {
 				}
 				c.flagsets[flg] = &IntFlag{Name: flg, Value: int(i)}
 			case float64:
-				if v, err = c.getFlagValue(args); err != nil {
+				v, err := c.getFlagValue(args)
+				if err != nil {
 					return err
 				}
 				i, err := strconv.ParseFloat(v, 64)
@@ -107,12 +105,14 @@ func (c *flagContext) Parse(args ...string) error {
 				}
 				c.flagsets[flg] = &Float64Flag{Name: flg, Value: float64(i)}
 			case string:
-				if v, err = c.getFlagValue(args); err != nil {
+				v, err := c.getFlagValue(args)
+				if err != nil {
 					return err
 				}
 				c.flagsets[flg] = &StringFlag{Name: flg, Value: v}
 			case []string:
-				if v, err = c.getFlagValue(args); err != nil {
+				v, err := c.getFlagValue(args)
+				if err != nil {
 					return err
 				}
 				if _, ok = c.flagsets[flg]; !ok {

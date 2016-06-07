@@ -183,10 +183,10 @@ var _ = Describe("Push Actor", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(appFiles.CopyFilesCallCount()).To(Equal(1))
-				filesToUpload, appDir, uploadDir := appFiles.CopyFilesArgsForCall(0)
+				filesToUpload, fromDir, toDir := appFiles.CopyFilesArgsForCall(0)
 				Expect(filesToUpload).To(Equal(expectedFiles))
-				Expect(appDir).To(Equal(fixturesDir))
-				Expect(uploadDir).To(Equal(tmpDir))
+				Expect(fromDir).To(Equal(fixturesDir))
+				Expect(toDir).To(Equal(tmpDir))
 			})
 		})
 
@@ -220,10 +220,10 @@ var _ = Describe("Push Actor", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(appFiles.CopyFilesCallCount()).To(Equal(1))
-				filesToUpload, appDir, uploadDir := appFiles.CopyFilesArgsForCall(0)
+				filesToUpload, fromDir, toDir := appFiles.CopyFilesArgsForCall(0)
 				Expect(filesToUpload).To(Equal(expectedFiles))
-				Expect(appDir).To(Equal(fixturesDir))
-				Expect(uploadDir).To(Equal(tmpDir))
+				Expect(fromDir).To(Equal(fixturesDir))
+				Expect(toDir).To(Equal(tmpDir))
 			})
 		})
 
@@ -253,10 +253,10 @@ var _ = Describe("Push Actor", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(appFiles.CopyFilesCallCount()).To(Equal(1))
-				filesToUpload, appDir, uploadDir := appFiles.CopyFilesArgsForCall(0)
+				filesToUpload, fromDir, toDir := appFiles.CopyFilesArgsForCall(0)
 				Expect(filesToUpload).To(BeEmpty())
-				Expect(appDir).To(Equal(fixturesDir))
-				Expect(uploadDir).To(Equal(tmpDir))
+				Expect(fromDir).To(Equal(fixturesDir))
+				Expect(toDir).To(Equal(tmpDir))
 			})
 		})
 	})
