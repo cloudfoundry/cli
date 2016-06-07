@@ -85,7 +85,7 @@ resources:
   source:
     uri: git@github.com:cloudfoundry/cli-pools
     private_key: {{cli-pools-github-private-key}}
-    branch: locks
+    branch: master
     pool: bosh-lites-dea
 
 - name: bosh-lites-diego-pool
