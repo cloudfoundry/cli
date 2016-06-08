@@ -144,7 +144,7 @@ var _ = Describe("loggregator logs repository", func() {
 				go func() {
 					defer GinkgoRecover()
 
-					Eventually(authRepo.RefreshAuthTokenCallCount()).Should(Equal(1))
+					Eventually(authRepo.RefreshAuthTokenCallCount).Should(Equal(1))
 					Consistently(errChan).ShouldNot(Receive())
 
 					close(done)
@@ -242,7 +242,6 @@ var _ = Describe("loggregator logs repository", func() {
 			It("flushes remaining log messages and closes the returned channel when Close is called", func() {
 				logsRepo.BufferTime = 10 * time.Second
 
-				var receivedMessages []Loggable
 				msg3 := makeLogMessage("hello3", 300)
 				msg2 := makeLogMessage("hello2", 200)
 				msg1 := makeLogMessage("hello1", 100)
@@ -261,12 +260,6 @@ var _ = Describe("loggregator logs repository", func() {
 
 				Expect(fakeConsumer.CloseCallCount()).To(Equal(0))
 
-				go func() {
-					for msg := range logChan {
-						receivedMessages = append(receivedMessages, msg)
-					}
-				}()
-
 				logsRepo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 				Consistently(errChan).ShouldNot(Receive())
 
@@ -274,15 +267,9 @@ var _ = Describe("loggregator logs repository", func() {
 
 				Expect(fakeConsumer.CloseCallCount()).To(Equal(1))
 
-				getReceivedMessages := func() []Loggable {
-					return receivedMessages
-				}
-
-				Eventually(getReceivedMessages).Should(Equal([]Loggable{
-					NewLoggregatorLogMessage(msg1),
-					NewLoggregatorLogMessage(msg2),
-					NewLoggregatorLogMessage(msg3),
-				}))
+				Eventually(logChan).Should(Receive(Equal(NewLoggregatorLogMessage(msg1))))
+				Eventually(logChan).Should(Receive(Equal(NewLoggregatorLogMessage(msg2))))
+				Eventually(logChan).Should(Receive(Equal(NewLoggregatorLogMessage(msg3))))
 			})
 		})
 	})

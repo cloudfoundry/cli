@@ -255,7 +255,7 @@ var _ = Describe("DeleteRoute", func() {
 
 			It("tries to find the route", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Eventually(routeRepo.FindCallCount()).Should(Equal(1))
+				Eventually(routeRepo.FindCallCount).Should(Equal(1))
 				host, domain, path, port := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal(""))
 				Expect(path).To(Equal(""))
