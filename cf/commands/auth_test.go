@@ -8,16 +8,18 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	"os"
+
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 )
 
 var _ = Describe("auth command", func() {
@@ -25,7 +27,7 @@ var _ = Describe("auth command", func() {
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		authRepo            *authenticationfakes.FakeRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 		fakeLogger          *tracefakes.FakePrinter
 	)
@@ -40,7 +42,7 @@ var _ = Describe("auth command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		authRepo = new(authenticationfakes.FakeRepository)
 		authRepo.AuthenticateStub = func(credentials map[string]string) error {
 			config.SetAccessToken("my-access-token")
@@ -62,18 +64,19 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("fails if the user has not set an api endpoint", func() {
+			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Failing{Message: "no api set"})
 			Expect(testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 	})
 
 	Context("when an api endpoint is targeted", func() {
 		BeforeEach(func() {
-			requirementsFactory.APIEndpointSuccess = true
+			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 			config.SetAPIEndpoint("foo.example.org/authenticate")
 		})
 
 		It("authenticates successfully", func() {
-			requirementsFactory.APIEndpointSuccess = true
+			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
@@ -102,7 +105,7 @@ var _ = Describe("auth command", func() {
 		})
 
 		It("gets the UAA endpoint and saves it to the config file", func() {
-			requirementsFactory.APIEndpointSuccess = true
+			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 			Expect(authRepo.GetLoginPromptsAndSaveUAAServerURLCallCount()).To(Equal(1))
 		})

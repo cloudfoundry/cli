@@ -8,13 +8,14 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commands"
@@ -25,7 +26,7 @@ var _ = Describe("target command", func() {
 	var (
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
 		deps                commandregistry.Dependency
@@ -53,12 +54,13 @@ var _ = Describe("target command", func() {
 	}
 
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
+		ui = new(testterm.FakeUI)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
-		requirementsFactory = new(testreq.FakeReqFactory)
-		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory.APIEndpointSuccess = true
+		config = testconfig.NewRepository()
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 	})
 
 	var callTarget = func(args []string) bool {
@@ -70,10 +72,9 @@ var _ = Describe("target command", func() {
 		var flagContext flags.FlagContext
 
 		BeforeEach(func() {
-			cmd = &commands.Target{}
+			cmd = new(commands.Target)
 			cmd.SetDependency(deps, false)
 			flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
-
 		})
 
 		It("fails with usage", func() {
@@ -90,7 +91,7 @@ var _ = Describe("target command", func() {
 
 	Describe("when there is no api endpoint set", func() {
 		BeforeEach(func() {
-			requirementsFactory.APIEndpointSuccess = false
+			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Failing{Message: "no api set"})
 		})
 
 		It("fails requirements", func() {
@@ -101,6 +102,7 @@ var _ = Describe("target command", func() {
 	Describe("when the user is not logged in", func() {
 		BeforeEach(func() {
 			config.SetAccessToken("")
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		})
 
 		It("prints the target info when no org or space is specified", func() {
@@ -122,7 +124,7 @@ var _ = Describe("target command", func() {
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		var expectOrgToBeCleared = func() {
@@ -141,11 +143,13 @@ var _ = Describe("target command", func() {
 
 				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
 				orgRepo.FindByNameReturns(org, nil)
+				config.SetOrganizationFields(models.OrganizationFields{Name: org.Name, GUID: org.GUID})
 			})
 
 			It("it updates the organization in the config", func() {
 				callTarget([]string{"-o", "my-organization"})
 
+				Expect(orgRepo.FindByNameCallCount()).To(Equal(1))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 
@@ -161,6 +165,7 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-s", "my-space"})
 
+				Expect(spaceRepo.FindByNameCallCount()).To(Equal(1))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
 				Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
@@ -174,9 +179,11 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
+				Expect(orgRepo.FindByNameCallCount()).To(Equal(1))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
 				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 
+				Expect(spaceRepo.FindByNameCallCount()).To(Equal(1))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
 				Expect(config.SpaceFields().GUID).To(Equal("my-space-guid"))
 
@@ -190,9 +197,11 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
+				Expect(orgRepo.FindByNameCallCount()).To(Equal(1))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-organization"))
 				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
 
+				Expect(spaceRepo.FindByNameCallCount()).To(Equal(1))
 				Expect(spaceRepo.FindByNameArgsForCall(0)).To(Equal("my-space"))
 				Expect(config.SpaceFields().GUID).To(Equal(""))
 
@@ -289,51 +298,58 @@ var _ = Describe("target command", func() {
 				expectSpaceToBeCleared()
 			})
 
-			It("fails when the user doesn't have access to the space", func() {
-				spaceRepo.FindByNameReturns(models.Space{}, errors.New("Error finding space by name."))
+			Context("when an org is targetted", func() {
+				var org models.Organization
+				BeforeEach(func() {
+					org = models.Organization{}
+					org.Name = "my-organization"
+					org.GUID = "my-organization-guid"
 
-				callTarget([]string{"-s", "my-space"})
+					config.SetOrganizationFields(models.OrganizationFields{Name: org.Name, GUID: org.GUID})
+				})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"Unable to access space", "my-space"},
-				))
+				It("fails when the user doesn't have access to the space", func() {
+					spaceRepo.FindByNameReturns(models.Space{}, errors.New("Error finding space by name."))
 
-				Expect(config.SpaceFields().GUID).To(Equal(""))
-				Expect(ui.ShowConfigurationCalled).To(BeFalse())
+					callTarget([]string{"-s", "my-space"})
 
-				Expect(config.OrganizationFields().GUID).NotTo(BeEmpty())
-				expectSpaceToBeCleared()
-			})
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"Unable to access space", "my-space"},
+					))
 
-			It("fails when the space is not found", func() {
-				spaceRepo.FindByNameReturns(models.Space{}, errors.NewModelNotFoundError("Space", "my-space"))
+					Expect(config.SpaceFields().GUID).To(Equal(""))
+					Expect(ui.ShowConfigurationCalled).To(BeFalse())
 
-				callTarget([]string{"-s", "my-space"})
+					Expect(config.OrganizationFields().GUID).NotTo(BeEmpty())
+					expectSpaceToBeCleared()
+				})
 
-				expectSpaceToBeCleared()
-				Expect(ui.Outputs).To(ContainSubstrings(
-					[]string{"FAILED"},
-					[]string{"my-space", "not found"},
-				))
-			})
+				It("fails when the space is not found", func() {
+					spaceRepo.FindByNameReturns(models.Space{}, errors.NewModelNotFoundError("Space", "my-space"))
 
-			It("fails to target the space automatically if is not found", func() {
-				org := models.Organization{}
-				org.Name = "my-organization"
-				org.GUID = "my-organization-guid"
+					callTarget([]string{"-s", "my-space"})
 
-				orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
-				orgRepo.FindByNameReturns(org, nil)
+					expectSpaceToBeCleared()
+					Expect(ui.Outputs).To(ContainSubstrings(
+						[]string{"FAILED"},
+						[]string{"my-space", "not found"},
+					))
+				})
 
-				spaceRepo.FindByNameReturns(models.Space{}, errors.NewModelNotFoundError("Space", "my-space"))
+				It("fails to target the space automatically if is not found", func() {
+					orgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+					orgRepo.FindByNameReturns(org, nil)
 
-				callTarget([]string{"-o", "my-organization"})
+					spaceRepo.FindByNameReturns(models.Space{}, errors.NewModelNotFoundError("Space", "my-space"))
 
-				Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
-				Expect(config.SpaceFields().GUID).To(Equal(""))
+					callTarget([]string{"-o", "my-organization"})
 
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+					Expect(config.OrganizationFields().GUID).To(Equal("my-organization-guid"))
+					Expect(config.SpaceFields().GUID).To(Equal(""))
+
+					Expect(ui.ShowConfigurationCalled).To(BeTrue())
+				})
 			})
 		})
 	})

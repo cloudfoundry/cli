@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -40,14 +41,14 @@ var _ = Describe("password command", func() {
 	})
 
 	It("does not pass requirements if you are not logged in", func() {
-		pwDeps.ReqFactory.LoginSuccess = false
+		pwDeps.ReqFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		_, passed := callPassword([]string{}, pwDeps)
 		Expect(passed).To(BeFalse())
 	})
 
 	Context("when logged in successfully", func() {
 		BeforeEach(func() {
-			pwDeps.ReqFactory.LoginSuccess = true
+			pwDeps.ReqFactory.NewLoginRequirementReturns(requirements.Passing{})
 			pwDeps.PwdRepo.UpdateUnauthorized = false
 		})
 
@@ -120,14 +121,14 @@ var _ = Describe("password command", func() {
 })
 
 type passwordDeps struct {
-	ReqFactory *testreq.FakeReqFactory
+	ReqFactory *requirementsfakes.FakeFactory
 	PwdRepo    *apifakes.OldFakePasswordRepo
 	Config     coreconfig.Repository
 }
 
 func getPasswordDeps() passwordDeps {
 	return passwordDeps{
-		ReqFactory: &testreq.FakeReqFactory{LoginSuccess: true},
+		ReqFactory: new(requirementsfakes.FakeFactory),
 		PwdRepo:    &apifakes.OldFakePasswordRepo{UpdateUnauthorized: true},
 		Config:     testconfig.NewRepository(),
 	}
