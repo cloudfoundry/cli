@@ -45,10 +45,10 @@ race_unsafe_packages="./cf/api/logs,./cf/commands/application,./cf/commands/plug
 race_unsafe_package2="./cf/api/logs ./cf/commands/application ./cf/commands/plugin ./cf/net ./plugin ./plugin_examples"
 
 echo -e "\n Testing race safe packages..."
-CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -race -skipPackage="$race_unsafe_packages" $@
+CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage="$race_unsafe_packages" $@
 
 echo -e "\n Testing race unsafe packages..."
-CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs $race_unsafe_package2 $@
+CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites $race_unsafe_package2 $@
 
 echo -e "\n Running build script to confirm everything compiles..."
 bin/build
