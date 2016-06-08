@@ -7,65 +7,166 @@ inputs:
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 
+params:
+  BACKEND: dea
+  CF_ADMIN_PASSWORD:
+  CF_ADMIN_USER:
+
+  INCLUDE_BACKEND_COMPATIBILITY: false
+  INCLUDE_DIEGO_DOCKER: false
+  INCLUDE_DIEGO_SSH: false
+  INCLUDE_INTERNET_DEPENDENT: false
+  INCLUDE_LOGGING: false
+  INCLUDE_OPERATOR: false
+  INCLUDE_ROUTE_SERVICES: true
+  INCLUDE_SECURITY_GROUPS: true
+  INCLUDE_SERVICES: true
+  INCLUDE_TASKS: false
+  INCLUDE_V3: false
+
+  BINARY_BUILDPACK_NAME:
+  GO_BUILDPACK_NAME:
+  JAVA_BUILDPACK_NAME:
+  NODEJS_BUILDPACK_NAME:
+  PHP_BUILDPACK_NAME:
+  PYTHON_BUILDPACK_NAME:
+  RUBY_BUILDPACK_NAME:
+  STATICFILE_BUILDPACK_NAME:
+
+  BROKER_START_TIMEOUT:
+  CF_API:
+  CF_APPS_DOMAIN:
+  CF_PUSH_TIMEOUT:
+  DEFAULT_TIMEOUT:
+  EXISTING_USER:
+  EXISTING_USER_PASSWORD:
+  LONG_CURL_TIMEOUT:
+  NODES: 2
+  PERSISTENT_APP_HOST:
+  PERSISTENT_APP_ORG:
+  PERSISTENT_APP_QUOTA_NAME:
+  PERSISTENT_APP_SPACE:
+  SKIP_SSL_VALIDATION: false
+  SKIP_SSO: true
+  USE_HTTP: false
+
 run:
   path: bash
   args:
   - -c
   - |
-    set -ex
+    # set -ex
 
-    export DOMAIN=`cat bosh-lite-lock/name`
 
-    export ADMIN_USER=admin
-    export ADMIN_PASSWORD=admin
-    export API_ENDPOINT="https://api.${DOMAIN}"
-    export API="https://api.${DOMAIN}"
-    export APPS_DOMAIN="${DOMAIN}"
-    export CC_HOSTNAME="api.${DOMAIN}"
-    export BOSH_LITE_HOSTNAME="ubuntu@${DOMAIN}"
-    export CF_USER=cats-user-linux64
-    export CF_USER_PASSWORD=cats-password
-    export CF_ORG=cats-org-linux64
-    export CF_SPACE=cats-space-linux64
-    export PATH=$GOPATH/bin:$PATH
+    set -eux
 
-    # Put cf-acceptance-tests within a GOPATH-like directory, because it makes
-    # references to itself
-    GOPATH=$PWD/cf-release-repo
-    cf_acceptance_tests_path=$GOPATH/src/github.com/cloudfoundry/cf-acceptance-tests
+    set +x
+    CF_ADMIN_PASSWORD="${CF_ADMIN_PASSWORD:?}"
+    set -x
 
-    go get github.com/onsi/ginkgo/ginkgo
+    CF_API="${CF_API:?}"
+    CF_ADMIN_USER="${CF_ADMIN_USER:?}"
+    CF_APPS_DOMAIN="${CF_APPS_DOMAIN:?}"
+    SKIP_SSL_VALIDATION="${SKIP_SSL_VALIDATION:?}"
+    USE_HTTP="${USE_HTTP:?}"
+    NODES="${NODES:?}"
 
+    export GOPATH="${PWD}/gopath"
+    export PATH="${GOPATH}/bin":${PATH}
+
+    # Added by CLI
+    mkdir -p gopath/bin
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
       chmod +x cf-cli_linux_x86-64
       ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
+    mv cf-release-repo/src $GOPATH
+    export DOMAIN=`cat bosh-lite-lock/name`
+    export CF_API="https://api.${DOMAIN}"
+    export CF_APPS_DOMAIN="${DOMAIN}"
 
-    PATH=$GOPATH/bin:$PATH
+    cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
-    cd $cf_acceptance_tests_path
+    go get github.com/onsi/ginkgo/ginkgo
 
-    cat<<EOF > config.json
+    set +xu
+    cat > integration_config.json <<EOF
     {
-      "api": "$API_ENDPOINT",
-      "apps_domain": "$APPS_DOMAIN",
-      "admin_user": "$ADMIN_USER",
-      "admin_password": "$ADMIN_PASSWORD",
-      "cf_user": "$CF_USER",
-      "cf_user_password": "$CF_USER_PASSWORD",
-      "cf_org": "$CF_ORG",
-      "cf_space": "$CF_SPACE",
-      "skip_ssl_validation": true,
-      "persistent_app_host": "persistent-app-linux64",
-      "default_timeout": 75,
-      "cf_push_timeout": 210,
-      "long_curl_timeout": 210,
-      "broker_start_timeout": 330
-    }
+      "api": "${CF_API}",
+      "admin_user": "${CF_ADMIN_USER}",
+      "admin_password": "${CF_ADMIN_PASSWORD}",
+      "apps_domain": "${CF_APPS_DOMAIN}",
+      "skip_ssl_validation": ${SKIP_SSL_VALIDATION},
+      "use_http": ${USE_HTTP},
+      "existing_user": "${EXISTING_USER}",
+      "use_existing_user": $( [ ! -z "${EXISTING_USER}" ] && echo true || echo false),
+      "keep_user_at_suite_end": $( [ ! -z "${EXISTING_USER}" ] && echo true || echo false),
+      "existing_user_password": "${EXISTING_USER_PASSWORD}",
     EOF
 
-    export CONFIG=$PWD/config.json
-    GOPATH=$GOPATH:$cf_acceptance_tests_path/Godeps/_workspace/
+    [ -n "$BACKEND" ] && echo "  \"backend\": \"${BACKEND}\"," >> integration_config.json
+    [ -n "$DEFAULT_TIMEOUT" ] && echo "  \"default_timeout\": \"${DEFAULT_TIMEOUT}\"," >> integration_config.json
+    [ -n "$CF_PUSH_TIMEOUT" ] && echo "  \"cf_push_timeout\": \"${CF_PUSH_TIMEOUT}\"," >> integration_config.json
+    [ -n "$LONG_CURL_TIMEOUT" ] && echo "  \"long_curl_timeout\": \"${LONG_CURL_TIMEOUT}\"," >> integration_config.json
+    [ -n "$BROKER_START_TIMEOUT" ] && echo "  \"broker_start_timeout\": \"${BROKER_START_TIMEOUT}\"," >> integration_config.json
 
-    ./bin/test_default -nodes=2
+    [ -n "$STATICFILE_BUILDPACK_NAME" ] && echo "  \"staticfile_buildpack_name\": \"${STATICFILE_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$JAVA_BUILDPACK_NAME" ] && echo "  \"java_buildpack_name\": \"${JAVA_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$RUBY_BUILDPACK_NAME" ] && echo "  \"ruby_buildpack_name\": \"${RUBY_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$NODEJS_BUILDPACK_NAME" ] && echo "  \"nodejs_buildpack_name\": \"${NODEJS_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$GO_BUILDPACK_NAME" ] && echo "  \"go_buildpack_name\": \"${GO_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$PYTHON_BUILDPACK_NAME" ] && echo "  \"python_buildpack_name\": \"${PYTHON_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$PHP_BUILDPACK_NAME" ] && echo "  \"php_buildpack_name\": \"${PHP_BUILDPACK_NAME}\"," >> integration_config.json
+    [ -n "$BINARY_BUILDPACK_NAME" ] && echo "  \"binary_buildpack_name\": \"${BINARY_BUILDPACK_NAME}\"," >> integration_config.json
+
+    [ -n "$PERSISTENT_APP_HOST" ] && echo "  \"persistent_app_host\": \"${PERSISTENT_APP_HOST}\"," >> integration_config.json
+    [ -n "$PERSISTENT_APP_SPACE" ] && echo "  \"persistent_app_space\": \"${PERSISTENT_APP_SPACE}\"," >> integration_config.json
+    [ -n "$PERSISTENT_APP_ORG" ] && echo "  \"persistent_app_org\": \"${PERSISTENT_APP_ORG}\"," >> integration_config.json
+    [ -n "$PERSISTENT_APP_QUOTA_NAME" ] && echo "  \"persistent_app_quota_name\": \"${PERSISTENT_APP_QUOTA_NAME}\"," >> integration_config.json
+    set -u
+    set -x
+
+    # Remove trailing comma
+    sed -ibak -E '$s/(.*),$/\1/' integration_config.json
+
+    echo "}" >> integration_config.json
+
+    # Redact passwords in output
+    sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' integration_config.json
+
+    export CONFIG=$PWD/integration_config.json
+
+    SKIP_PACKAGES="-skipPackage=helpers,"
+    $INCLUDE_DIEGO_SSH || SKIP_PACKAGES="${SKIP_PACKAGES}ssh,"
+    $INCLUDE_V3 || SKIP_PACKAGES="${SKIP_PACKAGES}v3,"
+    $INCLUDE_DIEGO_DOCKER || SKIP_PACKAGES="${SKIP_PACKAGES}docker,"
+    $INCLUDE_BACKEND_COMPATIBILITY || SKIP_PACKAGES="${SKIP_PACKAGES}backend_compatibility,"
+    $INCLUDE_SECURITY_GROUPS || SKIP_PACKAGES="${SKIP_PACKAGES}security_groups,"
+    $INCLUDE_LOGGING || SKIP_PACKAGES="${SKIP_PACKAGES}logging,"
+    $INCLUDE_OPERATOR || SKIP_PACKAGES="${SKIP_PACKAGES}operator,"
+    $INCLUDE_INTERNET_DEPENDENT || SKIP_PACKAGES="${SKIP_PACKAGES}internet_dependent,"
+    $INCLUDE_SERVICES || SKIP_PACKAGES="${SKIP_PACKAGES}services,"
+    $INCLUDE_ROUTE_SERVICES || SKIP_PACKAGES="${SKIP_PACKAGES}route_services,"
+
+    # Remove trailing comma
+    SKIP_PACKAGES=$(echo $SKIP_PACKAGES | sed -E 's/(.*)(,)/\1/')
+
+
+    SKIPS="-skip="
+    $SKIP_SSO && SKIPS="${SKIPS}SSO|"
+    [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
+    [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
+    [[ "$BACKEND" = "" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|NO_DIEGO_SUPPORT|"
+
+
+    # Remove trailing |
+    SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
+
+    ./bin/test \
+      -r \
+      -slowSpecThreshold=120 -randomizeAllSpecs \
+      -nodes "${NODES}" \
+      "${SKIP_PACKAGES}" \
+      "${SKIPS}" \
+      -keepGoing
