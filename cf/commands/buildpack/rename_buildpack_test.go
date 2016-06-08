@@ -5,8 +5,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +19,7 @@ var _ = Describe("rename-buildpack command", func() {
 	var (
 		fakeRepo            *apifakes.OldFakeBuildpackRepository
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -29,7 +30,9 @@ var _ = Describe("rename-buildpack command", func() {
 	}
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewBuildpackRequirementReturns(new(requirementsfakes.FakeBuildpackRequirement))
 		ui = new(testterm.FakeUI)
 		fakeRepo = new(apifakes.OldFakeBuildpackRepository)
 	})
@@ -47,10 +50,6 @@ var _ = Describe("rename-buildpack command", func() {
 	})
 
 	Context("when logged in", func() {
-		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-		})
-
 		It("renames a buildpack", func() {
 			fakeRepo.FindByNameBuildpack = models.Buildpack{
 				Name: "my-buildpack",

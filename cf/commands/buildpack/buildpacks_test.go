@@ -4,9 +4,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commands/buildpack"
@@ -19,7 +20,7 @@ var _ = Describe("ListBuildpacks", func() {
 	var (
 		ui                  *testterm.FakeUI
 		buildpackRepo       *apifakes.OldFakeBuildpackRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -32,7 +33,7 @@ var _ = Describe("ListBuildpacks", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		buildpackRepo = new(apifakes.OldFakeBuildpackRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -62,12 +63,13 @@ var _ = Describe("ListBuildpacks", func() {
 	})
 
 	It("fails requirements when login fails", func() {
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(runCommand()).To(BeFalse())
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		It("lists buildpacks", func() {

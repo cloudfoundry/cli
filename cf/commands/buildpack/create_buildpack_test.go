@@ -5,8 +5,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -17,7 +18,7 @@ import (
 
 var _ = Describe("create-buildpack command", func() {
 	var (
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		repo                *apifakes.OldFakeBuildpackRepository
 		bitsRepo            *apifakes.OldFakeBuildpackBitsRepository
 		ui                  *testterm.FakeUI
@@ -32,14 +33,15 @@ var _ = Describe("create-buildpack command", func() {
 	}
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		repo = new(apifakes.OldFakeBuildpackRepository)
 		bitsRepo = new(apifakes.OldFakeBuildpackBitsRepository)
 		ui = &testterm.FakeUI{}
 	})
 
 	It("fails requirements when the user is not logged in", func() {
-		requirementsFactory.LoginSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my-dir", "0"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 	})
 
