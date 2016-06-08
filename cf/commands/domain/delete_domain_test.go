@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +22,7 @@ var _ = Describe("delete-domain command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		domainRepo          *apifakes.FakeDomainRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -38,10 +39,19 @@ var _ = Describe("delete-domain command", func() {
 		}
 
 		domainRepo = new(apifakes.FakeDomainRepository)
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:       true,
-			TargetedOrgSuccess: true,
-		}
+
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+
+		fakeOrgRequirement := new(requirementsfakes.FakeOrganizationRequirement)
+		fakeOrgRequirement.GetOrganizationReturns(models.Organization{
+			OrganizationFields: models.OrganizationFields{
+				Name: "my-org",
+			},
+		})
+		requirementsFactory.NewOrganizationRequirementReturns(fakeOrgRequirement)
+
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -51,13 +61,15 @@ var _ = Describe("delete-domain command", func() {
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand("foo.com")).To(BeFalse())
 		})
 
 		It("fails when the an org is not targetted", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			targetedOrganizationReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrganizationReq.ExecuteReturns(errors.New("not targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrganizationReq)
 
 			Expect(runCommand("foo.com")).To(BeFalse())
 		})

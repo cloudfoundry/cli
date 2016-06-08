@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,7 +21,7 @@ var _ = Describe("delete-shared-domain command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		domainRepo          *apifakes.FakeDomainRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -35,7 +36,7 @@ var _ = Describe("delete-shared-domain command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		domainRepo = new(apifakes.FakeDomainRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -45,13 +46,16 @@ var _ = Describe("delete-shared-domain command", func() {
 
 	Describe("requirements", func() {
 		It("fails if you are not logged in", func() {
-			requirementsFactory.TargetedOrgSuccess = true
-
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("foo.com")).To(BeFalse())
 		})
 
 		It("fails if an organiztion is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+
+			targetedOrganizationReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrganizationReq.ExecuteReturns(errors.New("not targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrganizationReq)
 
 			Expect(runCommand("foo.com")).To(BeFalse())
 		})
@@ -59,8 +63,8 @@ var _ = Describe("delete-shared-domain command", func() {
 
 	Context("when the domain is owned", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name:   "foo1.com",
@@ -68,6 +72,7 @@ var _ = Describe("delete-shared-domain command", func() {
 					Shared: false,
 				}, nil)
 		})
+
 		It("informs the user that the domain is not shared", func() {
 			runCommand("foo1.com")
 
@@ -82,10 +87,11 @@ var _ = Describe("delete-shared-domain command", func() {
 			))
 		})
 	})
+
 	Context("when logged in and targeted an organiztion", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			domainRepo.FindByNameInOrgReturns(
 				models.DomainFields{
 					Name:   "foo.com",
