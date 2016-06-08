@@ -8,10 +8,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	noaa_errors "github.com/cloudfoundry/noaa/errors"
-	"github.com/gogo/protobuf/proto"
-	"github.com/gorilla/websocket"
 	"io/ioutil"
 	"mime/multipart"
 	"net"
@@ -21,15 +17,24 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	noaa_errors "github.com/cloudfoundry/noaa/errors"
+	"github.com/gogo/protobuf/proto"
+	"github.com/gorilla/websocket"
 )
 
 var (
-	// KeepAlive sets the interval between keep-alive messages sent by the client to loggregator.
+	// KeepAlive sets the interval between keep-alive messages sent by the client to loggregator. This may be mutated by package importers.
 	KeepAlive      = 25 * time.Second
 	boundaryRegexp = regexp.MustCompile("boundary=(.*)")
 	ErrNotFound    = errors.New("/recent path not found or has issues")
 	ErrBadResponse = errors.New("bad server response")
 	ErrBadRequest  = errors.New("bad client request")
+)
+
+const (
+	handshakeTimeout = 10 * time.Second
 )
 
 /* LoggregatorConsumer represents the actions that can be performed against a loggregator server.
@@ -155,8 +160,8 @@ func (cnsmr *consumer) httpRecent(appGuid string, authToken string) ([]*logmessa
 	}
 
 	recentPath := fmt.Sprintf("%s://%s/recent?app=%s", scheme, endpointUrl.Host, appGuid)
-	transport := &http.Transport{Proxy: cnsmr.proxy, TLSClientConfig: cnsmr.tlsConfig}
-	client := &http.Client{Transport: transport}
+	transport := &http.Transport{Proxy: cnsmr.proxy, TLSClientConfig: cnsmr.tlsConfig, TLSHandshakeTimeout: handshakeTimeout}
+	client := &http.Client{Timeout: handshakeTimeout, Transport: transport}
 
 	req, _ := http.NewRequest("GET", recentPath, nil)
 	req.Header.Set("Authorization", authToken)
@@ -330,7 +335,7 @@ func headersString(header http.Header) string {
 func (cnsmr *consumer) establishWebsocketConnection(path string, authToken string) (*websocket.Conn, error) {
 	header := http.Header{"Origin": []string{"http://localhost"}, "Authorization": []string{authToken}}
 
-	dialer := websocket.Dialer{NetDial: cnsmr.proxyDial, TLSClientConfig: cnsmr.tlsConfig}
+	dialer := websocket.Dialer{HandshakeTimeout: handshakeTimeout, NetDial: cnsmr.proxyDial, TLSClientConfig: cnsmr.tlsConfig}
 
 	url := cnsmr.endpoint + path
 
