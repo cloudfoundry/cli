@@ -18,4 +18,4 @@ run:
 
     cd $GOPATH/src/github.com/cloudfoundry/cli
 
-    bin/test
+    bin/test -race
