@@ -5,8 +5,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +19,7 @@ var _ = Describe("delete-buildpack command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		buildpackRepo       *apifakes.OldFakeBuildpackRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -31,7 +32,7 @@ var _ = Describe("delete-buildpack command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		buildpackRepo = new(apifakes.OldFakeBuildpackRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -40,7 +41,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 	Context("when the user is not logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		})
 
 		It("fails requirements", func() {
@@ -50,7 +51,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when the buildpack exists", func() {
