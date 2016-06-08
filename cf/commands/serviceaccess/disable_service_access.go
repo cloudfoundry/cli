@@ -80,7 +80,7 @@ func (cmd *DisableServiceAccess) Execute(c flags.FlagContext) error {
 		return err
 	}
 
-	cmd.ui.Say(T("OK"))
+	cmd.ui.Ok()
 	return nil
 }
 
