@@ -116,8 +116,8 @@
 			"importpath": "github.com/cloudfoundry/loggregator_consumer",
 			"repository": "https://github.com/cloudfoundry/loggregator_consumer",
 			"vcs": "git",
-			"revision": "89d7fe237afae1e8222554359ec03b72c8466d10",
-			"branch": "HEAD",
+			"revision": "a763160649643d5c2299ead471a9837a17ae4186",
+			"branch": "master",
 			"notests": true
 		},
 		{
