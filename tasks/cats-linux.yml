@@ -9,8 +9,8 @@ inputs:
 
 params:
   BACKEND: dea
-  CF_ADMIN_PASSWORD:
-  CF_ADMIN_USER:
+  CF_ADMIN_PASSWORD: admin
+  CF_ADMIN_USER: admin
 
   INCLUDE_BACKEND_COMPATIBILITY: false
   INCLUDE_DIEGO_DOCKER: false
@@ -55,9 +55,6 @@ run:
   args:
   - -c
   - |
-    # set -ex
-
-
     set -eux
 
     set +x
