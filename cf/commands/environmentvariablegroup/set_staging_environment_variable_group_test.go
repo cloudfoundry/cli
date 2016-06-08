@@ -5,10 +5,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	cf_errors "github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +18,7 @@ import (
 var _ = Describe("set-staging-environment-variable-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
-		requirementsFactory          *testreq.FakeReqFactory
+		requirementsFactory          *requirementsfakes.FakeFactory
 		environmentVariableGroupRepo *environmentvariablegroupsfakes.FakeRepository
 		configRepo                   coreconfig.Repository
 		deps                         commandregistry.Dependency
@@ -33,7 +34,7 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		environmentVariableGroupRepo = new(environmentvariablegroupsfakes.FakeRepository)
 	})
 
@@ -43,12 +44,12 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 
 		It("fails with usage when it does not receive any arguments", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
 			Expect(ui.Outputs).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
@@ -58,7 +59,7 @@ var _ = Describe("set-staging-environment-variable-group command", func() {
 
 	Describe("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		It("Sets the staging environment variable group", func() {
