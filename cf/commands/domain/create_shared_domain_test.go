@@ -98,7 +98,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires DOMAIN as an argument"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -113,7 +113,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("does not fail with usage", func() {
 				cmd.Requirements(factory, flagContext)
-				Expect(ui.Outputs).NotTo(ContainSubstrings(
+				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires DOMAIN as an argument"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -197,7 +197,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("prints a message", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating shared domain domain-name"},
 				))
 			})
@@ -212,7 +212,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("prints success message", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"OK"},
 				))
 			})
@@ -252,7 +252,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("prints a message", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating shared domain domain-name"},
 				))
 			})
@@ -267,7 +267,7 @@ var _ = Describe("CreateSharedDomain", func() {
 
 			It("prints success message", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"OK"},
 				))
 			})

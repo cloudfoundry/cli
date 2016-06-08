@@ -113,7 +113,7 @@ var _ = Describe("create-quota command", func() {
 
 		It("fails requirements when called without a quota name", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -121,7 +121,7 @@ var _ = Describe("create-quota command", func() {
 		It("creates a quota with a given name", func() {
 			runCommand("my-quota")
 			Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating quota", "my-quota", "my-user", "..."},
 				[]string{"OK"},
 			))
@@ -144,7 +144,7 @@ var _ = Describe("create-quota command", func() {
 			It("alerts the user when parsing the memory limit fails", func() {
 				runCommand("whoops", "12")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
@@ -157,7 +157,7 @@ var _ = Describe("create-quota command", func() {
 			It("alerts the user when parsing the memory limit fails", func() {
 				runCommand("-i", "whoops", "wit mah hussle", "12")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			Context("and the provided value is -1", func() {
@@ -224,7 +224,7 @@ var _ = Describe("create-quota command", func() {
 				quotaRepo.CreateReturns(errors.New("WHOOP THERE IT IS"))
 				runCommand("my-quota")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating quota", "my-quota"},
 					[]string{"FAILED"},
 				))
@@ -234,7 +234,7 @@ var _ = Describe("create-quota command", func() {
 				quotaRepo.CreateReturns(errors.NewHTTPError(400, errors.QuotaDefinitionNameTaken, "Quota Definition is taken: quota-sct"))
 				runCommand("Banana")
 
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
+				Expect(ui.Outputs()).ToNot(ContainSubstrings(
 					[]string{"FAILED"},
 				))
 				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
@@ -292,7 +292,7 @@ var _ = Describe("create-quota command", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))

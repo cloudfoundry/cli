@@ -186,7 +186,7 @@ var _ = Describe("list-apps command", func() {
 		It("lists apps in a table", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting apps in", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"name", "requested state", "instances", "memory", "disk", "urls"},
@@ -216,7 +216,7 @@ var _ = Describe("list-apps command", func() {
 
 				runCommand()
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 					[]string{"Application-1", "started", "?/2", "512M", "1G", "app1.cfapps.io"},
@@ -229,7 +229,7 @@ var _ = Describe("list-apps command", func() {
 				appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{}
 
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting apps in", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 					[]string{"No apps found"},

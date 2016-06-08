@@ -115,7 +115,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				[]string{"Really delete orphaned routes"},
 			))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting route", "hostname-2.cookieclicker.co"},
 				[]string{"OK"},
 			))
@@ -152,7 +152,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			Expect(len(ui.Prompts)).To(Equal(0))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting route", "hostname-2.cookieclicker.co"},
 				[]string{"OK"},
 			))

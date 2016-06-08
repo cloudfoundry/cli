@@ -84,7 +84,7 @@ var _ = Describe("set-space-quota command", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires", "as arguments"},
 				))
 			})
@@ -130,7 +130,7 @@ var _ = Describe("set-space-quota command", func() {
 
 					Expect(spaceGUID).To(Equal("my-space-guid"))
 					Expect(quotaGUID).To(Equal("quota-guid"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Assigning space quota", "to space", "my-user"},
 						[]string{"OK"},
 					))
@@ -151,7 +151,7 @@ var _ = Describe("set-space-quota command", func() {
 
 				It("warns the user that the operation was not performed", func() {
 					Expect(quotaRepo.UpdateCallCount()).To(Equal(0))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Assigning space quota", "to space", "my-user"},
 					))
 					Expect(executeErr).To(HaveOccurred())
@@ -169,7 +169,7 @@ var _ = Describe("set-space-quota command", func() {
 			})
 
 			It("prints an error", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Assigning space quota", "to space", "my-user"},
 				))
 				Expect(executeErr).To(Equal(spaceError))
@@ -194,7 +194,7 @@ var _ = Describe("set-space-quota command", func() {
 			})
 
 			It("prints an error", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Assigning space quota", "to space", "my-user"},
 				))
 				Expect(executeErr).To(Equal(quotaErr))

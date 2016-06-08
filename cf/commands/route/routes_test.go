@@ -150,14 +150,14 @@ var _ = Describe("routes command", func() {
 		It("lists routes", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(BeInDisplayOrder(
+			Expect(ui.Outputs()).To(BeInDisplayOrder(
 				[]string{"Getting routes for org my-org / space my-space as my-user ..."},
 				[]string{"space", "host", "domain", "port", "path", "type", "apps", "service"},
 			))
 
-			Expect(terminal.Decolorize(ui.Outputs[3])).To(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`))
-			Expect(terminal.Decolorize(ui.Outputs[4])).To(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`))
-			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp\s+dora,bora\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs()[3])).To(MatchRegexp(`^my-space\s+hostname-1\s+example.com\s+dora\s+test-service\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs()[4])).To(MatchRegexp(`^my-space\s+hostname-2\s+cookieclicker\.co\s+/foo\s+dora,bora\s*$`))
+			Expect(terminal.Decolorize(ui.Outputs()[5])).To(MatchRegexp(`^my-space\s+cookieclicker\.co\s+9090\s+tcp\s+dora,bora\s*$`))
 
 		})
 	})
@@ -201,7 +201,7 @@ var _ = Describe("routes command", func() {
 		It("lists routes at orglevel", func() {
 			runCommand("--orglevel")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting routes for org", "my-org", "my-user"},
 				[]string{"space", "host", "domain", "apps", "service"},
 				[]string{"space-1", "hostname-1", "example.com", "dora", "test-service"},
@@ -214,7 +214,7 @@ var _ = Describe("routes command", func() {
 		It("tells the user when no routes were found", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting routes"},
 				[]string{"No routes found"},
 			))
@@ -229,7 +229,7 @@ var _ = Describe("routes command", func() {
 		It("returns an error to the user", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting routes"},
 				[]string{"FAILED"},
 			))

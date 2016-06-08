@@ -44,12 +44,12 @@ var _ = Describe("set-quota command", func() {
 
 	It("fails with usage when provided too many or two few args", func() {
 		runCommand("org")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 
 		runCommand("org", "quota", "extra-stuff")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 
@@ -82,7 +82,7 @@ var _ = Describe("set-quota command", func() {
 
 			runCommand("my-org", "my-quota")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Setting quota", "my-quota", "my-org", "my-user"},
 				[]string{"OK"},
 			))

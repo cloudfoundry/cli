@@ -55,7 +55,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 
 		It("fails with usage when a name is not provided", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -80,7 +80,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 		})
 
 		It("describes what it's doing to the user", func() {
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Binding", "a-security-group-name", "as", "my-user"},
 				[]string{"OK"},
 			))
@@ -92,7 +92,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 			})
 
 			It("fails and describes the failure to the user", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"WOAH. I know kung fu"},
 				))
@@ -106,7 +106,7 @@ var _ = Describe("bind-staging-security-group command", func() {
 
 			It("fails and tells the user that the security group does not exist", func() {
 				Expect(fakeStagingSecurityGroupRepo.BindToStagingSetCallCount()).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 				))
 			})

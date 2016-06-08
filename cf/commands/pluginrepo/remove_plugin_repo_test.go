@@ -79,7 +79,7 @@ var _ = Describe("delte-plugin-repo", func() {
 			Expect(len(config.PluginRepos())).To(Equal(2))
 			Expect(config.PluginRepos()[0].Name).To(Equal("repo1"))
 			Expect(config.PluginRepos()[0].URL).To(Equal("http://someserver1.com:1234"))
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"fake-repo", "does not exist as a repo"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"fake-repo", "does not exist as a repo"}))
 		})
 	})
 })

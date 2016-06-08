@@ -82,7 +82,7 @@ var _ = Describe("SSH command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 
@@ -129,7 +129,7 @@ var _ = Describe("SSH command", func() {
 
 					It("returns an error", func() {
 						Expect(runCommand(args...)).To(BeFalse())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Incorrect Usage", "cannot be negative"},
 						))
 
@@ -142,7 +142,7 @@ var _ = Describe("SSH command", func() {
 			Context("when an error is returned during initialization", func() {
 				It("shows error and prints command usage", func() {
 					Expect(runCommand("app_name", "-L", "[9999:localhost...")).To(BeFalse())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Incorrect Usage"},
 						[]string{"USAGE:"},
 					))
@@ -204,7 +204,7 @@ var _ = Describe("SSH command", func() {
 					runCommand("my-app")
 
 					Expect(handler).To(HaveAllRequestsCalled())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error getting SSH info", "404"},
 					))
 
@@ -234,7 +234,7 @@ var _ = Describe("SSH command", func() {
 					runCommand("my-app")
 
 					Expect(handler).To(HaveAllRequestsCalled())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error getting one time auth code", "auth api error"},
 					))
 
@@ -275,7 +275,7 @@ var _ = Describe("SSH command", func() {
 
 					runCommand("my-app")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error opening SSH connection", "dial error"},
 					))
 
@@ -288,7 +288,7 @@ var _ = Describe("SSH command", func() {
 
 					runCommand("my-app", "-L", "8000:localhost:8000")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error forwarding port", "listen error"},
 					))
 
@@ -326,7 +326,7 @@ var _ = Describe("SSH command", func() {
 					fakeSecureShell.InteractiveSessionReturns(errors.New("ssh exit error"))
 					runCommand("my-app", "-k")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"ssh exit error"},
 					))
 

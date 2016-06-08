@@ -54,7 +54,7 @@ var _ = Describe("update-security-group command", func() {
 		It("fails with usage when a name is not provided", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -62,7 +62,7 @@ var _ = Describe("update-security-group command", func() {
 		It("fails with usage when a file path is not provided", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("my-group-name")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -97,7 +97,7 @@ var _ = Describe("update-security-group command", func() {
 			})
 
 			It("displays a message describing what its going to do", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating security group", "my-group-name", "my-user"},
 					[]string{"OK"},
 					[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
@@ -121,7 +121,7 @@ var _ = Describe("update-security-group command", func() {
 					})
 
 					It("fails loudly", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Updating security group", "my-group-name"},
 							[]string{"FAILED"},
 						))
@@ -135,7 +135,7 @@ var _ = Describe("update-security-group command", func() {
 				})
 
 				It("freaks out", func() {
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 					))
 				})

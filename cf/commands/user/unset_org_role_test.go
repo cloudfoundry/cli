@@ -79,7 +79,7 @@ var _ = Describe("UnsetOrgRole", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -210,7 +210,7 @@ var _ = Describe("UnsetOrgRole", func() {
 
 			It("tells the user it is removing the role", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Removing role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
 					[]string{"OK"},
 				))
@@ -253,7 +253,7 @@ var _ = Describe("UnsetOrgRole", func() {
 
 			It("tells the user it is removing the role", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Removing role", "OrgManager", "the-user-name", "the-org", "the-user-name"},
 					[]string{"OK"},
 				))

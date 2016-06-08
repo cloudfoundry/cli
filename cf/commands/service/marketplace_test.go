@@ -114,7 +114,7 @@ var _ = Describe("marketplace command", func() {
 				args := serviceBuilder.GetServicesForSpaceWithPlansArgsForCall(0)
 				Expect(args).To(Equal("the-space-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
 					[]string{"OK"},
 					[]string{"service", "plans", "description"},
@@ -133,13 +133,13 @@ var _ = Describe("marketplace command", func() {
 				It("lists the service offerings without displaying the paid message", func() {
 					testcmd.RunCLICommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
 						[]string{"OK"},
 						[]string{"service", "plans", "description"},
 						[]string{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
 					))
-					Expect(ui.Outputs).NotTo(ContainSubstrings(
+					Expect(ui.Outputs()).NotTo(ContainSubstrings(
 						[]string{"* The denoted service plans have specific costs associated with them. If a service instance of this type is created, a cost will be incurred."},
 					))
 				})
@@ -152,7 +152,7 @@ var _ = Describe("marketplace command", func() {
 
 					testcmd.RunCLICommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false, ui)
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting service plan information for service aaa-my-service-offering as my-user..."},
 						[]string{"OK"},
 						[]string{"service plan", "description", "free or paid"},
@@ -164,10 +164,10 @@ var _ = Describe("marketplace command", func() {
 				It("informs the user if the service cannot be found", func() {
 					testcmd.RunCLICommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false, ui)
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Service offering not found"},
 					))
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"service plan", "description", "free or paid"},
 					))
 				})
@@ -181,7 +181,7 @@ var _ = Describe("marketplace command", func() {
 
 			It("tells the user to target a space", func() {
 				testcmd.RunCLICommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false, ui)
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"without", "space"},
 				))
 			})
@@ -199,7 +199,7 @@ var _ = Describe("marketplace command", func() {
 
 			testcmd.RunCLICommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting all services from marketplace"},
 				[]string{"OK"},
 				[]string{"service", "plans", "description"},
@@ -214,10 +214,10 @@ var _ = Describe("marketplace command", func() {
 
 			testcmd.RunCLICommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"No service offerings found"},
 			))
-			Expect(ui.Outputs).ToNot(ContainSubstrings(
+			Expect(ui.Outputs()).ToNot(ContainSubstrings(
 				[]string{"service", "plans", "description"},
 			))
 		})
@@ -227,7 +227,7 @@ var _ = Describe("marketplace command", func() {
 				serviceBuilder.GetServiceByNameWithPlansReturns(serviceWithAPaidPlan, nil)
 				testcmd.RunCLICommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting service plan information for service aaa-my-service-offering"},
 					[]string{"OK"},
 					[]string{"service plan", "description", "free or paid"},
@@ -239,10 +239,10 @@ var _ = Describe("marketplace command", func() {
 			It("informs the user if the service cannot be found", func() {
 				testcmd.RunCLICommand("marketplace", []string{"-s", "aaa-my-service-offering"}, requirementsFactory, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Service offering not found"},
 				))
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
+				Expect(ui.Outputs()).ToNot(ContainSubstrings(
 					[]string{"service plan", "description", "free or paid"},
 				))
 			})

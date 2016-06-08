@@ -87,7 +87,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(func() {
 					cmd.Requirements(factory, flagContext)
 				}).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires SPACE and DOMAIN as arguments"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -200,7 +200,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(func() {
 					cmd.Requirements(factory, flagContext)
 				}).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify port together with hostname and/or path."},
 				))
@@ -217,7 +217,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(func() {
 					cmd.Requirements(factory, flagContext)
 				}).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify port together with hostname and/or path."},
 				))
@@ -234,7 +234,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(func() {
 					cmd.Requirements(factory, flagContext)
 				}).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
 				))
@@ -251,7 +251,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(func() {
 					cmd.Requirements(factory, flagContext)
 				}).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
 				))
@@ -268,7 +268,7 @@ var _ = Describe("CreateRoute", func() {
 				Expect(func() {
 					cmd.Requirements(factory, flagContext)
 				}).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
 				))
@@ -421,7 +421,7 @@ var _ = Describe("CreateRoute", func() {
 
 				It("prints a message", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Route domain-name already exists"},
 					))
@@ -518,7 +518,7 @@ var _ = Describe("CreateRoute", func() {
 
 				It("prints a message that it already exists", func() {
 					rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Route hostname.domain-name/path already exists"}))
 				})
@@ -534,7 +534,7 @@ var _ = Describe("CreateRoute", func() {
 
 			It("prints a success message", func() {
 				rc.CreateRoute("hostname", "path", 0, false, domainFields, spaceFields)
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 			})
 
 			Context("when --random-port is specified", func() {
@@ -548,7 +548,7 @@ var _ = Describe("CreateRoute", func() {
 
 				It("print a success message with created route", func() {
 					rc.CreateRoute("hostname", "path", 0, true, domainFields, spaceFields)
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Route domain-name:9090 has been created"},
 					))

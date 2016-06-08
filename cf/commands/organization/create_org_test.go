@@ -78,7 +78,7 @@ var _ = Describe("create-org command", func() {
 		It("fails with usage when not provided exactly one arg", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -97,7 +97,7 @@ var _ = Describe("create-org command", func() {
 		It("creates an org", func() {
 			runCommand("my-org")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating org", "my-org", "my-user"},
 				[]string{"OK"},
 			))
@@ -109,7 +109,7 @@ var _ = Describe("create-org command", func() {
 			orgRepo.CreateReturns(err)
 			runCommand("my-org")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating org", "my-org"},
 				[]string{"OK"},
 				[]string{"my-org", "already exists"},
@@ -148,7 +148,7 @@ var _ = Describe("create-org command", func() {
 				runCommand("my-org")
 
 				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Warning", "error error error"},
 				))
 
@@ -160,7 +160,7 @@ var _ = Describe("create-org command", func() {
 				runCommand("my-org")
 
 				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"cannot get org guid"},
 				))
@@ -173,7 +173,7 @@ var _ = Describe("create-org command", func() {
 				runCommand("my-org")
 
 				Expect(orgRoleSetter.SetOrgRoleCallCount()).To(Equal(1))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Assigning role OrgManager to user my-user in org my-org ..."},
 					[]string{"FAILED"},
 					[]string{"failed to assign role"},
@@ -200,7 +200,7 @@ var _ = Describe("create-org command", func() {
 
 				Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("non-default-quota"))
 				Expect(orgRepo.CreateArgsForCall(0).QuotaDefinition.GUID).To(Equal("non-default-quota-guid"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating org", "my-org"},
 					[]string{"OK"},
 				))
@@ -210,7 +210,7 @@ var _ = Describe("create-org command", func() {
 				quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("Could not find quota"))
 				runCommand("-q", "non-default-quota", "my-org")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating org", "my-org"},
 					[]string{"Could not find quota"},
 				))

@@ -58,7 +58,7 @@ var _ = Describe("auth command", func() {
 		It("fails with usage when given too few arguments", func() {
 			testcmd.RunCLICommand("auth", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -80,7 +80,7 @@ var _ = Describe("auth command", func() {
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.FailedWithUsage).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"foo.example.org/authenticate"},
 				[]string{"OK"},
 			))
@@ -98,7 +98,7 @@ var _ = Describe("auth command", func() {
 
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"To upgrade your CLI"},
 				[]string{"5.0.0"},
 			))
@@ -117,7 +117,7 @@ var _ = Describe("auth command", func() {
 			})
 
 			It("does not prompt the user when provided username and password", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{config.APIEndpoint()},
 					[]string{"Authenticating..."},
 					[]string{"FAILED"},

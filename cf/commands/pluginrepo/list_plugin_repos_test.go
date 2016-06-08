@@ -52,7 +52,7 @@ var _ = Describe("list-plugin-repo", func() {
 
 		callListPluginRepos()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"repo1", "http://url1.com"},
 			[]string{"repo2", "http://url2.com"},
 		))

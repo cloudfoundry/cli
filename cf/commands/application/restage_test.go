@@ -76,7 +76,7 @@ var _ = Describe("restage command", func() {
 
 		It("fails with usage when no arguments are given", func() {
 			passed := runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 			Expect(passed).To(BeFalse())
@@ -92,7 +92,7 @@ var _ = Describe("restage command", func() {
 		appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("app", "hocus-pocus"))
 		runCommand("hocus-pocus")
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"FAILED"},
 			[]string{"not found"},
 		))
@@ -110,7 +110,7 @@ var _ = Describe("restage command", func() {
 		It("sends a restage request", func() {
 			runCommand("my-app")
 			Expect(appRepo.CreateRestageRequestArgsForCall(0)).To(Equal("the-app-guid"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Restaging app", "my-app", "my-org", "my-space", "my-user"},
 			))
 		})

@@ -54,7 +54,7 @@ var _ = Describe("logs command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -117,7 +117,7 @@ var _ = Describe("logs command", func() {
 			runCommand("--recent", "my-app")
 
 			Expect(app.GUID).To(Equal(logsRepo.RecentLogsForArgsForCall(0)))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
 				[]string{"Log Line 2"},
@@ -133,7 +133,7 @@ var _ = Describe("logs command", func() {
 
 			It("does not treat them as format strings", func() {
 				runCommand("--recent", "my-app")
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"hello%2Bworld%v"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"hello%2Bworld%v"}))
 			})
 		})
 
@@ -142,7 +142,7 @@ var _ = Describe("logs command", func() {
 
 			appGUID, _, _, _ := logsRepo.TailLogsForArgsForCall(0)
 			Expect(app.GUID).To(Equal(appGUID))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"Log Line 1"},
 			))
@@ -156,7 +156,7 @@ var _ = Describe("logs command", func() {
 					}
 					runCommand("my-app")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Received invalid SSL certificate", "https://example.com"},
 						[]string{"TIP"},
 					))
@@ -166,7 +166,7 @@ var _ = Describe("logs command", func() {
 					logsRepo.RecentLogsForReturns(nil, errors.NewInvalidSSLCert("https://example.com", "how does SSL work???"))
 					runCommand("--recent", "my-app")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Received invalid SSL certificate", "https://example.com"},
 						[]string{"TIP"},
 					))
@@ -177,7 +177,7 @@ var _ = Describe("logs command", func() {
 		Context("when the loggregator server has a valid cert", func() {
 			It("tails logs", func() {
 				runCommand("my-app")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Connected, tailing logs for app", "my-org", "my-space", "my-user"},
 				))
 			})

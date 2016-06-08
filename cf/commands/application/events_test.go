@@ -78,7 +78,7 @@ var _ = Describe("events command", func() {
 				err := flagContext.Parse("too", "many")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage", "Requires an argument"},
 				))
 			})
@@ -139,7 +139,7 @@ var _ = Describe("events command", func() {
 
 			It("tells the user", func() {
 				Expect(executeCmdErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"events", "my-app"},
 					[]string{"No events", "my-app"},
 				))
@@ -190,7 +190,7 @@ var _ = Describe("events command", func() {
 				Expect(limit).To(Equal(int64(50)))
 				Expect(appGUID).To(Equal("my-app-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"time", "event", "actor", "description"},
 					[]string{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "George Clooney", "app instance exited", "78"},
@@ -209,7 +209,7 @@ var _ = Describe("events command", func() {
 
 			It("tells the user when an error occurs", func() {
 				Expect(executeCmdErr).To(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"events", "my-app"},
 				))
 				errStr := executeCmdErr.Error()

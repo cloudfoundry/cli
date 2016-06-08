@@ -45,7 +45,7 @@ var _ = Describe("rename-service command", func() {
 	Describe("requirements", func() {
 		It("Fails with usage when exactly two parameters not passed", func() {
 			runCommand("whatever")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -79,7 +79,7 @@ var _ = Describe("rename-service command", func() {
 		It("renames the service, obviously", func() {
 			runCommand("my-service", "new-name")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))

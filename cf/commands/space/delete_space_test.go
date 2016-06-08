@@ -76,7 +76,7 @@ var _ = Describe("delete-space command", func() {
 		runCommand("space-to-delete")
 
 		Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the space space-to-delete"}))
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Deleting space", "space-to-delete", "my-org", "my-user"},
 			[]string{"OK"},
 		))
@@ -88,7 +88,7 @@ var _ = Describe("delete-space command", func() {
 		runCommand("-f", "space-to-delete")
 
 		Expect(ui.Prompts).To(BeEmpty())
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Deleting", "space-to-delete"},
 			[]string{"OK"},
 		))

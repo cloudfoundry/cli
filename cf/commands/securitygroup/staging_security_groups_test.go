@@ -66,7 +66,7 @@ var _ = Describe("staging-security-groups command", func() {
 
 			It("shows the user the name of the security groups for staging", func() {
 				Expect(runCommand()).To(BeTrue())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Acquiring", "staging security group", "my-user"},
 					[]string{"hiphopopotamus"},
 					[]string{"my lyrics are bottomless"},
@@ -82,14 +82,14 @@ var _ = Describe("staging-security-groups command", func() {
 
 			It("fails loudly", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
 		Context("when there are no security groups set for staging", func() {
 			It("tells the user that there are none", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No", "staging security group", "set"},
 				))
 			})

@@ -119,7 +119,7 @@ var _ = Describe("CopySource", func() {
 
 				It("it displays an error", func() {
 					runCommand("source-app", "target-app")
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"accidentally the UAA"},
 					))
@@ -168,7 +168,7 @@ var _ = Describe("CopySource", func() {
 						Expect(orgName).To(Equal(config.OrganizationFields().Name))
 						Expect(spaceName).To(Equal(config.SpaceFields().Name))
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space my-space as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
@@ -180,7 +180,7 @@ var _ = Describe("CopySource", func() {
 							appRepo.ReadReturns(models.Application{}, errors.New("could not find source app"))
 							runCommand("source-app", "target-app")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"could not find source app"},
 							))
@@ -190,7 +190,7 @@ var _ = Describe("CopySource", func() {
 							appRepo.ReadFromSpaceReturns(models.Application{}, errors.New("could not find target app"))
 							runCommand("source-app", "target-app")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"could not find target app"},
 							))
@@ -211,7 +211,7 @@ var _ = Describe("CopySource", func() {
 						Expect(targetAppName).To(Equal("target-app"))
 						Expect(spaceGUID).To(Equal("model-space-guid"))
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Copying source from app", "source-app", "to target app", "target-app", "in org my-org / space space-name as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
@@ -223,7 +223,7 @@ var _ = Describe("CopySource", func() {
 							spaceRepo.FindByNameReturns(models.Space{}, errors.New("Error finding space by name."))
 
 							runCommand("-s", "space-name", "source-app", "target-app")
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"Error finding space by name."},
 							))
@@ -257,7 +257,7 @@ var _ = Describe("CopySource", func() {
 						Expect(orgName).To(Equal("org-name"))
 						Expect(spaceName).To(Equal("space-name"))
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Copying source from app source-app to target app target-app in org org-name / space space-name as my-user..."},
 							[]string{"Note: this may take some time"},
 							[]string{"OK"},
@@ -268,7 +268,7 @@ var _ = Describe("CopySource", func() {
 						It("cannot just accept an organization and no space", func() {
 							runCommand("-o", "org-name", "source-app", "target-app")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"Please provide the space within the organization containing the target application"},
 							))
@@ -278,7 +278,7 @@ var _ = Describe("CopySource", func() {
 							orgRepo.FindByNameReturns(models.Organization{}, errors.New("Could not find org"))
 							runCommand("-o", "org-name", "-s", "space-name", "source-app", "target-app")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"Could not find org"},
 							))
@@ -288,7 +288,7 @@ var _ = Describe("CopySource", func() {
 							orgRepo.FindByNameReturns(models.Organization{}, nil)
 							runCommand("-o", "org-name", "-s", "space-name", "source-app", "target-app")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"Could not find space space-name in organization org-name"},
 							))
@@ -307,7 +307,7 @@ var _ = Describe("CopySource", func() {
 							appRepo.ReadFromSpaceReturns(models.Application{}, errors.New("could not find app"))
 							runCommand("-o", "org-name", "-s", "space-name", "source-app", "target-app")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"FAILED"},
 								[]string{"could not find app"},
 							))

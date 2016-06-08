@@ -130,7 +130,7 @@ var _ = Describe("quotas command", func() {
 
 			It("lists quotas", func() {
 				Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting space quotas as", "my-user"},
 					[]string{"OK"},
 					[]string{"name", "total memory", "instance memory", "routes", "service instances", "paid plans", "app instances"},
@@ -157,7 +157,7 @@ var _ = Describe("quotas command", func() {
 
 				It("replaces -1 with unlimited", func() {
 					Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 
 						[]string{"quota-non-basic-not-allowed", "434M", "57M ", "1", "unlimited", "disallowed"},
 					))
@@ -183,7 +183,7 @@ var _ = Describe("quotas command", func() {
 
 				It("replaces -1 with unlimited", func() {
 					Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 
 						[]string{"quota-non-basic-not-allowed", "434M", "57M ", "1", "6", "disallowed", "unlimited"},
 					))
@@ -208,7 +208,7 @@ var _ = Describe("quotas command", func() {
 
 				It("should not contain app instance limit column", func() {
 					Expect(quotaRepo.FindByOrgArgsForCall(0)).To(Equal("my-org-guid"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"app instances"},
 						[]string{"unlimited"},
 					))
@@ -222,7 +222,7 @@ var _ = Describe("quotas command", func() {
 			})
 
 			It("prints an error", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting space quotas as", "my-user"},
 					[]string{"FAILED"},
 				))

@@ -77,7 +77,7 @@ var _ = Describe("delete-shared-domain command", func() {
 			runCommand("foo1.com")
 
 			Expect(domainRepo.DeleteSharedDomainCallCount()).To(BeZero())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"domain"},
 				[]string{"foo1.com"},
@@ -109,7 +109,7 @@ var _ = Describe("delete-shared-domain command", func() {
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.NewModelNotFoundError("Domain", "foo.com"))
 				runCommand("foo.com")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
 					[]string{"OK"},
 					[]string{"foo.com", "not found"},
@@ -120,7 +120,7 @@ var _ = Describe("delete-shared-domain command", func() {
 				domainRepo.FindByNameInOrgReturns(models.DomainFields{}, errors.New("couldn't find the droids you're lookin for"))
 				runCommand("foo.com")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
 					[]string{"FAILED"},
 					[]string{"foo.com"},
@@ -133,7 +133,7 @@ var _ = Describe("delete-shared-domain command", func() {
 				runCommand("foo.com")
 
 				Expect(domainRepo.DeleteSharedDomainArgsForCall(0)).To(Equal("foo-guid"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
 					[]string{"FAILED"},
 					[]string{"foo.com"},
@@ -146,7 +146,7 @@ var _ = Describe("delete-shared-domain command", func() {
 
 				Expect(domainRepo.DeleteSharedDomainArgsForCall(0)).To(Equal("foo-guid"))
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete", "domain", "foo.com"}))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
 					[]string{"OK"},
 				))
@@ -158,7 +158,7 @@ var _ = Describe("delete-shared-domain command", func() {
 
 			Expect(domainRepo.DeleteSharedDomainArgsForCall(0)).To(Equal("foo-guid"))
 			Expect(ui.Prompts).To(BeEmpty())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting domain", "foo.com"},
 				[]string{"OK"},
 			))

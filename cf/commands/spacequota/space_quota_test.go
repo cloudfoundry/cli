@@ -88,7 +88,7 @@ var _ = Describe("quotas command", func() {
 
 			It("lists the specific quota info", func() {
 				Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("quota-name"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting space quota quota-name info as", "my-user"},
 					[]string{"OK"},
 					[]string{"total memory limit", "1G"},
@@ -118,7 +118,7 @@ var _ = Describe("quotas command", func() {
 
 				It("replaces -1 with unlimited", func() {
 					Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("quota-name"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting space quota quota-name info as", "my-user"},
 						[]string{"OK"},
 						[]string{"total memory limit", "1G"},
@@ -147,7 +147,7 @@ var _ = Describe("quotas command", func() {
 
 				It("replaces -1 with unlimited", func() {
 					Expect(quotaRepo.FindByNameArgsForCall(0)).To(Equal("quota-name"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting space quota quota-name info as", "my-user"},
 						[]string{"OK"},
 						[]string{"total memory limit", "1G"},
@@ -166,7 +166,7 @@ var _ = Describe("quotas command", func() {
 			})
 
 			It("prints an error", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting space quota quota-name info as", "my-user"},
 					[]string{"FAILED"},
 				))

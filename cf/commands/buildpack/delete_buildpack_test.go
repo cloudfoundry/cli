@@ -70,7 +70,7 @@ var _ = Describe("delete-buildpack command", func() {
 				Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete the buildpack my-buildpack"}))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting buildpack", "my-buildpack"},
 					[]string{"OK"},
 				))
@@ -83,7 +83,7 @@ var _ = Describe("delete-buildpack command", func() {
 					Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
 					Expect(len(ui.Prompts)).To(Equal(0))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Deleting buildpack", "my-buildpack"},
 						[]string{"OK"},
 					))
@@ -103,7 +103,7 @@ var _ = Describe("delete-buildpack command", func() {
 				Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
 				Expect(buildpackRepo.FindByNameNotFound).To(BeTrue())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "my-buildpack"},
 					[]string{"OK"},
 				))
@@ -128,7 +128,7 @@ var _ = Describe("delete-buildpack command", func() {
 
 				Expect(buildpackRepo.DeleteBuildpackGUID).To(Equal("my-buildpack-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting buildpack", "my-buildpack"},
 					[]string{"FAILED"},
 					[]string{"my-buildpack"},

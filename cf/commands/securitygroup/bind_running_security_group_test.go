@@ -55,7 +55,7 @@ var _ = Describe("bind-running-security-group command", func() {
 
 		It("fails with usage when a name is not provided", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -75,7 +75,7 @@ var _ = Describe("bind-running-security-group command", func() {
 		})
 
 		It("Describes what it is doing to the user", func() {
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Binding", "security-group-name", "as", "my-user"},
 				[]string{"OK"},
 				[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
@@ -93,7 +93,7 @@ var _ = Describe("bind-running-security-group command", func() {
 			})
 
 			It("fails and describes the failure to the user", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"WOAH. I know kung fu"},
 				))
@@ -107,7 +107,7 @@ var _ = Describe("bind-running-security-group command", func() {
 
 			It("fails and tells the user that the security group does not exist", func() {
 				Expect(fakeRunningSecurityGroupRepo.BindToRunningSetCallCount()).To(Equal(0))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 				))
 			})

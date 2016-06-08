@@ -155,7 +155,7 @@ var _ = Describe("Login Command", func() {
 
 				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Select an org"},
 					[]string{"1. some-org"},
 					[]string{"2. my-new-org"},
@@ -194,7 +194,7 @@ var _ = Describe("Login Command", func() {
 
 				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Select an org"},
 					[]string{"1. some-org"},
 					[]string{"2. my-new-org"},
@@ -272,7 +272,7 @@ var _ = Describe("Login Command", func() {
 
 				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"To upgrade your CLI"},
 					[]string{"5.0.0"},
 				))
@@ -316,7 +316,7 @@ var _ = Describe("Login Command", func() {
 
 				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"my-org-2"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"my-org-2"}))
 				Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("my-org-1"))
 				Expect(Config.OrganizationFields().GUID).To(Equal("my-org-guid-1"))
 			})
@@ -498,7 +498,7 @@ var _ = Describe("Login Command", func() {
 					"password":       "the-password-3",
 				}))
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("prompts user for password again if password given on the cmd line fails", func() {
@@ -528,7 +528,7 @@ var _ = Describe("Login Command", func() {
 					"password":       "the-password-3",
 				}))
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 	})
@@ -570,14 +570,14 @@ var _ = Describe("Login Command", func() {
 
 		var ItFails = func() {
 			It("fails", func() {
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		}
 
 		var ItSucceeds = func() {
 			It("runs successfully", func() {
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 			})
 		}
 
@@ -669,7 +669,7 @@ var _ = Describe("Login Command", func() {
 				})
 
 				It("fails and suggests the user skip SSL validation", func() {
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"SSL Cert", "https://bobs-burgers.com"},
 						[]string{"TIP", "login", "--skip-ssl-validation"},

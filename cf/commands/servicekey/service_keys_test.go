@@ -90,19 +90,19 @@ var _ = Describe("service-keys command", func() {
 				},
 			}
 			callListServiceKeys([]string{"fake-service-instance"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting keys for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"name"},
 				[]string{"fake-service-key-1"},
 				[]string{"fake-service-key-2"},
 			))
-			Expect(ui.Outputs[1]).To(BeEmpty())
+			Expect(ui.Outputs()[1]).To(BeEmpty())
 			Expect(serviceKeyRepo.ListServiceKeysMethod.InstanceGUID).To(Equal("fake-instance-guid"))
 		})
 
 		It("does not list service keys when none are returned", func() {
 			callListServiceKeys([]string{"fake-service-instance"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting keys for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"No service key for service instance", "fake-service-instance"},
 			))

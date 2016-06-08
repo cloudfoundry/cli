@@ -46,7 +46,7 @@ var _ = Describe("update-service-auth-token command", func() {
 		It("fails with usage when not provided exactly three args", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("some-token-label", "a-provider")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -82,7 +82,7 @@ var _ = Describe("update-service-auth-token command", func() {
 			expectedAuthToken.Provider = "found provider"
 			expectedAuthToken.Token = "a value"
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Updating service auth token as", "my-user"},
 				[]string{"OK"},
 			))

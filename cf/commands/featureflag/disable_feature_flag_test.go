@@ -50,7 +50,7 @@ var _ = Describe("disable-feature-flag command", func() {
 
 		It("fails with usage if a single feature is not specified", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -68,7 +68,7 @@ var _ = Describe("disable-feature-flag command", func() {
 			Expect(flag).To(Equal("user_org_creation"))
 			Expect(set).To(BeFalse())
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Setting status of user_org_creation as my-user..."},
 				[]string{"OK"},
 				[]string{"Feature user_org_creation Disabled."},
@@ -82,7 +82,7 @@ var _ = Describe("disable-feature-flag command", func() {
 
 			It("fails with an error", func() {
 				runCommand("i-dont-exist")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"An error occurred."},
 				))

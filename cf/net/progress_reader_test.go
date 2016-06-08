@@ -27,9 +27,9 @@ var _ = Describe("ProgressReader", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		testFile, err = os.Open("../../fixtures/test.file")
-		Expect(err).ToNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 		fileStat, err = testFile.Stat()
-		Expect(err).ToNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		b = make([]byte, 1024)
 		progressReader = NewProgressReader(testFile, ui, 1*time.Millisecond)
@@ -45,9 +45,9 @@ var _ = Describe("ProgressReader", func() {
 			}
 		}
 
-		Expect(ui.UncapturedOutput).To(ContainSubstrings([]string{"\r", "uploaded..."}))
-		Expect(ui.UncapturedOutput).To(ContainSubstrings([]string{"\r    "}))
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"\rDone "}))
+		Expect(ui.UncapturedOutput()).To(ContainSubstrings([]string{"\r", "uploaded..."}))
+		Expect(ui.UncapturedOutput()).To(ContainSubstrings([]string{"\r    "}))
+		Expect(ui.Outputs()).To(ContainSubstrings([]string{"\rDone "}))
 	})
 
 	It("reads the correct number of bytes", func() {

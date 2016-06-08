@@ -113,12 +113,12 @@ var _ = Describe("quotas command", func() {
 
 		It("lists quotas", func() {
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
-			Expect(terminal.Decolorize(ui.Outputs[0])).To(Equal("Getting quotas as my-user..."))
-			Expect(terminal.Decolorize(ui.Outputs[1])).To(Equal("OK"))
-			Expect(terminal.Decolorize(ui.Outputs[3])).To(MatchRegexp("name\\s*total memory\\s*instance memory\\s*routes\\s*service instances\\s*paid plans\\s*app instances\\s*route ports\\s*"))
-			Expect(terminal.Decolorize(ui.Outputs[4])).To(MatchRegexp("quota-name\\s*1G\\s*512M\\s*111\\s*222\\s*allowed\\s*unlimited\\s*4"))
-			Expect(terminal.Decolorize(ui.Outputs[5])).To(MatchRegexp("quota-non-basic-not-allowed\\s*434M\\s*unlimited\\s*1\\s*2\\s*disallowed\\s*10\\s*4"))
-			Expect(terminal.Decolorize(ui.Outputs[6])).To(MatchRegexp("quota-unlimited-routes\\s*434M\\s*1M\\s*unlimited\\s*2\\s*disallowed\\s*10\\s*4"))
+			Expect(terminal.Decolorize(ui.Outputs()[0])).To(Equal("Getting quotas as my-user..."))
+			Expect(terminal.Decolorize(ui.Outputs()[1])).To(Equal("OK"))
+			Expect(terminal.Decolorize(ui.Outputs()[3])).To(MatchRegexp("name\\s*total memory\\s*instance memory\\s*routes\\s*service instances\\s*paid plans\\s*app instances\\s*route ports\\s*"))
+			Expect(terminal.Decolorize(ui.Outputs()[4])).To(MatchRegexp("quota-name\\s*1G\\s*512M\\s*111\\s*222\\s*allowed\\s*unlimited\\s*4"))
+			Expect(terminal.Decolorize(ui.Outputs()[5])).To(MatchRegexp("quota-non-basic-not-allowed\\s*434M\\s*unlimited\\s*1\\s*2\\s*disallowed\\s*10\\s*4"))
+			Expect(terminal.Decolorize(ui.Outputs()[6])).To(MatchRegexp("quota-unlimited-routes\\s*434M\\s*1M\\s*unlimited\\s*2\\s*disallowed\\s*10\\s*4"))
 		})
 
 		It("displays unlimited services properly", func() {
@@ -134,7 +134,7 @@ var _ = Describe("quotas command", func() {
 				},
 			}, nil)
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"quota-with-no-limit-to-services", "434M", "1M", "2", "unlimited", "disallowed", "7"},
 			))
 
@@ -150,7 +150,7 @@ var _ = Describe("quotas command", func() {
 				},
 			}, nil)
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"quota-with-no-limit-to-app-instance", "434M", "1M", "2", "7", "disallowed", "unlimited"},
 			))
 
@@ -167,7 +167,7 @@ var _ = Describe("quotas command", func() {
 				},
 			}, nil)
 			Expect(Expect(runCommand()).To(HavePassedRequirements())).To(HavePassedRequirements())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"quota-with-no-limit-to-app-instance", "434M", "1M", "2", "7", "disallowed", "7", "unlimited"},
 			))
 		})
@@ -180,7 +180,7 @@ var _ = Describe("quotas command", func() {
 
 		It("prints an error", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting quotas as", "my-user"},
 				[]string{"FAILED"},
 			))

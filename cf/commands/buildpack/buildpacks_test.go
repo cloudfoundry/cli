@@ -87,7 +87,7 @@ var _ = Describe("ListBuildpacks", func() {
 
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting buildpacks"},
 				[]string{"buildpack", "position", "enabled"},
 				[]string{"Buildpack-1", "5", "true", "false"},
@@ -98,7 +98,7 @@ var _ = Describe("ListBuildpacks", func() {
 
 		It("tells the user if no build packs exist", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting buildpacks"},
 				[]string{"No buildpacks found"},
 			))

@@ -82,7 +82,7 @@ var _ = Describe("restart-app-instance", func() {
 			app_guid, instance := appInstancesRepo.DeleteInstanceArgsForCall(0)
 			Expect(app_guid).To(Equal(application.GUID))
 			Expect(instance).To(Equal(0))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Restarting instance 0 of application my-app as my-user"},
 				[]string{"OK"},
 			))
@@ -99,7 +99,7 @@ var _ = Describe("restart-app-instance", func() {
 				Expect(app_guid).To(Equal(application.GUID))
 				Expect(instance).To(Equal(0))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"deletion failed"},
 				))
@@ -110,7 +110,7 @@ var _ = Describe("restart-app-instance", func() {
 			It("fails when it is a string", func() {
 				runCommand("my-app", "some-silly-thing")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Instance must be a non-negative integer"},
 				))
 			})

@@ -218,9 +218,9 @@ var _ = Describe("V3Apps", func() {
 
 					It("prints a table of the results", func() {
 						Expect(runCLIErr).NotTo(HaveOccurred())
-						outputs := make([]string, len(ui.Outputs))
-						for i := range ui.Outputs {
-							outputs[i] = terminal.Decolorize(ui.Outputs[i])
+						outputs := make([]string, len(ui.Outputs()))
+						for i := range ui.Outputs() {
+							outputs[i] = terminal.Decolorize(ui.Outputs()[i])
 						}
 						Expect(outputs).To(ConsistOf(
 							MatchRegexp(`name.*requested state.*instances.*memory.*disk.*urls`),

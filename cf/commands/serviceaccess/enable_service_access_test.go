@@ -61,7 +61,7 @@ var _ = Describe("enable-service-access command", func() {
 		It("fails with usage when it does not recieve any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand(nil)
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -88,7 +88,7 @@ var _ = Describe("enable-service-access command", func() {
 				tokenRefresher.RefreshAuthTokenReturns("", errors.New("Refreshing went wrong"))
 				runCommand([]string{serviceName})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Refreshing went wrong"},
 					[]string{"FAILED"},
 				))
@@ -98,7 +98,7 @@ var _ = Describe("enable-service-access command", func() {
 		Context("when the named service exists", func() {
 			It("returns OK when ran successfully", func() {
 				Expect(runCommand([]string{serviceName})).To(BeTrue())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"OK"},
 				))
 
@@ -112,7 +112,7 @@ var _ = Describe("enable-service-access command", func() {
 				actor.UpdateAllPlansForServiceReturns(errors.New("Kaboom!"))
 
 				Expect(runCommand([]string{serviceName})).To(BeFalse())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Kaboom!"},
 				))
 			})
@@ -122,14 +122,14 @@ var _ = Describe("enable-service-access command", func() {
 					actor.UpdateSinglePlanForServiceReturns(errors.New("could not find service"))
 
 					Expect(runCommand([]string{"-p", servicePlanName, serviceName})).To(BeFalse())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"could not find service"},
 					))
 				})
 
 				It("enables the plan", func() {
 					Expect(runCommand([]string{"-p", publicServicePlanName, serviceName})).To(BeTrue())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 
@@ -146,14 +146,14 @@ var _ = Describe("enable-service-access command", func() {
 					actor.UpdatePlanAndOrgForServiceReturns(errors.New("could not find org"))
 
 					Expect(runCommand([]string{"-p", servicePlanName, "-o", "not-findable-org", serviceName})).To(BeFalse())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"could not find org"},
 					))
 				})
 
 				It("enables the plan for the org", func() {
 					Expect(runCommand([]string{"-p", publicServicePlanName, "-o", orgName, serviceName})).To(BeTrue())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 
@@ -171,14 +171,14 @@ var _ = Describe("enable-service-access command", func() {
 					actor.UpdateOrgForServiceReturns(errors.New("could not find org"))
 
 					Expect(runCommand([]string{"-o", "not-findable-org", serviceName})).To(BeFalse())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"could not find org"},
 					))
 				})
 
 				It("tells the user if the service's plans are already accessible", func() {
 					Expect(runCommand([]string{"-o", orgName, serviceName})).To(BeTrue())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 

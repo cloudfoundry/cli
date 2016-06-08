@@ -73,7 +73,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires an argument"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -135,7 +135,9 @@ var _ = Describe("PurgeServiceInstance", func() {
 			It("warns the user", func() {
 				ui.Inputs = []string{"n"}
 				cmd.Execute(flagContext)
-				Eventually(func() []string { return ui.Outputs }).Should(ContainSubstrings(
+				Eventually(func() []string {
+					return ui.Outputs()
+				}).Should(ContainSubstrings(
 					[]string{"WARNING"},
 				))
 			})
@@ -189,7 +191,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 
 			It("prints a warning", func() {
 				cmd.Execute(flagContext)
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Service instance service-instance-name not found"},
 				))
 			})

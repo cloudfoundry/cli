@@ -87,7 +87,7 @@ var _ = Describe("CreateAppManifest", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires APP_NAME as argument"},
 				))
@@ -253,7 +253,7 @@ var _ = Describe("CreateAppManifest", func() {
 
 				It("says OK", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 						[]string{"Manifest file created successfully at ./app-name_manifest.yml"},
 					))

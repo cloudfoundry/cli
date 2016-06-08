@@ -22,39 +22,39 @@ var _ = Describe("Panic Printer", func() {
 	Describe("DisplayCrashDialog", func() {
 		It("includes the error message when given an error", func() {
 			panicprinter.DisplayCrashDialog(errors.New("some-error"), "some command", "some trace")
-			Expect(len(ui.Outputs)).To(BeNumerically(">", 0))
-			Expect(ui.Outputs).To(ContainElement(ContainSubstring("some-error")))
+			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
+			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-error")))
 		})
 
 		It("includes the string when given a string that is not terminal.QuietPanic", func() {
 			panicprinter.DisplayCrashDialog("some-error", "some command", "some trace")
-			Expect(len(ui.Outputs)).To(BeNumerically(">", 0))
-			Expect(ui.Outputs).To(ContainElement(ContainSubstring("some-error")))
+			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
+			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-error")))
 		})
 
 		It("does not print anything when given a string that is terminal.QuietPanic", func() {
 			err := terminal.QuietPanic
 			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(len(ui.Outputs)).To(Equal(0))
+			Expect(len(ui.Outputs())).To(Equal(0))
 		})
 
 		It("prints the unexpected error type message when not given a string or an error", func() {
 			panicprinter.DisplayCrashDialog(struct{}{}, "some command", "some trace")
-			Expect(len(ui.Outputs)).To(BeNumerically(">", 0))
-			Expect(ui.Outputs).To(ContainElement(ContainSubstring("An unexpected type of error")))
+			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
+			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("An unexpected type of error")))
 		})
 
 		It("includes the error message when given an errors.Exception with DisplayCrashDialog set to true", func() {
 			err := errors.Exception{DisplayCrashDialog: true, Message: "some-message"}
 			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(len(ui.Outputs)).To(BeNumerically(">", 0))
-			Expect(ui.Outputs).To(ContainElement(ContainSubstring("some-message")))
+			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
+			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-message")))
 		})
 
 		It("does not print anything when given an errors.Exception with DisplayCrashDialog set to false", func() {
 			err := errors.Exception{DisplayCrashDialog: false, Message: "some-message"}
 			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(len(ui.Outputs)).To(Equal(0))
+			Expect(len(ui.Outputs())).To(Equal(0))
 		})
 	})
 

@@ -83,7 +83,7 @@ var _ = Describe("bind-service command", func() {
 			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 			Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"TIP", "my-app"},
@@ -99,7 +99,7 @@ var _ = Describe("bind-service command", func() {
 			serviceBindingRepo.CreateReturns(errors.NewHTTPError(http.StatusBadRequest, errors.ServiceBindingAppServiceTaken, ""))
 			callBindService([]string{"my-app", "my-service"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Binding service"},
 				[]string{"OK"},
 				[]string{"my-app", "is already bound", "my-service"},
@@ -109,7 +109,7 @@ var _ = Describe("bind-service command", func() {
 		It("warns the user when the error is non HTTPError ", func() {
 			serviceBindingRepo.CreateReturns(errors.New("1001"))
 			callBindService([]string{"my-app1", "my-service1"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"FAILED"},
 				[]string{"1001"},
@@ -118,19 +118,19 @@ var _ = Describe("bind-service command", func() {
 
 		It("fails with usage when called without a service instance and app", func() {
 			callBindService([]string{"my-service"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 
 			ui = &testterm.FakeUI{}
 			callBindService([]string{"my-app"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 
 			ui = &testterm.FakeUI{}
 			callBindService([]string{"my-app", "my-service"})
-			Expect(ui.Outputs).ToNot(ContainSubstrings(
+			Expect(ui.Outputs()).ToNot(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -140,7 +140,7 @@ var _ = Describe("bind-service command", func() {
 				It("successfully creates a service and passes the params as a json string", func() {
 					callBindService([]string{"my-app", "my-service", "-c", `{"foo": "bar"}`})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 						[]string{"OK"},
 						[]string{"TIP"},
@@ -157,7 +157,7 @@ var _ = Describe("bind-service command", func() {
 					It("returns an error to the UI", func() {
 						callBindService([]string{"my-app", "my-service", "-c", `bad-json`})
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"FAILED"},
 							[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 						))
@@ -192,7 +192,7 @@ var _ = Describe("bind-service command", func() {
 				It("successfully creates a service and passes the params as a json", func() {
 					callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 						[]string{"OK"},
 						[]string{"TIP"},
@@ -213,7 +213,7 @@ var _ = Describe("bind-service command", func() {
 					It("returns an error to the UI", func() {
 						callBindService([]string{"my-app", "my-service", "-c", jsonFile.Name()})
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"FAILED"},
 							[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 						))

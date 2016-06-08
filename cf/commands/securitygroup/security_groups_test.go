@@ -80,7 +80,7 @@ var _ = Describe("list-security-groups command", func() {
 
 		It("tells the user what it's about to do", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting", "security groups", "my-user"},
 			))
 		})
@@ -89,7 +89,7 @@ var _ = Describe("list-security-groups command", func() {
 			repo.FindAllReturns([]models.SecurityGroup{}, errors.New("YO YO YO, ERROR YO"))
 
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 			))
 		})
@@ -99,7 +99,7 @@ var _ = Describe("list-security-groups command", func() {
 				repo.FindAllReturns([]models.SecurityGroup{}, nil)
 
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"No security groups"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"No security groups"}))
 			})
 		})
 
@@ -138,7 +138,7 @@ var _ = Describe("list-security-groups command", func() {
 
 				It("lists out the security group's: name, organization and space", func() {
 					runCommand()
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting", "security group", "my-user"},
 						[]string{"OK"},
 						[]string{"#0", "my-group", "org-1", "space-1"},
@@ -146,7 +146,7 @@ var _ = Describe("list-security-groups command", func() {
 
 					//If there is a panic in this test, it is likely due to the following
 					//Expectation to be false
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"#0", "my-group", "org-2", "space-2"},
 					))
 				})
@@ -155,7 +155,7 @@ var _ = Describe("list-security-groups command", func() {
 			Describe("Where there are no spaces assigned", func() {
 				It("lists out the security group's: name", func() {
 					runCommand()
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting", "security group", "my-user"},
 						[]string{"OK"},
 						[]string{"#0", "my-group"},

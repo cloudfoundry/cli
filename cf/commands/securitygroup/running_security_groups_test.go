@@ -66,7 +66,7 @@ var _ = Describe("Running-security-groups command", func() {
 
 			It("shows the user the name of the security groups of the Running set", func() {
 				Expect(runCommand()).To(BeTrue())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Acquiring", "security groups", "my-user"},
 					[]string{"hiphopopotamus"},
 					[]string{"my lyrics are bottomless"},
@@ -82,14 +82,14 @@ var _ = Describe("Running-security-groups command", func() {
 
 			It("fails loudly", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
 		Context("when there are no security groups set in the Running group", func() {
 			It("tells the user that there are none", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No", "security groups", "set"},
 				))
 			})

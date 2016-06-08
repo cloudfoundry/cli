@@ -60,7 +60,7 @@ var _ = Describe("delete-org command", func() {
 
 	It("fails with usage if no arguments are given", func() {
 		runCommand()
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires an argument"},
 		))
 	})
@@ -97,7 +97,7 @@ var _ = Describe("delete-org command", func() {
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the org org-to-delete"}))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "org-to-delete"},
 					[]string{"OK"},
 				))
@@ -117,7 +117,7 @@ var _ = Describe("delete-org command", func() {
 			ui.Inputs = []string{}
 			runCommand("-f", "org-to-delete")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting", "org-to-delete"},
 				[]string{"OK"},
 			))
@@ -132,7 +132,7 @@ var _ = Describe("delete-org command", func() {
 
 			Expect(orgRepo.DeleteCallCount()).To(Equal(0))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting", "org-to-delete"},
 				[]string{"OK"},
 			))

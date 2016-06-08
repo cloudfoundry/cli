@@ -66,7 +66,7 @@ var _ = Describe("org command", func() {
 
 			It("fails with no args", func() {
 				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -165,7 +165,7 @@ var _ = Describe("org command", func() {
 			It("shows the org with the given name", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting info for org", "my-org", "my-user"},
 					[]string{"OK"},
 					[]string{"my-org"},
@@ -185,7 +185,7 @@ var _ = Describe("org command", func() {
 				It("shows unlimited route ports", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"unlimited route ports"},
 					))
 				})
@@ -200,7 +200,7 @@ var _ = Describe("org command", func() {
 				It("should not display route ports", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(ui.Outputs).NotTo(ContainSubstrings(
+					Expect(ui.Outputs()).NotTo(ContainSubstrings(
 						[]string{"route ports"},
 					))
 				})
@@ -215,10 +215,10 @@ var _ = Describe("org command", func() {
 				It("shows only the org guid", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"my-org-guid"},
 					))
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Getting info for org", "my-org", "my-user"},
 					))
 				})

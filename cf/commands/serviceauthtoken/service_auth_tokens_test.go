@@ -92,7 +92,7 @@ var _ = Describe("service-auth-tokens command", func() {
 		It("shows you the service auth tokens", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting service auth tokens as", "my-user"},
 				[]string{"OK"},
 				[]string{"label", "provider"},

@@ -92,7 +92,7 @@ var _ = Describe("scale command", func() {
 		It("requires an app to be specified", func() {
 			passed := testcmd.RunCLICommand("scale", []string{"-m", "1G"}, requirementsFactory, updateCommandDependency, false, ui)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 			Expect(passed).To(BeFalse())
@@ -108,7 +108,7 @@ var _ = Describe("scale command", func() {
 			It("prints a description of the app's limits", func() {
 				testcmd.RunCLICommand("scale", []string{"my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Showing", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 					[]string{"memory", "256M"},
@@ -116,7 +116,7 @@ var _ = Describe("scale command", func() {
 					[]string{"instances", "42"},
 				))
 
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Scaling", "my-app", "my-org", "my-space", "my-user"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"Scaling", "my-app", "my-org", "my-space", "my-user"}))
 			})
 		})
 
@@ -148,7 +148,7 @@ var _ = Describe("scale command", func() {
 			It("can set an app's instance count, memory limit and disk limit", func() {
 				testcmd.RunCLICommand("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Scaling", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))

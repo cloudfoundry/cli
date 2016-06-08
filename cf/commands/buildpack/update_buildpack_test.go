@@ -18,14 +18,14 @@ import (
 )
 
 func successfulUpdate(ui *testterm.FakeUI, buildpackName string) {
-	Expect(ui.Outputs).To(ContainSubstrings(
+	Expect(ui.Outputs()).To(ContainSubstrings(
 		[]string{"Updating buildpack", buildpackName},
 		[]string{"OK"},
 	))
 }
 
 func failedUpdate(ui *testterm.FakeUI, buildpackName string) {
-	Expect(ui.Outputs).To(ContainSubstrings(
+	Expect(ui.Outputs()).To(ContainSubstrings(
 		[]string{"Updating buildpack", buildpackName},
 		[]string{"FAILED"},
 	))

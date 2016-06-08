@@ -50,7 +50,7 @@ var _ = Describe("set-health-check command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"get-health-check"},
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
@@ -98,8 +98,8 @@ var _ = Describe("set-health-check command", func() {
 			It("shows the health_check_type", func() {
 				runCommand("my-app")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Getting", "my-app", "health_check_type"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"port"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Getting", "my-app", "health_check_type"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"port"}))
 			})
 		})
 	})

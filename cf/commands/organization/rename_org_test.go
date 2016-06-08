@@ -44,12 +44,12 @@ var _ = Describe("rename-org command", func() {
 
 	It("fails with usage when given less than two args", func() {
 		callRenameOrg([]string{})
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 
 		callRenameOrg([]string{"foo"})
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 	})
@@ -74,7 +74,7 @@ var _ = Describe("rename-org command", func() {
 		It("renames an organization", func() {
 			targetedOrgName := configRepo.OrganizationFields().Name
 			callRenameOrg([]string{"the-old-org-name", "the-new-org-name"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming org", "the-old-org-name", "the-new-org-name", "my-user"},
 				[]string{"OK"},
 			))

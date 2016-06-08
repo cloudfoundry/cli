@@ -51,12 +51,12 @@ var _ = Describe("unset-space-quota command", func() {
 
 	It("fails with usage when provided too many or two few args", func() {
 		runCommand("space")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 
 		runCommand("space", "quota", "extra-stuff")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 	})
@@ -99,7 +99,7 @@ var _ = Describe("unset-space-quota command", func() {
 
 			runCommand("my-space", "my-quota")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Unassigning space quota", "my-quota", "my-space", "my-user"},
 				[]string{"OK"},
 			))

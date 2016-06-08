@@ -74,7 +74,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -133,7 +133,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 
 		It("tells the user it will create the user provided service", func() {
 			Expect(runCLIErr).NotTo(HaveOccurred())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating user provided service service-instance in org"},
 			))
 		})
@@ -155,7 +155,7 @@ var _ = Describe("CreateUserProvidedService", func() {
 
 			It("tells the user OK", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"OK"},
 				))
 			})

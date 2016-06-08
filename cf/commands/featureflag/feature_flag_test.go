@@ -66,7 +66,7 @@ var _ = Describe("feature-flag command", func() {
 
 		It("lists the state of the specified feature flag", func() {
 			runCommand("route_creation")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Retrieving status of route_creation as my-user..."},
 				[]string{"Feature", "State"},
 				[]string{"route_creation", "disabled"},
@@ -80,7 +80,7 @@ var _ = Describe("feature-flag command", func() {
 
 			It("fails with an error", func() {
 				runCommand("route_creation")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"An error occurred."},
 				))

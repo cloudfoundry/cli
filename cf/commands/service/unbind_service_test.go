@@ -80,7 +80,7 @@ var _ = Describe("unbind-service command", func() {
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding app", "my-service", "my-app", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
@@ -103,7 +103,7 @@ var _ = Describe("unbind-service command", func() {
 				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
 				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding app", "my-service", "my-app"},
 					[]string{"OK"},
 					[]string{"my-service", "my-app", "did not exist"},
@@ -118,19 +118,19 @@ var _ = Describe("unbind-service command", func() {
 
 		It("when no parameters are given the command fails with usage", func() {
 			callUnbindService([]string{"my-service"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 
 			ui = &testterm.FakeUI{}
 			callUnbindService([]string{"my-app"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 
 			ui = &testterm.FakeUI{}
 			callUnbindService([]string{"my-app", "my-service"})
-			Expect(ui.Outputs).ToNot(ContainSubstrings(
+			Expect(ui.Outputs()).ToNot(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})

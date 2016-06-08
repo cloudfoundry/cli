@@ -74,7 +74,7 @@ var _ = Describe("set-env command", func() {
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
 			runCommand("zomg", "too", "many", "args")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -94,7 +94,7 @@ var _ = Describe("set-env command", func() {
 			It("is created", func() {
 				runCommand("my-app", "DATABASE_URL", "mysql://new-example.com/my-db")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{
 						"Setting env variable",
 						"DATABASE_URL",
@@ -125,7 +125,7 @@ var _ = Describe("set-env command", func() {
 			It("is updated", func() {
 				runCommand("my-app", "DATABASE_URL", "mysql://new-example.com/my-db")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{
 						"Setting env variable",
 						"DATABASE_URL",
@@ -144,7 +144,7 @@ var _ = Describe("set-env command", func() {
 		It("allows the variable value to begin with a hyphen", func() {
 			runCommand("my-app", "MY_VAR", "--has-a-cool-value")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{
 					"Setting env variable",
 					"MY_VAR",
@@ -168,7 +168,7 @@ var _ = Describe("set-env command", func() {
 			It("tells the user", func() {
 				runCommand("please", "dont", "fail")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Setting env variable"},
 					[]string{"FAILED"},
 					[]string{"Error updating app."},
@@ -178,7 +178,7 @@ var _ = Describe("set-env command", func() {
 
 		It("gives the appropriate tip", func() {
 			runCommand("my-app", "DATABASE_URL", "mysql://new-example.com/my-db")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"TIP: Use 'cf restage my-app' to ensure your env variable changes take effect"},
 			))
 		})

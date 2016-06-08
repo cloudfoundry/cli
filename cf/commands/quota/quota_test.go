@@ -58,7 +58,7 @@ var _ = Describe("quota", func() {
 		Context("When not providing a quota name", func() {
 			It("fails with usage", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage", "Requires", "argument"},
 				))
 			})
@@ -83,7 +83,7 @@ var _ = Describe("quota", func() {
 				It("shows you that quota", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
 						[]string{"Total Memory", "512M"},
@@ -114,7 +114,7 @@ var _ = Describe("quota", func() {
 				It("shows you that quota", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
 						[]string{"Total Memory", "512M"},
@@ -144,7 +144,7 @@ var _ = Describe("quota", func() {
 				It("shows you that quota", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
 						[]string{"Total Memory", "512M"},
@@ -173,7 +173,7 @@ var _ = Describe("quota", func() {
 				It("does not show reserved route ports", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Reserved Route Ports"},
 					))
 				})
@@ -195,7 +195,7 @@ var _ = Describe("quota", func() {
 				It("shows you that quota", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
 						[]string{"Total Memory", "512M"},
@@ -223,7 +223,7 @@ var _ = Describe("quota", func() {
 				It("shows you that quota", func() {
 					runCommand("muh-muh-muh-my-qua-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting quota", "muh-muh-muh-my-qua-quota", "my-user"},
 						[]string{"OK"},
 						[]string{"Total Memory", "512M"},
@@ -243,7 +243,7 @@ var _ = Describe("quota", func() {
 				It("gives an error", func() {
 					runCommand("an-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"oops"},
 					))

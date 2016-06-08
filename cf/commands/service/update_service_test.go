@@ -130,7 +130,7 @@ var _ = Describe("update-service command", func() {
 			It("prints a user indicating it is a no-op", func() {
 				callUpdateService([]string{"my-service"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"OK"},
 					[]string{"No changes were made"},
 				))
@@ -172,7 +172,7 @@ var _ = Describe("update-service command", func() {
 			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "-c", `{"foo": "bar"}`, "my-service-instance"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating service", "my-service", "as", "my-user", "..."},
 					[]string{"OK"},
 					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
@@ -189,7 +189,7 @@ var _ = Describe("update-service command", func() {
 				It("returns an error to the UI", func() {
 					callUpdateService([]string{"-p", "flare", "-c", `bad-json`, "my-service-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
@@ -224,7 +224,7 @@ var _ = Describe("update-service command", func() {
 			It("successfully updates a service and passes the params as a json", func() {
 				callUpdateService([]string{"-p", "flare", "-c", jsonFile.Name(), "my-service-instance"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating service", "my-service", "as", "my-user", "..."},
 					[]string{"OK"},
 					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
@@ -246,7 +246,7 @@ var _ = Describe("update-service command", func() {
 				It("returns an error to the UI", func() {
 					callUpdateService([]string{"-p", "flare", "-c", jsonFile.Name(), "my-service-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
@@ -259,7 +259,7 @@ var _ = Describe("update-service command", func() {
 		It("successfully updates a service and passes the tags as json", func() {
 			callUpdateService([]string{"-t", "tag1, tag2,tag3,  tag4", "my-service-instance"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Updating service instance", "my-service-instance"},
 				[]string{"OK"},
 			))
@@ -270,7 +270,7 @@ var _ = Describe("update-service command", func() {
 		It("successfully updates a service and passes the tags as json", func() {
 			callUpdateService([]string{"-t", "tag1", "my-service-instance"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Updating service instance", "my-service-instance"},
 				[]string{"OK"},
 			))
@@ -282,7 +282,7 @@ var _ = Describe("update-service command", func() {
 			It("successfully updates the service", func() {
 				callUpdateService([]string{"-t", "", "my-service-instance"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating service instance", "my-service-instance"},
 					[]string{"OK"},
 				))
@@ -326,7 +326,7 @@ var _ = Describe("update-service command", func() {
 			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating service", "my-service", "as", "my-user", "..."},
 					[]string{"OK"},
 					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
@@ -342,7 +342,7 @@ var _ = Describe("update-service command", func() {
 			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating service", "my-service", "as", "my-user", "..."},
 					[]string{"OK"},
 					[]string{"Update in progress. Use 'cf services' or 'cf service my-service-instance' to check operation status."},
@@ -361,7 +361,7 @@ var _ = Describe("update-service command", func() {
 
 					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error finding instance"},
 						[]string{"FAILED"},
 					))
@@ -373,7 +373,7 @@ var _ = Describe("update-service command", func() {
 
 					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error fetching plans"},
 						[]string{"FAILED"},
 					))
@@ -383,7 +383,7 @@ var _ = Describe("update-service command", func() {
 				It("returns an error", func() {
 					callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Plan does not exist for the murkydb service"},
 						[]string{"FAILED"},
 					))
@@ -394,7 +394,7 @@ var _ = Describe("update-service command", func() {
 					serviceRepo.UpdateServiceInstanceReturns(errors.New("Error updating service instance"))
 					callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error updating service instance"},
 						[]string{"FAILED"},
 					))
@@ -432,7 +432,7 @@ var _ = Describe("update-service command", func() {
 			It("successfully updates a service", func() {
 				callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating service", "my-service", "as", "my-user", "..."},
 					[]string{"OK"},
 				))
@@ -452,7 +452,7 @@ var _ = Describe("update-service command", func() {
 
 					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error finding instance"},
 						[]string{"FAILED"},
 					))
@@ -464,7 +464,7 @@ var _ = Describe("update-service command", func() {
 
 					callUpdateService([]string{"-p", "flare", "some-stupid-not-real-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error fetching plans"},
 						[]string{"FAILED"},
 					))
@@ -474,7 +474,7 @@ var _ = Describe("update-service command", func() {
 				It("returns an error", func() {
 					callUpdateService([]string{"-p", "not-a-real-plan", "instance-without-service-offering"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Plan does not exist for the murkydb service"},
 						[]string{"FAILED"},
 					))
@@ -485,7 +485,7 @@ var _ = Describe("update-service command", func() {
 					serviceRepo.UpdateServiceInstanceReturns(errors.New("Error updating service instance"))
 					callUpdateService([]string{"-p", "flare", "my-service-instance"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Error updating service instance"},
 						[]string{"FAILED"},
 					))

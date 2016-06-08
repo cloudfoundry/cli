@@ -49,7 +49,7 @@ var _ = Describe("Create user command", func() {
 	It("creates a user", func() {
 		runCommand("my-user", "my-password")
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating user", "my-user"},
 			[]string{"OK"},
 			[]string{"TIP"},
@@ -70,7 +70,7 @@ var _ = Describe("Create user command", func() {
 				[]string{"already exists"},
 			))
 
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("fails when any error other than alreadyExists is returned", func() {
@@ -78,11 +78,11 @@ var _ = Describe("Create user command", func() {
 
 			runCommand("my-user", "my-password")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Forbidden"},
 			))
 
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 
 		})
 	})

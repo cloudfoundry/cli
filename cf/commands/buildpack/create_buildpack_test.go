@@ -47,7 +47,7 @@ var _ = Describe("create-buildpack command", func() {
 
 	It("fails with usage when given fewer than three arguments", func() {
 		testcmd.RunCLICommand("create-buildpack", []string{}, requirementsFactory, updateCommandDependency, false, ui)
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 	})
@@ -57,26 +57,26 @@ var _ = Describe("create-buildpack command", func() {
 
 		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
 		Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "my.war")).To(Equal(true))
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},
 			[]string{"Uploading buildpack", "my-buildpack"},
 			[]string{"OK"},
 		))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("warns the user when the buildpack already exists", func() {
 		repo.CreateBuildpackExists = true
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},
 			[]string{"my-buildpack", "already exists"},
 			[]string{"TIP", "use", cf.Name, "update-buildpack"},
 		))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("enables the buildpack when given the --enabled flag", func() {
@@ -95,7 +95,7 @@ var _ = Describe("create-buildpack command", func() {
 		bitsRepo.UploadBuildpackErr = true
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "bogus/path", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating buildpack", "my-buildpack"},
 			[]string{"OK"},
 			[]string{"Uploading buildpack"},

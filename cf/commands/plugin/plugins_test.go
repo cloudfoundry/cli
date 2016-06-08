@@ -58,7 +58,7 @@ var _ = Describe("Plugins", func() {
 
 			runCommand("--checksum")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Plugin Name", "Version", "sha1", "Command Help"},
 			))
 		})
@@ -99,7 +99,7 @@ var _ = Describe("Plugins", func() {
 
 		runCommand()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Listing Installed Plugins..."},
 			[]string{"OK"},
 			[]string{"Plugin Name", "Command Name", "Command Help"},
@@ -122,7 +122,7 @@ var _ = Describe("Plugins", func() {
 
 		runCommand()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Test1", "test_1_cmd1", "1.2.3", ", test_1_cmd1_alias", "help text for test_1_cmd1"},
 			[]string{"Test1", "test_1_cmd2", "1.2.3", ", test_1_cmd2_alias", "help text for test_1_cmd2"},
 		))
@@ -140,7 +140,7 @@ var _ = Describe("Plugins", func() {
 
 		runCommand()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Test1", "test_1_cmd1", "N/A", ", test_1_cmd1_alias", "help text for test_1_cmd1"},
 		))
 	})
@@ -151,7 +151,7 @@ var _ = Describe("Plugins", func() {
 		})
 
 		runCommand()
-		Expect(ui.Outputs).NotTo(ContainSubstrings(
+		Expect(ui.Outputs()).NotTo(ContainSubstrings(
 			[]string{"EmptyPlugin"},
 		))
 	})
@@ -163,7 +163,7 @@ var _ = Describe("Plugins", func() {
 		})
 
 		runCommand()
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Test1", "test_1_cmd1", "help text for test_1_cmd1"},
 			[]string{"Test2", "test_2_cmd1", "help text for test_2_cmd1"},
 		))

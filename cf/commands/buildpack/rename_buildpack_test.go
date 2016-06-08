@@ -43,7 +43,7 @@ var _ = Describe("rename-buildpack command", func() {
 
 	It("fails requirements when called without the current name and the new name to use", func() {
 		passed := runCommand("my-buildpack-name")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 		Expect(passed).To(BeFalse())
@@ -57,7 +57,7 @@ var _ = Describe("rename-buildpack command", func() {
 			}
 
 			runCommand("my-buildpack", "new-buildpack")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming buildpack", "my-buildpack"},
 				[]string{"OK"},
 			))
@@ -67,7 +67,7 @@ var _ = Describe("rename-buildpack command", func() {
 			fakeRepo.FindByNameNotFound = true
 
 			runCommand("my-buildpack1", "new-buildpack")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming buildpack", "my-buildpack"},
 				[]string{"FAILED"},
 				[]string{"Buildpack my-buildpack1 not found"},
@@ -82,7 +82,7 @@ var _ = Describe("rename-buildpack command", func() {
 			fakeRepo.UpdateBuildpackReturns.Error = errors.New("SAD TROMBONE")
 
 			runCommand("my-buildpack1", "new-buildpack")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming buildpack", "my-buildpack"},
 				[]string{"SAD TROMBONE"},
 			))

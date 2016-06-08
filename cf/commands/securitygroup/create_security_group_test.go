@@ -53,7 +53,7 @@ var _ = Describe("create-security-group command", func() {
 		It("fails with usage when a name is not provided", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -61,7 +61,7 @@ var _ = Describe("create-security-group command", func() {
 		It("fails with usage when a rules file is not provided", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("AWESOME_SECURITY_GROUP_NAME")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -90,7 +90,7 @@ var _ = Describe("create-security-group command", func() {
 			})
 
 			It("displays a message describing what its going to do", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating security group", "my-group", "my-user"},
 					[]string{"OK"},
 				))
@@ -110,7 +110,7 @@ var _ = Describe("create-security-group command", func() {
 					})
 
 					It("fails loudly", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Creating security group", "my-group"},
 							[]string{"FAILED"},
 						))
@@ -123,7 +123,7 @@ var _ = Describe("create-security-group command", func() {
 					})
 
 					It("warns the user when group already exists", func() {
-						Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+						Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 						Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
 					})
 				})
@@ -136,7 +136,7 @@ var _ = Describe("create-security-group command", func() {
 			})
 
 			It("freaks out", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect json format: file:", tempFile.Name()},
 					[]string{"Valid json file exampl"},

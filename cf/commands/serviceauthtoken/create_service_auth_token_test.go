@@ -47,7 +47,7 @@ var _ = Describe("create-service-auth-token command", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("whoops", "i-accidentally-an-arg")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -72,7 +72,7 @@ var _ = Describe("create-service-auth-token command", func() {
 		It("creates a service auth token, obviously", func() {
 			runCommand("a label", "a provider", "a value")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service auth token as", "my-user"},
 				[]string{"OK"},
 			))

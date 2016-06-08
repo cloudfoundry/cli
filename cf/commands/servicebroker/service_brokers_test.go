@@ -102,7 +102,7 @@ var _ = Describe("service-brokers command", func() {
 
 		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting service brokers as", "my-user"},
 			[]string{"name", "url"},
 			[]string{"service-broker-to-list-a", "http://service-a-url.com"},
@@ -145,7 +145,7 @@ var _ = Describe("service-brokers command", func() {
 
 		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(BeInDisplayOrder(
+		Expect(ui.Outputs()).To(BeInDisplayOrder(
 			[]string{"Getting service brokers as", "my-user"},
 			[]string{"name", "url"},
 			[]string{"123-service-broker-to-list", "http://service-d-url.com"},
@@ -158,7 +158,7 @@ var _ = Describe("service-brokers command", func() {
 	It("says when no service brokers were found", func() {
 		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting service brokers as", "my-user"},
 			[]string{"No service brokers found"},
 		))
@@ -168,9 +168,9 @@ var _ = Describe("service-brokers command", func() {
 		repo.ListServiceBrokersReturns(errors.New("Error finding service brokers"))
 		testcmd.RunCLICommand("service-brokers", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting service brokers as ", "my-user"},
 		))
-		Expect(strings.Join(ui.Outputs, "\n")).To(MatchRegexp(`FAILED\nError finding service brokers`))
+		Expect(strings.Join(ui.Outputs(), "\n")).To(MatchRegexp(`FAILED\nError finding service brokers`))
 	})
 })

@@ -67,7 +67,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -130,7 +130,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 			It("asks the user to confirm", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"WARNING"}))
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service-name from Cloud Foundry?"}))
 			})
 
@@ -141,7 +141,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 				It("tells the user it will purge the service offering", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service service-name..."}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Purging service service-name..."}))
 				})
 
 				It("tries to purge the service offering", func() {
@@ -156,7 +156,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 					It("says OK", func() {
 						Expect(runCLIErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 					})
 				})
 
@@ -205,7 +205,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 			It("warns the user", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Service offering does not exist"},
 				))
 			})
@@ -252,7 +252,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 				It("asks the user to confirm", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"WARNING"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"WARNING"}))
 					Expect(ui.Prompts).To(ContainSubstrings([]string{"Really purge service offering service-name from Cloud Foundry?"}))
 				})
 
@@ -263,7 +263,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 					It("tells the user it will purge the service offering", func() {
 						Expect(runCLIErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings([]string{"Purging service service-name..."}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"Purging service service-name..."}))
 					})
 
 					It("tries to purge the service offering", func() {
@@ -278,7 +278,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 						It("says OK", func() {
 							Expect(runCLIErr).NotTo(HaveOccurred())
-							Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+							Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 						})
 					})
 
@@ -327,7 +327,7 @@ var _ = Describe("PurgeServiceOffering", func() {
 
 				It("warns the user", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Service offering does not exist"},
 					))
 				})

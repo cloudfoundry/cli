@@ -45,7 +45,7 @@ var _ = Describe("delete-service-broker command", func() {
 	Describe("requirements", func() {
 		It("fails with usage when called without a broker's name", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -73,7 +73,7 @@ var _ = Describe("delete-service-broker command", func() {
 			Expect(brokerRepo.DeleteArgsForCall(0)).To(Equal("service-broker-to-delete-guid"))
 			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service-broker service-broker-to-delete"}))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting service broker", "service-broker-to-delete", "my-user"},
 				[]string{"OK"},
 			))
@@ -86,7 +86,7 @@ var _ = Describe("delete-service-broker command", func() {
 			Expect(brokerRepo.DeleteArgsForCall(0)).To(Equal("service-broker-to-delete-guid"))
 
 			Expect(ui.Prompts).To(BeEmpty())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting service broker", "service-broker-to-delete", "my-user"},
 				[]string{"OK"},
 			))
@@ -105,7 +105,7 @@ var _ = Describe("delete-service-broker command", func() {
 			Expect(brokerRepo.FindByNameCallCount()).To(Equal(1))
 			Expect(brokerRepo.FindByNameArgsForCall(0)).To(Equal("service-broker-to-delete"))
 			Expect(brokerRepo.DeleteCallCount()).To(BeZero())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting service broker", "service-broker-to-delete"},
 				[]string{"OK"},
 			))

@@ -52,7 +52,7 @@ var _ = Describe("curl command", func() {
 
 	It("fails with usage when not given enough input", func() {
 		runCurlWithInputs([]string{})
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "An argument is missing or not correctly enclosed"},
 		))
 	})
@@ -68,8 +68,8 @@ var _ = Describe("curl command", func() {
 
 		Expect(curlRepo.Method).To(Equal(""))
 		Expect(curlRepo.Path).To(Equal("/foo"))
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"response for get"}))
-		Expect(ui.Outputs).ToNot(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings([]string{"response for get"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings(
 			[]string{"FAILED"},
 			[]string{"Content-Size:1024"},
 		))
@@ -110,21 +110,21 @@ var _ = Describe("curl command", func() {
 		runCurlWithInputs([]string{"-X", "post", "/foo"})
 
 		Expect(curlRepo.Method).To(Equal("post"))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("sends headers given -H", func() {
 		runCurlWithInputs([]string{"-H", "Content-Type:cat", "/foo"})
 
 		Expect(curlRepo.Header).To(Equal("Content-Type:cat"))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("sends multiple headers given multiple -H flags", func() {
 		runCurlWithInputs([]string{"-H", "Content-Type:cat", "-H", "Content-Length:12", "/foo"})
 
 		Expect(curlRepo.Header).To(Equal("Content-Type:cat\nContent-Length:12"))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	It("prints out the response headers given -i", func() {
@@ -132,11 +132,11 @@ var _ = Describe("curl command", func() {
 		curlRepo.ResponseBody = "response for get"
 		runCurlWithInputs([]string{"-i", "/foo"})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Content-Size:1024"},
 			[]string{"response for get"},
 		))
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 	})
 
 	Context("when -d is provided", func() {
@@ -144,7 +144,7 @@ var _ = Describe("curl command", func() {
 			runCurlWithInputs([]string{"-d", "body content to upload", "/foo"})
 
 			Expect(curlRepo.Body).To(Equal("body content to upload"))
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("does not fail with empty string", func() {
@@ -152,7 +152,7 @@ var _ = Describe("curl command", func() {
 
 			Expect(curlRepo.Body).To(Equal(""))
 			Expect(curlRepo.Method).To(Equal("POST"))
-			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("uses given http verb if -X is also provided", func() {
@@ -160,7 +160,7 @@ var _ = Describe("curl command", func() {
 
 			Expect(curlRepo.Body).To(Equal("some body"))
 			Expect(curlRepo.Method).To(Equal("PUT"))
-			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("sets the request body with an @-prefixed file", func() {
@@ -172,7 +172,7 @@ var _ = Describe("curl command", func() {
 			runCurlWithInputs([]string{"-d", "@" + tempfile.Name(), "/foo"})
 
 			Expect(curlRepo.Body).To(Equal(`{"some":"json"}`))
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 		})
 	})
 
@@ -186,14 +186,14 @@ var _ = Describe("curl command", func() {
 
 		runCurlWithInputs([]string{"/foo"})
 
-		Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"response for get"}))
+		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"response for get"}))
 	})
 
 	It("prints a failure message when the response is not success", func() {
 		curlRepo.Error = errors.New("ooops")
 		runCurlWithInputs([]string{"/foo"})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"FAILED"},
 			[]string{"ooops"},
 		))
@@ -208,7 +208,7 @@ var _ = Describe("curl command", func() {
 		It("pretty-prints the response body", func() {
 			runCurlWithInputs([]string{"/ugly-printed-json-endpoint"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"{"},
 				[]string{"  \"total_results", "0"},
 				[]string{"  \"total_pages", "1"},
@@ -227,7 +227,7 @@ var _ = Describe("curl command", func() {
 			It("regular-prints the response body", func() {
 				runCurlWithInputs([]string{"/whateverz"})
 
-				Expect(ui.Outputs).To(Equal([]string{"FAIL: crumpets need MOAR butterz"}))
+				Expect(ui.Outputs()).To(Equal([]string{"FAIL: crumpets need MOAR butterz"}))
 			})
 		})
 	})

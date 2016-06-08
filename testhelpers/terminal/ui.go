@@ -17,8 +17,8 @@ import (
 const QuietPanic = "I should not print anything"
 
 type FakeUI struct {
-	Outputs                    []string
-	UncapturedOutput           []string
+	outputs                    []string
+	uncapturedOutput           []string
 	WarnOutputs                []string
 	Prompts                    []string
 	PasswordPrompts            []string
@@ -29,6 +29,20 @@ type FakeUI struct {
 	ShowConfigurationCalled    bool
 
 	sayMutex sync.Mutex
+}
+
+func (ui *FakeUI) Outputs() []string {
+	ui.sayMutex.Lock()
+	defer ui.sayMutex.Unlock()
+
+	return ui.outputs
+}
+
+func (ui *FakeUI) UncapturedOutput() []string {
+	ui.sayMutex.Lock()
+	defer ui.sayMutex.Unlock()
+
+	return ui.uncapturedOutput
 }
 
 func (ui *FakeUI) PrintPaginator(rows []string, err error) {
@@ -51,7 +65,7 @@ func (ui *FakeUI) PrintCapturingNoOutput(message string, args ...interface{}) {
 	defer ui.sayMutex.Unlock()
 
 	message = fmt.Sprintf(message, args...)
-	ui.UncapturedOutput = append(ui.UncapturedOutput, strings.Split(message, "\n")...)
+	ui.uncapturedOutput = append(ui.uncapturedOutput, strings.Split(message, "\n")...)
 	return
 }
 
@@ -60,7 +74,7 @@ func (ui *FakeUI) Say(message string, args ...interface{}) {
 	defer ui.sayMutex.Unlock()
 
 	message = fmt.Sprintf(message, args...)
-	ui.Outputs = append(ui.Outputs, strings.Split(message, "\n")...)
+	ui.outputs = append(ui.outputs, strings.Split(message, "\n")...)
 	return
 }
 
@@ -135,7 +149,7 @@ func (ui *FakeUI) DumpWarnOutputs() string {
 }
 
 func (ui *FakeUI) DumpOutputs() string {
-	return "****************************\n" + strings.Join(ui.Outputs, "\n")
+	return "****************************\n" + strings.Join(ui.Outputs(), "\n")
 }
 
 func (ui *FakeUI) DumpPrompts() string {
@@ -143,7 +157,10 @@ func (ui *FakeUI) DumpPrompts() string {
 }
 
 func (ui *FakeUI) ClearOutputs() {
-	ui.Outputs = []string{}
+	ui.sayMutex.Lock()
+	defer ui.sayMutex.Unlock()
+
+	ui.outputs = []string{}
 }
 
 func (ui *FakeUI) ShowConfiguration(config coreconfig.Reader) {

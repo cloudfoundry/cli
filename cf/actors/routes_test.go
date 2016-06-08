@@ -59,7 +59,7 @@ var _ = Describe("Routes", func() {
 		It("states which route it's creating", func() {
 			routeActor.CreateRandomTCPRoute(domain)
 
-			Expect(fakeUI.Outputs).To(ContainSubstrings(
+			Expect(fakeUI.Outputs()).To(ContainSubstrings(
 				[]string{"Creating random route for dies-tcp.com..."},
 			))
 		})

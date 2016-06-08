@@ -83,7 +83,7 @@ var _ = Describe("create-service-key command", func() {
 		It("create service key successfully", func() {
 			callCreateService([]string{"fake-service-instance", "fake-service-key"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"OK"},
 			))
@@ -96,7 +96,7 @@ var _ = Describe("create-service-key command", func() {
 
 			callCreateService([]string{"fake-service-instance", "exist-service-key"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service key", "exist-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"OK"},
 				[]string{"Service key exist-service-key already exists"}))
@@ -106,7 +106,7 @@ var _ = Describe("create-service-key command", func() {
 			serviceKeyRepo.CreateServiceKeyMethod.Error = errors.NewUnbindableServiceError()
 			callCreateService([]string{"fake-service-instance", "exist-service-key"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service key", "exist-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				[]string{"FAILED"},
 				[]string{"This service doesn't support creation of keys."}))
@@ -118,7 +118,7 @@ var _ = Describe("create-service-key command", func() {
 			It("successfully creates a service key and passes the params as a json string", func() {
 				callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", `{"foo": "bar"}`})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"OK"},
 				))
@@ -132,7 +132,7 @@ var _ = Describe("create-service-key command", func() {
 			It("returns an error to the UI", func() {
 				callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", `bad-json`})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 				))
@@ -165,7 +165,7 @@ var _ = Describe("create-service-key command", func() {
 			It("successfully creates a service key and passes the params as a json", func() {
 				callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", jsonFile.Name()})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating service key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"OK"},
 				))
@@ -180,7 +180,7 @@ var _ = Describe("create-service-key command", func() {
 				It("returns an error to the UI", func() {
 					callCreateService([]string{"fake-service-instance", "fake-service-key", "-c", jsonFile.Name()})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))

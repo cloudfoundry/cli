@@ -78,7 +78,7 @@ var _ = Describe("stop command", func() {
 
 		It("fails with usage when the app name is not given", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -86,7 +86,7 @@ var _ = Describe("stop command", func() {
 		It("stops the app with the given name", func() {
 			runCommand("my-app")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Stopping app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
@@ -99,7 +99,7 @@ var _ = Describe("stop command", func() {
 			appRepo.UpdateReturns(models.Application{}, errors.New("Error updating app."))
 			runCommand("my-app")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Stopping", "my-app"},
 				[]string{"FAILED"},
 				[]string{"Error updating app."},
@@ -116,7 +116,7 @@ var _ = Describe("stop command", func() {
 			It("warns the user when the app is already stopped", func() {
 				runCommand("my-app")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "is already stopped"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"my-app", "is already stopped"}))
 				Expect(appRepo.UpdateCallCount()).To(BeZero())
 			})
 		})

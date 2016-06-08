@@ -60,7 +60,7 @@ var _ = Describe("delete-quota command", func() {
 
 		It("fails requirements when called without a quota name", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -84,7 +84,7 @@ var _ = Describe("delete-quota command", func() {
 					[]string{"Really delete the quota", "my-quota"},
 				))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting quota", "my-quota", "my-user"},
 					[]string{"OK"},
 				))
@@ -103,7 +103,7 @@ var _ = Describe("delete-quota command", func() {
 
 				runCommand("-f", "my-quota")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "my-quota"},
 					[]string{"FAILED"},
 				))
@@ -119,7 +119,7 @@ var _ = Describe("delete-quota command", func() {
 				It("warns the user when that the quota does not exist", func() {
 					runCommand("-f", "non-existent-quota")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Deleting", "non-existent-quota"},
 						[]string{"OK"},
 					))
@@ -142,7 +142,7 @@ var _ = Describe("delete-quota command", func() {
 						[]string{"my-quota", "does not exist"},
 					))
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 					))
 

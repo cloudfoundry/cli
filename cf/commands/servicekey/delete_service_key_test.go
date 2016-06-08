@@ -95,7 +95,7 @@ var _ = Describe("delete-service-key command", func() {
 				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key", "-f"})).To(BeTrue())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"OK"}))
 			})
@@ -106,7 +106,7 @@ var _ = Describe("delete-service-key command", func() {
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeTrue())
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service key", "fake-service-key"}))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"OK"}))
 			})
@@ -117,7 +117,7 @@ var _ = Describe("delete-service-key command", func() {
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeTrue())
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service key", "fake-service-key"}))
-				Expect(ui.Outputs).To(BeEmpty())
+				Expect(ui.Outputs()).To(BeEmpty())
 			})
 
 		})
@@ -128,7 +128,7 @@ var _ = Describe("delete-service-key command", func() {
 
 				callDeleteServiceKey([]string{"non-exist-service-instance", "fake-service-key", "-f"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "fake-service-key", "for service instance", "non-exist-service-instance", "as", "my-user..."},
 					[]string{"OK"},
 					[]string{"Service instance", "non-exist-service-instance", "does not exist."},
@@ -139,7 +139,7 @@ var _ = Describe("delete-service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.Error = errors.New("")
 				callDeleteServiceKey([]string{"fake-service-instance", "non-exist-service-key", "-f"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "non-exist-service-key", "for service instance", "fake-service-instance", "as", "my-user..."},
 					[]string{"OK"},
 					[]string{"Service key", "non-exist-service-key", "does not exist for service instance", "fake-service-instance"},
@@ -150,7 +150,7 @@ var _ = Describe("delete-service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.ServiceKey = models.ServiceKey{}
 				callDeleteServiceKey([]string{"fake-service-instance", "non-exist-service-key", "-f"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "non-exist-service-key", "for service instance", "fake-service-instance", "as", "my-user..."},
 					[]string{"OK"},
 					[]string{"Service key", "non-exist-service-key", "does not exist for service instance", "fake-service-instance"},
@@ -162,7 +162,7 @@ var _ = Describe("delete-service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.Error = &errors.NotAuthorizedError{}
 				callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key", "-f"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"No service key", "fake-service-key", "found for service instance", "fake-service-instance"},
 				))
