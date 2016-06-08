@@ -48,7 +48,7 @@ params:
   PERSISTENT_APP_SPACE:
   SKIP_SSL_VALIDATION: false
   SKIP_SSO: true
-  USE_HTTP: false
+  USE_HTTP: true
 
 run:
   path: bash
@@ -56,6 +56,13 @@ run:
   - -c
   - |
     set -eux
+
+    ###########################################################
+    # Added by CLI
+    export DOMAIN=`cat bosh-lite-lock/name`
+    export CF_API="https://api.${DOMAIN}"
+    export CF_APPS_DOMAIN="${DOMAIN}"
+    ###########################################################
 
     set +x
     CF_ADMIN_PASSWORD="${CF_ADMIN_PASSWORD:?}"
@@ -71,6 +78,7 @@ run:
     export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
 
+    ###########################################################
     # Added by CLI
     mkdir -p gopath/bin
     pushd cf-cli-binaries
@@ -79,9 +87,7 @@ run:
       ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
     mv cf-release-repo/src $GOPATH
-    export DOMAIN=`cat bosh-lite-lock/name`
-    export CF_API="https://api.${DOMAIN}"
-    export CF_APPS_DOMAIN="${DOMAIN}"
+    ###########################################################
 
     cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
