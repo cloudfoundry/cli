@@ -9,8 +9,12 @@ import (
 	"text/template"
 	"unicode/utf8"
 
+	"path/filepath"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -56,9 +60,16 @@ func showAppHelp(writer io.Writer, helpTemplate string) {
 func newAppPresenter() appPresenter {
 	var presenter appPresenter
 
-	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
-		//fail silently when running help
-	})
+	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
+
+	pluginConfig := pluginconfig.NewPluginConfig(
+		func(err error) {
+			//fail silently when running help
+		},
+		configuration.NewDiskPersistor(filepath.Join(pluginPath, "config.json")),
+		pluginPath,
+	)
+
 	plugins := pluginConfig.Plugins()
 
 	maxNameLen := commandregistry.Commands.MaxCommandNameLength()

@@ -31,6 +31,12 @@ type FakePluginConfiguration struct {
 	removePluginArgsForCall []struct {
 		arg1 string
 	}
+	ListCommandsStub        func() []string
+	listCommandsMutex       sync.RWMutex
+	listCommandsArgsForCall []struct{}
+	listCommandsReturns     struct {
+		result1 []string
+	}
 }
 
 func (fake *FakePluginConfiguration) Plugins() map[string]pluginconfig.PluginMetadata {
@@ -126,6 +132,30 @@ func (fake *FakePluginConfiguration) RemovePluginArgsForCall(i int) string {
 	fake.removePluginMutex.RLock()
 	defer fake.removePluginMutex.RUnlock()
 	return fake.removePluginArgsForCall[i].arg1
+}
+
+func (fake *FakePluginConfiguration) ListCommands() []string {
+	fake.listCommandsMutex.Lock()
+	fake.listCommandsArgsForCall = append(fake.listCommandsArgsForCall, struct{}{})
+	fake.listCommandsMutex.Unlock()
+	if fake.ListCommandsStub != nil {
+		return fake.ListCommandsStub()
+	} else {
+		return fake.listCommandsReturns.result1
+	}
+}
+
+func (fake *FakePluginConfiguration) ListCommandsCallCount() int {
+	fake.listCommandsMutex.RLock()
+	defer fake.listCommandsMutex.RUnlock()
+	return len(fake.listCommandsArgsForCall)
+}
+
+func (fake *FakePluginConfiguration) ListCommandsReturns(result1 []string) {
+	fake.ListCommandsStub = nil
+	fake.listCommandsReturns = struct {
+		result1 []string
+	}{result1}
 }
 
 var _ pluginconfig.PluginConfiguration = new(FakePluginConfiguration)
