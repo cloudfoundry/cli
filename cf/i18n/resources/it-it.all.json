@@ -240,22 +240,6 @@
     "translation": "L'alias `{{.Command}}` è un comando/alias nel plug-in '{{.PluginName}}'.  Puoi provare a disinstallare il plug-in '{{.PluginName}}' e quindi a installare questo plug-in per richiamare il comando `{{.Command}}`.  Tuttavia, devi prima comprendere appieno l'impatto della disinstallazione del plug-in '{{.PluginName}}' esistente."
   },
   {
-    "id": "All plans of the service are already accessible for all orgs",
-    "translation": "Tutti i piani del servizio sono già accessibili per tutte le organizzazioni"
-  },
-  {
-    "id": "All plans of the service are already accessible for this org",
-    "translation": "Tutti i piani del servizio sono già accessibili per questa organizzazione"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for all orgs",
-    "translation": "Tutti i piani del servizio sono già inaccessibili per tutte le organizzazioni"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for this org",
-    "translation": "Tutti i piani del servizio sono già inaccessibili per questa organizzazione"
-  },
-  {
     "id": "Allow SSH access for the space",
     "translation": "Consenti accesso SSH per lo spazio"
   },
@@ -2976,14 +2960,6 @@
     "translation": "Nessun endpoint API impostato. Utilizza '{{.LoginTip}}' o '{{.APITip}}' per specificare un endpoint."
   },
   {
-    "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "Nessuna azione intrapresa.  Devi disabilitare l'accesso a tutti i piani del servizio {{.ServiceName}} per tutte le organizzazioni e quindi concedere l'accesso per tutte le organizzazioni eccetto l'organizzazione {{.OrgName}}."
-  },
-  {
-    "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "Nessuna azione intrapresa.  Devi disabilitare l'accesso al piano {{.PlanName}} del servizio {{.ServiceName}} per tutte le organizzazioni e quindi concedere l'accesso per tutte le organizzazioni eccetto l'organizzazione {{.OrgName}}."
-  },
-  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "Nessun endpoint api impostato. Utilizza '{{.Name}}' per impostare un endpoint"
   },
@@ -4110,22 +4086,6 @@
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "L'ordine in cui vengono controllati i pacchetti di build durante il rilevamento automatico di tali pacchetti"
-  },
-  {
-    "id": "The plan is already accessible for all orgs",
-    "translation": "Il piano è già accessibile per tutte le organizzazioni"
-  },
-  {
-    "id": "The plan is already accessible for this org",
-    "translation": "Il piano è già accessibile per questa organizzazione"
-  },
-  {
-    "id": "The plan is already inaccessible for all orgs",
-    "translation": "Il piano è già inaccessibile per tutte le organizzazioni"
-  },
-  {
-    "id": "The plan is already inaccessible for this org",
-    "translation": "Il piano è già inaccessibile per questa organizzazione"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

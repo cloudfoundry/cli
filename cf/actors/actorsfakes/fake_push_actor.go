@@ -42,15 +42,23 @@ type FakePushActor struct {
 		result2 bool
 		result3 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakePushActor) UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
+	var presentFilesCopy []resources.AppFileResource
+	if presentFiles != nil {
+		presentFilesCopy = make([]resources.AppFileResource, len(presentFiles))
+		copy(presentFilesCopy, presentFiles)
+	}
 	fake.uploadAppMutex.Lock()
 	fake.uploadAppArgsForCall = append(fake.uploadAppArgsForCall, struct {
 		appGUID      string
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
-	}{appGUID, zipFile, presentFiles})
+	}{appGUID, zipFile, presentFilesCopy})
+	fake.recordInvocation("UploadApp", []interface{}{appGUID, zipFile, presentFilesCopy})
 	fake.uploadAppMutex.Unlock()
 	if fake.UploadAppStub != nil {
 		return fake.UploadAppStub(appGUID, zipFile, presentFiles)
@@ -84,6 +92,7 @@ func (fake *FakePushActor) ProcessPath(dirOrZipFile string, f func(string)) erro
 		dirOrZipFile string
 		f            func(string)
 	}{dirOrZipFile, f})
+	fake.recordInvocation("ProcessPath", []interface{}{dirOrZipFile, f})
 	fake.processPathMutex.Unlock()
 	if fake.ProcessPathStub != nil {
 		return fake.ProcessPathStub(dirOrZipFile, f)
@@ -112,12 +121,18 @@ func (fake *FakePushActor) ProcessPathReturns(result1 error) {
 }
 
 func (fake *FakePushActor) GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
+	var localFilesCopy []models.AppFileFields
+	if localFiles != nil {
+		localFilesCopy = make([]models.AppFileFields, len(localFiles))
+		copy(localFilesCopy, localFiles)
+	}
 	fake.gatherFilesMutex.Lock()
 	fake.gatherFilesArgsForCall = append(fake.gatherFilesArgsForCall, struct {
 		localFiles []models.AppFileFields
 		appDir     string
 		uploadDir  string
-	}{localFiles, appDir, uploadDir})
+	}{localFilesCopy, appDir, uploadDir})
+	fake.recordInvocation("GatherFiles", []interface{}{localFilesCopy, appDir, uploadDir})
 	fake.gatherFilesMutex.Unlock()
 	if fake.GatherFilesStub != nil {
 		return fake.GatherFilesStub(localFiles, appDir, uploadDir)
@@ -145,6 +160,30 @@ func (fake *FakePushActor) GatherFilesReturns(result1 []resources.AppFileResourc
 		result2 bool
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakePushActor) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.uploadAppMutex.RLock()
+	defer fake.uploadAppMutex.RUnlock()
+	fake.processPathMutex.RLock()
+	defer fake.processPathMutex.RUnlock()
+	fake.gatherFilesMutex.RLock()
+	defer fake.gatherFilesMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakePushActor) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ actors.PushActor = new(FakePushActor)

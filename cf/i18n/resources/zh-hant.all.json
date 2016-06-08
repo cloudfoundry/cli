@@ -240,22 +240,6 @@
     "translation": "別名 '{{.Command}}' 是外掛程式 '{{.PluginName}}' 中的指令/別名。您可以嘗試解除安裝外掛程式 '{{.PluginName}}'，然後安裝此外掛程式，才能呼叫 '{{.Command}}' 指令。不過，您應該先充分瞭解解除安裝現有 '{{.PluginName}}' 外掛程式的影響。"
   },
   {
-    "id": "All plans of the service are already accessible for all orgs",
-    "translation": "已可針對所有組織存取服務的所有方案"
-  },
-  {
-    "id": "All plans of the service are already accessible for this org",
-    "translation": "已可針對這個組織存取服務的所有方案"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for all orgs",
-    "translation": "已無法針對所有組織存取服務的所有方案"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for this org",
-    "translation": "已無法針對這個組織存取服務的所有方案"
-  },
-  {
     "id": "Allow SSH access for the space",
     "translation": "容許空間的 SSH 存取權"
   },
@@ -2976,14 +2960,6 @@
     "translation": "未設定 API 端點。使用 '{{.LoginTip}}' 或 '{{.APITip}}'，將目標設為端點。"
   },
   {
-    "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "未採取任何動作。您必須停用所有組織中 {{.ServiceName}} 服務之所有方案的存取權，然後授與所有組織的存取權（{{.OrgName}} 組織除外）。"
-  },
-  {
-    "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "未採取任何動作。您必須停用所有組織中 {{.ServiceName}} 服務之 {{.PlanName}} 方案的存取權，然後授與所有組織的存取權（{{.OrgName}} 組織除外）。"
-  },
-  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "未設定 API 端點。使用 '{{.Name}}' 以設定端點"
   },
@@ -4110,22 +4086,6 @@
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "建置套件自動偵測期間的建置套件檢查順序"
-  },
-  {
-    "id": "The plan is already accessible for all orgs",
-    "translation": "已可針對所有組織存取方案"
-  },
-  {
-    "id": "The plan is already accessible for this org",
-    "translation": "已可針對這個組織存取方案"
-  },
-  {
-    "id": "The plan is already inaccessible for all orgs",
-    "translation": "已無法針對所有組織存取方案"
-  },
-  {
-    "id": "The plan is already inaccessible for this org",
-    "translation": "已無法針對這個組織存取方案"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

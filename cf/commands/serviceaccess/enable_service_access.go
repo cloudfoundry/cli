@@ -94,15 +94,7 @@ func (cmd *EnableServiceAccess) enablePlanAndOrgForService(serviceName string, p
 				"OrgName":     terminal.EntityNameColor(orgName),
 				"Username":    terminal.EntityNameColor(cmd.config.Username()),
 			}))
-	planOriginalAccess, err := cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
-	if err != nil {
-		return err
-	}
-
-	if planOriginalAccess == actors.All {
-		cmd.ui.Say(T("The plan is already accessible for this org"))
-	}
-	return nil
+	return cmd.actor.UpdatePlanAndOrgForService(serviceName, planName, orgName, true)
 }
 
 func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planName string) error {
@@ -112,15 +104,7 @@ func (cmd *EnableServiceAccess) enablePlanForService(serviceName string, planNam
 			"ServiceName": terminal.EntityNameColor(serviceName),
 			"Username":    terminal.EntityNameColor(cmd.config.Username()),
 		}))
-	planOriginalAccess, err := cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
-	if err != nil {
-		return err
-	}
-
-	if planOriginalAccess == actors.All {
-		cmd.ui.Say(T("The plan is already accessible for all orgs"))
-	}
-	return nil
+	return cmd.actor.UpdateSinglePlanForService(serviceName, planName, true)
 }
 
 func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) error {
@@ -129,15 +113,7 @@ func (cmd *EnableServiceAccess) enableAllPlansForService(serviceName string) err
 			"ServiceName": terminal.EntityNameColor(serviceName),
 			"Username":    terminal.EntityNameColor(cmd.config.Username()),
 		}))
-	allPlansInServicePublic, err := cmd.actor.UpdateAllPlansForService(serviceName, true)
-	if err != nil {
-		return err
-	}
-
-	if allPlansInServicePublic {
-		cmd.ui.Say(T("All plans of the service are already accessible for all orgs"))
-	}
-	return nil
+	return cmd.actor.UpdateAllPlansForService(serviceName, true)
 }
 
 func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName string, orgName string) error {
@@ -147,13 +123,5 @@ func (cmd *EnableServiceAccess) enableAllPlansForSingleOrgForService(serviceName
 			"OrgName":     terminal.EntityNameColor(orgName),
 			"Username":    terminal.EntityNameColor(cmd.config.Username()),
 		}))
-	allPlansWereSet, err := cmd.actor.UpdateOrgForService(serviceName, orgName, true)
-	if err != nil {
-		return err
-	}
-
-	if allPlansWereSet {
-		cmd.ui.Say(T("All plans of the service are already accessible for this org"))
-	}
-	return nil
+	return cmd.actor.UpdateOrgForService(serviceName, orgName, true)
 }
