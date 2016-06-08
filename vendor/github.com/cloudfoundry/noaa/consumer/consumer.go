@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cloudfoundry/noaa/consumer/internal"
+
 	"github.com/cloudfoundry/noaa"
 	"github.com/gorilla/websocket"
 )
@@ -55,13 +57,13 @@ type Consumer struct {
 
 // New creates a new consumer to a traffic controller.
 func New(trafficControllerUrl string, tlsConfig *tls.Config, proxy func(*http.Request) (*url.URL, error)) *Consumer {
-	transport := &http.Transport{Proxy: proxy, TLSClientConfig: tlsConfig}
+	transport := &http.Transport{Proxy: proxy, TLSClientConfig: tlsConfig, TLSHandshakeTimeout: internal.HandshakeTimeout, DisableKeepAlives: true}
 	consumer := &Consumer{
 		trafficControllerUrl: trafficControllerUrl,
 		proxy:                proxy,
 		debugPrinter:         noaa.NullDebugPrinter{},
 		client:               &http.Client{Transport: transport},
 	}
-	consumer.dialer = websocket.Dialer{NetDial: consumer.proxyDial, TLSClientConfig: tlsConfig}
+	consumer.dialer = websocket.Dialer{HandshakeTimeout: internal.HandshakeTimeout, NetDial: consumer.proxyDial, TLSClientConfig: tlsConfig}
 	return consumer
 }
