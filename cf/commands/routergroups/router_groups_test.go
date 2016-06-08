@@ -116,7 +116,7 @@ var _ = Describe("RouterGroups", func() {
 			It("lists router groups", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting router groups", "my-user"},
 					[]string{"name", "type"},
 					[]string{"default-router-group", "tcp"},
@@ -128,7 +128,7 @@ var _ = Describe("RouterGroups", func() {
 			It("tells the user when no router groups were found", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting router groups"},
 					[]string{"No router groups found"},
 				))
@@ -141,7 +141,7 @@ var _ = Describe("RouterGroups", func() {
 			})
 
 			It("returns an error to the user", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting router groups"},
 				))
 

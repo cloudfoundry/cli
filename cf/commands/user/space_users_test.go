@@ -69,7 +69,7 @@ var _ = Describe("space-users command", func() {
 
 	It("fails with usage when not invoked with exactly two args", func() {
 		runCommand("my-org")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires arguments"},
 		))
 	})
@@ -120,7 +120,7 @@ var _ = Describe("space-users command", func() {
 				Expect(actualRole).To(Equal(expectedRole))
 			}
 
-			Expect(ui.Outputs).To(BeInDisplayOrder(
+			Expect(ui.Outputs()).To(BeInDisplayOrder(
 				[]string{"Getting users in org", "Org1", "Space1", "my-user"},
 				[]string{"SPACE MANAGER"},
 				[]string{"user1"},
@@ -152,7 +152,7 @@ var _ = Describe("space-users command", func() {
 					return []models.UserFields{}, nil
 				}
 				runCommand("my-org", "my-space")
-				Expect(ui.Outputs).To(BeInDisplayOrder(
+				Expect(ui.Outputs()).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "Org1"},
 					[]string{"internet badness occurred"},
 				))
@@ -199,7 +199,7 @@ var _ = Describe("space-users command", func() {
 		It("shows a friendly message when there are no users in a role", func() {
 			runCommand("my-org", "my-space")
 
-			Expect(ui.Outputs).To(BeInDisplayOrder(
+			Expect(ui.Outputs()).To(BeInDisplayOrder(
 				[]string{"Getting users in org"},
 				[]string{"SPACE MANAGER"},
 				[]string{"mr-pointy-hair"},

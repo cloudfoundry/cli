@@ -90,7 +90,7 @@ var _ = Describe("App", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires an argument"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -192,7 +192,7 @@ var _ = Describe("App", func() {
 
 		It("prints a summary of the app", func() {
 			Expect(err).NotTo(HaveOccurred())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Showing health and status for app fake-app-name"},
 				[]string{"requested state: started"},
 				[]string{"instances: 1/1"},
@@ -217,7 +217,7 @@ var _ = Describe("App", func() {
 
 			It("prints appropriate output", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Showing health and status", "fake-app-name", "my-org", "my-space", "my-user"},
 					[]string{"state", "stopped"},
 					[]string{"instances", "0/1"},
@@ -237,7 +237,7 @@ var _ = Describe("App", func() {
 
 			It("prints appropriate output", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Showing health and status", "fake-app-name", "my-org", "my-space", "my-user"},
 					[]string{"state", "stopped"},
 					[]string{"instances", "0/1"},
@@ -267,7 +267,7 @@ var _ = Describe("App", func() {
 
 				It("prints appropriate output", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Showing health and status", "fake-app-name", "my-org", "my-space", "my-user"},
 						[]string{"state", "stopped"},
 						[]string{"instances", "0/1"},
@@ -297,7 +297,7 @@ var _ = Describe("App", func() {
 
 				It("prints appropriate output", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Showing health and status", "fake-app-name", "my-org", "my-space", "my-user"},
 						[]string{"state", "stopped"},
 						[]string{"instances", "0/1"},
@@ -317,7 +317,7 @@ var _ = Describe("App", func() {
 			It("prints 'unknown' as last uploaded", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"last uploaded: unknown"},
 				))
 			})
@@ -332,7 +332,7 @@ var _ = Describe("App", func() {
 			It("does not print 'app ports'", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).NotTo(ContainSubstrings(
+				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"app ports:"},
 				))
 			})
@@ -349,7 +349,7 @@ var _ = Describe("App", func() {
 			It("prints the buildpack", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"buildpack", "fake-buildpack"},
 				))
 			})
@@ -366,7 +366,7 @@ var _ = Describe("App", func() {
 			It("prints the detected buildpack", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"buildpack", "fake-detected-buildpack"},
 				))
 			})
@@ -382,7 +382,7 @@ var _ = Describe("App", func() {
 
 			It("prints the 'unknown' as the buildpack", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"buildpack", "unknown"},
 				))
 			})
@@ -396,7 +396,7 @@ var _ = Describe("App", func() {
 
 			It("displays a '?' for running instances", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"instances", "?/1"},
 				))
 			})
@@ -409,10 +409,10 @@ var _ = Describe("App", func() {
 
 			It("only prints the guid for the app", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"fake-app-guid"},
 				))
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
+				Expect(ui.Outputs()).ToNot(ContainSubstrings(
 					[]string{"Showing health and status", "my-app"},
 				))
 			})

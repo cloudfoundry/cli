@@ -85,7 +85,7 @@ var _ = Describe("stacks command", func() {
 		repo.FindAllReturns([]models.Stack{stack1, stack2}, nil)
 		testcmd.RunCLICommand("stacks", []string{}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting stacks in org", "my-org", "my-space", "my-user"},
 			[]string{"OK"},
 			[]string{"Stack-1", "Stack 1 Description"},

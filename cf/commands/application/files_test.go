@@ -79,7 +79,7 @@ var _ = Describe("Files", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -159,7 +159,7 @@ var _ = Describe("Files", func() {
 
 			It("tells the user it is getting the files", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting files for app app-name"},
 				))
 			})
@@ -180,7 +180,7 @@ var _ = Describe("Files", func() {
 
 				It("tells the user OK", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 				})
 
 				Context("when the files are empty", func() {
@@ -190,7 +190,7 @@ var _ = Describe("Files", func() {
 
 					It("tells the user no files were found", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings([]string{"No files found"}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"No files found"}))
 					})
 				})
 
@@ -201,7 +201,7 @@ var _ = Describe("Files", func() {
 
 					It("tells the user which files were found", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings([]string{"the-files"}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"the-files"}))
 					})
 				})
 			})

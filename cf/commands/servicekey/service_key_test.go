@@ -101,7 +101,7 @@ var _ = Describe("service-key command", func() {
 
 			It("gets service credential", func() {
 				callGetServiceKey([]string{"fake-service-instance", "fake-service-key"})
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"username", "fake-username"},
 					[]string{"password", "fake-password"},
@@ -110,15 +110,15 @@ var _ = Describe("service-key command", func() {
 					[]string{"database", "fake-db-name"},
 					[]string{"uri", "mysql://fake-user:fake-password@fake-host:3306/fake-db-name"},
 				))
-				Expect(ui.Outputs[1]).To(BeEmpty())
+				Expect(ui.Outputs()[1]).To(BeEmpty())
 				Expect(serviceKeyRepo.GetServiceKeyMethod.InstanceGUID).To(Equal("fake-service-instance-guid"))
 			})
 
 			It("gets service guid when '--guid' flag is provided", func() {
 				callGetServiceKey([]string{"--guid", "fake-service-instance", "fake-service-key"})
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"fake-service-key-guid"}))
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"fake-service-key-guid"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings(
 					[]string{"Getting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 				))
 			})
@@ -127,7 +127,7 @@ var _ = Describe("service-key command", func() {
 		Context("when service key does not exist", func() {
 			It("shows no service key is found", func() {
 				callGetServiceKey([]string{"fake-service-instance", "non-exist-service-key"})
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting key", "non-exist-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"No service key", "non-exist-service-key", "found for service instance", "fake-service-instance"},
 				))
@@ -136,8 +136,8 @@ var _ = Describe("service-key command", func() {
 			It("returns the empty string as guid when '--guid' flag is provided", func() {
 				callGetServiceKey([]string{"--guid", "fake-service-instance", "non-exist-service-key"})
 
-				Expect(len(ui.Outputs)).To(Equal(1))
-				Expect(ui.Outputs[0]).To(BeEmpty())
+				Expect(len(ui.Outputs())).To(Equal(1))
+				Expect(ui.Outputs()[0]).To(BeEmpty())
 			})
 		})
 
@@ -147,7 +147,7 @@ var _ = Describe("service-key command", func() {
 				serviceKeyRepo.GetServiceKeyMethod.Error = &errors.NotAuthorizedError{}
 
 				callGetServiceKey([]string{"fake-service-instance", "fake-service-key"})
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
 					[]string{"No service key", "fake-service-key", "found for service instance", "fake-service-instance"},
 				))

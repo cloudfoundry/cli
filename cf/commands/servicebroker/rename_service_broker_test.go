@@ -46,7 +46,7 @@ var _ = Describe("rename-service-broker command", func() {
 		It("fails with usage when not invoked with exactly two args", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("welp")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -70,7 +70,7 @@ var _ = Describe("rename-service-broker command", func() {
 			Expect(serviceBrokerRepo.FindByNameCallCount()).To(Equal(1))
 			Expect(serviceBrokerRepo.FindByNameArgsForCall(0)).To(Equal("my-broker"))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
 				[]string{"OK"},
 			))

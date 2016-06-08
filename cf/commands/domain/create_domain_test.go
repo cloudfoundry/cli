@@ -47,14 +47,20 @@ var _ = Describe("create domain command", func() {
 
 	It("fails with usage", func() {
 		runCommand("")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
 
 		runCommand("org1")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
+
+		runCommand("org1", "example.com")
+		Expect(ui.Outputs()).ToNot(ContainSubstrings(
+			[]string{"Incorrect Usage", "Requires", "arguments"},
+		))
+
 	})
 
 	Context("checks login", func() {
@@ -90,7 +96,7 @@ var _ = Describe("create domain command", func() {
 		domainName, domainOwningOrgGUID := domainRepo.CreateArgsForCall(0)
 		Expect(domainName).To(Equal("example.com"))
 		Expect(domainOwningOrgGUID).To(Equal("myOrg-guid"))
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating domain", "example.com", "myOrg", "my-user"},
 			[]string{"OK"},
 		))

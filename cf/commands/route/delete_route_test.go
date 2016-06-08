@@ -113,7 +113,7 @@ var _ = Describe("DeleteRoute", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -179,7 +179,7 @@ var _ = Describe("DeleteRoute", func() {
 
 					It("fails", func() {
 						Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"FAILED"},
 							[]string{"Cannot specify port together with hostname and/or path."},
 						))
@@ -193,7 +193,7 @@ var _ = Describe("DeleteRoute", func() {
 
 					It("fails", func() {
 						Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"FAILED"},
 							[]string{"Cannot specify port together with hostname and/or path."},
 						))
@@ -313,7 +313,7 @@ var _ = Describe("DeleteRoute", func() {
 
 					It("tells the user that it succeeded", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"OK"},
 						))
 					})
@@ -354,7 +354,7 @@ var _ = Describe("DeleteRoute", func() {
 
 				It("tells the user that it could not delete the route", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Unable to delete, route", "does not exist"},
 					))
 				})

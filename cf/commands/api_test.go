@@ -93,7 +93,7 @@ var _ = Describe("Api", func() {
 			It("prints out the api endpoint and appropriately sets the config", func() {
 				callApi([]string{})
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"https://api.run.pivotal.io", "2.0"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"https://api.run.pivotal.io", "2.0"}))
 				Expect(config.IsSSLDisabled()).To(BeTrue())
 			})
 
@@ -101,7 +101,7 @@ var _ = Describe("Api", func() {
 				It("unsets the APIEndpoint", func() {
 					callApi([]string{"--unset"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Unsetting api endpoint..."},
 						[]string{"OK"},
 						[]string{"No api endpoint set."},
@@ -115,7 +115,7 @@ var _ = Describe("Api", func() {
 			It("prompts the user to set an endpoint", func() {
 				callApi([]string{})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No api endpoint set", fmt.Sprintf("Use '%s api' to set an endpoint", cf.Name)},
 				))
 			})
@@ -151,7 +151,7 @@ var _ = Describe("Api", func() {
 				It("unsets the APIEndpoint", func() {
 					callApi([]string{"--unset", "https://example.com"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Unsetting api endpoint..."},
 						[]string{"OK"},
 						[]string{"No api endpoint set."},
@@ -164,7 +164,7 @@ var _ = Describe("Api", func() {
 				It("unsets the APIEndpoint", func() {
 					callApi([]string{"--unset", "https://example.com"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Unsetting api endpoint..."},
 						[]string{"OK"},
 						[]string{"No api endpoint set."},
@@ -180,7 +180,7 @@ var _ = Describe("Api", func() {
 				callApi([]string{"https://example.com"})
 				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
 				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("https://example.com"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Setting api endpoint to", "example.com"},
 					[]string{"OK"},
 				))
@@ -190,7 +190,7 @@ var _ = Describe("Api", func() {
 				callApi([]string{"https://example.com/"})
 				Expect(endpointRepo.GetCCInfoCallCount()).To(Equal(1))
 				Expect(endpointRepo.GetCCInfoArgsForCall(0)).To(Equal("https://example.com"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Setting api endpoint to", "example.com"},
 					[]string{"OK"},
 				))
@@ -216,7 +216,7 @@ var _ = Describe("Api", func() {
 		Describe("unencrypted http endpoints", func() {
 			It("warns the user", func() {
 				callApi([]string{"http://example.com"})
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Warning"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Warning"}))
 			})
 		})
 	})

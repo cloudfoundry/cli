@@ -169,7 +169,7 @@ var _ = Describe("OneTimeSSHCode", func() {
 
 					It("displays the token", func() {
 						Expect(runCLIerr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"some-code"},
 						))
 					})

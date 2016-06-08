@@ -47,7 +47,7 @@ var _ = Describe("Rename command", func() {
 		It("fails with usage when not invoked with an old name and a new name", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("foo")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -80,7 +80,7 @@ var _ = Describe("Rename command", func() {
 		appGUID, params := appRepo.UpdateArgsForCall(0)
 		Expect(appGUID).To(Equal(app.GUID))
 		Expect(*params.Name).To(Equal("my-new-app"))
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
 			[]string{"OK"},
 		))

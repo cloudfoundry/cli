@@ -52,7 +52,7 @@ var _ = Describe("stack command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			Expect(testcmd.RunCLICommand("stack", []string{}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"Incorrect Usage.", "Requires stack name as argument"},
 			))
@@ -70,8 +70,8 @@ var _ = Describe("stack command", func() {
 
 		testcmd.RunCLICommand("stack", []string{"Stack-1", "--guid"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(len(ui.Outputs)).To(Equal(1))
-		Expect(ui.Outputs[0]).To(Equal("Stack-1-GUID"))
+		Expect(len(ui.Outputs())).To(Equal(1))
+		Expect(ui.Outputs()[0]).To(Equal("Stack-1-GUID"))
 	})
 
 	It("returns the empty string as guid when '--guid' flag is provided and stack doesn't exist", func() {
@@ -85,8 +85,8 @@ var _ = Describe("stack command", func() {
 
 		testcmd.RunCLICommand("stack", []string{"Stack-1", "--guid"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(len(ui.Outputs)).To(Equal(1))
-		Expect(ui.Outputs[0]).To(Equal("Stack-1-GUID"))
+		Expect(len(ui.Outputs())).To(Equal(1))
+		Expect(ui.Outputs()[0]).To(Equal("Stack-1-GUID"))
 	})
 
 	It("lists the stack requested", func() {
@@ -94,8 +94,8 @@ var _ = Describe("stack command", func() {
 
 		testcmd.RunCLICommand("stack", []string{"Stack-1", "--guid"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(len(ui.Outputs)).To(Equal(1))
-		Expect(ui.Outputs[0]).To(Equal(""))
+		Expect(len(ui.Outputs())).To(Equal(1))
+		Expect(ui.Outputs()[0]).To(Equal(""))
 	})
 
 	It("informs user if stack is not found", func() {
@@ -103,7 +103,7 @@ var _ = Describe("stack command", func() {
 
 		testcmd.RunCLICommand("stack", []string{"Stack-1"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(ui.Outputs).To(BeInDisplayOrder(
+		Expect(ui.Outputs()).To(BeInDisplayOrder(
 			[]string{"FAILED"},
 			[]string{"Stack Stack-1 not found"},
 		))

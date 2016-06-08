@@ -50,7 +50,7 @@ var _ = Describe("set-health-check command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand("FAKE_APP")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -59,7 +59,7 @@ var _ = Describe("set-health-check command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand("FAKE_APP", "bad_type")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "HEALTH_CHECK_TYPE", "port", "none"},
 			))
 		})
@@ -99,7 +99,7 @@ var _ = Describe("set-health-check command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app", "none")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "already set to 'none'"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"my-app", "already set to 'none'"}))
 			})
 		})
 
@@ -121,8 +121,8 @@ var _ = Describe("set-health-check command", func() {
 					appGUID, params := appRepo.UpdateArgsForCall(0)
 					Expect(appGUID).To(Equal("my-app-guid"))
 					Expect(*params.HealthCheckType).To(Equal("port"))
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Updating", "my-app", "port"}))
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Updating", "my-app", "port"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 				})
 			})
 
@@ -132,7 +132,7 @@ var _ = Describe("set-health-check command", func() {
 					runCommand("my-app", "port")
 
 					Expect(appRepo.UpdateCallCount()).To(Equal(1))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error updating app"},
 					))
@@ -149,7 +149,7 @@ var _ = Describe("set-health-check command", func() {
 					runCommand("my-app", "port")
 
 					Expect(appRepo.UpdateCallCount()).To(Equal(1))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"health_check_type", "not set"},
 					))

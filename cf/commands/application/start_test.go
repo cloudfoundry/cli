@@ -277,7 +277,7 @@ var _ = Describe("start command", func() {
 			It("can still respond to staging failures", func() {
 				testcmd.RunCLICommandWithoutDependency("start", []string{"my-app"}, requirementsFactory, ui)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"FAILED"},
 					[]string{"BLAH, FAILED"},
@@ -322,7 +322,7 @@ var _ = Describe("start command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			callStart([]string{})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -339,7 +339,7 @@ var _ = Describe("start command", func() {
 			//defaultAppForStart.State = "started"
 			cmd.ApplicationStart(defaultAppForStart, "some-org", "some-space")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"my-app", "some-org", "some-space", "my-user"},
 				[]string{"OK"},
 			))
@@ -348,7 +348,7 @@ var _ = Describe("start command", func() {
 		It("starts an app, when given the app's name", func() {
 			ui, appRepo, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"0 of 2 instances running", "2 starting"},
@@ -367,7 +367,7 @@ var _ = Describe("start command", func() {
 
 			Expect(appRepo.GetAppCallCount()).To(Equal(1))
 			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `command start command`"},
 			))
 		})
@@ -379,7 +379,7 @@ var _ = Describe("start command", func() {
 
 			Expect(appRepo.GetAppCallCount()).To(Equal(1))
 			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"App my-app was started using this command `detected start command`"},
 			))
 		})
@@ -392,7 +392,7 @@ var _ = Describe("start command", func() {
 			appRepo.ReadReturns(defaultAppForStart, nil)
 
 			callStartWithLoggingTimeout([]string{"my-app"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"timeout connecting to log server"},
 			))
 		})
@@ -417,11 +417,11 @@ var _ = Describe("start command", func() {
 
 			callStart([]string{"my-app"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Log Line 2"},
 				[]string{"Log Line 3"},
 			))
-			Expect(ui.Outputs).ToNot(ContainSubstrings(
+			Expect(ui.Outputs()).ToNot(ContainSubstrings(
 				[]string{"Log Line 1"},
 				[]string{"Log Line 4"},
 			))
@@ -464,7 +464,7 @@ var _ = Describe("start command", func() {
 
 			Expect(appRepo.GetAppArgsForCall(0)).To(Equal("my-app-guid"))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Before close"},
 				[]string{"After close 1"},
 				[]string{"After close 2"},
@@ -478,7 +478,7 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"my-app"},
 				[]string{"FAILED"},
 				[]string{"AWWW, FAILED"},
@@ -491,7 +491,7 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"my-app"},
 				[]string{"FAILED"},
 				[]string{"is executed from within the directory"},
@@ -516,7 +516,7 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"TIP: Application must be listening on the right port."},
 			))
 		})
@@ -527,7 +527,7 @@ var _ = Describe("start command", func() {
 
 			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"an-error"},
 			))
 		})
@@ -551,7 +551,7 @@ var _ = Describe("start command", func() {
 
 				ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"0 of 2 instances running", "1 starting", "1 failing"},
 					[]string{"FAILED"},
@@ -579,7 +579,7 @@ var _ = Describe("start command", func() {
 
 				ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"0 of 2 instances running", "1 starting", "1 crashed"},
 					[]string{"FAILED"},
@@ -631,7 +631,7 @@ var _ = Describe("start command", func() {
 				defaultInstanceErrorCodes = []string{"", ""}
 
 				ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"my-app"},
 					[]string{"0 of 2 instances running", "2 starting"},
 					[]string{"0 of 2 instances running", "1 starting (no compatible cell)", "1 down"},
@@ -648,12 +648,12 @@ var _ = Describe("start command", func() {
 			defaultAppForStart.PackageState = "PENDING"
 			ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, requirementsFactory)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Starting", "my-app"},
 				[]string{"FAILED"},
 				[]string{"my-app failed to stage within", "minutes"},
 			))
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"instances running"}))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"instances running"}))
 		})
 
 		It("tells the user about the failure when starting the app fails", func() {
@@ -668,7 +668,7 @@ var _ = Describe("start command", func() {
 			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 			callStart(args)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"my-app"},
 				[]string{"FAILED"},
 				[]string{"Error updating app."},
@@ -692,7 +692,7 @@ var _ = Describe("start command", func() {
 			args := []string{"my-app"}
 			callStart(args)
 
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"my-app", "is already started"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"my-app", "is already started"}))
 
 			Expect(appRepo.UpdateCallCount()).To(BeZero())
 		})
@@ -710,7 +710,7 @@ var _ = Describe("start command", func() {
 
 			callStart([]string{"my-app"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"error tailing logs"},
 				[]string{"Ooops"},
 			))

@@ -52,7 +52,7 @@ var _ = Describe("org-users command", func() {
 		It("fails with usage when invoked without an org name", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -101,7 +101,7 @@ var _ = Describe("org-users command", func() {
 					Expect(actualRole).To(Equal(expectedRole))
 				}
 
-				Expect(ui.Outputs).To(BeInDisplayOrder(
+				Expect(ui.Outputs()).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"ORG MANAGER"},
 					[]string{"  No ORG MANAGER found"},
@@ -133,7 +133,7 @@ var _ = Describe("org-users command", func() {
 					Expect(actualRole).To(Equal(expectedRole))
 				}
 
-				Expect(ui.Outputs).To(BeInDisplayOrder(
+				Expect(ui.Outputs()).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"ORG MANAGER"},
 					[]string{"  user1"},
@@ -164,7 +164,7 @@ var _ = Describe("org-users command", func() {
 					Expect(orgGUID).To(Equal("the-org-guid"))
 					Expect(actualRole).To(Equal(expectedRole))
 				}
-				Expect(ui.Outputs).To(BeInDisplayOrder(
+				Expect(ui.Outputs()).To(BeInDisplayOrder(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"ORG MANAGER"},
 					[]string{"  user1"},
@@ -206,7 +206,7 @@ var _ = Describe("org-users command", func() {
 
 			orgGUID, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
 			Expect(orgGUID).To(Equal("the-org-guid"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting users in org", "the-org", "my-user"},
 				[]string{"ORG MANAGER"},
 				[]string{"user1"},
@@ -235,7 +235,7 @@ var _ = Describe("org-users command", func() {
 
 				orgGUID, _ := userRepo.ListUsersInOrgForRoleArgsForCall(0)
 				Expect(orgGUID).To(Equal("the-org-guid"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting users in org", "the-org", "my-user"},
 					[]string{"USERS"},
 					[]string{"user1"},

@@ -64,7 +64,7 @@ var _ = Describe("unbind-security-group command", func() {
 		It("should fail with usage when not provided with any arguments", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -72,15 +72,15 @@ var _ = Describe("unbind-security-group command", func() {
 		It("should fail with usage when provided with a number of arguments that is either 2 or 4 or a number larger than 4", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("I", "like")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 			runCommand("Turn", "down", "for", "what")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 			runCommand("My", "Very", "Excellent", "Mother", "Just", "Sat", "Under", "Nine", "ThingsThatArentPlanets")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -117,7 +117,7 @@ var _ = Describe("unbind-security-group command", func() {
 			It("removes the security group when we only pass the security group name (using the targeted org and space)", func() {
 				runCommand("my-group")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
@@ -129,7 +129,7 @@ var _ = Describe("unbind-security-group command", func() {
 			It("removes the security group when we pass the org and space", func() {
 				runCommand("my-group", "my-org", "my-space")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding security group", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
@@ -146,7 +146,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 			It("fails with an error", func() {
 				runCommand("my-group", "my-org", "my-space")
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 	})

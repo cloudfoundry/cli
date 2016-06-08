@@ -44,7 +44,7 @@ var _ = Describe("disable-ssh command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 
@@ -86,7 +86,7 @@ var _ = Describe("disable-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is enabled for 'my-app'"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"ssh support is enabled for 'my-app'"}))
 			})
 		})
 
@@ -101,7 +101,7 @@ var _ = Describe("disable-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("my-app")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is disabled for 'my-app'"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"ssh support is disabled for 'my-app'"}))
 			})
 		})
 

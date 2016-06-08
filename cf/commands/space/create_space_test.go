@@ -87,7 +87,7 @@ var _ = Describe("create-space command", func() {
 	Describe("Requirements", func() {
 		It("fails with usage when not provided exactly one argument", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -115,7 +115,7 @@ var _ = Describe("create-space command", func() {
 
 	It("creates a space", func() {
 		runCommand("my-space")
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating space", "my-space", "my-org", "my-user"},
 			[]string{"OK"},
 			[]string{"Assigning", "SpaceManager", "my-user", "my-space"},
@@ -138,12 +138,12 @@ var _ = Describe("create-space command", func() {
 		spaceRepo.CreateReturns(models.Space{}, errors.NewHTTPError(400, errors.SpaceNameTaken, "Space already exists"))
 		runCommand("my-space")
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating space", "my-space"},
 			[]string{"OK"},
 		))
 		Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"my-space", "already exists"}))
-		Expect(ui.Outputs).ToNot(ContainSubstrings(
+		Expect(ui.Outputs()).ToNot(ContainSubstrings(
 			[]string{"Assigning", "my-user", "my-space", "SpaceManager"},
 		))
 
@@ -164,7 +164,7 @@ var _ = Describe("create-space command", func() {
 
 			runCommand("-o", "other-org", "my-space")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating space", "my-space", "other-org", "my-user"},
 				[]string{"OK"},
 				[]string{"Assigning", "my-user", "my-space", "SpaceManager"},
@@ -187,7 +187,7 @@ var _ = Describe("create-space command", func() {
 			orgRepo.FindByNameReturns(models.Organization{}, errors.New("cool-organization does not exist"))
 			runCommand("-o", "cool-organization", "my-space")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"cool-organization", "does not exist"},
 			))
@@ -199,7 +199,7 @@ var _ = Describe("create-space command", func() {
 			orgRepo.FindByNameReturns(models.Organization{}, errors.New("cool-organization does not exist"))
 			runCommand("-o", "cool-organization", "my-space")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"Error"},
 			))
@@ -231,7 +231,7 @@ var _ = Describe("create-space command", func() {
 				spaceQuotaRepo.FindByNameAndOrgGUIDReturns(models.SpaceQuota{}, errors.New("Error"))
 				runCommand("-q", "my-space-quota", "my-space")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Error"},
 				))

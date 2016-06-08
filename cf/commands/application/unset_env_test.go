@@ -88,7 +88,7 @@ var _ = Describe("unset-env command", func() {
 		It("updates the app and tells the user what happened", func() {
 			runCommand("my-app", "DATABASE_URL")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
@@ -109,7 +109,7 @@ var _ = Describe("unset-env command", func() {
 			It("fails and alerts the user", func() {
 				runCommand("does-not-exist", "DATABASE_URL")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Removing env variable"},
 					[]string{"FAILED"},
 					[]string{"Error updating app."},
@@ -120,7 +120,7 @@ var _ = Describe("unset-env command", func() {
 		It("tells the user if the specified env var was not set", func() {
 			runCommand("my-app", "CANT_STOP_WONT_STOP_UNSETTIN_THIS_ENV")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Removing env variable"},
 				[]string{"OK"},
 				[]string{"CANT_STOP_WONT_STOP_UNSETTIN_THIS_ENV", "was not set."},

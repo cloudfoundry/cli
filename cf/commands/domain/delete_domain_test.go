@@ -88,7 +88,7 @@ var _ = Describe("delete-domain command", func() {
 			runCommand("foo1.com")
 
 			Expect(domainRepo.DeleteCallCount()).To(BeZero())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"domain"},
 				[]string{"foo1.com"},
@@ -114,7 +114,7 @@ var _ = Describe("delete-domain command", func() {
 			Expect(domainRepo.DeleteArgsForCall(0)).To(Equal("foo-guid"))
 
 			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the domain foo.com"}))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting domain", "foo.com", "my-user"},
 				[]string{"OK"},
 			))
@@ -130,7 +130,7 @@ var _ = Describe("delete-domain command", func() {
 
 				Expect(domainRepo.DeleteArgsForCall(0)).To(Equal("foo-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
 					[]string{"FAILED"},
 					[]string{"foo.com"},
@@ -151,7 +151,7 @@ var _ = Describe("delete-domain command", func() {
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"delete", "foo.com"}))
 
-				Expect(ui.Outputs).To(BeEmpty())
+				Expect(ui.Outputs()).To(BeEmpty())
 			})
 		})
 
@@ -165,7 +165,7 @@ var _ = Describe("delete-domain command", func() {
 
 				Expect(domainRepo.DeleteArgsForCall(0)).To(Equal("foo-guid"))
 				Expect(ui.Prompts).To(BeEmpty())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting domain", "foo.com"},
 					[]string{"OK"},
 				))
@@ -183,7 +183,7 @@ var _ = Describe("delete-domain command", func() {
 
 			Expect(domainRepo.DeleteCallCount()).To(BeZero())
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"OK"},
 				[]string{"foo.com", "not found"},
 			))
@@ -200,7 +200,7 @@ var _ = Describe("delete-domain command", func() {
 
 			Expect(domainRepo.DeleteCallCount()).To(BeZero())
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"foo.com"},
 				[]string{"failed badly"},

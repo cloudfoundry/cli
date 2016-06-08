@@ -51,7 +51,7 @@ var _ = Describe("security-group command", func() {
 		It("should fail with usage when not provided a single argument", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("whoops", "I can't believe", "I accidentally", "the whole thing")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -93,7 +93,7 @@ var _ = Describe("security-group command", func() {
 
 			It("tells the user what it's about to do and then shows the group", func() {
 				runCommand("my-group")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting", "security group", "my-group", "my-user"},
 					[]string{"OK"},
 					[]string{"Name", "my-group"},
@@ -122,7 +122,7 @@ var _ = Describe("security-group command", func() {
 
 				runCommand("my-group")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No spaces assigned"},
 				))
 			})
@@ -132,7 +132,7 @@ var _ = Describe("security-group command", func() {
 			securityGroupRepo.ReadReturns(models.SecurityGroup{}, errors.New("half-past-tea-time"))
 			runCommand("im-late!")
 
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 		})
 	})
 })

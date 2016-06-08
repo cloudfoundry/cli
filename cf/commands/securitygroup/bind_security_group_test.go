@@ -70,7 +70,7 @@ var _ = Describe("bind-security-group command", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("one fish", "two fish", "three fish", "purple fish")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -90,7 +90,7 @@ var _ = Describe("bind-security-group command", func() {
 				runCommand("my-nonexistent-security-group", "my-org", "my-space")
 
 				Expect(fakeSecurityGroupRepo.ReadArgsForCall(0)).To(Equal("my-nonexistent-security-group"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"security group", "my-nonexistent-security-group", "not found"},
 				))
@@ -106,7 +106,7 @@ var _ = Describe("bind-security-group command", func() {
 				runCommand("sec group", "org", "space")
 
 				Expect(fakeOrgRepo.FindByNameArgsForCall(0)).To(Equal("org"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Org", "org", "not found"},
 				))
@@ -129,7 +129,7 @@ var _ = Describe("bind-security-group command", func() {
 				name, orgGUID := fakeSpaceRepo.FindByNameInOrgArgsForCall(0)
 				Expect(name).To(Equal("space-name"))
 				Expect(orgGUID).To(Equal("org-guid"))
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Space", "space-name", "not found"},
 				))
@@ -165,7 +165,7 @@ var _ = Describe("bind-security-group command", func() {
 			})
 
 			It("describes what it is doing for the user's benefit", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Assigning security group security-group to space space-name in org org-name as my-user"},
 					[]string{"OK"},
 					[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},

@@ -75,7 +75,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -159,7 +159,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 
 			It("tells the user it is updating the user provided service", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating user provided service service-instance in org"},
 				))
 			})
@@ -172,7 +172,7 @@ var _ = Describe("UpdateUserProvidedService", func() {
 
 			It("tells the user no changes were made", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No flags specified. No changes were made."},
 				))
 			})
@@ -244,14 +244,14 @@ var _ = Describe("UpdateUserProvidedService", func() {
 
 				It("tells the user OK", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 				})
 
 				It("prints a tip", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"TIP"},
 					))
 				})

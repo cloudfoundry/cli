@@ -66,7 +66,7 @@ var _ = Describe("OauthToken", func() {
 			authRepo.RefreshAuthTokenReturns("", errors.New("Could not refresh"))
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"Could not refresh"},
 			))
@@ -76,7 +76,7 @@ var _ = Describe("OauthToken", func() {
 			authRepo.RefreshAuthTokenReturns("1234567890", nil)
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"1234567890"},
 			))
 		})

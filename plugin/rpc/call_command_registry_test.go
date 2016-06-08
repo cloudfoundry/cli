@@ -38,17 +38,17 @@ var _ = Describe("calling commands in commandregistry", func() {
 
 	It("runs the command requirements", func() {
 		NewCommandRunner().Command([]string{"fake-command"}, deps, false)
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"Requirement executed"}))
+		Expect(ui.Outputs()).To(ContainSubstrings([]string{"Requirement executed"}))
 	})
 
 	It("calls the command Execute() func", func() {
 		NewCommandRunner().Command([]string{"fake-command"}, deps, false)
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"Command Executed"}))
+		Expect(ui.Outputs()).To(ContainSubstrings([]string{"Command Executed"}))
 	})
 
 	It("sets the dependency of the command", func() {
 		NewCommandRunner().Command([]string{"fake-command"}, deps, false)
-		Expect(ui.Outputs).To(ContainSubstrings([]string{"SetDependency() called, pluginCall true"}))
+		Expect(ui.Outputs()).To(ContainSubstrings([]string{"SetDependency() called, pluginCall true"}))
 	})
 
 	It("returns an error if any of the requirements fail", func() {

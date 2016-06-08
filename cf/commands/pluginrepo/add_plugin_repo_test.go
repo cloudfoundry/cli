@@ -87,7 +87,7 @@ var _ = Describe("add-plugin-repo", func() {
 
 			callAddPluginRepo([]string{"repo", "http://repo2.com"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Plugin repo named \"repo\"", " already exists"},
 			))
 		})
@@ -102,7 +102,7 @@ var _ = Describe("add-plugin-repo", func() {
 
 			callAddPluginRepo([]string{"repo2", "http://repo.com"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"http://repo.com (repo1)", " already exists."},
 			))
 		})
@@ -115,7 +115,7 @@ var _ = Describe("add-plugin-repo", func() {
 
 				callAddPluginRepo([]string{"repo", "msn.com"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"msn.com", "is not a valid url"},
 				))
 			})
@@ -123,7 +123,7 @@ var _ = Describe("add-plugin-repo", func() {
 			It("should not contain the tip", func() {
 				callAddPluginRepo([]string{"repo", "msn.com"})
 
-				Expect(ui.Outputs).NotTo(ContainSubstrings(
+				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},
 				))
 			})
@@ -134,7 +134,7 @@ var _ = Describe("add-plugin-repo", func() {
 
 				callAddPluginRepo([]string{"repo", "https://google.com"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"https://google.com/list", "is not responding."},
 				))
 			})
@@ -156,7 +156,7 @@ var _ = Describe("add-plugin-repo", func() {
 			It("informs user of invalid repo server", func() {
 				callAddPluginRepo([]string{"repo", testServer.URL})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Error processing data from server"},
 				))
 			})
@@ -183,7 +183,7 @@ var _ = Describe("add-plugin-repo", func() {
 			It("informs user of invalid repo server", func() {
 				callAddPluginRepo([]string{"repo", testServer.URL})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"\"Plugins\" object not found in the responded data"},
 				))
 			})
@@ -193,7 +193,7 @@ var _ = Describe("add-plugin-repo", func() {
 			It("prints a tip", func() {
 				callAddPluginRepo([]string{"repo", "https://example.com:"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},
 				))
 			})
@@ -214,7 +214,7 @@ var _ = Describe("add-plugin-repo", func() {
 			It("does not print a tip", func() {
 				callAddPluginRepo([]string{"repo", testServer.URL})
 
-				Expect(ui.Outputs).NotTo(ContainSubstrings(
+				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."},
 				))
 			})

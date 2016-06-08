@@ -98,7 +98,7 @@ var _ = Describe("repo-plugins", func() {
 				Expect(fakePluginRepo.GetPluginsArgsForCall(0)[0].Name).To(Equal("repo2"))
 				Expect(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(1))
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from repository 'repo2'"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Getting plugins from repository 'repo2'"}))
 			})
 		})
 
@@ -111,7 +111,7 @@ var _ = Describe("repo-plugins", func() {
 				Expect(len(fakePluginRepo.GetPluginsArgsForCall(0))).To(Equal(2))
 				Expect(fakePluginRepo.GetPluginsArgsForCall(0)[1].Name).To(Equal("repo2"))
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Getting plugins from all repositories"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Getting plugins from all repositories"}))
 			})
 		})
 
@@ -135,11 +135,11 @@ var _ = Describe("repo-plugins", func() {
 				err := callRepoPlugins()
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"Logged errors:"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"repo1"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"plugin1"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"repo2"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"plugin2"}))
+				Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"Logged errors:"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"repo1"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"plugin1"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"repo2"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"plugin2"}))
 			})
 		})
 
@@ -153,9 +153,9 @@ var _ = Describe("repo-plugins", func() {
 				err := callRepoPlugins()
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Logged errors:"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"error from repo1"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"error from repo2"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Logged errors:"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"error from repo1"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"error from repo2"}))
 			})
 		})
 	})

@@ -88,7 +88,7 @@ var _ = Describe("restart command", func() {
 		It("fails with usage when not provided exactly one arg", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})

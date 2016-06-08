@@ -96,7 +96,7 @@ var _ = Describe("create-service command", func() {
 		spaceGUID, serviceName := serviceBuilder.GetServicesByNameForSpaceWithPlansArgsForCall(0)
 		Expect(spaceGUID).To(Equal(config.SpaceFields().GUID))
 		Expect(serviceName).To(Equal("cleardb"))
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
 			[]string{"OK"},
 		))
@@ -109,7 +109,7 @@ var _ = Describe("create-service command", func() {
 		It("sucessfully creates a service and passes the tags as json", func() {
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-t", "tag1, tag2,tag3,  tag4"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
@@ -123,7 +123,7 @@ var _ = Describe("create-service command", func() {
 			It("successfully creates a service and passes the params as a json string", func() {
 				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `{"foo": "bar"}`})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
@@ -135,7 +135,7 @@ var _ = Describe("create-service command", func() {
 				It("returns an error to the UI", func() {
 					callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", `bad-json`})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
@@ -170,7 +170,7 @@ var _ = Describe("create-service command", func() {
 			It("successfully creates a service and passes the params as a json", func() {
 				callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", jsonFile.Name()})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
@@ -186,7 +186,7 @@ var _ = Describe("create-service command", func() {
 				It("returns an error to the UI", func() {
 					callCreateService([]string{"cleardb", "spark", "my-cleardb-service", "-c", jsonFile.Name()})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object."},
 					))
@@ -221,7 +221,7 @@ var _ = Describe("create-service command", func() {
 
 			creatingServiceMessage := fmt.Sprintf("Create in progress. Use 'cf services' or 'cf service %s' to check operation status.", serviceInstance.ServiceInstanceFields.Name)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{creatingServiceMessage},
@@ -235,7 +235,7 @@ var _ = Describe("create-service command", func() {
 			serviceRepo.FindInstanceByNameReturns(models.ServiceInstance{}, errors.New("Error finding instance"))
 			callCreateService([]string{"cleardb", "spark", "fake-service-instance-name"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service instance fake-service-instance-name in org my-org / space my-space as my-user..."},
 				[]string{"FAILED"},
 				[]string{"Error finding instance"}))
@@ -245,16 +245,16 @@ var _ = Describe("create-service command", func() {
 	Describe("warning the user about paid services", func() {
 		It("does not warn the user when the service is free", func() {
 			callCreateService([]string{"cleardb", "spark", "my-free-cleardb-service"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service instance", "my-free-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))
-			Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"will incurr a cost"}))
+			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"will incurr a cost"}))
 		})
 
 		It("warns the user when the service is not free", func() {
 			callCreateService([]string{"cleardb", "expensive", "my-expensive-cleardb-service"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service instance", "my-expensive-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"Attention: The plan `expensive` of service `cleardb` is not free.  The instance `my-expensive-cleardb-service` will incur a cost.  Contact your administrator if you think this is in error."},
@@ -267,7 +267,7 @@ var _ = Describe("create-service command", func() {
 
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Creating service instance", "my-cleardb-service"},
 			[]string{"OK"},
 			[]string{"my-cleardb-service", "already exists"},
@@ -285,7 +285,7 @@ var _ = Describe("create-service command", func() {
 			serviceRepo.CreateServiceInstanceReturns(errors.NewModelAlreadyExistsError("Service", "my-cleardb-service"))
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service instance", "my-cleardb-service", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 			))

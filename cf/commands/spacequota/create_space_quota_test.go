@@ -81,7 +81,7 @@ var _ = Describe("create-space-quota", func() {
 			It("fails", func() {
 				flagContext.Parse()
 				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -173,7 +173,7 @@ var _ = Describe("create-space-quota", func() {
 				It("creates a quota with a given name", func() {
 					Expect(quotaRepo.CreateArgsForCall(0).Name).To(Equal("my-quota"))
 					Expect(quotaRepo.CreateArgsForCall(0).OrgGUID).To(Equal("my-org-guid"))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating space quota", "my-quota", "my-org", "my-user", "..."},
 						[]string{"OK"},
 					))
@@ -310,7 +310,7 @@ var _ = Describe("create-space-quota", func() {
 
 			It("alets the user when creating the quota fails", func() {
 				Expect(runCLIErr).To(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating space quota", "my-quota", "my-org"},
 				))
 				Expect(runCLIErr.Error()).To(Equal("WHOOP THERE IT IS"))
@@ -325,7 +325,7 @@ var _ = Describe("create-space-quota", func() {
 
 			It("warns the user", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 				Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"already exists"}))
 			})
 		})

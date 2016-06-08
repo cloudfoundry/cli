@@ -104,7 +104,7 @@ var _ = Describe("feature-flags command", func() {
 
 		It("lists the state of all feature flags", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Retrieving status of all flagged features as my-user..."},
 				[]string{"Feature", "State"},
 				[]string{"user_org_creation", "enabled"},
@@ -122,7 +122,7 @@ var _ = Describe("feature-flags command", func() {
 
 			It("fails with an error", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"An error occurred."},
 				))

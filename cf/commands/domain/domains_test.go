@@ -124,7 +124,7 @@ var _ = Describe("ListDomains", func() {
 
 			It("does not fail with usage", func() {
 				cmd.Requirements(factory, flagContext)
-				Expect(ui.Outputs).NotTo(ContainSubstrings(
+				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"Incorrect Usage. No argument required"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -154,7 +154,7 @@ var _ = Describe("ListDomains", func() {
 
 		It("prints getting domains message", func() {
 			Expect(err).NotTo(HaveOccurred())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting domains in org my-org"},
 			))
 		})
@@ -168,7 +168,7 @@ var _ = Describe("ListDomains", func() {
 
 		It("prints no domains found message", func() {
 			Expect(err).NotTo(HaveOccurred())
-			Expect(ui.Outputs).To(BeInDisplayOrder(
+			Expect(ui.Outputs()).To(BeInDisplayOrder(
 				[]string{"name", "status"},
 				[]string{"No domains found"},
 			))
@@ -202,14 +202,14 @@ var _ = Describe("ListDomains", func() {
 
 			It("does not print no domains found message", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).NotTo(ContainSubstrings(
+				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"No domains found"},
 				))
 			})
 
 			It("prints the domain information", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(BeInDisplayOrder(
+				Expect(ui.Outputs()).To(BeInDisplayOrder(
 					[]string{"name", "status", "type"},
 					[]string{"Shared-domain1", "shared"},
 					[]string{"Shared-domain2", "shared", "foobar"},

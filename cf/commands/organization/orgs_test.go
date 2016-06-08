@@ -134,7 +134,7 @@ var _ = Describe("orgs command", func() {
 		It("lists orgs", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting orgs as my-user"},
 				[]string{"Organization-1"},
 				[]string{"Organization-2"},
@@ -147,7 +147,7 @@ var _ = Describe("orgs command", func() {
 		orgRepo.ListOrgsReturns([]models.Organization{}, nil)
 		runCommand()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting orgs as my-user"},
 			[]string{"No orgs found"},
 		))

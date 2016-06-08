@@ -206,7 +206,7 @@ var _ = Describe("target command", func() {
 				Expect(config.SpaceFields().GUID).To(Equal(""))
 
 				Expect(ui.ShowConfigurationCalled).To(BeFalse())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Unable to access space", "my-space"},
 				))
@@ -254,7 +254,7 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-o", "my-organization"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"To upgrade your CLI"},
 					[]string{"5.0.0"},
 				))
@@ -266,7 +266,7 @@ var _ = Describe("target command", func() {
 				orgRepo.FindByNameReturns(models.Organization{}, errors.New("Invalid access"))
 
 				callTarget([]string{"-o", "my-organization"})
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 				expectOrgToBeCleared()
 				expectSpaceToBeCleared()
 			})
@@ -276,7 +276,7 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-o", "my-organization"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"my-organization", "not found"},
 				))
@@ -290,7 +290,7 @@ var _ = Describe("target command", func() {
 
 				callTarget([]string{"-s", "my-space"})
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"An org must be targeted before targeting a space"},
 				))
@@ -313,7 +313,7 @@ var _ = Describe("target command", func() {
 
 					callTarget([]string{"-s", "my-space"})
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Unable to access space", "my-space"},
 					))
@@ -331,7 +331,7 @@ var _ = Describe("target command", func() {
 					callTarget([]string{"-s", "my-space"})
 
 					expectSpaceToBeCleared()
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"my-space", "not found"},
 					))

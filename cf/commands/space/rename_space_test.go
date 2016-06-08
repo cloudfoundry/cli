@@ -61,7 +61,7 @@ var _ = Describe("rename-space command", func() {
 	Describe("when the user provides fewer than two args", func() {
 		It("fails with usage", func() {
 			callRenameSpace([]string{"foo"})
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -79,7 +79,7 @@ var _ = Describe("rename-space command", func() {
 			originalSpaceName := configRepo.SpaceFields().Name
 			callRenameSpace([]string{"the-old-space-name", "my-new-space"})
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Renaming space", "the-old-space-name", "my-new-space", "my-org", "my-user"},
 				[]string{"OK"},
 			))

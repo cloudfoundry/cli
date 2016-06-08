@@ -51,7 +51,7 @@ var _ = Describe("delete-security-group command", func() {
 		It("should fail with usage when not provided a single argument", func() {
 			requirementsFactory.LoginSuccess = true
 			runCommand("whoops", "I can't believe", "I accidentally", "the whole thing")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -108,7 +108,7 @@ var _ = Describe("delete-security-group command", func() {
 
 			It("tells the user what it's about to do", func() {
 				runCommand("-f", "my-group")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "security group", "my-group", "my-user"},
 					[]string{"OK"},
 				))
@@ -123,7 +123,7 @@ var _ = Describe("delete-security-group command", func() {
 			It("fails and tells the user", func() {
 				runCommand("-f", "whoops")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
@@ -143,7 +143,7 @@ var _ = Describe("delete-security-group command", func() {
 			securityGroupRepo.DeleteReturns(errors.New("raspberry"))
 			runCommand("-f", "whoops")
 
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 		})
 	})
 })

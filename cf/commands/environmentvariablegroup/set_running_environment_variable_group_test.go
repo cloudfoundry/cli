@@ -51,7 +51,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		It("fails with usage when it does not receive any arguments", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -65,7 +65,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		It("Sets the running environment variable group", func() {
 			runCommand(`{"abc":"123", "def": "456"}`)
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Setting the contents of the running environment variable group as my-user..."},
 				[]string{"OK"},
 			))
@@ -75,7 +75,7 @@ var _ = Describe("set-running-environment-variable-group command", func() {
 		It("Fails with a reasonable message when invalid JSON is passed", func() {
 			environmentVariableGroupRepo.SetRunningReturns(cf_errors.NewHTTPError(400, cf_errors.MessageParseError, "Request invalid due to parse error"))
 			runCommand(`{"abc":"123", "invalid : "json"}`)
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Setting the contents of the running environment variable group as my-user..."},
 				[]string{"FAILED"},
 				[]string{`Your JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{"name":"value","name":"value"}'`},

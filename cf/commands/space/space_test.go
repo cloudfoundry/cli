@@ -77,7 +77,7 @@ var _ = Describe("space command", func() {
 
 			It("fails with no args", func() {
 				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))
@@ -202,11 +202,11 @@ var _ = Describe("space command", func() {
 
 				It("shows only the space guid", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"whose-space-is-it-anyway-guid"},
 					))
 
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 					))
 				})
@@ -219,7 +219,7 @@ var _ = Describe("space command", func() {
 				})
 				It("it shows space information and security group rules", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting rules for the security group", "Nacho Security"},
 						[]string{"protocol", "all"},
 						[]string{"destination", "0.0.0.0-9.255.255.255"},
@@ -236,7 +236,7 @@ var _ = Describe("space command", func() {
 			Context("when the space has a space quota", func() {
 				It("shows information about the given space", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 						[]string{"OK"},
 						[]string{"whose-space-is-it-anyway"},
@@ -257,7 +257,7 @@ var _ = Describe("space command", func() {
 
 					It("displays unlimited as the route ports limit", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"unlimited route ports"},
 						))
 					})
@@ -271,7 +271,7 @@ var _ = Describe("space command", func() {
 
 					It("should not display route ports", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).NotTo(ContainSubstrings(
+						Expect(ui.Outputs()).NotTo(ContainSubstrings(
 							[]string{"route ports"},
 						))
 					})
@@ -285,7 +285,7 @@ var _ = Describe("space command", func() {
 
 					It("displays unlimited as the app instance limit", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"unlimited app instance limit"},
 						))
 					})
@@ -301,7 +301,7 @@ var _ = Describe("space command", func() {
 				It("shows information without a space quota", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 					Expect(quotaRepo.FindByGUIDCallCount()).To(Equal(0))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Getting info for space", "whose-space-is-it-anyway", "my-org", "my-user"},
 						[]string{"OK"},
 						[]string{"whose-space-is-it-anyway"},

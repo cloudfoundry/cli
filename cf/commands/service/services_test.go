@@ -140,7 +140,7 @@ var _ = Describe("services", func() {
 		serviceSummaryRepo.GetSummariesInCurrentSpaceInstances = serviceInstances
 
 		runCommand()
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
 			[]string{"name", "service", "plan", "bound apps", "last operation"},
 			[]string{"OK"},
@@ -156,13 +156,13 @@ var _ = Describe("services", func() {
 
 		runCommand()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Getting services in org", "my-org", "my-space", "my-user"},
 			[]string{"OK"},
 			[]string{"No services found"},
 		))
 
-		Expect(ui.Outputs).ToNot(ContainSubstrings(
+		Expect(ui.Outputs()).ToNot(ContainSubstrings(
 			[]string{"name", "service", "plan", "bound apps"},
 		))
 	})

@@ -122,7 +122,7 @@ var _ = Describe("UnmapRoute", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires app_name, domain_name as arguments"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -184,7 +184,7 @@ var _ = Describe("UnmapRoute", func() {
 
 				It("fails", func() {
 					Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify port together with hostname and/or path."},
 					))
@@ -198,7 +198,7 @@ var _ = Describe("UnmapRoute", func() {
 
 				It("fails", func() {
 					Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify port together with hostname and/or path."},
 					))
@@ -298,7 +298,7 @@ var _ = Describe("UnmapRoute", func() {
 
 			It("tells the user that it is removing the route", func() {
 				Expect(err).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Removing route", "from app", "in org"},
 				))
 			})
@@ -340,7 +340,7 @@ var _ = Describe("UnmapRoute", func() {
 
 					It("tells the user it succeeded", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(BeInDisplayOrder(
+						Expect(ui.Outputs()).To(BeInDisplayOrder(
 							[]string{"OK"},
 						))
 					})
@@ -365,14 +365,14 @@ var _ = Describe("UnmapRoute", func() {
 
 				It("tells the user 'OK'", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 				})
 
 				It("warns the user the route was not mapped to the application", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Route to be unmapped is not currently mapped to the application."},
 					))
 				})

@@ -79,7 +79,7 @@ var _ = Describe("Uninstall", func() {
 	Describe("requirements", func() {
 		It("fails with usage when not provided a path to the plugin executable", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage."},
 			))
 		})
@@ -89,7 +89,7 @@ var _ = Describe("Uninstall", func() {
 		It("if plugin name does not exist", func() {
 			runCommand("garbage")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Uninstalling plugin garbage..."},
 				[]string{"FAILED"},
 				[]string{"Plugin name", "garbage", "does not exist"},
@@ -150,7 +150,7 @@ var _ = Describe("Uninstall", func() {
 		It("prints success text", func() {
 			runCommand("test_1.exe")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Uninstalling plugin test_1.exe..."},
 				[]string{"OK"},
 				[]string{"Plugin", "test_1.exe", "successfully uninstalled."},

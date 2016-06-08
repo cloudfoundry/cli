@@ -54,7 +54,7 @@ var _ = Describe("unbind-staging-security-group command", func() {
 
 		It("fails with usage when a name is not provided", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -78,7 +78,7 @@ var _ = Describe("unbind-staging-security-group command", func() {
 			})
 
 			It("unbinds the group from the default staging group set", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding", "security group", "a-security-group-name", "my-user"},
 					[]string{"OK"},
 				))
@@ -99,7 +99,7 @@ var _ = Describe("unbind-staging-security-group command", func() {
 					[]string{"Security group", "anana-qui-parle", "does not exist"},
 				))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"OK"},
 				))
 			})

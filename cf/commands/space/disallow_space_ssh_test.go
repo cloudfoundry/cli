@@ -49,7 +49,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 
@@ -95,7 +95,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 			It("notifies the user", func() {
 				runCommand("the-space-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"ssh support is already disabled in space 'the-space-name'"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"ssh support is already disabled in space 'the-space-name'"}))
 			})
 		})
 
@@ -113,8 +113,8 @@ var _ = Describe("disallow-space-ssh command", func() {
 					spaceGUID, allow := spaceRepo.SetAllowSSHArgsForCall(0)
 					Expect(spaceGUID).To(Equal("the-space-guid"))
 					Expect(allow).To(Equal(false))
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Disabling ssh support for space 'the-space-name'"}))
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Disabling ssh support for space 'the-space-name'"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 				})
 			})
 
@@ -128,7 +128,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 					spaceRepo.SetAllowSSHReturns(errors.New("api error"))
 					runCommand("the-space-name")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Error", "api error"},
 					))

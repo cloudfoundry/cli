@@ -70,7 +70,7 @@ var _ = Describe("update-space-quota command", func() {
 			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -131,7 +131,7 @@ var _ = Describe("update-space-quota command", func() {
 			It("alerts the user when parsing the memory limit fails", func() {
 				runCommand("-m", "whoops", "wit mah hussle", "my-org")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
@@ -150,7 +150,7 @@ var _ = Describe("update-space-quota command", func() {
 
 			It("alerts the user when parsing the memory limit fails", func() {
 				runCommand("-i", "whoops", "my-quota")
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
@@ -230,7 +230,7 @@ var _ = Describe("update-space-quota command", func() {
 				quotaRepo.UpdateReturns(errors.New("WHOOP THERE IT IS"))
 				runCommand("my-quota")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating space quota", "my-quota", "my-user"},
 					[]string{"FAILED"},
 				))
@@ -238,7 +238,7 @@ var _ = Describe("update-space-quota command", func() {
 
 			It("fails if the allow and disallow flag are both passed", func() {
 				runCommand("--disallow-paid-service-plans", "--allow-paid-service-plans", "my-for-profit-quota")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 				))
 			})

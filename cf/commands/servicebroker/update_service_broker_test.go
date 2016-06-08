@@ -47,7 +47,7 @@ var _ = Describe("update-service-broker command", func() {
 			requirementsFactory.LoginSuccess = true
 
 			runCommand("arg1", "arg2", "arg3")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -71,7 +71,7 @@ var _ = Describe("update-service-broker command", func() {
 
 			Expect(serviceBrokerRepo.FindByNameArgsForCall(0)).To(Equal("my-broker"))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Updating service broker", "my-found-broker", "my-user"},
 				[]string{"OK"},
 			))

@@ -80,7 +80,7 @@ var _ = Describe("CheckRoute", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires host and domain as arguments"},
 				))
@@ -156,7 +156,7 @@ var _ = Describe("CheckRoute", func() {
 
 		It("tells the user that it is checking for the route", func() {
 			Expect(err).NotTo(HaveOccurred())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Checking for route"},
 			))
 		})
@@ -212,7 +212,7 @@ var _ = Describe("CheckRoute", func() {
 
 					It("tells the user the route exists", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does exist"}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does exist"}))
 					})
 				})
 
@@ -223,7 +223,7 @@ var _ = Describe("CheckRoute", func() {
 
 					It("tells the user the route exists", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does not exist"}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"Route hostname.domain-name/the-path does not exist"}))
 					})
 				})
 			})
@@ -235,12 +235,12 @@ var _ = Describe("CheckRoute", func() {
 
 				It("tells the user OK", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 				})
 
 				It("tells the user the route exists", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Route", "does exist"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Route", "does exist"}))
 				})
 			})
 
@@ -251,12 +251,12 @@ var _ = Describe("CheckRoute", func() {
 
 				It("tells the user OK", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 				})
 
 				It("tells the user the route does not exist", func() {
 					Expect(err).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Route", "does not exist"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Route", "does not exist"}))
 				})
 			})
 

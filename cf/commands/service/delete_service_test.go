@@ -66,7 +66,7 @@ var _ = Describe("delete-service command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -89,7 +89,7 @@ var _ = Describe("delete-service command", func() {
 
 						Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service my-service"}))
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
 							[]string{"OK"},
 							[]string{"Delete in progress. Use 'cf services' or 'cf service my-service' to check operation status."},
@@ -103,7 +103,7 @@ var _ = Describe("delete-service command", func() {
 					runCommand("-f", "foo.com")
 
 					Expect(ui.Prompts).To(BeEmpty())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Deleting service", "foo.com"},
 						[]string{"OK"},
 						[]string{"Delete in progress. Use 'cf services' or 'cf service foo.com' to check operation status."},
@@ -125,7 +125,7 @@ var _ = Describe("delete-service command", func() {
 
 						Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the service my-service"}))
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
 							[]string{"OK"},
 						))
@@ -138,7 +138,7 @@ var _ = Describe("delete-service command", func() {
 					runCommand("-f", "foo.com")
 
 					Expect(ui.Prompts).To(BeEmpty())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Deleting service", "foo.com"},
 						[]string{"OK"},
 					))
@@ -154,7 +154,7 @@ var _ = Describe("delete-service command", func() {
 			It("warns the user the service does not exist", func() {
 				runCommand("-f", "my-service")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting service", "my-service"},
 					[]string{"OK"},
 				))

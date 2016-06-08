@@ -92,7 +92,7 @@ var _ = Describe("UnbindRouteService", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments"},
 				))
@@ -196,14 +196,16 @@ var _ = Describe("UnbindRouteService", func() {
 
 				It("does not warn", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(func() []string { return ui.Outputs }).NotTo(ContainSubstrings(
+					Expect(func() []string {
+						return ui.Outputs()
+					}).NotTo(ContainSubstrings(
 						[]string{"Unbind cancelled"},
 					))
 				})
 
 				It("tells the user it is unbinding the route service", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Unbinding route", "from service instance"},
 					))
 				})
@@ -220,7 +222,7 @@ var _ = Describe("UnbindRouteService", func() {
 
 					It("says OK", func() {
 						Expect(runCLIErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"OK"},
 						))
 					})
@@ -233,14 +235,14 @@ var _ = Describe("UnbindRouteService", func() {
 
 					It("says OK", func() {
 						Expect(runCLIErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"OK"},
 						))
 					})
 
 					It("warns", func() {
 						Expect(runCLIErr).NotTo(HaveOccurred())
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Route", "was not bound to service instance"},
 						))
 					})
@@ -265,7 +267,7 @@ var _ = Describe("UnbindRouteService", func() {
 
 				It("warns", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Unbind cancelled"},
 					))
 				})

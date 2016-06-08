@@ -139,7 +139,7 @@ var _ = Describe("MapRoute", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires APP_NAME and DOMAIN as arguments"},
 					[]string{"NAME"},
 					[]string{"USAGE"},
@@ -274,7 +274,7 @@ var _ = Describe("MapRoute", func() {
 
 				It("fails", func() {
 					Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify port together with hostname and/or path."},
 					))
@@ -288,7 +288,7 @@ var _ = Describe("MapRoute", func() {
 
 				It("fails", func() {
 					Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify port together with hostname and/or path."},
 					))
@@ -305,7 +305,7 @@ var _ = Describe("MapRoute", func() {
 					Expect(func() {
 						cmd.Requirements(factory, flagContext)
 					}).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify random-port together with port, hostname and/or path."},
 					))
@@ -322,7 +322,7 @@ var _ = Describe("MapRoute", func() {
 					Expect(func() {
 						cmd.Requirements(factory, flagContext)
 					}).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify random-port together with port, hostname and/or path."},
 					))
@@ -339,7 +339,7 @@ var _ = Describe("MapRoute", func() {
 					Expect(func() {
 						cmd.Requirements(factory, flagContext)
 					}).To(Panic())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"Cannot specify random-port together with port, hostname and/or path."},
 					))
@@ -437,7 +437,7 @@ var _ = Describe("MapRoute", func() {
 
 			It("tells the user that it is adding the route", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Adding route", "to app", "in org"},
 				))
 			})
@@ -457,7 +457,7 @@ var _ = Describe("MapRoute", func() {
 
 				It("tells the user that it succeeded", func() {
 					Expect(err).ToNot(HaveOccurred())
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"OK"},
 					))
 				})

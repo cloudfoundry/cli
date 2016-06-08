@@ -147,7 +147,7 @@ var _ = Describe("spaces command", func() {
 		It("lists all of the spaces", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting spaces in org", "my-org", "my-user"},
 				[]string{"space1"},
 				[]string{"space2"},
@@ -162,7 +162,7 @@ var _ = Describe("spaces command", func() {
 
 			It("politely tells the user", func() {
 				runCommand()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Getting spaces in org", "my-org", "my-user"},
 					[]string{"No spaces found"},
 				))

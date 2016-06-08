@@ -159,7 +159,7 @@ var _ = Describe("app Command", func() {
 
 			It("fails with usage when the value cannot be parsed", func() {
 				runCommand("-m", "blasé", "le-tired")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage"},
 				))
 			})
@@ -194,7 +194,7 @@ var _ = Describe("app Command", func() {
 
 			It("fails with usage when the value cannot be parsed", func() {
 				runCommand("-m", "blasé", "le-tired")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage"},
 				))
 			})
@@ -206,7 +206,7 @@ var _ = Describe("app Command", func() {
 
 				Expect(quotaRepo.UpdateArgsForCall(0).Name).To(Equal("quota-new-name"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Updating quota", "quota-name", "as", "my-user"},
 					[]string{"OK"},
 				))
@@ -252,7 +252,7 @@ var _ = Describe("app Command", func() {
 			It("shows an error when both --allow and --disallow flags are provided", func() {
 				runCommand("--allow-paid-service-plans", "--disallow-paid-service-plans", "quota-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Both flags are not permitted"},
 				))
@@ -274,7 +274,7 @@ var _ = Describe("app Command", func() {
 		It("shows an error when updating fails", func() {
 			quotaRepo.UpdateReturns(errors.New("I accidentally a quota"))
 			runCommand("-m", "1M", "dead-serious")
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 		})
 
 		It("shows a message explaining the update", func() {
@@ -282,7 +282,7 @@ var _ = Describe("app Command", func() {
 			quotaRepo.FindByNameReturns(quota, nil)
 
 			runCommand("-m", "50G", "i-love-ui")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Updating quota", "i-love-ui", "as", "my-user"},
 				[]string{"OK"},
 			))
@@ -292,7 +292,7 @@ var _ = Describe("app Command", func() {
 			quotaRepo.FindByNameReturns(models.QuotaFields{}, errors.New("i can't believe it's not quotas!"))
 
 			runCommand("-m", "50Somethings", "what-could-possibly-go-wrong?")
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 		})
 	})
 
@@ -345,7 +345,7 @@ var _ = Describe("app Command", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
 				))

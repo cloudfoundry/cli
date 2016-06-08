@@ -77,7 +77,7 @@ var _ = Describe("CreateServiceBroker", func() {
 
 			It("fails with usage", func() {
 				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments"},
 				))
@@ -129,7 +129,7 @@ var _ = Describe("CreateServiceBroker", func() {
 
 		It("tells the user it is creating the service broker", func() {
 			Expect(runCLIErr).NotTo(HaveOccurred())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating service broker", "service-broker", "my-user"},
 				[]string{"OK"},
 			))
@@ -165,7 +165,7 @@ var _ = Describe("CreateServiceBroker", func() {
 
 			It("tells the user it is creating the service broker in the targeted org and space", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating service broker service-broker in org my-org / space my-space as my-user"},
 					[]string{"OK"},
 				))
@@ -179,7 +179,7 @@ var _ = Describe("CreateServiceBroker", func() {
 
 			It("says OK", func() {
 				Expect(runCLIErr).NotTo(HaveOccurred())
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"OK"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"OK"}))
 			})
 		})
 

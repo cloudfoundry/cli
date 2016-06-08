@@ -59,7 +59,7 @@ var _ = Describe("delete-user command", func() {
 
 		It("fails with usage when no arguments are given", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
 			))
 		})
@@ -78,7 +78,7 @@ var _ = Describe("delete-user command", func() {
 
 			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the user user-name"}))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting user", "user-name", "admin-user"},
 				[]string{"OK"},
 			))
@@ -100,7 +100,7 @@ var _ = Describe("delete-user command", func() {
 			ui.Inputs = []string{}
 			runCommand("-f", "user-name")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting user", "user-name"},
 				[]string{"OK"},
 			))
@@ -118,7 +118,7 @@ var _ = Describe("delete-user command", func() {
 		It("prints a warning", func() {
 			runCommand("-f", "user-name")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting user", "user-name"},
 				[]string{"OK"},
 			))

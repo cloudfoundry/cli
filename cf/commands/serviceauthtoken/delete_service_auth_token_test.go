@@ -47,7 +47,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 	Describe("requirements", func() {
 		It("fails with usage when fewer than two arguments are given", func() {
 			runCommand("yurp")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
 			))
 		})
@@ -75,7 +75,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 		It("deletes the service auth token", func() {
 			runCommand("a label", "a provider")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting service auth token as", "my-user"},
 				[]string{"OK"},
 			))
@@ -92,7 +92,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 			Expect(ui.Prompts).To(ContainSubstrings(
 				[]string{"Really delete", "service auth token", "a label", "a provider"},
 			))
-			Expect(ui.Outputs).To(BeEmpty())
+			Expect(ui.Outputs()).To(BeEmpty())
 			Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(models.ServiceAuthTokenFields{}))
 		})
 
@@ -101,7 +101,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 			runCommand("-f", "a label", "a provider")
 
 			Expect(ui.Prompts).To(BeEmpty())
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting"},
 				[]string{"OK"},
 			))
@@ -118,7 +118,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 		It("warns the user when the specified service auth token does not exist", func() {
 			runCommand("a label", "a provider")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting service auth token as", "my-user"},
 				[]string{"OK"},
 			))
@@ -134,7 +134,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 
 		It("shows the user an error", func() {
 			runCommand("a label", "a provider")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Deleting service auth token as", "my-user"},
 				[]string{"FAILED"},
 				[]string{"OH NOES"},

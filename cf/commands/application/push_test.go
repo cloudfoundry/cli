@@ -290,7 +290,7 @@ var _ = Describe("Push Command", func() {
 
 			It("fails with error", func() {
 				callPush("app-name", "-p", "badpath")
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Error processing app files: process-path-error"},
 				))
@@ -312,7 +312,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush("app-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"failed to get file mode"},
 				))
 			})
@@ -331,7 +331,7 @@ var _ = Describe("Push Command", func() {
 				Expect(boundAppGUID).To(Equal("app-name-guid"))
 				Expect(boundRouteGUID).To(Equal("my-route-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Using", "app-name.foo.cf-app.com"},
 					[]string{"Binding", "app-name.foo.cf-app.com"},
 					[]string{"OK"},
@@ -358,10 +358,10 @@ var _ = Describe("Push Command", func() {
 				It("it displays an error", func() {
 					callPush("of-bel-air")
 
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Error refreshing auth token"},
 					))
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"FAILED"},
 						[]string{"accidentally the UAA"},
 					))
@@ -383,7 +383,7 @@ var _ = Describe("Push Command", func() {
 				It("creates a route for each domain", func() {
 					callPush()
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating", "manifest-host.example1.com"},
 						[]string{"OK"},
 						[]string{"Binding", "manifest-host.example1.com"},
@@ -406,7 +406,7 @@ var _ = Describe("Push Command", func() {
 				It("creates a route for each host on every domains", func() {
 					callPush()
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating", "manifest-host.example1.com"},
 						[]string{"Binding", "manifest-host.example1.com"},
 						[]string{"Creating", "host2.example1.com"},
@@ -421,13 +421,13 @@ var _ = Describe("Push Command", func() {
 				It("`-d` from argument will override the domains in manifest", func() {
 					callPush("-d", "example1.com")
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating", "manifest-host.example1.com"},
 						[]string{"OK"},
 						[]string{"Binding", "manifest-host.example1.com"},
 					))
 
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Creating", "manifest-host.example2.com"},
 					))
 				})
@@ -436,7 +436,7 @@ var _ = Describe("Push Command", func() {
 
 			It("creates an app", func() {
 				callPush("-t", "111", "app-name")
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 
 				params := appRepo.CreateArgsForCall(0)
 				Expect(*params.Name).To(Equal("app-name"))
@@ -461,7 +461,7 @@ var _ = Describe("Push Command", func() {
 				appGUID, _, _ := actor.UploadAppArgsForCall(0)
 				Expect(appGUID).To(Equal("app-name-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating app", "app-name", "my-org", "my-space"},
 					[]string{"OK"},
 					[]string{"Creating", "app-name.foo.cf-app.com"},
@@ -492,11 +492,11 @@ var _ = Describe("Push Command", func() {
 				createdHost, _, _, _ := routeRepo.CreateArgsForCall(0)
 				Expect(createdHost).To(Equal("appname"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating", "appname.foo.cf-app.com"},
 					[]string{"Binding", "appname.foo.cf-app.com"},
 				))
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("sets the app params from the flags", func() {
@@ -526,7 +526,7 @@ var _ = Describe("Push Command", func() {
 					"app-name",
 				)
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Using", "customLinux"},
 					[]string{"OK"},
 					[]string{"Creating app", "app-name"},
@@ -576,8 +576,8 @@ var _ = Describe("Push Command", func() {
 
 			It("fails when an invalid app port is provided", func() {
 				callPush("--app-ports", "8080,abc", "app-name")
-				Expect(ui.Outputs).To(ContainElement("Invalid app port: abc"))
-				Expect(ui.Outputs).To(ContainElement("App port must be a number"))
+				Expect(ui.Outputs()).To(ContainElement("Invalid app port: abc"))
+				Expect(ui.Outputs()).To(ContainElement("App port must be a number"))
 			})
 
 			Context("when pushing a docker image with --docker-image or -o", func() {
@@ -600,7 +600,7 @@ var _ = Describe("Push Command", func() {
 					callPush("testApp", "--docker-image", "sample/dockerImage")
 
 					Expect(actor.UploadAppCallCount()).To(Equal(0))
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Uploading testApp"},
 					))
 				})
@@ -610,13 +610,13 @@ var _ = Describe("Push Command", func() {
 				It("shows error if value is not 'port' or none'", func() {
 					callPush("app-name", "-u", "bad-value")
 
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
 				})
 
 				It("does not show error if value is 'port' or none'", func() {
 					callPush("app-name", "--health-check-type", "port")
 
-					Expect(ui.Outputs).NotTo(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
+					Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"Error", "Invalid health-check-type", "bad-value"}))
 				})
 			})
 
@@ -657,7 +657,7 @@ var _ = Describe("Push Command", func() {
 					Expect(boundAppGUID).To(Equal("app-name-guid"))
 					Expect(boundRouteGUID).To(Equal("app-name-route-guid"))
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating app", "app-name", "my-org", "my-space"},
 						[]string{"OK"},
 						[]string{"Creating", "app-name.shared.cf-app.com/the-route-path"},
@@ -703,7 +703,7 @@ var _ = Describe("Push Command", func() {
 					Expect(boundAppGUID).To(Equal("app-name-guid"))
 					Expect(boundRouteGUID).To(Equal("app-name-route-guid"))
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating app", "app-name", "my-org", "my-space"},
 						[]string{"OK"},
 						[]string{"Creating", "app-name.private.cf-app.com"},
@@ -790,7 +790,7 @@ var _ = Describe("Push Command", func() {
 						Expect(path).To(Equal(""))
 						Expect(useRandomPort).To(BeTrue())
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{fmt.Sprintf("Creating random route for %s...", expectedDomain.Name)},
 						))
 					})
@@ -814,7 +814,7 @@ var _ = Describe("Push Command", func() {
 						Expect(path).To(Equal(""))
 						Expect(useRandomPort).To(BeTrue())
 
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{fmt.Sprintf("Creating random route for %s...", expectedDomain.Name)},
 						))
 					})
@@ -841,7 +841,7 @@ var _ = Describe("Push Command", func() {
 				appfiles.AppFilesInDirReturns([]models.AppFileFields{}, nil)
 				callPush("-p", "../some/path-to/an-app/file.zip", "app-with-path")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"No app files found in '../some/path-to/an-app/file.zip'"},
 				))
 			})
@@ -850,7 +850,7 @@ var _ = Describe("Push Command", func() {
 				appfiles.AppFilesInDirReturns([]models.AppFileFields{}, errors.New("some error"))
 				callPush("-p", "../some/path-to/an-app/file.zip", "app-with-path")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Error processing app files in '../some/path-to/an-app/file.zip': some error"},
 				))
 			})
@@ -876,7 +876,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush("-f", "bad/manifest/path")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"read manifest error"},
 				))
@@ -889,13 +889,13 @@ var _ = Describe("Push Command", func() {
 
 				callPush("--no-route", "app-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating app", "app-name"},
 					[]string{"OK"},
 					[]string{"Uploading", "app-name"},
 					[]string{"OK"},
 				))
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 			})
 
 			It("uses the manifest in the current directory by default", func() {
@@ -904,7 +904,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush("-p", "some/relative/path")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Using manifest file", "manifest.yml"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Using manifest file", "manifest.yml"}))
 
 				cwd, _ := os.Getwd()
 				Expect(manifestRepo.ReadManifestArgs.Path).To(Equal(cwd))
@@ -913,7 +913,7 @@ var _ = Describe("Push Command", func() {
 			It("does not use a manifest if the 'no-manifest' flag is passed", func() {
 				callPush("--no-route", "--no-manifest", "app-name")
 
-				Expect(ui.Outputs).ToNot(ContainSubstrings(
+				Expect(ui.Outputs()).ToNot(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"hacker-manifesto"},
 				))
@@ -933,7 +933,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush()
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating route", "manifest-host.manifest-example.com"},
 					[]string{"OK"},
 					[]string{"Binding", "manifest-host.manifest-example.com"},
@@ -965,7 +965,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush()
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating route", "manifest-host-1.manifest-example.com"},
 					[]string{"OK"},
 					[]string{"Binding", "manifest-host-1.manifest-example.com"},
@@ -982,7 +982,7 @@ var _ = Describe("Push Command", func() {
 
 				callPush()
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Error", "reading", "manifest"},
 					[]string{"buildpack should not be null"},
@@ -1032,14 +1032,14 @@ var _ = Describe("Push Command", func() {
 
 				callPush("app-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"app-name", "is a worker", "skipping route creation"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"app-name", "is a worker", "skipping route creation"}))
 				Expect(routeRepo.BindCallCount()).To(BeZero())
 			})
 
 			It("fails when given an invalid memory limit", func() {
 				callPush("-m", "abcM", "app-name")
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Invalid", "memory limit", "abcM"},
 				))
@@ -1053,7 +1053,7 @@ var _ = Describe("Push Command", func() {
 				It("pushes each app", func() {
 					callPush()
 
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Creating", "app1"},
 						[]string{"Creating", "app2"},
 					))
@@ -1074,8 +1074,8 @@ var _ = Describe("Push Command", func() {
 				It("pushes a single app when given the name of a single app in the manifest", func() {
 					callPush("app2")
 
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"Creating", "app2"}))
-					Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Creating", "app1"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"Creating", "app2"}))
+					Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"Creating", "app1"}))
 					Expect(appRepo.CreateCallCount()).To(Equal(1))
 					params := appRepo.CreateArgsForCall(0)
 					Expect(*params.Name).To(Equal("app2"))
@@ -1084,7 +1084,7 @@ var _ = Describe("Push Command", func() {
 				It("fails when given the name of an app that is not in the manifest", func() {
 					callPush("non-existant-app")
 
-					Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
+					Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 					Expect(appRepo.CreateCallCount()).To(BeZero())
 				})
 			})
@@ -1205,7 +1205,7 @@ var _ = Describe("Push Command", func() {
 		It("re-uploads the app", func() {
 			callPush("existing-app")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Uploading", "existing-app"},
 				[]string{"OK"},
 			))
@@ -1242,8 +1242,8 @@ var _ = Describe("Push Command", func() {
 				callPush("-d", "example.com", "existing-app")
 
 				Expect(routeRepo.CreateCallCount()).To(BeZero())
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"Creating route"}))
-				Expect(ui.Outputs).To(ContainSubstrings([]string{"Using route", "existing-app", "example.com"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"Creating route"}))
+				Expect(ui.Outputs()).To(ContainSubstrings([]string{"Using route", "existing-app", "example.com"}))
 			})
 
 			Context("and no route-related flags are given", func() {
@@ -1295,7 +1295,7 @@ var _ = Describe("Push Command", func() {
 				Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
 				Expect(randomPort).To(BeFalse())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating route", "existing-app.newdomain.com"},
 					[]string{"OK"},
 					[]string{"Binding", "existing-app.newdomain.com"},
@@ -1317,7 +1317,7 @@ var _ = Describe("Push Command", func() {
 				Expect(createdHost).To(Equal("new-host"))
 				Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating route", "new-host.example.com"},
 					[]string{"OK"},
 					[]string{"Binding", "new-host.example.com"},
@@ -1356,12 +1356,12 @@ var _ = Describe("Push Command", func() {
 				Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
 				Expect(randomPort).To(BeFalse())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating route", "example.com"},
 					[]string{"OK"},
 					[]string{"Binding", "example.com"},
 				))
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"existing-app.example.com"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"existing-app.example.com"}))
 			})
 		})
 	})
@@ -1400,7 +1400,7 @@ var _ = Describe("Push Command", func() {
 				Expect(serviceBinder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
 				Expect(serviceBinder.InstancesToBindTo[3].Name).To(Equal("global-service"))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Creating", "app1"},
 					[]string{"OK"},
 					[]string{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
@@ -1426,7 +1426,7 @@ var _ = Describe("Push Command", func() {
 			It("gracefully continues", func() {
 				callPush()
 				Expect(len(serviceBinder.AppsToBind)).To(Equal(4))
-				Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"FAILED"}))
+				Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
 			})
 		})
 
@@ -1438,7 +1438,7 @@ var _ = Describe("Push Command", func() {
 
 			It("fails with an error", func() {
 				callPush()
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Could not find service", "app1-service", "app1"},
 				))
@@ -1453,7 +1453,7 @@ var _ = Describe("Push Command", func() {
 
 			callPush("-t", "FooeyTimeout", "app-name")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"Invalid", "timeout", "FooeyTimeout"},
 			))
@@ -1471,7 +1471,7 @@ var _ = Describe("Push Command", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			callPush("appName")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Uploading", curDir},
 				[]string{"5.8M", "11 files"},
 			))
@@ -1483,7 +1483,7 @@ var _ = Describe("Push Command", func() {
 
 		callPush("app")
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Uploading"},
 			[]string{"FAILED"},
 		))
@@ -1502,7 +1502,7 @@ var _ = Describe("Push Command", func() {
 
 			callPush("existing-app")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"existing-app.foo.cf-app.com", "already in use"},
 				[]string{"TIP", "random-route"},
@@ -1514,15 +1514,15 @@ var _ = Describe("Push Command", func() {
 
 			callPush("existing-app")
 
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"FAILED"}))
-			Expect(ui.Outputs).ToNot(ContainSubstrings([]string{"TIP", "random-route"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"TIP", "random-route"}))
 		})
 	})
 
 	It("fails when neither a manifest nor a name is given", func() {
 		manifestRepo.ReadManifestReturns.Error = errors.New("No such manifest")
 		callPush()
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"FAILED"},
 			[]string{"Manifest file is not found"},
 			[]string{"USAGE:"},

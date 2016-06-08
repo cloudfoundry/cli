@@ -68,7 +68,7 @@ var _ = Describe("env command", func() {
 	It("fails with usage when no app name is given", func() {
 		passed := runCommand()
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "argument"},
 		))
 		Expect(passed).To(BeFalse())
@@ -78,7 +78,7 @@ var _ = Describe("env command", func() {
 		appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("app", "hocus-pocus"))
 		runCommand("hocus-pocus")
 
-		Expect(ui.Outputs).To(ContainSubstrings(
+		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"FAILED"},
 			[]string{"not found"},
 		))
@@ -116,7 +116,7 @@ var _ = Describe("env command", func() {
 		It("lists those environment variables, in sorted order for provided services", func() {
 			runCommand("my-app")
 			Expect(appRepo.ReadEnvArgsForCall(0)).To(Equal("the-app-guid"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"System-Provided:"},
@@ -132,7 +132,7 @@ var _ = Describe("env command", func() {
 		})
 		It("displays the application env info under the System env column", func() {
 			runCommand("my-app")
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"System-Provided:"},
@@ -153,7 +153,7 @@ var _ = Describe("env command", func() {
 			appRepo.ReadEnvReturns(&models.Environment{}, nil)
 			runCommand("my-app")
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app"},
 				[]string{"OK"},
 				[]string{"No", "system-provided", "env variables", "have been set"},
@@ -167,10 +167,10 @@ var _ = Describe("env command", func() {
 			appRepo.ReadEnvReturns(&models.Environment{}, nil)
 
 			runCommand("my-app")
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"No system-provided env variables have been set"}))
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"No user-defined env variables have been set"}))
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"No running env variables have been set"}))
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"No staging env variables have been set"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"No system-provided env variables have been set"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"No user-defined env variables have been set"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"No running env variables have been set"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"No staging env variables have been set"}))
 		})
 	})
 
@@ -200,7 +200,7 @@ var _ = Describe("env command", func() {
 		It("lists the environment variables", func() {
 			runCommand("my-app")
 			Expect(appRepo.ReadEnvArgsForCall(0)).To(Equal("the-app-guid"))
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
 				[]string{"OK"},
 				[]string{"Running Environment Variable Groups:"},
@@ -221,7 +221,7 @@ var _ = Describe("env command", func() {
 		It("tells you about that error", func() {
 			appRepo.ReadEnvReturns(nil, errors.New("BOO YOU CANT DO THAT; GO HOME; you're drunk"))
 			runCommand("whatever")
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"you're drunk"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"you're drunk"}))
 		})
 	})
 })

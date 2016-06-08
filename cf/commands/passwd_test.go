@@ -67,7 +67,7 @@ var _ = Describe("password command", func() {
 				[]string{"Verify Password"},
 			))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Changing password..."},
 				[]string{"OK"},
 				[]string{"Please log in again"},
@@ -90,7 +90,7 @@ var _ = Describe("password command", func() {
 				[]string{"Verify Password"},
 			))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"FAILED"},
 				[]string{"Password verification does not match"},
 			))
@@ -108,7 +108,7 @@ var _ = Describe("password command", func() {
 				[]string{"Verify Password"},
 			))
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Changing password..."},
 				[]string{"FAILED"},
 				[]string{"Current password did not match"},

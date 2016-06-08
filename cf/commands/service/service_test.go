@@ -79,7 +79,7 @@ var _ = Describe("service command", func() {
 				err := flagContext.Parse("too", "many")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage", "Requires an argument"},
 				))
 			})
@@ -189,7 +189,7 @@ var _ = Describe("service command", func() {
 				})
 
 				It("shows the service", func() {
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"Service instance:", "service1"},
 						[]string{"Service: ", "mysql"},
 						[]string{"Bound apps: ", "app1"},
@@ -211,7 +211,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("does not output the Started line", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Service instance:", "service1"},
 							[]string{"Service: ", "mysql"},
 							[]string{"Bound apps: ", "app1"},
@@ -224,7 +224,7 @@ var _ = Describe("service command", func() {
 							[]string{"Message: ", "creating resource - step 1"},
 							[]string{"Updated: ", "updated-date"},
 						))
-						Expect(ui.Outputs).ToNot(ContainSubstrings(
+						Expect(ui.Outputs()).ToNot(ContainSubstrings(
 							[]string{"Started: "},
 						))
 					})
@@ -236,7 +236,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("shows status: `create in progress`", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Status: ", "create in progress"},
 						))
 					})
@@ -248,7 +248,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("shows status: `create succeeded`", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Status: ", "create succeeded"},
 						))
 					})
@@ -260,7 +260,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("shows status: `create failed`", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Status: ", "create failed"},
 						))
 					})
@@ -272,7 +272,7 @@ var _ = Describe("service command", func() {
 					})
 
 					It("shows status: ``", func() {
-						Expect(ui.Outputs).To(ContainSubstrings(
+						Expect(ui.Outputs()).To(ContainSubstrings(
 							[]string{"Status: ", ""},
 						))
 					})
@@ -286,11 +286,11 @@ var _ = Describe("service command", func() {
 				})
 
 				It("shows only the service guid", func() {
-					Expect(ui.Outputs).To(ContainSubstrings(
+					Expect(ui.Outputs()).To(ContainSubstrings(
 						[]string{"service1-guid"},
 					))
 
-					Expect(ui.Outputs).ToNot(ContainSubstrings(
+					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"Service instance:", "service1"},
 					))
 				})
@@ -316,7 +316,7 @@ var _ = Describe("service command", func() {
 			})
 
 			It("shows user provided services", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Service instance: ", "service1"},
 					[]string{"Service: ", "user-provided"},
 					[]string{"Bound apps: ", "app1"},
@@ -338,7 +338,7 @@ var _ = Describe("service command", func() {
 			})
 
 			It("includes the tags in the output", func() {
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Tags: ", "tag1, tag2"},
 				))
 			})

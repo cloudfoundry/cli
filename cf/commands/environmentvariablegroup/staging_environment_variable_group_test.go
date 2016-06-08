@@ -86,7 +86,7 @@ var _ = Describe("staging-environment-variable-group command", func() {
 		It("Displays the staging environment variable group", func() {
 			runCommand()
 
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Retrieving the contents of the staging environment variable group as my-user..."},
 				[]string{"OK"},
 				[]string{"Variable Name", "Assigned Value"},

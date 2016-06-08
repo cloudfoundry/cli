@@ -72,7 +72,7 @@ var _ = Describe("delete app command", func() {
 
 		It("fails with usage when not provided exactly one arg", func() {
 			runCommand()
-			Expect(ui.Outputs).To(ContainSubstrings(
+			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
 			))
 		})
@@ -92,7 +92,7 @@ var _ = Describe("delete app command", func() {
 
 				Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the app app-to-delete"}))
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
 					[]string{"OK"},
 				))
@@ -105,7 +105,7 @@ var _ = Describe("delete app command", func() {
 				Expect(appRepo.DeleteArgsForCall(0)).To(Equal("app-to-delete-guid"))
 				Expect(ui.Prompts).To(BeEmpty())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "app-to-delete"},
 					[]string{"OK"},
 				))
@@ -145,7 +145,7 @@ var _ = Describe("delete app command", func() {
 						It("fails with the api error message", func() {
 							runCommand("-f", "-r", "app-to-delete")
 
-							Expect(ui.Outputs).To(ContainSubstrings(
+							Expect(ui.Outputs()).To(ContainSubstrings(
 								[]string{"Deleting", "app-to-delete"},
 								[]string{"FAILED"},
 							))
@@ -173,7 +173,7 @@ var _ = Describe("delete app command", func() {
 				Expect(appRepo.ReadArgsForCall(0)).To(Equal("app-to-delete"))
 				Expect(appRepo.DeleteCallCount()).To(BeZero())
 
-				Expect(ui.Outputs).To(ContainSubstrings(
+				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting", "app-to-delete"},
 					[]string{"OK"},
 				))
