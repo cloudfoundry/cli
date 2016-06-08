@@ -1,3 +1,102 @@
+## 6.19.0
+* Bump version to 6.19.0
+* Use proper coloring
+* move -race into units only, also randomizeAllSpecs
+* update commands to use counterfeiter fakes
+* update buildpacks to use counterfeiter fakes
+* Upgrade noaa library
+* Suggest commands for mispelled plugin commands
+* set ssl-validation to true
+* moved around variables, use http for CATs tests
+* set user/password for cats tests
+* use release-integration's run cats test task
+* fix disable-service-access, stop displaying additional help text
+* Race detected tests by default
+* Upgrade loggregator_consumer
+* Use master for routing-release
+* Add command auto-suggester
+* Rename acceptance pool in dies-lite
+* Add dies-lite pipeline
+* Remove vetshadow lintdebt
+* Make bosh-lites-pipeline accurate
+* Remove lintdebt from plugin_examples
+* bosh-lites-dea pool is actually on master
+* Switch dea pool to cli-pools
+* Switch diego cats back to 'bosh-lite-lock'
+* Switch bosh-lites pipeline to use cli-pools
+* Remove named return values
+* Properly unit test set-space-quota
+* Use counterfeiter fakes spacequota package
+* Use counterfeiter fake in application package
+* Adds missing error handling
+* Add errcheck slow linter
+* Add space requirement test and remove imports
+* Refactor organization command tests to not use runCLICommand
+* Refactor space tests to not use runCLICommand
+* Configure the lint deadlines
+* Add slow linter: unconvert
+* Add deadcode linter
+* Add vetshadow
+* Add gocyclo linter
+* Add gofmt linter
+* Add vet linter
+* Add NewNumberArguments to Factory
+* Introduce NumberArguments requirement
+* Remove two more Execute() panics
+* Remove one more Execute() panic
+* Provision dies lite
+* Fix UnlimitedDisplay constant
+* Does not display route ports when not provided by API
+* Does not display route ports if API does not provide it
+* Display route ports for space quota in cf space
+* Shift the indentation
+* Show reserved route ports in org quota in cf org
+* Change indentation of test
+* Skip if exists
+* Update routing release acceptance test name
+* Adding in goconst linter
+* Switch to gometalinter
+* Make casing consistent
+* Use all these magic flags to build static binaries
+* Handle language codes zh-TW and zh-HK
+* Panic -> DoesPanic
+* Add color for space quota
+* Eliminate stutter debt
+* Use CC error for invalid reserved-route-ports limit
+* Remove last of the debt
+* Remove more debt
+* Remove more debt
+* Remove more lintdebt
+* Remove more debt
+* Remove lint debt
+* Remove more debt
+* Remove some debt
+* Remove unused test helpers
+* Add codeclimate to travis
+* Enable codeclimate analysis
+* Manually revert ad587e7e91121c307e7d08fb935a42648b684c59
+* Revert "Remove inline-relations-depth from cf organizations"
+* Use git-hooks style for hooks
+* Don't release lock if stopped trying to connect
+* Improve tip for set-env command
+* Add route ports to space quotas command
+* Refactor space quotas to use FormattedServicesLimit
+* Add reserved route ports limit to space quota
+* Move services limit formatting to model
+* Initialize structs better
+* Release wait group after printing to not risk interweaving output.
+* Remove named return
+* Remove shadowed variable
+* Command.Execute() returns an error
+* Update total_reserved_route_ports on quotas
+* Update ginkgo and gomega
+* Remove more potentially offensive words.
+* go format
+* Remove potentially inappropriate words
+* Configure max TCP routes on create space quota
+* Remove RunCliCommand from create-space-quota
+* Remove unused dependency
+
 ## 6.18.1
 * Bump version to 6.18.1
 * Ignore errors from printing/syscalls in cf/terminal package
