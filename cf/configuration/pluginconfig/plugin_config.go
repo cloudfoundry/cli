@@ -1,11 +1,9 @@
 package pluginconfig
 
 import (
-	"path/filepath"
 	"sync"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 )
 
 //go:generate counterfeiter . PluginConfiguration
@@ -15,6 +13,7 @@ type PluginConfiguration interface {
 	SetPlugin(string, PluginMetadata)
 	GetPluginPath() string
 	RemovePlugin(string)
+	ListCommands() []string
 }
 
 type PluginConfig struct {
@@ -26,13 +25,12 @@ type PluginConfig struct {
 	pluginPath string
 }
 
-func NewPluginConfig(errorHandler func(error)) *PluginConfig {
-	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
+func NewPluginConfig(errorHandler func(error), persistor configuration.Persistor, pluginPath string) *PluginConfig {
 	return &PluginConfig{
 		data:       NewData(),
 		mutex:      new(sync.RWMutex),
 		initOnce:   new(sync.Once),
-		persistor:  configuration.NewDiskPersistor(filepath.Join(pluginPath, "config.json")),
+		persistor:  persistor,
 		onError:    errorHandler,
 		pluginPath: pluginPath,
 	}
@@ -60,6 +58,19 @@ func (c *PluginConfig) RemovePlugin(name string) {
 	c.write(func() {
 		delete(c.data.Plugins, name)
 	})
+}
+
+func (c *PluginConfig) ListCommands() []string {
+	plugins := c.Plugins()
+	allCommands := []string{}
+
+	for _, plugin := range plugins {
+		for _, command := range plugin.Commands {
+			allCommands = append(allCommands, command.Name)
+		}
+	}
+
+	return allCommands
 }
 
 func (c *PluginConfig) init() {

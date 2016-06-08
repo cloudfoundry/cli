@@ -6,7 +6,10 @@ import (
 	"runtime"
 	"strings"
 
+	"path/filepath"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
@@ -134,18 +137,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	pluginConfig := pluginconfig.NewPluginConfig(func(err error) {
-		deps.UI.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
-	})
+	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
+	pluginConfig := pluginconfig.NewPluginConfig(
+		func(err error) {
+			deps.UI.Failed(fmt.Sprintf("Error read/writing plugin config: %s, ", err.Error()))
+		},
+		configuration.NewDiskPersistor(filepath.Join(pluginPath, "config.json")),
+		pluginPath,
+	)
 	pluginList := pluginConfig.Plugins()
 
 	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
 	if !ran {
 		deps.UI.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
-		suggestCommands(cmdName, deps.UI, cmdRegistry.ListCommands())
+		suggestCommands(cmdName, deps.UI, append(cmdRegistry.ListCommands(), pluginConfig.ListCommands()...))
 		os.Exit(1)
 	}
-
 }
 
 func suggestCommands(cmdName string, ui terminal.UI, cmdsList []string) {

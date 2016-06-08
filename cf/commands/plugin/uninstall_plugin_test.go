@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
 	"github.com/cloudfoundry/gofileutils/fileutils"
@@ -56,7 +57,12 @@ var _ = Describe("Uninstall", func() {
 			return fakePluginRepoDir
 		}
 
-		pluginConfig = pluginconfig.NewPluginConfig(func(err error) { Expect(err).ToNot(HaveOccurred()) })
+		pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
+		pluginConfig = pluginconfig.NewPluginConfig(
+			func(err error) { Expect(err).ToNot(HaveOccurred()) },
+			configuration.NewDiskPersistor(filepath.Join(pluginPath, "config.json")),
+			pluginPath,
+		)
 		pluginConfig.SetPlugin("test_1.exe", pluginconfig.PluginMetadata{Location: filepath.Join(pluginDir, "test_1.exe")})
 		pluginConfig.SetPlugin("test_2.exe", pluginconfig.PluginMetadata{Location: filepath.Join(pluginDir, "test_2.exe")})
 	})

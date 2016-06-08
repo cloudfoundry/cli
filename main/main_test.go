@@ -174,6 +174,12 @@ var _ = Describe("main", func() {
 		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 	})
 
+	It("show user suggested commands for typos", func() {
+		output := Cf("hlp")
+		Eventually(output.Out, 3*time.Second).Should(Say("'hlp' is not a registered command. See 'cf help'"))
+		Eventually(output.Out, 3*time.Second).Should(Say("Did you mean?"))
+	})
+
 	Describe("Plugins", func() {
 		It("Can call a plugin command from the Plugins configuration if it does not exist as a cf command", func() {
 			output := Cf("test_1_cmd1").Wait(3 * time.Second)
@@ -188,12 +194,6 @@ var _ = Describe("main", func() {
 		It("Can call another plugin command when more than one plugin is installed", func() {
 			output := Cf("test_2_cmd1").Wait(3 * time.Second)
 			Eventually(output.Out).Should(Say("You called cmd1 in test_2"))
-		})
-
-		It("show user suggested commands for typos", func() {
-			output := Cf("hlp")
-			Eventually(output.Out, 3*time.Second).Should(Say("'hlp' is not a registered command. See 'cf help'"))
-			Eventually(output.Out, 3*time.Second).Should(Say("Did you mean?"))
 		})
 
 		It("hide suggetsions for commands that aren't close to anything", func() {
@@ -268,8 +268,13 @@ var _ = Describe("main", func() {
 			session := Cf("exit1").Wait(5 * time.Second)
 			Eventually(session).Should(Exit(1))
 		})
-	})
 
+		It("show user suggested plugin commands for typos", func() {
+			output := Cf("test_1_cmd")
+			Eventually(output.Out, 3*time.Second).Should(Say("'test_1_cmd' is not a registered command. See 'cf help'"))
+			Eventually(output.Out, 3*time.Second).Should(Say("Did you mean?"))
+		})
+	})
 })
 
 func Cf(args ...string) *Session {

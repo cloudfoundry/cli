@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"path/filepath"
+
 	"github.com/cloudfoundry/cli/cf/actors"
 	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
 	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
@@ -13,6 +15,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/appfiles"
+	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
@@ -83,7 +86,13 @@ func NewDependency(writer io.Writer, logger trace.Printer) Dependency {
 
 	deps.ManifestRepo = manifest.NewDiskRepository()
 	deps.AppManifest = manifest.NewGenerator()
-	deps.PluginConfig = pluginconfig.NewPluginConfig(errorHandler)
+
+	pluginPath := filepath.Join(confighelpers.PluginRepoDir(), ".cf", "plugins")
+	deps.PluginConfig = pluginconfig.NewPluginConfig(
+		errorHandler,
+		configuration.NewDiskPersistor(filepath.Join(pluginPath, "config.json")),
+		pluginPath,
+	)
 
 	terminal.UserAskedForColors = deps.Config.ColorEnabled()
 	terminal.InitColorSupport()
