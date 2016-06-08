@@ -154,7 +154,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 				ui.Inputs = []string{"y"}
 				cmd.Execute(flagContext)
 
-				Eventually(serviceRepo.PurgeServiceInstanceCallCount()).Should(Equal(1))
+				Eventually(serviceRepo.PurgeServiceInstanceCallCount).Should(Equal(1))
 				Expect(serviceRepo.PurgeServiceInstanceArgsForCall(0)).To(Equal(serviceInstance))
 			})
 

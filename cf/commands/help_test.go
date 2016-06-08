@@ -63,7 +63,7 @@ var _ = Describe("Help", func() {
 			err := cmd.Execute(flagContext)
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(buffer.Contents()).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+			Eventually(buffer.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(buffer).Should(gbytes.Say("CF_TRACE=true"))
 		})
 	})
