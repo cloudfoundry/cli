@@ -240,22 +240,6 @@
     "translation": "別名 `{{.Command}}` はプラグイン '{{.PluginName}}' 内のコマンド/別名です。`{{.Command}}` コマンドを呼び出すために、プラグイン '{{.PluginName}}' のアンインストールを試みてから、このプラグインをインストールすることができます。ただし、その前に、既存の '{{.PluginName}}' プラグインをアンインストールした場合の影響を十分理解しておく必要があります。"
   },
   {
-    "id": "All plans of the service are already accessible for all orgs",
-    "translation": "このサービスのすべてのプランは既にすべての組織がアクセスできるようになっています"
-  },
-  {
-    "id": "All plans of the service are already accessible for this org",
-    "translation": "このサービスのすべてのプランは既にこの組織がアクセスできるようになっています"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for all orgs",
-    "translation": "このサービスのすべてのプランは既にすべての組織がアクセスできないようになっています"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for this org",
-    "translation": "このサービスのすべてのプランは既にこの組織がアクセスできないようになっています"
-  },
-  {
     "id": "Allow SSH access for the space",
     "translation": "このスペースに対する SSH アクセスを許可します"
   },
@@ -2976,14 +2960,6 @@
     "translation": "API エンドポイントが設定されていません。'{{.LoginTip}}' または '{{.APITip}}' を使用して 1 つのエンドポイントをターゲットにしてください。"
   },
   {
-    "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "何の処置も取られませんでした。すべての組織について {{.ServiceName}} サービスのすべてのプランへのアクセスを無効にしてから、{{.OrgName}} 組織以外のすべての組織に対してアクセスを許可する必要があります。"
-  },
-  {
-    "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "何の処置も取られませんでした。すべての組織について {{.ServiceName}} サービスの {{.PlanName}} プランへのアクセスを無効にしてから、{{.OrgName}} 組織以外のすべての組織に対してアクセスを許可する必要があります。"
-  },
-  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "API エンドポイントが設定されていません。'{{.Name}}' を使用して 1 つのエンドポイントを設定してください"
   },
@@ -4110,22 +4086,6 @@
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "ビルドパックの自動検出時におけるビルドパックの検査の順序"
-  },
-  {
-    "id": "The plan is already accessible for all orgs",
-    "translation": "このプランは既にすべての組織がアクセスできるようになっています"
-  },
-  {
-    "id": "The plan is already accessible for this org",
-    "translation": "このプランは既にこの組織がアクセスできるようになっています"
-  },
-  {
-    "id": "The plan is already inaccessible for all orgs",
-    "translation": "このプランは既にすべての組織がアクセスできないようになっています"
-  },
-  {
-    "id": "The plan is already inaccessible for this org",
-    "translation": "このプランは既にこの組織がアクセスできないようになっています"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

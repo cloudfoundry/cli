@@ -240,22 +240,6 @@
     "translation": "别名“{{.Command}}”是插件“{{.PluginName}}”中的命令/别名。您可尝试卸载插件“{{.PluginName}}”，然后安装此插件，以便调用“{{.Command}}”命令。但是，应该首先完全了解卸载现有“{{.PluginName}}”插件会产生的影响。"
   },
   {
-    "id": "All plans of the service are already accessible for all orgs",
-    "translation": "服务的所有套餐都已经可供所有组织进行访问"
-  },
-  {
-    "id": "All plans of the service are already accessible for this org",
-    "translation": "服务的所有套餐都已经可供此组织进行访问"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for all orgs",
-    "translation": "服务的所有套餐对于所有组织已经不可访问"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for this org",
-    "translation": "服务的所有套餐对于此组织已经不可访问"
-  },
-  {
     "id": "Allow SSH access for the space",
     "translation": "允许对空间进行 SSH 访问"
   },
@@ -2976,14 +2960,6 @@
     "translation": "未设置任何 API 端点。使用“{{.LoginTip}}”或“{{.APITip}}”来确定目标端点。"
   },
   {
-    "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "未执行任何操作。您必须禁用对所有组织的 {{.ServiceName}} 服务的所有套餐的访问，然后授予对除了 {{.OrgName}} 组织之外的所有组织的访问权。"
-  },
-  {
-    "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "未执行任何操作。您必须禁用对所有组织的 {{.ServiceName}} 服务的 {{.PlanName}} 套餐的访问，然后授予对除了 {{.OrgName}} 组织之外的所有组织的访问权。"
-  },
-  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "未设置任何 API 端点。请使用“{{.Name}}”来设置端点"
   },
@@ -4110,22 +4086,6 @@
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "buildpack 自动检测期间检查 buildpack 的顺序"
-  },
-  {
-    "id": "The plan is already accessible for all orgs",
-    "translation": "该套餐已经可供所有组织进行访问"
-  },
-  {
-    "id": "The plan is already accessible for this org",
-    "translation": "该套餐已经可供此组织进行访问"
-  },
-  {
-    "id": "The plan is already inaccessible for all orgs",
-    "translation": "该套餐对于所有组织已经不可访问"
-  },
-  {
-    "id": "The plan is already inaccessible for this org",
-    "translation": "该套餐对于此组织已经不可访问"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

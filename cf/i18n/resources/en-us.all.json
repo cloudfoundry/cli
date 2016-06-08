@@ -240,22 +240,6 @@
     "translation": "Alias `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin."
   },
   {
-    "id": "All plans of the service are already accessible for all orgs",
-    "translation": "All plans of the service are already accessible for all orgs"
-  },
-  {
-    "id": "All plans of the service are already accessible for this org",
-    "translation": "All plans of the service are already accessible for this org"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for all orgs",
-    "translation": "All plans of the service are already inaccessible for all orgs"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for this org",
-    "translation": "All plans of the service are already inaccessible for this org"
-  },
-  {
     "id": "Allow SSH access for the space",
     "translation": "Allow SSH access for the space"
   },
@@ -2976,14 +2960,6 @@
     "translation": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint."
   },
   {
-    "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org."
-  },
-  {
-    "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org."
-  },
-  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "No api endpoint set. Use '{{.Name}}' to set an endpoint"
   },
@@ -4110,22 +4086,6 @@
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "The order in which the buildpacks are checked during buildpack auto-detection"
-  },
-  {
-    "id": "The plan is already accessible for all orgs",
-    "translation": "The plan is already accessible for all orgs"
-  },
-  {
-    "id": "The plan is already accessible for this org",
-    "translation": "The plan is already accessible for this org"
-  },
-  {
-    "id": "The plan is already inaccessible for all orgs",
-    "translation": "The plan is already inaccessible for all orgs"
-  },
-  {
-    "id": "The plan is already inaccessible for this org",
-    "translation": "The plan is already inaccessible for this org"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

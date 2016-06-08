@@ -20,6 +20,8 @@ type FakeServiceActor struct {
 		result1 []models.ServiceBroker
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceActor) FilterBrokers(brokerFlag string, serviceFlag string, orgFlag string) ([]models.ServiceBroker, error) {
@@ -29,6 +31,7 @@ func (fake *FakeServiceActor) FilterBrokers(brokerFlag string, serviceFlag strin
 		serviceFlag string
 		orgFlag     string
 	}{brokerFlag, serviceFlag, orgFlag})
+	fake.recordInvocation("FilterBrokers", []interface{}{brokerFlag, serviceFlag, orgFlag})
 	fake.filterBrokersMutex.Unlock()
 	if fake.FilterBrokersStub != nil {
 		return fake.FilterBrokersStub(brokerFlag, serviceFlag, orgFlag)
@@ -55,6 +58,26 @@ func (fake *FakeServiceActor) FilterBrokersReturns(result1 []models.ServiceBroke
 		result1 []models.ServiceBroker
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeServiceActor) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.filterBrokersMutex.RLock()
+	defer fake.filterBrokersMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceActor) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ actors.ServiceActor = new(FakeServiceActor)

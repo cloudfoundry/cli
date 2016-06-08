@@ -240,22 +240,6 @@
     "translation": "별명 `{{.Command}}`이(가) '{{.PluginName}}' 플러그인의 명령/별명입니다. `{{.Command}}` 명령을 호출하기 위해 '{{.PluginName}}' 플러그인을 설치 제거한 후 이 플러그인을 설치할 수 있습니다. 그러나 기존 '{{.PluginName}}' 플러그인 설치 제거의 영향을 완전히 이해하고 있어야 합니다."
   },
   {
-    "id": "All plans of the service are already accessible for all orgs",
-    "translation": "이미 모든 조직이 서비스의 모든 플랜에 액세스할 수 있음"
-  },
-  {
-    "id": "All plans of the service are already accessible for this org",
-    "translation": "이미 이 조직이 서비스의 모든 플랜에 액세스할 수 있음"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for all orgs",
-    "translation": "이미 모든 조직이 서비스의 모든 플랜에 액세스할 수 없음"
-  },
-  {
-    "id": "All plans of the service are already inaccessible for this org",
-    "translation": "이미 이 조직이 서비스의 모든 플랜에 액세스할 수 없음"
-  },
-  {
     "id": "Allow SSH access for the space",
     "translation": "영역에 대한 SSH 액세스 허용"
   },
@@ -2976,14 +2960,6 @@
     "translation": "API 엔드포인트가 설정되지 않았습니다. 엔드포인트를 대상 지정하려면 '{{.LoginTip}}' 또는 '{{.APITip}}'을(를) 사용하십시오."
   },
   {
-    "id": "No action taken.  You must disable access to all plans of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "조치가 수행되지 않았습니다. 모든 조직에서 사용할 {{.ServiceName}} 서비스의 모든 플랜에 대한 액세스를 사용 안함으로 설정한 후 {{.OrgName}} 조직 이외의 모든 조직에 액세스를 부여해야 합니다."
-  },
-  {
-    "id": "No action taken.  You must disable access to the {{.PlanName}} plan of {{.ServiceName}} service for all orgs and then grant access for all orgs except the {{.OrgName}} org.",
-    "translation": "조치가 수행되지 않았습니다. 모든 조직에서 사용할 {{.ServiceName}} 서비스의 {{.PlanName}} 플랜에 대한 액세스를 사용 안함으로 설정한 후 {{.OrgName}} 조직 이외의 모든 조직에 액세스를 부여해야 합니다."
-  },
-  {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
     "translation": "API 엔드포인트가 설정되지 않았습니다. 엔드포인트를 설정하려면 '{{.Name}}'을(를) 사용하십시오."
   },
@@ -4110,22 +4086,6 @@
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "빌드팩 자동 발견 중에 빌드팩을 검사하는 순서"
-  },
-  {
-    "id": "The plan is already accessible for all orgs",
-    "translation": "이미 모든 조직이 플랜에 액세스할 수 있음"
-  },
-  {
-    "id": "The plan is already accessible for this org",
-    "translation": "이미 이 조직이 플랜에 액세스할 수 있음"
-  },
-  {
-    "id": "The plan is already inaccessible for all orgs",
-    "translation": "이미 모든 조직이 플랜에 액세스할 수 없음"
-  },
-  {
-    "id": "The plan is already inaccessible for this org",
-    "translation": "이미 이 조직이 플랜에 액세스할 수 없음"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
