@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -18,7 +19,7 @@ import (
 var _ = Describe("create domain command", func() {
 
 	var (
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		ui                  *testterm.FakeUI
 		domainRepo          *apifakes.FakeDomainRepository
 		configRepo          coreconfig.Repository
@@ -33,7 +34,8 @@ var _ = Describe("create domain command", func() {
 	}
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		domainRepo = new(apifakes.FakeDomainRepository)
 		configRepo = testconfig.NewRepositoryWithAccessToken(coreconfig.TokenInfo{Username: "my-user"})
 	})
@@ -53,22 +55,23 @@ var _ = Describe("create domain command", func() {
 		Expect(ui.Outputs).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
-
-		runCommand("org1", "example.com")
-		Expect(ui.Outputs).ToNot(ContainSubstrings(
-			[]string{"Incorrect Usage", "Requires", "arguments"},
-		))
-
 	})
 
 	Context("checks login", func() {
 		It("passes when logged in", func() {
+			fakeOrgRequirement := new(requirementsfakes.FakeOrganizationRequirement)
+			fakeOrgRequirement.GetOrganizationReturns(models.Organization{
+				OrganizationFields: models.OrganizationFields{
+					Name: "my-org",
+				},
+			})
+			requirementsFactory.NewOrganizationRequirementReturns(fakeOrgRequirement)
 			Expect(runCommand("my-org", "example.com")).To(BeTrue())
-			Expect(requirementsFactory.OrganizationName).To(Equal("my-org"))
+			Expect(ui.Outputs).To(ContainSubstrings([]string{"my-org"}))
 		})
 
 		It("fails when not logged in", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand("my-org", "example.com")).To(BeFalse())
 		})
@@ -78,7 +81,10 @@ var _ = Describe("create domain command", func() {
 		org := models.Organization{}
 		org.Name = "myOrg"
 		org.GUID = "myOrg-guid"
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
+		fakeOrgRequirement := new(requirementsfakes.FakeOrganizationRequirement)
+		fakeOrgRequirement.GetOrganizationReturns(org)
+		requirementsFactory.NewOrganizationRequirementReturns(fakeOrgRequirement)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		runCommand("myOrg", "example.com")
 
 		domainName, domainOwningOrgGUID := domainRepo.CreateArgsForCall(0)
