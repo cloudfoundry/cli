@@ -8,11 +8,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/featureflag"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +22,7 @@ import (
 var _ = Describe("feature-flags command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		flagRepo            *featureflagsfakes.FakeFeatureFlagRepository
 		deps                commandregistry.Dependency
@@ -37,7 +38,8 @@ var _ = Describe("feature-flags command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 	})
 
@@ -47,7 +49,7 @@ var _ = Describe("feature-flags command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 
