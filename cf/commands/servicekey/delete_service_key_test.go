@@ -4,11 +4,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -22,7 +23,7 @@ var _ = Describe("delete-service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		serviceRepo         *apifakes.FakeServiceRepository
 		serviceKeyRepo      *apifakes.OldFakeServiceKeyRepo
 		deps                commandregistry.Dependency
@@ -44,7 +45,9 @@ var _ = Describe("delete-service-key command", func() {
 		serviceInstance.GUID = "fake-service-instance-guid"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 	})
 
 	var callDeleteServiceKey = func(args []string) bool {
@@ -53,7 +56,7 @@ var _ = Describe("delete-service-key command", func() {
 
 	Describe("requirements are not satisfied", func() {
 		It("fails when not logged in", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(callDeleteServiceKey([]string{"fake-service-key-name"})).To(BeFalse())
 		})
 
@@ -63,8 +66,8 @@ var _ = Describe("delete-service-key command", func() {
 			Expect(callDeleteServiceKey([]string{"fake-arg-one", "fake-arg-two", "fake-arg-three"})).To(BeFalse())
 		})
 
-		It("fails when space is not targetted", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+		It("fails when space is not targeted", func() {
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "no targeted space"})
 			Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeFalse())
 		})
 	})
@@ -92,8 +95,6 @@ var _ = Describe("delete-service-key command", func() {
 			})
 
 			It("deletes service key successfully when '-f' option is provided", func() {
-				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key", "-f"})).To(BeTrue())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Deleting key", "fake-service-key", "for service instance", "fake-service-instance", "as", "my-user"},
@@ -101,7 +102,6 @@ var _ = Describe("delete-service-key command", func() {
 			})
 
 			It("deletes service key successfully when '-f' option is not provided and confirmed 'yes'", func() {
-				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 				ui.Inputs = append(ui.Inputs, "yes")
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeTrue())
@@ -112,7 +112,6 @@ var _ = Describe("delete-service-key command", func() {
 			})
 
 			It("skips to delete service key when '-f' option is not provided and confirmed 'no'", func() {
-				requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 				ui.Inputs = append(ui.Inputs, "no")
 
 				Expect(callDeleteServiceKey([]string{"fake-service-instance", "fake-service-key"})).To(BeTrue())
