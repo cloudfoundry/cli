@@ -17,11 +17,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig/pluginconfigfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/cli/utils/utilsfakes"
 
@@ -35,7 +35,7 @@ import (
 var _ = Describe("Install", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		config              coreconfig.Repository
 		pluginConfig        *pluginconfigfakes.FakePluginConfiguration
 		fakePluginRepo      *pluginrepofakes.FakePluginRepo
@@ -67,7 +67,7 @@ var _ = Describe("Install", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		pluginConfig = new(pluginconfigfakes.FakePluginConfiguration)
 		config = testconfig.NewRepositoryWithDefaults()
 		fakePluginRepo = new(pluginrepofakes.FakePluginRepo)
