@@ -48,6 +48,13 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
+- name: homebrew-tap
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/homebrew-tap
+    private_key: {{homebrew-tap-github-private-key}}
+    branch: master
+
 - name: cf-cli-binaries
   type: s3
   source:
@@ -376,11 +383,17 @@ jobs:
     - get: cf-cli-installer-win64
       passed: [create-installers]
     - get: cli-ci
+    - get: homebrew-tap
   - task: publish
     file: cli-ci/ci/tasks/publish-final-release.yml
     params:
       AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+  - task: update-brew-formula
+    file: cli-ci/ci/tasks/update-brew-formula.yml
+  - put: homebrew-tap
+    params:
+      repository: update-brew-formula-output/homebrew-tap
 
 - name: create-cli-ci-image
   serial: true

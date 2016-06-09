@@ -1,0 +1,63 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: final-cli
+  path: cli
+- name: cf-cli-binaries
+- name: homebrew-tap
+
+outputs:
+- name: update-brew-formula-output
+
+params:
+  OUTPUT_PATH: update-brew-formula-output
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    pushd cf-cli-binaries
+      tar -xvf cf-cli-binaries.tgz
+      CLI_SHA256=$(shasum -a 256 cf-cli_osx | cut -d ' ' -f 1)
+    popd
+
+    CLI_VERSION=$(cat cli/VERSION)
+
+    pushd homebrew-tap
+      cat <<EOF > cf-cli.rb
+    require 'formula'
+
+    class CfCli < Formula
+      homepage 'https://github.com/cloudfoundry/cli'
+      head 'https://cli.run.pivotal.io/edge?arch=macosx64&source=homebrew'
+      url 'https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${CLI_VERSION}&source=homebrew'
+      version '${CLI_VERSION}'
+      sha256 '${CLI_SHA256}'
+
+      depends_on :arch => :x86_64
+
+      conflicts_with "pivotal/tap/cloudfoundry-cli", :because => "the Pivotal tap ships an older cli distribution"
+      conflicts_with "caskroom/cask/cloudfoundry-cli", :because => "the caskroom tap is not the official distribution"
+
+      def install
+        bin.install 'cf'
+      end
+
+      test do
+        system "#{bin}/cf"
+      end
+    end
+    EOF
+
+      git add cf-cli.rb
+      git config --global user.email "cf-cli-eng@pivotal.io"
+      git config --global user.name "Concourse CI"
+      git commit -m "Release ${CLI_VERSION}"
+    popd
+
+    mv homebrew-tap $OUTPUT_PATH
