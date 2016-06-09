@@ -29,6 +29,8 @@ import (
 
 	"sync"
 
+	"sync/atomic"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -41,7 +43,7 @@ var _ = Describe("start command", func() {
 		defaultInstanceResponses  [][]models.AppInstanceFields
 		defaultInstanceErrorCodes []string
 		requirementsFactory       *requirementsfakes.FakeFactory
-		loggies                   []logs.Loggable
+		logMessages               atomic.Value
 		logRepo                   *logsfakes.FakeRepository
 
 		appInstancesRepo   *appinstancesfakes.FakeAppInstancesRepository
@@ -49,23 +51,7 @@ var _ = Describe("start command", func() {
 		originalAppCommand commandregistry.Command
 		deps               commandregistry.Dependency
 		displayApp         *applicationfakes.FakeAppDisplayer
-
-		mutex sync.RWMutex
 	)
-
-	logMessages := func() []logs.Loggable {
-		mutex.RLock()
-		defer mutex.RUnlock()
-
-		return loggies
-	}
-
-	setLogMessages := func(newLogs []logs.Loggable) {
-		mutex.Lock()
-		defer mutex.Unlock()
-
-		loggies = newLogs
-	}
 
 	updateCommandDependency := func(logsRepo logs.Repository) {
 		deps.UI = ui
@@ -104,7 +90,6 @@ var _ = Describe("start command", func() {
 	})
 
 	BeforeEach(func() {
-		mutex = sync.RWMutex{}
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 		ui = new(testterm.FakeUI)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
@@ -162,7 +147,7 @@ var _ = Describe("start command", func() {
 		}
 
 		logRepo = new(logsfakes.FakeRepository)
-		setLogMessages([]logs.Loggable{})
+		logMessages.Store([]logs.Loggable{})
 
 		closeWait := sync.WaitGroup{}
 		closeWait.Add(1)
@@ -171,7 +156,7 @@ var _ = Describe("start command", func() {
 			onConnect()
 
 			go func() {
-				for _, log := range logMessages() {
+				for _, log := range logMessages.Load().([]logs.Loggable) {
 					logChan <- log
 				}
 
@@ -425,7 +410,7 @@ var _ = Describe("start command", func() {
 			wrongSourceName := "DEA"
 			correctSourceName := "STG"
 
-			setLogMessages([]logs.Loggable{
+			logMessages.Store([]logs.Loggable{
 				testlogs.NewLogMessage("Log Line 1", defaultAppForStart.GUID, wrongSourceName, "1", logmessage.LogMessage_OUT, currentTime),
 				testlogs.NewLogMessage("Log Line 2", defaultAppForStart.GUID, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
 				testlogs.NewLogMessage("Log Line 3", defaultAppForStart.GUID, correctSourceName, "1", logmessage.LogMessage_OUT, currentTime),
