@@ -3,12 +3,12 @@ package pluginrepo_test
 import (
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
@@ -19,7 +19,7 @@ var _ = Describe("delte-plugin-repo", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -31,7 +31,7 @@ var _ = Describe("delte-plugin-repo", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
