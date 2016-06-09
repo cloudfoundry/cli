@@ -20,6 +20,8 @@ import (
 	"bytes"
 	"io"
 
+	"sync"
+
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
@@ -28,10 +30,12 @@ type CliRpcService struct {
 	stopCh   chan struct{}
 	Pinged   bool
 	RpcCmd   *CliRpcCmd
+	Server   *rpc.Server
 }
 
 type CliRpcCmd struct {
 	PluginMetadata       *plugin.PluginMetadata
+	MetadataMutex        *sync.RWMutex
 	outputCapture        OutputCapture
 	terminalOutputSwitch TerminalOutputSwitch
 	cliConfig            coreconfig.Repository
@@ -62,10 +66,13 @@ func NewRpcService(
 	newCmdRunner CommandRunner,
 	logger trace.Printer,
 	w io.Writer,
+	rpcServer *rpc.Server,
 ) (*CliRpcService, error) {
 	rpcService := &CliRpcService{
+		Server: rpcServer,
 		RpcCmd: &CliRpcCmd{
 			PluginMetadata:       &plugin.PluginMetadata{},
+			MetadataMutex:        &sync.RWMutex{},
 			outputCapture:        outputCapture,
 			terminalOutputSwitch: terminalOutputSwitch,
 			cliConfig:            cliConfig,
@@ -77,7 +84,7 @@ func NewRpcService(
 		},
 	}
 
-	err := rpc.Register(rpcService.RpcCmd)
+	err := rpcService.Server.Register(rpcService.RpcCmd)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +122,7 @@ func (cli *CliRpcService) Start() error {
 					fmt.Println(err)
 				}
 			} else {
-				go rpc.ServeConn(conn)
+				go cli.Server.ServeConn(conn)
 			}
 		}
 	}()
@@ -145,6 +152,9 @@ func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) SetPluginMetadata(pluginMetadata plugin.PluginMetadata, retVal *bool) error {
+	cmd.MetadataMutex.Lock()
+	defer cmd.MetadataMutex.Unlock()
+
 	cmd.PluginMetadata = &pluginMetadata
 	*retVal = true
 	return nil

@@ -23,6 +23,8 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
 	"github.com/cloudfoundry/cli/spellcheck"
+
+	netrpc "net/rpc"
 )
 
 var cmdRegistry = commandregistry.Commands
@@ -131,7 +133,8 @@ func main() {
 	}
 
 	//non core command, try plugin command
-	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, Writer)
+	server := netrpc.NewServer()
+	rpcService, err := rpc.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, rpc.NewCommandRunner(), deps.Logger, Writer, server)
 	if err != nil {
 		deps.UI.Say(T("Error initializing RPC service: ") + err.Error())
 		os.Exit(1)

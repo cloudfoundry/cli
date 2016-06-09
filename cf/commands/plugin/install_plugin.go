@@ -79,9 +79,9 @@ func (cmd *PluginInstall) SetDependency(deps commandregistry.Dependency, pluginC
 
 	//reset rpc registration in case there is other running instance,
 	//each service can only be registered once
-	rpc.DefaultServer = rpc.NewServer()
+	server := rpc.NewServer()
 
-	rpcService, err := pluginRPCService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, pluginRPCService.NewCommandRunner(), deps.Logger, cmd.ui.Writer())
+	rpcService, err := pluginRPCService.NewRpcService(deps.TeePrinter, deps.TeePrinter, deps.Config, deps.RepoLocator, pluginRPCService.NewCommandRunner(), deps.Logger, cmd.ui.Writer(), server)
 	if err != nil {
 		cmd.ui.Failed("Error initializing RPC service: " + err.Error())
 	}
@@ -244,7 +244,10 @@ func (cmd *PluginInstall) runBinaryAndObtainPluginMetadata(pluginSourceFilepath 
 		return nil, err
 	}
 
-	return cmd.rpcService.RpcCmd.PluginMetadata, nil
+	c := cmd.rpcService.RpcCmd
+	c.MetadataMutex.RLock()
+	defer c.MetadataMutex.RUnlock()
+	return c.PluginMetadata, nil
 }
 
 func (cmd *PluginInstall) runPluginBinary(location string, servicePort string) error {
