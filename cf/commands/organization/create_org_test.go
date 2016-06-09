@@ -4,6 +4,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/commands/user/userfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
 	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
@@ -11,7 +13,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -24,7 +25,7 @@ var _ = Describe("create-org command", func() {
 	var (
 		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		quotaRepo           *quotasfakes.FakeQuotaRepository
 		deps                commandregistry.Dependency
@@ -49,7 +50,8 @@ var _ = Describe("create-org command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
@@ -76,7 +78,6 @@ var _ = Describe("create-org command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when not provided exactly one arg", func() {
-			requirementsFactory.LoginSuccess = true
 			runCommand()
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
@@ -84,6 +85,7 @@ var _ = Describe("create-org command", func() {
 		})
 
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-org")).To(BeFalse())
 		})
 	})
@@ -91,7 +93,6 @@ var _ = Describe("create-org command", func() {
 	Context("when logged in and provided the name of an org to create", func() {
 		BeforeEach(func() {
 			orgRepo.CreateReturns(nil)
-			requirementsFactory.LoginSuccess = true
 		})
 
 		It("creates an org", func() {

@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +18,7 @@ import (
 
 var _ = Describe("rename-org command", func() {
 	var (
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
@@ -32,7 +33,7 @@ var _ = Describe("rename-org command", func() {
 	}
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
@@ -55,6 +56,7 @@ var _ = Describe("rename-org command", func() {
 	})
 
 	It("fails requirements when not logged in", func() {
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(callRenameOrg([]string{"my-org", "my-new-org"})).To(BeFalse())
 	})
 
@@ -63,8 +65,10 @@ var _ = Describe("rename-org command", func() {
 			org := models.Organization{}
 			org.Name = "the-old-org-name"
 			org.GUID = "the-old-org-guid"
-			requirementsFactory.Organization = org
-			requirementsFactory.LoginSuccess = true
+			orgReq := new(requirementsfakes.FakeOrganizationRequirement)
+			orgReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(orgReq)
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		It("passes requirements", func() {
@@ -81,7 +85,6 @@ var _ = Describe("rename-org command", func() {
 
 			guid, name := orgRepo.RenameArgsForCall(0)
 
-			Expect(requirementsFactory.OrganizationName).To(Equal("the-old-org-name"))
 			Expect(guid).To(Equal("the-old-org-guid"))
 			Expect(name).To(Equal("the-new-org-name"))
 			Expect(configRepo.OrganizationFields().Name).To(Equal(targetedOrgName))

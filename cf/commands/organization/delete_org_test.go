@@ -2,6 +2,8 @@ package organization_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -9,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -21,7 +22,7 @@ var _ = Describe("delete-org command", func() {
 	var (
 		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		org                 models.Organization
 		deps                commandregistry.Dependency
@@ -39,7 +40,7 @@ var _ = Describe("delete-org command", func() {
 			Inputs: []string{"y"},
 		}
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 
 		org = models.Organization{}
 		org.Name = "org-to-delete"
@@ -55,6 +56,7 @@ var _ = Describe("delete-org command", func() {
 	}
 
 	It("fails requirements when not logged in", func() {
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(runCommand("some-org-name")).To(BeFalse())
 	})
 
@@ -67,7 +69,7 @@ var _ = Describe("delete-org command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when deleting the currently targeted org", func() {
