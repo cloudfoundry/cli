@@ -8,9 +8,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -24,7 +25,7 @@ var _ = Describe("bind-security-group command", func() {
 		ui                    *testterm.FakeUI
 		configRepo            coreconfig.Repository
 		fakeSecurityGroupRepo *securitygroupsfakes.FakeSecurityGroupRepo
-		requirementsFactory   *testreq.FakeReqFactory
+		requirementsFactory   *requirementsfakes.FakeFactory
 		fakeSpaceRepo         *apifakes.FakeSpaceRepository
 		fakeOrgRepo           *organizationsfakes.FakeOrganizationRepository
 		fakeSpaceBinder       *spacesfakes.FakeSecurityGroupSpaceBinder
@@ -45,7 +46,7 @@ var _ = Describe("bind-security-group command", func() {
 		ui = &testterm.FakeUI{}
 		fakeOrgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		fakeSpaceRepo = new(apifakes.FakeSpaceRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		fakeSpaceBinder = new(spacesfakes.FakeSecurityGroupSpaceBinder)
@@ -57,17 +58,18 @@ var _ = Describe("bind-security-group command", func() {
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-craaaaaazy-security-group", "my-org", "my-space")).To(BeFalse())
 		})
 
 		It("succeeds when the user is logged in", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			Expect(runCommand("my-craaaaaazy-security-group", "my-org", "my-space")).To(BeTrue())
 		})
 
 		It("fails with usage when not provided the name of a security group, org, and space", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("one fish", "two fish", "three fish", "purple fish")
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
@@ -78,7 +80,7 @@ var _ = Describe("bind-security-group command", func() {
 
 	Context("when the user is logged in and provides the name of a security group", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when a security group with that name does not exist", func() {
