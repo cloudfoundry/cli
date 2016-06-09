@@ -5,10 +5,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +18,7 @@ import (
 var _ = Describe("rename-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		serviceBrokerRepo   *apifakes.FakeServiceBrokerRepository
 		deps                commandregistry.Dependency
@@ -34,7 +35,7 @@ var _ = Describe("rename-service-broker command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		serviceBrokerRepo = new(apifakes.FakeServiceBrokerRepository)
 	})
 
@@ -44,7 +45,7 @@ var _ = Describe("rename-service-broker command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when not invoked with exactly two args", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("welp")
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -52,13 +53,14 @@ var _ = Describe("rename-service-broker command", func() {
 		})
 
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("okay", "DO---IIIIT")).To(BeFalse())
 		})
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
 			broker.GUID = "my-found-broker-guid"

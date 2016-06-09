@@ -6,10 +6,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +21,7 @@ var _ = Describe("delete-service-broker command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		brokerRepo          *apifakes.FakeServiceBrokerRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -35,7 +36,8 @@ var _ = Describe("delete-service-broker command", func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
 		brokerRepo = new(apifakes.FakeServiceBrokerRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 	})
 
 	runCommand := func(args ...string) bool {
@@ -51,7 +53,7 @@ var _ = Describe("delete-service-broker command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand("-f", "my-broker")).To(BeFalse())
 		})
