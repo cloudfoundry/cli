@@ -7,6 +7,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
@@ -14,7 +16,6 @@ import (
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -27,7 +28,7 @@ var _ = Describe("unbind-security-group command", func() {
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		spaceRepo           *apifakes.FakeSpaceRepository
 		secBinder           *spacesfakes.FakeSecurityGroupSpaceBinder
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -44,7 +45,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		securityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
@@ -58,11 +59,12 @@ var _ = Describe("unbind-security-group command", func() {
 
 	Describe("requirements", func() {
 		It("should fail if not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-group")).To(BeFalse())
 		})
 
 		It("should fail with usage when not provided with any arguments", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -70,7 +72,7 @@ var _ = Describe("unbind-security-group command", func() {
 		})
 
 		It("should fail with usage when provided with a number of arguments that is either 2 or 4 or a number larger than 4", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("I", "like")
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -88,7 +90,7 @@ var _ = Describe("unbind-security-group command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when everything exists", func() {

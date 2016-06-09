@@ -5,11 +5,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
 	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running/runningfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -22,7 +23,7 @@ var _ = Describe("Running-security-groups command", func() {
 		ui                           *testterm.FakeUI
 		configRepo                   coreconfig.Repository
 		fakeRunningSecurityGroupRepo *runningfakes.FakeSecurityGroupsRepo
-		requirementsFactory          *testreq.FakeReqFactory
+		requirementsFactory          *requirementsfakes.FakeFactory
 		deps                         commandregistry.Dependency
 	)
 
@@ -37,7 +38,7 @@ var _ = Describe("Running-security-groups command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		fakeRunningSecurityGroupRepo = new(runningfakes.FakeSecurityGroupsRepo)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -46,13 +47,14 @@ var _ = Describe("Running-security-groups command", func() {
 
 	Describe("requirements", func() {
 		It("should fail when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 	})
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when there are some security groups set in the Running group", func() {

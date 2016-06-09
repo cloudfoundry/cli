@@ -7,9 +7,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/securitygroups/securitygroupsfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -22,7 +23,7 @@ var _ = Describe("bind-running-security-group command", func() {
 	var (
 		ui                           *testterm.FakeUI
 		configRepo                   coreconfig.Repository
-		requirementsFactory          *testreq.FakeReqFactory
+		requirementsFactory          *requirementsfakes.FakeFactory
 		fakeSecurityGroupRepo        *securitygroupsfakes.FakeSecurityGroupRepo
 		fakeRunningSecurityGroupRepo *runningfakes.FakeSecurityGroupsRepo
 		deps                         commandregistry.Dependency
@@ -39,7 +40,7 @@ var _ = Describe("bind-running-security-group command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		fakeSecurityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		fakeRunningSecurityGroupRepo = new(runningfakes.FakeSecurityGroupsRepo)
 	})
@@ -50,6 +51,7 @@ var _ = Describe("bind-running-security-group command", func() {
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("name")).To(BeFalse())
 		})
 
@@ -63,7 +65,7 @@ var _ = Describe("bind-running-security-group command", func() {
 
 	Context("when the user is logged in and provides the name of a group", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			group := models.SecurityGroup{}
 			group.GUID = "being-a-guid"
 			group.Name = "security-group-name"
