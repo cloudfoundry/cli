@@ -50,7 +50,7 @@ var _ = Describe("start command", func() {
 		deps               commandregistry.Dependency
 		displayApp         *applicationfakes.FakeAppDisplayer
 
-		mutex sync.RWMutex
+		mutex *sync.RWMutex
 	)
 
 	logMessages := func() []logs.Loggable {
@@ -104,7 +104,7 @@ var _ = Describe("start command", func() {
 	})
 
 	BeforeEach(func() {
-		mutex = sync.RWMutex{}
+		mutex = &sync.RWMutex{}
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 		ui = new(testterm.FakeUI)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
