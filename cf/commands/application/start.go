@@ -22,6 +22,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
+	"sync/atomic"
 )
 
 const (
@@ -236,12 +237,12 @@ const (
 )
 
 func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, startWait, doneWait *sync.WaitGroup) {
-	var connectionStatus ConnectionType
-	connectionStatus = NoConnection
+	var connectionStatus atomic.Value
+	connectionStatus.Store(NoConnection)
 
 	onConnect := func() {
-		if connectionStatus != StoppedTrying {
-			connectionStatus = ConnectionWasEstablished
+		if connectionStatus.Load() != StoppedTrying {
+			connectionStatus.Store(ConnectionWasEstablished)
 			startWait.Done()
 		}
 	}
@@ -258,8 +259,8 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 	for {
 		select {
 		case <-timer.C:
-			if connectionStatus == NoConnection {
-				connectionStatus = StoppedTrying
+			if connectionStatus.Load() == NoConnection {
+				connectionStatus.Store(StoppedTrying)
 				cmd.ui.Warn("timeout connecting to log server, no log will be shown")
 				startWait.Done()
 				return
@@ -273,10 +274,10 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 
 		case err, ok := <-e:
 			if ok {
-				if connectionStatus != ConnectionWasClosed {
+				if connectionStatus.Load() != ConnectionWasClosed {
 					cmd.ui.Warn(T("Warning: error tailing logs"))
 					cmd.ui.Say("%s", err)
-					if connectionStatus == NoConnection {
+					if connectionStatus.Load() == NoConnection {
 						startWait.Done()
 					}
 					return
@@ -284,8 +285,8 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 			}
 
 		case <-stopChan:
-			if connectionStatus == ConnectionWasEstablished {
-				connectionStatus = ConnectionWasClosed
+			if connectionStatus.Load() == ConnectionWasEstablished {
+				connectionStatus.Store(ConnectionWasClosed)
 				cmd.logRepo.Close()
 			} else {
 				return
