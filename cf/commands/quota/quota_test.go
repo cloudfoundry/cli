@@ -9,9 +9,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,7 +21,7 @@ import (
 var _ = Describe("quota", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		config              coreconfig.Repository
 		quotaRepo           *quotasfakes.FakeQuotaRepository
 		deps                commandregistry.Dependency
@@ -35,7 +36,7 @@ var _ = Describe("quota", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		quotaRepo = new(quotasfakes.FakeQuotaRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 	})
@@ -45,6 +46,9 @@ var _ = Describe("quota", func() {
 	}
 
 	Context("When not logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
+		})
 		It("fails requirements", func() {
 			Expect(runCommand("quota-name")).To(BeFalse())
 		})
@@ -52,7 +56,7 @@ var _ = Describe("quota", func() {
 
 	Context("When logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("When not providing a quota name", func() {
