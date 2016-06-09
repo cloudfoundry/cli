@@ -7,12 +7,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,7 +27,7 @@ var _ = Describe("orgs command", func() {
 		ui                  *testterm.FakeUI
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		configRepo          coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -45,14 +46,15 @@ var _ = Describe("orgs command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand()).To(BeFalse())
 		})
