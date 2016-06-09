@@ -7,11 +7,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -25,7 +26,7 @@ var _ = Describe("create-service-key command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		serviceRepo         *apifakes.FakeServiceRepository
 		serviceKeyRepo      *apifakes.OldFakeServiceKeyRepo
 		deps                commandregistry.Dependency
@@ -48,8 +49,12 @@ var _ = Describe("create-service-key command", func() {
 		serviceInstance.Name = "fake-service-instance"
 		serviceRepo.FindInstanceByNameReturns(serviceInstance, nil)
 		serviceKeyRepo = apifakes.NewFakeServiceKeyRepo()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstanceNotFound: false}
-		requirementsFactory.ServiceInstance = serviceInstance
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+		serviceInstanceReq := new(requirementsfakes.FakeServiceInstanceRequirement)
+		requirementsFactory.NewServiceInstanceRequirementReturns(serviceInstanceReq)
+		serviceInstanceReq.GetServiceInstanceReturns(serviceInstance)
 	})
 
 	var callCreateService = func(args []string) bool {
@@ -58,7 +63,7 @@ var _ = Describe("create-service-key command", func() {
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(callCreateService([]string{"fake-service-instance", "fake-service-key"})).To(BeFalse())
 		})
 
@@ -69,12 +74,14 @@ var _ = Describe("create-service-key command", func() {
 		})
 
 		It("fails when service instance is not found", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, ServiceInstanceNotFound: true}
+			serviceInstanceReq := new(requirementsfakes.FakeServiceInstanceRequirement)
+			serviceInstanceReq.ExecuteReturns(errors.New("no service instance"))
+			requirementsFactory.NewServiceInstanceRequirementReturns(serviceInstanceReq)
 			Expect(callCreateService([]string{"non-exist-service-instance", "fake-service-key"})).To(BeFalse())
 		})
 
 		It("fails when space is not targetted", func() {
-			requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "no targeted space"})
 			Expect(callCreateService([]string{"non-exist-service-instance", "fake-service-key"})).To(BeFalse())
 		})
 	})
