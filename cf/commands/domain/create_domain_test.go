@@ -55,12 +55,6 @@ var _ = Describe("create domain command", func() {
 		Expect(ui.Outputs()).To(ContainSubstrings(
 			[]string{"Incorrect Usage", "Requires", "arguments"},
 		))
-
-		runCommand("org1", "example.com")
-		Expect(ui.Outputs()).ToNot(ContainSubstrings(
-			[]string{"Incorrect Usage", "Requires", "arguments"},
-		))
-
 	})
 
 	Context("checks login", func() {
@@ -73,7 +67,7 @@ var _ = Describe("create domain command", func() {
 			})
 			requirementsFactory.NewOrganizationRequirementReturns(fakeOrgRequirement)
 			Expect(runCommand("my-org", "example.com")).To(BeTrue())
-			Expect(ui.Outputs).To(ContainSubstrings([]string{"my-org"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"my-org"}))
 		})
 
 		It("fails when not logged in", func() {
