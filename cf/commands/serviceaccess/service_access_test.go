@@ -7,10 +7,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -25,7 +26,7 @@ var _ = Describe("service-access command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		actor               *actorsfakes.FakeServiceActor
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		serviceBroker1      models.ServiceBroker
 		serviceBroker2      models.ServiceBroker
 		authRepo            *authenticationfakes.FakeRepository
@@ -44,7 +45,8 @@ var _ = Describe("service-access command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		actor = new(actorsfakes.FakeServiceActor)
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		authRepo = new(authenticationfakes.FakeRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
@@ -55,7 +57,7 @@ var _ = Describe("service-access command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand()).ToNot(HavePassedRequirements())
 		})
 

@@ -7,10 +7,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,7 +21,7 @@ var _ = Describe("disable-service-access command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		actor               *actorsfakes.FakeServicePlanActor
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		tokenRefresher      *authenticationfakes.FakeRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -45,7 +46,7 @@ var _ = Describe("disable-service-access command", func() {
 		}
 		configRepo = configuration.NewRepositoryWithDefaults()
 		actor = new(actorsfakes.FakeServicePlanActor)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		tokenRefresher = new(authenticationfakes.FakeRepository)
 	})
 
@@ -55,11 +56,12 @@ var _ = Describe("disable-service-access command", func() {
 
 	Describe("requirements", func() {
 		It("requires the user to be logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand([]string{"foo"})).To(BeFalse())
 		})
 
 		It("fails with usage when it does not recieve any arguments", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand(nil)
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
@@ -69,7 +71,7 @@ var _ = Describe("disable-service-access command", func() {
 
 	Describe("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			serviceName = "service"
 			servicePlanName = "service-plan"
