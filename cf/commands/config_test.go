@@ -3,9 +3,9 @@ package commands_test
 import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -17,7 +17,7 @@ var _ = Describe("config command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -30,7 +30,7 @@ var _ = Describe("config command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) {
