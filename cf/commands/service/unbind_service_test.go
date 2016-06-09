@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +22,7 @@ var _ = Describe("unbind-service command", func() {
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		serviceInstance     models.ServiceInstance
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		serviceBindingRepo  *apifakes.FakeServiceBindingRepository
 		deps                commandregistry.Dependency
 	)
@@ -52,10 +53,13 @@ var _ = Describe("unbind-service command", func() {
 		}
 
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{
-			Application:     app,
-			ServiceInstance: serviceInstance,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+		applicationReq.GetApplicationReturns(app)
+		requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+		serviceInstanceReq := new(requirementsfakes.FakeServiceInstanceRequirement)
+		serviceInstanceReq.GetServiceInstanceReturns(serviceInstance)
+		requirementsFactory.NewServiceInstanceRequirementReturns(serviceInstanceReq)
 	})
 
 	callUnbindService := func(args []string) bool {
@@ -64,21 +68,19 @@ var _ = Describe("unbind-service command", func() {
 
 	Context("when not logged in", func() {
 		It("fails requirements when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(testcmd.RunCLICommand("unbind-service", []string{"my-service", "my-app"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		Context("when the service instance exists", func() {
 			It("unbinds a service from an app", func() {
 				callUnbindService([]string{"my-app", "my-service"})
-
-				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding app", "my-service", "my-app", "my-org", "my-space", "my-user"},
@@ -99,9 +101,6 @@ var _ = Describe("unbind-service command", func() {
 
 			It("warns the user the the service instance does not exist", func() {
 				callUnbindService([]string{"my-app", "my-service"})
-
-				Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-				Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Unbinding app", "my-service", "my-app"},

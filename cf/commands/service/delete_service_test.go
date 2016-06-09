@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +20,7 @@ import (
 var _ = Describe("delete-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		serviceRepo         *apifakes.FakeServiceRepository
 		serviceInstance     models.ServiceInstance
 		configRepo          coreconfig.Repository
@@ -40,9 +41,8 @@ var _ = Describe("delete-service command", func() {
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = new(apifakes.FakeServiceRepository)
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess: true,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 	})
 
 	runCommand := func(args ...string) bool {
@@ -51,7 +51,7 @@ var _ = Describe("delete-service command", func() {
 
 	Context("when not logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		})
 
 		It("does not pass requirements", func() {
@@ -61,7 +61,7 @@ var _ = Describe("delete-service command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		It("fails with usage when not provided exactly one arg", func() {

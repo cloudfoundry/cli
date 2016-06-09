@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,8 +21,10 @@ var _ = Describe("rename-service command", func() {
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
 		serviceRepo         *apifakes.FakeServiceRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
+
+		serviceInstance models.ServiceInstance
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -35,7 +38,14 @@ var _ = Describe("rename-service command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
 		serviceRepo = new(apifakes.FakeServiceRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+
+		serviceInstance = models.ServiceInstance{}
+		serviceInstance.Name = "different-name"
+		serviceInstance.GUID = "different-name-guid"
+		serviceReq := new(requirementsfakes.FakeServiceInstanceRequirement)
+		serviceReq.GetServiceInstanceReturns(serviceInstance)
+		requirementsFactory.NewServiceInstanceRequirementReturns(serviceReq)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -51,29 +61,23 @@ var _ = Describe("rename-service command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			requirementsFactory.TargetedSpaceSuccess = true
-
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("banana", "fppants")).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 
 			Expect(runCommand("banana", "faaaaasdf")).To(BeFalse())
 		})
 	})
 
 	Context("when logged in and a space is targeted", func() {
-		var serviceInstance models.ServiceInstance
-
 		BeforeEach(func() {
-			serviceInstance = models.ServiceInstance{}
-			serviceInstance.Name = "different-name"
-			serviceInstance.GUID = "different-name-guid"
-
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedSpaceSuccess = true
-			requirementsFactory.ServiceInstance = serviceInstance
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		})
 
 		It("renames the service, obviously", func() {

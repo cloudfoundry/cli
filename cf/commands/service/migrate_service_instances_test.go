@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +22,7 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 		ui                  *testterm.FakeUI
 		serviceRepo         *apifakes.FakeServiceRepository
 		config              coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		args                []string
 		deps                commandregistry.Dependency
 	)
@@ -37,7 +38,8 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepository()
 		serviceRepo = new(apifakes.FakeServiceRepository)
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		args = []string{}
 	})
 
@@ -52,9 +54,9 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 			Expect(testcmd.RunCLICommand("migrate-service-instances", args, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 		})
 
-		It("requires CC API version 2.47 or greater", func() {
-			requirementsFactory.MaxAPIVersionSuccess = false
-			requirementsFactory.LoginSuccess = true
+		It("requires CC API version 2.47 or lower", func() {
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Failing{Message: "max api version not met"})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			args = []string{"one", "two", "three", "four", "five"}
 			ui.Inputs = append(ui.Inputs, "no")
 
@@ -62,8 +64,8 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 		})
 
 		It("passes requirements if user is logged in and provided five args to run", func() {
-			requirementsFactory.MaxAPIVersionSuccess = true
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			args = []string{"one", "two", "three", "four", "five"}
 			ui.Inputs = append(ui.Inputs, "no")
 			serviceRepo.GetServiceInstanceCountForServicePlanReturns(1, nil)
@@ -74,8 +76,8 @@ var _ = Describe("migrating service instances from v1 to v2", func() {
 
 	Describe("migrating service instances", func() {
 		BeforeEach(func() {
-			requirementsFactory.MaxAPIVersionSuccess = true
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			args = []string{"v1-service-label", "v1-provider-name", "v1-plan-name", "v2-service-label", "v2-plan-name"}
 			serviceRepo.GetServiceInstanceCountForServicePlanReturns(1, nil)
 		})
