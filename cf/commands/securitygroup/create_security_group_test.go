@@ -8,9 +8,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -22,7 +23,7 @@ var _ = Describe("create-security-group command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		securityGroupRepo   *securitygroupsfakes.FakeSecurityGroupRepo
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -36,7 +37,7 @@ var _ = Describe("create-security-group command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		securityGroupRepo = new(securitygroupsfakes.FakeSecurityGroupRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
@@ -47,11 +48,12 @@ var _ = Describe("create-security-group command", func() {
 
 	Describe("requirements", func() {
 		It("fails when the user is not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("the-security-group")).To(BeFalse())
 		})
 
 		It("fails with usage when a name is not provided", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -59,7 +61,7 @@ var _ = Describe("create-security-group command", func() {
 		})
 
 		It("fails with usage when a rules file is not provided", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("AWESOME_SECURITY_GROUP_NAME")
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "arguments"},
@@ -72,7 +74,7 @@ var _ = Describe("create-security-group command", func() {
 
 		BeforeEach(func() {
 			tempFile, _ = ioutil.TempFile("", "")
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		})
 
 		AfterEach(func() {
