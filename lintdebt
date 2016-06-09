@@ -13,7 +13,7 @@ cf/commands/application/push.go:334::warning: cyclomatic complexity 14 of functi
 cf/commands/application/push.go:595::warning: cyclomatic complexity 13 of function (*Push).createAppSetFromContextAndManifest() is high (> 10) (gocyclo)
 cf/commands/application/push.go:664::warning: cyclomatic complexity 28 of function (*Push).getAppParamsFromContext() is high (> 10) (gocyclo)
 cf/commands/application/scale.go:77::warning: cyclomatic complexity 12 of function (*Scale).Execute() is high (> 10) (gocyclo)
-cf/commands/application/start.go:238::warning: cyclomatic complexity 14 of function (*Start).TailStagingLogs() is high (> 10) (gocyclo)
+cf/commands/application/start.go:239::warning: cyclomatic complexity 14 of function (*Start).TailStagingLogs() is high (> 10) (gocyclo)
 cf/commands/buildpack/update_buildpack.go:70::warning: cyclomatic complexity 19 of function (*UpdateBuildpack).Execute() is high (> 10) (gocyclo)
 cf/commands/config.go:53::warning: cyclomatic complexity 16 of function (*ConfigCommands).Execute() is high (> 10) (gocyclo)
 cf/commands/create_app_manifest.go:119::warning: cyclomatic complexity 16 of function (*CreateAppManifest).createManifest() is high (> 10) (gocyclo)
