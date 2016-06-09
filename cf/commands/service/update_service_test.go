@@ -5,20 +5,19 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/blang/semver"
 	planbuilderfakes "github.com/cloudfoundry/cli/cf/actors/planbuilder/planbuilderfakes"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/commands/service"
 	"github.com/cloudfoundry/cli/flags"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -28,7 +27,7 @@ var _ = Describe("update-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		config              coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		serviceRepo         *apifakes.FakeServiceRepository
 		planBuilder         *planbuilderfakes.FakePlanBuilder
 		offering1           models.ServiceOffering
@@ -48,11 +47,10 @@ var _ = Describe("update-service command", func() {
 
 		config = testconfig.NewRepositoryWithDefaults()
 
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:         true,
-			TargetedSpaceSuccess: true,
-			MinAPIVersionSuccess: true,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Passing{Type: "minAPIVersionReq"})
 
 		serviceRepo = new(apifakes.FakeServiceRepository)
 		planBuilder = new(planbuilderfakes.FakePlanBuilder)
@@ -84,12 +82,12 @@ var _ = Describe("update-service command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			requirementsFactory.TargetedSpaceSuccess = false
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(callUpdateService([]string{"cleardb", "spark", "my-cleardb-service"})).To(BeFalse())
 		})
 
@@ -103,8 +101,7 @@ var _ = Describe("update-service command", func() {
 				reqs := cmd.Requirements(requirementsFactory, fc)
 				Expect(reqs).NotTo(BeEmpty())
 
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal("Updating a plan"))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(cf.UpdateServicePlanMinimumAPIVersion))
+				Expect(reqs).To(ContainElement(requirements.Passing{Type: "minAPIVersionReq"}))
 			})
 
 			It("does not requirue a CC Api Version if not provided", func() {
@@ -116,10 +113,7 @@ var _ = Describe("update-service command", func() {
 				reqs := cmd.Requirements(requirementsFactory, fc)
 				Expect(reqs).NotTo(BeEmpty())
 
-				var s semver.Version
-
-				Expect(requirementsFactory.MinAPIVersionFeatureName).To(Equal(""))
-				Expect(requirementsFactory.MinAPIVersionRequiredVersion).To(Equal(s))
+				Expect(reqs).NotTo(ContainElement(requirements.Passing{Type: "minAPIVersionReq"}))
 			})
 		})
 	})

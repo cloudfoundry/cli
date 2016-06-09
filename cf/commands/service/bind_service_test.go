@@ -9,9 +9,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,7 +24,7 @@ import (
 var _ = Describe("bind-service command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		config              coreconfig.Repository
 		serviceBindingRepo  *apifakes.FakeServiceBindingRepository
 		deps                commandregistry.Dependency
@@ -39,7 +40,7 @@ var _ = Describe("bind-service command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = new(testreq.FakeReqFactory)
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		serviceBindingRepo = new(apifakes.FakeServiceBindingRepository)
 	})
 
@@ -48,6 +49,7 @@ var _ = Describe("bind-service command", func() {
 	}
 
 	It("fails requirements when not logged in", func() {
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(callBindService([]string{"service", "app"})).To(BeFalse())
 	})
 
@@ -58,7 +60,7 @@ var _ = Describe("bind-service command", func() {
 		)
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			app = models.Application{
 				ApplicationFields: models.ApplicationFields{
@@ -72,16 +74,17 @@ var _ = Describe("bind-service command", func() {
 					GUID: "my-service-guid",
 				},
 			}
+			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+			applicationReq.GetApplicationReturns(app)
+			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
 
-			requirementsFactory.Application = app
-			requirementsFactory.ServiceInstance = serviceInstance
+			serviceInstanceReq := new(requirementsfakes.FakeServiceInstanceRequirement)
+			serviceInstanceReq.GetServiceInstanceReturns(serviceInstance)
+			requirementsFactory.NewServiceInstanceRequirementReturns(serviceInstanceReq)
 		})
 
 		It("binds a service instance to an app", func() {
 			callBindService([]string{"my-app", "my-service"})
-
-			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
-			Expect(requirementsFactory.ServiceInstanceName).To(Equal("my-service"))
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},

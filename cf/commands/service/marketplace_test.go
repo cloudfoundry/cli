@@ -5,10 +5,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +20,7 @@ import (
 
 var _ = Describe("marketplace command", func() {
 	var ui *testterm.FakeUI
-	var requirementsFactory *testreq.FakeReqFactory
+	var requirementsFactory *requirementsfakes.FakeFactory
 	var config coreconfig.Repository
 	var serviceBuilder *servicebuilderfakes.FakeServiceBuilder
 	var fakeServiceOfferings []models.ServiceOffering
@@ -37,7 +38,8 @@ var _ = Describe("marketplace command", func() {
 	BeforeEach(func() {
 		serviceBuilder = new(servicebuilderfakes.FakeServiceBuilder)
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{APIEndpointSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 
 		serviceWithAPaidPlan = models.ServiceOffering{
 			Plans: []models.ServicePlanFields{
@@ -65,7 +67,7 @@ var _ = Describe("marketplace command", func() {
 		Context("when the an API endpoint is not targeted", func() {
 			It("does not meet its requirements", func() {
 				config = testconfig.NewRepository()
-				requirementsFactory.APIEndpointSuccess = false
+				requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Failing{Message: "no api"})
 
 				Expect(testcmd.RunCLICommand("marketplace", []string{}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
 			})
