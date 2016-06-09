@@ -5,10 +5,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commands/serviceauthtoken"
@@ -22,7 +23,7 @@ var _ = Describe("service-auth-tokens command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		authTokenRepo       *apifakes.OldFakeAuthTokenRepo
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -37,7 +38,7 @@ var _ = Describe("service-auth-tokens command", func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
 		authTokenRepo = new(apifakes.OldFakeAuthTokenRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -46,6 +47,7 @@ var _ = Describe("service-auth-tokens command", func() {
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand()).To(BeFalse())
 		})
 
@@ -72,16 +74,16 @@ var _ = Describe("service-auth-tokens command", func() {
 		})
 
 		It("requires CC API version 2.47 or greater", func() {
-			requirementsFactory.MaxAPIVersionSuccess = false
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Failing{Message: "max api 2.47"})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			Expect(runCommand()).To(BeFalse())
 		})
 	})
 
 	Context("when logged in and some service auth tokens exist", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.MaxAPIVersionSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Passing{})
 
 			authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{
 				{Label: "a label", Provider: "a provider"},
