@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,7 +21,7 @@ var _ = Describe("create-service-auth-token command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		authTokenRepo       *apifakes.OldFakeAuthTokenRepo
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -35,7 +36,7 @@ var _ = Describe("create-service-auth-token command", func() {
 		ui = &testterm.FakeUI{}
 		authTokenRepo = new(apifakes.OldFakeAuthTokenRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -44,7 +45,7 @@ var _ = Describe("create-service-auth-token command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when not invoked with exactly three args", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand("whoops", "i-accidentally-an-arg")
 
 			Expect(ui.Outputs()).To(ContainSubstrings(
@@ -53,20 +54,21 @@ var _ = Describe("create-service-auth-token command", func() {
 		})
 
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("just", "enough", "args")).To(BeFalse())
 		})
 
-		It("requires CC API version 2.47 or greater", func() {
-			requirementsFactory.MaxAPIVersionSuccess = false
-			requirementsFactory.LoginSuccess = true
+		It("requires CC API version 2.47 or lower", func() {
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Failing{Message: "max api 2.47"})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			Expect(runCommand("one", "two", "three")).To(BeFalse())
 		})
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.MaxAPIVersionSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Passing{})
 		})
 
 		It("creates a service auth token, obviously", func() {

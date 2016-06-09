@@ -6,12 +6,13 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -22,7 +23,7 @@ var _ = Describe("delete-service-auth-token command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		authTokenRepo       *apifakes.OldFakeAuthTokenRepo
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -37,7 +38,9 @@ var _ = Describe("delete-service-auth-token command", func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
 		authTokenRepo = new(apifakes.OldFakeAuthTokenRepo)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, MaxAPIVersionSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Passing{})
 	})
 
 	runCommand := func(args ...string) bool {
@@ -53,13 +56,13 @@ var _ = Describe("delete-service-auth-token command", func() {
 		})
 
 		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand()).To(BeFalse())
 		})
 
-		It("requires CC API version 2.47 or greater", func() {
-			requirementsFactory.MaxAPIVersionSuccess = false
-			requirementsFactory.LoginSuccess = true
+		It("requires CC API version 2.47 or lower", func() {
+			requirementsFactory.NewMaxAPIVersionRequirementReturns(requirements.Failing{Message: "max api 2.47"})
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			Expect(runCommand("one", "two")).To(BeFalse())
 		})
 	})
