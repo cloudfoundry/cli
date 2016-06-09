@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"encoding/json"
+
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
@@ -18,7 +19,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
 
@@ -26,7 +26,7 @@ var _ = Describe("create-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *quotasfakes.FakeQuotaRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -42,7 +42,7 @@ var _ = Describe("create-quota command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		quotaRepo = new(quotasfakes.FakeQuotaRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -97,7 +97,7 @@ var _ = Describe("create-quota command", func() {
 
 	Context("when the user is not logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		})
 
 		It("fails requirements", func() {
@@ -107,8 +107,8 @@ var _ = Describe("create-quota command", func() {
 
 	Context("when the user is logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.MinAPIVersionSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewMinAPIVersionRequirementReturns(requirements.Passing{})
 		})
 
 		It("fails requirements when called without a quota name", func() {
