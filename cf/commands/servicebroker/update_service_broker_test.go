@@ -5,9 +5,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +19,7 @@ import (
 var _ = Describe("update-service-broker command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		serviceBrokerRepo   *apifakes.FakeServiceBrokerRepository
 		deps                commandregistry.Dependency
@@ -34,7 +35,7 @@ var _ = Describe("update-service-broker command", func() {
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		serviceBrokerRepo = new(apifakes.FakeServiceBrokerRepository)
 	})
 
@@ -44,7 +45,7 @@ var _ = Describe("update-service-broker command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when invoked without exactly four args", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand("arg1", "arg2", "arg3")
 			Expect(ui.Outputs()).To(ContainSubstrings(
@@ -53,13 +54,14 @@ var _ = Describe("update-service-broker command", func() {
 		})
 
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("heeeeeeey", "yooouuuuuuu", "guuuuuuuuys", "ヾ(＠*ー⌒ー*@)ノ")).To(BeFalse())
 		})
 	})
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
 			broker.GUID = "my-found-broker-guid"
