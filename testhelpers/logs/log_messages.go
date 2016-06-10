@@ -8,15 +8,7 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-func NewLogMessage(
-	text string,
-	appGUID string,
-	sourceName string,
-	sourceID string,
-	messageType logmessage.LogMessage_MessageType,
-	timestamp time.Time,
-	drainURLs ...string,
-) logs.Loggable {
+func NewLogMessage(text string, appGUID string, sourceName string, sourceID string, messageType logmessage.LogMessage_MessageType, timestamp time.Time, drainURLs ...string) logs.Loggable {
 	return logs.NewLoggregatorLogMessage(
 		&logmessage.LogMessage{
 			Message:     []byte(text),
