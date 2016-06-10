@@ -5,11 +5,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +23,7 @@ import (
 var _ = Describe("org-users command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		userRepo            *apifakes.FakeUserRepository
 		deps                commandregistry.Dependency
@@ -40,7 +41,7 @@ var _ = Describe("org-users command", func() {
 		ui = &testterm.FakeUI{}
 		userRepo = new(apifakes.FakeUserRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 	})
 
@@ -50,7 +51,7 @@ var _ = Describe("org-users command", func() {
 
 	Describe("requirements", func() {
 		It("fails with usage when invoked without an org name", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			runCommand()
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires an argument"},
@@ -58,6 +59,7 @@ var _ = Describe("org-users command", func() {
 		})
 
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("say-hello-to-my-little-org")).To(BeFalse())
 		})
 	})
@@ -77,8 +79,10 @@ var _ = Describe("org-users command", func() {
 			user2 = models.UserFields{}
 			user2.Username = "user2"
 
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.Organization = org
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 		})
 
 		Context("shows friendly messaage when no users in ORG_MANAGER role", func() {
@@ -197,8 +201,10 @@ var _ = Describe("org-users command", func() {
 				return userFields, nil
 			}
 
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.Organization = org
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 		})
 
 		It("shows the special users in the given org", func() {
@@ -310,8 +316,10 @@ var _ = Describe("org-users command", func() {
 					return userFields, nil
 				}
 
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.Organization = org
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+				organizationReq.GetOrganizationReturns(org)
+				requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 				pluginUserModel = []plugin_models.GetOrgUsers_Model{}
 				deps.PluginModels.OrgUsers = &pluginUserModel
 			})
@@ -388,8 +396,10 @@ var _ = Describe("org-users command", func() {
 					return userFields, nil
 				}
 
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.Organization = org
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+				organizationReq.GetOrganizationReturns(org)
+				requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 				pluginUserModel = []plugin_models.GetOrgUsers_Model{}
 				deps.PluginModels.OrgUsers = &pluginUserModel
 			})

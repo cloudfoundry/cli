@@ -4,9 +4,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,7 +18,7 @@ import (
 
 var _ = Describe("Create user command", func() {
 	var (
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		ui                  *testterm.FakeUI
 		userRepo            *apifakes.FakeUserRepository
 		config              coreconfig.Repository
@@ -25,7 +26,8 @@ var _ = Describe("Create user command", func() {
 	)
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		ui = new(testterm.FakeUI)
 		userRepo = new(apifakes.FakeUserRepository)
 		config = testconfig.NewRepositoryWithDefaults()
@@ -92,7 +94,7 @@ var _ = Describe("Create user command", func() {
 	})
 
 	It("fails when the user is not logged in", func() {
-		requirementsFactory.LoginSuccess = false
+		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 		Expect(runCommand("my-user", "my-password")).To(BeFalse())
 	})
