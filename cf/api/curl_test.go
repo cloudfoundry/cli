@@ -3,15 +3,17 @@ package api_test
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -206,7 +208,7 @@ type curlDependencies struct {
 func newCurlDependencies() (deps curlDependencies) {
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAccessToken("BEARER my_access_token")
-	deps.gateway = cloudcontrollergateway.NewTestCloudControllerGateway(deps.config)
+	deps.gateway = net.NewCloudControllerGateway(deps.config, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	return
 }
 

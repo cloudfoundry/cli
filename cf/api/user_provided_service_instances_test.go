@@ -3,14 +3,17 @@ package api_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -185,7 +188,7 @@ func createUserProvidedServiceInstanceRepo(req []testnet.TestRequest) (ts *httpt
 	ts, handler = testnet.NewServer(req)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
-	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	repo = NewCCUserProvidedServiceInstanceRepository(configRepo, gateway)
 	return
 }

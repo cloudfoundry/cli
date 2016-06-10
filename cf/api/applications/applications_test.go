@@ -4,15 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/applications"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -97,7 +100,7 @@ var _ = Describe("ApplicationsRepository", func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(ccServer.URL())
-			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 			repo = NewCloudControllerRepository(configRepo, gateway)
 
 			name := "my-cool-app"
@@ -548,7 +551,7 @@ func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
-	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	repo = NewCloudControllerRepository(configRepo, gateway)
 	return
 }

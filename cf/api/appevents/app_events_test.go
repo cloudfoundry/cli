@@ -4,13 +4,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"time"
+
 	. "github.com/cloudfoundry/cli/cf/api/appevents"
 	"github.com/cloudfoundry/cli/cf/api/strategy"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	testtime "github.com/cloudfoundry/cli/testhelpers/time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,7 +36,7 @@ var _ = Describe("App Events Repo", func() {
 
 	JustBeforeEach(func() {
 		strategy := strategy.NewEndpointStrategy(config.APIVersion())
-		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
+		gateway := net.NewCloudControllerGateway(config, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
 	})
 

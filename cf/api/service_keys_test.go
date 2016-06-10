@@ -2,18 +2,21 @@ package api_test
 
 import (
 	"net/http"
+	"time"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/onsi/gomega/ghttp"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -32,7 +35,7 @@ var _ = Describe("Service Keys Repo", func() {
 		ccServer = ghttp.NewServer()
 		configRepo.SetAPIEndpoint(ccServer.URL())
 
-		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)
 	})
 

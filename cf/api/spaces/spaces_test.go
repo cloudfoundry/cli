@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/spaces"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -30,7 +33,7 @@ var _ = Describe("Space Repository", func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(ccServer.URL())
-			gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 			repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -366,7 +369,7 @@ func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
-	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -14,12 +15,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -196,7 +197,7 @@ var _ = Describe("SSH command", func() {
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
 					configRepo.SetAPIEndpoint(testServer.URL)
-					ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -226,7 +227,7 @@ var _ = Describe("SSH command", func() {
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
 					configRepo.SetAPIEndpoint(testServer.URL)
-					ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -265,7 +266,7 @@ var _ = Describe("SSH command", func() {
 
 				testServer, _ = testnet.NewServer([]testnet.TestRequest{getRequest})
 				configRepo.SetAPIEndpoint(testServer.URL)
-				ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+				ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 				deps.Gateways["cloud-controller"] = ccGateway
 			})
 

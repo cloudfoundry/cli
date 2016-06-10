@@ -5,16 +5,19 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -39,7 +42,7 @@ var _ = Describe("Services Repo", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAccessToken("BEARER my_access_token")
 
-		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		repo = NewCloudControllerServiceRepository(configRepo, gateway)
 	})
 

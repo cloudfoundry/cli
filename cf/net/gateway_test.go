@@ -20,7 +20,6 @@ import (
 	. "github.com/cloudfoundry/cli/cf/net"
 	"github.com/cloudfoundry/cli/cf/net/netfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -56,7 +55,7 @@ var _ = Describe("Gateway", func() {
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = cloudcontrollergateway.NewTestCloudControllerGateway(config)
+				ccGateway = NewCloudControllerGateway(config, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})
