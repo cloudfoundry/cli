@@ -86,7 +86,7 @@ var _ = Describe("create-service-key command", func() {
 		})
 	})
 
-	Describe("requiremnts are satisfied", func() {
+	Describe("requirements are satisfied", func() {
 		It("create service key successfully", func() {
 			callCreateService([]string{"fake-service-instance", "fake-service-key"})
 

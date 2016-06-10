@@ -6,9 +6,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,7 +22,7 @@ var _ = Describe("delete-user command", func() {
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
 		userRepo            *apifakes.FakeUserRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -35,7 +36,8 @@ var _ = Describe("delete-user command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{Inputs: []string{"y"}}
 		userRepo = new(apifakes.FakeUserRepository)
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
 		token, err := testconfig.EncodeAccessToken(coreconfig.TokenInfo{
@@ -52,7 +54,7 @@ var _ = Describe("delete-user command", func() {
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand("my-user")).To(BeFalse())
 		})

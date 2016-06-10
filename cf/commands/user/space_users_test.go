@@ -7,11 +7,12 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -24,7 +25,7 @@ import (
 var _ = Describe("space-users command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		spaceRepo           *apifakes.FakeSpaceRepository
 		userRepo            *apifakes.FakeUserRepository
 		configRepo          coreconfig.Repository
@@ -43,7 +44,7 @@ var _ = Describe("space-users command", func() {
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		userRepo = new(apifakes.FakeUserRepository)
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
@@ -55,15 +56,31 @@ var _ = Describe("space-users command", func() {
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-org", "my-space")).To(BeFalse())
 		})
 
 		It("succeeds when logged in", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(
+				models.Organization{
+					OrganizationFields: models.OrganizationFields{
+						Name: "some-org",
+					},
+				},
+			)
+			spaceRepo.FindByNameInOrgReturns(
+				models.Space{
+					SpaceFields: models.SpaceFields{
+						Name: "whatever-space",
+					},
+				}, nil)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 			passed := runCommand("some-org", "whatever-space")
 
 			Expect(passed).To(BeTrue())
-			Expect("some-org").To(Equal(requirementsFactory.OrganizationName))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Getting users in org some-org / space whatever-space as my-user"}))
 		})
 	})
 
@@ -76,7 +93,7 @@ var _ = Describe("space-users command", func() {
 
 	Context("when logged in and given some users in the org and space", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			org := models.Organization{}
 			org.Name = "Org1"
@@ -85,7 +102,9 @@ var _ = Describe("space-users command", func() {
 			space.Name = "Space1"
 			space.GUID = "space1-guid"
 
-			requirementsFactory.Organization = org
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 			spaceRepo.FindByNameInOrgReturns(space, nil)
 
 			user := models.UserFields{}
@@ -172,7 +191,7 @@ var _ = Describe("space-users command", func() {
 
 	Context("when logged in and there are no non-managers in the space", func() {
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			org := models.Organization{}
 			org.Name = "Org1"
@@ -181,7 +200,9 @@ var _ = Describe("space-users command", func() {
 			space.Name = "Space1"
 			space.GUID = "space1-guid"
 
-			requirementsFactory.Organization = org
+			organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+			organizationReq.GetOrganizationReturns(org)
+			requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 			spaceRepo.FindByNameInOrgReturns(space, nil)
 
 			user := models.UserFields{}
@@ -258,9 +279,10 @@ var _ = Describe("space-users command", func() {
 					return userFields, nil
 				}
 
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.Organization = org
-				requirementsFactory.Space = space
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+				organizationReq.GetOrganizationReturns(org)
+				requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 				pluginUserModel = []plugin_models.GetSpaceUsers_Model{}
 				deps.PluginModels.SpaceUsers = &pluginUserModel
 			})
@@ -328,9 +350,10 @@ var _ = Describe("space-users command", func() {
 					return userFields, nil
 				}
 
-				requirementsFactory.LoginSuccess = true
-				requirementsFactory.Organization = org
-				requirementsFactory.Space = space
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				organizationReq := new(requirementsfakes.FakeOrganizationRequirement)
+				organizationReq.GetOrganizationReturns(org)
+				requirementsFactory.NewOrganizationRequirementReturns(organizationReq)
 				pluginUserModel = []plugin_models.GetSpaceUsers_Model{}
 				deps.PluginModels.SpaceUsers = &pluginUserModel
 			})
