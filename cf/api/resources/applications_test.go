@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/models"
-	testtime "github.com/cloudfoundry/cli/testhelpers/time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -33,7 +32,9 @@ var _ = Describe("Application resources", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			applicationModel := resource.ToModel()
-			Expect(*applicationModel.PackageUpdatedAt).To(Equal(testtime.MustParse(eventTimestampFormat, "2013-10-07T16:51:07+00:00")))
+			timestamp, err := time.Parse(eventTimestampFormat, "2013-10-07T16:51:07+00:00")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(*applicationModel.PackageUpdatedAt).To(Equal(timestamp))
 		})
 	})
 
