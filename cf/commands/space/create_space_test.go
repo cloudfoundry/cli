@@ -10,10 +10,11 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -24,7 +25,7 @@ import (
 var _ = Describe("create-space command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configOrg           models.OrganizationFields
 		configRepo          coreconfig.Repository
 		spaceRepo           *apifakes.FakeSpaceRepository
@@ -66,7 +67,9 @@ var _ = Describe("create-space command", func() {
 		spaceQuotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		flagRepo = new(featureflagsfakes.FakeFeatureFlagRepository)
 
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 		configOrg = models.OrganizationFields{
 			Name: "my-org",
 			GUID: "my-org-guid",
@@ -94,7 +97,7 @@ var _ = Describe("create-space command", func() {
 
 		Context("when not logged in", func() {
 			BeforeEach(func() {
-				requirementsFactory.LoginSuccess = false
+				requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			})
 
 			It("fails requirements", func() {
@@ -104,7 +107,9 @@ var _ = Describe("create-space command", func() {
 
 		Context("when a org is not targeted", func() {
 			BeforeEach(func() {
-				requirementsFactory.TargetedOrgSuccess = false
+				targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+				targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+				requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 			})
 
 			It("fails requirements", func() {

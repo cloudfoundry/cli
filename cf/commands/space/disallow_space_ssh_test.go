@@ -7,9 +7,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -20,7 +21,7 @@ import (
 var _ = Describe("disallow-space-ssh command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		spaceRepo           *apifakes.FakeSpaceRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -29,7 +30,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 	})
 
@@ -45,9 +46,11 @@ var _ = Describe("disallow-space-ssh command", func() {
 	}
 
 	Describe("requirements", func() {
-		It("fails with usage when called without enough arguments", func() {
-			requirementsFactory.LoginSuccess = true
+		BeforeEach(func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		})
 
+		It("fails with usage when called without enough arguments", func() {
 			runCommand()
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Incorrect Usage", "Requires", "argument"},
@@ -56,19 +59,23 @@ var _ = Describe("disallow-space-ssh command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("does not pass requirements if org is not targeted", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("does not pass requirements if space does not exist", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.SpaceRequirementFails = true
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+			spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+			spaceReq.ExecuteReturns(errors.New("no space"))
+			requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
@@ -78,8 +85,8 @@ var _ = Describe("disallow-space-ssh command", func() {
 		var space models.Space
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 
 			space = models.Space{}
 			space.Name = "the-space-name"
@@ -89,7 +96,9 @@ var _ = Describe("disallow-space-ssh command", func() {
 		Context("when allow_ssh is already set to the false", func() {
 			BeforeEach(func() {
 				space.AllowSSH = false
-				requirementsFactory.Space = space
+				spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+				spaceReq.GetSpaceReturns(space)
+				requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 			})
 
 			It("notifies the user", func() {
@@ -103,7 +112,9 @@ var _ = Describe("disallow-space-ssh command", func() {
 			Context("Update successfully", func() {
 				BeforeEach(func() {
 					space.AllowSSH = true
-					requirementsFactory.Space = space
+					spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+					spaceReq.GetSpaceReturns(space)
+					requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 				})
 
 				It("updates the space's allow_ssh", func() {
@@ -121,7 +132,9 @@ var _ = Describe("disallow-space-ssh command", func() {
 			Context("Update fails", func() {
 				BeforeEach(func() {
 					space.AllowSSH = true
-					requirementsFactory.Space = space
+					spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+					spaceReq.GetSpaceReturns(space)
+					requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 				})
 
 				It("notifies user of any api error", func() {

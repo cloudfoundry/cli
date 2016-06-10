@@ -1,18 +1,20 @@
 package space_test
 
 import (
+	"errors"
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/models"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/commands/space"
@@ -24,7 +26,7 @@ import (
 var _ = Describe("spaces command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		spaceRepo           *apifakes.FakeSpaceRepository
 
@@ -42,7 +44,7 @@ var _ = Describe("spaces command", func() {
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 		ui = &testterm.FakeUI{}
 		spaceRepo = new(apifakes.FakeSpaceRepository)
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -52,13 +54,16 @@ var _ = Describe("spaces command", func() {
 
 	Describe("requirements", func() {
 		It("fails when not logged in", func() {
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand()).To(BeFalse())
 		})
 
 		It("fails when an org is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(runCommand()).To(BeFalse())
 		})
@@ -116,9 +121,8 @@ var _ = Describe("spaces command", func() {
 			space2.GUID = "456"
 			spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space, space2})
 
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.LoginSuccess = true
-
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 		})
 
 		It("populates the plugin models upon execution", func() {
@@ -140,8 +144,8 @@ var _ = Describe("spaces command", func() {
 			space3 := models.Space{}
 			space3.Name = "space3"
 			spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space, space2, space3})
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 		})
 
 		It("lists all of the spaces", func() {

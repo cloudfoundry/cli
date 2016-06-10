@@ -1,11 +1,14 @@
 package space_test
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +17,7 @@ import (
 var _ = Describe("space-ssh-allowed command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -29,12 +32,12 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		requirementsFactory = &testreq.FakeReqFactory{}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 
 	Describe("requirements", func() {
 		It("fails with usage when called without enough arguments", func() {
-			requirementsFactory.LoginSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
 			runCommand()
 			Expect(ui.Outputs()).To(ContainSubstrings(
@@ -44,20 +47,25 @@ var _ = Describe("space-ssh-allowed command", func() {
 		})
 
 		It("fails requirements when not logged in", func() {
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("does not pass requirements if org is not targeted", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("does not pass requirements if space does not exist", func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
-			requirementsFactory.SpaceRequirementFails = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+			spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+			spaceReq.ExecuteReturns(errors.New("no space"))
+			requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
@@ -67,18 +75,23 @@ var _ = Describe("space-ssh-allowed command", func() {
 		var space models.Space
 
 		BeforeEach(func() {
-			requirementsFactory.LoginSuccess = true
-			requirementsFactory.TargetedOrgSuccess = true
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
 
 			space = models.Space{}
 			space.Name = "the-space-name"
 			space.GUID = "the-space-guid"
+			spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+			spaceReq.GetSpaceReturns(space)
+			requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 		})
 
 		Context("when SSH is enabled for the space", func() {
 			It("notifies the user", func() {
 				space.AllowSSH = true
-				requirementsFactory.Space = space
+				spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+				spaceReq.GetSpaceReturns(space)
+				requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 
 				runCommand("the-space-name")
 
@@ -88,8 +101,6 @@ var _ = Describe("space-ssh-allowed command", func() {
 
 		Context("when SSH is disabled for the space", func() {
 			It("notifies the user", func() {
-				requirementsFactory.Space = space
-
 				runCommand("the-space-name")
 
 				Expect(ui.Outputs()).To(ContainSubstrings([]string{"ssh support is disabled in space 'the-space-name'"}))

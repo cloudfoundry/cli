@@ -1,14 +1,17 @@
 package space_test
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/cli/testhelpers/maker"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -22,7 +25,7 @@ var _ = Describe("delete-space command", func() {
 		space               models.Space
 		config              coreconfig.Repository
 		spaceRepo           *apifakes.FakeSpaceRepository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
 
@@ -47,11 +50,12 @@ var _ = Describe("delete-space command", func() {
 			"guid": "space-to-delete-guid",
 		})
 
-		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:       true,
-			TargetedOrgSuccess: true,
-			Space:              space,
-		}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+		requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+		spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+		spaceReq.GetSpaceReturns(space)
+		requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 	})
 
 	Describe("requirements", func() {
@@ -59,13 +63,15 @@ var _ = Describe("delete-space command", func() {
 			ui.Inputs = []string{"y"}
 		})
 		It("fails when not logged in", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
 		It("fails when not targeting a space", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
