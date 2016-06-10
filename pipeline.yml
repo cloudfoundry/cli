@@ -239,8 +239,18 @@ jobs:
       params:
         acquire: true
   - aggregate:
-    - task: cats-dea
+    - task: cats
       file: cli-ci/ci/tasks/cats-linux.yml
+      params:
+        BACKEND: dea
+        INCLUDE_DEFAULT: true
+        INCLUDE_INTERNET_DEPENDENT: true
+        INCLUDE_ROUTE_SERVICES: true
+        INCLUDE_SECURITY_GROUPS: true
+    - task: cats-services
+      file: cli-ci/ci/tasks/cats-linux.yml
+      params:
+        INCLUDE_SERVICES: true
     ensure:
       put: bosh-lites-dea-pool
       params:
