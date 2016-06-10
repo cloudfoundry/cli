@@ -8,19 +8,20 @@ inputs:
 - name: bosh-lite-lock
 
 params:
-  BACKEND: dea
+  BACKEND:
   CF_ADMIN_PASSWORD: admin
   CF_ADMIN_USER: admin
 
+  INCLUDE_DEFAULT: false
   INCLUDE_BACKEND_COMPATIBILITY: false
   INCLUDE_DIEGO_DOCKER: false
   INCLUDE_DIEGO_SSH: false
   INCLUDE_INTERNET_DEPENDENT: false
   INCLUDE_LOGGING: false
   INCLUDE_OPERATOR: false
-  INCLUDE_ROUTE_SERVICES: true
-  INCLUDE_SECURITY_GROUPS: true
-  INCLUDE_SERVICES: true
+  INCLUDE_ROUTE_SERVICES: false
+  INCLUDE_SECURITY_GROUPS: false
+  INCLUDE_SERVICES: false
   INCLUDE_TASKS: false
   INCLUDE_V3: false
 
@@ -151,6 +152,11 @@ run:
     $INCLUDE_INTERNET_DEPENDENT || SKIP_PACKAGES="${SKIP_PACKAGES}internet_dependent,"
     $INCLUDE_SERVICES || SKIP_PACKAGES="${SKIP_PACKAGES}services,"
     $INCLUDE_ROUTE_SERVICES || SKIP_PACKAGES="${SKIP_PACKAGES}route_services,"
+
+    ###########################################################
+    # Added by CLI
+    $INCLUDE_DEFAULT || SKIP_PACKAGES="${SKIP_PACKAGES}apps,detect,routing"
+    ###########################################################
 
     # Remove trailing comma
     SKIP_PACKAGES=$(echo $SKIP_PACKAGES | sed -E 's/(.*)(,)/\1/')
