@@ -41,8 +41,8 @@ done
 echo -e "\n Verifying total commands registered..."
 ginkgo commandsloader
 
-race_unsafe_packages="./plugin,./plugin_examples"
-race_unsafe_package2="./plugin ./plugin_examples"
+race_unsafe_packages="./plugin_examples"
+race_unsafe_package2="./plugin_examples"
 
 echo -e "\n Testing race safe packages..."
 CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage="$race_unsafe_packages" $@
