@@ -3,13 +3,16 @@ package password_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/net"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/password"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -38,7 +41,7 @@ func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Serve
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetUaaEndpoint(passwordServer.URL)
-	gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 	repo = NewCloudControllerRepository(configRepo, gateway)
 	return
 }

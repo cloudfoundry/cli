@@ -3,17 +3,19 @@ package api_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"time"
 
+	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-
-	. "github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +30,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(config)
+		gateway := net.NewCloudControllerGateway(config, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		repo = NewCloudControllerBuildpackRepository(config, gateway)
 	})
 

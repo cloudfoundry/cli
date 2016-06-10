@@ -6,14 +6,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"time"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -74,7 +76,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		gateway = cloudcontrollergateway.NewTestCloudControllerGateway(coreConfig)
+		gateway = net.NewCloudControllerGateway(coreConfig, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(gateway)
 	})

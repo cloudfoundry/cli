@@ -2,17 +2,20 @@ package stacks_test
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/onsi/gomega/ghttp"
 
 	. "github.com/cloudfoundry/cli/cf/api/stacks"
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +31,7 @@ var _ = Describe("StacksRepo", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAccessToken("BEARER my_access_token")
 
-		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		repo = NewCloudControllerStackRepository(configRepo, gateway)
 	})
 

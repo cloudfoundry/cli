@@ -2,17 +2,21 @@ package quotas_test
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/net"
 
-	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/onsi/gomega/ghttp"
 
 	"encoding/json"
+
+	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -28,7 +32,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAPIEndpoint(ccServer.URL())
-		gateway := cloudcontrollergateway.NewTestCloudControllerGateway(configRepo)
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
 		repo = quotas.NewCloudControllerQuotaRepository(configRepo, gateway)
 	})
 
