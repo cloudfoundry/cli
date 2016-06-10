@@ -31,9 +31,6 @@ var _ = Describe("App-Lister", func() {
 		ts, err = rpcserver.NewTestRPCServer(rpcHandlers)
 		Expect(err).NotTo(HaveOccurred())
 
-		err = ts.Start()
-		Expect(err).NotTo(HaveOccurred())
-
 		//set rpc.CallCoreCommand to a successful call
 		//rpc.CallCoreCommand is used in both cliConnection.CliCommand() and
 		//cliConnection.CliWithoutTerminalOutput()
@@ -47,6 +44,11 @@ var _ = Describe("App-Lister", func() {
 			*retVal = []string{"{}"}
 			return nil
 		}
+	})
+
+	JustBeforeEach(func() {
+		err = ts.Start()
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
@@ -79,12 +81,14 @@ var _ = Describe("App-Lister", func() {
 
 		Context("Running the command", func() {
 			Context("Curling v2/apps endpoint", func() {
-				It("shows the endpoint it is curling", func() {
+				BeforeEach(func() {
 					rpcHandlers.ApiEndpointStub = func(_ string, retVal *string) error {
 						*retVal = "api.example.com"
 						return nil
 					}
+				})
 
+				It("shows the endpoint it is curling", func() {
 					args := []string{ts.Port(), "list-apps"}
 					session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 					session.Wait()
@@ -92,29 +96,35 @@ var _ = Describe("App-Lister", func() {
 					Expect(session).To(gbytes.Say("api.example.com/v2/apps"))
 				})
 
-				It("raises an error when ApiEndpoint() returns an error", func() {
-					rpcHandlers.ApiEndpointStub = func(_ string, retVal *string) error {
-						*retVal = ""
-						return errors.New("Bad bad error")
-					}
+				Context("when ApiEndpoint() returns an error", func() {
+					BeforeEach(func() {
+						rpcHandlers.ApiEndpointStub = func(_ string, retVal *string) error {
+							*retVal = ""
+							return errors.New("Bad bad error")
+						}
+					})
 
-					args := []string{ts.Port(), "list-apps"}
-					session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
-					session.Wait()
-					Expect(err).NotTo(HaveOccurred())
-					Expect(session).To(gbytes.Say("FAILED"))
-					Expect(session).To(gbytes.Say("Bad bad error"))
-					Expect(session.ExitCode()).To(Equal(1))
+					It("raises an error when ApiEndpoint() returns an error", func() {
+						args := []string{ts.Port(), "list-apps"}
+						session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
+						session.Wait()
+						Expect(err).NotTo(HaveOccurred())
+						Expect(session).To(gbytes.Say("FAILED"))
+						Expect(session).To(gbytes.Say("Bad bad error"))
+						Expect(session.ExitCode()).To(Equal(1))
+					})
 				})
 
 				Context("when getting a list of apps", func() {
 					Context("without option flag", func() {
-						It("lists all apps", func() {
+						BeforeEach(func() {
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
 								*retVal = []string{marshal(sampleApps())}
 								return nil
 							}
+						})
 
+						It("lists all apps", func() {
 							args := []string{ts.Port(), "list-apps"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
@@ -126,12 +136,14 @@ var _ = Describe("App-Lister", func() {
 					})
 
 					Context("with --started", func() {
-						It("lists only started apps", func() {
+						BeforeEach(func() {
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
 								*retVal = []string{marshal(sampleApps())}
 								return nil
 							}
+						})
 
+						It("lists only started apps", func() {
 							args := []string{ts.Port(), "list-apps", "--started"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
@@ -143,12 +155,14 @@ var _ = Describe("App-Lister", func() {
 					})
 
 					Context("with --stopped", func() {
-						It("lists only stopped apps", func() {
+						BeforeEach(func() {
 							rpcHandlers.GetOutputAndResetStub = func(_ bool, retVal *[]string) error {
 								*retVal = []string{marshal(sampleApps())}
 								return nil
 							}
+						})
 
+						It("lists only stopped apps", func() {
 							args := []string{ts.Port(), "list-apps", "--stopped"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
@@ -160,11 +174,13 @@ var _ = Describe("App-Lister", func() {
 					})
 
 					Context("when CliCommandWithoutTerminalOutput() returns an error", func() {
-						It("notifies the user about the error", func() {
+						BeforeEach(func() {
 							rpcHandlers.CallCoreCommandStub = func(_ []string, retVal *bool) error {
 								return errors.New("something went wrong")
 							}
+						})
 
+						It("notifies the user about the error", func() {
 							args := []string{ts.Port(), "list-apps", "--stopped"}
 							session, err := gexec.Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
 							session.Wait()
