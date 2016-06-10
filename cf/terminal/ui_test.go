@@ -83,7 +83,7 @@ var _ = Describe("UI", func() {
 
 	Describe("Asking user for input", func() {
 		It("allows string with whitespaces", func() {
-			io_helpers.CaptureOutput(func() {
+			_ = io_helpers.CaptureOutput(func() {
 				io_helpers.SimulateStdin("foo bar\n", func(reader io.Reader) {
 					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Ask("?")).To(Equal("foo bar"))
@@ -92,7 +92,7 @@ var _ = Describe("UI", func() {
 		})
 
 		It("returns empty string if an error occured while reading string", func() {
-			io_helpers.CaptureOutput(func() {
+			_ = io_helpers.CaptureOutput(func() {
 				io_helpers.SimulateStdin("string without expected delimiter", func(reader io.Reader) {
 					ui := NewUI(reader, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 					Expect(ui.Ask("?")).To(Equal(""))
@@ -342,7 +342,7 @@ var _ = Describe("UI", func() {
 
 	Describe("failing", func() {
 		It("panics", func() {
-			io_helpers.CaptureOutput(func() {
+			_ = io_helpers.CaptureOutput(func() {
 				Expect(func() {
 					NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
 				}).To(Panic())
@@ -361,7 +361,7 @@ var _ = Describe("UI", func() {
 			})
 
 			It("panics if 'T' func is used to translate", func() {
-				io_helpers.CaptureOutput(func() {
+				_ = io_helpers.CaptureOutput(func() {
 					Expect(func() {
 						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
 					}).To(Panic())
