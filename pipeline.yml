@@ -278,12 +278,16 @@ jobs:
         acquire: true
   - aggregate:
     - task: linux
-      file: cli-ci/ci/tasks/cats-linux-diego.yml
-    - task: windows
-      file: cli-ci/ci/tasks/cats-windows-diego.yml
+      file: cli-ci/ci/tasks/cats-linux.yml
       params:
-        ADMIN_USER: {{bosh-lite-admin-username}}
-        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+        BACKEND: diego
+        INCLUDE_DEFAULT: true
+        INCLUDE_BACKEND_COMPATIBILITY: true
+        INCLUDE_DIEGO_DOCKER: true
+        INCLUDE_DIEGO_SSH: true
+        INCLUDE_INTERNET_DEPENDENT: true
+        INCLUDE_ROUTE_SERVICES: true
+        INCLUDE_SECURITY_GROUPS: true
     ensure:
       put: bosh-lites-diego-pool
       params:
