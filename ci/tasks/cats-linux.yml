@@ -155,7 +155,7 @@ run:
 
     ###########################################################
     # Added by CLI
-    $INCLUDE_DEFAULT || SKIP_PACKAGES="${SKIP_PACKAGES}apps,detect,routing"
+    $INCLUDE_DEFAULT || SKIP_PACKAGES="${SKIP_PACKAGES}apps,detect,routing,"
     ###########################################################
 
     # Remove trailing comma
