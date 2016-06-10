@@ -1,13 +1,16 @@
 package space_test
 
 import (
+	"errors"
+
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/requirements"
+	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testreq "github.com/cloudfoundry/cli/testhelpers/requirements"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,7 +22,7 @@ var _ = Describe("rename-space command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		configRepo          coreconfig.Repository
-		requirementsFactory *testreq.FakeReqFactory
+		requirementsFactory *requirementsfakes.FakeFactory
 		spaceRepo           *apifakes.FakeSpaceRepository
 		deps                commandregistry.Dependency
 	)
@@ -34,7 +37,7 @@ var _ = Describe("rename-space command", func() {
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		requirementsFactory = new(requirementsfakes.FakeFactory)
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 	})
 
@@ -44,7 +47,7 @@ var _ = Describe("rename-space command", func() {
 
 	Describe("when the user is not logged in", func() {
 		It("does not pass requirements", func() {
-			requirementsFactory.LoginSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 
 			Expect(callRenameSpace([]string{"my-space", "my-new-space"})).To(BeFalse())
 		})
@@ -52,7 +55,10 @@ var _ = Describe("rename-space command", func() {
 
 	Describe("when the user has not targeted an org", func() {
 		It("does not pass requirements", func() {
-			requirementsFactory.TargetedOrgSuccess = false
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(callRenameSpace([]string{"my-space", "my-new-space"})).To(BeFalse())
 		})
@@ -68,11 +74,16 @@ var _ = Describe("rename-space command", func() {
 	})
 
 	Describe("when the user is logged in and has provided an old and new space name", func() {
+		var space models.Space
 		BeforeEach(func() {
-			space := models.Space{}
+			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+			requirementsFactory.NewTargetedOrgRequirementReturns(new(requirementsfakes.FakeTargetedOrgRequirement))
+			space = models.Space{}
 			space.Name = "the-old-space-name"
 			space.GUID = "the-old-space-guid"
-			requirementsFactory.Space = space
+			spaceReq := new(requirementsfakes.FakeSpaceRequirement)
+			spaceReq.GetSpaceReturns(space)
+			requirementsFactory.NewSpaceRequirementReturns(spaceReq)
 		})
 
 		It("renames a space", func() {
@@ -92,7 +103,7 @@ var _ = Describe("rename-space command", func() {
 
 		Describe("renaming the space the user has targeted", func() {
 			BeforeEach(func() {
-				configRepo.SetSpaceFields(requirementsFactory.Space.SpaceFields)
+				configRepo.SetSpaceFields(space.SpaceFields)
 			})
 
 			It("renames the targeted space", func() {
