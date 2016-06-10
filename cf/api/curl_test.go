@@ -2,11 +2,11 @@ package api_test
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
-	testassert "github.com/cloudfoundry/cli/testhelpers/assert"
 	"github.com/cloudfoundry/cli/testhelpers/cloudcontrollergateway"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
@@ -57,7 +57,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 		})
 
 		It("returns the body as a JSON-encoded string", func() {
-			testassert.JSONStringEquals(body, expectedJSONResponse)
+			Expect(removeWhitespace(body)).To(Equal(removeWhitespace(expectedJSONResponse)))
 		})
 	})
 
@@ -110,7 +110,7 @@ var _ = Describe("CloudControllerCurlRepository ", func() {
 			})
 
 			It("returns the response body", func() {
-				testassert.JSONStringEquals(body, expectedJSONResponse)
+				Expect(removeWhitespace(body)).To(Equal(removeWhitespace(expectedJSONResponse)))
 			})
 
 			It("does not return an error", func() {
@@ -208,4 +208,12 @@ func newCurlDependencies() (deps curlDependencies) {
 	deps.config.SetAccessToken("BEARER my_access_token")
 	deps.gateway = cloudcontrollergateway.NewTestCloudControllerGateway(deps.config)
 	return
+}
+
+func removeWhitespace(body string) string {
+	body = strings.Replace(body, " ", "", -1)
+	body = strings.Replace(body, "\n", "", -1)
+	body = strings.Replace(body, "\r", "", -1)
+	body = strings.Replace(body, "\t", "", -1)
+	return body
 }

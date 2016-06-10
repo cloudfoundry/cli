@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	"github.com/cloudfoundry/cli/testhelpers/assert"
 	"github.com/cloudfoundry/cli/testhelpers/configuration"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
@@ -342,11 +341,11 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("failing", func() {
-		It("panics with a specific string", func() {
+		It("panics", func() {
 			io_helpers.CaptureOutput(func() {
-				assert.DoesPanic(QuietPanic, func() {
+				Expect(func() {
 					NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
-				})
+				}).To(Panic())
 			})
 		})
 
@@ -361,20 +360,20 @@ var _ = Describe("UI", func() {
 				i18n.T = t
 			})
 
-			It("does not use 'T' func to translate", func() {
+			It("panics if 'T' func is used to translate", func() {
 				io_helpers.CaptureOutput(func() {
-					assert.DoesPanic(QuietPanic, func() {
+					Expect(func() {
 						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
-					})
+					}).To(Panic())
 				})
 			})
 
 			It("does not duplicate output if logger is set to stdout", func() {
 				output := io_helpers.CaptureOutput(func() {
-					assert.DoesPanic(QuietPanic, func() {
-						logger := trace.NewWriterPrinter(os.Stdout, true)
+					logger := trace.NewWriterPrinter(os.Stdout, true)
+					Expect(func() {
 						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
-					})
+					}).To(Panic())
 				})
 
 				Expect(output).To(HaveLen(3))
@@ -386,12 +385,13 @@ var _ = Describe("UI", func() {
 
 		Context("when 'T' func is initialized", func() {
 			It("does not duplicate output if logger is set to stdout", func() {
-				output := io_helpers.CaptureOutput(func() {
-					assert.DoesPanic(QuietPanic, func() {
+				output := io_helpers.CaptureOutput(
+					func() {
 						logger := trace.NewWriterPrinter(os.Stdout, true)
-						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
+						Expect(func() {
+							NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
+						}).To(Panic())
 					})
-				})
 
 				Expect(output).To(HaveLen(3))
 				Expect(output[0]).To(Equal("FAILED"))
