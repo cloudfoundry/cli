@@ -37,7 +37,9 @@ var _ = Describe("Command", func() {
 				rpcHandlers = new(rpcserverfakes.FakeHandlers)
 				ts, err = rpcserver.NewTestRPCServer(rpcHandlers)
 				Expect(err).NotTo(HaveOccurred())
+			})
 
+			JustBeforeEach(func() {
 				err = ts.Start()
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -57,19 +59,25 @@ var _ = Describe("Command", func() {
 					Expect(rpcHandlers.IsMinCliVersionCallCount()).To(Equal(1))
 				})
 
-				It("notifies the user 'min cli version is not met'", func() {
-					rpcHandlers.IsMinCliVersionStub = func(_ string, result *bool) error {
-						*result = false
-						return nil
-					}
+				Context("when the min cli version is not met", func() {
+					BeforeEach(func() {
+						rpcHandlers.IsMinCliVersionStub = func(_ string, result *bool) error {
+							*result = false
+							return nil
+						}
+					})
 
-					args := []string{ts.Port(), "0"}
-					session, err := Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
-					Expect(err).ToNot(HaveOccurred())
+					It("notifies the user", func() {
 
-					session.Wait()
+						args := []string{ts.Port(), "0"}
+						session, err := Start(exec.Command(validPluginPath, args...), GinkgoWriter, GinkgoWriter)
+						Expect(err).ToNot(HaveOccurred())
 
-					Expect(session).To(gbytes.Say("Minimum CLI version 5.0.0 is required to run this plugin command"))
+						session.Wait()
+
+						Expect(session).To(gbytes.Say("Minimum CLI version 5.0.0 is required to run this plugin command"))
+
+					})
 				})
 			})
 		})
