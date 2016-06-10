@@ -15,7 +15,6 @@ import (
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-	testtime "github.com/cloudfoundry/cli/testhelpers/time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -55,12 +54,14 @@ var _ = Describe("App Events Repo", func() {
 
 			list, err := repo.RecentEvents("my-app-guid", 2)
 			Expect(err).ToNot(HaveOccurred())
+			timestamp, err := time.Parse(eventTimestampFormat, "2014-01-21T00:20:11+00:00")
+			Expect(err).ToNot(HaveOccurred())
 
 			Expect(list).To(ConsistOf([]models.EventFields{
 				{
 					GUID:        "event-1-guid",
 					Name:        "audit.app.update",
-					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
+					Timestamp:   timestamp,
 					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
 					Actor:       "cf-1-client",
 					ActorName:   "somebody@pivotallabs.com",
@@ -68,7 +69,7 @@ var _ = Describe("App Events Repo", func() {
 				{
 					GUID:        "event-2-guid",
 					Name:        "audit.app.update",
-					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
+					Timestamp:   timestamp,
 					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
 					Actor:       "cf-2-client",
 					ActorName:   "nobody@pivotallabs.com",
