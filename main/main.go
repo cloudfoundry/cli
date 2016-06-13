@@ -31,6 +31,7 @@ var cmdRegistry = commandregistry.Commands
 
 func main() {
 	traceEnv := os.Getenv("CF_TRACE")
+	// Writer is assigned in writer_unix.go/writer_windows.go
 	traceLogger := trace.NewLogger(Writer, false, traceEnv, "")
 
 	//handle `cf -v` for cf version
