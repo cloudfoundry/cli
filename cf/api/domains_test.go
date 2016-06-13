@@ -11,9 +11,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -35,7 +35,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	JustBeforeEach(func() {
-		gateway := net.NewCloudControllerGateway(config, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 		strategy := strategy.NewEndpointStrategy(config.APIVersion())
 		repo = NewCloudControllerDomainRepository(config, gateway, strategy)
 	})

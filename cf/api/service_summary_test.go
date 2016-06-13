@@ -7,9 +7,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -99,7 +99,7 @@ func createServiceSummaryRepo(req testnet.TestRequest) (ts *httptest.Server, han
 	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 	repo = NewCloudControllerServiceSummaryRepository(configRepo, gateway)
 	return
 }

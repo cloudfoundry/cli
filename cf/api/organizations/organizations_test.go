@@ -9,9 +9,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -33,7 +33,7 @@ var _ = Describe("Organization Repository", func() {
 				ccServer = ghttp.NewServer()
 				configRepo := testconfig.NewRepositoryWithDefaults()
 				configRepo.SetAPIEndpoint(ccServer.URL())
-				gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
@@ -128,7 +128,7 @@ var _ = Describe("Organization Repository", func() {
 				ccServer = ghttp.NewServer()
 				configRepo := testconfig.NewRepositoryWithDefaults()
 				configRepo.SetAPIEndpoint(ccServer.URL())
-				gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
@@ -395,7 +395,7 @@ func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.S
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(testserver.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return
 }

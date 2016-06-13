@@ -8,9 +8,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -29,7 +29,7 @@ var _ = Describe("Feature Flags Repository", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 		repo = NewCloudControllerFeatureFlagRepository(configRepo, gateway)
 	})
 

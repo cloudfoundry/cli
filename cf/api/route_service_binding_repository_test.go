@@ -10,8 +10,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/net"
 
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/onsi/gomega/ghttp"
 
@@ -32,7 +32,7 @@ var _ = Describe("RouteServiceBindingsRepository", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAPIEndpoint(ccServer.URL())
 
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 		routeServiceBindingRepo = api.NewCloudControllerRouteServiceBindingRepository(configRepo, gateway)
 	})
 

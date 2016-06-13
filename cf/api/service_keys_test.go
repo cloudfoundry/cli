@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/onsi/gomega/ghttp"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -35,7 +35,7 @@ var _ = Describe("Service Keys Repo", func() {
 		ccServer = ghttp.NewServer()
 		configRepo.SetAPIEndpoint(ccServer.URL())
 
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)
 	})
 
