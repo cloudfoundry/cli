@@ -44,17 +44,11 @@ var _ = Describe("Panic Printer", func() {
 			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("An unexpected type of error")))
 		})
 
-		It("includes the error message when given an errors.Exception with DisplayCrashDialog set to true", func() {
-			err := errors.Exception{DisplayCrashDialog: true, Message: "some-message"}
+		It("includes the error message when given an errors.Exception", func() {
+			err := errors.Exception{Message: "some-message"}
 			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
 			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
 			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-message")))
-		})
-
-		It("does not print anything when given an errors.Exception with DisplayCrashDialog set to false", func() {
-			err := errors.Exception{DisplayCrashDialog: false, Message: "some-message"}
-			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(len(ui.Outputs())).To(Equal(0))
 		})
 	})
 
