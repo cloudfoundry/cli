@@ -8,19 +8,27 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-var UI terminal.UI
+type PanicPrinter struct {
+	ui terminal.UI
+}
 
-func DisplayCrashDialog(err interface{}, commandArgs string, stackTrace string) {
+func NewPanicPrinter(ui terminal.UI) PanicPrinter {
+	return PanicPrinter{
+		ui: ui,
+	}
+}
+
+func (p PanicPrinter) DisplayCrashDialog(err interface{}, commandArgs string, stackTrace string) {
 	if err != nil && err != terminal.QuietPanic {
 		switch err := err.(type) {
 		case errors.Exception:
-			UI.Say(CrashDialog(err.Message, commandArgs, stackTrace))
+			p.ui.Say(CrashDialog(err.Message, commandArgs, stackTrace))
 		case error:
-			UI.Say(CrashDialog(err.Error(), commandArgs, stackTrace))
+			p.ui.Say(CrashDialog(err.Error(), commandArgs, stackTrace))
 		case string:
-			UI.Say(CrashDialog(err, commandArgs, stackTrace))
+			p.ui.Say(CrashDialog(err, commandArgs, stackTrace))
 		default:
-			UI.Say(CrashDialog("An unexpected type of error", commandArgs, stackTrace))
+			p.ui.Say(CrashDialog("An unexpected type of error", commandArgs, stackTrace))
 		}
 	}
 }

@@ -16,6 +16,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
+const QuietPanic = "This shouldn't print anything"
+
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
@@ -154,8 +156,6 @@ func (ui *terminalUI) Confirm(message string) bool {
 func (ui *terminalUI) Ok() {
 	ui.Say(SuccessColor(T("OK")))
 }
-
-const QuietPanic = "This shouldn't print anything"
 
 func (ui *terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
