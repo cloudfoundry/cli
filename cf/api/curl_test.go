@@ -8,9 +8,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -208,7 +208,7 @@ type curlDependencies struct {
 func newCurlDependencies() (deps curlDependencies) {
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAccessToken("BEARER my_access_token")
-	deps.gateway = net.NewCloudControllerGateway(deps.config, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+	deps.gateway = net.NewCloudControllerGateway(deps.config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 	return
 }
 

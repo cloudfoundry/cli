@@ -12,8 +12,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/net"
 	"github.com/onsi/gomega/ghttp"
 
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	. "github.com/onsi/ginkgo"
@@ -31,7 +31,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 		ccServer = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAPIEndpoint(ccServer.URL())
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 		repo = spacequotas.NewCloudControllerSpaceQuotaRepository(configRepo, gateway)
 	})
 

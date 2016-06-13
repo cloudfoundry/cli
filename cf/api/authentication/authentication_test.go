@@ -8,9 +8,9 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api/authentication"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -35,7 +35,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
 			fakePrinter = new(tracefakes.FakePrinter)
-			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, fakePrinter)
+			gateway = net.NewUAAGateway(config, new(terminalfakes.FakeUI), fakePrinter)
 			dumper = net.NewRequestDumper(fakePrinter)
 			auth = NewUAARepository(gateway, config, dumper)
 		})
@@ -240,7 +240,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			config.SetSSHOAuthClient("ssh-oauth-client")
 
 			fakePrinter = new(tracefakes.FakePrinter)
-			gateway = net.NewUAAGateway(config, &testterm.FakeUI{}, fakePrinter)
+			gateway = net.NewUAAGateway(config, new(terminalfakes.FakeUI), fakePrinter)
 			dumper = net.NewRequestDumper(fakePrinter)
 			authRepo = NewUAARepository(gateway, config, dumper)
 

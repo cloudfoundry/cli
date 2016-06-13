@@ -8,8 +8,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
@@ -29,7 +29,7 @@ var _ = Describe("ServiceBindingsRepository", func() {
 		server = ghttp.NewServer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAPIEndpoint(server.URL())
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 		repo = NewCloudControllerServiceBindingRepository(configRepo, gateway)
 	})
 
