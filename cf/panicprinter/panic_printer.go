@@ -14,11 +14,7 @@ func DisplayCrashDialog(err interface{}, commandArgs string, stackTrace string) 
 	if err != nil && err != terminal.QuietPanic {
 		switch err := err.(type) {
 		case errors.Exception:
-			if err.DisplayCrashDialog {
-				UI.Say(CrashDialog(err.Message, commandArgs, stackTrace))
-			} else {
-				fmt.Println(err.Message)
-			}
+			UI.Say(CrashDialog(err.Message, commandArgs, stackTrace))
 		case error:
 			UI.Say(CrashDialog(err.Error(), commandArgs, stackTrace))
 		case string:
