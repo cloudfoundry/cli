@@ -2,53 +2,55 @@ package panicprinter_test
 
 import (
 	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/panicprinter"
+	. "github.com/cloudfoundry/cli/cf/panicprinter"
+
 	"github.com/cloudfoundry/cli/cf/terminal"
-
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Panic Printer", func() {
-	var ui *testterm.FakeUI
+	var (
+		ui           *terminalfakes.FakeUI
+		panicPrinter PanicPrinter
+	)
 
 	BeforeEach(func() {
-		panicprinter.UI = &testterm.FakeUI{}
-		ui = panicprinter.UI.(*testterm.FakeUI)
+		ui = new(terminalfakes.FakeUI)
+		panicPrinter = NewPanicPrinter(ui)
 	})
 
 	Describe("DisplayCrashDialog", func() {
 		It("includes the error message when given an error", func() {
-			panicprinter.DisplayCrashDialog(errors.New("some-error"), "some command", "some trace")
-			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
-			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-error")))
+			panicPrinter.DisplayCrashDialog(errors.New("some-error"), "some command", "some trace")
+			Expect(ui.SayCallCount()).To(Equal(1))
+			Expect(ui.SayArgsForCall(0)).To(Equal(CrashDialog("some-error", "some command", "some trace")))
 		})
 
 		It("includes the string when given a string that is not terminal.QuietPanic", func() {
-			panicprinter.DisplayCrashDialog("some-error", "some command", "some trace")
-			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
-			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-error")))
+			panicPrinter.DisplayCrashDialog("some-error", "some command", "some trace")
+			Expect(ui.SayCallCount()).To(Equal(1))
+			Expect(ui.SayArgsForCall(0)).To(Equal(CrashDialog("some-error", "some command", "some trace")))
 		})
 
 		It("does not print anything when given a string that is terminal.QuietPanic", func() {
 			err := terminal.QuietPanic
-			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(len(ui.Outputs())).To(Equal(0))
+			panicPrinter.DisplayCrashDialog(err, "some command", "some trace")
+			Expect(ui.SayCallCount()).To(Equal(0))
 		})
 
 		It("prints the unexpected error type message when not given a string or an error", func() {
-			panicprinter.DisplayCrashDialog(struct{}{}, "some command", "some trace")
-			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
-			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("An unexpected type of error")))
+			panicPrinter.DisplayCrashDialog(struct{}{}, "some command", "some trace")
+			Expect(ui.SayCallCount()).To(Equal(1))
+			Expect(ui.SayArgsForCall(0)).To(ContainSubstring("An unexpected type of error"))
 		})
 
 		It("includes the error message when given an errors.Exception", func() {
 			err := errors.Exception{Message: "some-message"}
-			panicprinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(len(ui.Outputs())).To(BeNumerically(">", 0))
-			Expect(ui.Outputs()).To(ContainElement(ContainSubstring("some-message")))
+			panicPrinter.DisplayCrashDialog(err, "some command", "some trace")
+			Expect(ui.SayCallCount()).To(Equal(1))
+			Expect(ui.SayArgsForCall(0)).To(Equal(CrashDialog(err.Message, "some command", "some trace")))
 		})
 	})
 
@@ -60,7 +62,7 @@ var _ = Describe("Panic Printer", func() {
 		)
 
 		It("returns crash dialog text", func() {
-			Expect(panicprinter.CrashDialog(errMsg, commandArgs, stackTrace)).To(MatchRegexp(`
+			Expect(CrashDialog(errMsg, commandArgs, stackTrace)).To(MatchRegexp(`
 	Please re-run the command that caused this exception with the environment
 	variable CF_TRACE set to true.
 

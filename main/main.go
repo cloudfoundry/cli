@@ -170,13 +170,13 @@ func suggestCommands(cmdName string, ui terminal.UI, cmdsList []string) {
 }
 
 func handlePanics(printer terminal.Printer, logger trace.Printer) {
-	panicprinter.UI = terminal.NewUI(os.Stdin, Writer, printer, logger)
+	panicPrinter := panicprinter.NewPanicPrinter(terminal.NewUI(os.Stdin, Writer, printer, logger))
 
 	commandArgs := strings.Join(os.Args, " ")
 	stackTrace := generateBacktrace()
 
 	err := recover()
-	panicprinter.DisplayCrashDialog(err, commandArgs, stackTrace)
+	panicPrinter.DisplayCrashDialog(err, commandArgs, stackTrace)
 
 	if err != nil {
 		os.Exit(1)
