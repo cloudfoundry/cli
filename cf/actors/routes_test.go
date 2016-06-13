@@ -7,24 +7,22 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 )
 
 var _ = Describe("Routes", func() {
 	var (
-		fakeUI              *terminal.FakeUI
+		fakeUI              *terminalfakes.FakeUI
 		fakeRouteRepository *apifakes.FakeRouteRepository
 		routeActor          RouteActor
 	)
 
 	BeforeEach(func() {
-		fakeUI = &terminal.FakeUI{}
+		fakeUI = &terminalfakes.FakeUI{}
 		fakeRouteRepository = new(apifakes.FakeRouteRepository)
-
 		routeActor = NewRouteActor(fakeUI, fakeRouteRepository)
 	})
 
@@ -56,12 +54,11 @@ var _ = Describe("Routes", func() {
 			Expect(randomPort).To(BeTrue())
 		})
 
-		It("states which route it's creating", func() {
+		It("states that a route is being created", func() {
 			routeActor.CreateRandomTCPRoute(domain)
 
-			Expect(fakeUI.Outputs()).To(ContainSubstrings(
-				[]string{"Creating random route for dies-tcp.com..."},
-			))
+			Expect(fakeUI.SayCallCount()).To(Equal(1))
+			Expect(fakeUI.SayArgsForCall(0)).To(ContainSubstring("Creating random route for"))
 		})
 
 		It("returns the route retrieved from the repository", func() {
