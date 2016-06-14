@@ -16,7 +16,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testnet "github.com/cloudfoundry/cli/testhelpers/net"
 
 	. "github.com/cloudfoundry/cli/cf/api"
@@ -902,7 +901,11 @@ var _ = Describe("Services Repo", func() {
 					Status: 204,
 				}})
 
-			offering := maker.NewServiceOffering("the-offering")
+			offering := models.ServiceOffering{ServiceOfferingFields: models.ServiceOfferingFields{
+				Label:       "the-offering",
+				GUID:        "the-service-guid",
+				Description: "some service description",
+			}}
 			offering.GUID = "the-service-guid"
 
 			err := repo.PurgeServiceOffering(offering)
@@ -920,8 +923,10 @@ var _ = Describe("Services Repo", func() {
 					Status: 204,
 				}})
 
-			instance := maker.NewServiceInstance("schrodinger")
-			instance.GUID = "instance-guid"
+			instance := models.ServiceInstance{ServiceInstanceFields: models.ServiceInstanceFields{
+				Name: "schrodinger",
+				GUID: "instance-guid",
+			}}
 
 			err := repo.PurgeServiceInstance(instance)
 			Expect(err).NotTo(HaveOccurred())

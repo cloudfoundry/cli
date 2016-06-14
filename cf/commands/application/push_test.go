@@ -26,7 +26,6 @@ import (
 	"github.com/cloudfoundry/cli/generic"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/cli/words/generator/generatorfakes"
@@ -107,7 +106,11 @@ var _ = Describe("Push Command", func() {
 		appRepo = new(applicationsfakes.FakeRepository)
 
 		domainRepo = new(apifakes.FakeDomainRepository)
-		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
+		sharedDomain := models.DomainFields{
+			Name:   "foo.cf-app.com",
+			GUID:   "foo-domain-guid",
+			Shared: true,
+		}
 		domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
 			cb(sharedDomain)
 			return nil
@@ -302,7 +305,11 @@ var _ = Describe("Push Command", func() {
 				route := models.Route{}
 				route.GUID = "my-route-guid"
 				route.Host = "app-name"
-				route.Domain = maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
+				route.Domain = models.DomainFields{
+					Name:   "foo.cf-app.com",
+					GUID:   "foo-domain-guid",
+					Shared: true,
+				}
 
 				routeRepo.FindReturns(route, nil)
 			})
@@ -1369,7 +1376,9 @@ var _ = Describe("Push Command", func() {
 	Describe("service instances", func() {
 		BeforeEach(func() {
 			serviceRepo.FindInstanceByNameStub = func(name string) (models.ServiceInstance, error) {
-				return maker.NewServiceInstance(name), nil
+				return models.ServiceInstance{
+					ServiceInstanceFields: models.ServiceInstanceFields{Name: name},
+				}, nil
 			}
 
 			appRepo.CreateStub = func(params models.AppParams) (models.Application, error) {
@@ -1419,7 +1428,9 @@ var _ = Describe("Push Command", func() {
 
 		Context("when the app is already bound to the service", func() {
 			BeforeEach(func() {
-				appRepo.ReadReturns(maker.NewApp(maker.Overrides{}), nil)
+				appRepo.ReadReturns(models.Application{
+					ApplicationFields: models.ApplicationFields{Name: "app-name"},
+				}, nil)
 				serviceBinder.BindApplicationReturns.Error = errors.NewHTTPError(500, errors.ServiceBindingAppServiceTaken, "it don't work")
 			})
 
