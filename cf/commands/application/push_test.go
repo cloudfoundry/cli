@@ -26,7 +26,6 @@ import (
 	"github.com/cloudfoundry/cli/generic"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testmanifest "github.com/cloudfoundry/cli/testhelpers/manifest"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	"github.com/cloudfoundry/cli/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
@@ -41,7 +40,7 @@ var _ = Describe("Push Command", func() {
 	var (
 		ui                         *testterm.FakeUI
 		configRepo                 coreconfig.Repository
-		manifestRepo               *testmanifest.FakeManifestRepository
+		manifestRepo               *FakeManifestRepository
 		starter                    *applicationfakes.FakeStarter
 		stopper                    *applicationfakes.FakeStopper
 		serviceBinder              *servicefakes.OldFakeAppBinder
@@ -86,7 +85,7 @@ var _ = Describe("Push Command", func() {
 	}
 
 	BeforeEach(func() {
-		manifestRepo = &testmanifest.FakeManifestRepository{}
+		manifestRepo = &FakeManifestRepository{}
 
 		starter = new(applicationfakes.FakeStarter)
 		stopper = new(applicationfakes.FakeStopper)
@@ -1667,4 +1666,26 @@ func manifestWithServicesAndEnv() *manifest.Manifest {
 			},
 		}),
 	}
+}
+
+type FakeManifestRepository struct {
+	ReadManifestArgs struct {
+		Path string
+	}
+	ReadManifestReturns struct {
+		Manifest *manifest.Manifest
+		Error    error
+	}
+}
+
+func (repo *FakeManifestRepository) ReadManifest(inputPath string) (m *manifest.Manifest, err error) {
+	repo.ReadManifestArgs.Path = inputPath
+	if repo.ReadManifestReturns.Manifest != nil {
+		m = repo.ReadManifestReturns.Manifest
+	} else {
+		m = manifest.NewEmptyManifest()
+	}
+
+	err = repo.ReadManifestReturns.Error
+	return
 }
