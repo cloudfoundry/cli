@@ -1,33 +1,32 @@
 package net_test
 
 import (
+	"io"
 	"os"
 	"time"
 
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
-
 	. "github.com/cloudfoundry/cli/cf/net"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
-
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("ProgressReader", func() {
-
 	var (
 		testFile       *os.File
 		err            error
 		progressReader *ProgressReader
-		ui             *testterm.FakeUI
+		ui             *terminalfakes.FakeUI
 		b              []byte
 		fileStat       os.FileInfo
 	)
 
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
+		ui = new(terminalfakes.FakeUI)
+
 		testFile, err = os.Open("../../fixtures/test.file")
 		Expect(err).NotTo(HaveOccurred())
+
 		fileStat, err = testFile.Stat()
 		Expect(err).NotTo(HaveOccurred())
 
@@ -36,18 +35,29 @@ var _ = Describe("ProgressReader", func() {
 		progressReader.SetTotalSize(fileStat.Size())
 	})
 
+	AfterEach(func() {
+		err := testFile.Close()
+		Expect(err).NotTo(HaveOccurred())
+	})
+
 	It("prints progress while content is being read", func() {
 		for {
 			time.Sleep(50 * time.Microsecond)
 			_, err := progressReader.Read(b)
-			if err != nil {
+			if err == io.EOF {
 				break
 			}
+			Expect(err).NotTo(HaveOccurred())
 		}
 
-		Expect(ui.UncapturedOutput()).To(ContainSubstrings([]string{"\r", "uploaded..."}))
-		Expect(ui.UncapturedOutput()).To(ContainSubstrings([]string{"\r    "}))
-		Expect(ui.Outputs()).To(ContainSubstrings([]string{"\rDone "}))
+		Expect(ui.SayCallCount()).To(Equal(1))
+		Expect(ui.SayArgsForCall(0)).To(ContainSubstring("\rDone "))
+
+		Expect(ui.PrintCapturingNoOutputCallCount()).To(BeNumerically(">", 0))
+		status, _ := ui.PrintCapturingNoOutputArgsForCall(0)
+		Expect(status).To(ContainSubstring("uploaded..."))
+		status, _ = ui.PrintCapturingNoOutputArgsForCall(ui.PrintCapturingNoOutputCallCount() - 1)
+		Expect(status).To(Equal("\r                             "))
 	})
 
 	It("reads the correct number of bytes", func() {
@@ -55,10 +65,10 @@ var _ = Describe("ProgressReader", func() {
 
 		for {
 			n, err := progressReader.Read(b)
-			if err != nil {
+			if err == io.EOF {
 				break
 			}
-
+			Expect(err).NotTo(HaveOccurred())
 			bytesRead += n
 		}
 
