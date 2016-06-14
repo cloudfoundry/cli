@@ -9,9 +9,9 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/net"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -36,7 +36,7 @@ var _ = Describe("Routing Api Gateway", func() {
 	BeforeEach(func() {
 		fakeLogger = new(tracefakes.FakePrinter)
 		config = testconfig.NewRepository()
-		gateway = NewRoutingAPIGateway(config, time.Now, &testterm.FakeUI{}, fakeLogger)
+		gateway = NewRoutingAPIGateway(config, time.Now, new(terminalfakes.FakeUI), fakeLogger)
 	})
 
 	It("parses error responses", func() {
