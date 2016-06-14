@@ -11,7 +11,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -45,10 +44,10 @@ var _ = Describe("delete-space command", func() {
 		spaceRepo = new(apifakes.FakeSpaceRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 
-		space = maker.NewSpace(maker.Overrides{
-			"name": "space-to-delete",
-			"guid": "space-to-delete-guid",
-		})
+		space = models.Space{SpaceFields: models.SpaceFields{
+			Name: "space-to-delete",
+			GUID: "space-to-delete-guid",
+		}}
 
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})

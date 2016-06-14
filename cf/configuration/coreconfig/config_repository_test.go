@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/configurationfakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -89,11 +88,11 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetRefreshToken("the-token")
 		Expect(config.RefreshToken()).To(Equal("the-token"))
 
-		organization := maker.NewOrgFields(maker.Overrides{"name": "the-org"})
+		organization := models.OrganizationFields{Name: "the-org"}
 		config.SetOrganizationFields(organization)
 		Expect(config.OrganizationFields()).To(Equal(organization))
 
-		space := maker.NewSpaceFields(maker.Overrides{"name": "the-space"})
+		space := models.SpaceFields{Name: "the-space"}
 		config.SetSpaceFields(space)
 		Expect(config.SpaceFields()).To(Equal(space))
 

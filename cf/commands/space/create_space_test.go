@@ -14,7 +14,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -79,7 +78,10 @@ var _ = Describe("create-space command", func() {
 		OriginalCommand = commandregistry.Commands.FindCommand("set-space-role")
 
 		spaceRepo = new(apifakes.FakeSpaceRepository)
-		space := maker.NewSpace(maker.Overrides{"name": "my-space", "guid": "my-space-guid"})
+		space := models.Space{SpaceFields: models.SpaceFields{
+			Name: "my-space",
+			GUID: "my-space-guid",
+		}}
 		spaceRepo.CreateReturns(space, nil)
 	})
 

@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/maker"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -60,11 +59,13 @@ var _ = Describe("scale command", func() {
 		ui = new(testterm.FakeUI)
 		config = testconfig.NewRepositoryWithDefaults()
 
-		app = maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-		app.InstanceCount = 42
-		app.DiskQuota = 1024
-		app.Memory = 256
-
+		app = models.Application{ApplicationFields: models.ApplicationFields{
+			Name:          "my-app",
+			GUID:          "my-app-guid",
+			InstanceCount: 42,
+			DiskQuota:     1024,
+			Memory:        256,
+		}}
 		applicationReq := new(requirementsfakes.FakeApplicationRequirement)
 		applicationReq.GetApplicationReturns(app)
 		requirementsFactory.NewApplicationRequirementReturns(applicationReq)
