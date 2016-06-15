@@ -6,11 +6,13 @@ import (
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/commands"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
+	"github.com/cloudfoundry/cli/flags"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
@@ -30,6 +32,8 @@ var _ = Describe("auth command", func() {
 		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 		fakeLogger          *tracefakes.FakePrinter
+		flagContext         flags.FlagContext
+		cmd                 commands.Authenticate
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
@@ -52,27 +56,57 @@ var _ = Describe("auth command", func() {
 
 		fakeLogger = new(tracefakes.FakePrinter)
 		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
+
+		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+
+		cmd = commands.Authenticate{}
+		cmd.SetDependency(deps, false)
 	})
 
 	Describe("requirements", func() {
-		It("fails with usage when given too few arguments", func() {
-			testcmd.RunCLICommand("auth", []string{}, requirementsFactory, updateCommandDependency, false, ui)
+		var reqs []requirements.Requirement
 
-			Expect(ui.Outputs()).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "arguments"},
-			))
+		FContext("when given too few arguments", func() {
+			BeforeEach(func() {
+				flagContext.Parse("")
+			})
+
+			It("fails with usage", func() {
+				reqs = cmd.Requirements(requirementsFactory, flagContext)
+				//Expect(reqs).To(Contain(requirements.NumberArguments{args:[]....}))
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Incorrect Usage. Requires", "as arguments"},
+				))
+			})
 		})
 
-		It("fails if the user has not set an api endpoint", func() {
-			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Failing{Message: "no api set"})
-			Expect(testcmd.RunCLICommand("auth", []string{"username", "password"}, requirementsFactory, updateCommandDependency, false, ui)).To(BeFalse())
+		Context("when the user has not set an api endpoint", func() {
+			BeforeEach(func() {
+				flagContext.Parse("foo@example.com", "password")
+				requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Failing{Message: "no api set"})
+				reqs = cmd.Requirements(requirementsFactory, flagContext)
+			})
+
+			It("fails", func() {
+				//Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Incorrect Usage. Requires", "api set"},
+				))
+			})
 		})
 	})
 
 	Context("when an api endpoint is targeted", func() {
+		var executeErr error
+
 		BeforeEach(func() {
 			requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 			config.SetAPIEndpoint("foo.example.org/authenticate")
+		})
+
+		JustBeforeEach(func() {
+			flagContext.Parse("foo@example.com", "password")
+			executeErr = cmd.Execute(flagContext)
 		})
 
 		It("authenticates successfully", func() {

@@ -168,6 +168,6 @@ func (f apiRequirementFactory) NewUsageRequirement(cmd Usable, errorMessage stri
 	return NewUsageRequirement(cmd, errorMessage, pred)
 }
 
-func (f apiRequirementFactory) NewNumberArguments(passedArgs []string, expectedArgs ...string) Requirement {
-	return NewNumberArguments(passedArgs, expectedArgs)
+func (f apiRequirementFactory) NewNumberArguments(passedArgs []string, commandUsage string, expectedArgs ...string) Requirement {
+	return NewNumberArguments(passedArgs, expectedArgs, commandUsage)
 }
