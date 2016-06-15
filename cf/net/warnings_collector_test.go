@@ -80,8 +80,8 @@ var _ = Describe("WarningsCollector", func() {
 				warningsCollector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two)
 
 				warningsCollector.PrintWarnings()
-				//Expect(len(ui.Outputs())).To(Equal(1))
-				//Expect(ui.Outputs()).To(ContainSubstrings([]string{"Hello Darling"}))
+				Expect(ui.WarnCallCount()).To(Equal(1))
+				Expect(ui.WarnArgsForCall(0)).To(ContainSubstring("Hello Darling"))
 			})
 
 			It("does not print out Endpoint deprecated warnings", func() {
@@ -92,8 +92,8 @@ var _ = Describe("WarningsCollector", func() {
 				warningsCollector := net.NewWarningsCollector(ui, warning_producer_one, warning_producer_two)
 
 				warningsCollector.PrintWarnings()
-				//Expect(len(ui.Outputs())).To(Equal(1))
-				//Expect(ui.Outputs()).To(ContainSubstrings([]string{"A warning"}))
+				Expect(ui.WarnCallCount()).To(Equal(1))
+				Expect(ui.WarnArgsForCall(0)).To(ContainSubstring("A warning"))
 			})
 		})
 	})
