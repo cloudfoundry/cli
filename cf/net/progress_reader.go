@@ -35,9 +35,6 @@ func (progressReader *ProgressReader) Read(p []byte) (int, error) {
 	}
 
 	n, err := progressReader.ioReadSeeker.Read(p)
-	if err != nil {
-		return 0, err
-	}
 
 	if progressReader.total > int64(0) {
 		if n > 0 {

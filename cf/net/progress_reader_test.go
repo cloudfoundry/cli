@@ -1,7 +1,6 @@
 package net_test
 
 import (
-	"io"
 	"os"
 	"time"
 
@@ -35,19 +34,13 @@ var _ = Describe("ProgressReader", func() {
 		progressReader.SetTotalSize(fileStat.Size())
 	})
 
-	AfterEach(func() {
-		err := testFile.Close()
-		Expect(err).NotTo(HaveOccurred())
-	})
-
 	It("prints progress while content is being read", func() {
 		for {
 			time.Sleep(50 * time.Microsecond)
 			_, err := progressReader.Read(b)
-			if err == io.EOF {
+			if err != nil {
 				break
 			}
-			Expect(err).NotTo(HaveOccurred())
 		}
 
 		Expect(ui.SayCallCount()).To(Equal(1))
@@ -65,10 +58,10 @@ var _ = Describe("ProgressReader", func() {
 
 		for {
 			n, err := progressReader.Read(b)
-			if err == io.EOF {
+			if err != nil {
 				break
 			}
-			Expect(err).NotTo(HaveOccurred())
+
 			bytesRead += n
 		}
 
