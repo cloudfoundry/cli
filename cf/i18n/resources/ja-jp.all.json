@@ -464,7 +464,7 @@
     "translation": "CF_NAME auth name@example.com \"my password\" (スペースを含むパスワードには引用符を使用してください)"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
     "translation": ""
   },
   {

@@ -464,7 +464,7 @@
     "translation": "CF_NAME auth name@example.com \"my password\"（如果密碼含有空格，請使用引號）"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
     "translation": ""
   },
   {
