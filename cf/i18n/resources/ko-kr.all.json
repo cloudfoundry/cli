@@ -464,7 +464,7 @@
     "translation": "CF_NAME auth name@example.com \"my password\"(공백을 포함하는 비밀번호의 경우 따옴표 사용)"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
     "translation": ""
   },
   {

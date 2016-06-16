@@ -45,9 +45,10 @@ var _ = Describe("BindRouteService", func() {
 	)
 
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
+		ui = new(testterm.FakeUI)
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
+
 		routeRepo = new(apifakes.FakeRouteRepository)
 		repoLocator := deps.RepoLocator.SetRouteRepository(routeRepo)
 
@@ -60,7 +61,7 @@ var _ = Describe("BindRouteService", func() {
 			RepoLocator: repoLocator,
 		}
 
-		cmd = &service.BindRouteService{}
+		cmd = new(service.BindRouteService)
 		cmd.SetDependency(deps, false)
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
@@ -173,6 +174,52 @@ var _ = Describe("BindRouteService", func() {
 				Expect(routeRepo.FindCallCount()).To(Equal(1))
 				host, _, _, _ := routeRepo.FindArgsForCall(0)
 				Expect(host).To(Equal("the-hostname"))
+			})
+		})
+
+		Context("when given a path", func() {
+			BeforeEach(func() {
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				err := flagContext.Parse("domain-name", "service-instance", "--path", "/path")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to find the route with the given path", func() {
+				Expect(runCLIErr).NotTo(HaveOccurred())
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				_, _, path, _ := routeRepo.FindArgsForCall(0)
+				Expect(path).To(Equal("/path"))
+			})
+
+			Context("when the path does not have a leading slash", func() {
+				BeforeEach(func() {
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+					err := flagContext.Parse("domain-name", "service-instance", "--path", "path")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("prepends a leading slash and tries to find the route with the given path", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					_, _, path, _ := routeRepo.FindArgsForCall(0)
+					Expect(path).To(Equal("/path"))
+				})
+			})
+		})
+
+		Context("when given a path and a hostname", func() {
+			BeforeEach(func() {
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				err := flagContext.Parse("domain-name", "service-instance", "-n", "the-hostname", "--path", "/path")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("tries to find the route with both the given hostname and path", func() {
+				Expect(runCLIErr).NotTo(HaveOccurred())
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				host, _, path, _ := routeRepo.FindArgsForCall(0)
+				Expect(host).To(Equal("the-hostname"))
+				Expect(path).To(Equal("/path"))
 			})
 		})
 

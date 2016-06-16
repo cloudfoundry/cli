@@ -464,7 +464,7 @@
     "translation": "CF_NAME auth name@example.com \"my password\" (utilizza le virgolette per le password con uno spazio)"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
     "translation": ""
   },
   {

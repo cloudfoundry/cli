@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -11,6 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
+	"strings"
 )
 
 type BindRouteService struct {
@@ -33,6 +35,10 @@ func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 		ShortName: "n",
 		Usage:     T("Hostname used in combination with DOMAIN to specify the route to bind"),
 	}
+	fs["path"] = &flags.StringFlag{
+		Name:  "path",
+		Usage: T("Path for the HTTP route"),
+	}
 	fs["parameters"] = &flags.StringFlag{
 		ShortName: "c",
 		Usage:     T("Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering."),
@@ -44,10 +50,10 @@ func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 		ShortName:   "brs",
 		Description: T("Bind a service instance to an HTTP route"),
 		Usage: []string{
-			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]`),
+			T(`CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]`),
 		},
 		Examples: []string{
-			`CF_NAME bind-route-service example.com myratelimiter --hostname myapp`,
+			`CF_NAME bind-route-service example.com myratelimiter --hostname myapp --path foo`,
 			`CF_NAME bind-route-service example.com myratelimiter -c file.json`,
 			`CF_NAME bind-route-service example.com myratelimiter -c '{"valid":"json"}'`,
 			``,
@@ -97,11 +103,14 @@ func (cmd *BindRouteService) SetDependency(deps commandregistry.Dependency, plug
 }
 
 func (cmd *BindRouteService) Execute(c flags.FlagContext) error {
-	var path string
 	var port int
 
 	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
+	path := c.String("path")
+	if !strings.HasPrefix(path, "/") && len(path) > 0 {
+		path = fmt.Sprintf("/%s", path)
+	}
 
 	var parameters string
 
