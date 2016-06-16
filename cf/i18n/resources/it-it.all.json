@@ -904,8 +904,8 @@
     "translation": "CF_NAME target [-o ORG] [-s SPAZIO]"
   },
   {
-    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]",
-    "translation": "CF_NAME unbind-route-service DOMINIO ISTANZA_DEL_SERVIZIO [--hostname NOMEHOST] [-f]"
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
+    "translation": ""
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -3190,6 +3190,10 @@
   {
     "id": "Password verification does not match",
     "translation": "La verifica password non corrisponde"
+  },
+  {
+    "id": "Path for HTTP route",
+    "translation": ""
   },
   {
     "id": "Path for the HTTP route",

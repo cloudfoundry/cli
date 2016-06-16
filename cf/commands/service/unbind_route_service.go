@@ -1,6 +1,9 @@
 package service
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -35,6 +38,7 @@ func init() {
 func (cmd *UnbindRouteService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["hostname"] = &flags.StringFlag{Name: "hostname", ShortName: "n", Usage: T("Hostname used in combination with DOMAIN to specify the route to unbind")}
+	fs["path"] = &flags.StringFlag{Name: "path", Usage: T("Path for HTTP route")}
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force unbinding without confirmation")}
 
 	return commandregistry.CommandMetadata{
@@ -42,10 +46,10 @@ func (cmd *UnbindRouteService) MetaData() commandregistry.CommandMetadata {
 		ShortName:   "urs",
 		Description: T("Unbind a service instance from an HTTP route"),
 		Usage: []string{
-			T("CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"),
+			T("CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]"),
 		},
 		Examples: []string{
-			"CF_NAME unbind-route-service example.com myratelimiter --hostname myapp",
+			"CF_NAME unbind-route-service example.com myratelimiter --hostname myapp --path foo",
 		},
 		Flags: fs,
 	}
@@ -90,11 +94,14 @@ func (cmd *UnbindRouteService) SetDependency(deps commandregistry.Dependency, pl
 }
 
 func (cmd *UnbindRouteService) Execute(c flags.FlagContext) error {
-	var path string
 	var port int
 
 	host := c.String("hostname")
 	domain := cmd.domainReq.GetDomain()
+	path := c.String("path")
+	if !strings.HasPrefix(path, "/") && len(path) > 0 {
+		path = fmt.Sprintf("/%s", path)
+	}
 
 	route, err := cmd.routeRepo.Find(host, domain, path, port)
 	if err != nil {
