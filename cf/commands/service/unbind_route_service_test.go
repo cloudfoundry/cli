@@ -176,6 +176,55 @@ var _ = Describe("UnbindRouteService", func() {
 			})
 		})
 
+		Context("when given a path", func() {
+			BeforeEach(func() {
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				err := flagContext.Parse("domain-name", "service-instance", "--path", "/path")
+				Expect(err).NotTo(HaveOccurred())
+				ui.Inputs = []string{"n"}
+			})
+
+			It("should attempt to find the route", func() {
+				Expect(runCLIErr).NotTo(HaveOccurred())
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				_, _, path, _ := routeRepo.FindArgsForCall(0)
+				Expect(path).To(Equal("/path"))
+			})
+
+			Context("when the path does not contain a leading slash", func() {
+				BeforeEach(func() {
+					flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+					err := flagContext.Parse("domain-name", "service-instance", "--path", "path")
+					Expect(err).NotTo(HaveOccurred())
+					ui.Inputs = []string{"n"}
+				})
+
+				It("should prefix the path with a leading slash and attempt to find the route", func() {
+					Expect(runCLIErr).NotTo(HaveOccurred())
+					Expect(routeRepo.FindCallCount()).To(Equal(1))
+					_, _, path, _ := routeRepo.FindArgsForCall(0)
+					Expect(path).To(Equal("/path"))
+				})
+			})
+		})
+
+		Context("when given hostname and path", func() {
+			BeforeEach(func() {
+				flagContext = flags.NewFlagContext(cmd.MetaData().Flags)
+				err := flagContext.Parse("domain-name", "service-instance", "--hostname", "the-hostname", "--path", "path")
+				Expect(err).NotTo(HaveOccurred())
+				ui.Inputs = []string{"n"}
+			})
+
+			It("should attempt to find the route", func() {
+				Expect(runCLIErr).NotTo(HaveOccurred())
+				Expect(routeRepo.FindCallCount()).To(Equal(1))
+				hostname, _, path, _ := routeRepo.FindArgsForCall(0)
+				Expect(hostname).To(Equal("the-hostname"))
+				Expect(path).To(Equal("/path"))
+			})
+		})
+
 		Context("when the route can be found", func() {
 			BeforeEach(func() {
 				routeRepo.FindReturns(models.Route{GUID: "route-guid"}, nil)

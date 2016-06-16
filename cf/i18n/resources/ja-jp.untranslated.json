@@ -8,6 +8,10 @@
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]"
   },
   {
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]"
+  },
+  {
     "id": "Did you mean?",
     "translation": "Did you mean?"
   },
@@ -46,6 +50,10 @@
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
     "translation": "Maximum number of routes that may be created with reserved ports (Default: 0)"
+  },
+  {
+    "id": "Path for HTTP route",
+    "translation": "Path for HTTP route"
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
