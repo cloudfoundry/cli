@@ -118,7 +118,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
 	var reqs []requirements.Requirement
 
-	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd), "",
+	usageReq := requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd), "",
 		func() bool {
 			return len(fc.Args()) > 1
 		},
@@ -316,6 +316,7 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 						"Path": path,
 					}),
 			)
+			return
 		}
 
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
