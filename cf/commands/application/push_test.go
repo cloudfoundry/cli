@@ -1,7 +1,9 @@
 package application_test
 
 import (
+	"os"
 	"path/filepath"
+	"syscall"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
@@ -32,8 +34,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
-	"os"
-	"syscall"
 )
 
 var _ = Describe("Push Command", func() {
@@ -248,9 +248,8 @@ var _ = Describe("Push Command", func() {
 				return nil
 			}
 
-			actor.ProcessPathStub = func(dirOrZipFile string, cb func(string)) error {
-				cb(dirOrZipFile)
-				return nil
+			actor.ProcessPathStub = func(dirOrZipFile string, cb func(string) error) error {
+				return cb(dirOrZipFile)
 			}
 
 			appfiles.AppFilesInDirReturns(
@@ -333,7 +332,7 @@ var _ = Describe("Push Command", func() {
 
 			Context("when given a bad path", func() {
 				BeforeEach(func() {
-					actor.ProcessPathStub = func(dirOrZipFile string, f func(string)) error {
+					actor.ProcessPathStub = func(dirOrZipFile string, f func(string) error) error {
 						return errors.New("process-path-error")
 					}
 				})
@@ -399,10 +398,9 @@ var _ = Describe("Push Command", func() {
 					})
 
 					It("notifies users about the error actor.GatherFiles() returns", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
+						Expect(executeErr).To(HaveOccurred())
 
-						Expect(ui.FailedCallCount()).To(Equal(1))
-						Expect(ui.FailedArgsForCall(0)).To(ContainSubstring("failed to get file mode"))
+						Expect(executeErr.Error()).To(ContainSubstring("failed to get file mode"))
 					})
 				})
 			})
@@ -992,7 +990,7 @@ var _ = Describe("Push Command", func() {
 								Expect(useRandomPort).To(BeTrue())
 
 								totalOutput := terminal.Decolorize(string(output.Contents()))
-								Expect(totalOutput).To(ContainSubstring(fmt.Sprintf("Creating random route for %s...", expectedDomain.Name)))
+								Expect(totalOutput).To(ContainSubstring("Creating random route for " + expectedDomain.Name + "..."))
 							})
 						})
 
@@ -1020,7 +1018,7 @@ var _ = Describe("Push Command", func() {
 								Expect(useRandomPort).To(BeTrue())
 
 								totalOutput := terminal.Decolorize(string(output.Contents()))
-								Expect(totalOutput).To(ContainSubstring(fmt.Sprintf("Creating random route for %s...", expectedDomain.Name)))
+								Expect(totalOutput).To(ContainSubstring("Creating random route for " + expectedDomain.Name + "..."))
 							})
 						})
 					})
@@ -1050,19 +1048,20 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
-				XContext("when there are no app files to process", func() {
+				Context("when there are no app files to process", func() {
 					BeforeEach(func() {
 						deps.UI = uiWithContents
 						appfiles.AppFilesInDirReturns([]models.AppFileFields{}, nil)
 						args = []string{"-p", "../some/path-to/an-app/file.zip", "app-with-path"}
 					})
 
-					It("panics", func() {
-						Expect(terminal.Decolorize(string(output.Contents()))).To(ContainSubstring("No app files found in '../some/path-to/an-app/file.zip'"))
+					It("errors", func() {
+						Expect(executeErr).To(HaveOccurred())
+						Expect(executeErr.Error()).To(ContainSubstring("No app files found in '../some/path-to/an-app/file.zip'"))
 					})
 				})
 
-				XContext("when there is an error getting app files", func() {
+				Context("when there is an error getting app files", func() {
 					BeforeEach(func() {
 						deps.UI = uiWithContents
 						appfiles.AppFilesInDirReturns([]models.AppFileFields{}, errors.New("some error"))
@@ -1070,7 +1069,8 @@ var _ = Describe("Push Command", func() {
 					})
 
 					It("prints a message", func() {
-						Expect(terminal.Decolorize(string(output.Contents()))).To(ContainSubstring("Error processing app files in '../some/path-to/an-app/file.zip': some error"))
+						Expect(executeErr).To(HaveOccurred())
+						Expect(executeErr.Error()).To(ContainSubstring("Error processing app files in '../some/path-to/an-app/file.zip': some error"))
 					})
 				})
 
@@ -1123,13 +1123,13 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
-				XContext("when given a bad manifest", func() {
+				Context("when given a bad manifest", func() {
 					BeforeEach(func() {
 						manifestRepo.ReadManifestReturns(manifest.NewEmptyManifest(), errors.New("read manifest error"))
 						args = []string{"-f", "bad/manifest/path"}
 					})
 
-					It("panics", func() {
+					It("errors", func() {
 						Expect(executeErr).To(HaveOccurred())
 						Expect(executeErr.Error()).To(ContainSubstring("read manifest error"))
 					})
@@ -1518,7 +1518,6 @@ var _ = Describe("Push Command", func() {
 
 						It("fails", func() {
 							Expect(executeErr).To(HaveOccurred())
-
 							Expect(appRepo.CreateCallCount()).To(BeZero())
 						})
 					})
@@ -1672,7 +1671,6 @@ var _ = Describe("Push Command", func() {
 
 				It("does not stop the app", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
-
 					Expect(stopper.ApplicationStopCallCount()).To(Equal(0))
 				})
 			})
@@ -1731,6 +1729,7 @@ var _ = Describe("Push Command", func() {
 						Host:   "existing-app",
 						Domain: domain,
 					}, nil)
+
 					routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
 						return models.Route{
 							GUID:   "my-route-guid",
@@ -1821,7 +1820,6 @@ var _ = Describe("Push Command", func() {
 					BeforeEach(func() {
 						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.newdomain.com"))
 						domainRepo.FindByNameInOrgReturns(models.DomainFields{GUID: "domain-guid", Name: "newdomain.com"}, nil)
-
 						args = []string{"-d", "newdomain.com", "existing-app"}
 					})
 
@@ -1854,7 +1852,6 @@ var _ = Describe("Push Command", func() {
 					BeforeEach(func() {
 						domainRepo.FindByNameInOrgReturns(models.DomainFields{GUID: "domain-guid", Name: "example.com"}, nil)
 						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "new-host.newdomain.com"))
-
 						args = []string{"-n", "new-host", "existing-app"}
 					})
 
@@ -1902,7 +1899,6 @@ var _ = Describe("Push Command", func() {
 				Context("when the --no-hostname flag is given", func() {
 					BeforeEach(func() {
 						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.example.com"))
-
 						args = []string{"--no-hostname", "existing-app"}
 					})
 
@@ -1964,6 +1960,7 @@ var _ = Describe("Push Command", func() {
 						}),
 					}
 					manifestRepo.ReadManifestReturns(m, nil)
+
 					args = []string{}
 				})
 
@@ -2006,7 +2003,6 @@ var _ = Describe("Push Command", func() {
 
 					It("gracefully continues", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-
 						Expect(len(serviceBinder.AppsToBind)).To(Equal(4))
 					})
 				})
@@ -2018,7 +2014,6 @@ var _ = Describe("Push Command", func() {
 
 					It("fails with an error", func() {
 						Expect(executeErr).To(HaveOccurred())
-
 						Expect(executeErr.Error()).To(ContainSubstring("Could not find service app1-service to bind to existing-app"))
 					})
 				})
@@ -2027,13 +2022,11 @@ var _ = Describe("Push Command", func() {
 			Context("checking for bad flags", func() {
 				BeforeEach(func() {
 					appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("App", "the-app"))
-
 					args = []string{"-t", "FooeyTimeout", "app-name"}
 				})
 
 				It("fails when a non-numeric start timeout is given", func() {
 					Expect(executeErr).To(HaveOccurred())
-
 					Expect(executeErr.Error()).To(ContainSubstring("Invalid timeout param: FooeyTimeout"))
 				})
 			})
@@ -2059,16 +2052,15 @@ var _ = Describe("Push Command", func() {
 				})
 			})
 
-			XContext("when the app can't be uploaded", func() {
+			Context("when the app can't be uploaded", func() {
 				BeforeEach(func() {
 					actor.UploadAppReturns(errors.New("Boom!"))
-
 					args = []string{"app"}
 				})
 
 				It("fails when the app can't be uploaded", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).To(ContainSubstring("Uploading"))
+					Expect(executeErr.Error()).To(ContainSubstring("Error uploading application"))
 				})
 			})
 
@@ -2084,7 +2076,6 @@ var _ = Describe("Push Command", func() {
 
 				It("errors", func() {
 					Expect(executeErr).To(HaveOccurred())
-
 					Expect(executeErr.Error()).ToNot(ContainSubstring("TIP"))
 				})
 
@@ -2095,7 +2086,6 @@ var _ = Describe("Push Command", func() {
 
 					It("suggests using 'random-route' if the default route is taken", func() {
 						Expect(executeErr).To(HaveOccurred())
-
 						Expect(executeErr.Error()).To(ContainSubstring("existing-app.foo.cf-app.com is already in use"))
 						Expect(executeErr.Error()).To(ContainSubstring("TIP: Change the hostname with -n HOSTNAME or use --random-route"))
 					})

@@ -53,13 +53,21 @@ type FakeBrokerBuilder struct {
 		result1 models.ServiceBroker
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeBrokerBuilder) AttachBrokersToServices(arg1 []models.ServiceOffering) ([]models.ServiceBroker, error) {
+	var arg1Copy []models.ServiceOffering
+	if arg1 != nil {
+		arg1Copy = make([]models.ServiceOffering, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.attachBrokersToServicesMutex.Lock()
 	fake.attachBrokersToServicesArgsForCall = append(fake.attachBrokersToServicesArgsForCall, struct {
 		arg1 []models.ServiceOffering
-	}{arg1})
+	}{arg1Copy})
+	fake.recordInvocation("AttachBrokersToServices", []interface{}{arg1Copy})
 	fake.attachBrokersToServicesMutex.Unlock()
 	if fake.AttachBrokersToServicesStub != nil {
 		return fake.AttachBrokersToServicesStub(arg1)
@@ -89,11 +97,17 @@ func (fake *FakeBrokerBuilder) AttachBrokersToServicesReturns(result1 []models.S
 }
 
 func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServices(arg1 string, arg2 []models.ServiceOffering) (models.ServiceBroker, error) {
+	var arg2Copy []models.ServiceOffering
+	if arg2 != nil {
+		arg2Copy = make([]models.ServiceOffering, len(arg2))
+		copy(arg2Copy, arg2)
+	}
 	fake.attachSpecificBrokerToServicesMutex.Lock()
 	fake.attachSpecificBrokerToServicesArgsForCall = append(fake.attachSpecificBrokerToServicesArgsForCall, struct {
 		arg1 string
 		arg2 []models.ServiceOffering
-	}{arg1, arg2})
+	}{arg1, arg2Copy})
+	fake.recordInvocation("AttachSpecificBrokerToServices", []interface{}{arg1, arg2Copy})
 	fake.attachSpecificBrokerToServicesMutex.Unlock()
 	if fake.AttachSpecificBrokerToServicesStub != nil {
 		return fake.AttachSpecificBrokerToServicesStub(arg1, arg2)
@@ -125,6 +139,7 @@ func (fake *FakeBrokerBuilder) AttachSpecificBrokerToServicesReturns(result1 mod
 func (fake *FakeBrokerBuilder) GetAllServiceBrokers() ([]models.ServiceBroker, error) {
 	fake.getAllServiceBrokersMutex.Lock()
 	fake.getAllServiceBrokersArgsForCall = append(fake.getAllServiceBrokersArgsForCall, struct{}{})
+	fake.recordInvocation("GetAllServiceBrokers", []interface{}{})
 	fake.getAllServiceBrokersMutex.Unlock()
 	if fake.GetAllServiceBrokersStub != nil {
 		return fake.GetAllServiceBrokersStub()
@@ -152,6 +167,7 @@ func (fake *FakeBrokerBuilder) GetBrokerWithAllServices(brokerName string) (mode
 	fake.getBrokerWithAllServicesArgsForCall = append(fake.getBrokerWithAllServicesArgsForCall, struct {
 		brokerName string
 	}{brokerName})
+	fake.recordInvocation("GetBrokerWithAllServices", []interface{}{brokerName})
 	fake.getBrokerWithAllServicesMutex.Unlock()
 	if fake.GetBrokerWithAllServicesStub != nil {
 		return fake.GetBrokerWithAllServicesStub(brokerName)
@@ -185,6 +201,7 @@ func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedService(serviceName string)
 	fake.getBrokerWithSpecifiedServiceArgsForCall = append(fake.getBrokerWithSpecifiedServiceArgsForCall, struct {
 		serviceName string
 	}{serviceName})
+	fake.recordInvocation("GetBrokerWithSpecifiedService", []interface{}{serviceName})
 	fake.getBrokerWithSpecifiedServiceMutex.Unlock()
 	if fake.GetBrokerWithSpecifiedServiceStub != nil {
 		return fake.GetBrokerWithSpecifiedServiceStub(serviceName)
@@ -211,6 +228,34 @@ func (fake *FakeBrokerBuilder) GetBrokerWithSpecifiedServiceReturns(result1 mode
 		result1 models.ServiceBroker
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeBrokerBuilder) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.attachBrokersToServicesMutex.RLock()
+	defer fake.attachBrokersToServicesMutex.RUnlock()
+	fake.attachSpecificBrokerToServicesMutex.RLock()
+	defer fake.attachSpecificBrokerToServicesMutex.RUnlock()
+	fake.getAllServiceBrokersMutex.RLock()
+	defer fake.getAllServiceBrokersMutex.RUnlock()
+	fake.getBrokerWithAllServicesMutex.RLock()
+	defer fake.getBrokerWithAllServicesMutex.RUnlock()
+	fake.getBrokerWithSpecifiedServiceMutex.RLock()
+	defer fake.getBrokerWithSpecifiedServiceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeBrokerBuilder) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ brokerbuilder.BrokerBuilder = new(FakeBrokerBuilder)

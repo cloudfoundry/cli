@@ -284,21 +284,23 @@ var _ = Describe("Push Actor", func() {
 			})
 
 			It("extracts the zip when given a zip file", func() {
-				f := func(tempDir string) {
+				f := func(tempDir string) error {
 					for _, file := range allFiles {
 						actualFilePath := filepath.Join(tempDir, file.Path)
 						_, err := os.Stat(actualFilePath)
 						Expect(err).NotTo(HaveOccurred())
 					}
+					return nil
 				}
 				err := actor.ProcessPath(zipFile, f)
 				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("calls the provided function with the directory that it extracted to", func() {
-				f := func(tempDir string) {
+				f := func(tempDir string) error {
 					wasCalled = true
 					wasCalledWith = tempDir
+					return nil
 				}
 				err := actor.ProcessPath(zipFile, f)
 				Expect(err).NotTo(HaveOccurred())
@@ -308,8 +310,9 @@ var _ = Describe("Push Actor", func() {
 
 			It("cleans up the directory that it extracted to", func() {
 				var tempDirWas string
-				f := func(tempDir string) {
+				f := func(tempDir string) error {
 					tempDirWas = tempDir
+					return nil
 				}
 				err := actor.ProcessPath(zipFile, f)
 				Expect(err).NotTo(HaveOccurred())
@@ -323,7 +326,9 @@ var _ = Describe("Push Actor", func() {
 				fakezipper.IsZipFileReturns(true)
 				actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
 
-				f := func(tempDir string) {}
+				f := func(_ string) error {
+					return nil
+				}
 				err := actor.ProcessPath(zipFile, f)
 				Expect(err).To(HaveOccurred())
 			})
@@ -331,9 +336,10 @@ var _ = Describe("Push Actor", func() {
 
 		It("calls the provided function with the provided directory", func() {
 			appDir = filepath.Join(fixturesDir, "example-app")
-			f := func(tempDir string) {
+			f := func(tempDir string) error {
 				wasCalled = true
 				wasCalledWith = tempDir
+				return nil
 			}
 			err := actor.ProcessPath(appDir, f)
 			Expect(err).NotTo(HaveOccurred())
@@ -350,9 +356,10 @@ var _ = Describe("Push Actor", func() {
 
 			symlink := filepath.Join(fixturesDir, "example-app-symlink")
 			expectedDir := filepath.Join(fixturesDir, "example-app") // example-app-symlink -> example-app
-			f := func(dir string) {
+			f := func(dir string) error {
 				wasCalled = true
 				wasCalledWith = dir
+				return nil
 			}
 
 			err := actor.ProcessPath(symlink, f)
@@ -367,9 +374,10 @@ var _ = Describe("Push Actor", func() {
 			appDir = filepath.Join(fixturesDir, "example-app")
 			absolutePath, err := filepath.Abs(appDir)
 			Expect(err).NotTo(HaveOccurred())
-			f := func(tempDir string) {
+			f := func(tempDir string) error {
 				wasCalled = true
 				wasCalledWith = tempDir
+				return nil
 			}
 			err = actor.ProcessPath(absolutePath, f)
 			Expect(err).NotTo(HaveOccurred())

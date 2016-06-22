@@ -136,11 +136,14 @@ type FakeServiceBuilder struct {
 		result1 []models.ServiceOffering
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceBuilder) GetAllServices() ([]models.ServiceOffering, error) {
 	fake.getAllServicesMutex.Lock()
 	fake.getAllServicesArgsForCall = append(fake.getAllServicesArgsForCall, struct{}{})
+	fake.recordInvocation("GetAllServices", []interface{}{})
 	fake.getAllServicesMutex.Unlock()
 	if fake.GetAllServicesStub != nil {
 		return fake.GetAllServicesStub()
@@ -166,6 +169,7 @@ func (fake *FakeServiceBuilder) GetAllServicesReturns(result1 []models.ServiceOf
 func (fake *FakeServiceBuilder) GetAllServicesWithPlans() ([]models.ServiceOffering, error) {
 	fake.getAllServicesWithPlansMutex.Lock()
 	fake.getAllServicesWithPlansArgsForCall = append(fake.getAllServicesWithPlansArgsForCall, struct{}{})
+	fake.recordInvocation("GetAllServicesWithPlans", []interface{}{})
 	fake.getAllServicesWithPlansMutex.Unlock()
 	if fake.GetAllServicesWithPlansStub != nil {
 		return fake.GetAllServicesWithPlansStub()
@@ -193,6 +197,7 @@ func (fake *FakeServiceBuilder) GetServiceByNameWithPlans(arg1 string) (models.S
 	fake.getServiceByNameWithPlansArgsForCall = append(fake.getServiceByNameWithPlansArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetServiceByNameWithPlans", []interface{}{arg1})
 	fake.getServiceByNameWithPlansMutex.Unlock()
 	if fake.GetServiceByNameWithPlansStub != nil {
 		return fake.GetServiceByNameWithPlansStub(arg1)
@@ -226,6 +231,7 @@ func (fake *FakeServiceBuilder) GetServiceByNameWithPlansWithOrgNames(arg1 strin
 	fake.getServiceByNameWithPlansWithOrgNamesArgsForCall = append(fake.getServiceByNameWithPlansWithOrgNamesArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetServiceByNameWithPlansWithOrgNames", []interface{}{arg1})
 	fake.getServiceByNameWithPlansWithOrgNamesMutex.Unlock()
 	if fake.GetServiceByNameWithPlansWithOrgNamesStub != nil {
 		return fake.GetServiceByNameWithPlansWithOrgNamesStub(arg1)
@@ -260,6 +266,7 @@ func (fake *FakeServiceBuilder) GetServiceByNameForSpace(arg1 string, arg2 strin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetServiceByNameForSpace", []interface{}{arg1, arg2})
 	fake.getServiceByNameForSpaceMutex.Unlock()
 	if fake.GetServiceByNameForSpaceStub != nil {
 		return fake.GetServiceByNameForSpaceStub(arg1, arg2)
@@ -294,6 +301,7 @@ func (fake *FakeServiceBuilder) GetServiceByNameForSpaceWithPlans(arg1 string, a
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetServiceByNameForSpaceWithPlans", []interface{}{arg1, arg2})
 	fake.getServiceByNameForSpaceWithPlansMutex.Unlock()
 	if fake.GetServiceByNameForSpaceWithPlansStub != nil {
 		return fake.GetServiceByNameForSpaceWithPlansStub(arg1, arg2)
@@ -328,6 +336,7 @@ func (fake *FakeServiceBuilder) GetServicesByNameForSpaceWithPlans(arg1 string, 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetServicesByNameForSpaceWithPlans", []interface{}{arg1, arg2})
 	fake.getServicesByNameForSpaceWithPlansMutex.Unlock()
 	if fake.GetServicesByNameForSpaceWithPlansStub != nil {
 		return fake.GetServicesByNameForSpaceWithPlansStub(arg1, arg2)
@@ -362,6 +371,7 @@ func (fake *FakeServiceBuilder) GetServiceByNameForOrg(arg1 string, arg2 string)
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetServiceByNameForOrg", []interface{}{arg1, arg2})
 	fake.getServiceByNameForOrgMutex.Unlock()
 	if fake.GetServiceByNameForOrgStub != nil {
 		return fake.GetServiceByNameForOrgStub(arg1, arg2)
@@ -391,10 +401,16 @@ func (fake *FakeServiceBuilder) GetServiceByNameForOrgReturns(result1 models.Ser
 }
 
 func (fake *FakeServiceBuilder) GetServicesForManyBrokers(arg1 []string) ([]models.ServiceOffering, error) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.getServicesForManyBrokersMutex.Lock()
 	fake.getServicesForManyBrokersArgsForCall = append(fake.getServicesForManyBrokersArgsForCall, struct {
 		arg1 []string
-	}{arg1})
+	}{arg1Copy})
+	fake.recordInvocation("GetServicesForManyBrokers", []interface{}{arg1Copy})
 	fake.getServicesForManyBrokersMutex.Unlock()
 	if fake.GetServicesForManyBrokersStub != nil {
 		return fake.GetServicesForManyBrokersStub(arg1)
@@ -428,6 +444,7 @@ func (fake *FakeServiceBuilder) GetServicesForBroker(arg1 string) ([]models.Serv
 	fake.getServicesForBrokerArgsForCall = append(fake.getServicesForBrokerArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetServicesForBroker", []interface{}{arg1})
 	fake.getServicesForBrokerMutex.Unlock()
 	if fake.GetServicesForBrokerStub != nil {
 		return fake.GetServicesForBrokerStub(arg1)
@@ -461,6 +478,7 @@ func (fake *FakeServiceBuilder) GetServicesForSpace(arg1 string) ([]models.Servi
 	fake.getServicesForSpaceArgsForCall = append(fake.getServicesForSpaceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetServicesForSpace", []interface{}{arg1})
 	fake.getServicesForSpaceMutex.Unlock()
 	if fake.GetServicesForSpaceStub != nil {
 		return fake.GetServicesForSpaceStub(arg1)
@@ -494,6 +512,7 @@ func (fake *FakeServiceBuilder) GetServicesForSpaceWithPlans(arg1 string) ([]mod
 	fake.getServicesForSpaceWithPlansArgsForCall = append(fake.getServicesForSpaceWithPlansArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetServicesForSpaceWithPlans", []interface{}{arg1})
 	fake.getServicesForSpaceWithPlansMutex.Unlock()
 	if fake.GetServicesForSpaceWithPlansStub != nil {
 		return fake.GetServicesForSpaceWithPlansStub(arg1)
@@ -528,6 +547,7 @@ func (fake *FakeServiceBuilder) GetServiceVisibleToOrg(arg1 string, arg2 string)
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetServiceVisibleToOrg", []interface{}{arg1, arg2})
 	fake.getServiceVisibleToOrgMutex.Unlock()
 	if fake.GetServiceVisibleToOrgStub != nil {
 		return fake.GetServiceVisibleToOrgStub(arg1, arg2)
@@ -561,6 +581,7 @@ func (fake *FakeServiceBuilder) GetServicesVisibleToOrg(arg1 string) ([]models.S
 	fake.getServicesVisibleToOrgArgsForCall = append(fake.getServicesVisibleToOrgArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetServicesVisibleToOrg", []interface{}{arg1})
 	fake.getServicesVisibleToOrgMutex.Unlock()
 	if fake.GetServicesVisibleToOrgStub != nil {
 		return fake.GetServicesVisibleToOrgStub(arg1)
@@ -587,6 +608,52 @@ func (fake *FakeServiceBuilder) GetServicesVisibleToOrgReturns(result1 []models.
 		result1 []models.ServiceOffering
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeServiceBuilder) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.getAllServicesMutex.RLock()
+	defer fake.getAllServicesMutex.RUnlock()
+	fake.getAllServicesWithPlansMutex.RLock()
+	defer fake.getAllServicesWithPlansMutex.RUnlock()
+	fake.getServiceByNameWithPlansMutex.RLock()
+	defer fake.getServiceByNameWithPlansMutex.RUnlock()
+	fake.getServiceByNameWithPlansWithOrgNamesMutex.RLock()
+	defer fake.getServiceByNameWithPlansWithOrgNamesMutex.RUnlock()
+	fake.getServiceByNameForSpaceMutex.RLock()
+	defer fake.getServiceByNameForSpaceMutex.RUnlock()
+	fake.getServiceByNameForSpaceWithPlansMutex.RLock()
+	defer fake.getServiceByNameForSpaceWithPlansMutex.RUnlock()
+	fake.getServicesByNameForSpaceWithPlansMutex.RLock()
+	defer fake.getServicesByNameForSpaceWithPlansMutex.RUnlock()
+	fake.getServiceByNameForOrgMutex.RLock()
+	defer fake.getServiceByNameForOrgMutex.RUnlock()
+	fake.getServicesForManyBrokersMutex.RLock()
+	defer fake.getServicesForManyBrokersMutex.RUnlock()
+	fake.getServicesForBrokerMutex.RLock()
+	defer fake.getServicesForBrokerMutex.RUnlock()
+	fake.getServicesForSpaceMutex.RLock()
+	defer fake.getServicesForSpaceMutex.RUnlock()
+	fake.getServicesForSpaceWithPlansMutex.RLock()
+	defer fake.getServicesForSpaceWithPlansMutex.RUnlock()
+	fake.getServiceVisibleToOrgMutex.RLock()
+	defer fake.getServiceVisibleToOrgMutex.RUnlock()
+	fake.getServicesVisibleToOrgMutex.RLock()
+	defer fake.getServicesVisibleToOrgMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceBuilder) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ servicebuilder.ServiceBuilder = new(FakeServiceBuilder)

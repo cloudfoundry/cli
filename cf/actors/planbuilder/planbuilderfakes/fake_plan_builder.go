@@ -74,13 +74,21 @@ type FakePlanBuilder struct {
 		result1 []models.ServicePlanFields
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakePlanBuilder) AttachOrgsToPlans(arg1 []models.ServicePlanFields) ([]models.ServicePlanFields, error) {
+	var arg1Copy []models.ServicePlanFields
+	if arg1 != nil {
+		arg1Copy = make([]models.ServicePlanFields, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.attachOrgsToPlansMutex.Lock()
 	fake.attachOrgsToPlansArgsForCall = append(fake.attachOrgsToPlansArgsForCall, struct {
 		arg1 []models.ServicePlanFields
-	}{arg1})
+	}{arg1Copy})
+	fake.recordInvocation("AttachOrgsToPlans", []interface{}{arg1Copy})
 	fake.attachOrgsToPlansMutex.Unlock()
 	if fake.AttachOrgsToPlansStub != nil {
 		return fake.AttachOrgsToPlansStub(arg1)
@@ -110,11 +118,17 @@ func (fake *FakePlanBuilder) AttachOrgsToPlansReturns(result1 []models.ServicePl
 }
 
 func (fake *FakePlanBuilder) AttachOrgToPlans(arg1 []models.ServicePlanFields, arg2 string) ([]models.ServicePlanFields, error) {
+	var arg1Copy []models.ServicePlanFields
+	if arg1 != nil {
+		arg1Copy = make([]models.ServicePlanFields, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.attachOrgToPlansMutex.Lock()
 	fake.attachOrgToPlansArgsForCall = append(fake.attachOrgToPlansArgsForCall, struct {
 		arg1 []models.ServicePlanFields
 		arg2 string
-	}{arg1, arg2})
+	}{arg1Copy, arg2})
+	fake.recordInvocation("AttachOrgToPlans", []interface{}{arg1Copy, arg2})
 	fake.attachOrgToPlansMutex.Unlock()
 	if fake.AttachOrgToPlansStub != nil {
 		return fake.AttachOrgToPlansStub(arg1, arg2)
@@ -149,6 +163,7 @@ func (fake *FakePlanBuilder) GetPlansForServiceForOrg(arg1 string, arg2 string) 
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetPlansForServiceForOrg", []interface{}{arg1, arg2})
 	fake.getPlansForServiceForOrgMutex.Unlock()
 	if fake.GetPlansForServiceForOrgStub != nil {
 		return fake.GetPlansForServiceForOrgStub(arg1, arg2)
@@ -182,6 +197,7 @@ func (fake *FakePlanBuilder) GetPlansForServiceWithOrgs(arg1 string) ([]models.S
 	fake.getPlansForServiceWithOrgsArgsForCall = append(fake.getPlansForServiceWithOrgsArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetPlansForServiceWithOrgs", []interface{}{arg1})
 	fake.getPlansForServiceWithOrgsMutex.Unlock()
 	if fake.GetPlansForServiceWithOrgsStub != nil {
 		return fake.GetPlansForServiceWithOrgsStub(arg1)
@@ -211,10 +227,16 @@ func (fake *FakePlanBuilder) GetPlansForServiceWithOrgsReturns(result1 []models.
 }
 
 func (fake *FakePlanBuilder) GetPlansForManyServicesWithOrgs(arg1 []string) ([]models.ServicePlanFields, error) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.getPlansForManyServicesWithOrgsMutex.Lock()
 	fake.getPlansForManyServicesWithOrgsArgsForCall = append(fake.getPlansForManyServicesWithOrgsArgsForCall, struct {
 		arg1 []string
-	}{arg1})
+	}{arg1Copy})
+	fake.recordInvocation("GetPlansForManyServicesWithOrgs", []interface{}{arg1Copy})
 	fake.getPlansForManyServicesWithOrgsMutex.Unlock()
 	if fake.GetPlansForManyServicesWithOrgsStub != nil {
 		return fake.GetPlansForManyServicesWithOrgsStub(arg1)
@@ -248,6 +270,7 @@ func (fake *FakePlanBuilder) GetPlansForService(arg1 string) ([]models.ServicePl
 	fake.getPlansForServiceArgsForCall = append(fake.getPlansForServiceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetPlansForService", []interface{}{arg1})
 	fake.getPlansForServiceMutex.Unlock()
 	if fake.GetPlansForServiceStub != nil {
 		return fake.GetPlansForServiceStub(arg1)
@@ -281,6 +304,7 @@ func (fake *FakePlanBuilder) GetPlansVisibleToOrg(arg1 string) ([]models.Service
 	fake.getPlansVisibleToOrgArgsForCall = append(fake.getPlansVisibleToOrgArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetPlansVisibleToOrg", []interface{}{arg1})
 	fake.getPlansVisibleToOrgMutex.Unlock()
 	if fake.GetPlansVisibleToOrgStub != nil {
 		return fake.GetPlansVisibleToOrgStub(arg1)
@@ -307,6 +331,38 @@ func (fake *FakePlanBuilder) GetPlansVisibleToOrgReturns(result1 []models.Servic
 		result1 []models.ServicePlanFields
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakePlanBuilder) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.attachOrgsToPlansMutex.RLock()
+	defer fake.attachOrgsToPlansMutex.RUnlock()
+	fake.attachOrgToPlansMutex.RLock()
+	defer fake.attachOrgToPlansMutex.RUnlock()
+	fake.getPlansForServiceForOrgMutex.RLock()
+	defer fake.getPlansForServiceForOrgMutex.RUnlock()
+	fake.getPlansForServiceWithOrgsMutex.RLock()
+	defer fake.getPlansForServiceWithOrgsMutex.RUnlock()
+	fake.getPlansForManyServicesWithOrgsMutex.RLock()
+	defer fake.getPlansForManyServicesWithOrgsMutex.RUnlock()
+	fake.getPlansForServiceMutex.RLock()
+	defer fake.getPlansForServiceMutex.RUnlock()
+	fake.getPlansVisibleToOrgMutex.RLock()
+	defer fake.getPlansVisibleToOrgMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakePlanBuilder) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ planbuilder.PlanBuilder = new(FakePlanBuilder)

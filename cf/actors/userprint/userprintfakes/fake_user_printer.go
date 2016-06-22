@@ -14,6 +14,8 @@ type FakeUserPrinter struct {
 		guid     string
 		username string
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUserPrinter) PrintUsers(guid string, username string) {
@@ -22,6 +24,7 @@ func (fake *FakeUserPrinter) PrintUsers(guid string, username string) {
 		guid     string
 		username string
 	}{guid, username})
+	fake.recordInvocation("PrintUsers", []interface{}{guid, username})
 	fake.printUsersMutex.Unlock()
 	if fake.PrintUsersStub != nil {
 		fake.PrintUsersStub(guid, username)
@@ -38,6 +41,26 @@ func (fake *FakeUserPrinter) PrintUsersArgsForCall(i int) (string, string) {
 	fake.printUsersMutex.RLock()
 	defer fake.printUsersMutex.RUnlock()
 	return fake.printUsersArgsForCall[i].guid, fake.printUsersArgsForCall[i].username
+}
+
+func (fake *FakeUserPrinter) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.printUsersMutex.RLock()
+	defer fake.printUsersMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeUserPrinter) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ userprint.UserPrinter = new(FakeUserPrinter)
