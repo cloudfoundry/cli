@@ -1,11 +1,19 @@
 [
   {
+    "id": "Bind a security group to a particular space, or all spaces of an org",
+    "translation": "Bind a security group to a particular space, or all spaces of an org"
+  },
+  {
     "id": "Bound apps: {{.BoundApplications}}",
     "translation": "Bound apps: {{.BoundApplications}}"
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
     "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]"
+  },
+  {
+    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]",
+    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]"
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
@@ -38,6 +46,10 @@
   {
     "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
+  },
+  {
+    "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
+    "translation": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n"
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",

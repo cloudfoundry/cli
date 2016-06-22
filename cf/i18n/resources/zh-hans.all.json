@@ -372,8 +372,8 @@
     "translation": "BUILDPACK_NAME"
   },
   {
-    "id": "Bind a security group to a space",
-    "translation": "将安全组绑定到空间"
+    "id": "Bind a security group to a particular space, or all spaces of an org",
+    "translation": ""
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -472,8 +472,8 @@
     "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
   },
   {
-    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
-    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
+    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]",
+    "translation": ""
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
@@ -2454,6 +2454,10 @@
   {
     "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
     "translation": "用法不正确。需要 REPO_NAME 和 URL 作为自变量\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
+    "translation": ""
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",

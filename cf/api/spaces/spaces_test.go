@@ -117,6 +117,101 @@ var _ = Describe("Space Repository", func() {
 		})
 	})
 
+	Describe("ListSpacesFromOrg", func() {
+		var (
+			ccServer *ghttp.Server
+			repo     CloudControllerSpaceRepository
+		)
+
+		BeforeEach(func() {
+			ccServer = ghttp.NewServer()
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetAPIEndpoint(ccServer.URL())
+			configRepo.SetOrganizationFields(models.OrganizationFields{})
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+			repo = NewCloudControllerSpaceRepository(configRepo, gateway)
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/spaces", "order-by=name&inline-relations-depth=1"),
+					ghttp.VerifyHeader(http.Header{
+						"accept": []string{"application/json"},
+					}),
+					ghttp.RespondWith(http.StatusOK, `{
+						"total_results": 3,
+						"total_pages": 2,
+						"prev_url": null,
+						"next_url": "/v2/organizations/my-org-guid/spaces?order-by=name&page=2&inline-relations-depth=1",
+						"resources": [
+							{
+								"metadata": { "guid": "space3-guid" },
+								"entity": {
+								  "name": "Alpha",
+								  "allow_ssh": true,
+		              "security_groups": [
+		                {
+		                  "metadata": { "guid": "4302b3b4-4afc-4f12-ae6d-ed1bb815551f" },
+		                  "entity": { "name": "imma-security-group" }
+		                }
+		              ]
+		            }
+							},
+							{
+								"metadata": { "guid": "space2-guid" },
+								"entity": { "name": "Beta" }
+							}
+						]
+					}`),
+				),
+			)
+
+			ccServer.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/v2/organizations/my-org-guid/spaces", "order-by=name&page=2&inline-relations-depth=1"),
+					ghttp.VerifyHeader(http.Header{
+						"accept": []string{"application/json"},
+					}),
+					ghttp.RespondWith(http.StatusOK, `{
+						"total_results": 3,
+						"total_pages": 2,
+						"prev_url": null,
+						"next_url": null,
+						"resources": [
+							{
+								"metadata": { "guid": "space1-guid" },
+								"entity": { "name": "Gamma" }
+							}
+						]
+					}`),
+				),
+			)
+		})
+
+		AfterEach(func() {
+			ccServer.Close()
+		})
+
+		It("lists all the spaces", func() {
+			spaces := []models.Space{}
+			apiErr := repo.ListSpacesFromOrg("my-org-guid", func(space models.Space) bool {
+				spaces = append(spaces, space)
+				return true
+			})
+
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(len(spaces)).To(Equal(3))
+			Expect(spaces[0].GUID).To(Equal("space3-guid"))
+			Expect(spaces[0].AllowSSH).To(BeTrue())
+			Expect(spaces[0].SecurityGroups[0].Name).To(Equal("imma-security-group"))
+			Expect(spaces[0].Name).To(Equal("Alpha"))
+
+			Expect(spaces[1].GUID).To(Equal("space2-guid"))
+			Expect(spaces[1].Name).To(Equal("Beta"))
+
+			Expect(spaces[2].GUID).To(Equal("space1-guid"))
+			Expect(spaces[2].Name).To(Equal("Gamma"))
+		})
+	})
+
 	Describe("finding spaces by name", func() {
 		It("returns the space", func() {
 			testSpacesFindByNameWithOrg("my-org-guid",

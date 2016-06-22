@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
@@ -27,11 +28,11 @@ func init() {
 }
 
 func (cmd *BindSecurityGroup) MetaData() commandregistry.CommandMetadata {
-	primaryUsage := T("CF_NAME bind-security-group SECURITY_GROUP ORG SPACE")
+	primaryUsage := T("CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]")
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
 	return commandregistry.CommandMetadata{
 		Name:        "bind-security-group",
-		Description: T("Bind a security group to a space"),
+		Description: T("Bind a security group to a particular space, or all spaces of an org"),
 		Usage: []string{
 			primaryUsage,
 			"\n\n",
@@ -41,8 +42,8 @@ func (cmd *BindSecurityGroup) MetaData() commandregistry.CommandMetadata {
 }
 
 func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 3 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-security-group"))
+	if len(fc.Args()) != 2 && len(fc.Args()) != 3 {
+		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-security-group"))
 	}
 
 	reqs := []requirements.Requirement{}
@@ -63,40 +64,51 @@ func (cmd *BindSecurityGroup) SetDependency(deps commandregistry.Dependency, plu
 func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) error {
 	securityGroupName := context.Args()[0]
 	orgName := context.Args()[1]
-	spaceName := context.Args()[2]
-
-	cmd.ui.Say(T("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
-		map[string]interface{}{
-			"security_group": securityGroupName,
-			"space":          spaceName,
-			"organization":   orgName,
-			"username":       cmd.configRepo.Username(),
-		}))
 
 	securityGroup, err := cmd.securityGroupRepo.Read(securityGroupName)
-
 	if err != nil {
 		return err
 	}
 
 	org, err := cmd.orgRepo.FindByName(orgName)
-
 	if err != nil {
 		return err
 	}
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
+	spaces := []models.Space{}
+	if len(context.Args()) > 2 {
+		var space models.Space
+		space, err = cmd.spaceRepo.FindByNameInOrg(context.Args()[2], org.GUID)
+		if err != nil {
+			return err
+		}
 
-	if err != nil {
-		return err
+		spaces = append(spaces, space)
+	} else {
+		err = cmd.spaceRepo.ListSpacesFromOrg(org.GUID, func(space models.Space) bool {
+			spaces = append(spaces, space)
+			return false
+		})
+		if err != nil {
+			return err
+		}
 	}
 
-	err = cmd.spaceBinder.BindSpace(securityGroup.GUID, space.GUID)
-	if err != nil {
-		return err
+	for _, space := range spaces {
+		cmd.ui.Say(T("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
+			map[string]interface{}{
+				"security_group": securityGroupName,
+				"space":          space.Name,
+				"organization":   orgName,
+				"username":       cmd.configRepo.Username(),
+			}))
+		err = cmd.spaceBinder.BindSpace(securityGroup.GUID, space.GUID)
+		if err != nil {
+			return err
+		}
+		cmd.ui.Ok()
 	}
 
-	cmd.ui.Ok()
 	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
 	return nil

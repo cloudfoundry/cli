@@ -17,6 +17,15 @@ type FakeSpaceRepository struct {
 	listSpacesReturns struct {
 		result1 error
 	}
+	ListSpacesFromOrgStub        func(orgGUID string, spaceFunc func(models.Space) bool) error
+	listSpacesFromOrgMutex       sync.RWMutex
+	listSpacesFromOrgArgsForCall []struct {
+		orgGUID   string
+		spaceFunc func(models.Space) bool
+	}
+	listSpacesFromOrgReturns struct {
+		result1 error
+	}
 	FindByNameStub        func(name string) (space models.Space, apiErr error)
 	findByNameMutex       sync.RWMutex
 	findByNameArgsForCall []struct {
@@ -103,6 +112,39 @@ func (fake *FakeSpaceRepository) ListSpacesArgsForCall(i int) func(models.Space)
 func (fake *FakeSpaceRepository) ListSpacesReturns(result1 error) {
 	fake.ListSpacesStub = nil
 	fake.listSpacesReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeSpaceRepository) ListSpacesFromOrg(orgGUID string, spaceFunc func(models.Space) bool) error {
+	fake.listSpacesFromOrgMutex.Lock()
+	fake.listSpacesFromOrgArgsForCall = append(fake.listSpacesFromOrgArgsForCall, struct {
+		orgGUID   string
+		spaceFunc func(models.Space) bool
+	}{orgGUID, spaceFunc})
+	fake.listSpacesFromOrgMutex.Unlock()
+	if fake.ListSpacesFromOrgStub != nil {
+		return fake.ListSpacesFromOrgStub(orgGUID, spaceFunc)
+	} else {
+		return fake.listSpacesFromOrgReturns.result1
+	}
+}
+
+func (fake *FakeSpaceRepository) ListSpacesFromOrgCallCount() int {
+	fake.listSpacesFromOrgMutex.RLock()
+	defer fake.listSpacesFromOrgMutex.RUnlock()
+	return len(fake.listSpacesFromOrgArgsForCall)
+}
+
+func (fake *FakeSpaceRepository) ListSpacesFromOrgArgsForCall(i int) (string, func(models.Space) bool) {
+	fake.listSpacesFromOrgMutex.RLock()
+	defer fake.listSpacesFromOrgMutex.RUnlock()
+	return fake.listSpacesFromOrgArgsForCall[i].orgGUID, fake.listSpacesFromOrgArgsForCall[i].spaceFunc
+}
+
+func (fake *FakeSpaceRepository) ListSpacesFromOrgReturns(result1 error) {
+	fake.ListSpacesFromOrgStub = nil
+	fake.listSpacesFromOrgReturns = struct {
 		result1 error
 	}{result1}
 }

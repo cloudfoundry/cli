@@ -17,6 +17,7 @@ import (
 
 type SpaceRepository interface {
 	ListSpaces(func(models.Space) bool) error
+	ListSpacesFromOrg(orgGUID string, spaceFunc func(models.Space) bool) error
 	FindByName(name string) (space models.Space, apiErr error)
 	FindByNameInOrg(name, orgGUID string) (space models.Space, apiErr error)
 	Create(name string, orgGUID string, spaceQuotaGUID string) (space models.Space, apiErr error)
@@ -40,6 +41,16 @@ func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space
 	return repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
 		fmt.Sprintf("/v2/organizations/%s/spaces?order-by=name&inline-relations-depth=1", repo.config.OrganizationFields().GUID),
+		resources.SpaceResource{},
+		func(resource interface{}) bool {
+			return callback(resource.(resources.SpaceResource).ToModel())
+		})
+}
+
+func (repo CloudControllerSpaceRepository) ListSpacesFromOrg(orgGUID string, callback func(models.Space) bool) error {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.APIEndpoint(),
+		fmt.Sprintf("/v2/organizations/%s/spaces?order-by=name&inline-relations-depth=1", orgGUID),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
 			return callback(resource.(resources.SpaceResource).ToModel())
