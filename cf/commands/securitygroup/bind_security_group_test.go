@@ -68,13 +68,25 @@ var _ = Describe("bind-security-group command", func() {
 			Expect(runCommand("my-craaaaaazy-security-group", "my-org", "my-space")).To(BeTrue())
 		})
 
-		It("fails with usage when not provided the name of a security group, org, and space", func() {
-			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
-			runCommand("one fish", "two fish", "three fish", "purple fish")
+		Describe("number of arguments", func() {
+			Context("wrong number of arguments", func() {
+				It("fails with usage when not provided the name of a security group, org, and space", func() {
+					requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+					runCommand("one fish", "two fish", "three fish", "purple fish")
 
-			Expect(ui.Outputs()).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "arguments"},
-			))
+					Expect(ui.Outputs()).To(ContainSubstrings(
+						[]string{"Incorrect Usage", "Requires", "arguments"},
+					))
+				})
+			})
+
+			Context("providing securitygroup and org", func() {
+				It("should not fail", func() {
+					requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+
+					Expect(runCommand("my-craaaaaazy-security-group", "my-org")).To(BeTrue())
+				})
+			})
 		})
 	})
 
@@ -139,39 +151,87 @@ var _ = Describe("bind-security-group command", func() {
 		})
 
 		Context("everything is hunky dory", func() {
+			var securityGroup models.SecurityGroup
+			var org models.Organization
+
 			BeforeEach(func() {
-				org := models.Organization{}
+				org = models.Organization{}
 				org.Name = "org-name"
 				org.GUID = "org-guid"
-				fakeOrgRepo.ListOrgsReturns([]models.Organization{org}, nil)
+				fakeOrgRepo.FindByNameReturns(org, nil)
 
 				space := models.Space{}
 				space.Name = "space-name"
 				space.GUID = "space-guid"
 				fakeSpaceRepo.FindByNameInOrgReturns(space, nil)
 
-				securityGroup := models.SecurityGroup{}
+				securityGroup = models.SecurityGroup{}
 				securityGroup.Name = "security-group"
 				securityGroup.GUID = "security-group-guid"
 				fakeSecurityGroupRepo.ReadReturns(securityGroup, nil)
 			})
 
-			JustBeforeEach(func() {
-				runCommand("security-group", "org-name", "space-name")
+			Context("when space is provided", func() {
+				JustBeforeEach(func() {
+					runCommand("security-group", "org-name", "space-name")
+				})
+
+				It("assigns the security group to the space", func() {
+					secGroupGUID, spaceGUID := fakeSpaceBinder.BindSpaceArgsForCall(0)
+					Expect(secGroupGUID).To(Equal("security-group-guid"))
+					Expect(spaceGUID).To(Equal("space-guid"))
+				})
+
+				It("describes what it is doing for the user's benefit", func() {
+					Expect(ui.Outputs()).To(ContainSubstrings(
+						[]string{"Assigning security group security-group to space space-name in org org-name as my-user"},
+						[]string{"OK"},
+						[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
+					))
+				})
 			})
 
-			It("assigns the security group to the space", func() {
-				secGroupGUID, spaceGUID := fakeSpaceBinder.BindSpaceArgsForCall(0)
-				Expect(secGroupGUID).To(Equal("security-group-guid"))
-				Expect(spaceGUID).To(Equal("space-guid"))
-			})
+			Context("when no space is provided", func() {
+				var spaces []models.Space
+				BeforeEach(func() {
+					spaces := []models.Space{
+						{
+							SpaceFields: models.SpaceFields{
+								GUID: "space-guid-1",
+								Name: "space-name-1",
+							},
+						},
+						{
+							SpaceFields: models.SpaceFields{
+								GUID: "space-guid-2",
+								Name: "space-name-2",
+							},
+						},
+					}
 
-			It("describes what it is doing for the user's benefit", func() {
-				Expect(ui.Outputs()).To(ContainSubstrings(
-					[]string{"Assigning security group security-group to space space-name in org org-name as my-user"},
-					[]string{"OK"},
-					[]string{"TIP: Changes will not apply to existing running applications until they are restarted."},
-				))
+					fakeSpaceRepo.ListSpacesFromOrgStub = func(orgGUID string, callback func(models.Space) bool) error {
+						Expect(orgGUID).To(Equal(org.GUID))
+
+						for _, space := range spaces {
+							callback(space)
+						}
+
+						return nil
+					}
+				})
+
+				It("binds the security group to all of the org's spaces", func() {
+					runCommand("sec group", "org")
+
+					Expect(fakeSpaceRepo.ListSpacesFromOrgCallCount()).Should(Equal(1))
+					Expect(fakeSpaceBinder.BindSpaceCallCount()).Should(Equal(2))
+
+					for i, space := range spaces {
+						securityGroupGUID, spaceGUID := fakeSpaceBinder.BindSpaceArgsForCall(i)
+						Expect(securityGroupGUID).To(Equal(securityGroup.GUID))
+						Expect(spaceGUID).To(Equal(space.GUID))
+					}
+				})
 			})
 		})
 	})
