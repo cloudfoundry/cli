@@ -21,11 +21,11 @@ type FakePushActor struct {
 	uploadAppReturns struct {
 		result1 error
 	}
-	ProcessPathStub        func(dirOrZipFile string, f func(string)) error
+	ProcessPathStub        func(dirOrZipFile string, f func(string) error) error
 	processPathMutex       sync.RWMutex
 	processPathArgsForCall []struct {
 		dirOrZipFile string
-		f            func(string)
+		f            func(string) error
 	}
 	processPathReturns struct {
 		result1 error
@@ -86,11 +86,11 @@ func (fake *FakePushActor) UploadAppReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakePushActor) ProcessPath(dirOrZipFile string, f func(string)) error {
+func (fake *FakePushActor) ProcessPath(dirOrZipFile string, f func(string) error) error {
 	fake.processPathMutex.Lock()
 	fake.processPathArgsForCall = append(fake.processPathArgsForCall, struct {
 		dirOrZipFile string
-		f            func(string)
+		f            func(string) error
 	}{dirOrZipFile, f})
 	fake.recordInvocation("ProcessPath", []interface{}{dirOrZipFile, f})
 	fake.processPathMutex.Unlock()
@@ -107,7 +107,7 @@ func (fake *FakePushActor) ProcessPathCallCount() int {
 	return len(fake.processPathArgsForCall)
 }
 
-func (fake *FakePushActor) ProcessPathArgsForCall(i int) (string, func(string)) {
+func (fake *FakePushActor) ProcessPathArgsForCall(i int) (string, func(string) error) {
 	fake.processPathMutex.RLock()
 	defer fake.processPathMutex.RUnlock()
 	return fake.processPathArgsForCall[i].dirOrZipFile, fake.processPathArgsForCall[i].f

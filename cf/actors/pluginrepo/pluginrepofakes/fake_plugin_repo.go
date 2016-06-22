@@ -19,13 +19,21 @@ type FakePluginRepo struct {
 		result1 map[string][]clipr.Plugin
 		result2 []string
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakePluginRepo) GetPlugins(arg1 []models.PluginRepo) (map[string][]clipr.Plugin, []string) {
+	var arg1Copy []models.PluginRepo
+	if arg1 != nil {
+		arg1Copy = make([]models.PluginRepo, len(arg1))
+		copy(arg1Copy, arg1)
+	}
 	fake.getPluginsMutex.Lock()
 	fake.getPluginsArgsForCall = append(fake.getPluginsArgsForCall, struct {
 		arg1 []models.PluginRepo
-	}{arg1})
+	}{arg1Copy})
+	fake.recordInvocation("GetPlugins", []interface{}{arg1Copy})
 	fake.getPluginsMutex.Unlock()
 	if fake.GetPluginsStub != nil {
 		return fake.GetPluginsStub(arg1)
@@ -52,6 +60,26 @@ func (fake *FakePluginRepo) GetPluginsReturns(result1 map[string][]clipr.Plugin,
 		result1 map[string][]clipr.Plugin
 		result2 []string
 	}{result1, result2}
+}
+
+func (fake *FakePluginRepo) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.getPluginsMutex.RLock()
+	defer fake.getPluginsMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakePluginRepo) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ pluginrepo.PluginRepo = new(FakePluginRepo)

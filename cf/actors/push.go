@@ -20,7 +20,7 @@ const windowsPathPrefix = `\\?\`
 
 type PushActor interface {
 	UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error
-	ProcessPath(dirOrZipFile string, f func(string)) error
+	ProcessPath(dirOrZipFile string, f func(string) error) error
 	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 }
 
@@ -47,7 +47,7 @@ func NewPushActor(appBitsRepo applicationbits.Repository, zipper appfiles.Zipper
 // was a zip file or an app dir that it was given, and the caller would not be
 // responsible for cleaning up the temporary directory ProcessPath creates when
 // given a zip.
-func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) error {
+func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string) error) error {
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
 		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
 		if err != nil {
@@ -55,7 +55,10 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 		}
 
 		if filepath.IsAbs(appDir) {
-			f(appDir)
+			err = f(appDir)
+			if err != nil {
+				return err
+			}
 		} else {
 			var absPath string
 			absPath, err = filepath.Abs(appDir)
@@ -63,7 +66,10 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 				return err
 			}
 
-			f(absPath)
+			err = f(absPath)
+			if err != nil {
+				return err
+			}
 		}
 
 		return nil
@@ -79,7 +85,10 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string)) erro
 		return err
 	}
 
-	f(tempDir)
+	err = f(tempDir)
+	if err != nil {
+		return err
+	}
 
 	err = os.RemoveAll(tempDir)
 	if err != nil {

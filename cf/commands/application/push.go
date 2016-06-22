@@ -296,27 +296,24 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 	return nil
 }
 
-func (cmd *Push) processPathCallback(path string, app models.Application) func(string) {
-	return func(appDir string) {
+func (cmd *Push) processPathCallback(path string, app models.Application) func(string) error {
+	return func(appDir string) error {
 		localFiles, err := cmd.appfiles.AppFilesInDir(appDir)
 		if err != nil {
-			cmd.ui.Failed(
+			return errors.New(
 				T("Error processing app files in '{{.Path}}': {{.Error}}",
 					map[string]interface{}{
 						"Path":  path,
 						"Error": err.Error(),
-					}),
-			)
+					}))
 		}
 
 		if len(localFiles) == 0 {
-			cmd.ui.Failed(
+			return errors.New(
 				T("No app files found in '{{.Path}}'",
 					map[string]interface{}{
 						"Path": path,
-					}),
-			)
-			return
+					}))
 		}
 
 		cmd.ui.Say(T("Uploading {{.AppName}}...",
@@ -324,11 +321,11 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 
 		err = cmd.uploadApp(app.GUID, appDir, path, localFiles)
 		if err != nil {
-			cmd.ui.Failed(fmt.Sprintf(T("Error uploading application.\n{{.APIErr}}",
-				map[string]interface{}{"APIErr": err.Error()})))
-			return
+			return errors.New(T("Error uploading application.\n{{.APIErr}}",
+				map[string]interface{}{"APIErr": err.Error()}))
 		}
 		cmd.ui.Ok()
+		return nil
 	}
 }
 
