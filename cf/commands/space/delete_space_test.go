@@ -3,7 +3,7 @@ package space_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -23,7 +23,7 @@ var _ = Describe("delete-space command", func() {
 		ui                  *testterm.FakeUI
 		space               models.Space
 		config              coreconfig.Repository
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
@@ -41,7 +41,7 @@ var _ = Describe("delete-space command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 
 		space = models.Space{SpaceFields: models.SpaceFields{

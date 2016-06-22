@@ -5,6 +5,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/featureflags/featureflagsfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/user"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -27,7 +28,7 @@ var _ = Describe("create-space command", func() {
 		requirementsFactory *requirementsfakes.FakeFactory
 		configOrg           models.OrganizationFields
 		configRepo          coreconfig.Repository
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		userRepo            *apifakes.FakeUserRepository
 		spaceRoleSetter     user.SpaceRoleSetter
@@ -77,7 +78,7 @@ var _ = Describe("create-space command", func() {
 		//save original command and restore later
 		OriginalCommand = commandregistry.Commands.FindCommand("set-space-role")
 
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		space := models.Space{SpaceFields: models.SpaceFields{
 			Name: "my-space",
 			GUID: "my-space-guid",

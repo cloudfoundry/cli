@@ -3,8 +3,8 @@ package spacequota_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -23,7 +23,7 @@ var _ = Describe("unset-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
@@ -41,7 +41,7 @@ var _ = Describe("unset-space-quota command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 	})
 

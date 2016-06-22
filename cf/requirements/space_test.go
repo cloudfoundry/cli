@@ -3,7 +3,7 @@ package requirements_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	. "github.com/cloudfoundry/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
@@ -11,9 +11,9 @@ import (
 )
 
 var _ = Describe("SpaceRequirement", func() {
-	var spaceRepo *apifakes.FakeSpaceRepository
+	var spaceRepo *spacesfakes.FakeSpaceRepository
 	BeforeEach(func() {
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 	})
 
 	Context("when a space with the given name exists", func() {

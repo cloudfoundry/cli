@@ -4,9 +4,9 @@ import (
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
@@ -29,7 +29,7 @@ var _ = Describe("Login Command", func() {
 		authRepo     *authenticationfakes.FakeRepository
 		endpointRepo *coreconfigfakes.FakeEndpointRepository
 		orgRepo      *organizationsfakes.FakeOrganizationRepository
-		spaceRepo    *apifakes.FakeSpaceRepository
+		spaceRepo    *spacesfakes.FakeSpaceRepository
 
 		org  models.Organization
 		deps commandregistry.Dependency
@@ -86,7 +86,7 @@ var _ = Describe("Login Command", func() {
 		space.GUID = "my-space-guid"
 		space.Name = "my-space"
 
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		spaceRepo.ListSpacesStub = listSpacesStub([]models.Space{space})
 
 		authRepo.GetLoginPromptsAndSaveUAAServerURLReturns(map[string]coreconfig.AuthPrompt{
