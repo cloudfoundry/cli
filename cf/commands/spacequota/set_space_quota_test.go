@@ -1,8 +1,8 @@
 package spacequota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commands/spacequota"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -21,7 +21,7 @@ import (
 var _ = Describe("set-space-quota command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		quotaRepo           *spacequotasfakes.FakeSpaceQuotaRepository
 		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          *coreconfigfakes.FakeRepository
@@ -48,7 +48,7 @@ var _ = Describe("set-space-quota command", func() {
 		}
 		quotaRepo = new(spacequotasfakes.FakeSpaceQuotaRepository)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceQuotaRepository(quotaRepo)
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
 
 		flagContext = flags.NewFlagContext(cmd.MetaData().Flags)

@@ -2,8 +2,8 @@ package commands_test
 
 import (
 	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -25,7 +25,7 @@ import (
 var _ = Describe("target command", func() {
 	var (
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		requirementsFactory *requirementsfakes.FakeFactory
 		config              coreconfig.Repository
 		ui                  *testterm.FakeUI
@@ -56,7 +56,7 @@ var _ = Describe("target command", func() {
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		config = testconfig.NewRepository()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})

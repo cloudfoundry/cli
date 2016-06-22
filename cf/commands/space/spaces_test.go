@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -28,7 +28,7 @@ var _ = Describe("spaces command", func() {
 		ui                  *testterm.FakeUI
 		requirementsFactory *requirementsfakes.FakeFactory
 		configRepo          coreconfig.Repository
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 
 		deps commandregistry.Dependency
 	)
@@ -43,7 +43,7 @@ var _ = Describe("spaces command", func() {
 	BeforeEach(func() {
 		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
 		ui = &testterm.FakeUI{}
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})

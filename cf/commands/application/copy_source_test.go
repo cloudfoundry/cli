@@ -1,11 +1,11 @@
 package application_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/api/applications/applicationsfakes"
 	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
 	"github.com/cloudfoundry/cli/cf/api/copyapplicationsource/copyapplicationsourcefakes"
 	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commands/application/applicationfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
@@ -32,7 +32,7 @@ var _ = Describe("CopySource", func() {
 		authRepo            *authenticationfakes.FakeRepository
 		appRepo             *applicationsfakes.FakeRepository
 		copyAppSourceRepo   *copyapplicationsourcefakes.FakeRepository
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		appRestarter        *applicationfakes.FakeRestarter
 		OriginalCommand     commandregistry.Command
@@ -60,7 +60,7 @@ var _ = Describe("CopySource", func() {
 		authRepo = new(authenticationfakes.FakeRepository)
 		appRepo = new(applicationsfakes.FakeRepository)
 		copyAppSourceRepo = new(copyapplicationsourcefakes.FakeRepository)
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 

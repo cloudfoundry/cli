@@ -3,7 +3,7 @@ package space_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -22,7 +22,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 	var (
 		ui                  *testterm.FakeUI
 		requirementsFactory *requirementsfakes.FakeFactory
-		spaceRepo           *apifakes.FakeSpaceRepository
+		spaceRepo           *spacesfakes.FakeSpaceRepository
 		configRepo          coreconfig.Repository
 		deps                commandregistry.Dependency
 	)
@@ -31,7 +31,7 @@ var _ = Describe("disallow-space-ssh command", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
-		spaceRepo = new(apifakes.FakeSpaceRepository)
+		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 	})
 
 	updateCommandDependency := func(pluginCall bool) {
