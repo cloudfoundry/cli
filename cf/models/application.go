@@ -112,6 +112,7 @@ type AppParams struct {
 	State              *string
 	PackageUpdatedAt   *time.Time
 	AppPorts           *[]int
+	Routes             []ManifestRoute
 }
 
 func (app *AppParams) Merge(other *AppParams) {

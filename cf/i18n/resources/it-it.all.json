@@ -136,6 +136,10 @@
     "translation": "' non è un comando registrato. Vedi 'cf help'"
   },
   {
+    "id": "'routes' should be a list",
+    "translation": ""
+  },
+  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "Sono accettate anche '{{.VersionShort}}' e '{{.VersionLong}}'."
   },
@@ -4674,6 +4678,10 @@
   {
     "id": "down",
     "translation": "non attivo"
+  },
+  {
+    "id": "each route in 'routes' must have a 'route' property",
+    "translation": ""
   },
   {
     "id": "enabled",

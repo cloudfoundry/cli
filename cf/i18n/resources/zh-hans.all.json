@@ -136,6 +136,10 @@
     "translation": "' 不是注册的命令。请参阅“cf help”"
   },
   {
+    "id": "'routes' should be a list",
+    "translation": ""
+  },
+  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "还接受“{{.VersionShort}}”和“{{.VersionLong}}”。"
   },
@@ -4674,6 +4678,10 @@
   {
     "id": "down",
     "translation": "停止运行"
+  },
+  {
+    "id": "each route in 'routes' must have a 'route' property",
+    "translation": ""
   },
   {
     "id": "enabled",

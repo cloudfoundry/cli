@@ -53,3 +53,7 @@ func (r *RoutePresenter) URL() string {
 
 	return strings.TrimPrefix(u.String(), "//") // remove the empty scheme
 }
+
+type ManifestRoute struct {
+	Route string
+}

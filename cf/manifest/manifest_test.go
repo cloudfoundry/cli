@@ -37,7 +37,7 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].NoRoute).To(BeTrue())
 	})
 
-	Describe("when there is no applications block", func() {
+	Context("when there is no applications block", func() {
 		It("returns a single application with the global properties", func() {
 			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 				"instances": "3",
@@ -302,7 +302,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].Hosts).To(ConsistOf([]string{"my-hostname", "host-1", "host-2"}))
 	})
 
-	Describe("old-style property syntax", func() {
+	Context("old-style property syntax", func() {
 		It("returns an error when the manifest contains non-whitelist properties", func() {
 			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 				"applications": []interface{}{
@@ -407,7 +407,7 @@ var _ = Describe("Manifests", func() {
 		Expect(apps1).To(Equal(apps2))
 	})
 
-	Describe("parsing app ports", func() {
+	Context("parsing app ports", func() {
 		It("parses app ports", func() {
 			m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 				"applications": []interface{}{
@@ -472,7 +472,7 @@ var _ = Describe("Manifests", func() {
 		})
 	})
 
-	Describe("parsing env vars", func() {
+	Context("parsing env vars", func() {
 		It("handles values that are not strings", func() {
 			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 				"applications": []interface{}{
@@ -495,7 +495,7 @@ var _ = Describe("Manifests", func() {
 		})
 	})
 
-	Describe("parsing services", func() {
+	Context("parsing services", func() {
 		It("can read a list of service instance names", func() {
 			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 				"services": []interface{}{"service-1", "service-2"},
@@ -505,6 +505,98 @@ var _ = Describe("Manifests", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(*app[0].ServicesToBind).To(Equal([]string{"service-1", "service-2"}))
+		})
+	})
+
+	Context("when routes are provided", func() {
+		var manifest *manifest.Manifest
+
+		Context("when passed 'routes'", func() {
+			Context("valid 'routes'", func() {
+				BeforeEach(func() {
+					manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+						"applications": []interface{}{
+							generic.NewMap(map[interface{}]interface{}{
+								"routes": []interface{}{
+									map[interface{}]interface{}{"route": "route1.example.com"},
+									map[interface{}]interface{}{"route": "route2.example.com"},
+								},
+							}),
+						},
+					}))
+				})
+
+				It("parses routes into app params", func() {
+					apps, err := manifest.Applications()
+					Expect(err).NotTo(HaveOccurred())
+					Expect(apps).To(HaveLen(1))
+
+					routes := apps[0].Routes
+					Expect(routes).To(HaveLen(2))
+					Expect(routes[0].Route).To(Equal("route1.example.com"))
+					Expect(routes[1].Route).To(Equal("route2.example.com"))
+				})
+			})
+
+			Context("invalid 'routes'", func() {
+				Context("'routes' is formatted incorrectly", func() {
+					BeforeEach(func() {
+						manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+							"applications": []interface{}{
+								generic.NewMap(map[interface{}]interface{}{
+									"routes": []string{},
+								}),
+							},
+						}))
+					})
+
+					It("errors out", func() {
+						_, err := manifest.Applications()
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(MatchRegexp("should be a list"))
+					})
+				})
+
+				Context("an individual 'route' is formatted incorrectly", func() {
+					BeforeEach(func() {
+						manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+							"applications": []interface{}{
+								generic.NewMap(map[interface{}]interface{}{
+									"routes": []interface{}{
+										map[interface{}]interface{}{"routef": "route1.example.com"},
+									},
+								}),
+							},
+						}))
+					})
+
+					It("parses routes into app params", func() {
+						_, err := manifest.Applications()
+						Expect(err).To(HaveOccurred())
+						Expect(err.Error()).To(MatchRegexp("each route in 'routes' must have a 'route' property"))
+					})
+				})
+			})
+		})
+
+		Context("when there are no routes", func() {
+			BeforeEach(func() {
+				manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+					"applications": []interface{}{
+						generic.NewMap(map[interface{}]interface{}{
+							"buildpack": nil,
+							"command":   "echo banana",
+						}),
+					},
+				}))
+			})
+
+			It("sets routes to be nil", func() {
+				apps, err := manifest.Applications()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(apps).To(HaveLen(1))
+				Expect(apps[0].Routes).To(BeNil())
+			})
 		})
 	})
 })
