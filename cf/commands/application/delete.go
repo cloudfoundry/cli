@@ -41,11 +41,15 @@ func (cmd *DeleteApp) MetaData() commandregistry.CommandMetadata {
 }
 
 func (cmd *DeleteApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 1 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires app name as argument\n\n") + commandregistry.Commands.CommandUsage("delete"))
-	}
+	usageReq := requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
+		T("Requires app name as argument"),
+		func() bool {
+			return len(fc.Args()) != 1
+		},
+	)
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}

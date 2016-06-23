@@ -2496,10 +2496,6 @@
     "translation": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n"
   },
   {
-    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
-    "translation": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n"
-  },
-  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n"
   },
@@ -2530,10 +2526,6 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "Incorrect Usage. Requires an argument\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires app name as argument\n\n",
-    "translation": "Incorrect Usage. Requires app name as argument\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -3546,6 +3538,18 @@
   {
     "id": "Request pseudo-tty allocation",
     "translation": "Request pseudo-tty allocation"
+  },
+  {
+    "id": "Requires SOURCE-APP TARGET-APP as arguments",
+    "translation": "Requires SOURCE-APP TARGET-APP as arguments"
+  },
+  {
+    "id": "Requires an argument",
+    "translation": "Requires an argument"
+  },
+  {
+    "id": "Requires app name as argument",
+    "translation": "Requires app name as argument"
   },
   {
     "id": "Reserved Route Ports",

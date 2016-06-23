@@ -85,23 +85,27 @@ var _ = Describe("CopySource", func() {
 
 	Describe("requirement failures", func() {
 		It("when not logged in", func() {
+			requirementsFactory.NewUsageRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 			Expect(runCommand("source-app", "target-app")).ToNot(HavePassedRequirements())
 		})
 
 		It("when a space is not targeted", func() {
+			requirementsFactory.NewUsageRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 			Expect(runCommand("source-app", "target-app")).ToNot(HavePassedRequirements())
 		})
 
 		It("when provided too many args", func() {
+			requirementsFactory.NewUsageRequirementReturns(requirements.Failing{})
 			Expect(runCommand("source-app", "target-app", "too-much", "app-name")).ToNot(HavePassedRequirements())
 		})
 	})
 
 	Describe("Passing requirements", func() {
 		BeforeEach(func() {
+			requirementsFactory.NewUsageRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		})
