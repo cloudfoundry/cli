@@ -55,26 +55,28 @@ var _ = Describe("delete app command", func() {
 	}
 
 	It("fails requirements when not logged in", func() {
+		requirementsFactory.NewUsageRequirementReturns(requirements.Passing{})
 		requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
 		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
 	})
+
 	It("fails if a space is not targeted", func() {
+		requirementsFactory.NewUsageRequirementReturns(requirements.Passing{})
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
 		Expect(runCommand("-f", "delete-this-app-plz")).To(BeFalse())
 	})
 
-	Context("when logged in", func() {
+	It("fails with usage when not provided exactly one arg", func() {
+		requirementsFactory.NewUsageRequirementReturns(requirements.Failing{})
+		Expect(runCommand()).To(BeFalse())
+	})
+
+	Context("when passing requirements", func() {
 		BeforeEach(func() {
+			requirementsFactory.NewUsageRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
-		})
-
-		It("fails with usage when not provided exactly one arg", func() {
-			runCommand()
-			Expect(ui.Outputs()).To(ContainSubstrings(
-				[]string{"Incorrect Usage", "Requires", "argument"},
-			))
 		})
 
 		Context("When provided an app that exists", func() {

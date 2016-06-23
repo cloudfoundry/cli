@@ -2496,10 +2496,6 @@
     "translation": "올바르지 않은 사용법입니다. 인수로 SERVICE_INSTANCE와 SERVICE_KEY가 필요합니다.\n\n"
   },
   {
-    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
-    "translation": "올바르지 않은 사용법입니다. 인수로 SOURCE-APP TARGET-APP이 필요합니다.\n\n"
-  },
-  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "올바르지 않은 사용법입니다. 인수로 SPACE와 DOMAIN이 필요합니다.\n\n"
   },
@@ -2530,10 +2526,6 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "올바르지 않은 사용법입니다. 인수가 필요합니다.\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires app name as argument\n\n",
-    "translation": "올바르지 않은 사용법입니다. 인수로 앱 이름이 필요합니다.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -3546,6 +3538,18 @@
   {
     "id": "Request pseudo-tty allocation",
     "translation": "pseudo-tty 할당 요청"
+  },
+  {
+    "id": "Requires SOURCE-APP TARGET-APP as arguments",
+    "translation": "인수로 SOURCE-APP TARGET-APP이 필요합니다."
+  },
+  {
+    "id": "Requires an argument",
+    "translation": "인수가 필요합니다."
+  },
+  {
+    "id": "Requires app name as argument",
+    "translation": "인수로 앱 이름이 필요합니다."
   },
   {
     "id": "Reserved Route Ports",

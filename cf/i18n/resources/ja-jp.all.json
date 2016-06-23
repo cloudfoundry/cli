@@ -2496,10 +2496,6 @@
     "translation": "誤った使用法。引数として SERVICE_INSTANCE と SERVICE_KEY が必要です\n\n"
   },
   {
-    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
-    "translation": "誤った使用法。引数として SOURCE-APP TARGET-APP が必要です\n\n"
-  },
-  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "誤った使用法。引数として SPACE と DOMAIN が必要です\n\n"
   },
@@ -2530,10 +2526,6 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "誤った使用法。1 個の引数が必要です\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires app name as argument\n\n",
-    "translation": "誤った使用法。引数としてアプリ名が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -3546,6 +3538,18 @@
   {
     "id": "Request pseudo-tty allocation",
     "translation": "pseudo-tty 割り振りを要求します"
+  },
+  {
+    "id": "Requires SOURCE-APP TARGET-APP as arguments",
+    "translation": "引数として SOURCE-APP TARGET-APP が必要です"
+  },
+  {
+    "id": "Requires an argument",
+    "translation": "1 個の引数が必要です"
+  },
+  {
+    "id": "Requires app name as argument",
+    "translation": "引数としてアプリ名が必要です"
   },
   {
     "id": "Reserved Route Ports",

@@ -50,11 +50,15 @@ func (cmd *CopySource) MetaData() commandregistry.CommandMetadata {
 }
 
 func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	if len(fc.Args()) != 2 {
-		cmd.ui.Failed(T("Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n") + commandregistry.Commands.CommandUsage("copy-source"))
-	}
+	usageReq := requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
+		T("Requires SOURCE-APP TARGET-APP as arguments"),
+		func() bool {
+			return len(fc.Args()) != 2
+		},
+	)
 
 	reqs := []requirements.Requirement{
+		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
