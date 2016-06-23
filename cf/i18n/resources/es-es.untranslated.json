@@ -1,5 +1,9 @@
 [
   {
+    "id": "'routes' should be a list",
+    "translation": "'routes' should be a list"
+  },
+  {
     "id": "Bind a security group to a particular space, or all spaces of an org",
     "translation": "Bind a security group to a particular space, or all spaces of an org"
   },
@@ -86,6 +90,10 @@
   {
     "id": "app instances",
     "translation": "app instances"
+  },
+  {
+    "id": "each route in 'routes' must have a 'route' property",
+    "translation": "each route in 'routes' must have a 'route' property"
   },
   {
     "id": "reserved route ports",

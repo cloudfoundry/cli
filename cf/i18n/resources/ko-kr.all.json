@@ -136,6 +136,10 @@
     "translation": "'이(가) 등록된 명령이 아닙니다. 'cf 도움말'을 참조하십시오."
   },
   {
+    "id": "'routes' should be a list",
+    "translation": ""
+  },
+  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "'{{.VersionShort}}' 및 '{{.VersionLong}}'도 허용됩니다. "
   },
@@ -4674,6 +4678,10 @@
   {
     "id": "down",
     "translation": "작동 중지"
+  },
+  {
+    "id": "each route in 'routes' must have a 'route' property",
+    "translation": ""
   },
   {
     "id": "enabled",

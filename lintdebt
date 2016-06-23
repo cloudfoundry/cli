@@ -37,7 +37,7 @@ cf/commands/spacequota/create_space_quota.go:89::warning: cyclomatic complexity 
 cf/commands/spacequota/update_space_quota.go:86::warning: cyclomatic complexity 17 of function (*UpdateSpaceQuota).Execute() is high (> 10) (gocyclo)
 cf/manifest/generate_manifest.go:135::warning: cyclomatic complexity 15 of function generateAppMap() is high (> 10) (gocyclo)
 cf/manifest/manifest.go:101::warning: cyclomatic complexity 15 of function expandProperties() is high (> 10) (gocyclo)
-cf/models/application.go:117::warning: cyclomatic complexity 26 of function (*AppParams).Merge() is high (> 10) (gocyclo)
+cf/models/application.go:118::warning: cyclomatic complexity 26 of function (*AppParams).Merge() is high (> 10) (gocyclo)
 cf/ssh/ssh.go:209::warning: cyclomatic complexity 14 of function (*secureShell).InteractiveSession() is high (> 10) (gocyclo)
 flags/flags.go:244::warning: cyclomatic complexity 12 of function (*flagContext).setDefaultFlagValueIfAny() is high (> 10) (gocyclo)
 flags/flags.go:65::warning: cyclomatic complexity 20 of function (*flagContext).Parse() is high (> 10) (gocyclo)

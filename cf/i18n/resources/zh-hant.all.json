@@ -136,6 +136,10 @@
     "translation": "' 不是已登錄的指令。請參閱 'cf help'"
   },
   {
+    "id": "'routes' should be a list",
+    "translation": ""
+  },
+  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "也接受 '{{.VersionShort}}' 和 '{{.VersionLong}}'。"
   },
@@ -4674,6 +4678,10 @@
   {
     "id": "down",
     "translation": "關閉"
+  },
+  {
+    "id": "each route in 'routes' must have a 'route' property",
+    "translation": ""
   },
   {
     "id": "enabled",

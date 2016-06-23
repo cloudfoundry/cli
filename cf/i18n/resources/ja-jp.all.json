@@ -136,6 +136,10 @@
     "translation": "' は登録済みコマンドではありません。'cf help' を参照してください"
   },
   {
+    "id": "'routes' should be a list",
+    "translation": ""
+  },
+  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "'{{.VersionShort}}' および '{{.VersionLong}}' も受け入れられます。"
   },
@@ -4674,6 +4678,10 @@
   {
     "id": "down",
     "translation": "ダウン"
+  },
+  {
+    "id": "each route in 'routes' must have a 'route' property",
+    "translation": ""
   },
   {
     "id": "enabled",

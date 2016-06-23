@@ -201,6 +201,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 	appParams.HealthCheckType = stringVal(yamlMap, "health-check-type", &errs)
 	appParams.AppPorts = intSliceVal(yamlMap, "app-ports", &errs)
+	appParams.Routes = parseRoutes(yamlMap, &errs)
 
 	if appParams.Path != nil {
 		path := *appParams.Path
@@ -464,4 +465,35 @@ func validateEnvVars(input generic.Map) (errs []error) {
 		}
 	})
 	return
+}
+
+func parseRoutes(input generic.Map, errs *[]error) []models.ManifestRoute {
+	if !input.Has("routes") {
+		return nil
+	}
+
+	genericRoutes, ok := input.Get("routes").([]interface{})
+	if !ok {
+		*errs = append(*errs, fmt.Errorf(T("'routes' should be a list")))
+		return nil
+	}
+
+	manifestRoutes := []models.ManifestRoute{}
+	for _, genericRoute := range genericRoutes {
+		route, ok := genericRoute.(map[interface{}]interface{})
+		if !ok {
+			*errs = append(*errs, fmt.Errorf(T("each route in 'routes' must have a 'route' property")))
+			continue
+		}
+
+		if routeVal, exist := route["route"]; exist {
+			manifestRoutes = append(manifestRoutes, models.ManifestRoute{
+				Route: routeVal.(string),
+			})
+		} else {
+			*errs = append(*errs, fmt.Errorf(T("each route in 'routes' must have a 'route' property")))
+		}
+	}
+
+	return manifestRoutes
 }
