@@ -1092,6 +1092,10 @@
     "translation": "已連接，正在以 {{.Username}} 身分追蹤組織 {{.OrgName}}/空間 {{.SpaceName}} 中應用程式 {{.AppName}} 的日誌...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "將應用程式原始碼從某個應用程式複製到另一個應用程式。除非予以置換，否則 copy-source 指令將重新啟動應用程式。"
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分將來源從應用程式 {{.SourceApp}} 複製到組織 {{.OrgName}}/空間 {{.SpaceName}} 中的目標應用程式 {{.TargetApp}}..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMORY"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "將應用程式原始碼從某個應用程式複製到另一個應用程式。除非予以置換，否則 copy-source 指令將重新啟動應用程式。"
   },
   {
     "id": "Make a user-provided service instance available to CF apps",

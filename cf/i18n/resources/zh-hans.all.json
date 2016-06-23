@@ -1092,6 +1092,10 @@
     "translation": "已连接，正在以 {{.Username}} 身份跟踪组织 {{.OrgName}}/空间 {{.SpaceName}} 中应用程序 {{.AppName}} 的日志...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "将应用程序源代码从一个应用程序复制到另一个应用程序。除非已覆盖，否则 copy-source 命令将重新启动应用程序。"
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身份将源从应用程序 {{.SourceApp}} 复制到组织 {{.OrgName}}/空间 {{.SpaceName}} 中的目标应用程序 {{.TargetApp}}..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMORY"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "将应用程序源代码从一个应用程序复制到另一个应用程序。除非已覆盖，否则 copy-source 命令将重新启动应用程序。"
   },
   {
     "id": "Make a user-provided service instance available to CF apps",

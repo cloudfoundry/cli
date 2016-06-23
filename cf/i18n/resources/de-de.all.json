@@ -1092,6 +1092,10 @@
     "translation": "Verbundene, Tailing-Protokolle (Liveanzeige der aktuellen letzten Protokollzeilen) für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "Kopie des Quellcodes der App von einer Anwendung für eine andere erstellen.  Der Befehl copy-source startet die Anwendung erneut, wenn er nicht überschrieben wurde."
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Kopieren der Quelle von App {{.SourceApp}} zur Ziel-App {{.TargetApp}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMORY (HAUTPSPEICHER)"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "Kopie des Quellcodes der App von einer Anwendung für eine andere erstellen.  Der Befehl copy-source startet die Anwendung erneut, wenn er nicht überschrieben wurde."
   },
   {
     "id": "Make a user-provided service instance available to CF apps",
