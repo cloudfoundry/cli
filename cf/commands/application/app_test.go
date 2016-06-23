@@ -41,7 +41,6 @@ var _ = Describe("App", func() {
 		flagContext flags.FlagContext
 
 		loginRequirement         requirements.Requirement
-		usageRequirement         requirements.Requirement
 		targetedSpaceRequirement requirements.Requirement
 		applicationRequirement   *requirementsfakes.FakeApplicationRequirement
 	)
@@ -73,13 +72,10 @@ var _ = Describe("App", func() {
 
 		factory = new(requirementsfakes.FakeFactory)
 
-		loginRequirement = &passingRequirement{Name: "login"}
+		loginRequirement = &passingRequirement{}
 		factory.NewLoginRequirementReturns(loginRequirement)
 
-		usageRequirement = &passingRequirement{Name: "usage"}
-		factory.NewUsageRequirementReturns(usageRequirement)
-
-		targetedSpaceRequirement = &passingRequirement{Name: "targetedSpace"}
+		targetedSpaceRequirement = &passingRequirement{}
 		factory.NewTargetedSpaceRequirementReturns(targetedSpaceRequirement)
 
 		applicationRequirement = new(requirementsfakes.FakeApplicationRequirement)
@@ -87,36 +83,47 @@ var _ = Describe("App", func() {
 	})
 
 	Describe("Requirements", func() {
-		var actualRequirements []requirements.Requirement
+		Context("when not provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name", "extra-arg")
+			})
 
-		BeforeEach(func() {
-			flagContext.Parse("app-name")
-			actualRequirements = cmd.Requirements(factory, flagContext)
+			It("fails with usage", func() {
+				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"Incorrect Usage. Requires an argument"},
+					[]string{"NAME"},
+					[]string{"USAGE"},
+				))
+			})
 		})
 
-		It("returns a UsageRequirement", func() {
-			Expect(factory.NewUsageRequirementCallCount()).To(Equal(1))
+		Context("when provided exactly one arg", func() {
+			BeforeEach(func() {
+				flagContext.Parse("app-name")
+			})
 
-			Expect(actualRequirements).To(ContainElement(usageRequirement))
-		})
+			It("returns a LoginRequirement", func() {
+				actualRequirements := cmd.Requirements(factory, flagContext)
+				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
-		It("returns a LoginRequirement", func() {
-			Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(loginRequirement))
+			})
 
-			Expect(actualRequirements).To(ContainElement(loginRequirement))
-		})
+			It("returns a TargetedSpaceRequirement", func() {
+				actualRequirements := cmd.Requirements(factory, flagContext)
+				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 
-		It("returns a TargetedSpaceRequirement", func() {
-			Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
+				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
+			})
 
-			Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
-		})
+			It("returns an ApplicationRequirement", func() {
+				actualRequirements := cmd.Requirements(factory, flagContext)
+				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
+				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
 
-		It("returns an ApplicationRequirement", func() {
-			Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
-			Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
-
-			Expect(actualRequirements).To(ContainElement(applicationRequirement))
+				Expect(actualRequirements).To(ContainElement(applicationRequirement))
+			})
 		})
 	})
 

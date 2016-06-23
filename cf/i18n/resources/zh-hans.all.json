@@ -3544,10 +3544,6 @@
     "translation": "需要 SOURCE-APP TARGET-APP 作为自变量"
   },
   {
-    "id": "Requires an argument",
-    "translation": "需要自变量"
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "需要 app name 作为自变量"
   },

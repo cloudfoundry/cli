@@ -3544,10 +3544,6 @@
     "translation": "需要 SOURCE-APP TARGET-APP 作為引數"
   },
   {
-    "id": "Requires an argument",
-    "translation": "需要引數"
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "需要應用程式名稱作為引數"
   },
