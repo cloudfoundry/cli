@@ -1092,6 +1092,10 @@
     "translation": "接続されました、{{.Username}} として組織 {{.OrgName}} / スペース {{.SpaceName}} 内のアプリ {{.AppName}} のログを追尾しています...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "あるアプリケーションから他のアプリケーションにアプリ・ソース・コードをコピーします。オーバーライドされない限り、copy-source コマンドはそのアプリケーションを再始動します。"
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}} としてソースをアプリ {{.SourceApp}} から組織 {{.OrgName}} / スペース {{.SpaceName}} 内のターゲット・アプリ {{.TargetApp}} にコピーしています..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "メモリー"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "あるアプリケーションから他のアプリケーションにアプリ・ソース・コードをコピーします。オーバーライドされない限り、copy-source コマンドはそのアプリケーションを再始動します。"
   },
   {
     "id": "Make a user-provided service instance available to CF apps",

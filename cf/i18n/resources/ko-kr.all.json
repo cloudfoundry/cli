@@ -1092,6 +1092,10 @@
     "translation": "연결됨, {{.Username}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 있는 {{.AppName}} 앱의 로그 추적(tailing) 중...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "한 애플리케이션에서 다른 애플리케이션으로 앱 소스 코드를 복사합니다. 대체되지 않는 한 copy-source 명령은 애플리케이션을 다시 시작합니다."
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.SourceApp}} 앱에서 {{.OrgName}} 조직/{{.SpaceName}} 영역의 대상 앱 {{.TargetApp}}으로 소스 복사 중..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "메모리"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "한 애플리케이션에서 다른 애플리케이션으로 앱 소스 코드를 복사합니다. 대체되지 않는 한 copy-source 명령은 애플리케이션을 다시 시작합니다."
   },
   {
     "id": "Make a user-provided service instance available to CF apps",

@@ -1092,6 +1092,10 @@
     "translation": "Conectado, tailing logs para o app {{.AppName}} na organização {{.OrgName}} / espaço {{.SpaceName}} como {{.Username}}...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "Faça uma cópia do código-fonte do app de um aplicativo para outro.  A menos que seja substituído, o comando copy-source reiniciará o aplicativo."
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Copiando origem do app {{.SourceApp}} para o app de destino {{.TargetApp}} na organização {{.OrgName}}/espaço {{.SpaceName}} como {{.Username}}..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMÓRIA"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "Faça uma cópia do código-fonte do app de um aplicativo para outro.  A menos que seja substituído, o comando copy-source reiniciará o aplicativo."
   },
   {
     "id": "Make a user-provided service instance available to CF apps",

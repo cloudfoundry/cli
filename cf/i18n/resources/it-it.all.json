@@ -1092,6 +1092,10 @@
     "translation": "Connesso, accodamento dei log per l'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "Crea una copia del codice sorgente dell'applicazione da un'applicazione all'altra.  A meno che non venga sovrascritto, il comando copy-source riavvierà l'applicazione."
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Copia dell'origine dall'applicazione {{.SourceApp}} all'applicazione di destinazione {{.TargetApp}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMORIA"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "Crea una copia del codice sorgente dell'applicazione da un'applicazione all'altra.  A meno che non venga sovrascritto, il comando copy-source riavvierà l'applicazione."
   },
   {
     "id": "Make a user-provided service instance available to CF apps",

@@ -1092,6 +1092,10 @@
     "translation": "Connecté ; affichage des dernières lignes des journaux pour l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.Username}}...\n"
   },
   {
+    "id": "Copies the source code of an application to another existing application (and restarts that application)",
+    "translation": "Effectuez une copie du code source de l'application depuis une application dans une autre.  Sauf si elle est écrasée, la commande copy-source redémarre l'application."
+  },
+  {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
     "translation": "Copie de la source depuis l'application {{.SourceApp}} dans l'application cible {{.TargetApp}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.Username}}..."
   },
@@ -2842,10 +2846,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMOIRE"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "Effectuez une copie du code source de l'application depuis une application dans une autre.  Sauf si elle est écrasée, la commande copy-source redémarre l'application."
   },
   {
     "id": "Make a user-provided service instance available to CF apps",
