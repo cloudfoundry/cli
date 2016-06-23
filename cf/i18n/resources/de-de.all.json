@@ -3544,10 +3544,6 @@
     "translation": "Erfordert SOURCE-APP TARGET-APP als Argumente"
   },
   {
-    "id": "Requires an argument",
-    "translation": "Erfordert ein Argument"
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "Erfordert den Namen einer App als Argument"
   },

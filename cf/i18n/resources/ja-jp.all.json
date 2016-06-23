@@ -3544,10 +3544,6 @@
     "translation": "引数として SOURCE-APP TARGET-APP が必要です"
   },
   {
-    "id": "Requires an argument",
-    "translation": "1 個の引数が必要です"
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "引数としてアプリ名が必要です"
   },

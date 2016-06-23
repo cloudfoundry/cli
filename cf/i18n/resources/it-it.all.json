@@ -3544,10 +3544,6 @@
     "translation": "Richiede APPLICAZIONE-DI-ORIGINE APPLICAZIONE-DI-DESTINAZIONE come argomenti"
   },
   {
-    "id": "Requires an argument",
-    "translation": "Richiede un argomento"
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "Richiede il nome applicazione come argomento"
   },

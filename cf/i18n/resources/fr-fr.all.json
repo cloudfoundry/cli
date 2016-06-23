@@ -3544,10 +3544,6 @@
     "translation": "Requiert APP_SOURCE APP_CIBLE comme arguments"
   },
   {
-    "id": "Requires an argument",
-    "translation": "Requiert un argument"
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "Requiert le nom d'application comme argument"
   },

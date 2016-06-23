@@ -3544,10 +3544,6 @@
     "translation": "인수로 SOURCE-APP TARGET-APP이 필요합니다."
   },
   {
-    "id": "Requires an argument",
-    "translation": "인수가 필요합니다."
-  },
-  {
     "id": "Requires app name as argument",
     "translation": "인수로 앱 이름이 필요합니다."
   },
