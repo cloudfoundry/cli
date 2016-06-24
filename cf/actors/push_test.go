@@ -261,7 +261,7 @@ var _ = Describe("Push Actor", func() {
 		})
 	})
 
-	Describe(".UploadApp", func() {
+	Describe("UploadApp", func() {
 		It("Simply delegates to the UploadApp function on the app bits repo, which is not worth testing", func() {})
 	})
 
@@ -383,6 +383,65 @@ var _ = Describe("Push Actor", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wasCalled).To(BeTrue())
 			Expect(wasCalledWith).To(Equal(absolutePath))
+		})
+	})
+
+	Describe("ValidateAppParams", func() {
+		var apps []models.AppParams
+
+		Context("when 'routes' is provided", func() {
+			BeforeEach(func() {
+				appName := "my-app"
+				apps = []models.AppParams{
+					models.AppParams{
+						Name: &appName,
+						Routes: []models.ManifestRoute{
+							models.ManifestRoute{
+								Route: "route-name.example.com",
+							},
+							models.ManifestRoute{
+								Route: "other-route-name.example.com",
+							},
+						},
+					},
+				}
+			})
+
+			Context("and 'hosts' is provided", func() {
+				BeforeEach(func() {
+					apps[0].Hosts = &[]string{"host-name"}
+				})
+
+				It("returns an error", func() {
+					errs := actor.ValidateAppParams(apps)
+					Expect(errs).To(HaveLen(1))
+					Expect(errs[0].Error()).To(Equal("application my-app must not be configured with both 'routes' and 'hosts'"))
+				})
+			})
+
+			Context("and 'domains' is provided", func() {
+				BeforeEach(func() {
+					apps[0].Domains = &[]string{"domain-name"}
+				})
+
+				It("returns an error", func() {
+					errs := actor.ValidateAppParams(apps)
+					Expect(errs).To(HaveLen(1))
+					Expect(errs[0].Error()).To(Equal("application my-app must not be configured with both 'routes' and 'domains'"))
+				})
+			})
+
+			Context("and 'no-hostname' is set to 'true'", func() {
+				BeforeEach(func() {
+					apps[0].NoHostname = true
+				})
+
+				It("returns an error", func() {
+					errs := actor.ValidateAppParams(apps)
+					Expect(errs).To(HaveLen(1))
+					Expect(errs[0].Error()).To(Equal("application my-app must not be configured with both 'routes' and have 'no-hostname' set to 'true'"))
+				})
+			})
 		})
 	})
 })

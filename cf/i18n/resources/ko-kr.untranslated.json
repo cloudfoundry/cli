@@ -92,6 +92,18 @@
     "translation": "app instances"
   },
   {
+    "id": "application {{.AppName}} must not be configured with both 'routes' and 'domains'",
+    "translation": "application {{.AppName}} must not be configured with both 'routes' and 'domains'"
+  },
+  {
+    "id": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
+    "translation": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'"
+  },
+  {
+    "id": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
+    "translation": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'"
+  },
+  {
     "id": "each route in 'routes' must have a 'route' property",
     "translation": "each route in 'routes' must have a 'route' property"
   },

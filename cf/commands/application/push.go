@@ -192,6 +192,17 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		return err
 	}
 
+	errs := cmd.actor.ValidateAppParams(appSet)
+	if len(errs) > 0 {
+		errStr := "invalid application configuration:"
+
+		for _, e := range errs {
+			errStr = fmt.Sprintf("%s\n%s", errStr, e.Error())
+		}
+
+		return fmt.Errorf("%s", errStr)
+	}
+
 	_, err = cmd.authRepo.RefreshAuthToken()
 	if err != nil {
 		return err

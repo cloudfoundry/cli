@@ -42,6 +42,14 @@ type FakePushActor struct {
 		result2 bool
 		result3 error
 	}
+	ValidateAppParamsStub        func(apps []models.AppParams) []error
+	validateAppParamsMutex       sync.RWMutex
+	validateAppParamsArgsForCall []struct {
+		apps []models.AppParams
+	}
+	validateAppParamsReturns struct {
+		result1 []error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -162,6 +170,44 @@ func (fake *FakePushActor) GatherFilesReturns(result1 []resources.AppFileResourc
 	}{result1, result2, result3}
 }
 
+func (fake *FakePushActor) ValidateAppParams(apps []models.AppParams) []error {
+	var appsCopy []models.AppParams
+	if apps != nil {
+		appsCopy = make([]models.AppParams, len(apps))
+		copy(appsCopy, apps)
+	}
+	fake.validateAppParamsMutex.Lock()
+	fake.validateAppParamsArgsForCall = append(fake.validateAppParamsArgsForCall, struct {
+		apps []models.AppParams
+	}{appsCopy})
+	fake.recordInvocation("ValidateAppParams", []interface{}{appsCopy})
+	fake.validateAppParamsMutex.Unlock()
+	if fake.ValidateAppParamsStub != nil {
+		return fake.ValidateAppParamsStub(apps)
+	} else {
+		return fake.validateAppParamsReturns.result1
+	}
+}
+
+func (fake *FakePushActor) ValidateAppParamsCallCount() int {
+	fake.validateAppParamsMutex.RLock()
+	defer fake.validateAppParamsMutex.RUnlock()
+	return len(fake.validateAppParamsArgsForCall)
+}
+
+func (fake *FakePushActor) ValidateAppParamsArgsForCall(i int) []models.AppParams {
+	fake.validateAppParamsMutex.RLock()
+	defer fake.validateAppParamsMutex.RUnlock()
+	return fake.validateAppParamsArgsForCall[i].apps
+}
+
+func (fake *FakePushActor) ValidateAppParamsReturns(result1 []error) {
+	fake.ValidateAppParamsStub = nil
+	fake.validateAppParamsReturns = struct {
+		result1 []error
+	}{result1}
+}
+
 func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -171,6 +217,8 @@ func (fake *FakePushActor) Invocations() map[string][][]interface{} {
 	defer fake.processPathMutex.RUnlock()
 	fake.gatherFilesMutex.RLock()
 	defer fake.gatherFilesMutex.RUnlock()
+	fake.validateAppParamsMutex.RLock()
+	defer fake.validateAppParamsMutex.RUnlock()
 	return fake.invocations
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/applicationbits"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/appfiles"
+	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
@@ -22,6 +23,7 @@ type PushActor interface {
 	UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	ProcessPath(dirOrZipFile string, f func(string) error) error
 	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
+	ValidateAppParams(apps []models.AppParams) []error
 }
 
 type PushActorImpl struct {
@@ -164,4 +166,32 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 
 func (actor PushActorImpl) UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error {
 	return actor.appBitsRepo.UploadBits(appGUID, zipFile, presentFiles)
+}
+
+func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
+	errs := []error{}
+
+	for _, app := range apps {
+		appName := app.Name
+
+		if len(app.Routes) > 0 {
+			if app.Hosts != nil && len(*app.Hosts) > 0 {
+				errs = append(errs, fmt.Errorf(T("application {{.AppName}} must not be configured with both 'routes' and 'hosts'", map[string]interface{}{"AppName": appName})))
+			}
+
+			if app.Domains != nil && len(*app.Domains) > 0 {
+				errs = append(errs, fmt.Errorf(T("application {{.AppName}} must not be configured with both 'routes' and 'domains'", map[string]interface{}{"AppName": appName})))
+			}
+
+			if app.NoHostname {
+				errs = append(errs, fmt.Errorf(T("application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'", map[string]interface{}{"AppName": appName})))
+			}
+		}
+	}
+
+	if len(errs) > 0 {
+		return errs
+	}
+
+	return nil
 }
