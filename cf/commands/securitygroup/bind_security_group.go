@@ -87,7 +87,7 @@ func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) error {
 	} else {
 		err = cmd.spaceRepo.ListSpacesFromOrg(org.GUID, func(space models.Space) bool {
 			spaces = append(spaces, space)
-			return false
+			return true
 		})
 		if err != nil {
 			return err
@@ -97,19 +97,19 @@ func (cmd *BindSecurityGroup) Execute(context flags.FlagContext) error {
 	for _, space := range spaces {
 		cmd.ui.Say(T("Assigning security group {{.security_group}} to space {{.space}} in org {{.organization}} as {{.username}}...",
 			map[string]interface{}{
-				"security_group": securityGroupName,
-				"space":          space.Name,
-				"organization":   orgName,
-				"username":       cmd.configRepo.Username(),
+				"security_group": terminal.EntityNameColor(securityGroupName),
+				"space":          terminal.EntityNameColor(space.Name),
+				"organization":   terminal.EntityNameColor(orgName),
+				"username":       terminal.EntityNameColor(cmd.configRepo.Username()),
 			}))
 		err = cmd.spaceBinder.BindSpace(securityGroup.GUID, space.GUID)
 		if err != nil {
 			return err
 		}
 		cmd.ui.Ok()
+		cmd.ui.Say("")
 	}
 
-	cmd.ui.Say("\n\n")
 	cmd.ui.Say(T("TIP: Changes will not apply to existing running applications until they are restarted."))
 	return nil
 }
