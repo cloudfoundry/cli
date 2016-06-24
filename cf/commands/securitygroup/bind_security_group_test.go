@@ -213,7 +213,7 @@ var _ = Describe("bind-security-group command", func() {
 						Expect(orgGUID).To(Equal(org.GUID))
 
 						for _, space := range spaces {
-							callback(space)
+							Expect(callback(space)).To(BeTrue())
 						}
 
 						return nil
