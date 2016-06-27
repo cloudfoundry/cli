@@ -319,20 +319,6 @@ var _ = Describe("Push Command", func() {
 				args = []string{"app-name"}
 			})
 
-			Context("validating a manifest", func() {
-				BeforeEach(func() {
-					actor.ValidateAppParamsReturns([]error{
-						errors.New("error1"),
-						errors.New("error2"),
-					})
-				})
-
-				It("returns an properly formatted error", func() {
-					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).To(MatchRegexp("invalid application configuration:\nerror1\nerror2"))
-				})
-			})
-
 			It("tries to find the default route for the app", func() {
 				Expect(executeErr).NotTo(HaveOccurred())
 
