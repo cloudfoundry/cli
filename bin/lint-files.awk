@@ -7,6 +7,6 @@
     || /^plugin_examples\/.*other declaration of main/ \
     || /cf\/resources.*\(golint\)/ \
     || /words\/.*\(golint\)/ \
-    || /plugin\/.*\(golint\)/ \
+    || /plugin\/models\/.*\(golint\)/ \
     || /_test\.go.*\(errcheck\)/ \
 )

@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/flags"
 )
 
-var FakeCommand4Err = errors.New("ZOMG command errored!")
+var ErrFakeCommand4 = errors.New("ZOMG command errored")
 
 type FakeCommand4 struct {
 	Data string
@@ -38,5 +38,5 @@ func (cmd FakeCommand4) SetDependency(deps commandregistry.Dependency, pluginCal
 }
 
 func (cmd FakeCommand4) Execute(c flags.FlagContext) error {
-	return FakeCommand4Err
+	return ErrFakeCommand4
 }
