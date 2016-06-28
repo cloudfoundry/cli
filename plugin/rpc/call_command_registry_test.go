@@ -74,7 +74,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 
 		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command4"}, deps, false)
-			Expect(err).To(MatchError(FakeCommand4Err))
+			Expect(err).To(MatchError(ErrFakeCommand4))
 		})
 	})
 })

@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"errors"
-	"fmt"
 	"net/rpc"
 	"os"
 	"os/exec"
@@ -68,12 +67,12 @@ func (cmd *PluginUninstall) Execute(c flags.FlagContext) error {
 	pluginName := c.Args()[0]
 	pluginNameMap := map[string]interface{}{"PluginName": pluginName}
 
-	cmd.ui.Say(fmt.Sprintf(T("Uninstalling plugin {{.PluginName}}...", pluginNameMap)))
+	cmd.ui.Say(T("Uninstalling plugin {{.PluginName}}...", pluginNameMap))
 
 	plugins := cmd.config.Plugins()
 
 	if _, ok := plugins[pluginName]; !ok {
-		return errors.New(fmt.Sprintf(T("Plugin name {{.PluginName}} does not exist", pluginNameMap)))
+		return errors.New(T("Plugin name {{.PluginName}} does not exist", pluginNameMap))
 	}
 
 	pluginMetadata := plugins[pluginName]
@@ -96,7 +95,7 @@ func (cmd *PluginUninstall) Execute(c flags.FlagContext) error {
 	cmd.config.RemovePlugin(pluginName)
 
 	cmd.ui.Ok()
-	cmd.ui.Say(fmt.Sprintf(T("Plugin {{.PluginName}} successfully uninstalled.", pluginNameMap)))
+	cmd.ui.Say(T("Plugin {{.PluginName}} successfully uninstalled.", pluginNameMap))
 	return nil
 }
 
