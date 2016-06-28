@@ -242,7 +242,7 @@ var _ = Describe("Server", func() {
 				var output []string
 				client.Call("CliRpcCmd.GetOutputAndReset", false, &output)
 
-				Expect(output).To(Equal([]string{"Requirement executed\nCommand Executed\n"}))
+				Expect(output).To(Equal([]string{"Requirement executed", "Command Executed"}))
 			})
 		})
 	})

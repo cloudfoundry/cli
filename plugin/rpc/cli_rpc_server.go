@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"os"
+	"strings"
 
 	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
@@ -204,8 +205,8 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) GetOutputAndReset(args bool, retVal *[]string) error {
-	v := &[]string{cmd.outputBucket.String()}
-	*retVal = *v
+	v := strings.TrimSuffix(cmd.outputBucket.String(), "\n")
+	*retVal = strings.Split(v, "\n")
 	return nil
 }
 
