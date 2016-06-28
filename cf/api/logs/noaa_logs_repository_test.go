@@ -133,7 +133,7 @@ var _ = Describe("logs with noaa repository", func() {
 				defer repo.Close()
 				err := errors.New("oops")
 
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+				fakeNoaaConsumer.TailingLogsWithoutReconnectStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					go func() {
 						e <- err
 					}()
@@ -176,7 +176,7 @@ var _ = Describe("logs with noaa repository", func() {
 					return nil
 				}
 
-				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+				fakeNoaaConsumer.TailingLogsWithoutReconnectStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					ec := make(chan error)
 					lc := make(chan *events.LogMessage)
 
@@ -225,12 +225,12 @@ var _ = Describe("logs with noaa repository", func() {
 			It("asks for the logs for the given app", func(done Done) {
 				defer repo.Close()
 
-				fakeNoaaConsumer.TailingLogsReturns(c, e)
+				fakeNoaaConsumer.TailingLogsWithoutReconnectReturns(c, e)
 
 				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
-				Eventually(fakeNoaaConsumer.TailingLogsCallCount).Should(Equal(1))
-				appGuid, token := fakeNoaaConsumer.TailingLogsArgsForCall(0)
+				Eventually(fakeNoaaConsumer.TailingLogsWithoutReconnectCallCount).Should(Equal(1))
+				appGuid, token := fakeNoaaConsumer.TailingLogsWithoutReconnectArgsForCall(0)
 				Expect(appGuid).To(Equal("app-guid"))
 				Expect(token).To(Equal("the-access-token"))
 
@@ -240,7 +240,7 @@ var _ = Describe("logs with noaa repository", func() {
 			It("sets the on connect callback", func() {
 				defer repo.Close()
 
-				fakeNoaaConsumer.TailingLogsReturns(c, e)
+				fakeNoaaConsumer.TailingLogsWithoutReconnectReturns(c, e)
 
 				var cb = func() { return }
 				repo.TailLogsFor("app-guid", cb, logChan, errChan)
@@ -270,7 +270,7 @@ var _ = Describe("logs with noaa repository", func() {
 				lc = make(chan *events.LogMessage)
 				syncMu.Unlock()
 
-				fakeNoaaConsumer.TailingLogsStub = func(string, string) (<-chan *events.LogMessage, <-chan error) {
+				fakeNoaaConsumer.TailingLogsWithoutReconnectStub = func(string, string) (<-chan *events.LogMessage, <-chan error) {
 					go func() {
 						syncMu.Lock()
 						lc <- msg3
