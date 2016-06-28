@@ -31,8 +31,6 @@ var cmdRegistry = commandregistry.Commands
 
 func main() {
 	traceEnv := os.Getenv("CF_TRACE")
-	// Writer is assigned in writer_unix.go/writer_windows.go
-	traceLogger := trace.NewLogger(Writer, false, traceEnv, "")
 
 	//handle `cf -v` for cf version
 	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
@@ -50,11 +48,15 @@ func main() {
 
 	newArgs, isVerbose := handleVerbose(os.Args)
 	os.Args = newArgs
-	traceLogger = trace.NewLogger(Writer, isVerbose, traceEnv, "")
 
 	errFunc := func(err error) {
 		if err != nil {
-			ui := terminal.NewUI(os.Stdin, Writer, terminal.NewTeePrinter(Writer), traceLogger)
+			ui := terminal.NewUI(
+				os.Stdin,
+				Writer,
+				terminal.NewTeePrinter(Writer),
+				trace.NewLogger(Writer, isVerbose, traceEnv, ""),
+			)
 			ui.Failed(fmt.Sprintf("Config error: %s", err))
 		}
 	}
@@ -69,7 +71,8 @@ func main() {
 
 	traceConfigVal := config.Trace()
 
-	traceLogger = trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
+	// Writer is assigned in writer_unix.go/writer_windows.go
+	traceLogger := trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
 
 	deps := commandregistry.NewDependency(Writer, traceLogger)
 	defer handlePanics(deps.TeePrinter, deps.Logger)
