@@ -33,7 +33,7 @@ var _ = Describe("Organization Repository", func() {
 				ccServer = ghttp.NewServer()
 				configRepo := testconfig.NewRepositoryWithDefaults()
 				configRepo.SetAPIEndpoint(ccServer.URL())
-				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
@@ -128,7 +128,7 @@ var _ = Describe("Organization Repository", func() {
 				ccServer = ghttp.NewServer()
 				configRepo := testconfig.NewRepositoryWithDefaults()
 				configRepo.SetAPIEndpoint(ccServer.URL())
-				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+				gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
@@ -395,7 +395,7 @@ func createOrganizationRepo(reqs ...testnet.TestRequest) (testserver *httptest.S
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(testserver.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return
 }

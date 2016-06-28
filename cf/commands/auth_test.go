@@ -51,7 +51,7 @@ var _ = Describe("auth command", func() {
 		}
 
 		fakeLogger = new(tracefakes.FakePrinter)
-		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
+		deps = commandregistry.NewDependency(os.Stdout, fakeLogger, "")
 	})
 
 	Describe("requirements", func() {

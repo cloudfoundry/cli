@@ -35,7 +35,7 @@ var _ = Describe("App Events Repo", func() {
 
 	JustBeforeEach(func() {
 		strategy := strategy.NewEndpointStrategy(config.APIVersion())
-		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
 	})
 

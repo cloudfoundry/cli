@@ -2,6 +2,7 @@ package net
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -26,5 +27,14 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 }
 
 func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printer) Gateway {
-	return newGateway(uaaErrorHandler, config, ui, logger)
+	return Gateway{
+		errHandler:      uaaErrorHandler,
+		config:          config,
+		PollingThrottle: DefaultPollingThrottle,
+		warnings:        &[]string{},
+		Clock:           time.Now,
+		ui:              ui,
+		logger:          logger,
+		PollingEnabled:  false,
+	}
 }

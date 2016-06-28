@@ -32,10 +32,15 @@ var invalidTokenCloudControllerRequest = func(writer http.ResponseWriter, reques
 var _ = Describe("Cloud Controller Gateway", func() {
 	var gateway Gateway
 	var config coreconfig.Reader
+	var timeout string
 
 	BeforeEach(func() {
+		timeout = "1"
+	})
+
+	JustBeforeEach(func() {
 		config = testconfig.NewRepository()
-		gateway = NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway = NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), timeout)
 	})
 
 	It("parses error responses", func() {
@@ -62,5 +67,19 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The token is invalid"))
 		Expect(apiErr.(*errors.InvalidTokenError)).To(HaveOccurred())
+	})
+
+	It("usees the set polling throttle", func() {
+		Expect(gateway.PollingThrottle).To(Equal(1 * time.Second))
+	})
+
+	Context("with an invalid timeout", func() {
+		BeforeEach(func() {
+			timeout = ""
+		})
+
+		It("usees the default polling throttle", func() {
+			Expect(gateway.PollingThrottle).To(Equal(5 * time.Second))
+		})
 	})
 })

@@ -67,7 +67,7 @@ type PluginModels struct {
 	OauthToken    *plugin_models.GetOauthToken_Model
 }
 
-func NewDependency(writer io.Writer, logger trace.Printer) Dependency {
+func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string) Dependency {
 	deps := Dependency{}
 	deps.TeePrinter = terminal.NewTeePrinter(writer)
 	deps.UI = terminal.NewUI(os.Stdin, writer, deps.TeePrinter, logger)
@@ -98,7 +98,7 @@ func NewDependency(writer io.Writer, logger trace.Printer) Dependency {
 	terminal.InitColorSupport()
 
 	deps.Gateways = map[string]net.Gateway{
-		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.UI, logger),
+		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.UI, logger, envDialTimeout),
 		"uaa":              net.NewUAAGateway(deps.Config, deps.UI, logger),
 		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.UI, logger),
 	}

@@ -54,7 +54,7 @@ var _ = Describe("services", func() {
 		requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 		requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgRequirement)
 
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 	})
 
 	Describe("services requirements", func() {

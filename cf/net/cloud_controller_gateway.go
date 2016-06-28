@@ -29,9 +29,20 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 	return errors.NewHTTPError(statusCode, strconv.Itoa(response.Code), response.Description)
 }
 
-func NewCloudControllerGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
-	gateway := newGateway(cloudControllerErrorHandler, config, ui, logger)
-	gateway.Clock = clock
-	gateway.PollingEnabled = true
-	return gateway
+func NewCloudControllerGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer, envDialTimeout string) Gateway {
+	pollingThrottle := DefaultPollingThrottle
+	if timeout, err := strconv.Atoi(envDialTimeout); err == nil {
+		pollingThrottle = time.Duration(timeout) * time.Second
+	}
+
+	return Gateway{
+		errHandler:      cloudControllerErrorHandler,
+		config:          config,
+		PollingThrottle: pollingThrottle,
+		warnings:        &[]string{},
+		Clock:           clock,
+		ui:              ui,
+		logger:          logger,
+		PollingEnabled:  true,
+	}
 }

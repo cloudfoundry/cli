@@ -35,7 +35,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	JustBeforeEach(func() {
-		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		strategy := strategy.NewEndpointStrategy(config.APIVersion())
 		repo = NewCloudControllerDomainRepository(config, gateway, strategy)
 	})

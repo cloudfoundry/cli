@@ -48,7 +48,7 @@ var _ = Describe("space-users command", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		userRepo = new(apifakes.FakeUserRepository)
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 	})
 
 	runCommand := func(args ...string) bool {

@@ -46,7 +46,7 @@ var _ = Describe("Gateway", func() {
 		clock = func() time.Time { return currentTime }
 		config = testconfig.NewRepository()
 
-		ccGateway = NewCloudControllerGateway(config, clock, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		ccGateway = NewCloudControllerGateway(config, clock, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		ccGateway.PollingThrottle = 3 * time.Millisecond
 		uaaGateway = NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
 	})
@@ -55,7 +55,7 @@ var _ = Describe("Gateway", func() {
 		Context("when the config has a positive async timeout", func() {
 			It("inherits the async timeout from the config", func() {
 				config.SetAsyncTimeout(9001)
-				ccGateway = NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+				ccGateway = NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 				Expect(ccGateway.AsyncTimeout()).To(Equal(9001 * time.Minute))
 			})
 		})

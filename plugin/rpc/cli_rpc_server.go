@@ -26,6 +26,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
+var dialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
+
 type CliRpcService struct {
 	listener net.Listener
 	stopCh   chan struct{}
@@ -179,7 +181,7 @@ func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
 	cmd.outputCapture.SetOutputBucket(cmd.outputBucket)
 
 	if cmdRegistry.CommandExists(args[0]) {
-		deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+		deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 		//set deps objs to be the one used by all other commands
 		//once all commands are converted, we can make fresh deps for each command run
@@ -311,7 +313,7 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -329,7 +331,7 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -347,7 +349,7 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -365,7 +367,7 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -383,7 +385,7 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -402,7 +404,7 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -420,7 +422,7 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -438,7 +440,7 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -456,7 +458,7 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run
@@ -474,7 +476,7 @@ func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.G
 		recover()
 	}()
 
-	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger)
+	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
 	//once all commands are converted, we can make fresh deps for each command run

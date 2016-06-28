@@ -4,9 +4,10 @@ import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
 
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"os"
 )
 
 var _ = Describe("Dependency", func() {
@@ -14,7 +15,7 @@ var _ = Describe("Dependency", func() {
 
 	It("populates all fields by calling all the dependency contructors", func() {
 		fakeLogger := new(tracefakes.FakePrinter)
-		dependency = commandregistry.NewDependency(os.Stdout, fakeLogger)
+		dependency = commandregistry.NewDependency(os.Stdout, fakeLogger, "")
 
 		Expect(dependency.UI).ToNot(BeNil())
 		Expect(dependency.Config).ToNot(BeNil())

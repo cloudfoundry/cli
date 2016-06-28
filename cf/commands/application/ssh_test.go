@@ -197,7 +197,7 @@ var _ = Describe("SSH command", func() {
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
 					configRepo.SetAPIEndpoint(testServer.URL)
-					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter), "")
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -227,7 +227,7 @@ var _ = Describe("SSH command", func() {
 
 					testServer, handler = testnet.NewServer([]testnet.TestRequest{getRequest})
 					configRepo.SetAPIEndpoint(testServer.URL)
-					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+					ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter), "")
 					deps.Gateways["cloud-controller"] = ccGateway
 				})
 
@@ -266,7 +266,7 @@ var _ = Describe("SSH command", func() {
 
 				testServer, _ = testnet.NewServer([]testnet.TestRequest{getRequest})
 				configRepo.SetAPIEndpoint(testServer.URL)
-				ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter))
+				ccGateway = net.NewCloudControllerGateway(configRepo, time.Now, &testterm.FakeUI{}, new(tracefakes.FakePrinter), "")
 				deps.Gateways["cloud-controller"] = ccGateway
 			})
 

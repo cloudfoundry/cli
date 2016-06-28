@@ -42,7 +42,7 @@ var _ = Describe("org-users command", func() {
 		userRepo = new(apifakes.FakeUserRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 	})
 
 	runCommand := func(args ...string) bool {

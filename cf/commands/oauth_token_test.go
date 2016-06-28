@@ -43,7 +43,7 @@ var _ = Describe("OauthToken", func() {
 		authRepo = new(authenticationfakes.FakeRepository)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
-		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
+		deps = commandregistry.NewDependency(os.Stdout, fakeLogger, "")
 	})
 
 	runCommand := func() bool {
