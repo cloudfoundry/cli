@@ -15,6 +15,7 @@ import (
 var _ = Describe("calling commands in commandregistry", func() {
 
 	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
+	_ = FakeCommand4{} //make sure fake_command is imported and self-registered with init()
 
 	var (
 		ui         *terminalfakes.FakeUI
@@ -35,7 +36,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 		commandregistry.Commands.SetCommand(cmd2.SetDependency(deps, true))
 	})
 
-	Context("when not expecting the command to fail", func() {
+	Context("when command exists and the correct flags are passed", func() {
 		BeforeEach(func() {
 			err := NewCommandRunner().Command([]string{"fake-command"}, deps, false)
 			Expect(err).NotTo(HaveOccurred())
@@ -49,17 +50,31 @@ var _ = Describe("calling commands in commandregistry", func() {
 		})
 	})
 
-	Context("when expecting the command to fail", func() {
-		It("returns an error if any of the requirements fail", func() {
+	Context("when any of the command requirements fails", func() {
+		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command2"}, deps, false)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Requirement executed and failed"))
 		})
+	})
 
-		It("returns an error if invalid flag is provided", func() {
+	Context("when invalid flags are provided", func() {
+		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command", "-badFlag"}, deps, false)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Invalid flag: -badFlag"))
+		})
+	})
+
+	Context("when the command execute errors", func() {
+		BeforeEach(func() {
+			cmd4 := commandregistry.Commands.FindCommand("fake-command4")
+			commandregistry.Commands.SetCommand(cmd4.SetDependency(deps, true))
+		})
+
+		It("returns an error", func() {
+			err := NewCommandRunner().Command([]string{"fake-command4"}, deps, false)
+			Expect(err).To(MatchError(FakeCommand4Err))
 		})
 	})
 })

@@ -41,7 +41,7 @@ func (c *commandRunner) Command(args []string, deps commandregistry.Dependency, 
 			}
 		}
 
-		cfCmd.Execute(fc)
+		return cfCmd.Execute(fc)
 	}
 
 	return nil
