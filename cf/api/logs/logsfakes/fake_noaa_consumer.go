@@ -9,13 +9,13 @@ import (
 )
 
 type FakeNoaaConsumer struct {
-	TailingLogsStub        func(string, string) (<-chan *events.LogMessage, <-chan error)
-	tailingLogsMutex       sync.RWMutex
-	tailingLogsArgsForCall []struct {
+	TailingLogsWithoutReconnectStub        func(string, string) (<-chan *events.LogMessage, <-chan error)
+	tailingLogsWithoutReconnectMutex       sync.RWMutex
+	tailingLogsWithoutReconnectArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	tailingLogsReturns struct {
+	tailingLogsWithoutReconnectReturns struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}
@@ -42,35 +42,35 @@ type FakeNoaaConsumer struct {
 	}
 }
 
-func (fake *FakeNoaaConsumer) TailingLogs(arg1 string, arg2 string) (<-chan *events.LogMessage, <-chan error) {
-	fake.tailingLogsMutex.Lock()
-	fake.tailingLogsArgsForCall = append(fake.tailingLogsArgsForCall, struct {
+func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnect(arg1 string, arg2 string) (<-chan *events.LogMessage, <-chan error) {
+	fake.tailingLogsWithoutReconnectMutex.Lock()
+	fake.tailingLogsWithoutReconnectArgsForCall = append(fake.tailingLogsWithoutReconnectArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.tailingLogsMutex.Unlock()
-	if fake.TailingLogsStub != nil {
-		return fake.TailingLogsStub(arg1, arg2)
+	fake.tailingLogsWithoutReconnectMutex.Unlock()
+	if fake.TailingLogsWithoutReconnectStub != nil {
+		return fake.TailingLogsWithoutReconnectStub(arg1, arg2)
 	} else {
-		return fake.tailingLogsReturns.result1, fake.tailingLogsReturns.result2
+		return fake.tailingLogsWithoutReconnectReturns.result1, fake.tailingLogsWithoutReconnectReturns.result2
 	}
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsCallCount() int {
-	fake.tailingLogsMutex.RLock()
-	defer fake.tailingLogsMutex.RUnlock()
-	return len(fake.tailingLogsArgsForCall)
+func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnectCallCount() int {
+	fake.tailingLogsWithoutReconnectMutex.RLock()
+	defer fake.tailingLogsWithoutReconnectMutex.RUnlock()
+	return len(fake.tailingLogsWithoutReconnectArgsForCall)
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsArgsForCall(i int) (string, string) {
-	fake.tailingLogsMutex.RLock()
-	defer fake.tailingLogsMutex.RUnlock()
-	return fake.tailingLogsArgsForCall[i].arg1, fake.tailingLogsArgsForCall[i].arg2
+func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnectArgsForCall(i int) (string, string) {
+	fake.tailingLogsWithoutReconnectMutex.RLock()
+	defer fake.tailingLogsWithoutReconnectMutex.RUnlock()
+	return fake.tailingLogsWithoutReconnectArgsForCall[i].arg1, fake.tailingLogsWithoutReconnectArgsForCall[i].arg2
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsReturns(result1 <-chan *events.LogMessage, result2 <-chan error) {
-	fake.TailingLogsStub = nil
-	fake.tailingLogsReturns = struct {
+func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnectReturns(result1 <-chan *events.LogMessage, result2 <-chan error) {
+	fake.TailingLogsWithoutReconnectStub = nil
+	fake.tailingLogsWithoutReconnectReturns = struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}{result1, result2}

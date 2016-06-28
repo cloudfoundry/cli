@@ -70,7 +70,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
-	c, e := repo.consumer.TailingLogs(appGUID, repo.config.AccessToken())
+	c, e := repo.consumer.TailingLogsWithoutReconnect(appGUID, repo.config.AccessToken())
 
 	go func() {
 		for {
