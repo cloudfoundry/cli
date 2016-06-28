@@ -33,7 +33,7 @@ var _ = Describe("Space Repository", func() {
 			ccServer = ghttp.NewServer()
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(ccServer.URL())
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 			repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -128,7 +128,7 @@ var _ = Describe("Space Repository", func() {
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(ccServer.URL())
 			configRepo.SetOrganizationFields(models.OrganizationFields{})
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 			repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 			ccServer.AppendHandlers(
 				ghttp.CombineHandlers(
@@ -464,7 +464,7 @@ func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }

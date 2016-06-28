@@ -49,7 +49,7 @@ var _ = Describe("orgs command", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 	})
 
 	Describe("requirements", func() {

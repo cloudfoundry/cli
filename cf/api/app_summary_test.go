@@ -38,7 +38,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummariesRequest})
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(testServer.URL)
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
 		})
 
@@ -102,7 +102,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{getAppSummaryRequest})
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(testServer.URL)
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 			repo = NewCloudControllerAppSummaryRepository(configRepo, gateway)
 		})
 

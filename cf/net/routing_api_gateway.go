@@ -27,8 +27,14 @@ func errorHandler(statusCode int, body []byte) error {
 }
 
 func NewRoutingAPIGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
-	gateway := newGateway(errorHandler, config, ui, logger)
-	gateway.Clock = clock
-	gateway.PollingEnabled = true
-	return gateway
+	return Gateway{
+		errHandler:      errorHandler,
+		config:          config,
+		PollingThrottle: DefaultPollingThrottle,
+		warnings:        &[]string{},
+		Clock:           clock,
+		ui:              ui,
+		logger:          logger,
+		PollingEnabled:  true,
+	}
 }

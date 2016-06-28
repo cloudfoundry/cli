@@ -229,7 +229,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetAPIEndpoint(ccServer.URL())
-			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+			gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 			repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
 		})
 
@@ -350,7 +350,7 @@ func createServiceBrokerRepo(requests ...testnet.TestRequest) (ts *httptest.Serv
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAPIEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+	gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 	repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
 	return
 }

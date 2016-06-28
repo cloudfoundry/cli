@@ -25,7 +25,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 
 	BeforeEach(func() {
 		fakeLogger = new(tracefakes.FakePrinter)
-		deps = commandregistry.NewDependency(os.Stdout, fakeLogger)
+		deps = commandregistry.NewDependency(os.Stdout, fakeLogger, "")
 		ui = new(terminalfakes.FakeUI)
 		deps.UI = ui
 

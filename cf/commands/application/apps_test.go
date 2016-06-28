@@ -93,7 +93,7 @@ var _ = Describe("list-apps command", func() {
 
 		appSummaryRepo.GetSummariesInCurrentSpaceApps = []models.Application{app, app2}
 
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 	})
 
 	runCommand := func(args ...string) bool {

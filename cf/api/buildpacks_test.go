@@ -30,7 +30,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(config, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo = NewCloudControllerBuildpackRepository(config, gateway)
 	})
 

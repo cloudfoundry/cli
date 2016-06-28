@@ -32,7 +32,7 @@ var _ = Describe("CopyApplicationSource", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo = NewCloudControllerCopyApplicationSourceRepository(configRepo, gateway)
 	})
 

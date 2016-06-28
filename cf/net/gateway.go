@@ -69,18 +69,6 @@ type Gateway struct {
 	logger          trace.Printer
 }
 
-func newGateway(errHandler apiErrorHandler, config coreconfig.Reader, ui terminal.UI, logger trace.Printer) Gateway {
-	return Gateway{
-		errHandler:      errHandler,
-		config:          config,
-		PollingThrottle: DefaultPollingThrottle,
-		warnings:        &[]string{},
-		Clock:           time.Now,
-		ui:              ui,
-		logger:          logger,
-	}
-}
-
 func (gateway *Gateway) AsyncTimeout() time.Duration {
 	if gateway.config.AsyncTimeout() > 0 {
 		return time.Duration(gateway.config.AsyncTimeout()) * time.Minute

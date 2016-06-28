@@ -29,7 +29,7 @@ var _ = Describe("Feature Flags Repository", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo = NewCloudControllerFeatureFlagRepository(configRepo, gateway)
 	})
 
@@ -111,31 +111,31 @@ var featureFlagsGetAllRequest = apifakes.NewCloudControllerTestRequest(testnet.T
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `[
-    { 
+    {
       "name": "user_org_creation",
       "enabled": false,
       "error_message": null,
       "url": "/v2/config/feature_flags/user_org_creation"
     },
-    { 
+    {
       "name": "private_domain_creation",
       "enabled": false,
       "error_message": "foobar",
       "url": "/v2/config/feature_flags/private_domain_creation"
     },
-    { 
+    {
       "name": "app_bits_upload",
       "enabled": true,
       "error_message": null,
       "url": "/v2/config/feature_flags/app_bits_upload"
     },
-    { 
+    {
       "name": "app_scaling",
       "enabled": true,
       "error_message": null,
       "url": "/v2/config/feature_flags/app_scaling"
     },
-    { 
+    {
       "name": "route_creation",
       "enabled": true,
       "error_message": null,
@@ -177,7 +177,7 @@ var featureFlagsUpdateRequest = apifakes.NewCloudControllerTestRequest(testnet.T
 	Path:   "/v2/config/feature_flags/app_scaling",
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
-		Body: `{ 
+		Body: `{
       "name": "app_scaling",
       "enabled": true,
       "error_message": null,

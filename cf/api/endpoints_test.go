@@ -76,7 +76,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		gateway = net.NewCloudControllerGateway(coreConfig, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway = net.NewCloudControllerGateway(coreConfig, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(gateway)
 	})

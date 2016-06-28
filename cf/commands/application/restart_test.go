@@ -50,7 +50,7 @@ var _ = Describe("restart command", func() {
 
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		starter = new(applicationfakes.FakeStarter)
 		stopper = new(applicationfakes.FakeStopper)

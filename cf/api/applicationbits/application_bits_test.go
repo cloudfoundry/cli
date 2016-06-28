@@ -46,7 +46,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		gateway.PollingThrottle = time.Duration(0)
 
 		repo = NewCloudControllerApplicationBitsRepository(configRepo, gateway)

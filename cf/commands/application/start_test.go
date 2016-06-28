@@ -90,7 +90,7 @@ var _ = Describe("start command", func() {
 	})
 
 	BeforeEach(func() {
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 		ui = new(testterm.FakeUI)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 

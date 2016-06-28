@@ -35,7 +35,7 @@ var _ = Describe("Service Keys Repo", func() {
 		ccServer = ghttp.NewServer()
 		configRepo.SetAPIEndpoint(ccServer.URL())
 
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo = NewCloudControllerServiceKeyRepository(configRepo, gateway)
 	})
 

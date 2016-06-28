@@ -74,7 +74,7 @@ func main() {
 	// Writer is assigned in writer_unix.go/writer_windows.go
 	traceLogger := trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
 
-	deps := commandregistry.NewDependency(Writer, traceLogger)
+	deps := commandregistry.NewDependency(Writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
 	defer handlePanics(deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 

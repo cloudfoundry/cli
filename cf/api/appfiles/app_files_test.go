@@ -59,7 +59,7 @@ var _ = Describe("AppFilesRepository", func() {
 		configRepo := testconfig.NewRepositoryWithDefaults()
 		configRepo.SetAPIEndpoint(listFilesRedirectServer.URL)
 
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo := NewCloudControllerAppFilesRepository(configRepo, gateway)
 		list, err := repo.ListFiles("my-app-guid", 1, "some/path")
 

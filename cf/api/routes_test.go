@@ -37,7 +37,7 @@ var _ = Describe("route repository", func() {
 			GUID: "the-space-guid",
 			Name: "the-space-name",
 		})
-		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		gateway := net.NewCloudControllerGateway(configRepo, time.Now, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		repo = NewCloudControllerRouteRepository(configRepo, gateway)
 	})
 

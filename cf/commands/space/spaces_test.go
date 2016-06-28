@@ -41,7 +41,7 @@ var _ = Describe("spaces command", func() {
 	}
 
 	BeforeEach(func() {
-		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter))
+		deps = commandregistry.NewDependency(os.Stdout, new(tracefakes.FakePrinter), "")
 		ui = &testterm.FakeUI{}
 		spaceRepo = new(spacesfakes.FakeSpaceRepository)
 		requirementsFactory = new(requirementsfakes.FakeFactory)
