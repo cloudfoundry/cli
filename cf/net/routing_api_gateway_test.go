@@ -32,11 +32,16 @@ var _ = Describe("Routing Api Gateway", func() {
 	var gateway Gateway
 	var config coreconfig.Reader
 	var fakeLogger *tracefakes.FakePrinter
+	var timeout string
 
 	BeforeEach(func() {
 		fakeLogger = new(tracefakes.FakePrinter)
 		config = testconfig.NewRepository()
-		gateway = NewRoutingAPIGateway(config, time.Now, new(terminalfakes.FakeUI), fakeLogger)
+		timeout = "1"
+	})
+
+	JustBeforeEach(func() {
+		gateway = NewRoutingAPIGateway(config, time.Now, new(terminalfakes.FakeUI), fakeLogger, timeout)
 	})
 
 	It("parses error responses", func() {
@@ -83,6 +88,20 @@ var _ = Describe("Routing Api Gateway", func() {
 			Expect(apiErr).NotTo(BeNil())
 			Expect(apiErr.(errors.HTTPError)).To(HaveOccurred())
 			Expect(apiErr.(errors.HTTPError).StatusCode()).To(Equal(http.StatusInternalServerError))
+		})
+	})
+
+	It("uses the set dial timeout", func() {
+		Expect(gateway.DialTimeout).To(Equal(1 * time.Second))
+	})
+
+	Context("with an invalid timeout", func() {
+		BeforeEach(func() {
+			timeout = ""
+		})
+
+		It("uses the default dial timeout", func() {
+			Expect(gateway.DialTimeout).To(Equal(5 * time.Second))
 		})
 	})
 })

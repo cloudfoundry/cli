@@ -48,7 +48,7 @@ var _ = Describe("Gateway", func() {
 
 		ccGateway = NewCloudControllerGateway(config, clock, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 		ccGateway.PollingThrottle = 3 * time.Millisecond
-		uaaGateway = NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		uaaGateway = NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 	})
 
 	Describe("async timeout", func() {
@@ -679,7 +679,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")
 
-	authGateway := NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+	authGateway := NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), "")
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
 	fakePrinter := new(tracefakes.FakePrinter)

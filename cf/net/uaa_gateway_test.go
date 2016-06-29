@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -24,10 +25,15 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 var _ = Describe("UAA Gateway", func() {
 	var gateway Gateway
 	var config coreconfig.Reader
+	var timeout string
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		gateway = NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter))
+		timeout = "1"
+	})
+
+	JustBeforeEach(func() {
+		gateway = NewUAAGateway(config, new(terminalfakes.FakeUI), new(tracefakes.FakePrinter), timeout)
 	})
 
 	It("parses error responses", func() {
@@ -41,5 +47,19 @@ var _ = Describe("UAA Gateway", func() {
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The foo is wrong"))
 		Expect(apiErr.(errors.HTTPError).ErrorCode()).To(ContainSubstring("foo"))
+	})
+
+	It("uses the set dial timeout", func() {
+		Expect(gateway.DialTimeout).To(Equal(1 * time.Second))
+	})
+
+	Context("with an invalid timeout", func() {
+		BeforeEach(func() {
+			timeout = ""
+		})
+
+		It("uses the default dial timeout", func() {
+			Expect(gateway.DialTimeout).To(Equal(5 * time.Second))
+		})
 	})
 })

@@ -26,7 +26,7 @@ var uaaErrorHandler = func(statusCode int, body []byte) error {
 	return errors.NewHTTPError(statusCode, response.Code, response.Description)
 }
 
-func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printer) Gateway {
+func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printer, envDialTimeout string) Gateway {
 	return Gateway{
 		errHandler:      uaaErrorHandler,
 		config:          config,
@@ -36,6 +36,6 @@ func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printe
 		ui:              ui,
 		logger:          logger,
 		PollingEnabled:  false,
-		DialTimeout:     DefaultDialTimeout,
+		DialTimeout:     dialTimeout(envDialTimeout),
 	}
 }

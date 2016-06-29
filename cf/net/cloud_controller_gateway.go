@@ -30,11 +30,6 @@ func cloudControllerErrorHandler(statusCode int, body []byte) error {
 }
 
 func NewCloudControllerGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer, envDialTimeout string) Gateway {
-	dialTimeout := DefaultDialTimeout
-	if timeout, err := strconv.Atoi(envDialTimeout); err == nil {
-		dialTimeout = time.Duration(timeout) * time.Second
-	}
-
 	return Gateway{
 		errHandler:      cloudControllerErrorHandler,
 		config:          config,
@@ -44,6 +39,6 @@ func NewCloudControllerGateway(config coreconfig.Reader, clock func() time.Time,
 		ui:              ui,
 		logger:          logger,
 		PollingEnabled:  true,
-		DialTimeout:     dialTimeout,
+		DialTimeout:     dialTimeout(envDialTimeout),
 	}
 }
