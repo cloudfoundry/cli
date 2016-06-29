@@ -36,5 +36,6 @@ func NewRoutingAPIGateway(config coreconfig.Reader, clock func() time.Time, ui t
 		ui:              ui,
 		logger:          logger,
 		PollingEnabled:  true,
+		DialTimeout:     DefaultDialTimeout,
 	}
 }

@@ -27,6 +27,7 @@ const (
 	JobFinished            = "finished"
 	JobFailed              = "failed"
 	DefaultPollingThrottle = 5 * time.Second
+	DefaultDialTimeout     = 5 * time.Second
 )
 
 type JobResource struct {
@@ -67,6 +68,7 @@ type Gateway struct {
 	transport       *http.Transport
 	ui              terminal.UI
 	logger          trace.Printer
+	DialTimeout     time.Duration
 }
 
 func (gateway *Gateway) AsyncTimeout() time.Duration {
@@ -443,7 +445,7 @@ func (gateway Gateway) doRequest(request *http.Request) (*http.Response, error) 
 
 func makeHTTPTransport(gateway *Gateway) {
 	gateway.transport = &http.Transport{
-		Dial:            (&net.Dialer{Timeout: 5 * time.Second}).Dial,
+		Dial:            (&net.Dialer{Timeout: gateway.DialTimeout}).Dial,
 		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
 		Proxy:           http.ProxyFromEnvironment,
 	}
