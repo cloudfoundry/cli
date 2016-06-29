@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/flags"
@@ -18,9 +20,7 @@ func NewCommandRunner() CommandRunner {
 	return &commandRunner{}
 }
 
-func (c *commandRunner) Command(args []string, deps commandregistry.Dependency, pluginApiCall bool) error {
-	var err error
-
+func (c *commandRunner) Command(args []string, deps commandregistry.Dependency, pluginApiCall bool) (err error) {
 	cmdRegistry := commandregistry.Commands
 
 	if cmdRegistry.CommandExists(args[0]) {
@@ -40,6 +40,12 @@ func (c *commandRunner) Command(args []string, deps commandregistry.Dependency, 
 				return err
 			}
 		}
+
+		defer func() {
+			if r := recover(); r != nil {
+				err = fmt.Errorf("command panic: %v", r)
+			}
+		}()
 
 		return cfCmd.Execute(fc)
 	}

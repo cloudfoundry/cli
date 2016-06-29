@@ -15,6 +15,7 @@ import (
 var _ = Describe("calling commands in commandregistry", func() {
 
 	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
+	_ = FakeCommand3{} //make sure fake_command is imported and self-registered with init()
 	_ = FakeCommand4{} //make sure fake_command is imported and self-registered with init()
 
 	var (
@@ -75,6 +76,18 @@ var _ = Describe("calling commands in commandregistry", func() {
 		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command4"}, deps, false)
 			Expect(err).To(MatchError(ErrFakeCommand4))
+		})
+	})
+
+	Context("when the command execute panics", func() {
+		BeforeEach(func() {
+			cmd3 := commandregistry.Commands.FindCommand("fake-command3")
+			commandregistry.Commands.SetCommand(cmd3.SetDependency(deps, true))
+		})
+
+		It("returns an error", func() {
+			err := NewCommandRunner().Command([]string{"fake-command3"}, deps, false)
+			Expect(err.Error()).To(MatchRegexp("cli_rpc_server_test"))
 		})
 	})
 })
