@@ -176,6 +176,10 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 			fullPath = windowsPathPrefix + fullPath
 		}
 
+		if fullPath == dir {
+			return nil
+		}
+
 		if cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
 			if err == nil && f.IsDir() {
 				return filepath.SkipDir
@@ -185,10 +189,6 @@ func (appfiles ApplicationFiles) WalkAppFiles(dir string, onEachFile func(string
 
 		if err != nil {
 			return err
-		}
-
-		if fullPath == dir {
-			return nil
 		}
 
 		if !f.Mode().IsRegular() && !f.IsDir() {
