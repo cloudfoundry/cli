@@ -1,3 +1,71 @@
+## 6.20.0
+* Bump version to 6.20.0
+* Use dial timeout for UAA and Routing APIs also
+* properly handle '.*' in .cfignore
+* Make bind-security-group help text clearer
+* Set the timeout in the correct place
+* return cli execution panics as errors for plugins
+* Make polling throttle configurable
+* Prevent negative waitgroup counter with the noaa logs repo
+* stop ignoring plugin dir during linting
+* Fix path on windows worker for ginkgo.
+* backing out of these changes temporarily
+* Update concourse to 1.3.1
+* true=keep going, and remove unnecessary newlines
+* validate manifest yaml on push
+* roll back remove panic from app command
+* Remove some panics from requirements checks
+* 'routes' can be parsed by manifest
+* clarify copy source help message text
+* bind security groups to all spaces in org
+* Remove panics
+* Remove RunCLICommand from push_test.go
+* Replace old spacefakes with current fakes
+* add route path to unbind-route-service
+* Add --path to bind-route-service
+* Fix errors created in 6a5be90
+* Remove testhelpers/terminal from cf/net
+* Explain where the Writer is assigned
+* introduce constructor to panicprinter and remove testhelpers
+* Always output panic error exceptions
+* use common cats linux task for diego tests
+* remove time from testhelpers
+* improve formatting of log messages
+* run CATs services along side the rest of CATs
+* missed the last comma
+* add a way to ignore the default tests
+* Remove testhelpers/cloudcontrollergateway
+* Explicit returns
+* remove testhelpers/assert
+* Remove race from ./plugin_examples
+* Fix race condition in ./plugin
+* Remove the FakeReqFactory.
+* Use counterfeiter fakes in cf/commands/user
+* Use counterfeiter fakes in cf/commands/space
+* switch service key to counterfeiter
+* Use counterfeiter fakes in cf/commands/servicebroker
+* switch serviceauthtoken to use counterfeiter
+* switch service access to use counterfeiter
+* Use counterfeiter fakes in cf/commands/service
+* Use counterfeiter fake in cf/commands
+* Fix data races in RPC/Plugin code
+* switch security group to use counterfeiter
+* switch security group to use counterfeiter
+* switch routes to use counterfeiter
+* switch quota to use counterfeiter
+* Adds a concourse task to update the homebrew tap
+* Actually fix data races in cf/commands/application
+* Update to new version of go-ccapi with LICENSE
+* remove unnecessary test, fix other one
+* switch plugin and pluginrepo to use counterfeiter
+* switch organization package to use Counterfeiter
+* switch feature flag to use counterfeiter
+* Fix data races in cf/api/logs
+* Fix data races in cf/commands/application tests
+* Add locks to FakeUI, ProgressReader
+* switch environment variable group to use counterfeiter fakes
+* switch domains package to use counterfeiter
+
 ## 6.19.0
 * Bump version to 6.19.0
 * Use proper coloring
