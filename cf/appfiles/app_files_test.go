@@ -54,27 +54,33 @@ var _ = Describe("AppFiles", func() {
 			}
 		})
 
-		It("excludes files based on the .cfignore file", func() {
-			appPath := filepath.Join(fixturePath, "app-with-cfignore")
-			files, err := appFiles.AppFilesInDir(appPath)
-			Expect(err).ShouldNot(HaveOccurred())
+		Context("when .cfignore is provided", func() {
+			var paths []string
 
-			paths := []string{}
-			for _, file := range files {
-				paths = append(paths, file.Path)
-			}
+			BeforeEach(func() {
+				appPath := filepath.Join(fixturePath, "app-with-cfignore")
+				files, err := appFiles.AppFilesInDir(appPath)
+				Expect(err).NotTo(HaveOccurred())
 
-			Expect(paths).To(Equal([]string{
-				"dir1",
-				"dir1/child-dir",
-				"dir1/child-dir/file3.txt",
-				"dir1/file1.txt",
-				"dir2",
+				paths = []string{}
+				for _, file := range files {
+					paths = append(paths, file.Path)
+				}
+			})
 
-				// TODO: this should be excluded.
-				// .cfignore doesn't handle ** patterns right now
-				"dir2/child-dir2",
-			}))
+			It("excludes ignored files", func() {
+				Expect(paths).To(Equal([]string{
+					"dir1",
+					"dir1/child-dir",
+					"dir1/child-dir/file3.txt",
+					"dir1/file1.txt",
+					"dir2",
+
+					// TODO: this should be excluded.
+					// .cfignore doesn't handle ** patterns right now
+					"dir2/child-dir2",
+				}))
+			})
 		})
 
 		// NB: on windows, you can never rely on the size of a directory being zero
