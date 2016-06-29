@@ -4,8 +4,8 @@
     "translation": "'routes' should be a list"
   },
   {
-    "id": "Bind a security group to a particular space, or all spaces of an org",
-    "translation": "Bind a security group to a particular space, or all spaces of an org"
+    "id": "Bind a security group to a particular space, or all existing spaces of an org",
+    "translation": "Bind a security group to a particular space, or all existing spaces of an org"
   },
   {
     "id": "Bound apps: {{.BoundApplications}}",
