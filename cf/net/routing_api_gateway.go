@@ -26,7 +26,7 @@ func errorHandler(statusCode int, body []byte) error {
 	return errors.NewHTTPError(statusCode, response.Name, response.Message)
 }
 
-func NewRoutingAPIGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer) Gateway {
+func NewRoutingAPIGateway(config coreconfig.Reader, clock func() time.Time, ui terminal.UI, logger trace.Printer, envDialTimeout string) Gateway {
 	return Gateway{
 		errHandler:      errorHandler,
 		config:          config,
@@ -36,6 +36,6 @@ func NewRoutingAPIGateway(config coreconfig.Reader, clock func() time.Time, ui t
 		ui:              ui,
 		logger:          logger,
 		PollingEnabled:  true,
-		DialTimeout:     DefaultDialTimeout,
+		DialTimeout:     dialTimeout(envDialTimeout),
 	}
 }

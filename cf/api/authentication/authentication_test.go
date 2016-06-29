@@ -35,7 +35,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		BeforeEach(func() {
 			config = testconfig.NewRepository()
 			fakePrinter = new(tracefakes.FakePrinter)
-			gateway = net.NewUAAGateway(config, new(terminalfakes.FakeUI), fakePrinter)
+			gateway = net.NewUAAGateway(config, new(terminalfakes.FakeUI), fakePrinter, "")
 			dumper = net.NewRequestDumper(fakePrinter)
 			auth = NewUAARepository(gateway, config, dumper)
 		})
@@ -240,7 +240,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			config.SetSSHOAuthClient("ssh-oauth-client")
 
 			fakePrinter = new(tracefakes.FakePrinter)
-			gateway = net.NewUAAGateway(config, new(terminalfakes.FakeUI), fakePrinter)
+			gateway = net.NewUAAGateway(config, new(terminalfakes.FakeUI), fakePrinter, "")
 			dumper = net.NewRequestDumper(fakePrinter)
 			authRepo = NewUAARepository(gateway, config, dumper)
 

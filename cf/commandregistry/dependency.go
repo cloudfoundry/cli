@@ -99,8 +99,8 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 
 	deps.Gateways = map[string]net.Gateway{
 		"cloud-controller": net.NewCloudControllerGateway(deps.Config, time.Now, deps.UI, logger, envDialTimeout),
-		"uaa":              net.NewUAAGateway(deps.Config, deps.UI, logger),
-		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.UI, logger),
+		"uaa":              net.NewUAAGateway(deps.Config, deps.UI, logger, envDialTimeout),
+		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.UI, logger, envDialTimeout),
 	}
 	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways, logger)
 

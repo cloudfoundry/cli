@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -449,6 +450,14 @@ func makeHTTPTransport(gateway *Gateway) {
 		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
 		Proxy:           http.ProxyFromEnvironment,
 	}
+}
+
+func dialTimeout(envDialTimeout string) time.Duration {
+	dialTimeout := DefaultDialTimeout
+	if timeout, err := strconv.Atoi(envDialTimeout); err == nil {
+		dialTimeout = time.Duration(timeout) * time.Second
+	}
+	return dialTimeout
 }
 
 func (gateway *Gateway) SetTrustedCerts(certificates []tls.Certificate) {
