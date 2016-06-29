@@ -36,5 +36,6 @@ func NewUAAGateway(config coreconfig.Reader, ui terminal.UI, logger trace.Printe
 		ui:              ui,
 		logger:          logger,
 		PollingEnabled:  false,
+		DialTimeout:     DefaultDialTimeout,
 	}
 }

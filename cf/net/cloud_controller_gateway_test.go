@@ -69,8 +69,8 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		Expect(apiErr.(*errors.InvalidTokenError)).To(HaveOccurred())
 	})
 
-	It("usees the set polling throttle", func() {
-		Expect(gateway.PollingThrottle).To(Equal(1 * time.Second))
+	It("uses the set dial timeout", func() {
+		Expect(gateway.DialTimeout).To(Equal(1 * time.Second))
 	})
 
 	Context("with an invalid timeout", func() {
@@ -78,8 +78,8 @@ var _ = Describe("Cloud Controller Gateway", func() {
 			timeout = ""
 		})
 
-		It("usees the default polling throttle", func() {
-			Expect(gateway.PollingThrottle).To(Equal(5 * time.Second))
+		It("uses the default dial timeout", func() {
+			Expect(gateway.DialTimeout).To(Equal(5 * time.Second))
 		})
 	})
 })
