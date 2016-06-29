@@ -32,7 +32,7 @@ func (cmd *BindSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	tipUsage := T("TIP: Changes will not apply to existing running applications until they are restarted.")
 	return commandregistry.CommandMetadata{
 		Name:        "bind-security-group",
-		Description: T("Bind a security group to a particular space, or all spaces of an org"),
+		Description: T("Bind a security group to a particular space, or all existing spaces of an org"),
 		Usage: []string{
 			primaryUsage,
 			"\n\n",

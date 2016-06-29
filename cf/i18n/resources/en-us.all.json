@@ -376,8 +376,8 @@
     "translation": "BUILDPACK_NAME"
   },
   {
-    "id": "Bind a security group to a particular space, or all spaces of an org",
-    "translation": "Bind a security group to a particular space, or all spaces of an org"
+    "id": "Bind a security group to a particular space, or all existing spaces of an org",
+    "translation": "Bind a security group to a particular space, or all existing spaces of an org"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
