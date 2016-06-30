@@ -60,4 +60,4 @@ run:
       git commit -m "Release ${CLI_VERSION}"
     popd
 
-    mv homebrew-tap $OUTPUT_PATH
+    cp -R homebrew-tap $OUTPUT_PATH
