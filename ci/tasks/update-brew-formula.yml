@@ -5,7 +5,7 @@ image: docker:///cloudfoundry/cli-ci
 inputs:
 - name: final-cli
   path: cli
-- name: cf-cli-binaries
+- name: cf-cli-osx-tarball
 - name: homebrew-tap
 
 outputs:
@@ -21,9 +21,8 @@ run:
   - |
     set -ex
 
-    pushd cf-cli-binaries
-      tar -xvf cf-cli-binaries.tgz
-      CLI_SHA256=$(shasum -a 256 cf-cli_osx | cut -d ' ' -f 1)
+    pushd cf-cli-osx-tarball
+      CLI_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
     popd
 
     CLI_VERSION=$(cat cli/VERSION)
