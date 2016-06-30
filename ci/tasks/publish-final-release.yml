@@ -14,6 +14,9 @@ inputs:
 - name: cf-cli-installer-win32
 - name: cf-cli-installer-win64
 
+outputs:
+- name: cf-cli-osx-tarball
+
 run:
   path: bash
   args:
@@ -50,6 +53,8 @@ run:
         tar cvzf $root/archives/cf-cli_${release_tag}${os_arch}.tgz cf
         rm cf
       done
+
+      cp $root/archives/cf-cli_*_osx.tgz ../cf-cli-osx-tarball
 
       for BIN in cf-cli_win*; do
         [[ "${BIN}" =~ $filename_regex ]]
