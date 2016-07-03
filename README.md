@@ -61,10 +61,15 @@ $ brew tap cloudfoundry/tap
 $ brew install cf-cli
 ```
 
-Also, edge binaries are published for [Mac OS X 64 bit](https://cli.run.pivotal.io/edge?arch=macosx64&source=github), [Windows 64 bit](https://cli.run.pivotal.io/edge?arch=windows64&source=github) and [Linux 64 bit](https://cli.run.pivotal.io/edge?arch=linux64&source=github) with each new 'push' that passes though CI.
-These binaries are *not intended for wider use*; they're for developers to test new features and fixes as they are completed.
+### Edge Binaries
+**We strongly discourage the use of Edge Binaries**. Edge binaries are for people who want to use new experimental features that may not work at all. Some functionality depends on the edge of CF, which most people do not have installed.
 
-**Releases:** 32 bit releases and information about all our releases can be found [here](https://github.com/cloudfoundry/cli/releases)
+| Mac OS X 64 bit | Windows 64 bit | Linux 64 bit |
+| :---------------: |:---------------:| :------------:|
+| [tgz](https://cli.run.pivotal.io/edge?arch=macosx64&source=github) | [zip](https://cli.run.pivotal.io/edge?arch=windows64&source=github) | [tgz](https://cli.run.pivotal.io/edge?arch=linux64&source=github) |
+
+### All Releases 
+All our releases, including 32bit binaries, can be found [here](https://github.com/cloudfoundry/cli/releases)
 
 Troubleshooting / FAQs
 ======================
