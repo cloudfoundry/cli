@@ -47,6 +47,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		var setupTestServer = func(request testnet.TestRequest) {
 			testServer, handler = testnet.NewServer([]testnet.TestRequest{request})
 			config.SetAuthenticationEndpoint(testServer.URL)
+			config.SetCFOAuthClient("cf")
 		}
 
 		Describe("authenticating", func() {
