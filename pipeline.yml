@@ -1,4 +1,11 @@
 ---
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
 resources:
 - name: cli
   type: git
@@ -132,6 +139,11 @@ resources:
     email: {{dockerhub-email}}
     password: {{dockerhub-password}}
 
+- name: slack-alert
+  type: slack-notification
+  source:
+    url: https://hooks.slack.com/services/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
+
 groups:
 - name: cli
   jobs:
@@ -158,14 +170,20 @@ jobs:
     - get: final-cli
     - get: cli-ci
   - aggregate:
-    - task: units-linux
-      file: cli-ci/ci/tasks/units-linux.yml
-    - task: units-osx
-      file: cli-ci/ci/tasks/units-osx.yml
-    - task: units-windows
-      file: cli-ci/ci/tasks/units-windows.yml
-    - task: lint
-      file: cli-ci/ci/tasks/lint.yml
+    - do:
+      - task: units-linux
+        file: cli-ci/ci/tasks/units-linux.yml
+      - task: units-osx
+        file: cli-ci/ci/tasks/units-osx.yml
+      - task: units-windows
+        file: cli-ci/ci/tasks/units-windows.yml
+      - task: lint
+        file: cli-ci/ci/tasks/lint.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "unit tests failed OR errored :("
 
 - name: build-binaries
   serial: true
@@ -178,10 +196,16 @@ jobs:
       passed: [units]
     - get: cli-ci
   - aggregate:
-    - task: build
-      file: cli-ci/ci/tasks/build-binaries.yml
-    - task: build-osx
-      file: cli-ci/ci/tasks/build-osx-binary.yml
+    - do:
+      - task: build
+        file: cli-ci/ci/tasks/build-binaries.yml
+      - task: build-osx
+        file: cli-ci/ci/tasks/build-osx-binary.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "build binaries failed OR errored :("
   - task: combine-binaries
     file: cli-ci/ci/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -206,13 +230,19 @@ jobs:
       params:
         acquire: true
   - aggregate:
-    - task: linux
-      file: cli-ci/ci/tasks/gats-linux.yml
-    - task: windows
-      file: cli-ci/ci/tasks/gats-windows.yml
-      params:
-        ADMIN_USER: {{bosh-lite-admin-username}}
-        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+    - do:
+      - task: linux
+        file: cli-ci/ci/tasks/gats-linux.yml
+      - task: windows
+        file: cli-ci/ci/tasks/gats-windows.yml
+        params:
+          ADMIN_USER: {{bosh-lite-admin-username}}
+          ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "gats failed OR errored :("
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -239,22 +269,28 @@ jobs:
       params:
         acquire: true
   - aggregate:
-    - task: cats
-      file: cli-ci/ci/tasks/cats-linux.yml
-      params:
-        BACKEND: dea
-        INCLUDE_DEFAULT: true
-        INCLUDE_INTERNET_DEPENDENT: true
-        INCLUDE_ROUTE_SERVICES: true
-        INCLUDE_SECURITY_GROUPS: true
-    - task: cats-services
-      file: cli-ci/ci/tasks/cats-linux.yml
-      params:
-        INCLUDE_SERVICES: true
-    ensure:
-      put: bosh-lites-dea-pool
-      params:
-        release: bosh-lite-lock
+    - do:
+      - task: cats
+        file: cli-ci/ci/tasks/cats-linux.yml
+        params:
+          BACKEND: dea
+          INCLUDE_DEFAULT: true
+          INCLUDE_INTERNET_DEPENDENT: true
+          INCLUDE_ROUTE_SERVICES: true
+          INCLUDE_SECURITY_GROUPS: true
+      - task: cats-services
+        file: cli-ci/ci/tasks/cats-linux.yml
+        params:
+          INCLUDE_SERVICES: true
+      ensure:
+        put: bosh-lites-dea-pool
+        params:
+          release: bosh-lite-lock
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats linux failed OR errored :("
 
 - name: cats-diego
   serial: true
@@ -277,21 +313,27 @@ jobs:
       params:
         acquire: true
   - aggregate:
-    - task: linux
-      file: cli-ci/ci/tasks/cats-linux.yml
-      params:
-        BACKEND: diego
-        INCLUDE_DEFAULT: true
-        INCLUDE_BACKEND_COMPATIBILITY: true
-        INCLUDE_DIEGO_DOCKER: true
-        INCLUDE_DIEGO_SSH: true
-        INCLUDE_INTERNET_DEPENDENT: true
-        INCLUDE_ROUTE_SERVICES: true
-        INCLUDE_SECURITY_GROUPS: true
-    ensure:
-      put: bosh-lites-diego-pool
-      params:
-        release: bosh-lite-lock
+    - do:
+      - task: linux
+        file: cli-ci/ci/tasks/cats-linux.yml
+        params:
+          BACKEND: diego
+          INCLUDE_DEFAULT: true
+          INCLUDE_BACKEND_COMPATIBILITY: true
+          INCLUDE_DIEGO_DOCKER: true
+          INCLUDE_DIEGO_SSH: true
+          INCLUDE_INTERNET_DEPENDENT: true
+          INCLUDE_ROUTE_SERVICES: true
+          INCLUDE_SECURITY_GROUPS: true
+      ensure:
+        put: bosh-lites-diego-pool
+        params:
+          release: bosh-lite-lock
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats diego failed OR errored :("
 
 - name: cats-windows
   serial: true
@@ -322,6 +364,11 @@ jobs:
       put: bosh-lites-dea-pool
       params:
         release: bosh-lite-lock
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "cats windows failed OR errored :("
 
 - name: create-installers
   serial: true
@@ -337,13 +384,19 @@ jobs:
     - get: cli-private
     - get: cli-ci
   - aggregate:
-    - task: windows
-      file: cli-ci/ci/tasks/create-installers-windows.yml
-      params:
-        SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
-        SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
-    - task: unix
-      file: cli-ci/ci/tasks/create-installers.yml
+    - do:
+      - task: windows
+        file: cli-ci/ci/tasks/create-installers-windows.yml
+        params:
+          SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
+          SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
+      - task: unix
+        file: cli-ci/ci/tasks/create-installers.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "create installers failed OR errored :("
   - aggregate:
     - put: cf-cli-installer-win32
       params:
@@ -376,6 +429,11 @@ jobs:
     params:
       AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "publish edge archives failed OR errored :("
   - put: cf-cli-tracker
     params:
       repos:
@@ -403,8 +461,18 @@ jobs:
     params:
       AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "publish final release failed OR errored :("
   - task: update-brew-formula
     file: cli-ci/ci/tasks/update-brew-formula.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "Update brew formula failed OR errored :("
   - put: homebrew-tap
     params:
       repository: update-brew-formula-output/homebrew-tap
