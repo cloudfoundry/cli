@@ -64,6 +64,7 @@ type Reader interface {
 	UaaEndpoint() string
 	RoutingAPIEndpoint() string
 	AccessToken() string
+	CFOAuthClient() string
 	SSHOAuthClient() string
 	RefreshToken() string
 
@@ -108,6 +109,7 @@ type ReadWriter interface {
 	SetUaaEndpoint(string)
 	SetRoutingAPIEndpoint(string)
 	SetAccessToken(string)
+	SetCFOAuthClient(string)
 	SetSSHOAuthClient(string)
 	SetRefreshToken(string)
 	SetOrganizationFields(models.OrganizationFields)
@@ -236,6 +238,13 @@ func (c *ConfigRepository) HasAPIEndpoint() (hasEndpoint bool) {
 func (c *ConfigRepository) AccessToken() (accessToken string) {
 	c.read(func() {
 		accessToken = c.data.AccessToken
+	})
+	return
+}
+
+func (c *ConfigRepository) CFOAuthClient() (clientID string) {
+	c.read(func() {
+		clientID = c.data.CFOAuthClient
 	})
 	return
 }
@@ -470,6 +479,12 @@ func (c *ConfigRepository) SetRoutingAPIEndpoint(routingAPIEndpoint string) {
 func (c *ConfigRepository) SetAccessToken(token string) {
 	c.write(func() {
 		c.data.AccessToken = token
+	})
+}
+
+func (c *ConfigRepository) SetCFOAuthClient(clientID string) {
+	c.write(func() {
+		c.data.CFOAuthClient = clientID
 	})
 }
 

@@ -20,6 +20,7 @@ var _ = Describe("V3 Config files", func() {
 		"UaaEndpoint": "uaa.example.com",
 		"RoutingAPIEndpoint": "routing-api.example.com",
 		"AccessToken": "the-access-token",
+		"CFOAuthClient": "cf-oauth-client-id",
 		"SSHOAuthClient": "ssh-oauth-client-id",
 		"RefreshToken": "the-refresh-token",
 		"OrganizationFields": {
@@ -67,6 +68,7 @@ var _ = Describe("V3 Config files", func() {
 		"UaaEndpoint": "uaa.example.com",
 		"RoutingAPIEndpoint": "routing-api.example.com",
 		"AccessToken": "the-access-token",
+		"CFOAuthClient": "cf-oauth-client-id",
 		"SSHOAuthClient": "ssh-oauth-client-id",
 		"RefreshToken": "the-refresh-token",
 		"OrganizationFields": {
@@ -113,6 +115,7 @@ var _ = Describe("V3 Config files", func() {
 				UaaEndpoint:              "uaa.example.com",
 				AccessToken:              "the-access-token",
 				RefreshToken:             "the-refresh-token",
+				CFOAuthClient:            "cf-oauth-client-id",
 				SSHOAuthClient:           "ssh-oauth-client-id",
 				MinCLIVersion:            "6.0.0",
 				MinRecommendedCLIVersion: "6.9.0",
@@ -163,6 +166,7 @@ var _ = Describe("V3 Config files", func() {
 				UaaEndpoint:              "uaa.example.com",
 				AccessToken:              "the-access-token",
 				RefreshToken:             "the-refresh-token",
+				CFOAuthClient:            "cf-oauth-client-id",
 				SSHOAuthClient:           "ssh-oauth-client-id",
 				MinCLIVersion:            "6.0.0",
 				MinRecommendedCLIVersion: "6.9.0",

@@ -82,6 +82,9 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetAccessToken("the-token")
 		Expect(config.AccessToken()).To(Equal("the-token"))
 
+		config.SetCFOAuthClient("cf-oauth-client-id")
+		Expect(config.CFOAuthClient()).To(Equal("cf-oauth-client-id"))
+
 		config.SetSSHOAuthClient("oauth-client-id")
 		Expect(config.SSHOAuthClient()).To(Equal("oauth-client-id"))
 
