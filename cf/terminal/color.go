@@ -9,13 +9,13 @@ import (
 )
 
 const (
-	red     color.Attribute = color.FgRed
-	green                   = color.FgGreen
-	yellow                  = color.FgYellow
-	magenta                 = color.FgMagenta
-	cyan                    = color.FgCyan
-	grey                    = color.FgWhite
-	white                   = color.FgWhite
+	red            color.Attribute = color.FgRed
+	green                          = color.FgGreen
+	yellow                         = color.FgYellow
+	magenta                        = color.FgMagenta
+	cyan                           = color.FgCyan
+	grey                           = color.FgWhite
+	defaultFgColor                 = 38
 )
 
 var (
@@ -76,7 +76,7 @@ func Decolorize(message string) string {
 }
 
 func HeaderColor(message string) string {
-	return ColorizeBold(message, white)
+	return ColorizeBold(message, defaultFgColor)
 }
 
 func CommandColor(message string) string {
@@ -120,7 +120,7 @@ func WarningColor(message string) string {
 }
 
 func LogStdoutColor(message string) string {
-	return Colorize(message, white)
+	return Colorize(message, defaultFgColor)
 }
 
 func LogStderrColor(message string) string {
