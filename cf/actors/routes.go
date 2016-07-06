@@ -8,16 +8,25 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
-type RouteActor struct {
+//go:generate counterfeiter . RouteActor
+
+type RouteActor interface {
+	CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error)
+	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error)
+	BindRoute(app models.Application, route models.Route) error
+	UnbindAll(app models.Application) error
+}
+
+type routeActor struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
 }
 
-func NewRouteActor(ui terminal.UI, routeRepo api.RouteRepository) RouteActor {
-	return RouteActor{ui: ui, routeRepo: routeRepo}
+func NewRouteActor(ui terminal.UI, routeRepo api.RouteRepository) routeActor {
+	return routeActor{ui: ui, routeRepo: routeRepo}
 }
 
-func (routeActor RouteActor) CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error) {
+func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error) {
 	routeActor.ui.Say(T("Creating random route for {{.Domain}}", map[string]interface{}{
 		"Domain": terminal.EntityNameColor(domain.Name),
 	}) + "...")
@@ -30,18 +39,28 @@ func (routeActor RouteActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 	return route, nil
 }
 
-func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
+func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
 	var port int
 	route, err := routeActor.routeRepo.Find(hostname, domain, path, port)
 
 	switch err.(type) {
 	case nil:
-		routeActor.ui.Say(T("Using route {{.RouteURL}}", map[string]interface{}{"RouteURL": terminal.EntityNameColor(route.URL())}))
+		routeActor.ui.Say(
+			T("Using route {{.RouteURL}}",
+				map[string]interface{}{
+					"RouteURL": terminal.EntityNameColor(route.URL()),
+				}),
+		)
 	case *errors.ModelNotFoundError:
 		if useRandomPort {
 			route, err = routeActor.CreateRandomTCPRoute(domain)
 		} else {
-			routeActor.ui.Say(T("Creating route {{.Hostname}}...", map[string]interface{}{"Hostname": terminal.EntityNameColor(domain.URLForHostAndPath(hostname, path, port))}))
+			routeActor.ui.Say(
+				T("Creating route {{.Hostname}}...",
+					map[string]interface{}{
+						"Hostname": terminal.EntityNameColor(domain.URLForHostAndPath(hostname, path, port)),
+					}),
+			)
 
 			route, err = routeActor.routeRepo.Create(hostname, domain, path, useRandomPort)
 		}
@@ -53,9 +72,15 @@ func (routeActor RouteActor) FindOrCreateRoute(hostname string, domain models.Do
 	return route, err
 }
 
-func (routeActor RouteActor) BindRoute(app models.Application, route models.Route) error {
+func (routeActor routeActor) BindRoute(app models.Application, route models.Route) error {
 	if !app.HasRoute(route) {
-		routeActor.ui.Say(T("Binding {{.URL}} to {{.AppName}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL()), "AppName": terminal.EntityNameColor(app.Name)}))
+		routeActor.ui.Say(T(
+			"Binding {{.URL}} to {{.AppName}}...",
+			map[string]interface{}{
+				"URL":     terminal.EntityNameColor(route.URL()),
+				"AppName": terminal.EntityNameColor(app.Name),
+			}),
+		)
 
 		err := routeActor.routeRepo.Bind(route.GUID, app.GUID)
 		switch err := err.(type) {
@@ -65,7 +90,12 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 			return nil
 		case errors.HTTPError:
 			if err.ErrorCode() == errors.InvalidRelation {
-				return errors.New(T("The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", map[string]interface{}{"URL": route.URL()}))
+				return errors.New(T(
+					"The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
+					map[string]interface{}{
+						"URL": route.URL(),
+					}),
+				)
 			}
 		}
 		return err
@@ -73,9 +103,14 @@ func (routeActor RouteActor) BindRoute(app models.Application, route models.Rout
 	return nil
 }
 
-func (routeActor RouteActor) UnbindAll(app models.Application) error {
+func (routeActor routeActor) UnbindAll(app models.Application) error {
 	for _, route := range app.Routes {
-		routeActor.ui.Say(T("Removing route {{.URL}}...", map[string]interface{}{"URL": terminal.EntityNameColor(route.URL())}))
+		routeActor.ui.Say(T(
+			"Removing route {{.URL}}...",
+			map[string]interface{}{
+				"URL": terminal.EntityNameColor(route.URL()),
+			}),
+		)
 		err := routeActor.routeRepo.Unbind(route.GUID, app.GUID)
 		if err != nil {
 			return err
