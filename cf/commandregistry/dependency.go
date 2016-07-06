@@ -48,6 +48,7 @@ type Dependency struct {
 	AppZipper          appfiles.Zipper
 	AppFiles           appfiles.AppFiles
 	PushActor          actors.PushActor
+	RouteActor         actors.RouteActor
 	ChecksumUtil       utils.Sha1Checksum
 	WildcardDependency interface{} //use for injecting fakes
 	Logger             trace.Printer
@@ -144,6 +145,7 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 	deps.AppFiles = appfiles.ApplicationFiles{}
 
 	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
+	deps.RouteActor = actors.NewRouteActor(deps.UI, deps.RepoLocator.GetRouteRepository())
 
 	deps.ChecksumUtil = utils.NewSha1Checksum("")
 
