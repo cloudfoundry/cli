@@ -6,8 +6,10 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
 
+//go:generate counterfeiter . HTTPError
+
 type HTTPError interface {
-	error
+	Error() string
 	StatusCode() int   // actual HTTP status code
 	ErrorCode() string // error code returned in response body from CC or UAA
 }

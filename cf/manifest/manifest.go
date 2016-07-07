@@ -235,8 +235,11 @@ func removeDuplicatedValue(ary []string) *[]string {
 	}
 
 	newAry := []string{}
-	for k := range m {
-		newAry = append(newAry, k)
+	for _, val := range ary {
+		if m[val] {
+			newAry = append(newAry, val)
+			m[val] = false
+		}
 	}
 	return &newAry
 }
