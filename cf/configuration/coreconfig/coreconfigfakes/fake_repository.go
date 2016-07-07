@@ -258,6 +258,11 @@ type FakeRepository struct {
 	setCFOAuthClientArgsForCall []struct {
 		arg1 string
 	}
+	SetCFOAuthClientSecretStub        func(string)
+	setCFOAuthClientSecretMutex       sync.RWMutex
+	setCFOAuthClientSecretArgsForCall []struct {
+		arg1 string
+	}
 	SetSSHOAuthClientStub        func(string)
 	setSSHOAuthClientMutex       sync.RWMutex
 	setSSHOAuthClientArgsForCall []struct {
@@ -1391,6 +1396,30 @@ func (fake *FakeRepository) SetCFOAuthClientArgsForCall(i int) string {
 	return fake.setCFOAuthClientArgsForCall[i].arg1
 }
 
+func (fake *FakeRepository) SetCFOAuthClientSecret(arg1 string) {
+	fake.setCFOAuthClientSecretMutex.Lock()
+	fake.setCFOAuthClientSecretArgsForCall = append(fake.setCFOAuthClientSecretArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetCFOAuthClientSecret", []interface{}{arg1})
+	fake.setCFOAuthClientSecretMutex.Unlock()
+	if fake.SetCFOAuthClientSecretStub != nil {
+		fake.SetCFOAuthClientSecretStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetCFOAuthClientSecretCallCount() int {
+	fake.setCFOAuthClientSecretMutex.RLock()
+	defer fake.setCFOAuthClientSecretMutex.RUnlock()
+	return len(fake.setCFOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeRepository) SetCFOAuthClientSecretArgsForCall(i int) string {
+	fake.setCFOAuthClientSecretMutex.RLock()
+	defer fake.setCFOAuthClientSecretMutex.RUnlock()
+	return fake.setCFOAuthClientSecretArgsForCall[i].arg1
+}
+
 func (fake *FakeRepository) SetSSHOAuthClient(arg1 string) {
 	fake.setSSHOAuthClientMutex.Lock()
 	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
@@ -1760,6 +1789,8 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setCFOAuthClientMutex.RLock()
 	defer fake.setCFOAuthClientMutex.RUnlock()
+	fake.setCFOAuthClientSecretMutex.RLock()
+	defer fake.setCFOAuthClientSecretMutex.RUnlock()
 	fake.setSSHOAuthClientMutex.RLock()
 	defer fake.setSSHOAuthClientMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()
