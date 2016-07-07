@@ -65,6 +65,7 @@ type Reader interface {
 	RoutingAPIEndpoint() string
 	AccessToken() string
 	CFOAuthClient() string
+	CFOAuthClientSecret() string
 	SSHOAuthClient() string
 	RefreshToken() string
 
@@ -245,6 +246,13 @@ func (c *ConfigRepository) AccessToken() (accessToken string) {
 func (c *ConfigRepository) CFOAuthClient() (clientID string) {
 	c.read(func() {
 		clientID = c.data.CFOAuthClient
+	})
+	return
+}
+
+func (c *ConfigRepository) CFOAuthClientSecret() (clientID string) {
+	c.read(func() {
+		clientID = c.data.CFOAuthClientSecret
 	})
 	return
 }
@@ -485,6 +493,12 @@ func (c *ConfigRepository) SetAccessToken(token string) {
 func (c *ConfigRepository) SetCFOAuthClient(clientID string) {
 	c.write(func() {
 		c.data.CFOAuthClient = clientID
+	})
+}
+
+func (c *ConfigRepository) SetCFOAuthClientSecret(clientID string) {
+	c.write(func() {
+		c.data.CFOAuthClientSecret = clientID
 	})
 }
 

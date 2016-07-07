@@ -70,6 +70,12 @@ type FakeReadWriter struct {
 	cFOAuthClientReturns     struct {
 		result1 string
 	}
+	CFOAuthClientSecretStub        func() string
+	cFOAuthClientSecretMutex       sync.RWMutex
+	cFOAuthClientSecretArgsForCall []struct{}
+	cFOAuthClientSecretReturns     struct {
+		result1 string
+	}
 	SSHOAuthClientStub        func() string
 	sSHOAuthClientMutex       sync.RWMutex
 	sSHOAuthClientArgsForCall []struct{}
@@ -557,6 +563,31 @@ func (fake *FakeReadWriter) CFOAuthClientCallCount() int {
 func (fake *FakeReadWriter) CFOAuthClientReturns(result1 string) {
 	fake.CFOAuthClientStub = nil
 	fake.cFOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeReadWriter) CFOAuthClientSecret() string {
+	fake.cFOAuthClientSecretMutex.Lock()
+	fake.cFOAuthClientSecretArgsForCall = append(fake.cFOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("CFOAuthClientSecret", []interface{}{})
+	fake.cFOAuthClientSecretMutex.Unlock()
+	if fake.CFOAuthClientSecretStub != nil {
+		return fake.CFOAuthClientSecretStub()
+	} else {
+		return fake.cFOAuthClientSecretReturns.result1
+	}
+}
+
+func (fake *FakeReadWriter) CFOAuthClientSecretCallCount() int {
+	fake.cFOAuthClientSecretMutex.RLock()
+	defer fake.cFOAuthClientSecretMutex.RUnlock()
+	return len(fake.cFOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeReadWriter) CFOAuthClientSecretReturns(result1 string) {
+	fake.CFOAuthClientSecretStub = nil
+	fake.cFOAuthClientSecretReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1644,6 +1675,8 @@ func (fake *FakeReadWriter) Invocations() map[string][][]interface{} {
 	defer fake.accessTokenMutex.RUnlock()
 	fake.cFOAuthClientMutex.RLock()
 	defer fake.cFOAuthClientMutex.RUnlock()
+	fake.cFOAuthClientSecretMutex.RLock()
+	defer fake.cFOAuthClientSecretMutex.RUnlock()
 	fake.sSHOAuthClientMutex.RLock()
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
