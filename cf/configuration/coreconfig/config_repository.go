@@ -111,6 +111,7 @@ type ReadWriter interface {
 	SetRoutingAPIEndpoint(string)
 	SetAccessToken(string)
 	SetCFOAuthClient(string)
+	SetCFOAuthClientSecret(string)
 	SetSSHOAuthClient(string)
 	SetRefreshToken(string)
 	SetOrganizationFields(models.OrganizationFields)
