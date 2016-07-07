@@ -45,6 +45,7 @@ type Push struct {
 	authRepo      authentication.Repository
 	wordGenerator generator.WordGenerator
 	actor         actors.PushActor
+	routeActor    actors.RouteActor
 	zipper        appfiles.Zipper
 	appfiles      appfiles.AppFiles
 }
@@ -109,7 +110,6 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 			":\n   ",
 			"CF_NAME push ",
 			fmt.Sprintf("[-f %s] ", T("MANIFEST_PATH")),
-			"\n",
 		},
 		Flags: fs,
 	}
@@ -170,6 +170,7 @@ func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	cmd.authRepo = deps.RepoLocator.GetAuthenticationRepository()
 	cmd.wordGenerator = deps.WordGenerator
 	cmd.actor = deps.PushActor
+	cmd.routeActor = deps.RouteActor
 	cmd.zipper = deps.AppZipper
 	cmd.appfiles = deps.AppFiles
 
@@ -192,12 +193,21 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		return err
 	}
 
+	errs := cmd.actor.ValidateAppParams(appSet)
+	if len(errs) > 0 {
+		errStr := "invalid application configuration:"
+
+		for _, e := range errs {
+			errStr = fmt.Sprintf("%s\n%s", errStr, e.Error())
+		}
+
+		return fmt.Errorf("%s", errStr)
+	}
+
 	_, err = cmd.authRepo.RefreshAuthToken()
 	if err != nil {
 		return err
 	}
-
-	routeActor := actors.NewRouteActor(cmd.ui, cmd.routeRepo)
 
 	for _, appParams := range appSet {
 		if appParams.Name == nil {
@@ -259,7 +269,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 
-		err = cmd.updateRoutes(routeActor, app, appParams)
+		err = cmd.updateRoutes(app, appParams)
 		if err != nil {
 			return err
 		}
@@ -329,7 +339,7 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 	}
 }
 
-func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Application, appParams models.AppParams) error {
+func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams) error {
 	defaultRouteAcceptable := len(app.Routes) == 0
 	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.NoHostname
 
@@ -338,7 +348,7 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 			cmd.ui.Say(T("App {{.AppName}} is a worker, skipping route creation",
 				map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
 		} else {
-			err := routeActor.UnbindAll(app)
+			err := cmd.routeActor.UnbindAll(app)
 			if err != nil {
 				return err
 			}
@@ -353,7 +363,7 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 				return err
 			}
 			appParams.UseRandomPort = isTCP(domain)
-			err = cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
+			err = cmd.processDomainsAndBindRoutes(appParams, app, domain)
 			if err != nil {
 				return err
 			}
@@ -364,7 +374,7 @@ func (cmd *Push) updateRoutes(routeActor actors.RouteActor, app models.Applicati
 					return err
 				}
 				appParams.UseRandomPort = isTCP(domain)
-				err = cmd.processDomainsAndBindRoutes(appParams, routeActor, app, domain)
+				err = cmd.processDomainsAndBindRoutes(appParams, app, domain)
 				if err != nil {
 					return err
 				}
@@ -382,7 +392,6 @@ func isTCP(domain models.DomainFields) bool {
 
 func (cmd *Push) processDomainsAndBindRoutes(
 	appParams models.AppParams,
-	routeActor actors.RouteActor,
 	app models.Application,
 	domain models.DomainFields,
 ) error {
@@ -391,7 +400,6 @@ func (cmd *Push) processDomainsAndBindRoutes(
 			nil,
 			appParams.UseRandomRoute,
 			appParams.UseRandomPort,
-			routeActor,
 			app,
 			appParams.NoHostname,
 			domain,
@@ -406,7 +414,6 @@ func (cmd *Push) processDomainsAndBindRoutes(
 				&host,
 				appParams.UseRandomRoute,
 				appParams.UseRandomPort,
-				routeActor,
 				app,
 				appParams.NoHostname,
 				domain,
@@ -424,7 +431,6 @@ func (cmd *Push) createAndBindRoute(
 	host *string,
 	UseRandomRoute bool,
 	UseRandomPort bool,
-	routeActor actors.RouteActor,
 	app models.Application,
 	noHostName bool,
 	domain models.DomainFields,
@@ -447,14 +453,14 @@ func (cmd *Push) createAndBindRoute(
 	var route models.Route
 	var err error
 	if routePath != nil {
-		route, err = routeActor.FindOrCreateRoute(hostname, domain, *routePath, UseRandomPort)
+		route, err = cmd.routeActor.FindOrCreateRoute(hostname, domain, *routePath, UseRandomPort)
 	} else {
-		route, err = routeActor.FindOrCreateRoute(hostname, domain, "", UseRandomPort)
+		route, err = cmd.routeActor.FindOrCreateRoute(hostname, domain, "", UseRandomPort)
 	}
 	if err != nil {
 		return err
 	}
-	return routeActor.BindRoute(app, route)
+	return cmd.routeActor.BindRoute(app, route)
 }
 
 var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")

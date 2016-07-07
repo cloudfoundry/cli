@@ -54,6 +54,7 @@ var _ = Describe("Push Command", func() {
 		requirementsFactory        *requirementsfakes.FakeFactory
 		authRepo                   *authenticationfakes.FakeRepository
 		actor                      *actorsfakes.FakePushActor
+		routeActor                 *actorsfakes.FakeRouteActor
 		appfiles                   *appfilesfakes.FakeAppFiles
 		zipper                     *appfilesfakes.FakeZipper
 		deps                       commandregistry.Dependency
@@ -89,6 +90,7 @@ var _ = Describe("Push Command", func() {
 		wordGenerator = new(generatorfakes.FakeWordGenerator)
 		wordGenerator.BabbleReturns("random-host")
 		actor = new(actorsfakes.FakePushActor)
+		routeActor = new(actorsfakes.FakeRouteActor)
 		zipper = new(appfilesfakes.FakeZipper)
 		appfiles = new(appfilesfakes.FakeAppFiles)
 
@@ -98,6 +100,7 @@ var _ = Describe("Push Command", func() {
 			ManifestRepo:  manifestRepo,
 			WordGenerator: wordGenerator,
 			PushActor:     actor,
+			RouteActor:    routeActor,
 			AppZipper:     zipper,
 			AppFiles:      appfiles,
 		}
@@ -319,17 +322,18 @@ var _ = Describe("Push Command", func() {
 				args = []string{"app-name"}
 			})
 
-			It("tries to find the default route for the app", func() {
-				Expect(executeErr).NotTo(HaveOccurred())
+			Context("validating a manifest", func() {
+				BeforeEach(func() {
+					actor.ValidateAppParamsReturns([]error{
+						errors.New("error1"),
+						errors.New("error2"),
+					})
+				})
 
-				Expect(routeRepo.FindCallCount()).To(Equal(1))
-
-				host, domain, path, port := routeRepo.FindArgsForCall(0)
-
-				Expect(host).To(Equal("manifest-host"))
-				Expect(domain.Name).To(Equal("foo.cf-app.com"))
-				Expect(path).To(Equal(""))
-				Expect(port).To(Equal(0))
+				It("returns an properly formatted error", func() {
+					Expect(executeErr).To(HaveOccurred())
+					Expect(executeErr.Error()).To(MatchRegexp("invalid application configuration:\nerror1\nerror2"))
+				})
 			})
 
 			Context("when given a bad path", func() {
@@ -354,17 +358,19 @@ var _ = Describe("Push Command", func() {
 			})
 
 			Context("when the default route for the app already exists", func() {
+				var route models.Route
 				BeforeEach(func() {
-					routeRepo.FindReturns(
-						models.Route{
-							GUID: "my-route-guid",
-							Host: "app-name",
-							Domain: models.DomainFields{
-								Name:   "foo.cf-app.com",
-								GUID:   "foo-domain-guid",
-								Shared: true,
-							},
+					route = models.Route{
+						GUID: "my-route-guid",
+						Host: "app-name",
+						Domain: models.DomainFields{
+							Name:   "foo.cf-app.com",
+							GUID:   "foo-domain-guid",
+							Shared: true,
 						},
+					}
+					routeActor.FindOrCreateRouteReturns(
+						route,
 						nil,
 					)
 				})
@@ -377,20 +383,10 @@ var _ = Describe("Push Command", func() {
 					It("binds to existing routes", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(routeRepo.CreateCallCount()).To(BeZero())
-
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, _, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("manifest-host"))
-
-						Expect(routeRepo.BindCallCount()).To(Equal(1))
-						boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
-						Expect(boundAppGUID).To(Equal("app-name-guid"))
-						Expect(boundRouteGUID).To(Equal("my-route-guid"))
-
-						fullOutput := terminal.Decolorize(string(output.Contents()))
-						Expect(fullOutput).To(ContainSubstring("Using route app-name.foo.cf-app.com"))
-						Expect(fullOutput).To(ContainSubstring("Binding app-name.foo.cf-app.com to app-name...\nOK"))
+						Expect(routeActor.BindRouteCallCount()).To(Equal(1))
+						boundApp, boundRoute := routeActor.BindRouteArgsForCall(0)
+						Expect(boundApp.GUID).To(Equal("app-name-guid"))
+						Expect(boundRoute).To(Equal(route))
 					})
 				})
 
@@ -431,6 +427,13 @@ var _ = Describe("Push Command", func() {
 				})
 
 				Context("when multiple domains are specified in manifest", func() {
+					var (
+						route1 models.Route
+						route2 models.Route
+						route3 models.Route
+						route4 models.Route
+					)
+
 					BeforeEach(func() {
 						deps.UI = uiWithContents
 						domainRepo.FindByNameInOrgStub = func(name string, owningOrgGUID string) (models.DomainFields, error) {
@@ -473,39 +476,122 @@ var _ = Describe("Push Command", func() {
 							}, nil
 						}
 						args = []string{}
+
+						route1 = models.Route{
+							GUID: "route1-guid",
+						}
+						route2 = models.Route{
+							GUID: "route2-guid",
+						}
+						route3 = models.Route{
+							GUID: "route3-guid",
+						}
+						route4 = models.Route{
+							GUID: "route4-guid",
+						}
+
+						callCount := 0
+						routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
+							callCount = callCount + 1
+							switch callCount {
+							case 1:
+								Expect(hostname).To(Equal("host2"))
+								Expect(domain.Name).To(Equal("example1.com"))
+								Expect(path).To(BeEmpty())
+								Expect(useRandomPort).To(BeFalse())
+								return route1, nil
+							case 2:
+								Expect(hostname).To(Equal("manifest-host"))
+								Expect(domain.Name).To(Equal("example1.com"))
+								Expect(path).To(BeEmpty())
+								Expect(useRandomPort).To(BeFalse())
+								return route2, nil
+							case 3:
+								Expect(hostname).To(Equal("host2"))
+								Expect(domain.Name).To(Equal("example2.com"))
+								Expect(path).To(BeEmpty())
+								Expect(useRandomPort).To(BeFalse())
+								return route3, nil
+							case 4:
+								Expect(hostname).To(Equal("manifest-host"))
+								Expect(domain.Name).To(Equal("example2.com"))
+								Expect(path).To(BeEmpty())
+								Expect(useRandomPort).To(BeFalse())
+								return route4, nil
+							default:
+								Fail("should have only been called 4 times")
+							}
+							panic("should never have gotten this far")
+						}
 					})
 
 					It("creates a route for each domain", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						totalOutput := terminal.Decolorize(string(output.Contents()))
+						Expect(routeActor.BindRouteCallCount()).To(Equal(4))
+						app, route := routeActor.BindRouteArgsForCall(0)
+						Expect(app.Name).To(Equal("manifest-app-name"))
+						Expect(route).To(Equal(route1))
 
-						Expect(totalOutput).To(ContainSubstring("Creating app manifest-app-name in org my-org / space my-space as my-user...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding manifest-host.example1.com to manifest-app-name...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route manifest-host.example2.com...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding manifest-host.example2.com to manifest-app-name...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route host2.example1.com...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding host2.example1.com to manifest-app-name...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route host2.example2.com...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding host2.example2.com to manifest-app-name...\nOK"))
+						app, route = routeActor.BindRouteArgsForCall(1)
+						Expect(app.Name).To(Equal("manifest-app-name"))
+						Expect(route).To(Equal(route2))
+
+						app, route = routeActor.BindRouteArgsForCall(2)
+						Expect(app.Name).To(Equal("manifest-app-name"))
+						Expect(route).To(Equal(route3))
+
+						app, route = routeActor.BindRouteArgsForCall(3)
+						Expect(app.Name).To(Equal("manifest-app-name"))
+						Expect(route).To(Equal(route4))
 					})
 
 					Context("when overriding the manifest with flags", func() {
 						BeforeEach(func() {
 							args = []string{"-d", "example1.com"}
+							route1 = models.Route{
+								GUID: "route1-guid",
+							}
+							route2 = models.Route{
+								GUID: "route2-guid",
+							}
+
+							callCount := 0
+							routeActor.FindOrCreateRouteStub = func(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
+								callCount = callCount + 1
+								switch callCount {
+								case 1:
+									Expect(hostname).To(Equal("host2"))
+									Expect(domain.Name).To(Equal("example1.com"))
+									Expect(path).To(BeEmpty())
+									Expect(useRandomPort).To(BeFalse())
+									return route1, nil
+								case 2:
+									Expect(hostname).To(Equal("manifest-host"))
+									Expect(domain.Name).To(Equal("example1.com"))
+									Expect(path).To(BeEmpty())
+									Expect(useRandomPort).To(BeFalse())
+									return route2, nil
+								default:
+									Fail("should have only been called 2 times")
+								}
+								panic("should never have gotten this far")
+							}
 						})
 
 						It("`-d` from argument will override the domains", func() {
 							Expect(executeErr).NotTo(HaveOccurred())
 
-							totalOutput := terminal.Decolorize(string(output.Contents()))
-							Expect(totalOutput).To(ContainSubstring("Creating route manifest-host.example1.com...\nOK"))
-							Expect(totalOutput).To(ContainSubstring("Binding manifest-host.example1.com"))
+							Expect(routeActor.BindRouteCallCount()).To(Equal(2))
+							app, route := routeActor.BindRouteArgsForCall(0)
+							Expect(app.Name).To(Equal("manifest-app-name"))
+							Expect(route).To(Equal(route1))
 
-							Expect(totalOutput).NotTo(ContainSubstring("Creating route manifest-host.example2.com"))
+							app, route = routeActor.BindRouteArgsForCall(1)
+							Expect(app.Name).To(Equal("manifest-app-name"))
+							Expect(route).To(Equal(route2))
 						})
 					})
-
 				})
 
 				Context("when pushing an app", func() {
@@ -532,29 +618,11 @@ var _ = Describe("Push Command", func() {
 						Expect(*params.Name).To(Equal("app-name"))
 						Expect(*params.SpaceGUID).To(Equal("my-space-guid"))
 
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, _, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("manifest-host"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("manifest-host"))
-						Expect(createdDomainFields.GUID).To(Equal("foo-domain-guid"))
-						Expect(createdPath).To(BeEmpty())
-						Expect(randomPort).To(BeFalse())
-
-						Expect(routeRepo.BindCallCount()).To(Equal(1))
-						boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
-						Expect(boundAppGUID).To(Equal("app-name-guid"))
-						Expect(boundRouteGUID).To(Equal("my-route-guid"))
-
 						Expect(actor.UploadAppCallCount()).To(Equal(1))
 						appGUID, _, _ := actor.UploadAppArgsForCall(0)
 						Expect(appGUID).To(Equal("app-name-guid"))
 
 						Expect(totalOutput).To(ContainSubstring("Creating app app-name in org my-org / space my-space as my-user...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route manifest-host.foo.cf-app.com...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding manifest-host.foo.cf-app.com to app-name...\nOK"))
 						Expect(totalOutput).To(ContainSubstring("Uploading app-name...\nOK"))
 
 						Expect(stopper.ApplicationStopCallCount()).To(Equal(0))
@@ -569,53 +637,88 @@ var _ = Describe("Push Command", func() {
 				})
 
 				Context("when there are special characters in the app name", func() {
-					BeforeEach(func() {
-						deps.UI = uiWithContents
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-							return models.Route{
-								GUID:   "my-route-guid",
-								Host:   host,
-								Domain: domain,
-							}, nil
-						}
-						args = []string{"-t", "111", "app!name"}
+					Context("when the app name is specified via manifest file", func() {
+						BeforeEach(func() {
+							m := &manifest.Manifest{
+								Path: "manifest.yml",
+								Data: generic.NewMap(map[interface{}]interface{}{
+									"applications": []interface{}{
+										generic.NewMap(map[interface{}]interface{}{
+											"name":      "manifest!app-nam#",
+											"memory":    "128MB",
+											"instances": 1,
+											"stack":     "custom-stack",
+											"timeout":   360,
+											"buildpack": "some-buildpack",
+											"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+											"path":      filepath.Clean("some/path/from/manifest"),
+											"env": generic.NewMap(map[interface{}]interface{}{
+												"FOO":  "baz",
+												"PATH": "/u/apps/my-app/bin",
+											}),
+										}),
+									},
+								}),
+							}
+							manifestRepo.ReadManifestReturns(m, nil)
+
+							args = []string{}
+						})
+
+						It("strips special characters when creating a default route", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+
+							Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+							host, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+							Expect(host).To(Equal("manifestapp-nam"))
+						})
 					})
 
-					It("strips special characters when creating a default route", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
+					Context("when the app name is specified via flag", func() {
+						BeforeEach(func() {
+							manifestRepo.ReadManifestReturns(manifest.NewEmptyManifest(), nil)
+							args = []string{"app@#name"}
+						})
 
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, _, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("manifest-host"))
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, _, _, _ := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("manifest-host"))
+						It("strips special characters when creating a default route", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
 
-						totalOutputs := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutputs).To(ContainSubstring("Creating route manifest-host.foo.cf-app.com"))
-						Expect(totalOutputs).To(ContainSubstring("Binding manifest-host.foo.cf-app.com"))
-						Expect(totalOutputs).NotTo(ContainSubstring("FAILED"))
+							Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+							host, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+							Expect(host).To(Equal("appname"))
+						})
 					})
 				})
 
 				Context("when flags are provided", func() {
 					BeforeEach(func() {
-						deps.UI = uiWithContents
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-							return models.Route{
-								GUID:   "my-route-guid",
-								Host:   host,
-								Domain: domain,
-							}, nil
+						m := &manifest.Manifest{
+							Path: "manifest.yml",
+							Data: generic.NewMap(map[interface{}]interface{}{
+								"applications": []interface{}{
+									generic.NewMap(map[interface{}]interface{}{
+										"name":              "manifest!app-nam#",
+										"memory":            "128MB",
+										"instances":         1,
+										"host":              "host-name",
+										"domain":            "domain-name",
+										"disk_quota":        "1G",
+										"stack":             "custom-stack",
+										"timeout":           360,
+										"health-check-type": "none",
+										"app-ports":         []interface{}{3000},
+										"buildpack":         "some-buildpack",
+										"command":           `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+										"path":              filepath.Clean("some/path/from/manifest"),
+										"env": generic.NewMap(map[interface{}]interface{}{
+											"FOO":  "baz",
+											"PATH": "/u/apps/my-app/bin",
+										}),
+									}),
+								},
+							}),
 						}
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{
-							Name: "bar.cf-app.com",
-							GUID: "bar-domain-guid",
-						}, nil)
-						stackRepo.FindByNameReturns(models.Stack{
-							Name: "customLinux",
-							GUID: "custom-linux-guid",
-						}, nil)
+						manifestRepo.ReadManifestReturns(m, nil)
 
 						args = []string{
 							"-c", "unicorn -c config/unicorn.rb -D",
@@ -638,47 +741,24 @@ var _ = Describe("Push Command", func() {
 					It("sets the app params from the flags", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						totalOutput := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutput).To(ContainSubstring("Using stack customLinux...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating app app-name in org my-org / space my-space as my-user...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route my-hostname.bar.cf-app.com/my-route-path...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding my-hostname.bar.cf-app.com to app-name"))
-						Expect(totalOutput).To(ContainSubstring("Uploading app-name...\nOK"))
-
-						Expect(stackRepo.FindByNameArgsForCall(0)).To(Equal("customLinux"))
-
-						params := appRepo.CreateArgsForCall(0)
-						Expect(*params.Name).To(Equal("app-name"))
-						Expect(*params.Command).To(Equal("unicorn -c config/unicorn.rb -D"))
-						Expect(*params.InstanceCount).To(Equal(3))
-						Expect(*params.DiskQuota).To(Equal(int64(4096)))
-						Expect(*params.Memory).To(Equal(int64(2048)))
-						Expect(*params.StackGUID).To(Equal("custom-linux-guid"))
-						Expect(*params.HealthCheckTimeout).To(Equal(1))
-						Expect(*params.HealthCheckType).To(Equal("port"))
-						Expect(*params.BuildpackURL).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
-						Expect(*params.AppPorts).To(Equal([]int{8080, 9000}))
-
-						name, owningOrgGUID := domainRepo.FindByNameInOrgArgsForCall(0)
-						Expect(name).To(Equal("bar.cf-app.com"))
-						Expect(owningOrgGUID).To(Equal("my-org-guid"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("my-hostname"))
-						Expect(createdDomainFields.GUID).To(Equal("bar-domain-guid"))
-						Expect(createdPath).To(Equal("my-route-path"))
-						Expect(randomPort).To(BeFalse())
-
-						Expect(routeRepo.BindCallCount()).To(Equal(1))
-						boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
-						Expect(boundAppGUID).To(Equal("app-name-guid"))
-						Expect(boundRouteGUID).To(Equal("my-route-guid"))
-
-						appGUID, _, _ := actor.UploadAppArgsForCall(0)
-						Expect(appGUID).To(Equal("app-name-guid"))
-
-						Expect(starter.ApplicationStartCallCount()).To(Equal(0))
+						Expect(actor.ValidateAppParamsCallCount()).To(Equal(1))
+						appParams := actor.ValidateAppParamsArgsForCall(0)
+						Expect(appParams).To(HaveLen(1))
+						appParam := appParams[0]
+						Expect(*appParam.Command).To(Equal("unicorn -c config/unicorn.rb -D"))
+						Expect(*appParam.Domains).To(Equal([]string{"bar.cf-app.com"}))
+						Expect(*appParam.Hosts).To(Equal([]string{"my-hostname"}))
+						Expect(*appParam.RoutePath).To(Equal("my-route-path"))
+						Expect(*appParam.Name).To(Equal("app-name"))
+						Expect(*appParam.InstanceCount).To(Equal(3))
+						Expect(*appParam.DiskQuota).To(Equal(int64(4096)))
+						Expect(*appParam.Memory).To(Equal(int64(2048)))
+						Expect(*appParam.StackName).To(Equal("customLinux"))
+						Expect(*appParam.HealthCheckTimeout).To(Equal(1))
+						Expect(*appParam.HealthCheckType).To(Equal("port"))
+						Expect(*appParam.BuildpackURL).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
+						Expect(*appParam.AppPorts).To(Equal([]int{8080, 9000}))
+						Expect(*appParam.HealthCheckTimeout).To(Equal(1))
 					})
 				})
 
@@ -771,118 +851,6 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
-				Context("when there is a shared domain", func() {
-					BeforeEach(func() {
-						deps.UI = uiWithContents
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-							return models.Route{
-								GUID:   "my-route-guid",
-								Host:   host,
-								Domain: domain,
-							}, nil
-						}
-						privateDomain := models.DomainFields{
-							Shared: false,
-							Name:   "private.cf-app.com",
-							GUID:   "private-domain-guid",
-						}
-						sharedDomain := models.DomainFields{
-							Name:   "shared.cf-app.com",
-							Shared: true,
-							GUID:   "shared-domain-guid",
-						}
-
-						domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
-							cb(privateDomain)
-							cb(sharedDomain)
-							return nil
-						}
-
-						args = []string{"-t", "111", "--route-path", "the-route-path", "app-name"}
-					})
-
-					It("creates a route with the shared domain and maps it to the app", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, _, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("manifest-host"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("manifest-host"))
-						Expect(createdDomainFields.GUID).To(Equal("shared-domain-guid"))
-						Expect(createdPath).To(Equal("the-route-path"))
-						Expect(randomPort).To(BeFalse())
-
-						Expect(routeRepo.BindCallCount()).To(Equal(1))
-						boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
-						Expect(boundAppGUID).To(Equal("app-name-guid"))
-						Expect(boundRouteGUID).To(Equal("my-route-guid"))
-
-						totalOutput := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutput).To(ContainSubstring("Creating app app-name in org my-org / space my-space as my-user...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route manifest-host.shared.cf-app.com/the-route-path...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding manifest-host.shared.cf-app.com to app-name...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Uploading app-name...\nOK"))
-					})
-				})
-
-				Context("when there is no shared domain but there is a private domain in the targeted org", func() {
-					BeforeEach(func() {
-						deps.UI = uiWithContents
-
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-							return models.Route{
-								GUID:   "my-route-guid",
-								Host:   host,
-								Domain: domain,
-							}, nil
-						}
-
-						privateDomain := models.DomainFields{
-							Shared: false,
-							Name:   "private.cf-app.com",
-							GUID:   "private-domain-guid",
-						}
-
-						domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
-							cb(privateDomain)
-							return nil
-						}
-
-						appRepo.ReadReturns(models.Application{}, errors.NewModelNotFoundError("App", "the-app"))
-
-						args = []string{"-t", "111", "app-name"}
-					})
-
-					It("creates a route with the private domain and maps it to the app", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, _, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("manifest-host"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, createdPath, randomPort := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("manifest-host"))
-						Expect(createdDomainFields.GUID).To(Equal("private-domain-guid"))
-						Expect(createdPath).To(BeEmpty())
-						Expect(randomPort).To(BeFalse())
-
-						Expect(routeRepo.BindCallCount()).To(Equal(1))
-						boundRouteGUID, boundAppGUID := routeRepo.BindArgsForCall(0)
-						Expect(boundAppGUID).To(Equal("app-name-guid"))
-						Expect(boundRouteGUID).To(Equal("my-route-guid"))
-
-						totalOutput := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutput).To(ContainSubstring("Creating app app-name in org my-org / space my-space as my-user...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Creating route manifest-host.private.cf-app.com...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Binding manifest-host.private.cf-app.com to app-name...\nOK"))
-						Expect(totalOutput).To(ContainSubstring("Uploading app-name...\nOK"))
-					})
-				})
-
 				Context("with random-route option set", func() {
 					var manifestApp generic.Map
 
@@ -920,8 +888,8 @@ var _ = Describe("Push Command", func() {
 							It("provides a random hostname", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
-								Expect(routeRepo.FindCallCount()).To(Equal(1))
-								host, _, _, _ := routeRepo.FindArgsForCall(0)
+								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+								host, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 								Expect(host).To(Equal("app-name-random-host"))
 							})
 						})
@@ -935,8 +903,8 @@ var _ = Describe("Push Command", func() {
 							It("provides a random hostname", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
-								Expect(routeRepo.FindCallCount()).To(Equal(1))
-								host, _, _, _ := routeRepo.FindArgsForCall(0)
+								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+								host, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 								Expect(host).To(Equal("app-name-random-host"))
 							})
 						})
@@ -974,25 +942,12 @@ var _ = Describe("Push Command", func() {
 								args = []string{"--random-route", "app-name"}
 							})
 
-							It("provides a random port and hostename", func() {
+							It("provides a random port and hostname", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
-								Expect(routeRepo.FindCallCount()).To(Equal(1))
-								host, domain, path, port := routeRepo.FindArgsForCall(0)
-								Expect(host).To(Equal(""))
-								Expect(domain).To(Equal(expectedDomain))
-								Expect(path).To(Equal(""))
-								Expect(port).To(Equal(0))
-
-								Expect(routeRepo.CreateCallCount()).To(Equal(1))
-								host, domain, path, useRandomPort := routeRepo.CreateArgsForCall(0)
-								Expect(host).To(Equal(""))
-								Expect(domain).To(Equal(expectedDomain))
-								Expect(path).To(Equal(""))
-								Expect(useRandomPort).To(BeTrue())
-
-								totalOutput := terminal.Decolorize(string(output.Contents()))
-								Expect(totalOutput).To(ContainSubstring("Creating random route for " + expectedDomain.Name + "..."))
+								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+								_, _, _, randomPort := routeActor.FindOrCreateRouteArgsForCall(0)
+								Expect(randomPort).To(BeTrue())
 							})
 						})
 
@@ -1005,22 +960,9 @@ var _ = Describe("Push Command", func() {
 							It("provides a random port and hostname when set in the manifest", func() {
 								Expect(executeErr).NotTo(HaveOccurred())
 
-								Expect(routeRepo.FindCallCount()).To(Equal(1))
-								host, domain, path, port := routeRepo.FindArgsForCall(0)
-								Expect(host).To(Equal(""))
-								Expect(domain).To(Equal(expectedDomain))
-								Expect(path).To(Equal(""))
-								Expect(port).To(Equal(0))
-
-								Expect(routeRepo.CreateCallCount()).To(Equal(1))
-								host, domain, path, useRandomPort := routeRepo.CreateArgsForCall(0)
-								Expect(host).To(Equal(""))
-								Expect(domain).To(Equal(expectedDomain))
-								Expect(path).To(Equal(""))
-								Expect(useRandomPort).To(BeTrue())
-
-								totalOutput := terminal.Decolorize(string(output.Contents()))
-								Expect(totalOutput).To(ContainSubstring("Creating random route for " + expectedDomain.Name + "..."))
+								Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+								_, _, _, randomPort := routeActor.FindOrCreateRouteArgsForCall(0)
+								Expect(randomPort).To(BeTrue())
 							})
 						})
 					})
@@ -1210,132 +1152,6 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
-				Context("when provided a manifest with one app defined", func() {
-					BeforeEach(func() {
-						deps.UI = uiWithContents
-
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{
-							Name: "manifest-example.com",
-							GUID: "bar-domain-guid",
-						}, nil)
-
-						m := &manifest.Manifest{
-							Path: "manifest.yml",
-							Data: generic.NewMap(map[interface{}]interface{}{
-								"applications": []interface{}{
-									generic.NewMap(map[interface{}]interface{}{
-										"name":      "manifest-app-name",
-										"memory":    "128MB",
-										"instances": 1,
-										"host":      "manifest-host",
-										"domain":    "manifest-example.com",
-										"stack":     "custom-stack",
-										"timeout":   360,
-										"buildpack": "some-buildpack",
-										"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-										"path":      filepath.Clean("some/path/from/manifest"),
-										"env": generic.NewMap(map[interface{}]interface{}{
-											"FOO":  "baz",
-											"PATH": "/u/apps/my-app/bin",
-										}),
-									}),
-								},
-							}),
-						}
-						manifestRepo.ReadManifestReturns(m, nil)
-
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-							return models.Route{
-								GUID:   "my-route-guid",
-								Host:   host,
-								Domain: domain,
-							}, nil
-						}
-
-						args = []string{}
-					})
-
-					It("pushes the app", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						fullOutput := terminal.Decolorize(string(output.Contents()))
-						Expect(fullOutput).To(ContainSubstring("Creating route manifest-host.manifest-example.com...\nOK"))
-						Expect(fullOutput).To(ContainSubstring("Binding manifest-host.manifest-example.com to manifest-app-name...\nOK"))
-						Expect(fullOutput).To(ContainSubstring("Uploading manifest-app-name...\nOK"))
-
-						params := appRepo.CreateArgsForCall(0)
-						Expect(*params.Name).To(Equal("manifest-app-name"))
-						Expect(*params.Memory).To(Equal(int64(128)))
-						Expect(*params.InstanceCount).To(Equal(1))
-						Expect(*params.StackName).To(Equal("custom-stack"))
-						Expect(*params.BuildpackURL).To(Equal("some-buildpack"))
-						Expect(*params.Command).To(Equal("JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run"))
-						// Expect(actor.UploadedDir).To(Equal(filepath.Clean("some/path/from/manifest"))) TODO: Re-enable this once we develop a strategy
-
-						Expect(*params.EnvironmentVars).To(Equal(map[string]interface{}{
-							"PATH": "/u/apps/my-app/bin",
-							"FOO":  "baz",
-						}))
-					})
-				})
-
-				Context("when multiple hosts are provided", func() {
-					BeforeEach(func() {
-						deps.UI = uiWithContents
-
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{
-							Name: "manifest-example.com",
-							GUID: "bar-domain-guid",
-						}, nil)
-
-						m := &manifest.Manifest{
-							Path: "manifest.yml",
-							Data: generic.NewMap(map[interface{}]interface{}{
-								"applications": []interface{}{
-									generic.NewMap(map[interface{}]interface{}{
-										"name":      "manifest-app-name",
-										"memory":    "128MB",
-										"instances": 1,
-										"hosts":     []interface{}{"manifest-host-1", "manifest-host-2"},
-										"domain":    "manifest-example.com",
-										"stack":     "custom-stack",
-										"timeout":   360,
-										"buildpack": "some-buildpack",
-										"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-										"path":      filepath.Clean("some/path/from/manifest"),
-										"env": generic.NewMap(map[interface{}]interface{}{
-											"FOO":  "baz",
-											"PATH": "/u/apps/my-app/bin",
-										}),
-									}),
-								},
-							}),
-						}
-						manifestRepo.ReadManifestReturns(m, nil)
-
-						routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-							return models.Route{
-								GUID:   "my-route-guid",
-								Host:   host,
-								Domain: domain,
-							}, nil
-						}
-
-						args = []string{}
-					})
-
-					It("pushes an app with multiple routes", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						fullOutput := terminal.Decolorize(string(output.Contents()))
-						Expect(fullOutput).To(ContainSubstring("Creating route manifest-host-1.manifest-example.com...\nOK"))
-						Expect(fullOutput).To(ContainSubstring("Binding manifest-host-1.manifest-example.com to manifest-app-name...\nOK"))
-						Expect(fullOutput).To(ContainSubstring("Creating route manifest-host-2.manifest-example.com...\nOK"))
-						Expect(fullOutput).To(ContainSubstring("Binding manifest-host-2.manifest-example.com to manifest-app-name...\nOK"))
-						Expect(fullOutput).To(ContainSubstring("Uploading manifest-app-name...\nOK"))
-					})
-				})
-
 				Context("when the manifest has errors", func() {
 					BeforeEach(func() {
 						manifestRepo.ReadManifestReturns(
@@ -1390,12 +1206,10 @@ var _ = Describe("Push Command", func() {
 
 					It("maps the root domain route to the app", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
-						params := appRepo.CreateArgsForCall(0)
-						Expect(*params.Name).To(Equal("app-name"))
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, _, _ := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal(""))
-						Expect(createdDomainFields.GUID).To(Equal("bar-domain-guid"))
+
+						Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+						_, domain, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+						Expect(domain.GUID).To(Equal("bar-domain-guid"))
 					})
 				})
 
@@ -1722,24 +1536,6 @@ var _ = Describe("Push Command", func() {
 						Shared: true,
 					}
 
-					domainRepo.ListDomainsForOrgStub = func(orgGUID string, cb func(models.DomainFields) bool) error {
-						cb(domain)
-						return nil
-					}
-
-					routeRepo.FindReturns(models.Route{
-						Host:   "existing-app",
-						Domain: domain,
-					}, nil)
-
-					routeRepo.CreateStub = func(host string, domain models.DomainFields, _ string, _ bool) (models.Route, error) {
-						return models.Route{
-							GUID:   "my-route-guid",
-							Host:   host,
-							Domain: domain,
-						}, nil
-					}
-
 					existingApp.Routes = []models.RouteSummary{{
 						GUID:   "existing-route-guid",
 						Host:   "existing-app",
@@ -1748,21 +1544,6 @@ var _ = Describe("Push Command", func() {
 
 					appRepo.ReadReturns(existingApp, nil)
 					appRepo.UpdateReturns(existingApp, nil)
-				})
-
-				Context("when an existing route is set", func() {
-					BeforeEach(func() {
-						args = []string{"-d", "example.com", "existing-app"}
-					})
-
-					It("uses the existing route", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						Expect(routeRepo.CreateCallCount()).To(BeZero())
-						totalOutputs := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutputs).NotTo(ContainSubstring("Creating route"))
-						Expect(totalOutputs).To(ContainSubstring("Using route existing-app.example.com"))
-					})
 				})
 
 				Context("and no route-related flags are given", func() {
@@ -1777,103 +1558,6 @@ var _ = Describe("Push Command", func() {
 							Expect(routeRepo.CreateCallCount()).To(BeZero())
 						})
 					})
-
-					Context("and there is a route in the manifest", func() {
-						BeforeEach(func() {
-							m := &manifest.Manifest{
-								Path: "manifest.yml",
-								Data: generic.NewMap(map[interface{}]interface{}{
-									"applications": []interface{}{
-										generic.NewMap(map[interface{}]interface{}{
-											"name":      "manifest-app-name",
-											"memory":    "128MB",
-											"instances": 1,
-											"host":      "new-manifest-host",
-											"domain":    "example.com",
-											"stack":     "custom-stack",
-											"timeout":   360,
-											"buildpack": "some-buildpack",
-											"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-											"path":      filepath.Clean("some/path/from/manifest"),
-											"env": generic.NewMap(map[interface{}]interface{}{
-												"FOO":  "baz",
-												"PATH": "/u/apps/my-app/bin",
-											}),
-										}),
-									},
-								}),
-							}
-							manifestRepo.ReadManifestReturns(m, nil)
-							routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "an-error"))
-							domainRepo.FindByNameInOrgReturns(models.DomainFields{Name: "example.com", GUID: "example-domain-guid"}, nil)
-						})
-
-						It("adds the route", func() {
-							Expect(executeErr).NotTo(HaveOccurred())
-
-							Expect(routeRepo.CreateCallCount()).To(Equal(1))
-							createdHost, _, _, _ := routeRepo.CreateArgsForCall(0)
-							Expect(createdHost).To(Equal("new-manifest-host"))
-						})
-					})
-				})
-
-				Context("when a different domain is set", func() {
-					BeforeEach(func() {
-						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "existing-app.newdomain.com"))
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{GUID: "domain-guid", Name: "newdomain.com"}, nil)
-						args = []string{"-d", "newdomain.com", "existing-app"}
-					})
-
-					It("creates and binds a route in the new domain", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						Expect(domainRepo.FirstOrDefaultCallCount()).To(Equal(1))
-						domainOrgGUID, domainName := domainRepo.FirstOrDefaultArgsForCall(0)
-						Expect(*domainName).To(Equal("newdomain.com"))
-						Expect(domainOrgGUID).To(Equal("my-org-guid"))
-
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, domain, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("existing-app"))
-						Expect(domain.Name).To(Equal("newdomain.com"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, _, randomPort := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("existing-app"))
-						Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
-						Expect(randomPort).To(BeFalse())
-
-						totalOutputs := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutputs).To(ContainSubstring("Creating route existing-app.newdomain.com...\nOK"))
-						Expect(totalOutputs).To(ContainSubstring("Binding existing-app.newdomain.com to existing-app...\nOK"))
-					})
-				})
-
-				Context("when a different hostname is set", func() {
-					BeforeEach(func() {
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{GUID: "domain-guid", Name: "example.com"}, nil)
-						routeRepo.FindReturns(models.Route{}, errors.NewModelNotFoundError("Org", "new-host.newdomain.com"))
-						args = []string{"-n", "new-host", "existing-app"}
-					})
-
-					It("creates and binds a route when a different hostname is specified", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, domain, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal("new-host"))
-						Expect(domain.Name).To(Equal("example.com"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, _, _ := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal("new-host"))
-						Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
-
-						totalOutputs := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutputs).To(ContainSubstring("Creating route new-host.example.com...\nOK"))
-						Expect(totalOutputs).To(ContainSubstring("Binding new-host.example.com to existing-app...\nOK"))
-					})
 				})
 
 				Context("when --no-route flag is given", func() {
@@ -1887,14 +1571,11 @@ var _ = Describe("Push Command", func() {
 						appGUID, _, _ := actor.UploadAppArgsForCall(0)
 						Expect(appGUID).To(Equal("existing-app-guid"))
 
-						Expect(domainRepo.FindByNameInOrgCallCount()).To(BeZero())
-						Expect(routeRepo.FindCallCount()).To(BeZero())
-						Expect(routeRepo.CreateCallCount()).To(BeZero())
+						Expect(routeActor.UnbindAllCallCount()).To(Equal(1))
+						app := routeActor.UnbindAllArgsForCall(0)
+						Expect(app.GUID).To(Equal(appGUID))
 
-						Expect(routeRepo.UnbindCallCount()).To(Equal(1))
-						unboundRouteGUID, unboundAppGUID := routeRepo.UnbindArgsForCall(0)
-						Expect(unboundRouteGUID).To(Equal("existing-route-guid"))
-						Expect(unboundAppGUID).To(Equal("existing-app-guid"))
+						Expect(routeActor.FindOrCreateRouteCallCount()).To(BeZero())
 					})
 				})
 
@@ -1907,21 +1588,9 @@ var _ = Describe("Push Command", func() {
 					It("binds the root domain route to an app with a pre-existing route", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(routeRepo.FindCallCount()).To(Equal(1))
-						host, domain, _, _ := routeRepo.FindArgsForCall(0)
-						Expect(host).To(Equal(""))
-						Expect(domain.Name).To(Equal("example.com"))
-
-						Expect(routeRepo.CreateCallCount()).To(Equal(1))
-						createdHost, createdDomainFields, _, randomPort := routeRepo.CreateArgsForCall(0)
-						Expect(createdHost).To(Equal(""))
-						Expect(createdDomainFields.GUID).To(Equal("domain-guid"))
-						Expect(randomPort).To(BeFalse())
-
-						totalOutputs := terminal.Decolorize(string(output.Contents()))
-						Expect(totalOutputs).To(ContainSubstring("Creating route example.com...\nOK"))
-						Expect(totalOutputs).To(ContainSubstring("Binding example.com to existing-app...\nOK"))
-						Expect(totalOutputs).NotTo(ContainSubstring("existing-app.example.com"))
+						Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
+						hostname, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
+						Expect(hostname).To(BeEmpty())
 					})
 				})
 			})
@@ -2066,43 +1735,15 @@ var _ = Describe("Push Command", func() {
 				})
 			})
 
-			Context("when binding the route fails", func() {
+			Context("when no name and no manifest is given", func() {
 				BeforeEach(func() {
-					routeRepo.FindReturns(models.Route{
-						Host:   "existing-app",
-						Domain: models.DomainFields{Name: "foo.cf-app.com"},
-					}, nil)
-					args = []string{"existing-app"}
-					routeRepo.BindReturns(errors.NewHTTPError(500, "some-code", "exception happened"))
+					manifestRepo.ReadManifestReturns(manifest.NewEmptyManifest(), errors.New("No such manifest"))
+					args = []string{}
 				})
 
-				It("errors", func() {
+				It("fails", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).ToNot(ContainSubstring("TIP"))
-				})
-
-				Context("when the default route is taken", func() {
-					BeforeEach(func() {
-						routeRepo.BindReturns(errors.NewHTTPError(400, errors.InvalidRelation, "The URL not available"))
-					})
-
-					It("suggests using 'random-route' if the default route is taken", func() {
-						Expect(executeErr).To(HaveOccurred())
-						Expect(executeErr.Error()).To(ContainSubstring("existing-app.foo.cf-app.com is already in use"))
-						Expect(executeErr.Error()).To(ContainSubstring("TIP: Change the hostname with -n HOSTNAME or use --random-route"))
-					})
-				})
-
-				Context("when no name and no manifest is given", func() {
-					BeforeEach(func() {
-						manifestRepo.ReadManifestReturns(manifest.NewEmptyManifest(), errors.New("No such manifest"))
-						args = []string{}
-					})
-
-					It("fails", func() {
-						Expect(executeErr).To(HaveOccurred())
-						Expect(executeErr.Error()).To(ContainSubstring("Manifest file is not found"))
-					})
+					Expect(executeErr.Error()).To(ContainSubstring("Manifest file is not found"))
 				})
 			})
 		})
