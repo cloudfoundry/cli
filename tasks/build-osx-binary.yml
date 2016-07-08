@@ -27,7 +27,7 @@ run:
       bin/replace-sha
 
       echo "Building 64-bit Darwin"
-      GOARCH=amd64 GOOS=darwin go build -o out/cf-cli_osx ./main
+      GOARCH=amd64 GOOS=darwin go build -o out/cf-cli_osx .
 
       echo "Creating tarball"
       tar -cvzf $cwd/osx-compiled/cf-cli-osx-binary.tgz -C out .
