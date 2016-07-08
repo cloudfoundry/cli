@@ -1,7 +1,7 @@
 package serviceauthtoken
 
 import (
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -39,15 +39,13 @@ func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.
 		},
 	)
 
-	maximumVersion, err := semver.Make("2.46.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	reqs := []requirements.Requirement{
 		usageReq,
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewMaxAPIVersionRequirement("service-auth-tokens", maximumVersion),
+		requirementsFactory.NewMaxAPIVersionRequirement(
+			"service-auth-tokens",
+			cf.ServiceAuthTokenMaximumAPIVersion,
+		),
 	}
 
 	return reqs

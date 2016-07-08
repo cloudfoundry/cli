@@ -1,7 +1,7 @@
 package servicebroker
 
 import (
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -46,15 +46,10 @@ func (cmd *CreateServiceBroker) Requirements(requirementsFactory requirements.Fa
 	}
 
 	if fc.IsSet("space-scoped") {
-		requiredVersion, err := semver.Make("2.47.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
 		reqs = append(
 			reqs,
 			requirementsFactory.NewTargetedSpaceRequirement(),
-			requirementsFactory.NewMinAPIVersionRequirement("--space-scoped", requiredVersion),
+			requirementsFactory.NewMinAPIVersionRequirement("--space-scoped", cf.SpaceScopedMaximumAPIVersion),
 		)
 	}
 

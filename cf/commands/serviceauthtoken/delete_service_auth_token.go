@@ -3,7 +3,7 @@ package serviceauthtoken
 import (
 	"fmt"
 
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -44,14 +44,12 @@ func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requir
 		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n") + commandregistry.Commands.CommandUsage("delete-service-auth-token"))
 	}
 
-	maximumVersion, err := semver.Make("2.46.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewMaxAPIVersionRequirement("delete-service-auth-token", maximumVersion),
+		requirementsFactory.NewMaxAPIVersionRequirement(
+			"delete-service-auth-token",
+			cf.ServiceAuthTokenMaximumAPIVersion,
+		),
 	}
 
 	return reqs

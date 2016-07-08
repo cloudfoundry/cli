@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -48,11 +48,7 @@ func (cmd *PurgeServiceOffering) Requirements(requirementsFactory requirements.F
 	}
 
 	if fc.IsSet("p") {
-		maximumVersion, err := semver.Make("2.46.0")
-		if err != nil {
-			panic(err.Error())
-		}
-		reqs = append(reqs, requirementsFactory.NewMaxAPIVersionRequirement("Option '-p'", maximumVersion))
+		reqs = append(reqs, requirementsFactory.NewMaxAPIVersionRequirement("Option '-p'", cf.ServiceAuthTokenMaximumAPIVersion))
 	}
 
 	return reqs

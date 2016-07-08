@@ -1,7 +1,7 @@
 package serviceauthtoken
 
 import (
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -37,14 +37,12 @@ func (cmd *CreateServiceAuthTokenFields) Requirements(requirementsFactory requir
 		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service-auth-token"))
 	}
 
-	maximumVersion, err := semver.Make("2.46.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewMaxAPIVersionRequirement("create-service-auth-token", maximumVersion),
+		requirementsFactory.NewMaxAPIVersionRequirement(
+			"create-service-auth-token",
+			cf.ServiceAuthTokenMaximumAPIVersion,
+		),
 	}
 
 	return reqs
