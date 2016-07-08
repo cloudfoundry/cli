@@ -18,7 +18,7 @@ var (
 
 func TestCmd(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Cmd Suite")
+	RunSpecs(t, "SSH Suite")
 }
 
 var _ = BeforeSuite(func() {

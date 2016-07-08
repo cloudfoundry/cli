@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -29,25 +29,24 @@ import (
 
 var cmdRegistry = commandregistry.Commands
 
-func main() {
-	traceEnv := os.Getenv("CF_TRACE")
+func Main(traceEnv string, args []string) {
 
 	//handle `cf -v` for cf version
-	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-		os.Args[1] = "version"
+	if len(args) == 2 && (args[1] == "-v" || args[1] == "--version") {
+		args[1] = "version"
 	}
 
 	//handles `cf`
-	if len(os.Args) == 1 {
-		os.Args = []string{os.Args[0], "help"}
+	if len(args) == 1 {
+		args = []string{args[0], "help"}
 	}
 
 	//handles `cf [COMMAND] -h ...`
 	//rearrange args to `cf help COMMAND` and let `command help` to print out usage
-	os.Args = append([]string{os.Args[0]}, handleHelp(os.Args[1:])...)
+	args = append([]string{args[0]}, handleHelp(args[1:])...)
 
-	newArgs, isVerbose := handleVerbose(os.Args)
-	os.Args = newArgs
+	newArgs, isVerbose := handleVerbose(args)
+	args = newArgs
 
 	errFunc := func(err error) {
 		if err != nil {
@@ -75,14 +74,14 @@ func main() {
 	traceLogger := trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
 
 	deps := commandregistry.NewDependency(Writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
-	defer handlePanics(deps.TeePrinter, deps.Logger)
+	defer handlePanics(args, deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 
 	//handle `cf --build`
-	if len(os.Args) == 2 && (os.Args[1] == "--build" || os.Args[1] == "-b") {
+	if len(args) == 2 && (args[1] == "--build" || args[1] == "-b") {
 		deps.UI.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
 			map[string]interface{}{
-				"CFName":    os.Args[0],
+				"CFName":    args[0],
 				"GoVersion": runtime.Version(),
 			}))
 		os.Exit(0)
@@ -98,14 +97,14 @@ func main() {
 	commandsloader.Load()
 
 	//run core command
-	cmdName := os.Args[1]
+	cmdName := args[1]
 	cmd := cmdRegistry.FindCommand(cmdName)
 	if cmd != nil {
 		meta := cmd.MetaData()
 		flagContext := flags.NewFlagContext(meta.Flags)
 		flagContext.SkipFlagParsing(meta.SkipFlagParsing)
 
-		cmdArgs := os.Args[2:]
+		cmdArgs := args[2:]
 		err = flagContext.Parse(cmdArgs...)
 		if err != nil {
 			usage := cmdRegistry.CommandUsage(cmdName)
@@ -154,9 +153,9 @@ func main() {
 	)
 	pluginList := pluginConfig.Plugins()
 
-	ran := rpc.RunMethodIfExists(rpcService, os.Args[1:], pluginList)
+	ran := rpc.RunMethodIfExists(rpcService, args[1:], pluginList)
 	if !ran {
-		deps.UI.Say("'" + os.Args[1] + T("' is not a registered command. See 'cf help'"))
+		deps.UI.Say("'" + args[1] + T("' is not a registered command. See 'cf help'"))
 		suggestCommands(cmdName, deps.UI, append(cmdRegistry.ListCommands(), pluginConfig.ListCommands()...))
 		os.Exit(1)
 	}
@@ -173,10 +172,10 @@ func suggestCommands(cmdName string, ui terminal.UI, cmdsList []string) {
 	}
 }
 
-func handlePanics(printer terminal.Printer, logger trace.Printer) {
+func handlePanics(args []string, printer terminal.Printer, logger trace.Printer) {
 	panicPrinter := panicprinter.NewPanicPrinter(terminal.NewUI(os.Stdin, Writer, printer, logger))
 
-	commandArgs := strings.Join(os.Args, " ")
+	commandArgs := strings.Join(args, " ")
 	stackTrace := generateBacktrace()
 
 	err := recover()
