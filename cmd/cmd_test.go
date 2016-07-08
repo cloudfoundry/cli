@@ -1,4 +1,4 @@
-package main_test
+package cmd_test
 
 import (
 	"bufio"
@@ -16,7 +16,7 @@ import (
 var buildPath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	path, buildErr := Build("github.com/cloudfoundry/cli/main")
+	path, buildErr := Build("github.com/cloudfoundry/cli")
 	Expect(buildErr).NotTo(HaveOccurred())
 	return []byte(path)
 }, func(data []byte) {

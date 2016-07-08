@@ -10,4 +10,4 @@ if [[ $(git status --porcelain cf/i18n/resources) ]]; then
   $ROOT_DIR/bin/generate-language-resources
 fi
 
-go build -o $ROOT_DIR/out/cf ./main
+go build -o $ROOT_DIR/out/cf .

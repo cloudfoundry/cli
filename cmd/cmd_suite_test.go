@@ -1,4 +1,4 @@
-package main_test
+package cmd_test
 
 import (
 	"path/filepath"
@@ -28,5 +28,5 @@ func TestMain(t *testing.T) {
 	pluginbuilder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "echo")
 	pluginbuilder.BuildTestBinary(filepath.Join("..", "plugin_examples"), "interactive")
 
-	RunSpecs(t, "Main Suite")
+	RunSpecs(t, "Cmd Suite")
 }
