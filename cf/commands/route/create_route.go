@@ -3,7 +3,6 @@ package route
 import (
 	"fmt"
 
-	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -92,12 +91,7 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 	}
 
 	if fc.IsSet("path") {
-		requiredVersion, err := semver.Make("2.36.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
 	}
 
 	if fc.IsSet("port") {

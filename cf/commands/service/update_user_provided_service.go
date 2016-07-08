@@ -5,7 +5,6 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/blang/semver"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
@@ -74,12 +73,7 @@ func (cmd *UpdateUserProvidedService) Requirements(requirementsFactory requireme
 	}
 
 	if fc.IsSet("r") {
-		minAPIVersion, err := semver.Make("2.51.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-r'", minAPIVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-r'", cf.MultipleAppPortsMinimumAPIVersion))
 	}
 
 	return reqs
