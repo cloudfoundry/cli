@@ -170,20 +170,29 @@ jobs:
     - get: final-cli
     - get: cli-ci
   - aggregate:
-    - do:
-      - task: units-linux
-        file: cli-ci/ci/tasks/units-linux.yml
-      - task: units-osx
-        file: cli-ci/ci/tasks/units-osx.yml
-      - task: units-windows
-        file: cli-ci/ci/tasks/units-windows.yml
-      - task: lint
-        file: cli-ci/ci/tasks/lint.yml
+    - task: units-linux
+      file: cli-ci/ci/tasks/units-linux.yml
       on_failure:
          put: slack-alert
          params:
            channel: '#cli-firehose'
-           text: "unit tests failed OR errored :("
+           text: "linux unit tests failed OR errored :("
+    - task: units-osx
+      file: cli-ci/ci/tasks/units-osx.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "osx unit tests failed OR errored :("
+    - task: units-windows
+      file: cli-ci/ci/tasks/units-windows.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "windows unit tests failed OR errored :("
+    - task: lint
+      file: cli-ci/ci/tasks/lint.yml
 
 - name: build-binaries
   serial: true
@@ -196,16 +205,20 @@ jobs:
       passed: [units]
     - get: cli-ci
   - aggregate:
-    - do:
-      - task: build
-        file: cli-ci/ci/tasks/build-binaries.yml
-      - task: build-osx
-        file: cli-ci/ci/tasks/build-osx-binary.yml
+    - task: build
+      file: cli-ci/ci/tasks/build-binaries.yml
       on_failure:
          put: slack-alert
          params:
            channel: '#cli-firehose'
            text: "build binaries failed OR errored :("
+    - task: build-osx
+      file: cli-ci/ci/tasks/build-osx-binary.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "build osx binaries failed OR errored :("
   - task: combine-binaries
     file: cli-ci/ci/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -269,28 +282,32 @@ jobs:
       params:
         acquire: true
   - aggregate:
-    - do:
-      - task: cats
-        file: cli-ci/ci/tasks/cats-linux.yml
-        params:
-          BACKEND: dea
-          INCLUDE_DEFAULT: true
-          INCLUDE_INTERNET_DEPENDENT: true
-          INCLUDE_ROUTE_SERVICES: true
-          INCLUDE_SECURITY_GROUPS: true
-      - task: cats-services
-        file: cli-ci/ci/tasks/cats-linux.yml
-        params:
-          INCLUDE_SERVICES: true
-      ensure:
-        put: bosh-lites-dea-pool
-        params:
-          release: bosh-lite-lock
+    - task: cats
+      file: cli-ci/ci/tasks/cats-linux.yml
+      params:
+        BACKEND: dea
+        INCLUDE_DEFAULT: true
+        INCLUDE_INTERNET_DEPENDENT: true
+        INCLUDE_ROUTE_SERVICES: true
+        INCLUDE_SECURITY_GROUPS: true
       on_failure:
          put: slack-alert
          params:
            channel: '#cli-firehose'
            text: "cats linux failed OR errored :("
+    - task: cats-services
+      file: cli-ci/ci/tasks/cats-linux.yml
+      params:
+        INCLUDE_SERVICES: true
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "cats services linux failed OR errored :("
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
 
 - name: cats-diego
   serial: true
@@ -312,28 +329,26 @@ jobs:
       resource: bosh-lites-diego-pool
       params:
         acquire: true
-  - aggregate:
-    - do:
-      - task: linux
-        file: cli-ci/ci/tasks/cats-linux.yml
-        params:
-          BACKEND: diego
-          INCLUDE_DEFAULT: true
-          INCLUDE_BACKEND_COMPATIBILITY: true
-          INCLUDE_DIEGO_DOCKER: true
-          INCLUDE_DIEGO_SSH: true
-          INCLUDE_INTERNET_DEPENDENT: true
-          INCLUDE_ROUTE_SERVICES: true
-          INCLUDE_SECURITY_GROUPS: true
-      ensure:
-        put: bosh-lites-diego-pool
-        params:
-          release: bosh-lite-lock
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "cats diego failed OR errored :("
+  - task: linux
+    file: cli-ci/ci/tasks/cats-linux.yml
+    params:
+      BACKEND: diego
+      INCLUDE_DEFAULT: true
+      INCLUDE_BACKEND_COMPATIBILITY: true
+      INCLUDE_DIEGO_DOCKER: true
+      INCLUDE_DIEGO_SSH: true
+      INCLUDE_INTERNET_DEPENDENT: true
+      INCLUDE_ROUTE_SERVICES: true
+      INCLUDE_SECURITY_GROUPS: true
+  ensure:
+    put: bosh-lites-diego-pool
+    params:
+      release: bosh-lite-lock
+  on_failure:
+     put: slack-alert
+     params:
+       channel: '#cli-firehose'
+       text: "cats diego failed OR errored :("
 
 - name: cats-windows
   serial: true
