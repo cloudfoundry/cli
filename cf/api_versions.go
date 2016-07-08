@@ -13,4 +13,7 @@ var (
 	NoaaMinimumAPIVersion, _                            = semver.Make("2.29.0")
 	ListUsersInOrgOrSpaceWithoutUAAMinimumAPIVersion, _ = semver.Make("2.21.0")
 	UpdateServicePlanMinimumAPIVersion, _               = semver.Make("2.16.0")
+
+	ServiceAuthTokenMaximumAPIVersion, _ = semver.Make("2.46.0")
+	SpaceScopedMaximumAPIVersion, _      = semver.Make("2.47.0")
 )

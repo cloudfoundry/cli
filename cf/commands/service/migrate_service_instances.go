@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/flags"
 
@@ -46,14 +46,9 @@ func (cmd *MigrateServiceInstances) Requirements(requirementsFactory requirement
 		cmd.ui.Failed(T("Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n") + commandregistry.Commands.CommandUsage("migrate-service-instances"))
 	}
 
-	maximumVersion, err := semver.Make("2.46.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewMaxAPIVersionRequirement("migrate-service-instances", maximumVersion),
+		requirementsFactory.NewMaxAPIVersionRequirement("migrate-service-instances", cf.ServiceAuthTokenMaximumAPIVersion),
 	}
 
 	return reqs
