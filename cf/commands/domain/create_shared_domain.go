@@ -3,7 +3,7 @@ package domain
 import (
 	"errors"
 
-	"github.com/blang/semver"
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -43,18 +43,13 @@ func (cmd *CreateSharedDomain) Requirements(requirementsFactory requirements.Fac
 		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN as an argument\n\n") + commandregistry.Commands.CommandUsage("create-shared-domain"))
 	}
 
-	requiredVersion, err := semver.Make("2.36.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
 	if fc.String("router-group") != "" {
 		reqs = append(reqs, []requirements.Requirement{
-			requirementsFactory.NewMinAPIVersionRequirement("Option '--router-group'", requiredVersion),
+			requirementsFactory.NewMinAPIVersionRequirement("Option '--router-group'", cf.RoutePathMinimumAPIVersion),
 			requirementsFactory.NewRoutingAPIRequirement(),
 		}...)
 	}

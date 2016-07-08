@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/blang/semver"
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -85,12 +84,7 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 	var reqs []requirements.Requirement
 
 	if fc.String("path") != "" {
-		requiredVersion, err := semver.Make("2.36.0")
-		if err != nil {
-			panic(err.Error())
-		}
-
-		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", requiredVersion))
+		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--path'", cf.RoutePathMinimumAPIVersion))
 	}
 
 	var flag string

@@ -2,7 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/blang/semver"
+	"strings"
+
+	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -12,7 +14,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/util"
 	"github.com/cloudfoundry/cli/flags"
-	"strings"
 )
 
 type BindRouteService struct {
@@ -75,14 +76,9 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 	serviceName := fc.Args()[1]
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(serviceName)
 
-	minAPIVersion, err := semver.Make("2.51.0")
-	if err != nil {
-		panic(err.Error())
-	}
-
 	minAPIVersionRequirement := requirementsFactory.NewMinAPIVersionRequirement(
 		"bind-route-service",
-		minAPIVersion,
+		cf.MultipleAppPortsMinimumAPIVersion,
 	)
 
 	reqs := []requirements.Requirement{
