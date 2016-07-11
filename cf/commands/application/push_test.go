@@ -1600,6 +1600,7 @@ var _ = Describe("Push Command", func() {
 					appRepo.CreateStub = func(params models.AppParams) (models.Application, error) {
 						a := models.Application{}
 						a.Name = *params.Name
+						a.GUID = *params.Name + "-guid"
 
 						return a, nil
 					}
@@ -1745,6 +1746,67 @@ var _ = Describe("Push Command", func() {
 					Expect(executeErr).To(HaveOccurred())
 					Expect(executeErr.Error()).To(ContainSubstring("Manifest file is not found"))
 				})
+			})
+		})
+
+		Context("when routes are defined in the manifest", func() {
+			BeforeEach(func() {
+				m := &manifest.Manifest{
+					Path: "manifest.yml",
+					Data: generic.NewMap(map[interface{}]interface{}{
+						"applications": []interface{}{
+							generic.NewMap(map[interface{}]interface{}{
+								"routes": []interface{}{
+									map[interface{}]interface{}{"route": "app1route1.example.com"},
+									map[interface{}]interface{}{"route": "app1route2.example.com"},
+								},
+								"name": "manifest-app-name-1",
+							}),
+							generic.NewMap(map[interface{}]interface{}{
+								"name": "manifest-app-name-2",
+								"routes": []interface{}{
+									map[interface{}]interface{}{"route": "app2route1.example.com"},
+								},
+							}),
+						},
+					}),
+				}
+				manifestRepo.ReadManifestReturns(m, nil)
+
+				appRepo.ReadStub = func(appName string) (models.Application, error) {
+					return models.Application{
+						ApplicationFields: models.ApplicationFields{
+							Name: appName,
+							GUID: appName + "-guid",
+						},
+					}, nil
+				}
+
+				appRepo.UpdateStub = func(appGUID string, appParams models.AppParams) (models.Application, error) {
+					return models.Application{
+						ApplicationFields: models.ApplicationFields{
+							GUID: appGUID,
+						},
+					}, nil
+				}
+
+				args = []string{}
+			})
+
+			It("maps the routes to the specified apps", func() {
+				Expect(executeErr).ToNot(HaveOccurred())
+				Expect(actor.MapManifestRouteCallCount()).To(Equal(3))
+				route, app := actor.MapManifestRouteArgsForCall(0)
+				Expect(route).To(Equal("app1route1.example.com"))
+				Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+
+				route, app = actor.MapManifestRouteArgsForCall(1)
+				Expect(route).To(Equal("app1route2.example.com"))
+				Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+
+				route, app = actor.MapManifestRouteArgsForCall(2)
+				Expect(route).To(Equal("app2route1.example.com"))
+				Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-2-guid"))
 			})
 		})
 	})

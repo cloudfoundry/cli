@@ -84,6 +84,14 @@
     "translation": "SERVICE"
   },
   {
+    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
+    "translation": "The domain {{.DomainName}} is not an HTTP domain, unable to map route."
+  },
+  {
+    "id": "The route {{.RouteName}} did not match any existing domains.",
+    "translation": "The route {{.RouteName}} did not match any existing domains."
+  },
+  {
     "id": "Total number of application instances. -1 represents an unlimited amount.",
     "translation": "Total number of application instances. -1 represents an unlimited amount."
   },

@@ -9,6 +9,7 @@ import (
 	"runtime"
 
 	"github.com/cloudfoundry/cli/cf/actors"
+	"github.com/cloudfoundry/cli/cf/actors/actorsfakes"
 	"github.com/cloudfoundry/cli/cf/api/applicationbits/applicationbitsfakes"
 	"github.com/cloudfoundry/cli/cf/api/resources"
 	"github.com/cloudfoundry/cli/cf/appfiles"
@@ -23,6 +24,7 @@ var _ = Describe("Push Actor", func() {
 		appBitsRepo  *applicationbitsfakes.FakeApplicationBitsRepository
 		appFiles     *appfilesfakes.FakeAppFiles
 		fakezipper   *appfilesfakes.FakeZipper
+		routeActor   *actorsfakes.FakeRouteActor
 		actor        actors.PushActor
 		fixturesDir  string
 		appDir       string
@@ -34,7 +36,8 @@ var _ = Describe("Push Actor", func() {
 		appBitsRepo = new(applicationbitsfakes.FakeApplicationBitsRepository)
 		appFiles = new(appfilesfakes.FakeAppFiles)
 		fakezipper = new(appfilesfakes.FakeZipper)
-		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
+		routeActor = new(actorsfakes.FakeRouteActor)
+		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles, routeActor)
 		fixturesDir = filepath.Join("..", "..", "fixtures", "applications")
 		allFiles = []models.AppFileFields{
 			{Path: "example-app/.cfignore"},
@@ -273,7 +276,7 @@ var _ = Describe("Push Actor", func() {
 
 		BeforeEach(func() {
 			zipper := &appfiles.ApplicationZipper{}
-			actor = actors.NewPushActor(appBitsRepo, zipper, appFiles)
+			actor = actors.NewPushActor(appBitsRepo, zipper, appFiles, routeActor)
 		})
 
 		Context("when given a zip file", func() {
@@ -324,7 +327,7 @@ var _ = Describe("Push Actor", func() {
 				e := errors.New("some-error")
 				fakezipper.UnzipReturns(e)
 				fakezipper.IsZipFileReturns(true)
-				actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles)
+				actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles, routeActor)
 
 				f := func(_ string) error {
 					return nil
@@ -441,6 +444,38 @@ var _ = Describe("Push Actor", func() {
 					Expect(errs).To(HaveLen(1))
 					Expect(errs[0].Error()).To(Equal("application my-app must not be configured with both 'routes' and have 'no-hostname' set to 'true'"))
 				})
+			})
+		})
+	})
+
+	Describe("MapManifestRoute", func() {
+		var (
+			app    models.Application
+			domain models.DomainFields
+			route  models.Route
+		)
+
+		Context("when provided both a route name and an app", func() {
+			BeforeEach(func() {
+				app = models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name: "app-name",
+						GUID: "app-guid",
+					},
+				}
+				domain = models.DomainFields{Name: "route-name.example.com"}
+				route = models.Route{
+					Host: "route-name",
+					Path: "example.com",
+				}
+				routeActor.FindDomainReturns("", domain, nil)
+				routeActor.FindOrCreateRouteReturns(route, nil)
+				routeActor.BindRouteReturns(nil)
+			})
+
+			It("does not return an error", func() {
+				err := actor.MapManifestRoute("route-name.example.com", app)
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 	})

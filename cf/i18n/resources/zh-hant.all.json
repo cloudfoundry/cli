@@ -4092,12 +4092,20 @@
     "translation": "終止給定索引處的執行中應用程式實例，並實例化具有相同索引之應用程式的新實例"
   },
   {
+    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
+    "translation": ""
+  },
+  {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "外掛程式目錄下已有檔案 {{.PluginExecutableName}}。\n"
   },
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "建置套件自動偵測期間的建置套件檢查順序"
+  },
+  {
+    "id": "The route {{.RouteName}} did not match any existing domains.",
+    "translation": ""
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

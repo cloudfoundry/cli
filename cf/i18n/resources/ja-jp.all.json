@@ -4092,12 +4092,20 @@
     "translation": "この実行アプリケーション・インスタンスを指定された索引で終了し、同じ索引でそのアプリケーションの新しいインスタンスをインスタンス化します"
   },
   {
+    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
+    "translation": ""
+  },
+  {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "ファイル {{.PluginExecutableName}} は既にプラグイン・ディレクトリーの下に存在しています。\n"
   },
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "ビルドパックの自動検出時におけるビルドパックの検査の順序"
+  },
+  {
+    "id": "The route {{.RouteName}} did not match any existing domains.",
+    "translation": ""
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

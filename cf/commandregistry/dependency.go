@@ -144,8 +144,8 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 	deps.AppZipper = appfiles.ApplicationZipper{}
 	deps.AppFiles = appfiles.ApplicationFiles{}
 
-	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles)
-	deps.RouteActor = actors.NewRouteActor(deps.UI, deps.RepoLocator.GetRouteRepository())
+	deps.RouteActor = actors.NewRouteActor(deps.UI, deps.RepoLocator.GetRouteRepository(), deps.RepoLocator.GetDomainRepository())
+	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles, deps.RouteActor)
 
 	deps.ChecksumUtil = utils.NewSha1Checksum("")
 
