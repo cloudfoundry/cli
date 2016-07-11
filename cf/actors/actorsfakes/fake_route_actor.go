@@ -47,6 +47,16 @@ type FakeRouteActor struct {
 	unbindAllReturns struct {
 		result1 error
 	}
+	FindDomainStub        func(routeName string) (string, models.DomainFields, error)
+	findDomainMutex       sync.RWMutex
+	findDomainArgsForCall []struct {
+		routeName string
+	}
+	findDomainReturns struct {
+		result1 string
+		result2 models.DomainFields
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -189,6 +199,41 @@ func (fake *FakeRouteActor) UnbindAllReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *FakeRouteActor) FindDomain(routeName string) (string, models.DomainFields, error) {
+	fake.findDomainMutex.Lock()
+	fake.findDomainArgsForCall = append(fake.findDomainArgsForCall, struct {
+		routeName string
+	}{routeName})
+	fake.recordInvocation("FindDomain", []interface{}{routeName})
+	fake.findDomainMutex.Unlock()
+	if fake.FindDomainStub != nil {
+		return fake.FindDomainStub(routeName)
+	} else {
+		return fake.findDomainReturns.result1, fake.findDomainReturns.result2, fake.findDomainReturns.result3
+	}
+}
+
+func (fake *FakeRouteActor) FindDomainCallCount() int {
+	fake.findDomainMutex.RLock()
+	defer fake.findDomainMutex.RUnlock()
+	return len(fake.findDomainArgsForCall)
+}
+
+func (fake *FakeRouteActor) FindDomainArgsForCall(i int) string {
+	fake.findDomainMutex.RLock()
+	defer fake.findDomainMutex.RUnlock()
+	return fake.findDomainArgsForCall[i].routeName
+}
+
+func (fake *FakeRouteActor) FindDomainReturns(result1 string, result2 models.DomainFields, result3 error) {
+	fake.FindDomainStub = nil
+	fake.findDomainReturns = struct {
+		result1 string
+		result2 models.DomainFields
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeRouteActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -200,6 +245,8 @@ func (fake *FakeRouteActor) Invocations() map[string][][]interface{} {
 	defer fake.bindRouteMutex.RUnlock()
 	fake.unbindAllMutex.RLock()
 	defer fake.unbindAllMutex.RUnlock()
+	fake.findDomainMutex.RLock()
+	defer fake.findDomainMutex.RUnlock()
 	return fake.invocations
 }
 

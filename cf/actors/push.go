@@ -24,19 +24,22 @@ type PushActor interface {
 	ProcessPath(dirOrZipFile string, f func(string) error) error
 	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 	ValidateAppParams(apps []models.AppParams) []error
+	MapManifestRoute(routeName string, app models.Application) error
 }
 
 type PushActorImpl struct {
 	appBitsRepo applicationbits.Repository
 	appfiles    appfiles.AppFiles
 	zipper      appfiles.Zipper
+	routeActor  RouteActor
 }
 
-func NewPushActor(appBitsRepo applicationbits.Repository, zipper appfiles.Zipper, appfiles appfiles.AppFiles) PushActor {
+func NewPushActor(appBitsRepo applicationbits.Repository, zipper appfiles.Zipper, appfiles appfiles.AppFiles, routeActor RouteActor) PushActor {
 	return PushActorImpl{
 		appBitsRepo: appBitsRepo,
 		appfiles:    appfiles,
 		zipper:      zipper,
+		routeActor:  routeActor,
 	}
 }
 
@@ -194,4 +197,18 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 	}
 
 	return nil
+}
+
+func (actor PushActorImpl) MapManifestRoute(routeName string, app models.Application) error {
+	hostname, domain, err := actor.routeActor.FindDomain(routeName)
+	if err != nil {
+		return err
+	}
+
+	route, err := actor.routeActor.FindOrCreateRoute(hostname, domain, "", false)
+	if err != nil {
+		return err
+	}
+
+	return actor.routeActor.BindRoute(app, route)
 }

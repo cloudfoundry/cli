@@ -17,9 +17,10 @@ import (
 
 var _ = Describe("Routes", func() {
 	var (
-		fakeUI              *terminalfakes.FakeUI
-		fakeRouteRepository *apifakes.FakeRouteRepository
-		routeActor          RouteActor
+		fakeUI               *terminalfakes.FakeUI
+		fakeRouteRepository  *apifakes.FakeRouteRepository
+		fakeDomainRepository *apifakes.FakeDomainRepository
+		routeActor           RouteActor
 
 		expectedRoute  models.Route
 		expectedDomain models.DomainFields
@@ -28,7 +29,8 @@ var _ = Describe("Routes", func() {
 	BeforeEach(func() {
 		fakeUI = &terminalfakes.FakeUI{}
 		fakeRouteRepository = new(apifakes.FakeRouteRepository)
-		routeActor = NewRouteActor(fakeUI, fakeRouteRepository)
+		fakeDomainRepository = new(apifakes.FakeDomainRepository)
+		routeActor = NewRouteActor(fakeUI, fakeRouteRepository, fakeDomainRepository)
 	})
 
 	Describe("CreateRandomTCPRoute", func() {
@@ -294,6 +296,157 @@ var _ = Describe("Routes", func() {
 
 				message, _ = fakeUI.SayArgsForCall(1)
 				Expect(message).To(ContainSubstring("Removing route"))
+			})
+		})
+	})
+
+	Describe("FindDomain", func() {
+		var (
+			routeName           string
+			hostname            string
+			domain              models.DomainFields
+			findDomainErr       error
+			domainNotFoundError error
+		)
+
+		BeforeEach(func() {
+			routeName = "my-hostname.my-domain.com"
+			domainNotFoundError = cferrors.NewModelNotFoundError("Domain", routeName)
+		})
+
+		JustBeforeEach(func() {
+			hostname, domain, findDomainErr = routeActor.FindDomain(routeName)
+		})
+
+		Context("when the route belongs to a private domain", func() {
+			var privateDomain models.DomainFields
+
+			BeforeEach(func() {
+				privateDomain = models.DomainFields{
+					GUID: "private-domain-guid",
+				}
+				fakeDomainRepository.FindPrivateByNameReturns(privateDomain, nil)
+			})
+
+			It("returns the private domain", func() {
+				Expect(findDomainErr).NotTo(HaveOccurred())
+				Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+				Expect(fakeDomainRepository.FindPrivateByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
+				Expect(hostname).To(Equal(""))
+				Expect(domain).To(Equal(privateDomain))
+			})
+		})
+
+		Context("when the route belongs to a shared domain", func() {
+			var (
+				sharedDomain models.DomainFields
+			)
+
+			BeforeEach(func() {
+				sharedDomain = models.DomainFields{
+					GUID: "shared-domain-guid",
+				}
+				fakeDomainRepository.FindPrivateByNameStub = func(name string) (models.DomainFields, error) {
+					return models.DomainFields{}, domainNotFoundError
+				}
+			})
+
+			Context("when the route has no hostname", func() {
+				Context("and the domain is HTTP", func() {
+					BeforeEach(func() {
+						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+							if name == "my-hostname.my-domain.com" {
+								return sharedDomain, nil
+							}
+							return models.DomainFields{}, domainNotFoundError
+						}
+					})
+
+					It("returns the shared domain", func() {
+						Expect(findDomainErr).NotTo(HaveOccurred())
+						Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+						Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(1))
+						Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
+						Expect(hostname).To(Equal(""))
+						Expect(domain).To(Equal(sharedDomain))
+					})
+				})
+
+				Context("and the domain is not HTTP", func() {
+					BeforeEach(func() {
+						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+							return models.DomainFields{
+									GUID:            "non-http-shared-domain-guid",
+									Name:            "non-http-shared-domain",
+									RouterGroupType: "not-null",
+								},
+								nil
+						}
+					})
+
+					It("returns an error", func() {
+						Expect(findDomainErr).To(HaveOccurred())
+						Expect(findDomainErr.Error()).To(Equal("The domain non-http-shared-domain is not an HTTP domain, unable to map route."))
+					})
+				})
+			})
+
+			Context("when the route has a hostname", func() {
+				Context("and the domain is HTTP", func() {
+					BeforeEach(func() {
+						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+							if name == "my-domain.com" {
+								return sharedDomain, nil
+							}
+							return models.DomainFields{}, domainNotFoundError
+						}
+					})
+
+					It("returns the shared domain and hostname", func() {
+						Expect(findDomainErr).NotTo(HaveOccurred())
+						Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+						Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(2))
+						Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
+						Expect(fakeDomainRepository.FindSharedByNameArgsForCall(1)).To(Equal("my-domain.com"))
+						Expect(hostname).To(Equal("my-hostname"))
+						Expect(domain).To(Equal(sharedDomain))
+					})
+				})
+
+				Context("and the domain is not HTTP", func() {
+					BeforeEach(func() {
+						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+							if name == "my-domain.com" {
+								return models.DomainFields{
+										GUID:            "non-http-shared-domain-guid",
+										Name:            "non-http-shared-domain",
+										RouterGroupType: "not-null",
+									},
+									nil
+							}
+							return models.DomainFields{}, domainNotFoundError
+						}
+					})
+
+					It("returns an error", func() {
+						Expect(findDomainErr).To(HaveOccurred())
+						Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(2))
+						Expect(findDomainErr.Error()).To(Equal("The domain non-http-shared-domain is not an HTTP domain, unable to map route."))
+					})
+				})
+			})
+		})
+
+		Context("when the route does not belong to any existing domains", func() {
+			BeforeEach(func() {
+				routeName = "non-existant-domain.com"
+				fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+				fakeDomainRepository.FindSharedByNameReturns(models.DomainFields{}, domainNotFoundError)
+			})
+
+			It("returns an error", func() {
+				Expect(findDomainErr).To(HaveOccurred())
+				Expect(findDomainErr.Error()).To(Equal("The route non-existant-domain.com did not match any existing domains."))
 			})
 		})
 	})

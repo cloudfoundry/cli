@@ -4092,12 +4092,20 @@
     "translation": "Die aktive Anwendungsinstanz beim gegebenen Index beenden und eine neue Instanz der Anwendung mit demselben Index instanziieren"
   },
   {
+    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
+    "translation": ""
+  },
+  {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "Die Datei {{.PluginExecutableName}} ist bereits im Plug-in-Verzeichnis vorhanden.\n"
   },
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "Die Reihenfolge, in der die Buildpacks während der automatische Buildpackerkennung geprüft werden"
+  },
+  {
+    "id": "The route {{.RouteName}} did not match any existing domains.",
+    "translation": ""
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",

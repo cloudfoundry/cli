@@ -343,7 +343,8 @@ func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams
 	defaultRouteAcceptable := len(app.Routes) == 0
 	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.NoHostname
 
-	if appParams.NoRoute {
+	switch {
+	case appParams.NoRoute:
 		if len(app.Routes) == 0 {
 			cmd.ui.Say(T("App {{.AppName}} is a worker, skipping route creation",
 				map[string]interface{}{"AppName": terminal.EntityNameColor(app.Name)}))
@@ -353,12 +354,26 @@ func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams
 				return err
 			}
 		}
-		return nil
-	}
-
-	if routeDefined || defaultRouteAcceptable {
-		if appParams.Domains == nil {
-			domain, err := cmd.findDomain(nil)
+	case len(appParams.Routes) > 0:
+		for _, manifestRoute := range appParams.Routes {
+			err := cmd.actor.MapManifestRoute(manifestRoute.Route, app)
+			if err != nil {
+				return err
+			}
+		}
+	case (routeDefined || defaultRouteAcceptable) && appParams.Domains == nil:
+		domain, err := cmd.findDomain(nil)
+		if err != nil {
+			return err
+		}
+		appParams.UseRandomPort = isTCP(domain)
+		err = cmd.processDomainsAndBindRoutes(appParams, app, domain)
+		if err != nil {
+			return err
+		}
+	case routeDefined || defaultRouteAcceptable:
+		for _, d := range *(appParams.Domains) {
+			domain, err := cmd.findDomain(&d)
 			if err != nil {
 				return err
 			}
@@ -366,18 +381,6 @@ func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams
 			err = cmd.processDomainsAndBindRoutes(appParams, app, domain)
 			if err != nil {
 				return err
-			}
-		} else {
-			for _, d := range *(appParams.Domains) {
-				domain, err := cmd.findDomain(&d)
-				if err != nil {
-					return err
-				}
-				appParams.UseRandomPort = isTCP(domain)
-				err = cmd.processDomainsAndBindRoutes(appParams, app, domain)
-				if err != nil {
-					return err
-				}
 			}
 		}
 	}

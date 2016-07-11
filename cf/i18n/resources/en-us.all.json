@@ -4092,12 +4092,20 @@
     "translation": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"
   },
   {
+    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
+    "translation": "The domain {{.DomainName}} is not an HTTP domain, unable to map route."
+  },
+  {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n"
   },
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "The order in which the buildpacks are checked during buildpack auto-detection"
+  },
+  {
+    "id": "The route {{.RouteName}} did not match any existing domains.",
+    "translation": "The route {{.RouteName}} did not match any existing domains."
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
