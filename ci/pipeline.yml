@@ -340,15 +340,15 @@ jobs:
       INCLUDE_INTERNET_DEPENDENT: true
       INCLUDE_ROUTE_SERVICES: true
       INCLUDE_SECURITY_GROUPS: true
-  ensure:
-    put: bosh-lites-diego-pool
-    params:
-      release: bosh-lite-lock
-  on_failure:
-     put: slack-alert
-     params:
-       channel: '#cli-firehose'
-       text: "cats diego failed OR errored :("
+    ensure:
+      put: bosh-lites-diego-pool
+      params:
+        release: bosh-lite-lock
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "cats diego failed OR errored :("
 
 - name: cats-windows
   serial: true
