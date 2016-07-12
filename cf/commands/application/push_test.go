@@ -746,8 +746,8 @@ var _ = Describe("Push Command", func() {
 						Expect(appParams).To(HaveLen(1))
 						appParam := appParams[0]
 						Expect(*appParam.Command).To(Equal("unicorn -c config/unicorn.rb -D"))
-						Expect(*appParam.Domains).To(Equal([]string{"bar.cf-app.com"}))
-						Expect(*appParam.Hosts).To(Equal([]string{"my-hostname"}))
+						Expect(appParam.Domains).To(Equal([]string{"bar.cf-app.com"}))
+						Expect(appParam.Hosts).To(Equal([]string{"my-hostname"}))
 						Expect(*appParam.RoutePath).To(Equal("my-route-path"))
 						Expect(*appParam.Name).To(Equal("app-name"))
 						Expect(*appParam.InstanceCount).To(Equal(3))

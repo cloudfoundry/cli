@@ -266,8 +266,8 @@ var _ = Describe("Manifests", func() {
 
 		Expect(*apps[0].BuildpackURL).To(Equal("my-buildpack"))
 		Expect(*apps[0].DiskQuota).To(Equal(int64(512)))
-		Expect(*apps[0].Domains).To(ConsistOf([]string{"domain1.test", "domain2.test", "my-domain"}))
-		Expect(*apps[0].Hosts).To(ConsistOf([]string{"host-1", "host-2", "my-hostname"}))
+		Expect(apps[0].Domains).To(ConsistOf([]string{"domain1.test", "domain2.test", "my-domain"}))
+		Expect(apps[0].Hosts).To(ConsistOf([]string{"host-1", "host-2", "my-hostname"}))
 		Expect(*apps[0].Name).To(Equal("my-app-name"))
 		Expect(*apps[0].StackName).To(Equal("my-stack"))
 		Expect(*apps[0].HealthCheckType).To(Equal("none"))
@@ -296,10 +296,10 @@ var _ = Describe("Manifests", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(apps)).To(Equal(1))
 
-		Expect(len(*apps[0].Domains)).To(Equal(3))
-		Expect(*apps[0].Domains).To(ConsistOf([]string{"my-domain", "domain1.test", "domain2.test"}))
-		Expect(len(*apps[0].Hosts)).To(Equal(3))
-		Expect(*apps[0].Hosts).To(ConsistOf([]string{"my-hostname", "host-1", "host-2"}))
+		Expect(len(apps[0].Domains)).To(Equal(3))
+		Expect(apps[0].Domains).To(ConsistOf([]string{"my-domain", "domain1.test", "domain2.test"}))
+		Expect(len(apps[0].Hosts)).To(Equal(3))
+		Expect(apps[0].Hosts).To(ConsistOf([]string{"my-hostname", "host-1", "host-2"}))
 	})
 
 	Context("old-style property syntax", func() {
@@ -504,7 +504,7 @@ var _ = Describe("Manifests", func() {
 			app, err := m.Applications()
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(*app[0].ServicesToBind).To(Equal([]string{"service-1", "service-2"}))
+			Expect(app[0].ServicesToBind).To(Equal([]string{"service-1", "service-2"}))
 		})
 	})
 

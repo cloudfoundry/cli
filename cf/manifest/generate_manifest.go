@@ -254,8 +254,8 @@ func separateHostsAndDomains(routes []models.RouteSummary) ([]string, []string) 
 	var (
 		hostSlice    []string
 		domainSlice  []string
-		hostPSlice   *[]string
-		domainPSlice *[]string
+		hostPSlice   []string
+		domainPSlice []string
 		hosts        []string
 		domains      []string
 	)
@@ -269,10 +269,10 @@ func separateHostsAndDomains(routes []models.RouteSummary) ([]string, []string) 
 	domainPSlice = removeDuplicatedValue(domainSlice)
 
 	if hostPSlice != nil {
-		hosts = *hostPSlice
+		hosts = hostPSlice
 	}
 	if domainPSlice != nil {
-		domains = *domainPSlice
+		domains = domainPSlice
 	}
 
 	return hosts, domains
