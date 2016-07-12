@@ -292,6 +292,18 @@
     "translation": "應用程式實例索引"
   },
   {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
+    "translation": ""
+  },
+  {
     "id": "Apps:",
     "translation": "應用程式: "
   },
@@ -2616,6 +2628,10 @@
     "translation": "無效的應用程式埠: {{.AppPort}}\n應用程式埠必須是數字"
   },
   {
+    "id": "Invalid application configuration",
+    "translation": ""
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "來自伺服器的非同步回應無效"
   },
@@ -4605,18 +4621,6 @@
   },
   {
     "id": "app instances",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
     "translation": ""
   },
   {

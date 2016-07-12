@@ -292,6 +292,18 @@
     "translation": "Application instance index"
   },
   {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'"
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'"
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'"
+  },
+  {
     "id": "Apps:",
     "translation": "Apps:"
   },
@@ -2616,6 +2628,10 @@
     "translation": "Invalid app port: {{.AppPort}}\nApp port must be a number"
   },
   {
+    "id": "Invalid application configuration",
+    "translation": "Invalid application configuration"
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "Invalid async response from server"
   },
@@ -4606,18 +4622,6 @@
   {
     "id": "app instances",
     "translation": "app instances"
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": "application {{.AppName}} must not be configured with both 'routes' and 'domains'"
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'"
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
-    "translation": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'"
   },
   {
     "id": "apps",

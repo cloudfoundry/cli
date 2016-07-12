@@ -292,6 +292,18 @@
     "translation": "Index d'instance d'application"
   },
   {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
+    "translation": ""
+  },
+  {
     "id": "Apps:",
     "translation": "Applications :"
   },
@@ -2616,6 +2628,10 @@
     "translation": "Port d'application non valide : {{.AppPort}}\nLe port d'application doit être un nombre"
   },
   {
+    "id": "Invalid application configuration",
+    "translation": ""
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "Réponse asynchrone non valide du serveur"
   },
@@ -4605,18 +4621,6 @@
   },
   {
     "id": "app instances",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
     "translation": ""
   },
   {

@@ -195,7 +195,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 
 	errs := cmd.actor.ValidateAppParams(appSet)
 	if len(errs) > 0 {
-		errStr := "invalid application configuration:"
+		errStr := T("Invalid application configuration") + ":"
 
 		for _, e := range errs {
 			errStr = fmt.Sprintf("%s\n%s", errStr, e.Error())
