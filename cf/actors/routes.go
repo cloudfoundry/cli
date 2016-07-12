@@ -19,6 +19,8 @@ type RouteActor interface {
 	BindRoute(app models.Application, route models.Route) error
 	UnbindAll(app models.Application) error
 	FindDomain(routeName string) (string, models.DomainFields, error)
+	FindPath(routeName string) (string, string)
+	FindAndBindRoute(routeName string, app models.Application) error
 }
 
 type routeActor struct {
@@ -163,6 +165,27 @@ func (routeActor routeActor) FindDomain(routeName string) (string, models.Domain
 			"RouteName": routeName,
 		},
 	))
+}
+
+func (routeActor routeActor) FindPath(routeName string) (string, string) {
+	routeSlice := strings.Split(routeName, "/")
+	return routeSlice[0], strings.Join(routeSlice[1:], "/")
+}
+
+func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application) error {
+	routeWithoutPath, path := routeActor.FindPath(routeName)
+
+	hostname, domain, err := routeActor.FindDomain(routeWithoutPath)
+	if err != nil {
+		return err
+	}
+
+	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, false)
+	if err != nil {
+		return err
+	}
+
+	return routeActor.BindRoute(app, route)
 }
 
 func validateFoundDomain(domain models.DomainFields, err error) (bool, error) {

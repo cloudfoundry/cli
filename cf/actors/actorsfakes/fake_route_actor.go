@@ -57,6 +57,24 @@ type FakeRouteActor struct {
 		result2 models.DomainFields
 		result3 error
 	}
+	FindPathStub        func(routeName string) (string, string)
+	findPathMutex       sync.RWMutex
+	findPathArgsForCall []struct {
+		routeName string
+	}
+	findPathReturns struct {
+		result1 string
+		result2 string
+	}
+	FindAndBindRouteStub        func(routeName string, app models.Application) error
+	findAndBindRouteMutex       sync.RWMutex
+	findAndBindRouteArgsForCall []struct {
+		routeName string
+		app       models.Application
+	}
+	findAndBindRouteReturns struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -234,6 +252,74 @@ func (fake *FakeRouteActor) FindDomainReturns(result1 string, result2 models.Dom
 	}{result1, result2, result3}
 }
 
+func (fake *FakeRouteActor) FindPath(routeName string) (string, string) {
+	fake.findPathMutex.Lock()
+	fake.findPathArgsForCall = append(fake.findPathArgsForCall, struct {
+		routeName string
+	}{routeName})
+	fake.recordInvocation("FindPath", []interface{}{routeName})
+	fake.findPathMutex.Unlock()
+	if fake.FindPathStub != nil {
+		return fake.FindPathStub(routeName)
+	} else {
+		return fake.findPathReturns.result1, fake.findPathReturns.result2
+	}
+}
+
+func (fake *FakeRouteActor) FindPathCallCount() int {
+	fake.findPathMutex.RLock()
+	defer fake.findPathMutex.RUnlock()
+	return len(fake.findPathArgsForCall)
+}
+
+func (fake *FakeRouteActor) FindPathArgsForCall(i int) string {
+	fake.findPathMutex.RLock()
+	defer fake.findPathMutex.RUnlock()
+	return fake.findPathArgsForCall[i].routeName
+}
+
+func (fake *FakeRouteActor) FindPathReturns(result1 string, result2 string) {
+	fake.FindPathStub = nil
+	fake.findPathReturns = struct {
+		result1 string
+		result2 string
+	}{result1, result2}
+}
+
+func (fake *FakeRouteActor) FindAndBindRoute(routeName string, app models.Application) error {
+	fake.findAndBindRouteMutex.Lock()
+	fake.findAndBindRouteArgsForCall = append(fake.findAndBindRouteArgsForCall, struct {
+		routeName string
+		app       models.Application
+	}{routeName, app})
+	fake.recordInvocation("FindAndBindRoute", []interface{}{routeName, app})
+	fake.findAndBindRouteMutex.Unlock()
+	if fake.FindAndBindRouteStub != nil {
+		return fake.FindAndBindRouteStub(routeName, app)
+	} else {
+		return fake.findAndBindRouteReturns.result1
+	}
+}
+
+func (fake *FakeRouteActor) FindAndBindRouteCallCount() int {
+	fake.findAndBindRouteMutex.RLock()
+	defer fake.findAndBindRouteMutex.RUnlock()
+	return len(fake.findAndBindRouteArgsForCall)
+}
+
+func (fake *FakeRouteActor) FindAndBindRouteArgsForCall(i int) (string, models.Application) {
+	fake.findAndBindRouteMutex.RLock()
+	defer fake.findAndBindRouteMutex.RUnlock()
+	return fake.findAndBindRouteArgsForCall[i].routeName, fake.findAndBindRouteArgsForCall[i].app
+}
+
+func (fake *FakeRouteActor) FindAndBindRouteReturns(result1 error) {
+	fake.FindAndBindRouteStub = nil
+	fake.findAndBindRouteReturns = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRouteActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -247,6 +333,10 @@ func (fake *FakeRouteActor) Invocations() map[string][][]interface{} {
 	defer fake.unbindAllMutex.RUnlock()
 	fake.findDomainMutex.RLock()
 	defer fake.findDomainMutex.RUnlock()
+	fake.findPathMutex.RLock()
+	defer fake.findPathMutex.RUnlock()
+	fake.findAndBindRouteMutex.RLock()
+	defer fake.findAndBindRouteMutex.RUnlock()
 	return fake.invocations
 }
 

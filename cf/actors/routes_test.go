@@ -237,6 +237,7 @@ var _ = Describe("Routes", func() {
 			})
 		})
 	})
+
 	Describe("UnbindAll", func() {
 		var app models.Application
 
@@ -448,6 +449,81 @@ var _ = Describe("Routes", func() {
 				Expect(findDomainErr).To(HaveOccurred())
 				Expect(findDomainErr.Error()).To(Equal("The route non-existant-domain.com did not match any existing domains."))
 			})
+		})
+	})
+
+	Describe("FindPath", func() {
+		Context("when there is a path", func() {
+			It("returns the route without path and the path", func() {
+				routeName := "host.domain/long/path"
+				route, path := routeActor.FindPath(routeName)
+				Expect(route).To(Equal("host.domain"))
+				Expect(path).To(Equal("long/path"))
+			})
+		})
+
+		Context("when there is no path", func() {
+			It("returns the route path and the empty string", func() {
+				routeName := "host.domain"
+				route, path := routeActor.FindPath(routeName)
+				Expect(route).To(Equal("host.domain"))
+				Expect(path).To(Equal(""))
+			})
+		})
+	})
+
+	Describe("FindAndBindRoute", func() {
+		BeforeEach(func() {
+			domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "host.domain.com")
+
+			fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+			fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+				if name == "domain.com" {
+					return models.DomainFields{
+						Name: "domain.com",
+						GUID: "domain-guid",
+					}, nil
+				}
+				return models.DomainFields{}, domainNotFoundError
+			}
+			fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("route", "myroute"))
+			fakeRouteRepository.CreateReturns(models.Route{
+				GUID:   "route-guid",
+				Host:   "host",
+				Domain: models.DomainFields{Name: "domain.com"},
+				Path:   "path",
+			}, nil)
+			fakeRouteRepository.BindReturns(nil)
+		})
+
+		It("creates and binds the route", func() {
+			app := models.Application{
+				ApplicationFields: models.ApplicationFields{
+					Name: "app-name",
+					GUID: "app-guid",
+				},
+			}
+
+			_ = routeActor.FindAndBindRoute("host.domain.com/path", app)
+
+			actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
+			Expect(actualDomainName).To(Equal("domain.com"))
+
+			actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+			Expect(actualHost).To(Equal("host"))
+			Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
+			Expect(actualPath).To(Equal("path"))
+			Expect(actualPort).To(Equal(0))
+
+			actualHost, actualDomain, actualPath, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+			Expect(actualHost).To(Equal("host"))
+			Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
+			Expect(actualPath).To(Equal("path"))
+			Expect(actualUseRandomPort).To(BeFalse())
+
+			routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
+			Expect(routeGUID).To(Equal("route-guid"))
+			Expect(appGUID).To(Equal("app-guid"))
 		})
 	})
 })
