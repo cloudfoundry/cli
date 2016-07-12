@@ -450,9 +450,7 @@ var _ = Describe("Push Actor", func() {
 
 	Describe("MapManifestRoute", func() {
 		var (
-			app    models.Application
-			domain models.DomainFields
-			route  models.Route
+			app models.Application
 		)
 
 		Context("when provided both a route name and an app", func() {
@@ -463,12 +461,13 @@ var _ = Describe("Push Actor", func() {
 						GUID: "app-guid",
 					},
 				}
-				domain = models.DomainFields{Name: "route-name.example.com"}
-				route = models.Route{
-					Host: "route-name",
-					Path: "example.com",
+
+				domain := models.DomainFields{Name: "example.com"}
+				route := models.Route{
+					Host:   "route-name",
+					Domain: domain,
 				}
-				routeActor.FindDomainReturns("", domain, nil)
+				routeActor.FindDomainReturns("route-name", domain, nil)
 				routeActor.FindOrCreateRouteReturns(route, nil)
 				routeActor.BindRouteReturns(nil)
 			})
@@ -476,6 +475,24 @@ var _ = Describe("Push Actor", func() {
 			It("does not return an error", func() {
 				err := actor.MapManifestRoute("route-name.example.com", app)
 				Expect(err).NotTo(HaveOccurred())
+
+				Expect(routeActor.FindDomainArgsForCall(0)).To(Equal("route-name.example.com"))
+
+				hostname, domain, path, randomPort := routeActor.FindOrCreateRouteArgsForCall(0)
+				Expect(hostname).To(Equal("route-name"))
+				Expect(domain).To(Equal(models.DomainFields{Name: "example.com"}))
+				Expect(path).To(Equal(""))
+				Expect(randomPort).To(BeFalse())
+
+				actualApp, actualRoute := routeActor.BindRouteArgsForCall(0)
+				Expect(actualRoute).To(Equal(models.Route{
+					Host: hostname,
+					Domain: models.DomainFields{
+						Name: "example.com",
+					},
+					Path: "",
+				}))
+				Expect(actualApp).To(Equal(app))
 			})
 		})
 	})
