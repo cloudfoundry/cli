@@ -198,6 +198,7 @@ func (gateway Gateway) newRequest(request *http.Request, accessToken string, bod
 	}
 
 	request.Header.Set("accept", "application/json")
+	request.Header.Set("Connection", "close")
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
 
@@ -398,8 +399,8 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (*http.Respons
 	}
 
 	if rawResponse.StatusCode > 299 {
+		defer rawResponse.Body.Close()
 		jsonBytes, _ := ioutil.ReadAll(rawResponse.Body)
-		_ = rawResponse.Body.Close()
 		rawResponse.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
 		err = gateway.errHandler(rawResponse.StatusCode, jsonBytes)
 	}
