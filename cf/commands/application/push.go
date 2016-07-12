@@ -287,7 +287,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		}
 
 		if appParams.ServicesToBind != nil {
-			err := cmd.bindAppToServices(*appParams.ServicesToBind, app)
+			err := cmd.bindAppToServices(appParams.ServicesToBind, app)
 			if err != nil {
 				return err
 			}
@@ -372,7 +372,7 @@ func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams
 			return err
 		}
 	case routeDefined || defaultRouteAcceptable:
-		for _, d := range *(appParams.Domains) {
+		for _, d := range appParams.Domains {
 			domain, err := cmd.findDomain(&d)
 			if err != nil {
 				return err
@@ -412,7 +412,7 @@ func (cmd *Push) processDomainsAndBindRoutes(
 			return err
 		}
 	} else {
-		for _, host := range *(appParams.Hosts) {
+		for _, host := range appParams.Hosts {
 			err := cmd.createAndBindRoute(
 				&host,
 				appParams.UseRandomRoute,
@@ -680,7 +680,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	}
 
 	if c.String("n") != "" {
-		appParams.Hosts = &[]string{c.String("n")}
+		appParams.Hosts = []string{c.String("n")}
 	}
 
 	if c.String("route-path") != "" {
@@ -722,7 +722,7 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	}
 
 	if c.String("d") != "" {
-		appParams.Domains = &[]string{c.String("d")}
+		appParams.Domains = []string{c.String("d")}
 	}
 
 	if c.IsSet("i") {

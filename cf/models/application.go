@@ -87,7 +87,7 @@ type AppParams struct {
 	BuildpackURL       *string
 	Command            *string
 	DiskQuota          *int64
-	Domains            *[]string
+	Domains            []string
 	EnvironmentVars    *map[string]interface{}
 	GUID               *string
 	HealthCheckType    *string
@@ -95,7 +95,7 @@ type AppParams struct {
 	DockerImage        *string
 	Diego              *bool
 	EnableSSH          *bool
-	Hosts              *[]string
+	Hosts              []string
 	RoutePath          *string
 	InstanceCount      *int
 	Memory             *int64
@@ -105,7 +105,7 @@ type AppParams struct {
 	UseRandomRoute     bool
 	UseRandomPort      bool
 	Path               *string
-	ServicesToBind     *[]string
+	ServicesToBind     []string
 	SpaceGUID          *string
 	StackGUID          *string
 	StackName          *string
@@ -193,5 +193,5 @@ func (app *AppParams) IsEmpty() bool {
 }
 
 func (app *AppParams) IsHostEmpty() bool {
-	return app.Hosts == nil || len(*app.Hosts) == 0
+	return app.Hosts == nil || len(app.Hosts) == 0
 }

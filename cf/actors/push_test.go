@@ -412,7 +412,7 @@ var _ = Describe("Push Actor", func() {
 
 			Context("and 'hosts' is provided", func() {
 				BeforeEach(func() {
-					apps[0].Hosts = &[]string{"host-name"}
+					apps[0].Hosts = []string{"host-name"}
 				})
 
 				It("returns an error", func() {
@@ -424,7 +424,7 @@ var _ = Describe("Push Actor", func() {
 
 			Context("and 'domains' is provided", func() {
 				BeforeEach(func() {
-					apps[0].Domains = &[]string{"domain-name"}
+					apps[0].Domains = []string{"domain-name"}
 				})
 
 				It("returns an error", func() {

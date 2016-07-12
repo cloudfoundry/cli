@@ -175,13 +175,17 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.BuildpackURL = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 
-	domainAry := *sliceOrEmptyVal(yamlMap, "domains", &errs)
+	domainAry := sliceOrNil(yamlMap, "domains", &errs)
 	if domain := stringVal(yamlMap, "domain", &errs); domain != nil {
-		domainAry = append(domainAry, *domain)
+		if domainAry == nil {
+			domainAry = []string{*domain}
+		} else {
+			domainAry = append(domainAry, *domain)
+		}
 	}
 	appParams.Domains = removeDuplicatedValue(domainAry)
 
-	hostsArr := *sliceOrEmptyVal(yamlMap, "hosts", &errs)
+	hostsArr := sliceOrNil(yamlMap, "hosts", &errs)
 	if host := stringVal(yamlMap, "host", &errs); host != nil {
 		hostsArr = append(hostsArr, *host)
 	}
@@ -197,7 +201,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
 	appParams.NoHostname = boolVal(yamlMap, "no-hostname", &errs)
 	appParams.UseRandomRoute = boolVal(yamlMap, "random-route", &errs)
-	appParams.ServicesToBind = sliceOrEmptyVal(yamlMap, "services", &errs)
+	appParams.ServicesToBind = sliceOrNil(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 	appParams.HealthCheckType = stringVal(yamlMap, "health-check-type", &errs)
 	appParams.AppPorts = intSliceVal(yamlMap, "app-ports", &errs)
@@ -224,7 +228,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	return appParams, nil
 }
 
-func removeDuplicatedValue(ary []string) *[]string {
+func removeDuplicatedValue(ary []string) []string {
 	if ary == nil {
 		return nil
 	}
@@ -241,7 +245,7 @@ func removeDuplicatedValue(ary []string) *[]string {
 			m[val] = false
 		}
 	}
-	return &newAry
+	return newAry
 }
 
 func checkForNulls(yamlMap generic.Map) error {
@@ -364,15 +368,13 @@ func boolVal(yamlMap generic.Map, key string, errs *[]error) bool {
 	}
 }
 
-func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
+func sliceOrNil(yamlMap generic.Map, key string, errs *[]error) []string {
 	if !yamlMap.Has(key) {
-		return new([]string)
+		return nil
 	}
 
-	var (
-		stringSlice []string
-		err         error
-	)
+	var err error
+	stringSlice := []string{}
 
 	sliceErr := fmt.Errorf(T("Expected {{.PropertyName}} to be a list of strings.", map[string]interface{}{"PropertyName": key}))
 
@@ -392,10 +394,10 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
 
 	if err != nil {
 		*errs = append(*errs, err)
-		return &[]string{}
+		return []string{}
 	}
 
-	return &stringSlice
+	return stringSlice
 }
 
 func intSliceVal(yamlMap generic.Map, key string, errs *[]error) *[]int {

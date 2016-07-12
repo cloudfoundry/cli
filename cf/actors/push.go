@@ -177,12 +177,12 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 	for _, app := range apps {
 		appName := app.Name
 
-		if len(app.Routes) > 0 {
-			if app.Hosts != nil && len(*app.Hosts) > 0 {
+		if app.Routes != nil {
+			if app.Hosts != nil {
 				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'hosts'", map[string]interface{}{"AppName": appName})))
 			}
 
-			if app.Domains != nil && len(*app.Domains) > 0 {
+			if app.Domains != nil {
 				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'domains'", map[string]interface{}{"AppName": appName})))
 			}
 
