@@ -292,6 +292,18 @@
     "translation": "애플리케이션 인스턴스 색인"
   },
   {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
+    "translation": ""
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
+    "translation": ""
+  },
+  {
     "id": "Apps:",
     "translation": "앱:"
   },
@@ -2616,6 +2628,10 @@
     "translation": "올바르지 않은 앱 포트: {{.AppPort}}\n앱 포트는 숫자여야 함"
   },
   {
+    "id": "Invalid application configuration",
+    "translation": ""
+  },
+  {
     "id": "Invalid async response from server",
     "translation": "서버에서 올바르지 않은 비동기 응답"
   },
@@ -4605,18 +4621,6 @@
   },
   {
     "id": "app instances",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": ""
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
     "translation": ""
   },
   {

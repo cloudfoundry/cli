@@ -332,7 +332,7 @@ var _ = Describe("Push Command", func() {
 
 				It("returns an properly formatted error", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).To(MatchRegexp("invalid application configuration:\nerror1\nerror2"))
+					Expect(executeErr.Error()).To(MatchRegexp("Invalid application configuration:\nerror1\nerror2"))
 				})
 			})
 

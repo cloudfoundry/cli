@@ -4,6 +4,18 @@
     "translation": "'routes' should be a list"
   },
   {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'"
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'"
+  },
+  {
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'"
+  },
+  {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
     "translation": "Bind a security group to a particular space, or all existing spaces of an org"
   },
@@ -60,6 +72,10 @@
     "translation": "Incorrect Usage. Requires {{.Arguments}}"
   },
   {
+    "id": "Invalid application configuration",
+    "translation": "Invalid application configuration"
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports",
     "translation": "Maximum number of routes that may be created with reserved ports"
   },
@@ -98,18 +114,6 @@
   {
     "id": "app instances",
     "translation": "app instances"
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": "application {{.AppName}} must not be configured with both 'routes' and 'domains'"
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": "application {{.AppName}} must not be configured with both 'routes' and 'hosts'"
-  },
-  {
-    "id": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
-    "translation": "application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'"
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
