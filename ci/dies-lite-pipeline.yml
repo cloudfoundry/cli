@@ -122,8 +122,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         LITE_KEYPAIR: {{lite-keypair}}
         LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        AWS_SECURITY_GROUP: {{lite-acceptance-security-group}}
+        AWS_SUBNET_ID: {{lite-acceptance-subnet-id}}
         LITE_NAME: {{lite-acceptance-name}}
         LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
         LITE_HOSTNAME: {{lite-acceptance-hostname}}
