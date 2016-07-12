@@ -200,15 +200,5 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 }
 
 func (actor PushActorImpl) MapManifestRoute(routeName string, app models.Application) error {
-	hostname, domain, err := actor.routeActor.FindDomain(routeName)
-	if err != nil {
-		return err
-	}
-
-	route, err := actor.routeActor.FindOrCreateRoute(hostname, domain, "", false)
-	if err != nil {
-		return err
-	}
-
-	return actor.routeActor.BindRoute(app, route)
+	return actor.routeActor.FindAndBindRoute(routeName, app)
 }
