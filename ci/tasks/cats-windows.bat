@@ -1,6 +1,5 @@
 SET GOPATH=%CD%\cf-release-repo
 SET GATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
-SET GOPATH=%GOPATH%;%GATSPATH%\Godeps\_workspace
 
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%
@@ -19,6 +18,7 @@ pushd %CD%\cf-cli-binaries
 	gzip -d cf-cli-binaries.tgz
 	tar -xvf cf-cli-binaries.tar
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
+	dir ..
 popd
 
 go get -v github.com/onsi/ginkgo/ginkgo
