@@ -51,7 +51,7 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGUID string, cb
 	return err
 }
 
-func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr error) {
+func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
 		path,
@@ -73,33 +73,38 @@ func (repo CloudControllerDomainRepository) FindPrivateByName(name string) (doma
 	return repo.findOneWithPath(repo.strategy.PrivateDomainURL(name), name)
 }
 
-func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGUID string) (domain models.DomainFields, apiErr error) {
-	domain, apiErr = repo.findOneWithPath(repo.strategy.OrgDomainURL(orgGUID, name), name)
+func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGUID string) (models.DomainFields, error) {
+	domain, err := repo.findOneWithPath(repo.strategy.OrgDomainURL(orgGUID, name), name)
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case *errors.ModelNotFoundError:
-		domain, apiErr = repo.FindSharedByName(name)
+		domain, err = repo.FindSharedByName(name)
+		if err != nil {
+			return models.DomainFields{}, err
+		}
 		if !domain.Shared {
-			apiErr = errors.NewModelNotFoundError("Domain", name)
+			err = errors.NewModelNotFoundError("Domain", name)
 		}
 	}
 
-	return
+	return domain, err
 }
 
-func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiErr error) {
+func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (models.DomainFields, error) {
+	var domain models.DomainFields
+
 	foundDomain := false
-	apiErr = repo.listDomains(path, func(result models.DomainFields) bool {
+	err := repo.listDomains(path, func(result models.DomainFields) bool {
 		domain = result
 		foundDomain = true
 		return false
 	})
 
-	if apiErr == nil && !foundDomain {
-		apiErr = errors.NewModelNotFoundError("Domain", name)
+	if err == nil && !foundDomain {
+		err = errors.NewModelNotFoundError("Domain", name)
 	}
 
-	return
+	return domain, err
 }
 
 func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGUID string) (createdDomain models.DomainFields, err error) {
