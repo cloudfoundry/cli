@@ -6,8 +6,6 @@ image: docker:///cloudfoundry/cli-vagrant-ci
 params:
   LITE_PRIVATE_IP_ADDRESS:
 
-inputs:
-
 run:
   path: bash
   args:
