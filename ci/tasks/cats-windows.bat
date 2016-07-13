@@ -4,7 +4,7 @@ SET GATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%
 SET PATH=%CD%\cf-release-repo\bin;%PATH%
-SET PATH=C:\Program Files\7-Zip;%PATH%
+SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
@@ -15,8 +15,8 @@ SET CONFIG=%CD%\config.json
 go get -v github.com/onsi/ginkgo/ginkgo
 
 pushd %CD%\cf-cli-binaries
-	7z x cf-cli-binaries.tgz
-	7z x cf-cli-binaries.tar
+	gzip -d cf-cli-binaries.tgz
+	tar -xvf cf-cli-binaries.tar
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 	dir ..
 popd
