@@ -133,8 +133,8 @@ jobs:
     params:
       AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-      LITE_KEYPAIR: {{lite-keypair}}
-      LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+      LITE_KEYPAIR: {{acceptance-keypair}}
+      LITE_PRIVATE_KEY_PATH: {{acceptance-private-key-path}}
       AWS_SECURITY_GROUP: {{lite-acceptance-security-group}}
       AWS_SUBNET_ID: {{lite-acceptance-subnet-id}}
       LITE_NAME: {{lite-acceptance-name}}
