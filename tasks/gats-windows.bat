@@ -4,7 +4,7 @@ SET GATSPATH=%GOPATH%\src\github.com\cloudfoundry\cli-acceptance-tests
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%
 SET PATH=%GOPATH%\bin;%PATH%
-SET PATH=C:\Program Files\7-Zip;%PATH%
+SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
@@ -13,8 +13,8 @@ call %CD%\cli-ci\ci\tasks\create-cats-config.bat
 SET CONFIG=%CD%\config.json
 
 pushd %CD%\cf-cli-binaries
-	7z x cf-cli-binaries.tgz
-	7z x cf-cli-binaries.tar
+	gzip -d cf-cli-binaries.tgz
+	tar -xvf cf-cli-binaries.tar
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
 
