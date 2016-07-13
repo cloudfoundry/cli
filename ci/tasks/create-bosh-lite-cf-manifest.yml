@@ -32,7 +32,7 @@ run:
       echo "Generating bosh lite manifest from cf-release-repo/scripts/generate-bosh-lite-dev-manifest"
       cat > property-overrides.yml << EOF
     properties:
-      domain: ${LITE_HOSTNAME}
+      system_domain: ${LITE_HOSTNAME}
     EOF
       ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
     popd
