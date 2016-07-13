@@ -139,6 +139,14 @@ jobs:
       AWS_SUBNET_ID: {{lite-acceptance-subnet-id}}
       LITE_NAME: {{lite-acceptance-name}}
       LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+  - task: associate-elastic-ip
+    file: cli/ci/tasks/associate-elastic-ip.yml
+    params:
+      AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+      AWS_DEFAULT_REGION: {{lite-aws-region}}
+      LITE_INSTANCE_NAME: {{lite-acceptance-name}}
+      LITE_PUBLIC_IP_ADDRESS: {{lite-acceptance-public-ip}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
