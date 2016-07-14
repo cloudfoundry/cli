@@ -2,6 +2,7 @@ package actors
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api"
@@ -15,11 +16,12 @@ import (
 
 type RouteActor interface {
 	CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error)
-	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error)
+	FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error)
 	BindRoute(app models.Application, route models.Route) error
 	UnbindAll(app models.Application) error
 	FindDomain(routeName string) (string, models.DomainFields, error)
 	FindPath(routeName string) (string, string)
+	FindPort(routeName string) (string, int, error)
 	FindAndBindRoute(routeName string, app models.Application) error
 }
 
@@ -42,7 +44,7 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 		"Domain": terminal.EntityNameColor(domain.Name),
 	}) + "...")
 
-	route, err := routeActor.routeRepo.Create("", domain, "", true)
+	route, err := routeActor.routeRepo.Create("", domain, "", 0, true)
 	if err != nil {
 		return models.Route{}, err
 	}
@@ -50,8 +52,7 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 	return route, nil
 }
 
-func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
-	var port int
+func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error) {
 	route, err := routeActor.routeRepo.Find(hostname, domain, path, port)
 
 	switch err.(type) {
@@ -73,7 +74,7 @@ func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.Do
 					}),
 			)
 
-			route, err = routeActor.routeRepo.Create(hostname, domain, path, useRandomPort)
+			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, useRandomPort)
 		}
 
 		routeActor.ui.Ok()
@@ -172,15 +173,36 @@ func (routeActor routeActor) FindPath(routeName string) (string, string) {
 	return routeSlice[0], strings.Join(routeSlice[1:], "/")
 }
 
+func (routeActor routeActor) FindPort(routeName string) (string, int, error) {
+	var err error
+	routeSlice := strings.Split(routeName, ":")
+	port := 0
+	if len(routeSlice) == 2 {
+		port, err = strconv.Atoi(routeSlice[1])
+		if err != nil {
+			return "", 0, errors.New(T("Invalid port for route {{.RouteName}}",
+				map[string]interface{}{
+					"RouteName": routeName,
+				},
+			))
+		}
+	}
+	return routeSlice[0], port, nil
+}
+
 func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application) error {
-	routeWithoutPath, path := routeActor.FindPath(routeName)
+	routeWithoutPort, port, err := routeActor.FindPort(routeName)
+	if err != nil {
+		return err
+	}
+	routeWithoutPath, path := routeActor.FindPath(routeWithoutPort)
 
 	hostname, domain, err := routeActor.FindDomain(routeWithoutPath)
 	if err != nil {
 		return err
 	}
 
-	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, false)
+	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, false)
 	if err != nil {
 		return err
 	}
@@ -193,23 +215,8 @@ func validateFoundDomain(domain models.DomainFields, err error) (bool, error) {
 	case *errors.ModelNotFoundError:
 		return false, nil
 	case nil:
-		if err = assertHTTPDomain(domain); err != nil {
-			return false, err
-		}
 		return true, nil
 	default:
 		return false, err
 	}
-}
-
-func assertHTTPDomain(domain models.DomainFields) error {
-	if domain.RouterGroupType != "" {
-		return fmt.Errorf(T(
-			"The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
-			map[string]interface{}{
-				"DomainName": domain.Name,
-			},
-		))
-	}
-	return nil
 }

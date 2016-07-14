@@ -2696,6 +2696,10 @@
     "translation": "無效的記憶體限制: {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
+    "id": "Invalid port for route {{.RouteName}}",
+    "translation": ""
+  },
+  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "無效的逾時參數: {{.Timeout}}\n{{.Err}}"
   },
@@ -4106,10 +4110,6 @@
   {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "終止給定索引處的執行中應用程式實例，並實例化具有相同索引之應用程式的新實例"
-  },
-  {
-    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
-    "translation": ""
   },
   {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
