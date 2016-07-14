@@ -136,10 +136,6 @@
     "translation": "' ist kein registrierter Befehl. Siehe 'cf help'"
   },
   {
-    "id": "'routes' should be a list",
-    "translation": ""
-  },
-  {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
     "translation": "'{{.VersionShort}}' und '{{.VersionLong}}' werden auch akzeptiert."
   },
@@ -292,18 +288,6 @@
     "translation": "Anwendungsinstanzindex"
   },
   {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": ""
-  },
-  {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": ""
-  },
-  {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
-    "translation": ""
-  },
-  {
     "id": "Apps:",
     "translation": "Apps:"
   },
@@ -388,8 +372,8 @@
     "translation": "BUILDPACK_NAME (BUILDPACKNAME)"
   },
   {
-    "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "id": "Bind a security group to a space",
+    "translation": "Eine Sicherheitsgruppe an einen Bereich binden"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -437,7 +421,7 @@
   },
   {
     "id": "Bound apps: {{.BoundApplications}}",
-    "translation": ""
+    "translation": "Gebundene Apps: {{.BoundApplications}}"
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -480,16 +464,16 @@
     "translation": "CF_NAME auth name@example.com \"my password\" (Anführungszeichen für Kennwörter mit Leerzeichen verwenden)"
   },
   {
-    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]",
+    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
     "translation": "CF_NAME bind-running-security-group SECURITY_GROUP"
   },
   {
-    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]",
-    "translation": ""
+    "id": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE",
+    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG SPACE"
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
@@ -920,8 +904,8 @@
     "translation": "CF_NAME target [-o ORG] [-s SPACE]"
   },
   {
-    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": ""
+    "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]",
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -1106,10 +1090,6 @@
   {
     "id": "Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
     "translation": "Verbundene, Tailing-Protokolle (Liveanzeige der aktuellen letzten Protokollzeilen) für App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.Username}}...\n"
-  },
-  {
-    "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "Kopie des Quellcodes der App von einer Anwendung für eine andere erstellen.  Der Befehl copy-source startet die Anwendung erneut, wenn er nicht überschrieben wurde."
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1525,7 +1505,7 @@
   },
   {
     "id": "Did you mean?",
-    "translation": ""
+    "translation": "Meinten Sie?"
   },
   {
     "id": "Disable access for a specified organization",
@@ -1745,7 +1725,7 @@
   },
   {
     "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "Fehler beim Löschen der Domäne {{.DomainName}}\n{{.Err}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1785,7 +1765,7 @@
   },
   {
     "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "Fehler beim Suchen von Domänen {{.DomainName}}\n{{.Err}}"
   },
   {
     "id": "Error finding manifest",
@@ -1917,7 +1897,7 @@
   },
   {
     "id": "Error restarting application: {{.Error}}",
-    "translation": ""
+    "translation": "Fehler beim Neustarten der Anwendung: {{.Error}}"
   },
   {
     "id": "Error retrieving stack: ",
@@ -2025,7 +2005,7 @@
   },
   {
     "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": ""
+    "translation": "Abrufen von Domänen für Organization %s ist fehlgeschlagen.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2069,7 +2049,7 @@
   },
   {
     "id": "Failed to make plugin executable: {{.Error}}",
-    "translation": ""
+    "translation": "Plug-in konnte nicht ausführbar gemacht werden: {{.Error}}"
   },
   {
     "id": "Failed to marshal JSON",
@@ -2081,7 +2061,7 @@
   },
   {
     "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "Beobachten des Staging von App {{.AppName}} in Organisation {{.OrgName}} / Bereich {{.SpaceName}} als {{.CurrentUser}} fehlgeschlagen..."
   },
   {
     "id": "Feature {{.FeatureFlag}} Disabled.",
@@ -2476,10 +2456,6 @@
     "translation": "Falsche Verwendung. Erfordert REPO_NAME und URL als Argumente.\n\n"
   },
   {
-    "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
-  },
-  {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
     "translation": "Falsche Verwendung. Erfordert SECURITY_GROUP und PATH_TO_JSON_RULES_FILE als Argumente.\n\n"
   },
@@ -2506,6 +2482,10 @@
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
     "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE und SERVICE_KEY als Argumente.\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
+    "translation": "Falsche Verwendung. Erfordert SOURCE-APP TARGET-APP als Argumente.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
@@ -2538,6 +2518,10 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "Falsche Verwendung. Erfordert ein Argument.\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires app name as argument\n\n",
+    "translation": "Falsche Verwendung. Erfordert den Namen einer App als Argument.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -2581,7 +2565,7 @@
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",
-    "translation": ""
+    "translation": "Falsche Verwendung. {{.Arguments}} erforderlich"
   },
   {
     "id": "Incorrect Usage:",
@@ -2626,10 +2610,6 @@
   {
     "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
     "translation": "Ungültiger App-Port: {{.AppPort}}\nApp-Port muss eine Nummer sein"
-  },
-  {
-    "id": "Invalid application configuration",
-    "translation": ""
   },
   {
     "id": "Invalid async response from server",
@@ -2860,6 +2840,10 @@
     "translation": "MEMORY (HAUTPSPEICHER)"
   },
   {
+    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
+    "translation": "Kopie des Quellcodes der App von einer Anwendung für eine andere erstellen.  Der Befehl copy-source startet die Anwendung erneut, wenn er nicht überschrieben wurde."
+  },
+  {
     "id": "Make a user-provided service instance available to CF apps",
     "translation": "Eine vom Benutzer zur Verfügung gestellte Serviceinstanz für CF-Apps verfügbar machen"
   },
@@ -2909,11 +2893,11 @@
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
-    "translation": ""
+    "translation": "Maximale Anzahl von Routen, die mit reservierten Ports erstellt werden können"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
-    "translation": ""
+    "translation": "Maximale Anzahl von Routen, die mit reservierten Ports erstellt werden können (Standardwert: 0)"
   },
   {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
@@ -3121,7 +3105,7 @@
   },
   {
     "id": "OPTIONS:",
-    "translation": "OPTIONEN:"
+    "translation": "Optionen:"
   },
   {
     "id": "ORG ADMIN",
@@ -3206,10 +3190,6 @@
   {
     "id": "Password verification does not match",
     "translation": "Kennwortüberprüfung stellt keine Übereinstimmung fest"
-  },
-  {
-    "id": "Path for HTTP route",
-    "translation": ""
   },
   {
     "id": "Path for the HTTP route",
@@ -3385,7 +3365,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": ""
+    "translation": "RESERVED_ROUTE_PORTS (RESERVIERTE ROUTENPORTS)"
   },
   {
     "id": "RESPONSE:",
@@ -3556,16 +3536,8 @@
     "translation": "Pseudo-TTY-Zuordnung anfordern"
   },
   {
-    "id": "Requires SOURCE-APP TARGET-APP as arguments",
-    "translation": "Erfordert SOURCE-APP TARGET-APP als Argumente"
-  },
-  {
-    "id": "Requires app name as argument",
-    "translation": "Erfordert den Namen einer App als Argument"
-  },
-  {
     "id": "Reserved Route Ports",
-    "translation": ""
+    "translation": "Reservierte Routenports"
   },
   {
     "id": "Restage an app",
@@ -3693,7 +3665,7 @@
   },
   {
     "id": "SERVICE",
-    "translation": ""
+    "translation": "SERVICE"
   },
   {
     "id": "SERVICE ADMIN",
@@ -4108,20 +4080,12 @@
     "translation": "Die aktive Anwendungsinstanz beim gegebenen Index beenden und eine neue Instanz der Anwendung mit demselben Index instanziieren"
   },
   {
-    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
-    "translation": ""
-  },
-  {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
     "translation": "Die Datei {{.PluginExecutableName}} ist bereits im Plug-in-Verzeichnis vorhanden.\n"
   },
   {
     "id": "The order in which the buildpacks are checked during buildpack auto-detection",
     "translation": "Die Reihenfolge, in der die Buildpacks während der automatische Buildpackerkennung geprüft werden"
-  },
-  {
-    "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4193,7 +4157,7 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount.",
-    "translation": ""
+    "translation": "Gesamtzahl der Anwendungsinstanzen. -1 steht für eine unbegrenzte Menge."
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
@@ -4621,7 +4585,7 @@
   },
   {
     "id": "app instances",
-    "translation": ""
+    "translation": "App-Instanzen"
   },
   {
     "id": "apps",
@@ -4704,10 +4668,6 @@
     "translation": "inaktiv"
   },
   {
-    "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
-  },
-  {
     "id": "enabled",
     "translation": "aktiviert"
   },
@@ -4749,7 +4709,7 @@
   },
   {
     "id": "instance memory",
-    "translation": "instanzspeiche"
+    "translation": "Instanzspeicher"
   },
   {
     "id": "instance memory limit",
@@ -4837,7 +4797,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "bezahlte plane"
+    "translation": "Bezahlte Pläne"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -4901,11 +4861,11 @@
   },
   {
     "id": "reserved route ports",
-    "translation": ""
+    "translation": "Reservierte Routenports"
   },
   {
     "id": "route ports",
-    "translation": ""
+    "translation": "Routenports"
   },
   {
     "id": "routes",
@@ -5041,7 +5001,7 @@
   },
   {
     "id": "total memory",
-    "translation": "gesamtspeicher"
+    "translation": "Gesamtspeicher"
   },
   {
     "id": "total memory limit",
@@ -5161,11 +5121,11 @@
   },
   {
     "id": "{{.MemoryLimit}} memory limit",
-    "translation": ""
+    "translation": "{{.MemoryLimit}} Speicherbegrenzung"
   },
   {
     "id": "{{.MemoryLimit}}M memory limit",
-    "translation": "{{.MemoryLimit}} - Speicherbegrenzung"
+    "translation": "{{.MemoryLimit}}M - Speicherbegrenzung"
   },
   {
     "id": "{{.ModelType}} {{.ModelName}} already exists",
@@ -5197,7 +5157,7 @@
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",
-    "translation": ""
+    "translation": "{{.ReservedRoutePorts}} Routenports"
   },
   {
     "id": "{{.RoutesLimit}} routes",
@@ -5232,3 +5192,4 @@
     "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} Instanzen"
   }
 ]
+
