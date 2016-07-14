@@ -76,6 +76,10 @@
     "translation": "Invalid application configuration"
   },
   {
+    "id": "Invalid port for route {{.RouteName}}",
+    "translation": "Invalid port for route {{.RouteName}}"
+  },
+  {
     "id": "Maximum number of routes that may be created with reserved ports",
     "translation": "Maximum number of routes that may be created with reserved ports"
   },
@@ -98,10 +102,6 @@
   {
     "id": "SERVICE",
     "translation": "SERVICE"
-  },
-  {
-    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
-    "translation": "The domain {{.DomainName}} is not an HTTP domain, unable to map route."
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",

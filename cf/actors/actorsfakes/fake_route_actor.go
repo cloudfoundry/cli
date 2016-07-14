@@ -18,12 +18,13 @@ type FakeRouteActor struct {
 		result1 models.Route
 		result2 error
 	}
-	FindOrCreateRouteStub        func(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error)
+	FindOrCreateRouteStub        func(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error)
 	findOrCreateRouteMutex       sync.RWMutex
 	findOrCreateRouteArgsForCall []struct {
 		hostname      string
 		domain        models.DomainFields
 		path          string
+		port          int
 		useRandomPort bool
 	}
 	findOrCreateRouteReturns struct {
@@ -65,6 +66,16 @@ type FakeRouteActor struct {
 	findPathReturns struct {
 		result1 string
 		result2 string
+	}
+	FindPortStub        func(routeName string) (string, int, error)
+	findPortMutex       sync.RWMutex
+	findPortArgsForCall []struct {
+		routeName string
+	}
+	findPortReturns struct {
+		result1 string
+		result2 int
+		result3 error
 	}
 	FindAndBindRouteStub        func(routeName string, app models.Application) error
 	findAndBindRouteMutex       sync.RWMutex
@@ -113,18 +124,19 @@ func (fake *FakeRouteActor) CreateRandomTCPRouteReturns(result1 models.Route, re
 	}{result1, result2}
 }
 
-func (fake *FakeRouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, useRandomPort bool) (models.Route, error) {
+func (fake *FakeRouteActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error) {
 	fake.findOrCreateRouteMutex.Lock()
 	fake.findOrCreateRouteArgsForCall = append(fake.findOrCreateRouteArgsForCall, struct {
 		hostname      string
 		domain        models.DomainFields
 		path          string
+		port          int
 		useRandomPort bool
-	}{hostname, domain, path, useRandomPort})
-	fake.recordInvocation("FindOrCreateRoute", []interface{}{hostname, domain, path, useRandomPort})
+	}{hostname, domain, path, port, useRandomPort})
+	fake.recordInvocation("FindOrCreateRoute", []interface{}{hostname, domain, path, port, useRandomPort})
 	fake.findOrCreateRouteMutex.Unlock()
 	if fake.FindOrCreateRouteStub != nil {
-		return fake.FindOrCreateRouteStub(hostname, domain, path, useRandomPort)
+		return fake.FindOrCreateRouteStub(hostname, domain, path, port, useRandomPort)
 	} else {
 		return fake.findOrCreateRouteReturns.result1, fake.findOrCreateRouteReturns.result2
 	}
@@ -136,10 +148,10 @@ func (fake *FakeRouteActor) FindOrCreateRouteCallCount() int {
 	return len(fake.findOrCreateRouteArgsForCall)
 }
 
-func (fake *FakeRouteActor) FindOrCreateRouteArgsForCall(i int) (string, models.DomainFields, string, bool) {
+func (fake *FakeRouteActor) FindOrCreateRouteArgsForCall(i int) (string, models.DomainFields, string, int, bool) {
 	fake.findOrCreateRouteMutex.RLock()
 	defer fake.findOrCreateRouteMutex.RUnlock()
-	return fake.findOrCreateRouteArgsForCall[i].hostname, fake.findOrCreateRouteArgsForCall[i].domain, fake.findOrCreateRouteArgsForCall[i].path, fake.findOrCreateRouteArgsForCall[i].useRandomPort
+	return fake.findOrCreateRouteArgsForCall[i].hostname, fake.findOrCreateRouteArgsForCall[i].domain, fake.findOrCreateRouteArgsForCall[i].path, fake.findOrCreateRouteArgsForCall[i].port, fake.findOrCreateRouteArgsForCall[i].useRandomPort
 }
 
 func (fake *FakeRouteActor) FindOrCreateRouteReturns(result1 models.Route, result2 error) {
@@ -286,6 +298,41 @@ func (fake *FakeRouteActor) FindPathReturns(result1 string, result2 string) {
 	}{result1, result2}
 }
 
+func (fake *FakeRouteActor) FindPort(routeName string) (string, int, error) {
+	fake.findPortMutex.Lock()
+	fake.findPortArgsForCall = append(fake.findPortArgsForCall, struct {
+		routeName string
+	}{routeName})
+	fake.recordInvocation("FindPort", []interface{}{routeName})
+	fake.findPortMutex.Unlock()
+	if fake.FindPortStub != nil {
+		return fake.FindPortStub(routeName)
+	} else {
+		return fake.findPortReturns.result1, fake.findPortReturns.result2, fake.findPortReturns.result3
+	}
+}
+
+func (fake *FakeRouteActor) FindPortCallCount() int {
+	fake.findPortMutex.RLock()
+	defer fake.findPortMutex.RUnlock()
+	return len(fake.findPortArgsForCall)
+}
+
+func (fake *FakeRouteActor) FindPortArgsForCall(i int) string {
+	fake.findPortMutex.RLock()
+	defer fake.findPortMutex.RUnlock()
+	return fake.findPortArgsForCall[i].routeName
+}
+
+func (fake *FakeRouteActor) FindPortReturns(result1 string, result2 int, result3 error) {
+	fake.FindPortStub = nil
+	fake.findPortReturns = struct {
+		result1 string
+		result2 int
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeRouteActor) FindAndBindRoute(routeName string, app models.Application) error {
 	fake.findAndBindRouteMutex.Lock()
 	fake.findAndBindRouteArgsForCall = append(fake.findAndBindRouteArgsForCall, struct {
@@ -335,6 +382,8 @@ func (fake *FakeRouteActor) Invocations() map[string][][]interface{} {
 	defer fake.findDomainMutex.RUnlock()
 	fake.findPathMutex.RLock()
 	defer fake.findPathMutex.RUnlock()
+	fake.findPortMutex.RLock()
+	defer fake.findPortMutex.RUnlock()
 	fake.findAndBindRouteMutex.RLock()
 	defer fake.findAndBindRouteMutex.RUnlock()
 	return fake.invocations

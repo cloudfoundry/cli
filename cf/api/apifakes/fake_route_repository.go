@@ -37,12 +37,13 @@ type FakeRouteRepository struct {
 		result1 models.Route
 		result2 error
 	}
-	CreateStub        func(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error)
+	CreateStub        func(host string, domain models.DomainFields, path string, port int, useRandomPort bool) (createdRoute models.Route, apiErr error)
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		host          string
 		domain        models.DomainFields
 		path          string
+		port          int
 		useRandomPort bool
 	}
 	createReturns struct {
@@ -100,6 +101,8 @@ type FakeRouteRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr error) {
@@ -107,6 +110,7 @@ func (fake *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr 
 	fake.listRoutesArgsForCall = append(fake.listRoutesArgsForCall, struct {
 		cb func(models.Route) bool
 	}{cb})
+	fake.recordInvocation("ListRoutes", []interface{}{cb})
 	fake.listRoutesMutex.Unlock()
 	if fake.ListRoutesStub != nil {
 		return fake.ListRoutesStub(cb)
@@ -139,6 +143,7 @@ func (fake *FakeRouteRepository) ListAllRoutes(cb func(models.Route) bool) (apiE
 	fake.listAllRoutesArgsForCall = append(fake.listAllRoutesArgsForCall, struct {
 		cb func(models.Route) bool
 	}{cb})
+	fake.recordInvocation("ListAllRoutes", []interface{}{cb})
 	fake.listAllRoutesMutex.Unlock()
 	if fake.ListAllRoutesStub != nil {
 		return fake.ListAllRoutesStub(cb)
@@ -174,6 +179,7 @@ func (fake *FakeRouteRepository) Find(host string, domain models.DomainFields, p
 		path   string
 		port   int
 	}{host, domain, path, port})
+	fake.recordInvocation("Find", []interface{}{host, domain, path, port})
 	fake.findMutex.Unlock()
 	if fake.FindStub != nil {
 		return fake.FindStub(host, domain, path, port)
@@ -202,17 +208,19 @@ func (fake *FakeRouteRepository) FindReturns(result1 models.Route, result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeRouteRepository) Create(host string, domain models.DomainFields, path string, useRandomPort bool) (createdRoute models.Route, apiErr error) {
+func (fake *FakeRouteRepository) Create(host string, domain models.DomainFields, path string, port int, useRandomPort bool) (createdRoute models.Route, apiErr error) {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		host          string
 		domain        models.DomainFields
 		path          string
+		port          int
 		useRandomPort bool
-	}{host, domain, path, useRandomPort})
+	}{host, domain, path, port, useRandomPort})
+	fake.recordInvocation("Create", []interface{}{host, domain, path, port, useRandomPort})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(host, domain, path, useRandomPort)
+		return fake.CreateStub(host, domain, path, port, useRandomPort)
 	} else {
 		return fake.createReturns.result1, fake.createReturns.result2
 	}
@@ -224,10 +232,10 @@ func (fake *FakeRouteRepository) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, bool) {
+func (fake *FakeRouteRepository) CreateArgsForCall(i int) (string, models.DomainFields, string, int, bool) {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].host, fake.createArgsForCall[i].domain, fake.createArgsForCall[i].path, fake.createArgsForCall[i].useRandomPort
+	return fake.createArgsForCall[i].host, fake.createArgsForCall[i].domain, fake.createArgsForCall[i].path, fake.createArgsForCall[i].port, fake.createArgsForCall[i].useRandomPort
 }
 
 func (fake *FakeRouteRepository) CreateReturns(result1 models.Route, result2 error) {
@@ -245,6 +253,7 @@ func (fake *FakeRouteRepository) CheckIfExists(host string, domain models.Domain
 		domain models.DomainFields
 		path   string
 	}{host, domain, path})
+	fake.recordInvocation("CheckIfExists", []interface{}{host, domain, path})
 	fake.checkIfExistsMutex.Unlock()
 	if fake.CheckIfExistsStub != nil {
 		return fake.CheckIfExistsStub(host, domain, path)
@@ -283,6 +292,7 @@ func (fake *FakeRouteRepository) CreateInSpace(host string, path string, domainG
 		port       int
 		randomPort bool
 	}{host, path, domainGUID, spaceGUID, port, randomPort})
+	fake.recordInvocation("CreateInSpace", []interface{}{host, path, domainGUID, spaceGUID, port, randomPort})
 	fake.createInSpaceMutex.Unlock()
 	if fake.CreateInSpaceStub != nil {
 		return fake.CreateInSpaceStub(host, path, domainGUID, spaceGUID, port, randomPort)
@@ -317,6 +327,7 @@ func (fake *FakeRouteRepository) Bind(routeGUID string, appGUID string) (apiErr 
 		routeGUID string
 		appGUID   string
 	}{routeGUID, appGUID})
+	fake.recordInvocation("Bind", []interface{}{routeGUID, appGUID})
 	fake.bindMutex.Unlock()
 	if fake.BindStub != nil {
 		return fake.BindStub(routeGUID, appGUID)
@@ -350,6 +361,7 @@ func (fake *FakeRouteRepository) Unbind(routeGUID string, appGUID string) (apiEr
 		routeGUID string
 		appGUID   string
 	}{routeGUID, appGUID})
+	fake.recordInvocation("Unbind", []interface{}{routeGUID, appGUID})
 	fake.unbindMutex.Unlock()
 	if fake.UnbindStub != nil {
 		return fake.UnbindStub(routeGUID, appGUID)
@@ -382,6 +394,7 @@ func (fake *FakeRouteRepository) Delete(routeGUID string) (apiErr error) {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		routeGUID string
 	}{routeGUID})
+	fake.recordInvocation("Delete", []interface{}{routeGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(routeGUID)
@@ -407,6 +420,42 @@ func (fake *FakeRouteRepository) DeleteReturns(result1 error) {
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRouteRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listRoutesMutex.RLock()
+	defer fake.listRoutesMutex.RUnlock()
+	fake.listAllRoutesMutex.RLock()
+	defer fake.listAllRoutesMutex.RUnlock()
+	fake.findMutex.RLock()
+	defer fake.findMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.checkIfExistsMutex.RLock()
+	defer fake.checkIfExistsMutex.RUnlock()
+	fake.createInSpaceMutex.RLock()
+	defer fake.createInSpaceMutex.RUnlock()
+	fake.bindMutex.RLock()
+	defer fake.bindMutex.RUnlock()
+	fake.unbindMutex.RLock()
+	defer fake.unbindMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRouteRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.RouteRepository = new(FakeRouteRepository)

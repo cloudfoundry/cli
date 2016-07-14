@@ -49,10 +49,11 @@ var _ = Describe("Routes", func() {
 		It("calls Create on the route repo", func() {
 			routeActor.CreateRandomTCPRoute(expectedDomain)
 
-			host, d, path, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+			host, d, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
 			Expect(host).To(BeEmpty())
 			Expect(d).To(Equal(expectedDomain))
 			Expect(path).To(BeEmpty())
+			Expect(port).To(Equal(0))
 			Expect(randomPort).To(BeTrue())
 		})
 
@@ -107,7 +108,7 @@ var _ = Describe("Routes", func() {
 			})
 
 			It("does not create a route", func() {
-				route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, false)
+				route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, 0, false)
 				Expect(route).To(Equal(expectedRoute))
 				Expect(err).ToNot(HaveOccurred())
 
@@ -133,15 +134,16 @@ var _ = Describe("Routes", func() {
 				})
 
 				It("creates a route with a TCP Route", func() {
-					route, err := routeActor.FindOrCreateRoute("", expectedDomain, "", true)
+					route, err := routeActor.FindOrCreateRoute("", expectedDomain, "", 0, true)
 					Expect(route).To(Equal(tcpRoute))
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-					hostname, domain, path, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+					hostname, domain, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(hostname).To(BeEmpty())
 					Expect(domain).To(Equal(expectedDomain))
 					Expect(path).To(BeEmpty())
+					Expect(port).To(Equal(0))
 					Expect(randomPort).To(BeTrue())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
@@ -150,21 +152,46 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			Context("with out a random port", func() {
+			Context("without a specific port", func() {
 				BeforeEach(func() {
 					fakeRouteRepository.CreateReturns(expectedRoute, nil)
 				})
 
 				It("creates a route ", func() {
-					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, false)
+					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, "", 1337, false)
 					Expect(route).To(Equal(expectedRoute))
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-					hostname, domain, path, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+					hostname, domain, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
+					Expect(hostname).To(Equal(expectedHostname))
+					Expect(domain).To(Equal(expectedDomain))
+					Expect(path).To(Equal(""))
+					Expect(port).To(Equal(1337))
+					Expect(randomPort).To(BeFalse())
+
+					Expect(fakeUI.SayCallCount()).To(Equal(2))
+					output, _ := fakeUI.SayArgsForCall(0)
+					Expect(output).To(MatchRegexp("Creating route.*hostname.foo.com:1337"))
+				})
+			})
+
+			Context("with a path", func() {
+				BeforeEach(func() {
+					fakeRouteRepository.CreateReturns(expectedRoute, nil)
+				})
+
+				It("creates a route ", func() {
+					route, err := routeActor.FindOrCreateRoute(expectedHostname, expectedDomain, expectedPath, 0, false)
+					Expect(route).To(Equal(expectedRoute))
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
+					hostname, domain, path, port, randomPort := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(hostname).To(Equal(expectedHostname))
 					Expect(domain).To(Equal(expectedDomain))
 					Expect(path).To(Equal(expectedPath))
+					Expect(port).To(Equal(0))
 					Expect(randomPort).To(BeFalse())
 
 					Expect(fakeUI.SayCallCount()).To(Equal(2))
@@ -353,87 +380,43 @@ var _ = Describe("Routes", func() {
 			})
 
 			Context("when the route has no hostname", func() {
-				Context("and the domain is HTTP", func() {
-					BeforeEach(func() {
-						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
-							if name == "my-hostname.my-domain.com" {
-								return sharedDomain, nil
-							}
-							return models.DomainFields{}, domainNotFoundError
+				BeforeEach(func() {
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "my-hostname.my-domain.com" {
+							return sharedDomain, nil
 						}
-					})
-
-					It("returns the shared domain", func() {
-						Expect(findDomainErr).NotTo(HaveOccurred())
-						Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
-						Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(1))
-						Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
-						Expect(hostname).To(Equal(""))
-						Expect(domain).To(Equal(sharedDomain))
-					})
+						return models.DomainFields{}, domainNotFoundError
+					}
 				})
 
-				Context("and the domain is not HTTP", func() {
-					BeforeEach(func() {
-						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
-							return models.DomainFields{
-									GUID:            "non-http-shared-domain-guid",
-									Name:            "non-http-shared-domain",
-									RouterGroupType: "not-null",
-								},
-								nil
-						}
-					})
-
-					It("returns an error", func() {
-						Expect(findDomainErr).To(HaveOccurred())
-						Expect(findDomainErr.Error()).To(Equal("The domain non-http-shared-domain is not an HTTP domain, unable to map route."))
-					})
+				It("returns the shared domain", func() {
+					Expect(findDomainErr).NotTo(HaveOccurred())
+					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+					Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(1))
+					Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
+					Expect(hostname).To(Equal(""))
+					Expect(domain).To(Equal(sharedDomain))
 				})
 			})
 
 			Context("when the route has a hostname", func() {
-				Context("and the domain is HTTP", func() {
-					BeforeEach(func() {
-						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
-							if name == "my-domain.com" {
-								return sharedDomain, nil
-							}
-							return models.DomainFields{}, domainNotFoundError
+				BeforeEach(func() {
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "my-domain.com" {
+							return sharedDomain, nil
 						}
-					})
-
-					It("returns the shared domain and hostname", func() {
-						Expect(findDomainErr).NotTo(HaveOccurred())
-						Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
-						Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(2))
-						Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
-						Expect(fakeDomainRepository.FindSharedByNameArgsForCall(1)).To(Equal("my-domain.com"))
-						Expect(hostname).To(Equal("my-hostname"))
-						Expect(domain).To(Equal(sharedDomain))
-					})
+						return models.DomainFields{}, domainNotFoundError
+					}
 				})
 
-				Context("and the domain is not HTTP", func() {
-					BeforeEach(func() {
-						fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
-							if name == "my-domain.com" {
-								return models.DomainFields{
-										GUID:            "non-http-shared-domain-guid",
-										Name:            "non-http-shared-domain",
-										RouterGroupType: "not-null",
-									},
-									nil
-							}
-							return models.DomainFields{}, domainNotFoundError
-						}
-					})
-
-					It("returns an error", func() {
-						Expect(findDomainErr).To(HaveOccurred())
-						Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(2))
-						Expect(findDomainErr.Error()).To(Equal("The domain non-http-shared-domain is not an HTTP domain, unable to map route."))
-					})
+				It("returns the shared domain and hostname", func() {
+					Expect(findDomainErr).NotTo(HaveOccurred())
+					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+					Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(2))
+					Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
+					Expect(fakeDomainRepository.FindSharedByNameArgsForCall(1)).To(Equal("my-domain.com"))
+					Expect(hostname).To(Equal("my-hostname"))
+					Expect(domain).To(Equal(sharedDomain))
 				})
 			})
 		})
@@ -471,6 +454,35 @@ var _ = Describe("Routes", func() {
 			})
 		})
 	})
+	Describe("FindPort", func() {
+		Context("when there is a port", func() {
+			It("returns the route without port and the port", func() {
+				routeName := "host.domain:12345"
+				route, port, err := routeActor.FindPort(routeName)
+				Expect(route).To(Equal("host.domain"))
+				Expect(port).To(Equal(12345))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when there is no port", func() {
+			It("returns the route port and invalid port", func() {
+				routeName := "host.domain"
+				route, port, err := routeActor.FindPort(routeName)
+				Expect(route).To(Equal("host.domain"))
+				Expect(port).To(Equal(0))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when there is an invalid port", func() {
+			It("returns an error", func() {
+				routeName := "host.domain:thisisnotaport"
+				_, _, err := routeActor.FindPort(routeName)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
 
 	Describe("FindAndBindRoute", func() {
 		BeforeEach(func() {
@@ -486,6 +498,7 @@ var _ = Describe("Routes", func() {
 				}
 				return models.DomainFields{}, domainNotFoundError
 			}
+
 			fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("route", "myroute"))
 			fakeRouteRepository.CreateReturns(models.Route{
 				GUID:   "route-guid",
@@ -496,34 +509,70 @@ var _ = Describe("Routes", func() {
 			fakeRouteRepository.BindReturns(nil)
 		})
 
-		It("creates and binds the route", func() {
-			app := models.Application{
-				ApplicationFields: models.ApplicationFields{
-					Name: "app-name",
-					GUID: "app-guid",
-				},
-			}
+		Context("when route contains path", func() {
+			It("creates and binds the route", func() {
+				app := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name: "app-name",
+						GUID: "app-guid",
+					},
+				}
 
-			_ = routeActor.FindAndBindRoute("host.domain.com/path", app)
+				_ = routeActor.FindAndBindRoute("host.domain.com/path", app)
 
-			actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
-			Expect(actualDomainName).To(Equal("domain.com"))
+				actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
+				Expect(actualDomainName).To(Equal("domain.com"))
 
-			actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
-			Expect(actualHost).To(Equal("host"))
-			Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
-			Expect(actualPath).To(Equal("path"))
-			Expect(actualPort).To(Equal(0))
+				actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+				Expect(actualHost).To(Equal("host"))
+				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
+				Expect(actualPath).To(Equal("path"))
+				Expect(actualPort).To(Equal(0))
 
-			actualHost, actualDomain, actualPath, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
-			Expect(actualHost).To(Equal("host"))
-			Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
-			Expect(actualPath).To(Equal("path"))
-			Expect(actualUseRandomPort).To(BeFalse())
+				actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+				Expect(actualHost).To(Equal("host"))
+				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
+				Expect(actualPath).To(Equal("path"))
+				Expect(actualPort).To(Equal(0))
+				Expect(actualUseRandomPort).To(BeFalse())
 
-			routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
-			Expect(routeGUID).To(Equal("route-guid"))
-			Expect(appGUID).To(Equal("app-guid"))
+				routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
+				Expect(routeGUID).To(Equal("route-guid"))
+				Expect(appGUID).To(Equal("app-guid"))
+			})
+		})
+
+		Context("when route contains port", func() {
+			It("creates and binds the route", func() {
+				app := models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name: "app-name",
+						GUID: "app-guid",
+					},
+				}
+
+				_ = routeActor.FindAndBindRoute("host.domain.com:12345", app)
+
+				actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
+				Expect(actualDomainName).To(Equal("domain.com"))
+
+				actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+				Expect(actualHost).To(Equal("host"))
+				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
+				Expect(actualPath).To(Equal(""))
+				Expect(actualPort).To(Equal(12345))
+
+				actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+				Expect(actualHost).To(Equal("host"))
+				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
+				Expect(actualPath).To(Equal(""))
+				Expect(actualPort).To(Equal(12345))
+				Expect(actualUseRandomPort).To(BeFalse())
+
+				routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
+				Expect(routeGUID).To(Equal("route-guid"))
+				Expect(appGUID).To(Equal("app-guid"))
+			})
 		})
 	})
 })

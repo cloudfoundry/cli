@@ -2696,6 +2696,10 @@
     "translation": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
+    "id": "Invalid port for route {{.RouteName}}",
+    "translation": "Invalid port for route {{.RouteName}}"
+  },
+  {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
     "translation": "Invalid timeout param: {{.Timeout}}\n{{.Err}}"
   },
@@ -4106,10 +4110,6 @@
   {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"
-  },
-  {
-    "id": "The domain {{.DomainName}} is not an HTTP domain, unable to map route.",
-    "translation": "The domain {{.DomainName}} is not an HTTP domain, unable to map route."
   },
   {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
