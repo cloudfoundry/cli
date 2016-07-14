@@ -50,3 +50,4 @@ run:
     ./cf auth admin admin
     # This feature flag only affects the diego acceptance tests
     ./cf enable-feature-flag diego_docker
+
