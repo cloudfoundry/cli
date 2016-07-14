@@ -8,9 +8,10 @@ params:
 inputs:
 - name: cf-cli-binaries
 - name: cli
+- name: cli-ci
 
 outputs:
 - name: winstallers
 
 run:
-  path: cli/ci/tasks/create-installers-windows.bat
+  path: cli-ci/ci/tasks/create-installers-windows.bat
