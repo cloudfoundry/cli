@@ -24,7 +24,7 @@ popd
 
 ISCC %ROOT_DIR%\cli\installers\windows\windows-installer-x64.iss
 
-MOVE %ROOT_DIR%\cli\installers\windows\Output\setup.exe cf_installer.exe
+MOVE %ROOT_DIR%\cli\installers\windows\Output\mysetup.exe cf_installer.exe
 
 zip %ROOT_DIR%\winstallers\cf-cli-installer_winx64.zip cf_installer.exe
 
@@ -35,6 +35,6 @@ sed -i -e "s/SIGNTOOL_CERT_PATH/%SIGNTOOL_CERT_PATH%/" %ROOT_DIR%\cli\installers
 
 ISCC %ROOT_DIR%\cli\installers\windows\windows-installer-x86.iss
 
-MOVE %ROOT_DIR%\cli\installers\windows\Output\setup.exe cf_installer.exe
+MOVE %ROOT_DIR%\cli\installers\windows\Output\mysetup.exe cf_installer.exe
 
 zip %ROOT_DIR%\winstallers\cf-cli-installer_win32.zip cf_installer.exe
