@@ -9,6 +9,7 @@ params:
 
 inputs:
   - name: cf-release-repo
+  - name: cli-private
 
 outputs:
   - name: bosh-lite-cf-manifest
@@ -30,11 +31,7 @@ run:
       ./scripts/update > /dev/null
 
       echo "Generating bosh lite manifest from cf-release-repo/scripts/generate-bosh-lite-dev-manifest"
-      cat > property-overrides.yml << EOF
-    properties:
-      system_domain: ${LITE_HOSTNAME}
-    EOF
-      ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
+      ./scripts/generate-bosh-lite-dev-manifest ../cli-private/ci/acceptance-deployment/property-overrides.yml
     popd
 
     cp cf-release-repo/bosh-lite/deployments/cf.yml bosh-lite-cf-manifest
