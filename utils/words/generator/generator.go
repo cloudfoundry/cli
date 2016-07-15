@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/cloudfoundry/cli/words"
+	. "github.com/cloudfoundry/cli/utils/words"
 )
 
 //go:generate counterfeiter . WordGenerator
@@ -29,8 +29,8 @@ func (wg wordGenerator) Babble() (word string) {
 }
 
 func NewWordGenerator() WordGenerator {
-	adjectiveBytes, _ := Asset("words/dict/adjectives.txt")
-	nounBytes, _ := Asset("words/dict/nouns.txt")
+	adjectiveBytes, _ := Asset("utils/words/dict/adjectives.txt")
+	nounBytes, _ := Asset("utils/words/dict/nouns.txt")
 	source := rand.NewSource(time.Now().UnixNano())
 
 	return wordGenerator{

@@ -27,7 +27,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/words/generator"
+	"github.com/cloudfoundry/cli/utils/words/generator"
 )
 
 type Push struct {

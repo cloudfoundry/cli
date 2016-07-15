@@ -6,7 +6,7 @@
     || /^plugin_examples\/.*main redeclared in this block/ \
     || /^plugin_examples\/.*other declaration of main/ \
     || /cf\/resources.*\(golint\)/ \
-    || /words\/.*\(golint\)/ \
+    || /utils\/words\/.*\(golint\)/ \
     || /plugin\/models\/.*\(golint\)/ \
     || /_test\.go.*\(errcheck\)/ \
 )
