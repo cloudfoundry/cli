@@ -292,12 +292,12 @@
     "translation": "Application instance index"
   },
   {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'",
-    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'domains'"
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'"
   },
   {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'",
-    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'hosts'"
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
