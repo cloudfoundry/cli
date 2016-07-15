@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/appinstances"
+	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -31,6 +32,7 @@ type ShowApp struct {
 	config           coreconfig.Reader
 	appSummaryRepo   api.AppSummaryRepository
 	appInstancesRepo appinstances.Repository
+	stackRepo        stacks.StackRepository
 	appReq           requirements.ApplicationRequirement
 	pluginAppModel   *plugin_models.GetAppModel
 	pluginCall       bool
@@ -75,6 +77,7 @@ func (cmd *ShowApp) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	cmd.config = deps.Config
 	cmd.appSummaryRepo = deps.RepoLocator.GetAppSummaryRepository()
 	cmd.appInstancesRepo = deps.RepoLocator.GetAppInstancesRepository()
+	cmd.stackRepo = deps.RepoLocator.GetStackRepository()
 
 	cmd.pluginAppModel = deps.PluginModels.Application
 	cmd.pluginCall = pluginCall
@@ -164,8 +167,10 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) e
 		lastUpdated = "unknown"
 	}
 	cmd.ui.Say("%s %s", terminal.HeaderColor(T("last uploaded:")), lastUpdated)
-	if app.Stack != nil {
-		cmd.ui.Say("%s %s", terminal.HeaderColor(T("stack:")), app.Stack.Name)
+
+	appStack, err := cmd.stackRepo.FindByGUID(application.ApplicationFields.StackGUID)
+	if appStack.Name != "" && err == nil {
+		cmd.ui.Say("%s %s", terminal.HeaderColor(T("stack:")), appStack.Name)
 	} else {
 		cmd.ui.Say("%s %s", terminal.HeaderColor(T("stack:")), "unknown")
 	}
