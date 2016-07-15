@@ -25,7 +25,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/plugin/models"
 	"github.com/cloudfoundry/cli/utils"
-	"github.com/cloudfoundry/cli/words/generator"
+	"github.com/cloudfoundry/cli/utils/words/generator"
 )
 
 type Dependency struct {
