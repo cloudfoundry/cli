@@ -22,7 +22,7 @@ import (
 	"github.com/cloudfoundry/cli/commandsloader"
 	"github.com/cloudfoundry/cli/flags"
 	"github.com/cloudfoundry/cli/plugin/rpc"
-	"github.com/cloudfoundry/cli/spellcheck"
+	"github.com/cloudfoundry/cli/utils/spellcheck"
 
 	netrpc "net/rpc"
 )
