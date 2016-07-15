@@ -880,7 +880,7 @@ var _ = Describe("Push Command", func() {
 					})
 
 					Context("for http routes", func() {
-						Context("when random hostname is set as a flag", func() {
+						Context("when random-route is set as a flag", func() {
 							BeforeEach(func() {
 								args = []string{"--random-route", "app-name"}
 							})
@@ -894,7 +894,7 @@ var _ = Describe("Push Command", func() {
 							})
 						})
 
-						Context("when random hostname is set in the manifest", func() {
+						Context("when random-route is set in the manifest", func() {
 							BeforeEach(func() {
 								manifestApp.Set("random-route", true)
 								args = []string{"app-name"}
@@ -1170,21 +1170,62 @@ var _ = Describe("Push Command", func() {
 					})
 				})
 
-				Context("when provided the --no-route-flag", func() {
-					BeforeEach(func() {
-						domainRepo.FindByNameInOrgReturns(models.DomainFields{
-							Name: "bar.cf-app.com",
-							GUID: "bar-domain-guid",
-						}, nil)
+				Context("when the no-route option is set", func() {
+					Context("when provided the --no-route-flag", func() {
+						BeforeEach(func() {
+							domainRepo.FindByNameInOrgReturns(models.DomainFields{
+								Name: "bar.cf-app.com",
+								GUID: "bar-domain-guid",
+							}, nil)
 
-						args = []string{"--no-route", "app-name"}
+							args = []string{"--no-route", "app-name"}
+						})
+
+						It("does not create a route", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							params := appRepo.CreateArgsForCall(0)
+							Expect(*params.Name).To(Equal("app-name"))
+							Expect(routeRepo.CreateCallCount()).To(BeZero())
+						})
 					})
 
-					It("does not create a route", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-						params := appRepo.CreateArgsForCall(0)
-						Expect(*params.Name).To(Equal("app-name"))
-						Expect(routeRepo.CreateCallCount()).To(BeZero())
+					Context("when no-route is set in the manifest", func() {
+						BeforeEach(func() {
+							deps.UI = uiWithContents
+							workerManifest := &manifest.Manifest{
+								Path: "manifest.yml",
+								Data: generic.NewMap(map[interface{}]interface{}{
+									"applications": []interface{}{
+										generic.NewMap(map[interface{}]interface{}{
+											"name":      "manifest-app-name",
+											"memory":    "128MB",
+											"instances": 1,
+											"host":      "manifest-host",
+											"domain":    "manifest-example.com",
+											"stack":     "custom-stack",
+											"timeout":   360,
+											"buildpack": "some-buildpack",
+											"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+											"path":      filepath.Clean("some/path/from/manifest"),
+											"env": generic.NewMap(map[interface{}]interface{}{
+												"FOO":  "baz",
+												"PATH": "/u/apps/my-app/bin",
+											}),
+										}),
+									},
+								}),
+							}
+							workerManifest.Data.Get("applications").([]interface{})[0].(generic.Map).Set("no-route", true)
+							manifestRepo.ReadManifestReturns(workerManifest, nil)
+
+							args = []string{"app-name"}
+						})
+
+						It("Does not create a route", func() {
+							Expect(executeErr).NotTo(HaveOccurred())
+							Expect(terminal.Decolorize(string(output.Contents()))).To(ContainSubstring("App app-name is a worker, skipping route creation"))
+							Expect(routeRepo.BindCallCount()).To(BeZero())
+						})
 					})
 				})
 
@@ -1210,45 +1251,6 @@ var _ = Describe("Push Command", func() {
 						Expect(routeActor.FindOrCreateRouteCallCount()).To(Equal(1))
 						_, domain, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 						Expect(domain.GUID).To(Equal("bar-domain-guid"))
-					})
-				})
-
-				Context("when no-route is set in the manifest", func() {
-					BeforeEach(func() {
-						deps.UI = uiWithContents
-						workerManifest := &manifest.Manifest{
-							Path: "manifest.yml",
-							Data: generic.NewMap(map[interface{}]interface{}{
-								"applications": []interface{}{
-									generic.NewMap(map[interface{}]interface{}{
-										"name":      "manifest-app-name",
-										"memory":    "128MB",
-										"instances": 1,
-										"host":      "manifest-host",
-										"domain":    "manifest-example.com",
-										"stack":     "custom-stack",
-										"timeout":   360,
-										"buildpack": "some-buildpack",
-										"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-										"path":      filepath.Clean("some/path/from/manifest"),
-										"env": generic.NewMap(map[interface{}]interface{}{
-											"FOO":  "baz",
-											"PATH": "/u/apps/my-app/bin",
-										}),
-									}),
-								},
-							}),
-						}
-						workerManifest.Data.Get("applications").([]interface{})[0].(generic.Map).Set("no-route", true)
-						manifestRepo.ReadManifestReturns(workerManifest, nil)
-
-						args = []string{"app-name"}
-					})
-
-					It("Does not create a route", func() {
-						Expect(executeErr).NotTo(HaveOccurred())
-						Expect(terminal.Decolorize(string(output.Contents()))).To(ContainSubstring("App app-name is a worker, skipping route creation"))
-						Expect(routeRepo.BindCallCount()).To(BeZero())
 					})
 				})
 
