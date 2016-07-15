@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bufio"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -39,7 +40,7 @@ var _ = Describe("main", func() {
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
 
-		fullDir := filepath.Join(dir, "..", "fixtures", "config", "main-plugin-test-config")
+		fullDir := filepath.Join(dir, "..", "..", "fixtures", "config", "main-plugin-test-config")
 		err = os.Setenv("CF_PLUGIN_HOME", fullDir)
 		Expect(err).NotTo(HaveOccurred())
 	})
@@ -99,6 +100,14 @@ var _ = Describe("main", func() {
 	})
 
 	Describe("Enables verbose output with -v", func() {
+		BeforeEach(func() {
+			client := http.Client{Timeout: 3 * time.Second}
+			_, err := client.Get("http://api.bosh-lite.com/v2/info")
+			if err != nil {
+				Skip("unable to communicate with bosh-lite, skipping")
+			}
+		})
+
 		// Normally cf curl only shows the output of the response
 		// When using trace, it also shows the request/response information
 		It("enables verbose output when -v is provided before a command", func() {
@@ -148,7 +157,7 @@ var _ = Describe("main", func() {
 		It("runs requirement of the command", func() {
 			dir, err := os.Getwd()
 			Expect(err).ToNot(HaveOccurred())
-			fullDir := filepath.Join(dir, "..", "fixtures") //set home to a config w/o targeted api
+			fullDir := filepath.Join(dir, "..", "..", "fixtures") //set home to a config w/o targeted api
 			result := CfWith_CF_HOME(fullDir, "app", "app-should-never-exist-blah-blah")
 
 			Eventually(result.Out).Should(Say("No API endpoint set."))
