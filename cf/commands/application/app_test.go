@@ -6,6 +6,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/resources"
+	"github.com/cloudfoundry/cli/cf/api/stacks/stacksfakes"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands/application"
 	"github.com/cloudfoundry/cli/cf/errors"
@@ -33,6 +34,7 @@ var _ = Describe("App", func() {
 		ui               *testterm.FakeUI
 		appSummaryRepo   *apifakes.FakeAppSummaryRepository
 		appInstancesRepo *appinstancesfakes.FakeAppInstancesRepository
+		stackRepo        *stacksfakes.FakeStackRepository
 		getAppModel      *plugin_models.GetAppModel
 
 		cmd         commandregistry.Command
@@ -58,6 +60,8 @@ var _ = Describe("App", func() {
 		repoLocator = repoLocator.SetAppSummaryRepository(appSummaryRepo)
 		appInstancesRepo = new(appinstancesfakes.FakeAppInstancesRepository)
 		repoLocator = repoLocator.SetAppInstancesRepository(appInstancesRepo)
+		stackRepo = new(stacksfakes.FakeStackRepository)
+		repoLocator = repoLocator.SetStackRepository(stackRepo)
 
 		deps = commandregistry.Dependency{
 			UI:     ui,
@@ -131,6 +135,7 @@ var _ = Describe("App", func() {
 		var (
 			getApplicationModel models.Application
 			getAppSummaryModel  models.Application
+			appStackModel       models.Stack
 			appInstanceFields   []models.AppInstanceFields
 			getAppSummaryErr    error
 			err                 error
@@ -166,9 +171,15 @@ var _ = Describe("App", func() {
 				},
 			}
 
+			appStackModel = models.Stack{
+				GUID: "fake-stack-guid",
+				Name: "fake-stack-name",
+			}
+
 			applicationRequirement.GetApplicationReturns(getApplicationModel)
 			appSummaryRepo.GetSummaryReturns(getAppSummaryModel, getAppSummaryErr)
 			appInstancesRepo.GetInstancesReturns(appInstanceFields, nil)
+			stackRepo.FindByGUIDReturns(appStackModel, nil)
 		})
 
 		JustBeforeEach(func() {
@@ -188,6 +199,11 @@ var _ = Describe("App", func() {
 		It("gets the application from the application requirement", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(applicationRequirement.GetApplicationCallCount()).To(Equal(1))
+		})
+
+		It("gets the stack name from the stack repository", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(stackRepo.FindByGUIDCallCount()).To(Equal(1))
 		})
 
 		It("prints a summary of the app", func() {
