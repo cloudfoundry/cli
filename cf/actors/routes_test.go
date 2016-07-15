@@ -4,15 +4,13 @@ import (
 	"errors"
 
 	. "github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/errors/errorsfakes"
-
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	cferrors "github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/errors/errorsfakes"
 	"github.com/cloudfoundry/cli/cf/models"
+	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 )
 
 var _ = Describe("Routes", func() {
@@ -454,6 +452,7 @@ var _ = Describe("Routes", func() {
 			})
 		})
 	})
+
 	Describe("FindPort", func() {
 		Context("when there is a port", func() {
 			It("returns the route without port and the port", func() {
@@ -485,93 +484,191 @@ var _ = Describe("Routes", func() {
 	})
 
 	Describe("FindAndBindRoute", func() {
-		BeforeEach(func() {
-			domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "host.domain.com")
+		var (
+			routeName           string
+			findAndBindRouteErr error
+		)
 
-			fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
-			fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
-				if name == "domain.com" {
-					return models.DomainFields{
-						Name: "domain.com",
-						GUID: "domain-guid",
-					}, nil
-				}
-				return models.DomainFields{}, domainNotFoundError
-			}
-
-			fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("route", "myroute"))
-			fakeRouteRepository.CreateReturns(models.Route{
-				GUID:   "route-guid",
-				Host:   "host",
-				Domain: models.DomainFields{Name: "domain.com"},
-				Path:   "path",
-			}, nil)
-			fakeRouteRepository.BindReturns(nil)
-		})
-
-		Context("when route contains path", func() {
-			It("creates and binds the route", func() {
-				app := models.Application{
-					ApplicationFields: models.ApplicationFields{
-						Name: "app-name",
-						GUID: "app-guid",
-					},
-				}
-
-				_ = routeActor.FindAndBindRoute("host.domain.com/path", app)
-
-				actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
-				Expect(actualDomainName).To(Equal("domain.com"))
-
-				actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
-				Expect(actualHost).To(Equal("host"))
-				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
-				Expect(actualPath).To(Equal("path"))
-				Expect(actualPort).To(Equal(0))
-
-				actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
-				Expect(actualHost).To(Equal("host"))
-				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
-				Expect(actualPath).To(Equal("path"))
-				Expect(actualPort).To(Equal(0))
-				Expect(actualUseRandomPort).To(BeFalse())
-
-				routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
-				Expect(routeGUID).To(Equal("route-guid"))
-				Expect(appGUID).To(Equal("app-guid"))
+		JustBeforeEach(func() {
+			findAndBindRouteErr = routeActor.FindAndBindRoute(routeName, models.Application{
+				ApplicationFields: models.ApplicationFields{
+					Name: "app-name",
+					GUID: "app-guid",
+				},
 			})
 		})
 
-		Context("when route contains port", func() {
-			It("creates and binds the route", func() {
-				app := models.Application{
-					ApplicationFields: models.ApplicationFields{
-						Name: "app-name",
-						GUID: "app-guid",
-					},
+		Context("when the route is a HTTP route", func() {
+			var httpDomain models.DomainFields
+
+			BeforeEach(func() {
+				httpDomain = models.DomainFields{
+					Name:            "domain.com",
+					GUID:            "domain-guid",
+					RouterGroupType: "",
 				}
+				domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "host.domain.com")
 
-				_ = routeActor.FindAndBindRoute("host.domain.com:12345", app)
+				fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+				fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+					if name == "domain.com" {
+						return httpDomain, nil
+					}
+					return models.DomainFields{}, domainNotFoundError
+				}
+			})
 
-				actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
-				Expect(actualDomainName).To(Equal("domain.com"))
+			Context("and contains a port", func() {
+				BeforeEach(func() {
+					routeName = "domain.com:3333"
+				})
 
-				actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
-				Expect(actualHost).To(Equal("host"))
-				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
-				Expect(actualPath).To(Equal(""))
-				Expect(actualPort).To(Equal(12345))
+				It("should return an error", func() {
+					Expect(findAndBindRouteErr).To(HaveOccurred())
+					Expect(findAndBindRouteErr.Error()).To(Equal("Port not allowed in HTTP route domain.com:3333"))
+				})
+			})
 
-				actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
-				Expect(actualHost).To(Equal("host"))
-				Expect(actualDomain).To(Equal(models.DomainFields{Name: "domain.com", GUID: "domain-guid"}))
-				Expect(actualPath).To(Equal(""))
-				Expect(actualPort).To(Equal(12345))
-				Expect(actualUseRandomPort).To(BeFalse())
+			Context("and does not contain a port", func() {
+				BeforeEach(func() {
+					routeName = "host.domain.com"
 
-				routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
-				Expect(routeGUID).To(Equal("route-guid"))
-				Expect(appGUID).To(Equal("app-guid"))
+					fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("Route", "some-route"))
+					fakeRouteRepository.CreateReturns(
+						models.Route{
+							GUID:   "route-guid",
+							Domain: httpDomain,
+							Path:   "path",
+						},
+						nil,
+					)
+					fakeRouteRepository.BindReturns(nil)
+				})
+
+				It("creates and binds the route", func() {
+					Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+					actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
+					Expect(actualDomainName).To(Equal("domain.com"))
+
+					actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+					Expect(actualHost).To(Equal("host"))
+					Expect(actualDomain).To(Equal(httpDomain))
+					Expect(actualPath).To(Equal(""))
+					Expect(actualPort).To(Equal(0))
+
+					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					Expect(actualHost).To(Equal("host"))
+					Expect(actualDomain).To(Equal(httpDomain))
+					Expect(actualPath).To(Equal(""))
+					Expect(actualPort).To(Equal(0))
+					Expect(actualUseRandomPort).To(BeFalse())
+
+					routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
+					Expect(routeGUID).To(Equal("route-guid"))
+					Expect(appGUID).To(Equal("app-guid"))
+				})
+
+				Context("and contains a path", func() {
+					BeforeEach(func() {
+						routeName = "host.domain.com/path"
+					})
+
+					It("creates and binds the route", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(1)
+						Expect(actualDomainName).To(Equal("domain.com"))
+
+						actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+						Expect(actualHost).To(Equal("host"))
+						Expect(actualDomain).To(Equal(httpDomain))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						Expect(actualHost).To(Equal("host"))
+						Expect(actualDomain).To(Equal(httpDomain))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+						Expect(actualUseRandomPort).To(BeFalse())
+
+						routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
+						Expect(routeGUID).To(Equal("route-guid"))
+						Expect(appGUID).To(Equal("app-guid"))
+					})
+				})
+			})
+		})
+
+		Context("when the route is a TCP route", func() {
+			var tcpDomain models.DomainFields
+
+			BeforeEach(func() {
+				tcpDomain = models.DomainFields{
+					Name:            "domain.com",
+					GUID:            "domain-guid",
+					RouterGroupType: "tcp",
+				}
+				domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "host.domain.com")
+
+				fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+				fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+					if name == "domain.com" {
+						return tcpDomain, nil
+					}
+					return models.DomainFields{}, domainNotFoundError
+				}
+			})
+
+			Context("and contains a path", func() {
+				BeforeEach(func() {
+					routeName = "domain.com:3333/path"
+				})
+
+				It("returns an error", func() {
+					Expect(findAndBindRouteErr).To(HaveOccurred())
+					Expect(findAndBindRouteErr.Error()).To(Equal("Path not allowed in TCP route domain.com:3333/path"))
+				})
+			})
+
+			Context("and does not contain a path", func() {
+				BeforeEach(func() {
+					routeName = "domain.com:3333"
+
+					fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("Route", "some-route"))
+					fakeRouteRepository.CreateReturns(
+						models.Route{
+							GUID:   "route-guid",
+							Domain: tcpDomain,
+							Path:   "path",
+						},
+						nil,
+					)
+					fakeRouteRepository.BindReturns(nil)
+				})
+
+				It("creates and binds the route", func() {
+					actualDomainName := fakeDomainRepository.FindSharedByNameArgsForCall(0)
+					Expect(actualDomainName).To(Equal("domain.com"))
+
+					actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+					Expect(actualHost).To(Equal(""))
+					Expect(actualDomain).To(Equal(tcpDomain))
+					Expect(actualPath).To(Equal(""))
+					Expect(actualPort).To(Equal(3333))
+
+					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					Expect(actualHost).To(Equal(""))
+					Expect(actualDomain).To(Equal(tcpDomain))
+					Expect(actualPath).To(Equal(""))
+					Expect(actualPort).To(Equal(3333))
+					Expect(actualUseRandomPort).To(BeFalse())
+
+					routeGUID, appGUID := fakeRouteRepository.BindArgsForCall(0)
+					Expect(routeGUID).To(Equal("route-guid"))
+					Expect(appGUID).To(Equal("app-guid"))
+				})
 			})
 		})
 	})

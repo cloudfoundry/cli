@@ -191,15 +191,32 @@ func (routeActor routeActor) FindPort(routeName string) (string, int, error) {
 }
 
 func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application) error {
-	routeWithoutPort, port, err := routeActor.FindPort(routeName)
+	routeWithoutPath, path := routeActor.FindPath(routeName)
+
+	routeWithoutPathAndPort, port, err := routeActor.FindPort(routeWithoutPath)
 	if err != nil {
 		return err
 	}
-	routeWithoutPath, path := routeActor.FindPath(routeWithoutPort)
 
-	hostname, domain, err := routeActor.FindDomain(routeWithoutPath)
+	hostname, domain, err := routeActor.FindDomain(routeWithoutPathAndPort)
 	if err != nil {
 		return err
+	}
+
+	if domain.RouterGroupType == "tcp" && path != "" {
+		return fmt.Errorf(T("Path not allowed in TCP route {{.RouteName}}",
+			map[string]interface{}{
+				"RouteName": routeName,
+			},
+		))
+	}
+
+	if domain.RouterGroupType == "" && port != 0 {
+		return fmt.Errorf(T("Port not allowed in HTTP route {{.RouteName}}",
+			map[string]interface{}{
+				"RouteName": routeName,
+			},
+		))
 	}
 
 	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, false)

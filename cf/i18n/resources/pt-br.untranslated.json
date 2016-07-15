@@ -92,6 +92,14 @@
     "translation": "Path for HTTP route"
   },
   {
+    "id": "Path not allowed in TCP route {{.RouteName}}",
+    "translation": "Path not allowed in TCP route {{.RouteName}}"
+  },
+  {
+    "id": "Port not allowed in HTTP route {{.RouteName}}",
+    "translation": "Port not allowed in HTTP route {{.RouteName}}"
+  },
+  {
     "id": "RESERVED_ROUTE_PORTS",
     "translation": "RESERVED_ROUTE_PORTS"
   },
