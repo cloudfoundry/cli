@@ -3224,6 +3224,10 @@
     "translation": "Pfad für die Route"
   },
   {
+    "id": "Path not allowed in TCP route {{.RouteName}}",
+    "translation": ""
+  },
+  {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
     "translation": "Pfad zum App-Verzeichnis oder zu einer ZIP-Datei des Inhalts des App-Verzeichnisses"
   },
@@ -3310,6 +3314,10 @@
   {
     "id": "Port for the TCP route",
     "translation": "Port für die TCP-Route"
+  },
+  {
+    "id": "Port not allowed in HTTP route {{.RouteName}}",
+    "translation": ""
   },
   {
     "id": "Port used to identify the TCP route",

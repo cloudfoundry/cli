@@ -3224,6 +3224,10 @@
     "translation": "路径"
   },
   {
+    "id": "Path not allowed in TCP route {{.RouteName}}",
+    "translation": ""
+  },
+  {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
     "translation": "应用程序目录的路径或应用程序目录内容的 zip 文件的路径"
   },
@@ -3310,6 +3314,10 @@
   {
     "id": "Port for the TCP route",
     "translation": "TCP 路径的端口"
+  },
+  {
+    "id": "Port not allowed in HTTP route {{.RouteName}}",
+    "translation": ""
   },
   {
     "id": "Port used to identify the TCP route",
