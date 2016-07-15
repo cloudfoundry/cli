@@ -390,12 +390,12 @@ jobs:
   plan:
   - aggregate:
     - get: final-cli
-      passed: [cats-linux, cats-windows, gats]
+      passed: [cats-linux, cats-windows,cats-diego, gats]
     - get: cli
-      passed: [cats-linux, cats-windows, gats]
+      passed: [cats-linux, cats-windows,cats-diego, gats]
     - get: cf-cli-binaries
       trigger: true
-      passed: [cats-linux, cats-windows, gats]
+      passed: [cats-linux, cats-windows,cats-diego, gats]
     - get: cli-private
     - get: cli-ci
   - aggregate:
