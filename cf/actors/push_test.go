@@ -418,7 +418,7 @@ var _ = Describe("Push Actor", func() {
 				It("returns an error", func() {
 					errs := actor.ValidateAppParams(apps)
 					Expect(errs).To(HaveLen(1))
-					Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'routes' and 'hosts'"))
+					Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'routes' and 'host'/'hosts'"))
 				})
 			})
 
@@ -430,7 +430,7 @@ var _ = Describe("Push Actor", func() {
 				It("returns an error", func() {
 					errs := actor.ValidateAppParams(apps)
 					Expect(errs).To(HaveLen(1))
-					Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'routes' and 'domains'"))
+					Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'routes' and 'domain'/'domains'"))
 				})
 			})
 
