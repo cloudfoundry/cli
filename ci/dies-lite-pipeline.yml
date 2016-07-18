@@ -92,34 +92,11 @@ resources:
     deployment: cf-warden
 
 jobs:
-- name: destroy-bosh-lite
-  serial: true
-  plan:
-  - aggregate:
-    - get: cli
-    - put: bosh-lite-lock
-      resource: bosh-lites-acceptance-pool
-      params:
-        claim: {{lite-acceptance-hostname}}
-  - task: destroy
-    file: cli/ci/tasks/destroy-cf-lite.yml
-    params:
-      AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-      AWS_REGION: {{lite-aws-region}}
-      LITE_INSTANCE_NAME: {{lite-acceptance-name}}
-    ensure:
-      put: bosh-lites-acceptance-pool
-      params:
-        release: bosh-lite-lock
-
 - name: provision-bosh-lite
   serial: true
   plan:
   - aggregate:
     - get: bosh-lites-acceptance-pool
-      passed: [destroy-bosh-lite]
-      trigger: true
     - get: cli-private
     - get: bosh-lite
     - get: cli
@@ -127,26 +104,34 @@ jobs:
       resource: bosh-lites-acceptance-pool
       params:
         claim: {{lite-acceptance-hostname}}
-  - task: provision
-    file: cli/ci/tasks/provision-cf-lite.yml
-    privileged: true
-    params:
-      AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-      LITE_KEYPAIR: {{acceptance-keypair}}
-      LITE_PRIVATE_KEY_PATH: {{acceptance-private-key-path}}
-      AWS_SECURITY_GROUP: {{lite-acceptance-security-group}}
-      AWS_SUBNET_ID: {{lite-acceptance-subnet-id}}
-      LITE_NAME: {{lite-acceptance-name}}
-      LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
-  - task: associate-elastic-ip
-    file: cli/ci/tasks/associate-elastic-ip.yml
-    params:
-      AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-      AWS_DEFAULT_REGION: {{lite-aws-region}}
-      LITE_INSTANCE_NAME: {{lite-acceptance-name}}
-      LITE_PUBLIC_IP_ADDRESS: {{lite-acceptance-public-ip}}
+  - do:
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: {{lite-acceptance-name}}
+    - task: provision
+      file: cli/ci/tasks/provision-cf-lite.yml
+      privileged: true
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{acceptance-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{acceptance-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-acceptance-security-group}}
+        AWS_SUBNET_ID: {{lite-acceptance-subnet-id}}
+        LITE_NAME: {{lite-acceptance-name}}
+        LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+    - task: associate-elastic-ip
+      file: cli/ci/tasks/associate-elastic-ip.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_DEFAULT_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: {{lite-acceptance-name}}
+        LITE_PUBLIC_IP_ADDRESS: {{lite-acceptance-public-ip}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
