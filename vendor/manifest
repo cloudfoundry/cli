@@ -2,6 +2,32 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "code.cloudfoundry.org/diego-ssh/server",
+			"repository": "https://github.com/cloudfoundry/diego-ssh",
+			"vcs": "git",
+			"revision": "46bd01f4f8219bd02f3c2e02c2565f7095dc4a2f",
+			"branch": "master",
+			"path": "/server",
+			"notests": true
+		},
+		{
+			"importpath": "code.cloudfoundry.org/diego-ssh/test_helpers",
+			"repository": "https://github.com/cloudfoundry/diego-ssh",
+			"vcs": "git",
+			"revision": "46bd01f4f8219bd02f3c2e02c2565f7095dc4a2f",
+			"branch": "master",
+			"path": "test_helpers",
+			"notests": true
+		},
+		{
+			"importpath": "code.cloudfoundry.org/lager",
+			"repository": "https://github.com/cloudfoundry/lager",
+			"vcs": "git",
+			"revision": "62951a8009ab331bb21dc418074fa54e66eb9b6a",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Azure/go-ansiterm",
 			"repository": "https://github.com/Azure/go-ansiterm",
 			"vcs": "git",
@@ -40,24 +66,6 @@
 			"revision": "6663a3e55747f83c5b5e855d75c845632cc3d59f",
 			"branch": "HEAD",
 			"path": "/models",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/server",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/server",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/test_helpers",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/test_helpers",
 			"notests": true
 		},
 		{
@@ -274,18 +282,18 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/pivotal-golang/lager",
-			"repository": "https://github.com/pivotal-golang/lager",
-			"vcs": "git",
-			"revision": "24bc7249ba26ad2f1493363b9dcedf86023f47d7",
-			"branch": "HEAD",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/sajari/fuzzy",
 			"repository": "https://github.com/sajari/fuzzy",
 			"vcs": "git",
 			"revision": "243c923763cac789d1196949a834ca698dbd7a28",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/tedsuo/ifrit",
+			"repository": "https://github.com/tedsuo/ifrit",
+			"vcs": "git",
+			"revision": "6711154296c2b3fc5cd1932f0638c8ca0ce8a8a7",
 			"branch": "master",
 			"notests": true
 		},
