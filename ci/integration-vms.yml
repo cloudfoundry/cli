@@ -1,0 +1,710 @@
+---
+resources:
+- name: bosh-lites-dea-pool
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: {{cli-pools-github-private-key}}
+    branch: master
+    pool: bosh-lites-dea
+
+- name: bosh-lites-diego-pool
+  type: pool
+  source:
+    uri: git@github.com:cloudfoundry/cli-pools
+    private_key: {{cli-pools-github-private-key}}
+    branch: master
+    pool: bosh-lites-diego
+
+- name: cli
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths:
+    - ci
+
+- name: cli-private
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+- name: bosh-lite
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/bosh-lite.git
+    branch: master
+
+- name: cf-release-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry/cf-release.git
+    branch: master
+
+- name: diego-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-incubator/diego-release.git
+    branch: master
+
+- name: cf-routing-release-repo
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-incubator/cf-routing-release.git
+    branch: master
+
+- name: cf-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/cf-release
+
+- name: etcd-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/etcd-release
+
+- name: garden-linux-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/garden-linux-release
+
+- name: diego-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/diego-release
+
+- name: cflinuxfs2-rootfs-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry/cflinuxfs2-rootfs-release
+
+- name: cf-routing-release
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-incubator/cf-routing-release
+
+- name: bosh-lite-stemcell
+  type: bosh-io-stemcell
+  source:
+    name: bosh-warden-boshlite-ubuntu-trusty-go_agent
+
+- name: bosh-lite-1-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-1-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+- name: bosh-lite-2-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-2-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+- name: bosh-lite-3-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-3-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+- name: bosh-lite-4-deploy-cf
+  type: bosh-deployment
+  source:
+    target: {{lite-4-private-ip-address}}
+    username: admin
+    password: admin
+    deployment: cf-warden
+
+jobs:
+- name: provision-bosh-lite-1
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+    - get: cli-private
+    - get: bosh-lite
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-1-hostname}}
+  - do:
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-1
+    - task: provision
+      file: cli/ci/tasks/provision-cf-lite.yml
+      privileged: true
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: bosh-lite-1
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-cf-release-1
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [provision-bosh-lite-1]
+      trigger: true
+    - get: cli
+    - get: cf-release-repo
+    - get: cf-release
+    - get: bosh-lite-stemcell
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-1-hostname}}
+  - task: create-cf-manifest
+    file: cli/ci/tasks/create-bosh-lite-cf-manifest.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      LITE_HOSTNAME: {{lite-1-hostname}}
+  - put: bosh-lite-1-deploy-cf
+    params:
+      manifest: bosh-lite-cf-manifest/cf.yml
+      stemcells:
+        - bosh-lite-stemcell/stemcell.tgz
+      releases:
+        - cf-release/release.tgz
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: smoke-test-1
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-cf-release-1]
+      trigger: true
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-1-hostname}}
+  - task: run-smoke-tests
+    file: cli/ci/tasks/run-smoke-tests.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-1
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [smoke-test-1]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-1-hostname}}
+    - get: etcd-release
+    - get: garden-linux-release
+    - get: diego-release
+    - get: diego-repo
+    - get: cflinuxfs2-rootfs-release
+    - get: cli
+  - task: deploy-diego
+    file: cli/ci/tasks/deploy-diego.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-1
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-diego-release-1]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-1-hostname}}
+    - get: cf-routing-release
+    - get: cf-routing-release-repo
+    - get: cf-release-repo
+    - get: cli
+  - task: deploy-routing
+    file: cli/ci/tasks/deploy-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      LITE_HOSTNAME: {{lite-1-hostname}}
+  - task: test-routing
+    file: cli/ci/tasks/test-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: provision-bosh-lite-2
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+    - get: cli-private
+    - get: bosh-lite
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-2-hostname}}
+  - do:
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-2
+    - task: provision
+      file: cli/ci/tasks/provision-cf-lite.yml
+      privileged: true
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: bosh-lite-2
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-cf-release-2
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [provision-bosh-lite-2]
+      trigger: true
+    - get: cli
+    - get: cf-release-repo
+    - get: cf-release
+    - get: bosh-lite-stemcell
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-2-hostname}}
+  - task: create-cf-manifest
+    file: cli/ci/tasks/create-bosh-lite-cf-manifest.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      LITE_HOSTNAME: {{lite-2-hostname}}
+  - put: bosh-lite-2-deploy-cf
+    params:
+      manifest: bosh-lite-cf-manifest/cf.yml
+      stemcells:
+        - bosh-lite-stemcell/stemcell.tgz
+      releases:
+        - cf-release/release.tgz
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: smoke-test-2
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-cf-release-2]
+      trigger: true
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-2-hostname}}
+  - task: run-smoke-tests
+    file: cli/ci/tasks/run-smoke-tests.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-2
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [smoke-test-2]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-2-hostname}}
+    - get: etcd-release
+    - get: garden-linux-release
+    - get: diego-release
+    - get: diego-repo
+    - get: cflinuxfs2-rootfs-release
+    - get: cli
+  - task: deploy-diego
+    file: cli/ci/tasks/deploy-diego.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-2
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-diego-release-2]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-2-hostname}}
+    - get: cf-routing-release
+    - get: cf-routing-release-repo
+    - get: cf-release-repo
+    - get: cli
+  - task: deploy-routing
+    file: cli/ci/tasks/deploy-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      LITE_HOSTNAME: {{lite-2-hostname}}
+  - task: test-routing
+    file: cli/ci/tasks/test-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: provision-bosh-lite-3
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+    - get: cli-private
+    - get: bosh-lite
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-3-hostname}}
+  - do:
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-3
+    - task: provision
+      file: cli/ci/tasks/provision-cf-lite.yml
+      privileged: true
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: bosh-lite-3
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-cf-release-3
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [provision-bosh-lite-3]
+      trigger: true
+    - get: cli
+    - get: cf-release-repo
+    - get: cf-release
+    - get: bosh-lite-stemcell
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-3-hostname}}
+  - task: create-cf-manifest
+    file: cli/ci/tasks/create-bosh-lite-cf-manifest.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      LITE_HOSTNAME: {{lite-3-hostname}}
+  - put: bosh-lite-3-deploy-cf
+    params:
+      manifest: bosh-lite-cf-manifest/cf.yml
+      stemcells:
+        - bosh-lite-stemcell/stemcell.tgz
+      releases:
+        - cf-release/release.tgz
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: smoke-test-3
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-cf-release-3]
+      trigger: true
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-3-hostname}}
+  - task: run-smoke-tests
+    file: cli/ci/tasks/run-smoke-tests.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-3
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [smoke-test-3]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-3-hostname}}
+    - get: etcd-release
+    - get: garden-linux-release
+    - get: diego-release
+    - get: diego-repo
+    - get: cflinuxfs2-rootfs-release
+    - get: cli
+  - task: deploy-diego
+    file: cli/ci/tasks/deploy-diego.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-3
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-dea-pool
+      passed: [deploy-diego-release-3]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-dea-pool
+      params:
+        claim: {{lite-3-hostname}}
+    - get: cf-routing-release
+    - get: cf-routing-release-repo
+    - get: cf-release-repo
+    - get: cli
+  - task: deploy-routing
+    file: cli/ci/tasks/deploy-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      LITE_HOSTNAME: {{lite-3-hostname}}
+  - task: test-routing
+    file: cli/ci/tasks/test-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+    ensure:
+      put: bosh-lites-dea-pool
+      params:
+        release: bosh-lite-lock
+
+- name: provision-bosh-lite-4
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-diego-pool
+    - get: cli-private
+    - get: bosh-lite
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-diego-pool
+      params:
+        claim: {{lite-4-hostname}}
+  - do:
+    - task: destroy
+      file: cli/ci/tasks/destroy-cf-lite.yml
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        AWS_REGION: {{lite-aws-region}}
+        LITE_INSTANCE_NAME: bosh-lite-4
+    - task: provision
+      file: cli/ci/tasks/provision-cf-lite.yml
+      privileged: true
+      params:
+        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        LITE_KEYPAIR: {{lite-keypair}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
+        AWS_SUBNET_ID: {{lite-aws-subnet-id}}
+        LITE_NAME: bosh-lite-4
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: bosh-lites-diego-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-cf-release-4
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-diego-pool
+      passed: [provision-bosh-lite-4]
+      trigger: true
+    - get: cli
+    - get: cf-release-repo
+    - get: cf-release
+    - get: bosh-lite-stemcell
+    - put: bosh-lite-lock
+      resource: bosh-lites-diego-pool
+      params:
+        claim: {{lite-4-hostname}}
+  - task: create-cf-manifest
+    file: cli/ci/tasks/create-bosh-lite-cf-manifest.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+      LITE_HOSTNAME: {{lite-4-hostname}}
+  - put: bosh-lite-4-deploy-cf
+    params:
+      manifest: bosh-lite-cf-manifest/cf.yml
+      stemcells:
+        - bosh-lite-stemcell/stemcell.tgz
+      releases:
+        - cf-release/release.tgz
+    ensure:
+      put: bosh-lites-diego-pool
+      params:
+        release: bosh-lite-lock
+
+- name: smoke-test-4
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-diego-pool
+      passed: [deploy-cf-release-4]
+      trigger: true
+    - get: cli
+    - put: bosh-lite-lock
+      resource: bosh-lites-diego-pool
+      params:
+        claim: {{lite-4-hostname}}
+  - task: run-smoke-tests
+    file: cli/ci/tasks/run-smoke-tests.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: bosh-lites-diego-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-diego-release-4
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-diego-pool
+      passed: [smoke-test-4]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-diego-pool
+      params:
+        claim: {{lite-4-hostname}}
+    - get: etcd-release
+    - get: garden-linux-release
+    - get: diego-release
+    - get: diego-repo
+    - get: cflinuxfs2-rootfs-release
+    - get: cli
+  - do:
+    - task: deploy-diego
+      file: cli/ci/tasks/deploy-diego.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    - task: default-to-diego
+      file: cli/ci/tasks/set-cf-backend-to-diego.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: bosh-lites-diego-pool
+      params:
+        release: bosh-lite-lock
+
+- name: deploy-routing-release-4
+  serial: true
+  plan:
+  - aggregate:
+    - get: bosh-lites-diego-pool
+      passed: [deploy-diego-release-4]
+      trigger: true
+    - put: bosh-lite-lock
+      resource: bosh-lites-diego-pool
+      params:
+        claim: {{lite-4-hostname}}
+    - get: cf-routing-release
+    - get: cf-routing-release-repo
+    - get: cf-release-repo
+    - get: cli
+  - task: deploy-routing
+    file: cli/ci/tasks/deploy-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+      LITE_HOSTNAME: {{lite-4-hostname}}
+  - task: test-routing
+    file: cli/ci/tasks/test-routing.yml
+    params:
+      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+    ensure:
+      put: bosh-lites-diego-pool
+      params:
+        release: bosh-lite-lock
