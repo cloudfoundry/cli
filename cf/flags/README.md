@@ -1,5 +1,5 @@
 # flags - Golang command-line flag parser
-[![GoDoc](https://godoc.org/github.com/cloudfoundry/cli/flags?status.svg)](https://godoc.org/github.com/cloudfoundry/cli/flags)
+[![GoDoc](https://godoc.org/github.com/cloudfoundry/cli/cf/flags?status.svg)](https://godoc.org/github.com/cloudfoundry/cli/cf/flags)
 
 - Fully tested, reliable
 - Support flag ShortName (Alias)
@@ -14,14 +14,14 @@ The parsed results for all 3 statements are identical: `i=100`, `Args=[arg1, arg
 
 # Installation
 ```bash
-go get github.com/cloudfoundry/cli/flags  # installs the flags library
+go get github.com/cloudfoundry/cli/cf/flags  # installs the flags library
 ```
 
 # Usage
 ```Go
 package main
 
-Import "github.com/cloudfoundry/cli/flags"
+import "github.com/cloudfoundry/cli/cf/flags"
 
 func main(){
   fc := flags.New()

@@ -2,8 +2,8 @@ package fakecommand
 
 import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/flags"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeCommand2 struct {

@@ -3,7 +3,7 @@ package commands_test
 import (
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/cf/flags"
 
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 

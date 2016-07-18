@@ -6,12 +6,12 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"github.com/cloudfoundry/cli/cf/flags"
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/v3/models"
 	"github.com/cloudfoundry/cli/cf/v3/repository"
-	"github.com/cloudfoundry/cli/flags"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )

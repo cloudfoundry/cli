@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/flags"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/flags"
 )
 
 var ErrFakeCommand4 = errors.New("ZOMG command errored")

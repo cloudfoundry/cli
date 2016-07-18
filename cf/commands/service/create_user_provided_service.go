@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf"
+	"github.com/cloudfoundry/cli/cf/flags"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/util"
-	"github.com/cloudfoundry/cli/flags"
 
 	"fmt"
 
