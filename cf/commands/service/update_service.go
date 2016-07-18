@@ -16,7 +16,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/uihelpers"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/json"
+	"github.com/cloudfoundry/cli/utils/json"
 )
 
 type UpdateService struct {
