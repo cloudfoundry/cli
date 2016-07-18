@@ -341,7 +341,7 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 
 func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams) error {
 	defaultRouteAcceptable := len(app.Routes) == 0
-	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.NoHostname
+	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.IsNoHostnameTrue()
 
 	switch {
 	case appParams.NoRoute:
@@ -404,7 +404,7 @@ func (cmd *Push) processDomainsAndBindRoutes(
 			appParams.UseRandomRoute,
 			appParams.UseRandomPort,
 			app,
-			appParams.NoHostname,
+			appParams.IsNoHostnameTrue(),
 			domain,
 			appParams.RoutePath,
 		)
@@ -418,7 +418,7 @@ func (cmd *Push) processDomainsAndBindRoutes(
 				appParams.UseRandomRoute,
 				appParams.UseRandomPort,
 				app,
-				appParams.NoHostname,
+				appParams.IsNoHostnameTrue(),
 				domain,
 				appParams.RoutePath,
 			)
@@ -669,10 +669,11 @@ func addApp(apps *[]models.AppParams, app models.AppParams) error {
 }
 
 func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams, error) {
+	noHostBool := c.Bool("no-hostname")
 	appParams := models.AppParams{
 		NoRoute:        c.Bool("no-route"),
 		UseRandomRoute: c.Bool("random-route"),
-		NoHostname:     c.Bool("no-hostname"),
+		NoHostname:     &noHostBool,
 	}
 
 	if len(c.Args()) > 0 {

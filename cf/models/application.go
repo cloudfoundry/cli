@@ -100,7 +100,7 @@ type AppParams struct {
 	InstanceCount      *int
 	Memory             *int64
 	Name               *string
-	NoHostname         bool
+	NoHostname         *bool
 	NoRoute            bool
 	UseRandomRoute     bool
 	UseRandomPort      bool
@@ -184,14 +184,23 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute
-	app.NoHostname = app.NoHostname || other.NoHostname
+	noHostBool := app.IsNoHostnameTrue() || other.IsNoHostnameTrue()
+	app.NoHostname = &noHostBool
 	app.UseRandomRoute = app.UseRandomRoute || other.UseRandomRoute
 }
 
 func (app *AppParams) IsEmpty() bool {
-	return reflect.DeepEqual(*app, AppParams{})
+	noHostBool := false
+	return reflect.DeepEqual(*app, AppParams{NoHostname: &noHostBool})
 }
 
 func (app *AppParams) IsHostEmpty() bool {
 	return app.Hosts == nil || len(app.Hosts) == 0
+}
+
+func (app *AppParams) IsNoHostnameTrue() bool {
+	if app.NoHostname == nil {
+		return false
+	}
+	return *app.NoHostname
 }

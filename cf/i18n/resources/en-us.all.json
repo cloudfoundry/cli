@@ -300,8 +300,8 @@
     "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'"
   },
   {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'",
-    "translation": "Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'"
+    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
+    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'"
   },
   {
     "id": "Apps:",

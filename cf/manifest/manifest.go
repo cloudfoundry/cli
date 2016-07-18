@@ -199,7 +199,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (models.AppParams, err
 	appParams.InstanceCount = intVal(yamlMap, "instances", &errs)
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
-	appParams.NoHostname = boolVal(yamlMap, "no-hostname", &errs)
+	appParams.NoHostname = boolOrNil(yamlMap, "no-hostname", &errs)
 	appParams.UseRandomRoute = boolVal(yamlMap, "random-route", &errs)
 	appParams.ServicesToBind = sliceOrNil(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
@@ -368,6 +368,21 @@ func boolVal(yamlMap generic.Map, key string, errs *[]error) bool {
 	}
 }
 
+func boolOrNil(yamlMap generic.Map, key string, errs *[]error) *bool {
+	result := false
+	switch val := yamlMap.Get(key).(type) {
+	case nil:
+		return nil
+	case bool:
+		return &val
+	case string:
+		result = val == "true"
+		return &result
+	default:
+		*errs = append(*errs, fmt.Errorf(T("Expected {{.PropertyName}} to be a boolean.", map[string]interface{}{"PropertyName": key})))
+		return &result
+	}
+}
 func sliceOrNil(yamlMap generic.Map, key string, errs *[]error) []string {
 	if !yamlMap.Has(key) {
 		return nil
