@@ -1,4 +1,4 @@
-package sshTerminal
+package terminal
 
 import (
 	"io"
@@ -6,7 +6,8 @@ import (
 	"github.com/docker/docker/pkg/term"
 )
 
-//go:generate counterfeiter -o terminal_helper_fakes/fake_terminal_helper.go . TerminalHelper
+//go:generate counterfeiter . TerminalHelper
+
 type TerminalHelper interface {
 	StdStreams() (stdin io.ReadCloser, stdout io.Writer, stderr io.Writer)
 	GetFdInfo(in interface{}) (fd uintptr, isTerminal bool)

@@ -1,4 +1,4 @@
-package sshTerminal_test
+package terminal_test
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -1,7 +1,7 @@
-package sshTerminal_test
+package terminal_test
 
 import (
-	"github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/terminal"
+	"github.com/cloudfoundry/cli/cf/ssh/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

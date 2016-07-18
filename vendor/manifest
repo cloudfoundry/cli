@@ -43,15 +43,6 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/terminal",
-			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
-			"vcs": "git",
-			"revision": "fc5f5493005fa72ff7cc67596263d079a978994b",
-			"branch": "HEAD",
-			"path": "/cf-plugin/terminal",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/cloudfoundry-incubator/diego-ssh/server",
 			"repository": "https://github.com/cloudfoundry-incubator/diego-ssh",
 			"vcs": "git",

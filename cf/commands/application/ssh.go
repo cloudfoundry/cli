@@ -17,7 +17,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	sshCmd "github.com/cloudfoundry/cli/cf/ssh"
 	"github.com/cloudfoundry/cli/cf/ssh/options"
-	"github.com/cloudfoundry/cli/cf/ssh/terminal"
+	sshTerminal "github.com/cloudfoundry/cli/cf/ssh/terminal"
 	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
