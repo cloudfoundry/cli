@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/json"
+	"github.com/cloudfoundry/cli/utils/json"
 )
 
 type UpdateSecurityGroup struct {

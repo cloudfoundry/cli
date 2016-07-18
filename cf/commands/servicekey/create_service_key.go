@@ -8,7 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/flags"
-	"github.com/cloudfoundry/cli/json"
+	"github.com/cloudfoundry/cli/utils/json"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
 )
