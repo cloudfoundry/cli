@@ -77,7 +77,7 @@ type SecureSession interface {
 
 type secureShell struct {
 	secureDialer           SecureDialer
-	terminalHelper         sshTerminal.TerminalHelper
+	terminalHelper         terminal.TerminalHelper
 	listenerFactory        ListenerFactory
 	keepAliveInterval      time.Duration
 	app                    models.Application
@@ -92,7 +92,7 @@ type secureShell struct {
 
 func NewSecureShell(
 	secureDialer SecureDialer,
-	terminalHelper sshTerminal.TerminalHelper,
+	terminalHelper terminal.TerminalHelper,
 	listenerFactory ListenerFactory,
 	keepAliveInterval time.Duration,
 	app models.Application,

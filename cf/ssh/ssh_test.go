@@ -15,7 +15,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cloudfoundry-incubator/diego-ssh/cf-plugin/terminal"
 	"github.com/cloudfoundry-incubator/diego-ssh/server"
 	fake_server "github.com/cloudfoundry-incubator/diego-ssh/server/fakes"
 	"github.com/cloudfoundry-incubator/diego-ssh/test_helpers"
@@ -26,7 +25,8 @@ import (
 	"github.com/cloudfoundry/cli/cf/ssh"
 	"github.com/cloudfoundry/cli/cf/ssh/options"
 	"github.com/cloudfoundry/cli/cf/ssh/sshfakes"
-	"github.com/cloudfoundry/cli/cf/ssh/terminal/terminalhelperfakes"
+	"github.com/cloudfoundry/cli/cf/ssh/terminal"
+	"github.com/cloudfoundry/cli/cf/ssh/terminal/terminalfakes"
 	"github.com/docker/docker/pkg/term"
 	"github.com/kr/pty"
 	"github.com/pivotal-golang/lager/lagertest"
@@ -38,7 +38,7 @@ import (
 
 var _ = Describe("SSH", func() {
 	var (
-		fakeTerminalHelper  *terminalhelperfakes.FakeTerminalHelper
+		fakeTerminalHelper  *terminalfakes.FakeTerminalHelper
 		fakeListenerFactory *sshfakes.FakeListenerFactory
 
 		fakeConnection    *fake_ssh.FakeConn
@@ -59,7 +59,7 @@ var _ = Describe("SSH", func() {
 	)
 
 	BeforeEach(func() {
-		fakeTerminalHelper = &terminalhelperfakes.FakeTerminalHelper{}
+		fakeTerminalHelper = new(terminalfakes.FakeTerminalHelper)
 		terminalHelper = terminal.DefaultHelper()
 
 		fakeListenerFactory = new(sshfakes.FakeListenerFactory)
@@ -72,7 +72,7 @@ var _ = Describe("SSH", func() {
 		sshEndpointFingerprint = ""
 		token = ""
 
-		fakeConnection = &fake_ssh.FakeConn{}
+		fakeConnection = new(fake_ssh.FakeConn)
 		fakeSecureClient = new(sshfakes.FakeSecureClient)
 		fakeSecureDialer = new(sshfakes.FakeSecureDialer)
 		fakeSecureSession = new(sshfakes.FakeSecureSession)
