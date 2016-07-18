@@ -275,7 +275,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].InstanceCount).To(Equal(1))
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
 		Expect(apps[0].NoRoute).To(BeTrue())
-		Expect(apps[0].NoHostname).To(BeTrue())
+		Expect(*apps[0].NoHostname).To(BeTrue())
 		Expect(apps[0].UseRandomRoute).To(BeTrue())
 	})
 
@@ -596,6 +596,90 @@ var _ = Describe("Manifests", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(apps).To(HaveLen(1))
 				Expect(apps[0].Routes).To(BeNil())
+			})
+		})
+
+		Context("when no-hostname is not specified in the manifest", func() {
+			BeforeEach(func() {
+				manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+					"applications": []interface{}{
+						generic.NewMap(map[interface{}]interface{}{
+							"buildpack": nil,
+							"command":   "echo banana",
+						}),
+					},
+				}))
+			})
+
+			It("sets no-hostname to be nil", func() {
+				apps, err := manifest.Applications()
+				Expect(err).NotTo(HaveOccurred())
+				Expect(apps).To(HaveLen(1))
+				Expect(apps[0].NoHostname).To(BeNil())
+			})
+		})
+
+		Context("when no-hostname is specified in the manifest", func() {
+			Context("and it is set to true", func() {
+				Context("and the value is a boolean", func() {
+					BeforeEach(func() {
+						manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+							"applications": []interface{}{
+								generic.NewMap(map[interface{}]interface{}{
+									"buildpack":   nil,
+									"command":     "echo banana",
+									"no-hostname": true,
+								}),
+							},
+						}))
+					})
+
+					It("sets no-hostname to be true", func() {
+						apps, err := manifest.Applications()
+						Expect(err).NotTo(HaveOccurred())
+						Expect(apps).To(HaveLen(1))
+						Expect(*apps[0].NoHostname).To(BeTrue())
+					})
+				})
+				Context("and the value is a string", func() {
+					BeforeEach(func() {
+						manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+							"applications": []interface{}{
+								generic.NewMap(map[interface{}]interface{}{
+									"buildpack":   nil,
+									"command":     "echo banana",
+									"no-hostname": "true",
+								}),
+							},
+						}))
+					})
+
+					It("sets no-hostname to be true", func() {
+						apps, err := manifest.Applications()
+						Expect(err).NotTo(HaveOccurred())
+						Expect(apps).To(HaveLen(1))
+						Expect(*apps[0].NoHostname).To(BeTrue())
+					})
+				})
+			})
+			Context("and it is set to false", func() {
+				BeforeEach(func() {
+					manifest = NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+						"applications": []interface{}{
+							generic.NewMap(map[interface{}]interface{}{
+								"buildpack":   nil,
+								"command":     "echo banana",
+								"no-hostname": false,
+							}),
+						},
+					}))
+				})
+				It("sets no-hostname to be false", func() {
+					apps, err := manifest.Applications()
+					Expect(err).NotTo(HaveOccurred())
+					Expect(apps).To(HaveLen(1))
+					Expect(*apps[0].NoHostname).To(BeFalse())
+				})
 			})
 		})
 	})

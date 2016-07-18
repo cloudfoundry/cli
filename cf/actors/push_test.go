@@ -434,15 +434,27 @@ var _ = Describe("Push Actor", func() {
 				})
 			})
 
-			Context("and 'no-hostname' is set to 'true'", func() {
+			Context("and 'no-hostname' is provided", func() {
 				BeforeEach(func() {
-					apps[0].NoHostname = true
+					noHostBool := true
+					apps[0].NoHostname = &noHostBool
 				})
 
 				It("returns an error", func() {
 					errs := actor.ValidateAppParams(apps)
 					Expect(errs).To(HaveLen(1))
-					Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'routes' and have 'no-hostname' set to 'true'"))
+					Expect(errs[0].Error()).To(Equal("Application my-app must not be configured with both 'routes' and 'no-hostname'"))
+				})
+			})
+
+			Context("and 'no-hostname' is not provided", func() {
+				BeforeEach(func() {
+					apps[0].NoHostname = nil
+				})
+
+				It("returns an error", func() {
+					errs := actor.ValidateAppParams(apps)
+					Expect(errs).To(HaveLen(0))
 				})
 			})
 		})

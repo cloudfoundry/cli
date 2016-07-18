@@ -186,8 +186,8 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'", map[string]interface{}{"AppName": appName})))
 			}
 
-			if app.NoHostname {
-				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and have 'no-hostname' set to 'true'", map[string]interface{}{"AppName": appName})))
+			if app.NoHostname != nil {
+				errs = append(errs, fmt.Errorf(T("Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'", map[string]interface{}{"AppName": appName})))
 			}
 		}
 	}
