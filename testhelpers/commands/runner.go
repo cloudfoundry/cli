@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/flags"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/flags"
 	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
 

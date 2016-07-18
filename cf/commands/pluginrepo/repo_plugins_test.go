@@ -15,7 +15,7 @@ import (
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 
-	"github.com/cloudfoundry/cli/flags"
+	"github.com/cloudfoundry/cli/cf/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

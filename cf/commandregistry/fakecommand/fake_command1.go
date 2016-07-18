@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"github.com/cloudfoundry/cli/cf/flags"
 	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/flags"
 )
 
 type FakeCommand1 struct {
