@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/cloudfoundry/cli/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo"
@@ -12,6 +13,8 @@ import (
 
 func TestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
+
+	SetDefaultEventuallyTimeout(2 * time.Second)
 
 	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "fixtures", "plugins"), "test_1")
 	pluginbuilder.BuildTestBinary(filepath.Join("..", "..", "fixtures", "plugins"), "test_2")
