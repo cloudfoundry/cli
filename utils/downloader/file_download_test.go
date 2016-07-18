@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/cloudfoundry/cli/downloader"
+	"github.com/cloudfoundry/cli/utils/downloader"
 
 	"github.com/onsi/gomega/ghttp"
 

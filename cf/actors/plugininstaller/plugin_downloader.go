@@ -9,7 +9,7 @@ import (
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
-	"github.com/cloudfoundry/cli/downloader"
+	"github.com/cloudfoundry/cli/utils/downloader"
 )
 
 type PluginDownloader struct {
