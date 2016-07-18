@@ -33,6 +33,9 @@ pipelines_path=$(cd $(dirname $0)/.. && pwd)
 configure_pipeline cli \
   $pipelines_path/pipeline.yml
 
+configure_pipeline integration-vms \
+  $pipelines_path/integration-vms.yml
+
 configure_pipeline bosh-lites \
   $pipelines_path/bosh-lites-pipeline.yml
 
