@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/manifest"
-	"github.com/cloudfoundry/cli/generic"
+	"github.com/cloudfoundry/cli/utils/generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

@@ -12,7 +12,7 @@ import (
 
 	"github.com/cloudfoundry/cli/cf/formatters"
 	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/generic"
+	"github.com/cloudfoundry/cli/utils/generic"
 	"github.com/cloudfoundry/cli/utils/words/generator"
 )
 
