@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/commandsloader"
+	"github.com/cloudfoundry/cli/cf/commandsloader"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -16,7 +16,7 @@ var _ = Describe("CommandsLoader", func() {
 	It("references all command packages so all commands can be registered in commandregistry", func() {
 		commandsloader.Load()
 
-		count := walkDirAndCountCommand("../cf/commands")
+		count := walkDirAndCountCommand("../commands")
 		Expect(commandregistry.Commands.TotalCommands()).To(Equal(count))
 	})
 })
