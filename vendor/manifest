@@ -123,8 +123,8 @@
 			"importpath": "github.com/cloudfoundry/loggregatorlib/logmessage",
 			"repository": "https://github.com/cloudfoundry/loggregatorlib",
 			"vcs": "git",
-			"revision": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089",
-			"branch": "HEAD",
+			"revision": "03bfd6ee4743a1a21433092663292b65aa4ee14e",
+			"branch": "master",
 			"path": "/logmessage",
 			"notests": true
 		},
@@ -132,9 +132,9 @@
 			"importpath": "github.com/cloudfoundry/loggregatorlib/signature",
 			"repository": "https://github.com/cloudfoundry/loggregatorlib",
 			"vcs": "git",
-			"revision": "28ce6c1f1aa0352189bed34cdc9aa4ea8fcb9089",
-			"branch": "HEAD",
-			"path": "/signature",
+			"revision": "03bfd6ee4743a1a21433092663292b65aa4ee14e",
+			"branch": "master",
+			"path": "signature",
 			"notests": true
 		},
 		{
@@ -287,6 +287,33 @@
 			"vcs": "git",
 			"revision": "243c923763cac789d1196949a834ca698dbd7a28",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/assert",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "d77da356e56a7428ad25149ca77381849a6a5232",
+			"branch": "master",
+			"path": "/assert",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "d77da356e56a7428ad25149ca77381849a6a5232",
+			"branch": "master",
+			"path": "vendor/github.com/davecgh/go-spew/spew",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "d77da356e56a7428ad25149ca77381849a6a5232",
+			"branch": "master",
+			"path": "vendor/github.com/pmezard/go-difflib/difflib",
 			"notests": true
 		},
 		{

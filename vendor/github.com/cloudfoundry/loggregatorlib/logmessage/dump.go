@@ -3,6 +3,7 @@ package logmessage
 import (
 	"bytes"
 	"encoding/binary"
+
 	"github.com/gogo/protobuf/proto"
 )
 
