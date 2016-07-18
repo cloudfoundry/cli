@@ -741,10 +741,8 @@ var _ = Describe("Push Command", func() {
 					It("sets the app params from the flags", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						Expect(actor.ValidateAppParamsCallCount()).To(Equal(1))
-						appParams := actor.ValidateAppParamsArgsForCall(0)
-						Expect(appParams).To(HaveLen(1))
-						appParam := appParams[0]
+						Expect(appRepo.CreateCallCount()).To(Equal(1))
+						appParam := appRepo.CreateArgsForCall(0)
 						Expect(*appParam.Command).To(Equal("unicorn -c config/unicorn.rb -D"))
 						Expect(appParam.Domains).To(Equal([]string{"bar.cf-app.com"}))
 						Expect(appParam.Hosts).To(Equal([]string{"my-hostname"}))
