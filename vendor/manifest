@@ -98,8 +98,8 @@
 			"importpath": "github.com/cloudfoundry/gofileutils/fileutils",
 			"repository": "https://github.com/cloudfoundry/gofileutils",
 			"vcs": "git",
-			"revision": "b9aba8bc5b91f0764131fcac8ea0ff2dd202c8c4",
-			"branch": "HEAD",
+			"revision": "94cb17960d629e2ca9a67d381228ec499966a69b",
+			"branch": "master",
 			"path": "/fileutils",
 			"notests": true
 		},
