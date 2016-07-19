@@ -220,8 +220,8 @@
 			"importpath": "github.com/gorilla/websocket",
 			"repository": "https://github.com/gorilla/websocket",
 			"vcs": "git",
-			"revision": "e2e3d8414d0fbae04004f151979f4e27c6747fe7",
-			"branch": "HEAD",
+			"revision": "5e2e56d5dfd46884df1036f828777ee6273f2cff",
+			"branch": "master",
 			"notests": true
 		},
 		{
