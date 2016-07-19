@@ -31,16 +31,16 @@
 			"importpath": "github.com/Azure/go-ansiterm",
 			"repository": "https://github.com/Azure/go-ansiterm",
 			"vcs": "git",
-			"revision": "70b2c90b260171e829f1ebd7c17f600c11858dbe",
-			"branch": "HEAD",
+			"revision": "fa152c58bc15761d0200cb75fe958b89a9d4888e",
+			"branch": "master",
 			"notests": true
 		},
 		{
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
-			"revision": "446d1c146faa8ed3f4218f056fcd165f6bcfda81",
-			"branch": "HEAD",
+			"revision": "a283a10442df8dc09befd873fab202bf8a253d6a",
+			"branch": "master",
 			"notests": true
 		},
 		{
@@ -158,8 +158,8 @@
 			"importpath": "github.com/docker/docker/pkg/term",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "6d9a84bcd04cd178033309859eb7bf386a8db85d",
-			"branch": "HEAD",
+			"revision": "e6a97db2c932a2b80180c10f2896d7594108a406",
+			"branch": "master",
 			"path": "/pkg/term",
 			"notests": true
 		},
@@ -378,11 +378,27 @@
 			"notests": true
 		},
 		{
+			"importpath": "gopkg.in/airbrake/gobrake.v2",
+			"repository": "https://gopkg.in/airbrake/gobrake.v2",
+			"vcs": "git",
+			"revision": "31c8ff1fb8b79a6947e6565e9a6df535f98a6b94",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "gopkg.in/check.v1",
 			"repository": "https://gopkg.in/check.v1",
 			"vcs": "git",
 			"revision": "4f90aeace3a26ad7021961c297b22c42160c7b25",
 			"branch": "v1",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/gemnasium/logrus-airbrake-hook.v2",
+			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
+			"vcs": "git",
+			"revision": "31e6fd4bd5a98d8ee7673d24bc54ec73c31810dd",
+			"branch": "master",
 			"notests": true
 		},
 		{
