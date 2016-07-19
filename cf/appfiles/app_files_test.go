@@ -47,7 +47,7 @@ var _ = Describe("AppFiles", func() {
 	Describe("AppFilesInDir", func() {
 		It("all files have '/' path separators", func() {
 			files, err := appFiles.AppFilesInDir(fixturePath)
-			Expect(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			for _, afile := range files {
 				Expect(afile.Path).Should(Equal(filepath.ToSlash(afile.Path)))
