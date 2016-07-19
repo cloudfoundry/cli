@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
+	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
 	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
