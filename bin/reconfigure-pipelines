@@ -31,16 +31,8 @@ lpass sync
 pipelines_path=$(cd $(dirname $0)/.. && pwd)
 
 configure_pipeline cli \
-  $pipelines_path/pipeline.yml
+  $pipelines_path/cli/pipeline.yml
 
-configure_pipeline integration-vms \
-  $pipelines_path/integration-vms.yml
+configure_pipeline infrastructure \
+  $pipelines_path/infrastructure/pipeline.yml
 
-configure_pipeline bosh-lites \
-  $pipelines_path/bosh-lites-pipeline.yml
-
-configure_pipeline concourse-redeploy \
-  $pipelines_path/concourse-redeploy.yml
-
-configure_pipeline dies-lite \
-  $pipelines_path/dies-lite-pipeline.yml

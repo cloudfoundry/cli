@@ -13,4 +13,4 @@ inputs:
 - name: cli-ci
 
 run:
-  path: cli-ci/ci/tasks/cats-windows-diego.bat
+  path: cli-ci/ci/cli/tasks/cats-windows.bat
