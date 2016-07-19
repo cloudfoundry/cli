@@ -211,8 +211,8 @@
 			"importpath": "github.com/google/go-querystring/query",
 			"repository": "https://github.com/google/go-querystring",
 			"vcs": "git",
-			"revision": "6bb77fe6f42b85397288d4f6f67ac72f8f400ee7",
-			"branch": "HEAD",
+			"revision": "9235644dd9e52eeae6fa48efd539fdc351a0af53",
+			"branch": "master",
 			"path": "/query",
 			"notests": true
 		},
