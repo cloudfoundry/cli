@@ -47,8 +47,8 @@
 			"importpath": "github.com/blang/semver",
 			"repository": "https://github.com/blang/semver",
 			"vcs": "git",
-			"revision": "31b736133b98f26d5e078ec9eb591666edfd091f",
-			"branch": "HEAD",
+			"revision": "60ec3488bfea7cca02b021d106d9911120d25fe9",
+			"branch": "master",
 			"notests": true
 		},
 		{
