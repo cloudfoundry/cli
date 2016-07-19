@@ -182,6 +182,7 @@ groups:
   - deploy-diego-release-4
   - deploy-routing-release-4
 - name: dies-lite
+  jobs:
   - provision-bosh-lite
   - deploy-cf-release
   - smoke-test
