@@ -329,7 +329,7 @@
 			"repository": "https://github.com/tedsuo/rata",
 			"vcs": "git",
 			"revision": "b15ebd8bd97ae9202eb00c076d59b2f2824bce37",
-			"branch": "HEAD",
+			"branch": "master",
 			"notests": true
 		},
 		{
