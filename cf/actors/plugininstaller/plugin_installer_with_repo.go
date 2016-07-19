@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/models"
+	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
 	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"

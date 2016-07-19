@@ -60,12 +60,12 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/cloudfoundry-incubator/cli-plugin-repo/models",
+			"importpath": "github.com/cloudfoundry-incubator/cli-plugin-repo/web",
 			"repository": "https://github.com/cloudfoundry-incubator/cli-plugin-repo",
 			"vcs": "git",
-			"revision": "6663a3e55747f83c5b5e855d75c845632cc3d59f",
-			"branch": "HEAD",
-			"path": "/models",
+			"revision": "5aeeebfb703035071dc11df9d75d51abca9836e0",
+			"branch": "master",
+			"path": "/web",
 			"notests": true
 		},
 		{
