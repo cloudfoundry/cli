@@ -6,11 +6,11 @@ params:
   ADMIN_PASSWORD:
 
 inputs:
-- name: cli-acceptance-tests
-  path: gopath/src/github.com/cloudfoundry/cli-acceptance-tests
+- name: cf-release-repo
 - name: cf-cli-binaries
 - name: bosh-lite-lock
+- name: cli
 - name: cli-ci
 
 run:
-  path: cli-ci/ci/tasks/gats-windows.bat
+  path: cli-ci/ci/cli/tasks/cats-windows-diego.bat

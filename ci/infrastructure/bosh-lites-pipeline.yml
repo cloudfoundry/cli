@@ -140,7 +140,7 @@ jobs:
       - get: cli
       - get: cli-private
     - task: destroy
-      file: cli/ci/tasks/destroy-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/destroy-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -148,7 +148,7 @@ jobs:
         LITE_INSTANCE_NAME: bosh-lite-1
     - task: provision
       privileged: true
-      file: cli/ci/tasks/provision-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -167,7 +167,7 @@ jobs:
         releases:
           - cf-release/release.tgz
     - task: run-smoke-tests
-      file: cli/ci/tasks/run-smoke-tests.yml
+      file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
@@ -193,7 +193,7 @@ jobs:
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
-      file: cli/ci/tasks/deploy-diego.yml
+      file: cli/ci/infrastructure/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
@@ -217,12 +217,12 @@ jobs:
       - get: cf-release-repo
       - get: cli
     - task: deploy-routing
-      file: cli/ci/tasks/deploy-routing.yml
+      file: cli/ci/infrastructure/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
     - task: test-routing
-      file: cli/ci/tasks/test-routing.yml
+      file: cli/ci/infrastructure/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
     ensure:
@@ -246,7 +246,7 @@ jobs:
       - get: cli
       - get: cli-private
     - task: destroy
-      file: cli/ci/tasks/destroy-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/destroy-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -254,7 +254,7 @@ jobs:
         LITE_INSTANCE_NAME: bosh-lite-2
     - task: provision
       privileged: true
-      file: cli/ci/tasks/provision-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -273,7 +273,7 @@ jobs:
         releases:
           - cf-release/release.tgz
     - task: run-smoke-tests
-      file: cli/ci/tasks/run-smoke-tests.yml
+      file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
@@ -299,7 +299,7 @@ jobs:
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
-      file: cli/ci/tasks/deploy-diego.yml
+      file: cli/ci/infrastructure/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
@@ -323,12 +323,12 @@ jobs:
       - get: cf-release-repo
       - get: cli
     - task: deploy-routing
-      file: cli/ci/tasks/deploy-routing.yml
+      file: cli/ci/infrastructure/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
     - task: test-routing
-      file: cli/ci/tasks/test-routing.yml
+      file: cli/ci/infrastructure/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
     ensure:
@@ -353,7 +353,7 @@ jobs:
       - get: cli
       - get: cli-private
     - task: destroy
-      file: cli/ci/tasks/destroy-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/destroy-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -361,7 +361,7 @@ jobs:
         LITE_INSTANCE_NAME: bosh-lite-3
     - task: provision
       privileged: true
-      file: cli/ci/tasks/provision-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -380,7 +380,7 @@ jobs:
         releases:
           - cf-release/release.tgz
     - task: run-smoke-tests
-      file: cli/ci/tasks/run-smoke-tests.yml
+      file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
@@ -406,7 +406,7 @@ jobs:
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
-      file: cli/ci/tasks/deploy-diego.yml
+      file: cli/ci/infrastructure/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
@@ -430,12 +430,12 @@ jobs:
       - get: cf-release-repo
       - get: cli
     - task: deploy-routing
-      file: cli/ci/tasks/deploy-routing.yml
+      file: cli/ci/infrastructure/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
     - task: test-routing
-      file: cli/ci/tasks/test-routing.yml
+      file: cli/ci/infrastructure/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
     ensure:
@@ -459,7 +459,7 @@ jobs:
       - get: cli
       - get: cli-private
     - task: destroy
-      file: cli/ci/tasks/destroy-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/destroy-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -467,7 +467,7 @@ jobs:
         LITE_INSTANCE_NAME: bosh-lite-4
     - task: provision
       privileged: true
-      file: cli/ci/tasks/provision-cf-lite.yml
+      file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       params:
         AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
         AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
@@ -486,7 +486,7 @@ jobs:
         releases:
           - cf-release/release.tgz
     - task: run-smoke-tests
-      file: cli/ci/tasks/run-smoke-tests.yml
+      file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
@@ -512,11 +512,11 @@ jobs:
       - get: cflinuxfs2-rootfs-release
       - get: cli
     - task: deploy-diego
-      file: cli/ci/tasks/deploy-diego.yml
+      file: cli/ci/infrastructure/tasks/deploy-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     - task: default-to-diego
-      file: cli/ci/tasks/set-cf-backend-to-diego.yml
+      file: cli/ci/infrastructure/tasks/set-cf-backend-to-diego.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
@@ -540,12 +540,12 @@ jobs:
       - get: cf-release-repo
       - get: cli
     - task: deploy-routing
-      file: cli/ci/tasks/deploy-routing.yml
+      file: cli/ci/infrastructure/tasks/deploy-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
         LITE_HOSTNAME: {{lite-4-hostname}}
     - task: test-routing
-      file: cli/ci/tasks/test-routing.yml
+      file: cli/ci/infrastructure/tasks/test-routing.yml
       params:
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
     ensure:
