@@ -437,7 +437,7 @@
   },
   {
     "id": "Bound apps: {{.BoundApplications}}",
-    "translation": ""
+    "translation": "Applicazioni associate: {{.BoundApplications}}"
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -481,7 +481,7 @@
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "translation": "CF_NAME bind-route-service DOMINIO ISTANZA_DEL_SERVIZIO [--hostname NOMEHOST] [--path PERCORSO] [-c PARAMETERI_COME_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -489,7 +489,7 @@
   },
   {
     "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]",
-    "translation": ""
+    "translation": "CF_NAME bind-security-group GRUPPO_SICUREZZA ORG [SPAZIO]"
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
@@ -921,7 +921,7 @@
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": ""
+    "translation": "CF_NAME unbind-route-service DOMINIO ISTANZA_DEL_SERVIZIO [--hostname NOMEHOST] [--path PERCORSO] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -1525,7 +1525,7 @@
   },
   {
     "id": "Did you mean?",
-    "translation": ""
+    "translation": "Intendevi questo?"
   },
   {
     "id": "Disable access for a specified organization",
@@ -1745,7 +1745,7 @@
   },
   {
     "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "Errore durante l'eliminazione del dominio {{.DomainName}}\n{{.Err}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1785,7 +1785,7 @@
   },
   {
     "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "Errore durante la ricerca del dominio {{.DomainName}}\n{{.Err}}"
   },
   {
     "id": "Error finding manifest",
@@ -1917,7 +1917,7 @@
   },
   {
     "id": "Error restarting application: {{.Error}}",
-    "translation": ""
+    "translation": "Errore durante il riavvio dell'applicazione: {{.Error}}"
   },
   {
     "id": "Error retrieving stack: ",
@@ -2025,7 +2025,7 @@
   },
   {
     "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": ""
+    "translation": "Errore durante il recupero dei domini per l'organizzazione %s.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2069,7 +2069,7 @@
   },
   {
     "id": "Failed to make plugin executable: {{.Error}}",
-    "translation": ""
+    "translation": "Impossibile rendere eseguibile il plug-in: {{.Error}}"
   },
   {
     "id": "Failed to marshal JSON",
@@ -2081,7 +2081,7 @@
   },
   {
     "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "Impossibile visualizzare la preparazione dell'applicazione {{.AppName}} nell'organizzazione {{.OrgName}} / spazio {{.SpaceName}} come {{.CurrentUser}}..."
   },
   {
     "id": "Feature {{.FeatureFlag}} Disabled.",
@@ -2317,11 +2317,11 @@
   },
   {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
-    "translation": "Richiamo degli utenti nell'organizzazione {{.TargetOrg}} / spazio {{.TargetSpace}} come {{.CurrentUser}}"
+    "translation": "Ottenimento degli utenti nell'organizzazione {{.TargetOrg}} / spazio {{.TargetSpace}} come {{.CurrentUser}}"
   },
   {
     "id": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
-    "translation": "Richiamo degli utenti nell'organizzazione {{.TargetOrg}} come {{.CurrentUser}} in corso..."
+    "translation": "Ottenimento degli utenti nell'organizzazione {{.TargetOrg}} come {{.CurrentUser}} in corso..."
   },
   {
     "id": "HEALTH_CHECK_TYPE",
@@ -2508,6 +2508,10 @@
     "translation": "Utilizzo non corretto. Richiede ISTANZA_DEL_SERVIZIO e CHIAVE_SERVIZIO come argomenti\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
+    "translation": "Utilizzo non corretto. Richiede APPLICAZIONE-DI-ORIGINE APPLICAZIONE-DI-DESTINAZIONE come argomenti\n\n"
+  },
+  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "Utilizzo non corretto. Richiede SPAZIO e DOMINIO come argomenti\n\n"
   },
@@ -2538,6 +2542,10 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "Utilizzo non corretto. Richiede un argomento\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires app name as argument\n\n",
+    "translation": "Utilizzo non corretto. Richiede il nome applicazione come argomento\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -2581,7 +2589,7 @@
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",
-    "translation": ""
+    "translation": "Utilizzo non corretto. Richiede {{.Arguments}}"
   },
   {
     "id": "Incorrect Usage:",
@@ -2864,6 +2872,10 @@
     "translation": "MEMORIA"
   },
   {
+    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
+    "translation": "Crea una copia del codice sorgente dell'applicazione da un'applicazione all'altra.  A meno che non venga sovrascritto, il comando copy-source riavvierà l'applicazione."
+  },
+  {
     "id": "Make a user-provided service instance available to CF apps",
     "translation": "Rendi un'istanza del servizio fornita dall'utente disponibile alle applicazioni CF"
   },
@@ -2913,11 +2925,11 @@
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
-    "translation": ""
+    "translation": "Numero massimo di rotte che è possibile creare con porte riservate"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
-    "translation": ""
+    "translation": "Numero massimo di rotte che è possibile creare con porte riservate (valore predefinito: 0)"
   },
   {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
@@ -3397,7 +3409,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": ""
+    "translation": "PORTE_ROTTA_RISERVATE"
   },
   {
     "id": "RESPONSE:",
@@ -3577,7 +3589,7 @@
   },
   {
     "id": "Reserved Route Ports",
-    "translation": ""
+    "translation": "Porte rotta riservate"
   },
   {
     "id": "Restage an app",
@@ -3705,7 +3717,7 @@
   },
   {
     "id": "SERVICE",
-    "translation": ""
+    "translation": "SERVIZIO"
   },
   {
     "id": "SERVICE ADMIN",
@@ -4201,7 +4213,7 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount.",
-    "translation": ""
+    "translation": "Numero totale di istanze dell'applicazione. -1 rappresenta una quantità illimitata."
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
@@ -4629,7 +4641,7 @@
   },
   {
     "id": "app instances",
-    "translation": ""
+    "translation": "istanze applicazione"
   },
   {
     "id": "apps",
@@ -4845,7 +4857,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "piani a pagamento"
+    "translation": "piani pagati"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -4909,11 +4921,11 @@
   },
   {
     "id": "reserved route ports",
-    "translation": ""
+    "translation": "porte rotta riservate"
   },
   {
     "id": "route ports",
-    "translation": ""
+    "translation": "porte rotta"
   },
   {
     "id": "routes",
@@ -5169,7 +5181,7 @@
   },
   {
     "id": "{{.MemoryLimit}} memory limit",
-    "translation": ""
+    "translation": "Limite di memoria {{.MemoryLimit}}"
   },
   {
     "id": "{{.MemoryLimit}}M memory limit",
@@ -5205,7 +5217,7 @@
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",
-    "translation": ""
+    "translation": "{{.ReservedRoutePorts}} porte rotta"
   },
   {
     "id": "{{.RoutesLimit}} routes",

@@ -277,7 +277,7 @@
   },
   {
     "id": "App {{.AppName}} is already bound to {{.ServiceName}}.",
-    "translation": "{{.AppName}} 앱이 이미 {{.ServiceName}}에 바인드되어 있습니다."
+    "translation": "{{.AppName}} 앱이 이미 {{.ServiceName}}에 바인딩되어 있습니다."
   },
   {
     "id": "Append API request diagnostics to a log file",
@@ -437,7 +437,7 @@
   },
   {
     "id": "Bound apps: {{.BoundApplications}}",
-    "translation": ""
+    "translation": "바인딩된 앱: {{.BoundApplications}}"
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -481,7 +481,7 @@
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "translation": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -489,7 +489,7 @@
   },
   {
     "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]",
-    "translation": ""
+    "translation": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]"
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
@@ -921,7 +921,7 @@
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": ""
+    "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -1337,7 +1337,7 @@
   },
   {
     "id": "Credentials, provided inline or in a file, to be exposed in the VCAP_SERVICES environment variable for bound applications",
-    "translation": "바운드 애플리케이션에 대한 VCAP_SERVICES 환경 변수에서 노출되는 신임 정보(인라인 또는 파일 내에서 제공)"
+    "translation": "바인딩된 애플리케이션에 대한 VCAP_SERVICES 환경 변수에서 노출되는 신임 정보(인라인 또는 파일 내에서 제공)"
   },
   {
     "id": "Current Password",
@@ -1525,7 +1525,7 @@
   },
   {
     "id": "Did you mean?",
-    "translation": ""
+    "translation": "계속 진행하시겠습니까?"
   },
   {
     "id": "Disable access for a specified organization",
@@ -1745,7 +1745,7 @@
   },
   {
     "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "{{.DomainName}} 도메인 삭제 중에 오류 발생\n{{.Err}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1785,7 +1785,7 @@
   },
   {
     "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "{{.DomainName}} 도메인을 찾는 중에 오류 발생\n{{.Err}}"
   },
   {
     "id": "Error finding manifest",
@@ -1917,7 +1917,7 @@
   },
   {
     "id": "Error restarting application: {{.Error}}",
-    "translation": ""
+    "translation": "애플리케이션을 다시 시작하는 중에 오류 발생: {{.Error}}"
   },
   {
     "id": "Error retrieving stack: ",
@@ -2025,7 +2025,7 @@
   },
   {
     "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": ""
+    "translation": "%s 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2069,7 +2069,7 @@
   },
   {
     "id": "Failed to make plugin executable: {{.Error}}",
-    "translation": ""
+    "translation": "플러그인이 실행 가능하도록 만들 수 없음: {{.Error}}"
   },
   {
     "id": "Failed to marshal JSON",
@@ -2081,7 +2081,7 @@
   },
   {
     "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에서 {{.AppName}} 앱의 스테이징을 감시할 수 없음..."
   },
   {
     "id": "Feature {{.FeatureFlag}} Disabled.",
@@ -2508,6 +2508,10 @@
     "translation": "올바르지 않은 사용법입니다. 인수로 SERVICE_INSTANCE와 SERVICE_KEY가 필요합니다.\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
+    "translation": "올바르지 않은 사용법입니다. 인수로 SOURCE-APP TARGET-APP이 필요합니다.\n\n"
+  },
+  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "올바르지 않은 사용법입니다. 인수로 SPACE와 DOMAIN이 필요합니다.\n\n"
   },
@@ -2538,6 +2542,10 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "올바르지 않은 사용법입니다. 인수가 필요합니다.\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires app name as argument\n\n",
+    "translation": "올바르지 않은 사용법입니다. 인수로 앱 이름이 필요합니다.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -2581,7 +2589,7 @@
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",
-    "translation": ""
+    "translation": "올바르지 않은 사용법입니다. {{.Arguments}}이(가) 필요합니다."
   },
   {
     "id": "Incorrect Usage:",
@@ -2864,6 +2872,10 @@
     "translation": "메모리"
   },
   {
+    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
+    "translation": "한 애플리케이션에서 다른 애플리케이션으로 앱 소스 코드를 복사합니다. 대체되지 않는 한 copy-source 명령은 애플리케이션을 다시 시작합니다."
+  },
+  {
     "id": "Make a user-provided service instance available to CF apps",
     "translation": "사용자 제공 서비스 인스턴스를 CF 앱에 사용할 수 있도록 설정"
   },
@@ -2913,11 +2925,11 @@
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
-    "translation": ""
+    "translation": "예약된 포트에서 작성될 수 있는 최대 라우트 수"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
-    "translation": ""
+    "translation": "예약된 포트에서 작성될 수 있는 최대 라우트 수(기본값: 0)"
   },
   {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
@@ -3397,7 +3409,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": ""
+    "translation": "RESERVED_ROUTE_PORTS"
   },
   {
     "id": "RESPONSE:",
@@ -3577,7 +3589,7 @@
   },
   {
     "id": "Reserved Route Ports",
-    "translation": ""
+    "translation": "예약된 라우트 포트"
   },
   {
     "id": "Restage an app",
@@ -3669,7 +3681,7 @@
   },
   {
     "id": "Route {{.Route}} was not bound to service instance {{.ServiceInstance}}.",
-    "translation": "{{.Route}} 라우트가 서비스 인스턴스 {{.ServiceInstance}}에 바인드되지 않았습니다."
+    "translation": "{{.Route}} 라우트가 서비스 인스턴스 {{.ServiceInstance}}에 바인딩되지 않았습니다."
   },
   {
     "id": "Route {{.URL}} already exists",
@@ -3677,7 +3689,7 @@
   },
   {
     "id": "Route {{.URL}} is already bound to service instance {{.ServiceInstanceName}}.",
-    "translation": "{{.URL}} 라우트가 서비스 인스턴스 {{.ServiceInstanceName}}에 이미 바인드되어 있습니다. "
+    "translation": "{{.URL}} 라우트가 서비스 인스턴스 {{.ServiceInstanceName}}에 이미 바인딩되어 있습니다. "
   },
   {
     "id": "Router group {{.RouterGroup}} not found",
@@ -3705,7 +3717,7 @@
   },
   {
     "id": "SERVICE",
-    "translation": ""
+    "translation": "서비스"
   },
   {
     "id": "SERVICE ADMIN",
@@ -4085,7 +4097,7 @@
   },
   {
     "id": "TIP: Use '{{.CFRestageCommand}}' for any bound apps to ensure your env variable changes take effect",
-    "translation": "팁: 환경 변수 변경사항을 적용하려면 바인드된 앱에 '{{.CFRestageCommand}}'을(를) 사용하십시오."
+    "translation": "팁: 환경 변수 변경사항을 적용하려면 바인딩된 앱에 '{{.CFRestageCommand}}'을(를) 사용하십시오."
   },
   {
     "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
@@ -4201,7 +4213,7 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount.",
-    "translation": ""
+    "translation": "애플리케이션 인스턴스의 총계입니다. -1은 무제한 크기를 나타냅니다."
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
@@ -4629,7 +4641,7 @@
   },
   {
     "id": "app instances",
-    "translation": ""
+    "translation": "앱 인스턴스"
   },
   {
     "id": "apps",
@@ -4641,7 +4653,7 @@
   },
   {
     "id": "bound apps",
-    "translation": "바인드된 앱"
+    "translation": "바인딩된 앱"
   },
   {
     "id": "broker: {{.Name}}",
@@ -4757,7 +4769,7 @@
   },
   {
     "id": "instance memory",
-    "translation": "인스턴스 메모리 한계"
+    "translation": "인스턴스 메모리"
   },
   {
     "id": "instance memory limit",
@@ -4845,7 +4857,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "유료 서비스 플랜"
+    "translation": "유료 사용제"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -4909,11 +4921,11 @@
   },
   {
     "id": "reserved route ports",
-    "translation": ""
+    "translation": "예약된 라우트 포트"
   },
   {
     "id": "route ports",
-    "translation": ""
+    "translation": "라우트 포트"
   },
   {
     "id": "routes",
@@ -5049,7 +5061,7 @@
   },
   {
     "id": "total memory",
-    "translation": "총 메모리 한계"
+    "translation": "총 메모리"
   },
   {
     "id": "total memory limit",
@@ -5169,7 +5181,7 @@
   },
   {
     "id": "{{.MemoryLimit}} memory limit",
-    "translation": ""
+    "translation": "{{.MemoryLimit}} 메모리 한계"
   },
   {
     "id": "{{.MemoryLimit}}M memory limit",
@@ -5205,7 +5217,7 @@
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",
-    "translation": ""
+    "translation": "{{.ReservedRoutePorts}} 라우트 포트"
   },
   {
     "id": "{{.RoutesLimit}} routes",
