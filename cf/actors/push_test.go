@@ -462,17 +462,22 @@ var _ = Describe("Push Actor", func() {
 
 	Describe("MapManifestRoute", func() {
 		It("passes arguments to route actor", func() {
+			appName := "app-name"
 			app := models.Application{
 				ApplicationFields: models.ApplicationFields{
-					Name: "app-name",
+					Name: appName,
 					GUID: "app-guid",
 				},
 			}
+			appParamsFromContext := models.AppParams{
+				Name: &appName,
+			}
 
-			_ = actor.MapManifestRoute("route-name.example.com/testPath", app)
-			actualRoute, actualApp := routeActor.FindAndBindRouteArgsForCall(0)
+			_ = actor.MapManifestRoute("route-name.example.com/testPath", app, appParamsFromContext)
+			actualRoute, actualApp, actualAppParams := routeActor.FindAndBindRouteArgsForCall(0)
 			Expect(actualRoute).To(Equal("route-name.example.com/testPath"))
 			Expect(actualApp).To(Equal(app))
+			Expect(actualAppParams).To(Equal(appParamsFromContext))
 		})
 	})
 })

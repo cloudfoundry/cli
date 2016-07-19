@@ -269,7 +269,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 
-		err = cmd.updateRoutes(app, appParams)
+		err = cmd.updateRoutes(app, appParams, appFromContext)
 		if err != nil {
 			return err
 		}
@@ -339,7 +339,7 @@ func (cmd *Push) processPathCallback(path string, app models.Application) func(s
 	}
 }
 
-func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams) error {
+func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams, appParamsFromContext models.AppParams) error {
 	defaultRouteAcceptable := len(app.Routes) == 0
 	routeDefined := appParams.Domains != nil || !appParams.IsHostEmpty() || appParams.IsNoHostnameTrue()
 
@@ -356,7 +356,7 @@ func (cmd *Push) updateRoutes(app models.Application, appParams models.AppParams
 		}
 	case len(appParams.Routes) > 0:
 		for _, manifestRoute := range appParams.Routes {
-			err := cmd.actor.MapManifestRoute(manifestRoute.Route, app)
+			err := cmd.actor.MapManifestRoute(manifestRoute.Route, app, appParamsFromContext)
 			if err != nil {
 				return err
 			}

@@ -24,7 +24,7 @@ type PushActor interface {
 	ProcessPath(dirOrZipFile string, f func(string) error) error
 	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
 	ValidateAppParams(apps []models.AppParams) []error
-	MapManifestRoute(routeName string, app models.Application) error
+	MapManifestRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error
 }
 
 type PushActorImpl struct {
@@ -199,6 +199,6 @@ func (actor PushActorImpl) ValidateAppParams(apps []models.AppParams) []error {
 	return nil
 }
 
-func (actor PushActorImpl) MapManifestRoute(routeName string, app models.Application) error {
-	return actor.routeActor.FindAndBindRoute(routeName, app)
+func (actor PushActorImpl) MapManifestRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error {
+	return actor.routeActor.FindAndBindRoute(routeName, app, appParamsFromContext)
 }

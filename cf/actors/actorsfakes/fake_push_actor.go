@@ -50,11 +50,12 @@ type FakePushActor struct {
 	validateAppParamsReturns struct {
 		result1 []error
 	}
-	MapManifestRouteStub        func(routeName string, app models.Application) error
+	MapManifestRouteStub        func(routeName string, app models.Application, appParams models.AppParams) error
 	mapManifestRouteMutex       sync.RWMutex
 	mapManifestRouteArgsForCall []struct {
 		routeName string
 		app       models.Application
+		appParams models.AppParams
 	}
 	mapManifestRouteReturns struct {
 		result1 error
@@ -217,16 +218,17 @@ func (fake *FakePushActor) ValidateAppParamsReturns(result1 []error) {
 	}{result1}
 }
 
-func (fake *FakePushActor) MapManifestRoute(routeName string, app models.Application) error {
+func (fake *FakePushActor) MapManifestRoute(routeName string, app models.Application, appParams models.AppParams) error {
 	fake.mapManifestRouteMutex.Lock()
 	fake.mapManifestRouteArgsForCall = append(fake.mapManifestRouteArgsForCall, struct {
 		routeName string
 		app       models.Application
-	}{routeName, app})
-	fake.recordInvocation("MapManifestRoute", []interface{}{routeName, app})
+		appParams models.AppParams
+	}{routeName, app, appParams})
+	fake.recordInvocation("MapManifestRoute", []interface{}{routeName, app, appParams})
 	fake.mapManifestRouteMutex.Unlock()
 	if fake.MapManifestRouteStub != nil {
-		return fake.MapManifestRouteStub(routeName, app)
+		return fake.MapManifestRouteStub(routeName, app, appParams)
 	} else {
 		return fake.mapManifestRouteReturns.result1
 	}
@@ -238,10 +240,10 @@ func (fake *FakePushActor) MapManifestRouteCallCount() int {
 	return len(fake.mapManifestRouteArgsForCall)
 }
 
-func (fake *FakePushActor) MapManifestRouteArgsForCall(i int) (string, models.Application) {
+func (fake *FakePushActor) MapManifestRouteArgsForCall(i int) (string, models.Application, models.AppParams) {
 	fake.mapManifestRouteMutex.RLock()
 	defer fake.mapManifestRouteMutex.RUnlock()
-	return fake.mapManifestRouteArgsForCall[i].routeName, fake.mapManifestRouteArgsForCall[i].app
+	return fake.mapManifestRouteArgsForCall[i].routeName, fake.mapManifestRouteArgsForCall[i].app, fake.mapManifestRouteArgsForCall[i].appParams
 }
 
 func (fake *FakePushActor) MapManifestRouteReturns(result1 error) {
