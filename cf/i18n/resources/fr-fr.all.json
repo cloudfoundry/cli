@@ -169,7 +169,7 @@
   },
   {
     "id": "ALIAS:",
-    "translation": "ALIAS:"
+    "translation": "ALIAS :"
   },
   {
     "id": "API endpoint",
@@ -437,7 +437,7 @@
   },
   {
     "id": "Bound apps: {{.BoundApplications}}",
-    "translation": ""
+    "translation": "Applis liées : {{.BoundApplications}}"
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -481,7 +481,7 @@
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
-    "translation": ""
+    "translation": "CF_NAME bind-route-service DOMAINE INSTANCE_SERVICE [--hostname NOM_HOTE] [--path CHEMIN] [-c PARAMETRES_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -489,7 +489,7 @@
   },
   {
     "id": "CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]",
-    "translation": ""
+    "translation": "CF_NAME bind-security-group GROUPE_SECURITE ORG [ESPACE]"
   },
   {
     "id": "CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]",
@@ -921,7 +921,7 @@
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": ""
+    "translation": "CF_NAME unbind-route-service DOMAINE INSTANCE_SERVICE [--hostname NOM_HOTE] [--path CHEMIN] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -1525,7 +1525,7 @@
   },
   {
     "id": "Did you mean?",
-    "translation": ""
+    "translation": "Vouliez-vous dire ? "
   },
   {
     "id": "Disable access for a specified organization",
@@ -1745,7 +1745,7 @@
   },
   {
     "id": "Error deleting domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "Erreur lors de la suppression du domaine {{.DomainName}}\n{{.Err}}"
   },
   {
     "id": "Error disabling ssh support for ",
@@ -1785,7 +1785,7 @@
   },
   {
     "id": "Error finding domain {{.DomainName}}\n{{.Err}}",
-    "translation": ""
+    "translation": "Erreur lors de la recherche du domaine {{.DomainName}}\n{{.Err}}"
   },
   {
     "id": "Error finding manifest",
@@ -1917,7 +1917,7 @@
   },
   {
     "id": "Error restarting application: {{.Error}}",
-    "translation": ""
+    "translation": "Erreur lors du redémarrage de l'application : {{.Error}}"
   },
   {
     "id": "Error retrieving stack: ",
@@ -2025,7 +2025,7 @@
   },
   {
     "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": ""
+    "translation": "Echec de l'extraction des domaines pour l'organisation %s.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2069,7 +2069,7 @@
   },
   {
     "id": "Failed to make plugin executable: {{.Error}}",
-    "translation": ""
+    "translation": "Le plug-in ne peut pas devenir exécutable : {{.Error}}"
   },
   {
     "id": "Failed to marshal JSON",
@@ -2081,7 +2081,7 @@
   },
   {
     "id": "Failed to watch staging of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": ""
+    "translation": "Echec de la surveillance de la constitution de l'application {{.AppName}} dans l'organisation {{.OrgName}} / l'espace {{.SpaceName}} en tant que {{.CurrentUser}}..."
   },
   {
     "id": "Feature {{.FeatureFlag}} Disabled.",
@@ -2508,6 +2508,10 @@
     "translation": "Syntaxe incorrecte. Requiert INSTANCE_SERVICE et CLE_SERVICE comme arguments\n\n"
   },
   {
+    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
+    "translation": "Syntaxe incorrecte. Requiert APP_SOURCE APP_CIBLE comme arguments\n\n"
+  },
+  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "Syntaxe incorrecte. Requiert ESPACE et DOMAINE comme arguments\n\n"
   },
@@ -2538,6 +2542,10 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "Syntaxe incorrecte. Requiert un argument\n\n"
+  },
+  {
+    "id": "Incorrect Usage. Requires app name as argument\n\n",
+    "translation": "Syntaxe incorrecte. Requiert le nom d'application comme argument\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -2581,7 +2589,7 @@
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",
-    "translation": ""
+    "translation": "Syntaxe incorrecte. Requiert {{.Arguments}}"
   },
   {
     "id": "Incorrect Usage:",
@@ -2864,6 +2872,10 @@
     "translation": "MEMOIRE"
   },
   {
+    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
+    "translation": "Effectuez une copie du code source de l'application depuis une application dans une autre.  Sauf si elle est écrasée, la commande copy-source redémarre l'application."
+  },
+  {
     "id": "Make a user-provided service instance available to CF apps",
     "translation": "Mettre une instance de service fournie par un utilisateur à la disposition des applications CF"
   },
@@ -2913,11 +2925,11 @@
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
-    "translation": ""
+    "translation": "Nombre maximal de routes pouvant être créées avec des ports réservés "
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
-    "translation": ""
+    "translation": "Nombre maximal de routes pouvant être créées avec des ports réservés (par défaut : 0)"
   },
   {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
@@ -3125,7 +3137,7 @@
   },
   {
     "id": "OPTIONS:",
-    "translation": "OPTIONS:"
+    "translation": "OPTIONS :"
   },
   {
     "id": "ORG ADMIN",
@@ -3397,7 +3409,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": ""
+    "translation": "PORTS_ROUTE_RESERVES"
   },
   {
     "id": "RESPONSE:",
@@ -3577,7 +3589,7 @@
   },
   {
     "id": "Reserved Route Ports",
-    "translation": ""
+    "translation": "Ports de route réservés "
   },
   {
     "id": "Restage an app",
@@ -3705,7 +3717,7 @@
   },
   {
     "id": "SERVICE",
-    "translation": ""
+    "translation": "SERVICE"
   },
   {
     "id": "SERVICE ADMIN",
@@ -4201,7 +4213,7 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount.",
-    "translation": ""
+    "translation": "Nombre total d'instances d'application. -1 représente une quantité illimitée."
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
@@ -4629,7 +4641,7 @@
   },
   {
     "id": "app instances",
-    "translation": ""
+    "translation": "instances d'application "
   },
   {
     "id": "apps",
@@ -4757,7 +4769,7 @@
   },
   {
     "id": "instance memory",
-    "translation": "mémoire d'instance"
+    "translation": "mémoire d'instance "
   },
   {
     "id": "instance memory limit",
@@ -4845,7 +4857,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "plans payants"
+    "translation": "plans payants "
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -4909,11 +4921,11 @@
   },
   {
     "id": "reserved route ports",
-    "translation": ""
+    "translation": "ports de route réservés "
   },
   {
     "id": "route ports",
-    "translation": ""
+    "translation": "ports de route "
   },
   {
     "id": "routes",
@@ -5049,7 +5061,7 @@
   },
   {
     "id": "total memory",
-    "translation": "mémoire totale"
+    "translation": "mémoire totale "
   },
   {
     "id": "total memory limit",
@@ -5169,7 +5181,7 @@
   },
   {
     "id": "{{.MemoryLimit}} memory limit",
-    "translation": ""
+    "translation": "{{.MemoryLimit}} comme limite de mémoire "
   },
   {
     "id": "{{.MemoryLimit}}M memory limit",
@@ -5205,11 +5217,11 @@
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",
-    "translation": ""
+    "translation": "{{.ReservedRoutePorts}} port(s) de route "
   },
   {
     "id": "{{.RoutesLimit}} routes",
-    "translation": "{{.RoutesLimit}} routes"
+    "translation": "{{.RoutesLimit}} route(s)"
   },
   {
     "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
@@ -5217,7 +5229,7 @@
   },
   {
     "id": "{{.ServicesLimit}} services",
-    "translation": "{{.ServicesLimit}} services"
+    "translation": "{{.ServicesLimit}} service(s)"
   },
   {
     "id": "{{.StartingCount}} starting",
