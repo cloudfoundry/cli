@@ -228,8 +228,8 @@
 			"importpath": "github.com/kr/pty",
 			"repository": "https://github.com/kr/pty",
 			"vcs": "git",
-			"revision": "5cf931ef8f76dccd0910001d74a58a7fca84a83d",
-			"branch": "HEAD",
+			"revision": "ce7fa45920dc37a92de8377972e52bc55ffa8d57",
+			"branch": "master",
 			"notests": true
 		},
 		{
