@@ -363,8 +363,8 @@
 			"importpath": "golang.org/x/net/websocket",
 			"repository": "https://go.googlesource.com/net",
 			"vcs": "git",
-			"revision": "db8e4de5b2d6653f66aea53094624468caad15d2",
-			"branch": "HEAD",
+			"revision": "3797cd8864994d713d909eda5e61ede8683fdc12",
+			"branch": "master",
 			"path": "/websocket",
 			"notests": true
 		},
