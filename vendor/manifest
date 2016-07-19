@@ -333,11 +333,29 @@
 			"notests": true
 		},
 		{
+			"importpath": "golang.org/x/crypto/curve25519",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "911fafb28f4ee7c7bd483539a6c96190bbbccc3f",
+			"branch": "master",
+			"path": "curve25519",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/ed25519",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "911fafb28f4ee7c7bd483539a6c96190bbbccc3f",
+			"branch": "master",
+			"path": "ed25519",
+			"notests": true
+		},
+		{
 			"importpath": "golang.org/x/crypto/ssh",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "c10c31b5e94b6f7a0283272dc2bb27163dcea24b",
-			"branch": "HEAD",
+			"revision": "911fafb28f4ee7c7bd483539a6c96190bbbccc3f",
+			"branch": "master",
 			"path": "/ssh",
 			"notests": true
 		},
