@@ -44,9 +44,9 @@ import (
 //   /foo
 //   /foo/bar
 //
-// A pattern ending with a slash will get an implicit redirect to it's
-// non-slash version.  For example: Get("/foo/", handler) will implicitly
-// register Get("/foo", handler). You may override it by registering
+// A pattern ending with a slash will add an implicit redirect for its non-slash
+// version. For example: Get("/foo/", handler) also registers
+// Get("/foo", handler) as a redirect. You may override it by registering
 // Get("/foo", anotherhandler) before the slash version.
 //
 // Retrieve the capture from the r.URL.Query().Get(":name") in a handler (note
@@ -89,13 +89,21 @@ import (
 // convenience, PatternServeMux will add the Allow header for requests that
 // match a pattern for a method other than the method requested and set the
 // Status to "405 Method Not Allowed".
+//
+// If the NotFound handler is set, then it is used whenever the pattern doesn't
+// match the request path for the current method (and the Allow header is not
+// altered).
 type PatternServeMux struct {
+	// NotFound, if set, is used whenever the request doesn't match any
+	// pattern for its method. NotFound should be set before serving any
+	// requests.
+	NotFound http.Handler
 	handlers map[string][]*patHandler
 }
 
 // New returns a new PatternServeMux.
 func New() *PatternServeMux {
-	return &PatternServeMux{make(map[string][]*patHandler)}
+	return &PatternServeMux{handlers: make(map[string][]*patHandler)}
 }
 
 // ServeHTTP matches r.URL.Path against its routing table using the rules
@@ -103,12 +111,17 @@ func New() *PatternServeMux {
 func (p *PatternServeMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, ph := range p.handlers[r.Method] {
 		if params, ok := ph.try(r.URL.Path); ok {
-			if len(params) > 0 {
+			if len(params) > 0 && !ph.redirect {
 				r.URL.RawQuery = url.Values(params).Encode() + "&" + r.URL.RawQuery
 			}
 			ph.ServeHTTP(w, r)
 			return
 		}
+	}
+
+	if p.NotFound != nil {
+		p.NotFound.ServeHTTP(w, r)
+		return
 	}
 
 	allowed := make([]string, 0, len(p.handlers))
@@ -166,14 +179,40 @@ func (p *PatternServeMux) Options(pat string, h http.Handler) {
 	p.Add("OPTIONS", pat, h)
 }
 
+// Patch will register a pattern with a handler for PATCH requests.
+func (p *PatternServeMux) Patch(pat string, h http.Handler) {
+	p.Add("PATCH", pat, h)
+}
+
 // Add will register a pattern with a handler for meth requests.
 func (p *PatternServeMux) Add(meth, pat string, h http.Handler) {
-	p.handlers[meth] = append(p.handlers[meth], &patHandler{pat, h})
+	p.add(meth, pat, h, false)
+}
+
+func (p *PatternServeMux) add(meth, pat string, h http.Handler, redirect bool) {
+	handlers := p.handlers[meth]
+	for _, p1 := range handlers {
+		if p1.pat == pat {
+			return // found existing pattern; do nothing
+		}
+	}
+	handler := &patHandler{
+		pat:      pat,
+		Handler:  h,
+		redirect: redirect,
+	}
+	p.handlers[meth] = append(handlers, handler)
 
 	n := len(pat)
 	if n > 0 && pat[n-1] == '/' {
-		p.Add(meth, pat[:n-1], http.RedirectHandler(pat, http.StatusMovedPermanently))
+		p.add(meth, pat[:n-1], http.HandlerFunc(addSlashRedirect), true)
 	}
+}
+
+func addSlashRedirect(w http.ResponseWriter, r *http.Request) {
+	u := *r.URL
+	u.Path += "/"
+	http.Redirect(w, r, u.String(), http.StatusMovedPermanently)
 }
 
 // Tail returns the trailing string in path after the final slash for a pat ending with a slash.
@@ -209,6 +248,7 @@ func Tail(pat, path string) string {
 type patHandler struct {
 	pat string
 	http.Handler
+	redirect bool
 }
 
 func (ph *patHandler) try(path string) (url.Values, bool) {
