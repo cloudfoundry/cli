@@ -6,12 +6,12 @@ import (
 	"net/http/httptest"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/errors"
-	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
-	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
+	. "code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
+	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

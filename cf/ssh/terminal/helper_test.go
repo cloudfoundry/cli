@@ -1,7 +1,7 @@
 package terminal_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/ssh/terminal"
+	"code.cloudfoundry.org/cli/cf/ssh/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

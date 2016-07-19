@@ -4,8 +4,8 @@ package securitygroupsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/securitygroups"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api/securitygroups"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeSecurityGroupRepo struct {

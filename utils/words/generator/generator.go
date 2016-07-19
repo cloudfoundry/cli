@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/cloudfoundry/cli/utils/words"
+	. "code.cloudfoundry.org/cli/utils/words"
 )
 
 //go:generate counterfeiter . WordGenerator

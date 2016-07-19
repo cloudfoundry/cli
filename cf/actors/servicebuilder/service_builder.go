@@ -3,9 +3,9 @@ package servicebuilder
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/actors/planbuilder"
+	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 //go:generate counterfeiter . ServiceBuilder

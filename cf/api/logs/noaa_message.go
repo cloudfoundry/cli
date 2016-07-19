@@ -6,7 +6,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 

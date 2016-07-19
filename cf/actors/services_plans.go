@@ -3,12 +3,12 @@ package actors
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/api/organizations"
+	"code.cloudfoundry.org/cli/cf/api/organizations"
 
-	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
-	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/actors/planbuilder"
+	"code.cloudfoundry.org/cli/cf/actors/servicebuilder"
+	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 //go:generate counterfeiter . ServicePlanActor

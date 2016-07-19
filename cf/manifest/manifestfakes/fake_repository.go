@@ -4,7 +4,7 @@ package manifestfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/manifest"
+	"code.cloudfoundry.org/cli/cf/manifest"
 )
 
 type FakeRepository struct {

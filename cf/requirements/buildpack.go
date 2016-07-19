@@ -1,8 +1,8 @@
 package requirements
 
 import (
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 //go:generate counterfeiter . BuildpackRequirement

@@ -3,19 +3,19 @@ package organization
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/featureflags"
-	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/commands/user"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flags"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/api/featureflags"
+	"code.cloudfoundry.org/cli/cf/api/organizations"
+	"code.cloudfoundry.org/cli/cf/api/quotas"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/commands/user"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/flags"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type CreateOrg struct {

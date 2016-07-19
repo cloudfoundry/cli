@@ -1,7 +1,7 @@
 package apifakes
 
 import (
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type OldFakeServiceKeyRepo struct {

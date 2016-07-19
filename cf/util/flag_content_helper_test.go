@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/util"
+	"code.cloudfoundry.org/cli/cf/util"
 
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"

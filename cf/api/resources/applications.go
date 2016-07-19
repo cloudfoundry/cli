@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type PaginatedApplicationResources struct {

@@ -3,9 +3,9 @@ package fakecommand
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/flags"
-	"github.com/cloudfoundry/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/requirements"
 )
 
 var ErrFakeCommand4 = errors.New("ZOMG command errored")

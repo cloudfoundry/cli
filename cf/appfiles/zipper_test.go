@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	. "github.com/cloudfoundry/cli/cf/appfiles"
+	. "code.cloudfoundry.org/cli/cf/appfiles"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 
 	. "github.com/onsi/ginkgo"

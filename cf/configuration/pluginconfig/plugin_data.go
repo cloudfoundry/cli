@@ -3,7 +3,7 @@ package pluginconfig
 import (
 	"encoding/json"
 
-	"github.com/cloudfoundry/cli/plugin"
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 type PluginData struct {

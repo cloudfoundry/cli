@@ -4,8 +4,8 @@ package servicefakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/commands/service"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeRouteServiceUnbinder struct {

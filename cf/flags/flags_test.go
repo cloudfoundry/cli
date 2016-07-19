@@ -1,7 +1,7 @@
 package flags_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

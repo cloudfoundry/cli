@@ -17,7 +17,7 @@ import (
 var buildPath string
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	path, buildErr := Build("github.com/cloudfoundry/cli")
+	path, buildErr := Build("code.cloudfoundry.org/cli")
 	Expect(buildErr).NotTo(HaveOccurred())
 	return []byte(path)
 }, func(data []byte) {

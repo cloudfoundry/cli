@@ -1,25 +1,25 @@
 package quota_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/flags"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/flags"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/cf/api/quotas/quotasfakes"
+	"code.cloudfoundry.org/cli/cf/api/resources"
+	"code.cloudfoundry.org/cli/cf/commands/quota"
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
+	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/api/quotas/quotasfakes"
-	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/commands/quota"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
 )
 
 var _ = Describe("create-quota command", func() {

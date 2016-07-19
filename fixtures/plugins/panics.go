@@ -8,36 +8,38 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-type TestWithOrgs struct {
+type Panics struct {
 }
 
-func (c *TestWithOrgs) Run(cliConnection plugin.CliConnection, args []string) {
-	if args[0] == "orgs" {
-		theOrgsCmd()
+func (c *Panics) Run(cliConnection plugin.CliConnection, args []string) {
+	if args[0] == "panic" {
+		panic("OMG")
+	} else if args[0] == "exit1" {
+		os.Exit(1)
 	}
 }
 
-func (c *TestWithOrgs) GetMetadata() plugin.PluginMetadata {
+func (c *Panics) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name: "TestWithOrgs",
+		Name: "Panics",
 		Commands: []plugin.Command{
 			{
-				Name:     "orgs",
-				HelpText: "",
+				Name:     "panic",
+				HelpText: "omg panic",
+			},
+			{
+				Name:     "exit1",
+				HelpText: "omg exit1",
 			},
 		},
 	}
 }
 
-func theOrgsCmd() {
-	fmt.Println("You called orgs in test_with_orgs")
-}
-
 func main() {
-	plugin.Start(new(TestWithOrgs))
+	plugin.Start(new(Panics))
 }

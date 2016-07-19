@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/url"
 
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/v3/models"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/v3/models"
 	"github.com/cloudfoundry/go-ccapi/v3/client"
 )
 

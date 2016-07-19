@@ -4,17 +4,17 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/actors/pluginrepo"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/flags"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/terminal"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 type RepoPlugins struct {

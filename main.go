@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/cf/cmd"
 )
 
 func main() {

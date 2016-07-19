@@ -4,8 +4,8 @@ package quotasfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/quotas"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api/quotas"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeQuotaRepository struct {

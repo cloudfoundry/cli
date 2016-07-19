@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 //go:generate counterfeiter . TargetedOrgRequirement

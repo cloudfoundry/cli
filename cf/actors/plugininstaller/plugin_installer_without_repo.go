@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type pluginInstallerWithoutRepo struct {

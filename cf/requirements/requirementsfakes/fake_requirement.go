@@ -4,7 +4,7 @@ package requirementsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/requirements"
 )
 
 type FakeRequirement struct {

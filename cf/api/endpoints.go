@@ -3,8 +3,8 @@ package api
 import (
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/net"
 )
 
 type RemoteInfoRepository struct {

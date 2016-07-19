@@ -16,12 +16,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/appfiles"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/errors"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/appfiles"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/net"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 )
 

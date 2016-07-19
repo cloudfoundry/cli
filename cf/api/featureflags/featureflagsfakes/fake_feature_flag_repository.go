@@ -4,8 +4,8 @@ package featureflagsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/featureflags"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api/featureflags"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeFeatureFlagRepository struct {

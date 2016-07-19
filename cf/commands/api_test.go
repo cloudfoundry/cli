@@ -3,21 +3,21 @@ package commands_test
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/commands"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
-	"github.com/cloudfoundry/cli/cf/flags"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/cf/commands"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig/coreconfigfakes"
+	"code.cloudfoundry.org/cli/cf/flags"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 )
 
 var _ = Describe("Api", func() {

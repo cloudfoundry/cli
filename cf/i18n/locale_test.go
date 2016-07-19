@@ -1,7 +1,7 @@
 package i18n_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/i18n"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

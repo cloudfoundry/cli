@@ -4,8 +4,8 @@ package environmentvariablegroupsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/environmentvariablegroups"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api/environmentvariablegroups"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeRepository struct {

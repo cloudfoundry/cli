@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/applicationbits"
-	"github.com/cloudfoundry/cli/cf/api/resources"
+	"code.cloudfoundry.org/cli/cf/api/applicationbits"
+	"code.cloudfoundry.org/cli/cf/api/resources"
 )
 
 type FakeRepository struct {

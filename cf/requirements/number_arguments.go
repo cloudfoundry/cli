@@ -3,7 +3,7 @@ package requirements
 import (
 	"strings"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 type NumberArguments struct {

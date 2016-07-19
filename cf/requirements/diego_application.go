@@ -1,10 +1,10 @@
 package requirements
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/applications"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/api/applications"
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 //go:generate counterfeiter . DiegoApplicationRequirement

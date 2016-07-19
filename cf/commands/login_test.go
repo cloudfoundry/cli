@@ -3,22 +3,22 @@ package commands_test
 import (
 	"strconv"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/models"
-	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
+	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
+	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig/coreconfigfakes"
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/models"
+	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 )
 
 var _ = Describe("Login Command", func() {

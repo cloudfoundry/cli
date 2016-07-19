@@ -3,13 +3,13 @@ package actors_test
 import (
 	"errors"
 
-	. "github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	cferrors "github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/errors/errorsfakes"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
-	"github.com/cloudfoundry/cli/utils/words/generator/generatorfakes"
+	. "code.cloudfoundry.org/cli/cf/actors"
+	"code.cloudfoundry.org/cli/cf/api/apifakes"
+	cferrors "code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/errors/errorsfakes"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
+	"code.cloudfoundry.org/cli/utils/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

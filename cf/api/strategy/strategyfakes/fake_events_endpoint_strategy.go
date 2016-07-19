@@ -4,8 +4,8 @@ package strategyfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/api/strategy"
+	"code.cloudfoundry.org/cli/cf/api/resources"
+	"code.cloudfoundry.org/cli/cf/api/strategy"
 )
 
 type FakeEventsEndpointStrategy struct {

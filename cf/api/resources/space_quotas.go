@@ -1,6 +1,6 @@
 package resources
 
-import "github.com/cloudfoundry/cli/cf/models"
+import "code.cloudfoundry.org/cli/cf/models"
 
 type PaginatedSpaceQuotaResources struct {
 	Resources []SpaceQuotaResource

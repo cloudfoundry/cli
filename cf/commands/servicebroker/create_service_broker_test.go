@@ -3,18 +3,18 @@ package servicebroker_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/commands/servicebroker"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/flags"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/commands/servicebroker"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/cf/api/apifakes"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

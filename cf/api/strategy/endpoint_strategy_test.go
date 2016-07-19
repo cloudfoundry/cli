@@ -1,8 +1,8 @@
 package strategy_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/resources"
-	. "github.com/cloudfoundry/cli/cf/api/strategy"
+	"code.cloudfoundry.org/cli/cf/api/resources"
+	. "code.cloudfoundry.org/cli/cf/api/strategy"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

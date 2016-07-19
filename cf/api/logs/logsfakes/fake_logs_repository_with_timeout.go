@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/cf/api/logs"
 )
 
 type FakeLogsRepositoryWithTimeout struct{}

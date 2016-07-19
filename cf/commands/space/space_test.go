@@ -1,22 +1,22 @@
 package space_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/spacequotas/spacequotasfakes"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/api/spacequotas/spacequotasfakes"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
 
-	"github.com/cloudfoundry/cli/plugin/models"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/plugin/models"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/cli/cf/api"
-	"github.com/cloudfoundry/cli/cf/commands/space"
-	"github.com/cloudfoundry/cli/cf/flags"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/cf/api"
+	"code.cloudfoundry.org/cli/cf/commands/space"
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 )
 
 var _ = Describe("space command", func() {

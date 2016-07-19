@@ -4,7 +4,7 @@ package authenticationfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/authentication"
+	"code.cloudfoundry.org/cli/cf/api/authentication"
 )
 
 type FakeTokenRefresher struct {

@@ -3,7 +3,7 @@ package plugin_test
 import (
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/testhelpers/pluginbuilder"
+	"code.cloudfoundry.org/cli/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

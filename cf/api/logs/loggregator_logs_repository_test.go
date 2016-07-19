@@ -1,18 +1,18 @@
 package logs_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	"github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/errors"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
+	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/errors"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/gogo/protobuf/proto"
 
 	"time"
 
-	. "github.com/cloudfoundry/cli/cf/api/logs"
+	. "code.cloudfoundry.org/cli/cf/api/logs"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -4,8 +4,8 @@ package actorsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/actors"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeRouteActor struct {

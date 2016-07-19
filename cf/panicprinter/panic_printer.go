@@ -3,9 +3,9 @@ package panicprinter
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type PanicPrinter struct {
@@ -41,9 +41,9 @@ func CrashDialog(errorMessage string, commandArgs string, stackTrace string) str
 	variable CF_TRACE set to true.
 
 	Also, please update to the latest cli and try the command again:
-	https://github.com/cloudfoundry/cli/releases
+	https://code.cloudfoundry.org/cli/releases
 
-	Please create an issue at: https://github.com/cloudfoundry/cli/issues
+	Please create an issue at: https://code.cloudfoundry.org/cli/issues
 
 	Include the below information when creating the issue:
 

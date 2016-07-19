@@ -4,7 +4,7 @@ package generatorfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/utils/words/generator"
+	"code.cloudfoundry.org/cli/utils/words/generator"
 )
 
 type FakeWordGenerator struct {

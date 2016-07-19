@@ -9,9 +9,9 @@ import (
 
 	"os"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	term "github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	term "code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type FakeUI struct {

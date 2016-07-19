@@ -2,11 +2,10 @@ package terminal_test
 
 import (
 	"bytes"
-
 	"strings"
 
-	. "github.com/cloudfoundry/cli/cf/terminal"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/cf/terminal"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

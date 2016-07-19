@@ -11,13 +11,13 @@ import (
 
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
-	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
+	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type appPresenter struct {

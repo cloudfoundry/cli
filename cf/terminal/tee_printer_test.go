@@ -3,9 +3,9 @@ package terminal_test
 import (
 	"os"
 
-	. "github.com/cloudfoundry/cli/cf/terminal"
+	. "code.cloudfoundry.org/cli/cf/terminal"
 
-	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
+	io_helpers "code.cloudfoundry.org/cli/testhelpers/io"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"

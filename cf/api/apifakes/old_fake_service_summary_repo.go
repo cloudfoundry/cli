@@ -1,6 +1,6 @@
 package apifakes
 
-import "github.com/cloudfoundry/cli/cf/models"
+import "code.cloudfoundry.org/cli/cf/models"
 
 type OldFakeServiceSummaryRepo struct {
 	GetSummariesInCurrentSpaceInstances []models.ServiceInstance

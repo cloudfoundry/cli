@@ -1,7 +1,7 @@
 package formatters
 
 import (
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 func Allowed(allowed bool) string {

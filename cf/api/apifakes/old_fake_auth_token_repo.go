@@ -1,6 +1,6 @@
 package apifakes
 
-import "github.com/cloudfoundry/cli/cf/models"
+import "code.cloudfoundry.org/cli/cf/models"
 
 type OldFakeAuthTokenRepo struct {
 	CreatedServiceAuthTokenFields models.ServiceAuthTokenFields

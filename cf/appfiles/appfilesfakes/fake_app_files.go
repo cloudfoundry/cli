@@ -4,8 +4,8 @@ package appfilesfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/appfiles"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/appfiles"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeAppFiles struct {

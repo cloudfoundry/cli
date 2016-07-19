@@ -1,8 +1,8 @@
 package options_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/flags"
-	"github.com/cloudfoundry/cli/cf/ssh/options"
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/ssh/options"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -3,10 +3,10 @@ package defaults
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/api/resources"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/api/resources"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/net"
 )
 
 type DefaultSecurityGroupsRepoBase struct {

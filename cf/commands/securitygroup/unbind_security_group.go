@@ -3,16 +3,16 @@ package securitygroup
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/cf/api/organizations"
-	"github.com/cloudfoundry/cli/cf/api/securitygroups"
-	sgbinder "github.com/cloudfoundry/cli/cf/api/securitygroups/spaces"
-	"github.com/cloudfoundry/cli/cf/api/spaces"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/flags"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/api/organizations"
+	"code.cloudfoundry.org/cli/cf/api/securitygroups"
+	sgbinder "code.cloudfoundry.org/cli/cf/api/securitygroups/spaces"
+	"code.cloudfoundry.org/cli/cf/api/spaces"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/flags"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type UnbindSecurityGroup struct {
