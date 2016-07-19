@@ -149,8 +149,8 @@
 			"importpath": "github.com/cloudfoundry/sonde-go/events",
 			"repository": "https://github.com/cloudfoundry/sonde-go",
 			"vcs": "git",
-			"revision": "ae27095c3a1b9977a0ef1928b0147d5689f2e921",
-			"branch": "HEAD",
+			"revision": "64ff74a60c9558e7fcb55c9d22eff49412ec5826",
+			"branch": "master",
 			"path": "/events",
 			"notests": true
 		},
@@ -175,8 +175,8 @@
 			"importpath": "github.com/gogo/protobuf/gogoproto",
 			"repository": "https://github.com/gogo/protobuf",
 			"vcs": "git",
-			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
-			"branch": "HEAD",
+			"revision": "e57a569e1882958f6b188cb42231d6db87701f2a",
+			"branch": "master",
 			"path": "/gogoproto",
 			"notests": true
 		},
@@ -184,27 +184,27 @@
 			"importpath": "github.com/gogo/protobuf/proto",
 			"repository": "https://github.com/gogo/protobuf",
 			"vcs": "git",
-			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
-			"branch": "HEAD",
-			"path": "/proto",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
-			"repository": "https://github.com/gogo/protobuf",
-			"vcs": "git",
-			"revision": "82d16f734d6d871204a3feb1a73cb220cc92574c",
-			"branch": "HEAD",
-			"path": "/protoc-gen-gogo/descriptor",
+			"revision": "e57a569e1882958f6b188cb42231d6db87701f2a",
+			"branch": "master",
+			"path": "proto",
 			"notests": true
 		},
 		{
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
-			"revision": "0c959e80d8acfedb1ecd50c9f14a58cee287dc95",
-			"branch": "HEAD",
+			"revision": "874264fbbb43f4d91e999fecb4b40143ed611400",
+			"branch": "master",
 			"path": "/proto",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/golang/protobuf/ptypes/any",
+			"repository": "https://github.com/golang/protobuf",
+			"vcs": "git",
+			"revision": "874264fbbb43f4d91e999fecb4b40143ed611400",
+			"branch": "master",
+			"path": "ptypes/any",
 			"notests": true
 		},
 		{
