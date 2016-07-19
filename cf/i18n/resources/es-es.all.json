@@ -2508,10 +2508,6 @@
     "translation": "Uso incorrecto. Requiere SERVICE_INSTANCE y SERVICE_KEY como argumentos\n\n"
   },
   {
-    "id": "Incorrect Usage. Requires SOURCE-APP TARGET-APP as arguments\n\n",
-    "translation": "Uso incorrecto. Requiere SOURCE-APP TARGET-APP como argumentos\n\n"
-  },
-  {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
     "translation": "Uso incorrecto. Requiere SPACE y DOMAIN como argumentos\n\n"
   },
@@ -2542,10 +2538,6 @@
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
     "translation": "Uso incorrecto. Requiere un argumento\n\n"
-  },
-  {
-    "id": "Incorrect Usage. Requires app name as argument\n\n",
-    "translation": "Uso incorrecto. Requiere un nombre de app como argumento\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
@@ -2870,10 +2862,6 @@
   {
     "id": "MEMORY",
     "translation": "MEMORIA"
-  },
-  {
-    "id": "Make a copy of app source code from one application to another.  Unless overridden, the copy-source command will restart the application.",
-    "translation": "Haga una copia de código fuente de la app de una aplicación a otra.  A menos que se sustituya, el mandato copy-source reiniciará la aplicación."
   },
   {
     "id": "Make a user-provided service instance available to CF apps",
