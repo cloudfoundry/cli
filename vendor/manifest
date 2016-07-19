@@ -253,7 +253,7 @@
 			"repository": "https://github.com/nicksnyder/go-i18n",
 			"vcs": "git",
 			"revision": "37e5c2de3e03e4b82693e3fcb4a6aa2cc4eb07e3",
-			"branch": "HEAD",
+			"branch": "master",
 			"path": "/i18n",
 			"notests": true
 		},
