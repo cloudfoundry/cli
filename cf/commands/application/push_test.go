@@ -1749,64 +1749,150 @@ var _ = Describe("Push Command", func() {
 			})
 		})
 
-		Context("when routes are defined in the manifest", func() {
-			BeforeEach(func() {
-				m := &manifest.Manifest{
-					Path: "manifest.yml",
-					Data: generic.NewMap(map[interface{}]interface{}{
-						"applications": []interface{}{
-							generic.NewMap(map[interface{}]interface{}{
-								"routes": []interface{}{
-									map[interface{}]interface{}{"route": "app1route1.example.com/path"},
-									map[interface{}]interface{}{"route": "app1route2.example.com:8008"},
-								},
-								"name": "manifest-app-name-1",
-							}),
-							generic.NewMap(map[interface{}]interface{}{
-								"name": "manifest-app-name-2",
-								"routes": []interface{}{
-									map[interface{}]interface{}{"route": "app2route1.example.com"},
-								},
-							}),
-						},
-					}),
-				}
-				manifestRepo.ReadManifestReturns(m, nil)
+		Context("when routes are specified in the manifest", func() {
+			Context("and the manifest has more than one app", func() {
+				BeforeEach(func() {
+					m := &manifest.Manifest{
+						Path: "manifest.yml",
+						Data: generic.NewMap(map[interface{}]interface{}{
+							"applications": []interface{}{
+								generic.NewMap(map[interface{}]interface{}{
+									"routes": []interface{}{
+										map[interface{}]interface{}{"route": "app1route1.example.com/path"},
+										map[interface{}]interface{}{"route": "app1route2.example.com:8008"},
+									},
+									"name": "manifest-app-name-1",
+								}),
+								generic.NewMap(map[interface{}]interface{}{
+									"name": "manifest-app-name-2",
+									"routes": []interface{}{
+										map[interface{}]interface{}{"route": "app2route1.example.com"},
+									},
+								}),
+							},
+						}),
+					}
+					manifestRepo.ReadManifestReturns(m, nil)
 
-				appRepo.ReadStub = func(appName string) (models.Application, error) {
-					return models.Application{
-						ApplicationFields: models.ApplicationFields{
-							Name: appName,
-							GUID: appName + "-guid",
-						},
-					}, nil
-				}
+					appRepo.ReadStub = func(appName string) (models.Application, error) {
+						return models.Application{
+							ApplicationFields: models.ApplicationFields{
+								Name: appName,
+								GUID: appName + "-guid",
+							},
+						}, nil
+					}
 
-				appRepo.UpdateStub = func(appGUID string, appParams models.AppParams) (models.Application, error) {
-					return models.Application{
-						ApplicationFields: models.ApplicationFields{
-							GUID: appGUID,
-						},
-					}, nil
-				}
+					appRepo.UpdateStub = func(appGUID string, appParams models.AppParams) (models.Application, error) {
+						return models.Application{
+							ApplicationFields: models.ApplicationFields{
+								GUID: appGUID,
+							},
+						}, nil
+					}
+				})
 
-				args = []string{}
+				Context("and there are no flags", func() {
+					BeforeEach(func() {
+						args = []string{}
+					})
+
+					It("maps the routes to the specified apps", func() {
+						noHostBool := false
+						emptyAppParams := models.AppParams{
+							NoHostname: &noHostBool,
+						}
+
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(actor.MapManifestRouteCallCount()).To(Equal(3))
+
+						route, app, appParams := actor.MapManifestRouteArgsForCall(0)
+						Expect(route).To(Equal("app1route1.example.com/path"))
+						Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+						Expect(appParams).To(Equal(emptyAppParams))
+
+						route, app, appParams = actor.MapManifestRouteArgsForCall(1)
+						Expect(route).To(Equal("app1route2.example.com:8008"))
+						Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+						Expect(appParams).To(Equal(emptyAppParams))
+
+						route, app, appParams = actor.MapManifestRouteArgsForCall(2)
+						Expect(route).To(Equal("app2route1.example.com"))
+						Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-2-guid"))
+						Expect(appParams).To(Equal(emptyAppParams))
+					})
+				})
+
+				Context("and flags other than -f are present", func() {
+					BeforeEach(func() {
+						args = []string{"-n", "hostname-flag"}
+					})
+
+					It("should return an error", func() {
+						Expect(executeErr).To(HaveOccurred())
+						Expect(executeErr.Error()).To(Equal("Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file."))
+					})
+				})
 			})
 
-			It("maps the routes to the specified apps", func() {
-				Expect(executeErr).ToNot(HaveOccurred())
-				Expect(actor.MapManifestRouteCallCount()).To(Equal(3))
-				route, app := actor.MapManifestRouteArgsForCall(0)
-				Expect(route).To(Equal("app1route1.example.com/path"))
-				Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+			Context("and the manifest has only one app", func() {
+				BeforeEach(func() {
+					m := &manifest.Manifest{
+						Path: "manifest.yml",
+						Data: generic.NewMap(map[interface{}]interface{}{
+							"applications": []interface{}{
+								generic.NewMap(map[interface{}]interface{}{
+									"routes": []interface{}{
+										map[interface{}]interface{}{"route": "app1route1.example.com/path"},
+									},
+									"name": "manifest-app-name-1",
+								}),
+							},
+						}),
+					}
+					manifestRepo.ReadManifestReturns(m, nil)
 
-				route, app = actor.MapManifestRouteArgsForCall(1)
-				Expect(route).To(Equal("app1route2.example.com:8008"))
-				Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+					appRepo.ReadStub = func(appName string) (models.Application, error) {
+						return models.Application{
+							ApplicationFields: models.ApplicationFields{
+								Name: appName,
+								GUID: appName + "-guid",
+							},
+						}, nil
+					}
 
-				route, app = actor.MapManifestRouteArgsForCall(2)
-				Expect(route).To(Equal("app2route1.example.com"))
-				Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-2-guid"))
+					appRepo.UpdateStub = func(appGUID string, appParams models.AppParams) (models.Application, error) {
+						return models.Application{
+							ApplicationFields: models.ApplicationFields{
+								GUID: appGUID,
+							},
+						}, nil
+					}
+				})
+
+				Context("and flags are present", func() {
+					BeforeEach(func() {
+						args = []string{"-n", "flag-value"}
+					})
+
+					It("maps the routes to the apps", func() {
+						noHostBool := false
+						appParamsFromContext := models.AppParams{
+							Hosts:      []string{"flag-value"},
+							NoHostname: &noHostBool,
+						}
+
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(actor.MapManifestRouteCallCount()).To(Equal(1))
+
+						route, app, appParams := actor.MapManifestRouteArgsForCall(0)
+						Expect(route).To(Equal("app1route1.example.com/path"))
+						Expect(app.ApplicationFields.GUID).To(Equal("manifest-app-name-1-guid"))
+						Expect(appParams).To(Equal(appParamsFromContext))
+					})
+				})
 			})
 		})
 	})

@@ -22,7 +22,7 @@ type RouteActor interface {
 	FindDomain(routeName string) (string, models.DomainFields, error)
 	FindPath(routeName string) (string, string)
 	FindPort(routeName string) (string, int, error)
-	FindAndBindRoute(routeName string, app models.Application) error
+	FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error
 }
 
 type routeActor struct {
@@ -190,7 +190,7 @@ func (routeActor routeActor) FindPort(routeName string) (string, int, error) {
 	return routeSlice[0], port, nil
 }
 
-func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application) error {
+func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error {
 	routeWithoutPath, path := routeActor.FindPath(routeName)
 
 	routeWithoutPathAndPort, port, err := routeActor.FindPort(routeWithoutPath)
@@ -203,21 +203,12 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 		return err
 	}
 
-	if domain.RouterGroupType == "tcp" && path != "" {
-		return fmt.Errorf(T("Path not allowed in TCP route {{.RouteName}}",
-			map[string]interface{}{
-				"RouteName": routeName,
-			},
-		))
+	err = validateRoute(routeName, domain.RouterGroupType, port, path)
+	if err != nil {
+		return err
 	}
 
-	if domain.RouterGroupType == "" && port != 0 {
-		return fmt.Errorf(T("Port not allowed in HTTP route {{.RouteName}}",
-			map[string]interface{}{
-				"RouteName": routeName,
-			},
-		))
-	}
+	replaceHostname(domain.Shared, appParamsFromContext.Hosts, &hostname)
 
 	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, false)
 	if err != nil {
@@ -225,6 +216,32 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 	}
 
 	return routeActor.BindRoute(app, route)
+}
+
+func validateRoute(routeName string, domainType string, port int, path string) error {
+	if domainType == "tcp" && path != "" {
+		return fmt.Errorf(T("Path not allowed in TCP route {{.RouteName}}",
+			map[string]interface{}{
+				"RouteName": routeName,
+			},
+		))
+	}
+
+	if domainType == "" && port != 0 {
+		return fmt.Errorf(T("Port not allowed in HTTP route {{.RouteName}}",
+			map[string]interface{}{
+				"RouteName": routeName,
+			},
+		))
+	}
+
+	return nil
+}
+
+func replaceHostname(shared bool, hosts []string, hostname *string) {
+	if shared && len(hosts) > 0 && hosts[0] != "" {
+		*hostname = hosts[0]
+	}
 }
 
 func validateFoundDomain(domain models.DomainFields, err error) (bool, error) {
