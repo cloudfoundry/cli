@@ -23,6 +23,7 @@ run:
     INSTANCE_ID="$(aws ec2 describe-instances \
       --region "${AWS_DEFAULT_REGION}" \
       --filters "Name=tag:Name,Values=${LITE_INSTANCE_NAME}" | \
+                "Name=instance-state-name,Values=running" | \
       jq -r ".Reservations | map(.Instances[0]) | \
         map(.InstanceId) | join(\" \")")"
 
