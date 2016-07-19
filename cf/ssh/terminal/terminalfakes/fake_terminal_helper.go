@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/ssh/terminal"
+	"code.cloudfoundry.org/cli/cf/ssh/terminal"
 	"github.com/docker/docker/pkg/term"
 )
 

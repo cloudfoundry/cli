@@ -1,11 +1,11 @@
 package coreconfig_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/testhelpers/configuration"
+	. "code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/testhelpers/configuration"
 
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig/coreconfigfakes"
-	"github.com/cloudfoundry/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig/coreconfigfakes"
+	"code.cloudfoundry.org/cli/cf/i18n"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

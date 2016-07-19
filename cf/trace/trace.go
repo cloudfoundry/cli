@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 var LoggingToStdout bool

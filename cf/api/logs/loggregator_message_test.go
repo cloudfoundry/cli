@@ -3,9 +3,9 @@ package logs_test
 import (
 	"time"
 
-	testlogs "github.com/cloudfoundry/cli/testhelpers/logs"
+	testlogs "code.cloudfoundry.org/cli/testhelpers/logs"
 
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

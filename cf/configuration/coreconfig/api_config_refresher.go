@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 //go:generate counterfeiter . EndpointRepository

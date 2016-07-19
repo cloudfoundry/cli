@@ -4,7 +4,7 @@ package actorsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors"
+	"code.cloudfoundry.org/cli/cf/actors"
 )
 
 type FakeServicePlanActor struct {

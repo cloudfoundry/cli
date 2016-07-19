@@ -4,8 +4,8 @@ package appeventsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/appevents"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api/appevents"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeAppEventsRepository struct {

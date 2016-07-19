@@ -3,10 +3,10 @@ package plugin_test
 import (
 	"path/filepath"
 
-	"github.com/cloudfoundry/cli/cf/commands/plugin"
-	"github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/testhelpers/configuration"
-	"github.com/cloudfoundry/cli/testhelpers/pluginbuilder"
+	"code.cloudfoundry.org/cli/cf/commands/plugin"
+	"code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

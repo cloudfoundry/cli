@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 
-	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/api/authentication"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 
 	"github.com/cloudfoundry/noaa"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"

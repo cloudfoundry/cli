@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/errors"
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/errors"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 	"golang.org/x/net/websocket"
 )
 

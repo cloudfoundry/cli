@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strings"
 
+	"code.cloudfoundry.org/cli/cf/models"
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
-	"github.com/cloudfoundry/cli/cf/models"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 //go:generate counterfeiter . PluginRepo

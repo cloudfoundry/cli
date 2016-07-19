@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
+	"code.cloudfoundry.org/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/cf/models"
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/models"
 )
 
 type ConfigRepository struct {

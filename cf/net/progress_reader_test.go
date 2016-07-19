@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	. "github.com/cloudfoundry/cli/cf/net"
-	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
+	. "code.cloudfoundry.org/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

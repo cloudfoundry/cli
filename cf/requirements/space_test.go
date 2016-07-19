@@ -3,9 +3,9 @@ package requirements_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/api/spaces/spacesfakes"
-	"github.com/cloudfoundry/cli/cf/models"
-	. "github.com/cloudfoundry/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
+	"code.cloudfoundry.org/cli/cf/models"
+	. "code.cloudfoundry.org/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

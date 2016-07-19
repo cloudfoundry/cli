@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/cloudfoundry/cli/plugin/rpc"
+	"code.cloudfoundry.org/cli/plugin/rpc"
 )
 
 type FakeOutputCapture struct {

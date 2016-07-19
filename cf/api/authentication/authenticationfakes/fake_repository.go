@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/authentication"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/api/authentication"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 )
 
 type FakeRepository struct {

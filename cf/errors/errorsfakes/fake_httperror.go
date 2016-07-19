@@ -4,7 +4,7 @@ package errorsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/errors"
 )
 
 type FakeHTTPError struct {

@@ -5,7 +5,7 @@ import (
 
 	"time"
 
-	. "github.com/cloudfoundry/cli/cf/api/resources"
+	. "code.cloudfoundry.org/cli/cf/api/resources"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

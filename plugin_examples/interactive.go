@@ -9,7 +9,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/plugin"
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 type Interactive struct{}

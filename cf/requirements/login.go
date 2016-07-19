@@ -3,8 +3,8 @@ package requirements
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type LoginRequirement struct {

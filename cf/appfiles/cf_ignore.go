@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cloudfoundry/cli/utils/glob"
+	"code.cloudfoundry.org/cli/utils/glob"
 )
 
 //go:generate counterfeiter . CfIgnore

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type OldFakeServicePlanRepo struct {

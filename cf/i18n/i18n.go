@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/cloudfoundry/cli/cf/resources"
+	"code.cloudfoundry.org/cli/cf/resources"
 	go_i18n "github.com/nicksnyder/go-i18n/i18n"
 	"github.com/nicksnyder/go-i18n/i18n/language"
 )

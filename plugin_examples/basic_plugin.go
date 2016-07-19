@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/cloudfoundry/cli/plugin"
+	"code.cloudfoundry.org/cli/plugin"
 )
 
 // BasicPlugin is the struct implementing the interface defined by the core CLI. It can
-// be found at  "github.com/cloudfoundry/cli/plugin/plugin.go"
+// be found at  "code.cloudfoundry.org/cli/plugin/plugin.go"
 type BasicPlugin struct{}
 
 // Run must be implemented by any plugin because it is part of the
@@ -77,7 +77,7 @@ func main() {
 	// Any initialization for your plugin can be handled here
 	//
 	// Note: to run the plugin.Start method, we pass in a pointer to the struct
-	// implementing the interface defined at "github.com/cloudfoundry/cli/plugin/plugin.go"
+	// implementing the interface defined at "code.cloudfoundry.org/cli/plugin/plugin.go"
 	//
 	// Note: The plugin's main() method is invoked at install time to collect
 	// metadata. The plugin will exit 0 and the Run([]string) method will not be

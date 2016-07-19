@@ -1,6 +1,6 @@
 package strategy
 
-import "github.com/cloudfoundry/cli/cf/api/resources"
+import "code.cloudfoundry.org/cli/cf/api/resources"
 
 //go:generate counterfeiter . EventsEndpointStrategy
 

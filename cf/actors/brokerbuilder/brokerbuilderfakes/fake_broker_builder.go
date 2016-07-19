@@ -4,8 +4,8 @@ package brokerbuilderfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors/brokerbuilder"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/actors/brokerbuilder"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeBrokerBuilder struct {

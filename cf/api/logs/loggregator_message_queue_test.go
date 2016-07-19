@@ -1,7 +1,7 @@
 package logs_test
 
 import (
-	. "github.com/cloudfoundry/cli/cf/api/logs"
+	. "code.cloudfoundry.org/cli/cf/api/logs"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/gogo/protobuf/proto"
 	. "github.com/onsi/ginkgo"

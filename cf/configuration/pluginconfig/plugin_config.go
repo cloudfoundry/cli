@@ -3,7 +3,7 @@ package pluginconfig
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/cf/configuration"
 )
 
 //go:generate counterfeiter . PluginConfiguration

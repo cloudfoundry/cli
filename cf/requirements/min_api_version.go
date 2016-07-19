@@ -3,10 +3,10 @@ package requirements
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 
-	. "github.com/cloudfoundry/cli/cf/i18n"
+	. "code.cloudfoundry.org/cli/cf/i18n"
 )
 
 type MinAPIVersionRequirement struct {

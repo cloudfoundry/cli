@@ -3,11 +3,11 @@ package rpc_test
 import (
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
-	"github.com/cloudfoundry/cli/cf/trace/tracefakes"
-	. "github.com/cloudfoundry/cli/plugin/rpc"
-	. "github.com/cloudfoundry/cli/plugin/rpc/fakecommand"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
+	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
+	. "code.cloudfoundry.org/cli/plugin/rpc"
+	. "code.cloudfoundry.org/cli/plugin/rpc/fakecommand"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

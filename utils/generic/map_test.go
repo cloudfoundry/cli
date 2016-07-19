@@ -1,7 +1,7 @@
 package generic_test
 
 import (
-	. "github.com/cloudfoundry/cli/utils/generic"
+	. "code.cloudfoundry.org/cli/utils/generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

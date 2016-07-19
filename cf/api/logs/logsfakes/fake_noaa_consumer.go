@@ -4,7 +4,7 @@ package logsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/cf/api/logs"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 

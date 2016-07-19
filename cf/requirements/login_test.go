@@ -1,12 +1,12 @@
 package requirements_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	. "github.com/cloudfoundry/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
 )
 
 var _ = Describe("LoginRequirement", func() {

@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/cloudfoundry/cli/plugin/models"
+	"code.cloudfoundry.org/cli/plugin/models"
 )
 
 type cliConnection struct {

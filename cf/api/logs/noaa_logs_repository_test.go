@@ -5,18 +5,18 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/cloudfoundry/cli/cf/api/authentication/authenticationfakes"
-	testapi "github.com/cloudfoundry/cli/cf/api/logs/logsfakes"
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
+	testapi "code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
 
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/logs"
+	"code.cloudfoundry.org/cli/cf/api/logs"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -3,11 +3,11 @@ package requirements
 import (
 	"fmt"
 
+	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/terminal"
 	"errors"
-	"github.com/cloudfoundry/cli/cf"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	. "github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/cf/terminal"
 )
 
 type APIEndpointRequirement struct {

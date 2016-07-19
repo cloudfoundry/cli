@@ -4,8 +4,8 @@ package runningfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/api/securitygroups/defaults/running"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeSecurityGroupsRepo struct {

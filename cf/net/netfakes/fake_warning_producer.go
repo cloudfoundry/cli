@@ -4,7 +4,7 @@ package netfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/net"
+	"code.cloudfoundry.org/cli/cf/net"
 )
 
 type FakeWarningProducer struct {

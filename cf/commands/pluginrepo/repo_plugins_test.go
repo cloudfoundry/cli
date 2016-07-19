@@ -1,21 +1,21 @@
 package pluginrepo_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/actors/pluginrepo/pluginrepofakes"
-	"github.com/cloudfoundry/cli/cf/commands/pluginrepo"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
+	"code.cloudfoundry.org/cli/cf/actors/pluginrepo/pluginrepofakes"
+	"code.cloudfoundry.org/cli/cf/commands/pluginrepo"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
 
-	"github.com/cloudfoundry/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/flags"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

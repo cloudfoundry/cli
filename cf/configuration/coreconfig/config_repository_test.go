@@ -5,11 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"code.cloudfoundry.org/cli/cf/configuration"
+	"code.cloudfoundry.org/cli/cf/configuration/configurationfakes"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	"code.cloudfoundry.org/cli/cf/models"
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/configuration/configurationfakes"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/models"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

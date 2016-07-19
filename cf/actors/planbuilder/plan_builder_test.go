@@ -3,10 +3,10 @@ package planbuilder_test
 import (
 	"errors"
 
-	"github.com/cloudfoundry/cli/cf/actors/planbuilder"
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
-	"github.com/cloudfoundry/cli/cf/api/organizations/organizationsfakes"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/actors/planbuilder"
+	"code.cloudfoundry.org/cli/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
+	"code.cloudfoundry.org/cli/cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

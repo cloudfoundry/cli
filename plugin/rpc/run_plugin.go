@@ -4,7 +4,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
+	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
 )
 
 func RunMethodIfExists(rpcService *CliRpcService, args []string, pluginList map[string]pluginconfig.PluginMetadata) bool {

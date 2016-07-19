@@ -3,22 +3,22 @@ package service_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/cf/commandregistry"
+	"code.cloudfoundry.org/cli/cf/commands/service"
+	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	cferrors "code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/flags"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	"github.com/blang/semver"
-	"github.com/cloudfoundry/cli/cf/commandregistry"
-	"github.com/cloudfoundry/cli/cf/commands/service"
-	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	cferrors "github.com/cloudfoundry/cli/cf/errors"
-	"github.com/cloudfoundry/cli/cf/flags"
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/requirements"
-	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 
-	"github.com/cloudfoundry/cli/cf/api/apifakes"
+	"code.cloudfoundry.org/cli/cf/api/apifakes"
 
-	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
-	testterm "github.com/cloudfoundry/cli/testhelpers/terminal"
+	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
 
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

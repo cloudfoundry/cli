@@ -4,8 +4,8 @@ package repositoryfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/v3/models"
-	"github.com/cloudfoundry/cli/cf/v3/repository"
+	"code.cloudfoundry.org/cli/cf/v3/models"
+	"code.cloudfoundry.org/cli/cf/v3/repository"
 )
 
 type FakeRepository struct {

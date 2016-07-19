@@ -4,8 +4,8 @@ package requirementsfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/models"
-	"github.com/cloudfoundry/cli/cf/requirements"
+	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/requirements"
 )
 
 type FakeTargetedOrgRequirement struct {

@@ -4,8 +4,8 @@ package servicebuilderfakes
 import (
 	"sync"
 
-	"github.com/cloudfoundry/cli/cf/actors/servicebuilder"
-	"github.com/cloudfoundry/cli/cf/models"
+	"code.cloudfoundry.org/cli/cf/actors/servicebuilder"
+	"code.cloudfoundry.org/cli/cf/models"
 )
 
 type FakeServiceBuilder struct {

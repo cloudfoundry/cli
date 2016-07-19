@@ -1,8 +1,8 @@
 package stacks_test
 
 import (
-	"github.com/cloudfoundry/cli/cf/i18n"
-	"github.com/cloudfoundry/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
