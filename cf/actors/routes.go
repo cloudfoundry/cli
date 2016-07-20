@@ -208,7 +208,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 		return err
 	}
 
-	replaceHostname(domain.Shared, appParamsFromContext.Hosts, &hostname)
+	replaceHostname(domain.RouterGroupType, appParamsFromContext.Hosts, &hostname)
 
 	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, false)
 	if err != nil {
@@ -238,8 +238,8 @@ func validateRoute(routeName string, domainType string, port int, path string) e
 	return nil
 }
 
-func replaceHostname(shared bool, hosts []string, hostname *string) {
-	if shared && len(hosts) > 0 && hosts[0] != "" {
+func replaceHostname(domainType string, hosts []string, hostname *string) {
+	if domainType == "" && len(hosts) > 0 && hosts[0] != "" {
 		*hostname = hosts[0]
 	}
 }
