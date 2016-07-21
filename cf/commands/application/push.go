@@ -104,7 +104,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 			"\n   ",
 			// Commented to hide app-ports for release #117189491
 			// fmt.Sprintf("[--app-ports %s] ", T("APP_PORTS")),
-			"[--no-hostname] [--no-manifest] [--no-route] [--no-start]\n",
+			"[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n",
 			"\n   ",
 			T("Push multiple apps with a manifest"),
 			":\n   ",
