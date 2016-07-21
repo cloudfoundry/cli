@@ -343,26 +343,52 @@ var _ = Describe("Routes", func() {
 		JustBeforeEach(func() {
 			hostname, domain, findDomainErr = routeActor.FindDomain(routeName)
 		})
-
 		Context("when the route belongs to a private domain", func() {
-			var privateDomain models.DomainFields
+			Context("and do not have a hostname", func() {
+				var privateDomain models.DomainFields
 
-			BeforeEach(func() {
-				privateDomain = models.DomainFields{
-					GUID: "private-domain-guid",
-				}
-				fakeDomainRepository.FindPrivateByNameReturns(privateDomain, nil)
+				BeforeEach(func() {
+					routeName = "my-domain.com"
+					privateDomain = models.DomainFields{
+						GUID: "private-domain-guid",
+					}
+					fakeDomainRepository.FindPrivateByNameReturns(privateDomain, nil)
+				})
+
+				It("returns the private domain", func() {
+					Expect(findDomainErr).NotTo(HaveOccurred())
+					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+					Expect(fakeDomainRepository.FindPrivateByNameArgsForCall(0)).To(Equal("my-domain.com"))
+					Expect(hostname).To(Equal(""))
+					Expect(domain).To(Equal(privateDomain))
+				})
 			})
 
-			It("returns the private domain", func() {
-				Expect(findDomainErr).NotTo(HaveOccurred())
-				Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
-				Expect(fakeDomainRepository.FindPrivateByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
-				Expect(hostname).To(Equal(""))
-				Expect(domain).To(Equal(privateDomain))
+			Context("and have a hostname", func() {
+				var privateDomain models.DomainFields
+
+				BeforeEach(func() {
+					routeName = "my-hostname.my-domain.com"
+					privateDomain = models.DomainFields{
+						GUID: "private-domain-guid",
+					}
+					fakeDomainRepository.FindPrivateByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "my-domain.com" {
+							return privateDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+				})
+
+				It("returns the private domain", func() {
+					Expect(findDomainErr).NotTo(HaveOccurred())
+					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(2))
+					Expect(fakeDomainRepository.FindPrivateByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
+					Expect(hostname).To(Equal("my-hostname"))
+					Expect(domain).To(Equal(privateDomain))
+				})
 			})
 		})
-
 		Context("when the route belongs to a shared domain", func() {
 			var (
 				sharedDomain models.DomainFields
@@ -389,7 +415,7 @@ var _ = Describe("Routes", func() {
 
 				It("returns the shared domain", func() {
 					Expect(findDomainErr).NotTo(HaveOccurred())
-					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(2))
 					Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(1))
 					Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
 					Expect(hostname).To(Equal(""))
@@ -409,7 +435,7 @@ var _ = Describe("Routes", func() {
 
 				It("returns the shared domain and hostname", func() {
 					Expect(findDomainErr).NotTo(HaveOccurred())
-					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(1))
+					Expect(fakeDomainRepository.FindPrivateByNameCallCount()).To(Equal(2))
 					Expect(fakeDomainRepository.FindSharedByNameCallCount()).To(Equal(2))
 					Expect(fakeDomainRepository.FindSharedByNameArgsForCall(0)).To(Equal("my-hostname.my-domain.com"))
 					Expect(fakeDomainRepository.FindSharedByNameArgsForCall(1)).To(Equal("my-domain.com"))
