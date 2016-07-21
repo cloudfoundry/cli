@@ -77,16 +77,6 @@ func Main(traceEnv string, args []string) {
 	defer handlePanics(args, deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 
-	//handle `cf --build`
-	if len(args) == 2 && (args[1] == "--build" || args[1] == "-b") {
-		deps.UI.Say(T("{{.CFName}} was built with Go version: {{.GoVersion}}",
-			map[string]interface{}{
-				"CFName":    args[0],
-				"GoVersion": runtime.Version(),
-			}))
-		os.Exit(0)
-	}
-
 	warningProducers := []net.WarningProducer{}
 	for _, warningProducer := range deps.Gateways {
 		warningProducers = append(warningProducers, warningProducer)
