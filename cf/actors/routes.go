@@ -132,40 +132,11 @@ func (routeActor routeActor) UnbindAll(app models.Application) error {
 }
 
 func (routeActor routeActor) FindDomain(routeName string) (string, models.DomainFields, error) {
-	domain, err := routeActor.domainRepo.FindPrivateByName(routeName)
-	found, err := validateFoundDomain(domain, err)
-	if err != nil {
-		return "", models.DomainFields{}, err
+	host, domain, continueSearch, err := parseRoute(routeName, routeActor.domainRepo.FindPrivateByName)
+	if continueSearch {
+		host, domain, _, err = parseRoute(routeName, routeActor.domainRepo.FindSharedByName)
 	}
-	if found {
-		return "", domain, nil
-	}
-
-	domain, err = routeActor.domainRepo.FindSharedByName(routeName)
-	found, err = validateFoundDomain(domain, err)
-	if err != nil {
-		return "", models.DomainFields{}, err
-	}
-	if found {
-		return "", domain, nil
-	}
-
-	routeParts := strings.Split(routeName, ".")
-	domain, err = routeActor.domainRepo.FindSharedByName(strings.Join(routeParts[1:], "."))
-	found, err = validateFoundDomain(domain, err)
-	if err != nil {
-		return "", models.DomainFields{}, err
-	}
-	if found {
-		return routeParts[0], domain, nil
-	}
-
-	return "", models.DomainFields{}, fmt.Errorf(T(
-		"The route {{.RouteName}} did not match any existing domains.",
-		map[string]interface{}{
-			"RouteName": routeName,
-		},
-	))
+	return host, domain, err
 }
 
 func (routeActor routeActor) FindPath(routeName string) (string, string) {
@@ -253,4 +224,35 @@ func validateFoundDomain(domain models.DomainFields, err error) (bool, error) {
 	default:
 		return false, err
 	}
+}
+
+func parseRoute(routeName string, findFunc func(domainName string) (models.DomainFields, error)) (string, models.DomainFields, bool, error) {
+	var domain models.DomainFields
+	var err error
+	var found bool
+	domain, err = findFunc(routeName)
+	found, err = validateFoundDomain(domain, err)
+	if err != nil {
+		return "", models.DomainFields{}, false, err
+	}
+	if found {
+		return "", domain, false, nil
+	}
+
+	routeParts := strings.Split(routeName, ".")
+	domain, err = findFunc(strings.Join(routeParts[1:], "."))
+	found, err = validateFoundDomain(domain, err)
+	if err != nil {
+		return "", models.DomainFields{}, false, err
+	}
+	if found {
+		return routeParts[0], domain, false, nil
+	}
+
+	return "", models.DomainFields{}, true, fmt.Errorf(T(
+		"The route {{.RouteName}} did not match any existing domains.",
+		map[string]interface{}{
+			"RouteName": routeName,
+		},
+	))
 }
