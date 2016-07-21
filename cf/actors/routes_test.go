@@ -9,6 +9,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors/errorsfakes"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
+	"github.com/cloudfoundry/cli/utils/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -22,6 +23,7 @@ var _ = Describe("Routes", func() {
 
 		expectedRoute  models.Route
 		expectedDomain models.DomainFields
+		wordGenerator  *generatorfakes.FakeWordGenerator
 	)
 
 	BeforeEach(func() {
@@ -29,6 +31,7 @@ var _ = Describe("Routes", func() {
 		fakeRouteRepository = new(apifakes.FakeRouteRepository)
 		fakeDomainRepository = new(apifakes.FakeDomainRepository)
 		routeActor = NewRouteActor(fakeUI, fakeRouteRepository, fakeDomainRepository)
+		wordGenerator = new(generatorfakes.FakeWordGenerator)
 	})
 
 	Describe("CreateRandomTCPRoute", func() {
@@ -90,7 +93,8 @@ var _ = Describe("Routes", func() {
 			expectedPath = "path"
 
 			expectedDomain = models.DomainFields{
-				Name: "foo.com",
+				Name:            "foo.com",
+				RouterGroupType: "tcp",
 			}
 
 			expectedRoute = models.Route{
@@ -672,6 +676,125 @@ var _ = Describe("Routes", func() {
 						Expect(actualPath).To(Equal(""))
 						Expect(actualPort).To(Equal(0))
 					})
+				})
+			})
+		})
+
+		Context("and the --random-route flag is provided", func() {
+			BeforeEach(func() {
+				appParamsFromContext = models.AppParams{
+					UseRandomRoute: true,
+				}
+				fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("Route", "tcp-domain.com:3333"))
+			})
+
+			Context("and it is a http route", func() {
+				var httpDomain models.DomainFields
+
+				BeforeEach(func() {
+					httpDomain = models.DomainFields{
+						Name: "domain.com",
+						GUID: "domain-guid",
+					}
+					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
+
+					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "domain.com" {
+							return httpDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+				})
+
+				Context("and the route does not have a hostname", func() {
+					BeforeEach(func() {
+						routeName = "domain.com/path"
+					})
+					It("should append a random name ", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+						Expect(actualHost).To(MatchRegexp("[a-z]-[a-z]"))
+						Expect(actualDomain.Name).To(Equal("domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+						actualHost, actualDomain, actualPath, actualPort, useRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						Expect(actualHost).To(MatchRegexp("[a-z]-[a-z]"))
+						Expect(actualDomain.Name).To(Equal("domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+						Expect(useRandomPort).To(BeFalse())
+					})
+				})
+
+				Context("and the route has a hostname", func() {
+					BeforeEach(func() {
+						routeName = "host.domain.com/path"
+					})
+					It("should replace the hostname with a random name", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+						Expect(actualHost).To(MatchRegexp("[a-z]-[a-z]"))
+						Expect(actualDomain.Name).To(Equal("domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+					})
+				})
+
+				Context("when --hostname flag is present", func() {
+					BeforeEach(func() {
+						appParamsFromContext = models.AppParams{
+							UseRandomRoute: true,
+							Hosts:          []string{"flag-hostname"},
+						}
+						routeName = "host.domain.com/path"
+
+					})
+					It("should replace the hostname with flag hostname", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+						Expect(actualHost).To(Equal("flag-hostname"))
+						Expect(actualDomain.Name).To(Equal("domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+					})
+				})
+			})
+
+			Context("and it is a tcp route", func() {
+				var tcpDomain models.DomainFields
+
+				BeforeEach(func() {
+					tcpDomain = models.DomainFields{
+						Name:            "tcp-domain.com",
+						GUID:            "tcp-domain-guid",
+						RouterGroupGUID: "tcp-guid",
+						RouterGroupType: "tcp",
+					}
+					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
+
+					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "tcp-domain.com" {
+							return tcpDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+					routeName = "tcp-domain.com:3333"
+				})
+
+				It("replaces the provided port with a random port", func() {
+					Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+					actualHost, actualDomain, actualPath, actualPort, useRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					Expect(actualHost).To(Equal(""))
+					Expect(actualDomain.Name).To(Equal("tcp-domain.com"))
+					Expect(actualPath).To(Equal(""))
+					Expect(actualPort).To(Equal(0))
+					Expect(useRandomPort).To(Equal(true))
 				})
 			})
 		})

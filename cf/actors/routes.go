@@ -10,9 +10,12 @@ import (
 	. "github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/models"
 	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/utils/words/generator"
 )
 
 //go:generate counterfeiter . RouteActor
+
+const tcp = "tcp"
 
 type RouteActor interface {
 	CreateRandomTCPRoute(domain models.DomainFields) (models.Route, error)
@@ -64,7 +67,7 @@ func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.Do
 				}),
 		)
 	case *errors.ModelNotFoundError:
-		if useRandomPort {
+		if useRandomPort && domain.RouterGroupType == tcp {
 			route, err = routeActor.CreateRandomTCPRoute(domain)
 		} else {
 			routeActor.ui.Say(
@@ -74,7 +77,7 @@ func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.Do
 					}),
 			)
 
-			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, useRandomPort)
+			route, err = routeActor.routeRepo.Create(hostname, domain, path, port, false)
 		}
 
 		routeActor.ui.Ok()
@@ -178,10 +181,13 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 	if err != nil {
 		return err
 	}
+	if appParamsFromContext.UseRandomRoute && domain.RouterGroupType != tcp {
 
+		hostname = generator.NewWordGenerator().Babble()
+
+	}
 	replaceHostname(domain.RouterGroupType, appParamsFromContext.Hosts, &hostname)
-
-	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, false)
+	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, appParamsFromContext.UseRandomRoute)
 	if err != nil {
 		return err
 	}
@@ -190,7 +196,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 }
 
 func validateRoute(routeName string, domainType string, port int, path string) error {
-	if domainType == "tcp" && path != "" {
+	if domainType == tcp && path != "" {
 		return fmt.Errorf(T("Path not allowed in TCP route {{.RouteName}}",
 			map[string]interface{}{
 				"RouteName": routeName,
