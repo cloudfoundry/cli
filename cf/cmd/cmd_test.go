@@ -123,20 +123,6 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Shows debug information with -b or --build", func() {
-		It("prints the golang version if '--build' flag is provided", func() {
-			output := Cf("--build")
-			Eventually(output.Out.Contents).Should(ContainSubstring("was built with Go version:"))
-			Eventually(output).Should(Exit(0))
-		})
-
-		It("prints the golang version if '-b' flag is provided", func() {
-			output := Cf("-b")
-			Eventually(output.Out.Contents).Should(ContainSubstring("was built with Go version:"))
-			Eventually(output).Should(Exit(0))
-		})
-	})
-
 	Describe("Commands /w new command structure", func() {
 		It("prints usage help for all commands by providing `help` flag", func() {
 			output := Cf("api", "-h")

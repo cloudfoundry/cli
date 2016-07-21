@@ -5116,10 +5116,6 @@
     "translation": "login de {{.CFName}}"
   },
   {
-    "id": "{{.CFName}} was built with Go version: {{.GoVersion}}",
-    "translation": "{{.CFName}} foi construído com a versão Go: {{.GoVersion}}"
-  },
-  {
     "id": "{{.CountOfServices}} migrated.",
     "translation": "{{.CountOfServices}} migrado."
   },
