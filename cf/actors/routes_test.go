@@ -799,6 +799,98 @@ var _ = Describe("Routes", func() {
 			})
 		})
 
+		Context("and the --route-path flag is provided", func() {
+			BeforeEach(func() {
+				path := "flag-routepath"
+				appParamsFromContext = models.AppParams{
+					RoutePath: &path,
+				}
+			})
+
+			Context("and it is a http route", func() {
+				var httpDomain models.DomainFields
+
+				BeforeEach(func() {
+					httpDomain = models.DomainFields{
+						Name: "domain.com",
+						GUID: "domain-guid",
+					}
+					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
+
+					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "domain.com" {
+							return httpDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+				})
+
+				Context("and it does not have a path", func() {
+					BeforeEach(func() {
+						routeName = "host.domain.com"
+					})
+					It("adds the path to the route", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+						Expect(actualHost).To(Equal("host"))
+						Expect(actualDomain.Name).To(Equal("domain.com"))
+						Expect(actualPath).To(Equal("flag-routepath"))
+						Expect(actualPort).To(Equal(0))
+					})
+				})
+
+				Context("and a path is already specified on the route", func() {
+					BeforeEach(func() {
+						routeName = "host.domain.com/path"
+					})
+					It("replaces the path on the route", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+						Expect(actualHost).To(Equal("host"))
+						Expect(actualDomain.Name).To(Equal("domain.com"))
+						Expect(actualPath).To(Equal("flag-routepath"))
+						Expect(actualPort).To(Equal(0))
+					})
+				})
+			})
+
+			Context("and it is a tcp route", func() {
+				var tcpDomain models.DomainFields
+
+				BeforeEach(func() {
+					tcpDomain = models.DomainFields{
+						Name:            "tcp-domain.com",
+						GUID:            "tcp-domain-guid",
+						RouterGroupGUID: "tcp-guid",
+						RouterGroupType: "tcp",
+					}
+					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
+
+					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "tcp-domain.com" {
+							return tcpDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+					routeName = "tcp-domain.com:3333"
+				})
+
+				It("does not use the flag", func() {
+					Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+					actualHost, actualDomain, actualPath, actualPort := fakeRouteRepository.FindArgsForCall(0)
+					Expect(actualHost).To(Equal(""))
+					Expect(actualDomain.Name).To(Equal("tcp-domain.com"))
+					Expect(actualPath).To(Equal(""))
+					Expect(actualPort).To(Equal(3333))
+				})
+			})
+		})
+
 		Context("when the route is a TCP route", func() {
 			var tcpDomain models.DomainFields
 
