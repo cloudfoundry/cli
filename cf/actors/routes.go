@@ -56,7 +56,13 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 }
 
 func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error) {
-	route, err := routeActor.routeRepo.Find(hostname, domain, path, port)
+	var route models.Route
+	var err error
+	if !useRandomPort {
+		route, err = routeActor.routeRepo.Find(hostname, domain, path, port)
+	} else {
+		err = new(errors.ModelNotFoundError)
+	}
 
 	switch err.(type) {
 	case nil:
@@ -181,11 +187,14 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 	if err != nil {
 		return err
 	}
-	if appParamsFromContext.UseRandomRoute && domain.RouterGroupType != tcp {
 
-		hostname = generator.NewWordGenerator().Babble()
-
+	if appParamsFromContext.RoutePath != nil && *appParamsFromContext.RoutePath != "" && domain.RouterGroupType != tcp {
+		path = *appParamsFromContext.RoutePath
 	}
+	if appParamsFromContext.UseRandomRoute && domain.RouterGroupType != tcp {
+		hostname = generator.NewWordGenerator().Babble()
+	}
+
 	replaceHostname(domain.RouterGroupType, appParamsFromContext.Hosts, &hostname)
 	route, err := routeActor.FindOrCreateRoute(hostname, domain, path, port, appParamsFromContext.UseRandomRoute)
 	if err != nil {
