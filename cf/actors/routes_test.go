@@ -788,6 +788,7 @@ var _ = Describe("Routes", func() {
 
 				It("replaces the provided port with a random port", func() {
 					Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+					Expect(fakeRouteRepository.FindCallCount()).To(Equal(0))
 
 					actualHost, actualDomain, actualPath, actualPort, useRandomPort := fakeRouteRepository.CreateArgsForCall(0)
 					Expect(actualHost).To(Equal(""))
