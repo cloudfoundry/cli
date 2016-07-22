@@ -58,10 +58,11 @@ func (routeActor routeActor) CreateRandomTCPRoute(domain models.DomainFields) (m
 func (routeActor routeActor) FindOrCreateRoute(hostname string, domain models.DomainFields, path string, port int, useRandomPort bool) (models.Route, error) {
 	var route models.Route
 	var err error
-	if !useRandomPort {
-		route, err = routeActor.routeRepo.Find(hostname, domain, path, port)
-	} else {
+	//if tcp route use random port should skip route lookup
+	if useRandomPort && domain.RouterGroupType == tcp {
 		err = new(errors.ModelNotFoundError)
+	} else {
+		route, err = routeActor.routeRepo.Find(hostname, domain, path, port)
 	}
 
 	switch err.(type) {
