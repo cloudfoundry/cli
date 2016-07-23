@@ -59,12 +59,14 @@ type FakeApp struct {
 		arg1 string
 		arg2 int
 	}
-	DomainStub        func(string, string, string)
-	domainMutex       sync.RWMutex
-	domainArgsForCall []struct {
+	RouteStub        func(string, string, string, string, int)
+	routeMutex       sync.RWMutex
+	routeArgsForCall []struct {
 		arg1 string
 		arg2 string
 		arg3 string
+		arg4 string
+		arg5 int
 	}
 	GetContentsStub        func() []models.Application
 	getContentsMutex       sync.RWMutex
@@ -92,6 +94,8 @@ type FakeApp struct {
 	saveReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeApp) BuildpackURL(arg1 string, arg2 string) {
@@ -100,6 +104,7 @@ func (fake *FakeApp) BuildpackURL(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("BuildpackURL", []interface{}{arg1, arg2})
 	fake.buildpackURLMutex.Unlock()
 	if fake.BuildpackURLStub != nil {
 		fake.BuildpackURLStub(arg1, arg2)
@@ -124,6 +129,7 @@ func (fake *FakeApp) DiskQuota(arg1 string, arg2 int64) {
 		arg1 string
 		arg2 int64
 	}{arg1, arg2})
+	fake.recordInvocation("DiskQuota", []interface{}{arg1, arg2})
 	fake.diskQuotaMutex.Unlock()
 	if fake.DiskQuotaStub != nil {
 		fake.DiskQuotaStub(arg1, arg2)
@@ -148,6 +154,7 @@ func (fake *FakeApp) Memory(arg1 string, arg2 int64) {
 		arg1 string
 		arg2 int64
 	}{arg1, arg2})
+	fake.recordInvocation("Memory", []interface{}{arg1, arg2})
 	fake.memoryMutex.Unlock()
 	if fake.MemoryStub != nil {
 		fake.MemoryStub(arg1, arg2)
@@ -172,6 +179,7 @@ func (fake *FakeApp) Service(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("Service", []interface{}{arg1, arg2})
 	fake.serviceMutex.Unlock()
 	if fake.ServiceStub != nil {
 		fake.ServiceStub(arg1, arg2)
@@ -196,6 +204,7 @@ func (fake *FakeApp) StartCommand(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("StartCommand", []interface{}{arg1, arg2})
 	fake.startCommandMutex.Unlock()
 	if fake.StartCommandStub != nil {
 		fake.StartCommandStub(arg1, arg2)
@@ -221,6 +230,7 @@ func (fake *FakeApp) EnvironmentVars(arg1 string, arg2 string, arg3 string) {
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	fake.recordInvocation("EnvironmentVars", []interface{}{arg1, arg2, arg3})
 	fake.environmentVarsMutex.Unlock()
 	if fake.EnvironmentVarsStub != nil {
 		fake.EnvironmentVarsStub(arg1, arg2, arg3)
@@ -245,6 +255,7 @@ func (fake *FakeApp) HealthCheckTimeout(arg1 string, arg2 int) {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	fake.recordInvocation("HealthCheckTimeout", []interface{}{arg1, arg2})
 	fake.healthCheckTimeoutMutex.Unlock()
 	if fake.HealthCheckTimeoutStub != nil {
 		fake.HealthCheckTimeoutStub(arg1, arg2)
@@ -269,6 +280,7 @@ func (fake *FakeApp) Instances(arg1 string, arg2 int) {
 		arg1 string
 		arg2 int
 	}{arg1, arg2})
+	fake.recordInvocation("Instances", []interface{}{arg1, arg2})
 	fake.instancesMutex.Unlock()
 	if fake.InstancesStub != nil {
 		fake.InstancesStub(arg1, arg2)
@@ -287,34 +299,38 @@ func (fake *FakeApp) InstancesArgsForCall(i int) (string, int) {
 	return fake.instancesArgsForCall[i].arg1, fake.instancesArgsForCall[i].arg2
 }
 
-func (fake *FakeApp) Domain(arg1 string, arg2 string, arg3 string) {
-	fake.domainMutex.Lock()
-	fake.domainArgsForCall = append(fake.domainArgsForCall, struct {
+func (fake *FakeApp) Route(arg1 string, arg2 string, arg3 string, arg4 string, arg5 int) {
+	fake.routeMutex.Lock()
+	fake.routeArgsForCall = append(fake.routeArgsForCall, struct {
 		arg1 string
 		arg2 string
 		arg3 string
-	}{arg1, arg2, arg3})
-	fake.domainMutex.Unlock()
-	if fake.DomainStub != nil {
-		fake.DomainStub(arg1, arg2, arg3)
+		arg4 string
+		arg5 int
+	}{arg1, arg2, arg3, arg4, arg5})
+	fake.recordInvocation("Route", []interface{}{arg1, arg2, arg3, arg4, arg5})
+	fake.routeMutex.Unlock()
+	if fake.RouteStub != nil {
+		fake.RouteStub(arg1, arg2, arg3, arg4, arg5)
 	}
 }
 
-func (fake *FakeApp) DomainCallCount() int {
-	fake.domainMutex.RLock()
-	defer fake.domainMutex.RUnlock()
-	return len(fake.domainArgsForCall)
+func (fake *FakeApp) RouteCallCount() int {
+	fake.routeMutex.RLock()
+	defer fake.routeMutex.RUnlock()
+	return len(fake.routeArgsForCall)
 }
 
-func (fake *FakeApp) DomainArgsForCall(i int) (string, string, string) {
-	fake.domainMutex.RLock()
-	defer fake.domainMutex.RUnlock()
-	return fake.domainArgsForCall[i].arg1, fake.domainArgsForCall[i].arg2, fake.domainArgsForCall[i].arg3
+func (fake *FakeApp) RouteArgsForCall(i int) (string, string, string, string, int) {
+	fake.routeMutex.RLock()
+	defer fake.routeMutex.RUnlock()
+	return fake.routeArgsForCall[i].arg1, fake.routeArgsForCall[i].arg2, fake.routeArgsForCall[i].arg3, fake.routeArgsForCall[i].arg4, fake.routeArgsForCall[i].arg5
 }
 
 func (fake *FakeApp) GetContents() []models.Application {
 	fake.getContentsMutex.Lock()
 	fake.getContentsArgsForCall = append(fake.getContentsArgsForCall, struct{}{})
+	fake.recordInvocation("GetContents", []interface{}{})
 	fake.getContentsMutex.Unlock()
 	if fake.GetContentsStub != nil {
 		return fake.GetContentsStub()
@@ -342,6 +358,7 @@ func (fake *FakeApp) Stack(arg1 string, arg2 string) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("Stack", []interface{}{arg1, arg2})
 	fake.stackMutex.Unlock()
 	if fake.StackStub != nil {
 		fake.StackStub(arg1, arg2)
@@ -371,6 +388,7 @@ func (fake *FakeApp) AppPorts(arg1 string, arg2 []int) {
 		arg1 string
 		arg2 []int
 	}{arg1, arg2Copy})
+	fake.recordInvocation("AppPorts", []interface{}{arg1, arg2Copy})
 	fake.appPortsMutex.Unlock()
 	if fake.AppPortsStub != nil {
 		fake.AppPortsStub(arg1, arg2)
@@ -394,6 +412,7 @@ func (fake *FakeApp) Save(f io.Writer) error {
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
 		f io.Writer
 	}{f})
+	fake.recordInvocation("Save", []interface{}{f})
 	fake.saveMutex.Unlock()
 	if fake.SaveStub != nil {
 		return fake.SaveStub(f)
@@ -419,6 +438,50 @@ func (fake *FakeApp) SaveReturns(result1 error) {
 	fake.saveReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeApp) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.buildpackURLMutex.RLock()
+	defer fake.buildpackURLMutex.RUnlock()
+	fake.diskQuotaMutex.RLock()
+	defer fake.diskQuotaMutex.RUnlock()
+	fake.memoryMutex.RLock()
+	defer fake.memoryMutex.RUnlock()
+	fake.serviceMutex.RLock()
+	defer fake.serviceMutex.RUnlock()
+	fake.startCommandMutex.RLock()
+	defer fake.startCommandMutex.RUnlock()
+	fake.environmentVarsMutex.RLock()
+	defer fake.environmentVarsMutex.RUnlock()
+	fake.healthCheckTimeoutMutex.RLock()
+	defer fake.healthCheckTimeoutMutex.RUnlock()
+	fake.instancesMutex.RLock()
+	defer fake.instancesMutex.RUnlock()
+	fake.routeMutex.RLock()
+	defer fake.routeMutex.RUnlock()
+	fake.getContentsMutex.RLock()
+	defer fake.getContentsMutex.RUnlock()
+	fake.stackMutex.RLock()
+	defer fake.stackMutex.RUnlock()
+	fake.appPortsMutex.RLock()
+	defer fake.appPortsMutex.RUnlock()
+	fake.saveMutex.RLock()
+	defer fake.saveMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeApp) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ manifest.App = new(FakeApp)

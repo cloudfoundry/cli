@@ -390,14 +390,18 @@ var _ = Describe("CreateAppManifest", func() {
 						{
 							Host: "route-1-host",
 							Domain: models.DomainFields{
-								Name: "domain-1-name",
+								Name: "http-domain",
 							},
+							Path: "path",
+							Port: 0,
 						},
 						{
-							Host: "route-2-host",
+							Host: "",
 							Domain: models.DomainFields{
-								Name: "domain-2-name",
+								Name: "tcp-domain",
 							},
+							Path: "",
+							Port: 123,
 						},
 					}
 					appSummaryRepo.GetSummaryReturns(application, nil)
@@ -405,17 +409,21 @@ var _ = Describe("CreateAppManifest", func() {
 
 				It("sets the domains", func() {
 					Expect(runCLIErr).NotTo(HaveOccurred())
-					Expect(fakeManifest.DomainCallCount()).To(Equal(2))
+					Expect(fakeManifest.RouteCallCount()).To(Equal(2))
 
-					name, host, domainName := fakeManifest.DomainArgsForCall(0)
+					name, host, domainName, path, port := fakeManifest.RouteArgsForCall(0)
 					Expect(name).To(Equal("app-name"))
 					Expect(host).To(Equal("route-1-host"))
-					Expect(domainName).To(Equal("domain-1-name"))
+					Expect(domainName).To(Equal("http-domain"))
+					Expect(path).To(Equal("path"))
+					Expect(port).To(Equal(0))
 
-					name, host, domainName = fakeManifest.DomainArgsForCall(1)
+					name, host, domainName, path, port = fakeManifest.RouteArgsForCall(1)
 					Expect(name).To(Equal("app-name"))
-					Expect(host).To(Equal("route-2-host"))
-					Expect(domainName).To(Equal("domain-2-name"))
+					Expect(host).To(Equal(""))
+					Expect(domainName).To(Equal("tcp-domain"))
+					Expect(path).To(Equal(""))
+					Expect(port).To(Equal(123))
 				})
 			})
 

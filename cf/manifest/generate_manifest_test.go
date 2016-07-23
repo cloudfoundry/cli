@@ -137,16 +137,31 @@ var _ = Describe("generate_manifest", func() {
 				})
 			})
 
-			It("includes no-route when the application has no domains", func() {
+			It("includes no-route when the application has no routes", func() {
 				m.Save(f)
 				contents := getYaml(f)
 				application := contents.Applications[0]
 				Expect(application.NoRoute).To(BeTrue())
 			})
 
-			Context("when an application has one domain with a hostname", func() {
+			Context("when an application has one route with both hostname, domain path", func() {
 				BeforeEach(func() {
-					m.Domain("app1", "host-name", "domain-name")
+					m.Route("app1", "host-name", "domain-name", "/path", 0)
+				})
+
+				It("includes the route", func() {
+					err := m.Save(f)
+					Expect(err).NotTo(HaveOccurred())
+					contents := getYaml(f)
+					application := contents.Applications[0]
+					Expect(application.Routes[0]).To(Equal("route: host-name.domain-name/path"))
+				})
+
+			})
+
+			Context("when an application has one route without a hostname", func() {
+				BeforeEach(func() {
+					m.Route("app1", "", "domain-name", "", 0)
 				})
 
 				It("includes the domain", func() {
@@ -154,99 +169,82 @@ var _ = Describe("generate_manifest", func() {
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Domain).To(Equal("domain-name"))
+					Expect(application.Routes[0]).To(Equal("route: domain-name"))
 				})
 
-				It("does not include no-hostname", func() {
-					err := m.Save(f)
-					Expect(err).NotTo(HaveOccurred())
-					contents := getYaml(f)
-					application := contents.Applications[0]
-					Expect(application.NoHostname).To(BeFalse())
-				})
 			})
 
-			Context("when an application has one domain without a hostname", func() {
+			Context("when an application has one tcp route", func() {
 				BeforeEach(func() {
-					m.Domain("app1", "", "domain-name")
+					m.Route("app1", "", "domain-name", "", 123)
 				})
 
-				It("includes the domain", func() {
+				It("includes the route", func() {
 					err := m.Save(f)
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Domain).To(Equal("domain-name"))
+					Expect(application.Routes[0]).To(Equal("route: domain-name:123"))
 				})
 
-				It("includes no-hostname", func() {
-					m.Save(f)
+			})
+
+			Context("when an application has multiple routes", func() {
+				BeforeEach(func() {
+					m.Route("app1", "", "http-domain", "", 0)
+					m.Route("app1", "host", "http-domain", "", 0)
+					m.Route("app1", "host", "http-domain", "/path", 0)
+					m.Route("app1", "", "tcp-domain", "", 123)
+				})
+
+				It("includes the route", func() {
+					err := m.Save(f)
+					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.NoHostname).To(BeTrue())
+					Expect(application.Routes[0]).To(Equal("route: http-domain"))
+					Expect(application.Routes[1]).To(Equal("route: host.http-domain"))
+					Expect(application.Routes[2]).To(Equal("route: host.http-domain/path"))
+					Expect(application.Routes[3]).To(Equal("route: tcp-domain:123"))
 				})
+
 			})
 
-			It("generates a manifest containing two hosts two domains", func() {
-				m.Domain("app1", "foo1", "test1.com")
-				m.Domain("app1", "foo1", "test2.com")
-				m.Domain("app1", "foo2", "test1.com")
-				m.Domain("app1", "foo2", "test2.com")
-				err := m.Save(f)
-				Expect(err).NotTo(HaveOccurred())
+			Context("when multiple applications have multiple routes", func() {
+				BeforeEach(func() {
+					m.Stack("app2", "stack-name")
+					m.Memory("app2", 1024)
+					m.Instances("app2", 2)
+					m.DiskQuota("app2", 1024)
 
-				application := getYaml(f).Applications[0]
+					m.Route("app1", "", "http-domain", "", 0)
+					m.Route("app1", "host", "http-domain", "", 0)
+					m.Route("app1", "host", "http-domain", "/path", 0)
+					m.Route("app1", "", "tcp-domain", "", 123)
+					m.Route("app2", "", "http-domain", "", 0)
+					m.Route("app2", "host", "http-domain", "", 0)
+					m.Route("app2", "host", "http-domain", "/path", 0)
+					m.Route("app2", "", "tcp-domain", "", 123)
+				})
 
-				Expect(application.Name).To(Equal("app1"))
-				Expect(application.Hosts).To(ContainElement("foo1"))
-				Expect(application.Hosts).To(ContainElement("foo2"))
-				Expect(application.Domains).To(ContainElement("test1.com"))
-				Expect(application.Domains).To(ContainElement("test2.com"))
+				It("includes the route", func() {
+					err := m.Save(f)
+					Expect(err).NotTo(HaveOccurred())
+					contents := getYaml(f)
+					application := contents.Applications[0]
+					Expect(application.Routes[0]).To(Equal("route: http-domain"))
+					Expect(application.Routes[1]).To(Equal("route: host.http-domain"))
+					Expect(application.Routes[2]).To(Equal("route: host.http-domain/path"))
+					Expect(application.Routes[3]).To(Equal("route: tcp-domain:123"))
 
-				Expect(application.Host).To(Equal(""))
-				Expect(application.Domain).To(Equal(""))
-				Expect(application.NoRoute).To(BeFalse())
-				Expect(application.NoHostname).To(BeFalse())
+					application = contents.Applications[1]
+					Expect(application.Routes[0]).To(Equal("route: http-domain"))
+					Expect(application.Routes[1]).To(Equal("route: host.http-domain"))
+					Expect(application.Routes[2]).To(Equal("route: host.http-domain/path"))
+					Expect(application.Routes[3]).To(Equal("route: tcp-domain:123"))
+				})
+
 			})
-
-			It("generates a manifest containing two hosts one domain", func() {
-				m.Domain("app1", "foo1", "test.com")
-				m.Domain("app1", "foo2", "test.com")
-				err := m.Save(f)
-				Expect(err).NotTo(HaveOccurred())
-
-				application := getYaml(f).Applications[0]
-
-				Expect(application.Name).To(Equal("app1"))
-				Expect(application.Hosts).To(ContainElement("foo1"))
-				Expect(application.Hosts).To(ContainElement("foo2"))
-				Expect(application.Domain).To(Equal("test.com"))
-
-				Expect(application.Host).To(Equal(""))
-				Expect(application.Domains).To(BeEmpty())
-				Expect(application.NoRoute).To(BeFalse())
-				Expect(application.NoHostname).To(BeFalse())
-			})
-
-			It("generates a manifest containing one host two domains", func() {
-				m.Domain("app1", "foo", "test1.com")
-				m.Domain("app1", "foo", "test2.com")
-				err := m.Save(f)
-				Expect(err).NotTo(HaveOccurred())
-
-				application := getYaml(f).Applications[0]
-
-				Expect(application.Name).To(Equal("app1"))
-				Expect(application.Host).To(Equal("foo"))
-				Expect(application.Domains).To(ContainElement("test1.com"))
-				Expect(application.Domains).To(ContainElement("test2.com"))
-
-				Expect(application.Hosts).To(BeEmpty())
-				Expect(application.Domain).To(Equal(""))
-				Expect(application.NoRoute).To(BeFalse())
-				Expect(application.NoHostname).To(BeFalse())
-			})
-
 			Context("when the application contains environment vars", func() {
 				BeforeEach(func() {
 					m.EnvironmentVars("app1", "foo", "foo-value")
@@ -313,23 +311,19 @@ type YManifest struct {
 }
 
 type YApplication struct {
-	Name       string                 `yaml:"name"`
-	Services   []string               `yaml:"services"`
-	Buildpack  string                 `yaml:"buildpack"`
-	Memory     string                 `yaml:"memory"`
-	Command    string                 `yaml:"command"`
-	Env        map[string]interface{} `yaml:"env"`
-	Timeout    int                    `yaml:"timeout"`
-	Instances  int                    `yaml:"instances"`
-	Host       string                 `yaml:"host"`
-	Hosts      []string               `yaml:"hosts"`
-	Domain     string                 `yaml:"domain"`
-	Domains    []string               `yaml:"domains"`
-	NoHostname bool                   `yaml:"no-hostname"`
-	NoRoute    bool                   `yaml:"no-route"`
-	DiskQuota  string                 `yaml:"disk_quota"`
-	Stack      string                 `yaml:"stack"`
-	AppPorts   []int                  `yaml:"app-ports"`
+	Name      string                 `yaml:"name"`
+	Services  []string               `yaml:"services"`
+	Buildpack string                 `yaml:"buildpack"`
+	Memory    string                 `yaml:"memory"`
+	Command   string                 `yaml:"command"`
+	Env       map[string]interface{} `yaml:"env"`
+	Timeout   int                    `yaml:"timeout"`
+	Instances int                    `yaml:"instances"`
+	Routes    []string               `yaml:"routes"`
+	NoRoute   bool                   `yaml:"no-route"`
+	DiskQuota string                 `yaml:"disk_quota"`
+	Stack     string                 `yaml:"stack"`
+	AppPorts  []int                  `yaml:"app-ports"`
 }
 
 func getYaml(f *bytes.Buffer) YManifest {
