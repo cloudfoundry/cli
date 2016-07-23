@@ -3245,7 +3245,7 @@
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
-    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います。"
+    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3849,7 +3849,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "デフォルト・ロケールを設定します。LOCALE が CLEAR の場合は、前のロケールが削除されます。"
+    "translation": "デフォルト・ロケールを設定します。LOCALE が 'CLEAR' の場合は、前のロケールが削除されます。"
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
