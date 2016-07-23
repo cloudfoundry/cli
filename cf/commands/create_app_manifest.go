@@ -163,7 +163,7 @@ func (cmd *CreateAppManifest) createManifest(app models.Application) error {
 
 	if len(app.Routes) > 0 {
 		for i := 0; i < len(app.Routes); i++ {
-			cmd.manifest.Domain(app.Name, app.Routes[i].Host, app.Routes[i].Domain.Name)
+			cmd.manifest.Route(app.Name, app.Routes[i].Host, app.Routes[i].Domain.Name, app.Routes[i].Path, app.Routes[i].Port)
 		}
 	}
 

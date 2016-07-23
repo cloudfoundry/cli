@@ -3,6 +3,7 @@ package manifest
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -24,7 +25,7 @@ type App interface {
 	EnvironmentVars(string, string, string)
 	HealthCheckTimeout(string, int)
 	Instances(string, int)
-	Domain(string, string, string)
+	Route(string, string, string, string, int)
 	GetContents() []models.Application
 	Stack(string, string)
 	AppPorts(string, []int)
@@ -32,23 +33,19 @@ type App interface {
 }
 
 type Application struct {
-	Name       string                 `yaml:"name"`
-	Instances  int                    `yaml:"instances,omitempty"`
-	Memory     string                 `yaml:"memory,omitempty"`
-	DiskQuota  string                 `yaml:"disk_quota,omitempty"`
-	AppPorts   []int                  `yaml:"app-ports,omitempty"`
-	Host       string                 `yaml:"host,omitempty"`
-	Hosts      []string               `yaml:"hosts,omitempty"`
-	Domain     string                 `yaml:"domain,omitempty"`
-	Domains    []string               `yaml:"domains,omitempty"`
-	NoHostname bool                   `yaml:"no-hostname,omitempty"`
-	NoRoute    bool                   `yaml:"no-route,omitempty"`
-	Buildpack  string                 `yaml:"buildpack,omitempty"`
-	Command    string                 `yaml:"command,omitempty"`
-	Env        map[string]interface{} `yaml:"env,omitempty"`
-	Services   []string               `yaml:"services,omitempty"`
-	Stack      string                 `yaml:"stack,omitempty"`
-	Timeout    int                    `yaml:"timeout,omitempty"`
+	Name      string                 `yaml:"name"`
+	Instances int                    `yaml:"instances,omitempty"`
+	Memory    string                 `yaml:"memory,omitempty"`
+	DiskQuota string                 `yaml:"disk_quota,omitempty"`
+	AppPorts  []int                  `yaml:"app-ports,omitempty"`
+	Routes    []string               `yaml:"routes,omitempty"`
+	NoRoute   bool                   `yaml:"no-route,omitempty"`
+	Buildpack string                 `yaml:"buildpack,omitempty"`
+	Command   string                 `yaml:"command,omitempty"`
+	Env       map[string]interface{} `yaml:"env,omitempty"`
+	Services  []string               `yaml:"services,omitempty"`
+	Stack     string                 `yaml:"stack,omitempty"`
+	Timeout   int                    `yaml:"timeout,omitempty"`
 }
 
 type Applications struct {
@@ -108,14 +105,17 @@ func (m *appManifest) Service(appName string, name string) {
 	})
 }
 
-func (m *appManifest) Domain(appName string, host string, domain string) {
+func (m *appManifest) Route(appName, host, domain, path string, port int) {
 	i := m.findOrCreateApplication(appName)
 	m.contents[i].Routes = append(m.contents[i].Routes, models.RouteSummary{
 		Host: host,
 		Domain: models.DomainFields{
 			Name: domain,
 		},
+		Path: path,
+		Port: port,
 	})
+
 }
 
 func (m *appManifest) EnvironmentVars(appName string, key, value string) {
@@ -154,6 +154,10 @@ func generateAppMap(app models.Application) (Application, error) {
 		services = append(services, s.Name)
 	}
 
+	var routes []string
+	for _, routeSummary := range app.Routes {
+		routes = append(routes, buildRoute(routeSummary))
+	}
 	m := Application{
 		Name:      app.Name,
 		Services:  services,
@@ -166,40 +170,12 @@ func generateAppMap(app models.Application) (Application, error) {
 		DiskQuota: fmt.Sprintf("%dM", app.DiskQuota),
 		Stack:     app.Stack.Name,
 		AppPorts:  app.AppPorts,
+		Routes:    routes,
 	}
 
-	switch len(app.Routes) {
-	case 0:
+	if len(app.Routes) == 0 {
 		m.NoRoute = true
-	case 1:
-		const noHostname = ""
 
-		m.Domain = app.Routes[0].Domain.Name
-		host := app.Routes[0].Host
-
-		if host == noHostname {
-			m.NoHostname = true
-		} else {
-			m.Host = host
-		}
-	default:
-		hosts, domains := separateHostsAndDomains(app.Routes)
-
-		switch len(hosts) {
-		case 0:
-			m.NoHostname = true
-		case 1:
-			m.Host = hosts[0]
-		default:
-			m.Hosts = hosts
-		}
-
-		switch len(domains) {
-		case 1:
-			m.Domain = domains[0]
-		default:
-			m.Domains = domains
-		}
 	}
 
 	return m, nil
@@ -231,6 +207,24 @@ func (m *appManifest) Save(f io.Writer) error {
 	return nil
 }
 
+func buildRoute(routeSummary models.RouteSummary) string {
+	route := "route: "
+	if routeSummary.Host != "" {
+		route += routeSummary.Host
+		route += "."
+	}
+	route += routeSummary.Domain.Name
+	if routeSummary.Path != "" {
+		route += routeSummary.Path
+	}
+	if routeSummary.Port != 0 {
+		route += ":"
+		route += strconv.Itoa(routeSummary.Port)
+	}
+	return route
+
+}
+
 func (m *appManifest) findOrCreateApplication(name string) int {
 	for i, app := range m.contents {
 		if app.Name == name {
@@ -248,32 +242,4 @@ func (m *appManifest) addApplication(name string) {
 			EnvironmentVars: make(map[string]interface{}),
 		},
 	})
-}
-
-func separateHostsAndDomains(routes []models.RouteSummary) ([]string, []string) {
-	var (
-		hostSlice    []string
-		domainSlice  []string
-		hostPSlice   []string
-		domainPSlice []string
-		hosts        []string
-		domains      []string
-	)
-
-	for i := 0; i < len(routes); i++ {
-		hostSlice = append(hostSlice, routes[i].Host)
-		domainSlice = append(domainSlice, routes[i].Domain.Name)
-	}
-
-	hostPSlice = removeDuplicatedValue(hostSlice)
-	domainPSlice = removeDuplicatedValue(domainSlice)
-
-	if hostPSlice != nil {
-		hosts = hostPSlice
-	}
-	if domainPSlice != nil {
-		domains = domainPSlice
-	}
-
-	return hosts, domains
 }
