@@ -545,7 +545,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  선택적으로 올바른 JSON 오브젝트 인라인에 서비스별 구성 매개변수를 제공하십시오.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  선택적으로 올바른 JSON 오브젝트에 서비스별 구성 매개변수를 포함하는 파일을 제공하십시오. 매개변수 파일의 경로는 파일의 절대 또는 상대 경로입니다.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   올바른 JSON 오브젝트의 예:\n   {\n     \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   선택적으로 올바른 JSON 오브젝트 인라인에 서비스별 구성 매개변수를 제공하십시오.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   선택적으로 올바른 JSON 오브젝트에 서비스별 구성 매개변수를 포함하는 파일을 제공하십시오. 매개변수 파일의 경로는 파일의 절대 또는 상대 경로입니다.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   올바른 JSON 오브젝트의 예:\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
