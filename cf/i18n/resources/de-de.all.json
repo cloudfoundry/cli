@@ -285,7 +285,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "Überprüfungstyp für Anwendungsdiagnose (z.B. 'port' oder 'keiner')"
+    "translation": "Überprüfungstyp für Anwendungsdiagnose (z.B. 'port' oder 'none')"
   },
   {
     "id": "Application instance index",
@@ -2325,7 +2325,7 @@
   },
   {
     "id": "HEALTH_CHECK_TYPE",
-    "translation": "TYP DER ZUSTANDSPRÜFUNG"
+    "translation": "TYP-DER-ZUSTANDSPRÜFUNG"
   },
   {
     "id": "HOST",
@@ -2949,7 +2949,7 @@
   },
   {
     "id": "NUM_INSTANCES",
-    "translation": "ANZAHL INSTANZEN"
+    "translation": "ANZAHL-INSTANZEN"
   },
   {
     "id": "Name",
@@ -3397,7 +3397,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": "RESERVIERTE ROUTENPORTS"
+    "translation": "RESERVIERTE-ROUTENPORTS"
   },
   {
     "id": "RESPONSE:",
