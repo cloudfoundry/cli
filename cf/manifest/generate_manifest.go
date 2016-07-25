@@ -3,7 +3,6 @@ package manifest
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/models"
 
@@ -38,7 +37,7 @@ type Application struct {
 	Memory    string                 `yaml:"memory,omitempty"`
 	DiskQuota string                 `yaml:"disk_quota,omitempty"`
 	AppPorts  []int                  `yaml:"app-ports,omitempty"`
-	Routes    []string               `yaml:"routes,omitempty"`
+	Routes    []map[string]string    `yaml:"routes,omitempty"`
 	NoRoute   bool                   `yaml:"no-route,omitempty"`
 	Buildpack string                 `yaml:"buildpack,omitempty"`
 	Command   string                 `yaml:"command,omitempty"`
@@ -154,7 +153,7 @@ func generateAppMap(app models.Application) (Application, error) {
 		services = append(services, s.Name)
 	}
 
-	var routes []string
+	var routes []map[string]string
 	for _, routeSummary := range app.Routes {
 		routes = append(routes, buildRoute(routeSummary))
 	}
@@ -207,22 +206,25 @@ func (m *appManifest) Save(f io.Writer) error {
 	return nil
 }
 
-func buildRoute(routeSummary models.RouteSummary) string {
-	route := "route: "
+func buildRoute(routeSummary models.RouteSummary) map[string]string {
+	var route string
 	if routeSummary.Host != "" {
-		route += routeSummary.Host
-		route += "."
+		route = fmt.Sprintf("%s.", routeSummary.Host)
 	}
-	route += routeSummary.Domain.Name
-	if routeSummary.Path != "" {
-		route += routeSummary.Path
-	}
-	if routeSummary.Port != 0 {
-		route += ":"
-		route += strconv.Itoa(routeSummary.Port)
-	}
-	return route
 
+	route = fmt.Sprintf("%s%s", route, routeSummary.Domain.Name)
+
+	if routeSummary.Path != "" {
+		route = fmt.Sprintf("%s%s", route, routeSummary.Path)
+	}
+
+	if routeSummary.Port != 0 {
+		route = fmt.Sprintf("%s:%d", route, routeSummary.Port)
+	}
+
+	return map[string]string{
+		"route": route,
+	}
 }
 
 func (m *appManifest) findOrCreateApplication(name string) int {

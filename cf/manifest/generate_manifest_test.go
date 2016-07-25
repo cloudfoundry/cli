@@ -154,7 +154,7 @@ var _ = Describe("generate_manifest", func() {
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Routes[0]).To(Equal("route: host-name.domain-name/path"))
+					Expect(application.Routes[0]["route"]).To(Equal("host-name.domain-name/path"))
 				})
 
 			})
@@ -169,7 +169,7 @@ var _ = Describe("generate_manifest", func() {
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Routes[0]).To(Equal("route: domain-name"))
+					Expect(application.Routes[0]["route"]).To(Equal("domain-name"))
 				})
 
 			})
@@ -184,7 +184,7 @@ var _ = Describe("generate_manifest", func() {
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Routes[0]).To(Equal("route: domain-name:123"))
+					Expect(application.Routes[0]["route"]).To(Equal("domain-name:123"))
 				})
 
 			})
@@ -202,10 +202,10 @@ var _ = Describe("generate_manifest", func() {
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Routes[0]).To(Equal("route: http-domain"))
-					Expect(application.Routes[1]).To(Equal("route: host.http-domain"))
-					Expect(application.Routes[2]).To(Equal("route: host.http-domain/path"))
-					Expect(application.Routes[3]).To(Equal("route: tcp-domain:123"))
+					Expect(application.Routes[0]["route"]).To(Equal("http-domain"))
+					Expect(application.Routes[1]["route"]).To(Equal("host.http-domain"))
+					Expect(application.Routes[2]["route"]).To(Equal("host.http-domain/path"))
+					Expect(application.Routes[3]["route"]).To(Equal("tcp-domain:123"))
 				})
 
 			})
@@ -232,16 +232,16 @@ var _ = Describe("generate_manifest", func() {
 					Expect(err).NotTo(HaveOccurred())
 					contents := getYaml(f)
 					application := contents.Applications[0]
-					Expect(application.Routes[0]).To(Equal("route: http-domain"))
-					Expect(application.Routes[1]).To(Equal("route: host.http-domain"))
-					Expect(application.Routes[2]).To(Equal("route: host.http-domain/path"))
-					Expect(application.Routes[3]).To(Equal("route: tcp-domain:123"))
+					Expect(application.Routes[0]["route"]).To(Equal("http-domain"))
+					Expect(application.Routes[1]["route"]).To(Equal("host.http-domain"))
+					Expect(application.Routes[2]["route"]).To(Equal("host.http-domain/path"))
+					Expect(application.Routes[3]["route"]).To(Equal("tcp-domain:123"))
 
 					application = contents.Applications[1]
-					Expect(application.Routes[0]).To(Equal("route: http-domain"))
-					Expect(application.Routes[1]).To(Equal("route: host.http-domain"))
-					Expect(application.Routes[2]).To(Equal("route: host.http-domain/path"))
-					Expect(application.Routes[3]).To(Equal("route: tcp-domain:123"))
+					Expect(application.Routes[0]["route"]).To(Equal("http-domain"))
+					Expect(application.Routes[1]["route"]).To(Equal("host.http-domain"))
+					Expect(application.Routes[2]["route"]).To(Equal("host.http-domain/path"))
+					Expect(application.Routes[3]["route"]).To(Equal("tcp-domain:123"))
 				})
 
 			})
@@ -319,7 +319,7 @@ type YApplication struct {
 	Env       map[string]interface{} `yaml:"env"`
 	Timeout   int                    `yaml:"timeout"`
 	Instances int                    `yaml:"instances"`
-	Routes    []string               `yaml:"routes"`
+	Routes    []map[string]string    `yaml:"routes"`
 	NoRoute   bool                   `yaml:"no-route"`
 	DiskQuota string                 `yaml:"disk_quota"`
 	Stack     string                 `yaml:"stack"`
