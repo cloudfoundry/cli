@@ -285,7 +285,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "Tipo de comprobación de estado de la aplicación (p. ej. 'puerto' o 'ninguno')"
+    "translation": "Tipo de comprobación de estado de la aplicación (p. ej. 'port' o 'none')"
   },
   {
     "id": "Application instance index",
@@ -1233,7 +1233,7 @@
   },
   {
     "id": "Create an app manifest for an app that has been pushed successfully",
-    "translation": "Crear un manifiesto de app para una app que se ha enviado por push correctamente."
+    "translation": "Crear un manifiesto de app para una app que se ha enviado por push correctamente"
   },
   {
     "id": "Create an org",
@@ -1617,7 +1617,7 @@
   },
   {
     "id": "Domain (e.g. example.com)",
-    "translation": "Dominio (p. ej. ejemplo.com)"
+    "translation": "Dominio (p. ej. example.com)"
   },
   {
     "id": "Domains:",
@@ -3849,7 +3849,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "Establecer el entorno local predeterminado. Si ENTORNO LOCAL está 'BORRADO', se suprimirá el entorno local anterior."
+    "translation": "Establecer el entorno local predeterminado. Si ENTORNO LOCAL está 'CLEAR', se suprimirá el entorno local anterior."
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",

@@ -205,7 +205,7 @@
   },
   {
     "id": "APP_NAME",
-    "translation": "APP_NAME (APP-NAME)"
+    "translation": "APP-NAME"
   },
   {
     "id": "Access for plans of a particular broker",
@@ -285,7 +285,7 @@
   },
   {
     "id": "Application health check type (e.g. 'port' or 'none')",
-    "translation": "Überprüfungstyp für Anwendungsdiagnose (z.B. 'Port' oder 'keiner')"
+    "translation": "Überprüfungstyp für Anwendungsdiagnose (z.B. 'port' oder 'none')"
   },
   {
     "id": "Application instance index",
@@ -385,7 +385,7 @@
   },
   {
     "id": "BUILDPACK_NAME",
-    "translation": "BUILDPACK_NAME (BUILDPACKNAME)"
+    "translation": "BUILDPACKNAME"
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
@@ -545,7 +545,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  Optional können Sie servicespezifische Konfigurationsparameter in ein gültiges JSON-Objekt integriert zur Verfügung stellen.\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  Optional können Sie eine Datei mit servicespezifischen Konfigurationsparametern in ein gültiges JSON-Objekt integriert zur Verfügung stellen. Der Pfad zur Parameterdatei kann ein absoluter oder relativer Pfad zu einer Datei sein.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Beispiel für ein gültiges JSON-Objekt:\n   {\n     \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optional können Sie servicespezifische Konfigurationsparameter in ein gültiges JSON-Objekt integriert zur Verfügung stellen.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optional können Sie eine Datei mit servicespezifischen Konfigurationsparametern in ein gültiges JSON-Objekt integriert zur Verfügung stellen. Der Pfad zur Parameterdatei kann ein absoluter oder relativer Pfad zu einer Datei sein.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Beispiel für ein gültiges JSON-Objekt:\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -997,11 +997,11 @@
   },
   {
     "id": "Can not provision instances of paid service plans",
-    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden."
+    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
   {
     "id": "Can provision instances of paid service plans",
-    "translation": "Instanzen bezahlter Servicepläne können bereitgestellt werden."
+    "translation": "Instanzen bezahlter Servicepläne können bereitgestellt werden"
   },
   {
     "id": "Can provision instances of paid service plans (Default: disallowed)",
@@ -1021,7 +1021,7 @@
   },
   {
     "id": "Cannot provision instances of paid service plans",
-    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden."
+    "translation": "Instanzen bezahlter Servicepläne können nicht bereitgestellt werden"
   },
   {
     "id": "Cannot specify both lock and unlock options.",
@@ -1045,7 +1045,7 @@
   },
   {
     "id": "Change or view the instance count, disk space limit, and memory limit for an app",
-    "translation": "Den Instanzzähler, den Grenzwert für den Plattenspeicher und die Speicherbegrenzung für eine App ändern oder anzeigen."
+    "translation": "Den Instanzzähler, den Grenzwert für den Plattenspeicher und die Speicherbegrenzung für eine App ändern oder anzeigen"
   },
   {
     "id": "Change service plan for a service instance",
@@ -1361,7 +1361,7 @@
   },
   {
     "id": "DOCKER_IMAGE",
-    "translation": "DOCKER_IMAGE (DOCKER-IMAGE)"
+    "translation": "DOCKER-IMAGE"
   },
   {
     "id": "DOMAIN",
@@ -1977,7 +1977,7 @@
   },
   {
     "id": "Executes a request to the targeted API endpoint",
-    "translation": "Führt eine Anforderung an den anvisierten API-Endpunkt durch."
+    "translation": "Führt eine Anforderung an den anvisierten API-Endpunkt durch"
   },
   {
     "id": "Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'",
@@ -2325,7 +2325,7 @@
   },
   {
     "id": "HEALTH_CHECK_TYPE",
-    "translation": "HEALTH_CHECK_TYPE (TYP DER ZUSTANDSPRÜFUNG)"
+    "translation": "TYP-DER-ZUSTANDSPRÜFUNG"
   },
   {
     "id": "HOST",
@@ -2789,7 +2789,7 @@
   },
   {
     "id": "List domains in the target org",
-    "translation": "Domänen in der Zielorganisation auflisten."
+    "translation": "Domänen in der Zielorganisation auflisten"
   },
   {
     "id": "List keys for a service instance",
@@ -2829,7 +2829,7 @@
   },
   {
     "id": "Lock the buildpack to prevent updates",
-    "translation": "Sperren Sie das Buildpack, um Aktualisierungen zu vermeiden."
+    "translation": "Sperren Sie das Buildpack, um Aktualisierungen zu vermeiden"
   },
   {
     "id": "Log user in",
@@ -2857,11 +2857,11 @@
   },
   {
     "id": "MANIFEST_PATH",
-    "translation": "MANIFEST_PATH (MANIFESTPFAD)"
+    "translation": "MANIFESTPFAD"
   },
   {
     "id": "MEMORY",
-    "translation": "MEMORY (HAUTPSPEICHER)"
+    "translation": "HAUTPSPEICHER"
   },
   {
     "id": "Make a user-provided service instance available to CF apps",
@@ -2949,7 +2949,7 @@
   },
   {
     "id": "NUM_INSTANCES",
-    "translation": "NUM_INSTANCES (ANZAHL INSTANZEN)"
+    "translation": "ANZAHL-INSTANZEN"
   },
   {
     "id": "Name",
@@ -3125,7 +3125,7 @@
   },
   {
     "id": "OPTIONS:",
-    "translation": "Optionen:"
+    "translation": "OPTIONEN:"
   },
   {
     "id": "ORG ADMIN",
@@ -3369,11 +3369,11 @@
   },
   {
     "id": "Push multiple apps with a manifest",
-    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:"
+    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen"
   },
   {
     "id": "QUOTA",
-    "translation": "QUOTA (GRÖßENBESCHRÄNKUNG)"
+    "translation": "GRÖßENBESCHRÄNKUNG"
   },
   {
     "id": "Quota Definition {{.QuotaName}} already exists",
@@ -3397,7 +3397,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": "RESERVED_ROUTE_PORTS (RESERVIERTE ROUTENPORTS)"
+    "translation": "RESERVIERTE-ROUTENPORTS"
   },
   {
     "id": "RESPONSE:",
@@ -3413,7 +3413,7 @@
   },
   {
     "id": "ROUTE_PATH",
-    "translation": "ROUTE_PATH (ROUTENPFAD)"
+    "translation": "ROUTENPFAD"
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -3641,7 +3641,7 @@
   },
   {
     "id": "Retrieve the rules for all the security groups associated with the space",
-    "translation": "Regeln für alle Sicherheitsgruppen abrufen, die dem Bereich zugeordnet sind."
+    "translation": "Regeln für alle Sicherheitsgruppen abrufen, die dem Bereich zugeordnet sind"
   },
   {
     "id": "Retrieving status of all flagged features as {{.Username}}...",
@@ -3717,7 +3717,7 @@
   },
   {
     "id": "SERVICE_INSTANCES",
-    "translation": "SERVICE_INSTANCES (SERVICEINSTANZEN)"
+    "translation": "SERVICEINSTANZEN"
   },
   {
     "id": "SPACE",
@@ -4053,7 +4053,7 @@
   },
   {
     "id": "TIMEOUT",
-    "translation": "TIMEOUT (ZEITLIMIT)"
+    "translation": "ZEITLIMIT"
   },
   {
     "id": "TIP:\n",
@@ -4097,7 +4097,7 @@
   },
   {
     "id": "TOTAL_MEMORY",
-    "translation": "TOTAL_MEMORY (GESAMTSPEICHER)"
+    "translation": "GESAMTSPEICHER"
   },
   {
     "id": "Tags: {{.Tags}}",
@@ -4197,7 +4197,7 @@
   },
   {
     "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
-    "translation": "Der gesamte Speicherplatz eines Bereichs kann z. B. 1024M, 1G oder 10G betragen."
+    "translation": "Der gesamte Speicherplatz eines Bereichs kann z. B. 1024M, 1G oder 10G betragen"
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount.",

@@ -545,7 +545,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n  Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne.\n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n  Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n   Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n   Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -1617,7 +1617,7 @@
   },
   {
     "id": "Domain (e.g. example.com)",
-    "translation": "Domaine (par exemple exemple.com)"
+    "translation": "Domaine (par exemple example.com)"
   },
   {
     "id": "Domains:",

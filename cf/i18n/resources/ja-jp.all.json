@@ -545,7 +545,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n  オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n  オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例\n   {\n     \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -3245,7 +3245,7 @@
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
-    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います。"
+    "translation": "経路が現在存在しているかどうかを調べる簡単なチェックを行います"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3849,7 +3849,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "デフォルト・ロケールを設定します。LOCALE が CLEAR の場合は、前のロケールが削除されます。"
+    "translation": "デフォルト・ロケールを設定します。LOCALE が 'CLEAR' の場合は、前のロケールが削除されます。"
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
