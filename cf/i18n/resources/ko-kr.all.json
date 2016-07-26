@@ -4117,7 +4117,7 @@
   },
   {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
-    "translation": "주어진 색인에서 실행 중인 애플리케이션 인스턴스를 종료하고 애플리케이션의 새 인스턴스를 동일한 색인으로 인스턴스화합니다."
+    "translation": "주어진 색인에서 실행 중인 애플리케이션 인스턴스를 종료하고 애플리케이션의 새 인스턴스를 동일한 색인으로 인스턴스화합니다"
   },
   {
     "id": "The file {{.PluginExecutableName}} already exists under the plugin directory.\n",
@@ -4229,11 +4229,11 @@
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
-    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다. "
+    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다"
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": "바인딩된 라우트에 대한 요청을 전달한 URL입니다. 이 URL에 대한 스킴은 https이어야 합니다. "
+    "translation": "바인딩된 라우트에 대한 요청을 전달한 URL입니다. 이 URL에 대한 스킴은 https이어야 합니다"
   },
   {
     "id": "USAGE:",
