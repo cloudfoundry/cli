@@ -93,7 +93,12 @@ func (cmd *ListRoutes) Execute(c flags.FlagContext) error {
 		return true
 	})
 	if err != nil {
-		return errors.New(T("Failed fetching domains for organization %s.\n{{.Err}}", cmd.config.OrganizationFields().Name, map[string]interface{}{"Err": err.Error()}))
+		return errors.New(T("Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+			map[string]interface{}{
+				"Err":     err.Error(),
+				"OrgName": cmd.config.OrganizationFields().Name,
+			},
+		))
 	}
 
 	var routesFound bool

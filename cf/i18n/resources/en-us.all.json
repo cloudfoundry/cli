@@ -2024,8 +2024,8 @@
     "translation": "Failed fetching buildpacks.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "Failed fetching domains for organization %s.\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
