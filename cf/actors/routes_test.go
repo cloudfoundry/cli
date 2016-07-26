@@ -680,11 +680,151 @@ var _ = Describe("Routes", func() {
 			})
 		})
 
+		Context("when -d domains is set", func() {
+			BeforeEach(func() {
+				appParamsFromContext = models.AppParams{
+					Domains: []string{"shared-domain.com"},
+				}
+			})
+
+			Context("and it is a http shared domain", func() {
+				BeforeEach(func() {
+					httpDomain := models.DomainFields{
+						Name:            "shared-domain.com",
+						GUID:            "shared-domain-guid",
+						RouterGroupType: "",
+						Shared:          true,
+					}
+					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
+
+					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "shared-domain.com" {
+							return httpDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+
+					fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("", ""))
+				})
+
+				Context("when the hostname is present in the original route", func() {
+					BeforeEach(func() {
+						routeName = "hostname.old-domain.com/path"
+					})
+
+					It("replace the domain from manifest", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
+
+						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						Expect(actualHost).To(Equal("hostname"))
+						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+						Expect(actualUseRandomPort).To(BeFalse())
+					})
+				})
+
+				Context("when the hostname is provided as a flag", func() {
+					BeforeEach(func() {
+						routeName = "old-domain.com/path"
+						appParamsFromContext = models.AppParams{
+							Domains: []string{"shared-domain.com"},
+							Hosts:   []string{"hostname"},
+						}
+					})
+
+					It("replace the domain from manifest", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
+
+						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						Expect(actualHost).To(Equal("hostname"))
+						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+						Expect(actualUseRandomPort).To(BeFalse())
+					})
+				})
+
+				Context("when the path is provided as a flag", func() {
+					BeforeEach(func() {
+						routeName = "hostname.old-domain.com/oldpath"
+						path := "path"
+						appParamsFromContext = models.AppParams{
+							Domains:   []string{"shared-domain.com"},
+							RoutePath: &path,
+						}
+					})
+
+					It("replace the domain and path from manifest", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
+
+						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						Expect(actualHost).To(Equal("hostname"))
+						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
+						Expect(actualPath).To(Equal("path"))
+						Expect(actualPort).To(Equal(0))
+						Expect(actualUseRandomPort).To(BeFalse())
+					})
+				})
+			})
+
+			Context("and it is a TCP shared domain", func() {
+				BeforeEach(func() {
+					tcpDomain := models.DomainFields{
+						Name:            "shared-domain.com",
+						GUID:            "shared-domain-guid",
+						RouterGroupType: "tcp",
+						Shared:          true,
+					}
+					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
+
+					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
+					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
+						if name == "shared-domain.com" {
+							return tcpDomain, nil
+						}
+						return models.DomainFields{}, domainNotFoundError
+					}
+
+					routeName = "foo.com:1234"
+
+					fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("", ""))
+				})
+
+				Context("when the port is present in the original route", func() {
+					It("replace the domain from manifest", func() {
+						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+
+						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
+
+						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
+						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+						Expect(actualHost).To(BeEmpty())
+						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
+						Expect(actualPath).To(BeEmpty())
+						Expect(actualPort).To(Equal(1234))
+						Expect(actualUseRandomPort).To(BeFalse())
+					})
+				})
+			})
+		})
+
 		Context("and the --random-route flag is provided", func() {
 			BeforeEach(func() {
 				appParamsFromContext = models.AppParams{
 					UseRandomRoute: true,
 				}
+
 				fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("Route", "tcp-domain.com:3333"))
 			})
 

@@ -1,5 +1,6 @@
 cf/actors/push.go:106::warning: cyclomatic complexity 14 of function (PushActorImpl).GatherFiles() is high (> 10) (gocyclo)
 cf/actors/push.go:55::warning: cyclomatic complexity 11 of function (PushActorImpl).ProcessPath() is high (> 10) (gocyclo)
+cf/actors/routes.go:192::warning: cyclomatic complexity 12 of function (routeActor).FindAndBindRoute() is high (> 10) (gocyclo)
 cf/actors/services.go:67::warning: cyclomatic complexity 15 of function (ServiceHandler).buildBrokersVisibleFromOrg() is high (> 10) (gocyclo)
 cf/actors/services_plans.go:194::warning: cyclomatic complexity 23 of function (ServicePlanHandler).FindServiceAccess() is high (> 10) (gocyclo)
 cf/api/buildpack_bits.go:100::warning: cyclomatic complexity 14 of function normalizeBuildpackArchive() is high (> 10) (gocyclo)
