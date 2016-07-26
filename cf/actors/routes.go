@@ -176,14 +176,13 @@ func (routeActor routeActor) replaceDomain(routeWithoutPathAndPort string, domai
 	if err != nil {
 		return "", err
 	}
+
 	switch {
 	case flagDomain.Shared && flagDomain.RouterGroupType == "": // Shared HTTP
 		host := strings.Split(routeWithoutPathAndPort, ".")[0]
 		routeWithoutPathAndPort = fmt.Sprintf("%s.%s", host, flagDomain.Name)
-	case flagDomain.Shared && flagDomain.RouterGroupType == "tcp": //Shared TCP
-
-		return flagDomain.Name, nil
-	default: //private
+	default:
+		routeWithoutPathAndPort = flagDomain.Name
 	}
 
 	return routeWithoutPathAndPort, nil
@@ -219,7 +218,7 @@ func (routeActor routeActor) FindAndBindRoute(routeName string, app models.Appli
 
 	replaceHostname(domain.RouterGroupType, appParamsFromContext.Hosts, &hostname)
 
-	err = validateRoute(routeName, domain.RouterGroupType, port, path)
+	err = validateRoute(domain.Name, domain.RouterGroupType, port, path)
 	if err != nil {
 		return err
 	}

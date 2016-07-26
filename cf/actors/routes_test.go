@@ -557,18 +557,18 @@ var _ = Describe("Routes", func() {
 				}
 			})
 
-			Context("and contains a port", func() {
+			Context("contains a port", func() {
 				BeforeEach(func() {
 					routeName = "domain.com:3333"
 				})
 
 				It("should return an error", func() {
 					Expect(findAndBindRouteErr).To(HaveOccurred())
-					Expect(findAndBindRouteErr.Error()).To(Equal("Port not allowed in HTTP route domain.com:3333"))
+					Expect(findAndBindRouteErr.Error()).To(Equal("Port not allowed in HTTP route domain.com"))
 				})
 			})
 
-			Context("and does not contain a port", func() {
+			Context("does not contain a port", func() {
 				BeforeEach(func() {
 					routeName = "host.domain.com"
 
@@ -608,7 +608,7 @@ var _ = Describe("Routes", func() {
 					Expect(appGUID).To(Equal("app-guid"))
 				})
 
-				Context("and contains a path", func() {
+				Context("contains a path", func() {
 					BeforeEach(func() {
 						routeName = "host.domain.com/path"
 					})
@@ -639,14 +639,14 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			Context("and the --hostname flag is provided", func() {
+			Context("the --hostname flag is provided", func() {
 				BeforeEach(func() {
 					appParamsFromContext = models.AppParams{
 						Hosts: []string{"flag-hostname"},
 					}
 				})
 
-				Context("and the route contains a hostname", func() {
+				Context("the route contains a hostname", func() {
 					BeforeEach(func() {
 						routeName = "host.domain.com/path"
 					})
@@ -662,7 +662,7 @@ var _ = Describe("Routes", func() {
 					})
 				})
 
-				Context("and the route does not contain a hostname", func() {
+				Context("the route does not contain a hostname", func() {
 					BeforeEach(func() {
 						routeName = "domain.com"
 					})
@@ -687,7 +687,7 @@ var _ = Describe("Routes", func() {
 				}
 			})
 
-			Context("and it is a http shared domain", func() {
+			Context("it is a http shared domain", func() {
 				BeforeEach(func() {
 					httpDomain := models.DomainFields{
 						Name:            "shared-domain.com",
@@ -778,48 +778,40 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			Context("and it is a TCP shared domain", func() {
+			Context("when it is a private domain", func() {
 				BeforeEach(func() {
-					tcpDomain := models.DomainFields{
-						Name:            "shared-domain.com",
-						GUID:            "shared-domain-guid",
-						RouterGroupType: "tcp",
-						Shared:          true,
-					}
-					domainNotFoundError := cferrors.NewModelNotFoundError("Domain", "some-domain.com")
-
-					fakeDomainRepository.FindPrivateByNameReturns(models.DomainFields{}, domainNotFoundError)
-					fakeDomainRepository.FindSharedByNameStub = func(name string) (models.DomainFields, error) {
-						if name == "shared-domain.com" {
-							return tcpDomain, nil
-						}
-						return models.DomainFields{}, domainNotFoundError
+					httpDomain := models.DomainFields{
+						Name:            "private-domain.com",
+						GUID:            "private-domain-guid",
+						RouterGroupType: "",
 					}
 
-					routeName = "foo.com:1234"
+					fakeDomainRepository.FindPrivateByNameReturns(httpDomain, nil)
 
 					fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("", ""))
+					routeName = "hostname.old-domain.com/path"
+					appParamsFromContext = models.AppParams{
+						Domains: []string{"private-domain.com"},
+					}
 				})
 
-				Context("when the port is present in the original route", func() {
-					It("replace the domain from manifest", func() {
-						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
+				It("replace the domain from manifest", func() {
+					Expect(findAndBindRouteErr).NotTo(HaveOccurred())
 
-						Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
+					Expect(fakeRouteRepository.FindCallCount()).To(Equal(1))
 
-						Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
-						actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
-						Expect(actualHost).To(BeEmpty())
-						Expect(actualDomain.Name).To(Equal("shared-domain.com"))
-						Expect(actualPath).To(BeEmpty())
-						Expect(actualPort).To(Equal(1234))
-						Expect(actualUseRandomPort).To(BeFalse())
-					})
+					Expect(fakeRouteRepository.CreateCallCount()).To(Equal(1))
+					actualHost, actualDomain, actualPath, actualPort, actualUseRandomPort := fakeRouteRepository.CreateArgsForCall(0)
+					Expect(actualHost).To(BeEmpty())
+					Expect(actualDomain.Name).To(Equal("private-domain.com"))
+					Expect(actualPath).To(Equal("path"))
+					Expect(actualPort).To(BeZero())
+					Expect(actualUseRandomPort).To(BeFalse())
 				})
 			})
 		})
 
-		Context("and the --random-route flag is provided", func() {
+		Context("the --random-route flag is provided", func() {
 			BeforeEach(func() {
 				appParamsFromContext = models.AppParams{
 					UseRandomRoute: true,
@@ -828,7 +820,7 @@ var _ = Describe("Routes", func() {
 				fakeRouteRepository.FindReturns(models.Route{}, cferrors.NewModelNotFoundError("Route", "tcp-domain.com:3333"))
 			})
 
-			Context("and it is a http route", func() {
+			Context("it is a http route", func() {
 				var httpDomain models.DomainFields
 
 				BeforeEach(func() {
@@ -847,7 +839,7 @@ var _ = Describe("Routes", func() {
 					}
 				})
 
-				Context("and the route does not have a hostname", func() {
+				Context("the route does not have a hostname", func() {
 					BeforeEach(func() {
 						routeName = "domain.com/path"
 					})
@@ -868,7 +860,7 @@ var _ = Describe("Routes", func() {
 					})
 				})
 
-				Context("and the route has a hostname", func() {
+				Context("the route has a hostname", func() {
 					BeforeEach(func() {
 						routeName = "host.domain.com/path"
 					})
@@ -892,6 +884,7 @@ var _ = Describe("Routes", func() {
 						routeName = "host.domain.com/path"
 
 					})
+
 					It("should replace the hostname with flag hostname", func() {
 						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
 
@@ -904,7 +897,7 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			Context("and it is a tcp route", func() {
+			Context("it is a tcp route", func() {
 				var tcpDomain models.DomainFields
 
 				BeforeEach(func() {
@@ -940,7 +933,7 @@ var _ = Describe("Routes", func() {
 			})
 		})
 
-		Context("and the --route-path flag is provided", func() {
+		Context("the --route-path flag is provided", func() {
 			BeforeEach(func() {
 				path := "flag-routepath"
 				appParamsFromContext = models.AppParams{
@@ -948,7 +941,7 @@ var _ = Describe("Routes", func() {
 				}
 			})
 
-			Context("and it is a http route", func() {
+			Context("it is a http route", func() {
 				var httpDomain models.DomainFields
 
 				BeforeEach(func() {
@@ -967,10 +960,11 @@ var _ = Describe("Routes", func() {
 					}
 				})
 
-				Context("and it does not have a path", func() {
+				Context("it does not have a path", func() {
 					BeforeEach(func() {
 						routeName = "host.domain.com"
 					})
+
 					It("adds the path to the route", func() {
 						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
 
@@ -982,10 +976,11 @@ var _ = Describe("Routes", func() {
 					})
 				})
 
-				Context("and a path is already specified on the route", func() {
+				Context("a path is already specified on the route", func() {
 					BeforeEach(func() {
 						routeName = "host.domain.com/path"
 					})
+
 					It("replaces the path on the route", func() {
 						Expect(findAndBindRouteErr).NotTo(HaveOccurred())
 
@@ -998,7 +993,7 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			Context("and it is a tcp route", func() {
+			Context("it is a tcp route", func() {
 				var tcpDomain models.DomainFields
 
 				BeforeEach(func() {
@@ -1053,18 +1048,18 @@ var _ = Describe("Routes", func() {
 				}
 			})
 
-			Context("and contains a path", func() {
+			Context("contains a path", func() {
 				BeforeEach(func() {
 					routeName = "tcp-domain.com:3333/path"
 				})
 
 				It("returns an error", func() {
 					Expect(findAndBindRouteErr).To(HaveOccurred())
-					Expect(findAndBindRouteErr.Error()).To(Equal("Path not allowed in TCP route tcp-domain.com:3333/path"))
+					Expect(findAndBindRouteErr.Error()).To(Equal("Path not allowed in TCP route tcp-domain.com"))
 				})
 			})
 
-			Context("and does not contain a path", func() {
+			Context("does not contain a path", func() {
 				BeforeEach(func() {
 					routeName = "tcp-domain.com:3333"
 
@@ -1105,7 +1100,7 @@ var _ = Describe("Routes", func() {
 				})
 			})
 
-			Context("and the --hostname flag is provided", func() {
+			Context("the --hostname flag is provided", func() {
 				BeforeEach(func() {
 					routeName = "tcp-domain.com:3333"
 					appParamsFromContext = models.AppParams{
