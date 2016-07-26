@@ -3449,11 +3449,11 @@
   },
   {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
-    "translation": "Entfernen Sie einen Service und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen."
+    "translation": "Entfernen Sie einen Service und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen"
   },
   {
     "id": "Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker",
-    "translation": "Entfernen Sie eine Serviceinstanz und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen."
+    "translation": "Entfernen Sie eine Serviceinstanz und untergeordnete Objekte rekursiv aus der Cloud Foundry-Datenbank, ohne Anforderungen an den Service-Broker zu stellen"
   },
   {
     "id": "Remove a plugin repository",

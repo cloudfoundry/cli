@@ -3245,7 +3245,7 @@
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
-    "translation": "Realice una comprobación simple para determinar si existe o no en este momento una ruta."
+    "translation": "Realice una comprobación simple para determinar si existe o no en este momento una ruta"
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
