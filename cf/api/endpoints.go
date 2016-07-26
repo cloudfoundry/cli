@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
-	"github.com/cloudfoundry/cli/cf/errors"
 	"github.com/cloudfoundry/cli/cf/net"
 )
 
@@ -32,15 +31,7 @@ func (repo RemoteInfoRepository) GetCCInfo(endpoint string) (*coreconfig.CCInfo,
 	finalEndpoint := "https://" + endpoint
 	serverResponse, err := repo.getCCAPIInfo(finalEndpoint)
 	if err != nil {
-		if _, ok := err.(*errors.InvalidSSLCert); ok {
-			return nil, "", err
-		}
-
-		finalEndpoint = "http://" + endpoint
-		serverResponse, err = repo.getCCAPIInfo(finalEndpoint)
-		if err != nil {
-			return nil, "", err
-		}
+		return nil, "", err
 	}
 
 	return serverResponse, finalEndpoint, nil

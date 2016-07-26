@@ -164,20 +164,6 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.AuthorizationEndpoint).To(Equal("https://login.example.com"))
 				Expect(config.APIVersion).To(Equal("42.0.0"))
 			})
-
-			It("uses http when the server doesn't respond over https", func() {
-				testServer.Close()
-				testServer = httptest.NewServer(http.HandlerFunc(validAPIInfoEndpoint))
-				schemelessURL := strings.Replace(testServer.URL, "http://", "", 1)
-
-				config, endpoint, apiErr := repo.GetCCInfo(schemelessURL)
-
-				Expect(endpoint).To(Equal(testServer.URL))
-				Expect(apiErr).NotTo(HaveOccurred())
-
-				Expect(config.AuthorizationEndpoint).To(Equal("https://login.example.com"))
-				Expect(config.APIVersion).To(Equal("42.0.0"))
-			})
 		})
 	})
 })
