@@ -183,17 +183,6 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		return err
 	}
 
-	errs := cmd.actor.ValidateAppParams(appsFromManifest)
-	if len(errs) > 0 {
-		errStr := T("Invalid application configuration") + ":"
-
-		for _, e := range errs {
-			errStr = fmt.Sprintf("%s\n%s", errStr, e.Error())
-		}
-
-		return fmt.Errorf("%s", errStr)
-	}
-
 	appFromContext, err := cmd.getAppParamsFromContext(c)
 	if err != nil {
 		return err
@@ -202,6 +191,17 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 	appSet, err := cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
 	if err != nil {
 		return err
+	}
+
+	errs := cmd.actor.ValidateAppParams(appSet)
+	if len(errs) > 0 {
+		errStr := T("Invalid application configuration") + ":"
+
+		for _, e := range errs {
+			errStr = fmt.Sprintf("%s\n%s", errStr, e.Error())
+		}
+
+		return fmt.Errorf("%s", errStr)
 	}
 
 	_, err = cmd.authRepo.RefreshAuthToken()
