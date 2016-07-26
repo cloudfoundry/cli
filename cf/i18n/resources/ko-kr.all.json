@@ -2024,8 +2024,8 @@
     "translation": "빌드팩 페치에 실패했습니다.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "%s 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "{{.OrgName}} 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
