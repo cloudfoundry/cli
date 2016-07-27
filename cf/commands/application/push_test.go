@@ -1250,6 +1250,29 @@ var _ = Describe("Push Command", func() {
 						_, domain, _, _, _ := routeActor.FindOrCreateRouteArgsForCall(0)
 						Expect(domain.GUID).To(Equal("bar-domain-guid"))
 					})
+
+					Context("when using 'routes' in the manifest", func() {
+						BeforeEach(func() {
+							m := &manifest.Manifest{
+								Data: generic.NewMap(map[interface{}]interface{}{
+									"applications": []interface{}{
+										generic.NewMap(map[interface{}]interface{}{
+											"name": "app1",
+											"routes": []interface{}{
+												map[interface{}]interface{}{"route": "app2route1.example.com"},
+											},
+										}),
+									},
+								}),
+							}
+							manifestRepo.ReadManifestReturns(m, nil)
+						})
+
+						It("returns an error", func() {
+							Expect(executeErr).To(HaveOccurred())
+							Expect(executeErr).To(MatchError("Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute"))
+						})
+					})
 				})
 
 				Context("with an invalid memory limit", func() {

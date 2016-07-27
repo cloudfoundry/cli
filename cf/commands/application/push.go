@@ -199,6 +199,11 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 		return err
 	}
 
+	err = cmd.ValidateContextAndAppParams(appsFromManifest, appFromContext)
+	if err != nil {
+		return err
+	}
+
 	appSet, err := cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
 	if err != nil {
 		return err
@@ -788,6 +793,18 @@ func (cmd *Push) getAppParamsFromContext(c flags.FlagContext) (models.AppParams,
 	}
 
 	return appParams, nil
+}
+
+func (cmd Push) ValidateContextAndAppParams(appsFromManifest []models.AppParams, appFromContext models.AppParams) error {
+	if appFromContext.NoHostname != nil && *appFromContext.NoHostname {
+		for _, app := range appsFromManifest {
+			if app.Routes != nil {
+				return errors.New(T("Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute"))
+			}
+		}
+	}
+
+	return nil
 }
 
 func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles []models.AppFileFields) error {
