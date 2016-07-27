@@ -19,7 +19,6 @@ pushd %ROOT_DIR%\cf-cli-binaries
 	gzip -d cf-cli-binaries.tgz
 	tar -xvf cf-cli-binaries.tar
 	MOVE cf-cli_winx64.exe ..\cf.exe
-	MOVE cf-cli_win32.exe ..\cf.exe
 popd
 
 ISCC %ROOT_DIR%\cli\installers\windows\windows-installer-x64.iss
@@ -32,6 +31,10 @@ sed -i -e "s/VERSION/%VERSION%/" %ROOT_DIR%\cli\installers\windows\windows-insta
 sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli\installers\windows\windows-installer-x86.iss
 sed -i -e "s/SIGNTOOL_CERT_PASSWORD/%SIGNTOOL_CERT_PASSWORD%/" %ROOT_DIR%\cli\installers\windows\windows-installer-x86.iss
 sed -i -e "s/SIGNTOOL_CERT_PATH/%SIGNTOOL_CERT_PATH%/" %ROOT_DIR%\cli\installers\windows\windows-installer-x86.iss
+
+pushd %ROOT_DIR%\cf-cli-binaries
+	MOVE cf-cli_win32.exe ..\cf.exe
+popd
 
 ISCC %ROOT_DIR%\cli\installers\windows\windows-installer-x86.iss
 
