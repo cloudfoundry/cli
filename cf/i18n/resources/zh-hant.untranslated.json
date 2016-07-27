@@ -32,6 +32,10 @@
     "translation": "Invalid port for route {{.RouteName}}"
   },
   {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute"
+  },
+  {
     "id": "Path for HTTP route",
     "translation": "Path for HTTP route"
   },

@@ -3144,6 +3144,10 @@
     "translation": "ORGANIZAÇÕES"
   },
   {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": ""
+  },
+  {
     "id": "Org",
     "translation": "Organização"
   },
