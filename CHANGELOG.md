@@ -1,3 +1,112 @@
+## 6.21.0
+* Bump version to 6.21.0
+* add validation for --no-hostname
+* Revert "move validation after CLI parameter merging"
+* move validation after CLI parameter merging
+* support -d private-domain with new manifest routes
+* fixing translation
+* add -d to replace shared domain
+* removed unnecessary periods from translation files
+* Ensure cf api default url scheme defaults to https
+* update i18n
+* Change routes to map slice
+* hyphenate to indicate single value input in German
+* Fix translation regression in Chinese Simplified
+* create_app_manifest will print routes instead of hosts and domains
+* Skip route lookup when tcp route has a random port
+* add route-path flag to app manifest push
+* add usage of random route flag to push help text
+* enable cf push --random-route for app manifest
+* remove -b and --build
+* Check hostname for private routes on app manifest push
+* delete old pipeline
+* use team email instead of Ted's
+* does not set host when pushing manifest with tcp routes and -n flag
+* no pipes please
+* specify running instance
+* forgot to update path in windows tasks again
+* forgot to update path in windows task
+* enable -n flag to change manifest route
+* forgot jobs key in pipeline.yml
+* reorganize ci directory
+* Remove unused translations and clean untranslated list
+* Merge branch 'simonleung8-master'
+* Update language files
+* update cli-plugin-repo
+* update kr/pty
+* update gorilla/websocket
+* udpate go-querystring
+* update sonde-go/events and other dependencies
+* update bmizerany/pat
+* update blang/semver
+* update cloudfoundry/gofileutils
+* update go-i18n [#126537363]
+* Update docker and other dependencies
+* switching branch of github.com/tedsuo/rata
+* updating github.com/nu7hatch/gouuid
+* updating vendor/golang.org/x/sys/unix
+* updating golang.org/x/net/websocket
+* update golang.org/x/crypto/ssh
+* use 'Consistently()' with 'ShouldNot()'
+* update yaml package
+* update loggregatorlib/logmessage
+* routes and no-hostname should not co-exist in the app manifest
+* update lager
+* remove dependency on diego-ssh/cf-plugin/terminal
+* update ginkgo and gomega
+* flags -> cf/flags
+* json -> utils/json
+* Increase timeout on cmd suite
+* glob -> utils/glob
+* generic -> utils/generic
+* downloader/ -> utils/downloader/
+* commandsloader -> cf/commandsloader
+* more hidden cf directories
+* new bosh-lite pipeline
+* validate manifest before merging with flag context
+* validation for http/tcp routes with port/path
+* make cats-diego blocking
+* move cmd from TL to cf, and spellcheck into utils
+* update the tests to reflect the changes in error messages
+* stack name displays correctly on cf push
+* clearer error messages for manifest validation
+* move words -> utils/words
+* Revert "Added a self signed cert to the acceptance cf deployment"
+* we do in fact use that input for the tasks
+* for some reason the file is now mysetup.exe
+* support application manifest with routes field that has ports
+* Added a self signed cert to the acceptance cf deployment
+* Configure the acceptance pipeline to associate an
+* Configure the acceptance bosh-lite deployment to
+* Adds task to associate elastic ip with an aws instance
+* Revert "switching to 7z as well, sourceforge still broke"
+* Revert "swap GnuWin32 with 7zip, cuz sourceforge is broke"
+* go back top using tar and zip from gnuwin32
+* Change domain to system_domain
+* update windows create-installer to use 7zip
+* remove unneeded godeps, add some debugging
+* Break up the deploy-bosh-lite job for faster freedback cycle
+* app manifest accepts routes attribute with paths
+* MapManifestRoute test wasn't testing anything
+* Deploy the bosh-lite to its own subnet
+* app manifest parsing should fail with empty domains and routes set
+* capitalize error messages
+* Bubbles up the correct error msg from the API
+* add close connection to http header
+* indent ensure & on_failure to act on task level
+* Add functionality to create and bind routes from a manifest.
+* use max api version variables in commands
+* use min api version variables in commands
+* parallelize all the things again
+* main -> cmd, run cli as a library
+* refactor route actor to be injected into push
+* use default foreground color instead of white
+* Use Normal White instead of Bright White
+* Add slack-alert resource
+* Use Eventually().Should(Exit()) instead of Expect(Exit()).To(Equal())
+* update-brew-formula task calculates the correct sha256 hash
+* fix update brew formula script
+
 ## 6.20.0
 * Bump version to 6.20.0
 * Use dial timeout for UAA and Routing APIs also
