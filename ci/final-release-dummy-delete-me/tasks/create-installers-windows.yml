@@ -1,0 +1,15 @@
+---
+platform: windows
+
+params:
+  SIGNTOOL_CERT_PATH:
+  SIGNTOOL_CERT_PASSWORD:
+
+inputs:
+- name: cf-cli-binaries
+
+outputs:
+- name: 64bit-windows-installer
+
+run:
+  path: cli-ci/ci/final-release-dummy-delete-me/tasks/create-installers-windows.bat
