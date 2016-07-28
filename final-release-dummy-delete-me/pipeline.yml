@@ -1,0 +1,66 @@
+---
+groups:
+- name: final-release-maker
+  jobs:
+  - create-installers
+
+resources:
+- name: cli
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    ignore_paths:
+    - ci
+
+- name: cli-ci
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths:
+    - ci
+
+- name: 64bit-windows-binary
+  type: s3
+  source:
+    bucket: {{release-bucket-name}}
+    access_key_id: {{release-bucket-access-key-id}}
+    secret_access_key: {{release-bucket-secret-access-key}}
+    versioned_file: cf-cli_6.19.0_winx64.zip
+
+- name: cf-cli-installer-win64
+  type: s3
+  source:
+    bucket: {{staging-bucket-name}}
+    access_key_id: {{staging-bucket-access-key-id}}
+    secret_access_key: {{staging-bucket-secret-access-key}}
+    versioned_file: cf-cli-installer_6.19.0_winx64.zip
+
+- name: cli-private
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli-private
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+
+jobs:
+- name: create-installers
+  serial: true
+  plan:
+  - aggregate:
+    - get: 64bit-windows-binary
+    - get: cli-ci
+    - get: cli-private
+  - aggregate:
+    - do:
+      - task: windows
+        file: cli-ci/ci/final-release-dummy-delete-me/tasks/create-installers-windows.yml
+        params:
+          SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
+          SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
+  - put: cf-cli-installer-win64
+    params:
+      file: winstallers/cf-cli-installer_winx64.zip
