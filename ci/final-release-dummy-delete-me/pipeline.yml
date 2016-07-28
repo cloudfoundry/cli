@@ -29,7 +29,7 @@ resources:
     bucket: {{release-bucket-name}}
     access_key_id: {{release-bucket-access-key-id}}
     secret_access_key: {{release-bucket-secret-access-key}}
-    versioned_file: cf-cli_6.19.0_winx64.zip
+    versioned_file: {{64-bit-versioned-file}}
 
 - name: cf-cli-installer-win64
   type: s3
