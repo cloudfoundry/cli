@@ -15,7 +15,7 @@ const (
 	magenta                        = color.FgMagenta
 	cyan                           = color.FgCyan
 	grey                           = color.FgWhite
-	defaultFgColor                 = 38
+	defaultFgColor                 = color.FgWhite
 )
 
 var (
