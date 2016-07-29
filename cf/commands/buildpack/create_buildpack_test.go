@@ -52,18 +52,36 @@ var _ = Describe("create-buildpack command", func() {
 		))
 	})
 
-	It("creates and uploads buildpacks", func() {
-		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
+	Context("when a directory is provided", func() {
+		It("creates and uploads buildpacks", func() {
+			testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
-		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
-		Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "my.war")).To(Equal(true))
-		Expect(ui.Outputs()).To(ContainSubstrings(
-			[]string{"Creating buildpack", "my-buildpack"},
-			[]string{"OK"},
-			[]string{"Uploading buildpack", "my-buildpack"},
-			[]string{"OK"},
-		))
-		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
+			Expect(repo.CreateBuildpack.Enabled).To(BeNil())
+			Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "my.war")).To(Equal(true))
+			Expect(ui.Outputs()).To(ContainSubstrings(
+				[]string{"Creating buildpack", "my-buildpack"},
+				[]string{"OK"},
+				[]string{"Uploading buildpack", "my-buildpack"},
+				[]string{"OK"},
+			))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
+		})
+	})
+
+	Context("when a URL is provided", func() {
+		It("creates and uploads buildpacks", func() {
+			testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "https://some-url.com", "5"}, requirementsFactory, updateCommandDependency, false, ui)
+
+			Expect(repo.CreateBuildpack.Enabled).To(BeNil())
+			Expect(bitsRepo.UploadBuildpackPath).To(Equal("https://some-url.com"))
+			Expect(ui.Outputs()).To(ContainSubstrings(
+				[]string{"Creating buildpack", "my-buildpack"},
+				[]string{"OK"},
+				[]string{"Uploading buildpack", "my-buildpack"},
+				[]string{"OK"},
+			))
+			Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"FAILED"}))
+		})
 	})
 
 	It("warns the user when the buildpack already exists", func() {

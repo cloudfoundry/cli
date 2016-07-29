@@ -2,7 +2,6 @@ package buildpack
 
 import (
 	"errors"
-	"path/filepath"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -107,16 +106,8 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 	}
 
 	path := c.String("p")
-	var dir string
-	var err error
-	if path != "" {
-		dir, err = filepath.Abs(path)
-		if err != nil {
-			return err
-		}
-	}
 
-	if dir != "" && (lock || unlock) {
+	if path != "" && (lock || unlock) {
 		return errors.New(T("Cannot specify buildpack bits and lock/unlock."))
 	}
 
@@ -141,8 +132,8 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 		buildpack = newBuildpack
 	}
 
-	if dir != "" {
-		err := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
+	if path != "" {
+		err := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, path)
 		if err != nil {
 			return errors.New(T("Error uploading buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 				"Name":  terminal.EntityNameColor(buildpack.Name),

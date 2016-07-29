@@ -64,8 +64,14 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 			})
 		} else {
 			buildpackFileName = filepath.Base(buildpackLocation)
+			dir, pathErr := filepath.Abs(buildpackLocation)
+			if pathErr != nil {
+				err = pathErr
+				return
+			}
 
-			stats, statError := os.Stat(buildpackLocation)
+			buildpackFileName = filepath.Base(dir)
+			stats, statError := os.Stat(dir)
 			if statError != nil {
 				apiErr = fmt.Errorf("%s: %s", T("Error opening buildpack file"), statError.Error())
 				err = statError
