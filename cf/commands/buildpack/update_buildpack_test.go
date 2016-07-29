@@ -80,10 +80,21 @@ var _ = Describe("Updating buildpack command", func() {
 		})
 	})
 
-	It("updates buildpack", func() {
-		runCommand(buildpackName)
+	Context("when a path is provided", func() {
+		It("updates buildpack", func() {
+			runCommand(buildpackName)
 
-		successfulUpdate(ui, buildpackName)
+			successfulUpdate(ui, buildpackName)
+		})
+	})
+
+	Context("when a URL is provided", func() {
+		It("updates buildpack", func() {
+			testcmd.RunCLICommand("update-buildpack", []string{"my-buildpack", "-p", "https://some-url.com"}, requirementsFactory, updateCommandDependency, false, ui)
+
+			Expect(bitsRepo.UploadBuildpackPath).To(Equal("https://some-url.com"))
+			successfulUpdate(ui, buildpackName)
+		})
 	})
 
 	Context("updates buildpack when passed the proper flags", func() {

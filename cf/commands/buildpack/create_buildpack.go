@@ -2,7 +2,6 @@ package buildpack
 
 import (
 	"fmt"
-	"path/filepath"
 	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/flags"
@@ -86,12 +85,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Say(T("Uploading buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
-	dir, err := filepath.Abs(c.Args()[1])
-	if err != nil {
-		return err
-	}
-
-	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
+	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, c.Args()[1])
 	if err != nil {
 		return err
 	}
