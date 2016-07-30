@@ -75,7 +75,6 @@ func Main(traceEnv string, args []string) {
 	traceLogger := trace.NewLogger(Writer, isVerbose, traceEnv, traceConfigVal)
 
 	deps := commandregistry.NewDependency(Writer, traceLogger, os.Getenv("CF_DIAL_TIMEOUT"))
-	defer handlePanics(args, deps.TeePrinter, deps.Logger)
 	defer deps.Config.Close()
 
 	warningProducers := []net.WarningProducer{}
