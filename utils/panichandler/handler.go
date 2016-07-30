@@ -9,9 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 )
 
+//TODO: Burn this with fire
+const QuietPanic = "This shouldn't print anything"
+
 func HandlePanic() {
 	if err := recover(); err != nil {
-		formattedString := `
+		if err != QuietPanic {
+			formattedString := `
 	Something unexpected happened. This is a bug in {{.Binary}}.
 
 	Please re-run the command that caused this exception with the environment
@@ -33,7 +37,7 @@ func HandlePanic() {
 		Error
 		{{.Error}}
 
-		StackTrace
+		Stack Trace
 {{.StackTrace}}
 
 		Your Platform Details
@@ -42,14 +46,16 @@ func HandlePanic() {
 		Shell
 		e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
 `
-		formattedTemplate := template.Must(template.New("Panic Template").Parse(formattedString))
-		formattedTemplate.Execute(os.Stderr, map[string]interface{}{
-			"Binary":     os.Args[0],
-			"Command":    strings.Join(os.Args, " "),
-			"Version":    cf.Version,
-			"StackTrace": generateBacktrace(),
-			"Error":      err,
-		})
+			formattedTemplate := template.Must(template.New("Panic Template").Parse(formattedString))
+			formattedTemplate.Execute(os.Stderr, map[string]interface{}{
+				"Binary":     os.Args[0],
+				"Command":    strings.Join(os.Args, " "),
+				"Version":    cf.Version,
+				"StackTrace": generateBacktrace(),
+				"Error":      err,
+			})
+		}
+		os.Exit(1)
 	}
 }
 
