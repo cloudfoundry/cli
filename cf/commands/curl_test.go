@@ -8,6 +8,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/requirements/requirementsfakes"
 	testcmd "github.com/cloudfoundry/cli/testhelpers/commands"
 	testconfig "github.com/cloudfoundry/cli/testhelpers/configuration"
@@ -41,6 +42,7 @@ var _ = Describe("curl command", func() {
 		ui = &testterm.FakeUI{}
 		config = testconfig.NewRepository()
 		requirementsFactory = new(requirementsfakes.FakeFactory)
+		requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
 		curlRepo = new(apifakes.OldFakeCurlRepository)
 
 		trace.LoggingToStdout = false
@@ -57,8 +59,26 @@ var _ = Describe("curl command", func() {
 		))
 	})
 
-	It("passes requirements", func() {
-		Expect(runCurlWithInputs([]string{"/foo"})).To(BeTrue())
+	Context("requirements", func() {
+		Context("when no api is set", func() {
+			BeforeEach(func() {
+				requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Failing{Message: "no api set"})
+			})
+
+			It("fails", func() {
+				Expect(runCurlWithInputs([]string{"/foo"})).To(BeFalse())
+			})
+		})
+
+		Context("when api is set", func() {
+			BeforeEach(func() {
+				requirementsFactory.NewAPIEndpointRequirementReturns(requirements.Passing{})
+			})
+
+			It("passes", func() {
+				Expect(runCurlWithInputs([]string{"/foo"})).To(BeTrue())
+			})
+		})
 	})
 
 	It("makes a get request given an endpoint", func() {

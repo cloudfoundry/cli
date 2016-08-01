@@ -106,6 +106,12 @@ var _ = Describe("main", func() {
 			if err != nil {
 				Skip("unable to communicate with bosh-lite, skipping")
 			}
+			setApiOutput := Cf("api", "http://api.bosh-lite.com", "--skip-ssl-validation")
+			Eventually(setApiOutput.Out.Contents).Should(ContainSubstring("OK"))
+		})
+
+		AfterEach(func() {
+			Eventually(Cf("api", "nonsense").Out.Contents).Should(ContainSubstring("no such host"))
 		})
 
 		// Normally cf curl only shows the output of the response
@@ -123,7 +129,7 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Commands /w new command structure", func() {
+	Describe("Commands with new command structure", func() {
 		It("prints usage help for all commands by providing `help` flag", func() {
 			output := Cf("api", "-h")
 			Eventually(output.Out.Contents).Should(ContainSubstring("USAGE"))
