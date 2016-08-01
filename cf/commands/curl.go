@@ -65,7 +65,10 @@ func (cmd *Curl) Requirements(requirementsFactory requirements.Factory, fc flags
 		cmd.ui.Failed(T("Incorrect Usage. An argument is missing or not correctly enclosed.\n\n") + commandregistry.Commands.CommandUsage("curl"))
 	}
 
-	reqs := []requirements.Requirement{}
+	reqs := []requirements.Requirement{
+		requirementsFactory.NewAPIEndpointRequirement(),
+	}
+
 	return reqs
 }
 
