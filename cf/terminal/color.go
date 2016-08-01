@@ -15,7 +15,7 @@ const (
 	magenta                        = color.FgMagenta
 	cyan                           = color.FgCyan
 	grey                           = color.FgWhite
-	defaultFgColor                 = color.FgWhite
+	defaultFgColor                 = 38
 )
 
 var (
@@ -120,7 +120,7 @@ func WarningColor(message string) string {
 }
 
 func LogStdoutColor(message string) string {
-	return Colorize(message, defaultFgColor)
+	return message
 }
 
 func LogStderrColor(message string) string {
