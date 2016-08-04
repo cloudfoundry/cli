@@ -66,6 +66,12 @@ func (cmd *CreateBuildpack) SetDependency(deps commandregistry.Dependency, plugi
 func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 	buildpackName := c.Args()[0]
 
+	buildpackFile, buildpackFileName, err := cmd.buildpackBitsRepo.CreateBuildpackZipFile(c.Args()[1])
+	if err != nil {
+		cmd.ui.Warn(T("Failed to create local buildpack"))
+		return err
+	}
+
 	cmd.ui.Say(T("Creating buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
@@ -85,7 +91,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 
 	cmd.ui.Say(T("Uploading buildpack {{.BuildpackName}}...", map[string]interface{}{"BuildpackName": terminal.EntityNameColor(buildpackName)}))
 
-	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, c.Args()[1])
+	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, buildpackFile, buildpackFileName)
 	if err != nil {
 		return err
 	}

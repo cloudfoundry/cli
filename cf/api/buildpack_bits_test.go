@@ -55,45 +55,39 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		testServer.Close()
 	})
 
-	Describe("#UploadBuildpack", func() {
-		It("fails to upload a buildpack with an invalid directory", func() {
-			apiErr := repo.UploadBuildpack(buildpack, "/foo/bar")
-			Expect(apiErr).NotTo(BeNil())
-			Expect(apiErr.Error()).To(ContainSubstring("Error opening buildpack file"))
-		})
+	Describe("CreateBuildpackZipFile", func() {
 
-		It("uploads a valid buildpack directory", func() {
-			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack")
+		Context("when buildpack path is a directory", func() {
+			It("returns an error with an invalid directory", func() {
+				_, _, err := repo.CreateBuildpackZipFile("/foo/bar")
 
-			os.Chmod(filepath.Join(buildpackPath, "bin/compile"), 0755)
-			os.Chmod(filepath.Join(buildpackPath, "bin/detect"), 0755)
-			err := os.Chmod(filepath.Join(buildpackPath, "bin/release"), 0755)
-			Expect(err).NotTo(HaveOccurred())
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Error opening buildpack file"))
+			})
 
-			apiErr := repo.UploadBuildpack(buildpack, buildpackPath)
-			Expect(testServerHandler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-		})
+			It("does not return an error when it is a valid directory", func() {
+				buildpackPath := filepath.Join(buildpacksDir, "example-buildpack")
+				zipFile, zipFileName, err := repo.CreateBuildpackZipFile(buildpackPath)
 
-		It("uploads a valid zipped buildpack", func() {
-			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack.zip")
-
-			apiErr := repo.UploadBuildpack(buildpack, buildpackPath)
-			Expect(testServerHandler).To(HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-		})
-
-		Describe("when the buildpack is wrapped in an extra top-level directory", func() {
-			It("uploads a zip file containing only the actual buildpack", func() {
-				buildpackPath := filepath.Join(buildpacksDir, "example-buildpack-in-dir.zip")
-
-				apiErr := repo.UploadBuildpack(buildpack, buildpackPath)
-				Expect(testServerHandler).To(HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(zipFileName).To(Equal("example-buildpack.zip"))
+				Expect(zipFile).NotTo(BeNil())
+				Expect(zipFile.Name()).To(ContainSubstring("buildpack-upload"))
+				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
-		Describe("when given the URL of a buildpack", func() {
+		Context("when buildpack path is a file", func() {
+			It("returns an error", func() {
+				_, _, err := repo.CreateBuildpackZipFile(filepath.Join(buildpacksDir, "file"))
+
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("not a valid zip file"))
+
+			})
+
+		})
+
+		Context("when buildpack path is a URL", func() {
 			var buildpackFileServerHandler = func(buildpackName string) http.HandlerFunc {
 				return func(writer http.ResponseWriter, request *http.Request) {
 					Expect(request.URL.Path).To(Equal(fmt.Sprintf("/place/%s", buildpackName)))
@@ -108,30 +102,34 @@ var _ = Describe("BuildpackBitsRepository", func() {
 					fileServer := httptest.NewServer(buildpackFileServerHandler("bad-buildpack.zip"))
 					defer fileServer.Close()
 
-					apiErr := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/bad-buildpack.zip")
-					Expect(testServerHandler).NotTo(HaveAllRequestsCalled())
+					_, _, apiErr := repo.CreateBuildpackZipFile(fileServer.URL + "/place/bad-buildpack.zip")
+
 					Expect(apiErr).To(HaveOccurred())
 				})
 			})
 
-			It("uploads the file over HTTP", func() {
+			It("download and create zip file over HTTP", func() {
 				fileServer := httptest.NewServer(buildpackFileServerHandler("example-buildpack.zip"))
 				defer fileServer.Close()
 
-				apiErr := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+				zipFile, zipFileName, apiErr := repo.CreateBuildpackZipFile(fileServer.URL + "/place/example-buildpack.zip")
 
-				Expect(testServerHandler).To(HaveAllRequestsCalled())
+				Expect(zipFileName).To(Equal("example-buildpack.zip"))
+				Expect(zipFile).NotTo(BeNil())
+				Expect(zipFile.Name()).To(ContainSubstring("buildpack-upload"))
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 
-			It("uploads the file over HTTPS", func() {
+			It("download and create zip file over HTTPS", func() {
 				fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack.zip"))
 				defer fileServer.Close()
 
 				repo.TrustedCerts = fileServer.TLS.Certificates
-				apiErr := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+				zipFile, zipFileName, apiErr := repo.CreateBuildpackZipFile(fileServer.URL + "/place/example-buildpack.zip")
 
-				Expect(testServerHandler).To(HaveAllRequestsCalled())
+				Expect(zipFileName).To(Equal("example-buildpack.zip"))
+				Expect(zipFile).NotTo(BeNil())
+				Expect(zipFile.Name()).To(ContainSubstring("buildpack-upload"))
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 
@@ -139,31 +137,76 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack.zip"))
 				defer fileServer.Close()
 
-				apiErr := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+				_, _, apiErr := repo.CreateBuildpackZipFile(fileServer.URL + "/place/example-buildpack.zip")
 
-				Expect(testServerHandler).NotTo(HaveAllRequestsCalled())
 				Expect(apiErr).To(HaveOccurred())
 			})
 
-			Describe("when the buildpack is wrapped in an extra top-level directory", func() {
+			Context("when the buildpack is wrapped in an extra top-level directory", func() {
 				It("uploads a zip file containing only the actual buildpack", func() {
 					fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack-in-dir.zip"))
 					defer fileServer.Close()
 
 					repo.TrustedCerts = fileServer.TLS.Certificates
-					apiErr := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack-in-dir.zip")
+					zipFile, zipFileName, apiErr := repo.CreateBuildpackZipFile(fileServer.URL + "/place/example-buildpack-in-dir.zip")
 
-					Expect(testServerHandler).To(HaveAllRequestsCalled())
+					Expect(zipFileName).To(Equal("example-buildpack-in-dir.zip"))
+					Expect(zipFile).NotTo(BeNil())
+					Expect(zipFile.Name()).To(ContainSubstring("buildpack-upload"))
 					Expect(apiErr).NotTo(HaveOccurred())
 				})
 			})
 
 			It("returns an unsuccessful response when the server cannot be reached", func() {
-				apiErr := repo.UploadBuildpack(buildpack, "https://domain.bad-domain:223453/no-place/example-buildpack.zip")
-				Expect(testServerHandler).NotTo(HaveAllRequestsCalled())
+				_, _, apiErr := repo.CreateBuildpackZipFile("https://domain.bad-domain:223453/no-place/example-buildpack.zip")
+
 				Expect(apiErr).To(HaveOccurred())
 			})
 		})
+	})
+
+	Describe("UploadBuildpack", func() {
+		var (
+			zipFileName string
+			zipFile     *os.File
+			err         error
+		)
+
+		JustBeforeEach(func() {
+
+			buildpackPath := filepath.Join(buildpacksDir, zipFileName)
+			zipFile, _, err = repo.CreateBuildpackZipFile(buildpackPath)
+
+			Expect(zipFile).NotTo(BeNil())
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Context("when it is a valid zipped buildpack", func() {
+			BeforeEach(func() {
+				zipFileName = "example-buildpack.zip"
+			})
+			It("uploads the buildpack", func() {
+
+				apiErr := repo.UploadBuildpack(buildpack, zipFile, zipFileName)
+
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(testServerHandler).To(HaveAllRequestsCalled())
+			})
+		})
+
+		Describe("when the buildpack is wrapped in an extra top-level directory", func() {
+			BeforeEach(func() {
+				zipFileName = "example-buildpack-in-dir.zip"
+			})
+			It("uploads a zip file containing only the actual buildpack", func() {
+
+				apiErr := repo.UploadBuildpack(buildpack, zipFile, zipFileName)
+
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(testServerHandler).To(HaveAllRequestsCalled())
+			})
+		})
+
 	})
 })
 

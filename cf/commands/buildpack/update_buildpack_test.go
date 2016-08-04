@@ -2,7 +2,7 @@ package buildpack_test
 
 import (
 	"errors"
-	"strings"
+	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
 	"github.com/cloudfoundry/cli/cf/models"
@@ -36,7 +36,7 @@ var _ = Describe("Updating buildpack command", func() {
 		requirementsFactory *requirementsfakes.FakeFactory
 		ui                  *testterm.FakeUI
 		repo                *apifakes.OldFakeBuildpackRepository
-		bitsRepo            *apifakes.OldFakeBuildpackBitsRepository
+		bitsRepo            *apifakes.FakeBuildpackBitsRepository
 		deps                commandregistry.Dependency
 
 		buildpackName string
@@ -59,7 +59,7 @@ var _ = Describe("Updating buildpack command", func() {
 		requirementsFactory.NewBuildpackRequirementReturns(buildpackReq)
 		ui = new(testterm.FakeUI)
 		repo = new(apifakes.OldFakeBuildpackRepository)
-		bitsRepo = new(apifakes.OldFakeBuildpackBitsRepository)
+		bitsRepo = new(apifakes.FakeBuildpackBitsRepository)
 	})
 
 	runCommand := func(args ...string) bool {
@@ -80,6 +80,19 @@ var _ = Describe("Updating buildpack command", func() {
 		})
 	})
 
+	Context("when a file is provided", func() {
+		It("prints error and do not call create buildpack", func() {
+			bitsRepo.CreateBuildpackZipFileReturns(nil, "", fmt.Errorf("create buildpack error"))
+
+			Expect(runCommand(buildpackName, "-p", "file")).To(BeFalse())
+
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Failed to create local buildpack"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(bitsRepo.UploadBuildpackCallCount()).To(Equal(0))
+
+		})
+	})
+
 	Context("when a path is provided", func() {
 		It("updates buildpack", func() {
 			runCommand(buildpackName)
@@ -92,7 +105,9 @@ var _ = Describe("Updating buildpack command", func() {
 		It("updates buildpack", func() {
 			testcmd.RunCLICommand("update-buildpack", []string{"my-buildpack", "-p", "https://some-url.com"}, requirementsFactory, updateCommandDependency, false, ui)
 
-			Expect(bitsRepo.UploadBuildpackPath).To(Equal("https://some-url.com"))
+			Expect(bitsRepo.CreateBuildpackZipFileCallCount()).To(Equal(1))
+			buildpackPath := bitsRepo.CreateBuildpackZipFileArgsForCall(0)
+			Expect(buildpackPath).To(Equal("https://some-url.com"))
 			successfulUpdate(ui, buildpackName)
 		})
 	})
@@ -140,13 +155,15 @@ var _ = Describe("Updating buildpack command", func() {
 		Context("buildpack path", func() {
 			It("uploads buildpack when passed", func() {
 				runCommand("-p", "buildpack.zip", buildpackName)
-				Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "buildpack.zip")).To(Equal(true))
+				Expect(bitsRepo.CreateBuildpackZipFileCallCount()).To(Equal(1))
+				buildpackPath := bitsRepo.CreateBuildpackZipFileArgsForCall(0)
+				Expect(buildpackPath).To(Equal("buildpack.zip"))
 
 				successfulUpdate(ui, buildpackName)
 			})
 
 			It("errors when passed invalid path", func() {
-				bitsRepo.UploadBuildpackErr = true
+				bitsRepo.UploadBuildpackReturns(fmt.Errorf("upload error"))
 
 				runCommand("-p", "bogus/path", buildpackName)
 

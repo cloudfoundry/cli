@@ -2064,6 +2064,10 @@
     "translation": "Erstellen von JSON für die Anforderung resource_match ist fehlgeschlagen."
   },
   {
+    "id": "Failed to create local buildpack",
+    "translation": ""
+  },
+  {
     "id": "Failed to create manifest, unable to parse environment variable: ",
     "translation": "Erstellen von Manifest ist fehlgeschlagen; Umgebungsvariable konnte nicht geparst werden: "
   },
