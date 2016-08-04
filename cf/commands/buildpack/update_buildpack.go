@@ -2,6 +2,7 @@ package buildpack
 
 import (
 	"errors"
+	"os"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -120,6 +121,18 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 		buildpack.Locked = &unlock
 		updateBuildpack = true
 	}
+	var (
+		buildpackFile     *os.File
+		buildpackFileName string
+		err               error
+	)
+	if path != "" {
+		buildpackFile, buildpackFileName, err = cmd.buildpackBitsRepo.CreateBuildpackZipFile(path)
+		if err != nil {
+			cmd.ui.Warn(T("Failed to create local buildpack"))
+			return err
+		}
+	}
 
 	if updateBuildpack {
 		newBuildpack, err := cmd.buildpackRepo.Update(buildpack)
@@ -133,7 +146,7 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 	}
 
 	if path != "" {
-		err := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, path)
+		err := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, buildpackFile, buildpackFileName)
 		if err != nil {
 			return errors.New(T("Error uploading buildpack {{.Name}}\n{{.Error}}", map[string]interface{}{
 				"Name":  terminal.EntityNameColor(buildpack.Name),

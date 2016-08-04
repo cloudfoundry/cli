@@ -1,7 +1,7 @@
 package buildpack_test
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/apifakes"
@@ -20,7 +20,7 @@ var _ = Describe("create-buildpack command", func() {
 	var (
 		requirementsFactory *requirementsfakes.FakeFactory
 		repo                *apifakes.OldFakeBuildpackRepository
-		bitsRepo            *apifakes.OldFakeBuildpackBitsRepository
+		bitsRepo            *apifakes.FakeBuildpackBitsRepository
 		ui                  *testterm.FakeUI
 		deps                commandregistry.Dependency
 	)
@@ -36,7 +36,7 @@ var _ = Describe("create-buildpack command", func() {
 		requirementsFactory = new(requirementsfakes.FakeFactory)
 		requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 		repo = new(apifakes.OldFakeBuildpackRepository)
-		bitsRepo = new(apifakes.OldFakeBuildpackBitsRepository)
+		bitsRepo = new(apifakes.FakeBuildpackBitsRepository)
 		ui = &testterm.FakeUI{}
 	})
 
@@ -52,12 +52,27 @@ var _ = Describe("create-buildpack command", func() {
 		))
 	})
 
+	Context("when a file is provided", func() {
+		It("prints error and do not call create buildpack", func() {
+			bitsRepo.CreateBuildpackZipFileReturns(nil, "", fmt.Errorf("create buildpack error"))
+
+			testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "file", "5"}, requirementsFactory, updateCommandDependency, false, ui)
+
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Failed to create local buildpack"}))
+			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"Creating buildpack"}))
+
+		})
+	})
+
 	Context("when a directory is provided", func() {
 		It("creates and uploads buildpacks", func() {
 			testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "my.war", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(repo.CreateBuildpack.Enabled).To(BeNil())
-			Expect(strings.HasSuffix(bitsRepo.UploadBuildpackPath, "my.war")).To(Equal(true))
+			Expect(bitsRepo.CreateBuildpackZipFileCallCount()).To(Equal(1))
+			buildpackPath := bitsRepo.CreateBuildpackZipFileArgsForCall(0)
+			Expect(buildpackPath).To(Equal("my.war"))
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating buildpack", "my-buildpack"},
 				[]string{"OK"},
@@ -73,7 +88,9 @@ var _ = Describe("create-buildpack command", func() {
 			testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "https://some-url.com", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(repo.CreateBuildpack.Enabled).To(BeNil())
-			Expect(bitsRepo.UploadBuildpackPath).To(Equal("https://some-url.com"))
+			Expect(bitsRepo.CreateBuildpackZipFileCallCount()).To(Equal(1))
+			buildpackPath := bitsRepo.CreateBuildpackZipFileArgsForCall(0)
+			Expect(buildpackPath).To(Equal("https://some-url.com"))
 			Expect(ui.Outputs()).To(ContainSubstrings(
 				[]string{"Creating buildpack", "my-buildpack"},
 				[]string{"OK"},
@@ -110,7 +127,8 @@ var _ = Describe("create-buildpack command", func() {
 	})
 
 	It("alerts the user when uploading the buildpack bits fails", func() {
-		bitsRepo.UploadBuildpackErr = true
+		bitsRepo.UploadBuildpackReturns(fmt.Errorf("upload error"))
+
 		testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "bogus/path", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 		Expect(ui.Outputs()).To(ContainSubstrings(

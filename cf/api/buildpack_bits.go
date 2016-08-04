@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	gonet "net"
 	"net/http"
@@ -27,7 +28,8 @@ import (
 //go:generate counterfeiter . BuildpackBitsRepository
 
 type BuildpackBitsRepository interface {
-	UploadBuildpack(buildpack models.Buildpack, dir string) (apiErr error)
+	UploadBuildpack(buildpack models.Buildpack, buildpackFile *os.File, zipFileName string) error
+	CreateBuildpackZipFile(buildpackPath string) (*os.File, string, error)
 }
 
 type CloudControllerBuildpackBitsRepository struct {
@@ -44,63 +46,66 @@ func NewCloudControllerBuildpackBitsRepository(config coreconfig.Reader, gateway
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiErr error) {
-	fileutils.TempFile("buildpack-upload", func(zipFileToUpload *os.File, err error) {
+func zipErrorHelper(err error) error {
+	return fmt.Errorf("%s: %s", T("Couldn't write zip file"), err.Error())
+}
+
+func (repo CloudControllerBuildpackBitsRepository) CreateBuildpackZipFile(buildpackPath string) (*os.File, string, error) {
+	zipFileToUpload, err := ioutil.TempFile("", "buildpack-upload")
+	if err != nil {
+		return nil, "", fmt.Errorf("%s: %s", T("Couldn't create temp file for upload"), err.Error())
+	}
+
+	var buildpackFileName string
+	if isWebURL(buildpackPath) {
+		buildpackFileName = path.Base(buildpackPath)
+		repo.downloadBuildpack(buildpackPath, func(downloadFile *os.File, downloadErr error) {
+			if downloadErr != nil {
+				err = downloadErr
+				return
+			}
+
+			downloadErr = normalizeBuildpackArchive(downloadFile, zipFileToUpload)
+			if downloadErr != nil {
+				err = downloadErr
+				return
+			}
+		})
 		if err != nil {
-			apiErr = fmt.Errorf("%s: %s", T("Couldn't create temp file for upload"), err.Error())
-			return
+			return nil, "", zipErrorHelper(err)
+		}
+	} else {
+		buildpackFileName = filepath.Base(buildpackPath)
+		dir, err := filepath.Abs(buildpackPath)
+		if err != nil {
+			return nil, "", zipErrorHelper(err)
 		}
 
-		var buildpackFileName string
-		if isWebURL(buildpackLocation) {
-			buildpackFileName = path.Base(buildpackLocation)
-			repo.downloadBuildpack(buildpackLocation, func(downloadFile *os.File, downloadErr error) {
-				if downloadErr != nil {
-					err = downloadErr
-					return
-				}
+		buildpackFileName = filepath.Base(dir)
+		stats, err := os.Stat(dir)
+		if err != nil {
+			return nil, "", fmt.Errorf("%s: %s", T("Error opening buildpack file"), err.Error())
+		}
 
-				err = normalizeBuildpackArchive(downloadFile, zipFileToUpload)
-			})
+		if stats.IsDir() {
+			buildpackFileName += ".zip" // FIXME: remove once #71167394 is fixed
+			err = repo.zipper.Zip(buildpackPath, zipFileToUpload)
+			if err != nil {
+				return nil, "", zipErrorHelper(err)
+			}
 		} else {
-			buildpackFileName = filepath.Base(buildpackLocation)
-			dir, pathErr := filepath.Abs(buildpackLocation)
-			if pathErr != nil {
-				err = pathErr
-				return
+			specifiedFile, err := os.Open(buildpackPath)
+			if err != nil {
+				return nil, "", fmt.Errorf("%s: %s", T("Couldn't open buildpack file"), err.Error())
 			}
-
-			buildpackFileName = filepath.Base(dir)
-			stats, statError := os.Stat(dir)
-			if statError != nil {
-				apiErr = fmt.Errorf("%s: %s", T("Error opening buildpack file"), statError.Error())
-				err = statError
-				return
-			}
-
-			if stats.IsDir() {
-				buildpackFileName += ".zip" // FIXME: remove once #71167394 is fixed
-				err = repo.zipper.Zip(buildpackLocation, zipFileToUpload)
-			} else {
-				specifiedFile, openError := os.Open(buildpackLocation)
-				if openError != nil {
-					apiErr = fmt.Errorf("%s: %s", T("Couldn't open buildpack file"), openError.Error())
-					err = openError
-					return
-				}
-				err = normalizeBuildpackArchive(specifiedFile, zipFileToUpload)
+			err = normalizeBuildpackArchive(specifiedFile, zipFileToUpload)
+			if err != nil {
+				return nil, "", zipErrorHelper(err)
 			}
 		}
+	}
 
-		if err != nil {
-			apiErr = fmt.Errorf("%s: %s", T("Couldn't write zip file"), err.Error())
-			return
-		}
-
-		apiErr = repo.uploadBits(buildpack, zipFileToUpload, buildpackFileName)
-	})
-
-	return
+	return zipFileToUpload, buildpackFileName, nil
 }
 
 func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
@@ -241,12 +246,16 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 	})
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) error {
+func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackFile *os.File, buildpackName string) error {
+	defer func() {
+		buildpackFile.Close()
+		os.Remove(buildpackFile.Name())
+	}()
 	return repo.performMultiPartUpload(
 		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.APIEndpoint(), buildpack.GUID),
 		"buildpack",
 		buildpackName,
-		body)
+		buildpackFile)
 }
 
 func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) error {
