@@ -1,159 +1,159 @@
 package v2
 
-var Commands commands
+var Commands commandList
 
-type commands struct {
-	App                                AppCommand                                `command:"app"`
-	Help                               HelpCommand                               `command:"help"`
-	Version                            VersionCommand                            `command:"version"`
-	Login                              LoginCommand                              `command:"login"`
-	Logout                             LogoutCommand                             `command:"logout"`
-	Passwd                             PasswdCommand                             `command:"passwd"`
-	Target                             TargetCommand                             `command:"target"`
-	Api                                ApiCommand                                `command:"api"`
-	Auth                               AuthCommand                               `command:"auth"`
-	Apps                               AppsCommand                               `command:"apps"`
-	Push                               PushCommand                               `command:"push"`
-	Scale                              ScaleCommand                              `command:"scale"`
-	Delete                             DeleteCommand                             `command:"delete"`
-	Rename                             RenameCommand                             `command:"rename"`
-	Start                              StartCommand                              `command:"start"`
-	Stop                               StopCommand                               `command:"stop"`
-	Restart                            RestartCommand                            `command:"restart"`
-	Restage                            RestageCommand                            `command:"restage"`
-	RestartAppInstance                 RestartAppInstanceCommand                 `command:"restart-app-instance"`
-	Events                             EventsCommand                             `command:"events"`
-	Files                              FilesCommand                              `command:"files"`
-	Logs                               LogsCommand                               `command:"logs"`
-	Env                                EnvCommand                                `command:"env"`
-	SetEnv                             SetEnvCommand                             `command:"set-env"`
-	UnsetEnv                           UnsetEnvCommand                           `command:"unset-env"`
-	Stacks                             StacksCommand                             `command:"stacks"`
-	Stack                              StackCommand                              `command:"stack"`
-	CopySource                         CopySourceCommand                         `command:"copy-source"`
-	CreateAppManifest                  CreateAppManifestCommand                  `command:"create-app-manifest"`
-	GetHealthCheck                     GetHealthCheckCommand                     `command:"get-health-check"`
-	SetHealthCheck                     SetHealthCheckCommand                     `command:"set-health-check"`
-	EnableSSH                          EnableSSHCommand                          `command:"enable-ssh"`
-	DisableSSH                         DisableSSHCommand                         `command:"disable-ssh"`
-	SSHEnabled                         SSHEnabledCommand                         `command:"ssh-enabled"`
-	SSH                                SSHCommand                                `command:"ssh"`
-	Marketplace                        MarketplaceCommand                        `command:"marketplace"`
-	Services                           ServicesCommand                           `command:"services"`
-	Service                            ServiceCommand                            `command:"service"`
-	CreateService                      CreateServiceCommand                      `command:"create-service"`
-	UpdateService                      UpdateServiceCommand                      `command:"update-service"`
-	DeleteService                      DeleteServiceCommand                      `command:"delete-service"`
-	RenameService                      RenameServiceCommand                      `command:"rename-service"`
-	CreateServiceKey                   CreateServiceKeyCommand                   `command:"create-service-key"`
-	ServiceKeys                        ServiceKeysCommand                        `command:"service-keys"`
-	ServiceKey                         ServiceKeyCommand                         `command:"service-key"`
-	DeleteServiceKey                   DeleteServiceKeyCommand                   `command:"delete-service-key"`
-	BindService                        BindServiceCommand                        `command:"bind-service"`
-	UnbindService                      UnbindServiceCommand                      `command:"unbind-service"`
-	BindRouteService                   BindRouteServiceCommand                   `command:"bind-route-service"`
-	UnbindRouteService                 UnbindRouteServiceCommand                 `command:"unbind-route-service"`
-	CreateUserProvidedService          CreateUserProvidedServiceCommand          `command:"create-user-provided-service"`
-	UpdateUserProvidedService          UpdateUserProvidedServiceCommand          `command:"update-user-provided-service"`
-	Orgs                               OrgsCommand                               `command:"orgs"`
-	Org                                OrgCommand                                `command:"org"`
-	CreateOrg                          CreateOrgCommand                          `command:"create-org"`
-	DeleteOrg                          DeleteOrgCommand                          `command:"delete-org"`
-	RenameOrg                          RenameOrgCommand                          `command:"rename-org"`
-	Spaces                             SpacesCommand                             `command:"spaces"`
-	Space                              SpaceCommand                              `command:"space"`
-	CreateSpace                        CreateSpaceCommand                        `command:"create-space"`
-	DeleteSpace                        DeleteSpaceCommand                        `command:"delete-space"`
-	RenameSpace                        RenameSpaceCommand                        `command:"rename-space"`
-	AllowSpaceSSH                      AllowSpaceSSHCommand                      `command:"allow-space-ssh"`
-	DisallowSpaceSSH                   DisallowSpaceSSHCommand                   `command:"disallow-space-ssh"`
-	SpaceSSHAllowed                    SpaceSSHAllowedCommand                    `command:"space-ssh-allowed"`
-	Domains                            DomainsCommand                            `command:"domains"`
-	CreateDomain                       CreateDomainCommand                       `command:"create-domain"`
-	DeleteDomain                       DeleteDomainCommand                       `command:"delete-domain"`
-	CreateSharedDomain                 CreateSharedDomainCommand                 `command:"create-shared-domain"`
-	DeleteSharedDomain                 DeleteSharedDomainCommand                 `command:"delete-shared-domain"`
-	RouterGroups                       RouterGroupsCommand                       `command:"router-groups"`
-	Routes                             RoutesCommand                             `command:"routes"`
-	CreateRoute                        CreateRouteCommand                        `command:"create-route"`
-	CheckRoute                         CheckRouteCommand                         `command:"check-route"`
-	MapRoute                           MapRouteCommand                           `command:"map-route"`
-	UnmapRoute                         UnmapRouteCommand                         `command:"unmap-route"`
-	DeleteRoute                        DeleteRouteCommand                        `command:"delete-route"`
-	DeleteOrphanedRoutes               DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes"`
-	Buildpacks                         BuildpacksCommand                         `command:"buildpacks"`
-	CreateBuildpack                    CreateBuildpackCommand                    `command:"create-buildpack"`
-	UpdateBuildpack                    UpdateBuildpackCommand                    `command:"update-buildpack"`
-	RenameBuildpack                    RenameBuildpackCommand                    `command:"rename-buildpack"`
-	DeleteBuildpack                    DeleteBuildpackCommand                    `command:"delete-buildpack"`
-	CreateUser                         CreateUserCommand                         `command:"create-user"`
-	DeleteUser                         DeleteUserCommand                         `command:"delete-user"`
-	OrgUsers                           OrgUsersCommand                           `command:"org-users"`
-	SetOrgRole                         SetOrgRoleCommand                         `command:"set-org-role"`
-	UnsetOrgRole                       UnsetOrgRoleCommand                       `command:"unset-org-role"`
-	SpaceUsers                         SpaceUsersCommand                         `command:"space-users"`
-	SetSpaceRole                       SetSpaceRoleCommand                       `command:"set-space-role"`
-	UnsetSpaceRole                     UnsetSpaceRoleCommand                     `command:"unset-space-role"`
-	Quotas                             QuotasCommand                             `command:"quotas"`
-	Quota                              QuotaCommand                              `command:"quota"`
-	SetQuota                           SetQuotaCommand                           `command:"set-quota"`
-	CreateQuota                        CreateQuotaCommand                        `command:"create-quota"`
-	DeleteQuota                        DeleteQuotaCommand                        `command:"delete-quota"`
-	UpdateQuota                        UpdateQuotaCommand                        `command:"update-quota"`
-	SharePrivateDomain                 SharePrivateDomainCommand                 `command:"share-private-domain"`
-	UnsharePrivateDomain               UnsharePrivateDomainCommand               `command:"unshare-private-domain"`
-	SpaceQuotas                        SpaceQuotasCommand                        `command:"space-quotas"`
-	SpaceQuota                         SpaceQuotaCommand                         `command:"space-quota"`
-	CreateSpaceQuota                   CreateSpaceQuotaCommand                   `command:"create-space-quota"`
-	UpdateSpaceQuota                   UpdateSpaceQuotaCommand                   `command:"update-space-quota"`
-	DeleteSpaceQuota                   DeleteSpaceQuotaCommand                   `command:"delete-space-quota"`
-	SetSpaceQuota                      SetSpaceQuotaCommand                      `command:"set-space-quota"`
-	UnsetSpaceQuota                    UnsetSpaceQuotaCommand                    `command:"unset-space-quota"`
-	ServiceAuthTokens                  ServiceAuthTokensCommand                  `command:"service-auth-tokens"`
-	CreateServiceAuthToken             CreateServiceAuthTokenCommand             `command:"create-service-auth-token"`
-	UpdateServiceAuthToken             UpdateServiceAuthTokenCommand             `command:"update-service-auth-token"`
-	DeleteServiceAuthToken             DeleteServiceAuthTokenCommand             `command:"delete-service-auth-token"`
-	ServiceBrokers                     ServiceBrokersCommand                     `command:"service-brokers"`
-	CreateServiceBroker                CreateServiceBrokerCommand                `command:"create-service-broker"`
-	UpdateServiceBroker                UpdateServiceBrokerCommand                `command:"update-service-broker"`
-	DeleteServiceBroker                DeleteServiceBrokerCommand                `command:"delete-service-broker"`
-	RenameServiceBroker                RenameServiceBrokerCommand                `command:"rename-service-broker"`
-	MigrateServiceInstances            MigrateServiceInstancesCommand            `command:"migrate-service-instances"`
-	PurgeServiceOffering               PurgeServiceOfferingCommand               `command:"purge-service-offering"`
-	PurgeServiceInstance               PurgeServiceInstanceCommand               `command:"purge-service-instance"`
-	ServiceAccess                      ServiceAccessCommand                      `command:"service-access"`
-	EnableServiceAccess                EnableServiceAccessCommand                `command:"enable-service-access"`
-	DisableServiceAccess               DisableServiceAccessCommand               `command:"disable-service-access"`
-	SecurityGroup                      SecurityGroupCommand                      `command:"security-group"`
-	SecurityGroups                     SecurityGroupsCommand                     `command:"security-groups"`
-	CreateSecurityGroup                CreateSecurityGroupCommand                `command:"create-security-group"`
-	UpdateSecurityGroup                UpdateSecurityGroupCommand                `command:"update-security-group"`
-	DeleteSecurityGroup                DeleteSecurityGroupCommand                `command:"delete-security-group"`
-	BindSecurityGroup                  BindSecurityGroupCommand                  `command:"bind-security-group"`
-	UnbindSecurityGroup                UnbindSecurityGroupCommand                `command:"unbind-security-group"`
-	BindStagingSecurityGroup           BindStagingSecurityGroupCommand           `command:"bind-staging-security-group"`
-	StagingSecurityGroups              StagingSecurityGroupsCommand              `command:"staging-security-groups"`
-	UnbindStagingSecurityGroup         UnbindStagingSecurityGroupCommand         `command:"unbind-staging-security-group"`
-	BindRunningSecurityGroup           BindRunningSecurityGroupCommand           `command:"bind-running-security-group"`
-	RunningSecurityGroups              RunningSecurityGroupsCommand              `command:"running-security-groups"`
-	UnbindRunningSecurityGroup         UnbindRunningSecurityGroupCommand         `command:"unbind-running-security-group"`
-	RunningEnvironmentVariableGroup    RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group"`
-	StagingEnvironmentVariableGroup    StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group"`
-	SetStagingEnvironmentVariableGroup SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group"`
-	SetRunningEnvironmentVariableGroup SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group"`
-	FeatureFlags                       FeatureFlagsCommand                       `command:"feature-flags"`
-	FeatureFlag                        FeatureFlagCommand                        `command:"feature-flag"`
-	EnableFeatureFlag                  EnableFeatureFlagCommand                  `command:"enable-feature-flag"`
-	DisableFeatureFlag                 DisableFeatureFlagCommand                 `command:"disable-feature-flag"`
-	Curl                               CurlCommand                               `command:"curl"`
-	Config                             ConfigCommand                             `command:"config"`
-	OauthToken                         OauthTokenCommand                         `command:"oauth-token"`
-	SSHCode                            SSHCodeCommand                            `command:"ssh-code"`
-	AddPluginRepo                      AddPluginRepoCommand                      `command:"add-plugin-repo"`
-	RemovePluginRepo                   RemovePluginRepoCommand                   `command:"remove-plugin-repo"`
-	ListPluginRepos                    ListPluginReposCommand                    `command:"list-plugin-repos"`
-	RepoPlugins                        RepoPluginsCommand                        `command:"repo-plugins"`
-	Plugins                            PluginsCommand                            `command:"plugins"`
-	InstallPlugin                      InstallPluginCommand                      `command:"install-plugin"`
-	UninstallPlugin                    UninstallPluginCommand                    `command:"uninstall-plugin"`
+type commandList struct {
+	App                                AppCommand                                `command:"app" description:"Display health and status for app" usage:"\tcf app APP_NAME"`
+	Help                               HelpCommand                               `command:"help" alias:"h" description:"Show help"`
+	Version                            VersionCommand                            `command:"version" description:"Print the version"`
+	Login                              LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
+	Logout                             LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
+	Passwd                             PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
+	Target                             TargetCommand                             `command:"target" alias:"t" description:"Set or view the targeted org or space"`
+	Api                                ApiCommand                                `command:"api" description:"Set or view target api url"`
+	Auth                               AuthCommand                               `command:"auth" description:"Authenticate user non-interactively"`
+	Apps                               AppsCommand                               `command:"apps" alias:"a" description:"List all apps in the target space"`
+	Push                               PushCommand                               `command:"push" alias:"p" description:"Push a new app or sync changes to an existing app"`
+	Scale                              ScaleCommand                              `command:"scale" description:"Change or view the instance count, disk space limit, and memory limit for an app"`
+	Delete                             DeleteCommand                             `command:"delete" alias:"d" description:"Delete an app"`
+	Rename                             RenameCommand                             `command:"rename" description:"Rename an app"`
+	Start                              StartCommand                              `command:"start" alias:"st" description:"Start an app"`
+	Stop                               StopCommand                               `command:"stop" alias:"sp" description:"Stop an app"`
+	Restart                            RestartCommand                            `command:"restart" alias:"rs" description:"Restart an app"`
+	Restage                            RestageCommand                            `command:"restage" alias:"rg" description:"Restage an app"`
+	RestartAppInstance                 RestartAppInstanceCommand                 `command:"restart-app-instance" description:"Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"`
+	Events                             EventsCommand                             `command:"events" description:"Show recent app events"`
+	Files                              FilesCommand                              `command:"files" alias:"f" description:"Print out a list of files in a directory or the contents of a specific file of an app running on the DEA backend"`
+	Logs                               LogsCommand                               `command:"logs" description:"Tail or show recent logs for an app"`
+	Env                                EnvCommand                                `command:"env" alias:"e" description:"Show all env variables for an app"`
+	SetEnv                             SetEnvCommand                             `command:"set-env" alias:"se" description:"Set an env variable for an app"`
+	UnsetEnv                           UnsetEnvCommand                           `command:"unset-env" description:"Remove an env variable"`
+	Stacks                             StacksCommand                             `command:"stacks" description:"List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)"`
+	Stack                              StackCommand                              `command:"stack" description:"Show information for a stack (a stack is a pre-built file system, including an operating system, that can run apps"`
+	CopySource                         CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
+	CreateAppManifest                  CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
+	GetHealthCheck                     GetHealthCheckCommand                     `command:"get-health-check" description:"Get the health_check_type value of an app"`
+	SetHealthCheck                     SetHealthCheckCommand                     `command:"set-health-check" description:"Set health_check_type flag to either 'port' or 'none'"` //TODO: Figure out how to do this arg
+	EnableSSH                          EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
+	DisableSSH                         DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
+	SSHEnabled                         SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
+	SSH                                SSHCommand                                `command:"ssh" description:"SSH to an application container instance"`
+	Marketplace                        MarketplaceCommand                        `command:"marketplace" alias:"m" description:"List available offerings in the marketplace"`
+	Services                           ServicesCommand                           `command:"services" alias:"s" description:"List all service instances in the target space"`
+	Service                            ServiceCommand                            `command:"service" description:"Show service instance info"`
+	CreateService                      CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
+	UpdateService                      UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
+	DeleteService                      DeleteServiceCommand                      `command:"delete-service" description:"Delete a service instance"`
+	RenameService                      RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`
+	CreateServiceKey                   CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
+	ServiceKeys                        ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
+	ServiceKey                         ServiceKeyCommand                         `command:"service-key" description:"Show service key info"`
+	DeleteServiceKey                   DeleteServiceKeyCommand                   `command:"delete-service-key" alias:"dsk" description:"Delete a service key"`
+	BindService                        BindServiceCommand                        `command:"bind-service" alias:"bs" description:"Bind a service instance to an app"`
+	UnbindService                      UnbindServiceCommand                      `command:"unbind-service" alias:"us" description:"Unbind a service instance from an app"`
+	BindRouteService                   BindRouteServiceCommand                   `command:"bind-route-service" alias:"brs" description:"Bind a service instance to an HTTP route"`
+	UnbindRouteService                 UnbindRouteServiceCommand                 `command:"unbind-route-service" alias:"urs" description:"Unbind a service instance from an HTTP route"`
+	CreateUserProvidedService          CreateUserProvidedServiceCommand          `command:"create-user-provided-service" alias:"cups" description:"Make a user-provided service instance available to CF apps"`
+	UpdateUserProvidedService          UpdateUserProvidedServiceCommand          `command:"update-user-provided-service" alias:"uups" description:"Update user-provided service instance"`
+	Orgs                               OrgsCommand                               `command:"orgs" alias:"o" description:"List all orgs"`
+	Org                                OrgCommand                                `command:"org" description:"Show org info"`
+	CreateOrg                          CreateOrgCommand                          `command:"create-org" alias:"co" description:"Create an org"`
+	DeleteOrg                          DeleteOrgCommand                          `command:"delete-org" description:"Delete an org"`
+	RenameOrg                          RenameOrgCommand                          `command:"rename-org" description:"Rename an org"`
+	Spaces                             SpacesCommand                             `command:"spaces" description:"List all spaces in an org"`
+	Space                              SpaceCommand                              `command:"space" description:"Show space info"`
+	CreateSpace                        CreateSpaceCommand                        `command:"create-space" description:"Create a space"`
+	DeleteSpace                        DeleteSpaceCommand                        `command:"delete-space" description:"Delete a space"`
+	RenameSpace                        RenameSpaceCommand                        `command:"rename-space" description:"Rename a space"`
+	AllowSpaceSSH                      AllowSpaceSSHCommand                      `command:"allow-space-ssh" description:"Allow SSH access for the space"`
+	DisallowSpaceSSH                   DisallowSpaceSSHCommand                   `command:"disallow-space-ssh" description:"Disallow SSH access for the space"`
+	SpaceSSHAllowed                    SpaceSSHAllowedCommand                    `command:"space-ssh-allowed" description:"Reports whether SSH is allowed in a space"`
+	Domains                            DomainsCommand                            `command:"domains" description:"List domains in the target org"`
+	CreateDomain                       CreateDomainCommand                       `command:"create-domain" description:"Create a domain in an org for later use"`
+	DeleteDomain                       DeleteDomainCommand                       `command:"delete-domain" description:"Delete a domain"`
+	CreateSharedDomain                 CreateSharedDomainCommand                 `command:"create-shared-domain" description:"Create a domain that can be used by all orgs (admin-only)"`
+	DeleteSharedDomain                 DeleteSharedDomainCommand                 `command:"delete-shared-domain" description:"Delete a shared domain"`
+	RouterGroups                       RouterGroupsCommand                       `command:"router-groups" description:"List router groups"`
+	Routes                             RoutesCommand                             `command:"routes" alias:"r" description:"List all routes in the current space or the current organization"`
+	CreateRoute                        CreateRouteCommand                        `command:"create-route" description:"Create a url route in a space for later use"`
+	CheckRoute                         CheckRouteCommand                         `command:"check-route" description:"Perform a simple check to determine whether a route currently exists or not"`
+	MapRoute                           MapRouteCommand                           `command:"map-route" description:"Add a url route to an app"`
+	UnmapRoute                         UnmapRouteCommand                         `command:"unmap-route" description:"Remove a url route from an app"`
+	DeleteRoute                        DeleteRouteCommand                        `command:"delete-route" description:"Delete a route"`
+	DeleteOrphanedRoutes               DeleteOrphanedRoutesCommand               `command:"delete-orphaned-routes" description:"Delete all orphaned routes (i.e. those that are not mapped to an app)"`
+	Buildpacks                         BuildpacksCommand                         `command:"buildpacks" description:"List all buildpacks"`
+	CreateBuildpack                    CreateBuildpackCommand                    `command:"create-buildpack" description:"Create a buildpack"`
+	UpdateBuildpack                    UpdateBuildpackCommand                    `command:"update-buildpack" description:"Update a buildpack"`
+	RenameBuildpack                    RenameBuildpackCommand                    `command:"rename-buildpack" description:"Rename a buildpack"`
+	DeleteBuildpack                    DeleteBuildpackCommand                    `command:"delete-buildpack" description:"Delete a buildpack"`
+	CreateUser                         CreateUserCommand                         `command:"create-user" description:"Create a new user"`
+	DeleteUser                         DeleteUserCommand                         `command:"delete-user" description:"Delete a user"`
+	OrgUsers                           OrgUsersCommand                           `command:"org-users" description:"Show org users by role"`
+	SetOrgRole                         SetOrgRoleCommand                         `command:"set-org-role" description:"Assign an org role to a user"`
+	UnsetOrgRole                       UnsetOrgRoleCommand                       `command:"unset-org-role" description:"Remove an org role from a user"`
+	SpaceUsers                         SpaceUsersCommand                         `command:"space-users" description:"Show space users by role"`
+	SetSpaceRole                       SetSpaceRoleCommand                       `command:"set-space-role" description:"Assign a space role to a user"`
+	UnsetSpaceRole                     UnsetSpaceRoleCommand                     `command:"unset-space-role" description:"Remove a space role from a user"`
+	Quotas                             QuotasCommand                             `command:"quotas" description:"List available usage quotas"`
+	Quota                              QuotaCommand                              `command:"quota" description:"Show quota info"`
+	SetQuota                           SetQuotaCommand                           `command:"set-quota" description:"Assign a quota to an org"`
+	CreateQuota                        CreateQuotaCommand                        `command:"create-quota" description:"Define a new resource quota"`
+	DeleteQuota                        DeleteQuotaCommand                        `command:"delete-quota" description:"Delete a quota"`
+	UpdateQuota                        UpdateQuotaCommand                        `command:"update-quota" description:"Update an existing resource quota"`
+	SharePrivateDomain                 SharePrivateDomainCommand                 `command:"share-private-domain" description:"Share a private domain with an org"`
+	UnsharePrivateDomain               UnsharePrivateDomainCommand               `command:"unshare-private-domain" description:"Unshare a private domain with an org"`
+	SpaceQuotas                        SpaceQuotasCommand                        `command:"space-quotas" description:"List available space resource quotas"`
+	SpaceQuota                         SpaceQuotaCommand                         `command:"space-quota" description:"Show space quota info"`
+	CreateSpaceQuota                   CreateSpaceQuotaCommand                   `command:"create-space-quota" description:"Define a new space resource quota"`
+	UpdateSpaceQuota                   UpdateSpaceQuotaCommand                   `command:"update-space-quota" description:"Update an existing space quota"`
+	DeleteSpaceQuota                   DeleteSpaceQuotaCommand                   `command:"delete-space-quota" description:"Delete a space quota definition and unassign the space quota from all spaces"`
+	SetSpaceQuota                      SetSpaceQuotaCommand                      `command:"set-space-quota" description:"Assign a space quota definition to a space"`
+	UnsetSpaceQuota                    UnsetSpaceQuotaCommand                    `command:"unset-space-quota" description:"Unassign a quota from a space"`
+	ServiceAuthTokens                  ServiceAuthTokensCommand                  `command:"service-auth-tokens" description:"List service auth tokens"`
+	CreateServiceAuthToken             CreateServiceAuthTokenCommand             `command:"create-service-auth-token" description:"Create a service auth token"`
+	UpdateServiceAuthToken             UpdateServiceAuthTokenCommand             `command:"update-service-auth-token" description:"Update a service auth token"`
+	DeleteServiceAuthToken             DeleteServiceAuthTokenCommand             `command:"delete-service-auth-token" description:"Delete a service auth token"`
+	ServiceBrokers                     ServiceBrokersCommand                     `command:"service-brokers" description:"List service brokers"`
+	CreateServiceBroker                CreateServiceBrokerCommand                `command:"create-service-broker" alias:"csb" description:"Create a service broker"`
+	UpdateServiceBroker                UpdateServiceBrokerCommand                `command:"update-service-broker" description:"Update a service broker"`
+	DeleteServiceBroker                DeleteServiceBrokerCommand                `command:"delete-service-broker" description:"Delete a service broker"`
+	RenameServiceBroker                RenameServiceBrokerCommand                `command:"rename-service-broker" description:"Rename a service broker"`
+	MigrateServiceInstances            MigrateServiceInstancesCommand            `command:"migrate-service-instances" description:"Migrate service instances from one service plan to another"`
+	PurgeServiceOffering               PurgeServiceOfferingCommand               `command:"purge-service-offering" description:"Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"`
+	PurgeServiceInstance               PurgeServiceInstanceCommand               `command:"purge-service-instance" description:"Recursively remove a service instance and child objects from Cloud Foundry database without making requests to a service broker"`
+	ServiceAccess                      ServiceAccessCommand                      `command:"service-access" description:"List service access settings"`
+	EnableServiceAccess                EnableServiceAccessCommand                `command:"enable-service-access" description:"Enable access to a service or service plan for one or all orgs"`
+	DisableServiceAccess               DisableServiceAccessCommand               `command:"disable-service-access" description:"Disable access to a service or service plan for one or all orgs"`
+	SecurityGroup                      SecurityGroupCommand                      `command:"security-group" description:"Show a single security group"`
+	SecurityGroups                     SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
+	CreateSecurityGroup                CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
+	UpdateSecurityGroup                UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
+	DeleteSecurityGroup                DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Delete a security group"`
+	BindSecurityGroup                  BindSecurityGroupCommand                  `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`
+	UnbindSecurityGroup                UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
+	BindStagingSecurityGroup           BindStagingSecurityGroupCommand           `command:"bind-staging-security-group" description:"Bind a security group to the list of security groups to be used for staging applications"`
+	StagingSecurityGroups              StagingSecurityGroupsCommand              `command:"staging-security-groups" description:"List security groups in the staging set for applications"`
+	UnbindStagingSecurityGroup         UnbindStagingSecurityGroupCommand         `command:"unbind-staging-security-group" description:"Unbind a security group from the set of security groups for staging applications"`
+	BindRunningSecurityGroup           BindRunningSecurityGroupCommand           `command:"bind-running-security-group" description:"Bind a security group to the list of security groups to be used for running applications"`
+	RunningSecurityGroups              RunningSecurityGroupsCommand              `command:"running-security-groups" description:"List security groups in the set of security groups for running applications"`
+	UnbindRunningSecurityGroup         UnbindRunningSecurityGroupCommand         `command:"unbind-running-security-group" description:"Unbind a security group from the set of security groups for running applications"`
+	RunningEnvironmentVariableGroup    RunningEnvironmentVariableGroupCommand    `command:"running-environment-variable-group" alias:"revg" description:"Retrieve the contents of the running environment variable group"`
+	StagingEnvironmentVariableGroup    StagingEnvironmentVariableGroupCommand    `command:"staging-environment-variable-group" alias:"sevg" description:"Retrieve the contents of the staging environment variable group"`
+	SetStagingEnvironmentVariableGroup SetStagingEnvironmentVariableGroupCommand `command:"set-staging-environment-variable-group" alias:"ssevg" description:"Pass parameters as JSON to create a staging environment variable group"`
+	SetRunningEnvironmentVariableGroup SetRunningEnvironmentVariableGroupCommand `command:"set-running-environment-variable-group" alias:"srevg" description:"Pass parameters as JSON to create a running environment variable group"`
+	FeatureFlags                       FeatureFlagsCommand                       `command:"feature-flags" description:"Retrieve list of feature flags with status of each flag-able feature"`
+	FeatureFlag                        FeatureFlagCommand                        `command:"feature-flag" description:"Retrieve an individual feature flag with status"`
+	EnableFeatureFlag                  EnableFeatureFlagCommand                  `command:"enable-feature-flag" description:"Enable the use of a feature so that users have access to and can use the feature"`
+	DisableFeatureFlag                 DisableFeatureFlagCommand                 `command:"disable-feature-flag" description:"Disable the use of a feature so that users have access to and can use the feature"`
+	Curl                               CurlCommand                               `command:"curl" description:"Executes a request to the targeted API endpoint"`
+	Config                             ConfigCommand                             `command:"config" description:"Write default values to the config"`
+	OauthToken                         OauthTokenCommand                         `command:"oauth-token" description:"Retrieve and display the OAuth token for the current session"`
+	SSHCode                            SSHCodeCommand                            `command:"ssh-code" description:"Get a one time password for ssh clients"`
+	AddPluginRepo                      AddPluginRepoCommand                      `command:"add-plugin-repo" description:"Add a new plugin repository"`
+	RemovePluginRepo                   RemovePluginRepoCommand                   `command:"remove-plugin-repo" description:"Remove a plugin repository"`
+	ListPluginRepos                    ListPluginReposCommand                    `command:"list-plugin-repos" description:"List all the added plugin repositories"`
+	RepoPlugins                        RepoPluginsCommand                        `command:"repo-plugins" description:"List all available plugins in specified repository or in all added repositories"`
+	Plugins                            PluginsCommand                            `command:"plugins" description:"List all available plugin commands"`
+	InstallPlugin                      InstallPluginCommand                      `command:"install-plugin" description:"Install CLI plugin"`
+	UninstallPlugin                    UninstallPluginCommand                    `command:"uninstall-plugin" description:"Uninstall the plugin defined in command argument"`
 }

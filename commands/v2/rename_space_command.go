@@ -4,9 +4,12 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands/flags"
 )
 
-type RenameSpaceCommand struct{}
+type RenameSpaceCommand struct {
+	RequiredArgs flags.RenameSpaceArgs `positional-args:"yes"`
+}
 
 func (_ RenameSpaceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)

@@ -4,9 +4,12 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands/flags"
 )
 
-type CreateUserCommand struct{}
+type CreateUserCommand struct {
+	RequiredArgs flags.Authentication `positional-args:"yes"`
+}
 
 func (_ CreateUserCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)

@@ -4,9 +4,12 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands/flags"
 )
 
-type BindRunningSecurityGroupCommand struct{}
+type BindRunningSecurityGroupCommand struct {
+	RequiredArgs flags.SecurityGroup `positional-args:"yes"`
+}
 
 func (_ BindRunningSecurityGroupCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
