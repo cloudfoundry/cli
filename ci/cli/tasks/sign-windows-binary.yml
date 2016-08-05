@@ -6,6 +6,7 @@ params:
   SIGNTOOL_CERT_PASSWORD:
 
 inputs:
+- name: cli-ci
 - name: windows-signing
 
 outputs:

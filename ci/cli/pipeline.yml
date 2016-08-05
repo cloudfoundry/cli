@@ -212,16 +212,6 @@ jobs:
          params:
            channel: '#cli-firehose'
            text: "build binaries failed OR errored :("
-    - task: sign-windows-binary
-      file: cli-ci/ci/cli/tasks/sign-windows-binary.yml
-      params:
-        SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
-        SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "signing binaries failed OR errored :("
     - task: build-osx
       file: cli-ci/ci/cli/tasks/build-osx-binary.yml
       on_failure:
@@ -229,6 +219,16 @@ jobs:
          params:
            channel: '#cli-firehose'
            text: "build osx binaries failed OR errored :("
+  - task: sign-windows-binary
+    file: cli-ci/ci/cli/tasks/sign-windows-binary.yml
+    params:
+      SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
+      SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "signing binaries failed OR errored :("
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
