@@ -4,9 +4,13 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands/flags"
 )
 
-type StackCommand struct{}
+type StackCommand struct {
+	RequiredArgs flags.StackName `positional-args:"yes"`
+	GUID         bool            `long:"guid" description:"Retrieve and display the given stack's guid. All other output for the stack is suppressed."`
+}
 
 func (_ StackCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)

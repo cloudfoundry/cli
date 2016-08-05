@@ -4,9 +4,13 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands/flags"
 )
 
-type DeleteServiceCommand struct{}
+type DeleteServiceCommand struct {
+	RequiredArgs flags.ServiceInstance `positional-args:"yes"`
+	Force        bool                  `short:"f" description:"Force Deletion without confirmation"`
+}
 
 func (_ DeleteServiceCommand) Execute(args []string) error {
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
