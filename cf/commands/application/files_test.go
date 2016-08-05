@@ -188,9 +188,9 @@ var _ = Describe("Files", func() {
 						appFilesRepo.ListFilesReturns("", nil)
 					})
 
-					It("tells the user no files were found", func() {
+					It("tells the user empty file or no files were found", func() {
 						Expect(err).NotTo(HaveOccurred())
-						Expect(ui.Outputs()).To(ContainSubstrings([]string{"No files found"}))
+						Expect(ui.Outputs()).To(ContainSubstrings([]string{"Empty file or folder"}))
 					})
 				})
 
