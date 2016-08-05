@@ -106,7 +106,7 @@ func (cmd *Files) Execute(c flags.FlagContext) error {
 	cmd.ui.Say("")
 
 	if list == "" {
-		cmd.ui.Say("No files found")
+		cmd.ui.Say("Empty file or folder")
 	} else {
 		cmd.ui.Say("%s", list)
 	}
