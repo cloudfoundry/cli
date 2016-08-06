@@ -129,7 +129,7 @@ func (cmd *UpdateBuildpack) Execute(c flags.FlagContext) error {
 	if path != "" {
 		buildpackFile, buildpackFileName, err = cmd.buildpackBitsRepo.CreateBuildpackZipFile(path)
 		if err != nil {
-			cmd.ui.Warn(T("Failed to create local buildpack"))
+			cmd.ui.Warn(T("Failed to create a local temporary zip file for the buildpack"))
 			return err
 		}
 	}

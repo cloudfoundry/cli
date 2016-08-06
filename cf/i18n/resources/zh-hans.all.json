@@ -2060,12 +2060,12 @@
     "translation": "访存空间失败。\n{{.ErrorDescription}}"
   },
   {
-    "id": "Failed to create json for resource_match request",
-    "translation": "为 resource_match 请求创建 JSON 失败"
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
   },
   {
-    "id": "Failed to create local buildpack",
-    "translation": ""
+    "id": "Failed to create json for resource_match request",
+    "translation": "为 resource_match 请求创建 JSON 失败"
   },
   {
     "id": "Failed to create manifest, unable to parse environment variable: ",

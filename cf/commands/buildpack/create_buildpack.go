@@ -68,7 +68,7 @@ func (cmd *CreateBuildpack) Execute(c flags.FlagContext) error {
 
 	buildpackFile, buildpackFileName, err := cmd.buildpackBitsRepo.CreateBuildpackZipFile(c.Args()[1])
 	if err != nil {
-		cmd.ui.Warn(T("Failed to create local buildpack"))
+		cmd.ui.Warn(T("Failed to create a local temporary zip file for the buildpack"))
 		return err
 	}
 

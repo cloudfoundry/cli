@@ -2060,12 +2060,12 @@
     "translation": "Falha ao buscar espaços.\n{{.ErrorDescription}}"
   },
   {
-    "id": "Failed to create json for resource_match request",
-    "translation": "Falha ao criar json para solicitação resource_match"
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
   },
   {
-    "id": "Failed to create local buildpack",
-    "translation": ""
+    "id": "Failed to create json for resource_match request",
+    "translation": "Falha ao criar json para solicitação resource_match"
   },
   {
     "id": "Failed to create manifest, unable to parse environment variable: ",

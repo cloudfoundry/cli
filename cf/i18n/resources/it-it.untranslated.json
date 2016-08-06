@@ -20,8 +20,8 @@
     "translation": "Bind a security group to a particular space, or all existing spaces of an org"
   },
   {
-    "id": "Failed to create local buildpack",
-    "translation": "Failed to create local buildpack"
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": "Failed to create a local temporary zip file for the buildpack"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
