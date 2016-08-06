@@ -2060,12 +2060,12 @@
     "translation": "영역 페치에 실패했습니다.\n{{.ErrorDescription}}"
   },
   {
-    "id": "Failed to create json for resource_match request",
-    "translation": "resource_match 요청의 JSON 작성에 실패"
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
   },
   {
-    "id": "Failed to create local buildpack",
-    "translation": ""
+    "id": "Failed to create json for resource_match request",
+    "translation": "resource_match 요청의 JSON 작성에 실패"
   },
   {
     "id": "Failed to create manifest, unable to parse environment variable: ",

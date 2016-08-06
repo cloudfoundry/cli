@@ -59,7 +59,7 @@ var _ = Describe("create-buildpack command", func() {
 			testcmd.RunCLICommand("create-buildpack", []string{"my-buildpack", "file", "5"}, requirementsFactory, updateCommandDependency, false, ui)
 
 			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
-			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Failed to create local buildpack"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Failed to create a local temporary zip file for the buildpack"}))
 			Expect(ui.Outputs()).NotTo(ContainSubstrings([]string{"Creating buildpack"}))
 
 		})

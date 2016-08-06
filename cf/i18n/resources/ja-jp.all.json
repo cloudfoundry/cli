@@ -2060,12 +2060,12 @@
     "translation": "スペースを取り出せませんでした。\n{{.ErrorDescription}}"
   },
   {
-    "id": "Failed to create json for resource_match request",
-    "translation": "resource_match 要求の json を作成できませんでした"
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
   },
   {
-    "id": "Failed to create local buildpack",
-    "translation": ""
+    "id": "Failed to create json for resource_match request",
+    "translation": "resource_match 要求の json を作成できませんでした"
   },
   {
     "id": "Failed to create manifest, unable to parse environment variable: ",

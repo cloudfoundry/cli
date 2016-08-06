@@ -86,7 +86,7 @@ var _ = Describe("Updating buildpack command", func() {
 
 			Expect(runCommand(buildpackName, "-p", "file")).To(BeFalse())
 
-			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Failed to create local buildpack"}))
+			Expect(ui.Outputs()).To(ContainSubstrings([]string{"Failed to create a local temporary zip file for the buildpack"}))
 			Expect(ui.Outputs()).To(ContainSubstrings([]string{"FAILED"}))
 			Expect(bitsRepo.UploadBuildpackCallCount()).To(Equal(0))
 
