@@ -67,8 +67,8 @@ Known Issues
 * .cfignore used in `cf push` must be in UTF8 encoding for CLI to interpret correctly.
 * On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
 
-Filing Bugs
-===========
+Filing Issues
+=============
 
 First, update to the [latest cli](https://github.com/cloudfoundry/cli/releases)
 and try the command again.
@@ -86,13 +86,13 @@ Include the below information when creating the issue:
 * Your platform details (e.g. Mac OS X 10.11, Windows 8.1 64-bit, Ubuntu 14.04.3 64-bit)
 * The shell you used (e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator)
 
-##### For simple bugs (eg: text formatting, help messages, etc), please provide
+##### For simple issues (eg: text formatting, help messages, etc), please provide
 
 - the command you ran
 - what occurred
 - what you expected to occur
 
-##### For bugs related to HTTP requests or strange behavior, please run the command with env var `CF_TRACE=true` and provide
+##### For issues related to HTTP requests or strange behavior, please run the command with env var `CF_TRACE=true` and provide
 
 - the command you ran
 - the trace output
