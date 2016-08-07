@@ -71,11 +71,9 @@ Troubleshooting / FAQs
 
 Known Issues
 ------------
+* In Cygwin and Git Bash on Windows, interactive prompts (such as in `cf login`) do not work (see #171). Please use alternative commands (e.g. `cf api` and `cf auth` to `cf login`) or option `-f` to suppress the prompts.
 * .cfignore used in `cf push` must be in UTF8 encoding for CLI to interpret correctly.
-
-Linux
------
-* "bash: .cf: No such file or directory". Ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
+* On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
 
 Filing Bugs
 ===========
