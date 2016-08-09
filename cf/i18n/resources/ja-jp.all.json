@@ -5,15 +5,15 @@
   },
   {
     "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": "\n\nJSON ストリング構文が無効です。正しい構文は次のとおりです:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
+    "translation": "\n\nJSON ストリング構文が無効です。  正しい構文は次のとおりです:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": "\n\nJSON ストリング構文が無効です。正しい構文は次のとおりです:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
+    "translation": "\n\nJSON ストリング構文が無効です。  正しい構文は次のとおりです:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "\n* These service plans have an associated cost. Creating a service instance will incur this cost.",
-    "translation": "\n* これらのサービス・プランには関連コストが伴います。サービス・インスタンスを作成すると、このコストが発生します。"
+    "translation": "\n* これらのサービス・プランには関連コストが伴います。 サービス・インスタンスを作成すると、このコストが発生します。"
   },
   {
     "id": "\nApp started\n",
@@ -65,11 +65,11 @@
   },
   {
     "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME update-service -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
-    "translation": "   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n   CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。\n   このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME update-service -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }"
+    "translation": "   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n   CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。 \n   このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME update-service -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }"
   },
   {
     "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n   The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"permissions\": \"read-only\"\n   }",
-    "translation": "   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。\n   このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例:\n   {\n      \"permissions\": \"read-only\"\n   }"
+    "translation": "   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。 \n   このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例:\n   {\n      \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "   Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object.\n   The path to the parameters file can be an absolute or relative path to a file:\n\n   CF_NAME create-service SERVICE PLAN SERVICE_INSTANCE -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n      \"cluster_nodes\": {\n         \"count\": 5,\n         \"memory_mb\": 1024\n      }\n   }",
@@ -77,7 +77,7 @@
   },
   {
     "id": "   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest.",
-    "translation": "   path は zip ファイル、zip ファイルへの URL、またはローカル・ディレクトリーでなければなりません。position は正整数で、優先順位を設定するものであり、低いものから高いものへの順にソートされます。"
+    "translation": "   path は zip ファイル、zip ファイルへの URL、またはローカル・ディレクトリーでなければなりません。 position は正整数で、優先順位を設定するものであり、低いものから高いものへの順にソートされます。"
   },
   {
     "id": "   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.",
@@ -85,7 +85,7 @@
   },
   {
     "id": "   The provided path can be an absolute or relative path to a file.  The file should have\n   a single array with JSON objects inside describing the rules.  The JSON Base Object is \n   omitted and only the square brackets and associated child object are required in the file.  \n\n   Valid json file example:\n   [\n     {\n       \"protocol\": \"tcp\",\n       \"destination\": \"10.244.1.18\",\n       \"ports\": \"3306\"\n     }\n   ]",
-    "translation": "   提供されるパスはファイルへの絶対パスまたは相対パスとすることができます。このファイルは\n   内部にルールを記述する JSON オブジェクトを含む単一の配列を持つものでなければなりません。JSON 基本オブジェクトは\n   省略され、大括弧と関連子オブジェクトのみがファイル内で必要となります。\n\n   有効な json ファイルの例:\n   [\n     {\n       \"protocol\": \"tcp\",\n       \"destination\": \"10.244.1.18\",\n       \"ports\": \"3306\"\n     }\n   ]"
+    "translation": "   提供されるパスはファイルへの絶対パスまたは相対パスとすることができます。  このファイルは\n   内部にルールを記述する JSON オブジェクトを含む単一の配列を持つものでなければなりません。  JSON 基本オブジェクトは\n   省略され、大括弧と関連子オブジェクトのみがファイル内で必要となります。  \n\n   有効な json ファイルの例:\n   [\n     {\n       \"protocol\": \"tcp\",\n       \"destination\": \"10.244.1.18\",\n       \"ports\": \"3306\"\n     }\n   ]"
   },
   {
     "id": "   View allowable quotas with 'CF_NAME quotas'",
@@ -121,7 +121,7 @@
   },
   {
     "id": " is not responding. Please make sure it is a valid plugin repo.",
-    "translation": " は応答していません。有効なプラグイン・リポジトリーであるか確認してください。"
+    "translation": " は応答していません。 有効なプラグイン・リポジトリーであるか確認してください。"
   },
   {
     "id": " not found",
@@ -137,11 +137,11 @@
   },
   {
     "id": "' is not a registered command. See 'cf help'",
-    "translation": "' は登録済みコマンドではありません。'cf help' を参照してください"
+    "translation": "' は登録済みコマンドではありません。 'cf help' を参照してください"
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes' はリストである必要があります"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -245,7 +245,7 @@
   },
   {
     "id": "Alias `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
-    "translation": "別名 `{{.Command}}` はプラグイン '{{.PluginName}}' 内のコマンド/別名です。`{{.Command}}` コマンドを呼び出すために、プラグイン '{{.PluginName}}' のアンインストールを試みてから、このプラグインをインストールすることができます。ただし、その前に、既存の '{{.PluginName}}' プラグインをアンインストールした場合の影響を十分理解しておく必要があります。"
+    "translation": "別名 `{{.Command}}` はプラグイン '{{.PluginName}}' 内のコマンド/別名です。  `{{.Command}}` コマンドを呼び出すために、プラグイン '{{.PluginName}}' のアンインストールを試みてから、このプラグインをインストールすることができます。  ただし、その前に、既存の '{{.PluginName}}' プラグインをアンインストールした場合の影響を十分理解しておく必要があります。"
   },
   {
     "id": "Allow SSH access for the space",
@@ -297,15 +297,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "アプリケーション {{.AppName}} は、'routes' と 'domain'/'domains' の両方を使用して構成してはなりません"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "アプリケーション {{.AppName}} は、'routes' と 'host'/'hosts' の両方を使用して構成してはなりません"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "アプリケーション {{.AppName}} は、'routes' と 'no-hostname' の両方を使用して構成してはなりません"
   },
   {
     "id": "Apps:",
@@ -361,7 +361,7 @@
   },
   {
     "id": "Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
-    "translation": "注意: サービス `{{.ServiceName}}` のプラン `{{.PlanName}}` は無料ではありません。インスタンス `{{.ServiceInstanceName}}` はコストを発生させます。これが誤りであると思われる場合は、管理者にお問い合わせください。"
+    "translation": "注意: サービス `{{.ServiceName}}` のプラン `{{.PlanName}}` は無料ではありません。  インスタンス `{{.ServiceInstanceName}}` はコストを発生させます。  これが誤りであると思われる場合は、管理者にお問い合わせください。"
   },
   {
     "id": "Authenticate user non-interactively",
@@ -373,7 +373,7 @@
   },
   {
     "id": "Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a \u003cendpoint\u003e -u \u003cuser\u003e -o \u003corg\u003e -s \u003cspace\u003e` to log back in and re-authenticate.",
-    "translation": "認証の有効期限が切れました。ログインし直して再認証してください。\n\nヒント: ログインし直して再認証するには、`cf login -a \u003cendpoint\u003e -u \u003cuser\u003e -o \u003corg\u003e -s \u003cspace\u003e` を使用します。"
+    "translation": "認証の有効期限が切れました。  ログインし直して再認証してください。\n\nヒント: ログインし直して再認証するには、`cf login -a \u003cendpoint\u003e -u \u003cuser\u003e -o \u003corg\u003e -s \u003cspace\u003e` を使用します。"
   },
   {
     "id": "Authorization server did not redirect with one time code",
@@ -393,7 +393,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "セキュリティー・グループを特定のスペースや、組織の既存のすべてのスペースにバインドします"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -549,7 +549,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例\n   {\n     \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   オプションで、サービス固有の構成パラメーターを有効な JSON オブジェクト・インラインで提供します。\n  CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   オプションで、サービス固有の構成パラメーターを含むファイルを有効な JSON オブジェクトで提供します。 このパラメーター・ファイルへのパスはファイルへの絶対パスまたは相対パスとすることができます。\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   有効な JSON オブジェクトの例\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -569,7 +569,7 @@
   },
   {
     "id": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   By default 'CF_NAME curl' will perform a GET to the specified PATH. If data\n   is provided via -d, a POST will be performed instead, and the Content-Type\n   will be set to application/json. You may override headers with -H and the\n   request method with -X.\n\n   For API documentation, please visit http://apidocs.cloudfoundry.org.",
-    "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   デフォルトでは、'CF_NAME curl' は指定の PATH への GET を実行します。データが \n-d を使用して指定されている場合、代わりに POST が実行され、Content-Type が\n application/json に設定されます。-H を使用してヘッダーをオーバーライドでき、また\n  -X を使用して要求メソッドをオーバーライドできます。\n\n   API 資料については、http://apidocs.cloudfoundry.org にアクセスしてください"
+    "translation": "CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n   デフォルトでは、'CF_NAME curl' は指定の PATH への GET を実行します。 データが \n-d を使用して指定されている場合、代わりに POST が実行され、Content-Type が\n application/json に設定されます。 -H を使用してヘッダーをオーバーライドでき、また\n  -X を使用して要求メソッドをオーバーライドできます。\n\n   API 資料については、http://apidocs.cloudfoundry.org にアクセスしてください"
   },
   {
     "id": "CF_NAME delete APP_NAME [-f -r]",
@@ -1069,7 +1069,7 @@
   },
   {
     "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API バージョン {{.APIVer}} には CLI バージョン {{.CLIMin}} が必要です。現在のバージョンは {{.CLIVer}} です。CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
+    "translation": "Cloud Foundry API バージョン {{.APIVer}} には CLI バージョン {{.CLIMin}} が必要です。  現在のバージョンは {{.CLIVer}} です。 CLI をアップグレードするには次にアクセスしてください: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1085,15 +1085,15 @@
   },
   {
     "id": "Command `{{.Command}}` in the plugin being installed is a native CF command/alias.  Rename the `{{.Command}}` command in the plugin being installed in order to enable its installation and use.",
-    "translation": "インストールしようとしているプラグイン内のコマンド `{{.Command}}` はネイティブ CF コマンド/別名です。インストールしようとしているプラグインのインストールと使用を可能にするためには、そのプラグイン内の `{{.Command}}` コマンドを名前変更してください。"
+    "translation": "インストールしようとしているプラグイン内のコマンド `{{.Command}}` はネイティブ CF コマンド/別名です。  インストールしようとしているプラグインのインストールと使用を可能にするためには、そのプラグイン内の `{{.Command}}` コマンドを名前変更してください。"
   },
   {
     "id": "Command `{{.Command}}` is a command/alias in plugin '{{.PluginName}}'.  You could try uninstalling plugin '{{.PluginName}}' and then install this plugin in order to invoke the `{{.Command}}` command.  However, you should first fully understand the impact of uninstalling the existing '{{.PluginName}}' plugin.",
-    "translation": "コマンド `{{.Command}}` はプラグイン '{{.PluginName}}' 内のコマンド/別名です。`{{.Command}}` コマンドを呼び出すために、プラグイン '{{.PluginName}}' のアンインストールを試みてから、このプラグインをインストールすることができます。ただし、その前に、既存の '{{.PluginName}}' プラグインをアンインストールした場合の影響を十分理解しておく必要があります。"
+    "translation": "コマンド `{{.Command}}` はプラグイン '{{.PluginName}}' 内のコマンド/別名です。  `{{.Command}}` コマンドを呼び出すために、プラグイン '{{.PluginName}}' のアンインストールを試みてから、このプラグインをインストールすることができます。  ただし、その前に、既存の '{{.PluginName}}' プラグインをアンインストールした場合の影響を十分理解しておく必要があります。"
   },
   {
     "id": "Command to run. This flag can be defined more than once.",
-    "translation": "実行するコマンド。このフラグは何度でも定義できます。"
+    "translation": "実行するコマンド。 このフラグは何度でも定義できます。"
   },
   {
     "id": "Compute and show the sha1 value of the plugin binary file",
@@ -1113,7 +1113,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "あるアプリケーションから他のアプリケーションにアプリ・ソース・コードをコピーします。オーバーライドされない限り、copy-source コマンドはそのアプリケーションを再始動します。"
+    "translation": "アプリケーションのソース・コードを、別の既存のアプリケーションにコピーします。(そして、そのアプリケーションを再始動します)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1141,7 +1141,7 @@
   },
   {
     "id": "Could not find locale '{{.UnsupportedLocale}}'. The known locales are:\n",
-    "translation": "ロケール '{{.UnsupportedLocale}}' が見つかりませんでした。既知のロケール:\n"
+    "translation": "ロケール '{{.UnsupportedLocale}}' が見つかりませんでした。 既知のロケール:\n"
   },
   {
     "id": "Could not find plan with name {{.ServicePlanName}}",
@@ -1161,7 +1161,7 @@
   },
   {
     "id": "Could not serialize updates.",
-    "translation": "更新を直列化できませんでした。 "
+    "translation": "更新を直列化できませんでした。"
   },
   {
     "id": "Could not target org.\n{{.APIErr}}",
@@ -1257,7 +1257,7 @@
   },
   {
     "id": "Creating an app manifest from current settings of app ",
-    "translation": "アプリの現在の設定からアプリ・マニフェストを作成しています"
+    "translation": "アプリの現在の設定からアプリ・マニフェストを作成しています "
   },
   {
     "id": "Creating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1353,7 +1353,7 @@
   },
   {
     "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
-    "translation": "名前 (例: my-buildpack) または Git URL (例: 'https://github.com/cloudfoundry/java-buildpack.git') またはブランチまたはタグ付きの Git URL (例:  'v3.3.0' タグの場合は 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0') によるカスタム・ビルドパック。組み込みビルドパックのみを使用するには、'default' または 'null' を指定します"
+    "translation": "名前 (例: my-buildpack) または Git URL (例: 'https://github.com/cloudfoundry/java-buildpack.git') またはブランチまたはタグ付きの Git URL (例:  'v3.3.0' タグの場合は 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0') によるカスタム・ビルドパック。 組み込みビルドパックのみを使用するには、'default' または 'null' を指定します"
   },
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
@@ -1813,7 +1813,7 @@
   },
   {
     "id": "Error getting SSH code: ",
-    "translation": "SSH コードの取得時にエラーが発生しました:"
+    "translation": "SSH コードの取得時にエラーが発生しました: "
   },
   {
     "id": "Error getting SSH info:",
@@ -1909,7 +1909,7 @@
   },
   {
     "id": "Error requesting from",
-    "translation": "次のものから要求があったときエラーが発生しました: "
+    "translation": "次のものから要求があったときエラーが発生しました:"
   },
   {
     "id": "Error requesting one time code from server: {{.Error}}",
@@ -1925,7 +1925,7 @@
   },
   {
     "id": "Error retrieving stack: ",
-    "translation": "スタックの取得時にエラーが発生しました:"
+    "translation": "スタックの取得時にエラーが発生しました: "
   },
   {
     "id": "Error retrieving stacks: {{.Error}}",
@@ -1961,7 +1961,7 @@
   },
   {
     "id": "Error {{.ErrorDescription}} is being passed in as the argument for 'Position' but 'Position' requires an integer.  For more syntax help, see `cf create-buildpack -h`.",
-    "translation": "エラー {{.ErrorDescription}} が 'Position' の引数として渡されようとしていますが、'Position' は整数を必要としています。さらなる構文ヘルプについては、`cf create-buildpack -h` を参照してください。"
+    "translation": "エラー {{.ErrorDescription}} が 'Position' の引数として渡されようとしていますが、'Position' は整数を必要としています。  さらなる構文ヘルプについては、`cf create-buildpack -h` を参照してください。"
   },
   {
     "id": "Error: ",
@@ -2028,8 +2028,8 @@
     "translation": "ビルドパックを取り出せませんでした。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "組織 {{.OrgName}} のドメインを取り出せませんでした。\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "組織 %s のドメインを取り出せませんでした。\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2401,195 +2401,195 @@
   },
   {
     "id": "Incorrect Usage. An argument is missing or not correctly enclosed.\n\n",
-    "translation": "誤った使用法。欠落している引数または正しく囲まれていない引数があります。\n\n"
+    "translation": "誤った使用法。 欠落している引数または正しく囲まれていない引数があります。\n\n"
   },
   {
     "id": "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.",
-    "translation": "誤った使用法。コマンド・ライン・フラグ (-f 以外) は、マニフェスト・ファイルから複数のアプリをプッシュするときは適用されません。"
+    "translation": "誤った使用法。 コマンド・ライン・フラグ (-f 以外) は、マニフェスト・ファイルから複数のアプリをプッシュするときは適用されません。"
   },
   {
     "id": "Incorrect Usage. HEALTH_CHECK_TYPE must be \"port\" or \"none\"\\n\\n",
-    "translation": "誤った使用法。HEALTH_CHECK_TYPE は \"port\" または \"none\" でなければなりません\\n\\n"
+    "translation": "誤った使用法。 HEALTH_CHECK_TYPE は \"port\" または \"none\" でなければなりません\\n\\n"
   },
   {
     "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
-    "translation": "誤った使用法。引数として 'app-name env-name env-value' が必要です\n\n"
+    "translation": "誤った使用法。 引数として 'app-name env-name env-value' が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires 'app-name env-name' as arguments\n\n",
-    "translation": "誤った使用法。引数として 'app-name env-name' が必要です\n\n"
+    "translation": "誤った使用法。 引数として 'app-name env-name' が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires 'username password' as arguments\n\n",
-    "translation": "誤った使用法。引数として 'username password' が必要です\n\n"
+    "translation": "誤った使用法。 引数として 'username password' が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n",
-    "translation": "誤った使用法。引数として APP SERVICE_INSTANCE が必要です\n\n"
+    "translation": "誤った使用法。 引数として APP SERVICE_INSTANCE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
-    "translation": "誤った使用法。引数として APP_NAME と DOMAIN が必要です\n\n"
+    "translation": "誤った使用法。 引数として APP_NAME と DOMAIN が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n",
-    "translation": "誤った使用法。引数として APP_NAME と HEALTH_CHECK_TYPE が必要です\n\n"
+    "translation": "誤った使用法。 引数として APP_NAME と HEALTH_CHECK_TYPE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
-    "translation": "誤った使用法。引数として APP_NAME と SERVICE_INSTANCE が必要です\n\n"
+    "translation": "誤った使用法。 引数として APP_NAME と SERVICE_INSTANCE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME as argument",
-    "translation": "誤った使用法。引数として APP_NAME が必要です"
+    "translation": "誤った使用法。 引数として APP_NAME が必要です"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME as argument\n\n",
-    "translation": "誤った使用法。引数として APP_NAME が必要です\n\n"
+    "translation": "誤った使用法。 引数として APP_NAME が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
-    "translation": "誤った使用法。引数として BUILDPACK_NAME、NEW_BUILDPACK_NAME が必要です\n\n"
+    "translation": "誤った使用法。 引数として BUILDPACK_NAME、NEW_BUILDPACK_NAME が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
-    "translation": "誤った使用法。引数として DOMAIN と SERVICE_INSTANCE が必要です\n\n"
+    "translation": "誤った使用法。 引数として DOMAIN と SERVICE_INSTANCE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
-    "translation": "誤った使用法。引数として DOMAIN が必要です\n\n"
+    "translation": "誤った使用法。 引数として DOMAIN が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
-    "translation": "誤った使用法。引数として LABEL、PROVIDER、および TOKEN が必要です\n\n"
+    "translation": "誤った使用法。 引数として LABEL、PROVIDER、および TOKEN が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n",
-    "translation": "誤った使用法。引数として LABEL、PROVIDER が必要です\n\n"
+    "translation": "誤った使用法。 引数として LABEL、PROVIDER が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
-    "translation": "誤った使用法。引数として ORG と DOMAIN が必要です\n\n"
+    "translation": "誤った使用法。 引数として ORG と DOMAIN が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n",
-    "translation": "誤った使用法。引数として ORG と DOMAIN が必要です\n\n"
+    "translation": "誤った使用法。 引数として ORG と DOMAIN が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n",
-    "translation": "誤った使用法。引数として ORG_NAME、QUOTA が必要です\n\n"
+    "translation": "誤った使用法。 引数として ORG_NAME、QUOTA が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
-    "translation": "誤った使用法。引数として REPO_NAME と URL が必要です\n\n"
+    "translation": "誤った使用法。 引数として REPO_NAME と URL が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "誤った使用法。 引数として SECURITY_GROUP と ORG が必要です。オプションで SPACE を指定できます\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
-    "translation": "誤った使用法。引数として SECURITY_GROUP と PATH_TO_JSON_RULES_FILE が必要です\n\n"
+    "translation": "誤った使用法。 引数として SECURITY_GROUP と PATH_TO_JSON_RULES_FILE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n",
-    "translation": "誤った使用法。引数として SECURITY_GROUP、ORG、および SPACE が必要です\n\n"
+    "translation": "誤った使用法。 引数として SECURITY_GROUP、ORG、および SPACE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n",
-    "translation": "誤った使用法。引数として SERVICE_BROKER、NEW_SERVICE_BROKER が必要です\n\n"
+    "translation": "誤った使用法。 引数として SERVICE_BROKER、NEW_SERVICE_BROKER が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n",
-    "translation": "誤った使用法。引数として SERVICE_BROKER、USERNAME、PASSWORD、URL が必要です\n\n"
+    "translation": "誤った使用法。 引数として SERVICE_BROKER、USERNAME、PASSWORD、URL が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n",
-    "translation": "誤った使用法。引数として SERVICE_INSTANCE SERVICE_KEY が必要です\n\n"
+    "translation": "誤った使用法。 引数として SERVICE_INSTANCE SERVICE_KEY が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
-    "translation": "誤った使用法。引数として SERVICE_INSTANCE と NEW_SERVICE_INSTANCE が必要です\n\n"
+    "translation": "誤った使用法。 引数として SERVICE_INSTANCE と NEW_SERVICE_INSTANCE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
-    "translation": "誤った使用法。引数として SERVICE_INSTANCE と SERVICE_KEY が必要です\n\n"
+    "translation": "誤った使用法。 引数として SERVICE_INSTANCE と SERVICE_KEY が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
-    "translation": "誤った使用法。引数として SPACE と DOMAIN が必要です\n\n"
+    "translation": "誤った使用法。 引数として SPACE と DOMAIN が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n",
-    "translation": "誤った使用法。引数として SPACE と QUOTA が必要です\n\n"
+    "translation": "誤った使用法。 引数として SPACE と QUOTA が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n",
-    "translation": "誤った使用法。引数として SPACE-NAME と SPACE-QUOTA-NAME が必要です\n\n"
+    "translation": "誤った使用法。 引数として SPACE-NAME と SPACE-QUOTA-NAME が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
-    "translation": "誤った使用法。引数として SPACE_NAME NEW_SPACE_NAME が必要です\n\n"
+    "translation": "誤った使用法。 引数として SPACE_NAME NEW_SPACE_NAME が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE_NAME as argument\n\n",
-    "translation": "誤った使用法。引数として SPACE_NAME が必要です\n\n"
+    "translation": "誤った使用法。 引数として SPACE_NAME が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n",
-    "translation": "誤った使用法。引数として USERNAME、ORG、ROLE が必要です\n\n"
+    "translation": "誤った使用法。 引数として USERNAME、ORG、ROLE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
-    "translation": "誤った使用法。引数として USERNAME、ORG、SPACE、ROLE が必要です\n\n"
+    "translation": "誤った使用法。 引数として USERNAME、ORG、SPACE、ROLE が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
-    "translation": "誤った使用法。1 個の引数が必要です\n\n"
+    "translation": "誤った使用法。 1 個の引数が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
-    "translation": "誤った使用法。引数として app_name、domain_name が必要です\n\n"
+    "translation": "誤った使用法。 引数として app_name、domain_name が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires arguments\n\n",
-    "translation": "誤った使用法。いくつかの引数が必要です\n\n"
+    "translation": "誤った使用法。 いくつかの引数が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n",
-    "translation": "誤った使用法。引数として buildpack_name、path、および position が必要です\n\n"
+    "translation": "誤った使用法。 引数として buildpack_name、path、および position が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires host and domain as arguments\n\n",
-    "translation": "誤った使用法。引数としてホストとドメインが必要です\n\n"
+    "translation": "誤った使用法。 引数としてホストとドメインが必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires old app name and new app name as arguments\n\n",
-    "translation": "誤った使用法。引数として古いアプリ名と新しいアプリ名が必要です\n\n"
+    "translation": "誤った使用法。 引数として古いアプリ名と新しいアプリ名が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires old org name, new org name as arguments\n\n",
-    "translation": "誤った使用法。引数として古い組織名、新しい組織名が必要です\n\n"
+    "translation": "誤った使用法。 引数として古い組織名、新しい組織名が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires org_name, domain_name as arguments\n\n",
-    "translation": "誤った使用法。引数として org_name、domain_name が必要です\n\n"
+    "translation": "誤った使用法。 引数として org_name、domain_name が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
-    "translation": "誤った使用法。引数としてサービス、サービス・プラン、サービス・インスタンスが必要です\n\n"
+    "translation": "誤った使用法。 引数としてサービス、サービス・プラン、サービス・インスタンスが必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires stack name as argument\n\n",
-    "translation": "誤った使用法。引数としてスタック名が必要です\n\n"
+    "translation": "誤った使用法。 引数としてスタック名が必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
-    "translation": "誤った使用法。引数として v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN 必要です\n\n"
+    "translation": "誤った使用法。 引数として v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN 必要です\n\n"
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",
-    "translation": "誤った使用法。{{.Arguments}} が必要"
+    "translation": "誤った使用法。 {{.Arguments}} が必要"
   },
   {
     "id": "Incorrect Usage:",
@@ -2637,7 +2637,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "無効なアプリケーション構成"
   },
   {
     "id": "Invalid async response from server",
@@ -2649,7 +2649,7 @@
   },
   {
     "id": "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
-    "translation": "-c フラグに指定された無効な構成。有効な JSON オブジェクトまたは有効な JSON オブジェクトを含むファイルへのパスを指定してください。"
+    "translation": "-c フラグに指定された無効な構成。 有効な JSON オブジェクトまたは有効な JSON オブジェクトを含むファイルへのパスを指定してください。"
   },
   {
     "id": "Invalid data from '{{.repoName}}' - plugin data does not exist",
@@ -2689,7 +2689,7 @@
   },
   {
     "id": "Invalid manifest. Expected a map",
-    "translation": "無効なマニフェスト。マップを予期していました"
+    "translation": "無効なマニフェスト。 マップを予期していました"
   },
   {
     "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
@@ -2705,7 +2705,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "経路 {{.RouteName}} の無効なポート"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -2833,7 +2833,7 @@
   },
   {
     "id": "Local port forward specification. This flag can be defined more than once.",
-    "translation": "ローカル・ポート転送指定。このフラグは何度でも定義できます。"
+    "translation": "ローカル・ポート転送指定。 このフラグは何度でも定義できます。"
   },
   {
     "id": "Lock the buildpack to prevent updates",
@@ -2917,11 +2917,11 @@
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
-    "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)。-1 は量に制限がないことを表します。"
+    "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)。 -1 は量に制限がないことを表します。"
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)。-1 は量に制限がないことを表します。(デフォルト: 制限なし)"
+    "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)。 -1 は量に制限がないことを表します。 (デフォルト: 制限なし)"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
@@ -2989,11 +2989,11 @@
   },
   {
     "id": "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint.",
-    "translation": "API エンドポイントが設定されていません。'{{.LoginTip}}' または '{{.APITip}}' を使用して 1 つのエンドポイントをターゲットにしてください。"
+    "translation": "API エンドポイントが設定されていません。 '{{.LoginTip}}' または '{{.APITip}}' を使用して 1 つのエンドポイントをターゲットにしてください。"
   },
   {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
-    "translation": "API エンドポイントが設定されていません。'{{.Name}}' を使用して 1 つのエンドポイントを設定してください"
+    "translation": "API エンドポイントが設定されていません。 '{{.Name}}' を使用して 1 つのエンドポイントを設定してください"
   },
   {
     "id": "No app files found in '{{.Path}}'",
@@ -3025,7 +3025,7 @@
   },
   {
     "id": "No flags specified. No changes were made.",
-    "translation": "フラグが指定されていません。変更は行われませんでした。"
+    "translation": "フラグが指定されていません。 変更は行われませんでした。"
   },
   {
     "id": "No org and space targeted, use '{{.Command}}' to target an org and space",
@@ -3121,7 +3121,7 @@
   },
   {
     "id": "Not logged in. Use '{{.CFLoginCommand}}' to log in.",
-    "translation": "ログインしていません。'{{.CFLoginCommand}}' を使用してログインしてください。"
+    "translation": "ログインしていません。 '{{.CFLoginCommand}}' を使用してログインしてください。"
   },
   {
     "id": "Note: this may take some time",
@@ -3229,7 +3229,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "HTTP 経路のパス"
   },
   {
     "id": "Path for the HTTP route",
@@ -3241,7 +3241,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "パスは TCP 経路 {{.RouteName}} で許可されません"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3285,7 +3285,7 @@
   },
   {
     "id": "Please choose either allow or disallow. Both flags are not permitted to be passed in the same command.",
-    "translation": "allow または disallow のいずれかを選んでください。両方のフラグを同じコマンドで渡すことはできません。"
+    "translation": "allow または disallow のいずれかを選んでください。 両方のフラグを同じコマンドで渡すことはできません。"
   },
   {
     "id": "Please log in again",
@@ -3333,7 +3333,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "ポートは HTTP 経路 {{.RouteName}} で許可されません"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -3357,11 +3357,11 @@
   },
   {
     "id": "Process terminated by signal: %s. Exited with",
-    "translation": "このプロセスは次のシグナルによって終了しました: %s。次のもので終了しました:"
+    "translation": "このプロセスは次のシグナルによって終了しました: %s。 次のもので終了しました:"
   },
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
-    "translation": "プロパティー '{{.PropertyName}}' がマニフェストで見つかりました。このフィーチャーはサポートされなくなりました。これを削除して、やり直してください。"
+    "translation": "プロパティー '{{.PropertyName}}' がマニフェストで見つかりました。 このフィーチャーはサポートされなくなりました。 これを削除して、やり直してください。"
   },
   {
     "id": "Provider",
@@ -3621,27 +3621,27 @@
   },
   {
     "id": "Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.",
-    "translation": "指定されたアプリの GUID を取得して表示します。このアプリの他の正常性および状況出力はすべて抑制されます。"
+    "translation": "指定されたアプリの GUID を取得して表示します。  このアプリの他の正常性および状況出力はすべて抑制されます。"
   },
   {
     "id": "Retrieve and display the given org's guid.  All other output for the org is suppressed.",
-    "translation": "指定された組織の GUID を取得して表示します。この組織の他の出力はすべて抑制されます。"
+    "translation": "指定された組織の GUID を取得して表示します。  この組織の他の出力はすべて抑制されます。"
   },
   {
     "id": "Retrieve and display the given service's guid.  All other output for the service is suppressed.",
-    "translation": "指定されたサービスの GUID を取得して表示します。このサービスの他の出力はすべて抑制されます。"
+    "translation": "指定されたサービスの GUID を取得して表示します。  このサービスの他の出力はすべて抑制されます。"
   },
   {
     "id": "Retrieve and display the given service-key's guid.  All other output for the service is suppressed.",
-    "translation": "指定されたサービス・キーの GUID を取得して表示します。このサービスの他の出力はすべて抑制されます。"
+    "translation": "指定されたサービス・キーの GUID を取得して表示します。  このサービスの他の出力はすべて抑制されます。"
   },
   {
     "id": "Retrieve and display the given space's guid.  All other output for the space is suppressed.",
-    "translation": "指定されたスペースの GUID を取得して表示します。このスペースの他の出力はすべて抑制されます。"
+    "translation": "指定されたスペースの GUID を取得して表示します。  このスペースの他の出力はすべて抑制されます。"
   },
   {
     "id": "Retrieve and display the given stack's guid. All other output for the stack is suppressed.",
-    "translation": "指定されたスタックの GUID を取得して表示します。このスタックの他の出力はすべて抑制されます。"
+    "translation": "指定されたスタックの GUID を取得して表示します。 このスタックの他の出力はすべて抑制されます。"
   },
   {
     "id": "Retrieve list of feature flags with status of each flag-able feature",
@@ -3801,7 +3801,7 @@
   },
   {
     "id": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command.",
-    "translation": "サーバー・エラー、状況コード: 403: アクセスは拒否されました。このコマンドを実行する特権がありません。"
+    "translation": "サーバー・エラー、状況コード: 403: アクセスは拒否されました。  このコマンドを実行する特権がありません。"
   },
   {
     "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
@@ -3865,7 +3865,7 @@
   },
   {
     "id": "Set default locale. If LOCALE is 'CLEAR', previous locale is deleted.",
-    "translation": "デフォルト・ロケールを設定します。LOCALE が 'CLEAR' の場合は、前のロケールが削除されます。"
+    "translation": "デフォルト・ロケールを設定します。 LOCALE が 'CLEAR' の場合は、前のロケールが削除されます。"
   },
   {
     "id": "Set health_check_type flag to either 'port' or 'none'",
@@ -3985,7 +3985,7 @@
   },
   {
     "id": "Skip verification of the API endpoint. Not recommended!",
-    "translation": "API エンドポイントの検証をスキップします。推奨されません。"
+    "translation": "API エンドポイントの検証をスキップします。 推奨されません。"
   },
   {
     "id": "Space",
@@ -4013,7 +4013,7 @@
   },
   {
     "id": "Specify a path for file creation. If path not specified, manifest file is created in current working directory.",
-    "translation": "ファイル作成のパスを指定します。パスが指定されないと、マニフェスト・ファイルは現行作業ディレクトリーに作成されます。"
+    "translation": "ファイル作成のパスを指定します。 パスが指定されないと、マニフェスト・ファイルは現行作業ディレクトリーに作成されます。"
   },
   {
     "id": "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)",
@@ -4029,7 +4029,7 @@
   },
   {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.",
-    "translation": "アプリ開始タイムアウト\n\nヒント: アプリケーションは正しいポートで listen していなければなりません。このポートをハードコーディングしないで、$PORT 環境変数を使用してください。"
+    "translation": "アプリ開始タイムアウト\n\nヒント: アプリケーションは正しいポートで listen していなければなりません。 このポートをハードコーディングしないで、$PORT 環境変数を使用してください。"
   },
   {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
@@ -4085,7 +4085,7 @@
   },
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
-    "translation": "ヒント: ファイアウォールで保護されていて、HTTP プロキシーが必要な場合は、https_proxy 環境変数が正しく設定されているかを確認してください。それ以外の場合は、ネットワーク接続を確認してください。"
+    "translation": "ヒント: ファイアウォールで保護されていて、HTTP プロキシーが必要な場合は、https_proxy 環境変数が正しく設定されているかを確認してください。 それ以外の場合は、ネットワーク接続を確認してください。"
   },
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
@@ -4145,7 +4145,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "経路 {{.RouteName}} は既存のどのドメインとも一致しませんでした。"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4177,7 +4177,7 @@
   },
   {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
-    "translation": "このコマンドには Routing API が必要です。ターゲットのエンドポイントから有効になっていないと報告がありました。"
+    "translation": "このコマンドには Routing API が必要です。 ターゲットのエンドポイントから有効になっていないと報告がありました。"
   },
   {
     "id": "This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain {{.DomainName}}? ",
@@ -4193,7 +4193,7 @@
   },
   {
     "id": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?",
-    "translation": "このため、このアプリは再始動されます。{{.AppName}} をスケーリングしますか?"
+    "translation": "このため、このアプリは再始動されます。 {{.AppName}} をスケーリングしますか?"
   },
   {
     "id": "Timeout for async HTTP requests",
@@ -4217,11 +4217,11 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount.",
-    "translation": "アプリケーション・インスタンスの合計数-1 は量に制限がないことを表します。"
+    "translation": "アプリケーション・インスタンスの合計数 -1 は量に制限がないことを表します。"
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": "アプリケーション・インスタンスの合計数-1 は量に制限がないことを表します。(デフォルト: 制限なし)"
+    "translation": "アプリケーション・インスタンスの合計数 -1 は量に制限がないことを表します。 (デフォルト: 制限なし)"
   },
   {
     "id": "Total number of routes",
@@ -4249,7 +4249,7 @@
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": "バインド済み経路の要求の転送先 URL。この URL のスキームは https でなければなりません"
+    "translation": "バインド済み経路の要求の転送先 URL。 この URL のスキームは https でなければなりません"
   },
   {
     "id": "USAGE:",
@@ -4281,7 +4281,7 @@
   },
   {
     "id": "Unable to determine CC API Version. Please log in again.",
-    "translation": "CC API のバージョンを判別できません。ログインし直してください"
+    "translation": "CC API のバージョンを判別できません。 ログインし直してください"
   },
   {
     "id": "Unable to obtain plugin name for executable {{.Executable}}",
@@ -4329,7 +4329,7 @@
   },
   {
     "id": "Unbinding may leave apps mapped to route {{.URL}} vulnerable; e.g. if service instance {{.ServiceInstanceName}} provides authentication. Do you want to proceed?",
-    "translation": "アンバインディングにより、経路 {{.URL}} にマップされているアプリが脆弱なままになります (例えば、サービス・インスタンス {{.ServiceInstanceName}} が認証を提供している場合など)。続行しますか?"
+    "translation": "アンバインディングにより、経路 {{.URL}} にマップされているアプリが脆弱なままになります (例えば、サービス・インスタンス {{.ServiceInstanceName}} が認証を提供している場合など)。 続行しますか?"
   },
   {
     "id": "Unbinding route {{.URL}} from service instance {{.ServiceInstanceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -4525,11 +4525,11 @@
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください。"
+    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。 サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください。"
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください。"
+    "translation": "インラインまたはファイルのいずれかで提供されるサービス固有の構成パラメーターを含む有効な JSON オブジェクト。 サポートされている構成パラメーターのリストについては、当該サービス・オファリングの資料を参照してください。"
   },
   {
     "id": "Value for flag 'app-instance-index' cannot be negative",
@@ -4557,15 +4557,15 @@
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
-    "translation": "警告: この操作では、このサービス・インスタンスを担当しているサービス・ブローカーがもはや有効でないか、または 200 あるいは 410 で応答していないこと、そしてそのサービス・インスタンスが削除された結果、孤立レコードが Cloud Foundry のデータベースに放置されていることを前提としています。削除されたサービス・インスタンスに関する情報 (サービス・バインディングやサービス・キーなど) はすべて Cloud Foundry から除去されます。"
+    "translation": "警告: この操作では、このサービス・インスタンスを担当しているサービス・ブローカーがもはや有効でないか、または 200 あるいは 410 で応答していないこと、そしてそのサービス・インスタンスが削除された結果、孤立レコードが Cloud Foundry のデータベースに放置されていることを前提としています。 削除されたサービス・インスタンスに関する情報 (サービス・バインディングやサービス・キーなど) はすべて Cloud Foundry から除去されます。"
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
-    "translation": "警告: この操作では、このサービス・オファリングを担当しているサービス・ブローカーがもはや有効でないこと、そしてすべてのサービス・インスタンスが削除された結果、孤立レコードが Cloud Foundry のデータベースに放置されていることを前提としています。削除されたサービスに関する情報 (サービス・インスタンスやサービス・バインディングなど) はすべて Cloud Foundry から除去されます。サービス・ブローカーへのアクセスは試みられないので、サービス・ブローカーを破棄しないでこのコマンドを実行すると孤立したサービス・インスタンスが発生します。そのため、このコマンドを実行した後、delete-service-auth-token または delete-service-broker のいずれかを実行してクリーンアップを完了することをお勧めします。"
+    "translation": "警告: この操作では、このサービス・オファリングを担当しているサービス・ブローカーがもはや有効でないこと、そしてすべてのサービス・インスタンスが削除された結果、孤立レコードが Cloud Foundry のデータベースに放置されていることを前提としています。 削除されたサービスに関する情報 (サービス・インスタンスやサービス・バインディングなど) はすべて Cloud Foundry から除去されます。 サービス・ブローカーへのアクセスは試みられないので、サービス・ブローカーを破棄しないでこのコマンドを実行すると孤立したサービス・インスタンスが発生します。 そのため、このコマンドを実行した後、delete-service-auth-token または delete-service-broker のいずれかを実行してクリーンアップを完了することをお勧めします。"
   },
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
-    "translation": "警告: この操作は Cloud Foundry 内部で行われるものなので、サービス・ブローカーがこの操作に関与することはなく、サービス・インスタンスのリソースは変更されません。この操作の基本ユースケースは、サービス・インスタンスを v1 プランから v2 プランに再マップして、v1 Service Broker API を実装するサービス・ブローカーを、v2 API を実装するブローカーで置き換えることです。余分なインスタンスが作成されないようにするため、v1 プランをプライベートに設定するか、または v1 ブローカーをシャットダウンすることをお勧めします。サービス・インスタンスがマイグレーションされたならば、v1 サービスおよびプランを Cloud Foundry から削除することができます。"
+    "translation": "警告: この操作は Cloud Foundry 内部で行われるものなので、サービス・ブローカーがこの操作に関与することはなく、サービス・インスタンスのリソースは変更されません。 この操作の基本ユースケースは、サービス・インスタンスを v1 プランから v2 プランに再マップして、v1 Service Broker API を実装するサービス・ブローカーを、v2 API を実装するブローカーで置き換えることです。  余分なインスタンスが作成されないようにするため、v1 プランをプライベートに設定するか、または v1 ブローカーをシャットダウンすることをお勧めします。 サービス・インスタンスがマイグレーションされたならば、v1 サービスおよびプランを Cloud Foundry から削除することができます。"
   },
   {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
@@ -4729,7 +4729,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "'routes' 内の各経路には、'route' プロパティーがなければなりません"
   },
   {
     "id": "enabled",
@@ -5029,11 +5029,11 @@
   },
   {
     "id": "ssh support is not disabled for ",
-    "translation": "次のものに対して SSH サポートは無効になっていません:"
+    "translation": "次のものに対して SSH サポートは無効になっていません: "
   },
   {
     "id": "ssh support is not enabled for ",
-    "translation": "次のものに対して SSH サポートは有効になっていません:"
+    "translation": "次のものに対して SSH サポートは有効になっていません: "
   },
   {
     "id": "stack:",
@@ -5161,11 +5161,11 @@
   },
   {
     "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
-    "translation": "{{.Feature}} が動作するのは、CF API バージョン {{.MaximumVersion}} までのみです。ターゲットは {{.APIVersion}} です。"
+    "translation": "{{.Feature}} が動作するのは、CF API バージョン {{.MaximumVersion}} までのみです。 ターゲットは {{.APIVersion}} です。"
   },
   {
     "id": "{{.Feature}} requires CF API version {{.RequiredVersion}}+. Your target is {{.APIVersion}}.",
-    "translation": "{{.Feature}} には CF API バージョン {{.RequiredVersion}}+ が必要です。ターゲットは {{.APIVersion}} です。"
+    "translation": "{{.Feature}} には CF API バージョン {{.RequiredVersion}}+ が必要です。 ターゲットは {{.APIVersion}} です。"
   },
   {
     "id": "{{.FlappingCount}} failing",
@@ -5241,7 +5241,7 @@
   },
   {
     "id": "{{.State}} in progress. Use '{{.ServicesCommand}}' or '{{.ServiceCommand}}' to check operation status.",
-    "translation": "{{.State}} は進行中です。操作状況を確認するには '{{.ServicesCommand}}' または '{{.ServiceCommand}}' を使用します。"
+    "translation": "{{.State}} は進行中です。 操作状況を確認するには '{{.ServicesCommand}}' または '{{.ServiceCommand}}' を使用します。"
   },
   {
     "id": "{{.URL}} is not a valid url, please provide a url, e.g. https://your_repo.com",
