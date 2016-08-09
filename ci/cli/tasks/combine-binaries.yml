@@ -29,6 +29,7 @@ run:
 
     pushd signed
       mv * $cwd/combined
+      chmod 0755 $cwd/combined/cf-cli_win*
     popd
 
     pushd osx-compiled
