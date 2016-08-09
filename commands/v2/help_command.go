@@ -12,7 +12,7 @@ import (
 type HelpCommand struct {
 	UI           UI
 	OptionalArgs flags.CommandName `positional-args:"yes"`
-	usage        interface{}       `usage:"cf help [COMMAND]"`
+	usage        interface{}       `usage:"CF_NAME help [COMMAND]"`
 }
 
 func (cmd *HelpCommand) Setup() error {
@@ -35,10 +35,11 @@ type CommandFlags struct {
 }
 
 func GetCommandInfo(commandName string) (CommandInfo, error) {
+	sanitizedCmdName := strings.ToLower(commandName)
 	field, found := reflect.TypeOf(Commands).FieldByNameFunc(
 		func(fieldName string) bool {
 			field, _ := reflect.TypeOf(Commands).FieldByName(fieldName)
-			return field.Tag.Get("command") == strings.ToLower(commandName)
+			return field.Tag.Get("command") == sanitizedCmdName || field.Tag.Get("alias") == sanitizedCmdName
 		},
 	)
 
@@ -63,7 +64,8 @@ func GetCommandInfo(commandName string) (CommandInfo, error) {
 		}
 
 		if fieldTag.Get("usage") != "" {
-			cmd.Usage = fieldTag.Get("usage")
+			executableName := "cf" //TODO: Figure out how to dynamically get this name
+			cmd.Usage = strings.Replace(fieldTag.Get("usage"), "CF_NAME", executableName, -1)
 			continue
 		}
 

@@ -27,7 +27,7 @@ func parse(args []string) {
 
 	if flagErr, ok := err.(*flags.Error); ok {
 		switch flagErr.Type {
-		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrRequired:
+		case flags.ErrHelp, flags.ErrUnknownFlag:
 			field, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
 				func(fieldName string) bool {
 					field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
@@ -48,6 +48,9 @@ func parse(args []string) {
 			default:
 				parse(extraArgs[1:])
 			}
+		case flags.ErrRequired:
+			fmt.Printf("%s\n\n", flagErr.Error())
+			parse(append([]string{"help"}, args...))
 		case flags.ErrUnknownCommand:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 		default:

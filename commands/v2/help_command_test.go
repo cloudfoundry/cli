@@ -25,7 +25,7 @@ var _ = Describe("Help Command", func() {
 		}
 	})
 
-	Context("providing help for a command", func() {
+	Context("providing help for a specific command", func() {
 		BeforeEach(func() {
 			cmd.OptionalArgs = flags.CommandName{
 				CommandName: "heLp", //Help cased incorrectly on purpose
@@ -37,7 +37,7 @@ var _ = Describe("Help Command", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeUI.Out).To(Say("NAME:"))
-			Expect(fakeUI.Out).To(Say("\thelp - Show help"))
+			Expect(fakeUI.Out).To(Say("    help - Show help"))
 		})
 
 		It("displays the usage for help", func() {
@@ -46,7 +46,7 @@ var _ = Describe("Help Command", func() {
 
 			Expect(fakeUI.Out).To(Say("NAME:"))
 			Expect(fakeUI.Out).To(Say("USAGE:"))
-			Expect(fakeUI.Out).To(Say("\tcf help \\[COMMAND\\]"))
+			Expect(fakeUI.Out).To(Say("    cf help \\[COMMAND\\]"))
 		})
 
 		Describe("aliases", func() {
@@ -57,7 +57,7 @@ var _ = Describe("Help Command", func() {
 
 					Expect(fakeUI.Out).To(Say("USAGE:"))
 					Expect(fakeUI.Out).To(Say("ALIAS:"))
-					Expect(fakeUI.Out).To(Say("\th"))
+					Expect(fakeUI.Out).To(Say("    h"))
 				})
 			})
 
@@ -77,7 +77,7 @@ var _ = Describe("Help Command", func() {
 			})
 		})
 
-		FDescribe("options", func() {
+		Describe("options", func() {
 			Context("when the command has options", func() {
 				BeforeEach(func() {
 					cmd.OptionalArgs = flags.CommandName{
@@ -126,6 +126,22 @@ var _ = Describe("Help Command", func() {
 						Expect(fakeUI.Out).ToNot(Say("--app-ports"))
 					})
 				})
+			})
+		})
+
+		Context("when called with an alias", func() {
+			BeforeEach(func() {
+				cmd.OptionalArgs = flags.CommandName{
+					CommandName: "l",
+				}
+			})
+
+			It("displays help for that command", func() {
+				err := cmd.Execute(nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeUI.Out).To(Say("NAME:"))
+				Expect(fakeUI.Out).To(Say("    login - Log user in"))
 			})
 		})
 	})
