@@ -137,7 +137,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes' non deve essere un elenco"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -293,15 +293,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "L'applicazione {{.AppName}} non deve essere configurata con 'routes' e 'domain'/'domains'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "L'applicazione {{.AppName}} non deve essere configurata con 'routes' e 'host'/'hosts'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "L'applicazione {{.AppName}} non deve essere configurata con 'routes' e 'no-hostname'"
   },
   {
     "id": "Apps:",
@@ -389,7 +389,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "Esegui il bind di un gruppo di sicurezza a uno spazio particolare o a tutti gli spazi di un'organizzazione"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -545,7 +545,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key ISTANZA_DEL_SERVIZIO CHIAVE_SERVIZIO [-c PARAMETRI_COME_JSON]\n\n   Fornisci facoltativamente i parametri di configurazione specifici del servizio in un oggetto JSON valido incorporato.\n   CF_NAME create-service-key ISTANZA_DEL_SERVIZIO CHIAVE_SERVIZIO -c '{\"nome\":\"valore\",\"nome\":\"valore\"}'\n\n   Facoltativamente, fornisci un file contenente i parametri di configurazione specifici del servizio in un oggetto JSON valido. Il percorso del file dei parametri può essere un percorso assoluto o relativo a un file.\n   CF_NAME create-service-key ISTANZA_DEL_SERVIZIO CHIAVE_SERVIZIO -c PERCORSO_AL_FILE\n\n   Esempio di un oggetto JSON valido:\n   {\n     \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key ISTANZA_DEL_SERVIZIO CHIAVE_SERVIZIO [-c PARAMETRI_COME_JSON]\n\n   Fornisci facoltativamente i parametri di configurazione specifici del servizio in un oggetto JSON valido incorporato.\n  CF_NAME create-service-key ISTANZA_DEL_SERVIZIO CHIAVE_SERVIZIO -c '{\"nome\":\"valore\",\"nome\":\"valore\"}'\n\n  Facoltativamente, fornisci un file contenente i parametri di configurazione specifici del servizio in un oggetto JSON valido. Il percorso del file dei parametri può essere un percorso assoluto o relativo a un file.\n   CF_NAME create-service-key ISTANZA_DEL_SERVIZIO CHIAVE_SERVIZIO -c PERCORSO_AL_FILE\n\n   Esempio di un oggetto JSON valido:\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -1109,7 +1109,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "Crea una copia del codice sorgente dell'applicazione da un'applicazione all'altra.  A meno che non venga sovrascritto, il comando copy-source riavvierà l'applicazione."
+    "translation": "Copia il codice di origine di un'applicazione in un'altra applicazione esistente (e riavvia tale applicazione)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2024,8 +2024,8 @@
     "translation": "Errore durante il recupero dei pacchetti di build.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "Errore durante il recupero dei domini per l'organizzazione {{.OrgName}}.\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Errore durante il recupero dei domini per l'organizzazione %s.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2058,10 +2058,6 @@
   {
     "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
     "translation": "Errore durante il recupero degli spazi.\n{{.ErrorDescription}}"
-  },
-  {
-    "id": "Failed to create a local temporary zip file for the buildpack",
-    "translation": ""
   },
   {
     "id": "Failed to create json for resource_match request",
@@ -2481,7 +2477,7 @@
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "Utilizzo non corretto. Richiede GRUPPO_SICUREZZA e ORG, facoltativamente SPAZIO come argomenti\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2633,7 +2629,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "Configurazione dell'applicazione non valida"
   },
   {
     "id": "Invalid async response from server",
@@ -2701,7 +2697,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "Porta non valida per la rotta {{.RouteName}}"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -2902,10 +2898,6 @@
   {
     "id": "Max wait time for buildpack staging, in minutes",
     "translation": "Tempo massimo di attesa per la preparazione del pacchetto di build, in minuti"
-  },
-  {
-    "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": ""
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
@@ -3152,10 +3144,6 @@
     "translation": "ORGANIZZAZIONI"
   },
   {
-    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
-    "translation": ""
-  },
-  {
     "id": "Org",
     "translation": "Organizzazione"
   },
@@ -3225,7 +3213,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "Percorso per la rotta HTTP"
   },
   {
     "id": "Path for the HTTP route",
@@ -3237,7 +3225,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Percorso non consentito nella rotta TCP {{.RouteName}}"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3329,7 +3317,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Porta non consentita nella rotta HTTP {{.RouteName}}"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -4141,7 +4129,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "La rotta {{.RouteName}} non corrisponde ad alcun dominio."
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4725,7 +4713,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "ogni rotta in 'routes' deve avere una proprietà 'route'"
   },
   {
     "id": "enabled",

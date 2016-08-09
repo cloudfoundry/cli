@@ -41,7 +41,7 @@
   },
   {
     "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
-    "translation": "\nTIPP: Verwenden Sie '{{.CFTargetCommand}}', um einen neuen Bereich zu nutzen."
+    "translation": "\nTIPP: Verwenden Sie '{{.CFTargetCommand}}', um einen neuen Bereich zu nutzen"
   },
   {
     "id": "\nTIP: Use '{{.Command}}' to target new org",
@@ -49,7 +49,7 @@
   },
   {
     "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
-    "translation": "\nTIPP: Verwenden Sie 'cf login -a API --skip-ssl-validation' oder 'cf api API --skip-ssl-validation', um diesen Fehler zu unterdrücken."
+    "translation": "\nTIPP: Verwenden Sie 'cf login -a API --skip-ssl-validation' oder 'cf api API --skip-ssl-validation', um diesen Fehler zu unterdrücken"
   },
   {
     "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
@@ -137,7 +137,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes' muss eine Liste sein"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -201,7 +201,7 @@
   },
   {
     "id": "APP_INSTANCES",
-    "translation": "APP_INSTANCES"
+    "translation": "APP-INSTANZEN"
   },
   {
     "id": "APP_NAME",
@@ -253,7 +253,7 @@
   },
   {
     "id": "An org must be targeted before targeting a space",
-    "translation": "Eine Organisation muss als Ziel ausgewählt sein, bevor ein Bereich als Ziel verwendet werden kann."
+    "translation": "Eine Organisation muss als Ziel ausgewählt sein, bevor ein Bereich als Ziel verwendet werden kann"
   },
   {
     "id": "App ",
@@ -273,7 +273,7 @@
   },
   {
     "id": "App {{.AppName}} is a worker, skipping route creation",
-    "translation": "App {{.AppName}} ist ein Worker, der die Routeerstellung überspringt."
+    "translation": "App {{.AppName}} ist ein Worker, der die Routeerstellung überspringt"
   },
   {
     "id": "App {{.AppName}} is already bound to {{.ServiceName}}.",
@@ -293,15 +293,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "Anwendung {{.AppName}} darf nicht mit 'routes' und 'domain'/'domains' zusammen konfiguriert werden"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "Anwendung {{.AppName}} darf nicht mit 'routes' und 'host'/'hosts' zusammen konfiguriert werden"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "Anwendung {{.AppName}} darf nicht mit 'routes' and 'no-hostname' zusammen konfiguriert werden"
   },
   {
     "id": "Apps:",
@@ -389,7 +389,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "Eine Sicherheitsgruppe an einen bestimmten Bereich oder an alle vorhandenen Bereiche einer Organisation binden"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -441,7 +441,7 @@
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
-    "translation": "Buildpack {{.BuildpackName}} ist bereits vorhanden."
+    "translation": "Buildpack {{.BuildpackName}} ist bereits vorhanden"
   },
   {
     "id": "Buildpack {{.BuildpackName}} does not exist.",
@@ -449,7 +449,7 @@
   },
   {
     "id": "Byte quantity must be an integer with a unit of measurement like M, MB, G, or GB",
-    "translation": "Die Bytemenge muss eine ganze Zahl mit einer Maßeinheit wie M, MB, G oder GB sein."
+    "translation": "Die Bytemenge muss eine ganze Zahl mit einer Maßeinheit wie M, MB, G oder GB sein"
   },
   {
     "id": "CF_NAME add-plugin-repo REPO_NAME URL",
@@ -1009,15 +1009,15 @@
   },
   {
     "id": "Cannot delete service instance, service keys and bindings must first be deleted",
-    "translation": "Löschen nicht möglich, weil zuerst Serviceinstanzen, Serviceschlüssel und Bindungen gelöscht werden müssen."
+    "translation": "Löschen nicht möglich, weil zuerst Serviceinstanzen, Serviceschlüssel und Bindungen gelöscht werden müssen"
   },
   {
     "id": "Cannot list marketplace services without a targeted space",
-    "translation": "Marktplatzservices können ohne als Ziel ausgewählten Bereich nicht aufgelistet werden."
+    "translation": "Marktplatzservices können ohne als Ziel ausgewählten Bereich nicht aufgelistet werden"
   },
   {
     "id": "Cannot list plan information for {{.ServiceName}} without a targeted space",
-    "translation": "Planinformationen für {{.ServiceName}} können ohne als Ziel ausgewählten Bereich nicht aufgelistet werden."
+    "translation": "Planinformationen für {{.ServiceName}} können ohne als Ziel ausgewählten Bereich nicht aufgelistet werden"
   },
   {
     "id": "Cannot provision instances of paid service plans",
@@ -1109,7 +1109,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "Kopie des Quellcodes der App von einer Anwendung für eine andere erstellen.  Der Befehl copy-source startet die Anwendung erneut, wenn er nicht überschrieben wurde."
+    "translation": "Kopiert den Quellcode einer Anwendung zu einer weiteren bereits vorhandenen Anwendung (und startet diese Anwendung erneut)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1349,11 +1349,11 @@
   },
   {
     "id": "Custom buildpack by name (e.g. my-buildpack) or Git URL (e.g. 'https://github.com/cloudfoundry/java-buildpack.git') or Git URL with a branch or tag (e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag). To use built-in buildpacks only, specify 'default' or 'null'",
-    "translation": "Angepasstes Buildpack nach Name (z. B. my-buildpack) oder Git-URL (z. B. 'https://github.com/cloudfoundry/java-buildpack.git') oder Git-URL mit Zweig oder Tag (z. B. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' für Tag 'v3.3.0'). Geben Sie zur ausschließlichen Verwendung von integrierten Buildpacks 'default' oder 'null' an."
+    "translation": "Angepasstes Buildpack nach Name (z. B. my-buildpack) oder Git-URL (z. B. 'https://github.com/cloudfoundry/java-buildpack.git') oder Git-URL mit Zweig oder Tag (z. B. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' für Tag 'v3.3.0'). Geben Sie zur ausschließlichen Verwendung von integrierten Buildpacks 'default' oder 'null' an"
   },
   {
     "id": "Custom headers to include in the request, flag can be specified multiple times",
-    "translation": "Angepasste Header, die in die Anforderung einbezogen werden sollen. Das Flag kann mehrfach angegeben werden."
+    "translation": "Angepasste Header, die in die Anforderung einbezogen werden sollen. Das Flag kann mehrfach angegeben werden"
   },
   {
     "id": "DISK",
@@ -1629,7 +1629,7 @@
   },
   {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",
-    "translation": "Die Kontrollsumme der heruntergeladen Binärdateien des Plug-ins stimmt nicht mit den Repositorymetadaten überein."
+    "translation": "Die Kontrollsumme der heruntergeladen Binärdateien des Plug-ins stimmt nicht mit den Repositorymetadaten überein"
   },
   {
     "id": "Dump recent logs instead of tailing",
@@ -1985,7 +1985,7 @@
   },
   {
     "id": "Expected applications to be a list",
-    "translation": "Es wird erwartet, dass die Anwendungen Listen sind."
+    "translation": "Es wird erwartet, dass die Anwendungen Listen sind"
   },
   {
     "id": "Expected {{.Name}} to be a set of key =\u003e value, but it was a {{.Type}}.",
@@ -2024,8 +2024,8 @@
     "translation": "Abrufen von Buildpacks ist fehlgeschlagen.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "Abrufen von Domänen für Organization {{.OrgName}} ist fehlgeschlagen.\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Abrufen von Domänen für Organization %s ist fehlgeschlagen.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2058,10 +2058,6 @@
   {
     "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
     "translation": "Abrufen von Bereichen ist fehlgeschlagen.\n{{.ErrorDescription}}"
-  },
-  {
-    "id": "Failed to create a local temporary zip file for the buildpack",
-    "translation": ""
   },
   {
     "id": "Failed to create json for resource_match request",
@@ -2329,7 +2325,7 @@
   },
   {
     "id": "HEALTH_CHECK_TYPE",
-    "translation": "TYP-DER-ZUSTANDSPRÜFUNG"
+    "translation": "TYP DER ZUSTANDSPRÜFUNG"
   },
   {
     "id": "HOST",
@@ -2373,7 +2369,7 @@
   },
   {
     "id": "INSTANCE_MEMORY",
-    "translation": "INSTANCE_MEMORY"
+    "translation": "INSTANZSPEICHER"
   },
   {
     "id": "Ignore manifest file",
@@ -2405,51 +2401,51 @@
   },
   {
     "id": "Incorrect Usage. HEALTH_CHECK_TYPE must be \"port\" or \"none\"\\n\\n",
-    "translation": "Falsche Verwendung. HEALTH_CHECK_TYPE muss \"port\" oder \"none\" sein.\\n\\n"
+    "translation": "Falsche Verwendung. HEALTH_CHECK_TYPE muss \"port\" oder \"none\" sein\\n\\n"
   },
   {
     "id": "Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert 'app-name env-name env-value' als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert 'app-name env-name env-value' als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires 'app-name env-name' as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert 'app-name env-name' als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert 'app-name env-name' als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires 'username password' as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert 'username password' als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert 'username password' als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert APP SERVICE_INSTANCE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert APP SERVICE_INSTANCE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert APP_NAME und DOMAIN als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert APP_NAME und DOMAIN als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert APP_NAME und HEALTH_CHECK_TYPE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert APP_NAME und HEALTH_CHECK_TYPE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME and SERVICE_INSTANCE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert APP_NAME und SERVICE_INSTANCE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert APP_NAME und SERVICE_INSTANCE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME as argument",
-    "translation": "Falsche Verwendung. Erfordert APP_NAME als Argument.-"
+    "translation": "Falsche Verwendung. Erfordert APP_NAME als Argument"
   },
   {
     "id": "Incorrect Usage. Requires APP_NAME as argument\n\n",
-    "translation": "Falsche Verwendung. Erfordert APP_NAME als Argument.\n\n"
+    "translation": "Falsche Verwendung. Erfordert APP_NAME als Argument\n\n"
   },
   {
     "id": "Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert BUILDPACK_NAME, NEW_BUILDPACK_NAME als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert BUILDPACK_NAME, NEW_BUILDPACK_NAME als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert DOMAIN und SERVICE_INSTANCE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert DOMAIN und SERVICE_INSTANCE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires DOMAIN as an argument\n\n",
@@ -2457,75 +2453,75 @@
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert LABEL, PROVIDER und TOKEN als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert LABEL, PROVIDER und TOKEN als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert LABEL, PROVIDER als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert LABEL, PROVIDER als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires ORG and DOMAIN arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert ORG und DOMAIN als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert ORG und DOMAIN als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires ORG and DOMAIN as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert ORG und DOMAIN als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert ORG und DOMAIN als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert ORG_NAME, QUOTA als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert ORG_NAME und QUOTA als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert REPO_NAME und URL als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert REPO_NAME und URL als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "Falsche Verwendung. Erfordert SECURITY_GROUP und ORG sowie optional SPACE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SECURITY_GROUP und PATH_TO_JSON_RULES_FILE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SECURITY_GROUP und PATH_TO_JSON_RULES_FILE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP, ORG and SPACE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SECURITY_GROUP, ORG und SPACE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SECURITY_GROUP, ORG und SPACE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SERVICE_BROKER, NEW_SERVICE_BROKER als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SERVICE_BROKER, NEW_SERVICE_BROKER als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_BROKER, USERNAME, PASSWORD, URL as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SERVICE_BROKER, USERNAME, PASSWORD, URL als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SERVICE_BROKER, USERNAME, PASSWORD, URL als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE SERVICE_KEY als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE SERVICE_KEY als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE and NEW_SERVICE_INSTANCE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE und NEW_SERVICE_INSTANCE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE und NEW_SERVICE_INSTANCE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE und SERVICE_KEY als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SERVICE_INSTANCE und SERVICE_KEY als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SPACE und DOMAIN als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SPACE und DOMAIN als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE and QUOTA as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SPACE und QUOTA als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SPACE und QUOTA als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE-NAME and SPACE-QUOTA-NAME as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SPACE-NAME und SPACE-QUOTA-NAME als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SPACE-NAME und SPACE-QUOTA-NAME als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE_NAME NEW_SPACE_NAME as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert SPACE_NAME NEW_SPACE_NAME als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert SPACE_NAME NEW_SPACE_NAME als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SPACE_NAME as argument\n\n",
@@ -2533,11 +2529,11 @@
   },
   {
     "id": "Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert USERNAME, ORG, ROLE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert USERNAME, ORG, ROLE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert USERNAME, ORG, SPACE, ROLE als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert USERNAME, ORG, SPACE, ROLE als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires an argument\n\n",
@@ -2545,7 +2541,7 @@
   },
   {
     "id": "Incorrect Usage. Requires app_name, domain_name as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert app_name, domain_name als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert app_name, domain_name als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires arguments\n\n",
@@ -2553,35 +2549,35 @@
   },
   {
     "id": "Incorrect Usage. Requires buildpack_name, path and position as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert buildpack_name, path und position als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert buildpack_name, path und position als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires host and domain as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert host und domain als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert host und domain als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires old app name and new app name as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert den alten und den neuen Namen der App als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert den alten und den neuen Namen der App als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires old org name, new org name as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert den alten und den neuen Namen der Organisation als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert den alten und den neuen Namen der Organisation als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires org_name, domain_name as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert org_name, domain_name als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert org_name, domain_name als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires service, service plan, service instance as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert Service, Serviceplan, Serviceinstanz als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert Service, Serviceplan, Serviceinstanz als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires stack name as argument\n\n",
-    "translation": "Falsche Verwendung. Erfordert den Namen des Stacks als Argument.\n\n"
+    "translation": "Falsche Verwendung. Erfordert den Namen des Stacks als Argument\n\n"
   },
   {
     "id": "Incorrect Usage. Requires v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN as arguments\n\n",
-    "translation": "Falsche Verwendung. Erfordert v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN als Argumente.\n\n"
+    "translation": "Falsche Verwendung. Erfordert v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN als Argumente\n\n"
   },
   {
     "id": "Incorrect Usage. Requires {{.Arguments}}",
@@ -2633,7 +2629,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "Ungültige Anwendungskonfiguration"
   },
   {
     "id": "Invalid async response from server",
@@ -2649,7 +2645,7 @@
   },
   {
     "id": "Invalid data from '{{.repoName}}' - plugin data does not exist",
-    "translation": "Ungültige Daten von '{{.repoName}}' - Plug-in-Daten sind nicht vorhanden."
+    "translation": "Ungültige Daten von '{{.repoName}}' - Plug-in-Daten sind nicht vorhanden"
   },
   {
     "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
@@ -2665,7 +2661,7 @@
   },
   {
     "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
-    "translation": "Ungültiger Instanzzähler: {{.InstancesCount}}\nDer Instanzzähler muss eine positive ganze Zahl angeben."
+    "translation": "Ungültiger Instanzzähler: {{.InstancesCount}}\nDer Instanzzähler muss eine positive ganze Zahl angeben"
   },
   {
     "id": "Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}",
@@ -2673,7 +2669,7 @@
   },
   {
     "id": "Invalid instance: {{.Instance}}\nInstance must be a positive integer",
-    "translation": "Ungültige Instanz: {{.Instance}}\nDie Instanz muss eine positive ganze Zahl sein."
+    "translation": "Ungültige Instanz: {{.Instance}}\nDie Instanz muss eine positive ganze Zahl sein"
   },
   {
     "id": "Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
@@ -2685,7 +2681,7 @@
   },
   {
     "id": "Invalid manifest. Expected a map",
-    "translation": "Ungültiges Manifest. Es wurde eine Landkarte erwartet."
+    "translation": "Ungültiges Manifest. Es wurde eine Landkarte erwartet"
   },
   {
     "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
@@ -2701,7 +2697,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "Ungültiger Port für Route {{.RouteName}}"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -2853,7 +2849,7 @@
   },
   {
     "id": "Loggregator endpoint missing from config file",
-    "translation": "Loggregator-Endpunkt fehlt in Konfigurationsdatei."
+    "translation": "Loggregator-Endpunkt fehlt in Konfigurationsdatei"
   },
   {
     "id": "Looking up '{{.filePath}}' from repository '{{.repoName}}'",
@@ -2861,11 +2857,11 @@
   },
   {
     "id": "MANIFEST_PATH",
-    "translation": "MANIFESTPFAD"
+    "translation": "MANIFEST_PATH (MANIFESTPFAD)"
   },
   {
     "id": "MEMORY",
-    "translation": "HAUTPSPEICHER"
+    "translation": "HAUPTSPEICHER"
   },
   {
     "id": "Make a user-provided service instance available to CF apps",
@@ -2881,7 +2877,7 @@
   },
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
-    "translation": "Manifestdatei wurde im aktuellen Verzeichnis nicht gefunden. Bitte stellen Sie entweder einen App-Namen oder ein Manifest zur Verfügung."
+    "translation": "Manifestdatei wurde im aktuellen Verzeichnis nicht gefunden. Bitte stellen Sie entweder einen App-Namen oder ein Manifest zur Verfügung"
   },
   {
     "id": "Map a TCP route",
@@ -2904,20 +2900,16 @@
     "translation": "Maximale Wartezeit auf das Staging des Buildpacks in Minuten"
   },
   {
-    "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": ""
-  },
-  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
-    "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z.B. 1024M, 1G, 10G)"
+    "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z. B. 1024M, 1G, 10G)"
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount.",
-    "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z.B. 1024M, 1G, 10G). -1 steht für eine unbegrenzte Menge."
+    "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z. B. 1024M, 1G, 10G). -1 steht für eine unbegrenzte Menge."
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z.B. 1024M, 1G, 10G). -1 steht für eine unbegrenzte Menge. (Standard: unbegrenzt)"
+    "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z. B. 1024M, 1G, 10G). -1 steht für eine unbegrenzte Menge. (Standard: unbegrenzt)"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
@@ -2929,7 +2921,7 @@
   },
   {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
-    "translation": "Maximale Zeitdauer (in Sekunden), die die CLI auf den Start der Anwendung wartet. Es können andere Zeitlimitüberschreitung seitens des Servers auftreten."
+    "translation": "Maximale Zeitdauer (in Sekunden), die die CLI auf den Start der Anwendung wartet. Es können andere Zeitlimitüberschreitung seitens des Servers auftreten"
   },
   {
     "id": "Memory limit (e.g. 256M, 1024M, 1G)",
@@ -2953,11 +2945,11 @@
   },
   {
     "id": "NEW_NAME",
-    "translation": "NEW_NAME (NEUER NAME)"
+    "translation": "NEUER NAME"
   },
   {
     "id": "NUM_INSTANCES",
-    "translation": "ANZAHL-INSTANZEN"
+    "translation": "ANZAHL INSTANZEN"
   },
   {
     "id": "Name",
@@ -2989,7 +2981,7 @@
   },
   {
     "id": "No api endpoint set. Use '{{.Name}}' to set an endpoint",
-    "translation": "Kein API-Endpunkt festgelegt. Verwenden Sie '{{.Name}}', um einen Endpunkt festzulegen."
+    "translation": "Kein API-Endpunkt festgelegt. Verwenden Sie '{{.Name}}', um einen Endpunkt festzulegen"
   },
   {
     "id": "No app files found in '{{.Path}}'",
@@ -3025,7 +3017,7 @@
   },
   {
     "id": "No org and space targeted, use '{{.Command}}' to target an org and space",
-    "translation": "Keine Organisation und kein Bereich als Ziel ausgewählt, verwenden Sie '{{.Command}}', um eine Organisation und einen Bereich auszuwählen."
+    "translation": "Keine Organisation und kein Bereich als Ziel ausgewählt, verwenden Sie '{{.Command}}', um eine Organisation und einen Bereich auszuwählen"
   },
   {
     "id": "No org or space targeted, use '{{.CFTargetCommand}}'",
@@ -3053,11 +3045,11 @@
   },
   {
     "id": "No running env variables have been set",
-    "translation": "Es wurden keine aktiven Umgebungsvariablen festgelegt."
+    "translation": "Es wurden keine aktiven Umgebungsvariablen festgelegt"
   },
   {
     "id": "No running security groups set",
-    "translation": "Es wurden keine Sicherheitsgruppen festgelegt."
+    "translation": "Es wurden keine Sicherheitsgruppen festgelegt"
   },
   {
     "id": "No security groups",
@@ -3089,7 +3081,7 @@
   },
   {
     "id": "No space targeted, use '{{.Command}}' to target a space",
-    "translation": "Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.Command}}', um einen Bereich als Ziel auszuwählen."
+    "translation": "Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.Command}}', um einen Bereich als Ziel auszuwählen"
   },
   {
     "id": "No spaces assigned",
@@ -3121,7 +3113,7 @@
   },
   {
     "id": "Note: this may take some time",
-    "translation": "Hinweis: Dieser Vorgang kann eine Weile dauern."
+    "translation": "Hinweis: Dieser Vorgang kann eine Weile dauern"
   },
   {
     "id": "Number of instances",
@@ -3133,7 +3125,7 @@
   },
   {
     "id": "OPTIONS:",
-    "translation": "OPTIONEN:"
+    "translation": "Optionen:"
   },
   {
     "id": "ORG ADMIN",
@@ -3150,10 +3142,6 @@
   {
     "id": "ORGS",
     "translation": "ORGANISATIONEN"
-  },
-  {
-    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
-    "translation": ""
   },
   {
     "id": "Org",
@@ -3225,7 +3213,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "Pfad für HTTP-Route"
   },
   {
     "id": "Path for the HTTP route",
@@ -3237,7 +3225,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Pfad in TCP-Route {{.RouteName}} nicht zulässig"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3285,11 +3273,11 @@
   },
   {
     "id": "Please log in again",
-    "translation": "Bitte melden Sie sich erneut an."
+    "translation": "Bitte melden Sie sich erneut an"
   },
   {
     "id": "Please provide the space within the organization containing the target application",
-    "translation": "Bitte stellen Sie einen Bereich innerhalb der Organisation zur Verfügung, der die Zielanwendung enthält."
+    "translation": "Bitte stellen Sie einen Bereich innerhalb der Organisation zur Verfügung, der die Zielanwendung enthält"
   },
   {
     "id": "Plugin Name",
@@ -3329,7 +3317,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Port in HTTP-Route {{.RouteName}} nicht zulässig"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -3381,7 +3369,7 @@
   },
   {
     "id": "Push multiple apps with a manifest",
-    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen"
+    "translation": "Mehrere Apps mit einem Manifest mithilfe einer Push-Operation übertragen:"
   },
   {
     "id": "QUOTA",
@@ -3409,7 +3397,7 @@
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
-    "translation": "RESERVIERTE-ROUTENPORTS"
+    "translation": "RESERVIERTE ROUTENPORTS"
   },
   {
     "id": "RESPONSE:",
@@ -3793,7 +3781,7 @@
   },
   {
     "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
-    "translation": "Serverfehler, Statuscode: 403, Fehlercode: 10003, Nachricht: Sie sind nicht berechtigt, die angeforderte Aktion auszuführen."
+    "translation": "Serverfehler, Statuscode: 403, Fehlercode: 10003, Nachricht: Sie sind nicht berechtigt, die angeforderte Aktion auszuführen"
   },
   {
     "id": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command.",
@@ -4029,7 +4017,7 @@
   },
   {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-    "translation": "Start nicht erfolgreich\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten."
+    "translation": "Start nicht erfolgreich\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten"
   },
   {
     "id": "Started: {{.Started}}",
@@ -4073,7 +4061,7 @@
   },
   {
     "id": "TIP:\n   Use 'CF_NAME create-user-provided-service' to make user-provided services available to CF apps",
-    "translation": "TIPP:\n   Verwenden Sie 'CF_NAME create-user-provided-service', um vom Benutzer zur Verfügung gestellte Services für CF-Apps verfügbar zu machen."
+    "translation": "TIPP:\n   Verwenden Sie 'CF_NAME create-user-provided-service', um vom Benutzer zur Verfügung gestellte Services für CF-Apps verfügbar zu machen"
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
@@ -4085,27 +4073,27 @@
   },
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
-    "translation": "TIPP: Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.CfTargetCommand}}', um einen Bereich als Ziel auszuwählen."
+    "translation": "TIPP: Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.CfTargetCommand}}', um einen Bereich als Ziel auszuwählen"
   },
   {
     "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
-    "translation": "TIPP: Verwenden Sie '{{.APICommand}}', um mit einem unsicheren API-Endpunkt fortzufahren."
+    "translation": "TIPP: Verwenden Sie '{{.APICommand}}', um mit einem unsicheren API-Endpunkt fortzufahren"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
-    "translation": "TIPP: Verwenden Sie '{{.CFCommand}} {{.AppName}}', um sicherzustellen, dass die Änderungen an der Umgebungsvariablen wirksam sind."
+    "translation": "TIPP: Verwenden Sie '{{.CFCommand}} {{.AppName}}', um sicherzustellen, dass die Änderungen an der Umgebungsvariablen wirksam sind"
   },
   {
     "id": "TIP: Use '{{.CFRestageCommand}}' for any bound apps to ensure your env variable changes take effect",
-    "translation": "TIPP: Verwenden Sie '{{.CFRestageCommand}}' für alle gebundenen Apps, um sicherzustellen, dass die Änderungen an Ihren Umgebungsvariablen wirksam sind."
+    "translation": "TIPP: Verwenden Sie '{{.CFRestageCommand}}' für alle gebundenen Apps, um sicherzustellen, dass die Änderungen an Ihren Umgebungsvariablen wirksam sind"
   },
   {
     "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
-    "translation": "TIPP: Verwenden Sie '{{.Command}}', um sicherzustellen, dass die Änderungen an der Umgebungsvariablen wirksam sind."
+    "translation": "TIPP: Verwenden Sie '{{.Command}}', um sicherzustellen, dass die Änderungen an der Umgebungsvariablen wirksam sind"
   },
   {
     "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-    "translation": "TIPP: Verwenden Sie '{{.CfUpdateBuildpackCommand}}', um dieses Buildpack zu aktualisieren."
+    "translation": "TIPP: Verwenden Sie '{{.CfUpdateBuildpackCommand}}', um dieses Buildpack zu aktualisieren"
   },
   {
     "id": "TOTAL_MEMORY",
@@ -4141,7 +4129,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "Die Route {{.RouteName}} stimmte mit keiner bereits vorhandenen Domäne überein."
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4197,7 +4185,7 @@
   },
   {
     "id": "Tip: use 'add-plugin-repo' to register the repo",
-    "translation": "Tipp: Verwenden Sie 'add-plugin-repo', um das Repository zu registrieren."
+    "translation": "Tipp: Verwenden Sie 'add-plugin-repo', um das Repository zu registrieren"
   },
   {
     "id": "Total Memory",
@@ -4205,7 +4193,7 @@
   },
   {
     "id": "Total amount of memory (e.g. 1024M, 1G, 10G)",
-    "translation": "Der gesamte Speicherplatz (z.B. 1024M, 1G, 10G)"
+    "translation": "Der gesamte Speicherplatz (z. B. 1024M, 1G, 10G)"
   },
   {
     "id": "Total amount of memory a space can have (e.g. 1024M, 1G, 10G)",
@@ -4245,7 +4233,7 @@
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": "URL, an die Anforderungen für gebundene Routen weitergeleitet werden. Das Schema für diese URL muss https sein."
+    "translation": "URL, an die Anforderungen für gebundene Routen weitergeleitet werden. Das Schema für diese URL muss https sein"
   },
   {
     "id": "USAGE:",
@@ -4265,7 +4253,7 @@
   },
   {
     "id": "Unable to acquire one time code from authorization response",
-    "translation": "Es konnte kein Zeitcode aus der Autorisierungsantwort bezogen werden."
+    "translation": "Es konnte kein Zeitcode aus der Autorisierungsantwort bezogen werden"
   },
   {
     "id": "Unable to authenticate.",
@@ -4285,7 +4273,7 @@
   },
   {
     "id": "Unable to parse CC API Version '{{.APIVersion}}'",
-    "translation": "Die CC-API-Version '{{.APIVersion}}' kann nicht geparst werden."
+    "translation": "Die CC-API-Version '{{.APIVersion}}' kann nicht geparst werden"
   },
   {
     "id": "Unassign a quota from a space",
@@ -4473,11 +4461,11 @@
   },
   {
     "id": "Use '{{.Command}}' for more information",
-    "translation": "Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten."
+    "translation": "Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten"
   },
   {
     "id": "Use '{{.Name}}' to view or set your target org and space",
-    "translation": "Verwenden Sie '{{.Name}}', um Ihre Zielorganisation und Ihren Zielbereich anzuzeigen oder festzulegen."
+    "translation": "Verwenden Sie '{{.Name}}', um Ihre Zielorganisation und Ihren Zielbereich anzuzeigen oder festzulegen"
   },
   {
     "id": "Use a one-time password to login",
@@ -4549,7 +4537,7 @@
   },
   {
     "id": "WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history",
-    "translation": "WARNUNG:\n   Von der Angabe Ihres Kennworts als Befehlszeilenoption wird dringend abgeraten.\n   Ihr Kennwort könnte für andere sichtbar sein und in Ihrem Shellprotokoll erfasst werden."
+    "translation": "WARNUNG:\n   Von der Angabe Ihres Kennworts als Befehlszeilenoption wird dringend abgeraten.\n   Ihr Kennwort könnte für andere sichtbar sein und in Ihrem Shellprotokoll erfasst werden"
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
@@ -4565,7 +4553,7 @@
   },
   {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
-    "translation": "Warnung: Unsicherer API-Endpunkt wurde entdeckt: Es werden sichere HTTPS-API-Endpunkte empfohlen.\n"
+    "translation": "Warnung: Unsicherer API-Endpunkt wurde entdeckt: Es werden sichere HTTPS-API-Endpunkte empfohlen\n"
   },
   {
     "id": "Warning: accessing feature flag 'set_roles_by_username'",
@@ -4725,7 +4713,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "Jede Route in 'routes' muss eine Eigenschaft des Typs 'route' aufweisen"
   },
   {
     "id": "enabled",
@@ -4777,7 +4765,7 @@
   },
   {
     "id": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
-    "translation": "Instanz: {{.InstanceIndex}}, Ursache: {{.ExitDescription}}, exit_status: {{.ExitStatus}}"
+    "translation": "Instanz: {{.InstanceIndex}}, Ursache: {{.ExitDescription}}, Exitstatus: {{.ExitStatus}}"
   },
   {
     "id": "instances",
@@ -5133,7 +5121,7 @@
   },
   {
     "id": "{{.CrashedCount}} crashed",
-    "translation": "{{.CrashedCount}} ist abgestürzt."
+    "translation": "{{.CrashedCount}} ist abgestürzt"
   },
   {
     "id": "{{.DiskUsage}} of {{.DiskQuota}}",
@@ -5153,7 +5141,7 @@
   },
   {
     "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-    "translation": "{{.Err}}\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten."
+    "translation": "{{.Err}}\n\nTIPP: Verwenden Sie '{{.Command}}', um weitere Informationen zu erhalten"
   },
   {
     "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
@@ -5165,7 +5153,7 @@
   },
   {
     "id": "{{.FlappingCount}} failing",
-    "translation": "{{.FlappingCount}} ist fehlschlagen."
+    "translation": "{{.FlappingCount}} ist fehlschlagen"
   },
   {
     "id": "{{.InstanceMemoryLimit}} instance memory limit",
@@ -5185,31 +5173,31 @@
   },
   {
     "id": "{{.ModelType}} {{.ModelName}} already exists",
-    "translation": "{{.ModelType}} {{.ModelName}} ist bereits vorhanden."
+    "translation": "{{.ModelType}} {{.ModelName}} ist bereits vorhanden"
   },
   {
     "id": "{{.OperationType}} failed",
-    "translation": "{{.OperationType}} ist fehlgeschlagen."
+    "translation": "{{.OperationType}} ist fehlgeschlagen"
   },
   {
     "id": "{{.OperationType}} in progress",
-    "translation": "{{.OperationType}} ist in Bearbeitung."
+    "translation": "{{.OperationType}} ist in Bearbeitung"
   },
   {
     "id": "{{.OperationType}} succeeded",
-    "translation": "{{.OperationType}} war erfolgreich."
+    "translation": "{{.OperationType}} war erfolgreich"
   },
   {
     "id": "{{.PropertyName}} must be a string or null value",
-    "translation": "{{.PropertyName}} muss eine Zeichenfolge oder ein Nullwert sein."
+    "translation": "{{.PropertyName}} muss eine Zeichenfolge oder ein Nullwert sein"
   },
   {
     "id": "{{.PropertyName}} must be a string value",
-    "translation": "{{.PropertyName}} muss ein Zeichenfolgewert sein."
+    "translation": "{{.PropertyName}} muss ein Zeichenfolgewert sein"
   },
   {
     "id": "{{.PropertyName}} should not be null",
-    "translation": "{{.PropertyName}} sollte nicht null sein."
+    "translation": "{{.PropertyName}} sollte nicht null sein"
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",

@@ -137,7 +137,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "routes doit être une liste"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -293,15 +293,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "L'application {{.AppName}} ne doit pas être configurée à la fois avec routes et domain/domains"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "L'application {{.AppName}} ne doit pas être configurée à la fois avec routes et host/hosts"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "L'application {{.AppName}} ne doit pas être configurée à la fois avec routes et no-hostname"
   },
   {
     "id": "Apps:",
@@ -389,7 +389,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "Lier un groupe de sécurité à un espace particulier ou à tous les espaces existants d'une organisation"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -481,7 +481,7 @@
   },
   {
     "id": "CF_NAME bind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-c PARAMETERS_AS_JSON]",
-    "translation": "CF_NAME bind-route-service DOMAINE INSTANCE_SERVICE [--hostname NOM_HOTE] [--path CHEMIN] [-c PARAMETRES_JSON]"
+    "translation": "CF_NAME bind-route-service DOMAIN INSTANCE_SERVICE [--hostname NOM_HOTE] [--path CHEMIN] [-c PARAMETRES_JSON]"
   },
   {
     "id": "CF_NAME bind-running-security-group SECURITY_GROUP",
@@ -545,7 +545,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n   Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n   Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n   Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne.\n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n  Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -921,7 +921,7 @@
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
-    "translation": "CF_NAME unbind-route-service DOMAINE INSTANCE_SERVICE [--hostname NOM_HOTE] [--path CHEMIN] [-f]"
+    "translation": "CF_NAME unbind-route-service DOMAIN INSTANCE_SERVICE [--hostname NOM_HOTE] [--path CHEMIN] [-f]"
   },
   {
     "id": "CF_NAME unbind-running-security-group SECURITY_GROUP",
@@ -1109,7 +1109,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "Effectuez une copie du code source de l'application depuis une application dans une autre.  Sauf si elle est écrasée, la commande copy-source redémarre l'application."
+    "translation": "Copie le code source d'une application vers une autre application existante (et redémarre cette application)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1525,7 +1525,7 @@
   },
   {
     "id": "Did you mean?",
-    "translation": "Vouliez-vous dire ? "
+    "translation": "Vouliez-vous dire ?"
   },
   {
     "id": "Disable access for a specified organization",
@@ -2024,8 +2024,8 @@
     "translation": "Echec de l'extraction des packs de construction.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "Echec de l'extraction des domaines pour l'organisation {{.OrgName}}.\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Echec de l'extraction des domaines pour l'organisation %s.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2058,10 +2058,6 @@
   {
     "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
     "translation": "Echec de l'extraction des espaces.\n{{.ErrorDescription}}"
-  },
-  {
-    "id": "Failed to create a local temporary zip file for the buildpack",
-    "translation": ""
   },
   {
     "id": "Failed to create json for resource_match request",
@@ -2481,7 +2477,7 @@
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "Syntaxe incorrecte. Requiert GROUPE_SECURITE et ORG, ESPACE facultatif comme arguments\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2633,7 +2629,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "Configuration d'application non valide"
   },
   {
     "id": "Invalid async response from server",
@@ -2701,7 +2697,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "Port non valide pour la route {{.RouteName}}"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -2904,10 +2900,6 @@
     "translation": "Temps d'attente maximal pour la constitution du pack de construction, en minutes"
   },
   {
-    "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": ""
-  },
-  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Quantité maximale de mémoire dont une instance d'application peut disposer (par exemple 1024M, 1G, 10G)"
   },
@@ -2921,7 +2913,7 @@
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
-    "translation": "Nombre maximal de routes pouvant être créées avec des ports réservés "
+    "translation": "Nombre maximal de routes pouvant être créées avec des ports réservés"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
@@ -3152,10 +3144,6 @@
     "translation": "ORGANISATIONS"
   },
   {
-    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
-    "translation": ""
-  },
-  {
     "id": "Org",
     "translation": "Organisation"
   },
@@ -3225,7 +3213,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "Chemin pour la route HTTP"
   },
   {
     "id": "Path for the HTTP route",
@@ -3237,7 +3225,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Chemin non autorisé dans la route TCP {{.RouteName}}"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3329,7 +3317,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Port non autorisé dans la route HTTP {{.RouteName}}"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -3437,11 +3425,11 @@
   },
   {
     "id": "Really delete the {{.ModelType}} {{.ModelName}} and everything associated with it?",
-    "translation": "Voulez-vous vraiment supprimer {{.ModelType}} {{.ModelName}} et tous les éléments associés ?"
+    "translation": "Voulez-vous vraiment supprimer le {{.ModelType}} {{.ModelName}} et tous les éléments associés ?"
   },
   {
     "id": "Really delete the {{.ModelType}} {{.ModelName}}?",
-    "translation": "Voulez-vous vraiment supprimer {{.ModelType}} {{.ModelName}} ?"
+    "translation": "Voulez-vous vraiment supprimer le {{.ModelType}} {{.ModelName}} ?"
   },
   {
     "id": "Really migrate {{.ServiceInstanceDescription}} from plan {{.OldServicePlanName}} to {{.NewServicePlanName}}?\u003e",
@@ -3589,7 +3577,7 @@
   },
   {
     "id": "Reserved Route Ports",
-    "translation": "Ports de route réservés "
+    "translation": "Ports de route réservés"
   },
   {
     "id": "Restage an app",
@@ -4141,7 +4129,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "La route {{.RouteName}} ne correspond à aucun domaine existant."
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4641,7 +4629,7 @@
   },
   {
     "id": "app instances",
-    "translation": "instances d'application "
+    "translation": "instances d'application"
   },
   {
     "id": "apps",
@@ -4725,7 +4713,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "chaque route dans routes doit avoir une propriété route"
   },
   {
     "id": "enabled",
@@ -4769,7 +4757,7 @@
   },
   {
     "id": "instance memory",
-    "translation": "mémoire d'instance "
+    "translation": "mémoire d'instance"
   },
   {
     "id": "instance memory limit",
@@ -4857,7 +4845,7 @@
   },
   {
     "id": "paid plans",
-    "translation": "plans payants "
+    "translation": "plans payants"
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
@@ -4921,11 +4909,11 @@
   },
   {
     "id": "reserved route ports",
-    "translation": "ports de route réservés "
+    "translation": "ports de route réservés"
   },
   {
     "id": "route ports",
-    "translation": "ports de route "
+    "translation": "ports de route"
   },
   {
     "id": "routes",
@@ -5061,7 +5049,7 @@
   },
   {
     "id": "total memory",
-    "translation": "mémoire totale "
+    "translation": "mémoire totale"
   },
   {
     "id": "total memory limit",
@@ -5177,7 +5165,7 @@
   },
   {
     "id": "{{.MemoryLimit}} memory limit",
-    "translation": "{{.MemoryLimit}} comme limite de mémoire "
+    "translation": "{{.MemoryLimit}} comme limite de mémoire"
   },
   {
     "id": "{{.MemoryLimit}}M memory limit",
@@ -5213,7 +5201,7 @@
   },
   {
     "id": "{{.ReservedRoutePorts}} route ports",
-    "translation": "{{.ReservedRoutePorts}} port(s) de route "
+    "translation": "{{.ReservedRoutePorts}} port(s) de route"
   },
   {
     "id": "{{.RoutesLimit}} routes",

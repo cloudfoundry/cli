@@ -137,7 +137,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes' debe ser una lista"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -293,15 +293,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "La aplicación {{.AppName}} no se puede configurar con 'routes' y 'domain'/'domains'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "La aplicación {{.AppName}} no se puede configurar con 'routes' y 'host'/'hosts'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "La aplicación {{.AppName}} no se puede configurar con 'routes' y 'no-hostname'"
   },
   {
     "id": "Apps:",
@@ -389,7 +389,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "Enlazar un grupo de seguridad a un espacio determinado o a todos los espacios existentes de una organización"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -1109,7 +1109,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "Haga una copia de código fuente de la app de una aplicación a otra.  A menos que se sustituya, el mandato copy-source reiniciará la aplicación."
+    "translation": "Copia el código fuente de una aplicación a otra aplicación existente (y reinicia dicha aplicación)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2024,8 +2024,8 @@
     "translation": "Error al captar paquetes de compilación.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "Error al captar dominios para la organización {{.OrgName}}.\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Error al captar dominios para la organización %s.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2058,10 +2058,6 @@
   {
     "id": "Failed fetching spaces.\n{{.ErrorDescription}}",
     "translation": "Error al captar espacios.\n{{.ErrorDescription}}"
-  },
-  {
-    "id": "Failed to create a local temporary zip file for the buildpack",
-    "translation": ""
   },
   {
     "id": "Failed to create json for resource_match request",
@@ -2481,7 +2477,7 @@
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "Uso incorrecto. Requiere SECURITY_GROUP y ORG, SPACE opcional, como argumentos\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2633,7 +2629,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "Configuración de aplicación no válida"
   },
   {
     "id": "Invalid async response from server",
@@ -2701,7 +2697,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "Puerto no válido para la ruta {{.RouteName}}"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -2902,10 +2898,6 @@
   {
     "id": "Max wait time for buildpack staging, in minutes",
     "translation": "Tiempo de espera máximo para la transferencia del paquete de compilación, en minutos"
-  },
-  {
-    "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": ""
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
@@ -3129,7 +3121,7 @@
   },
   {
     "id": "OK",
-    "translation": "Aceptar"
+    "translation": "Correcto"
   },
   {
     "id": "OPTIONS:",
@@ -3150,10 +3142,6 @@
   {
     "id": "ORGS",
     "translation": "ORGANIZACIONES"
-  },
-  {
-    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
-    "translation": ""
   },
   {
     "id": "Org",
@@ -3225,7 +3213,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "Vía de acceso para la ruta HTTP"
   },
   {
     "id": "Path for the HTTP route",
@@ -3237,7 +3225,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Vía de acceso no permitida en la ruta TCP {{.RouteName}}"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3257,7 +3245,7 @@
   },
   {
     "id": "Perform a simple check to determine whether a route currently exists or not",
-    "translation": "Realice una comprobación simple para determinar si existe o no en este momento una ruta"
+    "translation": "Realice una comprobación simple para determinar si existe o no en este momento una ruta."
   },
   {
     "id": "Plan does not exist for the {{.ServiceName}} service",
@@ -3329,7 +3317,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "Puerto no permitido en la ruta HTTP {{.RouteName}}"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -4141,7 +4129,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "La ruta {{.RouteName}} no coincide con ningún dominio existente. "
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4725,7 +4713,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "cada ruta en 'routes' debe tener una propiedad 'route'"
   },
   {
     "id": "enabled",
