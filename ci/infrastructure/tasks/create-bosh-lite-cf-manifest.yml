@@ -6,6 +6,7 @@ image: docker:///cloudfoundry/cli-vagrant-ci
 params:
   LITE_PRIVATE_IP_ADDRESS:
   LITE_HOSTNAME:
+  LITE_EXTRA_STUB: "{}"
 
 inputs:
   - name: cf-release-repo
@@ -34,7 +35,7 @@ run:
     properties:
       system_domain: ${LITE_HOSTNAME}
     EOF
-      ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml
+      ./scripts/generate-bosh-lite-dev-manifest property-overrides.yml <(echo $LITE_EXTRA_STUB)
     popd
 
     cp cf-release-repo/bosh-lite/deployments/cf.yml bosh-lite-cf-manifest
