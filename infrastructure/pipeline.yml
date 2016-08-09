@@ -843,6 +843,7 @@ jobs:
     params:
       LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
       LITE_HOSTNAME: {{lite-acceptance-hostname}}
+      LITE_EXTRA_STUB: "properties: { doppler: { port: 443 } }"
   - put: bosh-lite-acceptance-deploy-cf
     params:
       manifest: bosh-lite-cf-manifest/cf.yml
