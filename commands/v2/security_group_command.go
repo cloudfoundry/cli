@@ -9,6 +9,11 @@ import (
 
 type SecurityGroupCommand struct {
 	RequiredArgs flags.SecurityGroup `positional-args:"yes"`
+	usage        interface{}         `usage:"CF_NAME security-group SECURITY_GROUP"`
+}
+
+func (_ SecurityGroupCommand) Setup() error {
+	return nil
 }
 
 func (_ SecurityGroupCommand) Execute(args []string) error {

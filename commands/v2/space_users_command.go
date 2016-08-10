@@ -9,6 +9,11 @@ import (
 
 type SpaceUsersCommand struct {
 	RequiredArgs flags.OrgSpace `positional-args:"yes"`
+	usage        interface{}    `usage:"CF_NAME space-users ORG SPACE"`
+}
+
+func (_ SpaceUsersCommand) Setup() error {
+	return nil
 }
 
 func (_ SpaceUsersCommand) Execute(args []string) error {

@@ -9,6 +9,11 @@ import (
 
 type SetStagingEnvironmentVariableGroupCommand struct {
 	RequiredArgs flags.ParamsAsJSON `positional-args:"yes"`
+	usage        interface{}        `usage:"CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+}
+
+func (_ SetStagingEnvironmentVariableGroupCommand) Setup() error {
+	return nil
 }
 
 func (_ SetStagingEnvironmentVariableGroupCommand) Execute(args []string) error {

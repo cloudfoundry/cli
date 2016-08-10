@@ -9,6 +9,11 @@ import (
 
 type RestageCommand struct {
 	RequiredArgs flags.AppName `positional-args:"yes"`
+	usage        interface{}   `usage:"CF_NAME restage APP_NAME"`
+}
+
+func (_ RestageCommand) Setup() error {
+	return nil
 }
 
 func (_ RestageCommand) Execute(args []string) error {

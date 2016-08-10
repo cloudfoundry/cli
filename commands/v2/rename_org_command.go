@@ -9,6 +9,11 @@ import (
 
 type RenameOrgCommand struct {
 	RequiredArgs flags.RenameOrgArgs `positional-args:"yes"`
+	usage        interface{}         `usage:"CF_NAME rename-org ORG NEW_ORG"`
+}
+
+func (_ RenameOrgCommand) Setup() error {
+	return nil
 }
 
 func (_ RenameOrgCommand) Execute(args []string) error {

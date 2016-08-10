@@ -9,6 +9,11 @@ import (
 
 type UninstallPluginCommand struct {
 	RequiredArgs flags.PluginName `positional-args:"yes"`
+	usage        interface{}      `usage:"CF_NAME uninstall-plugin PLUGIN-NAME"`
+}
+
+func (_ UninstallPluginCommand) Setup() error {
+	return nil
 }
 
 func (_ UninstallPluginCommand) Execute(args []string) error {

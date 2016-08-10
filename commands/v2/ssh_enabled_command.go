@@ -9,6 +9,11 @@ import (
 
 type SSHEnabledCommand struct {
 	RequiredArgs flags.AppName `positional-args:"yes"`
+	usage        interface{}   `usage:"CF_NAME ssh-enabled APP_NAME"`
+}
+
+func (_ SSHEnabledCommand) Setup() error {
+	return nil
 }
 
 func (_ SSHEnabledCommand) Execute(args []string) error {

@@ -7,8 +7,13 @@ import (
 )
 
 type TargetCommand struct {
-	Organization string `short:"o" description:"Organization"`
-	Space        string `short:"s" description:"Space"`
+	Organization string      `short:"o" description:"Organization"`
+	Space        string      `short:"s" description:"Space"`
+	usage        interface{} `usage:"CF_NAME target [-o ORG] [-s SPACE]"`
+}
+
+func (_ TargetCommand) Setup() error {
+	return nil
 }
 
 func (_ TargetCommand) Execute(args []string) error {

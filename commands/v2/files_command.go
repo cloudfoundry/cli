@@ -10,6 +10,11 @@ import (
 type FilesCommand struct {
 	RequiredArgs flags.FilesArgs `positional-args:"yes"`
 	Instance     int             `short:"i" description:"Instance"`
+	usage        interface{}     `usage:"CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\nTIP:\n    To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'"`
+}
+
+func (_ FilesCommand) Setup() error {
+	return nil
 }
 
 func (_ FilesCommand) Execute(args []string) error {

@@ -9,6 +9,11 @@ import (
 
 type RenameSpaceCommand struct {
 	RequiredArgs flags.RenameSpaceArgs `positional-args:"yes"`
+	usage        interface{}           `usage:"CF_NAME rename-space SPACE NEW_SPACE"`
+}
+
+func (_ RenameSpaceCommand) Setup() error {
+	return nil
 }
 
 func (_ RenameSpaceCommand) Execute(args []string) error {

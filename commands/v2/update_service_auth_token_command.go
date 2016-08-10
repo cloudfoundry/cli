@@ -9,6 +9,11 @@ import (
 
 type UpdateServiceAuthTokenCommand struct {
 	RequiredArgs flags.ServiceAuthTokenArgs `positional-args:"yes"`
+	usage        interface{}                `usage:"CF_NAME update-service-auth-token LABEL PROVIDER TOKEN"`
+}
+
+func (_ UpdateServiceAuthTokenCommand) Setup() error {
+	return nil
 }
 
 func (_ UpdateServiceAuthTokenCommand) Execute(args []string) error {

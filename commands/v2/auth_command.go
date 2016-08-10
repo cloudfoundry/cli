@@ -9,6 +9,11 @@ import (
 
 type AuthCommand struct {
 	RequiredArgs flags.Authentication `positional-args:"yes"`
+	usage        interface{}          `usage:"CF_NAME auth USERNAME PASSWORD\n\nWARNING:\n    Providing your password as a command line option is highly discouraged\n    Your password may be visible to others and may be recorded in your shell history\n\nExamples:\n    CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n    CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
+}
+
+func (_ AuthCommand) Setup() error {
+	return nil
 }
 
 func (_ AuthCommand) Execute(args []string) error {

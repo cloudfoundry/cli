@@ -10,6 +10,11 @@ import (
 type DeleteDomainCommand struct {
 	RequiredArgs flags.Domain `positional-args:"yes"`
 	Force        bool         `short:"f" description:"Force deletion without confirmation"`
+	usage        interface{}  `usage:"CF_NAME delete-domain DOMAIN [-f]"`
+}
+
+func (_ DeleteDomainCommand) Setup() error {
+	return nil
 }
 
 func (_ DeleteDomainCommand) Execute(args []string) error {

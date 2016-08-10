@@ -9,6 +9,11 @@ import (
 
 type RestartAppInstanceCommand struct {
 	RequiredArgs flags.AppInstance `positional-args:"yes"`
+	usage        interface{}       `usage:"CF_NAME restart-app-instance APP_NAME INDEX"`
+}
+
+func (_ RestartAppInstanceCommand) Setup() error {
+	return nil
 }
 
 func (_ RestartAppInstanceCommand) Execute(args []string) error {

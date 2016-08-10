@@ -9,6 +9,11 @@ import (
 
 type UpdateServiceBrokerCommand struct {
 	RequiredArgs flags.ServiceBrokerArgs `positional-args:"yes"`
+	usage        interface{}             `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"`
+}
+
+func (_ UpdateServiceBrokerCommand) Setup() error {
+	return nil
 }
 
 func (_ UpdateServiceBrokerCommand) Execute(args []string) error {

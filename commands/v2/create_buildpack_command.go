@@ -9,8 +9,13 @@ import (
 
 type CreateBuildpackCommand struct {
 	RequiredArgs flags.CreateBuildpackArgs `positional-args:"yes"`
-	Enable       bool                      `long:"enable" description:"Enable the buildpack to be used for staging"`
 	Disable      bool                      `long:"disable" description:"Disable the buildpack from being used for staging"`
+	Enable       bool                      `long:"enable" description:"Enable the buildpack to be used for staging"`
+	usage        interface{}               `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]\n\nTIP:\n    Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
+}
+
+func (_ CreateBuildpackCommand) Setup() error {
+	return nil
 }
 
 func (_ CreateBuildpackCommand) Execute(args []string) error {

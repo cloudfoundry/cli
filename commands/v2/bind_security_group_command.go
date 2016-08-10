@@ -9,6 +9,11 @@ import (
 
 type BindSecurityGroupCommand struct {
 	RequiredArgs flags.BindSecurityGroupArgs `positional-args:"yes"`
+	usage        interface{}                 `usage:"CF_NAME bind-security-group SECURITY_GROUP ORG [SPACE]\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+}
+
+func (_ BindSecurityGroupCommand) Setup() error {
+	return nil
 }
 
 func (_ BindSecurityGroupCommand) Execute(args []string) error {

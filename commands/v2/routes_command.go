@@ -7,7 +7,12 @@ import (
 )
 
 type RoutesCommand struct {
-	OrgLevel bool `long:"orglevel" description:"List all the routes for all spaces of current organization"`
+	OrgLevel bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
+	usage    interface{} `usage:"CF_NAME routes [--orglevel]"`
+}
+
+func (_ RoutesCommand) Setup() error {
+	return nil
 }
 
 func (_ RoutesCommand) Execute(args []string) error {

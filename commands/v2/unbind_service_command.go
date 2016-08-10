@@ -9,6 +9,11 @@ import (
 
 type UnbindServiceCommand struct {
 	RequiredArgs flags.BindServiceArgs `positional-args:"yes"`
+	usage        interface{}           `usage:"CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"`
+}
+
+func (_ UnbindServiceCommand) Setup() error {
+	return nil
 }
 
 func (_ UnbindServiceCommand) Execute(args []string) error {

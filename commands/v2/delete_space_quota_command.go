@@ -10,6 +10,11 @@ import (
 type DeleteSpaceQuotaCommand struct {
 	RequiredArgs flags.SpaceQuota `positional-args:"yes"`
 	Force        bool             `short:"f" description:"Force delete (do not prompt for confirmation)"`
+	usage        interface{}      `usage:"CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"`
+}
+
+func (_ DeleteSpaceQuotaCommand) Setup() error {
+	return nil
 }
 
 func (_ DeleteSpaceQuotaCommand) Execute(args []string) error {

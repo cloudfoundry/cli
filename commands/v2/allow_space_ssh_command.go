@@ -9,6 +9,11 @@ import (
 
 type AllowSpaceSSHCommand struct {
 	RequiredArgs flags.Space `positional-args:"yes"`
+	usage        interface{} `usage:"CF_NAME allow-space-ssh SPACE_NAME"`
+}
+
+func (_ AllowSpaceSSHCommand) Setup() error {
+	return nil
 }
 
 func (_ AllowSpaceSSHCommand) Execute(args []string) error {

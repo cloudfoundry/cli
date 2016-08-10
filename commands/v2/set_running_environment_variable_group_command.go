@@ -9,6 +9,11 @@ import (
 
 type SetRunningEnvironmentVariableGroupCommand struct {
 	RequiredArgs flags.ParamsAsJSON `positional-args:"yes"`
+	usage        interface{}        `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+}
+
+func (_ SetRunningEnvironmentVariableGroupCommand) Setup() error {
+	return nil
 }
 
 func (_ SetRunningEnvironmentVariableGroupCommand) Execute(args []string) error {
