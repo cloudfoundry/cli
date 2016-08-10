@@ -27,8 +27,8 @@ func parse(args []string) {
 
 	if flagErr, ok := err.(*flags.Error); ok {
 		switch flagErr.Type {
-		case flags.ErrHelp, flags.ErrUnknownFlag:
-			field, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
+		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument:
+			_, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
 				func(fieldName string) bool {
 					field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
 					return parser.Active != nil && parser.Active.Name == field.Tag.Get("command")
@@ -36,28 +36,32 @@ func parse(args []string) {
 			)
 
 			if found {
-				parse([]string{"help", field.Name})
-				return
+				parse([]string{"help", parser.Active.Name})
+			} else {
+				switch len(extraArgs) {
+				case 0:
+					parse([]string{"help"})
+				case 1:
+					parse([]string{"help", extraArgs[0]})
+				default:
+					parse(extraArgs[1:])
+				}
 			}
 
-			switch len(extraArgs) {
-			case 0:
-				parse([]string{"help"})
-			case 1:
-				parse([]string{"help", extraArgs[0]})
-			default:
-				parse(extraArgs[1:])
+			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument {
+				os.Exit(1)
 			}
 		case flags.ErrRequired:
 			fmt.Printf("%s\n\n", flagErr.Error())
 			parse(append([]string{"help"}, args...))
+			os.Exit(1)
 		case flags.ErrUnknownCommand:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 		default:
 			fmt.Printf("unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 		}
 	} else {
-		fmt.Println("unexpected non-flag error:", err.Error())
+		fmt.Println("unexpected error:", err.Error())
 	}
 }
 
