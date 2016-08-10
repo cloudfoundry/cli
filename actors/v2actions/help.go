@@ -1,0 +1,83 @@
+package v2actions
+
+import (
+	"reflect"
+	"strings"
+)
+
+// CommandInfo contains the help details of a command
+type CommandInfo struct {
+	// Name is the command name
+	Name string
+
+	// Description is the command description
+	Description string
+
+	// Alais is the command alias
+	Alias string
+
+	// Usage is the command usage string, may contain examples and flavor text
+	Usage string
+
+	// Flags contains the list of flags for this command
+	Flags []CommandFlag
+}
+
+// CommandFlag contains the help details of a command's flag
+type CommandFlag struct {
+	// Short is the short form of the flag
+	Short string
+
+	// Long is the long form of the flag
+	Long string
+
+	// Description is the description of the flag
+	Description string
+}
+
+// GetCommandInfo returns the help information for a particular commandName in the commandList.
+func (_ Actor) GetCommandInfo(commandList interface{}, commandName string) (CommandInfo, error) {
+	field, found := reflect.TypeOf(commandList).FieldByNameFunc(
+		func(fieldName string) bool {
+			field, _ := reflect.TypeOf(commandList).FieldByName(fieldName)
+			return field.Tag.Get("command") == commandName || field.Tag.Get("alias") == commandName
+		},
+	)
+
+	if !found {
+		return CommandInfo{}, ErrorInvalidCommand{CommandName: commandName}
+	}
+
+	tag := field.Tag
+	cmd := CommandInfo{
+		Name:        tag.Get("command"),
+		Description: tag.Get("description"),
+		Alias:       tag.Get("alias"),
+		Flags:       []CommandFlag{},
+	}
+
+	command := field.Type
+	for i := 0; i < command.NumField(); i++ {
+		fieldTag := command.Field(i).Tag
+
+		if fieldTag.Get("hidden") != "" {
+			continue
+		}
+
+		if fieldTag.Get("usage") != "" {
+			executableName := "cf" //TODO: Figure out how to dynamically get this name
+			cmd.Usage = strings.Replace(fieldTag.Get("usage"), "CF_NAME", executableName, -1)
+			continue
+		}
+
+		if fieldTag.Get("description") != "" {
+			cmd.Flags = append(cmd.Flags, CommandFlag{
+				Short:       fieldTag.Get("short"),
+				Long:        fieldTag.Get("long"),
+				Description: fieldTag.Get("description"),
+			})
+		}
+	}
+
+	return cmd, nil
+}
