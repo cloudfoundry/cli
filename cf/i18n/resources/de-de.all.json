@@ -2060,6 +2060,10 @@
     "translation": "Abrufen von Bereichen ist fehlgeschlagen.\n{{.ErrorDescription}}"
   },
   {
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
+  },
+  {
     "id": "Failed to create json for resource_match request",
     "translation": "Erstellen von JSON für die Anforderung resource_match ist fehlgeschlagen."
   },
@@ -2900,6 +2904,10 @@
     "translation": "Maximale Wartezeit auf das Staging des Buildpacks in Minuten"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z. B. 1024M, 1G, 10G)"
   },
@@ -3142,6 +3150,10 @@
   {
     "id": "ORGS",
     "translation": "ORGANISATIONEN"
+  },
+  {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": ""
   },
   {
     "id": "Org",

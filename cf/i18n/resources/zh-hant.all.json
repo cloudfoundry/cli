@@ -2060,6 +2060,10 @@
     "translation": "提取空間時失敗。\n{{.ErrorDescription}}"
   },
   {
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
+  },
+  {
     "id": "Failed to create json for resource_match request",
     "translation": "無法建立 resource_match 要求的 json"
   },
@@ -2900,6 +2904,10 @@
     "translation": "建置套件編譯打包的最長等待時間（分鐘）"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "應用程式實例可以具有的記憶體數量上限（例如 1024M、1G、10G）"
   },
@@ -3142,6 +3150,10 @@
   {
     "id": "ORGS",
     "translation": "組織"
+  },
+  {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": ""
   },
   {
     "id": "Org",

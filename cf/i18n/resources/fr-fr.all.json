@@ -2060,6 +2060,10 @@
     "translation": "Echec de l'extraction des espaces.\n{{.ErrorDescription}}"
   },
   {
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
+  },
+  {
     "id": "Failed to create json for resource_match request",
     "translation": "Echec de la création du json pour la demande resource_match"
   },
@@ -2900,6 +2904,10 @@
     "translation": "Temps d'attente maximal pour la constitution du pack de construction, en minutes"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Quantité maximale de mémoire dont une instance d'application peut disposer (par exemple 1024M, 1G, 10G)"
   },
@@ -3142,6 +3150,10 @@
   {
     "id": "ORGS",
     "translation": "ORGANISATIONS"
+  },
+  {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": ""
   },
   {
     "id": "Org",

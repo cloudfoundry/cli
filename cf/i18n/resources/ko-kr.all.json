@@ -2060,6 +2060,10 @@
     "translation": "영역 페치에 실패했습니다.\n{{.ErrorDescription}}"
   },
   {
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
+  },
+  {
     "id": "Failed to create json for resource_match request",
     "translation": "resource_match 요청의 JSON 작성에 실패"
   },
@@ -2900,6 +2904,10 @@
     "translation": "최대 빌드팩 스테이징 대기 시간(분)"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "애플리케이션 인스턴스에 있을 수 있는 최대 메모리 크기(예: 1024M, 1G, 10G)"
   },
@@ -3142,6 +3150,10 @@
   {
     "id": "ORGS",
     "translation": "조직"
+  },
+  {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": ""
   },
   {
     "id": "Org",

@@ -2060,6 +2060,10 @@
     "translation": "スペースを取り出せませんでした。\n{{.ErrorDescription}}"
   },
   {
+    "id": "Failed to create a local temporary zip file for the buildpack",
+    "translation": ""
+  },
+  {
     "id": "Failed to create json for resource_match request",
     "translation": "resource_match 要求の json を作成できませんでした"
   },
@@ -2900,6 +2904,10 @@
     "translation": "ビルドパック・ステージングの最大待ち時間 (分)"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)"
   },
@@ -3142,6 +3150,10 @@
   {
     "id": "ORGS",
     "translation": "組織"
+  },
+  {
+    "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
+    "translation": ""
   },
   {
     "id": "Org",
