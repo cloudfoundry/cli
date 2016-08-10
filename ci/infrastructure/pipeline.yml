@@ -140,12 +140,12 @@ resources:
 - name: diego-release
   type: bosh-io-release
   source:
-    repository: cloudfoundry-incubator/diego-release
+    repository: cloudfoundry/diego-release
 
 - name: diego-repo
   type: git
   source:
-    uri: https://github.com/cloudfoundry-incubator/diego-release.git
+    uri: https://github.com/cloudfoundry/diego-release.git
     branch: master
 
 - name: etcd-release
@@ -156,7 +156,7 @@ resources:
 - name: garden-linux-release
   type: bosh-io-release
   source:
-    repository: cloudfoundry-incubator/garden-linux-release
+    repository: cloudfoundry/garden-linux-release
 
 groups:
 - name: bosh-lites
