@@ -9,6 +9,11 @@ import (
 
 type RestartCommand struct {
 	RequiredArgs flags.AppName `positional-args:"yes"`
+	usage        interface{}   `usage:"CF_NAME restart APP_NAME"`
+}
+
+func (_ RestartCommand) Setup() error {
+	return nil
 }
 
 func (_ RestartCommand) Execute(args []string) error {

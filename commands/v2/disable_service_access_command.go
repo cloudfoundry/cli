@@ -9,8 +9,13 @@ import (
 
 type DisableServiceAccessCommand struct {
 	RequiredArgs flags.Service `positional-args:"yes"`
-	ServicePlan  string        `short:"p" description:"Enable access to a specified service plan"`
-	Organization string        `short:"o" description:"Enable access to a specified organization"`
+	Organization string        `short:"o" description:"Disable access for a specified organization"`
+	ServicePlan  string        `short:"p" description:"Disable access to a specified service plan"`
+	usage        interface{}   `usage:"CF_NAME disable-service-access SERVICE [-p PLAN] [-o ORG]"`
+}
+
+func (_ DisableServiceAccessCommand) Setup() error {
+	return nil
 }
 
 func (_ DisableServiceAccessCommand) Execute(args []string) error {

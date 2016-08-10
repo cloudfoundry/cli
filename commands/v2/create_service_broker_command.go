@@ -10,6 +10,11 @@ import (
 type CreateServiceBrokerCommand struct {
 	RequiredArgs flags.ServiceBrokerArgs `positional-args:"yes"`
 	SpaceScoped  bool                    `long:"space-scoped" description:"Make the broker's service plans only visible within the targeted space"`
+	usage        interface{}             `usage:"CF_NAME create-service-broker SERVICE_BROKER USERNAME PASSWORD URL [--space-scoped]"`
+}
+
+func (_ CreateServiceBrokerCommand) Setup() error {
+	return nil
 }
 
 func (_ CreateServiceBrokerCommand) Execute(args []string) error {

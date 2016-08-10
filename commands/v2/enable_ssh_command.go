@@ -9,6 +9,11 @@ import (
 
 type EnableSSHCommand struct {
 	RequiredArgs flags.AppName `positional-args:"yes"`
+	usage        interface{}   `usage:"CF_NAME enable-ssh APP_NAME"`
+}
+
+func (_ EnableSSHCommand) Setup() error {
+	return nil
 }
 
 func (_ EnableSSHCommand) Execute(args []string) error {

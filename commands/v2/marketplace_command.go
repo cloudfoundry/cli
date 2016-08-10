@@ -7,7 +7,12 @@ import (
 )
 
 type MarketplaceCommand struct {
-	ServicePlanInfo string `short:"s" description:"Show plan details for a particular service offering"`
+	ServicePlanInfo string      `short:"s" description:"Show plan details for a particular service offering"`
+	usage           interface{} `usage:"CF_NAME marketplace [-s SERVICE]"`
+}
+
+func (_ MarketplaceCommand) Setup() error {
+	return nil
 }
 
 func (_ MarketplaceCommand) Execute(args []string) error {

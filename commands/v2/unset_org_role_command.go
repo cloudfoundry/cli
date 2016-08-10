@@ -9,6 +9,11 @@ import (
 
 type UnsetOrgRoleCommand struct {
 	RequiredArgs flags.SetOrgRoleArgs `positional-args:"yes"`
+	usage        interface{}          `usage:"CF_NAME unset-org-role USERNAME ORG ROLE\n\nROLES:\n    'OrgManager' - Invite and manage users, select and change plans, and set spending limits\n    'BillingManager' - Create and manage the billing account and payment info\n    'OrgAuditor' - Read-only access to org info and reports"`
+}
+
+func (_ UnsetOrgRoleCommand) Setup() error {
+	return nil
 }
 
 func (_ UnsetOrgRoleCommand) Execute(args []string) error {

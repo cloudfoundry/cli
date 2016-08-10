@@ -7,9 +7,14 @@ import (
 )
 
 type ServiceAccessCommand struct {
-	Broker       string `short:"b" description:"Access for plans of a particular broker"`
-	Service      string `short:"e" description:"Access for service name of a particular service offering"`
-	Organization string `short:"o" description:"Plans accessible by a particular organization"`
+	Broker       string      `short:"b" description:"Access for plans of a particular broker"`
+	Service      string      `short:"e" description:"Access for service name of a particular service offering"`
+	Organization string      `short:"o" description:"Plans accessible by a particular organization"`
+	usage        interface{} `usage:"CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]"`
+}
+
+func (_ ServiceAccessCommand) Setup() error {
+	return nil
 }
 
 func (_ ServiceAccessCommand) Execute(args []string) error {

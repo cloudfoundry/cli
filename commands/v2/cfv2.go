@@ -33,7 +33,7 @@ type commandList struct {
 	CopySource                         CopySourceCommand                         `command:"copy-source" description:"Copies the source code of an application to another existing application (and restarts that application)"`
 	CreateAppManifest                  CreateAppManifestCommand                  `command:"create-app-manifest" description:"Create an app manifest for an app that has been pushed successfully"`
 	GetHealthCheck                     GetHealthCheckCommand                     `command:"get-health-check" description:"Get the health_check_type value of an app"`
-	SetHealthCheck                     SetHealthCheckCommand                     `command:"set-health-check" description:"Set health_check_type flag to either 'port' or 'none'"` //TODO: Figure out how to do this arg
+	SetHealthCheck                     SetHealthCheckCommand                     `command:"set-health-check" description:"Set health_check_type flag to either 'port' or 'none'"`
 	EnableSSH                          EnableSSHCommand                          `command:"enable-ssh" description:"Enable ssh for the application"`
 	DisableSSH                         DisableSSHCommand                         `command:"disable-ssh" description:"Disable ssh for the application"`
 	SSHEnabled                         SSHEnabledCommand                         `command:"ssh-enabled" description:"Reports whether SSH is enabled on an application container instance"`
@@ -128,7 +128,7 @@ type commandList struct {
 	SecurityGroups                     SecurityGroupsCommand                     `command:"security-groups" description:"List all security groups"`
 	CreateSecurityGroup                CreateSecurityGroupCommand                `command:"create-security-group" description:"Create a security group"`
 	UpdateSecurityGroup                UpdateSecurityGroupCommand                `command:"update-security-group" description:"Update a security group"`
-	DeleteSecurityGroup                DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Delete a security group"`
+	DeleteSecurityGroup                DeleteSecurityGroupCommand                `command:"delete-security-group" description:"Deletes a security group"`
 	BindSecurityGroup                  BindSecurityGroupCommand                  `command:"bind-security-group" description:"Bind a security group to a particular space, or all existing spaces of an org"`
 	UnbindSecurityGroup                UnbindSecurityGroupCommand                `command:"unbind-security-group" description:"Unbind a security group from a space"`
 	BindStagingSecurityGroup           BindStagingSecurityGroupCommand           `command:"bind-staging-security-group" description:"Bind a security group to the list of security groups to be used for staging applications"`

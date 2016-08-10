@@ -9,15 +9,20 @@ import (
 
 type UpdateSpaceQuotaCommand struct {
 	RequiredArgs             flags.SpaceQuota `positional-args:"yes"`
-	AppInstanceMemory        string           `short:"i" description:"Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)"`
+	NumAppInstances          int              `short:"a" description:"Total number of application instances. -1 represents an unlimited amount."`
+	AllowPaidServicePlans    bool             `long:"allow-paid-service-plans" description:"Can provision instances of paid service plans"`
+	DisallowPaidServicePlans bool             `long:"disallow-paid-service-plans" description:"Can not provision instances of paid service plans"`
+	AppInstanceMemory        string           `short:"i" description:"Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount."`
 	TotalMemory              string           `short:"m" description:"Total amount of memory a space can have (e.g. 1024M, 1G, 10G)"`
 	Name                     string           `short:"n" description:"New name"`
 	NumRoutes                int              `short:"r" description:"Total number of routes"`
+	ReservedRoutePorts       int              `long:"reserved-route-ports" description:"Maximum number of routes that may be created with reserved ports"`
 	NumServiceInstances      int              `short:"s" description:"Total number of service instances"`
-	AllowPaidServicePlans    bool             `long:"allow-paid-service-plans" description:"Can provision instances of paid service plans"`
-	DisallowPaidServicePlans bool             `long:"disallow-paid-service-plans" description:"Can not provision instances of paid service plans"`
-	NumAppInstances          int              `short:"a" description:"Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)"`
-	ReservedRoutePorts       int              `long:"reserved-route-ports" description:"Maximum number of routes that may be created with reserved ports (Default: 0)"`
+	usage                    interface{}      `usage:"CF_NAME update-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-n NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
+}
+
+func (_ UpdateSpaceQuotaCommand) Setup() error {
+	return nil
 }
 
 func (_ UpdateSpaceQuotaCommand) Execute(args []string) error {

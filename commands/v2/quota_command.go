@@ -9,6 +9,11 @@ import (
 
 type QuotaCommand struct {
 	RequiredArgs flags.Quota `positional-args:"yes"`
+	usage        interface{} `usage:"CF_NAME quota QUOTA"`
+}
+
+func (_ QuotaCommand) Setup() error {
+	return nil
 }
 
 func (_ QuotaCommand) Execute(args []string) error {

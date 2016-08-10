@@ -13,6 +13,11 @@ type ScaleCommand struct {
 	DiskLimit    string        `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	MemoryLimit  string        `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	ForceRestart bool          `short:"f" description:"Force restart of app without prompt"`
+	usage        interface{}   `usage:"CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"`
+}
+
+func (_ ScaleCommand) Setup() error {
+	return nil
 }
 
 func (_ ScaleCommand) Execute(args []string) error {

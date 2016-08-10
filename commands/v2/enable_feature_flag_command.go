@@ -9,6 +9,11 @@ import (
 
 type EnableFeatureFlagCommand struct {
 	RequiredArgs flags.Feature `positional-args:"yes"`
+	usage        interface{}   `usage:"CF_NAME enable-feature-flag FEATURE_NAME"`
+}
+
+func (_ EnableFeatureFlagCommand) Setup() error {
+	return nil
 }
 
 func (_ EnableFeatureFlagCommand) Execute(args []string) error {

@@ -6,6 +6,4 @@ package v2
 type UI interface {
 	DisplayText(string, ...map[string]interface{})
 	DisplayTextWithKeyTranslations(string, []string, ...map[string]interface{})
-	DisplayFlavorText(string, ...map[string]interface{})
-	DisplayFlavorTextWithKeyTranslations(string, []string, ...map[string]interface{})
 }

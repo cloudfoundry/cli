@@ -9,6 +9,11 @@ import (
 
 type DisableSSHCommand struct {
 	RequiredArgs flags.AppName `positional-args:"yes"`
+	usage        interface{}   `usage:"CF_NAME disable-ssh APP_NAME"`
+}
+
+func (_ DisableSSHCommand) Setup() error {
+	return nil
 }
 
 func (_ DisableSSHCommand) Execute(args []string) error {

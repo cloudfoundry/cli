@@ -9,6 +9,11 @@ import (
 
 type CreateServiceAuthTokenCommand struct {
 	RequiredArgs flags.ServiceAuthTokenArgs `positional-args:"yes"`
+	usage        interface{}                `usage:"CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"`
+}
+
+func (_ CreateServiceAuthTokenCommand) Setup() error {
+	return nil
 }
 
 func (_ CreateServiceAuthTokenCommand) Execute(args []string) error {

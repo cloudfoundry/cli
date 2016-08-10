@@ -9,6 +9,11 @@ import (
 
 type UnbindSecurityGroupCommand struct {
 	RequiredArgs flags.BindSecurityGroupArgs `positional-args:"yes"`
+	usage        interface{}                 `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+}
+
+func (_ UnbindSecurityGroupCommand) Setup() error {
+	return nil
 }
 
 func (_ UnbindSecurityGroupCommand) Execute(args []string) error {

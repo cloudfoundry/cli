@@ -12,6 +12,11 @@ type CopySourceCommand struct {
 	NoRestart    bool                 `long:"no-restart" description:"Override restart of the application in target environment after copy-source completes"`
 	Organization string               `short:"o" description:"Org that contains the target application"`
 	Space        string               `short:"s" description:"Space that contains the target application"`
+	usage        interface{}          `usage:"CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n"`
+}
+
+func (_ CopySourceCommand) Setup() error {
+	return nil
 }
 
 func (_ CopySourceCommand) Execute(args []string) error {

@@ -9,6 +9,11 @@ import (
 
 type BindRunningSecurityGroupCommand struct {
 	RequiredArgs flags.SecurityGroup `positional-args:"yes"`
+	usage        interface{}         `usage:"CF_NAME bind-staging-security-group SECURITY_GROUP"`
+}
+
+func (_ BindRunningSecurityGroupCommand) Setup() error {
+	return nil
 }
 
 func (_ BindRunningSecurityGroupCommand) Execute(args []string) error {

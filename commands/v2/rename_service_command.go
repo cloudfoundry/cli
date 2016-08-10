@@ -9,6 +9,11 @@ import (
 
 type RenameServiceCommand struct {
 	RequiredArgs flags.RenameServiceArgs `positional-args:"yes"`
+	usage        interface{}             `usage:"CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"`
+}
+
+func (_ RenameServiceCommand) Setup() error {
+	return nil
 }
 
 func (_ RenameServiceCommand) Execute(args []string) error {

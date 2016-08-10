@@ -9,6 +9,11 @@ import (
 
 type SetHealthCheckCommand struct {
 	RequiredArgs flags.SetHealthCheckArgs `positional-args:"yes"`
+	usage        interface{}              `usage:"CF_NAME set-health-check APP_NAME 'port'|'none'"`
+}
+
+func (_ SetHealthCheckCommand) Setup() error {
+	return nil
 }
 
 func (_ SetHealthCheckCommand) Execute(args []string) error {

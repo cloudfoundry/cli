@@ -9,6 +9,11 @@ import (
 
 type CreateUserCommand struct {
 	RequiredArgs flags.Authentication `positional-args:"yes"`
+	usage        interface{}          `usage:"CF_NAME create-user USERNAME PASSWORD"`
+}
+
+func (_ CreateUserCommand) Setup() error {
+	return nil
 }
 
 func (_ CreateUserCommand) Execute(args []string) error {
