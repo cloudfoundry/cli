@@ -1,3 +1,34 @@
+## 6.21.1
+* Bump version to 6.21.1
+* update diego resources to come from cloudfoundry, not incubator
+* Add CONTRIBUTING guide and cleanup README
+* configure dies' bosh-lite doppler to port 443
+* create bosh lite cf manifest can take an extra stub
+* chmod windows binaries before combining
+* shortened line with links to help
+* added slack url
+* changed bugs to issues
+* simplified login instructions by using login's -a option
+* merged Getting Help section into top
+* added known issue with cygwin
+* added links to docs, command ref guide
+* add i18n resources
+* update error message
+* move binary to the right output
+* fix pipeline config
+* adding task to sign windows binary
+* modify error message for files command
+* create and validate local builpack zip file before api calls
+* print standard log out without color
+* curl command now requires api endpoint set
+* Expose CF_DIAL_TIMEOUT to help text
+* fix error when uploading buildpack using url
+* no more invisible log text in windows terminals
+* Remove dummy pipeline from master. Move to remote.
+* Fix up some inputs and outputs for dummy 6.19.0
+* create tmp pipeline that makes 6.19.0 win64 installer
+* package correct binary in windows installers
+
 ## 6.21.0
 * Bump version to 6.21.0
 * add validation for --no-hostname
