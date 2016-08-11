@@ -22,9 +22,10 @@ import (
 )
 
 type Curl struct {
-	ui       terminal.UI
-	config   coreconfig.Reader
-	curlRepo api.CurlRepository
+	ui         terminal.UI
+	config     coreconfig.Reader
+	curlRepo   api.CurlRepository
+	pluginCall bool
 }
 
 func init() {
@@ -76,6 +77,7 @@ func (cmd *Curl) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.curlRepo = deps.RepoLocator.GetCurlRepository()
+	cmd.pluginCall = pluginCall
 	return cmd
 }
 
@@ -107,7 +109,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) error {
 		return errors.New(T("Error creating request:\n{{.Err}}", map[string]interface{}{"Err": apiErr.Error()}))
 	}
 
-	if trace.LoggingToStdout {
+	if trace.LoggingToStdout && !cmd.pluginCall {
 		return nil
 	}
 
