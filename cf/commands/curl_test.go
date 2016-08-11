@@ -52,6 +52,10 @@ var _ = Describe("curl command", func() {
 		return testcmd.RunCLICommand("curl", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
 
+	runCurlAsPluginWithInputs := func(args []string) bool {
+		return testcmd.RunCLICommand("curl", args, requirementsFactory, updateCommandDependency, true, ui)
+	}
+
 	It("fails with usage when not given enough input", func() {
 		runCurlWithInputs([]string{})
 		Expect(ui.Outputs()).To(ContainSubstrings(
@@ -207,6 +211,17 @@ var _ = Describe("curl command", func() {
 		runCurlWithInputs([]string{"/foo"})
 
 		Expect(ui.Outputs()).ToNot(ContainSubstrings([]string{"response for get"}))
+	})
+
+	It("prints the response even when verbose output is enabled if in a plugin call", func() {
+		trace.LoggingToStdout = true
+
+		curlRepo.ResponseHeader = "Content-Size:1024"
+		curlRepo.ResponseBody = "response for get"
+
+		runCurlAsPluginWithInputs([]string{"/foo"})
+
+		Expect(ui.Outputs()).To(ContainSubstrings([]string{"response for get"}))
 	})
 
 	It("prints a failure message when the response is not success", func() {
