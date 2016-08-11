@@ -166,6 +166,7 @@ func writeZipFile(dir string, targetFile *os.File) error {
 		}
 
 		header.Name = filepath.ToSlash(fileName)
+		header.Method = zip.Deflate
 
 		if fileInfo.IsDir() {
 			header.Name += "/"

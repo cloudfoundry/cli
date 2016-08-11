@@ -102,6 +102,8 @@ var _ = Describe("Zipper", func() {
 			"foo.txt",
 			"fooDir/",
 			"fooDir/bar/",
+			"largeblankfile/",
+			"largeblankfile/file.txt",
 			"lastDir/",
 			"subDir/",
 			"subDir/bar.txt",
@@ -169,8 +171,8 @@ var _ = Describe("Zipper", func() {
 			reader, err := zip.NewReader(zipFile, fileStat.Size())
 			Expect(err).NotTo(HaveOccurred())
 
-			readFileInZip(5, reader)
-			Expect(reader.File[5].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
+			readFileInZip(7, reader)
+			Expect(reader.File[7].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
 		})
 
 		It("creates a zip with executable file modes", func() {
@@ -210,6 +212,25 @@ var _ = Describe("Zipper", func() {
 			zippedFile, err := os.Open(fixture)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(readFile(zipFile)).To(Equal(readFile(zippedFile)))
+		})
+
+		It("compresses the files", func() {
+			workingDir, err := os.Getwd()
+			Expect(err).NotTo(HaveOccurred())
+
+			dir := filepath.Join(workingDir, "../../fixtures/zip/largeblankfile/")
+			fileStat, err := os.Stat(filepath.Join(dir, "file.txt"))
+			Expect(err).NotTo(HaveOccurred())
+			originalFileSize := fileStat.Size()
+
+			err = zipper.Zip(dir, zipFile)
+			Expect(err).NotTo(HaveOccurred())
+
+			fileStat, err = zipFile.Stat()
+			Expect(err).NotTo(HaveOccurred())
+
+			compressedFileSize := fileStat.Size()
+			Expect(compressedFileSize).To(BeNumerically("<", originalFileSize))
 		})
 
 		It("returns an error when zipping fails", func() {
@@ -442,5 +463,4 @@ var _ = Describe("Zipper", func() {
 			Expect(sizeErr).To(HaveOccurred())
 		})
 	})
-
 })
