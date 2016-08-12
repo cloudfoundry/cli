@@ -21,6 +21,8 @@ type FakeStagingWatcher struct {
 		result1 models.Application
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeStagingWatcher) WatchStaging(app models.Application, orgName string, spaceName string, startCommand func(app models.Application) (models.Application, error)) (updatedApp models.Application, err error) {
@@ -31,6 +33,7 @@ func (fake *FakeStagingWatcher) WatchStaging(app models.Application, orgName str
 		spaceName    string
 		startCommand func(app models.Application) (models.Application, error)
 	}{app, orgName, spaceName, startCommand})
+	fake.recordInvocation("WatchStaging", []interface{}{app, orgName, spaceName, startCommand})
 	fake.watchStagingMutex.Unlock()
 	if fake.WatchStagingStub != nil {
 		return fake.WatchStagingStub(app, orgName, spaceName, startCommand)
@@ -57,6 +60,26 @@ func (fake *FakeStagingWatcher) WatchStagingReturns(result1 models.Application, 
 		result1 models.Application
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeStagingWatcher) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.watchStagingMutex.RLock()
+	defer fake.watchStagingMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeStagingWatcher) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ application.StagingWatcher = new(FakeStagingWatcher)

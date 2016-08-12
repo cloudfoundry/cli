@@ -36,16 +36,17 @@ func (cmd *showQuota) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *showQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *showQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("quota"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *showQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -98,6 +99,9 @@ func (cmd *showQuota) Execute(c flags.FlagContext) error {
 	if reservedRoutePorts != "" {
 		table.Add(T("Reserved Route Ports"), reservedRoutePorts)
 	}
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

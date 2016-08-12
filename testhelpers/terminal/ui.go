@@ -14,8 +14,6 @@ import (
 	term "github.com/cloudfoundry/cli/cf/terminal"
 )
 
-const QuietPanic = "I should not print anything"
-
 type FakeUI struct {
 	outputs                    []string
 	uncapturedOutput           []string
@@ -25,7 +23,6 @@ type FakeUI struct {
 	Inputs                     []string
 	FailedWithUsage            bool
 	FailedWithUsageCommandName string
-	PanickedQuietly            bool
 	ShowConfigurationCalled    bool
 
 	sayMutex sync.Mutex
@@ -137,11 +134,6 @@ func (ui *FakeUI) Ok() {
 func (ui *FakeUI) Failed(message string, args ...interface{}) {
 	ui.Say("FAILED")
 	ui.Say(message, args...)
-	panic(QuietPanic)
-}
-
-func (ui *FakeUI) PanicQuietly() {
-	ui.PanickedQuietly = true
 }
 
 func (ui *FakeUI) DumpWarnOutputs() string {
@@ -163,8 +155,9 @@ func (ui *FakeUI) ClearOutputs() {
 	ui.outputs = []string{}
 }
 
-func (ui *FakeUI) ShowConfiguration(config coreconfig.Reader) {
+func (ui *FakeUI) ShowConfiguration(config coreconfig.Reader) error {
 	ui.ShowConfigurationCalled = true
+	return nil
 }
 
 func (ui *FakeUI) LoadingIndication() {

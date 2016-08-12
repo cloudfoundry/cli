@@ -57,13 +57,15 @@ func (cmd *DeleteRoute) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-route"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+		return nil, fmt.Errorf("Cannot specify port together with hostname and/or path.")
 	}
 
 	cmd.domainReq = requirementsFactory.NewDomainRequirement(fc.Args()[0])
@@ -83,7 +85,7 @@ func (cmd *DeleteRoute) Requirements(requirementsFactory requirements.Factory, f
 		cmd.domainReq,
 	}...)
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *DeleteRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

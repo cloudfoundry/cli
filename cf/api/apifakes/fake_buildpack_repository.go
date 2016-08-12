@@ -55,6 +55,8 @@ type FakeBuildpackRepository struct {
 		result1 models.Buildpack
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
@@ -62,6 +64,7 @@ func (fake *FakeBuildpackRepository) FindByName(name string) (buildpack models.B
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -95,6 +98,7 @@ func (fake *FakeBuildpackRepository) ListBuildpacks(arg1 func(models.Buildpack) 
 	fake.listBuildpacksArgsForCall = append(fake.listBuildpacksArgsForCall, struct {
 		arg1 func(models.Buildpack) bool
 	}{arg1})
+	fake.recordInvocation("ListBuildpacks", []interface{}{arg1})
 	fake.listBuildpacksMutex.Unlock()
 	if fake.ListBuildpacksStub != nil {
 		return fake.ListBuildpacksStub(arg1)
@@ -130,6 +134,7 @@ func (fake *FakeBuildpackRepository) Create(name string, position *int, enabled 
 		enabled  *bool
 		locked   *bool
 	}{name, position, enabled, locked})
+	fake.recordInvocation("Create", []interface{}{name, position, enabled, locked})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(name, position, enabled, locked)
@@ -163,6 +168,7 @@ func (fake *FakeBuildpackRepository) Delete(buildpackGUID string) (apiErr error)
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		buildpackGUID string
 	}{buildpackGUID})
+	fake.recordInvocation("Delete", []interface{}{buildpackGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(buildpackGUID)
@@ -195,6 +201,7 @@ func (fake *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updated
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		buildpack models.Buildpack
 	}{buildpack})
+	fake.recordInvocation("Update", []interface{}{buildpack})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(buildpack)
@@ -221,6 +228,34 @@ func (fake *FakeBuildpackRepository) UpdateReturns(result1 models.Buildpack, res
 		result1 models.Buildpack
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeBuildpackRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.listBuildpacksMutex.RLock()
+	defer fake.listBuildpacksMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeBuildpackRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.BuildpackRepository = new(FakeBuildpackRepository)

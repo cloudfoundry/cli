@@ -27,7 +27,7 @@ type FakeSpaceRoleSetter struct {
 	setDependencyReturns struct {
 		result1 commandregistry.Command
 	}
-	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
+	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error)
 	requirementsMutex       sync.RWMutex
 	requirementsArgsForCall []struct {
 		requirementsFactory requirements.Factory
@@ -35,6 +35,7 @@ type FakeSpaceRoleSetter struct {
 	}
 	requirementsReturns struct {
 		result1 []requirements.Requirement
+		result2 error
 	}
 	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
@@ -57,11 +58,14 @@ type FakeSpaceRoleSetter struct {
 	setSpaceRoleReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSpaceRoleSetter) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
+	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
 	if fake.MetaDataStub != nil {
 		return fake.MetaDataStub()
@@ -89,6 +93,7 @@ func (fake *FakeSpaceRoleSetter) SetDependency(deps commandregistry.Dependency, 
 		deps       commandregistry.Dependency
 		pluginCall bool
 	}{deps, pluginCall})
+	fake.recordInvocation("SetDependency", []interface{}{deps, pluginCall})
 	fake.setDependencyMutex.Unlock()
 	if fake.SetDependencyStub != nil {
 		return fake.SetDependencyStub(deps, pluginCall)
@@ -116,17 +121,18 @@ func (fake *FakeSpaceRoleSetter) SetDependencyReturns(result1 commandregistry.Co
 	}{result1}
 }
 
-func (fake *FakeSpaceRoleSetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (fake *FakeSpaceRoleSetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error) {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
 		context             flags.FlagContext
 	}{requirementsFactory, context})
+	fake.recordInvocation("Requirements", []interface{}{requirementsFactory, context})
 	fake.requirementsMutex.Unlock()
 	if fake.RequirementsStub != nil {
 		return fake.RequirementsStub(requirementsFactory, context)
 	} else {
-		return fake.requirementsReturns.result1
+		return fake.requirementsReturns.result1, fake.requirementsReturns.result2
 	}
 }
 
@@ -142,11 +148,12 @@ func (fake *FakeSpaceRoleSetter) RequirementsArgsForCall(i int) (requirements.Fa
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeSpaceRoleSetter) RequirementsReturns(result1 []requirements.Requirement) {
+func (fake *FakeSpaceRoleSetter) RequirementsReturns(result1 []requirements.Requirement, result2 error) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeSpaceRoleSetter) Execute(context flags.FlagContext) error {
@@ -154,6 +161,7 @@ func (fake *FakeSpaceRoleSetter) Execute(context flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
+	fake.recordInvocation("Execute", []interface{}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub(context)
@@ -191,6 +199,7 @@ func (fake *FakeSpaceRoleSetter) SetSpaceRole(space models.Space, orgGUID string
 		userGUID string
 		userName string
 	}{space, orgGUID, orgName, role, userGUID, userName})
+	fake.recordInvocation("SetSpaceRole", []interface{}{space, orgGUID, orgName, role, userGUID, userName})
 	fake.setSpaceRoleMutex.Unlock()
 	if fake.SetSpaceRoleStub != nil {
 		return fake.SetSpaceRoleStub(space, orgGUID, orgName, role, userGUID, userName)
@@ -216,6 +225,34 @@ func (fake *FakeSpaceRoleSetter) SetSpaceRoleReturns(result1 error) {
 	fake.setSpaceRoleReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSpaceRoleSetter) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.metaDataMutex.RLock()
+	defer fake.metaDataMutex.RUnlock()
+	fake.setDependencyMutex.RLock()
+	defer fake.setDependencyMutex.RUnlock()
+	fake.requirementsMutex.RLock()
+	defer fake.requirementsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.setSpaceRoleMutex.RLock()
+	defer fake.setSpaceRoleMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSpaceRoleSetter) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ user.SpaceRoleSetter = new(FakeSpaceRoleSetter)

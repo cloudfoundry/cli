@@ -69,14 +69,16 @@ var _ = Describe("V3Apps", func() {
 
 	Describe("Requirements", func() {
 		It("returns a LoginRequirement", func() {
-			actualRequirements := cmd.Requirements(factory, flagContext)
+			actualRequirements, err := cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 			Expect(actualRequirements).To(ContainElement(loginRequirement))
 		})
 
 		It("returns a TargetedSpaceRequirement", func() {
-			actualRequirements := cmd.Requirements(factory, flagContext)
+			actualRequirements, err := cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 
 			Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
@@ -85,9 +87,10 @@ var _ = Describe("V3Apps", func() {
 		It("should fail with usage", func() {
 			flagContext.Parse("blahblah")
 
-			reqs := cmd.Requirements(factory, flagContext)
+			reqs, err := cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
-			err := testcmd.RunRequirements(reqs)
+			err = testcmd.RunRequirements(reqs)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
 			Expect(err.Error()).To(ContainSubstring("No argument required"))

@@ -46,6 +46,8 @@ type FakeServiceKeyRepository struct {
 	deleteServiceKeyReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceKeyRepository) CreateServiceKey(serviceKeyGUID string, keyName string, params map[string]interface{}) error {
@@ -55,6 +57,7 @@ func (fake *FakeServiceKeyRepository) CreateServiceKey(serviceKeyGUID string, ke
 		keyName        string
 		params         map[string]interface{}
 	}{serviceKeyGUID, keyName, params})
+	fake.recordInvocation("CreateServiceKey", []interface{}{serviceKeyGUID, keyName, params})
 	fake.createServiceKeyMutex.Unlock()
 	if fake.CreateServiceKeyStub != nil {
 		return fake.CreateServiceKeyStub(serviceKeyGUID, keyName, params)
@@ -87,6 +90,7 @@ func (fake *FakeServiceKeyRepository) ListServiceKeys(serviceKeyGUID string) ([]
 	fake.listServiceKeysArgsForCall = append(fake.listServiceKeysArgsForCall, struct {
 		serviceKeyGUID string
 	}{serviceKeyGUID})
+	fake.recordInvocation("ListServiceKeys", []interface{}{serviceKeyGUID})
 	fake.listServiceKeysMutex.Unlock()
 	if fake.ListServiceKeysStub != nil {
 		return fake.ListServiceKeysStub(serviceKeyGUID)
@@ -121,6 +125,7 @@ func (fake *FakeServiceKeyRepository) GetServiceKey(serviceKeyGUID string, keyNa
 		serviceKeyGUID string
 		keyName        string
 	}{serviceKeyGUID, keyName})
+	fake.recordInvocation("GetServiceKey", []interface{}{serviceKeyGUID, keyName})
 	fake.getServiceKeyMutex.Unlock()
 	if fake.GetServiceKeyStub != nil {
 		return fake.GetServiceKeyStub(serviceKeyGUID, keyName)
@@ -154,6 +159,7 @@ func (fake *FakeServiceKeyRepository) DeleteServiceKey(serviceKeyGUID string) er
 	fake.deleteServiceKeyArgsForCall = append(fake.deleteServiceKeyArgsForCall, struct {
 		serviceKeyGUID string
 	}{serviceKeyGUID})
+	fake.recordInvocation("DeleteServiceKey", []interface{}{serviceKeyGUID})
 	fake.deleteServiceKeyMutex.Unlock()
 	if fake.DeleteServiceKeyStub != nil {
 		return fake.DeleteServiceKeyStub(serviceKeyGUID)
@@ -179,6 +185,32 @@ func (fake *FakeServiceKeyRepository) DeleteServiceKeyReturns(result1 error) {
 	fake.deleteServiceKeyReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeServiceKeyRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createServiceKeyMutex.RLock()
+	defer fake.createServiceKeyMutex.RUnlock()
+	fake.listServiceKeysMutex.RLock()
+	defer fake.listServiceKeysMutex.RUnlock()
+	fake.getServiceKeyMutex.RLock()
+	defer fake.getServiceKeyMutex.RUnlock()
+	fake.deleteServiceKeyMutex.RLock()
+	defer fake.deleteServiceKeyMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceKeyRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.ServiceKeyRepository = new(FakeServiceKeyRepository)

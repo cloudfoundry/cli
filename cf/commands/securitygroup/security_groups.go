@@ -34,7 +34,7 @@ func (cmd *SecurityGroups) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -46,7 +46,7 @@ func (cmd *SecurityGroups) Requirements(requirementsFactory requirements.Factory
 		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *SecurityGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -84,13 +84,16 @@ func (cmd *SecurityGroups) Execute(c flags.FlagContext) error {
 			table.Add(fmt.Sprintf("#%d", index), securityGroup.Name, "", "")
 		}
 	}
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 type table interface {
 	Add(row ...string)
-	Print()
+	Print() error
 }
 
 func (cmd SecurityGroups) printSpaces(table table, securityGroup models.SecurityGroup, index int) {

@@ -157,6 +157,8 @@ type FakeUserRepository struct {
 	unsetSpaceRoleByUsernameReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUserRepository) FindByUsername(username string) (user models.UserFields, apiErr error) {
@@ -164,6 +166,7 @@ func (fake *FakeUserRepository) FindByUsername(username string) (user models.Use
 	fake.findByUsernameArgsForCall = append(fake.findByUsernameArgsForCall, struct {
 		username string
 	}{username})
+	fake.recordInvocation("FindByUsername", []interface{}{username})
 	fake.findByUsernameMutex.Unlock()
 	if fake.FindByUsernameStub != nil {
 		return fake.FindByUsernameStub(username)
@@ -198,6 +201,7 @@ func (fake *FakeUserRepository) ListUsersInOrgForRole(orgGUID string, role model
 		orgGUID string
 		role    models.Role
 	}{orgGUID, role})
+	fake.recordInvocation("ListUsersInOrgForRole", []interface{}{orgGUID, role})
 	fake.listUsersInOrgForRoleMutex.Unlock()
 	if fake.ListUsersInOrgForRoleStub != nil {
 		return fake.ListUsersInOrgForRoleStub(orgGUID, role)
@@ -232,6 +236,7 @@ func (fake *FakeUserRepository) ListUsersInOrgForRoleWithNoUAA(orgGUID string, r
 		orgGUID string
 		role    models.Role
 	}{orgGUID, role})
+	fake.recordInvocation("ListUsersInOrgForRoleWithNoUAA", []interface{}{orgGUID, role})
 	fake.listUsersInOrgForRoleWithNoUAAMutex.Unlock()
 	if fake.ListUsersInOrgForRoleWithNoUAAStub != nil {
 		return fake.ListUsersInOrgForRoleWithNoUAAStub(orgGUID, role)
@@ -266,6 +271,7 @@ func (fake *FakeUserRepository) ListUsersInSpaceForRole(spaceGUID string, role m
 		spaceGUID string
 		role      models.Role
 	}{spaceGUID, role})
+	fake.recordInvocation("ListUsersInSpaceForRole", []interface{}{spaceGUID, role})
 	fake.listUsersInSpaceForRoleMutex.Unlock()
 	if fake.ListUsersInSpaceForRoleStub != nil {
 		return fake.ListUsersInSpaceForRoleStub(spaceGUID, role)
@@ -300,6 +306,7 @@ func (fake *FakeUserRepository) ListUsersInSpaceForRoleWithNoUAA(spaceGUID strin
 		spaceGUID string
 		role      models.Role
 	}{spaceGUID, role})
+	fake.recordInvocation("ListUsersInSpaceForRoleWithNoUAA", []interface{}{spaceGUID, role})
 	fake.listUsersInSpaceForRoleWithNoUAAMutex.Unlock()
 	if fake.ListUsersInSpaceForRoleWithNoUAAStub != nil {
 		return fake.ListUsersInSpaceForRoleWithNoUAAStub(spaceGUID, role)
@@ -334,6 +341,7 @@ func (fake *FakeUserRepository) Create(username string, password string) (apiErr
 		username string
 		password string
 	}{username, password})
+	fake.recordInvocation("Create", []interface{}{username, password})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(username, password)
@@ -366,6 +374,7 @@ func (fake *FakeUserRepository) Delete(userGUID string) (apiErr error) {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		userGUID string
 	}{userGUID})
+	fake.recordInvocation("Delete", []interface{}{userGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(userGUID)
@@ -400,6 +409,7 @@ func (fake *FakeUserRepository) SetOrgRoleByGUID(userGUID string, orgGUID string
 		orgGUID  string
 		role     models.Role
 	}{userGUID, orgGUID, role})
+	fake.recordInvocation("SetOrgRoleByGUID", []interface{}{userGUID, orgGUID, role})
 	fake.setOrgRoleByGUIDMutex.Unlock()
 	if fake.SetOrgRoleByGUIDStub != nil {
 		return fake.SetOrgRoleByGUIDStub(userGUID, orgGUID, role)
@@ -434,6 +444,7 @@ func (fake *FakeUserRepository) SetOrgRoleByUsername(username string, orgGUID st
 		orgGUID  string
 		role     models.Role
 	}{username, orgGUID, role})
+	fake.recordInvocation("SetOrgRoleByUsername", []interface{}{username, orgGUID, role})
 	fake.setOrgRoleByUsernameMutex.Unlock()
 	if fake.SetOrgRoleByUsernameStub != nil {
 		return fake.SetOrgRoleByUsernameStub(username, orgGUID, role)
@@ -468,6 +479,7 @@ func (fake *FakeUserRepository) UnsetOrgRoleByGUID(userGUID string, orgGUID stri
 		orgGUID  string
 		role     models.Role
 	}{userGUID, orgGUID, role})
+	fake.recordInvocation("UnsetOrgRoleByGUID", []interface{}{userGUID, orgGUID, role})
 	fake.unsetOrgRoleByGUIDMutex.Unlock()
 	if fake.UnsetOrgRoleByGUIDStub != nil {
 		return fake.UnsetOrgRoleByGUIDStub(userGUID, orgGUID, role)
@@ -502,6 +514,7 @@ func (fake *FakeUserRepository) UnsetOrgRoleByUsername(username string, orgGUID 
 		orgGUID  string
 		role     models.Role
 	}{username, orgGUID, role})
+	fake.recordInvocation("UnsetOrgRoleByUsername", []interface{}{username, orgGUID, role})
 	fake.unsetOrgRoleByUsernameMutex.Unlock()
 	if fake.UnsetOrgRoleByUsernameStub != nil {
 		return fake.UnsetOrgRoleByUsernameStub(username, orgGUID, role)
@@ -537,6 +550,7 @@ func (fake *FakeUserRepository) SetSpaceRoleByGUID(userGUID string, spaceGUID st
 		orgGUID   string
 		role      models.Role
 	}{userGUID, spaceGUID, orgGUID, role})
+	fake.recordInvocation("SetSpaceRoleByGUID", []interface{}{userGUID, spaceGUID, orgGUID, role})
 	fake.setSpaceRoleByGUIDMutex.Unlock()
 	if fake.SetSpaceRoleByGUIDStub != nil {
 		return fake.SetSpaceRoleByGUIDStub(userGUID, spaceGUID, orgGUID, role)
@@ -572,6 +586,7 @@ func (fake *FakeUserRepository) SetSpaceRoleByUsername(username string, spaceGUI
 		orgGUID   string
 		role      models.Role
 	}{username, spaceGUID, orgGUID, role})
+	fake.recordInvocation("SetSpaceRoleByUsername", []interface{}{username, spaceGUID, orgGUID, role})
 	fake.setSpaceRoleByUsernameMutex.Unlock()
 	if fake.SetSpaceRoleByUsernameStub != nil {
 		return fake.SetSpaceRoleByUsernameStub(username, spaceGUID, orgGUID, role)
@@ -606,6 +621,7 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByGUID(userGUID string, spaceGUID 
 		spaceGUID string
 		role      models.Role
 	}{userGUID, spaceGUID, role})
+	fake.recordInvocation("UnsetSpaceRoleByGUID", []interface{}{userGUID, spaceGUID, role})
 	fake.unsetSpaceRoleByGUIDMutex.Unlock()
 	if fake.UnsetSpaceRoleByGUIDStub != nil {
 		return fake.UnsetSpaceRoleByGUIDStub(userGUID, spaceGUID, role)
@@ -640,6 +656,7 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByUsername(userGUID string, spaceG
 		spaceGUID string
 		role      models.Role
 	}{userGUID, spaceGUID, role})
+	fake.recordInvocation("UnsetSpaceRoleByUsername", []interface{}{userGUID, spaceGUID, role})
 	fake.unsetSpaceRoleByUsernameMutex.Unlock()
 	if fake.UnsetSpaceRoleByUsernameStub != nil {
 		return fake.UnsetSpaceRoleByUsernameStub(userGUID, spaceGUID, role)
@@ -665,6 +682,54 @@ func (fake *FakeUserRepository) UnsetSpaceRoleByUsernameReturns(result1 error) {
 	fake.unsetSpaceRoleByUsernameReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeUserRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.findByUsernameMutex.RLock()
+	defer fake.findByUsernameMutex.RUnlock()
+	fake.listUsersInOrgForRoleMutex.RLock()
+	defer fake.listUsersInOrgForRoleMutex.RUnlock()
+	fake.listUsersInOrgForRoleWithNoUAAMutex.RLock()
+	defer fake.listUsersInOrgForRoleWithNoUAAMutex.RUnlock()
+	fake.listUsersInSpaceForRoleMutex.RLock()
+	defer fake.listUsersInSpaceForRoleMutex.RUnlock()
+	fake.listUsersInSpaceForRoleWithNoUAAMutex.RLock()
+	defer fake.listUsersInSpaceForRoleWithNoUAAMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.setOrgRoleByGUIDMutex.RLock()
+	defer fake.setOrgRoleByGUIDMutex.RUnlock()
+	fake.setOrgRoleByUsernameMutex.RLock()
+	defer fake.setOrgRoleByUsernameMutex.RUnlock()
+	fake.unsetOrgRoleByGUIDMutex.RLock()
+	defer fake.unsetOrgRoleByGUIDMutex.RUnlock()
+	fake.unsetOrgRoleByUsernameMutex.RLock()
+	defer fake.unsetOrgRoleByUsernameMutex.RUnlock()
+	fake.setSpaceRoleByGUIDMutex.RLock()
+	defer fake.setSpaceRoleByGUIDMutex.RUnlock()
+	fake.setSpaceRoleByUsernameMutex.RLock()
+	defer fake.setSpaceRoleByUsernameMutex.RUnlock()
+	fake.unsetSpaceRoleByGUIDMutex.RLock()
+	defer fake.unsetSpaceRoleByGUIDMutex.RUnlock()
+	fake.unsetSpaceRoleByUsernameMutex.RLock()
+	defer fake.unsetSpaceRoleByUsernameMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeUserRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.UserRepository = new(FakeUserRepository)

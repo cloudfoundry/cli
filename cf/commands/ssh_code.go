@@ -41,7 +41,7 @@ func (cmd *OneTimeSSHCode) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -54,7 +54,7 @@ func (cmd *OneTimeSSHCode) Requirements(requirementsFactory requirements.Factory
 		requirementsFactory.NewAPIEndpointRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *OneTimeSSHCode) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {

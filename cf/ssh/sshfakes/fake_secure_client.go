@@ -45,11 +45,14 @@ type FakeSecureClient struct {
 	closeReturns     struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSecureClient) NewSession() (sshCmd.SecureSession, error) {
 	fake.newSessionMutex.Lock()
 	fake.newSessionArgsForCall = append(fake.newSessionArgsForCall, struct{}{})
+	fake.recordInvocation("NewSession", []interface{}{})
 	fake.newSessionMutex.Unlock()
 	if fake.NewSessionStub != nil {
 		return fake.NewSessionStub()
@@ -75,6 +78,7 @@ func (fake *FakeSecureClient) NewSessionReturns(result1 sshCmd.SecureSession, re
 func (fake *FakeSecureClient) Conn() ssh.Conn {
 	fake.connMutex.Lock()
 	fake.connArgsForCall = append(fake.connArgsForCall, struct{}{})
+	fake.recordInvocation("Conn", []interface{}{})
 	fake.connMutex.Unlock()
 	if fake.ConnStub != nil {
 		return fake.ConnStub()
@@ -102,6 +106,7 @@ func (fake *FakeSecureClient) Dial(network string, address string) (net.Conn, er
 		network string
 		address string
 	}{network, address})
+	fake.recordInvocation("Dial", []interface{}{network, address})
 	fake.dialMutex.Unlock()
 	if fake.DialStub != nil {
 		return fake.DialStub(network, address)
@@ -133,6 +138,7 @@ func (fake *FakeSecureClient) DialReturns(result1 net.Conn, result2 error) {
 func (fake *FakeSecureClient) Wait() error {
 	fake.waitMutex.Lock()
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct{}{})
+	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
 	if fake.WaitStub != nil {
 		return fake.WaitStub()
@@ -157,6 +163,7 @@ func (fake *FakeSecureClient) WaitReturns(result1 error) {
 func (fake *FakeSecureClient) Close() error {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		return fake.CloseStub()
@@ -176,6 +183,34 @@ func (fake *FakeSecureClient) CloseReturns(result1 error) {
 	fake.closeReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSecureClient) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.newSessionMutex.RLock()
+	defer fake.newSessionMutex.RUnlock()
+	fake.connMutex.RLock()
+	defer fake.connMutex.RUnlock()
+	fake.dialMutex.RLock()
+	defer fake.dialMutex.RUnlock()
+	fake.waitMutex.RLock()
+	defer fake.waitMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSecureClient) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ sshCmd.SecureClient = new(FakeSecureClient)

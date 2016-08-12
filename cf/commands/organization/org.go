@@ -42,9 +42,10 @@ func (cmd *ShowOrg) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ShowOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ShowOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("org"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -54,7 +55,7 @@ func (cmd *ShowOrg) Requirements(requirementsFactory requirements.Factory, fc fl
 		cmd.orgReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ShowOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -137,7 +138,10 @@ func (cmd *ShowOrg) Execute(c flags.FlagContext) error {
 			table.Add("", T("spaces:"), terminal.EntityNameColor(strings.Join(spaces, ", ")))
 			table.Add("", T("space quotas:"), terminal.EntityNameColor(strings.Join(spaceQuotas, ", ")))
 
-			table.Print()
+			err := table.Print()
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

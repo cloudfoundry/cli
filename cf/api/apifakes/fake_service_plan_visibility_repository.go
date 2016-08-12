@@ -42,6 +42,8 @@ type FakeServicePlanVisibilityRepository struct {
 		result1 []models.ServicePlanVisibilityFields
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServicePlanVisibilityRepository) Create(arg1 string, arg2 string) error {
@@ -50,6 +52,7 @@ func (fake *FakeServicePlanVisibilityRepository) Create(arg1 string, arg2 string
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("Create", []interface{}{arg1, arg2})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(arg1, arg2)
@@ -80,6 +83,7 @@ func (fake *FakeServicePlanVisibilityRepository) CreateReturns(result1 error) {
 func (fake *FakeServicePlanVisibilityRepository) List() ([]models.ServicePlanVisibilityFields, error) {
 	fake.listMutex.Lock()
 	fake.listArgsForCall = append(fake.listArgsForCall, struct{}{})
+	fake.recordInvocation("List", []interface{}{})
 	fake.listMutex.Unlock()
 	if fake.ListStub != nil {
 		return fake.ListStub()
@@ -107,6 +111,7 @@ func (fake *FakeServicePlanVisibilityRepository) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(arg1)
@@ -139,6 +144,7 @@ func (fake *FakeServicePlanVisibilityRepository) Search(arg1 map[string]string) 
 	fake.searchArgsForCall = append(fake.searchArgsForCall, struct {
 		arg1 map[string]string
 	}{arg1})
+	fake.recordInvocation("Search", []interface{}{arg1})
 	fake.searchMutex.Unlock()
 	if fake.SearchStub != nil {
 		return fake.SearchStub(arg1)
@@ -165,6 +171,32 @@ func (fake *FakeServicePlanVisibilityRepository) SearchReturns(result1 []models.
 		result1 []models.ServicePlanVisibilityFields
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeServicePlanVisibilityRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.listMutex.RLock()
+	defer fake.listMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.searchMutex.RLock()
+	defer fake.searchMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServicePlanVisibilityRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.ServicePlanVisibilityRepository = new(FakeServicePlanVisibilityRepository)

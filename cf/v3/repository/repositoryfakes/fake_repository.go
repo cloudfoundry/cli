@@ -34,11 +34,14 @@ type FakeRepository struct {
 		result1 []models.V3Route
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) GetApplications() ([]models.V3Application, error) {
 	fake.getApplicationsMutex.Lock()
 	fake.getApplicationsArgsForCall = append(fake.getApplicationsArgsForCall, struct{}{})
+	fake.recordInvocation("GetApplications", []interface{}{})
 	fake.getApplicationsMutex.Unlock()
 	if fake.GetApplicationsStub != nil {
 		return fake.GetApplicationsStub()
@@ -66,6 +69,7 @@ func (fake *FakeRepository) GetProcesses(path string) ([]models.V3Process, error
 	fake.getProcessesArgsForCall = append(fake.getProcessesArgsForCall, struct {
 		path string
 	}{path})
+	fake.recordInvocation("GetProcesses", []interface{}{path})
 	fake.getProcessesMutex.Unlock()
 	if fake.GetProcessesStub != nil {
 		return fake.GetProcessesStub(path)
@@ -99,6 +103,7 @@ func (fake *FakeRepository) GetRoutes(path string) ([]models.V3Route, error) {
 	fake.getRoutesArgsForCall = append(fake.getRoutesArgsForCall, struct {
 		path string
 	}{path})
+	fake.recordInvocation("GetRoutes", []interface{}{path})
 	fake.getRoutesMutex.Unlock()
 	if fake.GetRoutesStub != nil {
 		return fake.GetRoutesStub(path)
@@ -125,6 +130,30 @@ func (fake *FakeRepository) GetRoutesReturns(result1 []models.V3Route, result2 e
 		result1 []models.V3Route
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.getApplicationsMutex.RLock()
+	defer fake.getApplicationsMutex.RUnlock()
+	fake.getProcessesMutex.RLock()
+	defer fake.getProcessesMutex.RUnlock()
+	fake.getRoutesMutex.RLock()
+	defer fake.getRoutesMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ repository.Repository = new(FakeRepository)

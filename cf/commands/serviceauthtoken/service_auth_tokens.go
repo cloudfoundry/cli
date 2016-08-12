@@ -31,7 +31,7 @@ func (cmd *ListServiceAuthTokens) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -48,7 +48,7 @@ func (cmd *ListServiceAuthTokens) Requirements(requirementsFactory requirements.
 		),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListServiceAuthTokens) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -76,6 +76,9 @@ func (cmd *ListServiceAuthTokens) Execute(c flags.FlagContext) error {
 		table.Add(authToken.Label, authToken.Provider)
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

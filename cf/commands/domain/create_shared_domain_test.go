@@ -97,7 +97,8 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires DOMAIN as an argument"},
 					[]string{"NAME"},
@@ -112,7 +113,9 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("does not fail with usage", func() {
-				cmd.Requirements(factory, flagContext)
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
+
 				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires DOMAIN as an argument"},
 					[]string{"NAME"},
@@ -121,19 +124,22 @@ var _ = Describe("CreateSharedDomain", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("does not return a RoutingAPIRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(0))
 				Expect(actualRequirements).ToNot(ContainElement(routingAPIRequirement))
 			})
 
 			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
 
@@ -143,13 +149,15 @@ var _ = Describe("CreateSharedDomain", func() {
 				})
 
 				It("returns a LoginRequirement", func() {
-					actualRequirements := cmd.Requirements(factory, flagContext)
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(loginRequirement))
 				})
 
 				It("returns a RoutingAPIRequirement", func() {
-					actualRequirements := cmd.Requirements(factory, flagContext)
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 
 					Expect(factory.NewRoutingAPIRequirementCallCount()).To(Equal(1))
 					Expect(actualRequirements).To(ContainElement(routingAPIRequirement))
@@ -159,7 +167,8 @@ var _ = Describe("CreateSharedDomain", func() {
 					expectedVersion, err := semver.Make("2.36.0")
 					Expect(err).NotTo(HaveOccurred())
 
-					actualRequirements := cmd.Requirements(factory, flagContext)
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 
 					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 					feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)

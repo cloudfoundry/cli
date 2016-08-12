@@ -21,11 +21,14 @@ type FakeServiceInstanceRequirement struct {
 	getServiceInstanceReturns     struct {
 		result1 models.ServiceInstance
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceInstanceRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -50,6 +53,7 @@ func (fake *FakeServiceInstanceRequirement) ExecuteReturns(result1 error) {
 func (fake *FakeServiceInstanceRequirement) GetServiceInstance() models.ServiceInstance {
 	fake.getServiceInstanceMutex.Lock()
 	fake.getServiceInstanceArgsForCall = append(fake.getServiceInstanceArgsForCall, struct{}{})
+	fake.recordInvocation("GetServiceInstance", []interface{}{})
 	fake.getServiceInstanceMutex.Unlock()
 	if fake.GetServiceInstanceStub != nil {
 		return fake.GetServiceInstanceStub()
@@ -69,6 +73,28 @@ func (fake *FakeServiceInstanceRequirement) GetServiceInstanceReturns(result1 mo
 	fake.getServiceInstanceReturns = struct {
 		result1 models.ServiceInstance
 	}{result1}
+}
+
+func (fake *FakeServiceInstanceRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getServiceInstanceMutex.RLock()
+	defer fake.getServiceInstanceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceInstanceRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.ServiceInstanceRequirement = new(FakeServiceInstanceRequirement)

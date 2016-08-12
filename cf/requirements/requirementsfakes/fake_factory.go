@@ -149,6 +149,8 @@ type FakeFactory struct {
 	newNumberArgumentsReturns struct {
 		result1 requirements.Requirement
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -156,6 +158,7 @@ func (fake *FakeFactory) NewApplicationRequirement(name string) requirements.App
 	fake.newApplicationRequirementArgsForCall = append(fake.newApplicationRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewApplicationRequirement", []interface{}{name})
 	fake.newApplicationRequirementMutex.Unlock()
 	if fake.NewApplicationRequirementStub != nil {
 		return fake.NewApplicationRequirementStub(name)
@@ -188,6 +191,7 @@ func (fake *FakeFactory) NewDEAApplicationRequirement(name string) requirements.
 	fake.newDEAApplicationRequirementArgsForCall = append(fake.newDEAApplicationRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewDEAApplicationRequirement", []interface{}{name})
 	fake.newDEAApplicationRequirementMutex.Unlock()
 	if fake.NewDEAApplicationRequirementStub != nil {
 		return fake.NewDEAApplicationRequirementStub(name)
@@ -220,6 +224,7 @@ func (fake *FakeFactory) NewDiegoApplicationRequirement(name string) requirement
 	fake.newDiegoApplicationRequirementArgsForCall = append(fake.newDiegoApplicationRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewDiegoApplicationRequirement", []interface{}{name})
 	fake.newDiegoApplicationRequirementMutex.Unlock()
 	if fake.NewDiegoApplicationRequirementStub != nil {
 		return fake.NewDiegoApplicationRequirementStub(name)
@@ -252,6 +257,7 @@ func (fake *FakeFactory) NewServiceInstanceRequirement(name string) requirements
 	fake.newServiceInstanceRequirementArgsForCall = append(fake.newServiceInstanceRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewServiceInstanceRequirement", []interface{}{name})
 	fake.newServiceInstanceRequirementMutex.Unlock()
 	if fake.NewServiceInstanceRequirementStub != nil {
 		return fake.NewServiceInstanceRequirementStub(name)
@@ -282,6 +288,7 @@ func (fake *FakeFactory) NewServiceInstanceRequirementReturns(result1 requiremen
 func (fake *FakeFactory) NewLoginRequirement() requirements.Requirement {
 	fake.newLoginRequirementMutex.Lock()
 	fake.newLoginRequirementArgsForCall = append(fake.newLoginRequirementArgsForCall, struct{}{})
+	fake.recordInvocation("NewLoginRequirement", []interface{}{})
 	fake.newLoginRequirementMutex.Unlock()
 	if fake.NewLoginRequirementStub != nil {
 		return fake.NewLoginRequirementStub()
@@ -306,6 +313,7 @@ func (fake *FakeFactory) NewLoginRequirementReturns(result1 requirements.Require
 func (fake *FakeFactory) NewRoutingAPIRequirement() requirements.Requirement {
 	fake.newRoutingAPIRequirementMutex.Lock()
 	fake.newRoutingAPIRequirementArgsForCall = append(fake.newRoutingAPIRequirementArgsForCall, struct{}{})
+	fake.recordInvocation("NewRoutingAPIRequirement", []interface{}{})
 	fake.newRoutingAPIRequirementMutex.Unlock()
 	if fake.NewRoutingAPIRequirementStub != nil {
 		return fake.NewRoutingAPIRequirementStub()
@@ -332,6 +340,7 @@ func (fake *FakeFactory) NewSpaceRequirement(name string) requirements.SpaceRequ
 	fake.newSpaceRequirementArgsForCall = append(fake.newSpaceRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewSpaceRequirement", []interface{}{name})
 	fake.newSpaceRequirementMutex.Unlock()
 	if fake.NewSpaceRequirementStub != nil {
 		return fake.NewSpaceRequirementStub(name)
@@ -362,6 +371,7 @@ func (fake *FakeFactory) NewSpaceRequirementReturns(result1 requirements.SpaceRe
 func (fake *FakeFactory) NewTargetedSpaceRequirement() requirements.Requirement {
 	fake.newTargetedSpaceRequirementMutex.Lock()
 	fake.newTargetedSpaceRequirementArgsForCall = append(fake.newTargetedSpaceRequirementArgsForCall, struct{}{})
+	fake.recordInvocation("NewTargetedSpaceRequirement", []interface{}{})
 	fake.newTargetedSpaceRequirementMutex.Unlock()
 	if fake.NewTargetedSpaceRequirementStub != nil {
 		return fake.NewTargetedSpaceRequirementStub()
@@ -386,6 +396,7 @@ func (fake *FakeFactory) NewTargetedSpaceRequirementReturns(result1 requirements
 func (fake *FakeFactory) NewTargetedOrgRequirement() requirements.TargetedOrgRequirement {
 	fake.newTargetedOrgRequirementMutex.Lock()
 	fake.newTargetedOrgRequirementArgsForCall = append(fake.newTargetedOrgRequirementArgsForCall, struct{}{})
+	fake.recordInvocation("NewTargetedOrgRequirement", []interface{}{})
 	fake.newTargetedOrgRequirementMutex.Unlock()
 	if fake.NewTargetedOrgRequirementStub != nil {
 		return fake.NewTargetedOrgRequirementStub()
@@ -412,6 +423,7 @@ func (fake *FakeFactory) NewOrganizationRequirement(name string) requirements.Or
 	fake.newOrganizationRequirementArgsForCall = append(fake.newOrganizationRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewOrganizationRequirement", []interface{}{name})
 	fake.newOrganizationRequirementMutex.Unlock()
 	if fake.NewOrganizationRequirementStub != nil {
 		return fake.NewOrganizationRequirementStub(name)
@@ -444,6 +456,7 @@ func (fake *FakeFactory) NewDomainRequirement(name string) requirements.DomainRe
 	fake.newDomainRequirementArgsForCall = append(fake.newDomainRequirementArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("NewDomainRequirement", []interface{}{name})
 	fake.newDomainRequirementMutex.Unlock()
 	if fake.NewDomainRequirementStub != nil {
 		return fake.NewDomainRequirementStub(name)
@@ -477,6 +490,7 @@ func (fake *FakeFactory) NewUserRequirement(username string, wantGUID bool) requ
 		username string
 		wantGUID bool
 	}{username, wantGUID})
+	fake.recordInvocation("NewUserRequirement", []interface{}{username, wantGUID})
 	fake.newUserRequirementMutex.Unlock()
 	if fake.NewUserRequirementStub != nil {
 		return fake.NewUserRequirementStub(username, wantGUID)
@@ -509,6 +523,7 @@ func (fake *FakeFactory) NewBuildpackRequirement(buildpack string) requirements.
 	fake.newBuildpackRequirementArgsForCall = append(fake.newBuildpackRequirementArgsForCall, struct {
 		buildpack string
 	}{buildpack})
+	fake.recordInvocation("NewBuildpackRequirement", []interface{}{buildpack})
 	fake.newBuildpackRequirementMutex.Unlock()
 	if fake.NewBuildpackRequirementStub != nil {
 		return fake.NewBuildpackRequirementStub(buildpack)
@@ -539,6 +554,7 @@ func (fake *FakeFactory) NewBuildpackRequirementReturns(result1 requirements.Bui
 func (fake *FakeFactory) NewAPIEndpointRequirement() requirements.Requirement {
 	fake.newAPIEndpointRequirementMutex.Lock()
 	fake.newAPIEndpointRequirementArgsForCall = append(fake.newAPIEndpointRequirementArgsForCall, struct{}{})
+	fake.recordInvocation("NewAPIEndpointRequirement", []interface{}{})
 	fake.newAPIEndpointRequirementMutex.Unlock()
 	if fake.NewAPIEndpointRequirementStub != nil {
 		return fake.NewAPIEndpointRequirementStub()
@@ -566,6 +582,7 @@ func (fake *FakeFactory) NewMinAPIVersionRequirement(commandName string, require
 		commandName     string
 		requiredVersion semver.Version
 	}{commandName, requiredVersion})
+	fake.recordInvocation("NewMinAPIVersionRequirement", []interface{}{commandName, requiredVersion})
 	fake.newMinAPIVersionRequirementMutex.Unlock()
 	if fake.NewMinAPIVersionRequirementStub != nil {
 		return fake.NewMinAPIVersionRequirementStub(commandName, requiredVersion)
@@ -599,6 +616,7 @@ func (fake *FakeFactory) NewMaxAPIVersionRequirement(commandName string, maximum
 		commandName    string
 		maximumVersion semver.Version
 	}{commandName, maximumVersion})
+	fake.recordInvocation("NewMaxAPIVersionRequirement", []interface{}{commandName, maximumVersion})
 	fake.newMaxAPIVersionRequirementMutex.Unlock()
 	if fake.NewMaxAPIVersionRequirementStub != nil {
 		return fake.NewMaxAPIVersionRequirementStub(commandName, maximumVersion)
@@ -633,6 +651,7 @@ func (fake *FakeFactory) NewUsageRequirement(arg1 requirements.Usable, arg2 stri
 		arg2 string
 		arg3 func() bool
 	}{arg1, arg2, arg3})
+	fake.recordInvocation("NewUsageRequirement", []interface{}{arg1, arg2, arg3})
 	fake.newUsageRequirementMutex.Unlock()
 	if fake.NewUsageRequirementStub != nil {
 		return fake.NewUsageRequirementStub(arg1, arg2, arg3)
@@ -671,6 +690,7 @@ func (fake *FakeFactory) NewNumberArguments(arg1 []string, arg2 ...string) requi
 		arg1 []string
 		arg2 []string
 	}{arg1Copy, arg2})
+	fake.recordInvocation("NewNumberArguments", []interface{}{arg1Copy, arg2})
 	fake.newNumberArgumentsMutex.Unlock()
 	if fake.NewNumberArgumentsStub != nil {
 		return fake.NewNumberArgumentsStub(arg1, arg2...)
@@ -696,6 +716,60 @@ func (fake *FakeFactory) NewNumberArgumentsReturns(result1 requirements.Requirem
 	fake.newNumberArgumentsReturns = struct {
 		result1 requirements.Requirement
 	}{result1}
+}
+
+func (fake *FakeFactory) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.newApplicationRequirementMutex.RLock()
+	defer fake.newApplicationRequirementMutex.RUnlock()
+	fake.newDEAApplicationRequirementMutex.RLock()
+	defer fake.newDEAApplicationRequirementMutex.RUnlock()
+	fake.newDiegoApplicationRequirementMutex.RLock()
+	defer fake.newDiegoApplicationRequirementMutex.RUnlock()
+	fake.newServiceInstanceRequirementMutex.RLock()
+	defer fake.newServiceInstanceRequirementMutex.RUnlock()
+	fake.newLoginRequirementMutex.RLock()
+	defer fake.newLoginRequirementMutex.RUnlock()
+	fake.newRoutingAPIRequirementMutex.RLock()
+	defer fake.newRoutingAPIRequirementMutex.RUnlock()
+	fake.newSpaceRequirementMutex.RLock()
+	defer fake.newSpaceRequirementMutex.RUnlock()
+	fake.newTargetedSpaceRequirementMutex.RLock()
+	defer fake.newTargetedSpaceRequirementMutex.RUnlock()
+	fake.newTargetedOrgRequirementMutex.RLock()
+	defer fake.newTargetedOrgRequirementMutex.RUnlock()
+	fake.newOrganizationRequirementMutex.RLock()
+	defer fake.newOrganizationRequirementMutex.RUnlock()
+	fake.newDomainRequirementMutex.RLock()
+	defer fake.newDomainRequirementMutex.RUnlock()
+	fake.newUserRequirementMutex.RLock()
+	defer fake.newUserRequirementMutex.RUnlock()
+	fake.newBuildpackRequirementMutex.RLock()
+	defer fake.newBuildpackRequirementMutex.RUnlock()
+	fake.newAPIEndpointRequirementMutex.RLock()
+	defer fake.newAPIEndpointRequirementMutex.RUnlock()
+	fake.newMinAPIVersionRequirementMutex.RLock()
+	defer fake.newMinAPIVersionRequirementMutex.RUnlock()
+	fake.newMaxAPIVersionRequirementMutex.RLock()
+	defer fake.newMaxAPIVersionRequirementMutex.RUnlock()
+	fake.newUsageRequirementMutex.RLock()
+	defer fake.newUsageRequirementMutex.RUnlock()
+	fake.newNumberArgumentsMutex.RLock()
+	defer fake.newNumberArgumentsMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeFactory) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.Factory = new(FakeFactory)

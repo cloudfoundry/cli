@@ -21,6 +21,8 @@ type FakeCurlRepository struct {
 		result2 string
 		result3 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeCurlRepository) Request(method string, path string, header string, body string) (resHeaders string, resBody string, apiErr error) {
@@ -31,6 +33,7 @@ func (fake *FakeCurlRepository) Request(method string, path string, header strin
 		header string
 		body   string
 	}{method, path, header, body})
+	fake.recordInvocation("Request", []interface{}{method, path, header, body})
 	fake.requestMutex.Unlock()
 	if fake.RequestStub != nil {
 		return fake.RequestStub(method, path, header, body)
@@ -58,6 +61,26 @@ func (fake *FakeCurlRepository) RequestReturns(result1 string, result2 string, r
 		result2 string
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeCurlRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.requestMutex.RLock()
+	defer fake.requestMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeCurlRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.CurlRepository = new(FakeCurlRepository)

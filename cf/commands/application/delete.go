@@ -40,7 +40,7 @@ func (cmd *DeleteApp) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *DeleteApp) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("Requires app name as argument"),
 		func() bool {
@@ -54,7 +54,7 @@ func (cmd *DeleteApp) Requirements(requirementsFactory requirements.Factory, fc 
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *DeleteApp) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

@@ -1,6 +1,8 @@
 package servicekey
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -55,9 +57,10 @@ func (cmd *CreateServiceKey) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE and SERVICE_KEY as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service-key"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
@@ -70,7 +73,7 @@ func (cmd *CreateServiceKey) Requirements(requirementsFactory requirements.Facto
 		targetSpaceRequirement,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateServiceKey) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

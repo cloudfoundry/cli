@@ -15,11 +15,14 @@ type FakeTokenRefresher struct {
 		result1 string
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeTokenRefresher) RefreshAuthToken() (updatedToken string, apiErr error) {
 	fake.refreshAuthTokenMutex.Lock()
 	fake.refreshAuthTokenArgsForCall = append(fake.refreshAuthTokenArgsForCall, struct{}{})
+	fake.recordInvocation("RefreshAuthToken", []interface{}{})
 	fake.refreshAuthTokenMutex.Unlock()
 	if fake.RefreshAuthTokenStub != nil {
 		return fake.RefreshAuthTokenStub()
@@ -40,6 +43,26 @@ func (fake *FakeTokenRefresher) RefreshAuthTokenReturns(result1 string, result2 
 		result1 string
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeTokenRefresher) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.refreshAuthTokenMutex.RLock()
+	defer fake.refreshAuthTokenMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeTokenRefresher) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ authentication.TokenRefresher = new(FakeTokenRefresher)

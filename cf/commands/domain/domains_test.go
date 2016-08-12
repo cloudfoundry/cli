@@ -108,9 +108,10 @@ var _ = Describe("ListDomains", func() {
 			It("should fail with usage", func() {
 				flagContext.Parse("blahblah")
 
-				reqs := cmd.Requirements(factory, flagContext)
+				reqs, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
-				err := testcmd.RunRequirements(reqs)
+				err = testcmd.RunRequirements(reqs)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
 				Expect(err.Error()).To(ContainSubstring("No argument required"))
@@ -123,7 +124,8 @@ var _ = Describe("ListDomains", func() {
 			})
 
 			It("does not fail with usage", func() {
-				cmd.Requirements(factory, flagContext)
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(ui.Outputs()).NotTo(ContainSubstrings(
 					[]string{"Incorrect Usage. No argument required"},
 					[]string{"NAME"},
@@ -132,13 +134,15 @@ var _ = Describe("ListDomains", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a TargetedOrgRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedOrgRequirement))
 			})

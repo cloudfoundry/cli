@@ -33,7 +33,10 @@ func (c *commandRunner) Command(args []string, deps commandregistry.Dependency, 
 		cfCmd := cmdRegistry.FindCommand(args[0])
 		cfCmd = cfCmd.SetDependency(deps, pluginApiCall)
 
-		reqs := cfCmd.Requirements(requirements.NewFactory(deps.Config, deps.RepoLocator), fc)
+		reqs, reqErr := cfCmd.Requirements(requirements.NewFactory(deps.Config, deps.RepoLocator), fc)
+		if reqErr != nil {
+			return reqErr
+		}
 
 		for _, r := range reqs {
 			if err = r.Execute(); err != nil {

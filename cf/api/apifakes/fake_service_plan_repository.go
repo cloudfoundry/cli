@@ -37,6 +37,8 @@ type FakeServicePlanRepository struct {
 		result1 []models.ServicePlanFields
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServicePlanRepository) Search(searchParameters map[string]string) ([]models.ServicePlanFields, error) {
@@ -44,6 +46,7 @@ func (fake *FakeServicePlanRepository) Search(searchParameters map[string]string
 	fake.searchArgsForCall = append(fake.searchArgsForCall, struct {
 		searchParameters map[string]string
 	}{searchParameters})
+	fake.recordInvocation("Search", []interface{}{searchParameters})
 	fake.searchMutex.Unlock()
 	if fake.SearchStub != nil {
 		return fake.SearchStub(searchParameters)
@@ -79,6 +82,7 @@ func (fake *FakeServicePlanRepository) Update(arg1 models.ServicePlanFields, arg
 		arg2 string
 		arg3 bool
 	}{arg1, arg2, arg3})
+	fake.recordInvocation("Update", []interface{}{arg1, arg2, arg3})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(arg1, arg2, arg3)
@@ -116,6 +120,7 @@ func (fake *FakeServicePlanRepository) ListPlansFromManyServices(serviceGUIDs []
 	fake.listPlansFromManyServicesArgsForCall = append(fake.listPlansFromManyServicesArgsForCall, struct {
 		serviceGUIDs []string
 	}{serviceGUIDsCopy})
+	fake.recordInvocation("ListPlansFromManyServices", []interface{}{serviceGUIDsCopy})
 	fake.listPlansFromManyServicesMutex.Unlock()
 	if fake.ListPlansFromManyServicesStub != nil {
 		return fake.ListPlansFromManyServicesStub(serviceGUIDs)
@@ -142,6 +147,30 @@ func (fake *FakeServicePlanRepository) ListPlansFromManyServicesReturns(result1 
 		result1 []models.ServicePlanFields
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeServicePlanRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.searchMutex.RLock()
+	defer fake.searchMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.listPlansFromManyServicesMutex.RLock()
+	defer fake.listPlansFromManyServicesMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServicePlanRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.ServicePlanRepository = new(FakeServicePlanRepository)

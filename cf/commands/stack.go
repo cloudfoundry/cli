@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/stacks"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -35,16 +37,17 @@ func (cmd *ListStack) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListStack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires stack name as argument\n\n") + commandregistry.Commands.CommandUsage("stack"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListStack) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
@@ -76,7 +79,10 @@ func (cmd *ListStack) Execute(c flags.FlagContext) error {
 		cmd.ui.Say("")
 		table := cmd.ui.Table([]string{T("name"), T("description")})
 		table.Add(stack.Name, stack.Description)
-		table.Print()
+		err = table.Print()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

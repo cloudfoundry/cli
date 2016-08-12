@@ -21,11 +21,14 @@ type FakeUserRequirement struct {
 	getUserReturns     struct {
 		result1 models.UserFields
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUserRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -50,6 +53,7 @@ func (fake *FakeUserRequirement) ExecuteReturns(result1 error) {
 func (fake *FakeUserRequirement) GetUser() models.UserFields {
 	fake.getUserMutex.Lock()
 	fake.getUserArgsForCall = append(fake.getUserArgsForCall, struct{}{})
+	fake.recordInvocation("GetUser", []interface{}{})
 	fake.getUserMutex.Unlock()
 	if fake.GetUserStub != nil {
 		return fake.GetUserStub()
@@ -69,6 +73,28 @@ func (fake *FakeUserRequirement) GetUserReturns(result1 models.UserFields) {
 	fake.getUserReturns = struct {
 		result1 models.UserFields
 	}{result1}
+}
+
+func (fake *FakeUserRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getUserMutex.RLock()
+	defer fake.getUserMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeUserRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.UserRequirement = new(FakeUserRequirement)

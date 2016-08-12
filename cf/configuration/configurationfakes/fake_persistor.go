@@ -33,11 +33,14 @@ type FakePersistor struct {
 	saveReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakePersistor) Delete() {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct{}{})
+	fake.recordInvocation("Delete", []interface{}{})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		fake.DeleteStub()
@@ -53,6 +56,7 @@ func (fake *FakePersistor) DeleteCallCount() int {
 func (fake *FakePersistor) Exists() bool {
 	fake.existsMutex.Lock()
 	fake.existsArgsForCall = append(fake.existsArgsForCall, struct{}{})
+	fake.recordInvocation("Exists", []interface{}{})
 	fake.existsMutex.Unlock()
 	if fake.ExistsStub != nil {
 		return fake.ExistsStub()
@@ -79,6 +83,7 @@ func (fake *FakePersistor) Load(arg1 configuration.DataInterface) error {
 	fake.loadArgsForCall = append(fake.loadArgsForCall, struct {
 		arg1 configuration.DataInterface
 	}{arg1})
+	fake.recordInvocation("Load", []interface{}{arg1})
 	fake.loadMutex.Unlock()
 	if fake.LoadStub != nil {
 		return fake.LoadStub(arg1)
@@ -111,6 +116,7 @@ func (fake *FakePersistor) Save(arg1 configuration.DataInterface) error {
 	fake.saveArgsForCall = append(fake.saveArgsForCall, struct {
 		arg1 configuration.DataInterface
 	}{arg1})
+	fake.recordInvocation("Save", []interface{}{arg1})
 	fake.saveMutex.Unlock()
 	if fake.SaveStub != nil {
 		return fake.SaveStub(arg1)
@@ -136,6 +142,32 @@ func (fake *FakePersistor) SaveReturns(result1 error) {
 	fake.saveReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakePersistor) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.existsMutex.RLock()
+	defer fake.existsMutex.RUnlock()
+	fake.loadMutex.RLock()
+	defer fake.loadMutex.RUnlock()
+	fake.saveMutex.RLock()
+	defer fake.saveMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakePersistor) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ configuration.Persistor = new(FakePersistor)

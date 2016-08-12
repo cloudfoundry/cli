@@ -55,9 +55,10 @@ func (cmd *UnbindRouteService) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("unbind-route-service"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	serviceName := fc.Args()[1]
@@ -77,7 +78,7 @@ func (cmd *UnbindRouteService) Requirements(requirementsFactory requirements.Fac
 		cmd.domainReq,
 		cmd.serviceInstanceReq,
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *UnbindRouteService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

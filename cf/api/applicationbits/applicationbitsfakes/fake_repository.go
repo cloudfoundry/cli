@@ -29,6 +29,8 @@ type FakeRepository struct {
 	uploadBitsReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) GetApplicationFiles(appFilesRequest []resources.AppFileResource) ([]resources.AppFileResource, error) {
@@ -41,6 +43,7 @@ func (fake *FakeRepository) GetApplicationFiles(appFilesRequest []resources.AppF
 	fake.getApplicationFilesArgsForCall = append(fake.getApplicationFilesArgsForCall, struct {
 		appFilesRequest []resources.AppFileResource
 	}{appFilesRequestCopy})
+	fake.recordInvocation("GetApplicationFiles", []interface{}{appFilesRequestCopy})
 	fake.getApplicationFilesMutex.Unlock()
 	if fake.GetApplicationFilesStub != nil {
 		return fake.GetApplicationFilesStub(appFilesRequest)
@@ -81,6 +84,7 @@ func (fake *FakeRepository) UploadBits(appGUID string, zipFile *os.File, present
 		zipFile      *os.File
 		presentFiles []resources.AppFileResource
 	}{appGUID, zipFile, presentFilesCopy})
+	fake.recordInvocation("UploadBits", []interface{}{appGUID, zipFile, presentFilesCopy})
 	fake.uploadBitsMutex.Unlock()
 	if fake.UploadBitsStub != nil {
 		return fake.UploadBitsStub(appGUID, zipFile, presentFiles)
@@ -106,6 +110,28 @@ func (fake *FakeRepository) UploadBitsReturns(result1 error) {
 	fake.uploadBitsReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.getApplicationFilesMutex.RLock()
+	defer fake.getApplicationFilesMutex.RUnlock()
+	fake.uploadBitsMutex.RLock()
+	defer fake.uploadBitsMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ applicationbits.Repository = new(FakeRepository)

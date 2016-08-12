@@ -27,7 +27,7 @@ type FakeOrgRoleSetter struct {
 	setDependencyReturns struct {
 		result1 commandregistry.Command
 	}
-	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
+	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error)
 	requirementsMutex       sync.RWMutex
 	requirementsArgsForCall []struct {
 		requirementsFactory requirements.Factory
@@ -35,6 +35,7 @@ type FakeOrgRoleSetter struct {
 	}
 	requirementsReturns struct {
 		result1 []requirements.Requirement
+		result2 error
 	}
 	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
@@ -55,11 +56,14 @@ type FakeOrgRoleSetter struct {
 	setOrgRoleReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeOrgRoleSetter) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
+	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
 	if fake.MetaDataStub != nil {
 		return fake.MetaDataStub()
@@ -87,6 +91,7 @@ func (fake *FakeOrgRoleSetter) SetDependency(deps commandregistry.Dependency, pl
 		deps       commandregistry.Dependency
 		pluginCall bool
 	}{deps, pluginCall})
+	fake.recordInvocation("SetDependency", []interface{}{deps, pluginCall})
 	fake.setDependencyMutex.Unlock()
 	if fake.SetDependencyStub != nil {
 		return fake.SetDependencyStub(deps, pluginCall)
@@ -114,17 +119,18 @@ func (fake *FakeOrgRoleSetter) SetDependencyReturns(result1 commandregistry.Comm
 	}{result1}
 }
 
-func (fake *FakeOrgRoleSetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (fake *FakeOrgRoleSetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error) {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
 		context             flags.FlagContext
 	}{requirementsFactory, context})
+	fake.recordInvocation("Requirements", []interface{}{requirementsFactory, context})
 	fake.requirementsMutex.Unlock()
 	if fake.RequirementsStub != nil {
 		return fake.RequirementsStub(requirementsFactory, context)
 	} else {
-		return fake.requirementsReturns.result1
+		return fake.requirementsReturns.result1, fake.requirementsReturns.result2
 	}
 }
 
@@ -140,11 +146,12 @@ func (fake *FakeOrgRoleSetter) RequirementsArgsForCall(i int) (requirements.Fact
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeOrgRoleSetter) RequirementsReturns(result1 []requirements.Requirement) {
+func (fake *FakeOrgRoleSetter) RequirementsReturns(result1 []requirements.Requirement, result2 error) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeOrgRoleSetter) Execute(context flags.FlagContext) error {
@@ -152,6 +159,7 @@ func (fake *FakeOrgRoleSetter) Execute(context flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
+	fake.recordInvocation("Execute", []interface{}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub(context)
@@ -187,6 +195,7 @@ func (fake *FakeOrgRoleSetter) SetOrgRole(orgGUID string, role models.Role, user
 		userGUID string
 		userName string
 	}{orgGUID, role, userGUID, userName})
+	fake.recordInvocation("SetOrgRole", []interface{}{orgGUID, role, userGUID, userName})
 	fake.setOrgRoleMutex.Unlock()
 	if fake.SetOrgRoleStub != nil {
 		return fake.SetOrgRoleStub(orgGUID, role, userGUID, userName)
@@ -212,6 +221,34 @@ func (fake *FakeOrgRoleSetter) SetOrgRoleReturns(result1 error) {
 	fake.setOrgRoleReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeOrgRoleSetter) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.metaDataMutex.RLock()
+	defer fake.metaDataMutex.RUnlock()
+	fake.setDependencyMutex.RLock()
+	defer fake.setDependencyMutex.RUnlock()
+	fake.requirementsMutex.RLock()
+	defer fake.requirementsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.setOrgRoleMutex.RLock()
+	defer fake.setOrgRoleMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeOrgRoleSetter) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ user.OrgRoleSetter = new(FakeOrgRoleSetter)

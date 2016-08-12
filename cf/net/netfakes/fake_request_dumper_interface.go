@@ -19,6 +19,8 @@ type FakeRequestDumperInterface struct {
 	dumpResponseArgsForCall []struct {
 		arg1 *http.Response
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRequestDumperInterface) DumpRequest(arg1 *http.Request) {
@@ -26,6 +28,7 @@ func (fake *FakeRequestDumperInterface) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
+	fake.recordInvocation("DumpRequest", []interface{}{arg1})
 	fake.dumpRequestMutex.Unlock()
 	if fake.DumpRequestStub != nil {
 		fake.DumpRequestStub(arg1)
@@ -49,6 +52,7 @@ func (fake *FakeRequestDumperInterface) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
 	}{arg1})
+	fake.recordInvocation("DumpResponse", []interface{}{arg1})
 	fake.dumpResponseMutex.Unlock()
 	if fake.DumpResponseStub != nil {
 		fake.DumpResponseStub(arg1)
@@ -65,6 +69,28 @@ func (fake *FakeRequestDumperInterface) DumpResponseArgsForCall(i int) *http.Res
 	fake.dumpResponseMutex.RLock()
 	defer fake.dumpResponseMutex.RUnlock()
 	return fake.dumpResponseArgsForCall[i].arg1
+}
+
+func (fake *FakeRequestDumperInterface) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.dumpRequestMutex.RLock()
+	defer fake.dumpRequestMutex.RUnlock()
+	fake.dumpResponseMutex.RLock()
+	defer fake.dumpResponseMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRequestDumperInterface) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ net.RequestDumperInterface = new(FakeRequestDumperInterface)

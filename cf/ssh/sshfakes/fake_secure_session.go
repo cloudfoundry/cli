@@ -79,6 +79,8 @@ type FakeSecureSession struct {
 	closeReturns     struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSecureSession) RequestPty(term string, height int, width int, termModes ssh.TerminalModes) error {
@@ -89,6 +91,7 @@ func (fake *FakeSecureSession) RequestPty(term string, height int, width int, te
 		width     int
 		termModes ssh.TerminalModes
 	}{term, height, width, termModes})
+	fake.recordInvocation("RequestPty", []interface{}{term, height, width, termModes})
 	fake.requestPtyMutex.Unlock()
 	if fake.RequestPtyStub != nil {
 		return fake.RequestPtyStub(term, height, width, termModes)
@@ -117,12 +120,18 @@ func (fake *FakeSecureSession) RequestPtyReturns(result1 error) {
 }
 
 func (fake *FakeSecureSession) SendRequest(name string, wantReply bool, payload []byte) (bool, error) {
+	var payloadCopy []byte
+	if payload != nil {
+		payloadCopy = make([]byte, len(payload))
+		copy(payloadCopy, payload)
+	}
 	fake.sendRequestMutex.Lock()
 	fake.sendRequestArgsForCall = append(fake.sendRequestArgsForCall, struct {
 		name      string
 		wantReply bool
 		payload   []byte
-	}{name, wantReply, payload})
+	}{name, wantReply, payloadCopy})
+	fake.recordInvocation("SendRequest", []interface{}{name, wantReply, payloadCopy})
 	fake.sendRequestMutex.Unlock()
 	if fake.SendRequestStub != nil {
 		return fake.SendRequestStub(name, wantReply, payload)
@@ -154,6 +163,7 @@ func (fake *FakeSecureSession) SendRequestReturns(result1 bool, result2 error) {
 func (fake *FakeSecureSession) StdinPipe() (io.WriteCloser, error) {
 	fake.stdinPipeMutex.Lock()
 	fake.stdinPipeArgsForCall = append(fake.stdinPipeArgsForCall, struct{}{})
+	fake.recordInvocation("StdinPipe", []interface{}{})
 	fake.stdinPipeMutex.Unlock()
 	if fake.StdinPipeStub != nil {
 		return fake.StdinPipeStub()
@@ -179,6 +189,7 @@ func (fake *FakeSecureSession) StdinPipeReturns(result1 io.WriteCloser, result2 
 func (fake *FakeSecureSession) StdoutPipe() (io.Reader, error) {
 	fake.stdoutPipeMutex.Lock()
 	fake.stdoutPipeArgsForCall = append(fake.stdoutPipeArgsForCall, struct{}{})
+	fake.recordInvocation("StdoutPipe", []interface{}{})
 	fake.stdoutPipeMutex.Unlock()
 	if fake.StdoutPipeStub != nil {
 		return fake.StdoutPipeStub()
@@ -204,6 +215,7 @@ func (fake *FakeSecureSession) StdoutPipeReturns(result1 io.Reader, result2 erro
 func (fake *FakeSecureSession) StderrPipe() (io.Reader, error) {
 	fake.stderrPipeMutex.Lock()
 	fake.stderrPipeArgsForCall = append(fake.stderrPipeArgsForCall, struct{}{})
+	fake.recordInvocation("StderrPipe", []interface{}{})
 	fake.stderrPipeMutex.Unlock()
 	if fake.StderrPipeStub != nil {
 		return fake.StderrPipeStub()
@@ -231,6 +243,7 @@ func (fake *FakeSecureSession) Start(command string) error {
 	fake.startArgsForCall = append(fake.startArgsForCall, struct {
 		command string
 	}{command})
+	fake.recordInvocation("Start", []interface{}{command})
 	fake.startMutex.Unlock()
 	if fake.StartStub != nil {
 		return fake.StartStub(command)
@@ -261,6 +274,7 @@ func (fake *FakeSecureSession) StartReturns(result1 error) {
 func (fake *FakeSecureSession) Shell() error {
 	fake.shellMutex.Lock()
 	fake.shellArgsForCall = append(fake.shellArgsForCall, struct{}{})
+	fake.recordInvocation("Shell", []interface{}{})
 	fake.shellMutex.Unlock()
 	if fake.ShellStub != nil {
 		return fake.ShellStub()
@@ -285,6 +299,7 @@ func (fake *FakeSecureSession) ShellReturns(result1 error) {
 func (fake *FakeSecureSession) Wait() error {
 	fake.waitMutex.Lock()
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct{}{})
+	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
 	if fake.WaitStub != nil {
 		return fake.WaitStub()
@@ -309,6 +324,7 @@ func (fake *FakeSecureSession) WaitReturns(result1 error) {
 func (fake *FakeSecureSession) Close() error {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		return fake.CloseStub()
@@ -328,6 +344,42 @@ func (fake *FakeSecureSession) CloseReturns(result1 error) {
 	fake.closeReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSecureSession) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.requestPtyMutex.RLock()
+	defer fake.requestPtyMutex.RUnlock()
+	fake.sendRequestMutex.RLock()
+	defer fake.sendRequestMutex.RUnlock()
+	fake.stdinPipeMutex.RLock()
+	defer fake.stdinPipeMutex.RUnlock()
+	fake.stdoutPipeMutex.RLock()
+	defer fake.stdoutPipeMutex.RUnlock()
+	fake.stderrPipeMutex.RLock()
+	defer fake.stderrPipeMutex.RUnlock()
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
+	fake.shellMutex.RLock()
+	defer fake.shellMutex.RUnlock()
+	fake.waitMutex.RLock()
+	defer fake.waitMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSecureSession) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ sshCmd.SecureSession = new(FakeSecureSession)

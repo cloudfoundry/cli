@@ -1,6 +1,8 @@
 package serviceauthtoken
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -32,9 +34,10 @@ func (cmd *CreateServiceAuthTokenFields) MetaData() commandregistry.CommandMetad
 	}
 }
 
-func (cmd *CreateServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER and TOKEN as arguments\n\n") + commandregistry.Commands.CommandUsage("create-service-auth-token"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 3)
 	}
 
 	reqs := []requirements.Requirement{
@@ -45,7 +48,7 @@ func (cmd *CreateServiceAuthTokenFields) Requirements(requirementsFactory requir
 		),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateServiceAuthTokenFields) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

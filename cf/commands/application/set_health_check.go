@@ -36,13 +36,15 @@ func (cmd *SetHealthCheck) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and HEALTH_CHECK_TYPE as arguments\n\n") + commandregistry.Commands.CommandUsage("set-health-check"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	if fc.Args()[1] != "port" && fc.Args()[1] != "none" {
 		cmd.ui.Failed(T(`Incorrect Usage. HEALTH_CHECK_TYPE must be "port" or "none"\n\n`) + commandregistry.Commands.CommandUsage("set-health-check"))
+		return nil, fmt.Errorf("Incorrect usage: invalid healthcheck type")
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -53,7 +55,7 @@ func (cmd *SetHealthCheck) Requirements(requirementsFactory requirements.Factory
 		cmd.appReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *SetHealthCheck) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

@@ -44,6 +44,8 @@ type FakeZipper struct {
 		result1 int64
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeZipper) Zip(dirToZip string, targetFile *os.File) (err error) {
@@ -52,6 +54,7 @@ func (fake *FakeZipper) Zip(dirToZip string, targetFile *os.File) (err error) {
 		dirToZip   string
 		targetFile *os.File
 	}{dirToZip, targetFile})
+	fake.recordInvocation("Zip", []interface{}{dirToZip, targetFile})
 	fake.zipMutex.Unlock()
 	if fake.ZipStub != nil {
 		return fake.ZipStub(dirToZip, targetFile)
@@ -84,6 +87,7 @@ func (fake *FakeZipper) IsZipFile(path string) bool {
 	fake.isZipFileArgsForCall = append(fake.isZipFileArgsForCall, struct {
 		path string
 	}{path})
+	fake.recordInvocation("IsZipFile", []interface{}{path})
 	fake.isZipFileMutex.Unlock()
 	if fake.IsZipFileStub != nil {
 		return fake.IsZipFileStub(path)
@@ -117,6 +121,7 @@ func (fake *FakeZipper) Unzip(appDir string, destDir string) (err error) {
 		appDir  string
 		destDir string
 	}{appDir, destDir})
+	fake.recordInvocation("Unzip", []interface{}{appDir, destDir})
 	fake.unzipMutex.Unlock()
 	if fake.UnzipStub != nil {
 		return fake.UnzipStub(appDir, destDir)
@@ -149,6 +154,7 @@ func (fake *FakeZipper) GetZipSize(zipFile *os.File) (int64, error) {
 	fake.getZipSizeArgsForCall = append(fake.getZipSizeArgsForCall, struct {
 		zipFile *os.File
 	}{zipFile})
+	fake.recordInvocation("GetZipSize", []interface{}{zipFile})
 	fake.getZipSizeMutex.Unlock()
 	if fake.GetZipSizeStub != nil {
 		return fake.GetZipSizeStub(zipFile)
@@ -175,6 +181,32 @@ func (fake *FakeZipper) GetZipSizeReturns(result1 int64, result2 error) {
 		result1 int64
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeZipper) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.zipMutex.RLock()
+	defer fake.zipMutex.RUnlock()
+	fake.isZipFileMutex.RLock()
+	defer fake.isZipFileMutex.RUnlock()
+	fake.unzipMutex.RLock()
+	defer fake.unzipMutex.RUnlock()
+	fake.getZipSizeMutex.RLock()
+	defer fake.getZipSizeMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeZipper) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ appfiles.Zipper = new(FakeZipper)

@@ -51,6 +51,8 @@ type FakeSecurityGroupRepo struct {
 		result1 []models.SecurityGroup
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSecurityGroupRepo) Create(name string, rules []map[string]interface{}) error {
@@ -64,6 +66,7 @@ func (fake *FakeSecurityGroupRepo) Create(name string, rules []map[string]interf
 		name  string
 		rules []map[string]interface{}
 	}{name, rulesCopy})
+	fake.recordInvocation("Create", []interface{}{name, rulesCopy})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(name, rules)
@@ -102,6 +105,7 @@ func (fake *FakeSecurityGroupRepo) Update(guid string, rules []map[string]interf
 		guid  string
 		rules []map[string]interface{}
 	}{guid, rulesCopy})
+	fake.recordInvocation("Update", []interface{}{guid, rulesCopy})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(guid, rules)
@@ -134,6 +138,7 @@ func (fake *FakeSecurityGroupRepo) Read(arg1 string) (models.SecurityGroup, erro
 	fake.readArgsForCall = append(fake.readArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("Read", []interface{}{arg1})
 	fake.readMutex.Unlock()
 	if fake.ReadStub != nil {
 		return fake.ReadStub(arg1)
@@ -167,6 +172,7 @@ func (fake *FakeSecurityGroupRepo) Delete(arg1 string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("Delete", []interface{}{arg1})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(arg1)
@@ -197,6 +203,7 @@ func (fake *FakeSecurityGroupRepo) DeleteReturns(result1 error) {
 func (fake *FakeSecurityGroupRepo) FindAll() ([]models.SecurityGroup, error) {
 	fake.findAllMutex.Lock()
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct{}{})
+	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
 	if fake.FindAllStub != nil {
 		return fake.FindAllStub()
@@ -217,6 +224,34 @@ func (fake *FakeSecurityGroupRepo) FindAllReturns(result1 []models.SecurityGroup
 		result1 []models.SecurityGroup
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeSecurityGroupRepo) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.readMutex.RLock()
+	defer fake.readMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.findAllMutex.RLock()
+	defer fake.findAllMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSecurityGroupRepo) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ securitygroups.SecurityGroupRepo = new(FakeSecurityGroupRepo)

@@ -48,9 +48,10 @@ func (cmd *CreateAppManifest) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + commandregistry.Commands.CommandUsage("create-app-manifest"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -61,7 +62,7 @@ func (cmd *CreateAppManifest) Requirements(requirementsFactory requirements.Fact
 		cmd.appReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateAppManifest) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

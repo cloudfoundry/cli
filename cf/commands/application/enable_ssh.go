@@ -35,9 +35,10 @@ func (cmd *EnableSSH) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME as argument\n\n") + commandregistry.Commands.CommandUsage("enable-ssh"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -48,7 +49,7 @@ func (cmd *EnableSSH) Requirements(requirementsFactory requirements.Factory, fc 
 		cmd.appReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *EnableSSH) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

@@ -14,11 +14,14 @@ type FakeWarningProducer struct {
 	warningsReturns     struct {
 		result1 []string
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeWarningProducer) Warnings() []string {
 	fake.warningsMutex.Lock()
 	fake.warningsArgsForCall = append(fake.warningsArgsForCall, struct{}{})
+	fake.recordInvocation("Warnings", []interface{}{})
 	fake.warningsMutex.Unlock()
 	if fake.WarningsStub != nil {
 		return fake.WarningsStub()
@@ -38,6 +41,26 @@ func (fake *FakeWarningProducer) WarningsReturns(result1 []string) {
 	fake.warningsReturns = struct {
 		result1 []string
 	}{result1}
+}
+
+func (fake *FakeWarningProducer) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.warningsMutex.RLock()
+	defer fake.warningsMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeWarningProducer) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ net.WarningProducer = new(FakeWarningProducer)

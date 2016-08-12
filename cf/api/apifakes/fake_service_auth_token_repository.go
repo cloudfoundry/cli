@@ -50,11 +50,14 @@ type FakeServiceAuthTokenRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceAuthTokenRepository) FindAll() (authTokens []models.ServiceAuthTokenFields, apiErr error) {
 	fake.findAllMutex.Lock()
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct{}{})
+	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
 	if fake.FindAllStub != nil {
 		return fake.FindAllStub()
@@ -83,6 +86,7 @@ func (fake *FakeServiceAuthTokenRepository) FindByLabelAndProvider(label string,
 		label    string
 		provider string
 	}{label, provider})
+	fake.recordInvocation("FindByLabelAndProvider", []interface{}{label, provider})
 	fake.findByLabelAndProviderMutex.Unlock()
 	if fake.FindByLabelAndProviderStub != nil {
 		return fake.FindByLabelAndProviderStub(label, provider)
@@ -116,6 +120,7 @@ func (fake *FakeServiceAuthTokenRepository) Create(authToken models.ServiceAuthT
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		authToken models.ServiceAuthTokenFields
 	}{authToken})
+	fake.recordInvocation("Create", []interface{}{authToken})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(authToken)
@@ -148,6 +153,7 @@ func (fake *FakeServiceAuthTokenRepository) Update(authToken models.ServiceAuthT
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		authToken models.ServiceAuthTokenFields
 	}{authToken})
+	fake.recordInvocation("Update", []interface{}{authToken})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(authToken)
@@ -180,6 +186,7 @@ func (fake *FakeServiceAuthTokenRepository) Delete(authToken models.ServiceAuthT
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		authToken models.ServiceAuthTokenFields
 	}{authToken})
+	fake.recordInvocation("Delete", []interface{}{authToken})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(authToken)
@@ -205,6 +212,34 @@ func (fake *FakeServiceAuthTokenRepository) DeleteReturns(result1 error) {
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeServiceAuthTokenRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.findAllMutex.RLock()
+	defer fake.findAllMutex.RUnlock()
+	fake.findByLabelAndProviderMutex.RLock()
+	defer fake.findByLabelAndProviderMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceAuthTokenRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.ServiceAuthTokenRepository = new(FakeServiceAuthTokenRepository)

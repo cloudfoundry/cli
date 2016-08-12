@@ -21,11 +21,14 @@ type FakeTargetedOrgRequirement struct {
 	getOrganizationFieldsReturns     struct {
 		result1 models.OrganizationFields
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeTargetedOrgRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -50,6 +53,7 @@ func (fake *FakeTargetedOrgRequirement) ExecuteReturns(result1 error) {
 func (fake *FakeTargetedOrgRequirement) GetOrganizationFields() models.OrganizationFields {
 	fake.getOrganizationFieldsMutex.Lock()
 	fake.getOrganizationFieldsArgsForCall = append(fake.getOrganizationFieldsArgsForCall, struct{}{})
+	fake.recordInvocation("GetOrganizationFields", []interface{}{})
 	fake.getOrganizationFieldsMutex.Unlock()
 	if fake.GetOrganizationFieldsStub != nil {
 		return fake.GetOrganizationFieldsStub()
@@ -69,6 +73,28 @@ func (fake *FakeTargetedOrgRequirement) GetOrganizationFieldsReturns(result1 mod
 	fake.getOrganizationFieldsReturns = struct {
 		result1 models.OrganizationFields
 	}{result1}
+}
+
+func (fake *FakeTargetedOrgRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getOrganizationFieldsMutex.RLock()
+	defer fake.getOrganizationFieldsMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeTargetedOrgRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.TargetedOrgRequirement = new(FakeTargetedOrgRequirement)

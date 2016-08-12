@@ -42,7 +42,7 @@ func (cmd *Target) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -59,7 +59,7 @@ func (cmd *Target) Requirements(requirementsFactory requirements.Factory, fc fla
 		reqs = append(reqs, requirementsFactory.NewLoginRequirement())
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Target) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
@@ -93,11 +93,14 @@ func (cmd *Target) Execute(c flags.FlagContext) error {
 		}
 	}
 
-	cmd.ui.ShowConfiguration(cmd.config)
-	if !cmd.config.IsLoggedIn() {
-		cmd.ui.PanicQuietly()
+	err := cmd.ui.ShowConfiguration(cmd.config)
+	if err != nil {
+		return err
 	}
 	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
+	if !cmd.config.IsLoggedIn() {
+		return fmt.Errorf(terminal.NotLoggedInText())
+	}
 	return nil
 }
 

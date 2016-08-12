@@ -2,6 +2,7 @@ package application
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api/appfiles"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -41,9 +42,10 @@ TIP:
 	}
 }
 
-func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) []requirements.Requirement {
-	if len(c.Args()) < 1 || len(c.Args()) > 2 {
+func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags.FlagContext) ([]requirements.Requirement, error) {
+	if len(c.Args()) != 1 && len(c.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("files"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(c.Args()), 1)
 	}
 
 	cmd.appReq = requirementsFactory.NewDEAApplicationRequirement(c.Args()[0])
@@ -54,7 +56,7 @@ func (cmd *Files) Requirements(requirementsFactory requirements.Factory, c flags
 		cmd.appReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Files) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

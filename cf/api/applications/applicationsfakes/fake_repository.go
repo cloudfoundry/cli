@@ -81,6 +81,8 @@ type FakeRepository struct {
 	createRestageRequestReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) Create(params models.AppParams) (createdApp models.Application, apiErr error) {
@@ -88,6 +90,7 @@ func (fake *FakeRepository) Create(params models.AppParams) (createdApp models.A
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		params models.AppParams
 	}{params})
+	fake.recordInvocation("Create", []interface{}{params})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(params)
@@ -121,6 +124,7 @@ func (fake *FakeRepository) GetApp(appGUID string) (models.Application, error) {
 	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
 		appGUID string
 	}{appGUID})
+	fake.recordInvocation("GetApp", []interface{}{appGUID})
 	fake.getAppMutex.Unlock()
 	if fake.GetAppStub != nil {
 		return fake.GetAppStub(appGUID)
@@ -154,6 +158,7 @@ func (fake *FakeRepository) Read(name string) (app models.Application, apiErr er
 	fake.readArgsForCall = append(fake.readArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("Read", []interface{}{name})
 	fake.readMutex.Unlock()
 	if fake.ReadStub != nil {
 		return fake.ReadStub(name)
@@ -188,6 +193,7 @@ func (fake *FakeRepository) ReadFromSpace(name string, spaceGUID string) (app mo
 		name      string
 		spaceGUID string
 	}{name, spaceGUID})
+	fake.recordInvocation("ReadFromSpace", []interface{}{name, spaceGUID})
 	fake.readFromSpaceMutex.Unlock()
 	if fake.ReadFromSpaceStub != nil {
 		return fake.ReadFromSpaceStub(name, spaceGUID)
@@ -222,6 +228,7 @@ func (fake *FakeRepository) Update(appGUID string, params models.AppParams) (upd
 		appGUID string
 		params  models.AppParams
 	}{appGUID, params})
+	fake.recordInvocation("Update", []interface{}{appGUID, params})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(appGUID, params)
@@ -255,6 +262,7 @@ func (fake *FakeRepository) Delete(appGUID string) (apiErr error) {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		appGUID string
 	}{appGUID})
+	fake.recordInvocation("Delete", []interface{}{appGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(appGUID)
@@ -287,6 +295,7 @@ func (fake *FakeRepository) ReadEnv(guid string) (*models.Environment, error) {
 	fake.readEnvArgsForCall = append(fake.readEnvArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("ReadEnv", []interface{}{guid})
 	fake.readEnvMutex.Unlock()
 	if fake.ReadEnvStub != nil {
 		return fake.ReadEnvStub(guid)
@@ -320,6 +329,7 @@ func (fake *FakeRepository) CreateRestageRequest(guid string) (apiErr error) {
 	fake.createRestageRequestArgsForCall = append(fake.createRestageRequestArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("CreateRestageRequest", []interface{}{guid})
 	fake.createRestageRequestMutex.Unlock()
 	if fake.CreateRestageRequestStub != nil {
 		return fake.CreateRestageRequestStub(guid)
@@ -345,6 +355,40 @@ func (fake *FakeRepository) CreateRestageRequestReturns(result1 error) {
 	fake.createRestageRequestReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	fake.readMutex.RLock()
+	defer fake.readMutex.RUnlock()
+	fake.readFromSpaceMutex.RLock()
+	defer fake.readFromSpaceMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.readEnvMutex.RLock()
+	defer fake.readEnvMutex.RUnlock()
+	fake.createRestageRequestMutex.RLock()
+	defer fake.createRestageRequestMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ applications.Repository = new(FakeRepository)

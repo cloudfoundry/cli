@@ -113,14 +113,16 @@ var _ = Describe("list-apps command", func() {
 
 		It("requires the user to be logged in", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Failing{Message: "not logged in"})
-			reqs := cmd.Requirements(requirementsFactory, flagContext)
+			reqs, err := cmd.Requirements(requirementsFactory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testcmd.RunRequirements(reqs)).To(HaveOccurred())
 		})
 
 		It("requires the user to have a space targeted", func() {
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
-			reqs := cmd.Requirements(requirementsFactory, flagContext)
+			reqs, err := cmd.Requirements(requirementsFactory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testcmd.RunRequirements(reqs)).To(HaveOccurred())
 		})
@@ -131,9 +133,10 @@ var _ = Describe("list-apps command", func() {
 
 			flagContext.Parse("blahblah")
 
-			reqs := cmd.Requirements(requirementsFactory, flagContext)
+			reqs, err := cmd.Requirements(requirementsFactory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
-			err := testcmd.RunRequirements(reqs)
+			err = testcmd.RunRequirements(reqs)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
 			Expect(err.Error()).To(ContainSubstring("No argument required"))
@@ -143,7 +146,8 @@ var _ = Describe("list-apps command", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
 			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
 
-			reqs := cmd.Requirements(requirementsFactory, flagContext)
+			reqs, err := cmd.Requirements(requirementsFactory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(testcmd.RunRequirements(reqs)).NotTo(HaveOccurred())
 		})

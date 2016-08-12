@@ -21,11 +21,14 @@ type FakeBuildpackRequirement struct {
 	getBuildpackReturns     struct {
 		result1 models.Buildpack
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeBuildpackRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -50,6 +53,7 @@ func (fake *FakeBuildpackRequirement) ExecuteReturns(result1 error) {
 func (fake *FakeBuildpackRequirement) GetBuildpack() models.Buildpack {
 	fake.getBuildpackMutex.Lock()
 	fake.getBuildpackArgsForCall = append(fake.getBuildpackArgsForCall, struct{}{})
+	fake.recordInvocation("GetBuildpack", []interface{}{})
 	fake.getBuildpackMutex.Unlock()
 	if fake.GetBuildpackStub != nil {
 		return fake.GetBuildpackStub()
@@ -69,6 +73,28 @@ func (fake *FakeBuildpackRequirement) GetBuildpackReturns(result1 models.Buildpa
 	fake.getBuildpackReturns = struct {
 		result1 models.Buildpack
 	}{result1}
+}
+
+func (fake *FakeBuildpackRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getBuildpackMutex.RLock()
+	defer fake.getBuildpackMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeBuildpackRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.BuildpackRequirement = new(FakeBuildpackRequirement)

@@ -39,9 +39,10 @@ func (cmd *DeleteServiceAuthTokenFields) MetaData() commandregistry.CommandMetad
 	}
 }
 
-func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires LABEL, PROVIDER as arguments\n\n") + commandregistry.Commands.CommandUsage("delete-service-auth-token"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	reqs := []requirements.Requirement{
@@ -52,7 +53,7 @@ func (cmd *DeleteServiceAuthTokenFields) Requirements(requirementsFactory requir
 		),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *DeleteServiceAuthTokenFields) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

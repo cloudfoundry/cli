@@ -46,6 +46,8 @@ type FakeLoggregatorConsumer struct {
 	setDebugPrinterArgsForCall []struct {
 		arg1 loggregator_consumer.DebugPrinter
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeLoggregatorConsumer) Tail(appGUID string, authToken string) (<-chan *logmessage.LogMessage, error) {
@@ -54,6 +56,7 @@ func (fake *FakeLoggregatorConsumer) Tail(appGUID string, authToken string) (<-c
 		appGUID   string
 		authToken string
 	}{appGUID, authToken})
+	fake.recordInvocation("Tail", []interface{}{appGUID, authToken})
 	fake.tailMutex.Unlock()
 	if fake.TailStub != nil {
 		return fake.TailStub(appGUID, authToken)
@@ -88,6 +91,7 @@ func (fake *FakeLoggregatorConsumer) Recent(appGUID string, authToken string) ([
 		appGUID   string
 		authToken string
 	}{appGUID, authToken})
+	fake.recordInvocation("Recent", []interface{}{appGUID, authToken})
 	fake.recentMutex.Unlock()
 	if fake.RecentStub != nil {
 		return fake.RecentStub(appGUID, authToken)
@@ -119,6 +123,7 @@ func (fake *FakeLoggregatorConsumer) RecentReturns(result1 []*logmessage.LogMess
 func (fake *FakeLoggregatorConsumer) Close() error {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		return fake.CloseStub()
@@ -145,6 +150,7 @@ func (fake *FakeLoggregatorConsumer) SetOnConnectCallback(arg1 func()) {
 	fake.setOnConnectCallbackArgsForCall = append(fake.setOnConnectCallbackArgsForCall, struct {
 		arg1 func()
 	}{arg1})
+	fake.recordInvocation("SetOnConnectCallback", []interface{}{arg1})
 	fake.setOnConnectCallbackMutex.Unlock()
 	if fake.SetOnConnectCallbackStub != nil {
 		fake.SetOnConnectCallbackStub(arg1)
@@ -168,6 +174,7 @@ func (fake *FakeLoggregatorConsumer) SetDebugPrinter(arg1 loggregator_consumer.D
 	fake.setDebugPrinterArgsForCall = append(fake.setDebugPrinterArgsForCall, struct {
 		arg1 loggregator_consumer.DebugPrinter
 	}{arg1})
+	fake.recordInvocation("SetDebugPrinter", []interface{}{arg1})
 	fake.setDebugPrinterMutex.Unlock()
 	if fake.SetDebugPrinterStub != nil {
 		fake.SetDebugPrinterStub(arg1)
@@ -184,6 +191,34 @@ func (fake *FakeLoggregatorConsumer) SetDebugPrinterArgsForCall(i int) loggregat
 	fake.setDebugPrinterMutex.RLock()
 	defer fake.setDebugPrinterMutex.RUnlock()
 	return fake.setDebugPrinterArgsForCall[i].arg1
+}
+
+func (fake *FakeLoggregatorConsumer) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.tailMutex.RLock()
+	defer fake.tailMutex.RUnlock()
+	fake.recentMutex.RLock()
+	defer fake.recentMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	fake.setOnConnectCallbackMutex.RLock()
+	defer fake.setOnConnectCallbackMutex.RUnlock()
+	fake.setDebugPrinterMutex.RLock()
+	defer fake.setDebugPrinterMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeLoggregatorConsumer) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ logs.LoggregatorConsumer = new(FakeLoggregatorConsumer)

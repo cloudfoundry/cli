@@ -60,17 +60,20 @@ func (cmd *MapRoute) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP_NAME and DOMAIN as arguments\n\n") + commandregistry.Commands.CommandUsage("map-route"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+		return nil, fmt.Errorf("Cannot specify port together with hostname and/or path.")
 	}
 
 	if fc.IsSet("random-port") && (fc.IsSet("port") || fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify random-port together with port, hostname and/or path."))
+		return nil, fmt.Errorf("Cannot specify random-port together with port, hostname and/or path.")
 	}
 
 	appName := fc.Args()[0]
@@ -106,7 +109,7 @@ func (cmd *MapRoute) Requirements(requirementsFactory requirements.Factory, fc f
 		cmd.domainReq,
 	}...)
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *MapRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

@@ -77,12 +77,12 @@ type FakeRouteActor struct {
 		result2 int
 		result3 error
 	}
-	FindAndBindRouteStub        func(routeName string, app models.Application, appParams models.AppParams) error
+	FindAndBindRouteStub        func(routeName string, app models.Application, appParamsFromContext models.AppParams) error
 	findAndBindRouteMutex       sync.RWMutex
 	findAndBindRouteArgsForCall []struct {
-		routeName string
-		app       models.Application
-		appParams models.AppParams
+		routeName            string
+		app                  models.Application
+		appParamsFromContext models.AppParams
 	}
 	findAndBindRouteReturns struct {
 		result1 error
@@ -334,17 +334,17 @@ func (fake *FakeRouteActor) FindPortReturns(result1 string, result2 int, result3
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRouteActor) FindAndBindRoute(routeName string, app models.Application, appParams models.AppParams) error {
+func (fake *FakeRouteActor) FindAndBindRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error {
 	fake.findAndBindRouteMutex.Lock()
 	fake.findAndBindRouteArgsForCall = append(fake.findAndBindRouteArgsForCall, struct {
-		routeName string
-		app       models.Application
-		appParams models.AppParams
-	}{routeName, app, appParams})
-	fake.recordInvocation("FindAndBindRoute", []interface{}{routeName, app, appParams})
+		routeName            string
+		app                  models.Application
+		appParamsFromContext models.AppParams
+	}{routeName, app, appParamsFromContext})
+	fake.recordInvocation("FindAndBindRoute", []interface{}{routeName, app, appParamsFromContext})
 	fake.findAndBindRouteMutex.Unlock()
 	if fake.FindAndBindRouteStub != nil {
-		return fake.FindAndBindRouteStub(routeName, app, appParams)
+		return fake.FindAndBindRouteStub(routeName, app, appParamsFromContext)
 	} else {
 		return fake.findAndBindRouteReturns.result1
 	}
@@ -359,7 +359,7 @@ func (fake *FakeRouteActor) FindAndBindRouteCallCount() int {
 func (fake *FakeRouteActor) FindAndBindRouteArgsForCall(i int) (string, models.Application, models.AppParams) {
 	fake.findAndBindRouteMutex.RLock()
 	defer fake.findAndBindRouteMutex.RUnlock()
-	return fake.findAndBindRouteArgsForCall[i].routeName, fake.findAndBindRouteArgsForCall[i].app, fake.findAndBindRouteArgsForCall[i].appParams
+	return fake.findAndBindRouteArgsForCall[i].routeName, fake.findAndBindRouteArgsForCall[i].app, fake.findAndBindRouteArgsForCall[i].appParamsFromContext
 }
 
 func (fake *FakeRouteActor) FindAndBindRouteReturns(result1 error) {

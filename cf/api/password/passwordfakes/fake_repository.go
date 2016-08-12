@@ -18,6 +18,8 @@ type FakeRepository struct {
 	updatePasswordReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) UpdatePassword(old string, new string) error {
@@ -26,6 +28,7 @@ func (fake *FakeRepository) UpdatePassword(old string, new string) error {
 		old string
 		new string
 	}{old, new})
+	fake.recordInvocation("UpdatePassword", []interface{}{old, new})
 	fake.updatePasswordMutex.Unlock()
 	if fake.UpdatePasswordStub != nil {
 		return fake.UpdatePasswordStub(old, new)
@@ -51,6 +54,26 @@ func (fake *FakeRepository) UpdatePasswordReturns(result1 error) {
 	fake.updatePasswordReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.updatePasswordMutex.RLock()
+	defer fake.updatePasswordMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ password.Repository = new(FakeRepository)

@@ -19,6 +19,8 @@ type FakeBinder struct {
 	bindApplicationReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeBinder) BindApplication(app models.Application, serviceInstance models.ServiceInstance, paramsMap map[string]interface{}) (apiErr error) {
@@ -28,6 +30,7 @@ func (fake *FakeBinder) BindApplication(app models.Application, serviceInstance 
 		serviceInstance models.ServiceInstance
 		paramsMap       map[string]interface{}
 	}{app, serviceInstance, paramsMap})
+	fake.recordInvocation("BindApplication", []interface{}{app, serviceInstance, paramsMap})
 	fake.bindApplicationMutex.Unlock()
 	if fake.BindApplicationStub != nil {
 		return fake.BindApplicationStub(app, serviceInstance, paramsMap)
@@ -53,6 +56,26 @@ func (fake *FakeBinder) BindApplicationReturns(result1 error) {
 	fake.bindApplicationReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeBinder) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.bindApplicationMutex.RLock()
+	defer fake.bindApplicationMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeBinder) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ service.Binder = new(FakeBinder)

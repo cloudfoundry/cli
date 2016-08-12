@@ -16,8 +16,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/trace"
 )
 
-const QuietPanic = "This shouldn't print anything"
-
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
@@ -39,8 +37,7 @@ type UI interface {
 	ConfirmDeleteWithAssociations(modelType, modelName string) bool
 	Ok()
 	Failed(message string, args ...interface{})
-	PanicQuietly()
-	ShowConfiguration(coreconfig.Reader)
+	ShowConfiguration(coreconfig.Reader) error
 	LoadingIndication()
 	Table(headers []string) *UITable
 	NotifyUpdateIfNeeded(coreconfig.Reader)
@@ -172,15 +169,10 @@ func (ui *terminalUI) Failed(message string, args ...interface{}) {
 		ui.Say(FailureColor(failed))
 		ui.Say(message)
 	}
-
-	ui.PanicQuietly()
 }
 
-func (ui *terminalUI) PanicQuietly() {
-	panic(QuietPanic)
-}
-
-func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) {
+func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) error {
+	var err error
 	table := ui.Table([]string{"", ""})
 
 	if config.HasAPIEndpoint() {
@@ -195,21 +187,27 @@ func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) {
 	}
 
 	if !config.IsLoggedIn() {
-		table.Print()
+		err = table.Print()
+		if err != nil {
+			return err
+		}
 		ui.Say(NotLoggedInText())
-		return
+		return nil
 	}
 
 	table.Add(T("User:"), EntityNameColor(config.UserEmail()))
 
 	if !config.HasOrganization() && !config.HasSpace() {
-		table.Print()
+		err = table.Print()
+		if err != nil {
+			return err
+		}
 		command := fmt.Sprintf("%s target -o ORG -s SPACE", cf.Name)
 		ui.Say(T("No org or space targeted, use '{{.CFTargetCommand}}'",
 			map[string]interface{}{
 				"CFTargetCommand": CommandColor(command),
 			}))
-		return
+		return nil
 	}
 
 	if config.HasOrganization() {
@@ -241,7 +239,11 @@ func (ui *terminalUI) ShowConfiguration(config coreconfig.Reader) {
 		)
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ui *terminalUI) LoadingIndication() {
@@ -267,11 +269,14 @@ func (u *UITable) Add(row ...string) {
 // Print formats the table and then prints it to the UI specified at
 // the time of the construction. Afterwards the table is cleared,
 // becoming ready for another round of rows and printing.
-func (u *UITable) Print() {
+func (u *UITable) Print() error {
 	result := &bytes.Buffer{}
 	t := u.Table
 
-	t.PrintTo(result)
+	err := t.PrintTo(result)
+	if err != nil {
+		return err
+	}
 
 	// DevNote. With the change to printing into a buffer all
 	// lines now come with a terminating \n. The t.ui.Say() below
@@ -291,6 +296,7 @@ func (u *UITable) Print() {
 	if len(r) > 0 {
 		u.UI.Say("%s", string(r))
 	}
+	return nil
 }
 
 func (ui *terminalUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {

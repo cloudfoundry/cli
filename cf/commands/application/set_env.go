@@ -1,6 +1,8 @@
 package application
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/applications"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -35,9 +37,10 @@ func (cmd *SetEnv) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *SetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *SetEnv) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires 'app-name env-name env-value' as arguments\n\n") + commandregistry.Commands.CommandUsage("set-env"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 3)
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -48,7 +51,7 @@ func (cmd *SetEnv) Requirements(requirementsFactory requirements.Factory, fc fla
 		cmd.appReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *SetEnv) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

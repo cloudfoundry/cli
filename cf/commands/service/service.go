@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/cloudfoundry/cli/cf/api/applications"
@@ -39,9 +40,10 @@ func (cmd *ShowService) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("service"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	cmd.serviceInstanceReq = requirementsFactory.NewServiceInstanceRequirement(fc.Args()[0])
@@ -52,7 +54,7 @@ func (cmd *ShowService) Requirements(requirementsFactory requirements.Factory, f
 		cmd.serviceInstanceReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ShowService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

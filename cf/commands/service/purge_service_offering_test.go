@@ -66,7 +66,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
@@ -80,7 +81,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
@@ -92,7 +94,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 			})
 
 			It("returns a MaxAPIVersion requirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(actualRequirements).To(ContainElement(maxAPIVersionRequirement))
 			})
 		})
@@ -104,7 +107,8 @@ var _ = Describe("PurgeServiceOffering", func() {
 		BeforeEach(func() {
 			err := flagContext.Parse("service-name")
 			Expect(err).NotTo(HaveOccurred())
-			cmd.Requirements(factory, flagContext)
+			_, err = cmd.Requirements(factory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 			ui.Inputs = []string{"n"}
 			serviceRepo.FindServiceOfferingsByLabelReturns([]models.ServiceOffering{{}}, nil)
 		})

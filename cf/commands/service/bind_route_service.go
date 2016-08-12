@@ -65,9 +65,10 @@ func (cmd *BindRouteService) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-route-service"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	domainName := fc.Args()[0]
@@ -87,7 +88,7 @@ func (cmd *BindRouteService) Requirements(requirementsFactory requirements.Facto
 		cmd.serviceInstanceReq,
 		minAPIVersionRequirement,
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *BindRouteService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

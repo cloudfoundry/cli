@@ -19,7 +19,7 @@ func NewPanicPrinter(ui terminal.UI) PanicPrinter {
 }
 
 func (p PanicPrinter) DisplayCrashDialog(err interface{}, commandArgs string, stackTrace string) {
-	if err != nil && err != terminal.QuietPanic {
+	if err != nil {
 		switch err := err.(type) {
 		case errors.Exception:
 			p.ui.Say(CrashDialog(err.Message, commandArgs, stackTrace))

@@ -28,11 +28,14 @@ type FakeSha1Checksum struct {
 	setFilePathArgsForCall []struct {
 		arg1 string
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSha1Checksum) ComputeFileSha1() ([]byte, error) {
 	fake.computeFileSha1Mutex.Lock()
 	fake.computeFileSha1ArgsForCall = append(fake.computeFileSha1ArgsForCall, struct{}{})
+	fake.recordInvocation("ComputeFileSha1", []interface{}{})
 	fake.computeFileSha1Mutex.Unlock()
 	if fake.ComputeFileSha1Stub != nil {
 		return fake.ComputeFileSha1Stub()
@@ -60,6 +63,7 @@ func (fake *FakeSha1Checksum) CheckSha1(arg1 string) bool {
 	fake.checkSha1ArgsForCall = append(fake.checkSha1ArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("CheckSha1", []interface{}{arg1})
 	fake.checkSha1Mutex.Unlock()
 	if fake.CheckSha1Stub != nil {
 		return fake.CheckSha1Stub(arg1)
@@ -92,6 +96,7 @@ func (fake *FakeSha1Checksum) SetFilePath(arg1 string) {
 	fake.setFilePathArgsForCall = append(fake.setFilePathArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("SetFilePath", []interface{}{arg1})
 	fake.setFilePathMutex.Unlock()
 	if fake.SetFilePathStub != nil {
 		fake.SetFilePathStub(arg1)
@@ -108,6 +113,30 @@ func (fake *FakeSha1Checksum) SetFilePathArgsForCall(i int) string {
 	fake.setFilePathMutex.RLock()
 	defer fake.setFilePathMutex.RUnlock()
 	return fake.setFilePathArgsForCall[i].arg1
+}
+
+func (fake *FakeSha1Checksum) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.computeFileSha1Mutex.RLock()
+	defer fake.computeFileSha1Mutex.RUnlock()
+	fake.checkSha1Mutex.RLock()
+	defer fake.checkSha1Mutex.RUnlock()
+	fake.setFilePathMutex.RLock()
+	defer fake.setFilePathMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSha1Checksum) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ utils.Sha1Checksum = new(FakeSha1Checksum)

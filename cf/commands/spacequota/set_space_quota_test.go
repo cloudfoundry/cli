@@ -64,8 +64,11 @@ var _ = Describe("set-space-quota command", func() {
 			var reqs []requirements.Requirement
 
 			BeforeEach(func() {
+				var err error
+
 				flagContext.Parse("space", "space-quota")
-				reqs = cmd.Requirements(requirementsFactory, flagContext)
+				reqs, err = cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns a LoginRequirement", func() {
@@ -83,7 +86,8 @@ var _ = Describe("set-space-quota command", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires", "as arguments"},
 				))

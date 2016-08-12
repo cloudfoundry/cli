@@ -37,7 +37,7 @@ func (cmd *ListServices) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListServices) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListServices) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -51,7 +51,7 @@ func (cmd *ListServices) Requirements(requirementsFactory requirements.Factory, 
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListServices) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -129,6 +129,9 @@ func (cmd *ListServices) Execute(fc flags.FlagContext) error {
 
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

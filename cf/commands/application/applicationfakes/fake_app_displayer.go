@@ -26,8 +26,8 @@ func (displayer *FakeAppDisplayer) SetDependency(_ commandregistry.Dependency, _
 	return displayer
 }
 
-func (displayer *FakeAppDisplayer) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
-	return []requirements.Requirement{}
+func (displayer *FakeAppDisplayer) Requirements(_ requirements.Factory, _ flags.FlagContext) ([]requirements.Requirement, error) {
+	return []requirements.Requirement{}, nil
 }
 
 func (displayer *FakeAppDisplayer) Execute(_ flags.FlagContext) error {

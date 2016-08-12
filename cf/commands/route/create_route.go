@@ -65,17 +65,20 @@ func (cmd *CreateRoute) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SPACE and DOMAIN as arguments\n\n") + commandregistry.Commands.CommandUsage("create-route"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+		return nil, fmt.Errorf("Cannot specify port together with hostname and/or path.")
 	}
 
 	if fc.IsSet("random-port") && (fc.IsSet("port") || fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify random-port together with port, hostname and/or path."))
+		return nil, fmt.Errorf("Cannot specify random-port together with port, hostname and/or path.")
 	}
 
 	domainName := fc.Args()[1]
@@ -102,7 +105,7 @@ func (cmd *CreateRoute) Requirements(requirementsFactory requirements.Factory, f
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '--random-port'", cf.TCPRoutingMinimumAPIVersion))
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

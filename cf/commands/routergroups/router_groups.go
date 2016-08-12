@@ -33,8 +33,7 @@ func (cmd *RouterGroups) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-
+func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	return []requirements.Requirement{
 		requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 			T("No argument required"),
@@ -44,7 +43,7 @@ func (cmd *RouterGroups) Requirements(requirementsFactory requirements.Factory, 
 		),
 		requirementsFactory.NewLoginRequirement(),
 		requirementsFactory.NewRoutingAPIRequirement(),
-	}
+	}, nil
 }
 
 func (cmd *RouterGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -76,6 +75,9 @@ func (cmd *RouterGroups) Execute(c flags.FlagContext) error {
 		cmd.ui.Say(T("No router groups found"))
 	}
 
-	table.Print()
+	err := table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

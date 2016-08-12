@@ -71,44 +71,56 @@ func (t *Table) Add(row ...string) {
 // the formatted table into the writer given to it as argument. The
 // exported Print() is just a wrapper around this which redirects the
 // result into CF datastructures.
-func (t *Table) PrintTo(result io.Writer) {
-
+func (t *Table) PrintTo(result io.Writer) error {
 	t.rowHeight = make([]int, len(t.rows)+1)
 
 	rowIndex := 0
 	if !t.headerPrinted {
 		// row transformer header row
-		t.calculateMaxSize(transHeader, rowIndex, t.headers)
+		err := t.calculateMaxSize(transHeader, rowIndex, t.headers)
+		if err != nil {
+			return err
+		}
 		rowIndex++
 	}
 
 	for _, row := range t.rows {
 		// table is row transformer itself, for content rows
-		t.calculateMaxSize(t, rowIndex, row)
+		err := t.calculateMaxSize(t, rowIndex, row)
+		if err != nil {
+			return err
+		}
 		rowIndex++
 	}
 
 	rowIndex = 0
 	if !t.headerPrinted {
-		t.printRow(result, transHeader, rowIndex, t.headers)
+		err := t.printRow(result, transHeader, rowIndex, t.headers)
+		if err != nil {
+			return err
+		}
 		t.headerPrinted = true
 		rowIndex++
 	}
 
 	for row := range t.rows {
-		t.printRow(result, t, rowIndex, t.rows[row])
+		err := t.printRow(result, t, rowIndex, t.rows[row])
+		if err != nil {
+			return err
+		}
 		rowIndex++
 	}
 
 	// Note, printing a table clears it.
 	t.rows = [][]string{}
+	return nil
 }
 
 // calculateMaxSize iterates over the collected rows of the specified
 // table, and their strings, determining the height of each row (in
 // lines), and the width of each column (in characters). The results
 // are stored in the table for use by Print.
-func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row []string) {
+func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row []string) error {
 
 	// Iterate columns
 	for columnIndex := range row {
@@ -149,17 +161,21 @@ func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row [
 			// https://www.pivotaltracker.com/n/projects/892938/stories/117404629
 
 			value := trim(Decolorize(transformer.Transform(columnIndex, trim(lines[i]))))
-			width := visibleSize(value)
+			width, err := visibleSize(value)
+			if err != nil {
+				return err
+			}
 			if t.columnWidth[columnIndex] < width {
 				t.columnWidth[columnIndex] = width
 			}
 		}
 	}
+	return nil
 }
 
 // printRow is responsible for the layouting, transforming and
 // printing of the string in a single row
-func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex int, row []string) {
+func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex int, row []string) error {
 
 	height := t.rowHeight[rowIndex]
 
@@ -187,11 +203,14 @@ func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex 
 				break
 			}
 
-			t.printCellValue(line, transformer, columnIndex, last, row[columnIndex])
+			err := t.printCellValue(line, transformer, columnIndex, last, row[columnIndex])
+			if err != nil {
+				return err
+			}
 		}
 
 		fmt.Fprintf(result, "%s\n", trim(string(line.Bytes())))
-		return
+		return nil
 	}
 
 	// We have at least one multi-line cell in this row.
@@ -223,16 +242,20 @@ func (t *Table) printRow(result io.Writer, transformer rowTransformer, rowIndex 
 		line := &bytes.Buffer{}
 
 		for columnIndex := range sub {
-			t.printCellValue(line, transformer, columnIndex, last, sub[columnIndex][rowIndex])
+			err := t.printCellValue(line, transformer, columnIndex, last, sub[columnIndex][rowIndex])
+			if err != nil {
+				return err
+			}
 		}
 
 		fmt.Fprintf(result, "%s\n", trim(string(line.Bytes())))
 	}
+	return nil
 }
 
 // printCellValue pads the specified string to the width of the given
 // column, adds the spacing bewtween columns, and returns the result.
-func (t *Table) printCellValue(result io.Writer, transformer rowTransformer, col, last int, value string) {
+func (t *Table) printCellValue(result io.Writer, transformer rowTransformer, col, last int, value string) error {
 	value = trim(transformer.Transform(col, trim(value)))
 	fmt.Fprint(result, value)
 
@@ -264,11 +287,16 @@ func (t *Table) printCellValue(result io.Writer, transformer rowTransformer, col
 		// This happened for
 		// https://www.pivotaltracker.com/n/projects/892938/stories/117404629
 
-		padlen := t.columnWidth[col] - visibleSize(trim(Decolorize(value)))
+		decolorizedLength, err := visibleSize(trim(Decolorize(value)))
+		if err != nil {
+			return err
+		}
+		padlen := t.columnWidth[col] - decolorizedLength
 		padding := strings.Repeat(" ", padlen)
 		fmt.Fprint(result, padding)
 		fmt.Fprint(result, t.colSpacing)
 	}
+	return nil
 }
 
 // rowTransformer is an interface behind which we can specify how to
@@ -313,7 +341,7 @@ func trim(s string) string {
 // visibleSize returns the number of columns the string will cover
 // when displayed in the terminal. This is the number of runes,
 // i.e. characters, not the number of bytes it consists of.
-func visibleSize(s string) int {
+func visibleSize(s string) (int, error) {
 	// This code re-implements the basic functionality of
 	// RuneCountInString to account for special cases. Namely
 	// UTF-8 characters taking up 3 bytes (**) appear as double-width.
@@ -328,7 +356,7 @@ func visibleSize(s string) int {
 	for range s {
 		_, runeSize, err := r.ReadRune()
 		if err != nil {
-			panic(fmt.Sprintf("error when calculating visible size of: %s", s))
+			return -1, fmt.Errorf("error when calculating visible size of: %s", s)
 		}
 
 		if runeSize == 3 {
@@ -338,5 +366,5 @@ func visibleSize(s string) int {
 		}
 	}
 
-	return size
+	return size, nil
 }

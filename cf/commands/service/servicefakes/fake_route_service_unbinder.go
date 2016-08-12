@@ -18,6 +18,8 @@ type FakeRouteServiceUnbinder struct {
 	unbindRouteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRouteServiceUnbinder) UnbindRoute(route models.Route, serviceInstance models.ServiceInstance) error {
@@ -26,6 +28,7 @@ func (fake *FakeRouteServiceUnbinder) UnbindRoute(route models.Route, serviceIns
 		route           models.Route
 		serviceInstance models.ServiceInstance
 	}{route, serviceInstance})
+	fake.recordInvocation("UnbindRoute", []interface{}{route, serviceInstance})
 	fake.unbindRouteMutex.Unlock()
 	if fake.UnbindRouteStub != nil {
 		return fake.UnbindRouteStub(route, serviceInstance)
@@ -51,6 +54,26 @@ func (fake *FakeRouteServiceUnbinder) UnbindRouteReturns(result1 error) {
 	fake.unbindRouteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRouteServiceUnbinder) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.unbindRouteMutex.RLock()
+	defer fake.unbindRouteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRouteServiceUnbinder) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ service.RouteServiceUnbinder = new(FakeRouteServiceUnbinder)

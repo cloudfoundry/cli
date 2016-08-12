@@ -155,7 +155,8 @@ var _ = Describe("Push Command", func() {
 			err := flagContext.Parse("app-name")
 			Expect(err).NotTo(HaveOccurred())
 
-			reqs = cmd.Requirements(requirementsFactory, flagContext)
+			reqs, err = cmd.Requirements(requirementsFactory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("checks that the user is logged in", func() {
@@ -178,7 +179,8 @@ var _ = Describe("Push Command", func() {
 				err := flagContext.Parse("app-name", "--route-path", "the-path")
 				Expect(err).NotTo(HaveOccurred())
 
-				reqs = cmd.Requirements(requirementsFactory, flagContext)
+				reqs, err = cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns a minAPIVersionRequirement", func() {
@@ -197,7 +199,8 @@ var _ = Describe("Push Command", func() {
 				err := flagContext.Parse("app-name", "--app-ports", "the-app-port")
 				Expect(err).NotTo(HaveOccurred())
 
-				reqs = cmd.Requirements(requirementsFactory, flagContext)
+				reqs, err = cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns a minAPIVersionRequirement", func() {

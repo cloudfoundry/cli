@@ -82,7 +82,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires USERNAME, ORG, SPACE, ROLE as arguments"},
 					[]string{"NAME"},
@@ -97,14 +98,16 @@ var _ = Describe("UnsetSpaceRole", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns an OrgRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewOrganizationRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewOrganizationRequirementArgsForCall(0)).To(Equal("the-org-name"))
 
@@ -117,7 +120,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 				})
 
 				It("requests the unset_roles_by_username flag", func() {
-					cmd.Requirements(factory, flagContext)
+					_, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(flagRepo.FindByNameCallCount()).To(Equal(1))
 					Expect(flagRepo.FindByNameArgsForCall(0)).To(Equal("unset_roles_by_username"))
 				})
@@ -128,7 +132,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 					})
 
 					It("returns a UserRequirement", func() {
-						actualRequirements := cmd.Requirements(factory, flagContext)
+						actualRequirements, err := cmd.Requirements(factory, flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
@@ -144,7 +149,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 					})
 
 					It("returns a UserRequirement", func() {
-						actualRequirements := cmd.Requirements(factory, flagContext)
+						actualRequirements, err := cmd.Requirements(factory, flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
@@ -160,7 +166,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 					})
 
 					It("returns a UserRequirement", func() {
-						actualRequirements := cmd.Requirements(factory, flagContext)
+						actualRequirements, err := cmd.Requirements(factory, flagContext)
+						Expect(err).NotTo(HaveOccurred())
 						Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 						actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 						Expect(actualUsername).To(Equal("the-user-name"))
@@ -177,7 +184,8 @@ var _ = Describe("UnsetSpaceRole", func() {
 				})
 
 				It("returns a UserRequirement", func() {
-					actualRequirements := cmd.Requirements(factory, flagContext)
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(factory.NewUserRequirementCallCount()).To(Equal(1))
 					actualUsername, actualWantGUID := factory.NewUserRequirementArgsForCall(0)
 					Expect(actualUsername).To(Equal("the-user-name"))

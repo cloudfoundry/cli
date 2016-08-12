@@ -13,6 +13,8 @@ type FakeTerminalOutputSwitch struct {
 	disableTerminalOutputArgsForCall []struct {
 		arg1 bool
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeTerminalOutputSwitch) DisableTerminalOutput(arg1 bool) {
@@ -20,6 +22,7 @@ func (fake *FakeTerminalOutputSwitch) DisableTerminalOutput(arg1 bool) {
 	fake.disableTerminalOutputArgsForCall = append(fake.disableTerminalOutputArgsForCall, struct {
 		arg1 bool
 	}{arg1})
+	fake.recordInvocation("DisableTerminalOutput", []interface{}{arg1})
 	fake.disableTerminalOutputMutex.Unlock()
 	if fake.DisableTerminalOutputStub != nil {
 		fake.DisableTerminalOutputStub(arg1)
@@ -36,6 +39,26 @@ func (fake *FakeTerminalOutputSwitch) DisableTerminalOutputArgsForCall(i int) bo
 	fake.disableTerminalOutputMutex.RLock()
 	defer fake.disableTerminalOutputMutex.RUnlock()
 	return fake.disableTerminalOutputArgsForCall[i].arg1
+}
+
+func (fake *FakeTerminalOutputSwitch) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.disableTerminalOutputMutex.RLock()
+	defer fake.disableTerminalOutputMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeTerminalOutputSwitch) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ rpc.TerminalOutputSwitch = new(FakeTerminalOutputSwitch)

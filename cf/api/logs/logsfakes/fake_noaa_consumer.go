@@ -40,6 +40,8 @@ type FakeNoaaConsumer struct {
 	setOnConnectCallbackArgsForCall []struct {
 		cb func()
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnect(arg1 string, arg2 string) (<-chan *events.LogMessage, <-chan error) {
@@ -48,6 +50,7 @@ func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnect(arg1 string, arg2 stri
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("TailingLogsWithoutReconnect", []interface{}{arg1, arg2})
 	fake.tailingLogsWithoutReconnectMutex.Unlock()
 	if fake.TailingLogsWithoutReconnectStub != nil {
 		return fake.TailingLogsWithoutReconnectStub(arg1, arg2)
@@ -82,6 +85,7 @@ func (fake *FakeNoaaConsumer) RecentLogs(appGUID string, authToken string) ([]*e
 		appGUID   string
 		authToken string
 	}{appGUID, authToken})
+	fake.recordInvocation("RecentLogs", []interface{}{appGUID, authToken})
 	fake.recentLogsMutex.Unlock()
 	if fake.RecentLogsStub != nil {
 		return fake.RecentLogsStub(appGUID, authToken)
@@ -113,6 +117,7 @@ func (fake *FakeNoaaConsumer) RecentLogsReturns(result1 []*events.LogMessage, re
 func (fake *FakeNoaaConsumer) Close() error {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		return fake.CloseStub()
@@ -139,6 +144,7 @@ func (fake *FakeNoaaConsumer) SetOnConnectCallback(cb func()) {
 	fake.setOnConnectCallbackArgsForCall = append(fake.setOnConnectCallbackArgsForCall, struct {
 		cb func()
 	}{cb})
+	fake.recordInvocation("SetOnConnectCallback", []interface{}{cb})
 	fake.setOnConnectCallbackMutex.Unlock()
 	if fake.SetOnConnectCallbackStub != nil {
 		fake.SetOnConnectCallbackStub(cb)
@@ -155,6 +161,32 @@ func (fake *FakeNoaaConsumer) SetOnConnectCallbackArgsForCall(i int) func() {
 	fake.setOnConnectCallbackMutex.RLock()
 	defer fake.setOnConnectCallbackMutex.RUnlock()
 	return fake.setOnConnectCallbackArgsForCall[i].cb
+}
+
+func (fake *FakeNoaaConsumer) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.tailingLogsWithoutReconnectMutex.RLock()
+	defer fake.tailingLogsWithoutReconnectMutex.RUnlock()
+	fake.recentLogsMutex.RLock()
+	defer fake.recentLogsMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	fake.setOnConnectCallbackMutex.RLock()
+	defer fake.setOnConnectCallbackMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeNoaaConsumer) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ logs.NoaaConsumer = new(FakeNoaaConsumer)

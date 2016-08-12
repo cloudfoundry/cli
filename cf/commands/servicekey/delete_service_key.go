@@ -1,6 +1,8 @@
 package servicekey
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -41,16 +43,17 @@ func (cmd *DeleteServiceKey) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *DeleteServiceKey) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_INSTANCE SERVICE_KEY as arguments\n\n") + commandregistry.Commands.CommandUsage("delete-service-key"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
 	targetSpaceRequirement := requirementsFactory.NewTargetedSpaceRequirement()
 
 	reqs := []requirements.Requirement{loginRequirement, targetSpaceRequirement}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *DeleteServiceKey) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

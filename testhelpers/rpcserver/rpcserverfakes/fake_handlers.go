@@ -280,6 +280,8 @@ type FakeHandlers struct {
 	getServiceReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeHandlers) IsMinCliVersion(args string, retVal *bool) error {
@@ -288,6 +290,7 @@ func (fake *FakeHandlers) IsMinCliVersion(args string, retVal *bool) error {
 		args   string
 		retVal *bool
 	}{args, retVal})
+	fake.recordInvocation("IsMinCliVersion", []interface{}{args, retVal})
 	fake.isMinCliVersionMutex.Unlock()
 	if fake.IsMinCliVersionStub != nil {
 		return fake.IsMinCliVersionStub(args, retVal)
@@ -321,6 +324,7 @@ func (fake *FakeHandlers) SetPluginMetadata(pluginMetadata plugin.PluginMetadata
 		pluginMetadata plugin.PluginMetadata
 		retVal         *bool
 	}{pluginMetadata, retVal})
+	fake.recordInvocation("SetPluginMetadata", []interface{}{pluginMetadata, retVal})
 	fake.setPluginMetadataMutex.Unlock()
 	if fake.SetPluginMetadataStub != nil {
 		return fake.SetPluginMetadataStub(pluginMetadata, retVal)
@@ -354,6 +358,7 @@ func (fake *FakeHandlers) DisableTerminalOutput(disable bool, retVal *bool) erro
 		disable bool
 		retVal  *bool
 	}{disable, retVal})
+	fake.recordInvocation("DisableTerminalOutput", []interface{}{disable, retVal})
 	fake.disableTerminalOutputMutex.Unlock()
 	if fake.DisableTerminalOutputStub != nil {
 		return fake.DisableTerminalOutputStub(disable, retVal)
@@ -382,11 +387,17 @@ func (fake *FakeHandlers) DisableTerminalOutputReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) CallCoreCommand(args []string, retVal *bool) error {
+	var argsCopy []string
+	if args != nil {
+		argsCopy = make([]string, len(args))
+		copy(argsCopy, args)
+	}
 	fake.callCoreCommandMutex.Lock()
 	fake.callCoreCommandArgsForCall = append(fake.callCoreCommandArgsForCall, struct {
 		args   []string
 		retVal *bool
-	}{args, retVal})
+	}{argsCopy, retVal})
+	fake.recordInvocation("CallCoreCommand", []interface{}{argsCopy, retVal})
 	fake.callCoreCommandMutex.Unlock()
 	if fake.CallCoreCommandStub != nil {
 		return fake.CallCoreCommandStub(args, retVal)
@@ -420,6 +431,7 @@ func (fake *FakeHandlers) GetOutputAndReset(args bool, retVal *[]string) error {
 		args   bool
 		retVal *[]string
 	}{args, retVal})
+	fake.recordInvocation("GetOutputAndReset", []interface{}{args, retVal})
 	fake.getOutputAndResetMutex.Unlock()
 	if fake.GetOutputAndResetStub != nil {
 		return fake.GetOutputAndResetStub(args, retVal)
@@ -453,6 +465,7 @@ func (fake *FakeHandlers) GetCurrentOrg(args string, retVal *plugin_models.Organ
 		args   string
 		retVal *plugin_models.Organization
 	}{args, retVal})
+	fake.recordInvocation("GetCurrentOrg", []interface{}{args, retVal})
 	fake.getCurrentOrgMutex.Unlock()
 	if fake.GetCurrentOrgStub != nil {
 		return fake.GetCurrentOrgStub(args, retVal)
@@ -486,6 +499,7 @@ func (fake *FakeHandlers) GetCurrentSpace(args string, retVal *plugin_models.Spa
 		args   string
 		retVal *plugin_models.Space
 	}{args, retVal})
+	fake.recordInvocation("GetCurrentSpace", []interface{}{args, retVal})
 	fake.getCurrentSpaceMutex.Unlock()
 	if fake.GetCurrentSpaceStub != nil {
 		return fake.GetCurrentSpaceStub(args, retVal)
@@ -519,6 +533,7 @@ func (fake *FakeHandlers) Username(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("Username", []interface{}{args, retVal})
 	fake.usernameMutex.Unlock()
 	if fake.UsernameStub != nil {
 		return fake.UsernameStub(args, retVal)
@@ -552,6 +567,7 @@ func (fake *FakeHandlers) UserGuid(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("UserGuid", []interface{}{args, retVal})
 	fake.userGuidMutex.Unlock()
 	if fake.UserGuidStub != nil {
 		return fake.UserGuidStub(args, retVal)
@@ -585,6 +601,7 @@ func (fake *FakeHandlers) UserEmail(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("UserEmail", []interface{}{args, retVal})
 	fake.userEmailMutex.Unlock()
 	if fake.UserEmailStub != nil {
 		return fake.UserEmailStub(args, retVal)
@@ -618,6 +635,7 @@ func (fake *FakeHandlers) IsLoggedIn(args string, retVal *bool) error {
 		args   string
 		retVal *bool
 	}{args, retVal})
+	fake.recordInvocation("IsLoggedIn", []interface{}{args, retVal})
 	fake.isLoggedInMutex.Unlock()
 	if fake.IsLoggedInStub != nil {
 		return fake.IsLoggedInStub(args, retVal)
@@ -651,6 +669,7 @@ func (fake *FakeHandlers) IsSSLDisabled(args string, retVal *bool) error {
 		args   string
 		retVal *bool
 	}{args, retVal})
+	fake.recordInvocation("IsSSLDisabled", []interface{}{args, retVal})
 	fake.isSSLDisabledMutex.Unlock()
 	if fake.IsSSLDisabledStub != nil {
 		return fake.IsSSLDisabledStub(args, retVal)
@@ -684,6 +703,7 @@ func (fake *FakeHandlers) HasOrganization(args string, retVal *bool) error {
 		args   string
 		retVal *bool
 	}{args, retVal})
+	fake.recordInvocation("HasOrganization", []interface{}{args, retVal})
 	fake.hasOrganizationMutex.Unlock()
 	if fake.HasOrganizationStub != nil {
 		return fake.HasOrganizationStub(args, retVal)
@@ -717,6 +737,7 @@ func (fake *FakeHandlers) HasSpace(args string, retVal *bool) error {
 		args   string
 		retVal *bool
 	}{args, retVal})
+	fake.recordInvocation("HasSpace", []interface{}{args, retVal})
 	fake.hasSpaceMutex.Unlock()
 	if fake.HasSpaceStub != nil {
 		return fake.HasSpaceStub(args, retVal)
@@ -750,6 +771,7 @@ func (fake *FakeHandlers) ApiEndpoint(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("ApiEndpoint", []interface{}{args, retVal})
 	fake.apiEndpointMutex.Unlock()
 	if fake.ApiEndpointStub != nil {
 		return fake.ApiEndpointStub(args, retVal)
@@ -783,6 +805,7 @@ func (fake *FakeHandlers) HasAPIEndpoint(args string, retVal *bool) error {
 		args   string
 		retVal *bool
 	}{args, retVal})
+	fake.recordInvocation("HasAPIEndpoint", []interface{}{args, retVal})
 	fake.hasAPIEndpointMutex.Unlock()
 	if fake.HasAPIEndpointStub != nil {
 		return fake.HasAPIEndpointStub(args, retVal)
@@ -816,6 +839,7 @@ func (fake *FakeHandlers) ApiVersion(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("ApiVersion", []interface{}{args, retVal})
 	fake.apiVersionMutex.Unlock()
 	if fake.ApiVersionStub != nil {
 		return fake.ApiVersionStub(args, retVal)
@@ -849,6 +873,7 @@ func (fake *FakeHandlers) LoggregatorEndpoint(args string, retVal *string) error
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("LoggregatorEndpoint", []interface{}{args, retVal})
 	fake.loggregatorEndpointMutex.Unlock()
 	if fake.LoggregatorEndpointStub != nil {
 		return fake.LoggregatorEndpointStub(args, retVal)
@@ -882,6 +907,7 @@ func (fake *FakeHandlers) DopplerEndpoint(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("DopplerEndpoint", []interface{}{args, retVal})
 	fake.dopplerEndpointMutex.Unlock()
 	if fake.DopplerEndpointStub != nil {
 		return fake.DopplerEndpointStub(args, retVal)
@@ -915,6 +941,7 @@ func (fake *FakeHandlers) AccessToken(args string, retVal *string) error {
 		args   string
 		retVal *string
 	}{args, retVal})
+	fake.recordInvocation("AccessToken", []interface{}{args, retVal})
 	fake.accessTokenMutex.Unlock()
 	if fake.AccessTokenStub != nil {
 		return fake.AccessTokenStub(args, retVal)
@@ -948,6 +975,7 @@ func (fake *FakeHandlers) GetApp(appName string, retVal *plugin_models.GetAppMod
 		appName string
 		retVal  *plugin_models.GetAppModel
 	}{appName, retVal})
+	fake.recordInvocation("GetApp", []interface{}{appName, retVal})
 	fake.getAppMutex.Unlock()
 	if fake.GetAppStub != nil {
 		return fake.GetAppStub(appName, retVal)
@@ -981,6 +1009,7 @@ func (fake *FakeHandlers) GetApps(args string, retVal *[]plugin_models.GetAppsMo
 		args   string
 		retVal *[]plugin_models.GetAppsModel
 	}{args, retVal})
+	fake.recordInvocation("GetApps", []interface{}{args, retVal})
 	fake.getAppsMutex.Unlock()
 	if fake.GetAppsStub != nil {
 		return fake.GetAppsStub(args, retVal)
@@ -1014,6 +1043,7 @@ func (fake *FakeHandlers) GetOrgs(args string, retVal *[]plugin_models.GetOrgs_M
 		args   string
 		retVal *[]plugin_models.GetOrgs_Model
 	}{args, retVal})
+	fake.recordInvocation("GetOrgs", []interface{}{args, retVal})
 	fake.getOrgsMutex.Unlock()
 	if fake.GetOrgsStub != nil {
 		return fake.GetOrgsStub(args, retVal)
@@ -1047,6 +1077,7 @@ func (fake *FakeHandlers) GetSpaces(args string, retVal *[]plugin_models.GetSpac
 		args   string
 		retVal *[]plugin_models.GetSpaces_Model
 	}{args, retVal})
+	fake.recordInvocation("GetSpaces", []interface{}{args, retVal})
 	fake.getSpacesMutex.Unlock()
 	if fake.GetSpacesStub != nil {
 		return fake.GetSpacesStub(args, retVal)
@@ -1080,6 +1111,7 @@ func (fake *FakeHandlers) GetServices(args string, retVal *[]plugin_models.GetSe
 		args   string
 		retVal *[]plugin_models.GetServices_Model
 	}{args, retVal})
+	fake.recordInvocation("GetServices", []interface{}{args, retVal})
 	fake.getServicesMutex.Unlock()
 	if fake.GetServicesStub != nil {
 		return fake.GetServicesStub(args, retVal)
@@ -1108,11 +1140,17 @@ func (fake *FakeHandlers) GetServicesReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
+	var argsCopy []string
+	if args != nil {
+		argsCopy = make([]string, len(args))
+		copy(argsCopy, args)
+	}
 	fake.getOrgUsersMutex.Lock()
 	fake.getOrgUsersArgsForCall = append(fake.getOrgUsersArgsForCall, struct {
 		args   []string
 		retVal *[]plugin_models.GetOrgUsers_Model
-	}{args, retVal})
+	}{argsCopy, retVal})
+	fake.recordInvocation("GetOrgUsers", []interface{}{argsCopy, retVal})
 	fake.getOrgUsersMutex.Unlock()
 	if fake.GetOrgUsersStub != nil {
 		return fake.GetOrgUsersStub(args, retVal)
@@ -1141,11 +1179,17 @@ func (fake *FakeHandlers) GetOrgUsersReturns(result1 error) {
 }
 
 func (fake *FakeHandlers) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
+	var argsCopy []string
+	if args != nil {
+		argsCopy = make([]string, len(args))
+		copy(argsCopy, args)
+	}
 	fake.getSpaceUsersMutex.Lock()
 	fake.getSpaceUsersArgsForCall = append(fake.getSpaceUsersArgsForCall, struct {
 		args   []string
 		retVal *[]plugin_models.GetSpaceUsers_Model
-	}{args, retVal})
+	}{argsCopy, retVal})
+	fake.recordInvocation("GetSpaceUsers", []interface{}{argsCopy, retVal})
 	fake.getSpaceUsersMutex.Unlock()
 	if fake.GetSpaceUsersStub != nil {
 		return fake.GetSpaceUsersStub(args, retVal)
@@ -1179,6 +1223,7 @@ func (fake *FakeHandlers) GetOrg(orgName string, retVal *plugin_models.GetOrg_Mo
 		orgName string
 		retVal  *plugin_models.GetOrg_Model
 	}{orgName, retVal})
+	fake.recordInvocation("GetOrg", []interface{}{orgName, retVal})
 	fake.getOrgMutex.Unlock()
 	if fake.GetOrgStub != nil {
 		return fake.GetOrgStub(orgName, retVal)
@@ -1212,6 +1257,7 @@ func (fake *FakeHandlers) GetSpace(spaceName string, retVal *plugin_models.GetSp
 		spaceName string
 		retVal    *plugin_models.GetSpace_Model
 	}{spaceName, retVal})
+	fake.recordInvocation("GetSpace", []interface{}{spaceName, retVal})
 	fake.getSpaceMutex.Unlock()
 	if fake.GetSpaceStub != nil {
 		return fake.GetSpaceStub(spaceName, retVal)
@@ -1245,6 +1291,7 @@ func (fake *FakeHandlers) GetService(serviceInstance string, retVal *plugin_mode
 		serviceInstance string
 		retVal          *plugin_models.GetService_Model
 	}{serviceInstance, retVal})
+	fake.recordInvocation("GetService", []interface{}{serviceInstance, retVal})
 	fake.getServiceMutex.Unlock()
 	if fake.GetServiceStub != nil {
 		return fake.GetServiceStub(serviceInstance, retVal)
@@ -1270,6 +1317,84 @@ func (fake *FakeHandlers) GetServiceReturns(result1 error) {
 	fake.getServiceReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeHandlers) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.isMinCliVersionMutex.RLock()
+	defer fake.isMinCliVersionMutex.RUnlock()
+	fake.setPluginMetadataMutex.RLock()
+	defer fake.setPluginMetadataMutex.RUnlock()
+	fake.disableTerminalOutputMutex.RLock()
+	defer fake.disableTerminalOutputMutex.RUnlock()
+	fake.callCoreCommandMutex.RLock()
+	defer fake.callCoreCommandMutex.RUnlock()
+	fake.getOutputAndResetMutex.RLock()
+	defer fake.getOutputAndResetMutex.RUnlock()
+	fake.getCurrentOrgMutex.RLock()
+	defer fake.getCurrentOrgMutex.RUnlock()
+	fake.getCurrentSpaceMutex.RLock()
+	defer fake.getCurrentSpaceMutex.RUnlock()
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	fake.hasOrganizationMutex.RLock()
+	defer fake.hasOrganizationMutex.RUnlock()
+	fake.hasSpaceMutex.RLock()
+	defer fake.hasSpaceMutex.RUnlock()
+	fake.apiEndpointMutex.RLock()
+	defer fake.apiEndpointMutex.RUnlock()
+	fake.hasAPIEndpointMutex.RLock()
+	defer fake.hasAPIEndpointMutex.RUnlock()
+	fake.apiVersionMutex.RLock()
+	defer fake.apiVersionMutex.RUnlock()
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	fake.getAppsMutex.RLock()
+	defer fake.getAppsMutex.RUnlock()
+	fake.getOrgsMutex.RLock()
+	defer fake.getOrgsMutex.RUnlock()
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	fake.getServicesMutex.RLock()
+	defer fake.getServicesMutex.RUnlock()
+	fake.getOrgUsersMutex.RLock()
+	defer fake.getOrgUsersMutex.RUnlock()
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	fake.getOrgMutex.RLock()
+	defer fake.getOrgMutex.RUnlock()
+	fake.getSpaceMutex.RLock()
+	defer fake.getSpaceMutex.RUnlock()
+	fake.getServiceMutex.RLock()
+	defer fake.getServiceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeHandlers) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ rpcserver.Handlers = new(FakeHandlers)

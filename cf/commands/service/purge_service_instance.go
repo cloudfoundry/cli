@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -36,9 +38,10 @@ func (cmd *PurgeServiceInstance) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("purge-service-instance"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
@@ -46,7 +49,7 @@ func (cmd *PurgeServiceInstance) Requirements(requirementsFactory requirements.F
 		requirementsFactory.NewMinAPIVersionRequirement("purge-service-instance", cf.RoutePathMinimumAPIVersion),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *PurgeServiceInstance) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

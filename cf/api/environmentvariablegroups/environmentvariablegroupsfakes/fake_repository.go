@@ -39,11 +39,14 @@ type FakeRepository struct {
 	setRunningReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) ListRunning() (variables []models.EnvironmentVariable, apiErr error) {
 	fake.listRunningMutex.Lock()
 	fake.listRunningArgsForCall = append(fake.listRunningArgsForCall, struct{}{})
+	fake.recordInvocation("ListRunning", []interface{}{})
 	fake.listRunningMutex.Unlock()
 	if fake.ListRunningStub != nil {
 		return fake.ListRunningStub()
@@ -69,6 +72,7 @@ func (fake *FakeRepository) ListRunningReturns(result1 []models.EnvironmentVaria
 func (fake *FakeRepository) ListStaging() (variables []models.EnvironmentVariable, apiErr error) {
 	fake.listStagingMutex.Lock()
 	fake.listStagingArgsForCall = append(fake.listStagingArgsForCall, struct{}{})
+	fake.recordInvocation("ListStaging", []interface{}{})
 	fake.listStagingMutex.Unlock()
 	if fake.ListStagingStub != nil {
 		return fake.ListStagingStub()
@@ -96,6 +100,7 @@ func (fake *FakeRepository) SetStaging(arg1 string) error {
 	fake.setStagingArgsForCall = append(fake.setStagingArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("SetStaging", []interface{}{arg1})
 	fake.setStagingMutex.Unlock()
 	if fake.SetStagingStub != nil {
 		return fake.SetStagingStub(arg1)
@@ -128,6 +133,7 @@ func (fake *FakeRepository) SetRunning(arg1 string) error {
 	fake.setRunningArgsForCall = append(fake.setRunningArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("SetRunning", []interface{}{arg1})
 	fake.setRunningMutex.Unlock()
 	if fake.SetRunningStub != nil {
 		return fake.SetRunningStub(arg1)
@@ -153,6 +159,32 @@ func (fake *FakeRepository) SetRunningReturns(result1 error) {
 	fake.setRunningReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listRunningMutex.RLock()
+	defer fake.listRunningMutex.RUnlock()
+	fake.listStagingMutex.RLock()
+	defer fake.listStagingMutex.RUnlock()
+	fake.setStagingMutex.RLock()
+	defer fake.setStagingMutex.RUnlock()
+	fake.setRunningMutex.RLock()
+	defer fake.setRunningMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ environmentvariablegroups.Repository = new(FakeRepository)
