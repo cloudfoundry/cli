@@ -196,7 +196,7 @@ var _ = Describe("Zipper", func() {
 			reader, err := zip.NewReader(zipFile, fileStat.Size())
 			Expect(err).NotTo(HaveOccurred())
 
-			readFileInZip(5, reader)
+			readFileInZip(7, reader)
 			Expect(fmt.Sprintf("%o", reader.File[5].FileInfo().Mode())).To(Equal("766"))
 		})
 
