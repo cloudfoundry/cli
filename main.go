@@ -57,6 +57,8 @@ func parse(args []string) {
 			os.Exit(1)
 		case flags.ErrUnknownCommand:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
+		case flags.ErrCommandRequired:
+			parse([]string{"help"})
 		default:
 			fmt.Printf("unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 		}

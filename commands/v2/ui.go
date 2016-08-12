@@ -6,4 +6,6 @@ package v2
 type UI interface {
 	DisplayText(string, ...map[string]interface{})
 	DisplayTextWithKeyTranslations(string, []string, ...map[string]interface{})
+	DisplayNewline()
+	DisplayHelpHeader(string)
 }
