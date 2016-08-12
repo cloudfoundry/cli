@@ -3,11 +3,12 @@ package terminal_test
 import (
 	"bytes"
 
+	"strings"
+
 	. "github.com/cloudfoundry/cli/cf/terminal"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"strings"
 )
 
 var _ = Describe("Table", func() {
@@ -35,10 +36,9 @@ var _ = Describe("Table", func() {
 			table = NewTable([]string{"watashi", "no ", "atama!"})
 		})
 
-		It("prints the table without panicking", func() {
-			Expect(func() {
-				table.PrintTo(outputs)
-			}).NotTo(Panic())
+		It("prints the table without error", func() {
+			err := table.PrintTo(outputs)
+			Expect(err).NotTo(HaveOccurred())
 
 			s := strings.Split(outputs.String(), "\n")
 			Expect(s).To(ContainSubstrings(
@@ -47,9 +47,8 @@ var _ = Describe("Table", func() {
 		})
 
 		It("prints the table with the extra whitespace from the header stripped", func() {
-			Expect(func() {
-				table.PrintTo(outputs)
-			}).NotTo(Panic())
+			err := table.PrintTo(outputs)
+			Expect(err).NotTo(HaveOccurred())
 
 			s := strings.Split(outputs.String(), "\n")
 			Expect(s).To(ContainSubstrings(

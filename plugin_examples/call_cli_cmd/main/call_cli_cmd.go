@@ -46,7 +46,7 @@ func (c *CliCmd) Run(cliConnection plugin.CliConnection, args []string) {
 	output, err := cliConnection.CliCommand(args[1:]...)
 
 	// The call to plugin.CliCommand() returns an error if the cli command
-	// returns a non-zero return code or panics. The output written by the CLI
+	// returns a non-zero return code. The output written by the CLI
 	// is returned in any case.
 	if err != nil {
 		fmt.Println("PLUGIN ERROR: Error from CliCommand: ", err)

@@ -151,7 +151,7 @@ func (t *Table) calculateMaxSize(transformer rowTransformer, rowIndex int, row [
 			// not match then pCV may compute a cell width
 			// larger than the max width found here, a
 			// negative padding length from that, and
-			// subsequently panic the Go runtime.  What
+			// subsequently return an error.  What
 			// was further missing is trimming before
 			// entering the user-transform. Especially
 			// with color transforms any trailing space
@@ -277,9 +277,8 @@ func (t *Table) printCellValue(result io.Writer, transformer rowTransformer, col
 		// information. If they do not match then we may here
 		// compute a cell width larger than the max width
 		// found by cMS, derive a negative padding length from
-		// that, and subsequently panic the Go runtime in
-		// "strings.Repeat". What was further missing is
-		// trimming before entering the
+		// that, and subsequently return an error. What was
+		// further missing is trimming before entering the
 		// user-transform. Especially with color transforms
 		// any trailing space going in will not be removable
 		// for print.

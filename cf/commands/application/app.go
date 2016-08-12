@@ -127,10 +127,6 @@ func (cmd *ShowApp) ShowApp(app models.Application, orgName, spaceName string) e
 		return err
 	}
 
-	if err != nil && !appIsStopped {
-		return err
-	}
-
 	if cmd.pluginCall {
 		cmd.populatePluginModel(application, app.Stack, instances)
 	}

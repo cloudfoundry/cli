@@ -126,7 +126,11 @@ func Main(traceEnv string, args []string) {
 			os.Exit(1)
 		}
 
-		warningsCollector.PrintWarnings()
+		err = warningsCollector.PrintWarnings()
+		if err != nil {
+			deps.UI.Failed(err.Error())
+			os.Exit(1)
+		}
 
 		os.Exit(0)
 	}

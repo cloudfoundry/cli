@@ -42,8 +42,9 @@ var _ = Describe("WarningsCollector", func() {
 					warningsCollector = net.NewWarningsCollector(ui, warning_producer_one)
 				})
 
-				It("panics with an error that contains all the warnings", func() {
-					Expect(warningsCollector.PrintWarnings).To(Panic())
+				It("returns an error", func() {
+					err := warningsCollector.PrintWarnings()
+					Expect(err).To(HaveOccurred())
 				})
 			})
 
@@ -52,10 +53,10 @@ var _ = Describe("WarningsCollector", func() {
 					warningsCollector = net.NewWarningsCollector(ui)
 				})
 
-				It("does not panic", func() {
-					Expect(warningsCollector.PrintWarnings).NotTo(Panic())
+				It("does not return an error", func() {
+					err := warningsCollector.PrintWarnings()
+					Expect(err).ToNot(HaveOccurred())
 				})
-
 			})
 		})
 
@@ -64,12 +65,13 @@ var _ = Describe("WarningsCollector", func() {
 				os.Setenv("CF_RAISE_ERROR_ON_WARNINGS", "")
 			})
 
-			It("does not panic", func() {
+			It("does not return an error", func() {
 				warning_producer_one := new(netfakes.FakeWarningProducer)
 				warning_producer_one.WarningsReturns([]string{"Hello", "Darling"})
 				warningsCollector := net.NewWarningsCollector(ui, warning_producer_one)
 
-				Expect(warningsCollector.PrintWarnings).NotTo(Panic())
+				err := warningsCollector.PrintWarnings()
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("does not print out duplicate warnings", func() {

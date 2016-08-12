@@ -1,6 +1,7 @@
 package net
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -27,7 +28,7 @@ func NewWarningsCollector(ui terminal.UI, warningsProducers ...WarningProducer) 
 	}
 }
 
-func (warningsCollector WarningsCollector) PrintWarnings() {
+func (warningsCollector WarningsCollector) PrintWarnings() error {
 	warnings := []string{}
 	for _, warningProducer := range warningsCollector.warningProducers {
 		for _, warning := range warningProducer.Warnings() {
@@ -40,7 +41,7 @@ func (warningsCollector WarningsCollector) PrintWarnings() {
 
 	if os.Getenv("CF_RAISE_ERROR_ON_WARNINGS") != "" {
 		if len(warnings) > 0 {
-			panic(strings.Join(warnings, "\n"))
+			return fmt.Errorf(strings.Join(warnings, "\n"))
 		}
 	}
 
@@ -49,6 +50,8 @@ func (warningsCollector WarningsCollector) PrintWarnings() {
 	for _, warning := range warnings {
 		warningsCollector.ui.Warn(warning)
 	}
+
+	return nil
 }
 
 func (warningsCollector WarningsCollector) removeDuplicates(stringArray []string) []string {

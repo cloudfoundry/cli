@@ -211,7 +211,7 @@ var _ = Describe("PurgeServiceInstance", func() {
 				runCLIErr = cmd.Execute(flagContext)
 			})
 
-			It("panics and prints a message with the error", func() {
+			It("prints a message with the error", func() {
 				Expect(runCLIErr).To(HaveOccurred())
 			})
 		})
