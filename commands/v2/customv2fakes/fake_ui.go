@@ -1,6 +1,7 @@
 package customv2fakes
 
 import (
+	"fmt"
 	"text/template"
 
 	"github.com/onsi/gomega/gbytes"
@@ -24,6 +25,8 @@ type FakeUI struct {
 
 	displayFlavorTextWithKeyTranslationsCallCount    int
 	displayFlavorTextWithKeyTranslationsDisplayCount int
+
+	helpHeaderCallCount int
 }
 
 // NewFakeUI is the constructor for a FakeUI. If TTY is set to false, flavour
@@ -110,6 +113,22 @@ func (ui FakeUI) DisplayFlavorTextWithKeyTranslationsCallCount() int {
 // DisplayFlavorTextWithKeyTranslations was displayed on the screen.
 func (ui FakeUI) DisplayFlavorTextWithKeyTranslationsDisplayCount() int {
 	return ui.displayFlavorTextWithKeyTranslationsDisplayCount
+}
+
+// DisplayNewline adds a newline to the Out buffer.
+func (ui FakeUI) DisplayNewline() {
+	fmt.Fprintf(ui.Out, "\n")
+}
+
+// DisplayHelpHeader tracks the number of times DisplayHelpHeader is called.
+func (ui FakeUI) DisplayHelpHeader(text string) {
+	ui.helpHeaderCallCount += 1
+	ui.outputToSTDOUT(text)
+}
+
+// DisplayHelpHeaderCount returns the number of times DisplayHelpHeader was called.
+func (ui FakeUI) DisplayHelpHeaderCount() int {
+	return ui.helpHeaderCallCount
 }
 
 func (ui FakeUI) mergeMap(maps []map[string]interface{}) map[string]interface{} {

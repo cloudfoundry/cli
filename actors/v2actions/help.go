@@ -1,9 +1,6 @@
 package v2actions
 
-import (
-	"reflect"
-	"strings"
-)
+import "reflect"
 
 // CommandInfo contains the help details of a command
 type CommandInfo struct {
@@ -65,8 +62,7 @@ func (_ Actor) GetCommandInfo(commandList interface{}, commandName string) (Comm
 		}
 
 		if fieldTag.Get("usage") != "" {
-			executableName := "cf" //TODO: Figure out how to dynamically get this name
-			cmd.Usage = strings.Replace(fieldTag.Get("usage"), "CF_NAME", executableName, -1)
+			cmd.Usage = fieldTag.Get("usage")
 			continue
 		}
 
@@ -80,4 +76,22 @@ func (_ Actor) GetCommandInfo(commandList interface{}, commandName string) (Comm
 	}
 
 	return cmd, nil
+}
+
+// GetAllNamesAndDescriptions returns a slice of CommandInfo that only fills in
+// the Name and Description for all the commands in commandList
+func (_ Actor) GetAllNamesAndDescriptions(commandList interface{}) map[string]CommandInfo {
+	handler := reflect.TypeOf(commandList)
+
+	infos := make(map[string]CommandInfo, handler.NumField())
+	for i := 0; i < handler.NumField(); i++ {
+		fieldTag := handler.Field(i).Tag
+		commandName := fieldTag.Get("command")
+		infos[commandName] = CommandInfo{
+			Name:        commandName,
+			Description: fieldTag.Get("description"),
+		}
+	}
+
+	return infos
 }

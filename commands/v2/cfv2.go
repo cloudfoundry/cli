@@ -3,7 +3,7 @@ package v2
 var Commands commandList
 
 type commandList struct {
-	App                                AppCommand                                `command:"app" description:"Display health and status for app" usage:"\tcf app APP_NAME"`
+	App                                AppCommand                                `command:"app" description:"Display health and status for app"`
 	Help                               HelpCommand                               `command:"help" alias:"h" description:"Show help"`
 	Version                            VersionCommand                            `command:"version" description:"Print the version"`
 	Login                              LoginCommand                              `command:"login" alias:"l" description:"Log user in"`

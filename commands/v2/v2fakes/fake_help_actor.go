@@ -19,6 +19,14 @@ type FakeHelpActor struct {
 		result1 v2actions.CommandInfo
 		result2 error
 	}
+	GetAllNamesAndDescriptionsStub        func(interface{}) map[string]v2actions.CommandInfo
+	getAllNamesAndDescriptionsMutex       sync.RWMutex
+	getAllNamesAndDescriptionsArgsForCall []struct {
+		arg1 interface{}
+	}
+	getAllNamesAndDescriptionsReturns struct {
+		result1 map[string]v2actions.CommandInfo
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -58,11 +66,46 @@ func (fake *FakeHelpActor) GetCommandInfoReturns(result1 v2actions.CommandInfo, 
 	}{result1, result2}
 }
 
+func (fake *FakeHelpActor) GetAllNamesAndDescriptions(arg1 interface{}) map[string]v2actions.CommandInfo {
+	fake.getAllNamesAndDescriptionsMutex.Lock()
+	fake.getAllNamesAndDescriptionsArgsForCall = append(fake.getAllNamesAndDescriptionsArgsForCall, struct {
+		arg1 interface{}
+	}{arg1})
+	fake.recordInvocation("GetAllNamesAndDescriptions", []interface{}{arg1})
+	fake.getAllNamesAndDescriptionsMutex.Unlock()
+	if fake.GetAllNamesAndDescriptionsStub != nil {
+		return fake.GetAllNamesAndDescriptionsStub(arg1)
+	} else {
+		return fake.getAllNamesAndDescriptionsReturns.result1
+	}
+}
+
+func (fake *FakeHelpActor) GetAllNamesAndDescriptionsCallCount() int {
+	fake.getAllNamesAndDescriptionsMutex.RLock()
+	defer fake.getAllNamesAndDescriptionsMutex.RUnlock()
+	return len(fake.getAllNamesAndDescriptionsArgsForCall)
+}
+
+func (fake *FakeHelpActor) GetAllNamesAndDescriptionsArgsForCall(i int) interface{} {
+	fake.getAllNamesAndDescriptionsMutex.RLock()
+	defer fake.getAllNamesAndDescriptionsMutex.RUnlock()
+	return fake.getAllNamesAndDescriptionsArgsForCall[i].arg1
+}
+
+func (fake *FakeHelpActor) GetAllNamesAndDescriptionsReturns(result1 map[string]v2actions.CommandInfo) {
+	fake.GetAllNamesAndDescriptionsStub = nil
+	fake.getAllNamesAndDescriptionsReturns = struct {
+		result1 map[string]v2actions.CommandInfo
+	}{result1}
+}
+
 func (fake *FakeHelpActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.getCommandInfoMutex.RLock()
 	defer fake.getCommandInfoMutex.RUnlock()
+	fake.getAllNamesAndDescriptionsMutex.RLock()
+	defer fake.getAllNamesAndDescriptionsMutex.RUnlock()
 	return fake.invocations
 }
 
