@@ -197,7 +197,7 @@ var _ = Describe("Zipper", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			readFileInZip(7, reader)
-			Expect(fmt.Sprintf("%o", reader.File[5].FileInfo().Mode())).To(Equal("766"))
+			Expect(fmt.Sprintf("%o", reader.File[7].FileInfo().Mode())).To(Equal("766"))
 		})
 
 		It("is a no-op for a zipfile", func() {
