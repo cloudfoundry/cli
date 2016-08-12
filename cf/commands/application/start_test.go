@@ -308,9 +308,7 @@ var _ = Describe("start command", func() {
 				startWait.Add(1)
 				doneWait := new(sync.WaitGroup)
 				doneWait.Add(1)
-				Expect(func() {
-					cmd.TailStagingLogs(defaultAppForStart, make(chan bool, 1), startWait, doneWait)
-				}).NotTo(Panic())
+				cmd.TailStagingLogs(defaultAppForStart, make(chan bool, 1), startWait, doneWait)
 			})
 		})
 	})

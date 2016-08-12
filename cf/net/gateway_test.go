@@ -641,9 +641,7 @@ var _ = Describe("Gateway", func() {
 
 func getHost(urlString string) string {
 	url, err := url.Parse(urlString)
-	if err != nil {
-		panic(err)
-	}
+	Expect(err).NotTo(HaveOccurred())
 	return url.Host
 }
 

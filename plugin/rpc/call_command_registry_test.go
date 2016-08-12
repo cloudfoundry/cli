@@ -13,7 +13,6 @@ import (
 )
 
 var _ = Describe("calling commands in commandregistry", func() {
-
 	_ = FakeCommand1{} //make sure fake_command is imported and self-registered with init()
 	_ = FakeCommand3{} //make sure fake_command is imported and self-registered with init()
 	_ = FakeCommand4{} //make sure fake_command is imported and self-registered with init()

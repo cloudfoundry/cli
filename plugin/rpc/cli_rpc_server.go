@@ -170,10 +170,6 @@ func (cmd *CliRpcCmd) DisableTerminalOutput(disable bool, retVal *bool) error {
 }
 
 func (cmd *CliRpcCmd) CallCoreCommand(args []string, retVal *bool) error {
-	defer func() {
-		recover()
-	}()
-
 	var err error
 	cmdRegistry := commandregistry.Commands
 
@@ -309,10 +305,6 @@ func (cmd *CliRpcCmd) AccessToken(args string, retVal *string) error {
 }
 
 func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -327,10 +319,6 @@ func (cmd *CliRpcCmd) GetApp(appName string, retVal *plugin_models.GetAppModel) 
 }
 
 func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -345,10 +333,6 @@ func (cmd *CliRpcCmd) GetApps(_ string, retVal *[]plugin_models.GetAppsModel) er
 }
 
 func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -363,10 +347,6 @@ func (cmd *CliRpcCmd) GetOrgs(_ string, retVal *[]plugin_models.GetOrgs_Model) e
 }
 
 func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -381,10 +361,6 @@ func (cmd *CliRpcCmd) GetSpaces(_ string, retVal *[]plugin_models.GetSpaces_Mode
 }
 
 func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -400,10 +376,6 @@ func (cmd *CliRpcCmd) GetServices(_ string, retVal *[]plugin_models.GetServices_
 }
 
 func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgUsers_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -418,10 +390,6 @@ func (cmd *CliRpcCmd) GetOrgUsers(args []string, retVal *[]plugin_models.GetOrgU
 }
 
 func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSpaceUsers_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -436,10 +404,6 @@ func (cmd *CliRpcCmd) GetSpaceUsers(args []string, retVal *[]plugin_models.GetSp
 }
 
 func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -454,10 +418,6 @@ func (cmd *CliRpcCmd) GetOrg(orgName string, retVal *plugin_models.GetOrg_Model)
 }
 
 func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands
@@ -472,10 +432,6 @@ func (cmd *CliRpcCmd) GetSpace(spaceName string, retVal *plugin_models.GetSpace_
 }
 
 func (cmd *CliRpcCmd) GetService(serviceInstance string, retVal *plugin_models.GetService_Model) error {
-	defer func() {
-		recover()
-	}()
-
 	deps := commandregistry.NewDependency(cmd.stdout, cmd.logger, dialTimeout)
 
 	//set deps objs to be the one used by all other commands

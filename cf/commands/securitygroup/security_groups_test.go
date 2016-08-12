@@ -147,8 +147,6 @@ var _ = Describe("list-security-groups command", func() {
 						[]string{"#0", "my-group", "org-1", "space-1"},
 					))
 
-					//If there is a panic in this test, it is likely due to the following
-					//Expectation to be false
 					Expect(ui.Outputs()).ToNot(ContainSubstrings(
 						[]string{"#0", "my-group", "org-2", "space-2"},
 					))

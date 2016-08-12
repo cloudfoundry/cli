@@ -118,25 +118,23 @@ var _ = Describe("TeePrinter", func() {
 		It("sets the []string used to save the output", func() {
 			bucket := gbytes.NewBuffer()
 
-			Expect(func() {
-				io_helpers.CaptureOutput(func() {
-					printer = NewTeePrinter(os.Stdout)
-					printer.SetOutputBucket(bucket)
-					printer.Printf("Hello %s", "everybody")
-				})
-			}).NotTo(Panic())
+			output := io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter(os.Stdout)
+				printer.SetOutputBucket(bucket)
+				printer.Printf("Hello %s", "everybody")
+			})
 
 			Expect(bucket).To(gbytes.Say("Hello everybody"))
+			Expect(output).To(ContainElement("Hello everybody"))
 		})
 
 		It("disables the output saving when set to nil", func() {
-			Expect(func() {
-				io_helpers.CaptureOutput(func() {
-					printer = NewTeePrinter(os.Stdout)
-					printer.SetOutputBucket(nil)
-					printer.Printf("Hello %s", "everybody")
-				})
-			}).NotTo(Panic())
+			output := io_helpers.CaptureOutput(func() {
+				printer = NewTeePrinter(os.Stdout)
+				printer.SetOutputBucket(nil)
+				printer.Printf("Hello %s", "everybody")
+			})
+			Expect(output).To(ContainElement("Hello everybody"))
 		})
 	})
 })
