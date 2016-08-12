@@ -45,6 +45,8 @@ type FakeAppFiles struct {
 	walkAppFilesReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeAppFiles) AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
@@ -52,6 +54,7 @@ func (fake *FakeAppFiles) AppFilesInDir(dir string) (appFiles []models.AppFileFi
 	fake.appFilesInDirArgsForCall = append(fake.appFilesInDirArgsForCall, struct {
 		dir string
 	}{dir})
+	fake.recordInvocation("AppFilesInDir", []interface{}{dir})
 	fake.appFilesInDirMutex.Unlock()
 	if fake.AppFilesInDirStub != nil {
 		return fake.AppFilesInDirStub(dir)
@@ -81,12 +84,18 @@ func (fake *FakeAppFiles) AppFilesInDirReturns(result1 []models.AppFileFields, r
 }
 
 func (fake *FakeAppFiles) CopyFiles(appFiles []models.AppFileFields, fromDir string, toDir string) (err error) {
+	var appFilesCopy []models.AppFileFields
+	if appFiles != nil {
+		appFilesCopy = make([]models.AppFileFields, len(appFiles))
+		copy(appFilesCopy, appFiles)
+	}
 	fake.copyFilesMutex.Lock()
 	fake.copyFilesArgsForCall = append(fake.copyFilesArgsForCall, struct {
 		appFiles []models.AppFileFields
 		fromDir  string
 		toDir    string
-	}{appFiles, fromDir, toDir})
+	}{appFilesCopy, fromDir, toDir})
+	fake.recordInvocation("CopyFiles", []interface{}{appFilesCopy, fromDir, toDir})
 	fake.copyFilesMutex.Unlock()
 	if fake.CopyFilesStub != nil {
 		return fake.CopyFilesStub(appFiles, fromDir, toDir)
@@ -119,6 +128,7 @@ func (fake *FakeAppFiles) CountFiles(directory string) int64 {
 	fake.countFilesArgsForCall = append(fake.countFilesArgsForCall, struct {
 		directory string
 	}{directory})
+	fake.recordInvocation("CountFiles", []interface{}{directory})
 	fake.countFilesMutex.Unlock()
 	if fake.CountFilesStub != nil {
 		return fake.CountFilesStub(directory)
@@ -152,6 +162,7 @@ func (fake *FakeAppFiles) WalkAppFiles(dir string, onEachFile func(string, strin
 		dir        string
 		onEachFile func(string, string) error
 	}{dir, onEachFile})
+	fake.recordInvocation("WalkAppFiles", []interface{}{dir, onEachFile})
 	fake.walkAppFilesMutex.Unlock()
 	if fake.WalkAppFilesStub != nil {
 		return fake.WalkAppFilesStub(dir, onEachFile)
@@ -177,6 +188,32 @@ func (fake *FakeAppFiles) WalkAppFilesReturns(result1 error) {
 	fake.walkAppFilesReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeAppFiles) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.appFilesInDirMutex.RLock()
+	defer fake.appFilesInDirMutex.RUnlock()
+	fake.copyFilesMutex.RLock()
+	defer fake.copyFilesMutex.RUnlock()
+	fake.countFilesMutex.RLock()
+	defer fake.countFilesMutex.RUnlock()
+	fake.walkAppFilesMutex.RLock()
+	defer fake.walkAppFilesMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeAppFiles) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ appfiles.AppFiles = new(FakeAppFiles)

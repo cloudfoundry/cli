@@ -82,6 +82,8 @@ type FakeSpaceRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSpaceRepository) ListSpaces(arg1 func(models.Space) bool) error {
@@ -89,6 +91,7 @@ func (fake *FakeSpaceRepository) ListSpaces(arg1 func(models.Space) bool) error 
 	fake.listSpacesArgsForCall = append(fake.listSpacesArgsForCall, struct {
 		arg1 func(models.Space) bool
 	}{arg1})
+	fake.recordInvocation("ListSpaces", []interface{}{arg1})
 	fake.listSpacesMutex.Unlock()
 	if fake.ListSpacesStub != nil {
 		return fake.ListSpacesStub(arg1)
@@ -122,6 +125,7 @@ func (fake *FakeSpaceRepository) ListSpacesFromOrg(orgGUID string, spaceFunc fun
 		orgGUID   string
 		spaceFunc func(models.Space) bool
 	}{orgGUID, spaceFunc})
+	fake.recordInvocation("ListSpacesFromOrg", []interface{}{orgGUID, spaceFunc})
 	fake.listSpacesFromOrgMutex.Unlock()
 	if fake.ListSpacesFromOrgStub != nil {
 		return fake.ListSpacesFromOrgStub(orgGUID, spaceFunc)
@@ -154,6 +158,7 @@ func (fake *FakeSpaceRepository) FindByName(name string) (space models.Space, ap
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -188,6 +193,7 @@ func (fake *FakeSpaceRepository) FindByNameInOrg(name string, orgGUID string) (s
 		name    string
 		orgGUID string
 	}{name, orgGUID})
+	fake.recordInvocation("FindByNameInOrg", []interface{}{name, orgGUID})
 	fake.findByNameInOrgMutex.Unlock()
 	if fake.FindByNameInOrgStub != nil {
 		return fake.FindByNameInOrgStub(name, orgGUID)
@@ -223,6 +229,7 @@ func (fake *FakeSpaceRepository) Create(name string, orgGUID string, spaceQuotaG
 		orgGUID        string
 		spaceQuotaGUID string
 	}{name, orgGUID, spaceQuotaGUID})
+	fake.recordInvocation("Create", []interface{}{name, orgGUID, spaceQuotaGUID})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(name, orgGUID, spaceQuotaGUID)
@@ -257,6 +264,7 @@ func (fake *FakeSpaceRepository) Rename(spaceGUID string, newName string) (apiEr
 		spaceGUID string
 		newName   string
 	}{spaceGUID, newName})
+	fake.recordInvocation("Rename", []interface{}{spaceGUID, newName})
 	fake.renameMutex.Unlock()
 	if fake.RenameStub != nil {
 		return fake.RenameStub(spaceGUID, newName)
@@ -290,6 +298,7 @@ func (fake *FakeSpaceRepository) SetAllowSSH(spaceGUID string, allow bool) (apiE
 		spaceGUID string
 		allow     bool
 	}{spaceGUID, allow})
+	fake.recordInvocation("SetAllowSSH", []interface{}{spaceGUID, allow})
 	fake.setAllowSSHMutex.Unlock()
 	if fake.SetAllowSSHStub != nil {
 		return fake.SetAllowSSHStub(spaceGUID, allow)
@@ -322,6 +331,7 @@ func (fake *FakeSpaceRepository) Delete(spaceGUID string) (apiErr error) {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		spaceGUID string
 	}{spaceGUID})
+	fake.recordInvocation("Delete", []interface{}{spaceGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(spaceGUID)
@@ -347,6 +357,40 @@ func (fake *FakeSpaceRepository) DeleteReturns(result1 error) {
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSpaceRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listSpacesMutex.RLock()
+	defer fake.listSpacesMutex.RUnlock()
+	fake.listSpacesFromOrgMutex.RLock()
+	defer fake.listSpacesFromOrgMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.findByNameInOrgMutex.RLock()
+	defer fake.findByNameInOrgMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.renameMutex.RLock()
+	defer fake.renameMutex.RUnlock()
+	fake.setAllowSSHMutex.RLock()
+	defer fake.setAllowSSHMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSpaceRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ spaces.SpaceRepository = new(FakeSpaceRepository)

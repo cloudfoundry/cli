@@ -79,7 +79,8 @@ var _ = Describe("CheckRoute", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires host and domain as arguments"},
@@ -93,13 +94,15 @@ var _ = Describe("CheckRoute", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a TargetedOrgRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewTargetedOrgRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(targetedOrgRequirement))
 			})
@@ -110,7 +113,8 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("returns a MinAPIVersionRequirement as the first requirement", func() {
-					actualRequirements := cmd.Requirements(factory, flagContext)
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 
 					expectedVersion, err := semver.Make("2.36.0")
 					Expect(err).NotTo(HaveOccurred())
@@ -129,7 +133,8 @@ var _ = Describe("CheckRoute", func() {
 				})
 
 				It("does not return a MinAPIVersionRequirement", func() {
-					actualRequirements := cmd.Requirements(factory, flagContext)
+					actualRequirements, err := cmd.Requirements(factory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 					Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
 					Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 				})

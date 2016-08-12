@@ -1,6 +1,8 @@
 package organization
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api/featureflags"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
@@ -44,16 +46,17 @@ func (cmd *CreateOrg) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-org"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

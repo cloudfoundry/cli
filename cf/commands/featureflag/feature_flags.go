@@ -30,7 +30,7 @@ func (cmd *ListFeatureFlags) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -43,7 +43,7 @@ func (cmd *ListFeatureFlags) Requirements(requirementsFactory requirements.Facto
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListFeatureFlags) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -74,7 +74,10 @@ func (cmd *ListFeatureFlags) Execute(c flags.FlagContext) error {
 		)
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

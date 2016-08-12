@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/flags"
@@ -38,9 +39,9 @@ func (cmd *Version) SetDependency(deps commandregistry.Dependency, pluginCall bo
 	return cmd
 }
 
-func (cmd *Version) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (cmd *Version) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error) {
 	reqs := []requirements.Requirement{}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Version) Execute(context flags.FlagContext) error {

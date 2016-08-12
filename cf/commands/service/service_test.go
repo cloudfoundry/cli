@@ -78,7 +78,8 @@ var _ = Describe("service command", func() {
 			It("fails", func() {
 				err := flagContext.Parse("too", "many")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
+				_, err = cmd.Requirements(reqFactory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage", "Requires an argument"},
 				))
@@ -91,7 +92,8 @@ var _ = Describe("service command", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("service-name")
 				Expect(err).NotTo(HaveOccurred())
-				actualRequirements = cmd.Requirements(reqFactory, flagContext)
+				actualRequirements, err = cmd.Requirements(reqFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns a LoginRequirement", func() {

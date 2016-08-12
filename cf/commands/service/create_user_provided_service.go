@@ -69,9 +69,10 @@ func (cmd *CreateUserProvidedService) MetaData() commandregistry.CommandMetadata
 	}
 }
 
-func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-user-provided-service"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
@@ -83,7 +84,7 @@ func (cmd *CreateUserProvidedService) Requirements(requirementsFactory requireme
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Option '-r'", cf.MultipleAppPortsMinimumAPIVersion))
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateUserProvidedService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

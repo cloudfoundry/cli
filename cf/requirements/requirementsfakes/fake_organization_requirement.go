@@ -26,11 +26,14 @@ type FakeOrganizationRequirement struct {
 	getOrganizationReturns     struct {
 		result1 models.Organization
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeOrganizationRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -57,6 +60,7 @@ func (fake *FakeOrganizationRequirement) SetOrganizationName(arg1 string) {
 	fake.setOrganizationNameArgsForCall = append(fake.setOrganizationNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("SetOrganizationName", []interface{}{arg1})
 	fake.setOrganizationNameMutex.Unlock()
 	if fake.SetOrganizationNameStub != nil {
 		fake.SetOrganizationNameStub(arg1)
@@ -78,6 +82,7 @@ func (fake *FakeOrganizationRequirement) SetOrganizationNameArgsForCall(i int) s
 func (fake *FakeOrganizationRequirement) GetOrganization() models.Organization {
 	fake.getOrganizationMutex.Lock()
 	fake.getOrganizationArgsForCall = append(fake.getOrganizationArgsForCall, struct{}{})
+	fake.recordInvocation("GetOrganization", []interface{}{})
 	fake.getOrganizationMutex.Unlock()
 	if fake.GetOrganizationStub != nil {
 		return fake.GetOrganizationStub()
@@ -97,6 +102,30 @@ func (fake *FakeOrganizationRequirement) GetOrganizationReturns(result1 models.O
 	fake.getOrganizationReturns = struct {
 		result1 models.Organization
 	}{result1}
+}
+
+func (fake *FakeOrganizationRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.setOrganizationNameMutex.RLock()
+	defer fake.setOrganizationNameMutex.RUnlock()
+	fake.getOrganizationMutex.RLock()
+	defer fake.getOrganizationMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeOrganizationRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.OrganizationRequirement = new(FakeOrganizationRequirement)

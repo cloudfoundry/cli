@@ -88,6 +88,8 @@ type FakeSpaceQuotaRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSpaceQuotaRepository) FindByName(name string) (quota models.SpaceQuota, apiErr error) {
@@ -95,6 +97,7 @@ func (fake *FakeSpaceQuotaRepository) FindByName(name string) (quota models.Spac
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -128,6 +131,7 @@ func (fake *FakeSpaceQuotaRepository) FindByOrg(guid string) (quota []models.Spa
 	fake.findByOrgArgsForCall = append(fake.findByOrgArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("FindByOrg", []interface{}{guid})
 	fake.findByOrgMutex.Unlock()
 	if fake.FindByOrgStub != nil {
 		return fake.FindByOrgStub(guid)
@@ -161,6 +165,7 @@ func (fake *FakeSpaceQuotaRepository) FindByGUID(guid string) (quota models.Spac
 	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("FindByGUID", []interface{}{guid})
 	fake.findByGUIDMutex.Unlock()
 	if fake.FindByGUIDStub != nil {
 		return fake.FindByGUIDStub(guid)
@@ -195,6 +200,7 @@ func (fake *FakeSpaceQuotaRepository) FindByNameAndOrgGUID(spaceQuotaName string
 		spaceQuotaName string
 		orgGUID        string
 	}{spaceQuotaName, orgGUID})
+	fake.recordInvocation("FindByNameAndOrgGUID", []interface{}{spaceQuotaName, orgGUID})
 	fake.findByNameAndOrgGUIDMutex.Unlock()
 	if fake.FindByNameAndOrgGUIDStub != nil {
 		return fake.FindByNameAndOrgGUIDStub(spaceQuotaName, orgGUID)
@@ -229,6 +235,7 @@ func (fake *FakeSpaceQuotaRepository) AssociateSpaceWithQuota(spaceGUID string, 
 		spaceGUID string
 		quotaGUID string
 	}{spaceGUID, quotaGUID})
+	fake.recordInvocation("AssociateSpaceWithQuota", []interface{}{spaceGUID, quotaGUID})
 	fake.associateSpaceWithQuotaMutex.Unlock()
 	if fake.AssociateSpaceWithQuotaStub != nil {
 		return fake.AssociateSpaceWithQuotaStub(spaceGUID, quotaGUID)
@@ -262,6 +269,7 @@ func (fake *FakeSpaceQuotaRepository) UnassignQuotaFromSpace(spaceGUID string, q
 		spaceGUID string
 		quotaGUID string
 	}{spaceGUID, quotaGUID})
+	fake.recordInvocation("UnassignQuotaFromSpace", []interface{}{spaceGUID, quotaGUID})
 	fake.unassignQuotaFromSpaceMutex.Unlock()
 	if fake.UnassignQuotaFromSpaceStub != nil {
 		return fake.UnassignQuotaFromSpaceStub(spaceGUID, quotaGUID)
@@ -294,6 +302,7 @@ func (fake *FakeSpaceQuotaRepository) Create(quota models.SpaceQuota) error {
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		quota models.SpaceQuota
 	}{quota})
+	fake.recordInvocation("Create", []interface{}{quota})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(quota)
@@ -326,6 +335,7 @@ func (fake *FakeSpaceQuotaRepository) Update(quota models.SpaceQuota) error {
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		quota models.SpaceQuota
 	}{quota})
+	fake.recordInvocation("Update", []interface{}{quota})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(quota)
@@ -358,6 +368,7 @@ func (fake *FakeSpaceQuotaRepository) Delete(quotaGUID string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		quotaGUID string
 	}{quotaGUID})
+	fake.recordInvocation("Delete", []interface{}{quotaGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(quotaGUID)
@@ -383,6 +394,42 @@ func (fake *FakeSpaceQuotaRepository) DeleteReturns(result1 error) {
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSpaceQuotaRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.findByOrgMutex.RLock()
+	defer fake.findByOrgMutex.RUnlock()
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	fake.findByNameAndOrgGUIDMutex.RLock()
+	defer fake.findByNameAndOrgGUIDMutex.RUnlock()
+	fake.associateSpaceWithQuotaMutex.RLock()
+	defer fake.associateSpaceWithQuotaMutex.RUnlock()
+	fake.unassignQuotaFromSpaceMutex.RLock()
+	defer fake.unassignQuotaFromSpaceMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSpaceQuotaRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ spacequotas.SpaceQuotaRepository = new(FakeSpaceQuotaRepository)

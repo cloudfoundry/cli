@@ -21,11 +21,14 @@ type FakeDiegoApplicationRequirement struct {
 	getApplicationReturns     struct {
 		result1 models.Application
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeDiegoApplicationRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -50,6 +53,7 @@ func (fake *FakeDiegoApplicationRequirement) ExecuteReturns(result1 error) {
 func (fake *FakeDiegoApplicationRequirement) GetApplication() models.Application {
 	fake.getApplicationMutex.Lock()
 	fake.getApplicationArgsForCall = append(fake.getApplicationArgsForCall, struct{}{})
+	fake.recordInvocation("GetApplication", []interface{}{})
 	fake.getApplicationMutex.Unlock()
 	if fake.GetApplicationStub != nil {
 		return fake.GetApplicationStub()
@@ -69,6 +73,28 @@ func (fake *FakeDiegoApplicationRequirement) GetApplicationReturns(result1 model
 	fake.getApplicationReturns = struct {
 		result1 models.Application
 	}{result1}
+}
+
+func (fake *FakeDiegoApplicationRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getApplicationMutex.RLock()
+	defer fake.getApplicationMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeDiegoApplicationRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.DiegoApplicationRequirement = new(FakeDiegoApplicationRequirement)

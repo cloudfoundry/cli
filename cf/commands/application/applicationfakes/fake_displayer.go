@@ -19,6 +19,8 @@ type FakeDisplayer struct {
 	showAppReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeDisplayer) ShowApp(app models.Application, orgName string, spaceName string) error {
@@ -28,6 +30,7 @@ func (fake *FakeDisplayer) ShowApp(app models.Application, orgName string, space
 		orgName   string
 		spaceName string
 	}{app, orgName, spaceName})
+	fake.recordInvocation("ShowApp", []interface{}{app, orgName, spaceName})
 	fake.showAppMutex.Unlock()
 	if fake.ShowAppStub != nil {
 		return fake.ShowAppStub(app, orgName, spaceName)
@@ -53,6 +56,26 @@ func (fake *FakeDisplayer) ShowAppReturns(result1 error) {
 	fake.showAppReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeDisplayer) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.showAppMutex.RLock()
+	defer fake.showAppMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeDisplayer) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ application.Displayer = new(FakeDisplayer)

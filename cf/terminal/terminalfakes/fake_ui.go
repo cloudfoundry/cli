@@ -85,13 +85,13 @@ type FakeUI struct {
 		message string
 		args    []interface{}
 	}
-	PanicQuietlyStub             func()
-	panicQuietlyMutex            sync.RWMutex
-	panicQuietlyArgsForCall      []struct{}
-	ShowConfigurationStub        func(coreconfig.Reader)
+	ShowConfigurationStub        func(coreconfig.Reader) error
 	showConfigurationMutex       sync.RWMutex
 	showConfigurationArgsForCall []struct {
 		arg1 coreconfig.Reader
+	}
+	showConfigurationReturns struct {
+		result1 error
 	}
 	LoadingIndicationStub        func()
 	loadingIndicationMutex       sync.RWMutex
@@ -115,6 +115,8 @@ type FakeUI struct {
 	writerReturns     struct {
 		result1 io.Writer
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUI) PrintPaginator(rows []string, err error) {
@@ -128,6 +130,7 @@ func (fake *FakeUI) PrintPaginator(rows []string, err error) {
 		rows []string
 		err  error
 	}{rowsCopy, err})
+	fake.recordInvocation("PrintPaginator", []interface{}{rowsCopy, err})
 	fake.printPaginatorMutex.Unlock()
 	if fake.PrintPaginatorStub != nil {
 		fake.PrintPaginatorStub(rows, err)
@@ -152,6 +155,7 @@ func (fake *FakeUI) Say(message string, args ...interface{}) {
 		message string
 		args    []interface{}
 	}{message, args})
+	fake.recordInvocation("Say", []interface{}{message, args})
 	fake.sayMutex.Unlock()
 	if fake.SayStub != nil {
 		fake.SayStub(message, args...)
@@ -176,6 +180,7 @@ func (fake *FakeUI) PrintCapturingNoOutput(message string, args ...interface{}) 
 		message string
 		args    []interface{}
 	}{message, args})
+	fake.recordInvocation("PrintCapturingNoOutput", []interface{}{message, args})
 	fake.printCapturingNoOutputMutex.Unlock()
 	if fake.PrintCapturingNoOutputStub != nil {
 		fake.PrintCapturingNoOutputStub(message, args...)
@@ -200,6 +205,7 @@ func (fake *FakeUI) Warn(message string, args ...interface{}) {
 		message string
 		args    []interface{}
 	}{message, args})
+	fake.recordInvocation("Warn", []interface{}{message, args})
 	fake.warnMutex.Unlock()
 	if fake.WarnStub != nil {
 		fake.WarnStub(message, args...)
@@ -223,6 +229,7 @@ func (fake *FakeUI) Ask(prompt string) (answer string) {
 	fake.askArgsForCall = append(fake.askArgsForCall, struct {
 		prompt string
 	}{prompt})
+	fake.recordInvocation("Ask", []interface{}{prompt})
 	fake.askMutex.Unlock()
 	if fake.AskStub != nil {
 		return fake.AskStub(prompt)
@@ -255,6 +262,7 @@ func (fake *FakeUI) AskForPassword(prompt string) (answer string) {
 	fake.askForPasswordArgsForCall = append(fake.askForPasswordArgsForCall, struct {
 		prompt string
 	}{prompt})
+	fake.recordInvocation("AskForPassword", []interface{}{prompt})
 	fake.askForPasswordMutex.Unlock()
 	if fake.AskForPasswordStub != nil {
 		return fake.AskForPasswordStub(prompt)
@@ -287,6 +295,7 @@ func (fake *FakeUI) Confirm(message string) bool {
 	fake.confirmArgsForCall = append(fake.confirmArgsForCall, struct {
 		message string
 	}{message})
+	fake.recordInvocation("Confirm", []interface{}{message})
 	fake.confirmMutex.Unlock()
 	if fake.ConfirmStub != nil {
 		return fake.ConfirmStub(message)
@@ -320,6 +329,7 @@ func (fake *FakeUI) ConfirmDelete(modelType string, modelName string) bool {
 		modelType string
 		modelName string
 	}{modelType, modelName})
+	fake.recordInvocation("ConfirmDelete", []interface{}{modelType, modelName})
 	fake.confirmDeleteMutex.Unlock()
 	if fake.ConfirmDeleteStub != nil {
 		return fake.ConfirmDeleteStub(modelType, modelName)
@@ -353,6 +363,7 @@ func (fake *FakeUI) ConfirmDeleteWithAssociations(modelType string, modelName st
 		modelType string
 		modelName string
 	}{modelType, modelName})
+	fake.recordInvocation("ConfirmDeleteWithAssociations", []interface{}{modelType, modelName})
 	fake.confirmDeleteWithAssociationsMutex.Unlock()
 	if fake.ConfirmDeleteWithAssociationsStub != nil {
 		return fake.ConfirmDeleteWithAssociationsStub(modelType, modelName)
@@ -383,6 +394,7 @@ func (fake *FakeUI) ConfirmDeleteWithAssociationsReturns(result1 bool) {
 func (fake *FakeUI) Ok() {
 	fake.okMutex.Lock()
 	fake.okArgsForCall = append(fake.okArgsForCall, struct{}{})
+	fake.recordInvocation("Ok", []interface{}{})
 	fake.okMutex.Unlock()
 	if fake.OkStub != nil {
 		fake.OkStub()
@@ -401,6 +413,7 @@ func (fake *FakeUI) Failed(message string, args ...interface{}) {
 		message string
 		args    []interface{}
 	}{message, args})
+	fake.recordInvocation("Failed", []interface{}{message, args})
 	fake.failedMutex.Unlock()
 	if fake.FailedStub != nil {
 		fake.FailedStub(message, args...)
@@ -419,29 +432,17 @@ func (fake *FakeUI) FailedArgsForCall(i int) (string, []interface{}) {
 	return fake.failedArgsForCall[i].message, fake.failedArgsForCall[i].args
 }
 
-func (fake *FakeUI) PanicQuietly() {
-	fake.panicQuietlyMutex.Lock()
-	fake.panicQuietlyArgsForCall = append(fake.panicQuietlyArgsForCall, struct{}{})
-	fake.panicQuietlyMutex.Unlock()
-	if fake.PanicQuietlyStub != nil {
-		fake.PanicQuietlyStub()
-	}
-}
-
-func (fake *FakeUI) PanicQuietlyCallCount() int {
-	fake.panicQuietlyMutex.RLock()
-	defer fake.panicQuietlyMutex.RUnlock()
-	return len(fake.panicQuietlyArgsForCall)
-}
-
-func (fake *FakeUI) ShowConfiguration(arg1 coreconfig.Reader) {
+func (fake *FakeUI) ShowConfiguration(arg1 coreconfig.Reader) error {
 	fake.showConfigurationMutex.Lock()
 	fake.showConfigurationArgsForCall = append(fake.showConfigurationArgsForCall, struct {
 		arg1 coreconfig.Reader
 	}{arg1})
+	fake.recordInvocation("ShowConfiguration", []interface{}{arg1})
 	fake.showConfigurationMutex.Unlock()
 	if fake.ShowConfigurationStub != nil {
-		fake.ShowConfigurationStub(arg1)
+		return fake.ShowConfigurationStub(arg1)
+	} else {
+		return fake.showConfigurationReturns.result1
 	}
 }
 
@@ -457,9 +458,17 @@ func (fake *FakeUI) ShowConfigurationArgsForCall(i int) coreconfig.Reader {
 	return fake.showConfigurationArgsForCall[i].arg1
 }
 
+func (fake *FakeUI) ShowConfigurationReturns(result1 error) {
+	fake.ShowConfigurationStub = nil
+	fake.showConfigurationReturns = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeUI) LoadingIndication() {
 	fake.loadingIndicationMutex.Lock()
 	fake.loadingIndicationArgsForCall = append(fake.loadingIndicationArgsForCall, struct{}{})
+	fake.recordInvocation("LoadingIndication", []interface{}{})
 	fake.loadingIndicationMutex.Unlock()
 	if fake.LoadingIndicationStub != nil {
 		fake.LoadingIndicationStub()
@@ -482,6 +491,7 @@ func (fake *FakeUI) Table(headers []string) *terminal.UITable {
 	fake.tableArgsForCall = append(fake.tableArgsForCall, struct {
 		headers []string
 	}{headersCopy})
+	fake.recordInvocation("Table", []interface{}{headersCopy})
 	fake.tableMutex.Unlock()
 	if fake.TableStub != nil {
 		return fake.TableStub(headers)
@@ -514,6 +524,7 @@ func (fake *FakeUI) NotifyUpdateIfNeeded(arg1 coreconfig.Reader) {
 	fake.notifyUpdateIfNeededArgsForCall = append(fake.notifyUpdateIfNeededArgsForCall, struct {
 		arg1 coreconfig.Reader
 	}{arg1})
+	fake.recordInvocation("NotifyUpdateIfNeeded", []interface{}{arg1})
 	fake.notifyUpdateIfNeededMutex.Unlock()
 	if fake.NotifyUpdateIfNeededStub != nil {
 		fake.NotifyUpdateIfNeededStub(arg1)
@@ -535,6 +546,7 @@ func (fake *FakeUI) NotifyUpdateIfNeededArgsForCall(i int) coreconfig.Reader {
 func (fake *FakeUI) Writer() io.Writer {
 	fake.writerMutex.Lock()
 	fake.writerArgsForCall = append(fake.writerArgsForCall, struct{}{})
+	fake.recordInvocation("Writer", []interface{}{})
 	fake.writerMutex.Unlock()
 	if fake.WriterStub != nil {
 		return fake.WriterStub()
@@ -554,6 +566,56 @@ func (fake *FakeUI) WriterReturns(result1 io.Writer) {
 	fake.writerReturns = struct {
 		result1 io.Writer
 	}{result1}
+}
+
+func (fake *FakeUI) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.printPaginatorMutex.RLock()
+	defer fake.printPaginatorMutex.RUnlock()
+	fake.sayMutex.RLock()
+	defer fake.sayMutex.RUnlock()
+	fake.printCapturingNoOutputMutex.RLock()
+	defer fake.printCapturingNoOutputMutex.RUnlock()
+	fake.warnMutex.RLock()
+	defer fake.warnMutex.RUnlock()
+	fake.askMutex.RLock()
+	defer fake.askMutex.RUnlock()
+	fake.askForPasswordMutex.RLock()
+	defer fake.askForPasswordMutex.RUnlock()
+	fake.confirmMutex.RLock()
+	defer fake.confirmMutex.RUnlock()
+	fake.confirmDeleteMutex.RLock()
+	defer fake.confirmDeleteMutex.RUnlock()
+	fake.confirmDeleteWithAssociationsMutex.RLock()
+	defer fake.confirmDeleteWithAssociationsMutex.RUnlock()
+	fake.okMutex.RLock()
+	defer fake.okMutex.RUnlock()
+	fake.failedMutex.RLock()
+	defer fake.failedMutex.RUnlock()
+	fake.showConfigurationMutex.RLock()
+	defer fake.showConfigurationMutex.RUnlock()
+	fake.loadingIndicationMutex.RLock()
+	defer fake.loadingIndicationMutex.RUnlock()
+	fake.tableMutex.RLock()
+	defer fake.tableMutex.RUnlock()
+	fake.notifyUpdateIfNeededMutex.RLock()
+	defer fake.notifyUpdateIfNeededMutex.RUnlock()
+	fake.writerMutex.RLock()
+	defer fake.writerMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeUI) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ terminal.UI = new(FakeUI)

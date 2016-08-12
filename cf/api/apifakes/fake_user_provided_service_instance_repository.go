@@ -35,6 +35,8 @@ type FakeUserProvidedServiceInstanceRepository struct {
 		result1 models.UserProvidedServiceSummary
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeUserProvidedServiceInstanceRepository) Create(name string, drainURL string, routeServiceURL string, params map[string]interface{}) (apiErr error) {
@@ -45,6 +47,7 @@ func (fake *FakeUserProvidedServiceInstanceRepository) Create(name string, drain
 		routeServiceURL string
 		params          map[string]interface{}
 	}{name, drainURL, routeServiceURL, params})
+	fake.recordInvocation("Create", []interface{}{name, drainURL, routeServiceURL, params})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(name, drainURL, routeServiceURL, params)
@@ -77,6 +80,7 @@ func (fake *FakeUserProvidedServiceInstanceRepository) Update(serviceInstanceFie
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		serviceInstanceFields models.ServiceInstanceFields
 	}{serviceInstanceFields})
+	fake.recordInvocation("Update", []interface{}{serviceInstanceFields})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(serviceInstanceFields)
@@ -107,6 +111,7 @@ func (fake *FakeUserProvidedServiceInstanceRepository) UpdateReturns(result1 err
 func (fake *FakeUserProvidedServiceInstanceRepository) GetSummaries() (models.UserProvidedServiceSummary, error) {
 	fake.getSummariesMutex.Lock()
 	fake.getSummariesArgsForCall = append(fake.getSummariesArgsForCall, struct{}{})
+	fake.recordInvocation("GetSummaries", []interface{}{})
 	fake.getSummariesMutex.Unlock()
 	if fake.GetSummariesStub != nil {
 		return fake.GetSummariesStub()
@@ -127,6 +132,30 @@ func (fake *FakeUserProvidedServiceInstanceRepository) GetSummariesReturns(resul
 		result1 models.UserProvidedServiceSummary
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeUserProvidedServiceInstanceRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.getSummariesMutex.RLock()
+	defer fake.getSummariesMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeUserProvidedServiceInstanceRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.UserProvidedServiceInstanceRepository = new(FakeUserProvidedServiceInstanceRepository)

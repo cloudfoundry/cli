@@ -49,7 +49,7 @@ func (cmd *CopySource) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("Requires SOURCE-APP TARGET-APP as arguments"),
 		func() bool {
@@ -63,7 +63,7 @@ func (cmd *CopySource) Requirements(requirementsFactory requirements.Factory, fc
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CopySource) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

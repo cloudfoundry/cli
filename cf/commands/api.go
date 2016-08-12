@@ -39,9 +39,9 @@ func (cmd API) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd API) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd API) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	reqs := []requirements.Requirement{}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd API) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {

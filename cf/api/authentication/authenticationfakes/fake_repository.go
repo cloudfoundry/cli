@@ -51,6 +51,8 @@ type FakeRepository struct {
 		result1 map[string]coreconfig.AuthPrompt
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) DumpRequest(arg1 *http.Request) {
@@ -58,6 +60,7 @@ func (fake *FakeRepository) DumpRequest(arg1 *http.Request) {
 	fake.dumpRequestArgsForCall = append(fake.dumpRequestArgsForCall, struct {
 		arg1 *http.Request
 	}{arg1})
+	fake.recordInvocation("DumpRequest", []interface{}{arg1})
 	fake.dumpRequestMutex.Unlock()
 	if fake.DumpRequestStub != nil {
 		fake.DumpRequestStub(arg1)
@@ -81,6 +84,7 @@ func (fake *FakeRepository) DumpResponse(arg1 *http.Response) {
 	fake.dumpResponseArgsForCall = append(fake.dumpResponseArgsForCall, struct {
 		arg1 *http.Response
 	}{arg1})
+	fake.recordInvocation("DumpResponse", []interface{}{arg1})
 	fake.dumpResponseMutex.Unlock()
 	if fake.DumpResponseStub != nil {
 		fake.DumpResponseStub(arg1)
@@ -102,6 +106,7 @@ func (fake *FakeRepository) DumpResponseArgsForCall(i int) *http.Response {
 func (fake *FakeRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
 	fake.refreshAuthTokenMutex.Lock()
 	fake.refreshAuthTokenArgsForCall = append(fake.refreshAuthTokenArgsForCall, struct{}{})
+	fake.recordInvocation("RefreshAuthToken", []interface{}{})
 	fake.refreshAuthTokenMutex.Unlock()
 	if fake.RefreshAuthTokenStub != nil {
 		return fake.RefreshAuthTokenStub()
@@ -129,6 +134,7 @@ func (fake *FakeRepository) Authenticate(credentials map[string]string) (apiErr 
 	fake.authenticateArgsForCall = append(fake.authenticateArgsForCall, struct {
 		credentials map[string]string
 	}{credentials})
+	fake.recordInvocation("Authenticate", []interface{}{credentials})
 	fake.authenticateMutex.Unlock()
 	if fake.AuthenticateStub != nil {
 		return fake.AuthenticateStub(credentials)
@@ -161,6 +167,7 @@ func (fake *FakeRepository) Authorize(token string) (string, error) {
 	fake.authorizeArgsForCall = append(fake.authorizeArgsForCall, struct {
 		token string
 	}{token})
+	fake.recordInvocation("Authorize", []interface{}{token})
 	fake.authorizeMutex.Unlock()
 	if fake.AuthorizeStub != nil {
 		return fake.AuthorizeStub(token)
@@ -192,6 +199,7 @@ func (fake *FakeRepository) AuthorizeReturns(result1 string, result2 error) {
 func (fake *FakeRepository) GetLoginPromptsAndSaveUAAServerURL() (map[string]coreconfig.AuthPrompt, error) {
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Lock()
 	fake.getLoginPromptsAndSaveUAAServerURLArgsForCall = append(fake.getLoginPromptsAndSaveUAAServerURLArgsForCall, struct{}{})
+	fake.recordInvocation("GetLoginPromptsAndSaveUAAServerURL", []interface{}{})
 	fake.getLoginPromptsAndSaveUAAServerURLMutex.Unlock()
 	if fake.GetLoginPromptsAndSaveUAAServerURLStub != nil {
 		return fake.GetLoginPromptsAndSaveUAAServerURLStub()
@@ -212,6 +220,36 @@ func (fake *FakeRepository) GetLoginPromptsAndSaveUAAServerURLReturns(result1 ma
 		result1 map[string]coreconfig.AuthPrompt
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.dumpRequestMutex.RLock()
+	defer fake.dumpRequestMutex.RUnlock()
+	fake.dumpResponseMutex.RLock()
+	defer fake.dumpResponseMutex.RUnlock()
+	fake.refreshAuthTokenMutex.RLock()
+	defer fake.refreshAuthTokenMutex.RUnlock()
+	fake.authenticateMutex.RLock()
+	defer fake.authenticateMutex.RUnlock()
+	fake.authorizeMutex.RLock()
+	defer fake.authorizeMutex.RUnlock()
+	fake.getLoginPromptsAndSaveUAAServerURLMutex.RLock()
+	defer fake.getLoginPromptsAndSaveUAAServerURLMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ authentication.Repository = new(FakeRepository)

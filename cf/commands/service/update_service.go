@@ -73,9 +73,10 @@ func (cmd *UpdateService) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("update-service"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
@@ -87,7 +88,7 @@ func (cmd *UpdateService) Requirements(requirementsFactory requirements.Factory,
 		reqs = append(reqs, requirementsFactory.NewMinAPIVersionRequirement("Updating a plan", cf.UpdateServicePlanMinimumAPIVersion))
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *UpdateService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

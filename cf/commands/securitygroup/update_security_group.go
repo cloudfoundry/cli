@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/flags"
 	. "github.com/cloudfoundry/cli/cf/i18n"
 
@@ -39,13 +41,14 @@ func (cmd *UpdateSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *UpdateSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UpdateSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n") + commandregistry.Commands.CommandUsage("update-security-group"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	reqs := []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *UpdateSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

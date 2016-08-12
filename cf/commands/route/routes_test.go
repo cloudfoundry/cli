@@ -77,9 +77,10 @@ var _ = Describe("routes command", func() {
 			It("should fail with usage", func() {
 				flagContext.Parse("blahblah")
 
-				reqs := cmd.Requirements(requirementsFactory, flagContext)
+				reqs, err := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
-				err := testcmd.RunRequirements(reqs)
+				err = testcmd.RunRequirements(reqs)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
 				Expect(err.Error()).To(ContainSubstring("No argument required"))

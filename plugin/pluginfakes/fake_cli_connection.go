@@ -216,6 +216,8 @@ type FakeCliConnection struct {
 		result1 plugin_models.GetSpace_Model
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) ([]string, error) {
@@ -223,6 +225,7 @@ func (fake *FakeCliConnection) CliCommandWithoutTerminalOutput(args ...string) (
 	fake.cliCommandWithoutTerminalOutputArgsForCall = append(fake.cliCommandWithoutTerminalOutputArgsForCall, struct {
 		args []string
 	}{args})
+	fake.recordInvocation("CliCommandWithoutTerminalOutput", []interface{}{args})
 	fake.cliCommandWithoutTerminalOutputMutex.Unlock()
 	if fake.CliCommandWithoutTerminalOutputStub != nil {
 		return fake.CliCommandWithoutTerminalOutputStub(args...)
@@ -256,6 +259,7 @@ func (fake *FakeCliConnection) CliCommand(args ...string) ([]string, error) {
 	fake.cliCommandArgsForCall = append(fake.cliCommandArgsForCall, struct {
 		args []string
 	}{args})
+	fake.recordInvocation("CliCommand", []interface{}{args})
 	fake.cliCommandMutex.Unlock()
 	if fake.CliCommandStub != nil {
 		return fake.CliCommandStub(args...)
@@ -287,6 +291,7 @@ func (fake *FakeCliConnection) CliCommandReturns(result1 []string, result2 error
 func (fake *FakeCliConnection) GetCurrentOrg() (plugin_models.Organization, error) {
 	fake.getCurrentOrgMutex.Lock()
 	fake.getCurrentOrgArgsForCall = append(fake.getCurrentOrgArgsForCall, struct{}{})
+	fake.recordInvocation("GetCurrentOrg", []interface{}{})
 	fake.getCurrentOrgMutex.Unlock()
 	if fake.GetCurrentOrgStub != nil {
 		return fake.GetCurrentOrgStub()
@@ -312,6 +317,7 @@ func (fake *FakeCliConnection) GetCurrentOrgReturns(result1 plugin_models.Organi
 func (fake *FakeCliConnection) GetCurrentSpace() (plugin_models.Space, error) {
 	fake.getCurrentSpaceMutex.Lock()
 	fake.getCurrentSpaceArgsForCall = append(fake.getCurrentSpaceArgsForCall, struct{}{})
+	fake.recordInvocation("GetCurrentSpace", []interface{}{})
 	fake.getCurrentSpaceMutex.Unlock()
 	if fake.GetCurrentSpaceStub != nil {
 		return fake.GetCurrentSpaceStub()
@@ -337,6 +343,7 @@ func (fake *FakeCliConnection) GetCurrentSpaceReturns(result1 plugin_models.Spac
 func (fake *FakeCliConnection) Username() (string, error) {
 	fake.usernameMutex.Lock()
 	fake.usernameArgsForCall = append(fake.usernameArgsForCall, struct{}{})
+	fake.recordInvocation("Username", []interface{}{})
 	fake.usernameMutex.Unlock()
 	if fake.UsernameStub != nil {
 		return fake.UsernameStub()
@@ -362,6 +369,7 @@ func (fake *FakeCliConnection) UsernameReturns(result1 string, result2 error) {
 func (fake *FakeCliConnection) UserGuid() (string, error) {
 	fake.userGuidMutex.Lock()
 	fake.userGuidArgsForCall = append(fake.userGuidArgsForCall, struct{}{})
+	fake.recordInvocation("UserGuid", []interface{}{})
 	fake.userGuidMutex.Unlock()
 	if fake.UserGuidStub != nil {
 		return fake.UserGuidStub()
@@ -387,6 +395,7 @@ func (fake *FakeCliConnection) UserGuidReturns(result1 string, result2 error) {
 func (fake *FakeCliConnection) UserEmail() (string, error) {
 	fake.userEmailMutex.Lock()
 	fake.userEmailArgsForCall = append(fake.userEmailArgsForCall, struct{}{})
+	fake.recordInvocation("UserEmail", []interface{}{})
 	fake.userEmailMutex.Unlock()
 	if fake.UserEmailStub != nil {
 		return fake.UserEmailStub()
@@ -412,6 +421,7 @@ func (fake *FakeCliConnection) UserEmailReturns(result1 string, result2 error) {
 func (fake *FakeCliConnection) IsLoggedIn() (bool, error) {
 	fake.isLoggedInMutex.Lock()
 	fake.isLoggedInArgsForCall = append(fake.isLoggedInArgsForCall, struct{}{})
+	fake.recordInvocation("IsLoggedIn", []interface{}{})
 	fake.isLoggedInMutex.Unlock()
 	if fake.IsLoggedInStub != nil {
 		return fake.IsLoggedInStub()
@@ -437,6 +447,7 @@ func (fake *FakeCliConnection) IsLoggedInReturns(result1 bool, result2 error) {
 func (fake *FakeCliConnection) IsSSLDisabled() (bool, error) {
 	fake.isSSLDisabledMutex.Lock()
 	fake.isSSLDisabledArgsForCall = append(fake.isSSLDisabledArgsForCall, struct{}{})
+	fake.recordInvocation("IsSSLDisabled", []interface{}{})
 	fake.isSSLDisabledMutex.Unlock()
 	if fake.IsSSLDisabledStub != nil {
 		return fake.IsSSLDisabledStub()
@@ -462,6 +473,7 @@ func (fake *FakeCliConnection) IsSSLDisabledReturns(result1 bool, result2 error)
 func (fake *FakeCliConnection) HasOrganization() (bool, error) {
 	fake.hasOrganizationMutex.Lock()
 	fake.hasOrganizationArgsForCall = append(fake.hasOrganizationArgsForCall, struct{}{})
+	fake.recordInvocation("HasOrganization", []interface{}{})
 	fake.hasOrganizationMutex.Unlock()
 	if fake.HasOrganizationStub != nil {
 		return fake.HasOrganizationStub()
@@ -487,6 +499,7 @@ func (fake *FakeCliConnection) HasOrganizationReturns(result1 bool, result2 erro
 func (fake *FakeCliConnection) HasSpace() (bool, error) {
 	fake.hasSpaceMutex.Lock()
 	fake.hasSpaceArgsForCall = append(fake.hasSpaceArgsForCall, struct{}{})
+	fake.recordInvocation("HasSpace", []interface{}{})
 	fake.hasSpaceMutex.Unlock()
 	if fake.HasSpaceStub != nil {
 		return fake.HasSpaceStub()
@@ -512,6 +525,7 @@ func (fake *FakeCliConnection) HasSpaceReturns(result1 bool, result2 error) {
 func (fake *FakeCliConnection) ApiEndpoint() (string, error) {
 	fake.apiEndpointMutex.Lock()
 	fake.apiEndpointArgsForCall = append(fake.apiEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("ApiEndpoint", []interface{}{})
 	fake.apiEndpointMutex.Unlock()
 	if fake.ApiEndpointStub != nil {
 		return fake.ApiEndpointStub()
@@ -537,6 +551,7 @@ func (fake *FakeCliConnection) ApiEndpointReturns(result1 string, result2 error)
 func (fake *FakeCliConnection) ApiVersion() (string, error) {
 	fake.apiVersionMutex.Lock()
 	fake.apiVersionArgsForCall = append(fake.apiVersionArgsForCall, struct{}{})
+	fake.recordInvocation("ApiVersion", []interface{}{})
 	fake.apiVersionMutex.Unlock()
 	if fake.ApiVersionStub != nil {
 		return fake.ApiVersionStub()
@@ -562,6 +577,7 @@ func (fake *FakeCliConnection) ApiVersionReturns(result1 string, result2 error) 
 func (fake *FakeCliConnection) HasAPIEndpoint() (bool, error) {
 	fake.hasAPIEndpointMutex.Lock()
 	fake.hasAPIEndpointArgsForCall = append(fake.hasAPIEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("HasAPIEndpoint", []interface{}{})
 	fake.hasAPIEndpointMutex.Unlock()
 	if fake.HasAPIEndpointStub != nil {
 		return fake.HasAPIEndpointStub()
@@ -587,6 +603,7 @@ func (fake *FakeCliConnection) HasAPIEndpointReturns(result1 bool, result2 error
 func (fake *FakeCliConnection) LoggregatorEndpoint() (string, error) {
 	fake.loggregatorEndpointMutex.Lock()
 	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("LoggregatorEndpoint", []interface{}{})
 	fake.loggregatorEndpointMutex.Unlock()
 	if fake.LoggregatorEndpointStub != nil {
 		return fake.LoggregatorEndpointStub()
@@ -612,6 +629,7 @@ func (fake *FakeCliConnection) LoggregatorEndpointReturns(result1 string, result
 func (fake *FakeCliConnection) DopplerEndpoint() (string, error) {
 	fake.dopplerEndpointMutex.Lock()
 	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("DopplerEndpoint", []interface{}{})
 	fake.dopplerEndpointMutex.Unlock()
 	if fake.DopplerEndpointStub != nil {
 		return fake.DopplerEndpointStub()
@@ -637,6 +655,7 @@ func (fake *FakeCliConnection) DopplerEndpointReturns(result1 string, result2 er
 func (fake *FakeCliConnection) AccessToken() (string, error) {
 	fake.accessTokenMutex.Lock()
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.recordInvocation("AccessToken", []interface{}{})
 	fake.accessTokenMutex.Unlock()
 	if fake.AccessTokenStub != nil {
 		return fake.AccessTokenStub()
@@ -664,6 +683,7 @@ func (fake *FakeCliConnection) GetApp(arg1 string) (plugin_models.GetAppModel, e
 	fake.getAppArgsForCall = append(fake.getAppArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetApp", []interface{}{arg1})
 	fake.getAppMutex.Unlock()
 	if fake.GetAppStub != nil {
 		return fake.GetAppStub(arg1)
@@ -695,6 +715,7 @@ func (fake *FakeCliConnection) GetAppReturns(result1 plugin_models.GetAppModel, 
 func (fake *FakeCliConnection) GetApps() ([]plugin_models.GetAppsModel, error) {
 	fake.getAppsMutex.Lock()
 	fake.getAppsArgsForCall = append(fake.getAppsArgsForCall, struct{}{})
+	fake.recordInvocation("GetApps", []interface{}{})
 	fake.getAppsMutex.Unlock()
 	if fake.GetAppsStub != nil {
 		return fake.GetAppsStub()
@@ -720,6 +741,7 @@ func (fake *FakeCliConnection) GetAppsReturns(result1 []plugin_models.GetAppsMod
 func (fake *FakeCliConnection) GetOrgs() ([]plugin_models.GetOrgs_Model, error) {
 	fake.getOrgsMutex.Lock()
 	fake.getOrgsArgsForCall = append(fake.getOrgsArgsForCall, struct{}{})
+	fake.recordInvocation("GetOrgs", []interface{}{})
 	fake.getOrgsMutex.Unlock()
 	if fake.GetOrgsStub != nil {
 		return fake.GetOrgsStub()
@@ -745,6 +767,7 @@ func (fake *FakeCliConnection) GetOrgsReturns(result1 []plugin_models.GetOrgs_Mo
 func (fake *FakeCliConnection) GetSpaces() ([]plugin_models.GetSpaces_Model, error) {
 	fake.getSpacesMutex.Lock()
 	fake.getSpacesArgsForCall = append(fake.getSpacesArgsForCall, struct{}{})
+	fake.recordInvocation("GetSpaces", []interface{}{})
 	fake.getSpacesMutex.Unlock()
 	if fake.GetSpacesStub != nil {
 		return fake.GetSpacesStub()
@@ -773,6 +796,7 @@ func (fake *FakeCliConnection) GetOrgUsers(arg1 string, arg2 ...string) ([]plugi
 		arg1 string
 		arg2 []string
 	}{arg1, arg2})
+	fake.recordInvocation("GetOrgUsers", []interface{}{arg1, arg2})
 	fake.getOrgUsersMutex.Unlock()
 	if fake.GetOrgUsersStub != nil {
 		return fake.GetOrgUsersStub(arg1, arg2...)
@@ -807,6 +831,7 @@ func (fake *FakeCliConnection) GetSpaceUsers(arg1 string, arg2 string) ([]plugin
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	fake.recordInvocation("GetSpaceUsers", []interface{}{arg1, arg2})
 	fake.getSpaceUsersMutex.Unlock()
 	if fake.GetSpaceUsersStub != nil {
 		return fake.GetSpaceUsersStub(arg1, arg2)
@@ -838,6 +863,7 @@ func (fake *FakeCliConnection) GetSpaceUsersReturns(result1 []plugin_models.GetS
 func (fake *FakeCliConnection) GetServices() ([]plugin_models.GetServices_Model, error) {
 	fake.getServicesMutex.Lock()
 	fake.getServicesArgsForCall = append(fake.getServicesArgsForCall, struct{}{})
+	fake.recordInvocation("GetServices", []interface{}{})
 	fake.getServicesMutex.Unlock()
 	if fake.GetServicesStub != nil {
 		return fake.GetServicesStub()
@@ -865,6 +891,7 @@ func (fake *FakeCliConnection) GetService(arg1 string) (plugin_models.GetService
 	fake.getServiceArgsForCall = append(fake.getServiceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetService", []interface{}{arg1})
 	fake.getServiceMutex.Unlock()
 	if fake.GetServiceStub != nil {
 		return fake.GetServiceStub(arg1)
@@ -898,6 +925,7 @@ func (fake *FakeCliConnection) GetOrg(arg1 string) (plugin_models.GetOrg_Model, 
 	fake.getOrgArgsForCall = append(fake.getOrgArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetOrg", []interface{}{arg1})
 	fake.getOrgMutex.Unlock()
 	if fake.GetOrgStub != nil {
 		return fake.GetOrgStub(arg1)
@@ -931,6 +959,7 @@ func (fake *FakeCliConnection) GetSpace(arg1 string) (plugin_models.GetSpace_Mod
 	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetSpace", []interface{}{arg1})
 	fake.getSpaceMutex.Unlock()
 	if fake.GetSpaceStub != nil {
 		return fake.GetSpaceStub(arg1)
@@ -957,6 +986,78 @@ func (fake *FakeCliConnection) GetSpaceReturns(result1 plugin_models.GetSpace_Mo
 		result1 plugin_models.GetSpace_Model
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCliConnection) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.cliCommandWithoutTerminalOutputMutex.RLock()
+	defer fake.cliCommandWithoutTerminalOutputMutex.RUnlock()
+	fake.cliCommandMutex.RLock()
+	defer fake.cliCommandMutex.RUnlock()
+	fake.getCurrentOrgMutex.RLock()
+	defer fake.getCurrentOrgMutex.RUnlock()
+	fake.getCurrentSpaceMutex.RLock()
+	defer fake.getCurrentSpaceMutex.RUnlock()
+	fake.usernameMutex.RLock()
+	defer fake.usernameMutex.RUnlock()
+	fake.userGuidMutex.RLock()
+	defer fake.userGuidMutex.RUnlock()
+	fake.userEmailMutex.RLock()
+	defer fake.userEmailMutex.RUnlock()
+	fake.isLoggedInMutex.RLock()
+	defer fake.isLoggedInMutex.RUnlock()
+	fake.isSSLDisabledMutex.RLock()
+	defer fake.isSSLDisabledMutex.RUnlock()
+	fake.hasOrganizationMutex.RLock()
+	defer fake.hasOrganizationMutex.RUnlock()
+	fake.hasSpaceMutex.RLock()
+	defer fake.hasSpaceMutex.RUnlock()
+	fake.apiEndpointMutex.RLock()
+	defer fake.apiEndpointMutex.RUnlock()
+	fake.apiVersionMutex.RLock()
+	defer fake.apiVersionMutex.RUnlock()
+	fake.hasAPIEndpointMutex.RLock()
+	defer fake.hasAPIEndpointMutex.RUnlock()
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	fake.getAppMutex.RLock()
+	defer fake.getAppMutex.RUnlock()
+	fake.getAppsMutex.RLock()
+	defer fake.getAppsMutex.RUnlock()
+	fake.getOrgsMutex.RLock()
+	defer fake.getOrgsMutex.RUnlock()
+	fake.getSpacesMutex.RLock()
+	defer fake.getSpacesMutex.RUnlock()
+	fake.getOrgUsersMutex.RLock()
+	defer fake.getOrgUsersMutex.RUnlock()
+	fake.getSpaceUsersMutex.RLock()
+	defer fake.getSpaceUsersMutex.RUnlock()
+	fake.getServicesMutex.RLock()
+	defer fake.getServicesMutex.RUnlock()
+	fake.getServiceMutex.RLock()
+	defer fake.getServiceMutex.RUnlock()
+	fake.getOrgMutex.RLock()
+	defer fake.getOrgMutex.RUnlock()
+	fake.getSpaceMutex.RLock()
+	defer fake.getSpaceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeCliConnection) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ plugin.CliConnection = new(FakeCliConnection)

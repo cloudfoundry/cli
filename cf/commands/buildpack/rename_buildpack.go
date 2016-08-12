@@ -2,6 +2,7 @@ package buildpack
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -30,16 +31,17 @@ func (cmd *RenameBuildpack) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *RenameBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires BUILDPACK_NAME, NEW_BUILDPACK_NAME as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-buildpack"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *RenameBuildpack) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

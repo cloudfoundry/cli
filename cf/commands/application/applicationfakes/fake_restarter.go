@@ -27,7 +27,7 @@ type FakeRestarter struct {
 	setDependencyReturns struct {
 		result1 commandregistry.Command
 	}
-	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
+	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error)
 	requirementsMutex       sync.RWMutex
 	requirementsArgsForCall []struct {
 		requirementsFactory requirements.Factory
@@ -35,6 +35,7 @@ type FakeRestarter struct {
 	}
 	requirementsReturns struct {
 		result1 []requirements.Requirement
+		result2 error
 	}
 	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
@@ -54,11 +55,14 @@ type FakeRestarter struct {
 	applicationRestartReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRestarter) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
+	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
 	if fake.MetaDataStub != nil {
 		return fake.MetaDataStub()
@@ -86,6 +90,7 @@ func (fake *FakeRestarter) SetDependency(deps commandregistry.Dependency, plugin
 		deps       commandregistry.Dependency
 		pluginCall bool
 	}{deps, pluginCall})
+	fake.recordInvocation("SetDependency", []interface{}{deps, pluginCall})
 	fake.setDependencyMutex.Unlock()
 	if fake.SetDependencyStub != nil {
 		return fake.SetDependencyStub(deps, pluginCall)
@@ -113,17 +118,18 @@ func (fake *FakeRestarter) SetDependencyReturns(result1 commandregistry.Command)
 	}{result1}
 }
 
-func (fake *FakeRestarter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (fake *FakeRestarter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error) {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
 		context             flags.FlagContext
 	}{requirementsFactory, context})
+	fake.recordInvocation("Requirements", []interface{}{requirementsFactory, context})
 	fake.requirementsMutex.Unlock()
 	if fake.RequirementsStub != nil {
 		return fake.RequirementsStub(requirementsFactory, context)
 	} else {
-		return fake.requirementsReturns.result1
+		return fake.requirementsReturns.result1, fake.requirementsReturns.result2
 	}
 }
 
@@ -139,11 +145,12 @@ func (fake *FakeRestarter) RequirementsArgsForCall(i int) (requirements.Factory,
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeRestarter) RequirementsReturns(result1 []requirements.Requirement) {
+func (fake *FakeRestarter) RequirementsReturns(result1 []requirements.Requirement, result2 error) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeRestarter) Execute(context flags.FlagContext) error {
@@ -151,6 +158,7 @@ func (fake *FakeRestarter) Execute(context flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
+	fake.recordInvocation("Execute", []interface{}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub(context)
@@ -185,6 +193,7 @@ func (fake *FakeRestarter) ApplicationRestart(app models.Application, orgName st
 		orgName   string
 		spaceName string
 	}{app, orgName, spaceName})
+	fake.recordInvocation("ApplicationRestart", []interface{}{app, orgName, spaceName})
 	fake.applicationRestartMutex.Unlock()
 	if fake.ApplicationRestartStub != nil {
 		return fake.ApplicationRestartStub(app, orgName, spaceName)
@@ -210,6 +219,34 @@ func (fake *FakeRestarter) ApplicationRestartReturns(result1 error) {
 	fake.applicationRestartReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeRestarter) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.metaDataMutex.RLock()
+	defer fake.metaDataMutex.RUnlock()
+	fake.setDependencyMutex.RLock()
+	defer fake.setDependencyMutex.RUnlock()
+	fake.requirementsMutex.RLock()
+	defer fake.requirementsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.applicationRestartMutex.RLock()
+	defer fake.applicationRestartMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRestarter) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ application.Restarter = new(FakeRestarter)

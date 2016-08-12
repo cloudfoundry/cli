@@ -34,7 +34,7 @@ func (cmd *ListSpaceQuotas) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListSpaceQuotas) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListSpaceQuotas) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -48,7 +48,7 @@ func (cmd *ListSpaceQuotas) Requirements(requirementsFactory requirements.Factor
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListSpaceQuotas) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -107,6 +107,9 @@ func (cmd *ListSpaceQuotas) Execute(c flags.FlagContext) error {
 		)
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

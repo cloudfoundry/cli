@@ -79,6 +79,8 @@ type FakeOrganizationRepository struct {
 	unsharePrivateDomainReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeOrganizationRepository) ListOrgs(limit int) ([]models.Organization, error) {
@@ -86,6 +88,7 @@ func (fake *FakeOrganizationRepository) ListOrgs(limit int) ([]models.Organizati
 	fake.listOrgsArgsForCall = append(fake.listOrgsArgsForCall, struct {
 		limit int
 	}{limit})
+	fake.recordInvocation("ListOrgs", []interface{}{limit})
 	fake.listOrgsMutex.Unlock()
 	if fake.ListOrgsStub != nil {
 		return fake.ListOrgsStub(limit)
@@ -124,6 +127,7 @@ func (fake *FakeOrganizationRepository) GetManyOrgsByGUID(orgGUIDs []string) (or
 	fake.getManyOrgsByGUIDArgsForCall = append(fake.getManyOrgsByGUIDArgsForCall, struct {
 		orgGUIDs []string
 	}{orgGUIDsCopy})
+	fake.recordInvocation("GetManyOrgsByGUID", []interface{}{orgGUIDsCopy})
 	fake.getManyOrgsByGUIDMutex.Unlock()
 	if fake.GetManyOrgsByGUIDStub != nil {
 		return fake.GetManyOrgsByGUIDStub(orgGUIDs)
@@ -157,6 +161,7 @@ func (fake *FakeOrganizationRepository) FindByName(name string) (org models.Orga
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -190,6 +195,7 @@ func (fake *FakeOrganizationRepository) Create(org models.Organization) (apiErr 
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		org models.Organization
 	}{org})
+	fake.recordInvocation("Create", []interface{}{org})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(org)
@@ -223,6 +229,7 @@ func (fake *FakeOrganizationRepository) Rename(orgGUID string, name string) (api
 		orgGUID string
 		name    string
 	}{orgGUID, name})
+	fake.recordInvocation("Rename", []interface{}{orgGUID, name})
 	fake.renameMutex.Unlock()
 	if fake.RenameStub != nil {
 		return fake.RenameStub(orgGUID, name)
@@ -255,6 +262,7 @@ func (fake *FakeOrganizationRepository) Delete(orgGUID string) (apiErr error) {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		orgGUID string
 	}{orgGUID})
+	fake.recordInvocation("Delete", []interface{}{orgGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(orgGUID)
@@ -288,6 +296,7 @@ func (fake *FakeOrganizationRepository) SharePrivateDomain(orgGUID string, domai
 		orgGUID    string
 		domainGUID string
 	}{orgGUID, domainGUID})
+	fake.recordInvocation("SharePrivateDomain", []interface{}{orgGUID, domainGUID})
 	fake.sharePrivateDomainMutex.Unlock()
 	if fake.SharePrivateDomainStub != nil {
 		return fake.SharePrivateDomainStub(orgGUID, domainGUID)
@@ -321,6 +330,7 @@ func (fake *FakeOrganizationRepository) UnsharePrivateDomain(orgGUID string, dom
 		orgGUID    string
 		domainGUID string
 	}{orgGUID, domainGUID})
+	fake.recordInvocation("UnsharePrivateDomain", []interface{}{orgGUID, domainGUID})
 	fake.unsharePrivateDomainMutex.Unlock()
 	if fake.UnsharePrivateDomainStub != nil {
 		return fake.UnsharePrivateDomainStub(orgGUID, domainGUID)
@@ -346,6 +356,40 @@ func (fake *FakeOrganizationRepository) UnsharePrivateDomainReturns(result1 erro
 	fake.unsharePrivateDomainReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeOrganizationRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listOrgsMutex.RLock()
+	defer fake.listOrgsMutex.RUnlock()
+	fake.getManyOrgsByGUIDMutex.RLock()
+	defer fake.getManyOrgsByGUIDMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.renameMutex.RLock()
+	defer fake.renameMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.sharePrivateDomainMutex.RLock()
+	defer fake.sharePrivateDomainMutex.RUnlock()
+	fake.unsharePrivateDomainMutex.RLock()
+	defer fake.unsharePrivateDomainMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeOrganizationRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ organizations.OrganizationRepository = new(FakeOrganizationRepository)

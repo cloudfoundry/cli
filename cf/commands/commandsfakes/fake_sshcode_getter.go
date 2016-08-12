@@ -26,7 +26,7 @@ type FakeSSHCodeGetter struct {
 	setDependencyReturns struct {
 		result1 commandregistry.Command
 	}
-	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement
+	RequirementsStub        func(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error)
 	requirementsMutex       sync.RWMutex
 	requirementsArgsForCall []struct {
 		requirementsFactory requirements.Factory
@@ -34,6 +34,7 @@ type FakeSSHCodeGetter struct {
 	}
 	requirementsReturns struct {
 		result1 []requirements.Requirement
+		result2 error
 	}
 	ExecuteStub        func(context flags.FlagContext) error
 	executeMutex       sync.RWMutex
@@ -50,11 +51,14 @@ type FakeSSHCodeGetter struct {
 		result1 string
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSSHCodeGetter) MetaData() commandregistry.CommandMetadata {
 	fake.metaDataMutex.Lock()
 	fake.metaDataArgsForCall = append(fake.metaDataArgsForCall, struct{}{})
+	fake.recordInvocation("MetaData", []interface{}{})
 	fake.metaDataMutex.Unlock()
 	if fake.MetaDataStub != nil {
 		return fake.MetaDataStub()
@@ -82,6 +86,7 @@ func (fake *FakeSSHCodeGetter) SetDependency(deps commandregistry.Dependency, pl
 		deps       commandregistry.Dependency
 		pluginCall bool
 	}{deps, pluginCall})
+	fake.recordInvocation("SetDependency", []interface{}{deps, pluginCall})
 	fake.setDependencyMutex.Unlock()
 	if fake.SetDependencyStub != nil {
 		return fake.SetDependencyStub(deps, pluginCall)
@@ -109,17 +114,18 @@ func (fake *FakeSSHCodeGetter) SetDependencyReturns(result1 commandregistry.Comm
 	}{result1}
 }
 
-func (fake *FakeSSHCodeGetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) []requirements.Requirement {
+func (fake *FakeSSHCodeGetter) Requirements(requirementsFactory requirements.Factory, context flags.FlagContext) ([]requirements.Requirement, error) {
 	fake.requirementsMutex.Lock()
 	fake.requirementsArgsForCall = append(fake.requirementsArgsForCall, struct {
 		requirementsFactory requirements.Factory
 		context             flags.FlagContext
 	}{requirementsFactory, context})
+	fake.recordInvocation("Requirements", []interface{}{requirementsFactory, context})
 	fake.requirementsMutex.Unlock()
 	if fake.RequirementsStub != nil {
 		return fake.RequirementsStub(requirementsFactory, context)
 	} else {
-		return fake.requirementsReturns.result1
+		return fake.requirementsReturns.result1, fake.requirementsReturns.result2
 	}
 }
 
@@ -135,11 +141,12 @@ func (fake *FakeSSHCodeGetter) RequirementsArgsForCall(i int) (requirements.Fact
 	return fake.requirementsArgsForCall[i].requirementsFactory, fake.requirementsArgsForCall[i].context
 }
 
-func (fake *FakeSSHCodeGetter) RequirementsReturns(result1 []requirements.Requirement) {
+func (fake *FakeSSHCodeGetter) RequirementsReturns(result1 []requirements.Requirement, result2 error) {
 	fake.RequirementsStub = nil
 	fake.requirementsReturns = struct {
 		result1 []requirements.Requirement
-	}{result1}
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeSSHCodeGetter) Execute(context flags.FlagContext) error {
@@ -147,6 +154,7 @@ func (fake *FakeSSHCodeGetter) Execute(context flags.FlagContext) error {
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct {
 		context flags.FlagContext
 	}{context})
+	fake.recordInvocation("Execute", []interface{}{context})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub(context)
@@ -177,6 +185,7 @@ func (fake *FakeSSHCodeGetter) ExecuteReturns(result1 error) {
 func (fake *FakeSSHCodeGetter) Get() (string, error) {
 	fake.getMutex.Lock()
 	fake.getArgsForCall = append(fake.getArgsForCall, struct{}{})
+	fake.recordInvocation("Get", []interface{}{})
 	fake.getMutex.Unlock()
 	if fake.GetStub != nil {
 		return fake.GetStub()
@@ -197,6 +206,34 @@ func (fake *FakeSSHCodeGetter) GetReturns(result1 string, result2 error) {
 		result1 string
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeSSHCodeGetter) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.metaDataMutex.RLock()
+	defer fake.metaDataMutex.RUnlock()
+	fake.setDependencyMutex.RLock()
+	defer fake.setDependencyMutex.RUnlock()
+	fake.requirementsMutex.RLock()
+	defer fake.requirementsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getMutex.RLock()
+	defer fake.getMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSSHCodeGetter) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ commands.SSHCodeGetter = new(FakeSSHCodeGetter)

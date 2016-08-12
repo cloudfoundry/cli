@@ -4,7 +4,6 @@ import (
 	"github.com/cloudfoundry/cli/cf/errors"
 	. "github.com/cloudfoundry/cli/cf/panicprinter"
 
-	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/cf/terminal/terminalfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,12 +31,6 @@ var _ = Describe("Panic Printer", func() {
 			panicPrinter.DisplayCrashDialog("some-error", "some command", "some trace")
 			Expect(ui.SayCallCount()).To(Equal(1))
 			Expect(ui.SayArgsForCall(0)).To(Equal(CrashDialog("some-error", "some command", "some trace")))
-		})
-
-		It("does not print anything when given a string that is terminal.QuietPanic", func() {
-			err := terminal.QuietPanic
-			panicPrinter.DisplayCrashDialog(err, "some command", "some trace")
-			Expect(ui.SayCallCount()).To(Equal(0))
 		})
 
 		It("prints the unexpected error type message when not given a string or an error", func() {

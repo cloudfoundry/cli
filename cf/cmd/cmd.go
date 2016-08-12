@@ -57,6 +57,7 @@ func Main(traceEnv string, args []string) {
 				trace.NewLogger(Writer, isVerbose, traceEnv, ""),
 			)
 			ui.Failed(fmt.Sprintf("Config error: %s", err))
+			os.Exit(1)
 		}
 	}
 
@@ -105,19 +106,24 @@ func Main(traceEnv string, args []string) {
 		cmdRegistry.SetCommand(cmd)
 
 		requirementsFactory := requirements.NewFactory(deps.Config, deps.RepoLocator)
-		reqs := cmd.Requirements(requirementsFactory, flagContext)
+		reqs, reqErr := cmd.Requirements(requirementsFactory, flagContext)
+		if reqErr != nil {
+			deps.UI.Failed(reqErr.Error())
+			os.Exit(1)
+		}
 
 		for _, req := range reqs {
 			err = req.Execute()
 			if err != nil {
 				deps.UI.Failed(err.Error())
+				os.Exit(1)
 			}
 		}
 
 		err = cmd.Execute(flagContext)
 		if err != nil {
-			ui := terminal.NewUI(os.Stdin, Writer, terminal.NewTeePrinter(Writer), traceLogger)
-			ui.Failed(err.Error())
+			deps.UI.Failed(err.Error())
+			os.Exit(1)
 		}
 
 		warningsCollector.PrintWarnings()

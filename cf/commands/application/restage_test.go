@@ -149,8 +149,8 @@ func (cmd *fakeStagingWatcher) SetDependency(_ commandregistry.Dependency, _ boo
 	return cmd
 }
 
-func (cmd *fakeStagingWatcher) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
-	return []requirements.Requirement{}
+func (cmd *fakeStagingWatcher) Requirements(_ requirements.Factory, _ flags.FlagContext) ([]requirements.Requirement, error) {
+	return []requirements.Requirement{}, nil
 }
 
 func (cmd *fakeStagingWatcher) Execute(_ flags.FlagContext) error {

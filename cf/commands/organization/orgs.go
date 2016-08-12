@@ -39,7 +39,7 @@ func (cmd *ListOrgs) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListOrgs) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListOrgs) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -52,7 +52,7 @@ func (cmd *ListOrgs) Requirements(requirementsFactory requirements.Factory, fc f
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListOrgs) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -80,7 +80,10 @@ func (cmd ListOrgs) Execute(fc flags.FlagContext) error {
 		noOrgs = false
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 
 	if err != nil {
 		return errors.New(T("Failed fetching orgs.\n{{.APIErr}}",

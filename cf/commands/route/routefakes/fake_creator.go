@@ -23,6 +23,8 @@ type FakeCreator struct {
 		result1 models.Route
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeCreator) CreateRoute(hostName string, path string, port int, randomPort bool, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
@@ -35,6 +37,7 @@ func (fake *FakeCreator) CreateRoute(hostName string, path string, port int, ran
 		domain     models.DomainFields
 		space      models.SpaceFields
 	}{hostName, path, port, randomPort, domain, space})
+	fake.recordInvocation("CreateRoute", []interface{}{hostName, path, port, randomPort, domain, space})
 	fake.createRouteMutex.Unlock()
 	if fake.CreateRouteStub != nil {
 		return fake.CreateRouteStub(hostName, path, port, randomPort, domain, space)
@@ -61,6 +64,26 @@ func (fake *FakeCreator) CreateRouteReturns(result1 models.Route, result2 error)
 		result1 models.Route
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeCreator) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createRouteMutex.RLock()
+	defer fake.createRouteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeCreator) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ route.Creator = new(FakeCreator)

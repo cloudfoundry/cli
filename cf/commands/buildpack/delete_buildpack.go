@@ -39,7 +39,7 @@ func (cmd *DeleteBuildpack) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd), "",
 		func() bool {
 			return len(fc.Args()) != 1
@@ -53,7 +53,7 @@ func (cmd *DeleteBuildpack) Requirements(requirementsFactory requirements.Factor
 		loginReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *DeleteBuildpack) Execute(c flags.FlagContext) error {

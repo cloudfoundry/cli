@@ -72,6 +72,8 @@ type FakeServiceBrokerRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceBrokerRepository) ListServiceBrokers(callback func(models.ServiceBroker) bool) error {
@@ -79,6 +81,7 @@ func (fake *FakeServiceBrokerRepository) ListServiceBrokers(callback func(models
 	fake.listServiceBrokersArgsForCall = append(fake.listServiceBrokersArgsForCall, struct {
 		callback func(models.ServiceBroker) bool
 	}{callback})
+	fake.recordInvocation("ListServiceBrokers", []interface{}{callback})
 	fake.listServiceBrokersMutex.Unlock()
 	if fake.ListServiceBrokersStub != nil {
 		return fake.ListServiceBrokersStub(callback)
@@ -111,6 +114,7 @@ func (fake *FakeServiceBrokerRepository) FindByName(name string) (serviceBroker 
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -144,6 +148,7 @@ func (fake *FakeServiceBrokerRepository) FindByGUID(guid string) (serviceBroker 
 	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("FindByGUID", []interface{}{guid})
 	fake.findByGUIDMutex.Unlock()
 	if fake.FindByGUIDStub != nil {
 		return fake.FindByGUIDStub(guid)
@@ -181,6 +186,7 @@ func (fake *FakeServiceBrokerRepository) Create(name string, url string, usernam
 		password  string
 		spaceGUID string
 	}{name, url, username, password, spaceGUID})
+	fake.recordInvocation("Create", []interface{}{name, url, username, password, spaceGUID})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(name, url, username, password, spaceGUID)
@@ -213,6 +219,7 @@ func (fake *FakeServiceBrokerRepository) Update(serviceBroker models.ServiceBrok
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		serviceBroker models.ServiceBroker
 	}{serviceBroker})
+	fake.recordInvocation("Update", []interface{}{serviceBroker})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(serviceBroker)
@@ -246,6 +253,7 @@ func (fake *FakeServiceBrokerRepository) Rename(guid string, name string) (apiEr
 		guid string
 		name string
 	}{guid, name})
+	fake.recordInvocation("Rename", []interface{}{guid, name})
 	fake.renameMutex.Unlock()
 	if fake.RenameStub != nil {
 		return fake.RenameStub(guid, name)
@@ -278,6 +286,7 @@ func (fake *FakeServiceBrokerRepository) Delete(guid string) (apiErr error) {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("Delete", []interface{}{guid})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(guid)
@@ -303,6 +312,38 @@ func (fake *FakeServiceBrokerRepository) DeleteReturns(result1 error) {
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeServiceBrokerRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listServiceBrokersMutex.RLock()
+	defer fake.listServiceBrokersMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.renameMutex.RLock()
+	defer fake.renameMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceBrokerRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.ServiceBrokerRepository = new(FakeServiceBrokerRepository)

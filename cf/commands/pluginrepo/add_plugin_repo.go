@@ -3,6 +3,7 @@ package pluginrepo
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -44,13 +45,14 @@ func (cmd *AddPluginRepo) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *AddPluginRepo) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires REPO_NAME and URL as arguments\n\n") + commandregistry.Commands.CommandUsage("add-plugin-repo"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	reqs := []requirements.Requirement{}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *AddPluginRepo) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

@@ -57,13 +57,15 @@ func (cmd *UnmapRoute) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires app_name, domain_name as arguments\n\n") + commandregistry.Commands.CommandUsage("unmap-route"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	if fc.IsSet("port") && (fc.IsSet("hostname") || fc.IsSet("path")) {
 		cmd.ui.Failed(T("Cannot specify port together with hostname and/or path."))
+		return nil, fmt.Errorf("Cannot specify port together with hostname and/or path.")
 	}
 
 	domainName := fc.Args()[1]
@@ -87,7 +89,7 @@ func (cmd *UnmapRoute) Requirements(requirementsFactory requirements.Factory, fc
 		cmd.domainReq,
 	}...)
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *UnmapRoute) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

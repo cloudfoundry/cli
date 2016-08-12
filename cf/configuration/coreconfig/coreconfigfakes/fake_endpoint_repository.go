@@ -18,6 +18,8 @@ type FakeEndpointRepository struct {
 		result2 string
 		result3 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeEndpointRepository) GetCCInfo(arg1 string) (*coreconfig.CCInfo, string, error) {
@@ -25,6 +27,7 @@ func (fake *FakeEndpointRepository) GetCCInfo(arg1 string) (*coreconfig.CCInfo, 
 	fake.getCCInfoArgsForCall = append(fake.getCCInfoArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("GetCCInfo", []interface{}{arg1})
 	fake.getCCInfoMutex.Unlock()
 	if fake.GetCCInfoStub != nil {
 		return fake.GetCCInfoStub(arg1)
@@ -52,6 +55,26 @@ func (fake *FakeEndpointRepository) GetCCInfoReturns(result1 *coreconfig.CCInfo,
 		result2 string
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *FakeEndpointRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.getCCInfoMutex.RLock()
+	defer fake.getCCInfoMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeEndpointRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ coreconfig.EndpointRepository = new(FakeEndpointRepository)

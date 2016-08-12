@@ -34,6 +34,8 @@ type FakeStackRepository struct {
 		result1 []models.Stack
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeStackRepository) FindByName(name string) (stack models.Stack, apiErr error) {
@@ -41,6 +43,7 @@ func (fake *FakeStackRepository) FindByName(name string) (stack models.Stack, ap
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -74,6 +77,7 @@ func (fake *FakeStackRepository) FindByGUID(guid string) (models.Stack, error) {
 	fake.findByGUIDArgsForCall = append(fake.findByGUIDArgsForCall, struct {
 		guid string
 	}{guid})
+	fake.recordInvocation("FindByGUID", []interface{}{guid})
 	fake.findByGUIDMutex.Unlock()
 	if fake.FindByGUIDStub != nil {
 		return fake.FindByGUIDStub(guid)
@@ -105,6 +109,7 @@ func (fake *FakeStackRepository) FindByGUIDReturns(result1 models.Stack, result2
 func (fake *FakeStackRepository) FindAll() (stacks []models.Stack, apiErr error) {
 	fake.findAllMutex.Lock()
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct{}{})
+	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
 	if fake.FindAllStub != nil {
 		return fake.FindAllStub()
@@ -125,6 +130,30 @@ func (fake *FakeStackRepository) FindAllReturns(result1 []models.Stack, result2 
 		result1 []models.Stack
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeStackRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.findByGUIDMutex.RLock()
+	defer fake.findByGUIDMutex.RUnlock()
+	fake.findAllMutex.RLock()
+	defer fake.findAllMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeStackRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ stacks.StackRepository = new(FakeStackRepository)

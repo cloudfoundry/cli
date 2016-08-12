@@ -93,7 +93,8 @@ var _ = Describe("App", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires an argument"},
 					[]string{"NAME"},
@@ -108,21 +109,24 @@ var _ = Describe("App", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a TargetedSpaceRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewTargetedSpaceRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(targetedSpaceRequirement))
 			})
 
 			It("returns an ApplicationRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewApplicationRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewApplicationRequirementArgsForCall(0)).To(Equal("app-name"))
 

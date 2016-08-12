@@ -65,7 +65,8 @@ var _ = Describe("org command", func() {
 			})
 
 			It("fails with no args", func() {
-				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(reqFactory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
@@ -79,7 +80,8 @@ var _ = Describe("org command", func() {
 			BeforeEach(func() {
 				err := flagContext.Parse("my-org")
 				Expect(err).NotTo(HaveOccurred())
-				actualRequirements = cmd.Requirements(reqFactory, flagContext)
+				actualRequirements, err = cmd.Requirements(reqFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			Context("when no flags are provided", func() {

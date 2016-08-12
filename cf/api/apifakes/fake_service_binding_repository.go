@@ -38,6 +38,8 @@ type FakeServiceBindingRepository struct {
 		result1 []models.ServiceBindingFields
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeServiceBindingRepository) Create(instanceGUID string, appGUID string, paramsMap map[string]interface{}) error {
@@ -47,6 +49,7 @@ func (fake *FakeServiceBindingRepository) Create(instanceGUID string, appGUID st
 		appGUID      string
 		paramsMap    map[string]interface{}
 	}{instanceGUID, appGUID, paramsMap})
+	fake.recordInvocation("Create", []interface{}{instanceGUID, appGUID, paramsMap})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(instanceGUID, appGUID, paramsMap)
@@ -80,6 +83,7 @@ func (fake *FakeServiceBindingRepository) Delete(instance models.ServiceInstance
 		instance models.ServiceInstance
 		appGUID  string
 	}{instance, appGUID})
+	fake.recordInvocation("Delete", []interface{}{instance, appGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(instance, appGUID)
@@ -113,6 +117,7 @@ func (fake *FakeServiceBindingRepository) ListAllForService(instanceGUID string)
 	fake.listAllForServiceArgsForCall = append(fake.listAllForServiceArgsForCall, struct {
 		instanceGUID string
 	}{instanceGUID})
+	fake.recordInvocation("ListAllForService", []interface{}{instanceGUID})
 	fake.listAllForServiceMutex.Unlock()
 	if fake.ListAllForServiceStub != nil {
 		return fake.ListAllForServiceStub(instanceGUID)
@@ -139,6 +144,30 @@ func (fake *FakeServiceBindingRepository) ListAllForServiceReturns(result1 []mod
 		result1 []models.ServiceBindingFields
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeServiceBindingRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	fake.listAllForServiceMutex.RLock()
+	defer fake.listAllForServiceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeServiceBindingRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.ServiceBindingRepository = new(FakeServiceBindingRepository)

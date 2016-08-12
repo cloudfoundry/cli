@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/actors/userprint"
 	"github.com/cloudfoundry/cli/cf/api"
@@ -41,9 +43,10 @@ func (cmd *OrgUsers) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("org-users"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -53,7 +56,7 @@ func (cmd *OrgUsers) Requirements(requirementsFactory requirements.Factory, fc f
 		cmd.orgReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *OrgUsers) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

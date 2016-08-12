@@ -84,9 +84,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires SPACE and DOMAIN as arguments"},
 					[]string{"NAME"},
@@ -102,7 +101,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a SpaceRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewSpaceRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewSpaceRequirementArgsForCall(0)).To(Equal("space-name"))
 
@@ -110,7 +110,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("returns a DomainRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewDomainRequirementCallCount()).To(Equal(1))
 				Expect(factory.NewDomainRequirementArgsForCall(0)).To(Equal("domain-name"))
 
@@ -128,7 +129,8 @@ var _ = Describe("CreateRoute", func() {
 				expectedVersion, err := semver.Make("2.36.0")
 				Expect(err).NotTo(HaveOccurred())
 
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
@@ -148,7 +150,8 @@ var _ = Describe("CreateRoute", func() {
 				expectedVersion, err := semver.Make("2.53.0")
 				Expect(err).NotTo(HaveOccurred())
 
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
@@ -168,7 +171,8 @@ var _ = Describe("CreateRoute", func() {
 				expectedVersion, err := semver.Make("2.53.0")
 				Expect(err).NotTo(HaveOccurred())
 
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				feature, requiredVersion := factory.NewMinAPIVersionRequirementArgsForCall(0)
@@ -185,7 +189,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
 		})
@@ -197,9 +202,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify port together with hostname and/or path."},
@@ -214,9 +218,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify port together with hostname and/or path."},
@@ -231,9 +234,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
@@ -248,9 +250,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},
@@ -265,9 +266,8 @@ var _ = Describe("CreateRoute", func() {
 			})
 
 			It("fails with error", func() {
-				Expect(func() {
-					cmd.Requirements(factory, flagContext)
-				}).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Cannot specify random-port together with port, hostname and/or path."},

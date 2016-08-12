@@ -1,6 +1,8 @@
 package servicebroker
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -30,16 +32,17 @@ func (cmd *RenameServiceBroker) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *RenameServiceBroker) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SERVICE_BROKER, NEW_SERVICE_BROKER as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-service-broker"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *RenameServiceBroker) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

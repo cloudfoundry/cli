@@ -41,6 +41,8 @@ type FakeSecureShell struct {
 	closeReturns     struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSecureShell) Connect(opts *options.SSHOptions) error {
@@ -48,6 +50,7 @@ func (fake *FakeSecureShell) Connect(opts *options.SSHOptions) error {
 	fake.connectArgsForCall = append(fake.connectArgsForCall, struct {
 		opts *options.SSHOptions
 	}{opts})
+	fake.recordInvocation("Connect", []interface{}{opts})
 	fake.connectMutex.Unlock()
 	if fake.ConnectStub != nil {
 		return fake.ConnectStub(opts)
@@ -78,6 +81,7 @@ func (fake *FakeSecureShell) ConnectReturns(result1 error) {
 func (fake *FakeSecureShell) InteractiveSession() error {
 	fake.interactiveSessionMutex.Lock()
 	fake.interactiveSessionArgsForCall = append(fake.interactiveSessionArgsForCall, struct{}{})
+	fake.recordInvocation("InteractiveSession", []interface{}{})
 	fake.interactiveSessionMutex.Unlock()
 	if fake.InteractiveSessionStub != nil {
 		return fake.InteractiveSessionStub()
@@ -102,6 +106,7 @@ func (fake *FakeSecureShell) InteractiveSessionReturns(result1 error) {
 func (fake *FakeSecureShell) LocalPortForward() error {
 	fake.localPortForwardMutex.Lock()
 	fake.localPortForwardArgsForCall = append(fake.localPortForwardArgsForCall, struct{}{})
+	fake.recordInvocation("LocalPortForward", []interface{}{})
 	fake.localPortForwardMutex.Unlock()
 	if fake.LocalPortForwardStub != nil {
 		return fake.LocalPortForwardStub()
@@ -126,6 +131,7 @@ func (fake *FakeSecureShell) LocalPortForwardReturns(result1 error) {
 func (fake *FakeSecureShell) Wait() error {
 	fake.waitMutex.Lock()
 	fake.waitArgsForCall = append(fake.waitArgsForCall, struct{}{})
+	fake.recordInvocation("Wait", []interface{}{})
 	fake.waitMutex.Unlock()
 	if fake.WaitStub != nil {
 		return fake.WaitStub()
@@ -150,6 +156,7 @@ func (fake *FakeSecureShell) WaitReturns(result1 error) {
 func (fake *FakeSecureShell) Close() error {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
 	fake.closeMutex.Unlock()
 	if fake.CloseStub != nil {
 		return fake.CloseStub()
@@ -169,6 +176,34 @@ func (fake *FakeSecureShell) CloseReturns(result1 error) {
 	fake.closeReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSecureShell) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.connectMutex.RLock()
+	defer fake.connectMutex.RUnlock()
+	fake.interactiveSessionMutex.RLock()
+	defer fake.interactiveSessionMutex.RUnlock()
+	fake.localPortForwardMutex.RLock()
+	defer fake.localPortForwardMutex.RUnlock()
+	fake.waitMutex.RLock()
+	defer fake.waitMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSecureShell) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ sshCmd.SecureShell = new(FakeSecureShell)

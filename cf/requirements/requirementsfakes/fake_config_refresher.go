@@ -16,11 +16,14 @@ type FakeConfigRefresher struct {
 		result1 coreconfig.Warning
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeConfigRefresher) Refresh() (coreconfig.Warning, error) {
 	fake.refreshMutex.Lock()
 	fake.refreshArgsForCall = append(fake.refreshArgsForCall, struct{}{})
+	fake.recordInvocation("Refresh", []interface{}{})
 	fake.refreshMutex.Unlock()
 	if fake.RefreshStub != nil {
 		return fake.RefreshStub()
@@ -41,6 +44,26 @@ func (fake *FakeConfigRefresher) RefreshReturns(result1 coreconfig.Warning, resu
 		result1 coreconfig.Warning
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeConfigRefresher) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.refreshMutex.RLock()
+	defer fake.refreshMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeConfigRefresher) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.ConfigRefresher = new(FakeConfigRefresher)

@@ -94,7 +94,8 @@ var _ = Describe("BindRouteService", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires DOMAIN and SERVICE_INSTANCE as arguments"},
@@ -108,25 +109,29 @@ var _ = Describe("BindRouteService", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a DomainRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a ServiceInstanceRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewServiceInstanceRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(serviceInstanceRequirement))
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(minAPIVersionRequirement))
 

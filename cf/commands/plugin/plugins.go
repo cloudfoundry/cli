@@ -35,7 +35,7 @@ func (cmd *Plugins) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *Plugins) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *Plugins) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -46,7 +46,7 @@ func (cmd *Plugins) Requirements(requirementsFactory requirements.Factory, fc fl
 	reqs := []requirements.Requirement{
 		usageReq,
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Plugins) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -104,6 +104,9 @@ func (cmd *Plugins) Execute(c flags.FlagContext) error {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
-	table.Print()
+	err := table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

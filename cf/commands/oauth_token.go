@@ -33,12 +33,12 @@ func (cmd *OAuthToken) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *OAuthToken) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *OAuthToken) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *OAuthToken) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

@@ -25,11 +25,14 @@ type FakeAppSummaryRepository struct {
 		result1 models.Application
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
 	fake.getSummariesInCurrentSpaceMutex.Lock()
 	fake.getSummariesInCurrentSpaceArgsForCall = append(fake.getSummariesInCurrentSpaceArgsForCall, struct{}{})
+	fake.recordInvocation("GetSummariesInCurrentSpace", []interface{}{})
 	fake.getSummariesInCurrentSpaceMutex.Unlock()
 	if fake.GetSummariesInCurrentSpaceStub != nil {
 		return fake.GetSummariesInCurrentSpaceStub()
@@ -57,6 +60,7 @@ func (fake *FakeAppSummaryRepository) GetSummary(appGUID string) (summary models
 	fake.getSummaryArgsForCall = append(fake.getSummaryArgsForCall, struct {
 		appGUID string
 	}{appGUID})
+	fake.recordInvocation("GetSummary", []interface{}{appGUID})
 	fake.getSummaryMutex.Unlock()
 	if fake.GetSummaryStub != nil {
 		return fake.GetSummaryStub(appGUID)
@@ -83,6 +87,28 @@ func (fake *FakeAppSummaryRepository) GetSummaryReturns(result1 models.Applicati
 		result1 models.Application
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeAppSummaryRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.getSummariesInCurrentSpaceMutex.RLock()
+	defer fake.getSummariesInCurrentSpaceMutex.RUnlock()
+	fake.getSummaryMutex.RLock()
+	defer fake.getSummaryMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeAppSummaryRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ api.AppSummaryRepository = new(FakeAppSummaryRepository)

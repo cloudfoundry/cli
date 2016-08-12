@@ -29,9 +29,9 @@ func (cmd *Logout) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *Logout) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *Logout) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	reqs := []requirements.Requirement{}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Logout) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {

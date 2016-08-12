@@ -19,6 +19,8 @@ type FakeRepository struct {
 		result1 []models.EventFields
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) RecentEvents(appGUID string, limit int64) ([]models.EventFields, error) {
@@ -27,6 +29,7 @@ func (fake *FakeRepository) RecentEvents(appGUID string, limit int64) ([]models.
 		appGUID string
 		limit   int64
 	}{appGUID, limit})
+	fake.recordInvocation("RecentEvents", []interface{}{appGUID, limit})
 	fake.recentEventsMutex.Unlock()
 	if fake.RecentEventsStub != nil {
 		return fake.RecentEventsStub(appGUID, limit)
@@ -53,6 +56,26 @@ func (fake *FakeRepository) RecentEventsReturns(result1 []models.EventFields, re
 		result1 []models.EventFields
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.recentEventsMutex.RLock()
+	defer fake.recentEventsMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ appevents.Repository = new(FakeRepository)

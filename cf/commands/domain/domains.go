@@ -34,7 +34,7 @@ func (cmd *ListDomains) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListDomains) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListDomains) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -48,7 +48,7 @@ func (cmd *ListDomains) Requirements(requirementsFactory requirements.Factory, f
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListDomains) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -87,7 +87,10 @@ func (cmd *ListDomains) Execute(c flags.FlagContext) error {
 		}
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 
 	if len(domains) == 0 {
 		cmd.ui.Say(T("No domains found"))

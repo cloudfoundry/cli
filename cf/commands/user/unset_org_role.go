@@ -42,9 +42,10 @@ func (cmd *UnsetOrgRole) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires USERNAME, ORG, ROLE as arguments\n\n") + commandregistry.Commands.CommandUsage("unset-org-role"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 3)
 	}
 
 	var wantGUID bool
@@ -64,7 +65,7 @@ func (cmd *UnsetOrgRole) Requirements(requirementsFactory requirements.Factory, 
 		cmd.orgReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *UnsetOrgRole) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

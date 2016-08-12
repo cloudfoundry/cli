@@ -34,11 +34,14 @@ type FakeFeatureFlagRepository struct {
 	updateReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeFeatureFlagRepository) List() ([]models.FeatureFlag, error) {
 	fake.listMutex.Lock()
 	fake.listArgsForCall = append(fake.listArgsForCall, struct{}{})
+	fake.recordInvocation("List", []interface{}{})
 	fake.listMutex.Unlock()
 	if fake.ListStub != nil {
 		return fake.ListStub()
@@ -66,6 +69,7 @@ func (fake *FakeFeatureFlagRepository) FindByName(arg1 string) (models.FeatureFl
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("FindByName", []interface{}{arg1})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(arg1)
@@ -100,6 +104,7 @@ func (fake *FakeFeatureFlagRepository) Update(arg1 string, arg2 bool) error {
 		arg1 string
 		arg2 bool
 	}{arg1, arg2})
+	fake.recordInvocation("Update", []interface{}{arg1, arg2})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(arg1, arg2)
@@ -125,6 +130,30 @@ func (fake *FakeFeatureFlagRepository) UpdateReturns(result1 error) {
 	fake.updateReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeFeatureFlagRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listMutex.RLock()
+	defer fake.listMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeFeatureFlagRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ featureflags.FeatureFlagRepository = new(FakeFeatureFlagRepository)

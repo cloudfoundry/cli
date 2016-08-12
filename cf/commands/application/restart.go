@@ -1,6 +1,8 @@
 package application
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/cf/flags"
@@ -40,9 +42,10 @@ func (cmd *Restart) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *Restart) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *Restart) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("restart"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	cmd.appReq = requirementsFactory.NewApplicationRequirement(fc.Args()[0])
@@ -53,7 +56,7 @@ func (cmd *Restart) Requirements(requirementsFactory requirements.Factory, fc fl
 		cmd.appReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Restart) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

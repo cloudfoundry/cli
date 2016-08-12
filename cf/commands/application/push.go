@@ -115,7 +115,7 @@ func (cmd *Push) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	var reqs []requirements.Requirement
 
 	usageReq := requirementsFactory.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd), "",
@@ -139,7 +139,7 @@ func (cmd *Push) Requirements(requirementsFactory requirements.Factory, fc flags
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}...)
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Push) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

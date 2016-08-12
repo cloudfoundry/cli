@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -33,9 +35,10 @@ func (cmd *UnbindService) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires APP SERVICE_INSTANCE as arguments\n\n") + commandregistry.Commands.CommandUsage("unbind-service"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	serviceName := fc.Args()[1]
@@ -48,7 +51,7 @@ func (cmd *UnbindService) Requirements(requirementsFactory requirements.Factory,
 		cmd.appReq,
 		cmd.serviceInstanceReq,
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *UnbindService) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

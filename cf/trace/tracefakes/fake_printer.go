@@ -30,6 +30,8 @@ type FakePrinter struct {
 	writesToConsoleReturns     struct {
 		result1 bool
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakePrinter) Print(v ...interface{}) {
@@ -37,6 +39,7 @@ func (fake *FakePrinter) Print(v ...interface{}) {
 	fake.printArgsForCall = append(fake.printArgsForCall, struct {
 		v []interface{}
 	}{v})
+	fake.recordInvocation("Print", []interface{}{v})
 	fake.printMutex.Unlock()
 	if fake.PrintStub != nil {
 		fake.PrintStub(v...)
@@ -61,6 +64,7 @@ func (fake *FakePrinter) Printf(format string, v ...interface{}) {
 		format string
 		v      []interface{}
 	}{format, v})
+	fake.recordInvocation("Printf", []interface{}{format, v})
 	fake.printfMutex.Unlock()
 	if fake.PrintfStub != nil {
 		fake.PrintfStub(format, v...)
@@ -84,6 +88,7 @@ func (fake *FakePrinter) Println(v ...interface{}) {
 	fake.printlnArgsForCall = append(fake.printlnArgsForCall, struct {
 		v []interface{}
 	}{v})
+	fake.recordInvocation("Println", []interface{}{v})
 	fake.printlnMutex.Unlock()
 	if fake.PrintlnStub != nil {
 		fake.PrintlnStub(v...)
@@ -105,6 +110,7 @@ func (fake *FakePrinter) PrintlnArgsForCall(i int) []interface{} {
 func (fake *FakePrinter) WritesToConsole() bool {
 	fake.writesToConsoleMutex.Lock()
 	fake.writesToConsoleArgsForCall = append(fake.writesToConsoleArgsForCall, struct{}{})
+	fake.recordInvocation("WritesToConsole", []interface{}{})
 	fake.writesToConsoleMutex.Unlock()
 	if fake.WritesToConsoleStub != nil {
 		return fake.WritesToConsoleStub()
@@ -124,6 +130,32 @@ func (fake *FakePrinter) WritesToConsoleReturns(result1 bool) {
 	fake.writesToConsoleReturns = struct {
 		result1 bool
 	}{result1}
+}
+
+func (fake *FakePrinter) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.printMutex.RLock()
+	defer fake.printMutex.RUnlock()
+	fake.printfMutex.RLock()
+	defer fake.printfMutex.RUnlock()
+	fake.printlnMutex.RLock()
+	defer fake.printlnMutex.RUnlock()
+	fake.writesToConsoleMutex.RLock()
+	defer fake.writesToConsoleMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakePrinter) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ trace.Printer = new(FakePrinter)

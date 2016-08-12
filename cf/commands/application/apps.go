@@ -42,7 +42,7 @@ func (cmd *ListApps) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListApps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListApps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -56,7 +56,7 @@ func (cmd *ListApps) Requirements(requirementsFactory requirements.Factory, fc f
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListApps) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -123,8 +123,10 @@ func (cmd *ListApps) Execute(c flags.FlagContext) error {
 		)
 	}
 
-	table.Print()
-
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	if cmd.pluginCall {
 		cmd.populatePluginModel(apps)
 	}

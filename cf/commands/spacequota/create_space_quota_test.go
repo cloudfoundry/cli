@@ -80,7 +80,8 @@ var _ = Describe("create-space-quota", func() {
 		Context("when not exactly one arg is provided", func() {
 			It("fails", func() {
 				flagContext.Parse()
-				Expect(func() { cmd.Requirements(reqFactory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(reqFactory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
@@ -90,11 +91,13 @@ var _ = Describe("create-space-quota", func() {
 
 		Context("when provided exactly one arg", func() {
 			var actualRequirements []requirements.Requirement
+			var err error
 
 			Context("when no flags are provided", func() {
 				BeforeEach(func() {
 					flagContext.Parse("myquota")
-					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+					actualRequirements, err = cmd.Requirements(reqFactory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("returns a login requirement", func() {
@@ -115,7 +118,8 @@ var _ = Describe("create-space-quota", func() {
 			Context("when the -a flag is provided", func() {
 				BeforeEach(func() {
 					flagContext.Parse("myquota", "-a", "2")
-					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+					actualRequirements, err = cmd.Requirements(reqFactory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("returns a min api version requirement", func() {
@@ -131,7 +135,8 @@ var _ = Describe("create-space-quota", func() {
 			Context("when the --reserved-route-ports is provided", func() {
 				BeforeEach(func() {
 					flagContext.Parse("myquota", "--reserved-route-ports", "2")
-					actualRequirements = cmd.Requirements(reqFactory, flagContext)
+					actualRequirements, err = cmd.Requirements(reqFactory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 				})
 
 				It("return a minimum api version requirement", func() {

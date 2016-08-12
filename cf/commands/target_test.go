@@ -80,9 +80,10 @@ var _ = Describe("target command", func() {
 		It("fails with usage", func() {
 			flagContext.Parse("blahblah")
 
-			reqs := cmd.Requirements(requirementsFactory, flagContext)
+			reqs, err := cmd.Requirements(requirementsFactory, flagContext)
+			Expect(err).NotTo(HaveOccurred())
 
-			err := testcmd.RunRequirements(reqs)
+			err = testcmd.RunRequirements(reqs)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Incorrect Usage"))
 			Expect(err.Error()).To(ContainSubstring("No argument required"))
@@ -106,13 +107,8 @@ var _ = Describe("target command", func() {
 		})
 
 		It("prints the target info when no org or space is specified", func() {
-			Expect(callTarget([]string{})).To(BeTrue())
+			Expect(callTarget([]string{})).To(BeFalse())
 			Expect(ui.ShowConfigurationCalled).To(BeTrue())
-		})
-
-		It("panics silently so that it returns an exit code of 1", func() {
-			callTarget([]string{})
-			Expect(ui.PanickedQuietly).To(BeTrue())
 		})
 
 		It("fails requirements when targeting a space or org", func() {

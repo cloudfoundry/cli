@@ -87,6 +87,7 @@ var _ = Describe("calling commands in commandregistry", func() {
 
 		It("returns an error", func() {
 			err := NewCommandRunner().Command([]string{"fake-command3"}, deps, false)
+			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(MatchRegexp("cli_rpc_server_test"))
 		})
 	})

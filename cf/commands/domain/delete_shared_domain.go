@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -36,9 +38,10 @@ func (cmd *DeleteSharedDomain) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("delete-shared-domain"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	loginReq := requirementsFactory.NewLoginRequirement()
@@ -49,7 +52,7 @@ func (cmd *DeleteSharedDomain) Requirements(requirementsFactory requirements.Fac
 		cmd.orgReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *DeleteSharedDomain) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

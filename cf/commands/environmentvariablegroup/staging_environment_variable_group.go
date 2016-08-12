@@ -31,7 +31,7 @@ func (cmd *StagingEnvironmentVariableGroup) MetaData() commandregistry.CommandMe
 	}
 }
 
-func (cmd *StagingEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *StagingEnvironmentVariableGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -43,7 +43,7 @@ func (cmd *StagingEnvironmentVariableGroup) Requirements(requirementsFactory req
 		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *StagingEnvironmentVariableGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -68,6 +68,9 @@ func (cmd *StagingEnvironmentVariableGroup) Execute(c flags.FlagContext) error {
 	for _, envVar := range stagingEnvVars {
 		table.Add(envVar.Name, envVar.Value)
 	}
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

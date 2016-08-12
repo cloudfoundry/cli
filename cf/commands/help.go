@@ -34,9 +34,9 @@ func (cmd *Help) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *Help) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *Help) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	reqs := []requirements.Requirement{}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *Help) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

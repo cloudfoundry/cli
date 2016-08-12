@@ -618,8 +618,8 @@ func (t testOrgsCmd) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
-	return []requirements.Requirement{}
+func (cmd testOrgsCmd) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
+	return []requirements.Requirement{}, nil
 }
 
 func (cmd testOrgsCmd) SetDependency(deps commandregistry.Dependency, pluginCall bool) (c commandregistry.Command) {

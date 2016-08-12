@@ -9,77 +9,108 @@ import (
 
 type FakeDataInterface struct {
 	JSONMarshalV3Stub        func() ([]byte, error)
-	jsonMarshalV3Mutex       sync.RWMutex
-	jsonMarshalV3ArgsForCall []struct{}
-	jsonMarshalV3Returns     struct {
+	jSONMarshalV3Mutex       sync.RWMutex
+	jSONMarshalV3ArgsForCall []struct{}
+	jSONMarshalV3Returns     struct {
 		result1 []byte
 		result2 error
 	}
 	JSONUnmarshalV3Stub        func([]byte) error
-	jsonUnmarshalV3Mutex       sync.RWMutex
-	jsonUnmarshalV3ArgsForCall []struct {
+	jSONUnmarshalV3Mutex       sync.RWMutex
+	jSONUnmarshalV3ArgsForCall []struct {
 		arg1 []byte
 	}
-	jsonUnmarshalV3Returns struct {
+	jSONUnmarshalV3Returns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeDataInterface) JSONMarshalV3() ([]byte, error) {
-	fake.jsonMarshalV3Mutex.Lock()
-	fake.jsonMarshalV3ArgsForCall = append(fake.jsonMarshalV3ArgsForCall, struct{}{})
-	fake.jsonMarshalV3Mutex.Unlock()
+	fake.jSONMarshalV3Mutex.Lock()
+	fake.jSONMarshalV3ArgsForCall = append(fake.jSONMarshalV3ArgsForCall, struct{}{})
+	fake.recordInvocation("JSONMarshalV3", []interface{}{})
+	fake.jSONMarshalV3Mutex.Unlock()
 	if fake.JSONMarshalV3Stub != nil {
 		return fake.JSONMarshalV3Stub()
 	} else {
-		return fake.jsonMarshalV3Returns.result1, fake.jsonMarshalV3Returns.result2
+		return fake.jSONMarshalV3Returns.result1, fake.jSONMarshalV3Returns.result2
 	}
 }
 
 func (fake *FakeDataInterface) JSONMarshalV3CallCount() int {
-	fake.jsonMarshalV3Mutex.RLock()
-	defer fake.jsonMarshalV3Mutex.RUnlock()
-	return len(fake.jsonMarshalV3ArgsForCall)
+	fake.jSONMarshalV3Mutex.RLock()
+	defer fake.jSONMarshalV3Mutex.RUnlock()
+	return len(fake.jSONMarshalV3ArgsForCall)
 }
 
 func (fake *FakeDataInterface) JSONMarshalV3Returns(result1 []byte, result2 error) {
 	fake.JSONMarshalV3Stub = nil
-	fake.jsonMarshalV3Returns = struct {
+	fake.jSONMarshalV3Returns = struct {
 		result1 []byte
 		result2 error
 	}{result1, result2}
 }
 
 func (fake *FakeDataInterface) JSONUnmarshalV3(arg1 []byte) error {
-	fake.jsonUnmarshalV3Mutex.Lock()
-	fake.jsonUnmarshalV3ArgsForCall = append(fake.jsonUnmarshalV3ArgsForCall, struct {
+	var arg1Copy []byte
+	if arg1 != nil {
+		arg1Copy = make([]byte, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.jSONUnmarshalV3Mutex.Lock()
+	fake.jSONUnmarshalV3ArgsForCall = append(fake.jSONUnmarshalV3ArgsForCall, struct {
 		arg1 []byte
-	}{arg1})
-	fake.jsonUnmarshalV3Mutex.Unlock()
+	}{arg1Copy})
+	fake.recordInvocation("JSONUnmarshalV3", []interface{}{arg1Copy})
+	fake.jSONUnmarshalV3Mutex.Unlock()
 	if fake.JSONUnmarshalV3Stub != nil {
 		return fake.JSONUnmarshalV3Stub(arg1)
 	} else {
-		return fake.jsonUnmarshalV3Returns.result1
+		return fake.jSONUnmarshalV3Returns.result1
 	}
 }
 
 func (fake *FakeDataInterface) JSONUnmarshalV3CallCount() int {
-	fake.jsonUnmarshalV3Mutex.RLock()
-	defer fake.jsonUnmarshalV3Mutex.RUnlock()
-	return len(fake.jsonUnmarshalV3ArgsForCall)
+	fake.jSONUnmarshalV3Mutex.RLock()
+	defer fake.jSONUnmarshalV3Mutex.RUnlock()
+	return len(fake.jSONUnmarshalV3ArgsForCall)
 }
 
 func (fake *FakeDataInterface) JSONUnmarshalV3ArgsForCall(i int) []byte {
-	fake.jsonUnmarshalV3Mutex.RLock()
-	defer fake.jsonUnmarshalV3Mutex.RUnlock()
-	return fake.jsonUnmarshalV3ArgsForCall[i].arg1
+	fake.jSONUnmarshalV3Mutex.RLock()
+	defer fake.jSONUnmarshalV3Mutex.RUnlock()
+	return fake.jSONUnmarshalV3ArgsForCall[i].arg1
 }
 
 func (fake *FakeDataInterface) JSONUnmarshalV3Returns(result1 error) {
 	fake.JSONUnmarshalV3Stub = nil
-	fake.jsonUnmarshalV3Returns = struct {
+	fake.jSONUnmarshalV3Returns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeDataInterface) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.jSONMarshalV3Mutex.RLock()
+	defer fake.jSONMarshalV3Mutex.RUnlock()
+	fake.jSONUnmarshalV3Mutex.RLock()
+	defer fake.jSONUnmarshalV3Mutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeDataInterface) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ configuration.DataInterface = new(FakeDataInterface)

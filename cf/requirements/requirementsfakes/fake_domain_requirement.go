@@ -21,11 +21,14 @@ type FakeDomainRequirement struct {
 	getDomainReturns     struct {
 		result1 models.DomainFields
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeDomainRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -50,6 +53,7 @@ func (fake *FakeDomainRequirement) ExecuteReturns(result1 error) {
 func (fake *FakeDomainRequirement) GetDomain() models.DomainFields {
 	fake.getDomainMutex.Lock()
 	fake.getDomainArgsForCall = append(fake.getDomainArgsForCall, struct{}{})
+	fake.recordInvocation("GetDomain", []interface{}{})
 	fake.getDomainMutex.Unlock()
 	if fake.GetDomainStub != nil {
 		return fake.GetDomainStub()
@@ -69,6 +73,28 @@ func (fake *FakeDomainRequirement) GetDomainReturns(result1 models.DomainFields)
 	fake.getDomainReturns = struct {
 		result1 models.DomainFields
 	}{result1}
+}
+
+func (fake *FakeDomainRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.getDomainMutex.RLock()
+	defer fake.getDomainMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeDomainRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.DomainRequirement = new(FakeDomainRequirement)

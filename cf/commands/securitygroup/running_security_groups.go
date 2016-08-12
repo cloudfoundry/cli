@@ -30,7 +30,7 @@ func (cmd *listRunningSecurityGroups) MetaData() commandregistry.CommandMetadata
 	}
 }
 
-func (cmd *listRunningSecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *listRunningSecurityGroups) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -42,7 +42,7 @@ func (cmd *listRunningSecurityGroups) Requirements(requirementsFactory requireme
 		usageReq,
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *listRunningSecurityGroups) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

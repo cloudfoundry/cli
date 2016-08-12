@@ -1,6 +1,8 @@
 package organization
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/quotas"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -33,9 +35,10 @@ func (cmd *SetQuota) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires ORG_NAME, QUOTA as arguments\n\n") + commandregistry.Commands.CommandUsage("set-quota"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -45,7 +48,7 @@ func (cmd *SetQuota) Requirements(requirementsFactory requirements.Factory, fc f
 		cmd.orgReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *SetQuota) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

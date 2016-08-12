@@ -72,7 +72,8 @@ var _ = Describe("PurgeServiceInstance", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(factory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(factory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"Incorrect Usage. Requires an argument"},
 					[]string{"NAME"},
@@ -87,14 +88,16 @@ var _ = Describe("PurgeServiceInstance", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewLoginRequirementCallCount()).To(Equal(1))
 
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("returns a MinAPIVersionRequirement", func() {
-				actualRequirements := cmd.Requirements(factory, flagContext)
+				actualRequirements, err := cmd.Requirements(factory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(factory.NewMinAPIVersionRequirementCallCount()).To(Equal(1))
 
 				expectedVersion, err := semver.Make("2.36.0")

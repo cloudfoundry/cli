@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/securitygroups"
 	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
@@ -37,15 +39,16 @@ func (cmd *unbindFromStagingGroup) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *unbindFromStagingGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *unbindFromStagingGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("unbind-staging-security-group"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
 	}
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *unbindFromStagingGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

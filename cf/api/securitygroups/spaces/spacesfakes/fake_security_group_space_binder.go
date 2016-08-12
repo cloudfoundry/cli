@@ -26,6 +26,8 @@ type FakeSecurityGroupSpaceBinder struct {
 	unbindSpaceReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSecurityGroupSpaceBinder) BindSpace(securityGroupGUID string, spaceGUID string) error {
@@ -34,6 +36,7 @@ func (fake *FakeSecurityGroupSpaceBinder) BindSpace(securityGroupGUID string, sp
 		securityGroupGUID string
 		spaceGUID         string
 	}{securityGroupGUID, spaceGUID})
+	fake.recordInvocation("BindSpace", []interface{}{securityGroupGUID, spaceGUID})
 	fake.bindSpaceMutex.Unlock()
 	if fake.BindSpaceStub != nil {
 		return fake.BindSpaceStub(securityGroupGUID, spaceGUID)
@@ -67,6 +70,7 @@ func (fake *FakeSecurityGroupSpaceBinder) UnbindSpace(securityGroupGUID string, 
 		securityGroupGUID string
 		spaceGUID         string
 	}{securityGroupGUID, spaceGUID})
+	fake.recordInvocation("UnbindSpace", []interface{}{securityGroupGUID, spaceGUID})
 	fake.unbindSpaceMutex.Unlock()
 	if fake.UnbindSpaceStub != nil {
 		return fake.UnbindSpaceStub(securityGroupGUID, spaceGUID)
@@ -92,6 +96,28 @@ func (fake *FakeSecurityGroupSpaceBinder) UnbindSpaceReturns(result1 error) {
 	fake.unbindSpaceReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeSecurityGroupSpaceBinder) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.bindSpaceMutex.RLock()
+	defer fake.bindSpaceMutex.RUnlock()
+	fake.unbindSpaceMutex.RLock()
+	defer fake.unbindSpaceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSecurityGroupSpaceBinder) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ spaces.SecurityGroupSpaceBinder = new(FakeSecurityGroupSpaceBinder)

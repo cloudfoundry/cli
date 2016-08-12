@@ -30,7 +30,7 @@ func (cmd *ListStacks) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -43,7 +43,7 @@ func (cmd *ListStacks) Requirements(requirementsFactory requirements.Factory, fc
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListStacks) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -73,6 +73,9 @@ func (cmd *ListStacks) Execute(c flags.FlagContext) error {
 		table.Add(stack.Name, stack.Description)
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

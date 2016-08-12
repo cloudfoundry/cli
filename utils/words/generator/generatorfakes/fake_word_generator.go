@@ -14,11 +14,14 @@ type FakeWordGenerator struct {
 	babbleReturns     struct {
 		result1 string
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeWordGenerator) Babble() string {
 	fake.babbleMutex.Lock()
 	fake.babbleArgsForCall = append(fake.babbleArgsForCall, struct{}{})
+	fake.recordInvocation("Babble", []interface{}{})
 	fake.babbleMutex.Unlock()
 	if fake.BabbleStub != nil {
 		return fake.BabbleStub()
@@ -38,6 +41,26 @@ func (fake *FakeWordGenerator) BabbleReturns(result1 string) {
 	fake.babbleReturns = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeWordGenerator) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.babbleMutex.RLock()
+	defer fake.babbleMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeWordGenerator) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ generator.WordGenerator = new(FakeWordGenerator)

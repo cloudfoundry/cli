@@ -1,6 +1,8 @@
 package servicekey
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -37,9 +39,10 @@ func (cmd *ServiceKeys) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ServiceKeys) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ServiceKeys) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("service-keys"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	loginRequirement := requirementsFactory.NewLoginRequirement()
@@ -48,7 +51,7 @@ func (cmd *ServiceKeys) Requirements(requirementsFactory requirements.Factory, f
 
 	reqs := []requirements.Requirement{loginRequirement, cmd.serviceInstanceRequirement, targetSpaceRequirement}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ServiceKeys) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -86,6 +89,9 @@ func (cmd *ServiceKeys) Execute(c flags.FlagContext) error {
 	}
 
 	cmd.ui.Say("")
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -1,6 +1,8 @@
 package space
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf"
 	"github.com/cloudfoundry/cli/cf/api"
 	"github.com/cloudfoundry/cli/cf/api/organizations"
@@ -46,9 +48,10 @@ func (cmd *CreateSpace) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 1 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires an argument\n\n") + commandregistry.Commands.CommandUsage("create-space"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 1)
 	}
 
 	reqs := []requirements.Requirement{
@@ -59,7 +62,7 @@ func (cmd *CreateSpace) Requirements(requirementsFactory requirements.Factory, f
 		reqs = append(reqs, requirementsFactory.NewTargetedOrgRequirement())
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *CreateSpace) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

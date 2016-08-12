@@ -37,7 +37,7 @@ func (c *V3Apps) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(c),
 		T("No argument required"),
 		func() bool {
@@ -51,7 +51,7 @@ func (c *V3Apps) Requirements(requirementsFactory requirements.Factory, fc flags
 		requirementsFactory.NewTargetedSpaceRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (c *V3Apps) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {
@@ -72,15 +72,15 @@ func (c *V3Apps) Execute(fc flags.FlagContext) error {
 	routes := make([][]models.V3Route, len(applications))
 
 	for i, app := range applications {
-		ps, err := c.repository.GetProcesses(app.Links.Processes.Href)
-		if err != nil {
-			return err
+		ps, apiErr := c.repository.GetProcesses(app.Links.Processes.Href)
+		if apiErr != nil {
+			return apiErr
 		}
 		processes[i] = ps
 
-		rs, err := c.repository.GetRoutes(app.Links.Routes.Href)
-		if err != nil {
-			return err
+		rs, apiErr := c.repository.GetRoutes(app.Links.Routes.Href)
+		if apiErr != nil {
+			return apiErr
 		}
 		routes[i] = rs
 	}
@@ -91,13 +91,16 @@ func (c *V3Apps) Execute(fc flags.FlagContext) error {
 		c.addRow(table, applications[i], processes[i], routes[i])
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 type table interface {
 	Add(row ...string)
-	Print()
+	Print() error
 }
 
 func (c *V3Apps) addRow(

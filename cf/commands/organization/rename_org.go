@@ -1,6 +1,8 @@
 package organization
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
@@ -31,9 +33,10 @@ func (cmd *RenameOrg) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires old org name, new org name as arguments\n\n") + commandregistry.Commands.CommandUsage("rename-org"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 2)
 	}
 
 	cmd.orgReq = requirementsFactory.NewOrganizationRequirement(fc.Args()[0])
@@ -43,7 +46,7 @@ func (cmd *RenameOrg) Requirements(requirementsFactory requirements.Factory, fc 
 		cmd.orgReq,
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *RenameOrg) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

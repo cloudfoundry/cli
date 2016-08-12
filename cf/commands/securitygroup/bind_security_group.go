@@ -1,6 +1,8 @@
 package securitygroup
 
 import (
+	"fmt"
+
 	"github.com/cloudfoundry/cli/cf/api/organizations"
 	"github.com/cloudfoundry/cli/cf/api/securitygroups"
 	sgbinder "github.com/cloudfoundry/cli/cf/api/securitygroups/spaces"
@@ -41,14 +43,15 @@ func (cmd *BindSecurityGroup) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *BindSecurityGroup) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	if len(fc.Args()) != 2 && len(fc.Args()) != 3 {
 		cmd.ui.Failed(T("Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n") + commandregistry.Commands.CommandUsage("bind-security-group"))
+		return nil, fmt.Errorf("Incorrect usage: %d arguments of %d required", len(fc.Args()), 3)
 	}
 
 	reqs := []requirements.Requirement{}
 	reqs = append(reqs, requirementsFactory.NewLoginRequirement())
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *BindSecurityGroup) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {

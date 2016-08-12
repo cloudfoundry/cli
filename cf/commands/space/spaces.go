@@ -38,7 +38,7 @@ func (cmd *ListSpaces) MetaData() commandregistry.CommandMetadata {
 
 }
 
-func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -52,7 +52,7 @@ func (cmd *ListSpaces) Requirements(requirementsFactory requirements.Factory, fc
 		requirementsFactory.NewTargetedOrgRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListSpaces) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -86,7 +86,10 @@ func (cmd *ListSpaces) Execute(c flags.FlagContext) error {
 
 		return true
 	})
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 
 	if err != nil {
 		return errors.New(T("Failed fetching spaces.\n{{.ErrorDescription}}",

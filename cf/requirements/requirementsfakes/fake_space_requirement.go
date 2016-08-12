@@ -26,11 +26,14 @@ type FakeSpaceRequirement struct {
 	getSpaceReturns     struct {
 		result1 models.Space
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeSpaceRequirement) Execute() error {
 	fake.executeMutex.Lock()
 	fake.executeArgsForCall = append(fake.executeArgsForCall, struct{}{})
+	fake.recordInvocation("Execute", []interface{}{})
 	fake.executeMutex.Unlock()
 	if fake.ExecuteStub != nil {
 		return fake.ExecuteStub()
@@ -57,6 +60,7 @@ func (fake *FakeSpaceRequirement) SetSpaceName(arg1 string) {
 	fake.setSpaceNameArgsForCall = append(fake.setSpaceNameArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	fake.recordInvocation("SetSpaceName", []interface{}{arg1})
 	fake.setSpaceNameMutex.Unlock()
 	if fake.SetSpaceNameStub != nil {
 		fake.SetSpaceNameStub(arg1)
@@ -78,6 +82,7 @@ func (fake *FakeSpaceRequirement) SetSpaceNameArgsForCall(i int) string {
 func (fake *FakeSpaceRequirement) GetSpace() models.Space {
 	fake.getSpaceMutex.Lock()
 	fake.getSpaceArgsForCall = append(fake.getSpaceArgsForCall, struct{}{})
+	fake.recordInvocation("GetSpace", []interface{}{})
 	fake.getSpaceMutex.Unlock()
 	if fake.GetSpaceStub != nil {
 		return fake.GetSpaceStub()
@@ -97,6 +102,30 @@ func (fake *FakeSpaceRequirement) GetSpaceReturns(result1 models.Space) {
 	fake.getSpaceReturns = struct {
 		result1 models.Space
 	}{result1}
+}
+
+func (fake *FakeSpaceRequirement) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.executeMutex.RLock()
+	defer fake.executeMutex.RUnlock()
+	fake.setSpaceNameMutex.RLock()
+	defer fake.setSpaceNameMutex.RUnlock()
+	fake.getSpaceMutex.RLock()
+	defer fake.getSpaceMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeSpaceRequirement) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ requirements.SpaceRequirement = new(FakeSpaceRequirement)

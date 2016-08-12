@@ -19,6 +19,8 @@ type FakeRepository struct {
 		result1 string
 		result2 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRepository) ListFiles(appGUID string, instance int, path string) (files string, apiErr error) {
@@ -28,6 +30,7 @@ func (fake *FakeRepository) ListFiles(appGUID string, instance int, path string)
 		instance int
 		path     string
 	}{appGUID, instance, path})
+	fake.recordInvocation("ListFiles", []interface{}{appGUID, instance, path})
 	fake.listFilesMutex.Unlock()
 	if fake.ListFilesStub != nil {
 		return fake.ListFilesStub(appGUID, instance, path)
@@ -54,6 +57,26 @@ func (fake *FakeRepository) ListFilesReturns(result1 string, result2 error) {
 		result1 string
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.listFilesMutex.RLock()
+	defer fake.listFilesMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ appfiles.Repository = new(FakeRepository)

@@ -291,7 +291,8 @@ var _ = Describe("create-quota command", func() {
 			})
 
 			It("fails with usage", func() {
-				Expect(func() { cmd.Requirements(requirementsFactory, flagContext) }).To(Panic())
+				_, err := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).To(HaveOccurred())
 				Expect(ui.Outputs()).To(ContainSubstrings(
 					[]string{"FAILED"},
 					[]string{"Incorrect Usage. Requires an argument"},
@@ -305,13 +306,15 @@ var _ = Describe("create-quota command", func() {
 			})
 
 			It("returns a LoginRequirement", func() {
-				actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+				actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(requirementsFactory.NewLoginRequirementCallCount()).To(Equal(1))
 				Expect(actualRequirements).To(ContainElement(loginRequirement))
 			})
 
 			It("does not return a MinAPIVersionRequirement", func() {
-				actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+				actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
+				Expect(err).NotTo(HaveOccurred())
 				Expect(requirementsFactory.NewMinAPIVersionRequirementCallCount()).To(Equal(0))
 				Expect(actualRequirements).NotTo(ContainElement(minAPIVersionRequirement))
 			})
@@ -323,7 +326,8 @@ var _ = Describe("create-quota command", func() {
 				})
 
 				It("returns a MinAPIVersionRequirement as the second requirement", func() {
-					actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+					actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 
 					expectedVersion, err := semver.Make("2.33.0")
 					Expect(err).NotTo(HaveOccurred())
@@ -343,7 +347,8 @@ var _ = Describe("create-quota command", func() {
 				})
 
 				It("returns a MinAPIVersionRequirement as the second requirement", func() {
-					actualRequirements := cmd.Requirements(requirementsFactory, flagContext)
+					actualRequirements, err := cmd.Requirements(requirementsFactory, flagContext)
+					Expect(err).NotTo(HaveOccurred())
 
 					expectedVersion, err := semver.Make("2.55.0")
 					Expect(err).NotTo(HaveOccurred())

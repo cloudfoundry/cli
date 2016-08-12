@@ -33,8 +33,8 @@ func (cmd FakeCommand1) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd FakeCommand1) Requirements(_ requirements.Factory, _ flags.FlagContext) []requirements.Requirement {
-	return []requirements.Requirement{}
+func (cmd FakeCommand1) Requirements(_ requirements.Factory, _ flags.FlagContext) ([]requirements.Requirement, error) {
+	return []requirements.Requirement{}, nil
 }
 
 func (cmd FakeCommand1) SetDependency(deps commandregistry.Dependency, _ bool) commandregistry.Command {

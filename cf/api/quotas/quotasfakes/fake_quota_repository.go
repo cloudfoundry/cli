@@ -58,11 +58,14 @@ type FakeQuotaRepository struct {
 	deleteReturns struct {
 		result1 error
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiErr error) {
 	fake.findAllMutex.Lock()
 	fake.findAllArgsForCall = append(fake.findAllArgsForCall, struct{}{})
+	fake.recordInvocation("FindAll", []interface{}{})
 	fake.findAllMutex.Unlock()
 	if fake.FindAllStub != nil {
 		return fake.FindAllStub()
@@ -90,6 +93,7 @@ func (fake *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFiel
 	fake.findByNameArgsForCall = append(fake.findByNameArgsForCall, struct {
 		name string
 	}{name})
+	fake.recordInvocation("FindByName", []interface{}{name})
 	fake.findByNameMutex.Unlock()
 	if fake.FindByNameStub != nil {
 		return fake.FindByNameStub(name)
@@ -124,6 +128,7 @@ func (fake *FakeQuotaRepository) AssignQuotaToOrg(orgGUID string, quotaGUID stri
 		orgGUID   string
 		quotaGUID string
 	}{orgGUID, quotaGUID})
+	fake.recordInvocation("AssignQuotaToOrg", []interface{}{orgGUID, quotaGUID})
 	fake.assignQuotaToOrgMutex.Unlock()
 	if fake.AssignQuotaToOrgStub != nil {
 		return fake.AssignQuotaToOrgStub(orgGUID, quotaGUID)
@@ -156,6 +161,7 @@ func (fake *FakeQuotaRepository) Create(quota models.QuotaFields) error {
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		quota models.QuotaFields
 	}{quota})
+	fake.recordInvocation("Create", []interface{}{quota})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
 		return fake.CreateStub(quota)
@@ -188,6 +194,7 @@ func (fake *FakeQuotaRepository) Update(quota models.QuotaFields) error {
 	fake.updateArgsForCall = append(fake.updateArgsForCall, struct {
 		quota models.QuotaFields
 	}{quota})
+	fake.recordInvocation("Update", []interface{}{quota})
 	fake.updateMutex.Unlock()
 	if fake.UpdateStub != nil {
 		return fake.UpdateStub(quota)
@@ -220,6 +227,7 @@ func (fake *FakeQuotaRepository) Delete(quotaGUID string) error {
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
 		quotaGUID string
 	}{quotaGUID})
+	fake.recordInvocation("Delete", []interface{}{quotaGUID})
 	fake.deleteMutex.Unlock()
 	if fake.DeleteStub != nil {
 		return fake.DeleteStub(quotaGUID)
@@ -245,6 +253,36 @@ func (fake *FakeQuotaRepository) DeleteReturns(result1 error) {
 	fake.deleteReturns = struct {
 		result1 error
 	}{result1}
+}
+
+func (fake *FakeQuotaRepository) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.findAllMutex.RLock()
+	defer fake.findAllMutex.RUnlock()
+	fake.findByNameMutex.RLock()
+	defer fake.findByNameMutex.RUnlock()
+	fake.assignQuotaToOrgMutex.RLock()
+	defer fake.assignQuotaToOrgMutex.RUnlock()
+	fake.createMutex.RLock()
+	defer fake.createMutex.RUnlock()
+	fake.updateMutex.RLock()
+	defer fake.updateMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeQuotaRepository) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ quotas.QuotaRepository = new(FakeQuotaRepository)

@@ -36,7 +36,7 @@ func (cmd *ListQuotas) MetaData() commandregistry.CommandMetadata {
 	}
 }
 
-func (cmd *ListQuotas) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) []requirements.Requirement {
+func (cmd *ListQuotas) Requirements(requirementsFactory requirements.Factory, fc flags.FlagContext) ([]requirements.Requirement, error) {
 	usageReq := requirements.NewUsageRequirement(commandregistry.CLICommandUsagePresenter(cmd),
 		T("No argument required"),
 		func() bool {
@@ -49,7 +49,7 @@ func (cmd *ListQuotas) Requirements(requirementsFactory requirements.Factory, fc
 		requirementsFactory.NewLoginRequirement(),
 	}
 
-	return reqs
+	return reqs, nil
 }
 
 func (cmd *ListQuotas) SetDependency(deps commandregistry.Dependency, pluginCall bool) commandregistry.Command {
@@ -121,6 +121,9 @@ func (cmd *ListQuotas) Execute(c flags.FlagContext) error {
 		)
 	}
 
-	table.Print()
+	err = table.Print()
+	if err != nil {
+		return err
+	}
 	return nil
 }

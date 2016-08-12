@@ -341,14 +341,6 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("failing", func() {
-		It("panics", func() {
-			_ = io_helpers.CaptureOutput(func() {
-				Expect(func() {
-					NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
-				}).To(Panic())
-			})
-		})
-
 		Context("when 'T' func is not initialized", func() {
 			var t go_i18n.TranslateFunc
 			BeforeEach(func() {
@@ -360,20 +352,10 @@ var _ = Describe("UI", func() {
 				i18n.T = t
 			})
 
-			It("panics if 'T' func is used to translate", func() {
-				_ = io_helpers.CaptureOutput(func() {
-					Expect(func() {
-						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger).Failed("uh oh")
-					}).To(Panic())
-				})
-			})
-
 			It("does not duplicate output if logger is set to stdout", func() {
 				output := io_helpers.CaptureOutput(func() {
 					logger := trace.NewWriterPrinter(os.Stdout, true)
-					Expect(func() {
-						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
-					}).To(Panic())
+					NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
 				})
 
 				Expect(output).To(HaveLen(3))
@@ -388,9 +370,7 @@ var _ = Describe("UI", func() {
 				output := io_helpers.CaptureOutput(
 					func() {
 						logger := trace.NewWriterPrinter(os.Stdout, true)
-						Expect(func() {
-							NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
-						}).To(Panic())
+						NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), logger).Failed("this should print only once")
 					})
 
 				Expect(output).To(HaveLen(3))
@@ -402,7 +382,6 @@ var _ = Describe("UI", func() {
 	})
 
 	Describe("NotifyUpdateIfNeeded", func() {
-
 		var (
 			output []string
 			config coreconfig.ReadWriter
