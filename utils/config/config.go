@@ -50,12 +50,28 @@ func LoadConfig() (*Config, error) {
 		HTTPSProxy:       os.Getenv("https_proxy"),
 	}
 
+	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
+	if _, err := os.Stat(pluginFilePath); os.IsNotExist(err) {
+		config.pluginConfig = PluginsConfig{}
+	} else {
+		file, err := ioutil.ReadFile(pluginFilePath)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(file, &config.pluginConfig)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &config, nil
 }
 
 type Config struct {
-	configFile CFConfig
-	env        EnvOverride
+	configFile   CFConfig
+	env          EnvOverride
+	pluginConfig PluginsConfig
 }
 
 type CFConfig struct {
@@ -121,6 +137,34 @@ type EnvOverride struct {
 	HTTPSProxy       string
 }
 
+type PluginsConfig struct {
+	Plugins map[string]PluginConfig `json:"Plugins"`
+}
+
+type PluginConfig struct {
+	Location string          `json:"Location"`
+	Version  PluginVersion   `json:"Version"`
+	Commands []PluginCommand `json:"Commands"`
+}
+
+type PluginVersion struct {
+	Major int `json:"Major"`
+	Minor int `json:"Minor"`
+	Build int `json:"Build"`
+}
+
+type PluginCommand struct {
+	Name         string             `json:"Name"`
+	Alias        string             `json:"Alias"`
+	HelpText     string             `json:"HelpText"`
+	UsageDetails PluginUsageDetails `json:"UsageDetails"`
+}
+
+type PluginUsageDetails struct {
+	Usage   string            `json:"Usage"`
+	Options map[string]string `json:"Options"`
+}
+
 type ColorSetting int
 
 const (
@@ -158,10 +202,14 @@ func (conf Config) Target() string {
 
 func (config Config) PluginHome() string {
 	if config.env.CFPluginHome != "" {
-		return config.env.CFPluginHome
+		return filepath.Join(config.env.CFPluginHome, ".cf", "plugins")
 	}
 
-	return filepath.Join(homeDirectory(), ".cf", "plugins") //TODO test this and find out default
+	return filepath.Join(homeDirectory(), ".cf", "plugins")
+}
+
+func (config Config) PluginConfig() map[string]PluginConfig {
+	return config.pluginConfig.Plugins
 }
 
 func (config Config) StagingTimeout() time.Duration {
