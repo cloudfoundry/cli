@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type RestartAppInstanceCommand struct {
 	usage        interface{}       `usage:"CF_NAME restart-app-instance APP_NAME INDEX"`
 }
 
-func (_ RestartAppInstanceCommand) Setup() error {
+func (_ RestartAppInstanceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type ServiceAccessCommand struct {
@@ -13,7 +14,7 @@ type ServiceAccessCommand struct {
 	usage        interface{} `usage:"CF_NAME service-access [-b BROKER] [-e SERVICE] [-o ORG]"`
 }
 
-func (_ ServiceAccessCommand) Setup() error {
+func (_ ServiceAccessCommand) Setup(config commands.Config) error {
 	return nil
 }
 

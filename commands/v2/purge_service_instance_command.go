@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type PurgeServiceInstanceCommand struct {
 	usage        interface{}           `usage:"CF_NAME purge-service-instance SERVICE_INSTANCE\n\nWARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys."`
 }
 
-func (_ PurgeServiceInstanceCommand) Setup() error {
+func (_ PurgeServiceInstanceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

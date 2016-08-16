@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type StackCommand struct {
 	usage        interface{}     `usage:"CF_NAME stack STACK_NAME"`
 }
 
-func (_ StackCommand) Setup() error {
+func (_ StackCommand) Setup(config commands.Config) error {
 	return nil
 }
 

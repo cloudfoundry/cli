@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteOrgCommand struct {
 	usage        interface{}        `usage:"CF_NAME delete-org ORG [-f]"`
 }
 
-func (_ DeleteOrgCommand) Setup() error {
+func (_ DeleteOrgCommand) Setup(config commands.Config) error {
 	return nil
 }
 

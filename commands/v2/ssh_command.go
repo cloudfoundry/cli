@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -20,7 +21,7 @@ type SSHCommand struct {
 	usage               interface{}   `usage:"CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]"`
 }
 
-func (_ SSHCommand) Setup() error {
+func (_ SSHCommand) Setup(config commands.Config) error {
 	return nil
 }
 

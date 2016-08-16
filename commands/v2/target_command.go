@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type TargetCommand struct {
@@ -12,7 +13,7 @@ type TargetCommand struct {
 	usage        interface{} `usage:"CF_NAME target [-o ORG] [-s SPACE]"`
 }
 
-func (_ TargetCommand) Setup() error {
+func (_ TargetCommand) Setup(config commands.Config) error {
 	return nil
 }
 

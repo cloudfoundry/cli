@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type PasswdCommand struct {
 	usage interface{} `usage:"CF_NAME passwd"`
 }
 
-func (_ PasswdCommand) Setup() error {
+func (_ PasswdCommand) Setup(config commands.Config) error {
 	return nil
 }
 

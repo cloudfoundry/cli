@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -16,7 +17,7 @@ type ScaleCommand struct {
 	usage        interface{}   `usage:"CF_NAME scale APP_NAME [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]"`
 }
 
-func (_ ScaleCommand) Setup() error {
+func (_ ScaleCommand) Setup(config commands.Config) error {
 	return nil
 }
 

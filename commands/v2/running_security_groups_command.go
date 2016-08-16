@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type RunningSecurityGroupsCommand struct {
 	usage interface{} `usage:"CF_NAME running-security-groups"`
 }
 
-func (_ RunningSecurityGroupsCommand) Setup() error {
+func (_ RunningSecurityGroupsCommand) Setup(config commands.Config) error {
 	return nil
 }
 

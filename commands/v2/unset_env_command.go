@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type UnsetEnvCommand struct {
 	usage interface{} `usage:"CF_NAME unset-env APP_NAME ENV_VAR_NAME"`
 }
 
-func (_ UnsetEnvCommand) Setup() error {
+func (_ UnsetEnvCommand) Setup(config commands.Config) error {
 	return nil
 }
 

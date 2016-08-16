@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type RenameSpaceCommand struct {
 	usage        interface{}           `usage:"CF_NAME rename-space SPACE NEW_SPACE"`
 }
 
-func (_ RenameSpaceCommand) Setup() error {
+func (_ RenameSpaceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteServiceAuthTokenCommand struct {
 	usage        interface{}                      `usage:"CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"`
 }
 
-func (_ DeleteServiceAuthTokenCommand) Setup() error {
+func (_ DeleteServiceAuthTokenCommand) Setup(config commands.Config) error {
 	return nil
 }
 

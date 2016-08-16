@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -14,7 +15,7 @@ type SpaceCommand struct {
 	usage              interface{} `usage:"CF_NAME space SPACE"`
 }
 
-func (_ SpaceCommand) Setup() error {
+func (_ SpaceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

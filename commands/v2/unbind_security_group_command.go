@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type UnbindSecurityGroupCommand struct {
 	usage        interface{}                 `usage:"CF_NAME unbind-security-group SECURITY_GROUP ORG SPACE\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
 }
 
-func (_ UnbindSecurityGroupCommand) Setup() error {
+func (_ UnbindSecurityGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 

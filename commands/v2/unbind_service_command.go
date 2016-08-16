@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type UnbindServiceCommand struct {
 	usage        interface{}           `usage:"CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"`
 }
 
-func (_ UnbindServiceCommand) Setup() error {
+func (_ UnbindServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

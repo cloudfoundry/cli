@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type AuthCommand struct {
 	usage        interface{}          `usage:"CF_NAME auth USERNAME PASSWORD\n\nWARNING:\n    Providing your password as a command line option is highly discouraged\n    Your password may be visible to others and may be recorded in your shell history\n\nExamples:\n    CF_NAME auth name@example.com \"my password\" (use quotes for passwords with a space)\n    CF_NAME auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)"`
 }
 
-func (_ AuthCommand) Setup() error {
+func (_ AuthCommand) Setup(config commands.Config) error {
 	return nil
 }
 

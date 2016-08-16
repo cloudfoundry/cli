@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type LogsCommand struct {
 	usage        interface{}   `usage:"CF_NAME logs APP_NAME"`
 }
 
-func (_ LogsCommand) Setup() error {
+func (_ LogsCommand) Setup(config commands.Config) error {
 	return nil
 }
 

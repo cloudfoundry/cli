@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -15,7 +16,7 @@ type UpdateServiceCommand struct {
 	usage            interface{}           `usage:"CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]\n\n    Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n    CF_NAME update-service -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n    Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n    The path to the parameters file can be an absolute or relative path to a file.\n    CF_NAME update-service -c PATH_TO_FILE\n\n    Example of valid JSON object:\n    {\n       \"cluster_nodes\": {\n          \"count\": 5,\n          \"memory_mb\": 1024\n       }\n    }\n\n    Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.\n\nEXAMPLES:\n    CF_NAME update-service mydb -p gold\n    CF_NAME update-service mydb -c '{\"ram_gb\":4}'\n    CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\n    CF_NAME update-service mydb -t \"list, of, tags\""`
 }
 
-func (_ UpdateServiceCommand) Setup() error {
+func (_ UpdateServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

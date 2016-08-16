@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type CreateOrgCommand struct {
 	usage        interface{}        `usage:"CF_NAME create-org ORG"`
 }
 
-func (_ CreateOrgCommand) Setup() error {
+func (_ CreateOrgCommand) Setup(config commands.Config) error {
 	return nil
 }
 

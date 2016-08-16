@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type AllowSpaceSSHCommand struct {
 	usage        interface{} `usage:"CF_NAME allow-space-ssh SPACE_NAME"`
 }
 
-func (_ AllowSpaceSSHCommand) Setup() error {
+func (_ AllowSpaceSSHCommand) Setup(config commands.Config) error {
 	return nil
 }
 

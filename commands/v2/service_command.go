@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type ServiceCommand struct {
 	usage        interface{}           `usage:"CF_NAME service SERVICE_INSTANCE"`
 }
 
-func (_ ServiceCommand) Setup() error {
+func (_ ServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

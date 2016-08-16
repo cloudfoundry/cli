@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteServiceKeyCommand struct {
 	usage        interface{}              `usage:"CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLES:\n    CF_NAME delete-service-key mydb mykey"`
 }
 
-func (_ DeleteServiceKeyCommand) Setup() error {
+func (_ DeleteServiceKeyCommand) Setup(config commands.Config) error {
 	return nil
 }
 

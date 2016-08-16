@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type CreateAppManifestCommand struct {
 	usage        interface{}   `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml ]"`
 }
 
-func (_ CreateAppManifestCommand) Setup() error {
+func (_ CreateAppManifestCommand) Setup(config commands.Config) error {
 	return nil
 }
 

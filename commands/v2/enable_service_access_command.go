@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -14,7 +15,7 @@ type EnableServiceAccessCommand struct {
 	usage        interface{}   `usage:"CF_NAME enable-service-access SERVICE [-p PLAN] [-o ORG]"`
 }
 
-func (_ EnableServiceAccessCommand) Setup() error {
+func (_ EnableServiceAccessCommand) Setup(config commands.Config) error {
 	return nil
 }
 

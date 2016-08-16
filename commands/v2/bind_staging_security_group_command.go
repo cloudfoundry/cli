@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type BindStagingSecurityGroupCommand struct {
 	usage        interface{}         `usage:"CF_NAME bind-staging-security-group SECURITY_GROUP"`
 }
 
-func (_ BindStagingSecurityGroupCommand) Setup() error {
+func (_ BindStagingSecurityGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 

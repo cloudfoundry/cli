@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -15,7 +16,7 @@ type UnbindRouteServiceCommand struct {
 	usage        interface{}            `usage:"CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]\n\nEXAMPLES:\n    CF_NAME unbind-route-service example.com myratelimiter --hostname myapp --path foo"`
 }
 
-func (_ UnbindRouteServiceCommand) Setup() error {
+func (_ UnbindRouteServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

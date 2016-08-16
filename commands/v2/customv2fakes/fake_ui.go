@@ -20,12 +20,6 @@ type FakeUI struct {
 
 	displayTextWithKeyTranslationsCallCount int
 
-	displayFlavorTextCallCount    int
-	displayFlavorTextDisplayCount int
-
-	displayFlavorTextWithKeyTranslationsCallCount    int
-	displayFlavorTextWithKeyTranslationsDisplayCount int
-
 	helpHeaderCallCount int
 }
 
@@ -65,56 +59,6 @@ func (ui FakeUI) DisplayTextWithKeyTranslationsCallCount() int {
 	return ui.displayTextWithKeyTranslationsCallCount
 }
 
-// DisplayFlavorText captures the input text in the Fake UI buffer so that this
-// can be asserted against in tests. If TTY is false, flavour text will not be
-// captured. If multiple maps are passed in, the merge will give precedence to
-// the latter maps.
-func (ui *FakeUI) DisplayFlavorText(template string, keys ...map[string]interface{}) {
-	ui.displayFlavorTextCallCount = ui.displayFlavorTextCallCount + 1
-
-	if ui.inTTY {
-		ui.displayFlavorTextDisplayCount = ui.displayFlavorTextDisplayCount + 1
-		ui.outputToSTDOUT(template, keys...)
-	}
-}
-
-// DisplayFlavorTextCallCount returns the number of times DisplayFlavorText was
-// called.
-func (ui FakeUI) DisplayFlavorTextCallCount() int {
-	return ui.displayFlavorTextCallCount
-}
-
-// DisplayFlavorTextDisplayCount returns the number of times DisplayFlavorText
-// was displayed on the screen.
-func (ui FakeUI) DisplayFlavorTextDisplayCount() int {
-	return ui.displayFlavorTextDisplayCount
-}
-
-// DisplayFlavorTextWithKeyTranslations captures the input text in the Fake UI
-// buffer so that this can be asserted against in tests. If TTY is false,
-// flavour text will not be captured. If multiple maps are passed in, the merge
-// will give precedence to the latter maps.
-func (ui *FakeUI) DisplayFlavorTextWithKeyTranslations(template string, _ []string, keys ...map[string]interface{}) {
-	ui.displayFlavorTextWithKeyTranslationsCallCount = ui.displayFlavorTextWithKeyTranslationsCallCount + 1
-
-	if ui.inTTY {
-		ui.displayFlavorTextWithKeyTranslationsDisplayCount = ui.displayFlavorTextWithKeyTranslationsDisplayCount + 1
-		ui.outputToSTDOUT(template, keys...)
-	}
-}
-
-// DisplayFlavorTextWithKeyTranslationsCallCount returns the number of times
-// DisplayFlavorTextWithKeyTranslations was called.
-func (ui FakeUI) DisplayFlavorTextWithKeyTranslationsCallCount() int {
-	return ui.displayFlavorTextWithKeyTranslationsCallCount
-}
-
-// DisplayFlavorTextWithKeyTranslationsDisplayCount returns the number of times
-// DisplayFlavorTextWithKeyTranslations was displayed on the screen.
-func (ui FakeUI) DisplayFlavorTextWithKeyTranslationsDisplayCount() int {
-	return ui.displayFlavorTextWithKeyTranslationsDisplayCount
-}
-
 // DisplayNewline adds a newline to the Out buffer.
 func (ui FakeUI) DisplayNewline() {
 	fmt.Fprintf(ui.Out, "\n")
@@ -148,6 +92,7 @@ func (ui FakeUI) mergeMap(maps []map[string]interface{}) map[string]interface{} 
 }
 
 func (ui FakeUI) outputToSTDOUT(formattedString string, keys ...map[string]interface{}) {
-	formattedTemplate := template.Must(template.New("Display Text").Parse(formattedString + "\n"))
+	formattedTemplate := template.Must(template.New("Display Text").Parse(formattedString))
 	formattedTemplate.Execute(ui.Out, ui.mergeMap(keys))
+	fmt.Fprintf(ui.Out, "\n")
 }

@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type QuotasCommand struct {
 	usage interface{} `usage:"CF_NAME quotas"`
 }
 
-func (_ QuotasCommand) Setup() error {
+func (_ QuotasCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -14,7 +15,7 @@ type InstallPluginCommand struct {
 	usage                interface{}             `usage:"CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n    Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n    CF_NAME install-plugin ~/Downloads/plugin-foobar\n    CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n    CF_NAME install-plugin -r My-Repo plugin-echo"`
 }
 
-func (_ InstallPluginCommand) Setup() error {
+func (_ InstallPluginCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type CreateSharedDomainCommand struct {
 	usage        interface{}  `usage:"CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]"`
 }
 
-func (_ CreateSharedDomainCommand) Setup() error {
+func (_ CreateSharedDomainCommand) Setup(config commands.Config) error {
 	return nil
 }
 

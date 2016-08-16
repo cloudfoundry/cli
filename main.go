@@ -8,6 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/v2"
+	"code.cloudfoundry.org/cli/utils/config"
 	"code.cloudfoundry.org/cli/utils/panichandler"
 	"github.com/jessevdk/go-flags"
 )
@@ -68,8 +69,10 @@ func parse(args []string) {
 }
 
 func myCommandHandler(cmd flags.Commander, args []string) error {
+	config, _ := config.LoadConfig()
+	//defer write config
 	if extendedCmd, ok := cmd.(commands.ExtendedCommander); ok {
-		err := extendedCmd.Setup()
+		err := extendedCmd.Setup(config)
 		if err != nil {
 			return err
 		}

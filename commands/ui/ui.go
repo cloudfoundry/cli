@@ -7,20 +7,41 @@ import (
 	"io"
 	"os"
 	"text/template"
+
+	"github.com/fatih/color"
+
+	"code.cloudfoundry.org/cli/utils/config"
 )
+
+const (
+	red            color.Attribute = color.FgRed
+	green                          = color.FgGreen
+	yellow                         = color.FgYellow
+	magenta                        = color.FgMagenta
+	cyan                           = color.FgCyan
+	grey                           = color.FgWhite
+	defaultFgColor                 = 38
+)
+
+//go:generate counterfeiter . Config
+
+type Config interface {
+	ColorEnabled() config.ColorSetting
+}
 
 // UI is interface to interact with the user
 type UI struct {
 	// Out is the output buffer.
 	Out io.WriteCloser
+
+	colorEnabled config.ColorSetting
 }
 
 // NewUI will return a UI object where Out is set to STDOUT
-func NewUI() UI {
-	InitColorSupport()
-
+func NewUI(c Config) UI {
 	return UI{
-		Out: os.Stdout,
+		Out:          os.Stdout,
+		colorEnabled: c.ColorEnabled(),
 	}
 }
 
@@ -28,8 +49,9 @@ func NewUI() UI {
 // outputs it to the UI.Out file. The maps are merged in a way that the last
 // one takes precidence over the first.
 func (ui UI) DisplayText(formattedString string, keys ...map[string]interface{}) {
-	formattedTemplate := template.Must(template.New("Display Text").Parse(formattedString + "\n"))
+	formattedTemplate := template.Must(template.New("Display Text").Parse(formattedString))
 	formattedTemplate.Execute(ui.Out, ui.mergeMap(keys))
+	ui.DisplayNewline()
 }
 
 // DisplayTextWithKeyTranslations captures the input text in the Fake UI buffer
@@ -45,9 +67,9 @@ func (ui UI) DisplayNewline() {
 	fmt.Fprintf(ui.Out, "\n")
 }
 
-// DisplayHelpHeader outputs a help header
+// DisplayHelpHeader outputs a bolded help header
 func (ui UI) DisplayHelpHeader(text string) {
-	ui.DisplayText(colorize(text, defaultFgColor, true))
+	ui.DisplayText(ui.colorize(text, defaultFgColor, true))
 }
 
 func (ui UI) mergeMap(maps []map[string]interface{}) map[string]interface{} {
@@ -64,4 +86,20 @@ func (ui UI) mergeMap(maps []map[string]interface{}) map[string]interface{} {
 	}
 
 	return main
+}
+
+func (ui UI) colorize(message string, textColor color.Attribute, bold bool) string {
+	colorPrinter := color.New(textColor)
+	switch ui.colorEnabled {
+	case config.ColorEnabled:
+		colorPrinter.EnableColor()
+	case config.ColorDisbled:
+		colorPrinter.DisableColor()
+	}
+
+	if bold {
+		colorPrinter = colorPrinter.Add(color.Bold)
+	}
+	f := colorPrinter.SprintFunc()
+	return f(message)
 }

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -16,7 +17,7 @@ type CreateRouteCommand struct {
 	usage        interface{}       `usage:"Create an HTTP route:\n      CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n    Create a TCP route:\n      CF_NAME create-route SPACE DOMAIN (--port PORT | --random-port)\n\nEXAMPLES:\n   CF_NAME create-route my-space example.com                             # example.com\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\n   CF_NAME create-route my-space example.com --port 50000                # example.com:50000"`
 }
 
-func (_ CreateRouteCommand) Setup() error {
+func (_ CreateRouteCommand) Setup(config commands.Config) error {
 	return nil
 }
 

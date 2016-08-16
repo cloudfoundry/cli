@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteSharedDomainCommand struct {
 	usage        interface{}  `usage:"CF_NAME delete-shared-domain DOMAIN [-f]"`
 }
 
-func (_ DeleteSharedDomainCommand) Setup() error {
+func (_ DeleteSharedDomainCommand) Setup(config commands.Config) error {
 	return nil
 }
 

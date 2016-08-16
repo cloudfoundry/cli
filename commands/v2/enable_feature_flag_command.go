@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type EnableFeatureFlagCommand struct {
 	usage        interface{}   `usage:"CF_NAME enable-feature-flag FEATURE_NAME"`
 }
 
-func (_ EnableFeatureFlagCommand) Setup() error {
+func (_ EnableFeatureFlagCommand) Setup(config commands.Config) error {
 	return nil
 }
 

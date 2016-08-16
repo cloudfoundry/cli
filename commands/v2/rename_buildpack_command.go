@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type RenameBuildpackCommand struct {
 	usage        interface{}               `usage:"CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"`
 }
 
-func (_ RenameBuildpackCommand) Setup() error {
+func (_ RenameBuildpackCommand) Setup(config commands.Config) error {
 	return nil
 }
 

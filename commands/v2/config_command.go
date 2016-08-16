@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type ConfigCommand struct {
@@ -14,7 +15,7 @@ type ConfigCommand struct {
 	usage        interface{} `usage:"CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"`
 }
 
-func (_ ConfigCommand) Setup() error {
+func (_ ConfigCommand) Setup(config commands.Config) error {
 	return nil
 }
 

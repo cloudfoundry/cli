@@ -6,6 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 	"code.cloudfoundry.org/cli/commands/ui"
 )
@@ -115,8 +116,8 @@ type HelpCommand struct {
 	usage        interface{}       `usage:"CF_NAME help [COMMAND]"`
 }
 
-func (cmd *HelpCommand) Setup() error {
-	cmd.UI = ui.NewUI()
+func (cmd *HelpCommand) Setup(config commands.Config) error {
+	cmd.UI = ui.NewUI(config)
 	cmd.Actor = v2actions.NewActor()
 	return nil
 }

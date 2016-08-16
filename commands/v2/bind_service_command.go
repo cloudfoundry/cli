@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type BindServiceCommand struct {
 	usage            interface{}           `usage:"CF_NAME bind-service APP_NAME SERVICE_INSTANCE [-c PARAMETERS_AS_JSON]\n\n    Optionally provide service-specific configuration parameters in a valid JSON object in-line:\n\n    CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n    Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \n    The path to the parameters file can be an absolute or relative path to a file.\n    CF_NAME bind-service APP_NAME SERVICE_INSTANCE -c PATH_TO_FILE\n\n    Example of valid JSON object:\n    {\n       \"permissions\": \"read-only\"\n    }\n\nEXAMPLES:\n    Linux/Mac:\n       CF_NAME bind-service myapp mydb -c '{\"permissions\":\"read-only\"}'\n\n    Windows Command Line:\n       CF_NAME bind-service myapp mydb -c \"{\\\"permissions\\\":\\\"read-only\\\"}\"\n\n    Windows PowerShell:\n       CF_NAME bind-service myapp mydb -c '{\\\"permissions\\\":\\\"read-only\\\"}'\n\n    CF_NAME bind-service myapp mydb -c ~/workspace/tmp/instance_config.json"`
 }
 
-func (_ BindServiceCommand) Setup() error {
+func (_ BindServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

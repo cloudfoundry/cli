@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type SpacesCommand struct {
 	usage interface{} `usage:"CF_NAME spaces"`
 }
 
-func (_ SpacesCommand) Setup() error {
+func (_ SpacesCommand) Setup(config commands.Config) error {
 	return nil
 }
 
