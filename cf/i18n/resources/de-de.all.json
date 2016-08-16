@@ -3564,6 +3564,10 @@
     "translation": "Umbenennen von Bereich {{.OldSpaceName}} in {{.NewSpaceName}} in Organisation {{.OrgName}} als {{.CurrentUser}}..."
   },
   {
+    "id": "Replace the specified rune (in hex) with a newline",
+    "translation": ""
+  },
+  {
     "id": "Repo Name",
     "translation": "Repositoryname"
   },

@@ -3564,6 +3564,10 @@
     "translation": "Renaming space {{.OldSpaceName}} to {{.NewSpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Replace the specified rune (in hex) with a newline",
+    "translation": "Replace the specified rune (in hex) with a newline"
+  },
+  {
     "id": "Repo Name",
     "translation": "Repo Name"
   },

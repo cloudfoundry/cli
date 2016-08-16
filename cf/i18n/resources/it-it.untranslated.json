@@ -60,6 +60,10 @@
     "translation": "Port not allowed in HTTP route {{.RouteName}}"
   },
   {
+    "id": "Replace the specified rune (in hex) with a newline",
+    "translation": "Replace the specified rune (in hex) with a newline"
+  },
+  {
     "id": "The route {{.RouteName}} did not match any existing domains.",
     "translation": "The route {{.RouteName}} did not match any existing domains."
   },

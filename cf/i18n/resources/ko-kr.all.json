@@ -3564,6 +3564,10 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직에서 {{.OldSpaceName}} 영역의 이름을 {{.NewSpaceName}}(으)로 바꾸는 중..."
   },
   {
+    "id": "Replace the specified rune (in hex) with a newline",
+    "translation": ""
+  },
+  {
     "id": "Repo Name",
     "translation": "저장소 이름"
   },

@@ -2,6 +2,8 @@ package application
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
@@ -28,7 +30,14 @@ func init() {
 
 func (cmd *Logs) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
-	fs["recent"] = &flags.BoolFlag{Name: "recent", Usage: T("Dump recent logs instead of tailing")}
+	fs["recent"] = &flags.BoolFlag{
+		Name:  "recent",
+		Usage: T("Dump recent logs instead of tailing"),
+	}
+	fs["newline"] = &flags.StringFlag{
+		Name:  "newline",
+		Usage: T("Replace the specified rune (in hex) with a newline"),
+	}
 
 	return commandregistry.CommandMetadata{
 		Name:        "logs",
@@ -67,25 +76,31 @@ func (cmd *Logs) SetDependency(deps commandregistry.Dependency, pluginCall bool)
 func (cmd *Logs) Execute(c flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
-	var err error
+	r := rune(-1)
+
+	sr := c.String("newline")
+	if sr != "" {
+		cp, err := strconv.ParseInt(sr, 16, 32)
+		if err != nil {
+			return err
+		}
+		r = rune(cp)
+	}
+
 	if c.Bool("recent") {
-		err = cmd.recentLogsFor(app)
-	} else {
-		err = cmd.tailLogsFor(app)
+		return cmd.recentLogsFor(app, r)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return cmd.tailLogsFor(app, r)
 }
 
-func (cmd *Logs) recentLogsFor(app models.Application) error {
+func (cmd *Logs) recentLogsFor(app models.Application, newline rune) error {
 	cmd.ui.Say(T("Connected, dumping recent logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
 		map[string]interface{}{
 			"AppName":   terminal.EntityNameColor(app.Name),
 			"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-			"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+			"Username":  terminal.EntityNameColor(cmd.config.Username()),
+		}))
 
 	messages, err := cmd.logsRepo.RecentLogsFor(app.GUID)
 	if err != nil {
@@ -93,19 +108,20 @@ func (cmd *Logs) recentLogsFor(app models.Application) error {
 	}
 
 	for _, msg := range messages {
-		cmd.ui.Say("%s", msg.ToLog(time.Local))
+		cmd.ui.Say("%s", newlineReplacement(newline, msg.ToLog(time.Local)))
 	}
 	return nil
 }
 
-func (cmd *Logs) tailLogsFor(app models.Application) error {
+func (cmd *Logs) tailLogsFor(app models.Application, newline rune) error {
 	onConnect := func() {
 		cmd.ui.Say(T("Connected, tailing logs for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...\n",
 			map[string]interface{}{
 				"AppName":   terminal.EntityNameColor(app.Name),
 				"OrgName":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 				"SpaceName": terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-				"Username":  terminal.EntityNameColor(cmd.config.Username())}))
+				"Username":  terminal.EntityNameColor(cmd.config.Username()),
+			}))
 	}
 
 	c := make(chan logs.Loggable)
@@ -119,7 +135,7 @@ func (cmd *Logs) tailLogsFor(app models.Application) error {
 			if !ok {
 				return nil
 			}
-			cmd.ui.Say("%s", msg.ToLog(time.Local))
+			cmd.ui.Say("%s", newlineReplacement(newline, msg.ToLog(time.Local)))
 		case err := <-e:
 			return cmd.handleError(err)
 		}
@@ -135,4 +151,13 @@ func (cmd *Logs) handleError(err error) error {
 		return err
 	}
 	return nil
+}
+
+func newlineReplacement(newline rune, msg string) string {
+	return strings.Map(func(r rune) rune {
+		if r == newline {
+			return '\n'
+		}
+		return r
+	}, msg)
 }

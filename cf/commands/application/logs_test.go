@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	"strings"
 	"time"
 
 	"github.com/cloudfoundry/cli/cf/api/logs"
@@ -19,6 +20,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -27,27 +29,30 @@ var _ = Describe("logs command", func() {
 		ui                  *testterm.FakeUI
 		logsRepo            *logsfakes.FakeRepository
 		requirementsFactory *requirementsfakes.FakeFactory
-		configRepo          coreconfig.Repository
-		deps                commandregistry.Dependency
+
+		configRepo coreconfig.Repository
+		deps       commandregistry.Dependency
 	)
 
 	updateCommandDependency := func(pluginCall bool) {
 		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetLogsRepository(logsRepo)
 		deps.Config = configRepo
-		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("logs").SetDependency(deps, pluginCall))
+		commandregistry.Commands.SetCommand(
+			commandregistry.Commands.FindCommand("logs").SetDependency(deps, pluginCall),
+		)
 	}
-
-	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
-		configRepo = testconfig.NewRepositoryWithDefaults()
-		logsRepo = new(logsfakes.FakeRepository)
-		requirementsFactory = new(requirementsfakes.FakeFactory)
-	})
 
 	runCommand := func(args ...string) bool {
 		return testcmd.RunCLICommand("logs", args, requirementsFactory, updateCommandDependency, false, ui)
 	}
+
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		logsRepo = &logsfakes.FakeRepository{}
+		requirementsFactory = &requirementsfakes.FakeFactory{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+	})
 
 	Describe("requirements", func() {
 		It("fails with usage when called without one argument", func() {
@@ -67,7 +72,9 @@ var _ = Describe("logs command", func() {
 
 		It("fails if a space is not targeted", func() {
 			requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
-			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{Message: "not targeting space"})
+			requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Failing{
+				Message: "not targeting space",
+			})
 			Expect(runCommand("--recent", "my-app")).To(BeFalse())
 		})
 
@@ -75,7 +82,9 @@ var _ = Describe("logs command", func() {
 
 	Context("when logged in", func() {
 		var (
-			app models.Application
+			app        models.Application
+			recentLogs []logs.Loggable
+			appLogs    []logs.Loggable
 		)
 
 		BeforeEach(func() {
@@ -86,20 +95,20 @@ var _ = Describe("logs command", func() {
 			app.Name = "my-app"
 			app.GUID = "my-app-guid"
 
-			currentTime := time.Now()
-			recentLogs := []logs.Loggable{
-				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
-				testlogs.NewLogMessage("Log Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, currentTime),
+			recentLogs = []logs.Loggable{
+				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+				testlogs.NewLogMessage("Log Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 			}
-
-			appLogs := []logs.Loggable{
+			appLogs = []logs.Loggable{
 				testlogs.NewLogMessage("Log Line 1", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
 			}
 
 			applicationReq := new(requirementsfakes.FakeApplicationRequirement)
 			applicationReq.GetApplicationReturns(app)
 			requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+		})
 
+		JustBeforeEach(func() {
 			logsRepo.RecentLogsForReturns(recentLogs, nil)
 			logsRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
 				onConnect()
@@ -124,11 +133,53 @@ var _ = Describe("logs command", func() {
 			))
 		})
 
+		Context("with unicode runes present", func() {
+			BeforeEach(func() {
+				recentLogs = []logs.Loggable{
+					testlogs.NewLogMessage("Unicode Line \u2713\u2028\u0000Log Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+				}
+				appLogs = []logs.Loggable{
+					testlogs.NewLogMessage("Unicode Line \u2713\u2028\u0000LLog Line 2", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
+				}
+			})
+
+			It("replaces rune provided by --newline with \\n when the --recent flag is provided", func() {
+				runCommand("--newline", "2028", "--recent", "my-app")
+
+				Expect(strings.Join(ui.Outputs(), "\n")).To(ContainSubstring(
+					"Unicode Line \u2713\n\u0000",
+				))
+			})
+
+			It("replaces rune provided by --newline with \\n when the --recent flag is not provided", func() {
+				runCommand("--newline", "2713", "my-app")
+
+				Expect(strings.Join(ui.Outputs(), "\n")).To(ContainSubstring(
+					"Unicode Line \n\u2028\u0000",
+				))
+			})
+
+			It("doesn't replace null when the flag isn't specified", func() {
+				runCommand("--recent", "my-app")
+
+				Expect(strings.Join(ui.Outputs(), "\n")).To(ContainSubstring(
+					"Unicode Line \u2713\u2028\u0000",
+				))
+			})
+
+			DescribeTable("handles parse errors", func(newline string) {
+				Expect(runCommand("--newline", newline, "--recent", "my-app")).To(BeFalse())
+			},
+				Entry("hex prefix", "0x2028"),
+				Entry("non-numeric", "LINE SEPARATOR"),
+			)
+		})
+
 		Context("when the log messages contain format string identifiers", func() {
 			BeforeEach(func() {
-				logsRepo.RecentLogsForReturns([]logs.Loggable{
+				recentLogs = []logs.Loggable{
 					testlogs.NewLogMessage("hello%2Bworld%v", app.GUID, "DEA", "1", logmessage.LogMessage_ERR, time.Now()),
-				}, nil)
+				}
 			})
 
 			It("does not treat them as format strings", func() {
