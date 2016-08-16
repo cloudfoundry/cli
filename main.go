@@ -43,7 +43,11 @@ func parse(args []string) {
 				case 0:
 					parse([]string{"help"})
 				case 1:
-					parse([]string{"help", extraArgs[0]})
+					if extraArgs[0] == "-v" || extraArgs[0] == "--version" {
+						parse([]string{"version"})
+					} else {
+						parse([]string{"help", extraArgs[0]})
+					}
 				default:
 					parse(extraArgs[1:])
 				}
