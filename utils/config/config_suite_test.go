@@ -22,3 +22,10 @@ func setConfig(homeDir string, rawConfig string) {
 	err = ioutil.WriteFile(filepath.Join(homeDir, ".cf", "config.json"), []byte(rawConfig), 0644)
 	Expect(err).ToNot(HaveOccurred())
 }
+
+func setPluginConfig(pluginDir string, rawConfig string) {
+	err := os.MkdirAll(filepath.Join(pluginDir), 0777)
+	Expect(err).ToNot(HaveOccurred())
+	err = ioutil.WriteFile(filepath.Join(pluginDir, "config.json"), []byte(rawConfig), 0644)
+	Expect(err).ToNot(HaveOccurred())
+}

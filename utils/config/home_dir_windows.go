@@ -9,7 +9,7 @@ import (
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
-func homeDirectory() {
+func homeDirectory() string {
 	var homeDir string
 	switch {
 	case os.Getenv("CF_HOME") != "":
