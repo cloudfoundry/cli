@@ -20,6 +20,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "code.cloudfoundry.org/gofileutils/fileutils",
+			"repository": "https://github.com/cloudfoundry/gofileutils",
+			"vcs": "git",
+			"revision": "68670d8076e64cabf01bd23efde055acc36a33c1",
+			"branch": "master",
+			"path": "/fileutils",
+			"notests": true
+		},
+		{
 			"importpath": "code.cloudfoundry.org/lager",
 			"repository": "https://github.com/cloudfoundry/lager",
 			"vcs": "git",
@@ -92,15 +101,6 @@
 			"revision": "aea9dd6bb3a3b4a7c0d439b17b74ab795ff2946e",
 			"branch": "master",
 			"path": "/v3/routing",
-			"notests": true
-		},
-		{
-			"importpath": "github.com/cloudfoundry/gofileutils/fileutils",
-			"repository": "https://github.com/cloudfoundry/gofileutils",
-			"vcs": "git",
-			"revision": "94cb17960d629e2ca9a67d381228ec499966a69b",
-			"branch": "master",
-			"path": "/fileutils",
 			"notests": true
 		},
 		{

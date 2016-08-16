@@ -6,7 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 func NewLogger(writer io.Writer, verbose bool, cfTrace, configTrace string) Printer {

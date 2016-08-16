@@ -14,7 +14,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/net"
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 const (

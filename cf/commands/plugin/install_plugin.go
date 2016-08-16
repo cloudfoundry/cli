@@ -20,7 +20,7 @@ import (
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/utils"
 	"code.cloudfoundry.org/cli/utils/downloader"
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	pluginRPCService "code.cloudfoundry.org/cli/plugin/rpc"
 )
