@@ -123,6 +123,7 @@ var _ = Describe("main", func() {
 		})
 
 		It("enables verbose output when -v is provided after a command", func() {
+			Skip("Remove after #128185123")
 			output := Cf("curl", "/v2/info", "-v")
 			Consistently(output.Out.Contents).ShouldNot(ContainSubstring("Invalid flag: -v"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("GET /v2/info HTTP/1.1"))
