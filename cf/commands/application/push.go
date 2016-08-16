@@ -219,7 +219,7 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			return errors.New(T("Error: No name found for app"))
 		}
 
-		err := cmd.fetchStackGUID(&appParams)
+		err = cmd.fetchStackGUID(&appParams)
 		if err != nil {
 			return err
 		}
@@ -229,8 +229,8 @@ func (cmd *Push) Execute(c flags.FlagContext) error {
 			appParams.Diego = &diego
 		}
 
-		var app models.Application
-		existingApp, err := cmd.appRepo.Read(*appParams.Name)
+		var app, existingApp models.Application
+		existingApp, err = cmd.appRepo.Read(*appParams.Name)
 		switch err.(type) {
 		case nil:
 			cmd.ui.Say(T("Updating app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",

@@ -27,7 +27,8 @@ func RunCLICommand(cmdName string, args []string, requirementsFactory requiremen
 		os.Exit(1)
 	}
 
-	requirements, err := cmd.Requirements(requirementsFactory, context)
+	var requirements []requirements.Requirement
+	requirements, err = cmd.Requirements(requirementsFactory, context)
 	if err != nil {
 		return false
 	}
