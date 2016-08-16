@@ -152,7 +152,7 @@ func (cmd *Start) ApplicationStart(app models.Application, orgName, spaceName st
 				"SpaceName":   terminal.EntityNameColor(spaceName),
 				"CurrentUser": terminal.EntityNameColor(cmd.config.Username())}))
 
-		state := "STARTED"
+		state := "started"
 		return cmd.appRepo.Update(app.GUID, models.AppParams{State: &state})
 	})
 }
@@ -190,12 +190,17 @@ func (cmd *Start) WatchStaging(app models.Application, orgName, spaceName string
 		return models.Application{}, fmt.Errorf("%s failed to stage within %f minutes", app.Name, cmd.StagingTimeout.Minutes())
 	}
 
-	err = cmd.waitForOneRunningInstance(updatedApp)
-	if err != nil {
-		return models.Application{}, err
+	if app.InstanceCount > 0 {
+		err = cmd.waitForOneRunningInstance(updatedApp)
+		if err != nil {
+			return models.Application{}, err
+		}
+		cmd.ui.Say(terminal.HeaderColor(T("\nApp started\n")))
+		cmd.ui.Say("")
+	} else {
+		cmd.ui.Say(terminal.HeaderColor(T("\nApp state changed to started, but note that it has 0 instances.\n")))
+		cmd.ui.Say("")
 	}
-	cmd.ui.Say(terminal.HeaderColor(T("\nApp started\n")))
-	cmd.ui.Say("")
 	cmd.ui.Ok()
 
 	//detectedstartcommand on first push is not present until starting completes

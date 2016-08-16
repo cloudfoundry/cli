@@ -20,6 +20,10 @@
     "translation": "\n앱 시작됨\n"
   },
   {
+    "id": "\nApp state changed to started, but note that it has 0 instances.\n",
+    "translation": ""
+  },
+  {
     "id": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
     "translation": "\n`{{.Command}}` 명령을 사용하여 {{.AppName}} 앱이 시작되었습니다.\n"
   },

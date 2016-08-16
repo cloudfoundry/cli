@@ -360,6 +360,43 @@ var _ = Describe("start command", func() {
 			Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
 		})
 
+		Context("when app instance count is zero", func() {
+			var zeroInstanceApp models.Application
+			BeforeEach(func() {
+				zeroInstanceApp = models.Application{
+					ApplicationFields: models.ApplicationFields{
+						Name:          "my-app",
+						GUID:          "my-app-guid",
+						InstanceCount: 0,
+						PackageState:  "STAGED",
+					},
+				}
+				defaultInstanceResponses = [][]models.AppInstanceFields{{}}
+			})
+
+			It("exit without polling for the app, and warns the user", func() {
+				ui, _, _ := startAppWithInstancesAndErrors(zeroInstanceApp, requirementsFactory)
+
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"my-app", "my-org", "my-space", "my-user"},
+					[]string{"OK"},
+					[]string{"App state changed to started, but note that it has 0 instances."},
+				))
+
+				Expect(appRepo.UpdateCallCount()).To(Equal(1))
+				appGuid, appParams := appRepo.UpdateArgsForCall(0)
+				Expect(appGuid).To(Equal(zeroInstanceApp.GUID))
+				startedState := "started"
+				Expect(appParams).To(Equal(models.AppParams{State: &startedState}))
+
+				zeroInstanceApp.State = startedState
+				ui, _, _ = startAppWithInstancesAndErrors(zeroInstanceApp, requirementsFactory)
+				Expect(ui.Outputs()).To(ContainSubstrings(
+					[]string{"App my-app is already started"},
+				))
+				Expect(appRepo.UpdateCallCount()).To(Equal(1))
+			})
+		})
 		It("displays the command start command instead of the detected start command when set", func() {
 			defaultAppForStart.Command = "command start command"
 			defaultAppForStart.DetectedStartCommand = "detected start command"
