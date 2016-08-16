@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SharePrivateDomainCommand struct {
 	usage        interface{}     `usage:"CF_NAME share-private-domain ORG DOMAIN"`
 }
 
-func (_ SharePrivateDomainCommand) Setup() error {
+func (_ SharePrivateDomainCommand) Setup(config commands.Config) error {
 	return nil
 }
 

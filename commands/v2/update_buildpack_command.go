@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -18,7 +19,7 @@ type UpdateBuildpackCommand struct {
 	usage        interface{}             `usage:"CF_NAME update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable] [--lock|--unlock]\n\nTIP:\n    Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
 }
 
-func (_ UpdateBuildpackCommand) Setup() error {
+func (_ UpdateBuildpackCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SetEnvCommand struct {
 	usage        interface{}              `usage:"CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`
 }
 
-func (_ SetEnvCommand) Setup() error {
+func (_ SetEnvCommand) Setup(config commands.Config) error {
 	return nil
 }
 

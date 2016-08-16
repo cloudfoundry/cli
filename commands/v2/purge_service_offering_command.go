@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -14,7 +15,7 @@ type PurgeServiceOfferingCommand struct {
 	usage        interface{}   `usage:"CF_NAME purge-service-offering SERVICE [-p PROVIDER]\n\nWARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup."`
 }
 
-func (_ PurgeServiceOfferingCommand) Setup() error {
+func (_ PurgeServiceOfferingCommand) Setup(config commands.Config) error {
 	return nil
 }
 

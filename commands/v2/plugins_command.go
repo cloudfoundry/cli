@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type PluginsCommand struct {
@@ -11,7 +12,7 @@ type PluginsCommand struct {
 	usage    interface{} `usage:"CF_NAME plugins"`
 }
 
-func (_ PluginsCommand) Setup() error {
+func (_ PluginsCommand) Setup(config commands.Config) error {
 	return nil
 }
 

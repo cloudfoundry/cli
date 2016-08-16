@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type StacksCommand struct {
 	usage interface{} `usage:"CF_NAME stacks"`
 }
 
-func (_ StacksCommand) Setup() error {
+func (_ StacksCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -15,7 +16,7 @@ type UpdateUserProvidedServiceCommand struct {
 	usage           interface{}           `usage:"CF_NAME update-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n    Pass comma separated credential parameter names to enable interactive mode:\n    CF_NAME update-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n    Pass credential parameters as JSON to create a service non-interactively:\n    CF_NAME update-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n    Specify a path to a file containing JSON:\n    CF_NAME update-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\n\nEXAMPLES:\n    CF_NAME update-user-provided-service my-db-mine -p '{\"username\":\"admin\", \"password\":\"pa55woRD\"}'\n    CF_NAME update-user-provided-service my-db-mine -p /path/to/credentials.json\n    CF_NAME update-user-provided-service my-drain-service -l syslog://example.com\n    CF_NAME update-user-provided-service my-route-service -r https://example.com"`
 }
 
-func (_ UpdateUserProvidedServiceCommand) Setup() error {
+func (_ UpdateUserProvidedServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

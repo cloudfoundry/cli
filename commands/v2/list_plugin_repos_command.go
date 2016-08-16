@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type ListPluginReposCommand struct {
 	usage interface{} `usage:"CF_NAME list-plugin-repos"`
 }
 
-func (_ ListPluginReposCommand) Setup() error {
+func (_ ListPluginReposCommand) Setup(config commands.Config) error {
 	return nil
 }
 

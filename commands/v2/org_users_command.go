@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type OrgUsersCommand struct {
 	usage        interface{}        `usage:"CF_NAME org-users ORG"`
 }
 
-func (_ OrgUsersCommand) Setup() error {
+func (_ OrgUsersCommand) Setup(config commands.Config) error {
 	return nil
 }
 

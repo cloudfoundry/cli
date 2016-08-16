@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type PushCommand struct {
@@ -30,7 +31,7 @@ type PushCommand struct {
 	usage                interface{} `usage:"Push a single app (with or without a manifest):\n    CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n    [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n    [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n\n    Push multiple apps with a manifest:\n    cf push [-f MANIFEST_PATH]"`
 }
 
-func (_ PushCommand) Setup() error {
+func (_ PushCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -16,7 +17,7 @@ type MapRouteCommand struct {
 	usage        interface{}     `usage:"Unmap an HTTP route:\n       CF_NAME unmap-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\n\nUnmap a TCP route:\n       CF_NAME unmap-route APP_NAME DOMAIN --port PORT\n\nEXAMPLES:\n    CF_NAME unmap-route my-app example.com                              # example.com\n    CF_NAME unmap-route my-app example.com --hostname myhost            # myhost.example.com\n    CF_NAME unmap-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\n    CF_NAME unmap-route my-app example.com --port 5000                  # example.com:5000"`
 }
 
-func (_ MapRouteCommand) Setup() error {
+func (_ MapRouteCommand) Setup(config commands.Config) error {
 	return nil
 }
 

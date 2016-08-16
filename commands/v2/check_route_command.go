@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type CheckRouteCommand struct {
 	usage        interface{}      `usage:"CF_NAME check-route HOST DOMAIN [--path PATH]\n\nEXAMPLES:\n    CF_NAME check-route myhost example.com            # example.com\n    CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo"`
 }
 
-func (_ CheckRouteCommand) Setup() error {
+func (_ CheckRouteCommand) Setup(config commands.Config) error {
 	return nil
 }
 

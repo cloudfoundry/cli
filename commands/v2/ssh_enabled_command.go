@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SSHEnabledCommand struct {
 	usage        interface{}   `usage:"CF_NAME ssh-enabled APP_NAME"`
 }
 
-func (_ SSHEnabledCommand) Setup() error {
+func (_ SSHEnabledCommand) Setup(config commands.Config) error {
 	return nil
 }
 

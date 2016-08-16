@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SpaceUsersCommand struct {
 	usage        interface{}    `usage:"CF_NAME space-users ORG SPACE"`
 }
 
-func (_ SpaceUsersCommand) Setup() error {
+func (_ SpaceUsersCommand) Setup(config commands.Config) error {
 	return nil
 }
 

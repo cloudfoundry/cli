@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type RenameServiceCommand struct {
 	usage        interface{}             `usage:"CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"`
 }
 
-func (_ RenameServiceCommand) Setup() error {
+func (_ RenameServiceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

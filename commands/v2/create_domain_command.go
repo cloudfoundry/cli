@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type CreateDomainCommand struct {
 	usage        interface{}     `usage:"CF_NAME create-domain ORG DOMAIN"`
 }
 
-func (_ CreateDomainCommand) Setup() error {
+func (_ CreateDomainCommand) Setup(config commands.Config) error {
 	return nil
 }
 

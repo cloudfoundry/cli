@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type DeleteOrphanedRoutesCommand struct {
@@ -11,7 +12,7 @@ type DeleteOrphanedRoutesCommand struct {
 	usage interface{} `usage:"CF_NAME delete-orphaned-routes [-f]"`
 }
 
-func (_ DeleteOrphanedRoutesCommand) Setup() error {
+func (_ DeleteOrphanedRoutesCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type SSHCodeCommand struct {
 	usage interface{} `usage:"CF_NAME ssh-code"`
 }
 
-func (_ SSHCodeCommand) Setup() error {
+func (_ SSHCodeCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type LogoutCommand struct {
 	usage interface{} `usage:"CF_NAME logout"`
 }
 
-func (_ LogoutCommand) Setup() error {
+func (_ LogoutCommand) Setup(config commands.Config) error {
 	return nil
 }
 

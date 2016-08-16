@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type StagingEnvironmentVariableGroupCommand struct {
 	usage interface{} `usage:"CF_NAME staging-environment-variable-group"`
 }
 
-func (_ StagingEnvironmentVariableGroupCommand) Setup() error {
+func (_ StagingEnvironmentVariableGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 

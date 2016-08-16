@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type ServicesCommand struct {
 	usage interface{} `usage:"CF_NAME services"`
 }
 
-func (_ ServicesCommand) Setup() error {
+func (_ ServicesCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -21,7 +22,7 @@ type UpdateSpaceQuotaCommand struct {
 	usage                    interface{}      `usage:"CF_NAME update-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-n NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
 }
 
-func (_ UpdateSpaceQuotaCommand) Setup() error {
+func (_ UpdateSpaceQuotaCommand) Setup(config commands.Config) error {
 	return nil
 }
 

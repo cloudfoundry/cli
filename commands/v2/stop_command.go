@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type StopCommand struct {
 	usage        interface{}   `usage:"CF_NAME stop APP_NAME"`
 }
 
-func (_ StopCommand) Setup() error {
+func (_ StopCommand) Setup(config commands.Config) error {
 	return nil
 }
 

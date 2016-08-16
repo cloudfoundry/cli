@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type UnsetSpaceQuotaCommand struct {
 	usage        interface{}             `usage:"CF_NAME unset-space-quota SPACE QUOTA\n\n"`
 }
 
-func (_ UnsetSpaceQuotaCommand) Setup() error {
+func (_ UnsetSpaceQuotaCommand) Setup(config commands.Config) error {
 	return nil
 }
 

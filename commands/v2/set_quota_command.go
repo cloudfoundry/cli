@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SetQuotaCommand struct {
 	usage        interface{}           `usage:"CF_NAME set-quota ORG QUOTA\n\nTIP:\n    View allowable quotas with 'CF_NAME quotas'"`
 }
 
-func (_ SetQuotaCommand) Setup() error {
+func (_ SetQuotaCommand) Setup(config commands.Config) error {
 	return nil
 }
 

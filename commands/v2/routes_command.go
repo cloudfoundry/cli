@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type RoutesCommand struct {
@@ -11,7 +12,7 @@ type RoutesCommand struct {
 	usage    interface{} `usage:"CF_NAME routes [--orglevel]"`
 }
 
-func (_ RoutesCommand) Setup() error {
+func (_ RoutesCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type UpdateServiceBrokerCommand struct {
 	usage        interface{}             `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"`
 }
 
-func (_ UpdateServiceBrokerCommand) Setup() error {
+func (_ UpdateServiceBrokerCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type BuildpacksCommand struct {
 	usage interface{} `usage:"CF_NAME buildpacks"`
 }
 
-func (_ BuildpacksCommand) Setup() error {
+func (_ BuildpacksCommand) Setup(config commands.Config) error {
 	return nil
 }
 

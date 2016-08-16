@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SecurityGroupCommand struct {
 	usage        interface{}         `usage:"CF_NAME security-group SECURITY_GROUP"`
 }
 
-func (_ SecurityGroupCommand) Setup() error {
+func (_ SecurityGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 

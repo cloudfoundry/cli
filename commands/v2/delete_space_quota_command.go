@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteSpaceQuotaCommand struct {
 	usage        interface{}      `usage:"CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"`
 }
 
-func (_ DeleteSpaceQuotaCommand) Setup() error {
+func (_ DeleteSpaceQuotaCommand) Setup(config commands.Config) error {
 	return nil
 }
 

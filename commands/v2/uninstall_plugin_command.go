@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type UninstallPluginCommand struct {
 	usage        interface{}      `usage:"CF_NAME uninstall-plugin PLUGIN-NAME"`
 }
 
-func (_ UninstallPluginCommand) Setup() error {
+func (_ UninstallPluginCommand) Setup(config commands.Config) error {
 	return nil
 }
 

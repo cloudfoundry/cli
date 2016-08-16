@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -14,7 +15,7 @@ type ApiCommand struct {
 	usage             interface{}     `usage:"CF_NAME api [URL]"`
 }
 
-func (_ ApiCommand) Setup() error {
+func (_ ApiCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type FilesCommand struct {
 	usage        interface{}     `usage:"CF_NAME files APP_NAME [PATH] [-i INSTANCE]\n\nTIP:\n    To list and inspect files of an app running on the Diego backend, use 'CF_NAME ssh'"`
 }
 
-func (_ FilesCommand) Setup() error {
+func (_ FilesCommand) Setup(config commands.Config) error {
 	return nil
 }
 

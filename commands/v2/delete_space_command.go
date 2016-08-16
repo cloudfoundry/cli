@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteSpaceCommand struct {
 	usage        interface{} `usage:"CF_NAME delete-space SPACE [-f]"`
 }
 
-func (_ DeleteSpaceCommand) Setup() error {
+func (_ DeleteSpaceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

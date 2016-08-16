@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type UnsetSpaceRoleCommand struct {
 	usage        interface{}            `usage:"CF_NAME unset-space-role USERNAME ORG SPACE ROLE\n\nROLES:\n    'SpaceManager' - Invite and manage users, and enable features for a given space\n    'SpaceDeveloper' - Create and manage apps and services, and see logs and reports\n    'SpaceAuditor' - View logs, reports, and settings on this space"`
 }
 
-func (_ UnsetSpaceRoleCommand) Setup() error {
+func (_ UnsetSpaceRoleCommand) Setup(config commands.Config) error {
 	return nil
 }
 

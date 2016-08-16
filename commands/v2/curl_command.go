@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -17,7 +18,7 @@ type CurlCommand struct {
 	usage                 interface{}   `usage:"CF_NAME curl PATH [-iv] [-X METHOD] [-H HEADER] [-d DATA] [--output FILE]\n\n    By default 'CF_NAME curl' will perform a GET to the specified PATH. If data\n    is provided via -d, a POST will be performed instead, and the Content-Type\n    will be set to application/json. You may override headers with -H and the\n    request method with -X.\n\n    For API documentation, please visit http://apidocs.cloudfoundry.org.\n\nEXAMPLES:\n    CF_NAME curl \"/v2/apps\" -X GET -H \"Content-Type: application/x-www-form-urlencoded\" -d 'q=name:myapp'\n    CF_NAME curl \"/v2/apps\" -d @/path/to/file"`
 }
 
-func (_ CurlCommand) Setup() error {
+func (_ CurlCommand) Setup(config commands.Config) error {
 	return nil
 }
 

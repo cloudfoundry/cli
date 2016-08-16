@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteSecurityGroupCommand struct {
 	usage        interface{}         `usage:"CF_NAME delete-security-group SECURITY_GROUP [-f]"`
 }
 
-func (_ DeleteSecurityGroupCommand) Setup() error {
+func (_ DeleteSecurityGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -13,7 +14,7 @@ type DeleteUserCommand struct {
 	usage        interface{}    `usage:"CF_NAME delete-user USERNAME [-f]"`
 }
 
-func (_ DeleteUserCommand) Setup() error {
+func (_ DeleteUserCommand) Setup(config commands.Config) error {
 	return nil
 }
 

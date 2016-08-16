@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type RestageCommand struct {
 	usage        interface{}   `usage:"CF_NAME restage APP_NAME"`
 }
 
-func (_ RestageCommand) Setup() error {
+func (_ RestageCommand) Setup(config commands.Config) error {
 	return nil
 }
 

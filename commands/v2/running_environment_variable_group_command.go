@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type RunningEnvironmentVariableGroupCommand struct {
 	usage interface{} `usage:"CF_NAME running-environment-variable-group"`
 }
 
-func (_ RunningEnvironmentVariableGroupCommand) Setup() error {
+func (_ RunningEnvironmentVariableGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 

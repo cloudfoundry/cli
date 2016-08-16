@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type CreateUserCommand struct {
 	usage        interface{}          `usage:"CF_NAME create-user USERNAME PASSWORD"`
 }
 
-func (_ CreateUserCommand) Setup() error {
+func (_ CreateUserCommand) Setup(config commands.Config) error {
 	return nil
 }
 

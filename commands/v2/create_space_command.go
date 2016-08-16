@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -14,7 +15,7 @@ type CreateSpaceCommand struct {
 	usage        interface{} `usage:"CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]"`
 }
 
-func (_ CreateSpaceCommand) Setup() error {
+func (_ CreateSpaceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

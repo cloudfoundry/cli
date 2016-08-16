@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type RepoPluginsCommand struct {
@@ -11,7 +12,7 @@ type RepoPluginsCommand struct {
 	usage                interface{} `usage:"CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLES:\n    CF_NAME repo-plugins -r PrivateRepo"`
 }
 
-func (_ RepoPluginsCommand) Setup() error {
+func (_ RepoPluginsCommand) Setup(config commands.Config) error {
 	return nil
 }
 

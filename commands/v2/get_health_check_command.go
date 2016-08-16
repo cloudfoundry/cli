@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type GetHealthCheckCommand struct {
 	usage        interface{}   `usage:"CF_NAME get-health-check APP_NAME"`
 }
 
-func (_ GetHealthCheckCommand) Setup() error {
+func (_ GetHealthCheckCommand) Setup(config commands.Config) error {
 	return nil
 }
 

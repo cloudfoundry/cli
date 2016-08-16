@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type CreateServiceAuthTokenCommand struct {
 	usage        interface{}                `usage:"CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"`
 }
 
-func (_ CreateServiceAuthTokenCommand) Setup() error {
+func (_ CreateServiceAuthTokenCommand) Setup(config commands.Config) error {
 	return nil
 }
 

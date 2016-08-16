@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type EventsCommand struct {
 	usage        interface{}   `usage:"CF_NAME events APP_NAME"`
 }
 
-func (_ EventsCommand) Setup() error {
+func (_ EventsCommand) Setup(config commands.Config) error {
 	return nil
 }
 

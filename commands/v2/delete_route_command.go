@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -16,7 +17,7 @@ type DeleteRouteCommand struct {
 	usage        interface{}  `usage:"Delete an HTTP route:\n      CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH]\n\n    Delete a TCP route:\n      CF_NAME delete-route DOMAIN --port PORT [-f]\n\nEXAMPLES:\n    CF_NAME delete-route example.com                              # example.com\n    CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\n    CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo\n    CF_NAME delete-route example.com --port 50000                 # example.com:50000"`
 }
 
-func (_ DeleteRouteCommand) Setup() error {
+func (_ DeleteRouteCommand) Setup(config commands.Config) error {
 	return nil
 }
 

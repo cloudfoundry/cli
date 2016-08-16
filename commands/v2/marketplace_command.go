@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type MarketplaceCommand struct {
@@ -11,7 +12,7 @@ type MarketplaceCommand struct {
 	usage           interface{} `usage:"CF_NAME marketplace [-s SERVICE]"`
 }
 
-func (_ MarketplaceCommand) Setup() error {
+func (_ MarketplaceCommand) Setup(config commands.Config) error {
 	return nil
 }
 

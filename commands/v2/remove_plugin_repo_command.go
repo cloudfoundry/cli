@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type RemovePluginRepoCommand struct {
 	usage        interface{}          `usage:"CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLES:\n    CF_NAME remove-plugin-repo PrivateRepo"`
 }
 
-func (_ RemovePluginRepoCommand) Setup() error {
+func (_ RemovePluginRepoCommand) Setup(config commands.Config) error {
 	return nil
 }
 

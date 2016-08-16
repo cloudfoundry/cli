@@ -2,6 +2,8 @@ package ui_test
 
 import (
 	. "code.cloudfoundry.org/cli/commands/ui"
+	"code.cloudfoundry.org/cli/commands/ui/uifakes"
+	"code.cloudfoundry.org/cli/utils/config"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -9,13 +11,16 @@ import (
 )
 
 var _ = Describe("UI", func() {
-	var ui UI
+	var (
+		ui         UI
+		fakeConfig *uifakes.FakeConfig
+	)
 
 	BeforeEach(func() {
-		InitColorSupport()
-		ui = UI{
-			Out: NewBuffer(),
-		}
+		fakeConfig = new(uifakes.FakeConfig)
+		fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+		ui = NewUI(fakeConfig)
+		ui.Out = NewBuffer()
 	})
 
 	Describe("DisplayText", func() {
@@ -68,9 +73,6 @@ var _ = Describe("UI", func() {
 		})
 	})
 
-	PDescribe("DisplayTextWithKeyTranslations", func() {
-	})
-
 	Describe("DisplayNewline", func() {
 		It("displays a new line", func() {
 			ui.DisplayNewline()
@@ -82,7 +84,7 @@ var _ = Describe("UI", func() {
 	Describe("DisplayHelpHeader", func() {
 		It("bolds and colorizes the input string", func() {
 			ui.DisplayHelpHeader("some-text")
-			Expect(ui.Out).To(Equal("\x1b[38;1msome-text\x1b[0m"))
+			Expect(ui.Out).To(Say("\x1b\\[38;1msome-text\x1b\\[0m"))
 		})
 	})
 })

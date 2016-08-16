@@ -4,13 +4,14 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 )
 
 type ServiceAuthTokensCommand struct {
 	usage interface{} `usage:"CF_NAME service-auth-tokens"`
 }
 
-func (_ ServiceAuthTokensCommand) Setup() error {
+func (_ ServiceAuthTokensCommand) Setup(config commands.Config) error {
 	return nil
 }
 

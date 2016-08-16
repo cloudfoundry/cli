@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -12,7 +13,7 @@ type SetRunningEnvironmentVariableGroupCommand struct {
 	usage        interface{}        `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
 }
 
-func (_ SetRunningEnvironmentVariableGroupCommand) Setup() error {
+func (_ SetRunningEnvironmentVariableGroupCommand) Setup(config commands.Config) error {
 	return nil
 }
 
