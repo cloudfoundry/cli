@@ -5,7 +5,7 @@ import (
 	"runtime"
 
 	. "code.cloudfoundry.org/cli/cf/trace"
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	"os"
 

@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
 	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"

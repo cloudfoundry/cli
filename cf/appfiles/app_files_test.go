@@ -11,7 +11,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 
 	"code.cloudfoundry.org/cli/cf/models"
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

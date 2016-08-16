@@ -10,7 +10,7 @@ import (
 	"runtime"
 
 	"code.cloudfoundry.org/cli/cf/errors"
-	"github.com/cloudfoundry/gofileutils/fileutils"
+	"code.cloudfoundry.org/gofileutils/fileutils"
 )
 
 //go:generate counterfeiter . Zipper
