@@ -147,7 +147,7 @@ Pragma: no-cache
 Pragma: no-cache
 Server: Apache-Coyote/1.1
 
-{"access_token":"[PRIVATE DATA HIDDEN]","token_type":"bearer","refresh_token":"[PRIVATE DATA HIDDEN]","expires_in":43199,"scope":"cloud_controller.read cloud_controller.write openid password.write","jti":"c6a7c136-6497-4faf-8799-4c42e1f3c6f5"}
+{"access_token":"[PRIVATE DATA HIDDEN]","token_type":"[PRIVATE DATA HIDDEN]","refresh_token":"[PRIVATE DATA HIDDEN]","expires_in":43199,"scope":"cloud_controller.read cloud_controller.write openid password.write","jti":"c6a7c136-6497-4faf-8799-4c42e1f3c6f5"}
 `
 
 			Expect(Sanitize(response)).To(Equal(expected))
@@ -189,6 +189,44 @@ Server: Apache-Coyote/1.1
 `
 
 			Expect(Sanitize(response)).To(Equal(expected))
+		})
+
+		Describe("hiding credentials in application environment variables", func() {
+			It("hides the value of any key matching case-insensitive substring 'token'", func() {
+				response := `
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{"guid":"99fefc8e-845e-47f3-a8b1-26e8a00222d9","name":"example","environment_json":{"token":"mytoken","TOKEN":"mytoken","foo_token_bar":"mytoken","FOO_TOKEN_BAR":"mytoken"},"memory":1024,"instances":1}
+`
+
+				expected := `
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{"guid":"99fefc8e-845e-47f3-a8b1-26e8a00222d9","name":"example","environment_json":{"token":"[PRIVATE DATA HIDDEN]","TOKEN":"[PRIVATE DATA HIDDEN]","foo_token_bar":"[PRIVATE DATA HIDDEN]","FOO_TOKEN_BAR":"[PRIVATE DATA HIDDEN]"},"memory":1024,"instances":1}
+`
+
+				Expect(Sanitize(response)).To(Equal(expected))
+			})
+
+			It("hides the value of any key matching case-insensitive substring 'password'", func() {
+				response := `
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{"guid":"99fefc8e-845e-47f3-a8b1-26e8a00222d9","name":"example","environment_json":{"password":"mypass","PASSWORD":"mypass","foo_password_bar":"mypass","FOO_PASSWORD_BAR":"mypass"},"memory":1024,"instances":1}
+`
+
+				expected := `
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{"guid":"99fefc8e-845e-47f3-a8b1-26e8a00222d9","name":"example","environment_json":{"password":"[PRIVATE DATA HIDDEN]","PASSWORD":"[PRIVATE DATA HIDDEN]","foo_password_bar":"[PRIVATE DATA HIDDEN]","FOO_PASSWORD_BAR":"[PRIVATE DATA HIDDEN]"},"memory":1024,"instances":1}
+`
+
+				Expect(Sanitize(response)).To(Equal(expected))
+			})
 		})
 	})
 })
