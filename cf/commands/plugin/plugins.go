@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/cloudfoundry/cli/cf/commandregistry"
 	"github.com/cloudfoundry/cli/cf/configuration/pluginconfig"
@@ -70,7 +71,14 @@ func (cmd *Plugins) Execute(c flags.FlagContext) error {
 		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
 	}
 
-	for pluginName, metadata := range plugins {
+	var sortedPluginNames []string
+	for k := range plugins {
+		sortedPluginNames = append(sortedPluginNames, k)
+	}
+	sort.Strings(sortedPluginNames)
+
+	for _, pluginName := range sortedPluginNames {
+		metadata := plugins[pluginName]
 		if metadata.Version.Major == 0 && metadata.Version.Minor == 0 && metadata.Version.Build == 0 {
 			version = "N/A"
 		} else {
