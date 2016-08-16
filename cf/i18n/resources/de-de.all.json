@@ -20,6 +20,10 @@
     "translation": "\nApp gestartet\n"
   },
   {
+    "id": "\nApp state changed to started, but note that it has 0 instances.\n",
+    "translation": ""
+  },
+  {
     "id": "\nApp {{.AppName}} was started using this command `{{.Command}}`\n",
     "translation": "\nApp {{.AppName}} wurde mit diesem Befehl gestartet: `{{.Command}}`\n"
   },

@@ -1,5 +1,9 @@
 [
   {
+    "id": "\nApp state changed to started, but note that it has 0 instances.\n",
+    "translation": "\nApp state changed to started, but note that it has 0 instances.\n"
+  },
+  {
     "id": "'routes' should be a list",
     "translation": "'routes' should be a list"
   },
