@@ -1,0 +1,19 @@
+name: cf
+version: v6.21.1
+summary:  The official command line client for Cloud Foundry.
+description: |
+  A tool to deploy and manage Cloud Foundry applications.
+confinement: strict
+
+apps:
+  cf:
+    command: bin/cli
+    plugs: [network, network-bind]
+
+parts:
+    cli:
+      source: .
+      plugin: go
+      go-importpath: github.com/cloudfoundry/cli
+      go-packages: [github.com/cloudfoundry/cli]
+      build-packages: [g++, git]
