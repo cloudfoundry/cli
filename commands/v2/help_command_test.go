@@ -2,10 +2,12 @@ package v2_test
 
 import (
 	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/commands/commandsfakes"
 	"code.cloudfoundry.org/cli/commands/flags"
 	. "code.cloudfoundry.org/cli/commands/v2"
 	"code.cloudfoundry.org/cli/commands/v2/customv2fakes"
 	"code.cloudfoundry.org/cli/commands/v2/v2fakes"
+	"code.cloudfoundry.org/cli/utils/config"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,18 +16,21 @@ import (
 
 var _ = Describe("Help Command", func() {
 	var (
-		fakeUI    *customv2fakes.FakeUI
-		fakeActor *v2fakes.FakeHelpActor
-		cmd       HelpCommand
+		fakeUI     *customv2fakes.FakeUI
+		fakeActor  *v2fakes.FakeHelpActor
+		cmd        HelpCommand
+		fakeConfig *commandsfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeUI = customv2fakes.NewFakeUI(true)
 		fakeActor = new(v2fakes.FakeHelpActor)
+		fakeConfig = new(commandsfakes.FakeConfig)
 
 		cmd = HelpCommand{
-			UI:    fakeUI,
-			Actor: fakeActor,
+			UI:     fakeUI,
+			Actor:  fakeActor,
+			Config: fakeConfig,
 		}
 	})
 
@@ -178,6 +183,16 @@ var _ = Describe("Help Command", func() {
 				}
 
 				cmd.Actor = v2actions.NewActor()
+				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+					"Diego-Enabler": config.PluginConfig{
+						Commands: []config.PluginCommand{
+							{
+								Name:     "enable-diego",
+								HelpText: "enable Diego support for an app",
+							},
+						},
+					},
+				})
 			})
 
 			It("returns a list of all commands", func() {
@@ -262,6 +277,9 @@ var _ = Describe("Help Command", func() {
 				Expect(fakeUI.Out).To(Say("ADD/REMOVE PLUGIN:"))
 				Expect(fakeUI.Out).To(Say("plugins\\s+List all available plugin commands"))
 				Expect(fakeUI.Out).To(Say("uninstall-plugin\\s+Uninstall the plugin defined in command argument"))
+
+				Expect(fakeUI.Out).To(Say("INSTALLED PLUGIN COMMANDS:"))
+				Expect(fakeUI.Out).To(Say("enable-diego\\s+enable Diego support for an app"))
 
 				Expect(fakeUI.Out).To(Say("ENVIRONMENT VARIABLES:"))
 				Expect(fakeUI.Out).To(Say("CF_COLOR=false\\s+Do not colorize output"))
