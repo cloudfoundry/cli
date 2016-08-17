@@ -43,11 +43,7 @@ func parse(args []string) {
 				case 0:
 					parse([]string{"help"})
 				case 1:
-					if extraArgs[0] == "-v" || extraArgs[0] == "--version" {
-						parse([]string{"version"})
-					} else {
-						parse([]string{"help", extraArgs[0]})
-					}
+					parse([]string{"help", extraArgs[0]})
 				default:
 					parse(extraArgs[1:])
 				}
@@ -63,7 +59,11 @@ func parse(args []string) {
 		case flags.ErrUnknownCommand:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 		case flags.ErrCommandRequired:
-			parse([]string{"help"})
+			if v2.Commands.VerboseOrVersion {
+				parse([]string{"version"})
+			} else {
+				parse([]string{"help"})
+			}
 		default:
 			fmt.Printf("unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 		}
