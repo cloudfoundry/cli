@@ -4,7 +4,6 @@ package stagingfakes
 import (
 	"sync"
 
-	. "github.com/cloudfoundry/cli/cf/api/securitygroups/defaults"
 	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/staging"
 	"github.com/cloudfoundry/cli/cf/models"
 )

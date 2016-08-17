@@ -4,7 +4,6 @@ package runningfakes
 import (
 	"sync"
 
-	. "github.com/cloudfoundry/cli/cf/api/securitygroups/defaults"
 	"github.com/cloudfoundry/cli/cf/api/securitygroups/defaults/running"
 	"github.com/cloudfoundry/cli/cf/models"
 )
