@@ -9,93 +9,13 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 	"code.cloudfoundry.org/cli/commands/ui"
+	"code.cloudfoundry.org/cli/commands/v2/internal"
 	"code.cloudfoundry.org/cli/utils/config"
 )
 
-type helpCategory struct {
-	categoryName string
-	commandList  []string
-}
-
 const (
-	BLANKLINE = ""
-	CF_NAME   = "cf"
+	CF_NAME = "cf"
 )
-
-var helpCategoryList = []helpCategory{
-	{
-		categoryName: "GETTING STARTED:",
-		commandList:  []string{"help", "version", "login", "logout", "passwd", "target", BLANKLINE, "api", "auth"},
-	},
-	{
-		categoryName: "APPS:",
-		commandList:  []string{"apps", "app", BLANKLINE, "push", "scale", "delete", "rename", BLANKLINE, "start", "stop", "restart", "restage", "restart-app-instance", BLANKLINE, "events", "files", "logs", BLANKLINE, "env", "set-env", "unset-env", BLANKLINE, "stacks", "stack", BLANKLINE, "copy-source", "create-app-manifest", BLANKLINE, "get-health-check", "set-health-check", "enable-ssh", "disable-ssh", "ssh-enabled", "ssh"},
-	},
-	{
-		categoryName: "SERVICES:",
-		commandList:  []string{"marketplace", "services", "service", BLANKLINE, "create-service", "update-service", "delete-service", "rename-service", BLANKLINE, "create-service-key", "service-keys", "service-key", "delete-service-key", BLANKLINE, "bind-service", "unbind-service", BLANKLINE, "bind-route-service", "unbind-route-service", BLANKLINE, "create-user-provided-service", "update-user-provided-service"},
-	},
-	{
-		categoryName: "ORGS:",
-		commandList:  []string{"orgs", "org", BLANKLINE, "create-org", "delete-org", "rename-org"},
-	},
-	{
-		categoryName: "SPACES:",
-		commandList:  []string{"spaces", "space", BLANKLINE, "create-space", "delete-space", "rename-space", BLANKLINE, "allow-space-ssh", "disallow-space-ssh", "space-ssh-allowed"},
-	},
-	{
-		categoryName: "DOMAINS:",
-		commandList:  []string{"domains", "create-domain", "delete-domain", "create-shared-domain", "delete-shared-domain", BLANKLINE, "router-groups"},
-	},
-	{
-		categoryName: "ROUTES:",
-		commandList:  []string{"routes", "create-route", "check-route", "map-route", "unmap-route", "delete-route", "delete-orphaned-routes"},
-	},
-	{
-		categoryName: "BUILDPACKS:",
-		commandList:  []string{"buildpacks", "create-buildpack", "update-buildpack", "rename-buildpack", "delete-buildpack"},
-	},
-	{
-		categoryName: "USER ADMIN:",
-		commandList:  []string{"create-user", "delete-user", BLANKLINE, "org-users", "set-org-role", "unset-org-role", BLANKLINE, "space-users", "set-space-role", "unset-space-role"},
-	},
-	{
-		categoryName: "ORG ADMIN:",
-		commandList:  []string{"quotas", "quota", "set-quota", BLANKLINE, "create-quota", "delete-quota", "update-quota", BLANKLINE, "share-private-domain", "unshare-private-domain"},
-	},
-	{
-		categoryName: "SPACE ADMIN:",
-		commandList:  []string{"space-quotas", "space-quota", BLANKLINE, "create-space-quota", "update-space-quota", "delete-space-quota", BLANKLINE, "set-space-quota", "unset-space-quota"},
-	},
-	{
-		categoryName: "SERVICE ADMIN:",
-		commandList:  []string{"service-auth-tokens", "create-service-auth-token", "update-service-auth-token", "delete-service-auth-token", BLANKLINE, "service-brokers", "create-service-broker", "update-service-broker", "delete-service-broker", "rename-service-broker", BLANKLINE, "migrate-service-instances", "purge-service-offering", "purge-service-instance", BLANKLINE, "service-access", "enable-service-access", "disable-service-access"},
-	},
-	{
-		categoryName: "SECURITY GROUP:",
-		commandList:  []string{"security-group", "security-groups", "create-security-group", "update-security-group", "delete-security-group", "bind-security-group", "unbind-security-group", BLANKLINE, "bind-staging-security-group", "staging-security-groups", "unbind-staging-security-group", BLANKLINE, "bind-running-security-group", "running-security-groups", "unbind-running-security-group"},
-	},
-	{
-		categoryName: "ENVIRONMENT VARIABLE GROUPS:",
-		commandList:  []string{"running-environment-variable-group", "staging-environment-variable-group", "set-staging-environment-variable-group", "set-running-environment-variable-group"},
-	},
-	{
-		categoryName: "FEATURE FLAGS:",
-		commandList:  []string{"feature-flags", "feature-flag", "enable-feature-flag", "disable-feature-flag"},
-	},
-	{
-		categoryName: "ADVANCED:",
-		commandList:  []string{"curl", "config", "oauth-token", "ssh-code"},
-	},
-	{
-		categoryName: "ADD/REMOVE PLUGIN REPOSITORY:",
-		commandList:  []string{"add-plugin-repo", "remove-plugin-repo", "list-plugin-repos", "repo-plugins"},
-	},
-	{
-		categoryName: "ADD/REMOVE PLUGIN:",
-		commandList:  []string{"plugins", "install-plugin", "uninstall-plugin"},
-	},
-}
 
 //go:generate counterfeiter . HelpActor
 
@@ -176,13 +96,13 @@ func (cmd HelpCommand) displayAllCommands() {
 	for _, pluginCommand := range cmd.Config.PluginConfig() {
 		pluginCommands = append(pluginCommands, pluginCommand.Commands...)
 	}
-	longestCmd := cmd.longestCommandName(cmdInfo, pluginCommands)
+	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
 
-	for _, category := range helpCategoryList {
-		cmd.UI.DisplayHelpHeader(category.categoryName)
+	for _, category := range internal.HelpCategoryList {
+		cmd.UI.DisplayHelpHeader(category.CategoryName)
 
-		for _, command := range category.commandList {
-			if command == BLANKLINE {
+		for _, command := range category.CommandList {
+			if command == internal.BLANKLINE {
 				cmd.UI.DisplayNewline()
 				continue
 			}
@@ -206,21 +126,6 @@ func (cmd HelpCommand) displayAllCommands() {
 		}
 		cmd.UI.DisplayNewline()
 	}
-}
-
-func (_ HelpCommand) longestCommandName(cmds map[string]v2actions.CommandInfo, pluginCmds []config.PluginCommand) int {
-	longest := 0
-	for name, _ := range cmds {
-		if len(name) > longest {
-			longest = len(name)
-		}
-	}
-	for _, command := range pluginCmds {
-		if len(command.Name) > longest {
-			longest = len(command.Name)
-		}
-	}
-	return longest
 }
 
 func (cmd HelpCommand) displayHelpFooter() {
@@ -293,7 +198,14 @@ func (cmd HelpCommand) displayHelpFooter() {
 func (cmd HelpCommand) displayCommand() error {
 	cmdInfo, err := cmd.Actor.GetCommandInfo(Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
-		return err
+		if err, ok := err.(v2actions.ErrorInvalidCommand); ok {
+			var found bool
+			if cmdInfo, found = cmd.findPlugin(); !found {
+				return err
+			}
+		} else {
+			return err
+		}
 	}
 
 	cmd.UI.DisplayText("NAME:")
@@ -326,7 +238,7 @@ func (cmd HelpCommand) displayCommand() error {
 
 	if len(cmdInfo.Flags) != 0 {
 		cmd.UI.DisplayText("OPTIONS:")
-		nameWidth := cmd.longestFlagWidth(cmdInfo.Flags) + 6
+		nameWidth := internal.LongestFlagWidth(cmdInfo.Flags) + 6
 		for _, flag := range cmdInfo.Flags {
 			var name string
 			if flag.Short != "" && flag.Long != "" {
@@ -350,20 +262,14 @@ func (cmd HelpCommand) displayCommand() error {
 	return nil
 }
 
-func (_ HelpCommand) longestFlagWidth(flags []v2actions.CommandFlag) int {
-	longest := 0
-	for _, flag := range flags {
-		var name string
-		if flag.Short != "" && flag.Long != "" {
-			name = fmt.Sprintf("--%s, -%s", flag.Long, flag.Short)
-		} else if flag.Short != "" {
-			name = "-" + flag.Short
-		} else {
-			name = "--" + flag.Long
-		}
-		if len(name) > longest {
-			longest = len(name)
+func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
+	for _, pluginConfig := range cmd.Config.PluginConfig() {
+		for _, command := range pluginConfig.Commands {
+			if command.Name == cmd.OptionalArgs.CommandName {
+				return internal.ConvertPluginToCommandInfo(command), true
+			}
 		}
 	}
-	return longest
+
+	return v2actions.CommandInfo{}, false
 }
