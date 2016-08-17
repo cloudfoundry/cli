@@ -115,17 +115,17 @@ func (cmd HelpCommand) displayAllCommands() {
 		}
 
 		cmd.UI.DisplayNewline()
-
-		cmd.UI.DisplayHelpHeader("INSTALLED PLUGIN COMMANDS:")
-		for _, pluginCommand := range pluginCommands {
-			cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
-				"CommandName":        pluginCommand.Name,
-				"CommandDescription": pluginCommand.HelpText,
-				"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
-			})
-		}
-		cmd.UI.DisplayNewline()
 	}
+
+	cmd.UI.DisplayHelpHeader("INSTALLED PLUGIN COMMANDS:")
+	for _, pluginCommand := range pluginCommands {
+		cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
+			"CommandName":        pluginCommand.Name,
+			"CommandDescription": pluginCommand.HelpText,
+			"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
+		})
+	}
+	cmd.UI.DisplayNewline()
 }
 
 func (cmd HelpCommand) displayHelpFooter() {
