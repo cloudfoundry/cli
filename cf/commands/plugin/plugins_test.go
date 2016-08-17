@@ -89,17 +89,17 @@ var _ = Describe("Plugins", func() {
 
 	It("returns a  sorted list of available methods of a plugin", func() {
 		config.PluginsReturns(map[string]pluginconfig.PluginMetadata{
-			"Test2": {
+			"BTest2": {
 				Location: "path/to/plugin",
 				Commands: []plugin.Command{
-					{Name: "test_2_cmd1", HelpText: "help text for test_2_cmd1"},
+					{Name: "B_test_2_cmd1", HelpText: "help text for test_2_cmd1"},
 				},
 			},
-			"Test1": {
+			"aTest1": {
 				Location: "path/to/plugin",
 				Commands: []plugin.Command{
-					{Name: "test_1_cmd1", HelpText: "help text for test_1_cmd1"},
-					{Name: "test_1_cmd2", HelpText: "help text for test_1_cmd2"},
+					{Name: "a_test_1_cmd1", HelpText: "help text for test_1_cmd1"},
+					{Name: "a_test_1_cmd2", HelpText: "help text for test_1_cmd2"},
 				},
 			},
 		})
@@ -110,9 +110,9 @@ var _ = Describe("Plugins", func() {
 			[]string{"Listing Installed Plugins..."},
 			[]string{"OK"},
 			[]string{"Plugin Name", "Command Name", "Command Help"},
-			[]string{"Test1", "test_1_cmd1", "help text for test_1_cmd1"},
-			[]string{"Test1", "test_1_cmd2", "help text for test_1_cmd2"},
-			[]string{"Test2", "test_2_cmd1", "help text for test_2_cmd1"},
+			[]string{"aTest1", "a_test_1_cmd1", "help text for test_1_cmd1"},
+			[]string{"aTest1", "a_test_1_cmd2", "help text for test_1_cmd2"},
+			[]string{"BTest2", "B_test_2_cmd1", "help text for test_2_cmd1"},
 		))
 
 		Expect(ui.Outputs()[6]).To(ContainSubstring("Test2"))
