@@ -11,6 +11,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/requirements"
 	"github.com/cloudfoundry/cli/cf/terminal"
 	"github.com/cloudfoundry/cli/utils"
+	"github.com/cloudfoundry/cli/utils/sortutils"
 )
 
 type Plugins struct {
@@ -75,7 +76,7 @@ func (cmd *Plugins) Execute(c flags.FlagContext) error {
 	for k := range plugins {
 		sortedPluginNames = append(sortedPluginNames, k)
 	}
-	sort.Strings(sortedPluginNames)
+	sort.Sort(sortutils.Alphabetic(sortedPluginNames))
 
 	for _, pluginName := range sortedPluginNames {
 		metadata := plugins[pluginName]
