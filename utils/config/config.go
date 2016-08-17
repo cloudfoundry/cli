@@ -173,7 +173,7 @@ const (
 	ColorAuto
 )
 
-func (config Config) ColorEnabled() ColorSetting {
+func (config *Config) ColorEnabled() ColorSetting {
 	if config.env.CFColor != "" {
 		val, err := strconv.ParseBool(config.env.CFColor)
 		if err == nil {
@@ -188,7 +188,7 @@ func (config Config) ColorEnabled() ColorSetting {
 	return config.boolToColorSetting(val)
 }
 
-func (_ Config) boolToColorSetting(val bool) ColorSetting {
+func (_ *Config) boolToColorSetting(val bool) ColorSetting {
 	if val {
 		return ColorEnabled
 	}
@@ -196,11 +196,11 @@ func (_ Config) boolToColorSetting(val bool) ColorSetting {
 	return ColorDisbled
 }
 
-func (conf Config) Target() string {
+func (conf *Config) Target() string {
 	return conf.configFile.Target
 }
 
-func (config Config) PluginHome() string {
+func (config *Config) PluginHome() string {
 	if config.env.CFPluginHome != "" {
 		return filepath.Join(config.env.CFPluginHome, ".cf", "plugins")
 	}
@@ -208,11 +208,11 @@ func (config Config) PluginHome() string {
 	return filepath.Join(homeDirectory(), ".cf", "plugins")
 }
 
-func (config Config) PluginConfig() map[string]PluginConfig {
+func (config *Config) PluginConfig() map[string]PluginConfig {
 	return config.pluginConfig.Plugins
 }
 
-func (config Config) StagingTimeout() time.Duration {
+func (config *Config) StagingTimeout() time.Duration {
 	if config.env.CFStagingTimeout != "" {
 		val, err := strconv.ParseInt(config.env.CFStagingTimeout, 10, 64)
 		if err == nil {
@@ -223,7 +223,7 @@ func (config Config) StagingTimeout() time.Duration {
 	return DefaultStagingTimeout
 }
 
-func (config Config) StartupTimeout() time.Duration {
+func (config *Config) StartupTimeout() time.Duration {
 	if config.env.CFStartupTimeout != "" {
 		val, err := strconv.ParseInt(config.env.CFStartupTimeout, 10, 64)
 		if err == nil {

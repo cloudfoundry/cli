@@ -9,6 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 	"code.cloudfoundry.org/cli/commands/ui"
+	"code.cloudfoundry.org/cli/utils/config"
 )
 
 type helpCategory struct {
@@ -109,8 +110,9 @@ type HelpActor interface {
 }
 
 type HelpCommand struct {
-	UI    UI
-	Actor HelpActor
+	UI     UI
+	Actor  HelpActor
+	Config commands.Config
 
 	OptionalArgs flags.CommandName `positional-args:"yes"`
 	usage        interface{}       `usage:"CF_NAME help [COMMAND]"`
@@ -119,6 +121,7 @@ type HelpCommand struct {
 func (cmd *HelpCommand) Setup(config commands.Config) error {
 	cmd.UI = ui.NewUI(config)
 	cmd.Actor = v2actions.NewActor()
+	cmd.Config = config
 	return nil
 }
 
@@ -168,7 +171,12 @@ func (cmd HelpCommand) displayHelpPreamble() {
 
 func (cmd HelpCommand) displayAllCommands() {
 	cmdInfo := cmd.Actor.GetAllNamesAndDescriptions(Commands)
-	longestCmd := cmd.longestCommandName(cmdInfo)
+	pluginCommands := []config.PluginCommand{}
+
+	for _, pluginCommand := range cmd.Config.PluginConfig() {
+		pluginCommands = append(pluginCommands, pluginCommand.Commands...)
+	}
+	longestCmd := cmd.longestCommandName(cmdInfo, pluginCommands)
 
 	for _, category := range helpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.categoryName)
@@ -187,14 +195,29 @@ func (cmd HelpCommand) displayAllCommands() {
 		}
 
 		cmd.UI.DisplayNewline()
+
+		cmd.UI.DisplayHelpHeader("INSTALLED PLUGIN COMMANDS:")
+		for _, pluginCommand := range pluginCommands {
+			cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
+				"CommandName":        pluginCommand.Name,
+				"CommandDescription": pluginCommand.HelpText,
+				"Gap":                strings.Repeat(" ", longestCmd+1-len(pluginCommand.Name)),
+			})
+		}
+		cmd.UI.DisplayNewline()
 	}
 }
 
-func (_ HelpCommand) longestCommandName(cmds map[string]v2actions.CommandInfo) int {
+func (_ HelpCommand) longestCommandName(cmds map[string]v2actions.CommandInfo, pluginCmds []config.PluginCommand) int {
 	longest := 0
 	for name, _ := range cmds {
 		if len(name) > longest {
 			longest = len(name)
+		}
+	}
+	for _, command := range pluginCmds {
+		if len(command.Name) > longest {
+			longest = len(command.Name)
 		}
 	}
 	return longest
