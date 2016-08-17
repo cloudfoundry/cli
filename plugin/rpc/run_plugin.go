@@ -21,6 +21,7 @@ func RunMethodIfExists(rpcService *CliRpcService, args []string, pluginList map[
 				cmd := exec.Command(metadata.Location, pluginArgs...)
 				cmd.Stdout = os.Stdout
 				cmd.Stdin = os.Stdin
+				cmd.Stderr = os.Stderr
 
 				defer stopPlugin(cmd)
 				err := cmd.Run()
