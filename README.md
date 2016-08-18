@@ -73,36 +73,7 @@ These binaries are *not intended for wider use*; they're for developers to test 
 First, update to the [latest cli](https://github.com/cloudfoundry/cli/releases)
 and try the command again.
 
-If the error remains, run the command that exposes the bug with the environment
-variable CF_TRACE set to true and [create an
-issue](https://github.com/cloudfoundry/cli/issues).
-
-Include the below information when creating the issue:
-
-* The error that occurred
-* The stack trace (if applicable)
-* The command you ran (e.g. `cf org-users`)
-* The CLI Version (e.g. 6.13.0-dfba612)
-* Your platform details (e.g. Mac OS X 10.11, Windows 8.1 64-bit, Ubuntu 14.04.3 64-bit)
-* The shell you used (e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator)
-
-##### For simple issues (eg: text formatting, help messages, etc), please provide
-
-- the command you ran
-- what occurred
-- what you expected to occur
-
-##### For issues related to HTTP requests or strange behavior, please run the command with env var `CF_TRACE=true` and provide
-
-- the command you ran
-- the trace output
-- a high-level description of the bug
-
-##### For panics and other crashes, please provide
-
-- the command you ran
-- the stack trace generated (if any)
-- any other relevant information
+If the error remains, [submit an issue](https://github.com/cloudfoundry/cli/issues) with the requested details.
 
 ## Plugins
 
