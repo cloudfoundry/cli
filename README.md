@@ -30,6 +30,8 @@ $ cd [my-app-directory]
 $ cf push
 ```
 
+Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.org) to further enhance your CLI experience.
+
 ## Downloads
 
 **Latest stable:** Download the installer or compressed binary for your platform:
