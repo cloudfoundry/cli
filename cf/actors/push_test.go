@@ -33,15 +33,12 @@ var _ = Describe("Push Actor", func() {
 	)
 
 	BeforeEach(func() {
-		var err error
-
 		appBitsRepo = new(applicationbitsfakes.FakeApplicationBitsRepository)
 		appFiles = new(appfilesfakes.FakeAppFiles)
 		fakezipper = new(appfilesfakes.FakeZipper)
 		routeActor = new(actorsfakes.FakeRouteActor)
 		actor = actors.NewPushActor(appBitsRepo, fakezipper, appFiles, routeActor)
-		fixturesDir, err = filepath.Abs(filepath.Join("..", "..", "fixtures", "applications"))
-		Expect(err).NotTo(HaveOccurred())
+		fixturesDir = filepath.Join("..", "..", "fixtures", "applications")
 		allFiles = []models.AppFileFields{
 			{Path: "example-app/.cfignore"},
 			{Path: "example-app/app.rb"},
@@ -342,17 +339,17 @@ var _ = Describe("Push Actor", func() {
 
 		It("calls the provided function with the provided directory", func() {
 			appDir = filepath.Join(fixturesDir, "example-app")
-
 			f := func(tempDir string) error {
 				wasCalled = true
 				wasCalledWith = tempDir
 				return nil
 			}
-
 			err := actor.ProcessPath(appDir, f)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(wasCalled).To(BeTrue())
-			Expect(wasCalledWith).To(Equal(appDir))
+			path, err := filepath.Abs(appDir)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(wasCalledWith).To(Equal(path))
 		})
 
 		It("dereferences the symlink when given a symlink to an app dir", func() {
