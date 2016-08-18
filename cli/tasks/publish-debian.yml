@@ -11,7 +11,7 @@ params:
   KEY_ID:
   AWS_SECRET_ACCESS_KEY:
   AWS_ACCESS_KEY_ID:
-  AWS_BUCKET_NAME:cf-cli-debian
+  AWS_BUCKET_NAME: cf-cli-debian
 
 run:
   path: bash
