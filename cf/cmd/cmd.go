@@ -108,7 +108,6 @@ func Main(traceEnv string, args []string) {
 		requirementsFactory := requirements.NewFactory(deps.Config, deps.RepoLocator)
 		reqs, reqErr := cmd.Requirements(requirementsFactory, flagContext)
 		if reqErr != nil {
-			deps.UI.Failed(reqErr.Error())
 			os.Exit(1)
 		}
 
