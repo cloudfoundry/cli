@@ -1,30 +1,25 @@
-High five for submitting a report!
+High five for submitting a report!  
+If you found an issue with the cf CLI, please visit the [releases page](https://github.com/cloudfoundry/cli/releases/) and confirm it's not fixed already in the latest release.  
 To avoid additional back and forth, please include the following details as relevant:
 
-### Command
+* Command  
+e.g. `cf push myapp -i 2 --no-route`
 
-e.g. cf org-users
+* What occurred, incl. error and/or stack trace
 
-### CLI Version
+* What you expected to occur
 
-e.g. 6.13.0-dfba612 (visit the [releases page](https://github.com/cloudfoundry/cli/releases/) and confirm it's reproducible on the latest version)
+* CLI Version  
+e.g. 6.13.0-dfba612 (see `cf -v` output)
 
-### Error
-
-### Stack Trace
-
-### CC API Endpoint Version
-
+* CC API Endpoint Version  
 see `cf api` output
 
-### CF Trace
+* CF Trace, if issue relates to HTTP requests or strange behavior  
+run the command with `-v` and paste or attach the trace output
 
-For bugs related to HTTP requests, please run the command with env var `CF_TRACE=true`
+* Platform & Shell Details  
+e.g. Mac OS X 10.11 iTerm, Windows 8.1 64-bit with PowerShell, Ubuntu 14.04.3 64-bit with gnome-terminal
 
-### Platform Details
-
-e.g. Mac OS X 10.11, Windows 8.1 64-bit, Ubuntu 14.04.3 64-bit
-
-### Shell
-
-e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
+* Any other relevant information  
+e.g. details of an environment, cf CLI version, flag or value it does work with, DNS/network configuration, etc.
