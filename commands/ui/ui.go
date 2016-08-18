@@ -5,7 +5,6 @@ package ui
 import (
 	"fmt"
 	"io"
-	"os"
 	"text/template"
 
 	"github.com/fatih/color"
@@ -32,7 +31,7 @@ type Config interface {
 // UI is interface to interact with the user
 type UI struct {
 	// Out is the output buffer.
-	Out io.WriteCloser
+	Out io.Writer
 
 	colorEnabled config.ColorSetting
 }
@@ -40,7 +39,7 @@ type UI struct {
 // NewUI will return a UI object where Out is set to STDOUT
 func NewUI(c Config) UI {
 	return UI{
-		Out:          os.Stdout,
+		Out:          color.Output,
 		colorEnabled: c.ColorEnabled(),
 	}
 }
