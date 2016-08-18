@@ -21,7 +21,8 @@ run:
   - |
     set -ex
     gpg --import ./cli-private/ci/gpg_key/gpg.key
-    apt-get install ruby1.9.1
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -y install ruby1.9.1
     gem install deb-s3
 
     tar -xvzf installers/cf-cli-installers.tgz -C cf-cli-installers
