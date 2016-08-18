@@ -3,7 +3,7 @@ package sortutils_test
 import (
 	"sort"
 
-	. "github.com/cloudfoundry/cli/utils/sortutils"
+	. "code.cloudfoundry.org/cli/utils/sortutils"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
