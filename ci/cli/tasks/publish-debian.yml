@@ -25,6 +25,7 @@ run:
     apt-get -y install ruby1.9.1
     gem install deb-s3
 
+    mkdir cf-cli-installers
     tar -xvzf installers/cf-cli-installers.tgz -C cf-cli-installers
     deb-s3 upload cf-cli-installers/*.deb -p --sign=${KEY_ID} -b ${AWS_BUCKET_NAME}
 
