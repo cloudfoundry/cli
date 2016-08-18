@@ -54,24 +54,26 @@ func NewPushActor(appBitsRepo applicationbits.Repository, zipper appfiles.Zipper
 // given a zip.
 func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string) error) error {
 	if !actor.zipper.IsZipFile(dirOrZipFile) {
-		appDir, err := filepath.EvalSymlinks(dirOrZipFile)
-		if err != nil {
-			return err
-		}
-
-		if filepath.IsAbs(appDir) {
+		if filepath.IsAbs(dirOrZipFile) {
+			appDir, err := filepath.EvalSymlinks(dirOrZipFile)
+			if err != nil {
+				return err
+			}
 			err = f(appDir)
 			if err != nil {
 				return err
 			}
 		} else {
-			var absPath string
-			absPath, err = filepath.Abs(appDir)
+			absPath, err := filepath.Abs(dirOrZipFile)
+			if err != nil {
+				return err
+			}
+			appDir, err := filepath.EvalSymlinks(absPath)
 			if err != nil {
 				return err
 			}
 
-			err = f(absPath)
+			err = f(appDir)
 			if err != nil {
 				return err
 			}
