@@ -1,0 +1,29 @@
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: cli
+  path: gopath/src/github.com/cloudfoundry/cli
+- name: installers
+
+params:
+  GPG_KEY:
+  KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  AWS_ACCESS_KEY_ID:
+  AWS_BUCKET_NAME:cf-cli-debian
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+  set -ex
+  echo ${GPG_KEY}>gpg.key
+  gpg --import gpg.key
+  apt-get install ruby1.9.1
+  gem install deb-s3
+
+  tar -xvzf installers/cf-cli-installers.tgz -C cf-cli-installers
+  deb-s3 upload cf-cli-installers/*.deb -p --sign=${KEY_ID} -b ${AWS_BUCKET_NAME}
+
