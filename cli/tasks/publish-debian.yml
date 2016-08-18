@@ -2,6 +2,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
+- name: cli-private
 - name: cli
   path: gopath/src/github.com/cloudfoundry/cli
 - name: installers
@@ -19,8 +20,7 @@ run:
   - -c
   - |
     set -ex
-    echo ${GPG_KEY}>gpg.key
-    gpg --import gpg.key
+    gpg --import ./cli-private/ci/gpg_key/gpg.key
     apt-get install ruby1.9.1
     gem install deb-s3
 
