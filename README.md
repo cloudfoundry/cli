@@ -45,9 +45,9 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 ```
 # ...download & extract Mac OS X binary
 $ curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github" | tar -zx
-# ...or Linux binary
+# ...or Linux 64-bit binary
 $ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
-# ...and confirm you got the version you expected
+# ...and to confirm your cf CLI version
 $ ./cf --version
 cf version x.y.z-...
 ```
