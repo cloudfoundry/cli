@@ -1,7 +1,12 @@
 # Contributing to CLI
 
-The Cloud Foundry team uses GitHub and accepts contributions via
-[pull request](https://help.github.com/articles/using-pull-requests).
+The Cloud Foundry team uses GitHub and accepts code contributions via
+[pull requests](https://help.github.com/articles/using-pull-requests).
+If your contribution includes a change that is exposed to cf CLI users
+(e.g. introducing a new command or flag), please submit an issue
+to discuss it first.  
+Major new feature proposals generally entail a publicly viewable
+google document with commenting allowed to be discussed on the [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list.
 
 ## Contributor License Agreement
 
@@ -12,8 +17,6 @@ Follow these steps to make a contribution to any of our open source repositories
   [corporations](http://www.cloudfoundry.org/corpcontribution.pdf).
 
 ## General Workflow
-
-Major new feature proposals are given as a publicly viewable google document with commenting allowed and discussed on the [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list.
 
 1. Install [Go 1.6.x](https://golang.org)
 1. Create a directory where you would like to store the source for Go projects and their binaries (e.g. `$HOME/go`)
