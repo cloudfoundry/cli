@@ -432,6 +432,13 @@ jobs:
     - put: cf-cli-installers
       params:
         file: installers/cf-cli-installers.tgz
+    - task: publish-debian
+      file: cli-ci/ci/cli/tasks/publish-debian.yml
+      params:
+        GPG_KEY: {{gpg_key}}
+        KEY_ID:  {{gpg_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{debian_secret_access_key}}
+        AWS_ACCESS_KEY_ID: {{debian_access_key_id}}
 
 - name: publish-edge-archives
   serial: true
