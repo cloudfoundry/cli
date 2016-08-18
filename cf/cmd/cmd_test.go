@@ -181,6 +181,13 @@ var _ = Describe("main", func() {
 		Eventually(output.Out, 3*time.Second).Should(Say("Did you mean?"))
 	})
 
+	It("does not display requirement errors twice", func() {
+		output := Cf("space")
+		Eventually(output).Should(Exit(1))
+		Expect(output.Out).To(Say("Incorrect Usage."))
+		Expect(output.Out).NotTo(Say("Incorrect usage:"))
+	})
+
 	Describe("Plugins", func() {
 		It("Can call a plugin command from the Plugins configuration if it does not exist as a cf command", func() {
 			output := Cf("test_1_cmd1")
