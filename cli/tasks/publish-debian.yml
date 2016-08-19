@@ -40,6 +40,7 @@ run:
 
     tar -xvzf cf-cli-installers/cf-cli-installers.tgz -C installers
 
+    filename_regex="cf-cli(-installer)?([-_0-9a-z]+)?(\.[a-z]+)?"
     pushd installers
       for installer in *.deb; do
         [[ "${installer}" =~ $filename_regex ]]
