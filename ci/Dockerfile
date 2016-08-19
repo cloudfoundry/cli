@@ -19,3 +19,7 @@ RUN apt-get update && apt-get -y install python-pip
 RUN pip install awscli
 
 RUN apt-get update && apt-get -y install jq
+
+# for debian repository generation
+RUN apt-get update && apt-get -y install ruby1.9.1
+RUN gem install deb-s3

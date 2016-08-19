@@ -471,6 +471,8 @@ jobs:
     - get: final-cli
       trigger: true
       passed: [create-installers]
+    - get: cli
+      passed: [create-installers]
     - get: cf-cli-binaries
       passed: [create-installers]
     - get: cf-cli-installers
