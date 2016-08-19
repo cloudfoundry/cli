@@ -22,7 +22,7 @@ run:
   - -c
   - |
     set -ex
-    gpg --import <(echo ${GPG_KEY})
+    gpg --import <(echo "${GPG_KEY}")
     export DEBIAN_FRONTEND=noninteractive
 
     mkdir installers
