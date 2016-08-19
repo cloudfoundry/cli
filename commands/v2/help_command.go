@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actors/v2actions"
@@ -11,6 +12,7 @@ import (
 	"code.cloudfoundry.org/cli/commands/ui"
 	"code.cloudfoundry.org/cli/commands/v2/internal"
 	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
 const (
@@ -90,12 +92,8 @@ func (cmd HelpCommand) displayHelpPreamble() {
 }
 
 func (cmd HelpCommand) displayAllCommands() {
+	pluginCommands := cmd.getSortedPluginCommands()
 	cmdInfo := cmd.Actor.GetAllNamesAndDescriptions(Commands)
-	pluginCommands := []config.PluginCommand{}
-
-	for _, pluginCommand := range cmd.Config.PluginConfig() {
-		pluginCommands = append(pluginCommands, pluginCommand.Commands...)
-	}
 	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
 
 	for _, category := range internal.HelpCategoryList {
@@ -272,4 +270,23 @@ func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
 	}
 
 	return v2actions.CommandInfo{}, false
+}
+
+func (cmd HelpCommand) getSortedPluginCommands() config.PluginCommands {
+	plugins := cmd.Config.PluginConfig()
+
+	sortedPluginNames := sortutils.Alphabetic{}
+	for plugin, _ := range plugins {
+		sortedPluginNames = append(sortedPluginNames, plugin)
+	}
+	sort.Sort(sortedPluginNames)
+
+	pluginCommands := config.PluginCommands{}
+	for _, pluginName := range sortedPluginNames {
+		sortedCommands := plugins[pluginName].Commands
+		sort.Sort(sortedCommands)
+		pluginCommands = append(pluginCommands, sortedCommands...)
+	}
+
+	return pluginCommands
 }

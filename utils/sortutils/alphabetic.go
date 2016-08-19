@@ -8,8 +8,12 @@ func (s Alphabetic) Len() int      { return len(s) }
 func (s Alphabetic) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
 func (s Alphabetic) Less(i, j int) bool {
-	iRunes := []rune(s[i])
-	jRunes := []rune(s[j])
+	return SortAlphabetic(s[i], s[j])
+}
+
+func SortAlphabetic(a string, b string) bool {
+	iRunes := []rune(a)
+	jRunes := []rune(b)
 
 	max := len(iRunes)
 	if max > len(jRunes) {

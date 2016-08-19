@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
 const (
@@ -142,9 +144,9 @@ type PluginsConfig struct {
 }
 
 type PluginConfig struct {
-	Location string          `json:"Location"`
-	Version  PluginVersion   `json:"Version"`
-	Commands []PluginCommand `json:"Commands"`
+	Location string         `json:"Location"`
+	Version  PluginVersion  `json:"Version"`
+	Commands PluginCommands `json:"Commands"`
 }
 
 type PluginVersion struct {
@@ -152,6 +154,12 @@ type PluginVersion struct {
 	Minor int `json:"Minor"`
 	Build int `json:"Build"`
 }
+
+type PluginCommands []PluginCommand
+
+func (p PluginCommands) Len() int               { return len(p) }
+func (p PluginCommands) Swap(i int, j int)      { p[i], p[j] = p[j], p[i] }
+func (p PluginCommands) Less(i int, j int) bool { return sortutils.SortAlphabetic(p[i].Name, p[j].Name) }
 
 type PluginCommand struct {
 	Name         string             `json:"Name"`
