@@ -22,10 +22,28 @@ run:
     set -ex
     gpg --import ./cli-private/ci/gpg_key/gpg.key
     export DEBIAN_FRONTEND=noninteractive
-    apt-get -y install ruby1.9.1
-    gem install deb-s3
 
     mkdir installers
+
+    pushd cli
+      git remote set-url origin https://github.com/cloudfoundry/cli.git
+      git fetch --tags
+      release_tag=$( git show-ref --tags -d | grep $(git rev-parse HEAD) | cut -d'/' -f3 | egrep 'v[0-9]' | cut -d'v' -f2 )
+    popd
+
+    if [ -z "${release_tag}" ]; then
+      echo "Expected the commit that triggered this build to be tagged." >&2
+      exit 1
+    fi
+
+    pushd installers
+      for installer in *.deb; do
+        [[ "${installer}" =~ $filename_regex ]]
+        os_arch="${BASH_REMATCH[2]}"
+        mv "${installer}" "cf-cli-installer_${release_tag}${os_arch}.deb"
+      done
+    popd
+
     tar -xvzf cf-cli-installers/cf-cli-installers.tgz -C installers
-    deb-s3 upload installers/*.deb -p --sign=${KEY_ID} -b ${AWS_BUCKET_NAME}
+    deb-s3 upload installers/*.deb --preserve-versions --sign=${KEY_ID} --bucket=${AWS_BUCKET_NAME}
 
