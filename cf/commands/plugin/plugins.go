@@ -72,11 +72,11 @@ func (cmd *Plugins) Execute(c flags.FlagContext) error {
 		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
 	}
 
-	var sortedPluginNames []string
+	var sortedPluginNames sortutils.Alphabetic
 	for k := range plugins {
 		sortedPluginNames = append(sortedPluginNames, k)
 	}
-	sort.Sort(sortutils.Alphabetic(sortedPluginNames))
+	sort.Sort(sortedPluginNames)
 
 	for _, pluginName := range sortedPluginNames {
 		metadata := plugins[pluginName]
