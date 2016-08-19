@@ -2,6 +2,8 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
+- name: final-cli
+  path: cli
 - name: cli-private
 - name: cli
   path: gopath/src/github.com/cloudfoundry/cli
@@ -25,7 +27,7 @@ run:
 
     mkdir installers
 
-    pushd gopath/src/github.com/cloudfoundry/cli
+    pushd cli
       git remote set-url origin https://github.com/cloudfoundry/cli.git
       git fetch --tags
       release_tag=$( git show-ref --tags -d | grep $(git rev-parse HEAD) | cut -d'/' -f3 | egrep 'v[0-9]' | cut -d'v' -f2 )
