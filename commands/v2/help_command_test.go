@@ -220,7 +220,7 @@ var _ = Describe("Help Command", func() {
 	})
 
 	Describe("providing help for all commands", func() {
-		Context("when do not provide command", func() {
+		Context("when a command is not provided", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs = flags.CommandName{
 					CommandName: "",
@@ -330,6 +330,57 @@ var _ = Describe("Help Command", func() {
 
 				Expect(fakeUI.Out).To(Say("GLOBAL OPTIONS:"))
 				Expect(fakeUI.Out).To(Say("--help, -h\\s+Show help"))
+			})
+
+			Context("when there are multiple installed plugins", func() {
+				BeforeEach(func() {
+					fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+						"some-plugin": config.PluginConfig{
+							Commands: []config.PluginCommand{
+								{
+									Name:     "enable",
+									HelpText: "enable command",
+								},
+								{
+									Name:     "disable",
+									HelpText: "disable command",
+								},
+								{
+									Name:     "some-other-command",
+									HelpText: "does something",
+								},
+							},
+						},
+						"Some-other-plugin": config.PluginConfig{
+							Commands: []config.PluginCommand{
+								{
+									Name:     "some-other-plugin-command",
+									HelpText: "does some other thing",
+								},
+							},
+						},
+						"the-last-plugin": config.PluginConfig{
+							Commands: []config.PluginCommand{
+								{
+									Name:     "last-plugin-command",
+									HelpText: "does the last thing",
+								},
+							},
+						},
+					})
+				})
+
+				It("returns the plugin commands organized by plugin and sorted in alphabetical order", func() {
+					err := cmd.Execute(nil)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakeUI.Out).To(Say(`INSTALLED PLUGIN COMMANDS:.*
+\s+some-other-plugin-command\s+does some other thing.*
+\s+disable\s+disable command.*
+\s+enable\s+enable command.*
+\s+some-other-command\s+does something.*
+\s+last-plugin-command\s+does the last thing`))
+				})
 			})
 		})
 	})
