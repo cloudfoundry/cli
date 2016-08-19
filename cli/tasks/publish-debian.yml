@@ -38,6 +38,8 @@ run:
       exit 1
     fi
 
+    tar -xvzf cf-cli-installers/cf-cli-installers.tgz -C installers
+
     pushd installers
       for installer in *.deb; do
         [[ "${installer}" =~ $filename_regex ]]
@@ -46,6 +48,5 @@ run:
       done
     popd
 
-    tar -xvzf cf-cli-installers/cf-cli-installers.tgz -C installers
     deb-s3 upload installers/*.deb --preserve-versions --sign=${KEY_ID} --bucket=${AWS_BUCKET_NAME}
 
