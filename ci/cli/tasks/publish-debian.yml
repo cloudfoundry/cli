@@ -25,7 +25,7 @@ run:
 
     mkdir installers
 
-    pushd cli
+    pushd gopath/src/github.com/cloudfoundry/cli
       git remote set-url origin https://github.com/cloudfoundry/cli.git
       git fetch --tags
       release_tag=$( git show-ref --tags -d | grep $(git rev-parse HEAD) | cut -d'/' -f3 | egrep 'v[0-9]' | cut -d'v' -f2 )
