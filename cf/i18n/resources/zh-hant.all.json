@@ -5,11 +5,11 @@
   },
   {
     "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": "\n\n您的 JSON 字串語法無效。適當的語法為:cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
+    "translation": "\n\n您的 JSON 字串語法無效。適當的語法為: cf set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "\n\nYour JSON string syntax is invalid.  Proper syntax is this:  cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'",
-    "translation": "\n\n您的 JSON 字串語法無效。適當的語法為:cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
+    "translation": "\n\n您的 JSON 字串語法無效。適當的語法為: cf set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"
   },
   {
     "id": "\n* These service plans have an associated cost. Creating a service instance will incur this cost.",
@@ -37,23 +37,23 @@
   },
   {
     "id": "\nTIP:  Use 'cf marketplace -s SERVICE' to view descriptions of individual plans of a given service.",
-    "translation": "\n提示:使用 'cf marketplace -s SERVICE'，以檢視給定服務的個別方案說明。"
+    "translation": "\n提示: 使用 'cf marketplace -s SERVICE'，以檢視給定服務的個別方案說明。"
   },
   {
     "id": "\nTIP: Assign roles with '{{.CurrentUser}} set-org-role' and '{{.CurrentUser}} set-space-role'",
-    "translation": "\n提示:使用 '{{.CurrentUser}} set-org-role' 和 '{{.CurrentUser}} set-space-role' 來指派角色"
+    "translation": "\n提示: 使用 '{{.CurrentUser}} set-org-role' 和 '{{.CurrentUser}} set-space-role' 來指派角色"
   },
   {
     "id": "\nTIP: Use '{{.CFTargetCommand}}' to target new space",
-    "translation": "\n提示:使用 '{{.CFTargetCommand}}' 以將目標設為新的空間"
+    "translation": "\n提示: 使用 '{{.CFTargetCommand}}' 以將目標設為新的空間"
   },
   {
     "id": "\nTIP: Use '{{.Command}}' to target new org",
-    "translation": "\n提示:使用 '{{.Command}}' 以將目標設為新的組織"
+    "translation": "\n提示: 使用 '{{.Command}}' 以將目標設為新的組織"
   },
   {
     "id": "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error",
-    "translation": "\n提示:使用 'cf login -a API --skip-ssl-validation' 或 'cf api API --skip-ssl-validation'，以抑制此錯誤"
+    "translation": "\n提示: 使用 'cf login -a API --skip-ssl-validation' 或 'cf api API --skip-ssl-validation'，以抑制此錯誤"
   },
   {
     "id": "   CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\n",
@@ -117,7 +117,7 @@
   },
   {
     "id": " is not available in repo '",
-    "translation": " 在下列儲存庫中未提供:'"
+    "translation": " 在下列儲存庫中未提供: '"
   },
   {
     "id": " is not responding. Please make sure it is a valid plugin repo.",
@@ -141,7 +141,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes' 應該為清單"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -153,7 +153,7 @@
   },
   {
     "id": "**Attention: Plugins are binaries written by potentially untrusted authors. Install and use plugins at your own risk.**\n\nDo you want to install the plugin {{.Plugin}}? (y or n)",
-    "translation": "**注意:外掛程式是由潛在未授信作者所編寫的二進位檔。您必須自行承擔安裝和使用外掛程式的風險。**\n\n您要安裝外掛程式 {{.Plugin}} 嗎？（y 或 n）"
+    "translation": "**注意: 外掛程式是由潛在未授信作者所編寫的二進位檔。您必須自行承擔安裝和使用外掛程式的風險。**\n\n您要安裝外掛程式 {{.Plugin}} 嗎？（y 或 n）"
   },
   {
     "id": "A command line tool to interact with Cloud Foundry",
@@ -189,15 +189,15 @@
   },
   {
     "id": "API endpoint: {{.APIEndpoint}}",
-    "translation": "API 端點:{{.APIEndpoint}}"
+    "translation": "API 端點: {{.APIEndpoint}}"
   },
   {
     "id": "API endpoint: {{.APIEndpoint}} (API version: {{.APIVersion}})",
-    "translation": "API 端點:{{.APIEndpoint}}（API 版本:{{.APIVersion}}）"
+    "translation": "API 端點: {{.APIEndpoint}}（API 版本: {{.APIVersion}}）"
   },
   {
     "id": "API endpoint: {{.Endpoint}}",
-    "translation": "API 端點:{{.Endpoint}}"
+    "translation": "API 端點: {{.Endpoint}}"
   },
   {
     "id": "APPS",
@@ -297,15 +297,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "應用程式 {{.AppName}} 不得同時配置 'routes' 和 'domain'/'domains'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "應用程式 {{.AppName}} 不得同時配置 'routes' 和 'host'/'hosts'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "應用程式 {{.AppName}} 不得同時配置 'routes' 和 'no-hostname'"
   },
   {
     "id": "Apps:",
@@ -337,7 +337,7 @@
   },
   {
     "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
-    "translation": "正在以 {{.CurrentUser}} 身分，指派角色 {{.Role}} 給組織 {{.TargetOrg}} / 空間 {{.TargetSpace}} 中的使用者 {{.TargetUser}}..."
+    "translation": "正在以 {{.CurrentUser}} 身分，指派角色 {{.Role}} 給組織 {{.TargetOrg}}/空間 {{.TargetSpace}} 中的使用者 {{.TargetUser}}..."
   },
   {
     "id": "Assigning role {{.Role}} to user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
@@ -361,7 +361,7 @@
   },
   {
     "id": "Attention: The plan `{{.PlanName}}` of service `{{.ServiceName}}` is not free.  The instance `{{.ServiceInstanceName}}` will incur a cost.  Contact your administrator if you think this is in error.",
-    "translation": "注意:服務 '{{.ServiceName}}' 的方案 '{{.PlanName}}' 不是免費的。實例 '{{.ServiceInstanceName}}' 會導致成本。如果您認為這是錯誤，請聯絡您的管理者。"
+    "translation": "注意: 服務 '{{.ServiceName}}' 的方案 '{{.PlanName}}' 不是免費的。實例 '{{.ServiceInstanceName}}' 會導致成本。如果您認為這是錯誤，請聯絡您的管理者。"
   },
   {
     "id": "Authenticate user non-interactively",
@@ -373,7 +373,7 @@
   },
   {
     "id": "Authentication has expired.  Please log back in to re-authenticate.\n\nTIP: Use `cf login -a \u003cendpoint\u003e -u \u003cuser\u003e -o \u003corg\u003e -s \u003cspace\u003e` to log back in and re-authenticate.",
-    "translation": "鑑別已過期。請重新登入以重新鑑別。\n\n提示:使用 'cf login -a \u003cendpoint\u003e -u \u003cuser\u003e -o \u003corg\u003e -s \u003cspace\u003e' 重新登入，並重新鑑別。"
+    "translation": "鑑別已過期。請重新登入以重新鑑別。\n\n提示: 使用 'cf login -a \u003cendpoint\u003e -u \u003cuser\u003e -o \u003corg\u003e -s \u003cspace\u003e' 重新登入，並重新鑑別。"
   },
   {
     "id": "Authorization server did not redirect with one time code",
@@ -393,7 +393,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "將安全群組連結至組織的特定空間或所有現有空間"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -441,7 +441,7 @@
   },
   {
     "id": "Bound apps: {{.BoundApplications}}",
-    "translation": "連結的應用程式:{{.BoundApplications}}"
+    "translation": "連結的應用程式: {{.BoundApplications}}"
   },
   {
     "id": "Buildpack {{.BuildpackName}} already exists",
@@ -1009,7 +1009,7 @@
   },
   {
     "id": "Can provision instances of paid service plans (Default: disallowed)",
-    "translation": "可以佈建付費服務方案的實例（預設值:禁止）"
+    "translation": "可以佈建付費服務方案的實例（預設值: 禁止）"
   },
   {
     "id": "Cannot delete service instance, service keys and bindings must first be deleted",
@@ -1069,7 +1069,7 @@
   },
   {
     "id": "Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-    "translation": "Cloud Foundry API {{.APIVer}} 版需要 CLI {{.CLIMin}} 版。您目前的版本為 {{.CLIVer}}。若要升級您的 CLI，請造訪:https://github.com/cloudfoundry/cli#downloads"
+    "translation": "Cloud Foundry API {{.APIVer}} 版需要 CLI {{.CLIMin}} 版。您目前的版本為 {{.CLIVer}}。若要升級您的 CLI，請造訪: https://github.com/cloudfoundry/cli#downloads"
   },
   {
     "id": "Comma delimited list of ports the application may listen on",
@@ -1113,7 +1113,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "將應用程式原始碼從某個應用程式複製到另一個應用程式。除非予以置換，否則 copy-source 指令將重新啟動應用程式。"
+    "translation": "將應用程式的原始碼複製到另一個現有應用程式（並重新啟動該應用程式）"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1121,7 +1121,7 @@
   },
   {
     "id": "Could not bind to service {{.ServiceName}}\nError: {{.Err}}",
-    "translation": "無法連結至服務 {{.ServiceName}}\n錯誤:{{.Err}}"
+    "translation": "無法連結至服務 {{.ServiceName}}\n錯誤: {{.Err}}"
   },
   {
     "id": "Could not copy plugin binary: \n{{.Error}}",
@@ -1377,7 +1377,7 @@
   },
   {
     "id": "Dashboard: {{.URL}}",
-    "translation": "儀表板:{{.URL}}"
+    "translation": "儀表板: {{.URL}}"
   },
   {
     "id": "Define a new resource quota",
@@ -1525,7 +1525,7 @@
   },
   {
     "id": "Description: {{.ServiceDescription}}",
-    "translation": "說明:{{.ServiceDescription}}"
+    "translation": "說明: {{.ServiceDescription}}"
   },
   {
     "id": "Did you mean?",
@@ -1617,7 +1617,7 @@
   },
   {
     "id": "Documentation url: {{.URL}}",
-    "translation": "文件 URL:{{.URL}}"
+    "translation": "文件 URL: {{.URL}}"
   },
   {
     "id": "Domain (e.g. example.com)",
@@ -1629,7 +1629,7 @@
   },
   {
     "id": "Download attempt failed: {{.Error}}\n\nUnable to install, plugin is not available from the given url.",
-    "translation": "下載嘗試失敗:{{.Error}}\n\n無法安裝，無法從給定的 URL 取得外掛程式。"
+    "translation": "下載嘗試失敗: {{.Error}}\n\n無法安裝，無法從給定的 URL 取得外掛程式。"
   },
   {
     "id": "Downloaded plugin binary's checksum does not match repo metadata",
@@ -1713,7 +1713,7 @@
   },
   {
     "id": "Error accessing org {{.OrgName}} for GUID': ",
-    "translation": "存取 GUID 的組織 {{.OrgName}} 時發生錯誤:"
+    "translation": "存取 GUID 的組織 {{.OrgName}} 時發生錯誤: "
   },
   {
     "id": "Error building request",
@@ -1721,7 +1721,7 @@
   },
   {
     "id": "Error creating manifest file: ",
-    "translation": "建立資訊清單檔時發生錯誤:"
+    "translation": "建立資訊清單檔時發生錯誤: "
   },
   {
     "id": "Error creating request:\n{{.Err}}",
@@ -1729,7 +1729,7 @@
   },
   {
     "id": "Error creating tmp file: {{.Err}}",
-    "translation": "建立暫存檔時發生錯誤:{{.Err}}"
+    "translation": "建立暫存檔時發生錯誤: {{.Err}}"
   },
   {
     "id": "Error creating upload",
@@ -1753,7 +1753,7 @@
   },
   {
     "id": "Error disabling ssh support for ",
-    "translation": "停用下者的 ssh 支援時發生錯誤:"
+    "translation": "停用下者的 ssh 支援時發生錯誤: "
   },
   {
     "id": "Error disabling ssh support for space ",
@@ -1769,7 +1769,7 @@
   },
   {
     "id": "Error enabling ssh support for ",
-    "translation": "啟用下者的 ssh 支援時發生錯誤:"
+    "translation": "啟用下者的 ssh 支援時發生錯誤: "
   },
   {
     "id": "Error enabling ssh support for space ",
@@ -1809,19 +1809,19 @@
   },
   {
     "id": "Error forwarding port: ",
-    "translation": "轉遞埠時發生錯誤:"
+    "translation": "轉遞埠時發生錯誤: "
   },
   {
     "id": "Error getting SSH code: ",
-    "translation": "取得 SSH 程式碼時發生錯誤:"
+    "translation": "取得 SSH 程式碼時發生錯誤: "
   },
   {
     "id": "Error getting SSH info:",
-    "translation": "取得 SSH 資訊時發生錯誤:"
+    "translation": "取得 SSH 資訊時發生錯誤: "
   },
   {
     "id": "Error getting application summary: ",
-    "translation": "取得應用程式摘要時發生錯誤:"
+    "translation": "取得應用程式摘要時發生錯誤: "
   },
   {
     "id": "Error getting command list from plugin {{.FilePath}}",
@@ -1833,19 +1833,19 @@
   },
   {
     "id": "Error getting one time auth code: ",
-    "translation": "取得一次性鑑別碼時發生錯誤:"
+    "translation": "取得一次性鑑別碼時發生錯誤: "
   },
   {
     "id": "Error getting plugin metadata from repo: ",
-    "translation": "從儲存庫取得外掛程式 meta 資料時發生錯誤:"
+    "translation": "從儲存庫取得外掛程式 meta 資料時發生錯誤: "
   },
   {
     "id": "Error getting the redirected location: {{.Error}}",
-    "translation": "取得重新導向的位置時發生錯誤:{{.Error}}"
+    "translation": "取得重新導向的位置時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error initializing RPC service: ",
-    "translation": "起始設定 RPC 服務時發生錯誤:"
+    "translation": "起始設定 RPC 服務時發生錯誤: "
   },
   {
     "id": "Error marshaling JSON",
@@ -1853,7 +1853,7 @@
   },
   {
     "id": "Error opening SSH connection: ",
-    "translation": "開啟 SSH 連線時發生錯誤:"
+    "translation": "開啟 SSH 連線時發生錯誤: "
   },
   {
     "id": "Error opening buildpack file",
@@ -1873,15 +1873,15 @@
   },
   {
     "id": "Error processing app files in '{{.Path}}': {{.Error}}",
-    "translation": "處理 '{{.Path}}' 中的應用程式檔案時發生錯誤:{{.Error}}"
+    "translation": "處理 '{{.Path}}' 中的應用程式檔案時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error processing app files: {{.Error}}",
-    "translation": "處理應用程式檔案時發生錯誤:{{.Error}}"
+    "translation": "處理應用程式檔案時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error processing data from server: ",
-    "translation": "處理來自伺服器的資料時發生錯誤:"
+    "translation": "處理來自伺服器的資料時發生錯誤: "
   },
   {
     "id": "Error reading manifest file:\n{{.Err}}",
@@ -1893,15 +1893,15 @@
   },
   {
     "id": "Error reading response from",
-    "translation": "讀取下者的回應時發生錯誤:"
+    "translation": "讀取下者的回應時發生錯誤: "
   },
   {
     "id": "Error reading response from server: ",
-    "translation": "讀取伺服器的回應時發生錯誤:"
+    "translation": "讀取伺服器的回應時發生錯誤: "
   },
   {
     "id": "Error refreshing oauth token: ",
-    "translation": "重新整理 OAuth 記號時發生錯誤:"
+    "translation": "重新整理 OAuth 記號時發生錯誤: "
   },
   {
     "id": "Error renaming buildpack {{.Name}}\n{{.Error}}",
@@ -1909,11 +1909,11 @@
   },
   {
     "id": "Error requesting from",
-    "translation": "從下者要求時發生錯誤:"
+    "translation": "從下者要求時發生錯誤: "
   },
   {
     "id": "Error requesting one time code from server: {{.Error}}",
-    "translation": "從伺服器要求一次性程式碼時發生錯誤:{{.Error}}"
+    "translation": "從伺服器要求一次性程式碼時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error resolving route:\n{{.Err}}",
@@ -1921,19 +1921,19 @@
   },
   {
     "id": "Error restarting application: {{.Error}}",
-    "translation": "重新啟動應用程式時發生錯誤:{{.Error}}"
+    "translation": "重新啟動應用程式時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error retrieving stack: ",
-    "translation": "擷取堆疊時發生錯誤:"
+    "translation": "擷取堆疊時發生錯誤: "
   },
   {
     "id": "Error retrieving stacks: {{.Error}}",
-    "translation": "擷取堆疊時發生錯誤:{{.Error}}"
+    "translation": "擷取堆疊時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error saving manifest: {{.Error}}",
-    "translation": "儲存資訊清單時發生錯誤:{{.Error}}"
+    "translation": "儲存資訊清單時發生錯誤: {{.Error}}"
   },
   {
     "id": "Error updating buildpack {{.Name}}\n{{.Error}}",
@@ -1941,7 +1941,7 @@
   },
   {
     "id": "Error updating health_check_type for ",
-    "translation": "更新下者的 health_check_type 時發生錯誤:"
+    "translation": "更新下者的 health_check_type 時發生錯誤: "
   },
   {
     "id": "Error uploading application.\n{{.APIErr}}",
@@ -1953,7 +1953,7 @@
   },
   {
     "id": "Error writing to tmp file: {{.Err}}",
-    "translation": "寫入暫存檔時發生錯誤:{{.Err}}"
+    "translation": "寫入暫存檔時發生錯誤: {{.Err}}"
   },
   {
     "id": "Error zipping application",
@@ -1965,19 +1965,19 @@
   },
   {
     "id": "Error: ",
-    "translation": "錯誤:"
+    "translation": "錯誤: "
   },
   {
     "id": "Error: No name found for app",
-    "translation": "錯誤:找不到應用程式的名稱"
+    "translation": "錯誤: 找不到應用程式的名稱"
   },
   {
     "id": "Error: timed out waiting for async job '{{.ErrURL}}' to finish",
-    "translation": "錯誤:等待非同步工作 '{{.ErrURL}}' 完成時逾時"
+    "translation": "錯誤: 等待非同步工作 '{{.ErrURL}}' 完成時逾時"
   },
   {
     "id": "Error: {{.Err}}",
-    "translation": "錯誤:{{.Err}}"
+    "translation": "錯誤: {{.Err}}"
   },
   {
     "id": "Executes a request to the targeted API endpoint",
@@ -2021,15 +2021,15 @@
   },
   {
     "id": "Failed assigning org role to user: ",
-    "translation": "將組織角色指派給使用者時失敗:"
+    "translation": "將組織角色指派給使用者時失敗: "
   },
   {
     "id": "Failed fetching buildpacks.\n{{.Error}}",
     "translation": "提取建置套件時失敗。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "提取組織 {{.OrgName}} 的網域時失敗。\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "提取組織 %s 的網域時失敗。\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2073,11 +2073,11 @@
   },
   {
     "id": "Failed to create manifest, unable to parse environment variable: ",
-    "translation": "無法建立資訊清單，無法剖析環境變數:"
+    "translation": "無法建立資訊清單，無法剖析環境變數: "
   },
   {
     "id": "Failed to make plugin executable: {{.Error}}",
-    "translation": "無法讓外掛程式成為可執行:{{.Error}}"
+    "translation": "無法讓外掛程式成為可執行: {{.Error}}"
   },
   {
     "id": "Failed to marshal JSON",
@@ -2141,7 +2141,7 @@
   },
   {
     "id": "GLOBAL OPTIONS:",
-    "translation": "廣域選項:"
+    "translation": "廣域選項: "
   },
   {
     "id": "Get a one time password for ssh clients",
@@ -2181,7 +2181,7 @@
   },
   {
     "id": "Getting health_check_type value for ",
-    "translation": "正在取得下者的 health_check_type 值:"
+    "translation": "正在取得下者的 health_check_type 值: "
   },
   {
     "id": "Getting info for org {{.OrgName}} as {{.Username}}...",
@@ -2213,7 +2213,7 @@
   },
   {
     "id": "Getting plugins from repository '",
-    "translation": "正在從下列儲存庫取得外掛程式:'"
+    "translation": "正在從下列儲存庫取得外掛程式: '"
   },
   {
     "id": "Getting quota {{.QuotaName}} info as {{.Username}}...",
@@ -2325,7 +2325,7 @@
   },
   {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
-    "translation": "正在以 {{.CurrentUser}} 身分取得組織 {{.TargetOrg}}/空間 {{.TargetSpace}} 中的使用者"
+    "translation": "正在以 {{.CurrentUser}} 身分取得組織 {{.TargetOrg}} / 空間 {{.TargetSpace}} 中的使用者"
   },
   {
     "id": "Getting users in org {{.TargetOrg}} as {{.CurrentUser}}...",
@@ -2385,11 +2385,11 @@
   },
   {
     "id": "In Windows Command Line use single-quoted, escaped JSON: '{\\\"valid\\\":\\\"json\\\"}'",
-    "translation": "在「Windows 指令行」中，使用單引號跳出的 JSON:'{\\\"valid\\\":\\\"json\\\"}'"
+    "translation": "在「Windows 指令行」中，使用單引號跳出的 JSON: '{\\\"valid\\\":\\\"json\\\"}'"
   },
   {
     "id": "In Windows PowerShell use double-quoted, escaped JSON: \"{\\\"valid\\\":\\\"json\\\"}\"",
-    "translation": "在 Windows PowerShell 中，使用雙引號跳出的 JSON:\"{\\\"valid\\\":\\\"json\\\"}\""
+    "translation": "在 Windows PowerShell 中，使用雙引號跳出的 JSON: \"{\\\"valid\\\":\\\"json\\\"}\""
   },
   {
     "id": "Include response headers in the output",
@@ -2485,7 +2485,7 @@
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "用法不正確。需要 SECURITY_GROUP 和 ORG，以及選用性的 SPACE 作為引數\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2593,11 +2593,11 @@
   },
   {
     "id": "Incorrect Usage:",
-    "translation": "不正確用法:"
+    "translation": "不正確用法: "
   },
   {
     "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
-    "translation": "json 格式不正確:檔案:{{.JSONFile}}\n\t\t\n有效的 JSON 檔案範例:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
+    "translation": "json 格式不正確: 檔案: {{.JSONFile}}\n\t\t\n有效的 JSON 檔案範例:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
     "id": "Install CLI plugin",
@@ -2633,11 +2633,11 @@
   },
   {
     "id": "Invalid app port: {{.AppPort}}\nApp port must be a number",
-    "translation": "無效的應用程式埠:{{.AppPort}}\n應用程式埠必須是數字"
+    "translation": "無效的應用程式埠: {{.AppPort}}\n應用程式埠必須是數字"
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "應用程式配置無效"
   },
   {
     "id": "Invalid async response from server",
@@ -2645,7 +2645,7 @@
   },
   {
     "id": "Invalid auth token: ",
-    "translation": "無效的鑑別記號:"
+    "translation": "無效的鑑別記號: "
   },
   {
     "id": "Invalid configuration provided for -c flag. Please provide a valid JSON object or path to a file containing a valid JSON object.",
@@ -2657,35 +2657,35 @@
   },
   {
     "id": "Invalid disk quota: {{.DiskQuota}}\n{{.ErrorDescription}}",
-    "translation": "無效的磁碟限額:{{.DiskQuota}}\n{{.ErrorDescription}}"
+    "translation": "無效的磁碟限額: {{.DiskQuota}}\n{{.ErrorDescription}}"
   },
   {
     "id": "Invalid disk quota: {{.DiskQuota}}\n{{.Err}}",
-    "translation": "無效的磁碟限額:{{.DiskQuota}}\n{{.Err}}"
+    "translation": "無效的磁碟限額: {{.DiskQuota}}\n{{.Err}}"
   },
   {
     "id": "Invalid health-check-type param: {{.healthCheckType}}",
-    "translation": "無效的 health-check-type 參數:{{.healthCheckType}}"
+    "translation": "無效的 health-check-type 參數: {{.healthCheckType}}"
   },
   {
     "id": "Invalid instance count: {{.InstancesCount}}\nInstance count must be a positive integer",
-    "translation": "無效的實例計數:{{.InstancesCount}}\n實例計數必須是正整數"
+    "translation": "無效的實例計數: {{.InstancesCount}}\n實例計數必須是正整數"
   },
   {
     "id": "Invalid instance memory limit: {{.MemoryLimit}}\n{{.Err}}",
-    "translation": "無效的實例記憶體限制:{{.MemoryLimit}}\n{{.Err}}"
+    "translation": "無效的實例記憶體限制: {{.MemoryLimit}}\n{{.Err}}"
   },
   {
     "id": "Invalid instance: {{.Instance}}\nInstance must be a positive integer",
-    "translation": "無效的實例:{{.Instance}}\n實例必須是正整數"
+    "translation": "無效的實例: {{.Instance}}\n實例必須是正整數"
   },
   {
     "id": "Invalid instance: {{.Instance}}\nInstance must be less than {{.InstanceCount}}",
-    "translation": "無效的實例:{{.Instance}}\n實例必須小於 {{.InstanceCount}}"
+    "translation": "無效的實例: {{.Instance}}\n實例必須小於 {{.InstanceCount}}"
   },
   {
     "id": "Invalid json data from",
-    "translation": "來自下者的 JSON 資料無效:"
+    "translation": "來自下者的 JSON 資料無效: "
   },
   {
     "id": "Invalid manifest. Expected a map",
@@ -2693,27 +2693,27 @@
   },
   {
     "id": "Invalid memory limit: {{.MemLimit}}\n{{.Err}}",
-    "translation": "無效的記憶體限制:{{.MemLimit}}\n{{.Err}}"
+    "translation": "無效的記憶體限制: {{.MemLimit}}\n{{.Err}}"
   },
   {
     "id": "Invalid memory limit: {{.MemoryLimit}}\n{{.Err}}",
-    "translation": "無效的記憶體限制:{{.MemoryLimit}}\n{{.Err}}"
+    "translation": "無效的記憶體限制: {{.MemoryLimit}}\n{{.Err}}"
   },
   {
     "id": "Invalid memory limit: {{.Memory}}\n{{.ErrorDescription}}",
-    "translation": "無效的記憶體限制:{{.Memory}}\n{{.ErrorDescription}}"
+    "translation": "無效的記憶體限制: {{.Memory}}\n{{.ErrorDescription}}"
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "路徑 {{.RouteName}} 的埠無效"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
-    "translation": "無效的逾時參數:{{.Timeout}}\n{{.Err}}"
+    "translation": "無效的逾時參數: {{.Timeout}}\n{{.Err}}"
   },
   {
     "id": "Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
-    "translation": "無效的 '{{.PropertyName}}' 值:{{.StringVal}}\n{{.Error}}"
+    "translation": "無效的 '{{.PropertyName}}' 值: {{.StringVal}}\n{{.Error}}"
   },
   {
     "id": "Invite and manage users, and enable features for a given space\n",
@@ -2849,7 +2849,7 @@
   },
   {
     "id": "Logged errors:",
-    "translation": "記載的錯誤:"
+    "translation": "記載的錯誤: "
   },
   {
     "id": "Logging out...",
@@ -2881,7 +2881,7 @@
   },
   {
     "id": "Manifest file created successfully at ",
-    "translation": "已順利在下列位置建立資訊清單檔:"
+    "translation": "已順利在下列位置建立資訊清單檔: "
   },
   {
     "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
@@ -2921,7 +2921,7 @@
   },
   {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G). -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": "應用程式實例可以具有的記憶體數量上限（例如 1024M、1G、10G）。-1 代表無限制數量。（預設值:無限制）"
+    "translation": "應用程式實例可以具有的記憶體數量上限（例如 1024M、1G、10G）。-1 代表無限制數量。（預設值: 無限制）"
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports",
@@ -2929,7 +2929,7 @@
   },
   {
     "id": "Maximum number of routes that may be created with reserved ports (Default: 0)",
-    "translation": "可以使用保留埠建立的路徑數目上限（預設值:0）"
+    "translation": "可以使用保留埠建立的路徑數目上限（預設值: 0）"
   },
   {
     "id": "Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply",
@@ -2941,7 +2941,7 @@
   },
   {
     "id": "Message: {{.Message}}",
-    "translation": "訊息:{{.Message}}"
+    "translation": "訊息: {{.Message}}"
   },
   {
     "id": "Migrate service instances from one service plan to another",
@@ -2953,7 +2953,7 @@
   },
   {
     "id": "NAME:",
-    "translation": "名稱:"
+    "translation": "名稱: "
   },
   {
     "id": "NEW_NAME",
@@ -3125,7 +3125,7 @@
   },
   {
     "id": "Note: this may take some time",
-    "translation": "附註:這可能需要一些時間"
+    "translation": "附註: 這可能需要一些時間"
   },
   {
     "id": "Number of instances",
@@ -3137,7 +3137,7 @@
   },
   {
     "id": "OPTIONS:",
-    "translation": "選項:"
+    "translation": "選項: "
   },
   {
     "id": "ORG ADMIN",
@@ -3181,7 +3181,7 @@
   },
   {
     "id": "Org:",
-    "translation": "組織:"
+    "translation": "組織: "
   },
   {
     "id": "Organization",
@@ -3229,7 +3229,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "HTTP 路徑 (route) 的路徑 (path)"
   },
   {
     "id": "Path for the HTTP route",
@@ -3241,7 +3241,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "TCP 路徑 {{.RouteName}} 中不接受路徑 (path)"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3277,7 +3277,7 @@
   },
   {
     "id": "Plan: {{.ServicePlanName}}",
-    "translation": "方案:{{.ServicePlanName}}"
+    "translation": "方案: {{.ServicePlanName}}"
   },
   {
     "id": "Plans accessible by a particular organization",
@@ -3317,7 +3317,7 @@
   },
   {
     "id": "Plugin requested has no binary available for your OS: ",
-    "translation": "所要求的外掛程式沒有可供您 OS 使用的二進位檔:"
+    "translation": "所要求的外掛程式沒有可供您 OS 使用的二進位檔: "
   },
   {
     "id": "Plugin {{.PluginName}} successfully uninstalled.",
@@ -3333,7 +3333,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "HTTP 路徑 {{.RouteName}} 中不接受埠"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -3353,11 +3353,11 @@
   },
   {
     "id": "Problem removing downloaded binary in temp directory: ",
-    "translation": "移除暫存目錄中的已下載二進位檔時發生問題:"
+    "translation": "移除暫存目錄中的已下載二進位檔時發生問題: "
   },
   {
     "id": "Process terminated by signal: %s. Exited with",
-    "translation": "因信號 %s 而終止處理程序。結束原因:"
+    "translation": "因信號 %s 而終止處理程序。結束原因: "
   },
   {
     "id": "Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
@@ -3409,7 +3409,7 @@
   },
   {
     "id": "REQUEST:",
-    "translation": "要求:"
+    "translation": "要求: "
   },
   {
     "id": "RESERVED_ROUTE_PORTS",
@@ -3417,7 +3417,7 @@
   },
   {
     "id": "RESPONSE:",
-    "translation": "回應:"
+    "translation": "回應: "
   },
   {
     "id": "ROLES:\n",
@@ -3425,7 +3425,7 @@
   },
   {
     "id": "ROUTES",
-    "translation": "路徑"
+    "translation": "ROUTES"
   },
   {
     "id": "ROUTE_PATH",
@@ -3461,7 +3461,7 @@
   },
   {
     "id": "Received invalid SSL certificate from ",
-    "translation": "收到來自下者的無效 SSL 憑證:"
+    "translation": "收到來自下者的無效 SSL 憑證: "
   },
   {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
@@ -3497,19 +3497,19 @@
   },
   {
     "id": "Removing env variable {{.VarName}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
-    "translation": "正在以 {{.CurrentUser}} 身分從組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}} 移除環境變數 {{.VarName}}..."
+    "translation": "正在以 {{.CurrentUser}} 身分，從組織 {{.OrgName}} / 空間 {{.SpaceName}} 中的應用程式 {{.AppName}} 移除環境變數 {{.VarName}}..."
   },
   {
     "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}...",
-    "translation": "正在以 {{.CurrentUser}} 身分從組織 {{.TargetOrg}}/空間 {{.TargetSpace}} 中的使用者 {{.TargetUser}} 移除角色 {{.Role}}..."
+    "translation": "正在以 {{.CurrentUser}} 身分，從組織 {{.TargetOrg}} / 空間 {{.TargetSpace}} 中的使用者 {{.TargetUser}} 移除角色 {{.Role}}..."
   },
   {
     "id": "Removing role {{.Role}} from user {{.TargetUser}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
-    "translation": "正在以 {{.CurrentUser}} 身分從組織 {{.TargetOrg}} 中的使用者 {{.TargetUser}} 移除角色 {{.Role}}..."
+    "translation": "正在以 {{.CurrentUser}} 身分，從組織 {{.TargetOrg}} 中的使用者 {{.TargetUser}} 移除角色 {{.Role}}..."
   },
   {
     "id": "Removing route {{.URL}} from app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
-    "translation": "正在以 {{.Username}} 身分從組織 {{.OrgName}}/空間 {{.SpaceName}} 中的應用程式 {{.AppName}} 移除路徑 {{.URL}}..."
+    "translation": "正在以 {{.Username}} 身分，從組織 {{.OrgName}} / 空間 {{.SpaceName}} 中的應用程式 {{.AppName}} 移除路徑 {{.URL}}..."
   },
   {
     "id": "Removing route {{.URL}}...",
@@ -3577,7 +3577,7 @@
   },
   {
     "id": "Repository: ",
-    "translation": "儲存庫:"
+    "translation": "儲存庫: "
   },
   {
     "id": "Request pseudo-tty allocation",
@@ -3713,7 +3713,7 @@
   },
   {
     "id": "Running Environment Variable Groups:",
-    "translation": "執行環境變數群組:"
+    "translation": "執行環境變數群組: "
   },
   {
     "id": "SECURITY GROUP",
@@ -3773,7 +3773,7 @@
   },
   {
     "id": "Security Groups:",
-    "translation": "安全群組:"
+    "translation": "安全群組: "
   },
   {
     "id": "Security group {{.security_group}} does not exist",
@@ -3785,27 +3785,27 @@
   },
   {
     "id": "Select a space (or press enter to skip):",
-    "translation": "選取空間（或按 Enter 鍵以跳過）:"
+    "translation": "選取空間（或按 Enter 鍵以跳過）: "
   },
   {
     "id": "Select an org (or press enter to skip):",
-    "translation": "選取組織（或按 Enter 鍵以跳過）:"
+    "translation": "選取組織（或按 Enter 鍵以跳過）: "
   },
   {
     "id": "Server error, error code: 1002, message: cannot set space role because user is not part of the org",
-    "translation": "伺服器錯誤，錯誤碼:1002，訊息:無法設定空間角色，因為使用者不屬於組織"
+    "translation": "伺服器錯誤，錯誤碼: 1002，訊息: 無法設定空間角色，因為使用者不屬於組織"
   },
   {
     "id": "Server error, status code: 403, error code: 10003, message: You are not authorized to perform the requested action",
-    "translation": "伺服器錯誤，狀態碼:403，錯誤碼:10003，訊息:您未獲授權，無法執行所要求的動作"
+    "translation": "伺服器錯誤，狀態碼: 403，錯誤碼: 10003，訊息: 您未獲授權，無法執行所要求的動作"
   },
   {
     "id": "Server error, status code: 403: Access is denied.  You do not have privileges to execute this command.",
-    "translation": "伺服器錯誤，狀態碼:403:拒絕存取。您沒有專用權可執行此指令。"
+    "translation": "伺服器錯誤，狀態碼: 403: 拒絕存取。您沒有專用權可執行此指令。"
   },
   {
     "id": "Server error, status code: {{.ErrStatusCode}}, error code: {{.ErrAPIErrorCode}}, message: {{.ErrDescription}}",
-    "translation": "伺服器錯誤，狀態碼:{{.ErrStatusCode}}，錯誤碼:{{.ErrAPIErrorCode}}，訊息:{{.ErrDescription}}"
+    "translation": "伺服器錯誤，狀態碼: {{.ErrStatusCode}}，錯誤碼: {{.ErrAPIErrorCode}}，訊息: {{.ErrDescription}}"
   },
   {
     "id": "Service Auth Token {{.Label}} {{.Provider}} does not exist.",
@@ -3829,7 +3829,7 @@
   },
   {
     "id": "Service instance: {{.ServiceName}}",
-    "translation": "服務實例:{{.ServiceName}}"
+    "translation": "服務實例: {{.ServiceName}}"
   },
   {
     "id": "Service key {{.ServiceKeyName}} does not exist for service instance {{.ServiceInstanceName}}.",
@@ -3837,7 +3837,7 @@
   },
   {
     "id": "Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.",
-    "translation": "服務供應項目不存在\n提示:如果您嘗試清除第 1 版服務供應項目，則必須設定 -p 旗標。"
+    "translation": "服務供應項目不存在\n提示: 如果您嘗試清除第 1 版服務供應項目，則必須設定 -p 旗標。"
   },
   {
     "id": "Service offering not found",
@@ -3849,7 +3849,7 @@
   },
   {
     "id": "Service: {{.ServiceDescription}}",
-    "translation": "服務:{{.ServiceDescription}}"
+    "translation": "服務: {{.ServiceDescription}}"
   },
   {
     "id": "Services",
@@ -3857,7 +3857,7 @@
   },
   {
     "id": "Services:",
-    "translation": "服務:"
+    "translation": "服務: "
   },
   {
     "id": "Set an env variable for an app",
@@ -3997,7 +3997,7 @@
   },
   {
     "id": "Space Quota:",
-    "translation": "空間配額:"
+    "translation": "空間配額: "
   },
   {
     "id": "Space that contains the target application",
@@ -4009,7 +4009,7 @@
   },
   {
     "id": "Space:",
-    "translation": "空間:"
+    "translation": "空間: "
   },
   {
     "id": "Specify a path for file creation. If path not specified, manifest file is created in current working directory.",
@@ -4021,7 +4021,7 @@
   },
   {
     "id": "Staging Environment Variable Groups:",
-    "translation": "編譯打包環境變數群組:"
+    "translation": "編譯打包環境變數群組: "
   },
   {
     "id": "Start an app",
@@ -4029,15 +4029,15 @@
   },
   {
     "id": "Start app timeout\n\nTIP: Application must be listening on the right port. Instead of hard coding the port, use the $PORT environment variable.",
-    "translation": "啟動應用程式逾時\n\n提示:必須在正確的埠接聽應用程式。使用 $PORT 環境變數，而非將埠寫在程式中。"
+    "translation": "啟動應用程式逾時\n\n提示: 必須在正確的埠接聽應用程式。使用 $PORT 環境變數，而非將埠寫在程式中。"
   },
   {
     "id": "Start unsuccessful\n\nTIP: use '{{.Command}}' for more information",
-    "translation": "啟動不成功\n\n提示:如需相關資訊，請使用 '{{.Command}}'"
+    "translation": "啟動不成功\n\n提示: 如需相關資訊，請使用 '{{.Command}}'"
   },
   {
     "id": "Started: {{.Started}}",
-    "translation": "已啟動:{{.Started}}"
+    "translation": "已啟動: {{.Started}}"
   },
   {
     "id": "Starting app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -4053,7 +4053,7 @@
   },
   {
     "id": "Status: {{.State}}",
-    "translation": "狀態:{{.State}}"
+    "translation": "狀態: {{.State}}"
   },
   {
     "id": "Stop an app",
@@ -4065,7 +4065,7 @@
   },
   {
     "id": "System-Provided:",
-    "translation": "由系統提供:"
+    "translation": "由系統提供: "
   },
   {
     "id": "TIMEOUT",
@@ -4081,35 +4081,35 @@
   },
   {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
-    "translation": "提示:除非已重新啟動現有執行中應用程式，否則不會對它們套用變更。"
+    "translation": "提示: 除非已重新啟動現有執行中應用程式，否則不會對它們套用變更。"
   },
   {
     "id": "TIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
-    "translation": "提示:如果您有防火牆保護，而且需要 HTTP Proxy，請驗證已正確設定 https_proxy 環境變數。否則，請檢查您的網路連線。"
+    "translation": "提示: 如果您有防火牆保護，而且需要 HTTP Proxy，請驗證已正確設定 https_proxy 環境變數。否則，請檢查您的網路連線。"
   },
   {
     "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
-    "translation": "提示:未將目標設為空間，使用 '{{.CfTargetCommand}}' 以將目標設為空間"
+    "translation": "提示: 未將目標設為空間，使用 '{{.CfTargetCommand}}' 以將目標設為空間"
   },
   {
     "id": "TIP: Use '{{.APICommand}}' to continue with an insecure API endpoint",
-    "translation": "提示:使用 '{{.APICommand}}'，繼續使用不安全的 API 端點"
+    "translation": "提示: 使用 '{{.APICommand}}'，繼續使用不安全的 API 端點"
   },
   {
     "id": "TIP: Use '{{.CFCommand}} {{.AppName}}' to ensure your env variable changes take effect",
-    "translation": "提示:使用 '{{.CFCommand}} {{.AppName}}'，確保您的環境變數變更生效"
+    "translation": "提示: 使用 '{{.CFCommand}} {{.AppName}}'，確保您的環境變數變更生效"
   },
   {
     "id": "TIP: Use '{{.CFRestageCommand}}' for any bound apps to ensure your env variable changes take effect",
-    "translation": "提示:針對任何連結的應用程式使用 '{{.CFRestageCommand}}'，確保您的環境變數變更生效"
+    "translation": "提示: 針對任何連結的應用程式使用 '{{.CFRestageCommand}}'，確保您的環境變數變更生效"
   },
   {
     "id": "TIP: Use '{{.Command}}' to ensure your env variable changes take effect",
-    "translation": "提示:使用 '{{.Command}}'，確保您的環境變數變更生效"
+    "translation": "提示: 使用 '{{.Command}}'，確保您的環境變數變更生效"
   },
   {
     "id": "TIP: use '{{.CfUpdateBuildpackCommand}}' to update this buildpack",
-    "translation": "提示:使用 '{{.CfUpdateBuildpackCommand}}'，更新這個建置套件"
+    "translation": "提示: 使用 '{{.CfUpdateBuildpackCommand}}'，更新這個建置套件"
   },
   {
     "id": "TOTAL_MEMORY",
@@ -4117,7 +4117,7 @@
   },
   {
     "id": "Tags: {{.Tags}}",
-    "translation": "標籤:{{.Tags}}"
+    "translation": "標籤: {{.Tags}}"
   },
   {
     "id": "Tail or show recent logs for an app",
@@ -4145,11 +4145,11 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "路徑 {{.RouteName}} 不符合任何現有網域。"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
-    "translation": "路徑 {{.URL}} 已在使用中。\n提示:使用 -n HOSTNAME 來變更主機名稱，或使用 --random-route 來產生新的路徑，然後重新推送。"
+    "translation": "路徑 {{.URL}} 已在使用中。\n提示: 使用 -n HOSTNAME 來變更主機名稱，或使用 --random-route 來產生新的路徑，然後重新推送。"
   },
   {
     "id": "The targeted API endpoint could not be reached.",
@@ -4165,11 +4165,11 @@
   },
   {
     "id": "There is an error performing request on '{{.RepoURL}}': ",
-    "translation": "在 '{{.RepoURL}}' 上執行要求時發生錯誤:"
+    "translation": "在 '{{.RepoURL}}' 上執行要求時發生錯誤: "
   },
   {
     "id": "There is an error performing request on '{{.RepoURL}}': {{.Error}}\n{{.Tip}}",
-    "translation": "在 '{{.RepoURL}}' 上執行要求時發生錯誤:{{.Error}}\n{{.Tip}}"
+    "translation": "在 '{{.RepoURL}}' 上執行要求時發生錯誤: {{.Error}}\n{{.Tip}}"
   },
   {
     "id": "This command",
@@ -4201,7 +4201,7 @@
   },
   {
     "id": "Tip: use 'add-plugin-repo' to register the repo",
-    "translation": "提示:使用 'add-plugin-repo'，登錄儲存庫"
+    "translation": "提示: 使用 'add-plugin-repo'，登錄儲存庫"
   },
   {
     "id": "Total Memory",
@@ -4221,7 +4221,7 @@
   },
   {
     "id": "Total number of application instances. -1 represents an unlimited amount. (Default: unlimited)",
-    "translation": "應用程式實例總數。-1 代表無限制數量。（預設值:無限制）"
+    "translation": "應用程式實例總數。-1 代表無限制數量。（預設值: 無限制）"
   },
   {
     "id": "Total number of routes",
@@ -4253,7 +4253,7 @@
   },
   {
     "id": "USAGE:",
-    "translation": "用法:"
+    "translation": "用法: "
   },
   {
     "id": "USER ADMIN",
@@ -4417,7 +4417,7 @@
   },
   {
     "id": "Updated: {{.Updated}}",
-    "translation": "已更新:{{.Updated}}"
+    "translation": "已更新: {{.Updated}}"
   },
   {
     "id": "Updating %s health_check_type to '%s'",
@@ -4497,11 +4497,11 @@
   },
   {
     "id": "User-Provided:",
-    "translation": "使用者提供的:"
+    "translation": "使用者提供的: "
   },
   {
     "id": "User:",
-    "translation": "使用者:"
+    "translation": "使用者: "
   },
   {
     "id": "Username",
@@ -4521,7 +4521,7 @@
   },
   {
     "id": "VERSION:",
-    "translation": "版本:"
+    "translation": "版本: "
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
@@ -4557,27 +4557,27 @@
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service instance is no longer available or is not responding with a 200 or 410, and the service instance has been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service instance will be removed from Cloud Foundry, including service bindings and service keys.",
-    "translation": "警告:此作業假設負責此服務實例的服務分配管理系統無法再使用或未回應 200 或 410，並且已刪除服務實例，而將遺留的記錄留在 Cloud Foundry 資料庫中。將會移除 Cloud Foundry 中對服務實例的所有知識（包括服務連結和服務金鑰）。"
+    "translation": "警告: 此作業假設負責此服務實例的服務分配管理系統無法再使用或未回應 200 或 410，並且已刪除服務實例，而將遺留的記錄留在 Cloud Foundry 資料庫中。將會移除 Cloud Foundry 中對服務實例的所有知識（包括服務連結和服務金鑰）。"
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
-    "translation": "警告:此作業假設負責此服務供應項目的服務分配管理系統無法再使用，並且已刪除所有服務實例，而將遺留的記錄留在 Cloud Foundry 資料庫中。將會移除 Cloud Foundry 中對服務的所有知識（包括服務實例和服務連結）。不會嘗試聯絡服務分配管理系統；執行此指令而不破壞服務分配管理系統，將會導致遺留的服務實例。執行此指令之後，您可能要執行 delete-service-auth-token 或 delete-service-broker 來完成清除。"
+    "translation": "警告: 此作業假設負責此服務供應項目的服務分配管理系統無法再使用，並且已刪除所有服務實例，而將遺留的記錄留在 Cloud Foundry 資料庫中。將會移除 Cloud Foundry 中對服務的所有知識（包括服務實例和服務連結）。不會嘗試聯絡服務分配管理系統；執行此指令而不破壞服務分配管理系統，將會導致遺留的服務實例。執行此指令之後，您可能要執行 delete-service-auth-token 或 delete-service-broker 來完成清除。"
   },
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
-    "translation": "警告:這是 Cloud Foundry 的內部作業；不會聯絡服務分配管理系統，而且不會變更服務實例的資源。此作業的主要用途是透過將服務實例從第 1 版方案重新對映至第 2 版方案，以將實作第 1 版「服務分配管理系統 API」的服務分配管理系統，取代為實作第 2 版 API 的分配管理系統。建議您將第 1 版方案設為專用，或關閉第 1 版分配管理系統，以防止建立其他實例。移轉服務實例之後，即可從 Cloud Foundry 中移除第 1 版服務和方案。"
+    "translation": "警告: 這是 Cloud Foundry 的內部作業；不會聯絡服務分配管理系統，而且不會變更服務實例的資源。此作業的主要用途是透過將服務實例從第 1 版方案重新對映至第 2 版方案，以將實作第 1 版「服務分配管理系統 API」的服務分配管理系統，取代為實作第 2 版 API 的分配管理系統。建議您將第 1 版方案設為專用，或關閉第 1 版分配管理系統，以防止建立其他實例。移轉服務實例之後，即可從 Cloud Foundry 中移除第 1 版服務和方案。"
   },
   {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
-    "translation": "警告:偵測到不安全的 http API 端點:建議使用安全的 https API 端點\n"
+    "translation": "警告: 偵測到不安全的 http API 端點: 建議使用安全的 https API 端點\n"
   },
   {
     "id": "Warning: accessing feature flag 'set_roles_by_username'",
-    "translation": "警告:正在存取特性旗標 'set_roles_by_username'"
+    "translation": "警告: 正在存取特性旗標 'set_roles_by_username'"
   },
   {
     "id": "Warning: error tailing logs",
-    "translation": "警告:追蹤日誌時發生錯誤"
+    "translation": "警告: 追蹤日誌時發生錯誤"
   },
   {
     "id": "Windows Command Line",
@@ -4661,11 +4661,11 @@
   },
   {
     "id": "broker: {{.Name}}",
-    "translation": "分配管理系統:{{.Name}}"
+    "translation": "分配管理系統: {{.Name}}"
   },
   {
     "id": "buildpack:",
-    "translation": "建置套件:"
+    "translation": "建置套件: "
   },
   {
     "id": "bytes downloaded",
@@ -4701,7 +4701,7 @@
   },
   {
     "id": "disk:",
-    "translation": "磁碟:"
+    "translation": "磁碟: "
   },
   {
     "id": "does not exist.",
@@ -4721,7 +4721,7 @@
   },
   {
     "id": "domains:",
-    "translation": "網域:"
+    "translation": "網域: "
   },
   {
     "id": "down",
@@ -4729,7 +4729,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "'routes' 路徑的每個路徑必須具有 'route' 內容"
   },
   {
     "id": "enabled",
@@ -4781,7 +4781,7 @@
   },
   {
     "id": "instance: {{.InstanceIndex}}, reason: {{.ExitDescription}}, exit_status: {{.ExitStatus}}",
-    "translation": "實例:{{.InstanceIndex}}，原因:{{.ExitDescription}}，exit_status:{{.ExitStatus}}"
+    "translation": "實例: {{.InstanceIndex}}，原因: {{.ExitDescription}}，exit_status: {{.ExitStatus}}"
   },
   {
     "id": "instances",
@@ -4789,7 +4789,7 @@
   },
   {
     "id": "instances:",
-    "translation": "實例:"
+    "translation": "實例: "
   },
   {
     "id": "invalid inherit path in manifest",
@@ -4813,7 +4813,7 @@
   },
   {
     "id": "last uploaded:",
-    "translation": "前次上傳:"
+    "translation": "前次上傳: "
   },
   {
     "id": "limited",
@@ -4829,7 +4829,7 @@
   },
   {
     "id": "memory:",
-    "translation": "記憶體:"
+    "translation": "記憶體: "
   },
   {
     "id": "name",
@@ -4865,7 +4865,7 @@
   },
   {
     "id": "paid services {{.NonBasicServicesAllowed}}",
-    "translation": "付費服務 {{.NonBasicServicesAllowed}}"
+    "translation": "付費服務{{.NonBasicServicesAllowed}}"
   },
   {
     "id": "path",
@@ -4893,7 +4893,7 @@
   },
   {
     "id": "quota:",
-    "translation": "配額:"
+    "translation": "配額: "
   },
   {
     "id": "repo-plugins",
@@ -4905,7 +4905,7 @@
   },
   {
     "id": "requested state:",
-    "translation": "所要求的狀態:"
+    "translation": "所要求的狀態: "
   },
   {
     "id": "required attribute 'disk_quota' missing",
@@ -4989,11 +4989,11 @@
   },
   {
     "id": "space quotas:",
-    "translation": "空間配額:"
+    "translation": "空間配額: "
   },
   {
     "id": "spaces:",
-    "translation": "空間:"
+    "translation": "空間: "
   },
   {
     "id": "ssh support is already disabled",
@@ -5013,7 +5013,7 @@
   },
   {
     "id": "ssh support is disabled for",
-    "translation": "已停用下者的 ssh 支援:"
+    "translation": "已停用下者的 ssh 支援: "
   },
   {
     "id": "ssh support is disabled in space ",
@@ -5021,7 +5021,7 @@
   },
   {
     "id": "ssh support is enabled for",
-    "translation": "已啟用下者的 ssh 支援:"
+    "translation": "已啟用下者的 ssh 支援: "
   },
   {
     "id": "ssh support is enabled in space ",
@@ -5029,15 +5029,15 @@
   },
   {
     "id": "ssh support is not disabled for ",
-    "translation": "未停用下者的 ssh 支援:"
+    "translation": "未停用下者的 ssh 支援: "
   },
   {
     "id": "ssh support is not enabled for ",
-    "translation": "未啟用下者的 ssh 支援:"
+    "translation": "未啟用下者的 ssh 支援: "
   },
   {
     "id": "stack:",
-    "translation": "堆疊:"
+    "translation": "堆疊: "
   },
   {
     "id": "starting",
@@ -5093,11 +5093,11 @@
   },
   {
     "id": "urls:",
-    "translation": "URL:"
+    "translation": "URL: "
   },
   {
     "id": "usage:",
-    "translation": "用法:"
+    "translation": "用法: "
   },
   {
     "id": "user",
@@ -5117,11 +5117,11 @@
   },
   {
     "id": "{{.APIEndpoint}} (API version: {{.APIVersionString}})",
-    "translation": "{{.APIEndpoint}}（API 版本:{{.APIVersionString}}）"
+    "translation": "{{.APIEndpoint}}（API 版本: {{.APIVersionString}}）"
   },
   {
     "id": "{{.AppInstanceLimit}} app instance limit",
-    "translation": "{{.AppInstanceLimit}} 應用程式實例限制"
+    "translation": "{{.AppInstanceLimit}} 個應用程式實例限制"
   },
   {
     "id": "{{.CFName}} api",
@@ -5149,15 +5149,15 @@
   },
   {
     "id": "{{.ErrorDescription}}\nTIP: Use '{{.CFServicesCommand}}' to view all services in this org and space.",
-    "translation": "{{.ErrorDescription}}\n提示:使用 '{{.CFServicesCommand}}'，檢視這個組織和空間中的所有服務。"
+    "translation": "{{.ErrorDescription}}\n提示: 使用 '{{.CFServicesCommand}}'，檢視這個組織和空間中的所有服務。"
   },
   {
     "id": "{{.Err}}\n\t\t\t\nTIP: Buildpacks are detected when the \"{{.PushCommand}}\" is executed from within the directory that contains the app source code.\n\nUse '{{.BuildpackCommand}}' to see a list of supported buildpacks.\n\nUse '{{.Command}}' for more in depth log information.",
-    "translation": "{{.Err}}\n\t\t\t\n提示:從包含應用程式原始碼的目錄內執行 \"{{.PushCommand}}\" 時，偵測到建置套件。\n\n使用 '{{.BuildpackCommand}}'，查看所支援建置套件的清單。\n\n如需深入日誌資訊，請使用 '{{.Command}}'。"
+    "translation": "{{.Err}}\n\t\t\t\n提示: 從包含應用程式原始碼的目錄內執行 \"{{.PushCommand}}\" 時，偵測到建置套件。\n\n使用 '{{.BuildpackCommand}}'，查看所支援建置套件的清單。\n\n如需深入日誌資訊，請使用 '{{.Command}}'。"
   },
   {
     "id": "{{.Err}}\n\nTIP: use '{{.Command}}' for more information",
-    "translation": "{{.Err}}\n\n提示:如需相關資訊，請使用 '{{.Command}}'"
+    "translation": "{{.Err}}\n\n提示: 如需相關資訊，請使用 '{{.Command}}'"
   },
   {
     "id": "{{.Feature}} only works up to CF API version {{.MaximumVersion}}. Your target is {{.APIVersion}}.",
@@ -5221,7 +5221,7 @@
   },
   {
     "id": "{{.RoutesLimit}} routes",
-    "translation": "{{.RoutesLimit}} 路徑"
+    "translation": "{{.RoutesLimit}} 個路徑"
   },
   {
     "id": "{{.RunningCount}} of {{.TotalCount}} instances running",
@@ -5229,7 +5229,7 @@
   },
   {
     "id": "{{.ServicesLimit}} services",
-    "translation": "{{.ServicesLimit}} 服務"
+    "translation": "{{.ServicesLimit}} 個服務"
   },
   {
     "id": "{{.StartingCount}} starting",

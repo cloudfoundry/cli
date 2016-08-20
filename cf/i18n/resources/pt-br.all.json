@@ -141,7 +141,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes' deve ser uma lista"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -217,7 +217,7 @@
   },
   {
     "id": "Access for service name of a particular service offering",
-    "translation": "Acesso para o nome do serviço de uma oferta de serviços específica"
+    "translation": "Acesso para o nome do serviço de um tipo de serviços específico"
   },
   {
     "id": "Acquiring running security groups as '{{.username}}'",
@@ -297,15 +297,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "O aplicativo {{.AppName}} não deve ser configurado com 'routes' e 'domain'/'domains'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "O aplicativo {{.AppName}} não deve ser configurado com 'routes' e 'host'/'hosts'"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "O aplicativo {{.AppName}} não deve ser configurado com 'routes' e 'no-hostname'"
   },
   {
     "id": "Apps:",
@@ -393,7 +393,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "Ligar um grupo de segurança a um espaço particular ou todos os espaços existentes de uma organização"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -549,7 +549,7 @@
   },
   {
     "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Example of valid JSON object:\n   {\n     \"permissions\": \"read-only\"\n   }",
-    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n    Opcionalmente, forneça parâmetros de configuração específicos do serviço em um objeto JSON válido sequencial.\n    CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n    Opcionalmente, forneça um arquivo contendo parâmetros de configuração específicos do serviço em um objeto JSON válido. O caminho para o arquivo de parâmetros pode ser um caminho absoluto ou relativo para um arquivo.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Exemplo de objeto JSON válido:\n   {\n     \"permissions\": \"read-only\"\n   }"
+    "translation": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\n\n   Opcionalmente, forneça parâmetros de configuração específicos do serviço em um objeto JSON válido sequencial.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\"name\":\"value\",\"name\":\"value\"}'\n\n   Opcionalmente, forneça um arquivo contendo parâmetros de configuração específicos do serviço em um objeto JSON válido. O caminho para o arquivo de parâmetros pode ser um caminho absoluto ou relativo para um arquivo.\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\n\n   Exemplo de objeto JSON válido:\n   {\n     \"permissions\": \"read-only\"\n   }"
   },
   {
     "id": "CF_NAME create-shared-domain DOMAIN [--router-group ROUTER_GROUP]",
@@ -1113,7 +1113,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "Faça uma cópia do código-fonte do app de um aplicativo para outro.  A menos que seja substituído, o comando copy-source reiniciará o aplicativo."
+    "translation": "Cópias do código-fonte de um aplicativo para outro aplicativo existente (e reinicia esse aplicativo)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -2028,8 +2028,8 @@
     "translation": "Falha ao buscar buildpacks.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "Falha ao buscar domínios para a organização {{.OrgName}}.\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "Falha ao buscar domínios para a organização %s.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2485,7 +2485,7 @@
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "Uso incorreto. Requer SECURITY_GROUP e ORG, e SPACE opcional como argumentos\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2637,7 +2637,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "Configuração de aplicativo inválida"
   },
   {
     "id": "Invalid async response from server",
@@ -2705,7 +2705,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "Porta inválida para a rota {{.RouteName}}"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -3081,7 +3081,7 @@
   },
   {
     "id": "No service offerings found",
-    "translation": "Nenhuma oferta de serviços localizada"
+    "translation": "Nenhum tipo de serviço localizado"
   },
   {
     "id": "No services found",
@@ -3229,7 +3229,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "Caminho para a rota HTTP"
   },
   {
     "id": "Path for the HTTP route",
@@ -3241,7 +3241,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "O caminho não é permitido em uma rota TCP {{.RouteName}}"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3333,7 +3333,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "A porta não é permitida na rota HTTP {{.RouteName}}"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -3457,7 +3457,7 @@
   },
   {
     "id": "Really purge service offering {{.ServiceName}} from Cloud Foundry?",
-    "translation": "Realmente limpar a oferta de serviços {{.ServiceName}} do Cloud Foundry?"
+    "translation": "Realmente limpar o tipo de serviço {{.ServiceName}} do Cloud Foundry?"
   },
   {
     "id": "Received invalid SSL certificate from ",
@@ -3589,7 +3589,7 @@
   },
   {
     "id": "Requires app name as argument",
-    "translation": "Requer app name como argumento"
+    "translation": "Requer o nome do aplicativo como argumento"
   },
   {
     "id": "Reserved Route Ports",
@@ -3837,11 +3837,11 @@
   },
   {
     "id": "Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.",
-    "translation": "A oferta de serviços não existe\nDICA: Se você estiver tentando limpar uma oferta de serviços v1, deverá configurar a sinalização -p."
+    "translation": "o tipo de serviço não existe\nDICA: Se você estiver tentando limpar um tipo de serviços v1, deverá configurar a sinalização -p."
   },
   {
     "id": "Service offering not found",
-    "translation": "Oferta de serviços não localizada"
+    "translation": "Tipo de serviços não localizado"
   },
   {
     "id": "Service {{.ServiceName}} does not exist.",
@@ -3937,7 +3937,7 @@
   },
   {
     "id": "Show plan details for a particular service offering",
-    "translation": "Mostrar detalhes de planejamento de uma oferta de serviços específica"
+    "translation": "Mostrar detalhes de planejamento de um tipo de serviços específico"
   },
   {
     "id": "Show quota info",
@@ -4145,7 +4145,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "A rota {{.RouteName}} não corresponde a nenhum domínio existente."
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4525,11 +4525,11 @@
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided either in-line or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": "Objeto JSON válido contendo parâmetros de configuração específicos do serviço, fornecidos sequencialmente ou em um arquivo. Para obter uma lista de parâmetros de configuração suportados, consulte a documentação da oferta de serviços específica."
+    "translation": "Objeto JSON válido contendo parâmetros de configuração específicos do serviço, fornecidos sequencialmente ou em um arquivo. Para obter uma lista de parâmetros de configuração suportados, consulte a documentação do tipo de serviços específico."
   },
   {
     "id": "Valid JSON object containing service-specific configuration parameters, provided inline or in a file. For a list of supported configuration parameters, see documentation for the particular service offering.",
-    "translation": "Objeto JSON válido contendo parâmetros de configuração específicos do serviço, fornecidos sequencialmente ou em um arquivo. Para obter uma lista de parâmetros de configuração suportados, consulte a documentação da oferta de serviços específica."
+    "translation": "Objeto JSON válido contendo parâmetros de configuração específicos do serviço, fornecidos sequencialmente ou em um arquivo. Para obter uma lista de parâmetros de configuração suportados, consulte a documentação do tipo de serviços específico."
   },
   {
     "id": "Value for flag 'app-instance-index' cannot be negative",
@@ -4561,7 +4561,7 @@
   },
   {
     "id": "WARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
-    "translation": "AVISO: Esta operação supõe que o broker de serviço responsável por esta oferta de serviços não está mais disponível e que todas as instâncias de serviço foram excluídas, deixando registros órfãos no banco de dados do Cloud Foundry. Todo o conhecimento do serviço será removido do Cloud Foundry, incluindo instâncias de serviço e ligações de serviços. Nenhuma tentativa será feita para entrar em contato com o broker de serviço; executar esse comando sem destruir o broker de serviço causará instâncias de serviço órfãs. Após a execução desse comando, é possível que você queira executar delete-service-auth-token ou delete-service-broker para concluir a limpeza."
+    "translation": "AVISO: Esta operação supõe que o broker de serviço responsável por este tipo de serviços não está mais disponível e que todas as instâncias de serviço foram excluídas, deixando registros órfãos no banco de dados do Cloud Foundry. Todo o conhecimento do serviço será removido do Cloud Foundry, incluindo instâncias de serviço e ligações de serviços. Nenhuma tentativa será feita para entrar em contato com o broker de serviço; executar esse comando sem destruir o broker de serviço causará instâncias de serviço órfãs. Após a execução desse comando, é possível que você queira executar delete-service-auth-token ou delete-service-broker para concluir a limpeza."
   },
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
@@ -4609,7 +4609,7 @@
   },
   {
     "id": "[global options] command [arguments...] [command options]",
-    "translation": "[opções globais] comando [argumentos...] [opções de comando]"
+    "translation": "[global options] command [arguments...] [command options]"
   },
   {
     "id": "access",
@@ -4693,7 +4693,7 @@
   },
   {
     "id": "disallowed",
-    "translation": "desautorizado"
+    "translation": "desaprovado"
   },
   {
     "id": "disk",
@@ -4729,7 +4729,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "cada rota em 'routes' deve ter uma propriedade 'route'"
   },
   {
     "id": "enabled",
