@@ -2,10 +2,12 @@ package internal
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
 type HelpCategory struct {
@@ -99,7 +101,14 @@ func ConvertPluginToCommandInfo(plugin config.PluginCommand) v2actions.CommandIn
 		Flags:       []v2actions.CommandFlag{},
 	}
 
-	for flag, description := range plugin.UsageDetails.Options {
+	flagNames := sortutils.Alphabetic{}
+	for flag := range plugin.UsageDetails.Options {
+		flagNames = append(flagNames, flag)
+	}
+	sort.Sort(flagNames)
+
+	for _, flag := range flagNames {
+		description := plugin.UsageDetails.Options[flag]
 		strippedFlag := strings.Trim(flag, "-")
 		switch len(flag) {
 		case 1:

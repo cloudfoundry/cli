@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/cli/utils/sortutils"
@@ -18,6 +19,7 @@ const (
 
 	DefaultTarget       = "https://api.bosh-lite.com"
 	DefaultColorEnabled = "true"
+	DefaultLocal        = ""
 )
 
 func LoadConfig() (*Config, error) {
@@ -50,6 +52,8 @@ func LoadConfig() (*Config, error) {
 		CFStartupTimeout: os.Getenv("CF_STARTUP_TIMEOUT"),
 		CFTrace:          os.Getenv("CF_TRACE"),
 		HTTPSProxy:       os.Getenv("https_proxy"),
+		Lang:             os.Getenv("LANG"),
+		LCAll:            os.Getenv("LC_ALL"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
@@ -137,6 +141,8 @@ type EnvOverride struct {
 	CFStartupTimeout string
 	CFTrace          string
 	HTTPSProxy       string
+	Lang             string
+	LCAll            string
 }
 
 type PluginsConfig struct {
@@ -248,4 +254,24 @@ func (config Config) HTTPSProxy() string {
 	}
 
 	return ""
+}
+
+func (config Config) Locale() string {
+	if config.env.Lang != "" {
+		return config.convertLocale(config.env.Lang)
+	}
+
+	if config.env.LCAll != "" {
+		return config.convertLocale(config.env.LCAll)
+	}
+
+	if config.configFile.Locale != "" {
+		return config.configFile.Locale
+	}
+	return DefaultLocal
+}
+
+func (config Config) convertLocale(local string) string {
+	lang := strings.Split(local, ".")[0]
+	return strings.Replace(lang, "_", "-", -1)
 }
