@@ -26,6 +26,7 @@ var _ = Describe("Help Command", func() {
 		fakeUI = customv2fakes.NewFakeUI(true)
 		fakeActor = new(v2fakes.FakeHelpActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
+		fakeConfig.BinaryNameReturns("faceman")
 
 		cmd = HelpCommand{
 			UI:     fakeUI,
@@ -68,7 +69,7 @@ var _ = Describe("Help Command", func() {
 
 				Expect(fakeUI.Out).To(Say("NAME:"))
 				Expect(fakeUI.Out).To(Say("USAGE:"))
-				Expect(fakeUI.Out).To(Say("    cf help \\[COMMAND\\]"))
+				Expect(fakeUI.Out).To(Say("    faceman help \\[COMMAND\\]"))
 			})
 
 			Describe("aliases", func() {
@@ -190,7 +191,7 @@ var _ = Describe("Help Command", func() {
 								Alias:    "ed",
 								HelpText: "enable Diego support for an app",
 								UsageDetails: config.PluginUsageDetails{
-									Usage: "cf diego-enabler this and that and a little stuff",
+									Usage: "faceman diego-enabler this and that and a little stuff",
 									Options: map[string]string{
 										"--first":        "foobar",
 										"--second-third": "baz",
@@ -210,7 +211,7 @@ var _ = Describe("Help Command", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeUI.Out).To(Say("enable-diego - enable Diego support for an app"))
-				Expect(fakeUI.Out).To(Say("cf diego-enabler this and that and a little stuff"))
+				Expect(fakeUI.Out).To(Say("faceman diego-enabler this and that and a little stuff"))
 				Expect(fakeUI.Out).To(Say("ALIAS:"))
 				Expect(fakeUI.Out).To(Say("ed"))
 				Expect(fakeUI.Out).To(Say("--first\\s+foobar"))
@@ -244,9 +245,9 @@ var _ = Describe("Help Command", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeUI.Out).To(Say("NAME:"))
-				Expect(fakeUI.Out).To(Say("cf - A command line tool to interact with Cloud Foundry"))
+				Expect(fakeUI.Out).To(Say("faceman - A command line tool to interact with Cloud Foundry"))
 				Expect(fakeUI.Out).To(Say("USAGE:"))
-				Expect(fakeUI.Out).To(Say("cf \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
+				Expect(fakeUI.Out).To(Say("faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
 				Expect(fakeUI.Out).To(Say("VERSION:"))
 				Expect(fakeUI.Out).To(Say("BUILT_FROM_SOURCE-BUILT_AT_UNKNOWN_TIME"))
 

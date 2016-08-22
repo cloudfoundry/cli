@@ -215,6 +215,18 @@ var _ = Describe("Config", func() {
 			Entry("config=empty LANG=empty       LC_ALL=empty       default", "", "", "", DefaultLocal),
 		)
 
+		Describe("BinaryName", func() {
+			It("returns the name used to invoke", func() {
+				config, err := LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+
+				// Ginkgo will uses a config file as the first test argument, so that
+				// will be considered the binary name
+				Expect(config.BinaryName()).To(MatchRegexp("config\\.test$"))
+			})
+		})
+
 		Context("when there are environment variables", func() {
 			var (
 				originalCFStagingTimeout string

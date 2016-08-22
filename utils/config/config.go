@@ -46,6 +46,7 @@ func LoadConfig() (*Config, error) {
 	}
 
 	config.env = EnvOverride{
+		BinaryName:       os.Args[0],
 		CFColor:          os.Getenv("CF_COLOR"),
 		CFPluginHome:     os.Getenv("CF_PLUGIN_HOME"),
 		CFStagingTimeout: os.Getenv("CF_STAGING_TIMEOUT"),
@@ -134,6 +135,7 @@ type PluginRepos struct {
 }
 
 type EnvOverride struct {
+	BinaryName       string
 	CFColor          string
 	CFHome           string
 	CFPluginHome     string
@@ -248,7 +250,7 @@ func (config *Config) StartupTimeout() time.Duration {
 	return DefaultStartupTimeout
 }
 
-func (config Config) HTTPSProxy() string {
+func (config *Config) HTTPSProxy() string {
 	if config.env.HTTPSProxy != "" {
 		return config.env.HTTPSProxy
 	}
@@ -256,7 +258,7 @@ func (config Config) HTTPSProxy() string {
 	return ""
 }
 
-func (config Config) Locale() string {
+func (config *Config) Locale() string {
 	if config.env.Lang != "" {
 		return config.convertLocale(config.env.Lang)
 	}
@@ -271,7 +273,11 @@ func (config Config) Locale() string {
 	return DefaultLocal
 }
 
-func (config Config) convertLocale(local string) string {
+func (config *Config) BinaryName() string {
+	return config.env.BinaryName
+}
+
+func (config *Config) convertLocale(local string) string {
 	lang := strings.Split(local, ".")[0]
 	return strings.Replace(lang, "_", "-", -1)
 }
