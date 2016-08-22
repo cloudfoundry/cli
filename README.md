@@ -1,4 +1,4 @@
-# Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli) [![Code Climate](https://codeclimate.com/github/cloudfoundry/cli/badges/gpa.svg)](https://codeclimate.com/github/cloudfoundry/cli)
+# Cloud Foundry CLI [![Apache License 2.0](https://img.shields.io/github/license/cloudfoundry/cli.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE) [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli) [![Code Climate](https://codeclimate.com/github/cloudfoundry/cli/badges/gpa.svg)](https://codeclimate.com/github/cloudfoundry/cli)
 
 This is the official command line client for [Cloud Foundry](https://cloudfoundry.org).
 Latest help of each command is [here](https://cli.cloudfoundry.org) (or run `cf help`);
