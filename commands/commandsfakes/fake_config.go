@@ -9,6 +9,12 @@ import (
 )
 
 type FakeConfig struct {
+	BinaryNameStub        func() string
+	binaryNameMutex       sync.RWMutex
+	binaryNameArgsForCall []struct{}
+	binaryNameReturns     struct {
+		result1 string
+	}
 	ColorEnabledStub        func() config.ColorSetting
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct{}
@@ -29,6 +35,31 @@ type FakeConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeConfig) BinaryName() string {
+	fake.binaryNameMutex.Lock()
+	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct{}{})
+	fake.recordInvocation("BinaryName", []interface{}{})
+	fake.binaryNameMutex.Unlock()
+	if fake.BinaryNameStub != nil {
+		return fake.BinaryNameStub()
+	} else {
+		return fake.binaryNameReturns.result1
+	}
+}
+
+func (fake *FakeConfig) BinaryNameCallCount() int {
+	fake.binaryNameMutex.RLock()
+	defer fake.binaryNameMutex.RUnlock()
+	return len(fake.binaryNameArgsForCall)
+}
+
+func (fake *FakeConfig) BinaryNameReturns(result1 string) {
+	fake.BinaryNameStub = nil
+	fake.binaryNameReturns = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) ColorEnabled() config.ColorSetting {
@@ -109,6 +140,8 @@ func (fake *FakeConfig) PluginConfigReturns(result1 map[string]config.PluginConf
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.binaryNameMutex.RLock()
+	defer fake.binaryNameMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.localeMutex.RLock()

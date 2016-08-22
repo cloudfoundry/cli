@@ -15,10 +15,6 @@ import (
 	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
-const (
-	CF_NAME = "cf"
-)
-
 //go:generate counterfeiter . HelpActor
 
 // HelpActor handles the business logic of the help command
@@ -75,7 +71,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandName}} - {{.CommandDescription}}",
 		[]string{"CommandDescription"},
 		map[string]interface{}{
-			"CommandName":        CF_NAME,
+			"CommandName":        cmd.Config.BinaryName(),
 			"CommandDescription": "A command line tool to interact with Cloud Foundry",
 		})
 	cmd.UI.DisplayNewline()
@@ -84,7 +80,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandName}} {{.CommandUsage}}",
 		[]string{"CommandUsage"},
 		map[string]interface{}{
-			"CommandName":  CF_NAME,
+			"CommandName":  cmd.Config.BinaryName(),
 			"CommandUsage": "[global options] command [arguments...] [command options]",
 		})
 	cmd.UI.DisplayNewline()
@@ -223,8 +219,7 @@ func (cmd HelpCommand) displayCommand() error {
 		})
 	cmd.UI.DisplayText("")
 
-	//TODO: Figure out the best way to dynamically determine this
-	usageString := strings.Replace(cmdInfo.Usage, "CF_NAME", CF_NAME, -1)
+	usageString := strings.Replace(cmdInfo.Usage, "CF_NAME", cmd.Config.BinaryName(), -1)
 	cmd.UI.DisplayText("USAGE:")
 	cmd.UI.DisplayTextWithKeyTranslations("    {{.CommandUsage}}",
 		[]string{"CommandUsage"},
