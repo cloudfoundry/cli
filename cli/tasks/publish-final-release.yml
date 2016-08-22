@@ -49,8 +49,7 @@ run:
         [[ "${BIN}" =~ $filename_regex ]]
         os_arch="${BASH_REMATCH[2]}"
 
-        cp ${BIN} cf
-        tar -c cf | gzip -n > $root/archives/cf-cli_${release_tag}${os_arch}.tgz
+        tar -c ${BIN} | gzip -n > $root/archives/cf-cli_${release_tag}${os_arch}.tgz
         rm cf
       done
 
