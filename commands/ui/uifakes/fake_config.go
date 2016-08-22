@@ -15,6 +15,12 @@ type FakeConfig struct {
 	colorEnabledReturns     struct {
 		result1 config.ColorSetting
 	}
+	LocaleStub        func() string
+	localeMutex       sync.RWMutex
+	localeArgsForCall []struct{}
+	localeReturns     struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -44,11 +50,38 @@ func (fake *FakeConfig) ColorEnabledReturns(result1 config.ColorSetting) {
 	}{result1}
 }
 
+func (fake *FakeConfig) Locale() string {
+	fake.localeMutex.Lock()
+	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
+	fake.recordInvocation("Locale", []interface{}{})
+	fake.localeMutex.Unlock()
+	if fake.LocaleStub != nil {
+		return fake.LocaleStub()
+	} else {
+		return fake.localeReturns.result1
+	}
+}
+
+func (fake *FakeConfig) LocaleCallCount() int {
+	fake.localeMutex.RLock()
+	defer fake.localeMutex.RUnlock()
+	return len(fake.localeArgsForCall)
+}
+
+func (fake *FakeConfig) LocaleReturns(result1 string) {
+	fake.LocaleStub = nil
+	fake.localeReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
+	fake.localeMutex.RLock()
+	defer fake.localeMutex.RUnlock()
 	return fake.invocations
 }
 

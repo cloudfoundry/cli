@@ -41,9 +41,15 @@ type HelpCommand struct {
 }
 
 func (cmd *HelpCommand) Setup(config commands.Config) error {
-	cmd.UI = ui.NewUI(config)
+	var err error
+	cmd.UI, err = ui.NewUI(config)
+	if err != nil {
+		return err
+	}
+
 	cmd.Actor = v2actions.NewActor()
 	cmd.Config = config
+
 	return nil
 }
 
@@ -105,11 +111,13 @@ func (cmd HelpCommand) displayAllCommands() {
 				continue
 			}
 
-			cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
-				"CommandName":        cmdInfo[command].Name,
-				"CommandDescription": cmdInfo[command].Description,
-				"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
-			})
+			cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}",
+				[]string{"CommandDescription"},
+				map[string]interface{}{
+					"CommandName":        cmdInfo[command].Name,
+					"CommandDescription": cmdInfo[command].Description,
+					"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
+				})
 		}
 
 		cmd.UI.DisplayNewline()

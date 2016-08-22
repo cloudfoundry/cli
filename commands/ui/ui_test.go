@@ -16,10 +16,15 @@ var _ = Describe("UI", func() {
 		fakeConfig *uifakes.FakeConfig
 	)
 
+	// type TranslateFunc func(translationID string, args ...interface{}) string
 	BeforeEach(func() {
 		fakeConfig = new(uifakes.FakeConfig)
 		fakeConfig.ColorEnabledReturns(config.ColorEnabled)
-		ui = NewUI(fakeConfig)
+
+		var err error
+		ui, err = NewUI(fakeConfig)
+		Expect(err).NotTo(HaveOccurred())
+
 		ui.Out = NewBuffer()
 	})
 
@@ -70,6 +75,68 @@ var _ = Describe("UI", func() {
 					Expect(ui.Out).To(Say("some-string my-other-map-value\n"))
 				})
 			})
+
+			Context("when the local is not set to 'en-us'", func() {
+				BeforeEach(func() {
+					fakeConfig = new(uifakes.FakeConfig)
+					fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+					fakeConfig.LocaleReturns("fr-FR")
+
+					var err error
+					ui, err = NewUI(fakeConfig)
+					Expect(err).NotTo(HaveOccurred())
+
+					ui.Out = NewBuffer()
+				})
+
+				It("translates the main string passed to DisplayText", func() {
+					ui.DisplayText("\nTIP: Use '{{.Command}}' to target new org",
+						map[string]interface{}{
+							"Command": "foo",
+						},
+					)
+
+					Expect(ui.Out).To(Say("\nASTUCE : utilisez 'foo' pour cibler une nouvelle organisation"))
+				})
+
+				It("translates the main string and keys passed to DisplayTextWithKeyTranslations", func() {
+					ui.DisplayTextWithKeyTranslations("   {{.CommandName}} - {{.CommandDescription}}",
+						[]string{"CommandDescription"},
+						map[string]interface{}{
+							"CommandName":        "ADVANCED", // In translation file, should not be translated
+							"CommandDescription": "A command line tool to interact with Cloud Foundry",
+						})
+
+					Expect(ui.Out).To(Say("   ADVANCED - Outil de ligne de commande permettant d'interagir avec Cloud Foundry"))
+				})
+			})
+		})
+	})
+
+	Describe("DisplayTextWithKeyTranslations", func() {
+		Context("when the local is not set to 'en-us'", func() {
+			BeforeEach(func() {
+				fakeConfig = new(uifakes.FakeConfig)
+				fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Out = NewBuffer()
+			})
+
+			It("translates the main string and keys passed to DisplayTextWithKeyTranslations", func() {
+				ui.DisplayTextWithKeyTranslations("   {{.CommandName}} - {{.CommandDescription}}",
+					[]string{"CommandDescription"},
+					map[string]interface{}{
+						"CommandName":        "ADVANCED", // In translation file, should not be translated
+						"CommandDescription": "A command line tool to interact with Cloud Foundry",
+					})
+
+				Expect(ui.Out).To(Say("   ADVANCED - Outil de ligne de commande permettant d'interagir avec Cloud Foundry"))
+			})
 		})
 	})
 
@@ -85,6 +152,25 @@ var _ = Describe("UI", func() {
 		It("bolds and colorizes the input string", func() {
 			ui.DisplayHelpHeader("some-text")
 			Expect(ui.Out).To(Say("\x1b\\[38;1msome-text\x1b\\[0m"))
+		})
+
+		Context("when the local is not set to 'en-us'", func() {
+			BeforeEach(func() {
+				fakeConfig = new(uifakes.FakeConfig)
+				fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+
+				ui.Out = NewBuffer()
+			})
+
+			It("bolds and colorizes the input string", func() {
+				ui.DisplayHelpHeader("FEATURE FLAGS")
+				Expect(ui.Out).To(Say("\x1b\\[38;1mINDICATEURS DE FONCTION\x1b\\[0m"))
+			})
 		})
 	})
 })

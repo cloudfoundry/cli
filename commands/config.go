@@ -7,5 +7,6 @@ import "code.cloudfoundry.org/cli/utils/config"
 // Config a way of getting basic CF configuration
 type Config interface {
 	ColorEnabled() config.ColorSetting
+	Locale() string
 	PluginConfig() map[string]config.PluginConfig
 }

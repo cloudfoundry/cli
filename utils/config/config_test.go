@@ -33,7 +33,15 @@ var _ = Describe("Config", func() {
 	})
 
 	Context("when there isn't a config set", func() {
+		var oldLang string
+		BeforeEach(func() {
+			oldLang = os.Getenv("LANG")
+			os.Unsetenv("LANG")
+		})
+
 		It("returns a default config", func() {
+			defer os.Setenv("LANG", oldLang)
+
 			config, err := LoadConfig()
 			Expect(err).ToNot(HaveOccurred())
 
@@ -43,6 +51,7 @@ var _ = Describe("Config", func() {
 			Expect(config.PluginHome()).To(Equal(filepath.Join(homeDir, ".cf", "plugins")))
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
 			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
+			Expect(config.Locale()).To(BeEmpty())
 
 			pluginConfig := config.PluginConfig()
 			Expect(pluginConfig).To(BeEmpty())
@@ -172,6 +181,39 @@ var _ = Describe("Config", func() {
 				Expect(config.Target()).To(Equal("https://api.foo.com"))
 			})
 		})
+
+		DescribeTable("Locale",
+			func(configVal string, langVal string, lcAllVall string, expected string) {
+				rawConfig := fmt.Sprintf(`{"Locale":"%s"}`, configVal)
+				setConfig(homeDir, rawConfig)
+
+				defer os.Unsetenv("LANG")
+				if langVal == "" {
+					os.Unsetenv("LANG")
+				} else {
+					os.Setenv("LANG", langVal)
+				}
+
+				defer os.Unsetenv("LC_ALL")
+				if lcAllVall == "" {
+					os.Unsetenv("LC_ALL")
+				} else {
+					os.Setenv("LC_ALL", lcAllVall)
+				}
+
+				config, err := LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+
+				Expect(config.Locale()).To(Equal(expected))
+			},
+
+			Entry("config=en-US LC_ALL=empty       LANG=empty       en-US", "en-US", "", "", "en-US"),
+			Entry("config=en-US LC_ALL=kr_KR.UTF-8 LANG=empty       kr-KR", "en-US", "", "kr_KR.UTF-8", "kr-KR"),
+			Entry("config=en-US LC_ALL=kr_KR.UTF-8 LANG=en_US.UTF-8 en-US", "en-US", "en_US.UTF-8", "kr_KR.UTF-8", "en-US"),
+
+			Entry("config=empty LANG=empty       LC_ALL=empty       default", "", "", "", DefaultLocal),
+		)
 
 		Context("when there are environment variables", func() {
 			var (
