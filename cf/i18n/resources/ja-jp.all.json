@@ -164,16 +164,16 @@
     "translation": "プラグインの追加/削除"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "プラグインの追加/削除:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "プラグイン・リポジトリーの追加/削除"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "プラグイン・リポジトリーの追加/削除:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "プラグインの追加/削除:"
   },
   {
     "id": "ADVANCED",

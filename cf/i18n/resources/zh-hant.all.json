@@ -164,16 +164,16 @@
     "translation": "新增/移除外掛程式"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "新增/移除外掛程式:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "新增/移除外掛程式儲存庫"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "新增/移除外掛程式儲存庫:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "新增/移除外掛程式:"
   },
   {
     "id": "ADVANCED",

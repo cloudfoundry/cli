@@ -164,16 +164,16 @@
     "translation": "ADD/REMOVE PLUGIN"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "ADD/REMOVE PLUGIN:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "ADD/REMOVE PLUGIN REPOSITORY"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "ADD/REMOVE PLUGIN REPOSITORY:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "ADD/REMOVE PLUGIN:"
   },
   {
     "id": "ADVANCED",

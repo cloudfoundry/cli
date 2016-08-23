@@ -164,16 +164,16 @@
     "translation": "AGGIUNGI/RIMUOVI PLUGIN"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "AGGIUNGI/RIMUOVI PLUGIN:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "AGGIUNGI/RIMUOVI REPOSITORY PLUGIN"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "AGGIUNGI/RIMUOVI REPOSITORY PLUGIN:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "AGGIUNGI/RIMUOVI PLUGIN:"
   },
   {
     "id": "ADVANCED",
