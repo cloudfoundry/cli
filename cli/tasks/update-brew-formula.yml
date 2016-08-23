@@ -53,10 +53,15 @@ run:
     end
     EOF
 
-      git add cf-cli.rb
+    git add cf-cli.rb
+    if ! [ -z "$(git status --porcelain)"];
+    then
       git config --global user.email "cf-cli-eng@pivotal.io"
       git config --global user.name "Concourse CI"
       git commit -m "Release ${CLI_VERSION}"
+    else
+        echo "no new version to commit"
+    fi
     popd
 
     cp -R homebrew-tap $OUTPUT_PATH
