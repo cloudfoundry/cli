@@ -50,6 +50,7 @@ run:
         os_arch="${BASH_REMATCH[2]}"
 
         tar -c ${BIN} | gzip -n > $root/archives/cf-cli_${release_tag}${os_arch}.tgz
+        rm cf
       done
 
       cp $root/archives/cf-cli_*_osx.tgz ../cf-cli-osx-tarball
