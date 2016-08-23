@@ -164,16 +164,16 @@
     "translation": "INCLUIR/REMOVER PLUG-IN"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "INCLUIR/REMOVER PLUG-IN:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "INCLUIR/REMOVER REPOSITÓRIO DE PLUG-IN"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "INCLUIR/REMOVER REPOSITÓRIO DE PLUG-IN:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "INCLUIR/REMOVER PLUG-IN:"
   },
   {
     "id": "ADVANCED",

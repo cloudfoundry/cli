@@ -164,16 +164,16 @@
     "translation": "添加/除去插件"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "添加/除去插件:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "添加/除去插件存储库"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "添加/除去插件存储库:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "添加/除去插件:"
   },
   {
     "id": "ADVANCED",

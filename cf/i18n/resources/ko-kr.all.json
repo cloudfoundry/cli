@@ -164,16 +164,16 @@
     "translation": "플러그인 추가/제거"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "플러그인 추가/제거:"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "플러그인 저장소 추가/제거"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "플러그인 저장소 추가/제거:"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "플러그인 추가/제거:"
   },
   {
     "id": "ADVANCED",

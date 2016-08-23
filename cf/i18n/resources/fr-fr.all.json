@@ -164,16 +164,16 @@
     "translation": "AJOUTER/RETIRER UN PLUG-IN"
   },
   {
-    "id": "ADD/REMOVE PLUGIN:",
-    "translation": "AJOUTER/RETIRER UN PLUG-IN :"
-  },
-  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "AJOUTER/RETIRER UN REFERENTIEL DE PLUG-IN"
   },
   {
     "id": "ADD/REMOVE PLUGIN REPOSITORY:",
     "translation": "AJOUTER/RETIRER UN REFERENTIEL DE PLUG-IN :"
+  },
+  {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "AJOUTER/RETIRER UN PLUG-IN :"
   },
   {
     "id": "ADVANCED",
