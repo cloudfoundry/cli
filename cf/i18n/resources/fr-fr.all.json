@@ -3564,6 +3564,10 @@
     "translation": "Changement du nom de l'espace {{.OldSpaceName}} en {{.NewSpaceName}} dans l'organisation {{.OrgName}} en tant que {{.CurrentUser}}..."
   },
   {
+    "id": "Replace the specified rune (in hex) with a newline",
+    "translation": ""
+  },
+  {
     "id": "Repo Name",
     "translation": "Nom du référentiel"
   },

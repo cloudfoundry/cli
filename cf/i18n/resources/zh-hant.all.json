@@ -3564,6 +3564,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分將組織 {{.OrgName}} 中的空間 {{.OldSpaceName}} 重新命名為 {{.NewSpaceName}}..."
   },
   {
+    "id": "Replace the specified rune (in hex) with a newline",
+    "translation": ""
+  },
+  {
     "id": "Repo Name",
     "translation": "儲存庫名稱"
   },
