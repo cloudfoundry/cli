@@ -4,7 +4,7 @@ The Cloud Foundry team uses GitHub and accepts code contributions via
 [pull requests](https://help.github.com/articles/using-pull-requests).
 If your contribution includes a change that is exposed to cf CLI users
 (e.g. introducing a new command or flag), please submit an issue
-to discuss it first.  
+to discuss it first.
 Major new feature proposals generally entail a publicly viewable
 google document with commenting allowed to be discussed on the [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list.
 
@@ -13,10 +13,10 @@ google document with commenting allowed to be discussed on the [cf-dev](https://
 Follow these steps to make a contribution to any of our open source repositories:
 
 1. Ensure that you have completed our CLA Agreement for
-  [individuals](http://www.cloudfoundry.org/individualcontribution.pdf) or
-  [corporations](http://www.cloudfoundry.org/corpcontribution.pdf).
+  [individuals](https://www.cloudfoundry.org/wp-content/uploads/2015/09/CFF_Individual_CLA.pdf) or
+  [corporations](https://www.cloudfoundry.org/wp-content/uploads/2015/09/CFF_Corporate_CLA.pdf).
 
-## General Workflow
+## Setup
 
 1. Install [Go 1.6.x](https://golang.org)
 1. Create a directory where you would like to store the source for Go projects and their binaries (e.g. `$HOME/go`)
@@ -25,9 +25,14 @@ Follow these steps to make a contribution to any of our open source repositories
   * (Ignore any warnings about "no buildable Go source files")
 1. [Fork this repository](https://help.github.com/articles/fork-a-repo/), adding your fork as a remote
 1. Run our bootstrap script, `bin/bootstrap`
+
+## Workflow
+
+1. Run all the existing tests with `bin/test` to ensure they pass
 1. Write a new test, see it fail when running `bin/test` (or `ginkgo -p path/to/the/package/being/tested`)
 1. Write code to pass the test
 1. Repeat the above two steps until the feature is complete
+1. Run all the existing tests with `bin/test` to ensure they *still* pass
 1. Submit a [pull request](https://help.github.com/articles/using-pull-requests/) to the `master` branch
 
 **_*_ For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples)**
