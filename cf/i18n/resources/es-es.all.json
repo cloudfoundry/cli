@@ -164,12 +164,24 @@
     "translation": "AÑADIR/ELIMINAR PLUGIN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "AÑADIR/ELIMINAR PLUGIN:"
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "AÑADIR/ELIMINAR EL REPOSITORIO DE PLUGINS"
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": "AÑADIR/ELIMINAR EL REPOSITORIO DE PLUGINS:"
+  },
+  {
     "id": "ADVANCED",
     "translation": "AVANZADO"
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": "AVANZADO:"
   },
   {
     "id": "ALIAS:",
@@ -202,6 +214,10 @@
   {
     "id": "APPS",
     "translation": "APPS"
+  },
+  {
+    "id": "APPS:",
+    "translation": "APPS:"
   },
   {
     "id": "APP_INSTANCES",
@@ -386,6 +402,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "PAQUETES DE COMPILACIÓN"
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": "PAQUETES DE COMPILACIÓN:"
   },
   {
     "id": "BUILDPACK_NAME",
@@ -1376,6 +1396,10 @@
     "translation": "DOMAINS"
   },
   {
+    "id": "DOMAINS:",
+    "translation": "DOMAINS:"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "Panel de instrumentos: {{.URL}}"
   },
@@ -1642,6 +1666,10 @@
   {
     "id": "ENVIRONMENT VARIABLE GROUPS",
     "translation": "GRUPOS DE VARIABLE DE ENTORNO"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": "GRUPOS DE VARIABLE DE ENTORNO:"
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
@@ -2020,6 +2048,10 @@
     "translation": "DISTINTIVOS DE CARACTERÍSTICAS"
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": "DISTINTIVOS DE CARACTERÍSTICAS:"
+  },
+  {
     "id": "Failed assigning org role to user: ",
     "translation": "No se ha podido asignar el rol org al usuario: "
   },
@@ -2138,6 +2170,10 @@
   {
     "id": "GETTING STARTED",
     "translation": "CÓMO EMPEZAR"
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": "CÓMO EMPEZAR:"
   },
   {
     "id": "GLOBAL OPTIONS:",
@@ -2374,6 +2410,10 @@
   {
     "id": "INSTALLED PLUGIN COMMANDS",
     "translation": "MANDATOS DE PLUGIN INSTALADOS"
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
+    "translation": "MANDATOS DE PLUGIN INSTALADOS:"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3144,6 +3184,10 @@
     "translation": "ADMINISTRADOR DE ORGANIZACIÓN"
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": "ADMINISTRADOR DE ORGANIZACIÓN:"
+  },
+  {
     "id": "ORG AUDITOR",
     "translation": "AUDITOR DE ORGANIZACIÓN"
   },
@@ -3154,6 +3198,10 @@
   {
     "id": "ORGS",
     "translation": "ORGANIZACIONES"
+  },
+  {
+    "id": "ORGS:",
+    "translation": "ORGANIZACIONES:"
   },
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
@@ -3426,6 +3474,10 @@
   {
     "id": "ROUTES",
     "translation": "RUTAS"
+  },
+  {
+    "id": "ROUTES:",
+    "translation": "RUTAS:"
   },
   {
     "id": "ROUTE_PATH",
@@ -3720,6 +3772,10 @@
     "translation": "GRUPO DE SEGURIDAD"
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": "GRUPO DE SEGURIDAD:"
+  },
+  {
     "id": "SERVICE",
     "translation": "SERVICIO"
   },
@@ -3728,8 +3784,16 @@
     "translation": "ADMINISTRADOR DE SERVICIO"
   },
   {
+    "id": "SERVICE ADMIN:",
+    "translation": "ADMINISTRADOR DE SERVICIO:"
+  },
+  {
     "id": "SERVICES",
     "translation": "SERVICIOS"
+  },
+  {
+    "id": "SERVICES:",
+    "translation": "SERVICIOS:"
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -3742,6 +3806,10 @@
   {
     "id": "SPACE ADMIN",
     "translation": "ADMINISTRADOR DEL ESPACIO"
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": "ADMINISTRADOR DEL ESPACIO:"
   },
   {
     "id": "SPACE AUDITOR",
@@ -3758,6 +3826,10 @@
   {
     "id": "SPACES",
     "translation": "ESPACIOS"
+  },
+  {
+    "id": "SPACES:",
+    "translation": "ESPACIOS:"
   },
   {
     "id": "SSH to an application container instance",
@@ -4258,6 +4330,10 @@
   {
     "id": "USER ADMIN",
     "translation": "ADMINISTRACIÓN DE USUARIOS"
+  },
+  {
+    "id": "USER ADMIN:",
+    "translation": "ADMINISTRACIÓN DE USUARIOS:"
   },
   {
     "id": "USERS",

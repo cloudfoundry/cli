@@ -164,12 +164,24 @@
     "translation": "AJOUTER/RETIRER UN PLUG-IN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "AJOUTER/RETIRER UN PLUG-IN :"
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "AJOUTER/RETIRER UN REFERENTIEL DE PLUG-IN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": "AJOUTER/RETIRER UN REFERENTIEL DE PLUG-IN :"
+  },
+  {
     "id": "ADVANCED",
     "translation": "AVANCE"
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": "AVANCE :"
   },
   {
     "id": "ALIAS:",
@@ -202,6 +214,10 @@
   {
     "id": "APPS",
     "translation": "APPLICATIONS"
+  },
+  {
+    "id": "APPS:",
+    "translation": "APPLICATIONS :"
   },
   {
     "id": "APP_INSTANCES",
@@ -386,6 +402,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "PACKS DE CONSTRUCTION"
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": "PACKS DE CONSTRUCTION :"
   },
   {
     "id": "BUILDPACK_NAME",
@@ -1376,6 +1396,10 @@
     "translation": "DOMAINES"
   },
   {
+    "id": "DOMAINS:",
+    "translation": "DOMAINES :"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "Tableau de bord : {{.URL}}"
   },
@@ -1642,6 +1666,10 @@
   {
     "id": "ENVIRONMENT VARIABLE GROUPS",
     "translation": "GROUPES DE VARIABLES D'ENVIRONNEMENT"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": "GROUPES DE VARIABLES D'ENVIRONNEMENT :"
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
@@ -2020,6 +2048,10 @@
     "translation": "INDICATEURS DE FONCTION"
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": "INDICATEURS DE FONCTION :"
+  },
+  {
     "id": "Failed assigning org role to user: ",
     "translation": "Echec de l'affectation d'un rôle d'organisation à l'utilisateur : "
   },
@@ -2138,6 +2170,10 @@
   {
     "id": "GETTING STARTED",
     "translation": "INITIATION"
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": "INITIATION :"
   },
   {
     "id": "GLOBAL OPTIONS:",
@@ -2374,6 +2410,10 @@
   {
     "id": "INSTALLED PLUGIN COMMANDS",
     "translation": "COMMANDES DE PLUG-IN INSTALLEES"
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
+    "translation": "COMMANDES DE PLUG-IN INSTALLEES :"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3144,6 +3184,10 @@
     "translation": "ADMINISTRATEUR DE L'ORGANISATION"
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": "ADMINISTRATEUR DE L'ORGANISATION :"
+  },
+  {
     "id": "ORG AUDITOR",
     "translation": "AUDITEUR DE L'ORGANISATION"
   },
@@ -3154,6 +3198,10 @@
   {
     "id": "ORGS",
     "translation": "ORGANISATIONS"
+  },
+  {
+    "id": "ORGS:",
+    "translation": "ORGANISATIONS :"
   },
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
@@ -3426,6 +3474,10 @@
   {
     "id": "ROUTES",
     "translation": "ROUTES"
+  },
+  {
+    "id": "ROUTES:",
+    "translation": "ROUTES :"
   },
   {
     "id": "ROUTE_PATH",
@@ -3720,6 +3772,10 @@
     "translation": "GROUPE DE SECURITE"
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": "GROUPE DE SECURITE :"
+  },
+  {
     "id": "SERVICE",
     "translation": "SERVICE"
   },
@@ -3728,8 +3784,16 @@
     "translation": "ADMINISTRATEUR DU SERVICE"
   },
   {
+    "id": "SERVICE ADMIN:",
+    "translation": "ADMINISTRATEUR DU SERVICE :"
+  },
+  {
     "id": "SERVICES",
     "translation": "SERVICES"
+  },
+  {
+    "id": "SERVICES:",
+    "translation": "SERVICES :"
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -3742,6 +3806,10 @@
   {
     "id": "SPACE ADMIN",
     "translation": "ADMINISTRATEUR DE L'ESPACE"
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": "ADMINISTRATEUR DE L'ESPACE :"
   },
   {
     "id": "SPACE AUDITOR",
@@ -3758,6 +3826,10 @@
   {
     "id": "SPACES",
     "translation": "ESPACES"
+  },
+  {
+    "id": "SPACES:",
+    "translation": "ESPACES :"
   },
   {
     "id": "SSH to an application container instance",
@@ -4258,6 +4330,10 @@
   {
     "id": "USER ADMIN",
     "translation": "ADMINISTRATEUR"
+  },
+  {
+    "id": "USER ADMIN:",
+    "translation": "ADMINISTRATEUR :"
   },
   {
     "id": "USERS",
@@ -4789,7 +4865,7 @@
   },
   {
     "id": "instances:",
-    "translation": "instances :"
+    "translation": "instances :"
   },
   {
     "id": "invalid inherit path in manifest",

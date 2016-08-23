@@ -148,7 +148,7 @@ func (cmd HelpCommand) displayHelpFooter() {
 		[]string{"Description"},
 		map[string]interface{}{
 			"ENVName":     "CF_PLUGIN_HOME=path/to/dir/",
-			"Description": "Override path to default plugin config director",
+			"Description": "Override path to default plugin config directory",
 		})
 	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}              {{.Description}}",
 		[]string{"Description"},
