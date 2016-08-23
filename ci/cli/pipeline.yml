@@ -154,6 +154,7 @@ groups:
   - cats-diego
   - cats-windows
   - create-installers
+  - shipit
   - publish-edge-archives
   - publish-final-release
 - name: images
@@ -464,7 +465,7 @@ jobs:
       repos:
       - cli
 
-- name: publish-final-release
+- name: shipit
   serial: true
   plan:
   - aggregate:
@@ -481,6 +482,24 @@ jobs:
       passed: [create-installers]
     - get: cf-cli-installer-win64
       passed: [create-installers]
+
+- name: publish-final-release
+  serial: true
+  plan:
+  - aggregate:
+    - get: final-cli
+      trigger: true
+      passed: [shipit]
+    - get: cli
+      passed: [shipit]
+    - get: cf-cli-binaries
+      passed: [shipit]
+    - get: cf-cli-installers
+      passed: [shipit]
+    - get: cf-cli-installer-win32
+      passed: [shipit]
+    - get: cf-cli-installer-win64
+      passed: [shipit]
     - get: cli-ci
     - get: homebrew-tap
     - get: cli-private
