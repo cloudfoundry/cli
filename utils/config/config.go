@@ -86,9 +86,9 @@ type CFConfig struct {
 	Target                   string             `json:"Target"`
 	APIVersion               string             `json:"APIVersion"`
 	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
-	LoggregatorEndPoint      string             `json:"LoggregatorEndPoint"`
-	DopplerEndPoint          string             `json:"DopplerEndPoint"`
-	UaaEndpoint              string             `json:"UaaEndpoint"`
+	LoggregatorEndpoint      string             `json:"LoggregatorEndPoint"`
+	DopplerEndpoint          string             `json:"DopplerEndPoint"`
+	UAAEndpoint              string             `json:"UaaEndpoint"`
 	RoutingAPIEndpoint       string             `json:"RoutingAPIEndpoint"`
 	AccessToken              string             `json:"AccessToken"`
 	SSHOAuthClient           string             `json:"SSHOAuthClient"`
