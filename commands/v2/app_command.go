@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"fmt"
 	"os"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
@@ -20,7 +19,6 @@ func (_ AppCommand) Setup(config commands.Config) error {
 }
 
 func (_ AppCommand) Execute(args []string) error {
-	fmt.Println("executing app command")
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }
