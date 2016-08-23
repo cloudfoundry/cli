@@ -19,7 +19,7 @@ const (
 
 	DefaultTarget       = "https://api.bosh-lite.com"
 	DefaultColorEnabled = "true"
-	DefaultLocal        = ""
+	DefaultLocale       = ""
 )
 
 func LoadConfig() (*Config, error) {
@@ -259,18 +259,19 @@ func (config *Config) HTTPSProxy() string {
 }
 
 func (config *Config) Locale() string {
-	if config.env.Lang != "" {
-		return config.convertLocale(config.env.Lang)
+	if config.configFile.Locale != "" {
+		return config.configFile.Locale
 	}
 
 	if config.env.LCAll != "" {
 		return config.convertLocale(config.env.LCAll)
 	}
 
-	if config.configFile.Locale != "" {
-		return config.configFile.Locale
+	if config.env.Lang != "" {
+		return config.convertLocale(config.env.Lang)
 	}
-	return DefaultLocal
+
+	return DefaultLocale
 }
 
 func (config *Config) BinaryName() string {
