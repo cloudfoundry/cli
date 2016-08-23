@@ -164,12 +164,24 @@
     "translation": "플러그인 추가/제거"
   },
   {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "플러그인 추가/제거:"
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "플러그인 저장소 추가/제거"
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": "플러그인 저장소 추가/제거:"
+  },
+  {
     "id": "ADVANCED",
     "translation": "고급"
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": "고급:"
   },
   {
     "id": "ALIAS:",
@@ -202,6 +214,10 @@
   {
     "id": "APPS",
     "translation": "앱"
+  },
+  {
+    "id": "APPS:",
+    "translation": "앱:"
   },
   {
     "id": "APP_INSTANCES",
@@ -386,6 +402,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "빌드팩"
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": "빌드팩:"
   },
   {
     "id": "BUILDPACK_NAME",
@@ -1376,6 +1396,10 @@
     "translation": "도메인"
   },
   {
+    "id": "DOMAINS:",
+    "translation": "도메인:"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "대시보드: {{.URL}}"
   },
@@ -1642,6 +1666,10 @@
   {
     "id": "ENVIRONMENT VARIABLE GROUPS",
     "translation": "환경 변수 그룹"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": "환경 변수 그룹:"
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
@@ -2020,6 +2048,10 @@
     "translation": "기능 플래그"
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": "기능 플래그:"
+  },
+  {
     "id": "Failed assigning org role to user: ",
     "translation": "사용자에게 조직 역할을 지정하는 데 실패: "
   },
@@ -2138,6 +2170,10 @@
   {
     "id": "GETTING STARTED",
     "translation": "시작하기"
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": "시작하기:"
   },
   {
     "id": "GLOBAL OPTIONS:",
@@ -2374,6 +2410,10 @@
   {
     "id": "INSTALLED PLUGIN COMMANDS",
     "translation": "설치된 플러그인 명령"
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
+    "translation": "설치된 플러그인 명령:"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3144,6 +3184,10 @@
     "translation": "조직 관리"
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": "조직 관리:"
+  },
+  {
     "id": "ORG AUDITOR",
     "translation": "조직 감사자"
   },
@@ -3154,6 +3198,10 @@
   {
     "id": "ORGS",
     "translation": "조직"
+  },
+  {
+    "id": "ORGS:",
+    "translation": "조직:"
   },
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
@@ -3426,6 +3474,10 @@
   {
     "id": "ROUTES",
     "translation": "라우트"
+  },
+  {
+    "id": "ROUTES:",
+    "translation": "라우트:"
   },
   {
     "id": "ROUTE_PATH",
@@ -3720,6 +3772,10 @@
     "translation": "보안 그룹"
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": "보안 그룹:"
+  },
+  {
     "id": "SERVICE",
     "translation": "서비스"
   },
@@ -3728,8 +3784,16 @@
     "translation": "서비스 관리"
   },
   {
+    "id": "SERVICE ADMIN:",
+    "translation": "서비스 관리:"
+  },
+  {
     "id": "SERVICES",
     "translation": "서비스"
+  },
+  {
+    "id": "SERVICES:",
+    "translation": "서비스:"
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -3742,6 +3806,10 @@
   {
     "id": "SPACE ADMIN",
     "translation": "영역 관리"
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": "영역 관리:"
   },
   {
     "id": "SPACE AUDITOR",
@@ -3758,6 +3826,10 @@
   {
     "id": "SPACES",
     "translation": "영역"
+  },
+  {
+    "id": "SPACES:",
+    "translation": "영역:"
   },
   {
     "id": "SSH to an application container instance",
@@ -4258,6 +4330,10 @@
   {
     "id": "USER ADMIN",
     "translation": "사용자 관리"
+  },
+  {
+    "id": "USER ADMIN:",
+    "translation": "사용자 관리:"
   },
   {
     "id": "USERS",

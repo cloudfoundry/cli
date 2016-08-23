@@ -164,12 +164,24 @@
     "translation": "PLUG-IN HINZUFÜGEN/ENTFERNEN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "PLUG-IN HINZUFÜGEN/ENTFERNEN:"
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "PLUG-IN-REPOSITORY HINZUFÜGEN/ENTFERNEN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": "PLUG-IN-REPOSITORY HINZUFÜGEN/ENTFERNEN:"
+  },
+  {
     "id": "ADVANCED",
     "translation": "ERWEITERT"
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": "ERWEITERT:"
   },
   {
     "id": "ALIAS:",
@@ -202,6 +214,10 @@
   {
     "id": "APPS",
     "translation": "APPS"
+  },
+  {
+    "id": "APPS:",
+    "translation": "APPS:"
   },
   {
     "id": "APP_INSTANCES",
@@ -386,6 +402,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "BUILDPAKETE"
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": "BUILDPAKETE:"
   },
   {
     "id": "BUILDPACK_NAME",
@@ -1376,6 +1396,10 @@
     "translation": "DOMÄNEN"
   },
   {
+    "id": "DOMAINS:",
+    "translation": "DOMÄNEN:"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "Dashboard: {{.URL}}"
   },
@@ -1642,6 +1666,10 @@
   {
     "id": "ENVIRONMENT VARIABLE GROUPS",
     "translation": "UMGEBUNGSVARIABLENGRUPPEN"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": "UMGEBUNGSVARIABLENGRUPPEN:"
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
@@ -2020,6 +2048,10 @@
     "translation": "FEATURE-FLAGS"
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": "FEATURE-FLAGS:"
+  },
+  {
     "id": "Failed assigning org role to user: ",
     "translation": "Zuordnen von Organisationsrolle zu Benutzer ist fehlgeschlagen: "
   },
@@ -2138,6 +2170,10 @@
   {
     "id": "GETTING STARTED",
     "translation": "ERSTE SCHRITTE"
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": "ERSTE SCHRITTE:"
   },
   {
     "id": "GLOBAL OPTIONS:",
@@ -2374,6 +2410,10 @@
   {
     "id": "INSTALLED PLUGIN COMMANDS",
     "translation": "INSTALLIERTE PLUG-IN-BEFEHLE"
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
+    "translation": "INSTALLIERTE PLUG-IN-BEFEHLE:"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3144,6 +3184,10 @@
     "translation": "ORGANISATIONSADMINISTRATOR"
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": "ORGANISATIONSADMINISTRATOR:"
+  },
+  {
     "id": "ORG AUDITOR",
     "translation": "ORGANISATIONSAUDITOR"
   },
@@ -3154,6 +3198,10 @@
   {
     "id": "ORGS",
     "translation": "ORGANISATIONEN"
+  },
+  {
+    "id": "ORGS:",
+    "translation": "ORGANISATIONEN:"
   },
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
@@ -3426,6 +3474,10 @@
   {
     "id": "ROUTES",
     "translation": "ROUTEN"
+  },
+  {
+    "id": "ROUTES:",
+    "translation": "ROUTEN:"
   },
   {
     "id": "ROUTE_PATH",
@@ -3720,6 +3772,10 @@
     "translation": "SICHERHEITSGRUPPE"
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": "SICHERHEITSGRUPPE:"
+  },
+  {
     "id": "SERVICE",
     "translation": "SERVICE"
   },
@@ -3728,8 +3784,16 @@
     "translation": "SERVICE-ADMIN"
   },
   {
+    "id": "SERVICE ADMIN:",
+    "translation": "SERVICE-ADMIN:"
+  },
+  {
     "id": "SERVICES",
     "translation": "SERVICES"
+  },
+  {
+    "id": "SERVICES:",
+    "translation": "SERVICES:"
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -3742,6 +3806,10 @@
   {
     "id": "SPACE ADMIN",
     "translation": "BEREICHSADMIN"
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": "BEREICHSADMIN:"
   },
   {
     "id": "SPACE AUDITOR",
@@ -3758,6 +3826,10 @@
   {
     "id": "SPACES",
     "translation": "BEREICHE"
+  },
+  {
+    "id": "SPACES:",
+    "translation": "BEREICHE:"
   },
   {
     "id": "SSH to an application container instance",
@@ -4258,6 +4330,10 @@
   {
     "id": "USER ADMIN",
     "translation": "BENUTZER ADMIN"
+  },
+  {
+    "id": "USER ADMIN:",
+    "translation": "BENUTZER ADMIN:"
   },
   {
     "id": "USERS",

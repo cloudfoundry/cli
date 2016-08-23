@@ -164,12 +164,24 @@
     "translation": "AGGIUNGI/RIMUOVI PLUGIN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "AGGIUNGI/RIMUOVI PLUGIN:"
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "AGGIUNGI/RIMUOVI REPOSITORY PLUGIN"
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": "AGGIUNGI/RIMUOVI REPOSITORY PLUGIN:"
+  },
+  {
     "id": "ADVANCED",
     "translation": "AVANZATE"
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": "AVANZATE:"
   },
   {
     "id": "ALIAS:",
@@ -202,6 +214,10 @@
   {
     "id": "APPS",
     "translation": "APPLICAZIONI"
+  },
+  {
+    "id": "APPS:",
+    "translation": "APPLICAZIONI:"
   },
   {
     "id": "APP_INSTANCES",
@@ -386,6 +402,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "PACCHETTI DI BUILD"
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": "PACCHETTI DI BUILD:"
   },
   {
     "id": "BUILDPACK_NAME",
@@ -1376,6 +1396,10 @@
     "translation": "DOMINI"
   },
   {
+    "id": "DOMAINS:",
+    "translation": "DOMINI:"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "Dashboard: {{.URL}}"
   },
@@ -1642,6 +1666,10 @@
   {
     "id": "ENVIRONMENT VARIABLE GROUPS",
     "translation": "GRUPPI DI VARIABILI DI AMBIENTE"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": "GRUPPI DI VARIABILI DI AMBIENTE:"
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
@@ -2020,6 +2048,10 @@
     "translation": "INDICATORI FUNZIONE"
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": "INDICATORI FUNZIONE:"
+  },
+  {
     "id": "Failed assigning org role to user: ",
     "translation": "Impossibile assegnare il ruolo organizzazione all'utente: "
   },
@@ -2138,6 +2170,10 @@
   {
     "id": "GETTING STARTED",
     "translation": "INTRODUZIONE"
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": "INTRODUZIONE:"
   },
   {
     "id": "GLOBAL OPTIONS:",
@@ -2374,6 +2410,10 @@
   {
     "id": "INSTALLED PLUGIN COMMANDS",
     "translation": "COMANDI PLUGIN INSTALLATO"
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
+    "translation": "COMANDI PLUGIN INSTALLATO:"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3144,6 +3184,10 @@
     "translation": "AMMINISTRATORE ORGANIZZAZIONE"
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": "AMMINISTRATORE ORGANIZZAZIONE:"
+  },
+  {
     "id": "ORG AUDITOR",
     "translation": "REVISORE ORGANIZZAZIONE"
   },
@@ -3154,6 +3198,10 @@
   {
     "id": "ORGS",
     "translation": "ORGANIZZAZIONI"
+  },
+  {
+    "id": "ORGS:",
+    "translation": "ORGANIZZAZIONI:"
   },
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
@@ -3426,6 +3474,10 @@
   {
     "id": "ROUTES",
     "translation": "ROTTE"
+  },
+  {
+    "id": "ROUTES:",
+    "translation": "ROTTE:"
   },
   {
     "id": "ROUTE_PATH",
@@ -3720,6 +3772,10 @@
     "translation": "GRUPPO DI SICUREZZA"
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": "GRUPPO DI SICUREZZA:"
+  },
+  {
     "id": "SERVICE",
     "translation": "SERVIZIO"
   },
@@ -3728,8 +3784,16 @@
     "translation": "AMMINISTRATORE SERVIZIO"
   },
   {
+    "id": "SERVICE ADMIN:",
+    "translation": "AMMINISTRATORE SERVIZIO:"
+  },
+  {
     "id": "SERVICES",
     "translation": "SERVIZI"
+  },
+  {
+    "id": "SERVICES:",
+    "translation": "SERVIZI:"
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -3742,6 +3806,10 @@
   {
     "id": "SPACE ADMIN",
     "translation": "AMMINISTRATORE SPAZIO"
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": "AMMINISTRATORE SPAZIO:"
   },
   {
     "id": "SPACE AUDITOR",
@@ -3758,6 +3826,10 @@
   {
     "id": "SPACES",
     "translation": "SPAZI"
+  },
+  {
+    "id": "SPACES:",
+    "translation": "SPAZI:"
   },
   {
     "id": "SSH to an application container instance",
@@ -4258,6 +4330,10 @@
   {
     "id": "USER ADMIN",
     "translation": "AMMINISTRAZIONE UTENTI"
+  },
+  {
+    "id": "USER ADMIN:",
+    "translation": "AMMINISTRAZIONE UTENTI:"
   },
   {
     "id": "USERS",

@@ -164,12 +164,24 @@
     "translation": "新增/移除外掛程式"
   },
   {
+    "id": "ADD/REMOVE PLUGIN:",
+    "translation": "新增/移除外掛程式:"
+  },
+  {
     "id": "ADD/REMOVE PLUGIN REPOSITORY",
     "translation": "新增/移除外掛程式儲存庫"
   },
   {
+    "id": "ADD/REMOVE PLUGIN REPOSITORY:",
+    "translation": "新增/移除外掛程式儲存庫:"
+  },
+  {
     "id": "ADVANCED",
     "translation": "進階"
+  },
+  {
+    "id": "ADVANCED:",
+    "translation": "進階:"
   },
   {
     "id": "ALIAS:",
@@ -202,6 +214,10 @@
   {
     "id": "APPS",
     "translation": "應用程式"
+  },
+  {
+    "id": "APPS:",
+    "translation": "應用程式:"
   },
   {
     "id": "APP_INSTANCES",
@@ -386,6 +402,10 @@
   {
     "id": "BUILDPACKS",
     "translation": "建置套件"
+  },
+  {
+    "id": "BUILDPACKS:",
+    "translation": "建置套件:"
   },
   {
     "id": "BUILDPACK_NAME",
@@ -1376,6 +1396,10 @@
     "translation": "網域"
   },
   {
+    "id": "DOMAINS:",
+    "translation": "網域:"
+  },
+  {
     "id": "Dashboard: {{.URL}}",
     "translation": "儀表板: {{.URL}}"
   },
@@ -1642,6 +1666,10 @@
   {
     "id": "ENVIRONMENT VARIABLE GROUPS",
     "translation": "環境變數群組"
+  },
+  {
+    "id": "ENVIRONMENT VARIABLE GROUPS:",
+    "translation": "環境變數群組:"
   },
   {
     "id": "ENVIRONMENT VARIABLES:",
@@ -2020,6 +2048,10 @@
     "translation": "特性旗標"
   },
   {
+    "id": "FEATURE FLAGS:",
+    "translation": "特性旗標:"
+  },
+  {
     "id": "Failed assigning org role to user: ",
     "translation": "將組織角色指派給使用者時失敗: "
   },
@@ -2138,6 +2170,10 @@
   {
     "id": "GETTING STARTED",
     "translation": "開始使用"
+  },
+  {
+    "id": "GETTING STARTED:",
+    "translation": "開始使用:"
   },
   {
     "id": "GLOBAL OPTIONS:",
@@ -2374,6 +2410,10 @@
   {
     "id": "INSTALLED PLUGIN COMMANDS",
     "translation": "已安裝的外掛程式指令"
+  },
+  {
+    "id": "INSTALLED PLUGIN COMMANDS:",
+    "translation": "已安裝的外掛程式指令:"
   },
   {
     "id": "INSTANCE_MEMORY",
@@ -3144,6 +3184,10 @@
     "translation": "組織管理者"
   },
   {
+    "id": "ORG ADMIN:",
+    "translation": "組織管理者:"
+  },
+  {
     "id": "ORG AUDITOR",
     "translation": "組織審核員"
   },
@@ -3154,6 +3198,10 @@
   {
     "id": "ORGS",
     "translation": "組織"
+  },
+  {
+    "id": "ORGS:",
+    "translation": "組織:"
   },
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
@@ -3426,6 +3474,10 @@
   {
     "id": "ROUTES",
     "translation": "ROUTES"
+  },
+  {
+    "id": "ROUTES:",
+    "translation": "路徑:"
   },
   {
     "id": "ROUTE_PATH",
@@ -3720,6 +3772,10 @@
     "translation": "安全群組"
   },
   {
+    "id": "SECURITY GROUP:",
+    "translation": "安全群組:"
+  },
+  {
     "id": "SERVICE",
     "translation": "服務"
   },
@@ -3728,8 +3784,16 @@
     "translation": "服務管理"
   },
   {
+    "id": "SERVICE ADMIN:",
+    "translation": "服務管理:"
+  },
+  {
     "id": "SERVICES",
     "translation": "服務"
+  },
+  {
+    "id": "SERVICES:",
+    "translation": "服務:"
   },
   {
     "id": "SERVICE_INSTANCES",
@@ -3742,6 +3806,10 @@
   {
     "id": "SPACE ADMIN",
     "translation": "空間管理"
+  },
+  {
+    "id": "SPACE ADMIN:",
+    "translation": "空間管理:"
   },
   {
     "id": "SPACE AUDITOR",
@@ -3758,6 +3826,10 @@
   {
     "id": "SPACES",
     "translation": "空間"
+  },
+  {
+    "id": "SPACES:",
+    "translation": "空間:"
   },
   {
     "id": "SSH to an application container instance",
@@ -4258,6 +4330,10 @@
   {
     "id": "USER ADMIN",
     "translation": "使用者管理"
+  },
+  {
+    "id": "USER ADMIN:",
+    "translation": "使用者管理:"
   },
   {
     "id": "USERS",
