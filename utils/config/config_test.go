@@ -183,7 +183,7 @@ var _ = Describe("Config", func() {
 		})
 
 		DescribeTable("Locale",
-			func(configVal string, langVal string, lcAllVall string, expected string) {
+			func(langVal string, lcAllVall string, configVal string, expected string) {
 				rawConfig := fmt.Sprintf(`{"Locale":"%s"}`, configVal)
 				setConfig(homeDir, rawConfig)
 
@@ -208,11 +208,11 @@ var _ = Describe("Config", func() {
 				Expect(config.Locale()).To(Equal(expected))
 			},
 
-			Entry("config=en-US LC_ALL=empty       LANG=empty       en-US", "en-US", "", "", "en-US"),
-			Entry("config=en-US LC_ALL=kr_KR.UTF-8 LANG=empty       kr-KR", "en-US", "", "kr_KR.UTF-8", "kr-KR"),
-			Entry("config=en-US LC_ALL=kr_KR.UTF-8 LANG=en_US.UTF-8 en-US", "en-US", "en_US.UTF-8", "kr_KR.UTF-8", "en-US"),
+			Entry("LANG=ko-KO.UTF-8 LC_ALL=empty       config=empty ko-KO", "ko-KO.UTF-8", "", "", "ko-KO"),
+			Entry("LANG=ko-KO.UTF-8 LC_ALL=fr_FR.UTF-8 config=empty fr-FR", "ko-KO.UTF-8", "fr_FR.UTF-8", "", "fr-FR"),
+			Entry("LANG=ko-KO.UTF-8 LC_ALL=fr_FR.UTF-8 config=pt-BR pt-BR", "ko-KO.UTF-8", "fr_FR.UTF-8", "pt-BR", "pt-BR"),
 
-			Entry("config=empty LANG=empty       LC_ALL=empty       default", "", "", "", DefaultLocal),
+			Entry("config=empty LANG=empty       LC_ALL=empty       default", "", "", "", DefaultLocale),
 		)
 
 		Describe("BinaryName", func() {
