@@ -56,7 +56,7 @@ var _ = Describe("Help Command", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeUI.Out).To(Say("NAME:"))
-				Expect(fakeUI.Out).To(Say("    help - Show help"))
+				Expect(fakeUI.Out).To(Say("   help - Show help"))
 
 				Expect(fakeActor.GetCommandInfoCallCount()).To(Equal(1))
 				_, commandName := fakeActor.GetCommandInfoArgsForCall(0)
@@ -69,7 +69,7 @@ var _ = Describe("Help Command", func() {
 
 				Expect(fakeUI.Out).To(Say("NAME:"))
 				Expect(fakeUI.Out).To(Say("USAGE:"))
-				Expect(fakeUI.Out).To(Say("    faceman help \\[COMMAND\\]"))
+				Expect(fakeUI.Out).To(Say("   faceman help \\[COMMAND\\]"))
 			})
 
 			Describe("aliases", func() {
@@ -80,7 +80,7 @@ var _ = Describe("Help Command", func() {
 
 						Expect(fakeUI.Out).To(Say("USAGE:"))
 						Expect(fakeUI.Out).To(Say("ALIAS:"))
-						Expect(fakeUI.Out).To(Say("    h"))
+						Expect(fakeUI.Out).To(Say("   h"))
 					})
 				})
 
