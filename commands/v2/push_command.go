@@ -18,7 +18,7 @@ type PushCommand struct {
 	Hostname             string      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
 	NumInstances         string      `short:"i" description:"Number of instances"`
 	DiskLimit            string      `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
-	MemoryLimit          string      `short:"m" description:"Memory limit (e.g. 256M, 1025M, 1G)"`
+	MemoryLimit          string      `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoHostname           bool        `long:"no-hostname" description:"Map the root domain to this app"`
 	NoManifest           bool        `long:"no-manifest" description:"Ignore manifest file"`
 	NoRoute              bool        `long:"no-route" description:"Do not map a route to this app and remove routes from previous pushes of this app"`
@@ -26,9 +26,9 @@ type PushCommand struct {
 	DirectoryPath        string      `short:"p" description:"Path to app directory or to a zip file of the contents of the app directory"` //TODO: Custom Directory flag that does validation
 	RandomRoute          bool        `long:"random-route" description:"Create a random route for this app"`
 	RoutePath            string      `long:"route-path" description:"Path for the route"`
-	Stack                string      `short:"s" description:"Stack to use (a stack is a pre-build file system including an operating system, that can run apps)"`
+	Stack                string      `short:"s" description:"Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"`
 	ApplicationStartTime int         `short:"t" description:"Maximum time (in seconds) for CLI to wait for application start, other server side timeouts may apply"`
-	usage                interface{} `usage:"Push a single app (with or without a manifest):\n    CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n    [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n    [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n\n    Push multiple apps with a manifest:\n    cf push [-f MANIFEST_PATH]"`
+	usage                interface{} `usage:"Push a single app (with or without a manifest):\n   CF_NAME push APP_NAME [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH] [--docker-image DOCKER_IMAGE]\n   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [--hostname HOST] [-p PATH] [-s STACK] [-t TIMEOUT] [-u HEALTH_CHECK_TYPE] [--route-path ROUTE_PATH]\n   [--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n\n   Push multiple apps with a manifest:\n   cf push [-f MANIFEST_PATH]"`
 }
 
 func (_ PushCommand) Setup(config commands.Config) error {

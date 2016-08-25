@@ -9,7 +9,7 @@ import (
 
 type RepoPluginsCommand struct {
 	RegisteredRepository string      `short:"r" description:"Name of a registered repository"`
-	usage                interface{} `usage:"CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLES:\n    CF_NAME repo-plugins -r PrivateRepo"`
+	usage                interface{} `usage:"CF_NAME repo-plugins [-r REPO_NAME]\n\nEXAMPLES:\n   CF_NAME repo-plugins -r PrivateRepo"`
 }
 
 func (_ RepoPluginsCommand) Setup(config commands.Config) error {

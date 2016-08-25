@@ -211,30 +211,30 @@ func (cmd HelpCommand) displayCommand() error {
 	}
 
 	cmd.UI.DisplayText("NAME:")
-	cmd.UI.DisplayTextWithKeyTranslations("    {{.CommandName}} - {{.CommandDescription}}",
+	cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandName}} - {{.CommandDescription}}",
 		[]string{"CommandDescription"},
 		map[string]interface{}{
 			"CommandName":        cmdInfo.Name,
 			"CommandDescription": cmdInfo.Description,
 		})
-	cmd.UI.DisplayText("")
+	cmd.UI.DisplayNewline()
 
 	usageString := strings.Replace(cmdInfo.Usage, "CF_NAME", cmd.Config.BinaryName(), -1)
 	cmd.UI.DisplayText("USAGE:")
-	cmd.UI.DisplayTextWithKeyTranslations("    {{.CommandUsage}}",
+	cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandUsage}}",
 		[]string{"CommandUsage"},
 		map[string]interface{}{
 			"CommandUsage": usageString,
 		})
-	cmd.UI.DisplayText("")
+	cmd.UI.DisplayNewline()
 
 	if cmdInfo.Alias != "" {
 		cmd.UI.DisplayText("ALIAS:")
-		cmd.UI.DisplayText("    {{.Alias}}",
+		cmd.UI.DisplayText("   {{.Alias}}",
 			map[string]interface{}{
 				"Alias": cmdInfo.Alias,
 			})
-		cmd.UI.DisplayText("")
+		cmd.UI.DisplayNewline()
 	}
 
 	if len(cmdInfo.Flags) != 0 {
@@ -250,7 +250,7 @@ func (cmd HelpCommand) displayCommand() error {
 				name = "--" + flag.Long
 			}
 
-			cmd.UI.DisplayTextWithKeyTranslations("    {{.Flags}}{{.Spaces}}{{.Description}}",
+			cmd.UI.DisplayTextWithKeyTranslations("   {{.Flags}}{{.Spaces}}{{.Description}}",
 				[]string{"Description"},
 				map[string]interface{}{
 					"Flags":       name,
