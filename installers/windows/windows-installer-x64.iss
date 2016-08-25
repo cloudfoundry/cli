@@ -8,6 +8,7 @@ AppPublisher=Cloud Foundry Foundation
 SignTool=signtool sign /f $qSIGNTOOL_CERT_PATH$q /p $qSIGNTOOL_CERT_PASSWORD$q /t http://timestamp.comodoca.com/authenticode $f
 ArchitecturesInstallIn64BitMode=x64 ia64
 ArchitecturesAllowed=x64 ia64
+PrivilegesRequired=none
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Check: Uninstall32Bit() and NeedsAddPath(ExpandConstant('{app}'))
