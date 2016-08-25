@@ -12,7 +12,7 @@ type CreateBuildpackCommand struct {
 	RequiredArgs flags.CreateBuildpackArgs `positional-args:"yes"`
 	Disable      bool                      `long:"disable" description:"Disable the buildpack from being used for staging"`
 	Enable       bool                      `long:"enable" description:"Enable the buildpack to be used for staging"`
-	usage        interface{}               `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]\n\nTIP:\n    Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
+	usage        interface{}               `usage:"CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]\n\nTIP:\n   Path should be a zip file, a url to a zip file, or a local directory. Position is a positive integer, sets priority, and is sorted from lowest to highest."`
 }
 
 func (_ CreateBuildpackCommand) Setup(config commands.Config) error {

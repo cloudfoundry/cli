@@ -10,7 +10,7 @@ import (
 
 type UpdateSecurityGroupCommand struct {
 	RequiredArgs flags.SecurityGroupArgs `positional-args:"yes"`
-	usage        interface{}             `usage:"CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE\n\n    The provided path can be an absolute or relative path to a file.\n    It should have a single array with JSON objects inside describing the rules.\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+	usage        interface{}             `usage:"CF_NAME update-security-group SECURITY_GROUP PATH_TO_JSON_RULES_FILE\n\n   The provided path can be an absolute or relative path to a file.\n   It should have a single array with JSON objects inside describing the rules.\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
 }
 
 func (_ UpdateSecurityGroupCommand) Setup(config commands.Config) error {

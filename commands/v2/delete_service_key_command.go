@@ -11,7 +11,7 @@ import (
 type DeleteServiceKeyCommand struct {
 	RequiredArgs flags.ServiceInstanceKey `positional-args:"yes"`
 	Force        bool                     `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{}              `usage:"CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLES:\n    CF_NAME delete-service-key mydb mykey"`
+	usage        interface{}              `usage:"CF_NAME delete-service-key SERVICE_INSTANCE SERVICE_KEY [-f]\n\nEXAMPLES:\n   CF_NAME delete-service-key mydb mykey"`
 }
 
 func (_ DeleteServiceKeyCommand) Setup(config commands.Config) error {

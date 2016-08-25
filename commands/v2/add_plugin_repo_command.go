@@ -10,7 +10,7 @@ import (
 
 type AddPluginRepoCommand struct {
 	RequiredArgs flags.AddPluginRepoArgs `positional-args:"yes"`
-	usage        interface{}             `usage:"CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLES:\n    CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"`
+	usage        interface{}             `usage:"CF_NAME add-plugin-repo REPO_NAME URL\n\nEXAMPLES:\n   CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"`
 }
 
 func (_ AddPluginRepoCommand) Setup(config commands.Config) error {

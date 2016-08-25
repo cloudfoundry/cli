@@ -10,7 +10,7 @@ import (
 
 type SetOrgRoleCommand struct {
 	RequiredArgs flags.SetOrgRoleArgs `positional-args:"yes"`
-	usage        interface{}          `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n\nROLES:\n    'OrgManager' - Invite and manage users, select and change plans, and set spending limits\n    'BillingManager' - Create and manage the billing account and payment info\n    'OrgAuditor' - Read-only access to org info and reports"`
+	usage        interface{}          `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n\nROLES:\n   'OrgManager' - Invite and manage users, select and change plans, and set spending limits\n   'BillingManager' - Create and manage the billing account and payment info\n   'OrgAuditor' - Read-only access to org info and reports"`
 }
 
 func (_ SetOrgRoleCommand) Setup(config commands.Config) error {
