@@ -9,8 +9,9 @@ import (
 )
 
 type EnvCommand struct {
-	RequiredArgs flags.AppName `positional-args:"yes"`
-	usage        interface{}   `usage:"CF_NAME env APP_NAME"`
+	RequiredArgs    flags.AppName `positional-args:"yes"`
+	usage           interface{}   `usage:"CF_NAME env APP_NAME"`
+	relatedCommands interface{}   `related_commands:"app, apps, set-env, unset-env, running-environment-variable-group, staging-environment-variable-group"`
 }
 
 func (_ EnvCommand) Setup(config commands.Config) error {

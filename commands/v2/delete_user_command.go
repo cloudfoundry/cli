@@ -9,9 +9,10 @@ import (
 )
 
 type DeleteUserCommand struct {
-	RequiredArgs flags.Username `positional-args:"yes"`
-	Force        bool           `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{}    `usage:"CF_NAME delete-user USERNAME [-f]"`
+	RequiredArgs    flags.Username `positional-args:"yes"`
+	Force           bool           `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{}    `usage:"CF_NAME delete-user USERNAME [-f]"`
+	relatedCommands interface{}    `related_commands:"org-users"`
 }
 
 func (_ DeleteUserCommand) Setup(config commands.Config) error {

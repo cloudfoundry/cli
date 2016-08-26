@@ -9,8 +9,9 @@ import (
 )
 
 type SetStagingEnvironmentVariableGroupCommand struct {
-	RequiredArgs flags.ParamsAsJSON `positional-args:"yes"`
-	usage        interface{}        `usage:"CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+	RequiredArgs    flags.ParamsAsJSON `positional-args:"yes"`
+	usage           interface{}        `usage:"CF_NAME set-staging-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+	relatedCommands interface{}        `related_commands:"set-env, staging-environment-variable-group"`
 }
 
 func (_ SetStagingEnvironmentVariableGroupCommand) Setup(config commands.Config) error {

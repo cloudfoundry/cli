@@ -9,8 +9,9 @@ import (
 )
 
 type EnableFeatureFlagCommand struct {
-	RequiredArgs flags.Feature `positional-args:"yes"`
-	usage        interface{}   `usage:"CF_NAME enable-feature-flag FEATURE_NAME"`
+	RequiredArgs    flags.Feature `positional-args:"yes"`
+	usage           interface{}   `usage:"CF_NAME enable-feature-flag FEATURE_NAME"`
+	relatedCommands interface{}   `related_commands:"disable-feature-flag, feature-flags"`
 }
 
 func (_ EnableFeatureFlagCommand) Setup(config commands.Config) error {

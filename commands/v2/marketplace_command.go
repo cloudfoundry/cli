@@ -10,6 +10,7 @@ import (
 type MarketplaceCommand struct {
 	ServicePlanInfo string      `short:"s" description:"Show plan details for a particular service offering"`
 	usage           interface{} `usage:"CF_NAME marketplace [-s SERVICE]"`
+	relatedCommands interface{} `related_commands:"create-service, services"`
 }
 
 func (_ MarketplaceCommand) Setup(config commands.Config) error {

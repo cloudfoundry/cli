@@ -20,6 +20,7 @@ type UpdateQuotaCommand struct {
 	ReservedRoutePorts       int         `long:"reserved-route-ports" description:"Maximum number of routes that may be created with reserved ports"`
 	NumServiceInstances      int         `short:"s" description:"Total number of service instances"`
 	usage                    interface{} `usage:"CF_NAME update-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-n NEW_NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
+	relatedCommands          interface{} `related_commands:"org, quota"`
 }
 
 func (_ UpdateQuotaCommand) Setup(config commands.Config) error {

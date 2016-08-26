@@ -9,8 +9,9 @@ import (
 )
 
 type SharePrivateDomainCommand struct {
-	RequiredArgs flags.OrgDomain `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME share-private-domain ORG DOMAIN"`
+	RequiredArgs    flags.OrgDomain `positional-args:"yes"`
+	usage           interface{}     `usage:"CF_NAME share-private-domain ORG DOMAIN"`
+	relatedCommands interface{}     `related_commands:"domains, unshare-private-domain"`
 }
 
 func (_ SharePrivateDomainCommand) Setup(config commands.Config) error {

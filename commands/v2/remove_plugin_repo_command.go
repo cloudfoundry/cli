@@ -9,8 +9,9 @@ import (
 )
 
 type RemovePluginRepoCommand struct {
-	RequiredArgs flags.PluginRepoName `positional-args:"yes"`
-	usage        interface{}          `usage:"CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLES:\n   CF_NAME remove-plugin-repo PrivateRepo"`
+	RequiredArgs    flags.PluginRepoName `positional-args:"yes"`
+	usage           interface{}          `usage:"CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLES:\n   CF_NAME remove-plugin-repo PrivateRepo"`
+	relatedCommands interface{}          `related_commands:"list-plugin-repos"`
 }
 
 func (_ RemovePluginRepoCommand) Setup(config commands.Config) error {

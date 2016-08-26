@@ -9,9 +9,10 @@ import (
 )
 
 type DeleteServiceCommand struct {
-	RequiredArgs flags.ServiceInstance `positional-args:"yes"`
-	Force        bool                  `short:"f" description:"Force Deletion without confirmation"`
-	usage        interface{}           `usage:"CF_NAME delete-service SERVICE_INSTANCE [-f]"`
+	RequiredArgs    flags.ServiceInstance `positional-args:"yes"`
+	Force           bool                  `short:"f" description:"Force Deletion without confirmation"`
+	usage           interface{}           `usage:"CF_NAME delete-service SERVICE_INSTANCE [-f]"`
+	relatedCommands interface{}           `related_commands:"unbind-service, services"`
 }
 
 func (_ DeleteServiceCommand) Setup(config commands.Config) error {

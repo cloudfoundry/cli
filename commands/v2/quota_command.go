@@ -9,8 +9,9 @@ import (
 )
 
 type QuotaCommand struct {
-	RequiredArgs flags.Quota `positional-args:"yes"`
-	usage        interface{} `usage:"CF_NAME quota QUOTA"`
+	RequiredArgs    flags.Quota `positional-args:"yes"`
+	usage           interface{} `usage:"CF_NAME quota QUOTA"`
+	relatedCommands interface{} `related_commands:"org, quotas"`
 }
 
 func (_ QuotaCommand) Setup(config commands.Config) error {

@@ -9,9 +9,10 @@ import (
 )
 
 type DeleteSpaceQuotaCommand struct {
-	RequiredArgs flags.SpaceQuota `positional-args:"yes"`
-	Force        bool             `short:"f" description:"Force delete (do not prompt for confirmation)"`
-	usage        interface{}      `usage:"CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"`
+	RequiredArgs    flags.SpaceQuota `positional-args:"yes"`
+	Force           bool             `short:"f" description:"Force delete (do not prompt for confirmation)"`
+	usage           interface{}      `usage:"CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"`
+	relatedCommands interface{}      `related_commands:"space-quotas"`
 }
 
 func (_ DeleteSpaceQuotaCommand) Setup(config commands.Config) error {

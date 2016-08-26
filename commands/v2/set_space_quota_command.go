@@ -9,8 +9,9 @@ import (
 )
 
 type SetSpaceQuotaCommand struct {
-	RequiredArgs flags.SetSpaceQuotaArgs `positional-args:"yes"`
-	usage        interface{}             `usage:"CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"`
+	RequiredArgs    flags.SetSpaceQuotaArgs `positional-args:"yes"`
+	usage           interface{}             `usage:"CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME"`
+	relatedCommands interface{}             `related_commands:"space, space-quotas, spaces"`
 }
 
 func (_ SetSpaceQuotaCommand) Setup(config commands.Config) error {

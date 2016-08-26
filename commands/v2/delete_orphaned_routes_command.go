@@ -8,8 +8,9 @@ import (
 )
 
 type DeleteOrphanedRoutesCommand struct {
-	Force bool        `short:"f" description:"Force deletion without confirmation"`
-	usage interface{} `usage:"CF_NAME delete-orphaned-routes [-f]"`
+	Force           bool        `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{} `usage:"CF_NAME delete-orphaned-routes [-f]"`
+	relatedCommands interface{} `related_commands:"delete-route, routes"`
 }
 
 func (_ DeleteOrphanedRoutesCommand) Setup(config commands.Config) error {

@@ -9,8 +9,9 @@ import (
 )
 
 type UnbindServiceCommand struct {
-	RequiredArgs flags.BindServiceArgs `positional-args:"yes"`
-	usage        interface{}           `usage:"CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"`
+	RequiredArgs    flags.BindServiceArgs `positional-args:"yes"`
+	usage           interface{}           `usage:"CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"`
+	relatedCommands interface{}           `related_commands:"apps, delete-service, services"`
 }
 
 func (_ UnbindServiceCommand) Setup(config commands.Config) error {

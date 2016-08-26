@@ -9,9 +9,10 @@ import (
 )
 
 type DeleteDomainCommand struct {
-	RequiredArgs flags.Domain `positional-args:"yes"`
-	Force        bool         `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{}  `usage:"CF_NAME delete-domain DOMAIN [-f]"`
+	RequiredArgs    flags.Domain `positional-args:"yes"`
+	Force           bool         `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{}  `usage:"CF_NAME delete-domain DOMAIN [-f]"`
+	relatedCommands interface{}  `related_commands:"delete-shared-domain, domains, unshare-private-domain"`
 }
 
 func (_ DeleteDomainCommand) Setup(config commands.Config) error {

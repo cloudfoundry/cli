@@ -18,6 +18,7 @@ type CreateSpaceQuotaCommand struct {
 	ReservedRoutePorts          int              `long:"reserved-route-ports" description:"Maximum number of routes that may be created with reserved ports (Default: 0)"`
 	NumServiceInstances         int              `short:"s" description:"Total number of service instances"`
 	usage                       interface{}      `usage:"CF_NAME create-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
+	relatedCommands             interface{}      `related_commands:"quotas, space-quotas"`
 }
 
 func (_ CreateSpaceQuotaCommand) Setup(config commands.Config) error {

@@ -9,9 +9,10 @@ import (
 )
 
 type DeleteQuotaCommand struct {
-	RequiredArgs flags.Quota `positional-args:"yes"`
-	Force        bool        `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{} `usage:"CF_NAME delete-quota QUOTA [-f]"`
+	RequiredArgs    flags.Quota `positional-args:"yes"`
+	Force           bool        `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{} `usage:"CF_NAME delete-quota QUOTA [-f]"`
+	relatedCommands interface{} `related_commands:"quotas"`
 }
 
 func (_ DeleteQuotaCommand) Setup(config commands.Config) error {

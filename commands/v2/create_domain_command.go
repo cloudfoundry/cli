@@ -9,8 +9,9 @@ import (
 )
 
 type CreateDomainCommand struct {
-	RequiredArgs flags.OrgDomain `positional-args:"yes"`
-	usage        interface{}     `usage:"CF_NAME create-domain ORG DOMAIN"`
+	RequiredArgs    flags.OrgDomain `positional-args:"yes"`
+	usage           interface{}     `usage:"CF_NAME create-domain ORG DOMAIN"`
+	relatedCommands interface{}     `related_commands:"create-shared-domain, domains, router-groups, share-private-domain"`
 }
 
 func (_ CreateDomainCommand) Setup(config commands.Config) error {

@@ -8,7 +8,8 @@ import (
 )
 
 type RouterGroupsCommand struct {
-	usage interface{} `usage:"CF_NAME router-groups"`
+	usage           interface{} `usage:"CF_NAME router-groups"`
+	relatedCommands interface{} `related_commands:"create-domain, domains"`
 }
 
 func (_ RouterGroupsCommand) Setup(config commands.Config) error {

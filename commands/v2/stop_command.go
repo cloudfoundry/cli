@@ -9,8 +9,9 @@ import (
 )
 
 type StopCommand struct {
-	RequiredArgs flags.AppName `positional-args:"yes"`
-	usage        interface{}   `usage:"CF_NAME stop APP_NAME"`
+	RequiredArgs    flags.AppName `positional-args:"yes"`
+	usage           interface{}   `usage:"CF_NAME stop APP_NAME"`
+	relatedCommands interface{}   `related_commands:"restart, scale, start"`
 }
 
 func (_ StopCommand) Setup(config commands.Config) error {

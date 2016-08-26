@@ -9,8 +9,9 @@ import (
 )
 
 type RestartAppInstanceCommand struct {
-	RequiredArgs flags.AppInstance `positional-args:"yes"`
-	usage        interface{}       `usage:"CF_NAME restart-app-instance APP_NAME INDEX"`
+	RequiredArgs    flags.AppInstance `positional-args:"yes"`
+	usage           interface{}       `usage:"CF_NAME restart-app-instance APP_NAME INDEX"`
+	relatedCommands interface{}       `related_commands:"restart"`
 }
 
 func (_ RestartAppInstanceCommand) Setup(config commands.Config) error {

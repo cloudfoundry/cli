@@ -8,7 +8,8 @@ import (
 )
 
 type BuildpacksCommand struct {
-	usage interface{} `usage:"CF_NAME buildpacks"`
+	usage           interface{} `usage:"CF_NAME buildpacks"`
+	relatedCommands interface{} `related_commands:"push"`
 }
 
 func (_ BuildpacksCommand) Setup(config commands.Config) error {

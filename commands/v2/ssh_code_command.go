@@ -8,7 +8,8 @@ import (
 )
 
 type SSHCodeCommand struct {
-	usage interface{} `usage:"CF_NAME ssh-code"`
+	usage           interface{} `usage:"CF_NAME ssh-code"`
+	relatedCommands interface{} `related_commands:"curl, ssh"`
 }
 
 func (_ SSHCodeCommand) Setup(config commands.Config) error {

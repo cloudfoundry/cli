@@ -8,7 +8,8 @@ import (
 )
 
 type ServicesCommand struct {
-	usage interface{} `usage:"CF_NAME services"`
+	usage           interface{} `usage:"CF_NAME services"`
+	relatedCommands interface{} `related_commands:"create-service, marketplace"`
 }
 
 func (_ ServicesCommand) Setup(config commands.Config) error {

@@ -8,7 +8,8 @@ import (
 )
 
 type ListPluginReposCommand struct {
-	usage interface{} `usage:"CF_NAME list-plugin-repos"`
+	usage           interface{} `usage:"CF_NAME list-plugin-repos"`
+	relatedCommands interface{} `related_commands:"add-plugin-repo, install-plugin"`
 }
 
 func (_ ListPluginReposCommand) Setup(config commands.Config) error {

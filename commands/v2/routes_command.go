@@ -8,8 +8,9 @@ import (
 )
 
 type RoutesCommand struct {
-	OrgLevel bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
-	usage    interface{} `usage:"CF_NAME routes [--orglevel]"`
+	OrgLevel        bool        `long:"orglevel" description:"List all the routes for all spaces of current organization"`
+	usage           interface{} `usage:"CF_NAME routes [--orglevel]"`
+	relatedCommands interface{} `related_commands:"check-route, domains, map-route, unmap-route"`
 }
 
 func (_ RoutesCommand) Setup(config commands.Config) error {

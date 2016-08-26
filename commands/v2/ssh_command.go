@@ -19,6 +19,7 @@ type SSHCommand struct {
 	ForcePseudoTTY      bool          `long:"force-pseudo-tty" short:"F" description:"Force pseudo-tty allocation"`
 	DisablePseudoTTY    bool          `long:"disable-pseudo-tty" short:"T" description:"Disable pseudo-tty allocation"`
 	usage               interface{}   `usage:"CF_NAME ssh APP_NAME [-i app-instance-index] [-c command] [-L [bind_address:]port:host:hostport] [--skip-host-validation] [--skip-remote-execution] [--request-pseudo-tty] [--force-pseudo-tty] [--disable-pseudo-tty]"`
+	relatedCommands     interface{}   `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
 }
 
 func (_ SSHCommand) Setup(config commands.Config) error {

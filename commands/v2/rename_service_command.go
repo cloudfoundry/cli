@@ -9,8 +9,9 @@ import (
 )
 
 type RenameServiceCommand struct {
-	RequiredArgs flags.RenameServiceArgs `positional-args:"yes"`
-	usage        interface{}             `usage:"CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"`
+	RequiredArgs    flags.RenameServiceArgs `positional-args:"yes"`
+	usage           interface{}             `usage:"CF_NAME rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE"`
+	relatedCommands interface{}             `related_commands:"services, update-service"`
 }
 
 func (_ RenameServiceCommand) Setup(config commands.Config) error {

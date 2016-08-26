@@ -9,8 +9,9 @@ import (
 )
 
 type RenameCommand struct {
-	RequiredArgs flags.AppRenameArgs `positional-args:"yes"`
-	usage        interface{}         `usage:"CF_NAME rename APP_NAME NEW_APP_NAME"`
+	RequiredArgs    flags.AppRenameArgs `positional-args:"yes"`
+	usage           interface{}         `usage:"CF_NAME rename APP_NAME NEW_APP_NAME"`
+	relatedCommands interface{}         `related_commands:"apps, delete"`
 }
 
 func (_ RenameCommand) Setup(config commands.Config) error {
