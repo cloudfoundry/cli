@@ -33,14 +33,21 @@ var _ = Describe("Config", func() {
 	})
 
 	Context("when there isn't a config set", func() {
-		var oldLang string
+		var (
+			oldLang  string
+			oldLCAll string
+		)
+
 		BeforeEach(func() {
 			oldLang = os.Getenv("LANG")
+			oldLCAll = os.Getenv("LC_ALL")
 			os.Unsetenv("LANG")
+			os.Unsetenv("LC_ALL")
 		})
 
 		It("returns a default config", func() {
 			defer os.Setenv("LANG", oldLang)
+			defer os.Setenv("LC_ALL", oldLCAll)
 
 			config, err := LoadConfig()
 			Expect(err).ToNot(HaveOccurred())
