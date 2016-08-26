@@ -72,6 +72,37 @@ var _ = Describe("Help Command", func() {
 				Expect(fakeUI.Out).To(Say("   faceman help \\[COMMAND\\]"))
 			})
 
+			Describe("related commands", func() {
+				Context("when the command has related commands", func() {
+					BeforeEach(func() {
+						commandInfo := v2actions.CommandInfo{
+							Name:            "app",
+							RelatedCommands: []string{"broccoli", "tomato"},
+						}
+						fakeActor.GetCommandInfoReturns(commandInfo, nil)
+					})
+
+					It("displays the related commands for help", func() {
+						err := cmd.Execute(nil)
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(fakeUI.Out).To(Say("NAME:"))
+						Expect(fakeUI.Out).To(Say("SEE ALSO:"))
+						Expect(fakeUI.Out).To(Say("   broccoli, tomato"))
+					})
+				})
+
+				Context("when the command does not have related commands", func() {
+					It("displays the related commands for help", func() {
+						err := cmd.Execute(nil)
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(fakeUI.Out).To(Say("NAME:"))
+						Expect(fakeUI.Out).NotTo(Say("SEE ALSO:"))
+					})
+				})
+			})
+
 			Describe("aliases", func() {
 				Context("when the command has an alias", func() {
 					It("displays the alias for help", func() {
