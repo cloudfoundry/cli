@@ -15,4 +15,5 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; Value
 [Files]
 Source: CF_SOURCE; DestDir: "{app}"
 
+[Code]
 #include "common.iss"
