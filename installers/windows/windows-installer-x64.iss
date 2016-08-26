@@ -15,7 +15,7 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Check: not IsAdminLoggedOn and Uninstall32Bit() and NeedsAddPath(ExpandConstant('{app}'))
 
 [Files]
-Source: "C:\Users\potato\Downloads\cf\cf.exe"; DestDir: "{app}"
+Source: CF_SOURCE; DestDir: "{app}"
 
 [Code]
 function Uninstall32Bit(): Boolean;
