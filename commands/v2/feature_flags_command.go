@@ -8,7 +8,8 @@ import (
 )
 
 type FeatureFlagsCommand struct {
-	usage interface{} `usage:"CF_NAME feature-flags"`
+	usage           interface{} `usage:"CF_NAME feature-flags"`
+	relatedCommands interface{} `related_commands:"disable-feature-flag, enable-feature-flag"`
 }
 
 func (_ FeatureFlagsCommand) Setup(config commands.Config) error {

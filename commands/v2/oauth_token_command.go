@@ -8,7 +8,8 @@ import (
 )
 
 type OauthTokenCommand struct {
-	usage interface{} `usage:"CF_NAME oauth-token"`
+	usage           interface{} `usage:"CF_NAME oauth-token"`
+	relatedCommands interface{} `related_commands:"curl"`
 }
 
 func (_ OauthTokenCommand) Setup(config commands.Config) error {

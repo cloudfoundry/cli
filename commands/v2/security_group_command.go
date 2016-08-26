@@ -9,8 +9,9 @@ import (
 )
 
 type SecurityGroupCommand struct {
-	RequiredArgs flags.SecurityGroup `positional-args:"yes"`
-	usage        interface{}         `usage:"CF_NAME security-group SECURITY_GROUP"`
+	RequiredArgs    flags.SecurityGroup `positional-args:"yes"`
+	usage           interface{}         `usage:"CF_NAME security-group SECURITY_GROUP"`
+	relatedCommands interface{}         `related_commands:"bind-security-group, bind-running-security-group, bind-staging-security-group"`
 }
 
 func (_ SecurityGroupCommand) Setup(config commands.Config) error {

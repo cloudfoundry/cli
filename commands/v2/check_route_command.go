@@ -9,9 +9,10 @@ import (
 )
 
 type CheckRouteCommand struct {
-	RequiredArgs flags.HostDomain `positional-args:"yes"`
-	Path         string           `long:"path" description:"Path for the route"`
-	usage        interface{}      `usage:"CF_NAME check-route HOST DOMAIN [--path PATH]\n\nEXAMPLES:\n   CF_NAME check-route myhost example.com            # example.com\n   CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo"`
+	RequiredArgs    flags.HostDomain `positional-args:"yes"`
+	Path            string           `long:"path" description:"Path for the route"`
+	usage           interface{}      `usage:"CF_NAME check-route HOST DOMAIN [--path PATH]\n\nEXAMPLES:\n   CF_NAME check-route myhost example.com            # example.com\n   CF_NAME check-route myhost example.com --path foo # myhost.example.com/foo"`
+	relatedCommands interface{}      `related_commands:"create-route, delete-route, routes"`
 }
 
 func (_ CheckRouteCommand) Setup(config commands.Config) error {

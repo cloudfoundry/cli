@@ -8,7 +8,8 @@ import (
 )
 
 type SpaceQuotasCommand struct {
-	usage interface{} `usage:"CF_NAME space-quotas"`
+	usage           interface{} `usage:"CF_NAME space-quotas"`
+	relatedCommands interface{} `related_commands:"set-space-quota"`
 }
 
 func (_ SpaceQuotasCommand) Setup(config commands.Config) error {

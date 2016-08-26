@@ -18,6 +18,7 @@ type CreateQuotaCommand struct {
 	ReservedRoutePorts          int         `long:"reserved-route-ports" description:"Maximum number of routes that may be created with reserved ports (Default: 0)"`
 	NumServiceInstances         int         `short:"s" description:"Total number of service instances"`
 	usage                       interface{} `usage:"CF_NAME create-quota QUOTA [-m TOTAL_MEMORY] [-i INSTANCE_MEMORY] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
+	relatedCommands             interface{} `related_commands:"create-org, quotas, set-quota"`
 }
 
 func (_ CreateQuotaCommand) Setup(config commands.Config) error {

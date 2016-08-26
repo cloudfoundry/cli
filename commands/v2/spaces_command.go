@@ -8,7 +8,8 @@ import (
 )
 
 type SpacesCommand struct {
-	usage interface{} `usage:"CF_NAME spaces"`
+	usage           interface{} `usage:"CF_NAME spaces"`
+	relatedCommands interface{} `related_commands:"target"`
 }
 
 func (_ SpacesCommand) Setup(config commands.Config) error {

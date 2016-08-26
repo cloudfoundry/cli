@@ -9,8 +9,9 @@ import (
 )
 
 type RenameBuildpackCommand struct {
-	RequiredArgs flags.RenameBuildpackArgs `positional-args:"yes"`
-	usage        interface{}               `usage:"CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"`
+	RequiredArgs    flags.RenameBuildpackArgs `positional-args:"yes"`
+	usage           interface{}               `usage:"CF_NAME rename-buildpack BUILDPACK_NAME NEW_BUILDPACK_NAME"`
+	relatedCommands interface{}               `related_commands:"update-buildpack"`
 }
 
 func (_ RenameBuildpackCommand) Setup(config commands.Config) error {

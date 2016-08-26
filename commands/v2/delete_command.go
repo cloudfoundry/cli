@@ -13,6 +13,7 @@ type DeleteCommand struct {
 	DeleteMappedRoutes bool          `short:"r" description:"Also delete any mapped routes"`
 	ForceDelete        bool          `short:"f" description:"Force deletion without confirmation"`
 	usage              interface{}   `usage:"CF_NAME delete APP_NAME [-r] [-f]"`
+	relatedCommands    interface{}   `related_commands:"apps, scale, stop"`
 }
 
 func (_ DeleteCommand) Setup(config commands.Config) error {

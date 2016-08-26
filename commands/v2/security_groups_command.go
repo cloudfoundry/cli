@@ -8,7 +8,8 @@ import (
 )
 
 type SecurityGroupsCommand struct {
-	usage interface{} `usage:"CF_NAME security-groups"`
+	usage           interface{} `usage:"CF_NAME security-groups"`
+	relatedCommands interface{} `related_commands:"bind-security-group, bind-running-security-group, bind-staging-security-group, security-group"`
 }
 
 func (_ SecurityGroupsCommand) Setup(config commands.Config) error {

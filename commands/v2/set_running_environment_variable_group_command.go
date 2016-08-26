@@ -9,8 +9,9 @@ import (
 )
 
 type SetRunningEnvironmentVariableGroupCommand struct {
-	RequiredArgs flags.ParamsAsJSON `positional-args:"yes"`
-	usage        interface{}        `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+	RequiredArgs    flags.ParamsAsJSON `positional-args:"yes"`
+	usage           interface{}        `usage:"CF_NAME set-running-environment-variable-group '{\"name\":\"value\",\"name\":\"value\"}'"`
+	relatedCommands interface{}        `related_commands:"set-env, running-environment-variable-group"`
 }
 
 func (_ SetRunningEnvironmentVariableGroupCommand) Setup(config commands.Config) error {

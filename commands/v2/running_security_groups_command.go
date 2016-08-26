@@ -8,7 +8,8 @@ import (
 )
 
 type RunningSecurityGroupsCommand struct {
-	usage interface{} `usage:"CF_NAME running-security-groups"`
+	usage           interface{} `usage:"CF_NAME running-security-groups"`
+	relatedCommands interface{} `related_commands:"bind-running-security-group, security-group, unbind-running-security-group"`
 }
 
 func (_ RunningSecurityGroupsCommand) Setup(config commands.Config) error {

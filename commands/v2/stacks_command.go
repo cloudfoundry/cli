@@ -8,7 +8,8 @@ import (
 )
 
 type StacksCommand struct {
-	usage interface{} `usage:"CF_NAME stacks"`
+	usage           interface{} `usage:"CF_NAME stacks"`
+	relatedCommands interface{} `related_commands:"app, push"`
 }
 
 func (_ StacksCommand) Setup(config commands.Config) error {

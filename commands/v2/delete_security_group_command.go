@@ -9,9 +9,10 @@ import (
 )
 
 type DeleteSecurityGroupCommand struct {
-	RequiredArgs flags.SecurityGroup `positional-args:"yes"`
-	Force        bool                `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{}         `usage:"CF_NAME delete-security-group SECURITY_GROUP [-f]"`
+	RequiredArgs    flags.SecurityGroup `positional-args:"yes"`
+	Force           bool                `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{}         `usage:"CF_NAME delete-security-group SECURITY_GROUP [-f]"`
+	relatedCommands interface{}         `related_commands:"security-groups"`
 }
 
 func (_ DeleteSecurityGroupCommand) Setup(config commands.Config) error {

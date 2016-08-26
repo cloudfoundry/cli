@@ -9,8 +9,9 @@ import (
 )
 
 type SSHEnabledCommand struct {
-	RequiredArgs flags.AppName `positional-args:"yes"`
-	usage        interface{}   `usage:"CF_NAME ssh-enabled APP_NAME"`
+	RequiredArgs    flags.AppName `positional-args:"yes"`
+	usage           interface{}   `usage:"CF_NAME ssh-enabled APP_NAME"`
+	relatedCommands interface{}   `related_commands:"enable-ssh, space-ssh-allowed, ssh"`
 }
 
 func (_ SSHEnabledCommand) Setup(config commands.Config) error {

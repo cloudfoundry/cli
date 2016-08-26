@@ -13,6 +13,7 @@ type SpaceCommand struct {
 	GUID               bool        `long:"guid" description:"Retrieve and display the given space's guid.  All other output for the space is suppressed."`
 	SecurityGroupRules bool        `long:"security-group-rules" description:"Retrieve the rules for all the security groups associated with the space"`
 	usage              interface{} `usage:"CF_NAME space SPACE"`
+	relatedCommands    interface{} `related_commands:"space-users"`
 }
 
 func (_ SpaceCommand) Setup(config commands.Config) error {

@@ -8,7 +8,8 @@ import (
 )
 
 type DomainsCommand struct {
-	usage interface{} `usage:"CF_NAME domains"`
+	usage           interface{} `usage:"CF_NAME domains"`
+	relatedCommands interface{} `related_commands:"router-groups, create-route, routes"`
 }
 
 func (_ DomainsCommand) Setup(config commands.Config) error {

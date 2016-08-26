@@ -9,8 +9,9 @@ import (
 )
 
 type UnbindStagingSecurityGroupCommand struct {
-	RequiredArgs flags.SecurityGroup `positional-args:"yes"`
-	usage        interface{}         `usage:"CF_NAME unbind-staging-security-group SECURITY_GROUP\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+	RequiredArgs    flags.SecurityGroup `positional-args:"yes"`
+	usage           interface{}         `usage:"CF_NAME unbind-staging-security-group SECURITY_GROUP\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+	relatedCommands interface{}         `related_commands:"apps, restart, staging-security-groups"`
 }
 
 func (_ UnbindStagingSecurityGroupCommand) Setup(config commands.Config) error {

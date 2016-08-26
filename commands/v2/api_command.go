@@ -13,6 +13,7 @@ type ApiCommand struct {
 	Unset             bool            `long:"unset" description:"Remove all api endpoint targeting"`
 	SkipSSLValidation bool            `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`
 	usage             interface{}     `usage:"CF_NAME api [URL]"`
+	relatedCommands   interface{}     `related_commands:"auth, login, target"`
 }
 
 func (_ ApiCommand) Setup(config commands.Config) error {

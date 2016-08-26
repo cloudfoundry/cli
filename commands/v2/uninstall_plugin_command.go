@@ -9,8 +9,9 @@ import (
 )
 
 type UninstallPluginCommand struct {
-	RequiredArgs flags.PluginName `positional-args:"yes"`
-	usage        interface{}      `usage:"CF_NAME uninstall-plugin PLUGIN-NAME"`
+	RequiredArgs    flags.PluginName `positional-args:"yes"`
+	usage           interface{}      `usage:"CF_NAME uninstall-plugin PLUGIN-NAME"`
+	relatedCommands interface{}      `related_commands:"plugins"`
 }
 
 func (_ UninstallPluginCommand) Setup(config commands.Config) error {

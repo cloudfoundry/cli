@@ -9,8 +9,9 @@ import (
 )
 
 type DisallowSpaceSSHCommand struct {
-	RequiredArgs flags.Space `positional-args:"yes"`
-	usage        interface{} `usage:"CF_NAME disallow-space-ssh SPACE_NAME"`
+	RequiredArgs    flags.Space `positional-args:"yes"`
+	usage           interface{} `usage:"CF_NAME disallow-space-ssh SPACE_NAME"`
+	relatedCommands interface{} `related_commands:"disable-ssh, space-ssh-allowed, ssh, ssh-enabled"`
 }
 
 func (_ DisallowSpaceSSHCommand) Setup(config commands.Config) error {

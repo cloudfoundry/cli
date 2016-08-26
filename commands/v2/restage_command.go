@@ -9,8 +9,9 @@ import (
 )
 
 type RestageCommand struct {
-	RequiredArgs flags.AppName `positional-args:"yes"`
-	usage        interface{}   `usage:"CF_NAME restage APP_NAME"`
+	RequiredArgs    flags.AppName `positional-args:"yes"`
+	usage           interface{}   `usage:"CF_NAME restage APP_NAME"`
+	relatedCommands interface{}   `related_commands:"restart"`
 }
 
 func (_ RestageCommand) Setup(config commands.Config) error {

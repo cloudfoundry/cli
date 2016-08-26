@@ -8,8 +8,9 @@ import (
 )
 
 type PluginsCommand struct {
-	Checksum bool        `long:"checksum" description:"Compute and show the sha1 value of the plugin binary file"`
-	usage    interface{} `usage:"CF_NAME plugins"`
+	Checksum        bool        `long:"checksum" description:"Compute and show the sha1 value of the plugin binary file"`
+	usage           interface{} `usage:"CF_NAME plugins"`
+	relatedCommands interface{} `related_commands:"install-plugin, repo-plugins, uninstall-plugin"`
 }
 
 func (_ PluginsCommand) Setup(config commands.Config) error {

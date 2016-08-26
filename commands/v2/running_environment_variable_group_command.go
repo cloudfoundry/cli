@@ -8,7 +8,8 @@ import (
 )
 
 type RunningEnvironmentVariableGroupCommand struct {
-	usage interface{} `usage:"CF_NAME running-environment-variable-group"`
+	usage           interface{} `usage:"CF_NAME running-environment-variable-group"`
+	relatedCommands interface{} `related_commands:"env, staging-environment-variable-group"`
 }
 
 func (_ RunningEnvironmentVariableGroupCommand) Setup(config commands.Config) error {

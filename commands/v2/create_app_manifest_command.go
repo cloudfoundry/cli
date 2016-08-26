@@ -9,9 +9,10 @@ import (
 )
 
 type CreateAppManifestCommand struct {
-	RequiredArgs flags.AppName `positional-args:"yes"`
-	FilePath     string        `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
-	usage        interface{}   `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml ]"`
+	RequiredArgs    flags.AppName `positional-args:"yes"`
+	FilePath        string        `short:"p" description:"Specify a path for file creation. If path not specified, manifest file is created in current working directory."`
+	usage           interface{}   `usage:"CF_NAME create-app-manifest APP_NAME [-p /path/to/<app-name>-manifest.yml ]"`
+	relatedCommands interface{}   `related_commands:"apps, push"`
 }
 
 func (_ CreateAppManifestCommand) Setup(config commands.Config) error {
