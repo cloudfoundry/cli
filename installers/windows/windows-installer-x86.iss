@@ -6,6 +6,7 @@ AppVerName=Cloud Foundry CLI version VERSION
 AppPublisher=Cloud Foundry Foundation
 SignTool=signtool sign /f $qSIGNTOOL_CERT_PATH$q /p $qSIGNTOOL_CERT_PASSWORD$q /t http://timestamp.comodoca.com/authenticode $f
 PrivilegesRequired=none
+DefaultDirName={pf}\CloudFoundry
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Check: NeedsAddPath(ExpandConstant('{app}'))
