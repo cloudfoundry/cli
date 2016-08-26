@@ -36,4 +36,4 @@ begin
   Result := true;
 end;
 
-#include common.iss
+#include "common.iss"
