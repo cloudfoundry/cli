@@ -31,6 +31,9 @@ var _ = Describe("Help Actions", func() {
 						Long:        "guid",
 						Description: "Retrieve and display the given app's guid.  All other health and status output for the app is suppressed.",
 					}))
+					Expect(commandInfo.RelatedCommands).To(ConsistOf(
+						"apps", "events", "logs", "map-route", "push", "unmap-route",
+					))
 				})
 			})
 

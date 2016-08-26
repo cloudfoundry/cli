@@ -217,8 +217,8 @@ func (cmd HelpCommand) displayCommand() error {
 			"CommandName":        cmdInfo.Name,
 			"CommandDescription": cmdInfo.Description,
 		})
-	cmd.UI.DisplayNewline()
 
+	cmd.UI.DisplayNewline()
 	usageString := strings.Replace(cmdInfo.Usage, "CF_NAME", cmd.Config.BinaryName(), -1)
 	cmd.UI.DisplayText("USAGE:")
 	cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandUsage}}",
@@ -226,18 +226,18 @@ func (cmd HelpCommand) displayCommand() error {
 		map[string]interface{}{
 			"CommandUsage": usageString,
 		})
-	cmd.UI.DisplayNewline()
 
 	if cmdInfo.Alias != "" {
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("ALIAS:")
 		cmd.UI.DisplayText("   {{.Alias}}",
 			map[string]interface{}{
 				"Alias": cmdInfo.Alias,
 			})
-		cmd.UI.DisplayNewline()
 	}
 
 	if len(cmdInfo.Flags) != 0 {
+		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("OPTIONS:")
 		nameWidth := internal.LongestFlagWidth(cmdInfo.Flags) + 6
 		for _, flag := range cmdInfo.Flags {
@@ -258,6 +258,15 @@ func (cmd HelpCommand) displayCommand() error {
 					"Description": flag.Description,
 				})
 		}
+	}
+
+	if len(cmdInfo.RelatedCommands) > 0 {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("SEE ALSO:")
+		cmd.UI.DisplayText("   {{.RelatedCommands}}",
+			map[string]interface{}{
+				"RelatedCommands": strings.Join(cmdInfo.RelatedCommands, ", "),
+			})
 	}
 
 	return nil

@@ -1,6 +1,9 @@
 package v2actions
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 // CommandInfo contains the help details of a command
 type CommandInfo struct {
@@ -10,11 +13,14 @@ type CommandInfo struct {
 	// Description is the command description
 	Description string
 
-	// Alais is the command alias
+	// Alias is the command alias
 	Alias string
 
 	// Usage is the command usage string, may contain examples and flavor text
 	Usage string
+
+	// RelatedCommands is a list of commands related to the command
+	RelatedCommands []string
 
 	// Flags contains the list of flags for this command
 	Flags []CommandFlag
@@ -63,6 +69,11 @@ func (_ Actor) GetCommandInfo(commandList interface{}, commandName string) (Comm
 
 		if fieldTag.Get("usage") != "" {
 			cmd.Usage = fieldTag.Get("usage")
+			continue
+		}
+
+		if fieldTag.Get("related_commands") != "" {
+			cmd.RelatedCommands = strings.Split(fieldTag.Get("related_commands"), ", ")
 			continue
 		}
 
