@@ -2028,8 +2028,8 @@
     "translation": "빌드팩 페치에 실패했습니다.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "%s 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "{{.OrgName}} 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -4145,7 +4145,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": "{{.RouteName}} 라우트가 기존 도메인과 일치하지 않습니다."
+    "translation": "{{.RouteName}} 라우트가 기존 도메인과 일치하지 않습니다"
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4245,7 +4245,7 @@
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
-    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다. "
+    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다"
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",

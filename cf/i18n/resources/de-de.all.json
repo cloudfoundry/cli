@@ -2028,8 +2028,8 @@
     "translation": "Abrufen von Buildpacks ist fehlgeschlagen.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "Abrufen von Domänen für Organization %s ist fehlgeschlagen.\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "Abrufen von Domänen für Organization %{{.OrgName}}ist fehlgeschlagen.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",

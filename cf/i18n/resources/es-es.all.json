@@ -2028,8 +2028,8 @@
     "translation": "Error al captar paquetes de compilación.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "Error al captar dominios para la organización %s.\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "Error al captar dominios para la organización {{.OrgName}}.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
