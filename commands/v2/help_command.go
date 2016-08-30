@@ -125,8 +125,14 @@ func (cmd HelpCommand) displayCommonCommands() {
 
 	size := int(math.Ceil(float64(len(pluginCommands)) / 3))
 	table := make([][]string, size)
-	for i, pluginCommand := range pluginCommands {
-		table[i/3] = append(table[i/3], pluginCommand.Name)
+	for i := 0; i < size; i++ {
+		table[i] = make([]string, 3)
+		for j := 0; j < 3; j++ {
+			index := i + j*3
+			if index < len(pluginCommands) {
+				table[i][j] = pluginCommands[index].Name
+			}
+		}
 	}
 
 	cmd.UI.DisplayTable("   ", table)
@@ -167,8 +173,6 @@ func (cmd HelpCommand) displayAllCommands() {
 						"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
 					})
 			}
-
-			cmd.UI.DisplayNewline()
 		}
 
 		cmd.UI.DisplayNewline()
