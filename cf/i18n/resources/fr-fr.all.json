@@ -2028,8 +2028,8 @@
     "translation": "Echec de l'extraction des packs de construction.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "Echec de l'extraction des domaines pour l'organisation %s.\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "Echec de l'extraction des domaines pour l'organisation {{.OrgName}}.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",

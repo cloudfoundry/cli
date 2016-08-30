@@ -2028,8 +2028,8 @@
     "translation": "ビルドパックを取り出せませんでした。\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
-    "translation": "組織 %s のドメインを取り出せませんでした。\n{{.Err}}"
+    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
+    "translation": "組織 {{.OrgName}} のドメインを取り出せませんでした。\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
