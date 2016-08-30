@@ -2,6 +2,7 @@ package v2
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 
@@ -19,12 +20,12 @@ import (
 
 // HelpActor handles the business logic of the help command
 type HelpActor interface {
-	// GetCommandInfo returns back a help command information for the given
+	// CommandInfoByName returns back a help command information for the given
 	// command
-	GetCommandInfo(interface{}, string) (v2actions.CommandInfo, error)
+	CommandInfoByName(interface{}, string) (v2actions.CommandInfo, error)
 
-	// GetAllNamesAndDescriptions returns a list of all commands
-	GetAllNamesAndDescriptions(interface{}) map[string]v2actions.CommandInfo
+	// CommandInfos returns a list of all commands
+	CommandInfos(interface{}) map[string]v2actions.CommandInfo
 }
 
 type HelpCommand struct {
@@ -33,6 +34,7 @@ type HelpCommand struct {
 	Config commands.Config
 
 	OptionalArgs flags.CommandName `positional-args:"yes"`
+	AllCommands  bool              `short:"a" description:"All available CLI commands"`
 	usage        interface{}       `usage:"CF_NAME help [COMMAND]"`
 }
 
@@ -62,8 +64,12 @@ func (cmd HelpCommand) Execute(args []string) error {
 
 func (cmd HelpCommand) displayFullHelp() {
 	cmd.displayHelpPreamble()
-	cmd.displayAllCommands()
-	cmd.displayHelpFooter()
+	if cmd.AllCommands {
+		cmd.displayAllCommands()
+		cmd.displayHelpFooter()
+	} else {
+		cmd.displayCommonCommands()
+	}
 }
 
 func (cmd HelpCommand) displayHelpPreamble() {
@@ -93,27 +99,82 @@ func (cmd HelpCommand) displayHelpPreamble() {
 	cmd.UI.DisplayNewline()
 }
 
+func (cmd HelpCommand) displayCommonCommands() {
+	cmdInfo := cmd.Actor.CommandInfos(Commands)
+
+	for _, category := range internal.CommonHelpCategoryList {
+		cmd.UI.DisplayHelpHeader(category.CategoryName)
+		table := [][]string{}
+
+		for _, row := range category.CommandList {
+			finalRow := []string{}
+
+			for _, command := range row {
+				separator := ""
+				if info, ok := cmdInfo[command]; ok {
+					if len(info.Alias) > 0 {
+						separator = ","
+					}
+					finalRow = append(finalRow, fmt.Sprintf("%s%s%s\t", info.Name, separator, info.Alias))
+				}
+			}
+
+			table = append(table, finalRow)
+		}
+
+		cmd.UI.DisplayTable("   ", table)
+		cmd.UI.DisplayNewline()
+	}
+
+	pluginCommands := cmd.getSortedPluginCommands()
+	cmd.UI.DisplayHelpHeader("Commands offered by installed plugins:")
+
+	size := int(math.Ceil(float64(len(pluginCommands)) / 3))
+	table := make([][]string, size)
+	for i, pluginCommand := range pluginCommands {
+		table[i/3] = append(table[i/3], pluginCommand.Name)
+	}
+
+	cmd.UI.DisplayTable("   ", table)
+	cmd.UI.DisplayNewline()
+
+	cmd.UI.DisplayHelpHeader("Global options:")
+	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}                         {{.Description}}",
+		[]string{"Description"},
+		map[string]interface{}{
+			"ENVName":     "--help, -h",
+			"Description": "Show help",
+		})
+	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}                                 {{.Description}}",
+		[]string{"Description"},
+		map[string]interface{}{
+			"ENVName":     "-v",
+			"Description": "Print API request diagnostics to stdout",
+		})
+	cmd.UI.DisplayNewline()
+	cmd.UI.DisplayText("'cf help -a' lists all commands with short descriptions. See 'cf help <command>' to read about a specific command.")
+}
+
 func (cmd HelpCommand) displayAllCommands() {
 	pluginCommands := cmd.getSortedPluginCommands()
-	cmdInfo := cmd.Actor.GetAllNamesAndDescriptions(Commands)
+	cmdInfo := cmd.Actor.CommandInfos(Commands)
 	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
 
 	for _, category := range internal.HelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 
-		for _, command := range category.CommandList {
-			if command == internal.BLANKLINE {
-				cmd.UI.DisplayNewline()
-				continue
+		for _, row := range category.CommandList {
+			for _, command := range row {
+				cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}",
+					[]string{"CommandDescription"},
+					map[string]interface{}{
+						"CommandName":        cmdInfo[command].Name,
+						"CommandDescription": cmdInfo[command].Description,
+						"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
+					})
 			}
 
-			cmd.UI.DisplayTextWithKeyTranslations("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}",
-				[]string{"CommandDescription"},
-				map[string]interface{}{
-					"CommandName":        cmdInfo[command].Name,
-					"CommandDescription": cmdInfo[command].Description,
-					"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
-				})
+			cmd.UI.DisplayNewline()
 		}
 
 		cmd.UI.DisplayNewline()
@@ -198,7 +259,7 @@ func (cmd HelpCommand) displayHelpFooter() {
 }
 
 func (cmd HelpCommand) displayCommand() error {
-	cmdInfo, err := cmd.Actor.GetCommandInfo(Commands, cmd.OptionalArgs.CommandName)
+	cmdInfo, err := cmd.Actor.CommandInfoByName(Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
 		if err, ok := err.(v2actions.ErrorInvalidCommand); ok {
 			var found bool

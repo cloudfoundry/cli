@@ -41,8 +41,9 @@ type CommandFlag struct {
 	Description string
 }
 
-// GetCommandInfo returns the help information for a particular commandName in the commandList.
-func (_ Actor) GetCommandInfo(commandList interface{}, commandName string) (CommandInfo, error) {
+// CommandInfoByName returns the help information for a particular commandName in
+// the commandList.
+func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (CommandInfo, error) {
 	field, found := reflect.TypeOf(commandList).FieldByNameFunc(
 		func(fieldName string) bool {
 			field, _ := reflect.TypeOf(commandList).FieldByName(fieldName)
@@ -94,9 +95,9 @@ func (_ Actor) GetCommandInfo(commandList interface{}, commandName string) (Comm
 	return cmd, nil
 }
 
-// GetAllNamesAndDescriptions returns a slice of CommandInfo that only fills in
+// CommandInfos returns a slice of CommandInfo that only fills in
 // the Name and Description for all the commands in commandList
-func (_ Actor) GetAllNamesAndDescriptions(commandList interface{}) map[string]CommandInfo {
+func (_ Actor) CommandInfos(commandList interface{}) map[string]CommandInfo {
 	handler := reflect.TypeOf(commandList)
 
 	infos := make(map[string]CommandInfo, handler.NumField())
@@ -106,6 +107,7 @@ func (_ Actor) GetAllNamesAndDescriptions(commandList interface{}) map[string]Co
 		infos[commandName] = CommandInfo{
 			Name:        commandName,
 			Description: fieldTag.Get("description"),
+			Alias:       fieldTag.Get("alias"),
 		}
 	}
 

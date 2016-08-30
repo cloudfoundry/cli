@@ -5,6 +5,8 @@ package ui
 import (
 	"fmt"
 	"io"
+	"strings"
+	"text/tabwriter"
 	"text/template"
 
 	"github.com/fatih/color"
@@ -65,6 +67,18 @@ func NewTestUI(out io.Writer) UI {
 		colorEnabled: config.ColorDisbled,
 		translate:    i18n.TranslateFunc(func(s string, _ ...interface{}) string { return s }),
 	}
+}
+
+// DisplayTable presents a two dimentional array of strings as a table
+func (ui UI) DisplayTable(prefix string, table [][]string) {
+	tw := tabwriter.NewWriter(ui.Out, 0, 2, 2, ' ', 0)
+
+	for _, row := range table {
+		fmt.Fprint(tw, prefix)
+		fmt.Fprintln(tw, strings.Join(row, "\t"))
+	}
+
+	tw.Flush()
 }
 
 // DisplayText combines the formattedString template with the key maps and then

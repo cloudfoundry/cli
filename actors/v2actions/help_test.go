@@ -14,11 +14,11 @@ var _ = Describe("Help Actions", func() {
 		actor = NewActor()
 	})
 
-	Describe("GetCommandInfo", func() {
+	Describe("CommandInfoByName", func() {
 		Context("when the command exists", func() {
 			Context("when passed the command name", func() {
 				It("returns command info", func() {
-					commandInfo, err := actor.GetCommandInfo(v2.Commands, "app")
+					commandInfo, err := actor.CommandInfoByName(v2.Commands, "app")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(commandInfo.Name).To(Equal("app"))
@@ -39,21 +39,27 @@ var _ = Describe("Help Actions", func() {
 
 			Context("when passed the command alias", func() {
 				It("returns command info", func() {
-					commandInfo, err := actor.GetCommandInfo(v2.Commands, "h")
+					commandInfo, err := actor.CommandInfoByName(v2.Commands, "h")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(commandInfo.Name).To(Equal("help"))
 					Expect(commandInfo.Description).To(Equal("Show help"))
 					Expect(commandInfo.Alias).To(Equal("h"))
 					Expect(commandInfo.Usage).To(Equal("CF_NAME help [COMMAND]"))
-					Expect(commandInfo.Flags).To(BeEmpty())
+					Expect(commandInfo.Flags).To(ConsistOf(
+						CommandFlag{
+							Short:       "a",
+							Long:        "",
+							Description: "All available CLI commands",
+						},
+					))
 				})
 			})
 		})
 
 		Context("when the command does not exist", func() {
 			It("returns err", func() {
-				_, err := actor.GetCommandInfo(v2.Commands, "does-not-exist")
+				_, err := actor.CommandInfoByName(v2.Commands, "does-not-exist")
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(MatchError(ErrorInvalidCommand{CommandName: "does-not-exist"}))
@@ -61,9 +67,9 @@ var _ = Describe("Help Actions", func() {
 		})
 	})
 
-	Describe("GetAllNamesAndDescriptions", func() {
+	Describe("CommandInfos", func() {
 		It("returns back all the command's names and descriptions", func() {
-			commands := actor.GetAllNamesAndDescriptions(v2.Commands)
+			commands := actor.CommandInfos(v2.Commands)
 
 			Expect(len(commands)).To(BeNumerically(">=", 153))
 			Expect(commands["app"]).To(Equal(CommandInfo{
@@ -73,6 +79,16 @@ var _ = Describe("Help Actions", func() {
 			Expect(commands["curl"]).To(Equal(CommandInfo{
 				Name:        "curl",
 				Description: "Executes a request to the targeted API endpoint",
+			}))
+			Expect(commands["apps"]).To(Equal(CommandInfo{
+				Name:        "apps",
+				Description: "List all apps in the target space",
+				Alias:       "a",
+			}))
+			Expect(commands["routes"]).To(Equal(CommandInfo{
+				Name:        "routes",
+				Description: "List all routes in the current space or the current organization",
+				Alias:       "r",
 			}))
 		})
 	})
