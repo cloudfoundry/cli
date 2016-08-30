@@ -14,7 +14,7 @@ type ServiceKeyCommand struct {
 	usage        interface{}              `usage:"CF_NAME service-key SERVICE_INSTANCE SERVICE_KEY\n\nEXAMPLES:\n   CF_NAME service-key mydb mykey"`
 }
 
-func (_ ServiceKeyCommand) Setup(config commands.Config) error {
+func (_ ServiceKeyCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

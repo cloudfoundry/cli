@@ -13,7 +13,7 @@ type EventsCommand struct {
 	usage        interface{}   `usage:"CF_NAME events APP_NAME"`
 }
 
-func (_ EventsCommand) Setup(config commands.Config) error {
+func (_ EventsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

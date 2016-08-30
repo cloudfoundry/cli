@@ -17,7 +17,7 @@ type CopySourceCommand struct {
 	relatedCommands interface{}          `related_commands:"apps, push, restart, target"`
 }
 
-func (_ CopySourceCommand) Setup(config commands.Config) error {
+func (_ CopySourceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

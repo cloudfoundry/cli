@@ -14,7 +14,7 @@ type AddPluginRepoCommand struct {
 	relatedCommands interface{}             `related_commands:"install-plugin, list-plugin-repos"`
 }
 
-func (_ AddPluginRepoCommand) Setup(config commands.Config) error {
+func (_ AddPluginRepoCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

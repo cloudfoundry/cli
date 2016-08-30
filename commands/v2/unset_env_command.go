@@ -12,7 +12,7 @@ type UnsetEnvCommand struct {
 	relatedCommands interface{} `related_commands:"apps, env, restart, set-staging-environment-variable-group, set-running-environment-variable-group"`
 }
 
-func (_ UnsetEnvCommand) Setup(config commands.Config) error {
+func (_ UnsetEnvCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

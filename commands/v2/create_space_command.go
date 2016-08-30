@@ -16,7 +16,7 @@ type CreateSpaceCommand struct {
 	relatedCommands interface{} `related_commands:"target, space-quotas, spaces"`
 }
 
-func (_ CreateSpaceCommand) Setup(config commands.Config) error {
+func (_ CreateSpaceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

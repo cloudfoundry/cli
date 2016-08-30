@@ -14,7 +14,7 @@ type UpdateSecurityGroupCommand struct {
 	relatedCommands interface{}             `related_commands:"restage, security-groups"`
 }
 
-func (_ UpdateSecurityGroupCommand) Setup(config commands.Config) error {
+func (_ UpdateSecurityGroupCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

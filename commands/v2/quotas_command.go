@@ -11,7 +11,7 @@ type QuotasCommand struct {
 	usage interface{} `usage:"CF_NAME quotas"`
 }
 
-func (_ QuotasCommand) Setup(config commands.Config) error {
+func (_ QuotasCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

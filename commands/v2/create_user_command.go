@@ -14,7 +14,7 @@ type CreateUserCommand struct {
 	relatedCommands interface{}          `related_commands:"passwd, set-org-role, set-space-role"`
 }
 
-func (_ CreateUserCommand) Setup(config commands.Config) error {
+func (_ CreateUserCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

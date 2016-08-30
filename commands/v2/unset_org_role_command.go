@@ -14,7 +14,7 @@ type UnsetOrgRoleCommand struct {
 	relatedCommands interface{}          `related_commands:"org-users, delete-user"`
 }
 
-func (_ UnsetOrgRoleCommand) Setup(config commands.Config) error {
+func (_ UnsetOrgRoleCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -14,7 +14,7 @@ type RenameServiceBrokerCommand struct {
 	relatedCommands interface{}                   `related_commands:"service-brokers, update-service-broker"`
 }
 
-func (_ RenameServiceBrokerCommand) Setup(config commands.Config) error {
+func (_ RenameServiceBrokerCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

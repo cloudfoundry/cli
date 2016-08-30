@@ -15,7 +15,7 @@ type ConfigCommand struct {
 	usage        interface{} `usage:"CF_NAME config [--async-timeout TIMEOUT_IN_MINUTES] [--trace (true | false | path/to/file)] [--color (true | false)] [--locale (LOCALE | CLEAR)]"`
 }
 
-func (_ ConfigCommand) Setup(config commands.Config) error {
+func (_ ConfigCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

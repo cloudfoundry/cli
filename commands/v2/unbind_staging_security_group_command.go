@@ -14,7 +14,7 @@ type UnbindStagingSecurityGroupCommand struct {
 	relatedCommands interface{}         `related_commands:"apps, restart, staging-security-groups"`
 }
 
-func (_ UnbindStagingSecurityGroupCommand) Setup(config commands.Config) error {
+func (_ UnbindStagingSecurityGroupCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

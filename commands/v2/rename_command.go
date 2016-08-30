@@ -14,7 +14,7 @@ type RenameCommand struct {
 	relatedCommands interface{}         `related_commands:"apps, delete"`
 }
 
-func (_ RenameCommand) Setup(config commands.Config) error {
+func (_ RenameCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

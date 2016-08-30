@@ -15,7 +15,7 @@ type ServiceAccessCommand struct {
 	relatedCommands interface{} `related_commands:"marketplace, disable-service-access, enable-service-access, service-brokers"`
 }
 
-func (_ ServiceAccessCommand) Setup(config commands.Config) error {
+func (_ ServiceAccessCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

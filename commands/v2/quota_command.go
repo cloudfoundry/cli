@@ -14,7 +14,7 @@ type QuotaCommand struct {
 	relatedCommands interface{} `related_commands:"org, quotas"`
 }
 
-func (_ QuotaCommand) Setup(config commands.Config) error {
+func (_ QuotaCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

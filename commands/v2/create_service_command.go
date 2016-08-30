@@ -16,7 +16,7 @@ type CreateServiceCommand struct {
 	relatedCommands   interface{}             `related_commands:"bind-service, create-user-provided-service, marketplace, services"`
 }
 
-func (_ CreateServiceCommand) Setup(config commands.Config) error {
+func (_ CreateServiceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -11,7 +11,7 @@ type LogoutCommand struct {
 	usage interface{} `usage:"CF_NAME logout"`
 }
 
-func (_ LogoutCommand) Setup(config commands.Config) error {
+func (_ LogoutCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

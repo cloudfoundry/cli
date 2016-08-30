@@ -12,7 +12,7 @@ type StagingEnvironmentVariableGroupCommand struct {
 	relatedCommands interface{} `related_commands:"env, running-environment-variable-group"`
 }
 
-func (_ StagingEnvironmentVariableGroupCommand) Setup(config commands.Config) error {
+func (_ StagingEnvironmentVariableGroupCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -14,7 +14,7 @@ type AuthCommand struct {
 	relatedCommands interface{}          `related_commands:"api, login, target"`
 }
 
-func (_ AuthCommand) Setup(config commands.Config) error {
+func (_ AuthCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

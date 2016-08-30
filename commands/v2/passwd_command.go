@@ -11,7 +11,7 @@ type PasswdCommand struct {
 	usage interface{} `usage:"CF_NAME passwd"`
 }
 
-func (_ PasswdCommand) Setup(config commands.Config) error {
+func (_ PasswdCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

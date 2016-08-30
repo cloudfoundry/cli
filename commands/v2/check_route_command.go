@@ -15,7 +15,7 @@ type CheckRouteCommand struct {
 	relatedCommands interface{}      `related_commands:"create-route, delete-route, routes"`
 }
 
-func (_ CheckRouteCommand) Setup(config commands.Config) error {
+func (_ CheckRouteCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -15,7 +15,7 @@ type FilesCommand struct {
 	relatedCommands interface{}     `related_commands:"ssh"`
 }
 
-func (_ FilesCommand) Setup(config commands.Config) error {
+func (_ FilesCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

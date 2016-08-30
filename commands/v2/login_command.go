@@ -19,7 +19,7 @@ type LoginCommand struct {
 	relatedCommands   interface{} `related_commands:"api, auth, target"`
 }
 
-func (_ LoginCommand) Setup(config commands.Config) error {
+func (_ LoginCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

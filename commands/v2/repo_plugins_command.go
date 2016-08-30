@@ -13,7 +13,7 @@ type RepoPluginsCommand struct {
 	relatedCommands      interface{} `related_commands:"add-plugin-repo, delete-plugin-repo, install-plugin"`
 }
 
-func (_ RepoPluginsCommand) Setup(config commands.Config) error {
+func (_ RepoPluginsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

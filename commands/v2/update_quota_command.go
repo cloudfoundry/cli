@@ -23,7 +23,7 @@ type UpdateQuotaCommand struct {
 	relatedCommands          interface{} `related_commands:"org, quota"`
 }
 
-func (_ UpdateQuotaCommand) Setup(config commands.Config) error {
+func (_ UpdateQuotaCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

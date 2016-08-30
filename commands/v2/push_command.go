@@ -32,7 +32,7 @@ type PushCommand struct {
 	relatedCommands      interface{} `related_commands:"apps, create-app-manifest, logs, ssh, start"`
 }
 
-func (_ PushCommand) Setup(config commands.Config) error {
+func (_ PushCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

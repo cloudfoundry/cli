@@ -14,7 +14,7 @@ type TargetCommand struct {
 	relatedCommands interface{} `related_commands:"create-org, create-space, login, orgs, spaces"`
 }
 
-func (_ TargetCommand) Setup(config commands.Config) error {
+func (_ TargetCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

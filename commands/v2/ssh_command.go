@@ -22,7 +22,7 @@ type SSHCommand struct {
 	relatedCommands     interface{}   `related_commands:"allow-space-ssh, enable-ssh, space-ssh-allowed, ssh-code, ssh-enabled"`
 }
 
-func (_ SSHCommand) Setup(config commands.Config) error {
+func (_ SSHCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -7,6 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
+	"code.cloudfoundry.org/cli/commands/ui"
 	"code.cloudfoundry.org/cli/commands/v2"
 	"code.cloudfoundry.org/cli/utils/config"
 	"code.cloudfoundry.org/cli/utils/panichandler"
@@ -75,8 +76,14 @@ func parse(args []string) {
 func myCommandHandler(cmd flags.Commander, args []string) error {
 	config, _ := config.LoadConfig()
 	//defer write config
+	var err error
+	commandUI, err := ui.NewUI(config)
+	if err != nil {
+		return err
+	}
+
 	if extendedCmd, ok := cmd.(commands.ExtendedCommander); ok {
-		err := extendedCmd.Setup(config)
+		err := extendedCmd.Setup(config, commandUI)
 		if err != nil {
 			return err
 		}

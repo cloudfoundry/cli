@@ -15,7 +15,7 @@ type DeleteBuildpackCommand struct {
 	relatedCommands interface{}     `related_commands:"buildpacks"`
 }
 
-func (_ DeleteBuildpackCommand) Setup(config commands.Config) error {
+func (_ DeleteBuildpackCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

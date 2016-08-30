@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
-	"code.cloudfoundry.org/cli/commands/ui"
 	"code.cloudfoundry.org/cli/commands/v2/internal"
 	"code.cloudfoundry.org/cli/utils/config"
 	"code.cloudfoundry.org/cli/utils/sortutils"
@@ -29,7 +28,7 @@ type HelpActor interface {
 }
 
 type HelpCommand struct {
-	UI     UI
+	UI     commands.UI
 	Actor  HelpActor
 	Config commands.Config
 
@@ -38,15 +37,10 @@ type HelpCommand struct {
 	usage        interface{}       `usage:"CF_NAME help [COMMAND]"`
 }
 
-func (cmd *HelpCommand) Setup(config commands.Config) error {
-	var err error
-	cmd.UI, err = ui.NewUI(config)
-	if err != nil {
-		return err
-	}
-
+func (cmd *HelpCommand) Setup(config commands.Config, ui commands.UI) error {
 	cmd.Actor = v2actions.NewActor()
 	cmd.Config = config
+	cmd.UI = ui
 
 	return nil
 }

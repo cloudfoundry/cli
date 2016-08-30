@@ -12,7 +12,7 @@ type RouterGroupsCommand struct {
 	relatedCommands interface{} `related_commands:"create-domain, domains"`
 }
 
-func (_ RouterGroupsCommand) Setup(config commands.Config) error {
+func (_ RouterGroupsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

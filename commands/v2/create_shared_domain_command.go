@@ -15,7 +15,7 @@ type CreateSharedDomainCommand struct {
 	relatedCommands interface{}  `related_commands:"create-domain, domains, router-groups"`
 }
 
-func (_ CreateSharedDomainCommand) Setup(config commands.Config) error {
+func (_ CreateSharedDomainCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

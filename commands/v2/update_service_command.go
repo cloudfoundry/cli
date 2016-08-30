@@ -17,7 +17,7 @@ type UpdateServiceCommand struct {
 	relatedCommands  interface{}           `related_commands:"rename-service, services, update-user-provided-service"`
 }
 
-func (_ UpdateServiceCommand) Setup(config commands.Config) error {
+func (_ UpdateServiceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

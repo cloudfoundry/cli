@@ -15,7 +15,7 @@ type DeleteUserCommand struct {
 	relatedCommands interface{}    `related_commands:"org-users"`
 }
 
-func (_ DeleteUserCommand) Setup(config commands.Config) error {
+func (_ DeleteUserCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

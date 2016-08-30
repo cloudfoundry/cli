@@ -12,7 +12,7 @@ type AppsCommand struct {
 	relatedCommands interface{} `related_commands:"events, logs, map-route, push, scale, start, stop, restart"`
 }
 
-func (_ AppsCommand) Setup(config commands.Config) error {
+func (_ AppsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

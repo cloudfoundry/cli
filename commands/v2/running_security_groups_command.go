@@ -12,7 +12,7 @@ type RunningSecurityGroupsCommand struct {
 	relatedCommands interface{} `related_commands:"bind-running-security-group, security-group, unbind-running-security-group"`
 }
 
-func (_ RunningSecurityGroupsCommand) Setup(config commands.Config) error {
+func (_ RunningSecurityGroupsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

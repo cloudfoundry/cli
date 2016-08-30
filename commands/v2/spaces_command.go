@@ -12,7 +12,7 @@ type SpacesCommand struct {
 	relatedCommands interface{} `related_commands:"target"`
 }
 
-func (_ SpacesCommand) Setup(config commands.Config) error {
+func (_ SpacesCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -12,7 +12,7 @@ type OauthTokenCommand struct {
 	relatedCommands interface{} `related_commands:"curl"`
 }
 
-func (_ OauthTokenCommand) Setup(config commands.Config) error {
+func (_ OauthTokenCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

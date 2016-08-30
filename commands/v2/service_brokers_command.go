@@ -12,7 +12,7 @@ type ServiceBrokersCommand struct {
 	relatedCommands interface{} `related_commands:"delete-service-broker, disable-service-access, enable-service-access"`
 }
 
-func (_ ServiceBrokersCommand) Setup(config commands.Config) error {
+func (_ ServiceBrokersCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

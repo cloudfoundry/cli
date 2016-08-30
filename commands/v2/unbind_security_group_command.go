@@ -14,7 +14,7 @@ type UnbindSecurityGroupCommand struct {
 	relatedCommands interface{}                 `related_commands:"apps, restart, security-groups"`
 }
 
-func (_ UnbindSecurityGroupCommand) Setup(config commands.Config) error {
+func (_ UnbindSecurityGroupCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

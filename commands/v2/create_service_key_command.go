@@ -15,7 +15,7 @@ type CreateServiceKeyCommand struct {
 	relatedCommands  interface{}              `related_commands:"service-key"`
 }
 
-func (_ CreateServiceKeyCommand) Setup(config commands.Config) error {
+func (_ CreateServiceKeyCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

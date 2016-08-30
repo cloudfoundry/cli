@@ -16,7 +16,7 @@ type CreateBuildpackCommand struct {
 	relatedCommands interface{}               `related_commands:"buildpacks, push"`
 }
 
-func (_ CreateBuildpackCommand) Setup(config commands.Config) error {
+func (_ CreateBuildpackCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

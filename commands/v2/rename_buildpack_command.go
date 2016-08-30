@@ -14,7 +14,7 @@ type RenameBuildpackCommand struct {
 	relatedCommands interface{}               `related_commands:"update-buildpack"`
 }
 
-func (_ RenameBuildpackCommand) Setup(config commands.Config) error {
+func (_ RenameBuildpackCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

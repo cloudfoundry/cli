@@ -15,7 +15,7 @@ type StackCommand struct {
 	relatedCommands interface{}     `related_commands:"app, push, stacks"`
 }
 
-func (_ StackCommand) Setup(config commands.Config) error {
+func (_ StackCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

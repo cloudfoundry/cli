@@ -15,7 +15,7 @@ type DeleteSharedDomainCommand struct {
 	relatedCommands interface{}  `related_commands:"delete-domain, domains"`
 }
 
-func (_ DeleteSharedDomainCommand) Setup(config commands.Config) error {
+func (_ DeleteSharedDomainCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

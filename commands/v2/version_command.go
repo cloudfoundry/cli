@@ -11,7 +11,7 @@ type VersionCommand struct {
 	usage interface{} `usage:"CF_NAME version\n\n   'cf -v' and 'cf --version' are also accepted."`
 }
 
-func (_ VersionCommand) Setup(config commands.Config) error {
+func (_ VersionCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

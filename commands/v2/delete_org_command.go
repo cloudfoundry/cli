@@ -14,7 +14,7 @@ type DeleteOrgCommand struct {
 	usage        interface{}        `usage:"CF_NAME delete-org ORG [-f]"`
 }
 
-func (_ DeleteOrgCommand) Setup(config commands.Config) error {
+func (_ DeleteOrgCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 
