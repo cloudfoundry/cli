@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/api/organizations"
 	"code.cloudfoundry.org/cli/cf/api/spaces"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -19,6 +20,7 @@ type DeleteSpace struct {
 	config    coreconfig.ReadWriter
 	spaceRepo spaces.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
+	orgRepo   organizations.OrganizationRepository
 }
 
 func init() {
@@ -28,12 +30,14 @@ func init() {
 func (cmd *DeleteSpace) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Delete space within specifid org")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "delete-space",
 		Description: T("Delete a space"),
 		Usage: []string{
 			T("CF_NAME delete-space SPACE [-f]"),
+			T("CF_NAME delete-space SPACE [-o]"),
 		},
 		Flags: fs,
 	}
@@ -60,10 +64,28 @@ func (cmd *DeleteSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	cmd.ui = deps.UI
 	cmd.config = deps.Config
 	cmd.spaceRepo = deps.RepoLocator.GetSpaceRepository()
+	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	return cmd
 }
 func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
+	// var err error = nil
 	spaceName := c.Args()[0]
+	orgName := c.String("o")
+	orgGUID := ""
+
+	if orgName == "" {
+		orgName = cmd.config.OrganizationFields().Name
+		orgGUID = cmd.config.OrganizationFields().GUID
+	}
+
+	if orgGUID == "" {
+		org, err := cmd.orgRepo.FindByName(orgName)
+		if err != nil {
+			panic(err)
+		}
+
+		orgGUID = org.GUID
+	}
 
 	if !c.Bool("f") {
 		if !cmd.ui.ConfirmDelete(T("space"), spaceName) {
@@ -78,9 +100,13 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	space := cmd.spaceReq.GetSpace()
+	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, orgGUID)
 
-	err := cmd.spaceRepo.Delete(space.GUID)
+	if c.String("o") == "" {
+		space = cmd.spaceReq.GetSpace()
+	}
+
+	err = cmd.spaceRepo.Delete(space.GUID)
 	if err != nil {
 		return err
 	}
