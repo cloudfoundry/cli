@@ -141,7 +141,7 @@
   },
   {
     "id": "'routes' should be a list",
-    "translation": ""
+    "translation": "'routes'는 목록이어야 함"
   },
   {
     "id": "'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.",
@@ -297,15 +297,15 @@
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": ""
+    "translation": "{{.AppName}} 애플리케이션을 'routes' 및 'domain'/'domains' 둘 다로 구성할 수 없음"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": ""
+    "translation": "{{.AppName}} 애플리케이션을 'routes' 및 'host'/'hosts' 둘 다로 구성할 수 없음"
   },
   {
     "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": ""
+    "translation": "{{.AppName}} 애플리케이션을 'routes' 및 'no-hostname' 둘 다로 구성할 수 없음"
   },
   {
     "id": "Apps:",
@@ -393,7 +393,7 @@
   },
   {
     "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": ""
+    "translation": "조직의 모든 기존 영역 또는 특정 영역에 보안 그룹 바인드"
   },
   {
     "id": "Bind a security group to the list of security groups to be used for running applications",
@@ -1113,7 +1113,7 @@
   },
   {
     "id": "Copies the source code of an application to another existing application (and restarts that application)",
-    "translation": "한 애플리케이션에서 다른 애플리케이션으로 앱 소스 코드를 복사합니다. 대체되지 않는 한 copy-source 명령은 애플리케이션을 다시 시작합니다."
+    "translation": "애플리케이션의 소스 코드를 다른 기존 애플리케이션에 복사(그리고 해당 애플리케이션을 다시 시작)"
   },
   {
     "id": "Copying source from app {{.SourceApp}} to target app {{.TargetApp}} in org {{.OrgName}} / space {{.SpaceName}} as {{.Username}}...",
@@ -1381,11 +1381,11 @@
   },
   {
     "id": "Define a new resource quota",
-    "translation": "새 자원 할당량 정의"
+    "translation": "새 리소스 할당량 정의"
   },
   {
     "id": "Define a new space resource quota",
-    "translation": "새 영역 자원 할당량 정의"
+    "translation": "새 영역 리소스 할당량 정의"
   },
   {
     "id": "Delete a TCP route",
@@ -2028,8 +2028,8 @@
     "translation": "빌드팩 페치에 실패했습니다.\n{{.Error}}"
   },
   {
-    "id": "Failed fetching domains for organization {{.OrgName}}.\n{{.Err}}",
-    "translation": "{{.OrgName}} 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
+    "id": "Failed fetching domains for organization %s.\n{{.Err}}",
+    "translation": "%s 조직의 도메인 페치에 실패했습니다.\n{{.Err}}"
   },
   {
     "id": "Failed fetching domains.\n{{.Error}}",
@@ -2485,7 +2485,7 @@
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": ""
+    "translation": "올바르지 않은 사용법입니다. 인수로 SECURITY_GROUP, ORG 및 선택적 SPACE가 필요합니다.\n\n"
   },
   {
     "id": "Incorrect Usage. Requires SECURITY_GROUP and PATH_TO_JSON_RULES_FILE as arguments\n\n",
@@ -2637,7 +2637,7 @@
   },
   {
     "id": "Invalid application configuration",
-    "translation": ""
+    "translation": "올바르지 않은 애플리케이션 구성"
   },
   {
     "id": "Invalid async response from server",
@@ -2705,7 +2705,7 @@
   },
   {
     "id": "Invalid port for route {{.RouteName}}",
-    "translation": ""
+    "translation": "{{.RouteName}} 라우트에 대한 올바르지 않은 포트"
   },
   {
     "id": "Invalid timeout param: {{.Timeout}}\n{{.Err}}",
@@ -2789,7 +2789,7 @@
   },
   {
     "id": "List available space resource quotas",
-    "translation": "사용 가능한 영역 자원 할당량 나열"
+    "translation": "사용 가능한 영역 리소스 할당량 나열"
   },
   {
     "id": "List available usage quotas",
@@ -3229,7 +3229,7 @@
   },
   {
     "id": "Path for HTTP route",
-    "translation": ""
+    "translation": "HTTP 라우트에 대한 경로"
   },
   {
     "id": "Path for the HTTP route",
@@ -3241,7 +3241,7 @@
   },
   {
     "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": ""
+    "translation": "TCP 라우트 {{.RouteName}}에서 경로가 허용되지 않음"
   },
   {
     "id": "Path to app directory or to a zip file of the contents of the app directory",
@@ -3333,7 +3333,7 @@
   },
   {
     "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": ""
+    "translation": "HTTP 라우트 {{.RouteName}}에서 포트가 허용되지 않음"
   },
   {
     "id": "Port used to identify the TCP route",
@@ -4145,7 +4145,7 @@
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": ""
+    "translation": "{{.RouteName}} 라우트가 기존 도메인과 일치하지 않습니다."
   },
   {
     "id": "The route {{.URL}} is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.",
@@ -4245,11 +4245,11 @@
   },
   {
     "id": "URL to which logs for bound applications will be streamed",
-    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다"
+    "translation": "바인딩된 애플리케이션에 대한 로그를 스트리밍할 URL입니다. "
   },
   {
     "id": "URL to which requests for bound routes will be forwarded. Scheme for this URL must be https",
-    "translation": "바인딩된 라우트에 대한 요청을 전달한 URL입니다. 이 URL에 대한 스킴은 https이어야 합니다"
+    "translation": "바인딩된 라우트에 대한 요청을 전달한 URL입니다. 이 URL에 대한 스킴은 https이어야 합니다. "
   },
   {
     "id": "USAGE:",
@@ -4405,7 +4405,7 @@
   },
   {
     "id": "Update an existing resource quota",
-    "translation": "기존 자원 할당량 업데이트"
+    "translation": "기존 리소스 할당량 업데이트"
   },
   {
     "id": "Update an existing space quota",
@@ -4565,7 +4565,7 @@
   },
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
-    "translation": "경고: 이 조작은 Cloud Foundry의 내부 조작입니다. 서비스 브로커에 접속하지 않으며 서비스 인스턴스의 자원은 변경되지 않습니다. 이 조작의 기본 유스 케이스는 v1 플랜에서 v2 플랜으로 서비스 인스턴스를 다시 맵핑하여 v1 서비스 브로커 API를 구현하는 서비스 브로커를 v2 API를 구현하는 브로커로 바꾸는 것입니다. v1 플랜을 개인용으로 작성하거나 추가 인스턴스가 작성되지 않도록 v1 브로커를 종료하는 것이 좋습니다. 서비스 인스턴스가 마이그레이션되면 v1 서비스와 플랜을 Cloud Foundry에서 제거할 수 있습니다."
+    "translation": "경고: 이 조작은 Cloud Foundry의 내부 조작입니다. 서비스 브로커에 접속하지 않으며 서비스 인스턴스의 리소스는 변경되지 않습니다. 이 조작의 기본 유스 케이스는 v1 플랜에서 v2 플랜으로 서비스 인스턴스를 다시 맵핑하여 v1 서비스 브로커 API를 구현하는 서비스 브로커를 v2 API를 구현하는 브로커로 바꾸는 것입니다. v1 플랜을 개인용으로 작성하거나 추가 인스턴스가 작성되지 않도록 v1 브로커를 종료하는 것이 좋습니다. 서비스 인스턴스가 마이그레이션되면 v1 서비스와 플랜을 Cloud Foundry에서 제거할 수 있습니다."
   },
   {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
@@ -4729,7 +4729,7 @@
   },
   {
     "id": "each route in 'routes' must have a 'route' property",
-    "translation": ""
+    "translation": "'routes'의 각 라우트는 'route' 특성을 가져야 함"
   },
   {
     "id": "enabled",
