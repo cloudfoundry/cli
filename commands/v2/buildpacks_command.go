@@ -12,7 +12,7 @@ type BuildpacksCommand struct {
 	relatedCommands interface{} `related_commands:"push"`
 }
 
-func (_ BuildpacksCommand) Setup(config commands.Config) error {
+func (_ BuildpacksCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

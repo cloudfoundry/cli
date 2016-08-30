@@ -14,7 +14,7 @@ type StopCommand struct {
 	relatedCommands interface{}   `related_commands:"restart, scale, start"`
 }
 
-func (_ StopCommand) Setup(config commands.Config) error {
+func (_ StopCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

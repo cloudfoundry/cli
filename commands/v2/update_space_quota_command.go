@@ -23,7 +23,7 @@ type UpdateSpaceQuotaCommand struct {
 	relatedCommands          interface{}      `related_commands:"space-quota, space-quotas"`
 }
 
-func (_ UpdateSpaceQuotaCommand) Setup(config commands.Config) error {
+func (_ UpdateSpaceQuotaCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

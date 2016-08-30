@@ -16,7 +16,7 @@ type ApiCommand struct {
 	relatedCommands   interface{}     `related_commands:"auth, login, target"`
 }
 
-func (_ ApiCommand) Setup(config commands.Config) error {
+func (_ ApiCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

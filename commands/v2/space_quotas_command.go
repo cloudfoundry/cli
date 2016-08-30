@@ -12,7 +12,7 @@ type SpaceQuotasCommand struct {
 	relatedCommands interface{} `related_commands:"set-space-quota"`
 }
 
-func (_ SpaceQuotasCommand) Setup(config commands.Config) error {
+func (_ SpaceQuotasCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

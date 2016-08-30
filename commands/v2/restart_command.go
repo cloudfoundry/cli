@@ -14,7 +14,7 @@ type RestartCommand struct {
 	relatedCommands interface{}   `related_commands:"restage, restart-app-instance"`
 }
 
-func (_ RestartCommand) Setup(config commands.Config) error {
+func (_ RestartCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

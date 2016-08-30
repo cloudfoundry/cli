@@ -13,7 +13,7 @@ type StartCommand struct {
 	usage        interface{}   `usage:"CF_NAME start APP_NAME"`
 }
 
-func (_ StartCommand) Setup(config commands.Config) error {
+func (_ StartCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

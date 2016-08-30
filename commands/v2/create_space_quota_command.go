@@ -21,7 +21,7 @@ type CreateSpaceQuotaCommand struct {
 	relatedCommands             interface{}      `related_commands:"quotas, space-quotas"`
 }
 
-func (_ CreateSpaceQuotaCommand) Setup(config commands.Config) error {
+func (_ CreateSpaceQuotaCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

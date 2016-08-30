@@ -14,7 +14,7 @@ type CreateSecurityGroupCommand struct {
 	relatedCommands interface{}             `related_commands:"bind-security-group, bind-running-security-group, bind-staging-security-group, security-groups"`
 }
 
-func (_ CreateSecurityGroupCommand) Setup(config commands.Config) error {
+func (_ CreateSecurityGroupCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

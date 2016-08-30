@@ -14,7 +14,7 @@ type RemovePluginRepoCommand struct {
 	relatedCommands interface{}          `related_commands:"list-plugin-repos"`
 }
 
-func (_ RemovePluginRepoCommand) Setup(config commands.Config) error {
+func (_ RemovePluginRepoCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

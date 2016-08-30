@@ -12,7 +12,7 @@ type ServicesCommand struct {
 	relatedCommands interface{} `related_commands:"create-service, marketplace"`
 }
 
-func (_ ServicesCommand) Setup(config commands.Config) error {
+func (_ ServicesCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -12,7 +12,7 @@ type StagingSecurityGroupsCommand struct {
 	relatedCommands interface{} `related_commands:"bind-staging-security-group, security-group, unbind-staging-security-group"`
 }
 
-func (_ StagingSecurityGroupsCommand) Setup(config commands.Config) error {
+func (_ StagingSecurityGroupsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

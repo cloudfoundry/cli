@@ -15,7 +15,7 @@ type DeleteQuotaCommand struct {
 	relatedCommands interface{} `related_commands:"quotas"`
 }
 
-func (_ DeleteQuotaCommand) Setup(config commands.Config) error {
+func (_ DeleteQuotaCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

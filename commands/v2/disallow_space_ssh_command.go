@@ -14,7 +14,7 @@ type DisallowSpaceSSHCommand struct {
 	relatedCommands interface{} `related_commands:"disable-ssh, space-ssh-allowed, ssh, ssh-enabled"`
 }
 
-func (_ DisallowSpaceSSHCommand) Setup(config commands.Config) error {
+func (_ DisallowSpaceSSHCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

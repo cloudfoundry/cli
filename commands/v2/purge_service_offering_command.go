@@ -16,7 +16,7 @@ type PurgeServiceOfferingCommand struct {
 	relatedCommands interface{}   `related_commands:"marketplace, purge-service-instance, service-brokers"`
 }
 
-func (_ PurgeServiceOfferingCommand) Setup(config commands.Config) error {
+func (_ PurgeServiceOfferingCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

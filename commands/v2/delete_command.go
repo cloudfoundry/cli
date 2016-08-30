@@ -16,7 +16,7 @@ type DeleteCommand struct {
 	relatedCommands    interface{}   `related_commands:"apps, scale, stop"`
 }
 
-func (_ DeleteCommand) Setup(config commands.Config) error {
+func (_ DeleteCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -15,7 +15,7 @@ type OrgUsersCommand struct {
 	relatedCommands interface{}        `related_commands:"orgs"`
 }
 
-func (_ OrgUsersCommand) Setup(config commands.Config) error {
+func (_ OrgUsersCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

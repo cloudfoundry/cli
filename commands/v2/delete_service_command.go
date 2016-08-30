@@ -15,7 +15,7 @@ type DeleteServiceCommand struct {
 	relatedCommands interface{}           `related_commands:"unbind-service, services"`
 }
 
-func (_ DeleteServiceCommand) Setup(config commands.Config) error {
+func (_ DeleteServiceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

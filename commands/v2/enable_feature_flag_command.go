@@ -14,7 +14,7 @@ type EnableFeatureFlagCommand struct {
 	relatedCommands interface{}   `related_commands:"disable-feature-flag, feature-flags"`
 }
 
-func (_ EnableFeatureFlagCommand) Setup(config commands.Config) error {
+func (_ EnableFeatureFlagCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

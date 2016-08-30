@@ -18,7 +18,7 @@ type ScaleCommand struct {
 	relatedCommands interface{}   `related_commands:"push"`
 }
 
-func (_ ScaleCommand) Setup(config commands.Config) error {
+func (_ ScaleCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

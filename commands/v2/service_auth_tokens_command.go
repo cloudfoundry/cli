@@ -11,7 +11,7 @@ type ServiceAuthTokensCommand struct {
 	usage interface{} `usage:"CF_NAME service-auth-tokens"`
 }
 
-func (_ ServiceAuthTokensCommand) Setup(config commands.Config) error {
+func (_ ServiceAuthTokensCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

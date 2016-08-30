@@ -15,7 +15,7 @@ type CreateAppManifestCommand struct {
 	relatedCommands interface{}   `related_commands:"apps, push"`
 }
 
-func (_ CreateAppManifestCommand) Setup(config commands.Config) error {
+func (_ CreateAppManifestCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

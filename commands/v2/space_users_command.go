@@ -14,7 +14,7 @@ type SpaceUsersCommand struct {
 	relatedCommands interface{}    `related_commands:"org-users, set-space-role, unset-space-role, orgs, spaces"`
 }
 
-func (_ SpaceUsersCommand) Setup(config commands.Config) error {
+func (_ SpaceUsersCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

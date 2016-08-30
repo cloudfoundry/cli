@@ -18,7 +18,7 @@ type DeleteRouteCommand struct {
 	relatedCommands interface{}  `related_commands:"delete-orphaned-routes, routes, unmap-route"`
 }
 
-func (_ DeleteRouteCommand) Setup(config commands.Config) error {
+func (_ DeleteRouteCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

@@ -13,7 +13,7 @@ type SpaceQuotaCommand struct {
 	usage        interface{}      `usage:"CF_NAME space-quota SPACE_QUOTA_NAME"`
 }
 
-func (_ SpaceQuotaCommand) Setup(config commands.Config) error {
+func (_ SpaceQuotaCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

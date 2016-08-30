@@ -17,7 +17,7 @@ type UnmapRouteCommand struct {
 	relatedCommands interface{}     `related_commands:"delete-route, routes"`
 }
 
-func (_ UnmapRouteCommand) Setup(config commands.Config) error {
+func (_ UnmapRouteCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

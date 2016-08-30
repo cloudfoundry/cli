@@ -17,7 +17,7 @@ type BindRouteServiceCommand struct {
 	relatedCommands  interface{}            `related_commands:"routes, services"`
 }
 
-func (_ BindRouteServiceCommand) Setup(config commands.Config) error {
+func (_ BindRouteServiceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

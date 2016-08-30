@@ -13,7 +13,7 @@ type RenameSpaceCommand struct {
 	usage        interface{}           `usage:"CF_NAME rename-space SPACE NEW_SPACE"`
 }
 
-func (_ RenameSpaceCommand) Setup(config commands.Config) error {
+func (_ RenameSpaceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

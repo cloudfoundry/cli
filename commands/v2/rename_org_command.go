@@ -13,7 +13,7 @@ type RenameOrgCommand struct {
 	usage        interface{}         `usage:"CF_NAME rename-org ORG NEW_ORG"`
 }
 
-func (_ RenameOrgCommand) Setup(config commands.Config) error {
+func (_ RenameOrgCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

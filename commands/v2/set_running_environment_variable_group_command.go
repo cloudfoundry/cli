@@ -14,7 +14,7 @@ type SetRunningEnvironmentVariableGroupCommand struct {
 	relatedCommands interface{}        `related_commands:"set-env, running-environment-variable-group"`
 }
 
-func (_ SetRunningEnvironmentVariableGroupCommand) Setup(config commands.Config) error {
+func (_ SetRunningEnvironmentVariableGroupCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

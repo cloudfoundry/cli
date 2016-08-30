@@ -13,7 +13,7 @@ type CreateServiceAuthTokenCommand struct {
 	usage        interface{}                `usage:"CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"`
 }
 
-func (_ CreateServiceAuthTokenCommand) Setup(config commands.Config) error {
+func (_ CreateServiceAuthTokenCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

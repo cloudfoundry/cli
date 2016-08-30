@@ -13,7 +13,7 @@ type RoutesCommand struct {
 	relatedCommands interface{} `related_commands:"check-route, domains, map-route, unmap-route"`
 }
 
-func (_ RoutesCommand) Setup(config commands.Config) error {
+func (_ RoutesCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

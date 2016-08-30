@@ -15,7 +15,7 @@ type BindServiceCommand struct {
 	relatedCommands  interface{}           `related_commands:"services"`
 }
 
-func (_ BindServiceCommand) Setup(config commands.Config) error {
+func (_ BindServiceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

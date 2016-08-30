@@ -12,7 +12,7 @@ type SSHCodeCommand struct {
 	relatedCommands interface{} `related_commands:"curl, ssh"`
 }
 
-func (_ SSHCodeCommand) Setup(config commands.Config) error {
+func (_ SSHCodeCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

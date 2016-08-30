@@ -15,7 +15,7 @@ type CreateServiceBrokerCommand struct {
 	relatedCommands interface{}             `related_commands:"enable-service-access, service-brokers, target"`
 }
 
-func (_ CreateServiceBrokerCommand) Setup(config commands.Config) error {
+func (_ CreateServiceBrokerCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

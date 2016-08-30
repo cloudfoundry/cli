@@ -14,7 +14,7 @@ type DeleteSpaceCommand struct {
 	usage        interface{} `usage:"CF_NAME delete-space SPACE [-f]"`
 }
 
-func (_ DeleteSpaceCommand) Setup(config commands.Config) error {
+func (_ DeleteSpaceCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

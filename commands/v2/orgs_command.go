@@ -11,7 +11,7 @@ type OrgsCommand struct {
 	usage interface{} `usage:"CF_NAME orgs"`
 }
 
-func (_ OrgsCommand) Setup(config commands.Config) error {
+func (_ OrgsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

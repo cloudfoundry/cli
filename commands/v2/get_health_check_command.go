@@ -13,7 +13,7 @@ type GetHealthCheckCommand struct {
 	usage        interface{}   `usage:"CF_NAME get-health-check APP_NAME"`
 }
 
-func (_ GetHealthCheckCommand) Setup(config commands.Config) error {
+func (_ GetHealthCheckCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

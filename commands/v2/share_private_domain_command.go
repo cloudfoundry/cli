@@ -14,7 +14,7 @@ type SharePrivateDomainCommand struct {
 	relatedCommands interface{}     `related_commands:"domains, unshare-private-domain"`
 }
 
-func (_ SharePrivateDomainCommand) Setup(config commands.Config) error {
+func (_ SharePrivateDomainCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

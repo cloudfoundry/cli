@@ -15,7 +15,7 @@ type DeleteServiceKeyCommand struct {
 	relatedCommands interface{}              `related_commands:"service-keys"`
 }
 
-func (_ DeleteServiceKeyCommand) Setup(config commands.Config) error {
+func (_ DeleteServiceKeyCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

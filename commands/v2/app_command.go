@@ -15,7 +15,7 @@ type AppCommand struct {
 	relatedCommands interface{}   `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 }
 
-func (_ AppCommand) Setup(config commands.Config) error {
+func (_ AppCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

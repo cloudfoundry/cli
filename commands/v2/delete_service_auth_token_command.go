@@ -14,7 +14,7 @@ type DeleteServiceAuthTokenCommand struct {
 	usage        interface{}                      `usage:"CF_NAME delete-service-auth-token LABEL PROVIDER [-f]"`
 }
 
-func (_ DeleteServiceAuthTokenCommand) Setup(config commands.Config) error {
+func (_ DeleteServiceAuthTokenCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

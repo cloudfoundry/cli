@@ -15,7 +15,7 @@ type DeleteServiceBrokerCommand struct {
 	relatedCommands interface{}         `related_commands:"delete-service, purge-service-offering, service-brokers"`
 }
 
-func (_ DeleteServiceBrokerCommand) Setup(config commands.Config) error {
+func (_ DeleteServiceBrokerCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 

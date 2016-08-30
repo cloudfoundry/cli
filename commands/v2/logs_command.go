@@ -15,7 +15,7 @@ type LogsCommand struct {
 	relatedCommands interface{}   `related_commands:"app, apps, ssh"`
 }
 
-func (_ LogsCommand) Setup(config commands.Config) error {
+func (_ LogsCommand) Setup(config commands.Config, ui commands.UI) error {
 	return nil
 }
 
