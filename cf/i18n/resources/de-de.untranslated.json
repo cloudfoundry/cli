@@ -4,40 +4,8 @@
     "translation": "\nApp state changed to started, but note that it has 0 instances.\n"
   },
   {
-    "id": "'routes' should be a list",
-    "translation": "'routes' should be a list"
-  },
-  {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'",
-    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'domain'/'domains'"
-  },
-  {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'",
-    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'host'/'hosts'"
-  },
-  {
-    "id": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'",
-    "translation": "Application {{.AppName}} must not be configured with both 'routes' and 'no-hostname'"
-  },
-  {
-    "id": "Bind a security group to a particular space, or all existing spaces of an org",
-    "translation": "Bind a security group to a particular space, or all existing spaces of an org"
-  },
-  {
     "id": "Failed to create a local temporary zip file for the buildpack",
     "translation": "Failed to create a local temporary zip file for the buildpack"
-  },
-  {
-    "id": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n",
-    "translation": "Incorrect Usage. Requires SECURITY_GROUP and ORG, optional SPACE as arguments\n\n"
-  },
-  {
-    "id": "Invalid application configuration",
-    "translation": "Invalid application configuration"
-  },
-  {
-    "id": "Invalid port for route {{.RouteName}}",
-    "translation": "Invalid port for route {{.RouteName}}"
   },
   {
     "id": "Max wait time to establish a connection, including name resolution, in seconds",
@@ -46,25 +14,5 @@
   {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
     "translation": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute"
-  },
-  {
-    "id": "Path for HTTP route",
-    "translation": "Path for HTTP route"
-  },
-  {
-    "id": "Path not allowed in TCP route {{.RouteName}}",
-    "translation": "Path not allowed in TCP route {{.RouteName}}"
-  },
-  {
-    "id": "Port not allowed in HTTP route {{.RouteName}}",
-    "translation": "Port not allowed in HTTP route {{.RouteName}}"
-  },
-  {
-    "id": "The route {{.RouteName}} did not match any existing domains.",
-    "translation": "The route {{.RouteName}} did not match any existing domains."
-  },
-  {
-    "id": "each route in 'routes' must have a 'route' property",
-    "translation": "each route in 'routes' must have a 'route' property"
   }
 ]
