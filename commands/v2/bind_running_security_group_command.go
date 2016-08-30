@@ -10,7 +10,7 @@ import (
 
 type BindRunningSecurityGroupCommand struct {
 	RequiredArgs    flags.SecurityGroup `positional-args:"yes"`
-	usage           interface{}         `usage:"CF_NAME bind-staging-security-group SECURITY_GROUP"`
+	usage           interface{}         `usage:"CF_NAME bind-running-security-group SECURITY_GROUP"\n\nTIP: Changes will not apply to existing running applications until they are restarted.`
 	relatedCommands interface{}         `related_commands:"apps, bind-security-group, bind-staging-security-group, restart, running-security-groups, security-groups"`
 }
 
