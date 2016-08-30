@@ -44,7 +44,7 @@ type commandList struct {
 	Service                            ServiceCommand                            `command:"service" description:"Show service instance info"`
 	CreateService                      CreateServiceCommand                      `command:"create-service" alias:"cs" description:"Create a service instance"`
 	UpdateService                      UpdateServiceCommand                      `command:"update-service" description:"Update a service instance"`
-	DeleteService                      DeleteServiceCommand                      `command:"delete-service" description:"Delete a service instance"`
+	DeleteService                      DeleteServiceCommand                      `command:"delete-service" alias:"ds" description:"Delete a service instance"`
 	RenameService                      RenameServiceCommand                      `command:"rename-service" description:"Rename a service instance"`
 	CreateServiceKey                   CreateServiceKeyCommand                   `command:"create-service-key" alias:"csk" description:"Create key for a service instance"`
 	ServiceKeys                        ServiceKeysCommand                        `command:"service-keys" alias:"sk" description:"List keys for a service instance"`
