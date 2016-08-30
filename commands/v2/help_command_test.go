@@ -214,8 +214,8 @@ var _ = Describe("Help Command", func() {
 					CommandName: "enable-diego",
 				}
 
-				fakeConfig.PluginsReturns(map[string]config.Plugin{
-					"Diego-Enabler": config.Plugin{
+				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+					"Diego-Enabler": config.PluginConfig{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "enable-diego",
@@ -295,8 +295,8 @@ var _ = Describe("Help Command", func() {
 
 		Context("when there are multiple installed plugins", func() {
 			BeforeEach(func() {
-				fakeConfig.PluginsReturns(map[string]config.Plugin{
-					"some-plugin": config.Plugin{
+				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+					"some-plugin": config.PluginConfig{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "enable",
@@ -312,7 +312,7 @@ var _ = Describe("Help Command", func() {
 							},
 						},
 					},
-					"Some-other-plugin": config.Plugin{
+					"Some-other-plugin": config.PluginConfig{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "some-other-plugin-command",
@@ -320,7 +320,7 @@ var _ = Describe("Help Command", func() {
 							},
 						},
 					},
-					"the-last-plugin": config.Plugin{
+					"the-last-plugin": config.PluginConfig{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "last-plugin-command",
@@ -351,8 +351,8 @@ var _ = Describe("Help Command", func() {
 				cmd.AllCommands = true
 
 				cmd.Actor = v2actions.NewActor()
-				fakeConfig.PluginsReturns(map[string]config.Plugin{
-					"Diego-Enabler": config.Plugin{
+				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+					"Diego-Enabler": config.PluginConfig{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "enable-diego",
@@ -458,8 +458,8 @@ var _ = Describe("Help Command", func() {
 
 			Context("when there are multiple installed plugins", func() {
 				BeforeEach(func() {
-					fakeConfig.PluginsReturns(map[string]config.Plugin{
-						"some-plugin": config.Plugin{
+					fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+						"some-plugin": config.PluginConfig{
 							Commands: []config.PluginCommand{
 								{
 									Name:     "enable",
@@ -475,7 +475,7 @@ var _ = Describe("Help Command", func() {
 								},
 							},
 						},
-						"Some-other-plugin": config.Plugin{
+						"Some-other-plugin": config.PluginConfig{
 							Commands: []config.PluginCommand{
 								{
 									Name:     "some-other-plugin-command",
@@ -483,7 +483,7 @@ var _ = Describe("Help Command", func() {
 								},
 							},
 						},
-						"the-last-plugin": config.Plugin{
+						"the-last-plugin": config.PluginConfig{
 							Commands: []config.PluginCommand{
 								{
 									Name:     "last-plugin-command",
