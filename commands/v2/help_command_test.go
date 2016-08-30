@@ -4,8 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
 	"code.cloudfoundry.org/cli/commands/flags"
+	"code.cloudfoundry.org/cli/commands/ui"
 	. "code.cloudfoundry.org/cli/commands/v2"
-	"code.cloudfoundry.org/cli/commands/v2/customv2fakes"
 	"code.cloudfoundry.org/cli/commands/v2/v2fakes"
 	"code.cloudfoundry.org/cli/utils/config"
 
@@ -16,14 +16,14 @@ import (
 
 var _ = Describe("Help Command", func() {
 	var (
-		fakeUI     *customv2fakes.FakeUI
+		fakeUI     ui.UI
 		fakeActor  *v2fakes.FakeHelpActor
 		cmd        HelpCommand
 		fakeConfig *commandsfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
-		fakeUI = customv2fakes.NewFakeUI(true)
+		fakeUI = ui.NewTestUI(NewBuffer())
 		fakeActor = new(v2fakes.FakeHelpActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")

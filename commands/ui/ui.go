@@ -58,6 +58,15 @@ func NewUI(c Config) (UI, error) {
 	}, nil
 }
 
+// NewTestUI will return a UI object where Out is customizable
+func NewTestUI(out io.Writer) UI {
+	return UI{
+		Out:          out,
+		colorEnabled: config.ColorDisbled,
+		translate:    i18n.TranslateFunc(func(s string, _ ...interface{}) string { return s }),
+	}
+}
+
 // DisplayText combines the formattedString template with the key maps and then
 // outputs it to the UI.Out file. The maps are merged in a way that the last
 // one takes precidence over the first. Prior to outputting the
