@@ -10,8 +10,8 @@ import (
 
 type ApiCommand struct {
 	OptionalArgs      flags.APITarget `positional-args:"yes"`
-	Unset             bool            `long:"unset" description:"Remove all api endpoint targeting"`
 	SkipSSLValidation bool            `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`
+	Unset             bool            `long:"unset" description:"Remove all api endpoint targeting"`
 	usage             interface{}     `usage:"CF_NAME api [URL]"`
 	relatedCommands   interface{}     `related_commands:"auth, login, target"`
 }
