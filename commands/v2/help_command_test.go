@@ -48,7 +48,7 @@ var _ = Describe("Help Command", func() {
 					Usage:       "CF_NAME help [COMMAND]",
 					Alias:       "h",
 				}
-				fakeActor.GetCommandInfoReturns(commandInfo, nil)
+				fakeActor.CommandInfoByNameReturns(commandInfo, nil)
 			})
 
 			It("displays the name for help", func() {
@@ -58,8 +58,8 @@ var _ = Describe("Help Command", func() {
 				Expect(fakeUI.Out).To(Say("NAME:"))
 				Expect(fakeUI.Out).To(Say("   help - Show help"))
 
-				Expect(fakeActor.GetCommandInfoCallCount()).To(Equal(1))
-				_, commandName := fakeActor.GetCommandInfoArgsForCall(0)
+				Expect(fakeActor.CommandInfoByNameCallCount()).To(Equal(1))
+				_, commandName := fakeActor.CommandInfoByNameArgsForCall(0)
 				Expect(commandName).To(Equal("help"))
 			})
 
@@ -79,7 +79,7 @@ var _ = Describe("Help Command", func() {
 							Name:            "app",
 							RelatedCommands: []string{"broccoli", "tomato"},
 						}
-						fakeActor.GetCommandInfoReturns(commandInfo, nil)
+						fakeActor.CommandInfoByNameReturns(commandInfo, nil)
 					})
 
 					It("displays the related commands for help", func() {
@@ -124,7 +124,7 @@ var _ = Describe("Help Command", func() {
 						commandInfo := v2actions.CommandInfo{
 							Name: "app",
 						}
-						fakeActor.GetCommandInfoReturns(commandInfo, nil)
+						fakeActor.CommandInfoByNameReturns(commandInfo, nil)
 					})
 
 					It("no alias is displayed", func() {
@@ -160,7 +160,7 @@ var _ = Describe("Help Command", func() {
 								},
 							},
 						}
-						fakeActor.GetCommandInfoReturns(commandInfo, nil)
+						fakeActor.CommandInfoByNameReturns(commandInfo, nil)
 					})
 
 					Context("only has a long option", func() {
@@ -233,7 +233,7 @@ var _ = Describe("Help Command", func() {
 					},
 				})
 
-				fakeActor.GetCommandInfoReturns(v2actions.CommandInfo{},
+				fakeActor.CommandInfoByNameReturns(v2actions.CommandInfo{},
 					v2actions.ErrorInvalidCommand{CommandName: "enable-diego"})
 			})
 
@@ -251,12 +251,104 @@ var _ = Describe("Help Command", func() {
 		})
 	})
 
+	Describe("help for common commands", func() {
+		BeforeEach(func() {
+			cmd.OptionalArgs = flags.CommandName{
+				CommandName: "",
+			}
+			cmd.AllCommands = false
+			cmd.Actor = v2actions.NewActor()
+		})
+
+		It("returns a list of only the common commands", func() {
+			err := cmd.Execute(nil)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fakeUI.Out).To(Say("Before getting started:"))
+			Expect(fakeUI.Out).To(Say("help,h\\s+logout,lo"))
+
+			Expect(fakeUI.Out).To(Say("Application lifecycle:"))
+			Expect(fakeUI.Out).To(Say("apps,a\\s+logs\\s+set-env,se"))
+
+			Expect(fakeUI.Out).To(Say("Services integration:"))
+			Expect(fakeUI.Out).To(Say("marketplace,m\\s+create-user-provided-service,cups"))
+			Expect(fakeUI.Out).To(Say("services,s\\s+update-user-provided-service,uups"))
+
+			Expect(fakeUI.Out).To(Say("Route and domain management:"))
+			Expect(fakeUI.Out).To(Say("routes,r\\s+delete-route\\s+create-domain"))
+			Expect(fakeUI.Out).To(Say("domains\\s+map-route"))
+
+			Expect(fakeUI.Out).To(Say("Space management:"))
+			Expect(fakeUI.Out).To(Say("spaces\\s+create-space\\s+set-space-role"))
+
+			Expect(fakeUI.Out).To(Say("Org management:"))
+			Expect(fakeUI.Out).To(Say("orgs,o\\s+set-org-role"))
+
+			Expect(fakeUI.Out).To(Say("CLI plugin management:"))
+			Expect(fakeUI.Out).To(Say("plugins\\s+add-plugin-repo\\s+repo-plugins"))
+
+			Expect(fakeUI.Out).To(Say("Global options:"))
+			Expect(fakeUI.Out).To(Say("--help, -h\\s+Show help"))
+
+			Expect(fakeUI.Out).To(Say("'cf help -a' lists all commands with short descriptions. See 'cf help <command>'"))
+		})
+
+		Context("when there are multiple installed plugins", func() {
+			BeforeEach(func() {
+				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
+					"some-plugin": config.PluginConfig{
+						Commands: []config.PluginCommand{
+							{
+								Name:     "enable",
+								HelpText: "enable command",
+							},
+							{
+								Name:     "disable",
+								HelpText: "disable command",
+							},
+							{
+								Name:     "some-other-command",
+								HelpText: "does something",
+							},
+						},
+					},
+					"Some-other-plugin": config.PluginConfig{
+						Commands: []config.PluginCommand{
+							{
+								Name:     "some-other-plugin-command",
+								HelpText: "does some other thing",
+							},
+						},
+					},
+					"the-last-plugin": config.PluginConfig{
+						Commands: []config.PluginCommand{
+							{
+								Name:     "last-plugin-command",
+								HelpText: "does the last thing",
+							},
+						},
+					},
+				})
+			})
+
+			It("returns the plugin commands organized by plugin and sorted in alphabetical order", func() {
+				err := cmd.Execute(nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeUI.Out).To(Say("Commands offered by installed plugins:"))
+				Expect(fakeUI.Out).To(Say("some-other-plugin-command\\s+disable\\s+enable"))
+				Expect(fakeUI.Out).To(Say("some-other-command\\s+last-plugin-command"))
+			})
+		})
+	})
+
 	Describe("providing help for all commands", func() {
 		Context("when a command is not provided", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs = flags.CommandName{
 					CommandName: "",
 				}
+				cmd.AllCommands = true
 
 				cmd.Actor = v2actions.NewActor()
 				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{

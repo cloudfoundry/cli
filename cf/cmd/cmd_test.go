@@ -52,13 +52,13 @@ var _ = Describe("main", func() {
 
 	Describe("Help menu with -h/--help", func() {
 		It("prints the help output with our custom template when run with 'cf -h'", func() {
-			output := Cf("-h")
+			output := Cf("-h", "-a")
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
 		})
 
 		It("prints the help output with our custom template when run with 'cf --help'", func() {
-			output := Cf("--help")
+			output := Cf("--help", "-a")
 			Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
 			Eventually(output.Out.Contents).Should(ContainSubstring("CF_TRACE=true"))
 		})

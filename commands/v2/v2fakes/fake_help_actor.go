@@ -9,92 +9,92 @@ import (
 )
 
 type FakeHelpActor struct {
-	GetCommandInfoStub        func(interface{}, string) (v2actions.CommandInfo, error)
-	getCommandInfoMutex       sync.RWMutex
-	getCommandInfoArgsForCall []struct {
+	CommandInfoByNameStub        func(interface{}, string) (v2actions.CommandInfo, error)
+	commandInfoByNameMutex       sync.RWMutex
+	commandInfoByNameArgsForCall []struct {
 		arg1 interface{}
 		arg2 string
 	}
-	getCommandInfoReturns struct {
+	commandInfoByNameReturns struct {
 		result1 v2actions.CommandInfo
 		result2 error
 	}
-	GetAllNamesAndDescriptionsStub        func(interface{}) map[string]v2actions.CommandInfo
-	getAllNamesAndDescriptionsMutex       sync.RWMutex
-	getAllNamesAndDescriptionsArgsForCall []struct {
+	CommandInfosStub        func(interface{}) map[string]v2actions.CommandInfo
+	commandInfosMutex       sync.RWMutex
+	commandInfosArgsForCall []struct {
 		arg1 interface{}
 	}
-	getAllNamesAndDescriptionsReturns struct {
+	commandInfosReturns struct {
 		result1 map[string]v2actions.CommandInfo
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHelpActor) GetCommandInfo(arg1 interface{}, arg2 string) (v2actions.CommandInfo, error) {
-	fake.getCommandInfoMutex.Lock()
-	fake.getCommandInfoArgsForCall = append(fake.getCommandInfoArgsForCall, struct {
+func (fake *FakeHelpActor) CommandInfoByName(arg1 interface{}, arg2 string) (v2actions.CommandInfo, error) {
+	fake.commandInfoByNameMutex.Lock()
+	fake.commandInfoByNameArgsForCall = append(fake.commandInfoByNameArgsForCall, struct {
 		arg1 interface{}
 		arg2 string
 	}{arg1, arg2})
-	fake.recordInvocation("GetCommandInfo", []interface{}{arg1, arg2})
-	fake.getCommandInfoMutex.Unlock()
-	if fake.GetCommandInfoStub != nil {
-		return fake.GetCommandInfoStub(arg1, arg2)
+	fake.recordInvocation("CommandInfoByName", []interface{}{arg1, arg2})
+	fake.commandInfoByNameMutex.Unlock()
+	if fake.CommandInfoByNameStub != nil {
+		return fake.CommandInfoByNameStub(arg1, arg2)
 	} else {
-		return fake.getCommandInfoReturns.result1, fake.getCommandInfoReturns.result2
+		return fake.commandInfoByNameReturns.result1, fake.commandInfoByNameReturns.result2
 	}
 }
 
-func (fake *FakeHelpActor) GetCommandInfoCallCount() int {
-	fake.getCommandInfoMutex.RLock()
-	defer fake.getCommandInfoMutex.RUnlock()
-	return len(fake.getCommandInfoArgsForCall)
+func (fake *FakeHelpActor) CommandInfoByNameCallCount() int {
+	fake.commandInfoByNameMutex.RLock()
+	defer fake.commandInfoByNameMutex.RUnlock()
+	return len(fake.commandInfoByNameArgsForCall)
 }
 
-func (fake *FakeHelpActor) GetCommandInfoArgsForCall(i int) (interface{}, string) {
-	fake.getCommandInfoMutex.RLock()
-	defer fake.getCommandInfoMutex.RUnlock()
-	return fake.getCommandInfoArgsForCall[i].arg1, fake.getCommandInfoArgsForCall[i].arg2
+func (fake *FakeHelpActor) CommandInfoByNameArgsForCall(i int) (interface{}, string) {
+	fake.commandInfoByNameMutex.RLock()
+	defer fake.commandInfoByNameMutex.RUnlock()
+	return fake.commandInfoByNameArgsForCall[i].arg1, fake.commandInfoByNameArgsForCall[i].arg2
 }
 
-func (fake *FakeHelpActor) GetCommandInfoReturns(result1 v2actions.CommandInfo, result2 error) {
-	fake.GetCommandInfoStub = nil
-	fake.getCommandInfoReturns = struct {
+func (fake *FakeHelpActor) CommandInfoByNameReturns(result1 v2actions.CommandInfo, result2 error) {
+	fake.CommandInfoByNameStub = nil
+	fake.commandInfoByNameReturns = struct {
 		result1 v2actions.CommandInfo
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeHelpActor) GetAllNamesAndDescriptions(arg1 interface{}) map[string]v2actions.CommandInfo {
-	fake.getAllNamesAndDescriptionsMutex.Lock()
-	fake.getAllNamesAndDescriptionsArgsForCall = append(fake.getAllNamesAndDescriptionsArgsForCall, struct {
+func (fake *FakeHelpActor) CommandInfos(arg1 interface{}) map[string]v2actions.CommandInfo {
+	fake.commandInfosMutex.Lock()
+	fake.commandInfosArgsForCall = append(fake.commandInfosArgsForCall, struct {
 		arg1 interface{}
 	}{arg1})
-	fake.recordInvocation("GetAllNamesAndDescriptions", []interface{}{arg1})
-	fake.getAllNamesAndDescriptionsMutex.Unlock()
-	if fake.GetAllNamesAndDescriptionsStub != nil {
-		return fake.GetAllNamesAndDescriptionsStub(arg1)
+	fake.recordInvocation("CommandInfos", []interface{}{arg1})
+	fake.commandInfosMutex.Unlock()
+	if fake.CommandInfosStub != nil {
+		return fake.CommandInfosStub(arg1)
 	} else {
-		return fake.getAllNamesAndDescriptionsReturns.result1
+		return fake.commandInfosReturns.result1
 	}
 }
 
-func (fake *FakeHelpActor) GetAllNamesAndDescriptionsCallCount() int {
-	fake.getAllNamesAndDescriptionsMutex.RLock()
-	defer fake.getAllNamesAndDescriptionsMutex.RUnlock()
-	return len(fake.getAllNamesAndDescriptionsArgsForCall)
+func (fake *FakeHelpActor) CommandInfosCallCount() int {
+	fake.commandInfosMutex.RLock()
+	defer fake.commandInfosMutex.RUnlock()
+	return len(fake.commandInfosArgsForCall)
 }
 
-func (fake *FakeHelpActor) GetAllNamesAndDescriptionsArgsForCall(i int) interface{} {
-	fake.getAllNamesAndDescriptionsMutex.RLock()
-	defer fake.getAllNamesAndDescriptionsMutex.RUnlock()
-	return fake.getAllNamesAndDescriptionsArgsForCall[i].arg1
+func (fake *FakeHelpActor) CommandInfosArgsForCall(i int) interface{} {
+	fake.commandInfosMutex.RLock()
+	defer fake.commandInfosMutex.RUnlock()
+	return fake.commandInfosArgsForCall[i].arg1
 }
 
-func (fake *FakeHelpActor) GetAllNamesAndDescriptionsReturns(result1 map[string]v2actions.CommandInfo) {
-	fake.GetAllNamesAndDescriptionsStub = nil
-	fake.getAllNamesAndDescriptionsReturns = struct {
+func (fake *FakeHelpActor) CommandInfosReturns(result1 map[string]v2actions.CommandInfo) {
+	fake.CommandInfosStub = nil
+	fake.commandInfosReturns = struct {
 		result1 map[string]v2actions.CommandInfo
 	}{result1}
 }
@@ -102,10 +102,10 @@ func (fake *FakeHelpActor) GetAllNamesAndDescriptionsReturns(result1 map[string]
 func (fake *FakeHelpActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getCommandInfoMutex.RLock()
-	defer fake.getCommandInfoMutex.RUnlock()
-	fake.getAllNamesAndDescriptionsMutex.RLock()
-	defer fake.getAllNamesAndDescriptionsMutex.RUnlock()
+	fake.commandInfoByNameMutex.RLock()
+	defer fake.commandInfoByNameMutex.RUnlock()
+	fake.commandInfosMutex.RLock()
+	defer fake.commandInfosMutex.RUnlock()
 	return fake.invocations
 }
 

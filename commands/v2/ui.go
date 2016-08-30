@@ -4,8 +4,9 @@ package v2
 
 // UI is the interface to STDOUT
 type UI interface {
-	DisplayText(string, ...map[string]interface{})
-	DisplayTextWithKeyTranslations(string, []string, ...map[string]interface{})
+	DisplayText(template string, data ...map[string]interface{})
+	DisplayTextWithKeyTranslations(template string, keysToTranslate []string, data ...map[string]interface{})
 	DisplayNewline()
-	DisplayHelpHeader(string)
+	DisplayHelpHeader(text string)
+	DisplayTable(prefix string, table [][]string)
 }
