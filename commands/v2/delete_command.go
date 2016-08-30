@@ -10,8 +10,8 @@ import (
 
 type DeleteCommand struct {
 	RequiredArgs       flags.AppName `positional-args:"yes"`
-	DeleteMappedRoutes bool          `short:"r" description:"Also delete any mapped routes"`
 	ForceDelete        bool          `short:"f" description:"Force deletion without confirmation"`
+	DeleteMappedRoutes bool          `short:"r" description:"Also delete any mapped routes"`
 	usage              interface{}   `usage:"CF_NAME delete APP_NAME [-r] [-f]"`
 	relatedCommands    interface{}   `related_commands:"apps, scale, stop"`
 }
