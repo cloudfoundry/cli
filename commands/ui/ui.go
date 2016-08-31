@@ -71,7 +71,7 @@ func NewTestUI(out io.Writer) UI {
 
 // DisplayTable presents a two dimentional array of strings as a table
 func (ui UI) DisplayTable(prefix string, table [][]string) {
-	tw := tabwriter.NewWriter(ui.Out, 0, 2, 2, ' ', 0)
+	tw := tabwriter.NewWriter(ui.Out, 0, 1, 2, ' ', 0)
 
 	for _, row := range table {
 		fmt.Fprint(tw, prefix)

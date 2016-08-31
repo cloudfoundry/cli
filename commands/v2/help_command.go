@@ -109,7 +109,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 					if len(info.Alias) > 0 {
 						separator = ","
 					}
-					finalRow = append(finalRow, fmt.Sprintf("%s%s%s\t", info.Name, separator, info.Alias))
+					finalRow = append(finalRow, fmt.Sprintf("%s%s%s", info.Name, separator, info.Alias))
 				}
 			}
 
