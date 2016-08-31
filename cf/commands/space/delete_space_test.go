@@ -71,12 +71,20 @@ var _ = Describe("delete-space command", func() {
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
-		It("fails when not targeting a space", func() {
+		It("fails when not targeting an org and not providing -o", func() {
 			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
 			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
 			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
+		})
+
+		It("succeeds if you use the -o flag but don't have an org targeted", func() {
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
+
+			Expect(runCommand("-o", "other-org", "my-space")).To(BeTrue())
 		})
 	})
 
@@ -123,17 +131,17 @@ var _ = Describe("delete-space command", func() {
 		runCommand("-o", "other-org", "other-space-to-delete")
 
 		Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the space other-space-to-delete"}))
-		// Expect(ui.Outputs()).To(ContainSubstrings(
-		// 	[]string{"Deleting space", "space-to-delete", "other-org", "my-user"},
-		// 	[]string{"OK"},
-		// ))
+		Expect(ui.Outputs()).To(ContainSubstrings(
+			[]string{"Deleting space", "space-to-delete", "other-org", "my-user"},
+			[]string{"OK"},
+		))
 
 		Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("other-org"))
 
 		spaceArg, orgArg := spaceRepo.FindByNameInOrgArgsForCall(0)
 		Expect(spaceArg).To(Equal("other-space-to-delete"))
 		Expect(orgArg).To(Equal("other-org-guid"))
-		// Expect(spaceRepo.DeleteArgsForCall(0)).To(Equal("other-space-to-delete-guid"))
+		Expect(spaceRepo.DeleteArgsForCall(0)).To(Equal("other-space-to-delete-guid"))
 		Expect(config.HasSpace()).To(Equal(true))
 	})
 

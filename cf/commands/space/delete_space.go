@@ -53,8 +53,11 @@ func (cmd *DeleteSpace) Requirements(requirementsFactory requirements.Factory, f
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		requirementsFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
+	}
+
+	if fc.String("o") == "" {
+		reqs = append(reqs, requirementsFactory.NewTargetedOrgRequirement())
 	}
 
 	return reqs, nil
@@ -67,8 +70,8 @@ func (cmd *DeleteSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	return cmd
 }
+
 func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
-	// var err error = nil
 	spaceName := c.Args()[0]
 	orgName := c.String("o")
 	orgGUID := ""
@@ -81,7 +84,7 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
 	if orgGUID == "" {
 		org, err := cmd.orgRepo.FindByName(orgName)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		orgGUID = org.GUID
@@ -96,11 +99,14 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
 	cmd.ui.Say(T("Deleting space {{.TargetSpace}} in org {{.TargetOrg}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"TargetSpace": terminal.EntityNameColor(spaceName),
-			"TargetOrg":   terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			"TargetOrg":   terminal.EntityNameColor(orgName),
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
 	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, orgGUID)
+	if err != nil {
+		return err
+	}
 
 	if c.String("o") == "" {
 		space = cmd.spaceReq.GetSpace()
