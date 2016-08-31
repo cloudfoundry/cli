@@ -4,7 +4,7 @@ image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli
-  path: gopath/src/github.com/cloudfoundry/cli
+  path: gopath/src/code.cloudfoundry.org/cli
 
 run:
   path: bash
@@ -16,6 +16,6 @@ run:
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
 
-    cd $GOPATH/src/github.com/cloudfoundry/cli
+    cd $GOPATH/src/code.cloudfoundry.org/cli
 
     bin/test -race

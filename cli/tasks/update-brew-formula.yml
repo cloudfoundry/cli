@@ -32,7 +32,7 @@ run:
     require 'formula'
 
     class CfCli < Formula
-      homepage 'https://github.com/cloudfoundry/cli'
+      homepage 'https://code.cloudfoundry.org/cli'
       head 'https://cli.run.pivotal.io/edge?arch=macosx64&source=homebrew'
       url 'https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${CLI_VERSION}&source=homebrew'
       version '${CLI_VERSION}'

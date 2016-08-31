@@ -1,5 +1,5 @@
 SET GOPATH=%CD%\gopath
-SET GATSPATH=%GOPATH%\src\github.com\cloudfoundry\cli-acceptance-tests
+SET GATSPATH=%GOPATH%\src\code.cloudfoundry.org\cli-acceptance-tests
 
 SET PATH=C:\Go\bin;%PATH%
 SET PATH=C:\Program Files\Git\cmd\;%PATH%

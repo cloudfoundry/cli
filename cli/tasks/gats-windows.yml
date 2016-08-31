@@ -7,7 +7,7 @@ params:
 
 inputs:
 - name: cli-acceptance-tests
-  path: gopath/src/github.com/cloudfoundry/cli-acceptance-tests
+  path: gopath/src/code.cloudfoundry.org/cli-acceptance-tests
 - name: cf-cli-binaries
 - name: bosh-lite-lock
 - name: cli-ci
