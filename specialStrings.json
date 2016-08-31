@@ -1,0 +1,6 @@
+{
+  "captureGroupSubstrings": [
+    "`.*description:\"(.*)\".*`",
+    "`.*usage:\"(.*)\".*`"
+  ]
+}
