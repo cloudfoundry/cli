@@ -128,7 +128,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 	for i := 0; i < size; i++ {
 		table[i] = make([]string, 3)
 		for j := 0; j < 3; j++ {
-			index := i + j*3
+			index := i + j*size
 			if index < len(pluginCommands) {
 				table[i][j] = pluginCommands[index].Name
 			}

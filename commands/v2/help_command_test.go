@@ -336,8 +336,9 @@ var _ = Describe("Help Command", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeUI.Out).To(Say("Commands offered by installed plugins:"))
-				Expect(fakeUI.Out).To(Say("some-other-plugin-command\\s+disable\\s+enable"))
-				Expect(fakeUI.Out).To(Say("some-other-command\\s+last-plugin-command"))
+				Expect(fakeUI.Out).To(Say("some-other-plugin-command\\s+enable\\s+last-plugin-command"))
+				Expect(fakeUI.Out).To(Say("disable\\s+some-other-command"))
+
 			})
 		})
 	})
