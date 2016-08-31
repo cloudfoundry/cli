@@ -173,9 +173,9 @@ func (cmd HelpCommand) displayAllCommands() {
 						"Gap":                strings.Repeat(" ", longestCmd+1-len(command)),
 					})
 			}
-		}
 
-		cmd.UI.DisplayNewline()
+			cmd.UI.DisplayNewline()
+		}
 	}
 
 	cmd.UI.DisplayHelpHeader("INSTALLED PLUGIN COMMANDS:")
