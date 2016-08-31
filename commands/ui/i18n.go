@@ -12,8 +12,6 @@ import (
 
 const (
 	defaultLocale  = "en-us"
-	lang           = "LANG"
-	lcAll          = "LC_ALL"
 	resourceSuffix = ".all.json"
 	zhTW           = "zh-tw"
 	zhHK           = "zh-hk"

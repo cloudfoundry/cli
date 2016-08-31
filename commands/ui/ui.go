@@ -16,13 +16,13 @@ import (
 )
 
 const (
-	red            color.Attribute = color.FgRed
-	green                          = color.FgGreen
-	yellow                         = color.FgYellow
-	magenta                        = color.FgMagenta
-	cyan                           = color.FgCyan
-	grey                           = color.FgWhite
-	defaultFgColor                 = 38
+	// red            color.Attribute = color.FgRed
+	// green                          = color.FgGreen
+	// yellow                         = color.FgYellow
+	// magenta                        = color.FgMagenta
+	// cyan                           = color.FgCyan
+	// grey                           = color.FgWhite
+	defaultFgColor = 38
 )
 
 //go:generate counterfeiter . Config
