@@ -3,7 +3,7 @@ platform: windows
 
 inputs:
 - name: cli
-  path: gopath/src/github.com/cloudfoundry/cli
+  path: gopath/src/code.cloudfoundry.org/cli
 
 run:
-  path: gopath/src/github.com/cloudfoundry/cli/ci/cli/tasks/units-windows.bat
+  path: gopath/src/code.cloudfoundry.org/cli/ci/cli/tasks/units-windows.bat

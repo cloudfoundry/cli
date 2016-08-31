@@ -4,7 +4,7 @@ image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli
-  path: gopath/src/github.com/cloudfoundry/cli
+  path: gopath/src/code.cloudfoundry.org/cli
 
 params:
   LINT_SLOW: true
@@ -21,6 +21,6 @@ run:
     export GOPATH=$PWD/gopath
     export PATH=$GOPATH/bin:$PATH
 
-    cd $GOPATH/src/github.com/cloudfoundry/cli
-
-    bin/lint
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
+      bin/lint
+    popd

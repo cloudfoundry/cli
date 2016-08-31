@@ -4,7 +4,7 @@ image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli
-  path: gopath/src/github.com/cloudfoundry/cli
+  path: gopath/src/code.cloudfoundry.org/cli
 
 outputs:
 - name: osx-compiled
@@ -23,7 +23,7 @@ run:
 
     go version
 
-    pushd $GOPATH/src/github.com/cloudfoundry/cli
+    pushd $GOPATH/src/code.cloudfoundry.org/cli
       bin/replace-sha
 
       echo "Building 64-bit Darwin"
