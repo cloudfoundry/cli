@@ -32,8 +32,8 @@ run:
     # Put cli-acceptance-tests within a GOPATH-like directory, because it makes
     # references to itself
     export GOPATH=$PWD/gopath
-    mkdir -p $GOPATH/src/github.com/cloudfoundry
-    ln -s $PWD/cli-acceptance-tests $GOPATH/src/github.com/cloudfoundry/cli-acceptance-tests
+    mkdir -p $GOPATH/src/code.cloudfoundry.org
+    ln -s $PWD/cli-acceptance-tests $GOPATH/src/code.cloudfoundry.org/cli-acceptance-tests
 
     go get github.com/onsi/ginkgo/ginkgo
 
@@ -45,7 +45,7 @@ run:
 
     export PATH=$GOPATH/bin:$PATH
 
-    cd $GOPATH/src/github.com/cloudfoundry/cli-acceptance-tests
+    cd $GOPATH/src/code.cloudfoundry.org/cli-acceptance-tests
 
     cat<<EOF > config.json
     {
