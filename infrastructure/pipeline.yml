@@ -245,18 +245,19 @@ jobs:
       resource: bosh-lites-dea-pool
       params:
         claim: {{lite-1-hostname}}
-  - task: create-cf-manifest
-    file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
-    params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
-      LITE_HOSTNAME: {{lite-1-hostname}}
-  - put: bosh-lite-1-deploy-cf
-    params:
-      manifest: bosh-lite-cf-manifest/cf.yml
-      stemcells:
-        - bosh-lite-stemcell/stemcell.tgz
-      releases:
-        - cf-release/release.tgz
+  - do:
+    - task: create-cf-manifest
+      file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+        LITE_HOSTNAME: {{lite-1-hostname}}
+    - put: bosh-lite-1-deploy-cf
+      params:
+        manifest: bosh-lite-cf-manifest/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -390,18 +391,19 @@ jobs:
       resource: bosh-lites-dea-pool
       params:
         claim: {{lite-2-hostname}}
-  - task: create-cf-manifest
-    file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
-    params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
-      LITE_HOSTNAME: {{lite-2-hostname}}
-  - put: bosh-lite-2-deploy-cf
-    params:
-      manifest: bosh-lite-cf-manifest/cf.yml
-      stemcells:
-        - bosh-lite-stemcell/stemcell.tgz
-      releases:
-        - cf-release/release.tgz
+  - do:
+    - task: create-cf-manifest
+      file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+        LITE_HOSTNAME: {{lite-2-hostname}}
+    - put: bosh-lite-2-deploy-cf
+      params:
+        manifest: bosh-lite-cf-manifest/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -535,18 +537,19 @@ jobs:
       resource: bosh-lites-dea-pool
       params:
         claim: {{lite-3-hostname}}
-  - task: create-cf-manifest
-    file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
-    params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
-      LITE_HOSTNAME: {{lite-3-hostname}}
-  - put: bosh-lite-3-deploy-cf
-    params:
-      manifest: bosh-lite-cf-manifest/cf.yml
-      stemcells:
-        - bosh-lite-stemcell/stemcell.tgz
-      releases:
-        - cf-release/release.tgz
+  - do:
+    - task: create-cf-manifest
+      file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+        LITE_HOSTNAME: {{lite-3-hostname}}
+    - put: bosh-lite-3-deploy-cf
+      params:
+        manifest: bosh-lite-cf-manifest/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -680,18 +683,19 @@ jobs:
       resource: bosh-lites-diego-pool
       params:
         claim: {{lite-4-hostname}}
-  - task: create-cf-manifest
-    file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
-    params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
-      LITE_HOSTNAME: {{lite-4-hostname}}
-  - put: bosh-lite-4-deploy-cf
-    params:
-      manifest: bosh-lite-cf-manifest/cf.yml
-      stemcells:
-        - bosh-lite-stemcell/stemcell.tgz
-      releases:
-        - cf-release/release.tgz
+  - do:
+    - task: create-cf-manifest
+      file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
+      params:
+        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_HOSTNAME: {{lite-4-hostname}}
+    - put: bosh-lite-4-deploy-cf
+      params:
+        manifest: bosh-lite-cf-manifest/cf.yml
+        stemcells:
+          - bosh-lite-stemcell/stemcell.tgz
+        releases:
+          - cf-release/release.tgz
     ensure:
       put: bosh-lites-diego-pool
       params:
