@@ -68,5 +68,6 @@ run:
 
     export CONFIG=$PWD/config.json
 
+    CF_API=$DOMAIN ginkgo -r -nodes=4 -slowSpecThreshold=30 -randomizeSuites ./integration
     ginkgo -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites ./gats/application
     ginkgo -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites -skipPackage application ./gats
