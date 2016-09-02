@@ -30,6 +30,10 @@ func parse(args []string) {
 	if flagErr, ok := err.(*flags.Error); ok {
 		switch flagErr.Type {
 		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument:
+			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument {
+				fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
+			}
+
 			_, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
 				func(fieldName string) bool {
 					field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
@@ -54,7 +58,7 @@ func parse(args []string) {
 				os.Exit(1)
 			}
 		case flags.ErrRequired:
-			fmt.Printf("%s\n\n", flagErr.Error())
+			fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
 			parse(append([]string{"help"}, args...))
 			os.Exit(1)
 		case flags.ErrUnknownCommand:
@@ -66,10 +70,10 @@ func parse(args []string) {
 				parse([]string{"help"})
 			}
 		default:
-			fmt.Printf("unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
+			fmt.Fprintf(os.Stderr, "unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 		}
 	} else {
-		fmt.Println("unexpected error:", err.Error())
+		fmt.Fprintf(os.Stderr, "unexpected error: %s\n", err.Error())
 	}
 }
 
