@@ -184,7 +184,8 @@ var _ = Describe("main", func() {
 	It("does not display requirement errors twice", func() {
 		output := Cf("space")
 		Eventually(output).Should(Exit(1))
-		Expect(output.Out).To(Say("the required argument `SPACE` was not provided"))
+		Expect(output.Err).To(Say("the required argument `SPACE` was not provided"))
+		Expect(output.Err).NotTo(Say("the required argument `SPACE` was not provided"))
 		Expect(output.Out).NotTo(Say("the required argument `SPACE` was not provided"))
 	})
 
