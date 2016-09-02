@@ -30,16 +30,29 @@ func parse(args []string) {
 	if flagErr, ok := err.(*flags.Error); ok {
 		switch flagErr.Type {
 		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument:
-			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument {
-				fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
-			}
-
 			_, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
 				func(fieldName string) bool {
 					field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
 					return parser.Active != nil && parser.Active.Name == field.Tag.Get("command")
 				},
 			)
+
+			if found && flagErr.Type == flags.ErrUnknownFlag && parser.Active.Name == "set-env" {
+				newArgs := []string{}
+				for _, arg := range args {
+					if arg[0] == '-' {
+						newArgs = append(newArgs, fmt.Sprintf("%s%s", v2.WorkAroundPrefix, arg))
+					} else {
+						newArgs = append(newArgs, arg)
+					}
+				}
+				parse(newArgs)
+				return
+			}
+
+			if flagErr.Type == flags.ErrUnknownFlag || flagErr.Type == flags.ErrExpectedArgument {
+				fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
+			}
 
 			if found {
 				parse([]string{"help", parser.Active.Name})
