@@ -8,6 +8,9 @@ import (
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
+// WorkAroundPrefix is the flag in hole emoji
+const WorkAroundPrefix = "\U000026f3"
+
 type SetEnvCommand struct {
 	RequiredArgs    flags.SetEnvironmentArgs `positional-args:"yes"`
 	usage           interface{}              `usage:"CF_NAME set-env APP_NAME ENV_VAR_NAME ENV_VAR_VALUE"`
@@ -19,6 +22,7 @@ func (_ SetEnvCommand) Setup(config commands.Config, ui commands.UI) error {
 }
 
 func (_ SetEnvCommand) Execute(args []string) error {
+	//TODO: Be sure to sanitize the WorkAroundPrefix
 	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 	return nil
 }
