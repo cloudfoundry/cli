@@ -264,6 +264,9 @@ var _ = Describe("Help Command", func() {
 			err := cmd.Execute(nil)
 			Expect(err).ToNot(HaveOccurred())
 
+			Expect(fakeUI.Out).To(Say("faceman version BUILT_FROM_SOURCE-BUILT_AT_UNKNOWN_TIME, Cloud Foundry command line tool"))
+			Expect(fakeUI.Out).To(Say("Usage: faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
+
 			Expect(fakeUI.Out).To(Say("Before getting started:"))
 			Expect(fakeUI.Out).To(Say("help,h\\s+logout,lo"))
 

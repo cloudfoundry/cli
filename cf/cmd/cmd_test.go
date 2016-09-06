@@ -172,7 +172,7 @@ var _ = Describe("main", func() {
 
 	It("can print help menu by executing only the command `cf`", func() {
 		output := Cf()
-		Eventually(output.Out.Contents).Should(ContainSubstring("A command line tool to interact with Cloud Foundry"))
+		Eventually(output.Out.Contents).Should(ContainSubstring("Cloud Foundry command line tool"))
 	})
 
 	It("show user suggested commands for typos", func() {
