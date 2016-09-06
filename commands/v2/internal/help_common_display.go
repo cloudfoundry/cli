@@ -5,7 +5,7 @@ var CommonHelpCategoryList = []HelpCategory{
 		CategoryName: "Before getting started:",
 		CommandList: [][]string{
 			{"config", "login", "target"},
-			{"help", "logout"},
+			{"help", "logout", ""},
 		},
 	},
 
@@ -14,10 +14,10 @@ var CommonHelpCategoryList = []HelpCategory{
 		CommandList: [][]string{
 			{"apps", "logs", "set-env"},
 			{"push", "ssh", "create-app-manifest"},
-			{"start", "app"},
-			{"stop", "env"},
-			{"restart", "scale"},
-			{"restage", "events"},
+			{"start", "app", ""},
+			{"stop", "env", ""},
+			{"restart", "scale", ""},
+			{"restage", "events", ""},
 		},
 	},
 
@@ -39,8 +39,8 @@ var CommonHelpCategoryList = []HelpCategory{
 		CategoryName: "Route and domain management:",
 		CommandList: [][]string{
 			{"routes", "delete-route", "create-domain"},
-			{"domains", "map-route"},
-			{"create-route", "unmap-route"},
+			{"domains", "map-route", ""},
+			{"create-route", "unmap-route", ""},
 		},
 	},
 
@@ -64,7 +64,7 @@ var CommonHelpCategoryList = []HelpCategory{
 		CategoryName: "CLI plugin management:",
 		CommandList: [][]string{
 			{"plugins", "add-plugin-repo", "repo-plugins"},
-			{"install-plugin", "list-plugin-repos"},
+			{"install-plugin", "list-plugin-repos", ""},
 		},
 	},
 }

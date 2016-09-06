@@ -57,8 +57,8 @@ func (cmd HelpCommand) Execute(args []string) error {
 }
 
 func (cmd HelpCommand) displayFullHelp() {
-	cmd.displayHelpPreamble()
 	if cmd.AllCommands {
+		cmd.displayHelpPreamble()
 		cmd.displayAllCommands()
 		cmd.displayHelpFooter()
 	} else {
@@ -96,6 +96,24 @@ func (cmd HelpCommand) displayHelpPreamble() {
 func (cmd HelpCommand) displayCommonCommands() {
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
 
+	cmd.UI.DisplayTextWithKeyTranslations("{{.CommandName}} {{.VersionCommand}} {{.Version}}-{{.Time}}, {{.CLI}}",
+		[]string{"VersionCommand", "CLI"},
+		map[string]interface{}{
+			"CommandName":    cmd.Config.BinaryName(),
+			"VersionCommand": "version",
+			"Version":        cf.Version,
+			"Time":           cf.BuiltOnDate,
+			"CLI":            "Cloud Foundry command line tool",
+		})
+	cmd.UI.DisplayTextWithKeyTranslations("{{.Usage}} {{.CommandName}} {{.CommandUsage}}",
+		[]string{"Usage", "CommandUsage"},
+		map[string]interface{}{
+			"Usage":        "Usage:",
+			"CommandName":  cmd.Config.BinaryName(),
+			"CommandUsage": "[global options] command [arguments...] [command options]",
+		})
+	cmd.UI.DisplayNewline()
+
 	for _, category := range internal.CommonHelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 		table := [][]string{}
@@ -116,7 +134,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 			table = append(table, finalRow)
 		}
 
-		cmd.UI.DisplayTable("   ", table)
+		cmd.UI.DisplayTable("  ", table)
 		cmd.UI.DisplayNewline()
 	}
 
