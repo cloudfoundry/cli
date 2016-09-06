@@ -155,7 +155,10 @@ func (cmd *SSH) Execute(fc flags.FlagContext) error {
 		if exitError, ok := err.(*ssh.ExitError); ok {
 			exitStatus := exitError.ExitStatus()
 			if sig := exitError.Signal(); sig != "" {
-				cmd.ui.Say(fmt.Sprintf(T("Process terminated by signal: %s. Exited with")+" %d.\n", sig, exitStatus))
+				cmd.ui.Say(T("Process terminated by signal: {{.Signal}}. Exited with {{.ExitCode}}", map[string]interface{}{
+					"Signal":   sig,
+					"ExitCode": exitStatus,
+				}))
 			}
 			os.Exit(exitStatus)
 		} else {

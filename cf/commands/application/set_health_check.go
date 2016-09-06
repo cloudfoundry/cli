@@ -75,7 +75,13 @@ func (cmd *SetHealthCheck) Execute(fc flags.FlagContext) error {
 		return nil
 	}
 
-	cmd.ui.Say(fmt.Sprintf(T("Updating %s health_check_type to '%s'"), app.Name, healthCheckType))
+	cmd.ui.Say(fmt.Sprintf(T(""), app.Name, healthCheckType))
+	cmd.ui.Say(T("Updating {{.AppName}} health_check_type to '{{.HealthCheckType}}'",
+		map[string]interface{}{
+			"AppName":         app.Name,
+			"HealthCheckType": healthCheckType,
+		},
+	))
 	cmd.ui.Say("")
 
 	updatedApp, err := cmd.appRepo.Update(app.GUID, models.AppParams{HealthCheckType: &healthCheckType})

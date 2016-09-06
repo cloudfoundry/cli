@@ -103,7 +103,7 @@ to be logged in, and the actual behavior of the command itself. You can find it 
 
 ## i18n
 
-If you are adding new strings or updating existing strings within the CLI code, you'll need to update the binary representation of the translation files. This file is generated/maintained using [i18n4go](https://github.com/krishicks/i18n4go), [goi18n](https://github.com/nicksnyder/go-i18n), and `bin/generate-language-resources`.
+If you are adding new strings or updating existing strings within the CLI code, you'll need to update the binary representation of the translation files. This file is generated/maintained using [i18n4go](https://github.com/XenoPhex/i18n4go), [goi18n](https://github.com/nicksnyder/go-i18n), and `bin/generate-language-resources`.
 
 After adding/changing strings supplied to the goi18n `T()` translation func, run the following to update the translations binary:
 

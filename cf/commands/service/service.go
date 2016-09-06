@@ -29,6 +29,7 @@ func init() {
 func (cmd *ShowService) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["guid"] = &flags.BoolFlag{Name: "guid", Usage: T("Retrieve and display the given service's guid.  All other output for the service is suppressed.")}
+	T("user-provided")
 
 	return commandregistry.CommandMetadata{
 		Name:        "service",

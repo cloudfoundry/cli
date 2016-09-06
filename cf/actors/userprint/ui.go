@@ -1,8 +1,6 @@
 package userprint
 
 import (
-	"fmt"
-
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
@@ -38,7 +36,9 @@ func (p *OrgUsersUIPrinter) PrintUsers(guid string, username string) {
 		p.UI.Say("%s", terminal.HeaderColor(displayName))
 
 		if len(users) == 0 {
-			p.UI.Say(fmt.Sprintf("  "+T("No %s found"), displayName))
+			p.UI.Say("  " + T("No {{.Role}} found", map[string]interface{}{
+				"Role": displayName,
+			}))
 		} else {
 			for _, user := range users {
 				p.UI.Say("  %s", user.Username)
@@ -63,7 +63,9 @@ func (p *SpaceUsersUIPrinter) PrintUsers(guid string, username string) {
 		p.UI.Say("%s", terminal.HeaderColor(displayName))
 
 		if len(users) == 0 {
-			p.UI.Say(fmt.Sprintf("  "+T("No %s found"), displayName))
+			p.UI.Say("  " + T("No {{.Role}} found", map[string]interface{}{
+				"Role": displayName,
+			}))
 		} else {
 			for _, user := range users {
 				p.UI.Say("  %s", user.Username)
