@@ -8,10 +8,6 @@
     "translation": "Failed to create a local temporary zip file for the buildpack"
   },
   {
-    "id": "Max wait time to establish a connection, including name resolution, in seconds",
-    "translation": "Max wait time to establish a connection, including name resolution, in seconds"
-  },
-  {
     "id": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute",
     "translation": "Option '--no-hostname' cannot be used with an app manifest containing the 'routes' attribute"
   }

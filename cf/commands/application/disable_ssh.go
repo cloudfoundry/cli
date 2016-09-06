@@ -67,7 +67,11 @@ func (cmd *DisableSSH) Execute(fc flags.FlagContext) error {
 		return nil
 	}
 
-	cmd.ui.Say(fmt.Sprintf(T("Disabling ssh support for '%s'..."), app.Name))
+	cmd.ui.Say(T("Disabling ssh support for '{{.AppName}}'...",
+		map[string]interface{}{
+			"AppName": app.Name,
+		},
+	))
 	cmd.ui.Say("")
 
 	enable := false

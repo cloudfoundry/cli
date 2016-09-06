@@ -12,7 +12,7 @@ echo "Installing go-i18n..."
 go get -u github.com/nicksnyder/go-i18n/goi18n
 
 echo "Installing i18n4go..."
-go get -u github.com/krishicks/i18n4go/i18n4go
+go get -u github.com/XenoPhex/i18n4go/i18n4go
 
 echo "Installing go-bindata..."
 go get -u github.com/jteeuwen/go-bindata/...

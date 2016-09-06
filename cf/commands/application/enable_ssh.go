@@ -63,11 +63,15 @@ func (cmd *EnableSSH) Execute(fc flags.FlagContext) error {
 	app := cmd.appReq.GetApplication()
 
 	if app.EnableSSH {
-		cmd.ui.Say(fmt.Sprintf(T("ssh support is already enabled")+" for '%s'", app.Name))
+		cmd.ui.Say(T("ssh support is already enabled for '{{.AppName}}'", map[string]interface{}{
+			"AppName": app.Name,
+		}))
 		return nil
 	}
 
-	cmd.ui.Say(fmt.Sprintf(T("Enabling ssh support for '%s'..."), app.Name))
+	cmd.ui.Say(T("Enabling ssh support for '{{.AppName}}'...", map[string]interface{}{
+		"AppName": app.Name,
+	}))
 	cmd.ui.Say("")
 
 	enable := true

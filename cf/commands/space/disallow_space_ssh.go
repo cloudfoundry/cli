@@ -66,7 +66,11 @@ func (cmd *DisallowSpaceSSH) Execute(fc flags.FlagContext) error {
 		return nil
 	}
 
-	cmd.ui.Say(fmt.Sprintf(T("Disabling ssh support for space '%s'..."), space.Name))
+	cmd.ui.Say(T("Disabling ssh support for space '{{.SpaceName}}'...",
+		map[string]interface{}{
+			"SpaceName": space.Name,
+		},
+	))
 	cmd.ui.Say("")
 
 	err := cmd.spaceRepo.SetAllowSSH(space.GUID, false)

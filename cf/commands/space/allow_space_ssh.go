@@ -62,11 +62,19 @@ func (cmd *AllowSpaceSSH) Execute(fc flags.FlagContext) error {
 	space := cmd.spaceReq.GetSpace()
 
 	if space.AllowSSH {
-		cmd.ui.Say(fmt.Sprintf(T("ssh support is already enabled in space ")+"'%s'", space.Name))
+		cmd.ui.Say(T("ssh support is already enabled in space '{{.SpaceName}}'",
+			map[string]interface{}{
+				"SpaceName": space.Name,
+			},
+		))
 		return nil
 	}
 
-	cmd.ui.Say(fmt.Sprintf(T("Enabling ssh support for space '%s'..."), space.Name))
+	cmd.ui.Say(T("Enabling ssh support for space '{{.SpaceName}}'...",
+		map[string]interface{}{
+			"SpaceName": space.Name,
+		},
+	))
 	cmd.ui.Say("")
 
 	err := cmd.spaceRepo.SetAllowSSH(space.GUID, true)
