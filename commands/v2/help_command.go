@@ -350,7 +350,7 @@ func (cmd HelpCommand) displayCommand() error {
 }
 
 func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
-	for _, pluginConfig := range cmd.Config.PluginConfig() {
+	for _, pluginConfig := range cmd.Config.Plugins() {
 		for _, command := range pluginConfig.Commands {
 			if command.Name == cmd.OptionalArgs.CommandName {
 				return internal.ConvertPluginToCommandInfo(command), true
@@ -362,7 +362,7 @@ func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
 }
 
 func (cmd HelpCommand) getSortedPluginCommands() config.PluginCommands {
-	plugins := cmd.Config.PluginConfig()
+	plugins := cmd.Config.Plugins()
 
 	sortedPluginNames := sortutils.Alphabetic{}
 	for plugin, _ := range plugins {

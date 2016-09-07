@@ -17,20 +17,27 @@ const (
 	DefaultStartupTimeout = 5 * time.Minute
 	// DefaultPingerThrottle = 5 * time.Second
 
-	DefaultTarget       = "https://api.bosh-lite.com"
-	DefaultColorEnabled = "true"
-	DefaultLocale       = ""
+	DefaultTarget         = "https://api.bosh-lite.com"
+	DefaultColorEnabled   = "true"
+	DefaultLocale         = ""
+	DefaultPluginRepoName = "CF-Community"
+	DefaultPluginRepoURL  = "https://plugins.cloudfoundry.org"
 )
 
 func LoadConfig() (*Config, error) {
-	filePath := defaultFilePath()
+	filePath := ConfigFilePath()
 
 	var config Config
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		config = Config{
-			configFile: CFConfig{
-				Target:       DefaultTarget,
-				ColorEnabled: DefaultColorEnabled,
+			ConfigFile: CFConfig{
+				ConfigVersion: 3,
+				Target:        DefaultTarget,
+				ColorEnabled:  DefaultColorEnabled,
+				PluginRepos: []PluginRepos{{
+					Name: DefaultPluginRepoName,
+					URL:  DefaultPluginRepoURL,
+				}},
 			},
 		}
 	} else {
@@ -39,13 +46,13 @@ func LoadConfig() (*Config, error) {
 			return nil, err
 		}
 
-		err = json.Unmarshal(file, &config.configFile)
+		err = json.Unmarshal(file, &config.ConfigFile)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	config.env = EnvOverride{
+	config.ENV = EnvOverride{
 		BinaryName:       os.Args[0],
 		CFColor:          os.Getenv("CF_COLOR"),
 		CFPluginHome:     os.Getenv("CF_PLUGIN_HOME"),
@@ -75,37 +82,51 @@ func LoadConfig() (*Config, error) {
 	return &config, nil
 }
 
+func WriteConfig(c *Config) error {
+	rawConfig, err := json.MarshalIndent(c.ConfigFile, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(filepath.Join(homeDirectory(), ".cf"), 0700)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(ConfigFilePath(), rawConfig, 0600)
+}
+
 type Config struct {
-	configFile   CFConfig
-	env          EnvOverride
+	ConfigFile   CFConfig
+	ENV          EnvOverride
 	pluginConfig PluginsConfig
 }
 
 type CFConfig struct {
-	ConfigVersion            int                `json:"ConfigVersion"`
-	Target                   string             `json:"Target"`
-	APIVersion               string             `json:"APIVersion"`
-	AuthorizationEndpoint    string             `json:"AuthorizationEndpoint"`
-	LoggregatorEndpoint      string             `json:"LoggregatorEndPoint"`
-	DopplerEndpoint          string             `json:"DopplerEndPoint"`
-	UAAEndpoint              string             `json:"UaaEndpoint"`
-	RoutingAPIEndpoint       string             `json:"RoutingAPIEndpoint"`
-	AccessToken              string             `json:"AccessToken"`
-	SSHOAuthClient           string             `json:"SSHOAuthClient"`
-	RefreshToken             string             `json:"RefreshToken"`
-	OrganizationFields       OrganizationFields `json:"OrganizationFields"`
-	SpaceFields              SpaceFields        `json:"SpaceFields"`
-	SSLDisabled              bool               `json:"SSLDisabled"`
-	AsyncTimeout             int                `json:"AsyncTimeout"`
-	Trace                    string             `json:"Trace"`
-	ColorEnabled             string             `json:"ColorEnabled"`
-	Locale                   string             `json:"Locale"`
-	PluginRepos              []PluginRepos      `json:"PluginRepos"`
-	MinCLIVersion            string             `json:"MinCLIVersion"`
-	MinRecommendedCLIVersion string             `json:"MinRecommendedCLIVersion"`
+	ConfigVersion            int           `json:"ConfigVersion"`
+	Target                   string        `json:"Target"`
+	APIVersion               string        `json:"APIVersion"`
+	AuthorizationEndpoint    string        `json:"AuthorizationEndpoint"`
+	LoggregatorEndpoint      string        `json:"LoggregatorEndPoint"`
+	DopplerEndpoint          string        `json:"DopplerEndPoint"`
+	UAAEndpoint              string        `json:"UaaEndpoint"`
+	RoutingAPIEndpoint       string        `json:"RoutingAPIEndpoint"`
+	AccessToken              string        `json:"AccessToken"`
+	SSHOAuthClient           string        `json:"SSHOAuthClient"`
+	RefreshToken             string        `json:"RefreshToken"`
+	TargetedOrganization     Organization  `json:"OrganizationFields"`
+	TargetedSpace            Space         `json:"SpaceFields"`
+	SSLDisabled              bool          `json:"SSLDisabled"`
+	AsyncTimeout             int           `json:"AsyncTimeout"`
+	Trace                    string        `json:"Trace"`
+	ColorEnabled             string        `json:"ColorEnabled"`
+	Locale                   string        `json:"Locale"`
+	PluginRepos              []PluginRepos `json:"PluginRepos"`
+	MinCLIVersion            string        `json:"MinCLIVersion"`
+	MinRecommendedCLIVersion string        `json:"MinRecommendedCLIVersion"`
 }
 
-type OrganizationFields struct {
+type Organization struct {
 	GUID            string          `json:"GUID"`
 	Name            string          `json:"Name"`
 	QuotaDefinition QuotaDefinition `json:"QuotaDefinition"`
@@ -123,7 +144,7 @@ type QuotaDefinition struct {
 	TotalReservedRoutePorts int    `json:"total_reserved_route_ports"`
 }
 
-type SpaceFields struct {
+type Space struct {
 	GUID     string `json:"GUID"`
 	Name     string `json:"Name"`
 	AllowSSH bool   `json:"AllowSSH"`
@@ -148,10 +169,10 @@ type EnvOverride struct {
 }
 
 type PluginsConfig struct {
-	Plugins map[string]PluginConfig `json:"Plugins"`
+	Plugins map[string]Plugin `json:"Plugins"`
 }
 
-type PluginConfig struct {
+type Plugin struct {
 	Location string         `json:"Location"`
 	Version  PluginVersion  `json:"Version"`
 	Commands PluginCommands `json:"Commands"`
@@ -190,14 +211,14 @@ const (
 )
 
 func (config *Config) ColorEnabled() ColorSetting {
-	if config.env.CFColor != "" {
-		val, err := strconv.ParseBool(config.env.CFColor)
+	if config.ENV.CFColor != "" {
+		val, err := strconv.ParseBool(config.ENV.CFColor)
 		if err == nil {
 			return config.boolToColorSetting(val)
 		}
 	}
 
-	val, err := strconv.ParseBool(config.configFile.ColorEnabled)
+	val, err := strconv.ParseBool(config.ConfigFile.ColorEnabled)
 	if err != nil {
 		return ColorEnabled
 	}
@@ -213,24 +234,24 @@ func (_ *Config) boolToColorSetting(val bool) ColorSetting {
 }
 
 func (conf *Config) Target() string {
-	return conf.configFile.Target
+	return conf.ConfigFile.Target
 }
 
 func (config *Config) PluginHome() string {
-	if config.env.CFPluginHome != "" {
-		return filepath.Join(config.env.CFPluginHome, ".cf", "plugins")
+	if config.ENV.CFPluginHome != "" {
+		return filepath.Join(config.ENV.CFPluginHome, ".cf", "plugins")
 	}
 
 	return filepath.Join(homeDirectory(), ".cf", "plugins")
 }
 
-func (config *Config) PluginConfig() map[string]PluginConfig {
+func (config *Config) Plugins() map[string]Plugin {
 	return config.pluginConfig.Plugins
 }
 
 func (config *Config) StagingTimeout() time.Duration {
-	if config.env.CFStagingTimeout != "" {
-		val, err := strconv.ParseInt(config.env.CFStagingTimeout, 10, 64)
+	if config.ENV.CFStagingTimeout != "" {
+		val, err := strconv.ParseInt(config.ENV.CFStagingTimeout, 10, 64)
 		if err == nil {
 			return time.Duration(val) * time.Minute
 		}
@@ -240,8 +261,8 @@ func (config *Config) StagingTimeout() time.Duration {
 }
 
 func (config *Config) StartupTimeout() time.Duration {
-	if config.env.CFStartupTimeout != "" {
-		val, err := strconv.ParseInt(config.env.CFStartupTimeout, 10, 64)
+	if config.ENV.CFStartupTimeout != "" {
+		val, err := strconv.ParseInt(config.ENV.CFStartupTimeout, 10, 64)
 		if err == nil {
 			return time.Duration(val) * time.Minute
 		}
@@ -251,31 +272,59 @@ func (config *Config) StartupTimeout() time.Duration {
 }
 
 func (config *Config) HTTPSProxy() string {
-	if config.env.HTTPSProxy != "" {
-		return config.env.HTTPSProxy
+	if config.ENV.HTTPSProxy != "" {
+		return config.ENV.HTTPSProxy
 	}
 
 	return ""
 }
 
 func (config *Config) Locale() string {
-	if config.configFile.Locale != "" {
-		return config.configFile.Locale
+	if config.ConfigFile.Locale != "" {
+		return config.ConfigFile.Locale
 	}
 
-	if config.env.LCAll != "" {
-		return config.convertLocale(config.env.LCAll)
+	if config.ENV.LCAll != "" {
+		return config.convertLocale(config.ENV.LCAll)
 	}
 
-	if config.env.Lang != "" {
-		return config.convertLocale(config.env.Lang)
+	if config.ENV.Lang != "" {
+		return config.convertLocale(config.ENV.Lang)
 	}
 
 	return DefaultLocale
 }
 
 func (config *Config) BinaryName() string {
-	return config.env.BinaryName
+	return config.ENV.BinaryName
+}
+
+func (config *Config) SetOrganizationInformation(guid string, name string) {
+	config.ConfigFile.TargetedOrganization.GUID = guid
+	config.ConfigFile.TargetedOrganization.Name = name
+	config.ConfigFile.TargetedOrganization.QuotaDefinition = QuotaDefinition{}
+}
+
+func (config *Config) SetSpaceInformation(guid string, name string, allowSSH bool) {
+	config.ConfigFile.TargetedSpace.GUID = guid
+	config.ConfigFile.TargetedSpace.Name = name
+	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH
+}
+
+func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string) {
+	config.ConfigFile.Target = api
+	config.ConfigFile.APIVersion = apiVersion
+	config.ConfigFile.AuthorizationEndpoint = auth
+	config.ConfigFile.LoggregatorEndpoint = loggregator
+	config.ConfigFile.DopplerEndpoint = doppler
+	config.ConfigFile.UAAEndpoint = uaa
+
+	config.SetOrganizationInformation("", "")
+	config.SetSpaceInformation("", "", false)
+}
+
+func (config *Config) PluginRepos() []PluginRepos {
+	return config.ConfigFile.PluginRepos
 }
 
 func (config *Config) convertLocale(local string) string {

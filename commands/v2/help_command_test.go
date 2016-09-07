@@ -23,7 +23,7 @@ var _ = Describe("Help Command", func() {
 	)
 
 	BeforeEach(func() {
-		fakeUI = ui.NewTestUI(NewBuffer())
+		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeHelpActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
@@ -214,8 +214,8 @@ var _ = Describe("Help Command", func() {
 					CommandName: "enable-diego",
 				}
 
-				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
-					"Diego-Enabler": config.PluginConfig{
+				fakeConfig.PluginsReturns(map[string]config.Plugin{
+					"Diego-Enabler": config.Plugin{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "enable-diego",
@@ -298,8 +298,8 @@ var _ = Describe("Help Command", func() {
 
 		Context("when there are multiple installed plugins", func() {
 			BeforeEach(func() {
-				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
-					"some-plugin": config.PluginConfig{
+				fakeConfig.PluginsReturns(map[string]config.Plugin{
+					"some-plugin": config.Plugin{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "enable",
@@ -315,7 +315,7 @@ var _ = Describe("Help Command", func() {
 							},
 						},
 					},
-					"Some-other-plugin": config.PluginConfig{
+					"Some-other-plugin": config.Plugin{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "some-other-plugin-command",
@@ -323,7 +323,7 @@ var _ = Describe("Help Command", func() {
 							},
 						},
 					},
-					"the-last-plugin": config.PluginConfig{
+					"the-last-plugin": config.Plugin{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "last-plugin-command",
@@ -355,8 +355,8 @@ var _ = Describe("Help Command", func() {
 				cmd.AllCommands = true
 
 				cmd.Actor = v2actions.NewActor()
-				fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
-					"Diego-Enabler": config.PluginConfig{
+				fakeConfig.PluginsReturns(map[string]config.Plugin{
+					"Diego-Enabler": config.Plugin{
 						Commands: []config.PluginCommand{
 							{
 								Name:     "enable-diego",
@@ -462,8 +462,8 @@ var _ = Describe("Help Command", func() {
 
 			Context("when there are multiple installed plugins", func() {
 				BeforeEach(func() {
-					fakeConfig.PluginConfigReturns(map[string]config.PluginConfig{
-						"some-plugin": config.PluginConfig{
+					fakeConfig.PluginsReturns(map[string]config.Plugin{
+						"some-plugin": config.Plugin{
 							Commands: []config.PluginCommand{
 								{
 									Name:     "enable",
@@ -479,7 +479,7 @@ var _ = Describe("Help Command", func() {
 								},
 							},
 						},
-						"Some-other-plugin": config.PluginConfig{
+						"Some-other-plugin": config.Plugin{
 							Commands: []config.PluginCommand{
 								{
 									Name:     "some-other-plugin-command",
@@ -487,7 +487,7 @@ var _ = Describe("Help Command", func() {
 								},
 							},
 						},
-						"the-last-plugin": config.PluginConfig{
+						"the-last-plugin": config.Plugin{
 							Commands: []config.PluginCommand{
 								{
 									Name:     "last-plugin-command",

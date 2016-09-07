@@ -246,6 +246,8 @@
     "BUILT_AT_UNKNOWN_TIME",
     "BUILT_FROM_SOURCE",
     "CF_NAME",
+    "CLI",
+    "VersionCommand",
     "/v2/routes?",
     ";provider:",
     "?inline-relations-depth=1",

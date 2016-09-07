@@ -7,10 +7,9 @@ import (
 	"unicode/utf8"
 
 	"code.cloudfoundry.org/cli/cf"
-	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
-	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/utils/config"
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
 )
@@ -19,19 +18,13 @@ var _ = initI18nFunc()
 var Commands = NewRegistry()
 
 func initI18nFunc() bool {
-	errorHandler := func(err error) {
-		if err != nil {
-			fmt.Println(FailureColor("FAILED"))
-			fmt.Println("Error read/writing config: ", err.Error())
-			os.Exit(1)
-		}
-	}
-
-	configPath, err := confighelpers.DefaultFilePath()
+	config, err := config.LoadConfig()
 	if err != nil {
-		errorHandler(err)
+		fmt.Println(FailureColor("FAILED"))
+		fmt.Println("Error read/writing config: ", err.Error())
+		os.Exit(1)
 	}
-	T = Init(coreconfig.NewRepositoryFromFilepath(configPath, errorHandler))
+	T = Init(config)
 	return true
 }
 

@@ -9,5 +9,6 @@ type Config interface {
 	BinaryName() string
 	ColorEnabled() config.ColorSetting
 	Locale() string
-	PluginConfig() map[string]config.PluginConfig
+	Plugins() map[string]config.Plugin
+	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string)
 }
