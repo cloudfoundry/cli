@@ -4284,6 +4284,10 @@
     "translation": "儲存庫: "
   },
   {
+    "id": "Request error: {{.Error}}\nTIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection.",
+    "translation": "Request error: {{.Error}}\nTIP: If you are behind a firewall and require an HTTP proxy, verify the https_proxy environment variable is correctly set. Else, check your network connection."
+  },
+  {
     "id": "Request pseudo-tty allocation",
     "translation": "要求 pseudo-tty 配置"
   },

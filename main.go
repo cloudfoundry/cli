@@ -17,6 +17,7 @@ import (
 
 type UI interface {
 	DisplayError(err ui.TranslatableError)
+	DisplayErrorMessage(err string, keys ...map[string]interface{})
 }
 
 var ErrFailed = errors.New("command failed")
@@ -28,7 +29,7 @@ func main() {
 
 func parse(args []string) {
 	parser := flags.NewParser(&v2.Commands, flags.HelpFlag)
-	parser.CommandHandler = myCommandHandler
+	parser.CommandHandler = executionWrapper
 	extraArgs, err := parser.ParseArgs(args)
 	if err == nil {
 		return
@@ -96,10 +97,11 @@ func parse(args []string) {
 		os.Exit(1)
 	} else {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
+		os.Exit(1)
 	}
 }
 
-func myCommandHandler(cmd flags.Commander, args []string) error {
+func executionWrapper(cmd flags.Commander, args []string) error {
 	cfConfig, err := config.LoadConfig()
 	if err != nil {
 		return err
@@ -114,12 +116,12 @@ func myCommandHandler(cmd flags.Commander, args []string) error {
 
 		err = extendedCmd.Setup(cfConfig, commandUI)
 		if err != nil {
-			return err
+			return handleError(err, commandUI)
 		}
 		return handleError(extendedCmd.Execute(args), commandUI)
 	}
 
-	return fmt.Errorf("unable to setup command")
+	return fmt.Errorf("command does not conform to ExtendedCommander")
 }
 
 func handleError(err error, commandUI UI) error {
@@ -129,8 +131,8 @@ func handleError(err error, commandUI UI) error {
 
 	if e, ok := err.(ui.TranslatableError); ok {
 		commandUI.DisplayError(e)
-		return ErrFailed
+	} else {
+		commandUI.DisplayErrorMessage(e.Error())
 	}
-
-	return err
+	return ErrFailed
 }
