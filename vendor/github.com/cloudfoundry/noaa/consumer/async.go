@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"bufio"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -12,7 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudfoundry/noaa"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
@@ -84,7 +84,7 @@ func (c *Consumer) FirehoseWithoutReconnect(subscriptionId string, authToken str
 
 // SetDebugPrinter sets the websocket connection to write debug information to
 // debugPrinter.
-func (c *Consumer) SetDebugPrinter(debugPrinter noaa.DebugPrinter) {
+func (c *Consumer) SetDebugPrinter(debugPrinter DebugPrinter) {
 	c.debugPrinter = debugPrinter
 }
 
@@ -257,8 +257,50 @@ func (c *Consumer) newConn() *connection {
 	return conn
 }
 
-func (c *Consumer) establishWebsocketConnection(path string, authToken string) (*websocket.Conn, error) {
-	header := http.Header{"Origin": []string{"http://localhost"}, "Authorization": []string{authToken}}
+func (c *Consumer) websocketConn(path, authToken string) (*websocket.Conn, error) {
+	if authToken == "" && c.refreshTokens {
+		return c.websocketConnNewToken(path)
+	}
+
+	var err error
+	ws, httpErr := c.tryWebsocketConnection(path, authToken)
+	if httpErr != nil {
+		err = httpErr.error
+		if httpErr.statusCode == http.StatusUnauthorized && c.refreshTokens {
+			ws, err = c.websocketConnNewToken(path)
+		}
+	}
+	return ws, err
+}
+
+func (c *Consumer) websocketConnNewToken(path string) (*websocket.Conn, error) {
+	token, err := c.getToken()
+	if err != nil {
+		return nil, err
+	}
+	ws, httpErr := c.tryWebsocketConnection(path, token)
+	if httpErr != nil {
+		return nil, httpErr.error
+	}
+	return ws, nil
+}
+
+func (c *Consumer) establishWebsocketConnection(path, authToken string) (*websocket.Conn, error) {
+	ws, err := c.websocketConn(path, authToken)
+	if err != nil {
+		return nil, err
+	}
+
+	callback := c.onConnectCallback()
+	if err == nil && callback != nil {
+		callback()
+	}
+
+	return ws, nil
+}
+
+func (c *Consumer) tryWebsocketConnection(path, token string) (*websocket.Conn, *httpError) {
+	header := http.Header{"Origin": []string{"http://localhost"}, "Authorization": []string{token}}
 	url := c.trafficControllerUrl + path
 
 	c.debugPrinter.Print("WEBSOCKET REQUEST:",
@@ -274,22 +316,21 @@ func (c *Consumer) establishWebsocketConnection(path string, authToken string) (
 				headersString(resp.Header))
 	}
 
-	if resp != nil && resp.StatusCode == http.StatusUnauthorized {
-		bodyData, _ := ioutil.ReadAll(resp.Body)
-		err = noaa_errors.NewUnauthorizedError(string(bodyData))
-		return ws, err
+	httpErr := &httpError{}
+	if resp != nil {
+		if resp.StatusCode == http.StatusUnauthorized {
+			bodyData, _ := ioutil.ReadAll(resp.Body)
+			err = noaa_errors.NewUnauthorizedError(string(bodyData))
+		}
+		httpErr.statusCode = resp.StatusCode
 	}
-
-	callback := c.onConnectCallback()
-	if err == nil && callback != nil {
-		callback()
-	}
-
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Error dialing traffic controller server: %s.\nPlease ask your Cloud Foundry Operator to check the platform configuration (traffic controller is %s).", err.Error(), c.trafficControllerUrl))
+		errMsg := "Error dialing trafficcontroller server: %s.\n" +
+			"Please ask your Cloud Foundry Operator to check the platform configuration (trafficcontroller is %s)."
+		httpErr.error = errors.New(fmt.Sprintf(errMsg, err.Error(), c.trafficControllerUrl))
+		return nil, httpErr
 	}
-
-	return ws, err
+	return ws, nil
 }
 
 func (c *Consumer) proxyDial(network, addr string) (net.Conn, error) {
@@ -311,6 +352,15 @@ func (c *Consumer) proxyDial(network, addr string) (net.Conn, error) {
 		return net.Dial(network, addr)
 	}
 
+	connectHeader := make(http.Header)
+	if user := proxyUrl.User; user != nil {
+		proxyUser := user.Username()
+		if proxyPassword, passwordSet := user.Password(); passwordSet {
+			credential := base64.StdEncoding.EncodeToString([]byte(proxyUser + ":" + proxyPassword))
+			connectHeader.Set("Proxy-Authorization", "Basic "+credential)
+		}
+	}
+
 	proxyConn, err := net.Dial(network, proxyUrl.Host)
 	if err != nil {
 		return nil, err
@@ -320,7 +370,7 @@ func (c *Consumer) proxyDial(network, addr string) (net.Conn, error) {
 		Method: "CONNECT",
 		URL:    targetUrl,
 		Host:   targetUrl.Host,
-		Header: make(http.Header),
+		Header: connectHeader,
 	}
 	connectReq.Write(proxyConn)
 
