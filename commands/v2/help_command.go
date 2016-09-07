@@ -95,6 +95,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 
 func (cmd HelpCommand) displayCommonCommands() {
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
+	prefix := "  "
 
 	cmd.UI.DisplayTextWithKeyTranslations("{{.CommandName}} {{.VersionCommand}} {{.Version}}-{{.Time}}, {{.CLI}}",
 		[]string{"VersionCommand", "CLI"},
@@ -134,7 +135,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 			table = append(table, finalRow)
 		}
 
-		cmd.UI.DisplayTable("  ", table)
+		cmd.UI.DisplayTable(prefix, table)
 		cmd.UI.DisplayNewline()
 	}
 
@@ -153,17 +154,17 @@ func (cmd HelpCommand) displayCommonCommands() {
 		}
 	}
 
-	cmd.UI.DisplayTable("   ", table)
+	cmd.UI.DisplayTable(prefix, table)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHelpHeader("Global options:")
-	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}                         {{.Description}}",
+	cmd.UI.DisplayTextWithKeyTranslations(prefix+"{{.ENVName}}                         {{.Description}}",
 		[]string{"Description"},
 		map[string]interface{}{
 			"ENVName":     "--help, -h",
 			"Description": "Show help",
 		})
-	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}                                 {{.Description}}",
+	cmd.UI.DisplayTextWithKeyTranslations(prefix+"{{.ENVName}}                                 {{.Description}}",
 		[]string{"Description"},
 		map[string]interface{}{
 			"ENVName":     "-v",
