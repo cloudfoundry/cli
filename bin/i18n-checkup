@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
-mkdir lang_temp
+tmpdir=$(mktemp -d)
 function cleanup {
-   rm -rf lang_temp
+  rm -rf ${tmpdir}
 }
 trap cleanup EXIT
 
@@ -23,11 +23,11 @@ fi
 
 IGNORE_FILES_REGEX=".*test.go|.*resources.go|fake.*\.go|template.go"
 
-i18n4go -c extract-strings -e excluded.json -s specialStrings.json -o lang_temp -d commands -r --ignore-regexp $IGNORE_FILES_REGEX
-i18n4go -c extract-strings -e excluded.json -s specialStrings.json -o lang_temp -d cf -r --ignore-regexp $IGNORE_FILES_REGEX
-i18n4go -c merge-strings -v -d lang_temp
+i18n4go -c extract-strings -e excluded.json -s specialStrings.json -o ${tmpdir} -d commands -r --ignore-regexp $IGNORE_FILES_REGEX
+i18n4go -c extract-strings -e excluded.json -s specialStrings.json -o ${tmpdir} -d cf -r --ignore-regexp $IGNORE_FILES_REGEX
+i18n4go -c merge-strings -d ${tmpdir}
 
-i18n4go -c fixup --source-language-file lang_temp/en.all.json
+i18n4go -c fixup --source-language-file ${tmpdir}/en.all.json
 
 set +e
 
@@ -44,4 +44,6 @@ if [[ $(git status --porcelain cf/i18n/resources) ]]; then
     exit 1
   fi
 fi
+
+git checkout cf/i18n/resources/en-us.untranslated.json
 
