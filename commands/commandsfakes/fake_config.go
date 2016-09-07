@@ -27,11 +27,21 @@ type FakeConfig struct {
 	localeReturns     struct {
 		result1 string
 	}
-	PluginConfigStub        func() map[string]config.PluginConfig
-	pluginConfigMutex       sync.RWMutex
-	pluginConfigArgsForCall []struct{}
-	pluginConfigReturns     struct {
-		result1 map[string]config.PluginConfig
+	PluginsStub        func() map[string]config.Plugin
+	pluginsMutex       sync.RWMutex
+	pluginsArgsForCall []struct{}
+	pluginsReturns     struct {
+		result1 map[string]config.Plugin
+	}
+	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string)
+	setTargetInformationMutex       sync.RWMutex
+	setTargetInformationArgsForCall []struct {
+		api         string
+		apiVersion  string
+		auth        string
+		loggregator string
+		doppler     string
+		uaa         string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -112,29 +122,58 @@ func (fake *FakeConfig) LocaleReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) PluginConfig() map[string]config.PluginConfig {
-	fake.pluginConfigMutex.Lock()
-	fake.pluginConfigArgsForCall = append(fake.pluginConfigArgsForCall, struct{}{})
-	fake.recordInvocation("PluginConfig", []interface{}{})
-	fake.pluginConfigMutex.Unlock()
-	if fake.PluginConfigStub != nil {
-		return fake.PluginConfigStub()
+func (fake *FakeConfig) Plugins() map[string]config.Plugin {
+	fake.pluginsMutex.Lock()
+	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
+	fake.recordInvocation("Plugins", []interface{}{})
+	fake.pluginsMutex.Unlock()
+	if fake.PluginsStub != nil {
+		return fake.PluginsStub()
 	} else {
-		return fake.pluginConfigReturns.result1
+		return fake.pluginsReturns.result1
 	}
 }
 
-func (fake *FakeConfig) PluginConfigCallCount() int {
-	fake.pluginConfigMutex.RLock()
-	defer fake.pluginConfigMutex.RUnlock()
-	return len(fake.pluginConfigArgsForCall)
+func (fake *FakeConfig) PluginsCallCount() int {
+	fake.pluginsMutex.RLock()
+	defer fake.pluginsMutex.RUnlock()
+	return len(fake.pluginsArgsForCall)
 }
 
-func (fake *FakeConfig) PluginConfigReturns(result1 map[string]config.PluginConfig) {
-	fake.PluginConfigStub = nil
-	fake.pluginConfigReturns = struct {
-		result1 map[string]config.PluginConfig
+func (fake *FakeConfig) PluginsReturns(result1 map[string]config.Plugin) {
+	fake.PluginsStub = nil
+	fake.pluginsReturns = struct {
+		result1 map[string]config.Plugin
 	}{result1}
+}
+
+func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string) {
+	fake.setTargetInformationMutex.Lock()
+	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
+		api         string
+		apiVersion  string
+		auth        string
+		loggregator string
+		doppler     string
+		uaa         string
+	}{api, apiVersion, auth, loggregator, doppler, uaa})
+	fake.recordInvocation("SetTargetInformation", []interface{}{api, apiVersion, auth, loggregator, doppler, uaa})
+	fake.setTargetInformationMutex.Unlock()
+	if fake.SetTargetInformationStub != nil {
+		fake.SetTargetInformationStub(api, apiVersion, auth, loggregator, doppler, uaa)
+	}
+}
+
+func (fake *FakeConfig) SetTargetInformationCallCount() int {
+	fake.setTargetInformationMutex.RLock()
+	defer fake.setTargetInformationMutex.RUnlock()
+	return len(fake.setTargetInformationArgsForCall)
+}
+
+func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string) {
+	fake.setTargetInformationMutex.RLock()
+	defer fake.setTargetInformationMutex.RUnlock()
+	return fake.setTargetInformationArgsForCall[i].api, fake.setTargetInformationArgsForCall[i].apiVersion, fake.setTargetInformationArgsForCall[i].auth, fake.setTargetInformationArgsForCall[i].loggregator, fake.setTargetInformationArgsForCall[i].doppler, fake.setTargetInformationArgsForCall[i].uaa
 }
 
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
@@ -146,8 +185,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
-	fake.pluginConfigMutex.RLock()
-	defer fake.pluginConfigMutex.RUnlock()
+	fake.pluginsMutex.RLock()
+	defer fake.pluginsMutex.RUnlock()
+	fake.setTargetInformationMutex.RLock()
+	defer fake.setTargetInformationMutex.RUnlock()
 	return fake.invocations
 }
 

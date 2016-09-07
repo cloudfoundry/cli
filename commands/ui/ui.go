@@ -5,9 +5,9 @@ package ui
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"text/tabwriter"
-	"text/template"
 
 	"github.com/fatih/color"
 
@@ -16,11 +16,11 @@ import (
 )
 
 const (
-	// red            color.Attribute = color.FgRed
-	// green                          = color.FgGreen
+	red   color.Attribute = color.FgRed
+	green                 = color.FgGreen
 	// yellow                         = color.FgYellow
 	// magenta                        = color.FgMagenta
-	// cyan                           = color.FgCyan
+	cyan = color.FgCyan
 	// grey                           = color.FgWhite
 	defaultFgColor = 38
 )
@@ -36,17 +36,30 @@ type Config interface {
 	Locale() string
 }
 
+//go:generate counterfeiter . TranslatableError
+
+// TranslatableError it wraps the error interface adding a way to set the
+// translation function on the error
+type TranslatableError interface {
+	Error() string
+	SetTranslation(i18n.TranslateFunc)
+}
+
 // UI is interface to interact with the user
 type UI struct {
 	// Out is the output buffer
 	Out io.Writer
+
+	// Err is the error buffer
+	Err io.Writer
 
 	colorEnabled config.ColorSetting
 
 	translate i18n.TranslateFunc
 }
 
-// NewUI will return a UI object where Out is set to STDOUT
+// NewUI will return a UI object where Out is set to STDOUT and Err is set to
+// STDERR
 func NewUI(c Config) (UI, error) {
 	translateFunc, err := GetTranslationFunc(c)
 	if err != nil {
@@ -55,21 +68,24 @@ func NewUI(c Config) (UI, error) {
 
 	return UI{
 		Out:          color.Output,
+		Err:          os.Stderr,
 		colorEnabled: c.ColorEnabled(),
 		translate:    translateFunc,
 	}, nil
 }
 
-// NewTestUI will return a UI object where Out is customizable
-func NewTestUI(out io.Writer) UI {
+// NewTestUI will return a UI object where Out and Err are customizable, and
+// colors are disabled
+func NewTestUI(out io.Writer, err io.Writer) UI {
 	return UI{
 		Out:          out,
+		Err:          err,
 		colorEnabled: config.ColorDisbled,
-		translate:    i18n.TranslateFunc(func(s string, _ ...interface{}) string { return s }),
+		translate:    translationWrapper(i18n.IdentityTfunc()),
 	}
 }
 
-// DisplayTable presents a two dimentional array of strings as a table
+// DisplayTable presents a two dimentional array of strings as a table to UI.Out
 func (ui UI) DisplayTable(prefix string, table [][]string) {
 	tw := tabwriter.NewWriter(ui.Out, 0, 1, 4, ' ', 0)
 
@@ -82,54 +98,86 @@ func (ui UI) DisplayTable(prefix string, table [][]string) {
 }
 
 // DisplayText combines the formattedString template with the key maps and then
-// outputs it to the UI.Out file. The maps are merged in a way that the last
-// one takes precidence over the first. Prior to outputting the
-// formattedString, it is run through the an internationalization function to
-// translate it to a pre-cofigured langauge.
+// outputs it to the UI.Out file. Prior to outputting the formattedString, it
+// is run through the an internationalization function to translate it to a
+// pre-configured langauge. Only the first map in keys is used.
 func (ui UI) DisplayText(formattedString string, keys ...map[string]interface{}) {
-	mergedMap := ui.mergeMap(keys)
-	translatedFormatString := ui.translate(formattedString, mergedMap)
-	formattedTemplate := template.Must(template.New("Display Text").Parse(translatedFormatString))
-	formattedTemplate.Execute(ui.Out, mergedMap)
-	ui.DisplayNewline()
+	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
+	fmt.Fprintf(ui.Out, "%s\n", translatedValue)
 }
 
-// DisplayTextWithKeyTranslations merges keys together (similar to
-// DisplayText), translates the keys listed in keysToTranslate, and then passes
-// these values to DisplayText.
+// DisplayTextWithKeyTranslations translates the keys listed in
+// keysToTranslate, and then passes these values to DisplayText. Only the first
+// map in keys is used.
 func (ui UI) DisplayTextWithKeyTranslations(formattedString string, keysToTranslate []string, keys ...map[string]interface{}) {
-	mergedMap := ui.mergeMap(keys)
+	templateValues := ui.templateValuesFromKeys(keys)
 	for _, key := range keysToTranslate {
-		mergedMap[key] = ui.translate(mergedMap[key].(string))
+		templateValues[key] = ui.translate(templateValues[key].(string))
 	}
-	ui.DisplayText(formattedString, mergedMap)
+	fmt.Fprintf(ui.Out, "%s\n", ui.translate(formattedString, templateValues))
 }
 
-// DisplayNewline outputs a newline.
+// DisplayNewline outputs a newline to UI.Out.
 func (ui UI) DisplayNewline() {
 	fmt.Fprintf(ui.Out, "\n")
 }
 
-// DisplayHelpHeader translates and then bolds the help header.
-func (ui UI) DisplayHelpHeader(text string) {
-	fmt.Fprintf(ui.Out, ui.colorize(ui.translate(text), defaultFgColor, true))
-	ui.DisplayNewline()
+// DisplayPair outputs the "attribute: formattedString" pair to UI.Out. keys
+// are applied to the translation of formattedString, while attribute is
+// translated directly.
+func (ui UI) DisplayPair(attribute string, formattedString string, keys ...map[string]interface{}) {
+	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
+	fmt.Fprintf(ui.Out, "%s: %s\n", ui.translate(attribute), translatedValue)
 }
 
-func (ui UI) mergeMap(maps []map[string]interface{}) map[string]interface{} {
-	if len(maps) == 1 {
-		return maps[0]
+// DisplayHelpHeader translates and then bolds the help header. Sends output to
+// UI.Out.
+func (ui UI) DisplayHelpHeader(text string) {
+	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(ui.translate(text), defaultFgColor, true))
+}
+
+// DisplayHeaderFlavorText outputs the translated text, with cyan color keys,
+// to UI.Out.
+func (ui UI) DisplayHeaderFlavorText(formattedString string, keys ...map[string]interface{}) {
+	templateValues := ui.templateValuesFromKeys(keys)
+	for key, value := range templateValues {
+		templateValues[key] = ui.colorize(fmt.Sprint(value), cyan, true)
 	}
 
-	main := map[string]interface{}{}
+	translatedValue := ui.translate(formattedString, templateValues)
+	fmt.Fprintf(ui.Out, "%s\n", translatedValue)
+}
 
-	for _, minor := range maps {
-		for key, value := range minor {
-			main[key] = value
-		}
+// DisplayOK outputs a green translated "OK" message to UI.Out.
+func (ui UI) DisplayOK() {
+	translatedFormatString := ui.translate("OK", nil)
+	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, green, true))
+}
+
+// DisplayErrorMessage combines the err template with the key maps and then
+// outputs it to the UI.Err file. Prior to outputting the err, it is run
+// through the an internationalization function to translate it to a
+// pre-configured langauge.
+func (ui UI) DisplayErrorMessage(err string, keys ...map[string]interface{}) {
+	translatedValue := ui.translate(err, ui.templateValuesFromKeys(keys))
+	fmt.Fprintf(ui.Err, "%s\n", translatedValue)
+}
+
+// DisplayError outputs the error to UI.Err and ouputs a red translated
+// "FAILED" to UI.Out.
+func (ui UI) DisplayError(err TranslatableError) {
+	err.SetTranslation(ui.translate)
+	fmt.Fprintf(ui.Err, "%s\n", err.Error())
+
+	translatedFormatString := ui.translate("FAILED", nil)
+	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, red, true))
+}
+
+func (ui UI) templateValuesFromKeys(keys []map[string]interface{}) map[string]interface{} {
+	if len(keys) > 0 {
+		return keys[0]
 	}
-
-	return main
+	return map[string]interface{}{}
 }
 
 func (ui UI) colorize(message string, textColor color.Attribute, bold bool) string {

@@ -1,9 +1,11 @@
 package ui
 
 import (
+	"bytes"
 	"fmt"
 	"path"
 	"strings"
+	"text/template"
 
 	"code.cloudfoundry.org/cli/cf/resources"
 	"github.com/nicksnyder/go-i18n/i18n"
@@ -21,15 +23,44 @@ const (
 )
 
 func GetTranslationFunc(config Config) (i18n.TranslateFunc, error) {
-	err := loadAsset("cf/i18n/resources/" + defaultLocale + resourceSuffix)
+	t, err := getConfiguredLocal(config)
 	if err != nil {
 		return nil, err
 	}
-	defaultTfunc := i18n.MustTfunc(defaultLocale)
 
+	if t == nil {
+		t, err = getDefaultLocal()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return translationWrapper(t), nil
+}
+
+func translationWrapper(translationFunc i18n.TranslateFunc) i18n.TranslateFunc {
+	return func(translationID string, args ...interface{}) string {
+		var keys interface{}
+		if len(args) > 0 {
+			keys = args[0]
+		}
+
+		if translated := translationFunc(translationID, keys); translated != translationID {
+			return translated
+		}
+
+		var buffer bytes.Buffer
+		formattedTemplate := template.Must(template.New("Display Text").Parse(translationID))
+		formattedTemplate.Execute(&buffer, keys)
+
+		return buffer.String()
+	}
+}
+
+func getConfiguredLocal(config Config) (i18n.TranslateFunc, error) {
+	source := config.Locale()
 	assetNames := resources.AssetNames()
 
-	source := config.Locale()
 	for _, l := range language.Parse(source) {
 		if l.Tag == zhTW || l.Tag == zhHK {
 			l.Tag = zhHant
@@ -43,20 +74,21 @@ func GetTranslationFunc(config Config) (i18n.TranslateFunc, error) {
 					return nil, err
 				}
 
-				t := i18n.MustTfunc(l.Tag)
-
-				return func(translationID string, args ...interface{}) string {
-					if translated := t(translationID, args...); translated != translationID {
-						return translated
-					}
-
-					return defaultTfunc(translationID, args...)
-				}, nil
+				return i18n.MustTfunc(l.Tag), nil
 			}
 		}
 	}
 
-	return defaultTfunc, nil
+	return nil, nil
+}
+
+func getDefaultLocal() (i18n.TranslateFunc, error) {
+	err := loadAsset("cf/i18n/resources/" + defaultLocale + resourceSuffix)
+	if err != nil {
+		return nil, err
+	}
+
+	return i18n.MustTfunc(defaultLocale), nil
 }
 
 func loadAsset(assetName string) error {

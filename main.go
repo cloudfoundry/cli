@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -13,6 +14,12 @@ import (
 	"code.cloudfoundry.org/cli/utils/panichandler"
 	"github.com/jessevdk/go-flags"
 )
+
+type UI interface {
+	DisplayError(err ui.TranslatableError)
+}
+
+var ErrFailed = errors.New("command failed")
 
 func main() {
 	defer panichandler.HandlePanic()
@@ -83,29 +90,47 @@ func parse(args []string) {
 				parse([]string{"help"})
 			}
 		default:
-			fmt.Fprintf(os.Stderr, "unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
+			fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 		}
+	} else if err == ErrFailed {
+		os.Exit(1)
 	} else {
-		fmt.Fprintf(os.Stderr, "unexpected error: %s\n", err.Error())
+		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 	}
 }
 
 func myCommandHandler(cmd flags.Commander, args []string) error {
-	config, _ := config.LoadConfig()
-	//defer write config
-	var err error
-	commandUI, err := ui.NewUI(config)
+	cfConfig, err := config.LoadConfig()
 	if err != nil {
 		return err
 	}
+	defer config.WriteConfig(cfConfig)
 
 	if extendedCmd, ok := cmd.(commands.ExtendedCommander); ok {
-		err := extendedCmd.Setup(config, commandUI)
+		commandUI, err := ui.NewUI(cfConfig)
 		if err != nil {
 			return err
 		}
-		return extendedCmd.Execute(args)
+
+		err = extendedCmd.Setup(cfConfig, commandUI)
+		if err != nil {
+			return err
+		}
+		return handleError(extendedCmd.Execute(args), commandUI)
 	}
 
 	return fmt.Errorf("unable to setup command")
+}
+
+func handleError(err error, commandUI UI) error {
+	if err == nil {
+		return nil
+	}
+
+	if e, ok := err.(ui.TranslatableError); ok {
+		commandUI.DisplayError(e)
+		return ErrFailed
+	}
+
+	return err
 }

@@ -18,7 +18,7 @@ func homeDirectory() string {
 	return homeDir
 }
 
-// DefaultFilePath returns the location of the config file
-func defaultFilePath() string {
+// ConfigFilePath returns the location of the config file
+func ConfigFilePath() string {
 	return filepath.Join(homeDirectory(), ".cf", "config.json")
 }

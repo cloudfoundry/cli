@@ -1616,6 +1616,10 @@
     "translation": "Cloud Foundry API 버전 {{.APIVer}}에는 CLI 버전 {{.CLIMin}}이(가) 필요합니다. 현재 버전 {{.CLIVer}}에 있습니다. CLI를 업그레이드하려면 https://github.com/cloudfoundry/cli#downloads를 방문하십시오."
   },
   {
+    "id": "Cloud Foundry command line tool",
+    "translation": "Cloud Foundry command line tool"
+  },
+  {
     "id": "Comma delimited list of ports the application may listen on",
     "translation": "애플리케이션이 청취할 수 있는 포트를 쉼표로 구분한 목록"
   },
@@ -3246,6 +3250,10 @@
   {
     "id": "Invalid Role {{.Role}}",
     "translation": "올바르지 않은 역할 {{.Role}}"
+  },
+  {
+    "id": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
+    "translation": "Invalid SSL Cert for {{.API}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"
   },
   {
     "id": "Invalid SSL Cert for {{.URL}}\n{{.TipMessage}}",
@@ -5502,6 +5510,14 @@
   {
     "id": "Uploading {{.ZipFileBytes}}, {{.FileCount}} files",
     "translation": "{{.ZipFileBytes}}, {{.FileCount}} 파일 업로드"
+  },
+  {
+    "id": "Usage",
+    "translation": "Usage"
+  },
+  {
+    "id": "Usage:",
+    "translation": "Usage:"
   },
   {
     "id": "Use '{{.Command}}' for more information",

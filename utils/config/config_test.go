@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -59,8 +60,12 @@ var _ = Describe("Config", func() {
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
 			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
 			Expect(config.Locale()).To(BeEmpty())
+			Expect(config.PluginRepos()).To(Equal([]PluginRepos{{
+				Name: "CF-Community",
+				URL:  "https://plugins.cloudfoundry.org",
+			}}))
 
-			pluginConfig := config.PluginConfig()
+			pluginConfig := config.Plugins()
 			Expect(pluginConfig).To(BeEmpty())
 		})
 	})
@@ -111,7 +116,7 @@ var _ = Describe("Config", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(config).ToNot(BeNil())
 
-			plugins := config.PluginConfig()
+			plugins := config.Plugins()
 			Expect(plugins).ToNot(BeEmpty())
 
 			plugin := plugins["Diego-Enabler"]
@@ -139,7 +144,7 @@ var _ = Describe("Config", func() {
 		}),
 	)
 
-	Describe("Getter Functions", func() {
+	Describe("getter functions", func() {
 		DescribeTable("ColorEnabled",
 			func(configVal string, envVal string, expected ColorSetting) {
 				rawConfig := fmt.Sprintf(`{"ColorEnabled":"%s"}`, configVal)
@@ -267,6 +272,100 @@ var _ = Describe("Config", func() {
 				Expect(config.StagingTimeout()).To(Equal(time.Duration(8675) * time.Minute))
 				Expect(config.StartupTimeout()).To(Equal(time.Duration(309) * time.Minute))
 				Expect(config.HTTPSProxy()).To(Equal("proxy.com"))
+			})
+		})
+	})
+
+	Describe("Write Config", func() {
+		var config *Config
+		BeforeEach(func() {
+			config = &Config{
+				ConfigFile: CFConfig{
+					ConfigVersion: 3,
+					Target:        "foo.com",
+					ColorEnabled:  "true",
+				},
+				ENV: EnvOverride{
+					CFColor: "false",
+				},
+			}
+		})
+
+		It("writes ConfigFile to homeDir/.cf/config.json", func() {
+			err := WriteConfig(config)
+			Expect(err).ToNot(HaveOccurred())
+
+			file, err := ioutil.ReadFile(filepath.Join(homeDir, ".cf", "config.json"))
+			Expect(err).ToNot(HaveOccurred())
+
+			var writtenCFConfig CFConfig
+			err = json.Unmarshal(file, &writtenCFConfig)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(writtenCFConfig.ConfigVersion).To(Equal(config.ConfigFile.ConfigVersion))
+			Expect(writtenCFConfig.Target).To(Equal(config.ConfigFile.Target))
+			Expect(writtenCFConfig.ColorEnabled).To(Equal(config.ConfigFile.ColorEnabled))
+		})
+	})
+
+	Describe("setter functions", func() {
+		Describe("SetTargetInformation", func() {
+			It("sets the api target and other related endpoints", func() {
+				config := Config{
+					ConfigFile: CFConfig{
+						TargetedOrganization: Organization{
+							GUID: "this-is-a-guid",
+							Name: "jo bobo jim boo",
+						},
+						TargetedSpace: Space{
+							GUID:     "this-is-a-guid",
+							Name:     "jo bobo jim boo",
+							AllowSSH: true,
+						},
+					},
+				}
+				config.SetTargetInformation(
+					"https://api.foo.com",
+					"2.59.31",
+					"https://login.foo.com",
+					"wws://loggregator.foo.com:443",
+					"wws://doppler.foo.com:443",
+					"https://uaa.foo.com",
+				)
+
+				Expect(config.ConfigFile.Target).To(Equal("https://api.foo.com"))
+				Expect(config.ConfigFile.APIVersion).To(Equal("2.59.31"))
+				Expect(config.ConfigFile.AuthorizationEndpoint).To(Equal("https://login.foo.com"))
+				Expect(config.ConfigFile.LoggregatorEndpoint).To(Equal("wws://loggregator.foo.com:443"))
+				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
+				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))
+
+				Expect(config.ConfigFile.TargetedOrganization.GUID).To(BeEmpty())
+				Expect(config.ConfigFile.TargetedOrganization.Name).To(BeEmpty())
+				Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
+				Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
+				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+			})
+		})
+
+		Describe("SetOrganizationInformation", func() {
+			It("sets the organization GUID and name", func() {
+				config := Config{}
+				config.SetOrganizationInformation("guid-value-1", "my-org-name")
+
+				Expect(config.ConfigFile.TargetedOrganization.GUID).To(Equal("guid-value-1"))
+				Expect(config.ConfigFile.TargetedOrganization.Name).To(Equal("my-org-name"))
+			})
+		})
+
+		Describe("SetSpaceInformation", func() {
+			It("sets the organization GUID and name", func() {
+				config := Config{}
+				config.SetSpaceInformation("guid-value-1", "my-org-name", true)
+
+				Expect(config.ConfigFile.TargetedSpace.GUID).To(Equal("guid-value-1"))
+				Expect(config.ConfigFile.TargetedSpace.Name).To(Equal("my-org-name"))
+				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeTrue())
 			})
 		})
 	})
