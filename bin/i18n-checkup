@@ -2,7 +2,12 @@
 
 set -e
 
-tmpdir=$(mktemp -d)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  tmpdir=$TMPDIR
+else
+  tmpdir=$(mktemp -d)
+fi
+
 function cleanup {
   rm -rf ${tmpdir}
 }
