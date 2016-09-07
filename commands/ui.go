@@ -10,5 +10,4 @@ type UI interface {
 	DisplayHelpHeader(text string)
 	DisplayTable(prefix string, table [][]string)
 	DisplayHeaderFlavorText(text string, keys ...map[string]interface{})
-	DisplayErrorMessage(err string, keys ...map[string]interface{})
 }

@@ -15,10 +15,13 @@ type FakeTranslatableError struct {
 	errorReturns     struct {
 		result1 string
 	}
-	SetTranslationStub        func(i18n.TranslateFunc)
+	SetTranslationStub        func(i18n.TranslateFunc) error
 	setTranslationMutex       sync.RWMutex
 	setTranslationArgsForCall []struct {
 		arg1 i18n.TranslateFunc
+	}
+	setTranslationReturns struct {
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -49,7 +52,7 @@ func (fake *FakeTranslatableError) ErrorReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeTranslatableError) SetTranslation(arg1 i18n.TranslateFunc) {
+func (fake *FakeTranslatableError) SetTranslation(arg1 i18n.TranslateFunc) error {
 	fake.setTranslationMutex.Lock()
 	fake.setTranslationArgsForCall = append(fake.setTranslationArgsForCall, struct {
 		arg1 i18n.TranslateFunc
@@ -57,7 +60,9 @@ func (fake *FakeTranslatableError) SetTranslation(arg1 i18n.TranslateFunc) {
 	fake.recordInvocation("SetTranslation", []interface{}{arg1})
 	fake.setTranslationMutex.Unlock()
 	if fake.SetTranslationStub != nil {
-		fake.SetTranslationStub(arg1)
+		return fake.SetTranslationStub(arg1)
+	} else {
+		return fake.setTranslationReturns.result1
 	}
 }
 
@@ -71,6 +76,13 @@ func (fake *FakeTranslatableError) SetTranslationArgsForCall(i int) i18n.Transla
 	fake.setTranslationMutex.RLock()
 	defer fake.setTranslationMutex.RUnlock()
 	return fake.setTranslationArgsForCall[i].arg1
+}
+
+func (fake *FakeTranslatableError) SetTranslationReturns(result1 error) {
+	fake.SetTranslationStub = nil
+	fake.setTranslationReturns = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeTranslatableError) Invocations() map[string][][]interface{} {

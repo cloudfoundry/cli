@@ -197,10 +197,11 @@ var _ = Describe("UI", func() {
 
 	Describe("DisplayErrorMessage", func() {
 		Context("when only a string is passed in", func() {
-			It("displays the string to Out with a newline", func() {
+			It("displays the string to Err and outputs FAILED to Out", func() {
 				ui.DisplayErrorMessage("some-string")
 
 				Expect(ui.Err).To(Say("some-string\n"))
+				Expect(ui.Out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
 			})
 		})
 
@@ -211,6 +212,7 @@ var _ = Describe("UI", func() {
 				})
 
 				Expect(ui.Err).To(Say("some-string my-map-value\n"))
+				Expect(ui.Out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
 			})
 
 			Context("when the local is not set to 'en-us'", func() {
@@ -222,11 +224,11 @@ var _ = Describe("UI", func() {
 					var err error
 					ui, err = NewUI(fakeConfig)
 					Expect(err).NotTo(HaveOccurred())
-
+					ui.Out = NewBuffer()
 					ui.Err = NewBuffer()
 				})
 
-				It("translates the main string passed to DisplayText", func() {
+				It("translates the main string that gets passed to err and outputs a translated FAILED", func() {
 					ui.DisplayErrorMessage("\nTIP: Use '{{.Command}}' to target new org",
 						map[string]interface{}{
 							"Command": "foo",
@@ -234,6 +236,7 @@ var _ = Describe("UI", func() {
 					)
 
 					Expect(ui.Err).To(Say("\nASTUCE : utilisez 'foo' pour cibler une nouvelle organisation"))
+					Expect(ui.Out).To(Say("\x1b\\[31;1mECHEC\x1b\\[0m\n"))
 				})
 			})
 		})
@@ -244,20 +247,21 @@ var _ = Describe("UI", func() {
 
 		BeforeEach(func() {
 			fakeTranslateErr = new(uifakes.FakeTranslatableError)
+			fakeTranslateErr.SetTranslationReturns(fakeTranslateErr)
 			fakeTranslateErr.ErrorReturns("I am an error")
+
+			ui.DisplayError(fakeTranslateErr)
 		})
 
 		It("displays the error to Err and displays the FAILED text in red to Out", func() {
-			ui.DisplayError(fakeTranslateErr)
-
-			Expect(fakeTranslateErr.SetTranslationCallCount()).To(Equal(1))
-			Expect(fakeTranslateErr.SetTranslationArgsForCall(0)).NotTo(BeNil())
 			Expect(ui.Err).To(Say("I am an error\n"))
 			Expect(ui.Out).To(Say("\x1b\\[31;1mFAILED\x1b\\[0m\n"))
 		})
 
-		Context("when the local is not set to 'en-us'", func() {
+		Context("when the locale is not set to 'en-us'", func() {
 			It("translates the error text and the FAILED text", func() {
+				Expect(fakeTranslateErr.SetTranslationCallCount()).To(Equal(1))
+				Expect(fakeTranslateErr.SetTranslationArgsForCall(0)).NotTo(BeNil())
 			})
 		})
 	})
