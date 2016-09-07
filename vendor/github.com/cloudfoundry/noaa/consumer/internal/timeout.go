@@ -4,5 +4,5 @@ import "time"
 
 var (
 	// DO NOT USE
-	HandshakeTimeout = 10 * time.Second
+	Timeout = 10 * time.Second
 )
