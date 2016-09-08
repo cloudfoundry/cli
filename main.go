@@ -132,7 +132,7 @@ func handleError(err error, commandUI UI) error {
 	if e, ok := err.(ui.TranslatableError); ok {
 		commandUI.DisplayError(e)
 	} else {
-		commandUI.DisplayErrorMessage(e.Error())
+		commandUI.DisplayErrorMessage(err.Error())
 	}
 	return ErrFailed
 }
