@@ -1284,6 +1284,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME space SPACE [--guid] [--security-group-rules]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME space-quota SPACE_QUOTA_NAME",
     "translation": ""
   },
