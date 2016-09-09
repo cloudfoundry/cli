@@ -1048,6 +1048,10 @@
     "translation": "CF_NAME org ORG"
   },
   {
+    "id": "CF_NAME org ORG [--guid]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME org-users ORG",
     "translation": "CF_NAME org-users ORG"
   },
