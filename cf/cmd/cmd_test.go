@@ -110,10 +110,6 @@ var _ = Describe("main", func() {
 			Eventually(setApiOutput.Out.Contents).Should(ContainSubstring("OK"))
 		})
 
-		AfterEach(func() {
-			Eventually(Cf("api", "nonsense").Out.Contents).Should(ContainSubstring("no such host"))
-		})
-
 		// Normally cf curl only shows the output of the response
 		// When using trace, it also shows the request/response information
 		It("enables verbose output when -v is provided before a command", func() {
@@ -144,15 +140,6 @@ var _ = Describe("main", func() {
 			result = Cf("api", "--h")
 			Consistently(result.Out).ShouldNot(Say("Invalid flag: --h"))
 			Eventually(result.Out.Contents).Should(ContainSubstring("api - Set or view target api url"))
-		})
-
-		It("runs requirement of the command", func() {
-			dir, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
-			fullDir := filepath.Join(dir, "..", "..", "fixtures") //set home to a config w/o targeted api
-			result := CfWith_CF_HOME(fullDir, "app", "app-should-never-exist-blah-blah")
-
-			Eventually(result.Out).Should(Say("No API endpoint set."))
 		})
 	})
 

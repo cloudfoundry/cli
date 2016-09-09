@@ -17,7 +17,7 @@ const (
 	DefaultStartupTimeout = 5 * time.Minute
 	// DefaultPingerThrottle = 5 * time.Second
 
-	DefaultTarget         = "https://api.bosh-lite.com"
+	DefaultTarget         = ""
 	DefaultColorEnabled   = "true"
 	DefaultLocale         = ""
 	DefaultPluginRepoName = "CF-Community"
@@ -116,7 +116,7 @@ type CFConfig struct {
 	RefreshToken             string        `json:"RefreshToken"`
 	TargetedOrganization     Organization  `json:"OrganizationFields"`
 	TargetedSpace            Space         `json:"SpaceFields"`
-	SSLDisabled              bool          `json:"SSLDisabled"`
+	SkipSSLValidation        bool          `json:"SSLDisabled"`
 	AsyncTimeout             int           `json:"AsyncTimeout"`
 	Trace                    string        `json:"Trace"`
 	ColorEnabled             string        `json:"ColorEnabled"`
@@ -237,6 +237,22 @@ func (conf *Config) Target() string {
 	return conf.ConfigFile.Target
 }
 
+func (conf *Config) APIVersion() string {
+	return conf.ConfigFile.APIVersion
+}
+
+func (conf *Config) TargetedOrganization() Organization {
+	return conf.ConfigFile.TargetedOrganization
+}
+
+func (conf *Config) TargetedSpace() Space {
+	return conf.ConfigFile.TargetedSpace
+}
+
+func (conf *Config) CurrentUser() (User, error) {
+	return decodeUserFromJWT(conf.ConfigFile.AccessToken)
+}
+
 func (config *Config) PluginHome() string {
 	if config.ENV.CFPluginHome != "" {
 		return filepath.Join(config.ENV.CFPluginHome, ".cf", "plugins")
@@ -311,13 +327,14 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH
 }
 
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string) {
+func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, skipSSLValidation bool) {
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
 	config.ConfigFile.AuthorizationEndpoint = auth
 	config.ConfigFile.LoggregatorEndpoint = loggregator
 	config.ConfigFile.DopplerEndpoint = doppler
 	config.ConfigFile.UAAEndpoint = uaa
+	config.ConfigFile.SkipSSLValidation = skipSSLValidation
 
 	config.SetOrganizationInformation("", "")
 	config.SetSpaceInformation("", "", false)

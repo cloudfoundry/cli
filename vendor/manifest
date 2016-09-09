@@ -45,6 +45,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/SermoDigital/jose",
+			"repository": "https://github.com/SermoDigital/jose",
+			"vcs": "git",
+			"revision": "5d7fcbc3e492ba754c75700fbfa18bc498a705db",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",

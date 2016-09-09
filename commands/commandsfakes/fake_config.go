@@ -9,6 +9,12 @@ import (
 )
 
 type FakeConfig struct {
+	APIVersionStub        func() string
+	aPIVersionMutex       sync.RWMutex
+	aPIVersionArgsForCall []struct{}
+	aPIVersionReturns     struct {
+		result1 string
+	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct{}
@@ -20,6 +26,13 @@ type FakeConfig struct {
 	colorEnabledArgsForCall []struct{}
 	colorEnabledReturns     struct {
 		result1 config.ColorSetting
+	}
+	CurrentUserStub        func() (config.User, error)
+	currentUserMutex       sync.RWMutex
+	currentUserArgsForCall []struct{}
+	currentUserReturns     struct {
+		result1 config.User
+		result2 error
 	}
 	LocaleStub        func() string
 	localeMutex       sync.RWMutex
@@ -33,18 +46,62 @@ type FakeConfig struct {
 	pluginsReturns     struct {
 		result1 map[string]config.Plugin
 	}
-	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string)
+	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
 	setTargetInformationArgsForCall []struct {
-		api         string
-		apiVersion  string
-		auth        string
-		loggregator string
-		doppler     string
-		uaa         string
+		api               string
+		apiVersion        string
+		auth              string
+		loggregator       string
+		doppler           string
+		uaa               string
+		skipSSLValidation bool
+	}
+	TargetStub        func() string
+	targetMutex       sync.RWMutex
+	targetArgsForCall []struct{}
+	targetReturns     struct {
+		result1 string
+	}
+	TargetedOrganizationStub        func() config.Organization
+	targetedOrganizationMutex       sync.RWMutex
+	targetedOrganizationArgsForCall []struct{}
+	targetedOrganizationReturns     struct {
+		result1 config.Organization
+	}
+	TargetedSpaceStub        func() config.Space
+	targetedSpaceMutex       sync.RWMutex
+	targetedSpaceArgsForCall []struct{}
+	targetedSpaceReturns     struct {
+		result1 config.Space
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeConfig) APIVersion() string {
+	fake.aPIVersionMutex.Lock()
+	fake.aPIVersionArgsForCall = append(fake.aPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("APIVersion", []interface{}{})
+	fake.aPIVersionMutex.Unlock()
+	if fake.APIVersionStub != nil {
+		return fake.APIVersionStub()
+	} else {
+		return fake.aPIVersionReturns.result1
+	}
+}
+
+func (fake *FakeConfig) APIVersionCallCount() int {
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
+	return len(fake.aPIVersionArgsForCall)
+}
+
+func (fake *FakeConfig) APIVersionReturns(result1 string) {
+	fake.APIVersionStub = nil
+	fake.aPIVersionReturns = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeConfig) BinaryName() string {
@@ -97,6 +154,32 @@ func (fake *FakeConfig) ColorEnabledReturns(result1 config.ColorSetting) {
 	}{result1}
 }
 
+func (fake *FakeConfig) CurrentUser() (config.User, error) {
+	fake.currentUserMutex.Lock()
+	fake.currentUserArgsForCall = append(fake.currentUserArgsForCall, struct{}{})
+	fake.recordInvocation("CurrentUser", []interface{}{})
+	fake.currentUserMutex.Unlock()
+	if fake.CurrentUserStub != nil {
+		return fake.CurrentUserStub()
+	} else {
+		return fake.currentUserReturns.result1, fake.currentUserReturns.result2
+	}
+}
+
+func (fake *FakeConfig) CurrentUserCallCount() int {
+	fake.currentUserMutex.RLock()
+	defer fake.currentUserMutex.RUnlock()
+	return len(fake.currentUserArgsForCall)
+}
+
+func (fake *FakeConfig) CurrentUserReturns(result1 config.User, result2 error) {
+	fake.CurrentUserStub = nil
+	fake.currentUserReturns = struct {
+		result1 config.User
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeConfig) Locale() string {
 	fake.localeMutex.Lock()
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
@@ -147,20 +230,21 @@ func (fake *FakeConfig) PluginsReturns(result1 map[string]config.Plugin) {
 	}{result1}
 }
 
-func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string) {
+func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, skipSSLValidation bool) {
 	fake.setTargetInformationMutex.Lock()
 	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
-		api         string
-		apiVersion  string
-		auth        string
-		loggregator string
-		doppler     string
-		uaa         string
-	}{api, apiVersion, auth, loggregator, doppler, uaa})
-	fake.recordInvocation("SetTargetInformation", []interface{}{api, apiVersion, auth, loggregator, doppler, uaa})
+		api               string
+		apiVersion        string
+		auth              string
+		loggregator       string
+		doppler           string
+		uaa               string
+		skipSSLValidation bool
+	}{api, apiVersion, auth, loggregator, doppler, uaa, skipSSLValidation})
+	fake.recordInvocation("SetTargetInformation", []interface{}{api, apiVersion, auth, loggregator, doppler, uaa, skipSSLValidation})
 	fake.setTargetInformationMutex.Unlock()
 	if fake.SetTargetInformationStub != nil {
-		fake.SetTargetInformationStub(api, apiVersion, auth, loggregator, doppler, uaa)
+		fake.SetTargetInformationStub(api, apiVersion, auth, loggregator, doppler, uaa, skipSSLValidation)
 	}
 }
 
@@ -170,25 +254,110 @@ func (fake *FakeConfig) SetTargetInformationCallCount() int {
 	return len(fake.setTargetInformationArgsForCall)
 }
 
-func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string) {
+func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string, bool) {
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
-	return fake.setTargetInformationArgsForCall[i].api, fake.setTargetInformationArgsForCall[i].apiVersion, fake.setTargetInformationArgsForCall[i].auth, fake.setTargetInformationArgsForCall[i].loggregator, fake.setTargetInformationArgsForCall[i].doppler, fake.setTargetInformationArgsForCall[i].uaa
+	return fake.setTargetInformationArgsForCall[i].api, fake.setTargetInformationArgsForCall[i].apiVersion, fake.setTargetInformationArgsForCall[i].auth, fake.setTargetInformationArgsForCall[i].loggregator, fake.setTargetInformationArgsForCall[i].doppler, fake.setTargetInformationArgsForCall[i].uaa, fake.setTargetInformationArgsForCall[i].skipSSLValidation
+}
+
+func (fake *FakeConfig) Target() string {
+	fake.targetMutex.Lock()
+	fake.targetArgsForCall = append(fake.targetArgsForCall, struct{}{})
+	fake.recordInvocation("Target", []interface{}{})
+	fake.targetMutex.Unlock()
+	if fake.TargetStub != nil {
+		return fake.TargetStub()
+	} else {
+		return fake.targetReturns.result1
+	}
+}
+
+func (fake *FakeConfig) TargetCallCount() int {
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
+	return len(fake.targetArgsForCall)
+}
+
+func (fake *FakeConfig) TargetReturns(result1 string) {
+	fake.TargetStub = nil
+	fake.targetReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) TargetedOrganization() config.Organization {
+	fake.targetedOrganizationMutex.Lock()
+	fake.targetedOrganizationArgsForCall = append(fake.targetedOrganizationArgsForCall, struct{}{})
+	fake.recordInvocation("TargetedOrganization", []interface{}{})
+	fake.targetedOrganizationMutex.Unlock()
+	if fake.TargetedOrganizationStub != nil {
+		return fake.TargetedOrganizationStub()
+	} else {
+		return fake.targetedOrganizationReturns.result1
+	}
+}
+
+func (fake *FakeConfig) TargetedOrganizationCallCount() int {
+	fake.targetedOrganizationMutex.RLock()
+	defer fake.targetedOrganizationMutex.RUnlock()
+	return len(fake.targetedOrganizationArgsForCall)
+}
+
+func (fake *FakeConfig) TargetedOrganizationReturns(result1 config.Organization) {
+	fake.TargetedOrganizationStub = nil
+	fake.targetedOrganizationReturns = struct {
+		result1 config.Organization
+	}{result1}
+}
+
+func (fake *FakeConfig) TargetedSpace() config.Space {
+	fake.targetedSpaceMutex.Lock()
+	fake.targetedSpaceArgsForCall = append(fake.targetedSpaceArgsForCall, struct{}{})
+	fake.recordInvocation("TargetedSpace", []interface{}{})
+	fake.targetedSpaceMutex.Unlock()
+	if fake.TargetedSpaceStub != nil {
+		return fake.TargetedSpaceStub()
+	} else {
+		return fake.targetedSpaceReturns.result1
+	}
+}
+
+func (fake *FakeConfig) TargetedSpaceCallCount() int {
+	fake.targetedSpaceMutex.RLock()
+	defer fake.targetedSpaceMutex.RUnlock()
+	return len(fake.targetedSpaceArgsForCall)
+}
+
+func (fake *FakeConfig) TargetedSpaceReturns(result1 config.Space) {
+	fake.TargetedSpaceStub = nil
+	fake.targetedSpaceReturns = struct {
+		result1 config.Space
+	}{result1}
 }
 
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.aPIVersionMutex.RLock()
+	defer fake.aPIVersionMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
+	fake.currentUserMutex.RLock()
+	defer fake.currentUserMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
 	fake.pluginsMutex.RLock()
 	defer fake.pluginsMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
+	fake.targetedOrganizationMutex.RLock()
+	defer fake.targetedOrganizationMutex.RUnlock()
+	fake.targetedSpaceMutex.RLock()
+	defer fake.targetedSpaceMutex.RUnlock()
 	return fake.invocations
 }
 
