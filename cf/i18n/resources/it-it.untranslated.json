@@ -484,6 +484,10 @@
     "translation": "CF_NAME set-staging-environment-variable-group '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'"
   },
   {
+    "id": "CF_NAME space SPACE [--guid] [--security-group-rules]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME space-quotas",
     "translation": "CF_NAME space-quotas"
   },
