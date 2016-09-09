@@ -1770,7 +1770,7 @@ var _ = Describe("Push Command", func() {
 
 				It("fails", func() {
 					Expect(executeErr).To(HaveOccurred())
-					Expect(executeErr.Error()).To(ContainSubstring("Manifest file is not found"))
+					Expect(executeErr.Error()).To(ContainSubstring("Incorrect Usage. The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file."))
 				})
 			})
 		})

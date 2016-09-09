@@ -3212,6 +3212,10 @@
     "translation": "用法不正确。需要 {{.Arguments}}"
   },
   {
+    "id": "Incorrect Usage. The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.",
+    "translation": "在当前目录中找不到清单文件，请提供应用程序名称或清单"
+  },
+  {
     "id": "Incorrect Usage:",
     "translation": "用法不正确: "
   },
@@ -3514,10 +3518,6 @@
   {
     "id": "Manifest file created successfully at ",
     "translation": "清单文件已成功创建，创建时间: "
-  },
-  {
-    "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
-    "translation": "在当前目录中找不到清单文件，请提供应用程序名称或清单"
   },
   {
     "id": "Map a TCP route",

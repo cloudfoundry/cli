@@ -3212,6 +3212,10 @@
     "translation": "Uso incorrecto. Necesita {{.Arguments}}"
   },
   {
+    "id": "Incorrect Usage. The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.",
+    "translation": "No se ha encontrado el archivo de manifiesto en el directorio actual, proporcione un nombre de app o manifiesto"
+  },
+  {
     "id": "Incorrect Usage:",
     "translation": "Uso incorrecto:"
   },
@@ -3514,10 +3518,6 @@
   {
     "id": "Manifest file created successfully at ",
     "translation": "Se ha creado correctamente el archivo de manifiesto en "
-  },
-  {
-    "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
-    "translation": "No se ha encontrado el archivo de manifiesto en el directorio actual, proporcione un nombre de app o manifiesto"
   },
   {
     "id": "Map a TCP route",
