@@ -568,6 +568,10 @@
     "translation": "CF_NAME plugins"
   },
   {
+    "id": "CF_NAME plugins [--checksum]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME purge-service-instance SERVICE_INSTANCE",
     "translation": "CF_NAME purge-service-instance SERVICE_INSTANCE"
   },
