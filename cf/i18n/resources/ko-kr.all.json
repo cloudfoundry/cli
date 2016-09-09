@@ -3212,6 +3212,10 @@
     "translation": "올바르지 않은 사용법입니다. {{.Arguments}}이(가) 필요합니다."
   },
   {
+    "id": "Incorrect Usage. The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.",
+    "translation": "Manifest 파일을 현재 디렉토리에서 찾을 수 없습니다. 앱 이름 또는 Manifest를 제공하십시오."
+  },
+  {
     "id": "Incorrect Usage:",
     "translation": "올바르지 않은 사용법:"
   },
@@ -3514,10 +3518,6 @@
   {
     "id": "Manifest file created successfully at ",
     "translation": "Manifest 파일이 작성된 위치 "
-  },
-  {
-    "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
-    "translation": "Manifest 파일을 현재 디렉토리에서 찾을 수 없습니다. 앱 이름 또는 Manifest를 제공하십시오."
   },
   {
     "id": "Map a TCP route",

@@ -612,7 +612,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams,
 	case 0:
 		if contextApp.Name == nil {
 			return nil, errors.New(
-				T("Manifest file is not found in the current directory, please provide either an app name or manifest") +
+				T("Incorrect Usage. The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.") +
 					"\n\n" +
 					commandregistry.Commands.CommandUsage("push"),
 			)

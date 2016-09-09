@@ -3212,6 +3212,10 @@
     "translation": "Syntaxe incorrecte. Requiert {{.Arguments}}"
   },
   {
+    "id": "Incorrect Usage. The push command requires an app name. The app name can be supplied as an argument or with a manifest.yml file.",
+    "translation": "Le fichier manifeste est introuvable dans le répertoire de travail ; indiquez un nom d'application ou un manifeste."
+  },
+  {
     "id": "Incorrect Usage:",
     "translation": "Syntaxe incorrecte :"
   },
@@ -3514,10 +3518,6 @@
   {
     "id": "Manifest file created successfully at ",
     "translation": "Fichier manifeste créé dans "
-  },
-  {
-    "id": "Manifest file is not found in the current directory, please provide either an app name or manifest",
-    "translation": "Le fichier manifeste est introuvable dans le répertoire de travail ; indiquez un nom d'application ou un manifeste."
   },
   {
     "id": "Map a TCP route",
