@@ -28,6 +28,10 @@
     "translation": "API URL to target"
   },
   {
+    "id": "API version",
+    "translation": ""
+  },
+  {
     "id": "APPS",
     "translation": "APPS"
   },
@@ -1598,6 +1602,10 @@
   {
     "id": "Usage:",
     "translation": "Usage:"
+  },
+  {
+    "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
+    "translation": ""
   },
   {
     "id": "Windows PowerShell",

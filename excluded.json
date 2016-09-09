@@ -229,6 +229,7 @@
     "form-data; name=\"application\"; filename=\"application.zip\"",
     "ftp://",
     "ftps://",
+    "http:",
     "http",
     "http://",
     "http://plugins.cloudfoundry.org",
@@ -548,6 +549,7 @@
     "purge-service-instance",
     "unbind-service",
     "set-health-check",
+    "cf api",
 
     "\rDone uploading",
     ". Process to uninstall ...",

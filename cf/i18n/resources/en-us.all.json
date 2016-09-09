@@ -228,6 +228,10 @@
     "translation": "API endpoint: {{.Endpoint}}"
   },
   {
+    "id": "API version",
+    "translation": ""
+  },
+  {
     "id": "APPS",
     "translation": "APPS"
   },
@@ -5614,6 +5618,10 @@
   {
     "id": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry.",
     "translation": "WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and resources for service instances will not be altered. The primary use case for this operation is to replace a service broker which implements the v1 Service Broker API with a broker which implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend making the v1 plan private or shutting down the v1 broker to prevent additional instances from being created. Once service instances have been migrated, the v1 services and plans can be removed from Cloud Foundry."
+  },
+  {
+    "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended",
+    "translation": ""
   },
   {
     "id": "Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n",
