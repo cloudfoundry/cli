@@ -872,6 +872,14 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME delete-space SPACE [-o]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME delete-space SPACE [-o] [-f]",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
     "translation": ""
   },
@@ -2046,6 +2054,14 @@
   {
     "id": "Delete cancelled",
     "translation": "削除が取り消されました"
+  },
+  {
+    "id": "Delete space within specifid org",
+    "translation": ""
+  },
+  {
+    "id": "Delete space within specified org",
+    "translation": ""
   },
   {
     "id": "Deletes a security group",
