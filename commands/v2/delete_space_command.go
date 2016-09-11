@@ -11,7 +11,8 @@ import (
 type DeleteSpaceCommand struct {
 	RequiredArgs flags.Space `positional-args:"yes"`
 	Force        bool        `short:"f" description:"Force deletion without confirmation"`
-	usage        interface{} `usage:"CF_NAME delete-space SPACE [-f]"`
+	Org          string      `short:"o" description:"Delete space within specified org"`
+	usage        interface{} `usage:"CF_NAME delete-space SPACE [-o] [-f]"`
 }
 
 func (_ DeleteSpaceCommand) Setup(config commands.Config, ui commands.UI) error {
