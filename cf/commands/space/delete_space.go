@@ -53,11 +53,11 @@ func (cmd *DeleteSpace) Requirements(requirementsFactory requirements.Factory, f
 
 	reqs := []requirements.Requirement{
 		requirementsFactory.NewLoginRequirement(),
-		cmd.spaceReq,
 	}
 
 	if fc.String("o") == "" {
 		reqs = append(reqs, requirementsFactory.NewTargetedOrgRequirement())
+		reqs = append(reqs, cmd.spaceReq)
 	}
 
 	return reqs, nil
