@@ -530,8 +530,8 @@ jobs:
     params:
       GPG_KEY: {{gpg_key}}
       KEY_ID:  {{gpg_key_id}}
-      AWS_SECRET_ACCESS_KEY: {{debian_secret_access_key}}
-      AWS_ACCESS_KEY_ID: {{debian_access_key_id}}
+      AWS_SECRET_ACCESS_KEY: {{repository_manager_secret_access_key}}
+      AWS_ACCESS_KEY_ID: {{repository_manager_access_key_id}}
 
 - name: create-cli-ci-image
   serial: true
