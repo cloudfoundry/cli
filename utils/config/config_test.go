@@ -165,13 +165,13 @@ var _ = Describe("Config", func() {
 				Expect(config.ColorEnabled()).To(Equal(expected))
 			},
 			Entry("config=true  env=true  enabled", "true", "true", ColorEnabled),
-			Entry("config=true  env=false disabled", "true", "false", ColorDisbled),
+			Entry("config=true  env=false disabled", "true", "false", ColorDisabled),
 			Entry("config=false env=true  enabled", "false", "true", ColorEnabled),
-			Entry("config=false env=false disabled", "false", "false", ColorDisbled),
+			Entry("config=false env=false disabled", "false", "false", ColorDisabled),
 
-			Entry("config=unset env=false disabled", "", "false", ColorDisbled),
+			Entry("config=unset env=false disabled", "", "false", ColorDisabled),
 			Entry("config=unset env=true  enabled", "", "true", ColorEnabled),
-			Entry("config=false env=unset disabled", "false", "", ColorDisbled),
+			Entry("config=false env=unset disabled", "false", "", ColorDisabled),
 			Entry("config=true  env=unset disabled", "true", "", ColorEnabled),
 
 			Entry("config=unset env=unset falls back to default", "", "", ColorEnabled),

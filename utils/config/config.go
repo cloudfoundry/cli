@@ -244,8 +244,8 @@ type PluginUsageDetails struct {
 type ColorSetting int
 
 const (
-	// ColorDisbled means that no colors/bolding will be displayed
-	ColorDisbled ColorSetting = iota
+	// ColorDisabled means that no colors/bolding will be displayed
+	ColorDisabled ColorSetting = iota
 	// ColorEnabled means colors/bolding will be displayed
 	ColorEnabled
 	// ColorAuto means that the UI should decide if colors/bolding will be
@@ -277,7 +277,7 @@ func (config *Config) boolToColorSetting(val bool) ColorSetting {
 		return ColorEnabled
 	}
 
-	return ColorDisbled
+	return ColorDisabled
 }
 
 // Target returns the CC API URL
