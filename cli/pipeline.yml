@@ -418,6 +418,8 @@ jobs:
           SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
       - task: unix
         file: cli-ci/ci/cli/tasks/create-installers.yml
+        params:
+          GPG_KEY: {{gpg_key}}
       on_failure:
          put: slack-alert
          params:
