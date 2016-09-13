@@ -66,32 +66,32 @@ resources:
   type: s3
   source:
     bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
     versioned_file: cf-cli-binaries.tgz
 
 - name: cf-cli-installers
   type: s3
   source:
     bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
     versioned_file: cf-cli-installers.tgz
 
 - name: cf-cli-installer-win32
   type: s3
   source:
     bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
     versioned_file: cf-cli-installer_win32.zip
 
 - name: cf-cli-installer-win64
   type: s3
   source:
     bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
     versioned_file: cf-cli-installer_winx64.zip
 
 - name: bosh-lites-dea-pool
@@ -455,8 +455,8 @@ jobs:
   - task: publish
     file: cli-ci/ci/cli/tasks/publish-edge-archives.yml
     params:
-      AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+      AWS_ACCESS_KEY_ID: {{cli-production-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-secret-access-key}}
     on_failure:
        put: slack-alert
        params:
@@ -508,8 +508,8 @@ jobs:
   - task: publish
     file: cli-ci/ci/cli/tasks/publish-final-release.yml
     params:
-      AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
+      AWS_ACCESS_KEY_ID: {{cli-production-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-secret-access-key}}
     on_failure:
        put: slack-alert
        params:
@@ -530,8 +530,8 @@ jobs:
     params:
       GPG_KEY: {{gpg_key}}
       KEY_ID:  {{gpg_key_id}}
-      AWS_SECRET_ACCESS_KEY: {{repository_manager_secret_access_key}}
-      AWS_ACCESS_KEY_ID: {{repository_manager_access_key_id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-secret-access-key}}
+      AWS_ACCESS_KEY_ID: {{cli-production-access-key-id}}
 
 - name: create-cli-ci-image
   serial: true
