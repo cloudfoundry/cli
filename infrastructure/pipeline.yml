@@ -225,6 +225,7 @@ jobs:
         AWS_SUBNET_ID: {{lite-aws-subnet-id}}
         LITE_NAME: bosh-lite-1
         LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+        LITE_PUBLIC_IP_ADDRESS: {{lite-1-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -371,6 +372,7 @@ jobs:
         AWS_SUBNET_ID: {{lite-aws-subnet-id}}
         LITE_NAME: bosh-lite-2
         LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+        LITE_PUBLIC_IP_ADDRESS: {{lite-2-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -517,6 +519,7 @@ jobs:
         AWS_SUBNET_ID: {{lite-aws-subnet-id}}
         LITE_NAME: bosh-lite-3
         LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+        LITE_PUBLIC_IP_ADDRESS: {{lite-3-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -663,6 +666,7 @@ jobs:
         AWS_SUBNET_ID: {{lite-aws-subnet-id}}
         LITE_NAME: bosh-lite-4
         LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_PUBLIC_IP_ADDRESS: {{lite-4-public-ip-address}}
     ensure:
       put: bosh-lites-diego-pool
       params:
