@@ -24,9 +24,9 @@ run:
   - |
     set -ex
 
-    pushd bosh-lite
-
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
+
+    pushd bosh-lite
 
     env | sort -
 
