@@ -12,6 +12,7 @@ params:
   AWS_SUBNET_ID:
   LITE_NAME:
   BOSH_LITE_ELASTIC_IP:
+  BOSH_LITE_SUBNET_ID:
 
 inputs:
   - name: cli-private
@@ -39,8 +40,5 @@ run:
     pushd scratch
       vagrant init cloudfoundry/bosh-lite
 
-      # sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.instance_type = 'm3.2xlarge'\n  end/" \
-      #   Vagrantfile
-
-      vagrant up --provider aws --destroy-on-error
+      BOSH_LITE_INSTANCE_TYPE="m3.2xlarge" vagrant up --provider aws --destroy-on-error
     popd
