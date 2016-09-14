@@ -4,14 +4,14 @@ platform: linux
 image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
-  AWS_ACCESS_KEY_ID:
-  AWS_SECRET_ACCESS_KEY:
-  LITE_KEYPAIR:
-  LITE_PRIVATE_KEY_PATH:
-  AWS_SECURITY_GROUP:
-  LITE_NAME:
+  BOSH_LITE_NAME:
+  BOSH_AWS_ACCESS_KEY_ID:
+  BOSH_AWS_SECRET_ACCESS_KEY:
   BOSH_LITE_ELASTIC_IP:
+  BOSH_LITE_KEYPAIR:
+  BOSH_LITE_SECURITY_GROUP:
   BOSH_LITE_SUBNET_ID:
+  LITE_PRIVATE_KEY_PATH:
 
 inputs:
   - name: cli-private
@@ -24,19 +24,9 @@ run:
   - |
     set -ex
 
-    export BOSH_AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
-    export BOSH_AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
-    export BOSH_LITE_KEYPAIR="${LITE_KEYPAIR}"
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
-    export BOSH_LITE_SECURITY_GROUP="${AWS_SECURITY_GROUP}"
-    export BOSH_LITE_NAME="${LITE_NAME}"
     export BOSH_LITE_ROOT="$PWD/bosh-lite"
-    export SCRATCH_ROOT="$PWD/scratch"
 
-    mkdir scratch
+    env | sort -
 
-    pushd scratch
-      vagrant init cloudfoundry/bosh-lite
-
-      BOSH_LITE_INSTANCE_TYPE="m3.2xlarge" vagrant up --provider aws --destroy-on-error
-    popd
+    BOSH_LITE_INSTANCE_TYPE="m3.2xlarge" vagrant up --provider aws --destroy-on-error
