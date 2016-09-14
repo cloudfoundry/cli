@@ -35,7 +35,7 @@ func (cmd *Restart) MetaData() commandregistry.CommandMetadata {
 	return commandregistry.CommandMetadata{
 		Name:        "restart",
 		ShortName:   "rs",
-		Description: T("Stop and restart the app within the existing droplet"),
+		Description: T("Restart the app within its existing container"),
 		Usage: []string{
 			T("CF_NAME restart APP_NAME"),
 		},
