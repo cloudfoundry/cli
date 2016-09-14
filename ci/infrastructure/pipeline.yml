@@ -217,14 +217,14 @@ jobs:
       file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       privileged: true
       params:
-        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        LITE_KEYPAIR: {{lite-keypair}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: bosh-lite-1
+        BOSH_LITE_NAME: bosh-lite-1
+        BOSH_AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        BOSH_AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         BOSH_LITE_ELASTIC_IP: {{lite-1-public-ip-address}}
+        BOSH_LITE_KEYPAIR: {{lite-keypair}}
+        BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -363,14 +363,14 @@ jobs:
       file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       privileged: true
       params:
-        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        LITE_KEYPAIR: {{lite-keypair}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: bosh-lite-2
+        BOSH_LITE_NAME: bosh-lite-2
+        BOSH_AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        BOSH_AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         BOSH_LITE_ELASTIC_IP: {{lite-2-public-ip-address}}
+        BOSH_LITE_KEYPAIR: {{lite-keypair}}
+        BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -509,14 +509,14 @@ jobs:
       file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       privileged: true
       params:
-        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        LITE_KEYPAIR: {{lite-keypair}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: bosh-lite-3
+        BOSH_LITE_NAME: bosh-lite-3
+        BOSH_AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        BOSH_AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         BOSH_LITE_ELASTIC_IP: {{lite-3-public-ip-address}}
+        BOSH_LITE_KEYPAIR: {{lite-keypair}}
+        BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -655,14 +655,14 @@ jobs:
       file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       privileged: true
       params:
-        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        LITE_KEYPAIR: {{lite-keypair}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
-        AWS_SECURITY_GROUP: {{lite-aws-security-group}}
-        LITE_NAME: bosh-lite-4
+        BOSH_LITE_NAME: bosh-lite-4
+        BOSH_AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        BOSH_AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
         BOSH_LITE_ELASTIC_IP: {{lite-4-public-ip-address}}
+        BOSH_LITE_KEYPAIR: {{lite-keypair}}
+        BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
+        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
     ensure:
       put: bosh-lites-diego-pool
       params:
