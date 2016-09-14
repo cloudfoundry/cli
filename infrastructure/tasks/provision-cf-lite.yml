@@ -11,7 +11,7 @@ params:
   AWS_SECURITY_GROUP:
   AWS_SUBNET_ID:
   LITE_NAME:
-  LITE_PRIVATE_IP_ADDRESS:
+  BOSH_LITE_ELASTIC_IP:
 
 inputs:
   - name: cli-private
@@ -39,7 +39,7 @@ run:
     pushd scratch
       vagrant init cloudfoundry/bosh-lite
 
-      sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.instance_type = 'm3.2xlarge'\n    aws.private_ip_address = '${LITE_PRIVATE_IP_ADDRESS}'\n    aws.elastic_ip = true\n  end/" \
+      sed -i -e "s/do |config|/do |config|\n  config.vm.provider 'aws' do |aws|\n    aws.instance_type = 'm3.2xlarge'\n  end/" \
         Vagrantfile
 
       vagrant up --provider aws
