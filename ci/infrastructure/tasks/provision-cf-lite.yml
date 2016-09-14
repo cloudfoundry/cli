@@ -24,9 +24,12 @@ run:
   - |
     set -ex
 
+    pushd bosh-lite
+
     export BOSH_LITE_PRIVATE_KEY=$PWD/"${LITE_PRIVATE_KEY_PATH}"
-    export BOSH_LITE_ROOT="$PWD/bosh-lite"
 
     env | sort -
 
     BOSH_LITE_INSTANCE_TYPE="m3.2xlarge" vagrant up --provider aws --destroy-on-error
+
+    popd
