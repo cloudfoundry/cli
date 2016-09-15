@@ -22,7 +22,7 @@ resources:
 - name: bosh-lite-1-deploy-cf
   type: bosh-deployment
   source:
-    target: {{lite-1-private-ip-address}}
+    target: {{lite-1-public-ip-address}}
     username: admin
     password: admin
     deployment: cf-warden
@@ -30,7 +30,7 @@ resources:
 - name: bosh-lite-2-deploy-cf
   type: bosh-deployment
   source:
-    target: {{lite-2-private-ip-address}}
+    target: {{lite-2-public-ip-address}}
     username: admin
     password: admin
     deployment: cf-warden
@@ -38,7 +38,7 @@ resources:
 - name: bosh-lite-3-deploy-cf
   type: bosh-deployment
   source:
-    target: {{lite-3-private-ip-address}}
+    target: {{lite-3-public-ip-address}}
     username: admin
     password: admin
     deployment: cf-warden
@@ -46,7 +46,7 @@ resources:
 - name: bosh-lite-4-deploy-cf
   type: bosh-deployment
   source:
-    target: {{lite-4-private-ip-address}}
+    target: {{lite-4-public-ip-address}}
     username: admin
     password: admin
     deployment: cf-warden
