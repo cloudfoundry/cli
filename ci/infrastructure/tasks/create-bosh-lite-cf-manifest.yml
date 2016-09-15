@@ -4,7 +4,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
-  LITE_PRIVATE_IP_ADDRESS:
+  LITE_IP_ADDRESS:
   LITE_HOSTNAME:
   LITE_EXTRA_STUB: "{}"
 
@@ -24,7 +24,7 @@ run:
     export BOSH_LITE_ROOT="$PWD/bosh-lite"
 
     pushd cf-release-repo
-      bosh -n target $LITE_PRIVATE_IP_ADDRESS
+      bosh -n target $LITE_IP_ADDRESS
       bosh -n login admin admin
 
       echo "Updating cf-release sub modules"
