@@ -249,7 +249,7 @@ jobs:
     - task: create-cf-manifest
       file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
       params:
-        LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+        LITE_IP_ADDRESS: {{lite-1-public-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
     - put: bosh-lite-1-deploy-cf
       params:
@@ -278,7 +278,7 @@ jobs:
   - task: run-smoke-tests
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-1-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -304,7 +304,7 @@ jobs:
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-1-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -328,12 +328,12 @@ jobs:
   - task: deploy-routing
     file: cli/ci/infrastructure/tasks/deploy-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-1-public-ip-address}}
       LITE_HOSTNAME: {{lite-1-hostname}}
   - task: test-routing
     file: cli/ci/infrastructure/tasks/test-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-1-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-1-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -395,7 +395,7 @@ jobs:
     - task: create-cf-manifest
       file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
       params:
-        LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+        LITE_IP_ADDRESS: {{lite-2-public-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
     - put: bosh-lite-2-deploy-cf
       params:
@@ -424,7 +424,7 @@ jobs:
   - task: run-smoke-tests
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-2-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -450,7 +450,7 @@ jobs:
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-2-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -474,12 +474,12 @@ jobs:
   - task: deploy-routing
     file: cli/ci/infrastructure/tasks/deploy-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-2-public-ip-address}}
       LITE_HOSTNAME: {{lite-2-hostname}}
   - task: test-routing
     file: cli/ci/infrastructure/tasks/test-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-2-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-2-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -541,7 +541,7 @@ jobs:
     - task: create-cf-manifest
       file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
       params:
-        LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+        LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
     - put: bosh-lite-3-deploy-cf
       params:
@@ -570,7 +570,7 @@ jobs:
   - task: run-smoke-tests
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -596,7 +596,7 @@ jobs:
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -620,12 +620,12 @@ jobs:
   - task: deploy-routing
     file: cli/ci/infrastructure/tasks/deploy-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
       LITE_HOSTNAME: {{lite-3-hostname}}
   - task: test-routing
     file: cli/ci/infrastructure/tasks/test-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-3-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -687,7 +687,7 @@ jobs:
     - task: create-cf-manifest
       file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
       params:
-        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
         LITE_HOSTNAME: {{lite-4-hostname}}
     - put: bosh-lite-4-deploy-cf
       params:
@@ -716,7 +716,7 @@ jobs:
   - task: run-smoke-tests
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
     ensure:
       put: bosh-lites-diego-pool
       params:
@@ -743,11 +743,11 @@ jobs:
     - task: deploy-diego
       file: cli/ci/infrastructure/tasks/deploy-diego.yml
       params:
-        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
     - task: default-to-diego
       file: cli/ci/infrastructure/tasks/set-cf-backend-to-diego.yml
       params:
-        LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+        LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
     ensure:
       put: bosh-lites-diego-pool
       params:
@@ -771,12 +771,12 @@ jobs:
   - task: deploy-routing
     file: cli/ci/infrastructure/tasks/deploy-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
       LITE_HOSTNAME: {{lite-4-hostname}}
   - task: test-routing
     file: cli/ci/infrastructure/tasks/test-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-4-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-4-public-ip-address}}
     ensure:
       put: bosh-lites-diego-pool
       params:
@@ -806,14 +806,14 @@ jobs:
       file: cli/ci/infrastructure/tasks/provision-cf-lite.yml
       privileged: true
       params:
-        AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
-        AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
-        LITE_KEYPAIR: {{acceptance-keypair}}
+        BOSH_LITE_NAME: {{lite-acceptance-name}}
+        BOSH_AWS_ACCESS_KEY_ID: {{lite-access-key-id}}
+        BOSH_AWS_SECRET_ACCESS_KEY: {{lite-secret-access-key}}
+        BOSH_LITE_ELASTIC_IP: {{lite-acceptance-private-ip-address}}
+        BOSH_LITE_KEYPAIR: {{acceptance-keypair}}
+        BOSH_LITE_SECURITY_GROUP: {{lite-acceptance-security-group}}
+        BOSH_LITE_SUBNET_ID: {{lite-acceptance-subnet-id}}
         LITE_PRIVATE_KEY_PATH: {{acceptance-private-key-path}}
-        AWS_SECURITY_GROUP: {{lite-acceptance-security-group}}
-        AWS_SUBNET_ID: {{lite-acceptance-subnet-id}}
-        LITE_NAME: {{lite-acceptance-name}}
-        LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     - task: associate-elastic-ip
       file: cli/ci/infrastructure/tasks/associate-elastic-ip.yml
       params:
@@ -845,7 +845,7 @@ jobs:
   - task: create-cf-manifest
     file: cli/ci/infrastructure/tasks/create-bosh-lite-cf-manifest.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
       LITE_HOSTNAME: {{lite-acceptance-hostname}}
       LITE_EXTRA_STUB: "properties: { doppler: { port: 443 } }"
   - put: bosh-lite-acceptance-deploy-cf
@@ -875,7 +875,7 @@ jobs:
   - task: run-smoke-tests
     file: cli/ci/infrastructure/tasks/run-smoke-tests.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
@@ -901,7 +901,7 @@ jobs:
   - task: deploy-diego
     file: cli/ci/infrastructure/tasks/deploy-diego.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
@@ -925,12 +925,12 @@ jobs:
   - task: deploy-routing
     file: cli/ci/infrastructure/tasks/deploy-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
       LITE_HOSTNAME: {{lite-acceptance-hostname}}
   - task: test-routing
     file: cli/ci/infrastructure/tasks/test-routing.yml
     params:
-      LITE_PRIVATE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
+      LITE_IP_ADDRESS: {{lite-acceptance-private-ip-address}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
