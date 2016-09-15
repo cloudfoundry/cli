@@ -1,0 +1,28 @@
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs: []
+
+params:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+
+    aws s3 sync \
+      --exclude "*" \
+      --include 'releases/*/*.rpm' \
+      --exclude "*installer*" \
+      s3://cf-cli-releases \
+      .
+
+    createrepo .
+
+    aws s3 sync \
+      repodata \
+      s3://cf-cli-rpm-repo/repodata
