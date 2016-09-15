@@ -16,13 +16,13 @@ run:
 
     aws s3 sync \
       --exclude "*" \
-      --include 'releases/*/*.rpm' \
-      --exclude "*installer*" \
+      --include "releases/*/*installer*.rpm" \
       s3://cf-cli-releases \
       .
 
     createrepo .
 
     aws s3 sync \
+      --delete \
       repodata \
       s3://cf-cli-rpm-repo/repodata
