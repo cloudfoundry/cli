@@ -4,7 +4,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
-  LITE_PRIVATE_IP_ADDRESS:
+  LITE_IP_ADDRESS:
 
 run:
   path: bash
@@ -16,7 +16,7 @@ run:
     export ADMIN_USER=admin
     export ADMIN_PASSWORD=admin
 
-    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n target $LITE_IP_ADDRESS
     bosh login $ADMIN_USER $ADMIN_PASSWORD
     bosh -n download manifest 'cf-warden' cf-warden.yml
     bosh -n deployment cf-warden.yml
