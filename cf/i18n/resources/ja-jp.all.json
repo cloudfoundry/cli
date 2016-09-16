@@ -868,14 +868,6 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME delete-space SPACE [-f]",
-    "translation": ""
-  },
-  {
-    "id": "CF_NAME delete-space SPACE [-o]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME delete-space SPACE [-o] [-f]",
     "translation": ""
   },

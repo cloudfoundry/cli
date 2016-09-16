@@ -392,14 +392,6 @@
     "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
   },
   {
-    "id": "CF_NAME delete-space SPACE [-f]",
-    "translation": "CF_NAME delete-space SPACE [-f]"
-  },
-  {
-    "id": "CF_NAME delete-space SPACE [-o]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME delete-space SPACE [-o] [-f]",
     "translation": ""
   },
