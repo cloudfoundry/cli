@@ -144,6 +144,11 @@ resources:
   source:
     url: https://hooks.slack.com/services/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
 
+- name: publish-rpm-timer
+  type: time
+  source:
+    interval: 1h
+
 groups:
 - name: cli
   jobs:
@@ -160,6 +165,9 @@ groups:
 - name: images
   jobs:
   - create-cli-ci-image
+- name: publish-rpm
+  jobs:
+  - publish-rpm
 
 jobs:
 - name: units
@@ -541,3 +549,14 @@ jobs:
     params:
       load_base: golang
       build: cli-ci-dockerfile/ci
+- name: publish-rpm
+  plan:
+  - aggregate:
+    - get: publish-rpm-timer
+      trigger: true
+    - get: cli-ci
+  - task: publish-rpm
+    file: cli-ci/ci/cli/tasks/publish-rpm.yml
+    params:
+      AWS_ACCESS_KEY_ID: {{cli-production-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-secret-access-key}}
