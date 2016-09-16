@@ -24,7 +24,7 @@ var _ = Describe("Targgeting", func() {
 	})
 
 	Describe("SetTarget", func() {
-		var expectedAPI, expectedAPIVersion, expectedAuth, expectedLoggregator, expectedDoppler, expectedUAA string
+		var expectedAPI, expectedAPIVersion, expectedAuth, expectedLoggregator, expectedDoppler, expectedUAA, expectedRouting string
 
 		BeforeEach(func() {
 			expectedAPI = "https://api.foo.com"
@@ -33,6 +33,7 @@ var _ = Describe("Targgeting", func() {
 			expectedLoggregator = "wss://log.foo.com"
 			expectedDoppler = "wss://doppler.foo.com"
 			expectedUAA = "https://uaa.foo.com"
+			expectedRouting = "https://api.foo.com/routing"
 
 			fakeCloudControllerClient.APIReturns(expectedAPI)
 			fakeCloudControllerClient.APIVersionReturns(expectedAPIVersion)
@@ -40,6 +41,7 @@ var _ = Describe("Targgeting", func() {
 			fakeCloudControllerClient.LoggregatorEndpointReturns(expectedLoggregator)
 			fakeCloudControllerClient.DopplerEndpointReturns(expectedDoppler)
 			fakeCloudControllerClient.TokenEndpointReturns(expectedUAA)
+			fakeCloudControllerClient.RoutingEndpointReturns(expectedRouting)
 		})
 
 		It("targets the passed API", func() {
@@ -57,7 +59,7 @@ var _ = Describe("Targgeting", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, loggregator, doppler, uaa, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			api, apiVersion, auth, loggregator, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 
 			Expect(api).To(Equal(expectedAPI))
 			Expect(apiVersion).To(Equal(expectedAPIVersion))
@@ -65,6 +67,7 @@ var _ = Describe("Targgeting", func() {
 			Expect(loggregator).To(Equal(expectedLoggregator))
 			Expect(doppler).To(Equal(expectedDoppler))
 			Expect(uaa).To(Equal(expectedUAA))
+			Expect(routing).To(Equal(expectedRouting))
 			Expect(sslDisabled).To(Equal(skipSSLValidation))
 		})
 	})
@@ -74,7 +77,7 @@ var _ = Describe("Targgeting", func() {
 			actor.ClearTarget()
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
-			api, apiVersion, auth, loggregator, doppler, uaa, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
+			api, apiVersion, auth, loggregator, doppler, uaa, routing, sslDisabled := fakeConfig.SetTargetInformationArgsForCall(0)
 
 			Expect(api).To(BeEmpty())
 			Expect(apiVersion).To(BeEmpty())
@@ -82,7 +85,19 @@ var _ = Describe("Targgeting", func() {
 			Expect(loggregator).To(BeEmpty())
 			Expect(doppler).To(BeEmpty())
 			Expect(uaa).To(BeEmpty())
+			Expect(routing).To(BeEmpty())
 			Expect(sslDisabled).To(BeFalse())
+		})
+
+		It("clears all the token information", func() {
+			actor.ClearTarget()
+
+			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
+			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
+
+			Expect(accessToken).To(BeEmpty())
+			Expect(refreshToken).To(BeEmpty())
+			Expect(sshOAuthClient).To(BeEmpty())
 		})
 	})
 })

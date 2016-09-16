@@ -1,14 +1,15 @@
 package cloudcontrollerv2
 
 type APIInformation struct {
-	Name                         string `json:"name"`
+	APIVersion                   string `json:"api_version"`
 	AuthorizationEndpoint        string `json:"authorization_endpoint"`
-	TokenEndpoint                string `json:"token_endpoint"`
+	DopplerEndpoint              string `json:"doppler_logging_endpoint"`
+	LoggregatorEndpoint          string `json:"logging_endpoint"`
 	MinimumCLIVersion            string `json:"min_cli_version"`
 	MinimumRecommendedCLIVersion string `json:"min_recommended_cli_version"`
-	APIVersion                   string `json:"api_version"`
-	LoggregatorEndpoint          string `json:"logging_endpoint"`
-	DopplerEndpoint              string `json:"doppler_logging_endpoint"`
+	Name                         string `json:"name"`
+	RoutingEndpoint              string `json:"routing_endpoint"`
+	TokenEndpoint                string `json:"token_endpoint"`
 }
 
 func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
@@ -28,10 +29,11 @@ func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation b
 		return Warnings(response.Warnings), err
 	}
 
-	client.cloudControllerAPIVersion = info.APIVersion
 	client.authorizationEndpoint = info.AuthorizationEndpoint
-	client.loggregatorEndpoint = info.LoggregatorEndpoint
+	client.cloudControllerAPIVersion = info.APIVersion
 	client.dopplerEndpoint = info.DopplerEndpoint
+	client.loggregatorEndpoint = info.LoggregatorEndpoint
+	client.routingEndpoint = info.RoutingEndpoint
 	client.tokenEndpoint = info.TokenEndpoint
 
 	return Warnings(response.Warnings), nil

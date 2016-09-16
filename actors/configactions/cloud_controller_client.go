@@ -10,7 +10,8 @@ type CloudControllerClient interface {
 	API() string
 	APIVersion() string
 	AuthorizationEndpoint() string
-	LoggregatorEndpoint() string
 	DopplerEndpoint() string
+	LoggregatorEndpoint() string
+	RoutingEndpoint() string
 	TokenEndpoint() string
 }
