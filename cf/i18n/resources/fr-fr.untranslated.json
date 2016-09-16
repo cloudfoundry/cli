@@ -256,10 +256,6 @@
     "translation": "CF_NAME delete-service-key mydb mykey"
   },
   {
-    "id": "CF_NAME delete-space SPACE [-o]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME delete-space SPACE [-o] [-f]",
     "translation": ""
   },
