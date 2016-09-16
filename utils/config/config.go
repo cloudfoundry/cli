@@ -110,7 +110,7 @@ type CFConfig struct {
 	LoggregatorEndpoint      string        `json:"LoggregatorEndPoint"`
 	DopplerEndpoint          string        `json:"DopplerEndPoint"`
 	UAAEndpoint              string        `json:"UaaEndpoint"`
-	RoutingAPIEndpoint       string        `json:"RoutingAPIEndpoint"`
+	RoutingEndpoint          string        `json:"RoutingAPIEndpoint"`
 	AccessToken              string        `json:"AccessToken"`
 	SSHOAuthClient           string        `json:"SSHOAuthClient"`
 	RefreshToken             string        `json:"RefreshToken"`
@@ -327,17 +327,24 @@ func (config *Config) SetSpaceInformation(guid string, name string, allowSSH boo
 	config.ConfigFile.TargetedSpace.AllowSSH = allowSSH
 }
 
-func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, skipSSLValidation bool) {
+func (config *Config) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool) {
 	config.ConfigFile.Target = api
 	config.ConfigFile.APIVersion = apiVersion
 	config.ConfigFile.AuthorizationEndpoint = auth
 	config.ConfigFile.LoggregatorEndpoint = loggregator
 	config.ConfigFile.DopplerEndpoint = doppler
 	config.ConfigFile.UAAEndpoint = uaa
+	config.ConfigFile.RoutingEndpoint = routing
 	config.ConfigFile.SkipSSLValidation = skipSSLValidation
 
 	config.SetOrganizationInformation("", "")
 	config.SetSpaceInformation("", "", false)
+}
+
+func (config *Config) SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string) {
+	config.ConfigFile.AccessToken = accessToken
+	config.ConfigFile.RefreshToken = refreshToken
+	config.ConfigFile.SSHOAuthClient = sshOAuthClient
 }
 
 func (config *Config) PluginRepos() []PluginRepos {

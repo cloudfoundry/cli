@@ -38,6 +38,7 @@ var _ = Describe("Target", func() {
 					"api_version":"2.59.0",
 					"app_ssh_endpoint":"ssh.APISERVER",
 					"app_ssh_host_key_fingerprint":"a6:d1:08:0b:b0:cb:9b:5f:c4:ba:44:2a:97:26:19:8a",
+					"routing_endpoint": "https://APISERVER/routing",
 					"app_ssh_oauth_client":"ssh-proxy",
 					"logging_endpoint":"wss://loggregator.APISERVER",
 					"doppler_logging_endpoint":"wss://doppler.APISERVER"
@@ -61,8 +62,9 @@ var _ = Describe("Target", func() {
 						Expect(client.API()).To(MatchRegexp("https://%s", serverAPIURL))
 						Expect(client.APIVersion()).To(Equal("2.59.0"))
 						Expect(client.AuthorizationEndpoint()).To(MatchRegexp("https://login.%s", serverAPIURL))
-						Expect(client.LoggregatorEndpoint()).To(MatchRegexp("wss://loggregator.%s", serverAPIURL))
 						Expect(client.DopplerEndpoint()).To(MatchRegexp("wss://doppler.%s", serverAPIURL))
+						Expect(client.LoggregatorEndpoint()).To(MatchRegexp("wss://loggregator.%s", serverAPIURL))
+						Expect(client.RoutingEndpoint()).To(MatchRegexp("https://%s/routing", serverAPIURL))
 						Expect(client.TokenEndpoint()).To(MatchRegexp("https://uaa.%s", serverAPIURL))
 					})
 				})
