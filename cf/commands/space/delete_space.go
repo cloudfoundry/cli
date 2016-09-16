@@ -36,8 +36,7 @@ func (cmd *DeleteSpace) MetaData() commandregistry.CommandMetadata {
 		Name:        "delete-space",
 		Description: T("Delete a space"),
 		Usage: []string{
-			T("CF_NAME delete-space SPACE [-f]"),
-			T("CF_NAME delete-space SPACE [-o]"),
+			T("CF_NAME delete-space SPACE [-o] [-f]"),
 		},
 		Flags: fs,
 	}
@@ -70,24 +69,26 @@ func (cmd *DeleteSpace) SetDependency(deps commandregistry.Dependency, pluginCal
 	cmd.orgRepo = deps.RepoLocator.GetOrganizationRepository()
 	return cmd
 }
-
 func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
+	var space models.Space
+
 	spaceName := c.Args()[0]
 	orgName := c.String("o")
-	orgGUID := ""
 
 	if orgName == "" {
-		orgName = cmd.config.OrganizationFields().Name
-		orgGUID = cmd.config.OrganizationFields().GUID
-	}
+		space = cmd.spaceReq.GetSpace()
 
-	if orgGUID == "" {
+		orgName = cmd.config.OrganizationFields().Name
+	} else {
 		org, err := cmd.orgRepo.FindByName(orgName)
 		if err != nil {
 			return err
 		}
 
-		orgGUID = org.GUID
+		space, err = cmd.spaceRepo.FindByNameInOrg(spaceName, org.GUID)
+		if err != nil {
+			return err
+		}
 	}
 
 	if !c.Bool("f") {
@@ -103,16 +104,7 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	space, err := cmd.spaceRepo.FindByNameInOrg(spaceName, orgGUID)
-	if err != nil {
-		return err
-	}
-
-	if c.String("o") == "" {
-		space = cmd.spaceReq.GetSpace()
-	}
-
-	err = cmd.spaceRepo.Delete(space.GUID)
+	err := cmd.spaceRepo.Delete(space.GUID)
 	if err != nil {
 		return err
 	}
