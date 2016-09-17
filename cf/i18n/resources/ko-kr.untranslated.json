@@ -392,6 +392,10 @@
     "translation": "CF_NAME delete-shared-domain DOMAIN [-f]"
   },
   {
+    "id": "CF_NAME delete-space SPACE [-o] ORG [-f]",
+    "translation": "CF_NAME delete-space SPACE [-o] ORG [-f]"
+  },
+  {
     "id": "CF_NAME delete-space SPACE [-o] [-f]",
     "translation": ""
   },
@@ -1074,10 +1078,6 @@
   {
     "id": "Delete an HTTP route:\\n      CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\\n\\n   Delete a TCP route:\\n      CF_NAME delete-route DOMAIN --port PORT [-f]\\n\\nEXAMPLES:\\n   CF_NAME delete-route example.com                              # example.com\\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME delete-route example.com --port 5000                  # example.com:5000",
     "translation": "Delete an HTTP route:\\n      CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\\n\\n   Delete a TCP route:\\n      CF_NAME delete-route DOMAIN --port PORT [-f]\\n\\nEXAMPLES:\\n   CF_NAME delete-route example.com                              # example.com\\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME delete-route example.com --port 5000                  # example.com:5000"
-  },
-  {
-    "id": "Delete space within specifid org",
-    "translation": ""
   },
   {
     "id": "Delete space within specified org",
