@@ -36,7 +36,7 @@ func (cmd *DeleteSpace) MetaData() commandregistry.CommandMetadata {
 		Name:        "delete-space",
 		Description: T("Delete a space"),
 		Usage: []string{
-			T("CF_NAME delete-space SPACE [-o] ORG [-f]"),
+			T("CF_NAME delete-space SPACE [-o ORG] [-f]"),
 		},
 		Flags: fs,
 	}
