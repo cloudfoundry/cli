@@ -31,8 +31,6 @@ run:
     VERSION=$(cat cli/VERSION)
     RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
 
-    mkdir archives
-
     echo "Building 32-bit Debian package"
     (
         SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_linux_i686 | cut -f 1)"
