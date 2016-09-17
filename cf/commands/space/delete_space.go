@@ -30,13 +30,13 @@ func init() {
 func (cmd *DeleteSpace) MetaData() commandregistry.CommandMetadata {
 	fs := make(map[string]flags.FlagSet)
 	fs["f"] = &flags.BoolFlag{ShortName: "f", Usage: T("Force deletion without confirmation")}
-	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Delete space within specifid org")}
+	fs["o"] = &flags.StringFlag{ShortName: "o", Usage: T("Delete space within specified org")}
 
 	return commandregistry.CommandMetadata{
 		Name:        "delete-space",
 		Description: T("Delete a space"),
 		Usage: []string{
-			T("CF_NAME delete-space SPACE [-o] [-f]"),
+			T("CF_NAME delete-space SPACE [-o] ORG [-f]"),
 		},
 		Flags: fs,
 	}
