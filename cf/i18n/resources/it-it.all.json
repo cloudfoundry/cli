@@ -868,7 +868,7 @@
     "translation": "CF_NAME delete-shared-domain DOMINIO [-f]"
   },
   {
-    "id": "CF_NAME delete-space SPACE [-o] ORG [-f]",
+    "id": "CF_NAME delete-space SPACE [-o ORG] [-f]",
     "translation": ""
   },
   {
