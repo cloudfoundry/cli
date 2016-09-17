@@ -4,7 +4,6 @@ AppName=Cloud Foundry CLI
 AppVersion=VERSION
 AppVerName=Cloud Foundry CLI version VERSION
 AppPublisher=Cloud Foundry Foundation
-SignTool=signtool sign /f $qSIGNTOOL_CERT_PATH$q /p $qSIGNTOOL_CERT_PASSWORD$q /t http://timestamp.comodoca.com/authenticode $f
 ArchitecturesInstallIn64BitMode=x64 ia64
 ArchitecturesAllowed=x64 ia64
 PrivilegesRequired=none

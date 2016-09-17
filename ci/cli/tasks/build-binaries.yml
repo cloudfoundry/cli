@@ -37,7 +37,6 @@ run:
       echo "Building 64-bit Windows"
       GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe .
 
-
       echo "Creating tarball"
       tar -cvzf $cwd/cross-compiled/cf-cli-binaries.tgz -C out .
     popd
