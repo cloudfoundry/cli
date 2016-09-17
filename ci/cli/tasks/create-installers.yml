@@ -7,9 +7,6 @@ inputs:
 - name: cli-private
 - name: cli
 
-params:
-  GPG_KEY:
-
 outputs:
 - name: installers
 
@@ -22,7 +19,6 @@ run:
     set -o pipefail
 
     root=$PWD
-    gpg --import <(echo "${GPG_KEY}")
 
     cat<< EOF >~/.rpmmacros
     CF CLI Team <cf-cli-eng@pivotal.io>
