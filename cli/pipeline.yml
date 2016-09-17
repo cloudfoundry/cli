@@ -66,98 +66,110 @@ resources:
 - name: edge-linux-binary-32
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli_edge_linux_i686.tgz
+    versioned_file: master/cf-cli_edge_linux_i686.tgz
+    region_name: us-west-1
 
 - name: edge-linux-binary-64
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli_edge_linux_x86-64.tgz
+    versioned_file: master/cf-cli_edge_linux_x86-64.tgz
+    region_name: us-west-1
 
 - name: edge-osx-binary-64
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli_edge_osx.tgz
+    versioned_file: master/cf-cli_edge_osx.tgz
+    region_name: us-west-1
 
 - name: edge-windows-binary-32
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli_edge_win32.zip
+    versioned_file: master/cf-cli_edge_win32.zip
+    region_name: us-west-1
 
 - name: edge-windows-binary-64
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli_edge_winx64.zip
+    versioned_file: master/cf-cli_edge_winx64.zip
+    region_name: us-west-1
 
 - name: edge-deb-installer-32
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_i686.deb
+    versioned_file: master/cf-cli-installer_edge_i686.deb
+    region_name: us-west-1
 
 - name: edge-deb-installer-64
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_x86-64.deb
+    versioned_file: master/cf-cli-installer_edge_x86-64.deb
+    region_name: us-west-1
 
 - name: edge-redhat-installer-32
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_i686.rpm
+    versioned_file: master/cf-cli-installer_edge_i686.rpm
+    region_name: us-west-1
 
 - name: edge-redhat-installer-64
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_x86-64.rpm
+    versioned_file: master/cf-cli-installer_edge_x86-64.rpm
+    region_name: us-west-1
 
 - name: edge-osx-installer-64
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_osx.pkg
+    versioned_file: master/cf-cli-installer_edge_osx.pkg
+    region_name: us-west-1
 
 - name: edge-windows-installer-32
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_win32.zip
+    versioned_file: master/cf-cli-installer_edge_win32.zip
+    region_name: us-west-1
 
 - name: edge-windows-installer-64
   type: s3
   source:
-    bucket: cf-cli-release/master
+    bucket: cf-cli-releases
     access_key_id: {{cli-production-access-key-id}}
     secret_access_key: {{cli-production-secret-access-key}}
-    versioned_file: cf-cli-installer_edge_winx64.zip
+    versioned_file: master/cf-cli-installer_edge_winx64.zip
+    region_name: us-west-1
 
 - name: bosh-lites-dea-pool
   type: pool
@@ -494,15 +506,15 @@ jobs:
     - put: edge-osx-binary-64
       params:
         file: archives/cf-cli_edge_osx.tgz
-    - put: edge-deb-installer-32
-      params:
-        file: archives/cf-cli-installer_i686.deb
     - put: edge-windows-binary-32
       params:
         file: archives/cf-cli_edge_win32.zip
     - put: edge-windows-binary-64
       params:
         file: archives/cf-cli_edge_winx64.zip
+    - put: edge-deb-installer-32
+      params:
+        file: archives/cf-cli-installer_i686.deb
     - put: edge-deb-installer-64
       params:
         file: archives/cf-cli-installer_x86-64.deb
