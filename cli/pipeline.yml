@@ -524,7 +524,7 @@ jobs:
     - put: edge-redhat-installer-64
       params:
         file: archives/cf-cli-installer_x86-64.rpm
-    - put: edge-osx-binary-64
+    - put: edge-osx-installer-64
       params:
         file: archives/cf-cli-installer_osx.pkg
     - put: edge-windows-installer-32
