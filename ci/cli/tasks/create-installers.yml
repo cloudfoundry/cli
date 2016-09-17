@@ -8,7 +8,7 @@ inputs:
 - name: cli
 
 outputs:
-- name: installers
+- name: archives
 
 run:
   path: bash
