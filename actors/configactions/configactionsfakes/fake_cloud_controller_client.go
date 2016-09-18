@@ -37,16 +37,22 @@ type FakeCloudControllerClient struct {
 	authorizationEndpointReturns     struct {
 		result1 string
 	}
+	DopplerEndpointStub        func() string
+	dopplerEndpointMutex       sync.RWMutex
+	dopplerEndpointArgsForCall []struct{}
+	dopplerEndpointReturns     struct {
+		result1 string
+	}
 	LoggregatorEndpointStub        func() string
 	loggregatorEndpointMutex       sync.RWMutex
 	loggregatorEndpointArgsForCall []struct{}
 	loggregatorEndpointReturns     struct {
 		result1 string
 	}
-	DopplerEndpointStub        func() string
-	dopplerEndpointMutex       sync.RWMutex
-	dopplerEndpointArgsForCall []struct{}
-	dopplerEndpointReturns     struct {
+	RoutingEndpointStub        func() string
+	routingEndpointMutex       sync.RWMutex
+	routingEndpointArgsForCall []struct{}
+	routingEndpointReturns     struct {
 		result1 string
 	}
 	TokenEndpointStub        func() string
@@ -169,6 +175,31 @@ func (fake *FakeCloudControllerClient) AuthorizationEndpointReturns(result1 stri
 	}{result1}
 }
 
+func (fake *FakeCloudControllerClient) DopplerEndpoint() string {
+	fake.dopplerEndpointMutex.Lock()
+	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("DopplerEndpoint", []interface{}{})
+	fake.dopplerEndpointMutex.Unlock()
+	if fake.DopplerEndpointStub != nil {
+		return fake.DopplerEndpointStub()
+	} else {
+		return fake.dopplerEndpointReturns.result1
+	}
+}
+
+func (fake *FakeCloudControllerClient) DopplerEndpointCallCount() int {
+	fake.dopplerEndpointMutex.RLock()
+	defer fake.dopplerEndpointMutex.RUnlock()
+	return len(fake.dopplerEndpointArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DopplerEndpointReturns(result1 string) {
+	fake.DopplerEndpointStub = nil
+	fake.dopplerEndpointReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeCloudControllerClient) LoggregatorEndpoint() string {
 	fake.loggregatorEndpointMutex.Lock()
 	fake.loggregatorEndpointArgsForCall = append(fake.loggregatorEndpointArgsForCall, struct{}{})
@@ -194,27 +225,27 @@ func (fake *FakeCloudControllerClient) LoggregatorEndpointReturns(result1 string
 	}{result1}
 }
 
-func (fake *FakeCloudControllerClient) DopplerEndpoint() string {
-	fake.dopplerEndpointMutex.Lock()
-	fake.dopplerEndpointArgsForCall = append(fake.dopplerEndpointArgsForCall, struct{}{})
-	fake.recordInvocation("DopplerEndpoint", []interface{}{})
-	fake.dopplerEndpointMutex.Unlock()
-	if fake.DopplerEndpointStub != nil {
-		return fake.DopplerEndpointStub()
+func (fake *FakeCloudControllerClient) RoutingEndpoint() string {
+	fake.routingEndpointMutex.Lock()
+	fake.routingEndpointArgsForCall = append(fake.routingEndpointArgsForCall, struct{}{})
+	fake.recordInvocation("RoutingEndpoint", []interface{}{})
+	fake.routingEndpointMutex.Unlock()
+	if fake.RoutingEndpointStub != nil {
+		return fake.RoutingEndpointStub()
 	} else {
-		return fake.dopplerEndpointReturns.result1
+		return fake.routingEndpointReturns.result1
 	}
 }
 
-func (fake *FakeCloudControllerClient) DopplerEndpointCallCount() int {
-	fake.dopplerEndpointMutex.RLock()
-	defer fake.dopplerEndpointMutex.RUnlock()
-	return len(fake.dopplerEndpointArgsForCall)
+func (fake *FakeCloudControllerClient) RoutingEndpointCallCount() int {
+	fake.routingEndpointMutex.RLock()
+	defer fake.routingEndpointMutex.RUnlock()
+	return len(fake.routingEndpointArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) DopplerEndpointReturns(result1 string) {
-	fake.DopplerEndpointStub = nil
-	fake.dopplerEndpointReturns = struct {
+func (fake *FakeCloudControllerClient) RoutingEndpointReturns(result1 string) {
+	fake.RoutingEndpointStub = nil
+	fake.routingEndpointReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -255,10 +286,12 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.aPIVersionMutex.RUnlock()
 	fake.authorizationEndpointMutex.RLock()
 	defer fake.authorizationEndpointMutex.RUnlock()
-	fake.loggregatorEndpointMutex.RLock()
-	defer fake.loggregatorEndpointMutex.RUnlock()
 	fake.dopplerEndpointMutex.RLock()
 	defer fake.dopplerEndpointMutex.RUnlock()
+	fake.loggregatorEndpointMutex.RLock()
+	defer fake.loggregatorEndpointMutex.RUnlock()
+	fake.routingEndpointMutex.RLock()
+	defer fake.routingEndpointMutex.RUnlock()
 	fake.tokenEndpointMutex.RLock()
 	defer fake.tokenEndpointMutex.RUnlock()
 	return fake.invocations

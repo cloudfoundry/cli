@@ -4,7 +4,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
-  LITE_PRIVATE_IP_ADDRESS:
+  LITE_IP_ADDRESS:
 
 run:
   path: bash
@@ -13,7 +13,7 @@ run:
   - |
     set -eux
 
-    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n target $LITE_IP_ADDRESS
     bosh login admin admin
 
     bosh download manifest cf-warden cf-warden.yml

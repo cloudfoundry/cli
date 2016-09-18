@@ -4,7 +4,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
-  LITE_PRIVATE_IP_ADDRESS:
+  LITE_IP_ADDRESS:
 
 run:
   path: bash
@@ -19,7 +19,7 @@ run:
     routing_deployment_name=cf-warden-routing
     routing_deployment_file=cf-warden-routing.yml
 
-    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n target $LITE_IP_ADDRESS
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $routing_deployment_name $routing_deployment_file
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deployment $routing_deployment_file

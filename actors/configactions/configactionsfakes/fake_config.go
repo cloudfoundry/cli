@@ -8,36 +8,45 @@ import (
 )
 
 type FakeConfig struct {
-	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, sslDisabled bool)
+	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
 	setTargetInformationArgsForCall []struct {
-		api         string
-		apiVersion  string
-		auth        string
-		loggregator string
-		doppler     string
-		uaa         string
-		sslDisabled bool
+		api               string
+		apiVersion        string
+		auth              string
+		loggregator       string
+		doppler           string
+		uaa               string
+		routing           string
+		skipSSLValidation bool
+	}
+	SetTokenInformationStub        func(accessToken string, refreshToken string, sshOAuthClient string)
+	setTokenInformationMutex       sync.RWMutex
+	setTokenInformationArgsForCall []struct {
+		accessToken    string
+		refreshToken   string
+		sshOAuthClient string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, sslDisabled bool) {
+func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool) {
 	fake.setTargetInformationMutex.Lock()
 	fake.setTargetInformationArgsForCall = append(fake.setTargetInformationArgsForCall, struct {
-		api         string
-		apiVersion  string
-		auth        string
-		loggregator string
-		doppler     string
-		uaa         string
-		sslDisabled bool
-	}{api, apiVersion, auth, loggregator, doppler, uaa, sslDisabled})
-	fake.recordInvocation("SetTargetInformation", []interface{}{api, apiVersion, auth, loggregator, doppler, uaa, sslDisabled})
+		api               string
+		apiVersion        string
+		auth              string
+		loggregator       string
+		doppler           string
+		uaa               string
+		routing           string
+		skipSSLValidation bool
+	}{api, apiVersion, auth, loggregator, doppler, uaa, routing, skipSSLValidation})
+	fake.recordInvocation("SetTargetInformation", []interface{}{api, apiVersion, auth, loggregator, doppler, uaa, routing, skipSSLValidation})
 	fake.setTargetInformationMutex.Unlock()
 	if fake.SetTargetInformationStub != nil {
-		fake.SetTargetInformationStub(api, apiVersion, auth, loggregator, doppler, uaa, sslDisabled)
+		fake.SetTargetInformationStub(api, apiVersion, auth, loggregator, doppler, uaa, routing, skipSSLValidation)
 	}
 }
 
@@ -47,10 +56,36 @@ func (fake *FakeConfig) SetTargetInformationCallCount() int {
 	return len(fake.setTargetInformationArgsForCall)
 }
 
-func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string, bool) {
+func (fake *FakeConfig) SetTargetInformationArgsForCall(i int) (string, string, string, string, string, string, string, bool) {
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
-	return fake.setTargetInformationArgsForCall[i].api, fake.setTargetInformationArgsForCall[i].apiVersion, fake.setTargetInformationArgsForCall[i].auth, fake.setTargetInformationArgsForCall[i].loggregator, fake.setTargetInformationArgsForCall[i].doppler, fake.setTargetInformationArgsForCall[i].uaa, fake.setTargetInformationArgsForCall[i].sslDisabled
+	return fake.setTargetInformationArgsForCall[i].api, fake.setTargetInformationArgsForCall[i].apiVersion, fake.setTargetInformationArgsForCall[i].auth, fake.setTargetInformationArgsForCall[i].loggregator, fake.setTargetInformationArgsForCall[i].doppler, fake.setTargetInformationArgsForCall[i].uaa, fake.setTargetInformationArgsForCall[i].routing, fake.setTargetInformationArgsForCall[i].skipSSLValidation
+}
+
+func (fake *FakeConfig) SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string) {
+	fake.setTokenInformationMutex.Lock()
+	fake.setTokenInformationArgsForCall = append(fake.setTokenInformationArgsForCall, struct {
+		accessToken    string
+		refreshToken   string
+		sshOAuthClient string
+	}{accessToken, refreshToken, sshOAuthClient})
+	fake.recordInvocation("SetTokenInformation", []interface{}{accessToken, refreshToken, sshOAuthClient})
+	fake.setTokenInformationMutex.Unlock()
+	if fake.SetTokenInformationStub != nil {
+		fake.SetTokenInformationStub(accessToken, refreshToken, sshOAuthClient)
+	}
+}
+
+func (fake *FakeConfig) SetTokenInformationCallCount() int {
+	fake.setTokenInformationMutex.RLock()
+	defer fake.setTokenInformationMutex.RUnlock()
+	return len(fake.setTokenInformationArgsForCall)
+}
+
+func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, string) {
+	fake.setTokenInformationMutex.RLock()
+	defer fake.setTokenInformationMutex.RUnlock()
+	return fake.setTokenInformationArgsForCall[i].accessToken, fake.setTokenInformationArgsForCall[i].refreshToken, fake.setTokenInformationArgsForCall[i].sshOAuthClient
 }
 
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
@@ -58,6 +93,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
+	fake.setTokenInformationMutex.RLock()
+	defer fake.setTokenInformationMutex.RUnlock()
 	return fake.invocations
 }
 

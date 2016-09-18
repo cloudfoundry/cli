@@ -19,12 +19,16 @@ func (client *CloudControllerClient) AuthorizationEndpoint() string {
 	return client.authorizationEndpoint
 }
 
+func (client *CloudControllerClient) DopplerEndpoint() string {
+	return client.dopplerEndpoint
+}
+
 func (client *CloudControllerClient) LoggregatorEndpoint() string {
 	return client.loggregatorEndpoint
 }
 
-func (client *CloudControllerClient) DopplerEndpoint() string {
-	return client.dopplerEndpoint
+func (client *CloudControllerClient) RoutingEndpoint() string {
+	return client.routingEndpoint
 }
 
 func (client *CloudControllerClient) TokenEndpoint() string {

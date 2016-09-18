@@ -402,6 +402,7 @@ var _ = Describe("Config", func() {
 					"wws://loggregator.foo.com:443",
 					"wws://doppler.foo.com:443",
 					"https://uaa.foo.com",
+					"https://api.foo.com/routing",
 					true,
 				)
 
@@ -411,6 +412,7 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.LoggregatorEndpoint).To(Equal("wws://loggregator.foo.com:443"))
 				Expect(config.ConfigFile.DopplerEndpoint).To(Equal("wws://doppler.foo.com:443"))
 				Expect(config.ConfigFile.UAAEndpoint).To(Equal("https://uaa.foo.com"))
+				Expect(config.ConfigFile.RoutingEndpoint).To(Equal("https://api.foo.com/routing"))
 				Expect(config.ConfigFile.SkipSSLValidation).To(BeTrue())
 
 				Expect(config.ConfigFile.TargetedOrganization.GUID).To(BeEmpty())
@@ -418,6 +420,17 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.TargetedSpace.GUID).To(BeEmpty())
 				Expect(config.ConfigFile.TargetedSpace.Name).To(BeEmpty())
 				Expect(config.ConfigFile.TargetedSpace.AllowSSH).To(BeFalse())
+			})
+		})
+
+		Describe("SetTokenInformation", func() {
+			It("sets the authentication token information", func() {
+				var config Config
+				config.SetTokenInformation("I am the access token", "I am the refresh token", "I am the SSH OAuth client")
+
+				Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
+				Expect(config.ConfigFile.RefreshToken).To(Equal("I am the refresh token"))
+				Expect(config.ConfigFile.SSHOAuthClient).To(Equal("I am the SSH OAuth client"))
 			})
 		})
 

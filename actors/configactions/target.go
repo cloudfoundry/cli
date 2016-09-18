@@ -13,6 +13,7 @@ func (actor Actor) SetTarget(CCAPI string, skipSSLValidation bool) (Warnings, er
 		actor.CloudControllerClient.LoggregatorEndpoint(),
 		actor.CloudControllerClient.DopplerEndpoint(),
 		actor.CloudControllerClient.TokenEndpoint(),
+		actor.CloudControllerClient.RoutingEndpoint(),
 		skipSSLValidation,
 	)
 
@@ -20,5 +21,6 @@ func (actor Actor) SetTarget(CCAPI string, skipSSLValidation bool) (Warnings, er
 }
 
 func (actor Actor) ClearTarget() {
-	actor.Config.SetTargetInformation("", "", "", "", "", "", false)
+	actor.Config.SetTargetInformation("", "", "", "", "", "", "", false)
+	actor.Config.SetTokenInformation("", "", "")
 }
