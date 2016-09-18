@@ -55,44 +55,121 @@ resources:
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
 
-- name: homebrew-tap
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/homebrew-tap
-    private_key: {{homebrew-tap-github-private-key}}
-    branch: master
-
 - name: cf-cli-binaries
   type: s3
   source:
     bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
     versioned_file: cf-cli-binaries.tgz
 
-- name: cf-cli-installers
+- name: edge-linux-binary-32
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
-    versioned_file: cf-cli-installers.tgz
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli_edge_linux_i686.tgz
+    region_name: us-west-1
 
-- name: cf-cli-installer-win32
+- name: edge-linux-binary-64
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
-    versioned_file: cf-cli-installer_win32.zip
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli_edge_linux_x86-64.tgz
+    region_name: us-west-1
 
-- name: cf-cli-installer-win64
+- name: edge-osx-binary-64
   type: s3
   source:
-    bucket: {{staging-bucket-name}}
-    access_key_id: {{staging-bucket-access-key-id}}
-    secret_access_key: {{staging-bucket-secret-access-key}}
-    versioned_file: cf-cli-installer_winx64.zip
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli_edge_osx.tgz
+    region_name: us-west-1
+
+- name: edge-windows-binary-32
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli_edge_win32.zip
+    region_name: us-west-1
+
+- name: edge-windows-binary-64
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli_edge_winx64.zip
+    region_name: us-west-1
+
+- name: edge-deb-installer-32
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_i686.deb
+    region_name: us-west-1
+
+- name: edge-deb-installer-64
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_x86-64.deb
+    region_name: us-west-1
+
+- name: edge-redhat-installer-32
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_i686.rpm
+    region_name: us-west-1
+
+- name: edge-redhat-installer-64
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_x86-64.rpm
+    region_name: us-west-1
+
+- name: edge-osx-installer-64
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_osx.pkg
+    region_name: us-west-1
+
+- name: edge-windows-installer-32
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_win32.zip
+    region_name: us-west-1
+
+- name: edge-windows-installer-64
+  type: s3
+  source:
+    bucket: cf-cli-releases
+    access_key_id: {{cli-production-access-key-id}}
+    secret_access_key: {{cli-production-secret-access-key}}
+    versioned_file: master/cf-cli-installer_edge_winx64.zip
+    region_name: us-west-1
 
 - name: bosh-lites-dea-pool
   type: pool
@@ -144,6 +221,11 @@ resources:
   source:
     url: https://hooks.slack.com/services/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
 
+- name: publish-rpm-timer
+  type: time
+  source:
+    interval: 1h
+
 groups:
 - name: cli
   jobs:
@@ -154,12 +236,12 @@ groups:
   - cats-diego
   - cats-windows
   - create-installers
-  - shipit
-  - publish-edge-archives
-  - publish-final-release
 - name: images
   jobs:
   - create-cli-ci-image
+- name: publish-rpm
+  jobs:
+  - publish-rpm
 
 jobs:
 - name: units
@@ -220,16 +302,6 @@ jobs:
          params:
            channel: '#cli-firehose'
            text: "build osx binaries failed OR errored :("
-  - task: sign-windows-binary
-    file: cli-ci/ci/cli/tasks/sign-windows-binary.yml
-    params:
-      SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
-      SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
-    on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-firehose'
-         text: "signing binaries failed OR errored :("
   - task: combine-binaries
     file: cli-ci/ci/cli/tasks/combine-binaries.yml
   - put: cf-cli-binaries
@@ -410,126 +482,57 @@ jobs:
     - get: cli-private
     - get: cli-ci
   - aggregate:
-    - do:
-      - task: windows
-        file: cli-ci/ci/cli/tasks/create-installers-windows.yml
-        params:
-          SIGNTOOL_CERT_PATH: {{signtool-cert-path}}
-          SIGNTOOL_CERT_PASSWORD: {{signtool-cert-password}}
-      - task: unix
-        file: cli-ci/ci/cli/tasks/create-installers.yml
+    - task: unix
+      file: cli-ci/ci/cli/tasks/create-installers.yml
       on_failure:
          put: slack-alert
          params:
            channel: '#cli-firehose'
-           text: "create installers failed OR errored :("
+           text: "create unix installers failed OR errored :("
+    - task: windows
+      file: cli-ci/ci/cli/tasks/create-installers-windows.yml
+      on_failure:
+         put: slack-alert
+         params:
+           channel: '#cli-firehose'
+           text: "create windows installer failed OR errored :("
   - aggregate:
-    - put: cf-cli-installer-win32
+    - put: edge-linux-binary-32
+      params:
+        file: archives/cf-cli_edge_linux_i686.tgz
+    - put: edge-linux-binary-64
+      params:
+        file: archives/cf-cli_edge_linux_x86-64.tgz
+    - put: edge-osx-binary-64
+      params:
+        file: archives/cf-cli_edge_osx.tgz
+    - put: edge-windows-binary-32
+      params:
+        file: archives/cf-cli_edge_win32.zip
+    - put: edge-windows-binary-64
+      params:
+        file: archives/cf-cli_edge_winx64.zip
+    - put: edge-deb-installer-32
+      params:
+        file: archives/cf-cli-installer_i686.deb
+    - put: edge-deb-installer-64
+      params:
+        file: archives/cf-cli-installer_x86-64.deb
+    - put: edge-redhat-installer-32
+      params:
+        file: archives/cf-cli-installer_i686.rpm
+    - put: edge-redhat-installer-64
+      params:
+        file: archives/cf-cli-installer_x86-64.rpm
+    - put: edge-osx-installer-64
+      params:
+        file: archives/cf-cli-installer_osx.pkg
+    - put: edge-windows-installer-32
       params:
         file: winstallers/cf-cli-installer_win32.zip
-    - put: cf-cli-installer-win64
+    - put: edge-windows-installer-64
       params:
         file: winstallers/cf-cli-installer_winx64.zip
-    - put: cf-cli-installers
-      params:
-        file: installers/cf-cli-installers.tgz
-
-- name: publish-edge-archives
-  serial: true
-  plan:
-  - aggregate:
-    - get: cf-cli-binaries
-      trigger: true
-      passed: [create-installers]
-    - get: cli
-      passed: [create-installers]
-    - get: cf-cli-installers
-      passed: [create-installers]
-    - get: cf-cli-installer-win32
-      passed: [create-installers]
-    - get: cf-cli-installer-win64
-      passed: [create-installers]
-    - get: cli-ci
-  - task: publish
-    file: cli-ci/ci/cli/tasks/publish-edge-archives.yml
-    params:
-      AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
-    on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-firehose'
-         text: "publish edge archives failed OR errored :("
-  - put: cf-cli-tracker
-    params:
-      repos:
-      - cli
-
-- name: shipit
-  serial: true
-  plan:
-  - aggregate:
-    - get: final-cli
-      trigger: true
-      passed: [create-installers]
-    - get: cli
-      passed: [create-installers]
-    - get: cf-cli-binaries
-      passed: [create-installers]
-    - get: cf-cli-installers
-      passed: [create-installers]
-    - get: cf-cli-installer-win32
-      passed: [create-installers]
-    - get: cf-cli-installer-win64
-      passed: [create-installers]
-
-- name: publish-final-release
-  serial: true
-  plan:
-  - aggregate:
-    - get: final-cli
-      trigger: true
-      passed: [shipit]
-    - get: cli
-      passed: [shipit]
-    - get: cf-cli-binaries
-      passed: [shipit]
-    - get: cf-cli-installers
-      passed: [shipit]
-    - get: cf-cli-installer-win32
-      passed: [shipit]
-    - get: cf-cli-installer-win64
-      passed: [shipit]
-    - get: cli-ci
-    - get: homebrew-tap
-    - get: cli-private
-  - task: publish
-    file: cli-ci/ci/cli/tasks/publish-final-release.yml
-    params:
-      AWS_ACCESS_KEY_ID: {{release-bucket-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{release-bucket-secret-access-key}}
-    on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-firehose'
-         text: "publish final release failed OR errored :("
-  - task: update-brew-formula
-    file: cli-ci/ci/cli/tasks/update-brew-formula.yml
-    on_failure:
-       put: slack-alert
-       params:
-         channel: '#cli-firehose'
-         text: "Update brew formula failed OR errored :("
-  - put: homebrew-tap
-    params:
-      repository: update-brew-formula-output/homebrew-tap
-  - task: publish-debian
-    file: cli-ci/ci/cli/tasks/publish-debian.yml
-    params:
-      GPG_KEY: {{gpg_key}}
-      KEY_ID:  {{gpg_key_id}}
-      AWS_SECRET_ACCESS_KEY: {{debian_secret_access_key}}
-      AWS_ACCESS_KEY_ID: {{debian_access_key_id}}
 
 - name: create-cli-ci-image
   serial: true
@@ -544,3 +547,15 @@ jobs:
     params:
       load_base: golang
       build: cli-ci-dockerfile/ci
+
+- name: publish-rpm
+  plan:
+  - aggregate:
+    - get: publish-rpm-timer
+      trigger: true
+    - get: cli-ci
+  - task: publish-rpm
+    file: cli-ci/ci/cli/tasks/publish-rpm.yml
+    params:
+      AWS_ACCESS_KEY_ID: {{cli-production-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-secret-access-key}}

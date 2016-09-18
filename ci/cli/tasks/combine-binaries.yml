@@ -4,7 +4,6 @@ image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cross-compiled
-- name: signed
 - name: osx-compiled
 
 outputs:
@@ -27,10 +26,6 @@ run:
       mv * $cwd/combined
     popd
 
-    pushd signed
-      mv * $cwd/combined
-      chmod 0755 $cwd/combined/cf-cli_win*
-    popd
 
     pushd osx-compiled
       tar -xzf *.tgz

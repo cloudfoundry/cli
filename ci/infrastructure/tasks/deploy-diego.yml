@@ -4,7 +4,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-vagrant-ci
 
 params:
-  LITE_PRIVATE_IP_ADDRESS:
+  LITE_IP_ADDRESS:
 
 inputs:
 - name: bosh-lite-lock
@@ -21,7 +21,7 @@ run:
   - |
     set -eux
 
-    bosh -n target $LITE_PRIVATE_IP_ADDRESS
+    bosh -n target $LITE_IP_ADDRESS
     bosh login admin admin
     bosh upload release cflinuxfs2-rootfs-release/release.tgz --skip-if-exists
     bosh upload release etcd-release/release.tgz --skip-if-exists

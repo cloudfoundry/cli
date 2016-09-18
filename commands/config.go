@@ -12,7 +12,8 @@ type Config interface {
 	CurrentUser() (config.User, error)
 	Locale() string
 	Plugins() map[string]config.Plugin
-	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, skipSSLValidation bool)
+	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
+	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	Target() string
 	TargetedOrganization() config.Organization
 	TargetedSpace() config.Space
