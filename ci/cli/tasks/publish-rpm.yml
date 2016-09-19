@@ -20,7 +20,7 @@ run:
       s3://cf-cli-releases \
       .
 
-    createrepo .
+      createrepo -s sha .
 
     aws s3 sync \
       --delete \
