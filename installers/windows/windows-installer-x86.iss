@@ -4,7 +4,7 @@ AppName=Cloud Foundry CLI
 AppVersion=VERSION
 AppVerName=Cloud Foundry CLI version VERSION
 AppPublisher=Cloud Foundry Foundation
-PrivilegesRequired=none
+PrivilegesRequired=lowest
 DefaultDirName={pf}\CloudFoundry
 
 [Registry]
