@@ -2,6 +2,7 @@ package config
 
 import "github.com/SermoDigital/jose/jws"
 
+// User represents the user information provided by the JWT access token
 type User struct {
 	Name string
 }
