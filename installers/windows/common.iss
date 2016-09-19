@@ -39,7 +39,7 @@ begin
       'Please select whether you wish to make this software available for all users or just yourself.',
       True, False);
 
-  OptionPage.Add('&Anyone who uses this computer');
+  OptionPage.Add('&Anyone who uses this computer (run as administrator to enable)');
   OptionPage.Add('&Only for me');
 
   if IsAdminLoggedOn then
