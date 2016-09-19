@@ -1,5 +1,8 @@
 // package ui will provide hooks into STDOUT, STDERR and STDIN. It will also
 // handle translation as necessary.
+//
+// This package is explicitly designed for the CF CLI and is *not* to be used
+// by any package outside of the commands package.
 package ui
 
 import (
@@ -41,6 +44,7 @@ type Config interface {
 // TranslatableError it wraps the error interface adding a way to set the
 // translation function on the error
 type TranslatableError interface {
+	// Returns back the untranslated error string
 	Error() string
 	SetTranslation(i18n.TranslateFunc) error
 }
@@ -85,7 +89,7 @@ func NewTestUI(out io.Writer, err io.Writer) UI {
 	}
 }
 
-// DisplayTable presents a two dimentional array of strings as a table to UI.Out
+// DisplayTable presents a two dimensional array of strings as a table to UI.Out
 func (ui UI) DisplayTable(prefix string, table [][]string) {
 	tw := tabwriter.NewWriter(ui.Out, 0, 1, 4, ' ', 0)
 
@@ -99,8 +103,8 @@ func (ui UI) DisplayTable(prefix string, table [][]string) {
 
 // DisplayText combines the formattedString template with the key maps and then
 // outputs it to the UI.Out file. Prior to outputting the formattedString, it
-// is run through the an internationalization function to translate it to a
-// pre-configured langauge. Only the first map in keys is used.
+// is run through an internationalization function to translate it to a
+// pre-configured language. Only the first map in keys is used.
 func (ui UI) DisplayText(formattedString string, keys ...map[string]interface{}) {
 	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
 	fmt.Fprintf(ui.Out, "%s\n", translatedValue)
@@ -156,8 +160,8 @@ func (ui UI) DisplayOK() {
 
 // DisplayErrorMessage combines the err template with the key maps and then
 // outputs it to the UI.Err file. It will then output a red translated "FAILED"
-// to UI.Out. Prior to outputting the err, it is run through the an
-// internationalization function to translate it to a pre-configured langauge.
+// to UI.Out. Prior to outputting the err, it is run through an
+// internationalization function to translate it to a pre-configured language.
 func (ui UI) DisplayErrorMessage(err string, keys ...map[string]interface{}) {
 	translatedValue := ui.translate(err, ui.templateValuesFromKeys(keys))
 	fmt.Fprintf(ui.Err, "%s\n", translatedValue)
