@@ -25,7 +25,7 @@ run:
       CLI_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
     popd
 
-    CLI_VERSION=$(cat cli/VERSION)
+    CLI_VERSION=$(cat cli-ci/ci/VERSION)
 
     pushd homebrew-tap
       cat <<EOF > cf-cli.rb

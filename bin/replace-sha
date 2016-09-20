@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURRENT_SHA=$(git rev-parse --short HEAD)
-CURRENT_VERSION=$(cat VERSION)
+CURRENT_VERSION=$(cat ci/VERSION)
 VERSION_STRING="${CURRENT_VERSION}+${CURRENT_SHA}"
 
 if [ $(uname) == darwin ]; then
