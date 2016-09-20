@@ -4,5 +4,5 @@ echo "Ammending commit with CHANGELOG update"
 git commit --amend --no-edit
 
 echo "Retagging"
-git tag -d v$(cat VERSION)
-git tag v$(cat VERSION)
+git tag -d v$(cat ci/VERSION)
+git tag v$(cat ci/VERSION)

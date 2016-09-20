@@ -28,14 +28,14 @@ run:
        tar xvf cf-cli-binaries.tgz
     popd
 
-    VERSION=$(cat cli/VERSION)
+    VERSION=$(cat cli-ci/ci/VERSION)
     RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
 
     echo "Building 32-bit Debian package"
     (
         SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_linux_i686 | cut -f 1)"
 
-        pushd cli/installers/deb
+        pushd cli-ci/ci/installers/deb
           mkdir -p cf/usr/bin
 
           cp $root/cf-cli-binaries/cf-cli_linux_i686 cf/usr/bin/cf
@@ -55,7 +55,7 @@ run:
     (
         SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_linux_x86-64 | cut -f 1)"
 
-        pushd cli/installers/deb
+        pushd cli-ci/ci/installers/deb
           mkdir -p cf/usr/bin
 
           cp $root/cf-cli-binaries/cf-cli_linux_x86-64 cf/usr/bin/cf
@@ -73,7 +73,7 @@ run:
 
     echo "Building 32-bit RedHat package"
     (
-      pushd cli/installers/rpm
+      pushd cli-ci/ci/installers/rpm
         cp $root/cf-cli-binaries/cf-cli_linux_i686 cf
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
@@ -84,7 +84,7 @@ run:
 
     echo "Building 64-bit RedHat package"
     (
-      pushd cli/installers/rpm
+      pushd cli-ci/ci/installers/rpm
         cp $root/cf-cli-binaries/cf-cli_linux_x86-64 cf
         echo "Version: ${RPM_VERSION}" > cf-cli.spec
         cat cf-cli.spec.template >> cf-cli.spec
@@ -97,7 +97,7 @@ run:
     (
       SIZE="$(BLOCKSIZE=1000 du $root/cf-cli-binaries/cf-cli_osx | cut -f 1)"
 
-      pushd cli/installers/osx
+      pushd cli-ci/ci/installers/osx
         sed -i -e "s/VERSION/${VERSION}/g" Distribution
         sed -i -e "s/SIZE/${SIZE}/g" Distribution
         mkdir -p cf-cli/usr/local/bin

@@ -6,7 +6,7 @@ set -ex
 
 component=$1
 
-old_version=$(cat VERSION)
+old_version=$(cat ci/VERSION)
 major=$(echo $old_version | cut -d'.' -f 1)
 minor=$(echo $old_version | cut -d'.' -f 2)
 patch=$(echo $old_version | cut -d'.' -f 3)
@@ -34,11 +34,11 @@ esac
 version=$major.$minor.$patch
 
 echo "Updating VERSION file to $version"
-echo $version > VERSION
+echo $version > ci/VERSION
 
 echo "Committing change"
 git reset .
-git add VERSION
+git add ci/VERSION
 
 git commit -m "Bump version to $version"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=$(cat VERSION)
+VERSION=$(cat ci/VERSION)
 
 cat <<-NOTES
 Installers
