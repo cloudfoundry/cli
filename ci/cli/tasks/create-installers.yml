@@ -6,6 +6,7 @@ inputs:
 - name: cf-cli-binaries
 - name: cli-private
 - name: cli
+- name: cli-ci
 
 outputs:
 - name: archives
