@@ -6,7 +6,7 @@ AppVerName=Cloud Foundry CLI version VERSION
 AppPublisher=Cloud Foundry Foundation
 ArchitecturesInstallIn64BitMode=x64 ia64
 ArchitecturesAllowed=x64 ia64
-PrivilegesRequired=lowest
+PrivilegesRequired=none
 DefaultDirName={pf}\CloudFoundry
 
 [Registry]
