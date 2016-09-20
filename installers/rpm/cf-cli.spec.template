@@ -1,0 +1,26 @@
+Summary: Cloud Foundry command line client 
+Name: cf-cli 
+Release: 1
+Group: Development/Tools 
+License: Apache 
+Source: %{expand:%%(pwd)}
+
+%description
+%{summary}
+
+%prep
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/usr/bin
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/cf-cli
+cd $RPM_BUILD_ROOT
+cp %{SOURCEURL0}/cf ./usr/bin/cf
+cp %{SOURCEURL0}/COPYING ./usr/share/doc/cf-cli/COPYING
+
+%clean
+rm -rf "$RPM_BUILD_ROOT"
+
+%files
+%defattr(644,root,root)
+/usr/share/doc/cf-cli/COPYING
+%defattr(755,root,root)
+/usr/bin/cf
