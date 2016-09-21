@@ -28,9 +28,37 @@ Follow these steps to make a contribution to any of our open source repositories
 
 ## Compiling the Binary
 
-1. `cd $GOPATH/src/github.com/cloudfoundry/cli`
-1. `bin/build`
-1. The binary will be in `out/cf`
+This will build a static binary, without ``-tags netgo``, it will dynamically link to the local networking library.
+
+### Linux 32-bit
+
+```
+CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_i686 .
+```
+
+### Linux 64-bit
+
+```
+CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_x86-64 .
+```
+
+### Windows 32-bit
+
+```
+GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe .
+```
+
+### Windows 64-bit
+
+```
+GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe .
+```
+
+### OSX
+
+```
+GOARCH=amd64 GOOS=darwin go build -o out/cf-cli_osx .
+```
 
 ## Workflow
 
