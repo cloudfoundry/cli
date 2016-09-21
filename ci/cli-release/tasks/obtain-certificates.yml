@@ -7,7 +7,7 @@ params:
   CERT_PATH:
 
 outputs:
-- name: certificates
+- name: certificates-osx
 
 run:
   path: bash
@@ -16,4 +16,4 @@ run:
   - |
     set -ex
 
-    cp -a $CERT_PATH/* certificates
+    cp -a $CERT_PATH/* certificates-osx
