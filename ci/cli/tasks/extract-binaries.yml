@@ -1,0 +1,24 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: cf-cli-binaries
+
+outputs:
+- name: extracted-binaries
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+    set -o pipefail
+
+    pushd cf-cli-binaries
+      tar xvf cf-cli-binaries.tgz
+      rm cf-cli-binaries.tgz
+    popd
+
+    mv cf-cli-binaries/* extracted-binaries
