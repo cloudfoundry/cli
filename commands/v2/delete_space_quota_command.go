@@ -10,8 +10,8 @@ import (
 
 type DeleteSpaceQuotaCommand struct {
 	RequiredArgs    flags.SpaceQuota `positional-args:"yes"`
-	Force           bool             `short:"f" description:"Force delete (do not prompt for confirmation)"`
-	usage           interface{}      `usage:"CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"`
+	Force           bool             `short:"f" description:"Force deletion without confirmation"`
+	usage           interface{}      `usage:"CF_NAME delete-space-quota SPACE_QUOTA_NAME [-f]"`
 	relatedCommands interface{}      `related_commands:"space-quotas"`
 }
 
