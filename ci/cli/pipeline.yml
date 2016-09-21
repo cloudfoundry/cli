@@ -547,6 +547,10 @@ jobs:
     - put: edge-windows-installer-64
       params:
         file: winstallers/cf-cli-installer_winx64.zip
+  - put: cf-cli-tracker
+    params:
+      repos:
+      - cli
 
 - name: create-cli-ci-image
   serial: true
