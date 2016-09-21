@@ -1,0 +1,19 @@
+---
+platform: darwin
+
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  CERT_PATH:
+
+outputs:
+- name: certificates
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    cp -a $CERT_PATH/* certificates

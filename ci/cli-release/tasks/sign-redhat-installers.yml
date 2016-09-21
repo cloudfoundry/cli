@@ -1,0 +1,32 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  GPG_KEY_LOCATION:
+
+inputs:
+- name: cli-ci
+- name: edge-redhat-installer-32
+- name: edge-redhat-installer-64
+
+outputs:
+- name: signed-redhat-installer
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    VERSION=$(cat cli-ci/ci/VERSION)
+
+    gpg --import $GPG_KEY_LOCATION
+
+    rpmsign --addsign edge-redhat-installer-32/cf-cli-installer_i686.rpm
+    rpmsign --addsign edge-redhat-installer-64/cf-cli-installer_x86-64.rpm
+
+    mv edge-redhat-installer-32/cf-cli-installer_i686.rpm signed-redhat-installer/cf-cli-installer_$VERSION_i686.rpm
+    mv edge-redhat-installer-64/cf-cli-installer_x86-64.rpm signed-redhat-installer/cf-cli-installer_$VERSION_x86-64.rpm
