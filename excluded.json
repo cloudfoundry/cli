@@ -573,7 +573,7 @@
     "^yaml",
     "^\\.\\w+$",
     "^[\\Wsd]+$",
-    "%#?[sodtvq]",
+    "%#?-?\\d*[sodtvq]",
     "^ (restage|target).*$",
     "^(   )+CF_NAME [\\w-]+ .*$",
     "^' must be an? (float64|integer)$",

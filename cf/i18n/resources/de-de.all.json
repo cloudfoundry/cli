@@ -2240,6 +2240,10 @@
     "translation": "UMGEBUNGSVARIABLEN:"
   },
   {
+    "id": "ENVIRONMENT:",
+    "translation": ""
+  },
+  {
     "id": "EXAMPLES",
     "translation": "BEISPIELE"
   },

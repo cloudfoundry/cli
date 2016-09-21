@@ -27,6 +27,9 @@ type CommandInfo struct {
 
 	// Flags contains the list of flags for this command
 	Flags []CommandFlag
+
+	// Environment is a list of environment variables specific for this command
+	Environment []EnvironmentVariable
 }
 
 // CommandFlag contains the help details of a command's flag
@@ -39,6 +42,13 @@ type CommandFlag struct {
 
 	// Description is the description of the flag
 	Description string
+}
+
+// Environment contains env vars specific for this command
+type EnvironmentVariable struct {
+	Name         string
+	Description  string
+	DefaultValue string
 }
 
 // CommandInfoByName returns the help information for a particular commandName in
@@ -61,6 +71,7 @@ func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (C
 		Description: tag.Get("description"),
 		Alias:       tag.Get("alias"),
 		Flags:       []CommandFlag{},
+		Environment: []EnvironmentVariable{},
 	}
 
 	command := field.Type
@@ -88,6 +99,14 @@ func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (C
 				Short:       fieldTag.Get("short"),
 				Long:        fieldTag.Get("long"),
 				Description: fieldTag.Get("description"),
+			})
+		}
+
+		if fieldTag.Get("environmentName") != "" {
+			cmd.Environment = append(cmd.Environment, EnvironmentVariable{
+				Name:         fieldTag.Get("environmentName"),
+				DefaultValue: fieldTag.Get("environmentDefault"),
+				Description:  fieldTag.Get("environmentDescription"),
 			})
 		}
 	}
