@@ -9,9 +9,11 @@ import (
 )
 
 type RestartCommand struct {
-	RequiredArgs    flags.AppName `positional-args:"yes"`
-	usage           interface{}   `usage:"CF_NAME restart APP_NAME"`
-	relatedCommands interface{}   `related_commands:"restage, restart-app-instance"`
+	RequiredArgs        flags.AppName `positional-args:"yes"`
+	usage               interface{}   `usage:"CF_NAME restart APP_NAME"`
+	relatedCommands     interface{}   `related_commands:"restage, restart-app-instance"`
+	envCFStagingTimeout interface{}   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 }
 
 func (_ RestartCommand) Setup(config commands.Config, ui commands.UI) error {

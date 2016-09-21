@@ -228,18 +228,6 @@ func (cmd HelpCommand) displayHelpFooter() {
 			"ENVName":     "CF_PLUGIN_HOME=path/to/dir/",
 			"Description": "Override path to default plugin config directory",
 		})
-	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}              {{.Description}}",
-		[]string{"Description"},
-		map[string]interface{}{
-			"ENVName":     "CF_STAGING_TIMEOUT=15",
-			"Description": "Max wait time for buildpack staging, in minutes",
-		})
-	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}               {{.Description}}",
-		[]string{"Description"},
-		map[string]interface{}{
-			"ENVName":     "CF_STARTUP_TIMEOUT=5",
-			"Description": "Max wait time for app instance startup, in minutes",
-		})
 	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}                      {{.Description}}",
 		[]string{"Description"},
 		map[string]interface{}{
@@ -334,6 +322,19 @@ func (cmd HelpCommand) displayCommand() error {
 					"Flags":       name,
 					"Spaces":      strings.Repeat(" ", nameWidth-len(name)),
 					"Description": flag.Description,
+				})
+		}
+	}
+
+	if len(cmdInfo.Environment) != 0 {
+		cmd.UI.DisplayNewline()
+		cmd.UI.DisplayText("ENVIRONMENT:")
+		for _, envVar := range cmdInfo.Environment {
+			cmd.UI.DisplayTextWithKeyTranslations("   {{.EnvVar}}{{.Description}}",
+				[]string{"Description"},
+				map[string]interface{}{
+					"EnvVar":      fmt.Sprintf("%-29s", fmt.Sprintf("%s=%s", envVar.Name, envVar.DefaultValue)),
+					"Description": envVar.Description,
 				})
 		}
 	}

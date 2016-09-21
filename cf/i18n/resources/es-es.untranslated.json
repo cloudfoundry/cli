@@ -1120,6 +1120,10 @@
     "translation": "Disabling ssh support for space '{{.SpaceName}}'..."
   },
   {
+    "id": "ENVIRONMENT:",
+    "translation": ""
+  },
+  {
     "id": "Empty file or folder",
     "translation": "Empty file or folder"
   },

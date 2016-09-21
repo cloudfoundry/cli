@@ -2240,6 +2240,10 @@
     "translation": "环境变量:"
   },
   {
+    "id": "ENVIRONMENT:",
+    "translation": ""
+  },
+  {
     "id": "EXAMPLES",
     "translation": "示例"
   },

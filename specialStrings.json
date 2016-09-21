@@ -1,6 +1,7 @@
 {
   "captureGroupSubstrings": [
     "`.*description:\"(.*)\".*`",
-    "`.*usage:\"(.*)\".*`"
+    "`.*usage:\"(.*)\".*`",
+    "`.*environmentDescription:\"(.*?)\".*`"
   ]
 }

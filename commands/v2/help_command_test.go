@@ -208,6 +208,66 @@ var _ = Describe("Help Command", func() {
 			})
 		})
 
+		Describe("Environment", func() {
+			Context("has environment variables", func() {
+				var envVars []v2actions.EnvironmentVariable
+
+				BeforeEach(func() {
+					cmd.OptionalArgs = flags.CommandName{
+						CommandName: "push",
+					}
+					envVars = []v2actions.EnvironmentVariable{
+						v2actions.EnvironmentVariable{
+							Name:         "CF_STAGING_TIMEOUT",
+							Description:  "Max wait time for buildpack staging, in minutes",
+							DefaultValue: "15",
+						},
+						v2actions.EnvironmentVariable{
+							Name:         "CF_STARTUP_TIMEOUT",
+							Description:  "Max wait time for app instance startup, in minutes",
+							DefaultValue: "5",
+						},
+					}
+					commandInfo := v2actions.CommandInfo{
+						Name:        "push",
+						Environment: envVars,
+					}
+
+					fakeActor.CommandInfoByNameReturns(commandInfo, nil)
+				})
+
+				It("displays the timeouts under environment", func() {
+					err := cmd.Execute(nil)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(fakeUI.Out).To(Say("ENVIRONMENT:"))
+					Expect(fakeUI.Out).To(Say(`
+   CF_STAGING_TIMEOUT=15        Max wait time for buildpack staging, in minutes
+   CF_STARTUP_TIMEOUT=5         Max wait time for app instance startup, in minutes
+`))
+				})
+			})
+
+			Context("does not have any associated environment variables", func() {
+				BeforeEach(func() {
+					cmd.OptionalArgs = flags.CommandName{
+						CommandName: "app",
+					}
+					commandInfo := v2actions.CommandInfo{
+						Name: "app",
+					}
+
+					fakeActor.CommandInfoByNameReturns(commandInfo, nil)
+				})
+
+				It("does not show the environment section", func() {
+					err := cmd.Execute(nil)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(fakeUI.Out).ToNot(Say("ENVIRONMENT:"))
+				})
+			})
+		})
+
 		Describe("plug-in command", func() {
 			BeforeEach(func() {
 				cmd.OptionalArgs = flags.CommandName{
