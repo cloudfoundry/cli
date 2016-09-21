@@ -24,6 +24,9 @@ run:
 
     VERSION=$(cat cli-ci/ci/VERSION)
 
+    ls repackaged-binaries-and-installers signed-osx-installer signed-redhat-installer
+    exit 1
+
     aws s3 cp repackaged-binaries-and-installers/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
     aws s3 cp signed-osx-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
     aws s3 cp signed-redhat-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
