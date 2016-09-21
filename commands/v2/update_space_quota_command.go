@@ -19,7 +19,7 @@ type UpdateSpaceQuotaCommand struct {
 	NumRoutes                int                       `short:"r" description:"Total number of routes"`
 	ReservedRoutePorts       int                       `long:"reserved-route-ports" description:"Maximum number of routes that may be created with reserved ports"`
 	NumServiceInstances      int                       `short:"s" description:"Total number of service instances"`
-	usage                    interface{}               `usage:"CF_NAME update-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-n NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
+	usage                    interface{}               `usage:"CF_NAME update-space-quota SPACE_QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-n NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]"`
 	relatedCommands          interface{}               `related_commands:"space-quota, space-quotas"`
 }
 
