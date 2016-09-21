@@ -81,7 +81,7 @@ If the error remains or feature still missing, check the [open issues](https://g
 
 For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples).
 
-## Contributing to & Building the CLI
+## Contributing & Build Instructions
 
 Please read the [contributors' guide](CONTRIBUTING.md)
 
