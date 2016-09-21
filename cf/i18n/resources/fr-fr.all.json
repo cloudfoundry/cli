@@ -636,12 +636,16 @@
     "translation": "CF_NAME config [--async-timeout DELAI_ATTENTE_EN_MINUTES] [--trace (true | false | chemin/fichier)] [--color (true | false)] [--locale (ENVIRONNEMENT_LOCAL | CLEAR)]"
   },
   {
-    "id": "CF_NAME copy-source SOURCE-APP TARGET-APP [-s TARGET-SPACE [-o TARGET-ORG]] [--no-restart]\\n",
+    "id": "CF_NAME copy-source SOURCE_APP TARGET_APP [-s TARGET_SPACE [-o TARGET_ORG]] [--no-restart]",
     "translation": ""
   },
   {
     "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml ]",
     "translation": "CF_NAME create-app-manifest NOM_APP [-p /chemin/\u003cnom-app\u003e-manifeste.yml ]"
+  },
+  {
+    "id": "CF_NAME create-app-manifest APP_NAME [-p /path/to/\u003capp-name\u003e-manifest.yml]",
+    "translation": ""
   },
   {
     "id": "CF_NAME create-buildpack BUILDPACK PATH POSITION [--enable|--disable]",
@@ -720,7 +724,7 @@
     "translation": "CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE [-c PARAMETRES_JSON]\n\n   Si vous le souhaitez, fournissez des paramètres de configuration propres au service dans un objet JSON valide en ligne.\n  CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c '{\"nom\":\"valeur\",\"nom\":\"valeur\"}'\n\n  Si vous le souhaitez, fournissez un fichier contenant des paramètres de configuration propres au service dans un objet JSON valide. Le chemin d'accès au fichier de paramètres peut être absolu ou relatif.\n   CF_NAME create-service-key INSTANCE_SERVICE CLE_SERVICE -c CHEMIN_FICHIER\n\n   Exemple d'objet JSON valide :\n   {\n \"permissions\": \"read-only\"\n   }"
   },
   {
-    "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\\n\\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'\\n\\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\\n\\n   Example of valid JSON object:\\n   {\\n     \\\"permissions\\\": \\\"read-only\\\"\\n   }\\n\\nEXAMPLES:\\n   CF_NAME create-service-key mydb mykey -c '{\\\"permissions\\\":\\\"read-only\\\"}'\\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
+    "id": "CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY [-c PARAMETERS_AS_JSON]\\n\\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'\\n\\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. The path to the parameters file can be an absolute or relative path to a file.\\n   CF_NAME create-service-key SERVICE_INSTANCE SERVICE_KEY -c PATH_TO_FILE\\n\\n   Example of valid JSON object:\\n   {\\n      \\\"permissions\\\": \\\"read-only\\\"\\n   }\\n\\nEXAMPLES:\\n   CF_NAME create-service-key mydb mykey -c '{\\\"permissions\\\":\\\"read-only\\\"}'\\n   CF_NAME create-service-key mydb mykey -c ~/workspace/tmp/instance_config.json",
     "translation": ""
   },
   {
@@ -738,6 +742,10 @@
   {
     "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE-QUOTA]",
     "translation": "CF_NAME create-space ESPACE [-o ORG] [-q QUOTA-ESPACE]"
+  },
+  {
+    "id": "CF_NAME create-space SPACE [-o ORG] [-q SPACE_QUOTA]",
+    "translation": ""
   },
   {
     "id": "CF_NAME create-space-quota ",
@@ -874,6 +882,10 @@
   {
     "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
     "translation": "CF_NAME delete-space-quota NOM_QUOTA_ESPACE [-f]"
+  },
+  {
+    "id": "CF_NAME delete-space-quota SPACE_QUOTA_NAME [-f]",
+    "translation": ""
   },
   {
     "id": "CF_NAME delete-user USERNAME [-f]",
@@ -1084,7 +1096,7 @@
     "translation": "CF_NAME purge-service-offering SERVICE [-p FOURNISSEUR]"
   },
   {
-    "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER]\\n\\nWARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
+    "id": "CF_NAME purge-service-offering SERVICE [-p PROVIDER] [-f]\\n\\nWARNING: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
     "translation": ""
   },
   {
@@ -1240,6 +1252,10 @@
     "translation": "CF_NAME set-health-check NOM_APP 'port'|'none'"
   },
   {
+    "id": "CF_NAME set-health-check APP_NAME ('port' | 'none')",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME set-org-role USERNAME ORG ROLE\n\n",
     "translation": "CF_NAME set-org-role NOM_UTILISATEUR ORG ROLE\n\n"
   },
@@ -1266,6 +1282,10 @@
   {
     "id": "CF_NAME set-space-quota SPACE-NAME SPACE-QUOTA-NAME",
     "translation": "CF_NAME set-space-quota NOM_ESPACE NOM_QUOTA_ESPACE"
+  },
+  {
+    "id": "CF_NAME set-space-quota SPACE_NAME SPACE_QUOTA_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME set-space-role USERNAME ORG SPACE ROLE\n\n",
@@ -1432,7 +1452,7 @@
     "translation": "CF_NAME unset-space-quota ESPACE QUOTA\n\n"
   },
   {
-    "id": "CF_NAME unset-space-quota SPACE QUOTA\\n\\n",
+    "id": "CF_NAME unset-space-quota SPACE SPACE_QUOTA",
     "translation": ""
   },
   {
@@ -1476,7 +1496,7 @@
     "translation": "CF_NAME update-service INSTANCE_SERVICE [-p NOUVEAU_PLAN] [-c PARAMETRES_JSON] [-t ETIQUETTES]"
   },
   {
-    "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]\\n\\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\\n   CF_NAME update-service -c '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'\\n\\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \\n   The path to the parameters file can be an absolute or relative path to a file.\\n   CF_NAME update-service -c PATH_TO_FILE\\n\\n   Example of valid JSON object:\\n   {\\n      \\\"cluster_nodes\\\": {\\n         \\\"count\\\": 5,\\n         \\\"memory_mb\\\": 1024\\n      }\\n   }\\n\\n   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.\\n\\nEXAMPLES:\\n   CF_NAME update-service mydb -p gold\\n   CF_NAME update-service mydb -c '{\\\"ram_gb\\\":4}'\\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\\n   CF_NAME update-service mydb -t \\\"list,of, tags\\\"",
+    "id": "CF_NAME update-service SERVICE_INSTANCE [-p NEW_PLAN] [-c PARAMETERS_AS_JSON] [-t TAGS]\\n\\n   Optionally provide service-specific configuration parameters in a valid JSON object in-line.\\n   CF_NAME update-service -c '{\\\"name\\\":\\\"value\\\",\\\"name\\\":\\\"value\\\"}'\\n\\n   Optionally provide a file containing service-specific configuration parameters in a valid JSON object. \\n   The path to the parameters file can be an absolute or relative path to a file.\\n   CF_NAME update-service -c PATH_TO_FILE\\n\\n   Example of valid JSON object:\\n   {\\n      \\\"cluster_nodes\\\": {\\n         \\\"count\\\": 5,\\n         \\\"memory_mb\\\": 1024\\n      }\\n   }\\n\\n   Optionally provide a list of comma-delimited tags that will be written to the VCAP_SERVICES environment variable for any bound applications.\\n\\nEXAMPLES:\\n   CF_NAME update-service mydb -p gold\\n   CF_NAME update-service mydb -c '{\\\"ram_gb\\\":4}'\\n   CF_NAME update-service mydb -c ~/workspace/tmp/instance_config.json\\n   CF_NAME update-service mydb -t \\\"list, of, tags\\\"",
     "translation": ""
   },
   {
@@ -1508,7 +1528,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME update-space-quota QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-n NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]",
+    "id": "CF_NAME update-space-quota SPACE_QUOTA [-i INSTANCE_MEMORY] [-m MEMORY] [-n NAME] [-r ROUTES] [-s SERVICE_INSTANCES] [-a APP_INSTANCES] [--allow-paid-service-plans | --disallow-paid-service-plans] [--reserved-route-ports RESERVED_ROUTE_PORTS]",
     "translation": ""
   },
   {
