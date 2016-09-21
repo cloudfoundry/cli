@@ -18,13 +18,19 @@ Follow these steps to make a contribution to any of our open source repositories
 
 ## Setup
 
-1. Install [Go 1.6.x](https://golang.org)
+1. Install [Go 1.7.1] or up (https://golang.org/dl/)
 1. Create a directory where you would like to store the source for Go projects and their binaries (e.g. `$HOME/go`)
 1. Set an environment variable, `GOPATH`, pointing at the directory you created
 1. Get the `cf` source: `go get github.com/cloudfoundry/cli`
   * (Ignore any warnings about "no buildable Go source files")
 1. [Fork this repository](https://help.github.com/articles/fork-a-repo/), adding your fork as a remote
 1. Run our bootstrap script, `bin/bootstrap`
+
+## Compiling the Binary
+
+1. `cd $GOPATH/src/github.com/cloudfoundry/cli`
+1. `bin/build`
+1. The binary will be in `out/cf`
 
 ## Workflow
 
