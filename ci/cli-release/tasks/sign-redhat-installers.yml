@@ -7,6 +7,7 @@ params:
   GPG_KEY_LOCATION:
 
 inputs:
+- name: certificates
 - name: cli-ci
 - name: edge-redhat-installer-32
 - name: edge-redhat-installer-64
@@ -23,7 +24,7 @@ run:
 
     VERSION=$(cat cli-ci/ci/VERSION)
 
-    gpg --import $GPG_KEY_LOCATION
+    gpg --import certificates/$GPG_KEY_LOCATION
 
     rpmsign --addsign edge-redhat-installer-32/cf-cli-installer_i686.rpm
     rpmsign --addsign edge-redhat-installer-64/cf-cli-installer_x86-64.rpm
