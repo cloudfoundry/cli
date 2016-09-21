@@ -77,11 +77,11 @@ and try the command again.
 
 If the error remains or feature still missing, check the [open issues](https://github.com/cloudfoundry/cli/issues) and if not already raised please file a new issue with the requested details.
 
-## Plugins
+## Plugin Development
 
 For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples).
 
-## Contributing
+## Contributing to & Building the CLI
 
 Please read the [contributors' guide](CONTRIBUTING.md)
 
