@@ -1,0 +1,22 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  CERT_PATH:
+
+inputs:
+  - name: certificates-osx
+
+outputs:
+  - name: certificates
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    cp -a certificates-osx/* certificates
