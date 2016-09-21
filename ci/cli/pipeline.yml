@@ -481,6 +481,13 @@ jobs:
       passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cli-private
     - get: cli-ci
+  - task: extract-binaries
+    file: cli-ci/ci/cli/tasks/extract-binaries.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "extracting the binaries in installer creation failed OR errored :("
   - aggregate:
     - task: unix
       file: cli-ci/ci/cli/tasks/create-installers.yml
@@ -496,6 +503,13 @@ jobs:
          params:
            channel: '#cli-firehose'
            text: "create windows installer failed OR errored :("
+  - task: package-binaries
+    file: cli-ci/ci/cli/tasks/package-binaries.yml
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "extracting the binaries in installer creation failed OR errored :("
   - aggregate:
     - put: edge-linux-binary-32
       params:

@@ -1,0 +1,34 @@
+---
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: extracted-binaries
+- name: packaged
+
+outputs:
+- name: archives
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+    set -o pipefail
+
+    root=$PWD
+
+    pushd extracted-binaries
+      tar --transform="flags=r;s|cf-cli_osx|cf|" -czf $root/archives/cf-cli_edge_osx.tgz cf-cli_osx
+      tar --transform="flags=r;s|cf-cli_linux_i686|cf|" -czf $root/archives/cf-cli_edge_linux_i686.tgz cf-cli_linux_i686
+      tar --transform="flags=r;s|cf-cli_linux_x86-64|cf|" -czf $root/archives/cf-cli_edge_linux_x86-64.tgz cf-cli_linux_x86-64
+
+      mkdir win32 win64
+      mv cf-cli_win32.exe win32/cf.exe
+      mv cf-cli_winx64.exe win64/cf.exe
+      zip -j $root/archives/cf-cli_edge_win32.zip win32/cf.exe
+      zip -j $root/archives/cf-cli_edge_winx64.zip win64/cf.exe
+    popd
+
+    mv packaged/* archives
