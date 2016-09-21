@@ -82,6 +82,15 @@ var _ = Describe("main", func() {
 			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
 			Consistently(result.Out).ShouldNot(Say("Start an app"))
 			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("push"))
+		})
+
+		It("accepts -h before the command alias", func() {
+			result := Cf("-h", "p", "--no-route")
+			Consistently(result.Out).ShouldNot(Say("Incorrect Usage"))
+			Consistently(result.Out).ShouldNot(Say("Start an app"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("USAGE"))
+			Eventually(result.Out.Contents).Should(ContainSubstring("push"))
 		})
 	})
 

@@ -76,7 +76,11 @@ func parse(args []string) {
 						parse([]string{"help"})
 					}
 				default:
-					parse(extraArgs[1:])
+					if isCommand(extraArgs[0]) {
+						parse([]string{"help", extraArgs[0]})
+					} else {
+						parse(extraArgs[1:])
+					}
 				}
 			}
 
@@ -106,6 +110,15 @@ func parse(args []string) {
 	}
 }
 
+func isCommand(s string) bool {
+	_, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
+		func(fieldName string) bool {
+			field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
+			return s == field.Tag.Get("command") || s == field.Tag.Get("alias")
+		})
+
+	return found
+}
 func isOption(s string) bool {
 	return strings.HasPrefix(s, "-")
 }
