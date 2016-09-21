@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
@@ -69,7 +70,11 @@ func parse(args []string) {
 				case 0:
 					parse([]string{"help"})
 				case 1:
-					parse([]string{"help", extraArgs[0]})
+					if !isOption(extraArgs[0]) || (len(args) > 1 && extraArgs[0] == "-a") {
+						parse([]string{"help", extraArgs[0]})
+					} else {
+						parse([]string{"help"})
+					}
 				default:
 					parse(extraArgs[1:])
 				}
@@ -99,6 +104,10 @@ func parse(args []string) {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
 		os.Exit(1)
 	}
+}
+
+func isOption(s string) bool {
+	return strings.HasPrefix(s, "-")
 }
 
 func executionWrapper(cmd flags.Commander, args []string) error {
