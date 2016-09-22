@@ -3,6 +3,7 @@ image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli-ci
+- name: certificates
 
 params:
   GPG_KEY_LOCATION:
