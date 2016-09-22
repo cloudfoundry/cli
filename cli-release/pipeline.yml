@@ -188,3 +188,20 @@ jobs:
         CF_PASSWORD: {{cf-password}}
         CF_ORGANIZATION: {{oss-organization}}
         CF_SPACE: {{oss-space}}
+
+- name: update-debian-repo
+  serial: true
+  plan:
+  - get: cli-ci
+    trigger: true
+    passed: [update-claw]
+    params:
+      depth: 2
+  - task: publish-debian
+    file: cli-ci/ci/cli-release/tasks/publish-debian.yml
+    params:
+      GPG_KEY_LOCATION: {{gpg-key-location}}
+      KEY_ID: {{gpg-key-id-location}}
+      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
+      AWS_BUCKET_NAME: cf-cli-debian-repo
