@@ -28,7 +28,7 @@ run:
     ./cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$CF_ORGANIZATION" -s "$CF_SPACE"
     CURRENT_VERSIONS=$(./cf env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')
 
-    if [[ $CURRENT_VERSIONS ==*${LATEST_VERSION}* ]]; then
+    if [[ $CURRENT_VERSIONS == *${LATEST_VERSION}* ]]; then
       exit
     fi
 
