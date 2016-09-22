@@ -155,5 +155,5 @@ jobs:
   - task: upload-releases
     file: cli-ci/ci/cli-release/tasks/upload-releases.yml
     params:
-      ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
-      SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
+      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
