@@ -24,6 +24,10 @@ run:
 
     VERSION=$(cat cli-ci/ci/VERSION)
 
+    mkdir gpg-dir
+    export GNUPGHOME=$PWD/gpg-dir
+    trap "rm -rf $GNUPGHOME" 0
+
     gpg --import certificates/$GPG_KEY_LOCATION
 
     rpmsign --addsign edge-redhat-installer-32/cf-cli-installer_i686.rpm
