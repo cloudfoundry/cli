@@ -27,6 +27,9 @@ run:
     CERT_PASSWORD=$(cat certificates/$CERT_PASSWORD_LOCATION)
 
     security create-keychain -p "" temp-keychain
+
+    trap "security delete-keychain temp-keychain" 0
+
     security import certificates/$CERT_LOCATION -k temp-keychain -T "$(which productsign)" -P "$CERT_PASSWORD"
 
     productsign --timestamp \
@@ -34,5 +37,3 @@ run:
       --keychain temp-keychain \
       edge-osx-installer-64/cf-cli-installer_edge_osx.pkg \
       signed-osx-installer/cf-cli-installer_${VERSION}_osx.pkg
-
-    security delete-keychain temp-keychain
