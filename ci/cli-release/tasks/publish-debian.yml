@@ -7,7 +7,7 @@ inputs:
 
 params:
   GPG_KEY_LOCATION:
-  KEY_ID:
+  KEY_ID_LOCATION:
   AWS_SECRET_ACCESS_KEY:
   AWS_ACCESS_KEY_ID:
   AWS_BUCKET_NAME:
@@ -40,5 +40,4 @@ run:
     default-preference-list SHA512 SHA384 SHA256 SHA224 AES256 AES192 AES CAST5 ZLIB BZIP2 ZIP Uncompressed
     EOF
 
-    deb-s3 upload installers/*.deb --preserve-versions --sign=${KEY_ID} --bucket=${AWS_BUCKET_NAME}
-
+    deb-s3 upload installers/*.deb --preserve-versions --sign=$(cat ${KEY_ID_LOCATION}) --bucket=${AWS_BUCKET_NAME}
