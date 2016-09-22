@@ -115,7 +115,7 @@ jobs:
   - aggregate:
     - get: cli-ci
       params:
-        - depth: 2
+        depth: 2
     - get: edge-linux-binary-32
     - get: edge-linux-binary-64
     - get: edge-osx-binary-64
@@ -159,3 +159,27 @@ jobs:
     params:
       AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
+
+- name: create-and-sign-installers
+  serial: true
+  plan:
+  - get: cli-ci
+    params:
+      depth: 2
+  - aggregate:
+    - task: update-claw-pivotal
+      file: cli-ci/ci/cli-release/tasks/update-claw.yml
+      params:
+        CF_API: {{cf-api}}
+        CF_USERNAME: {{cf-username}}
+        CF_PASSWORD: {{cf-password}}
+        CF_ORGANIZATION: {{pivotal-organization}}
+        CF_SPACE: {{pivotal-space}}
+    - task: update-claw-oss
+      file: cli-ci/ci/cli-release/tasks/update-claw.yml
+      params:
+        CF_API: {{cf-api}}
+        CF_USERNAME: {{cf-username}}
+        CF_PASSWORD: {{cf-password}}
+        CF_ORGANIZATION: {{oss-organization}}
+        CF_SPACE: {{oss-space}}
