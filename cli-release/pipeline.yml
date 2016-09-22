@@ -160,14 +160,16 @@ jobs:
       AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
 
-- name: create-and-sign-installers
+- name: update-claw
   serial: true
   plan:
   - get: cli-ci
+    trigger: true
+    passed: [create-and-sign-installers]
     params:
       depth: 2
   - aggregate:
-    - task: update-claw-pivotal
+    - task: claw.run.pivotal.io
       file: cli-ci/ci/cli-release/tasks/update-claw.yml
       params:
         CF_API: {{cf-api}}
@@ -175,7 +177,7 @@ jobs:
         CF_PASSWORD: {{cf-password}}
         CF_ORGANIZATION: {{pivotal-organization}}
         CF_SPACE: {{pivotal-space}}
-    - task: update-claw-oss
+    - task: packages.cloudfoundry.org
       file: cli-ci/ci/cli-release/tasks/update-claw.yml
       params:
         CF_API: {{cf-api}}
