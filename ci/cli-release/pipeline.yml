@@ -143,7 +143,7 @@ jobs:
   - task: sign-redhat-installers
     file: cli-ci/ci/cli-release/tasks/sign-redhat-installers.yml
     params:
-      GPG_KEY_LOCATION: {{osx-certificate-location}}
+      GPG_KEY_LOCATION: {{gpg-key-location}}
 #   - do:
 #     - task: sign-windows-binaries
 #       file: cli-ci/ci/cli-release/tasks/sign-windows-binaries.yml
