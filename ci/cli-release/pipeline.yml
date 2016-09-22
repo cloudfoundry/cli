@@ -207,7 +207,7 @@ jobs:
     file: cli-ci/ci/cli-release/tasks/publish-debian.yml
     params:
       GPG_KEY_LOCATION: {{gpg-key-location}}
-      KEY_ID: {{gpg-key-id-location}}
+      KEY_ID_LOCATION: {{gpg-key-id-location}}
       AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
       AWS_BUCKET_NAME: cf-cli-debian-repo
