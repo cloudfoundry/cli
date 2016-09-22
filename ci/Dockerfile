@@ -24,3 +24,6 @@ RUN apt-get update && apt-get -y install jq
 RUN apt-get update && apt-get -y install ruby1.9.1
 RUN gem install deb-s3
 RUN apt-get update && apt-get -y install createrepo
+
+# for rpmsigning process
+RUN apt-get update && apt-get -y install expect
