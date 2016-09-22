@@ -24,6 +24,10 @@ run:
 
     VERSION=$(cat cli-ci/ci/VERSION)
 
+    cat<< EOF >~/.rpmmacros
+    _gpg_name CF CLI Team <cf-cli-eng@pivotal.io>
+    EOF
+
     mkdir gpg-dir
     export GNUPGHOME=$PWD/gpg-dir
     trap "rm -rf $GNUPGHOME" 0
