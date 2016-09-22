@@ -22,11 +22,11 @@ run:
   - |
     set -ex
     cat<<EOF >sign-rpm
-      #!/usr/bin/env expect -f
-      spawn rpmsign --addsign {*}$argv
-      expect -exact "Enter pass phrase: "
-      send -- "\r"
-      expect eof
+    #!/usr/bin/expect -f
+    spawn rpmsign --addsign {*}\$argv
+    expect -exact "Enter pass phrase: "
+    send -- "\r"
+    expect eof
     EOF
     chmod 700 sign-rpm
 
