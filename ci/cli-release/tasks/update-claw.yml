@@ -12,6 +12,7 @@ params:
 
 inputs:
 - name: cli-ci
+- name: edge-linux-binary-64
 
 run:
   path: bash
@@ -20,14 +21,16 @@ run:
   - |
     set -ex
 
+    tar -zxf edge-linux-binary-64/*.tgz
+
     LATEST_VERSION=$(cat cli-ci/ci/VERSION)
 
-    cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$CF_ORGANIZATION" -s "$CF_SPACE"
-    CURRENT_VERSIONS=$(cf env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')
+    ./cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$CF_ORGANIZATION" -s "$CF_SPACE"
+    CURRENT_VERSIONS=$(./cf env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')
 
     if [[ $CURRENT_VERSIONS ==*${LATEST_VERSION}* ]]; then
       exit
     fi
 
-    cf set-env claw AVAILABLE_VERSIONS "${CURRENT_VERSIONS},${LATEST_VERSION}"
-    cf restage claw
+    ./cf set-env claw AVAILABLE_VERSIONS "${CURRENT_VERSIONS},${LATEST_VERSION}"
+    ./cf restage claw
