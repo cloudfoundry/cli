@@ -1,0 +1,33 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  CF_API:
+  CF_USERNAME:
+  CF_PASSWORD:
+  CF_ORGANIZATION:
+  CF_SPACE:
+
+inputs:
+- name: cli-ci
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    LATEST_VERSION=$(cat cli-ci/ci/VERSION)
+
+    cf login -a $CF_API -u "$CF_USERNAME" -p "$CF_PASSWORD" -o "$CF_ORGANIZATION" -s "$CF_SPACE"
+    CURRENT_VERSIONS=$(cf env claw | grep AVAILABLE_VERSIONS | awk '{print $2}')
+
+    if [[ $CURRENT_VERSIONS ==*${LATEST_VERSION}* ]]; then
+      exit
+    fi
+
+    cf set-env claw AVAILABLE_VERSIONS "${CURRENT_VERSIONS},${LATEST_VERSION}"
+    cf restage claw
