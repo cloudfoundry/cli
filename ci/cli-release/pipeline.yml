@@ -197,6 +197,12 @@ jobs:
     passed: [update-claw]
     params:
       depth: 2
+  - task: obtain-certificates
+    file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
+    params:
+      CERT_PATH: {{osx-certificate-store}}
+  - task: copy-certificates
+    file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
   - task: publish-debian
     file: cli-ci/ci/cli-release/tasks/publish-debian.yml
     params:
