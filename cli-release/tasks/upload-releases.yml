@@ -7,7 +7,7 @@ params:
   AWS_SECRET_ACCESS_KEY:
 
 inputs:
-- name: cli-ci
+- name: cli
 - name: repackaged-binaries-and-installers
 - name: signed-osx-installer
 - name: signed-redhat-installer
@@ -22,7 +22,7 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli-ci/ci/VERSION)
+    VERSION=$(cat cli/ci/VERSION)
 
     aws s3 cp repackaged-binaries-and-installers/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
     aws s3 cp signed-osx-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive

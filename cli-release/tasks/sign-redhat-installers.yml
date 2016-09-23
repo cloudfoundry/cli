@@ -8,7 +8,7 @@ params:
 
 inputs:
 - name: certificates
-- name: cli-ci
+- name: cli
 - name: edge-redhat-installer-32
 - name: edge-redhat-installer-64
 
@@ -30,7 +30,7 @@ run:
     EOF
     chmod 700 sign-rpm
 
-    VERSION=$(cat cli-ci/ci/VERSION)
+    VERSION=$(cat cli/ci/VERSION)
 
     cat<< EOF >~/.rpmmacros
     %_gpg_name CF CLI Team <cf-cli-eng@pivotal.io>
