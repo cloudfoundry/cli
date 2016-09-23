@@ -11,6 +11,7 @@ inputs:
 - name: repackaged-binaries-and-installers
 - name: signed-osx-installer
 - name: signed-redhat-installer
+- name: signed-windows-zips
 
 outputs:
 - name: cf-cli-osx-tarball
@@ -27,3 +28,4 @@ run:
     aws s3 cp repackaged-binaries-and-installers/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
     aws s3 cp signed-osx-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
     aws s3 cp signed-redhat-installer/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
+    aws s3 cp signed-windows-zips/ s3://cf-cli-releases/releases/v${VERSION}/ --recursive
