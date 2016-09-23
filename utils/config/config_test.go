@@ -64,6 +64,7 @@ var _ = Describe("Config", func() {
 				Name: "CF-Community",
 				URL:  "https://plugins.cloudfoundry.org",
 			}}))
+			Expect(config.Experimental()).To(BeFalse())
 
 			pluginConfig := config.Plugins()
 			Expect(pluginConfig).To(BeEmpty())
@@ -193,6 +194,30 @@ var _ = Describe("Config", func() {
 				Expect(config.Target()).To(Equal("https://api.foo.com"))
 			})
 		})
+
+		DescribeTable("Experimental",
+			func(envVal string, expected bool) {
+				rawConfig := fmt.Sprintf(`{}`)
+				setConfig(homeDir, rawConfig)
+
+				defer os.Unsetenv("EXPERIMENTAL")
+				if envVal == "" {
+					os.Unsetenv("EXPERIMENTAL")
+				} else {
+					os.Setenv("EXPERIMENTAL", envVal)
+				}
+
+				config, err := LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+
+				Expect(config.Experimental()).To(Equal(expected))
+			},
+
+			Entry("uses default value of false if environment value is not set", "", false),
+			Entry("uses environment value if a valid environment value is set", "true", true),
+			Entry("uses default value of false if an invalid environment value is set", "something-invalid", false),
+		)
 
 		DescribeTable("Locale",
 			func(langVal string, lcAllVall string, configVal string, expected string) {
