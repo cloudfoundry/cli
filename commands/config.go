@@ -17,4 +17,5 @@ type Config interface {
 	Target() string
 	TargetedOrganization() config.Organization
 	TargetedSpace() config.Space
+	Experimental() bool
 }

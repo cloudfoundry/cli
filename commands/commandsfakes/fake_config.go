@@ -83,6 +83,12 @@ type FakeConfig struct {
 	targetedSpaceReturns     struct {
 		result1 config.Space
 	}
+	ExperimentalStub        func() bool
+	experimentalMutex       sync.RWMutex
+	experimentalArgsForCall []struct{}
+	experimentalReturns     struct {
+		result1 bool
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -370,6 +376,31 @@ func (fake *FakeConfig) TargetedSpaceReturns(result1 config.Space) {
 	}{result1}
 }
 
+func (fake *FakeConfig) Experimental() bool {
+	fake.experimentalMutex.Lock()
+	fake.experimentalArgsForCall = append(fake.experimentalArgsForCall, struct{}{})
+	fake.recordInvocation("Experimental", []interface{}{})
+	fake.experimentalMutex.Unlock()
+	if fake.ExperimentalStub != nil {
+		return fake.ExperimentalStub()
+	} else {
+		return fake.experimentalReturns.result1
+	}
+}
+
+func (fake *FakeConfig) ExperimentalCallCount() int {
+	fake.experimentalMutex.RLock()
+	defer fake.experimentalMutex.RUnlock()
+	return len(fake.experimentalArgsForCall)
+}
+
+func (fake *FakeConfig) ExperimentalReturns(result1 bool) {
+	fake.ExperimentalStub = nil
+	fake.experimentalReturns = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -395,6 +426,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.targetedOrganizationMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
+	fake.experimentalMutex.RLock()
+	defer fake.experimentalMutex.RUnlock()
 	return fake.invocations
 }
 

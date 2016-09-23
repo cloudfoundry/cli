@@ -28,6 +28,7 @@ var _ = Describe("API Command", func() {
 		fakeUI = ui.NewTestUI(out, out)
 		fakeActor = new(v2fakes.FakeAPIConfigActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
+		fakeConfig.ExperimentalReturns(true)
 
 		cmd = ApiCommand{
 			UI:     fakeUI,

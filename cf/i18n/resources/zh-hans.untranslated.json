@@ -1592,6 +1592,10 @@
     "translation": "The username"
   },
   {
+    "id": "This command is in EXPERIMENTAL stage and may change without notice",
+    "translation": ""
+  },
+  {
     "id": "URL",
     "translation": "URL"
   },
