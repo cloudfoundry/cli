@@ -1,3 +1,221 @@
+## 6.22.0
+* Bump version to 6.22.0
+* runs the old api command unless EXPERIMENTAL is set to true
+* adds 'Experimental' environment override to the config
+* GPG key id is stored in a file, not passed directly
+* follow symlinks
+* add certificates to the debian publising process
+* adding debian repo creation to release pipeline
+* Add space after equals sign
+* pull in cf-cli from previous step
+* update names, trigger claw update when signing is complete
+* add task for adding new version to claw env
+* don't go chasing waterfalls
+* upload to new-release-process for temporary testing
+* because gpg is dumb and requires interaction
+* try defining the macro directly
+* add rpm config for signing
+* force cleanup on exit, set the GNUPGHOME to working dir
+* add tacker story delivery
+* forgot to add the evil thing
+* evil thing I need to do until vito/houdini/issues/6 is fixed
+* improved wording
+* clarifying these sections are for cli & plugin developers
+* fix link
+* Replace build script in compilation instructions with commands
+* Add instructions for compiling the binary
+* fix file location, don't run sign jobs in aggregate
+* Show command help when given -h with command and extra args
+* use lastpass to store credentials
+* Remove duplicate invalid option message
+* update translations
+* adding base assets for release pipeline
+* update english help text to remove inconsistencies
+* adds environment variables section to the help command
+* change PrivilegesRequired back to none from lowest
+* add cli-ci add an input into cerate installers
+* move installers and VERSION into ci directory
+* enable installation of 32-bit windows cli as non-admin
+* enable non-admins to install without admin password
+* rpm use sha1 for checksum
+* more godoc!
+* name should align with external binaries
+* archives created by concourse
+* use the correct output directory
+* no longer require gpg key
+* no longer sign in our pipeline
+* Add RPM repo publish task to pipeline
+* remove signing from pipeline
+* download the installer rpm
+* Concourse task to generate and publish RPM repo metadata
+* use elastic ip addresses for the bosh lites
+* use relintdockerhubpushbot because it is more up-to-date
+* export prior to changing directories
+* run vagrant up in bosh-lite directory
+* use the correct env variables directly in bosh-lite provisioning
+* remove the correct value this time
+* Revert "update to use a separate subnet"
+* update to use a separate subnet
+* have to set subnet, can set instance type via ENV
+* try not changing the vagrant file, also destroy-on-error
+* swap private ip for public one
+* try automatically setting elastic ip
+* Revert "pass along public ip address"
+* pass along public ip address
+* update debian repo location
+* rename Debian keys to generic manager keys
+* update cf cli release bucket
+* update docker image to include createrepo
+* sign rpm installers
+* add options to cf plugins usage
+* add options to cf org usage
+* add options to cf space usage
+* use a more concise error message when app name and manifest are not provided
+* initial rewrite of 'api' command
+* use the original error not the coerced one
+* consolidate indentation for new help command
+* workaround mktemp for old darwin
+* use $TMPDIR instead of mktemp for osx
+* Remove incidental mistranslations
+* update error interface to adhere to standard error interface
+* UI no longer merges map, config is written to disk on command exit
+* verify that new phrases can be added to i18n files
+* reduce ginkgo test run parallelism to ensure it does not exceed resource limit
+* fix CF_API endpoint on gats scripts
+* run new integration suite with GATs
+* force posix style flags on windows
+* ensure locks get released on all deploy-cf-release
+* work around for the set-env
+* fix test to check for usage errors on stderr
+* display flag/argument errors to the screen
+* patch go-flags to allow custom flags to read '-'
+* use custom flag for memory and update go-flags
+* use the correct arguments for UpdateBuildpackCommand
+* update gats install path to code.cloudfoundry.org
+* change padding on common help to 4 spaces
+* org, not com.
+* add travis test branch
+* Update to code.cloudfoundry.com, and go 1.7
+* add basic tooling for new i18n workflow
+* update cli repo path to code.cloudfoundry.org
+* Update lint debt
+* fix spacing for create/delete-route commands
+* properly use 2 spaces between common commands
+* re-add line break between command categories for cf help -a
+* fix math for print plugin commands
+* adjust order of common plugin commands
+* fixup i18n files
+* refactor new UI so that it's injectable
+* Revert "somehow these tests didn't get merged in"
+* somehow these tests didn't get merged in
+* make tcp route help port numbers consistent
+* fix mismatching usage help for bind-running-security-group
+* fix capitalization of examples on auth help
+* add missing ds alias for delete-service
+* fix wrong capitalization on delete-service help
+* sort command help options
+* cf help shows only common commands
+* Remove FakeUI and added a NewTestUI()
+* sort related commands
+* add related commands to help text
+* translate "SEE ALSO:"
+* initial related commands structure
+* somehow missed these in the last commit
+* yeah, lets not keep debug output
+* EndPoint -> Endpoint, UaaEndpoint -> UAAEndpoint
+* add translations and fixed up some resources
+* fix help headers translation
+* fix language translation order
+* detect binary name from invocation
+* internationalization is back
+* displays installed plugins help by plugin and sorts commands alphabetically
+* use Alphabetic
+* Update test to reflect error returned from go-flags
+* Fix colors on Windows
+* switch to code.cloudfoundry.org
+* don't display plugins after every help category
+* support '-v' properly
+* help displays plugin specific help
+* add installed plugin commands to master help text
+* read plugin config
+* support the -v/--version flag
+* gofileutils/fileutils uses code.cloudfoundry.org
+* read config prior to running commands
+* added full page help
+* add actor interface
+* support additional error cases in help
+* add usage to all commands
+* show help with aliases and incorrect usage errors
+* WIP Backfilled all commands
+* use standard golang naming in commands directory
+* handle the horribleness that is PanicQuietly
+* move error handling to utils
+* add all the commands
+* introduce go-flags
+* github.com/cloudfoundry/cli -> code.cloudfoundry.org/cli
+* update untranslated files
+* fix translation issues
+* Merge remote-tracking branch 'origin/pr/940'
+* winstallers: fix include directive for x86 installer
+* winstallers: fix source path for cf.exe
+* winstallers: fix broken include directive
+* winstaller: add cf.exe to Path for non-admins
+* add default install directory
+* allow user to change install directory
+* change default install directory for non-admin users
+* build windows installer does not require privileged user
+* Merge remote-tracking branch 'origin/pr/926'
+* Merge pull request #936 from hyenaspots/contrib_doc
+* add shipt job to gate resources before release
+* preserve timestamp when copying cf binary on release
+* Revert "skip copy file to preserve file modification timestamp"
+* Revert "fix minor issue"
+* homebrew tap only commit if sha changes
+* fix minor issue
+* skip copy file to preserve file modification timestamp
+* Update i18n resources
+* make checksume constant when compressing the same file
+* added license shield
+* Improve contributor's guide
+* fix bad yaml
+* add sha256 signing to gpg
+* fix gpg_key printing on publish_debian task
+* Change import path of gpg private key
+* match os_arch on .deb filename
+* extract tarball with .deb before processing
+* edit path again for debian version
+* fix path for publish debian
+* configure more debian ci
+* publish debian repo in publish final release job
+* add directory before untarring installers
+* Non-interactive ruby installation on ci
+* Use private repo to import gpg key
+* add more spacing for concourse
+* add a space
+* add debian publishing to ci
+* Prevent usage messages form being printed twice
+* fixes an error with the way the cli resolves symlinks on windows
+* improved wording
+* moved edge binaries to end of download section
+* added plug for/link to community plugins site
+* added filing feature requests
+* removed details that are included in the issue template already
+* added items from main readme
+* mentioned that PRs with command/flag changes should be discussed in an issue first
+* Merge pull request #931 from cloudfoundry/shalako-patch-1
+* Fix a few problems that arise with go 1.7
+* output stderr for plugin commands
+* no more shadows
+* fixup bad linebreak on i18n file
+* Allow apps with 0 instances to be started
+* trace: Redact all passwords and tokens in JSON
+* remove more panics
+* command requirements use errors rather than panics
+* more fix
+* fix bug for windows appfiles test
+* Enable compression when creating zip files
+* Ensure cf curl output is properly passed back to plugins
+
 ## 6.21.1
 * Bump version to 6.21.1
 * update diego resources to come from cloudfoundry, not incubator
