@@ -1,0 +1,44 @@
+---
+platform: linux
+
+image: docker:///cloudfoundry/cli-ci
+
+params:
+  CERT_LOCATION:
+  CERT_PASSWORD_LOCATION:
+
+inputs:
+- name: edge-windows-binary-32
+- name: edge-windows-binary-64
+- name: certificates
+
+outputs:
+- name: extracted-binaries
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    unzip edge-windows-binary-64/cf-cli_edge_winx64.zip
+
+    osslsigncode sign \
+      -pkcs12 certificates/$CERT_LOCATION \
+      -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
+      -t http://timestamp.comodoca.com/authenticode \
+      -h sha256 \
+      -in cf.exe \
+      -out extracted-binaries/cf-cli_winx64.exe
+    rm -f cf.exe
+
+    unzip edge-windows-binary-32/cf-cli_edge_win32.zip
+
+    osslsigncode sign \
+      -pkcs12 certificates/$CERT_LOCATION \
+      -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
+      -t http://timestamp.comodoca.com/authenticode \
+      -h sha256 \
+      -in cf.exe \
+      -out extracted-binaries/cf-cli_win32.exe
