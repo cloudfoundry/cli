@@ -5236,6 +5236,10 @@
     "translation": "這個指令"
   },
   {
+    "id": "This command is in EXPERIMENTAL stage and may change without notice",
+    "translation": ""
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "這個指令需要「遞送 API」。您的目標端點回報它尚未啟用。"
   },

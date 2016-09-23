@@ -2,10 +2,12 @@ package v2
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actors/configactions"
 	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 	"code.cloudfoundry.org/cli/commands/ui"
@@ -38,6 +40,14 @@ func (cmd *ApiCommand) Setup(config commands.Config, ui commands.UI) error {
 }
 
 func (cmd *ApiCommand) Execute(args []string) error {
+	if cmd.Config.Experimental() == false {
+		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
+		return nil
+	}
+
+	cmd.UI.DisplayText("This command is in EXPERIMENTAL stage and may change without notice")
+	cmd.UI.DisplayNewline()
+
 	if cmd.Unset {
 		return cmd.ClearTarget()
 	}
