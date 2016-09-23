@@ -143,6 +143,7 @@ jobs:
   - task: copy-certificates
     file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
 
+- aggregate:
   - task: repackage-binaries-and-installers
     file: cli-ci/ci/cli-release/tasks/repackage-binaries-and-installers.yml
   - task: sign-osx-installer
@@ -155,13 +156,19 @@ jobs:
     file: cli-ci/ci/cli-release/tasks/sign-redhat-installers.yml
     params:
       GPG_KEY_LOCATION: {{gpg-key-location}}
-#   - do:
-#     - task: sign-windows-binaries
-#       file: cli-ci/ci/cli-release/tasks/sign-windows-binaries.yml
-#     - task: create-windows-installers
-#       file: cli-ci/ci/cli/tasks/create-windows-installers.yml
-#     - task: sign-windows-installers
-#       file: cli-ci/ci/cli/tasks/sign-windows-installers
+  - do:
+    - task: sign-windows-binaries
+      file: cli-ci/ci/cli-release/tasks/sign-windows-binaries.yml
+      params:
+        CERT_LOCATION: {{windows-certificate-location}}
+        CERT_PASSWORD_LOCATION: {{windows-certificate-password-location}}
+    - task: create-windows-installers
+      file: cli-ci/ci/cli/tasks/create-windows-installers.yml
+    - task: sign-and-repackage-installers-and-binaries
+      file: cli-ci/ci/cli/tasks/sign-and-repackage-installers-and-binaries.yml
+      params:
+        CERT_LOCATION: {{windows-certificate-location}}
+        CERT_PASSWORD_LOCATION: {{windows-certificate-password-location}}
 
   - task: upload-releases
     file: cli-ci/ci/cli-release/tasks/upload-releases.yml
