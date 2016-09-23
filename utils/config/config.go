@@ -76,6 +76,7 @@ func LoadConfig() (*Config, error) {
 		HTTPSProxy:       os.Getenv("https_proxy"),
 		Lang:             os.Getenv("LANG"),
 		LCAll:            os.Getenv("LC_ALL"),
+		Experimental:     os.Getenv("EXPERIMENTAL"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
@@ -195,6 +196,7 @@ type EnvOverride struct {
 	HTTPSProxy       string
 	Lang             string
 	LCAll            string
+	Experimental     string
 }
 
 // PluginsConfig represents the plugin configuration
@@ -387,6 +389,20 @@ func (config *Config) Locale() string {
 // BinaryName returns the running name of the CF CLI
 func (config *Config) BinaryName() string {
 	return config.ENV.BinaryName
+}
+
+// Experimental returns whether or not to run experimental CLI commands
+func (config *Config) Experimental() bool {
+	envValStr := config.ENV.Experimental
+
+	if envValStr != "" {
+		envVal, err := strconv.ParseBool(envValStr)
+		if err == nil {
+			return envVal
+		}
+	}
+
+	return false
 }
 
 // SetOrganizationInformation sets the currently targeted organization
