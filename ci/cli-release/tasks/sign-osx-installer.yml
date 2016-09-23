@@ -10,7 +10,7 @@ params:
 
 inputs:
 - name: certificates
-- name: cli-ci
+- name: cli
 - name: edge-osx-installer-64
 
 outputs:
@@ -23,7 +23,7 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli-ci/ci/VERSION)
+    VERSION=$(cat cli/ci/VERSION)
     CERT_PASSWORD=$(cat certificates/$CERT_PASSWORD_LOCATION)
 
     security create-keychain -p "" temp-keychain
