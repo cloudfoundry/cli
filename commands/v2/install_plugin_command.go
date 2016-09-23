@@ -10,7 +10,7 @@ import (
 
 type InstallPluginCommand struct {
 	OptionalArgs         flags.InstallPluginArgs `positional-args:"yes"`
-	Force                string                  `short:"f" description:"Force install of plugin without confirmation"`
+	Force                bool                    `short:"f" description:"Force install of plugin without confirmation"`
 	RegisteredRepository string                  `short:"r" description:"Name of a registered repository where the specified plugin is located"`
 	usage                interface{}             `usage:"CF_NAME install-plugin (LOCAL-PATH/TO/PLUGIN | URL | -r REPO_NAME PLUGIN_NAME) [-f]\n\n   Prompts for confirmation unless '-f' is provided.\n\nEXAMPLES:\n   CF_NAME install-plugin ~/Downloads/plugin-foobar\n   CF_NAME install-plugin https://example.com/plugin-foobar_linux_amd64\n   CF_NAME install-plugin -r My-Repo plugin-echo"`
 	relatedCommands      interface{}             `related_commands:"add-plugin-repo, list-plugin-repos, plugins"`
