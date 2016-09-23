@@ -3,9 +3,7 @@ platform: linux
 image: docker:///cloudfoundry/cli-ci
 
 inputs:
-- name: final-cli
-  path: cli
-- name: cf-cli-osx-tarball
+- name: cli
 - name: homebrew-tap
 
 outputs:
@@ -21,11 +19,14 @@ run:
   - |
     set -ex
 
+    VERSION=$(cat cli/ci/VERSION)
+
+    mkdir cf-cli-osx-tarball
+    curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${VERSION}&source=github-rel" > installers/cf-cli_${VERSION}_osx.tgz
+
     pushd cf-cli-osx-tarball
       CLI_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
     popd
-
-    CLI_VERSION=$(cat cli-ci/ci/VERSION)
 
     pushd homebrew-tap
       cat <<EOF > cf-cli.rb
@@ -34,8 +35,8 @@ run:
     class CfCli < Formula
       homepage 'https://code.cloudfoundry.org/cli'
       head 'https://cli.run.pivotal.io/edge?arch=macosx64&source=homebrew'
-      url 'https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${CLI_VERSION}&source=homebrew'
-      version '${CLI_VERSION}'
+      url 'https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${VERSION}&source=homebrew'
+      version '${VERSION}'
       sha256 '${CLI_SHA256}'
 
       depends_on :arch => :x86_64
@@ -58,7 +59,7 @@ run:
     then
       git config --global user.email "cf-cli-eng@pivotal.io"
       git config --global user.name "Concourse CI"
-      git commit -m "Release ${CLI_VERSION}"
+      git commit -m "Release ${VERSION}"
     else
         echo "no new version to commit"
     fi

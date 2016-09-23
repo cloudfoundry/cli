@@ -17,6 +17,13 @@ resources:
     paths:
     - ci
 
+- name: homebrew-tap
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/homebrew-tap
+    private_key: {{release-pipeline-ssh-key}}
+    branch: master
+
 - name: edge-linux-binary-32
   type: s3
   source:
@@ -220,3 +227,22 @@ jobs:
       AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
       AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
       AWS_BUCKET_NAME: cf-cli-debian-repo
+
+- name: update-homebrew
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [update-claw]
+      params:
+        depth: 2
+    - get: cli-ci
+      params:
+        depth: 2
+    - get: homebrew-tap
+  - task: update-brew-formula
+    file: cli-ci/ci/cli-release/tasks/update-brew-formula.yml
+  - put: homebrew-tap
+    params:
+      repository: update-brew-formula-output/homebrew-tap
