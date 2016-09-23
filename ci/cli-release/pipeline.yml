@@ -3,17 +3,16 @@ resources:
 - name: cli
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{release-pipeline-ssh-key}}
+    uri: https://github.com/cloudfoundry/cli
     branch: master
+    tag_filter: "v6*"
     ignore_paths:
     - ci
 
 - name: cli-ci
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{release-pipeline-ssh-key}}
+    uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
     - ci
@@ -113,6 +112,9 @@ jobs:
   serial: true
   plan:
   - aggregate:
+    - get: cli
+      params:
+        depth: 2
     - get: cli-ci
       params:
         depth: 2
@@ -164,9 +166,12 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cli-ci
+    - get: cli
       trigger: true
       passed: [create-and-sign-installers]
+      params:
+        depth: 2
+    - get: cli-ci
       params:
         depth: 2
     - get: edge-linux-binary-64
@@ -192,11 +197,15 @@ jobs:
 - name: update-debian-repo
   serial: true
   plan:
-  - get: cli-ci
-    trigger: true
-    passed: [update-claw]
-    params:
-      depth: 2
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [update-claw]
+      params:
+        depth: 2
+    - get: cli-ci
+      params:
+        depth: 2
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
     params:
