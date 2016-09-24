@@ -1,0 +1,47 @@
+platform: linux
+image: docker:///cloudfoundry/cli-ci
+
+inputs:
+- name: certificates
+
+params:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  GPG_KEY_LOCATION:
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -e
+    cat<<EOF >sign-repodata
+
+    #!/usr/bin/expect -f
+    spawn gpg --detach-sign --armor repodata/repomd.xml
+    expect -exact "Enter pass phrase: "
+    send -- "\r"
+    expect eof
+    EOF
+    chmod 700 sign-repodata
+
+    mkdir gpg-dir
+    export GNUPGHOME=$PWD/gpg-dir
+    chmod 700 $GNUPGHOME
+    trap "rm -rf $GNUPGHOME" 0
+
+    gpg --import certificates/$GPG_KEY_LOCATION
+
+    aws s3 sync \
+      --exclude "*" \
+      --include "releases/*/*installer*.rpm" \
+      s3://cf-cli-releases \
+      .
+
+    createrepo -s sha .
+    ./sign-repodata
+
+    aws s3 sync \
+      --delete \
+      repodata \
+      s3://cf-cli-rpm-repo/repodata
