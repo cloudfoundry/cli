@@ -166,7 +166,7 @@ jobs:
           CERT_LOCATION: {{windows-certificate-location}}
           CERT_PASSWORD_LOCATION: {{windows-certificate-password-location}}
       - task: create-windows-installers
-        file: cli-ci/ci/cli/tasks/create-windows-installers.yml
+        file: cli-ci/ci/cli/tasks/create-installers-windows.yml
       - task: sign-and-repackage-installers-and-binaries
         file: cli-ci/ci/cli/tasks/sign-and-repackage-installers-and-binaries.yml
         params:
@@ -186,11 +186,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [create-and-sign-installers]
-      params:
-        depth: 2
     - get: cli-ci
-      params:
-        depth: 2
     - get: edge-linux-binary-64
       passed: [create-and-sign-installers]
   - aggregate:
@@ -218,11 +214,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [update-claw]
-      params:
-        depth: 2
     - get: cli-ci
-      params:
-        depth: 2
   - task: obtain-certificates
     file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
     params:
@@ -232,11 +224,11 @@ jobs:
   - task: publish-debian
     file: cli-ci/ci/cli-release/tasks/publish-debian.yml
     params:
+      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
+      AWS_BUCKET_NAME: cf-cli-debian-repo
+      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
       GPG_KEY_LOCATION: {{gpg-key-location}}
       KEY_ID_LOCATION: {{gpg-key-id-location}}
-      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
-      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
-      AWS_BUCKET_NAME: cf-cli-debian-repo
 
 - name: update-homebrew
   serial: true
@@ -245,14 +237,31 @@ jobs:
     - get: cli
       trigger: true
       passed: [update-claw]
-      params:
-        depth: 2
     - get: cli-ci
-      params:
-        depth: 2
     - get: homebrew-tap
   - task: update-brew-formula
     file: cli-ci/ci/cli-release/tasks/update-brew-formula.yml
   - put: homebrew-tap
     params:
       repository: update-brew-formula-output/homebrew-tap
+
+- name: update-rpm-repo
+  serial: true
+  plan:
+  - aggregate:
+    - get: cli
+      trigger: true
+      passed: [update-claw]
+    - get: cli-ci
+  - task: obtain-certificates
+    file: cli-ci/ci/cli-release/tasks/obtain-certificates.yml
+    params:
+      CERT_PATH: {{osx-certificate-store}}
+  - task: copy-certificates
+    file: cli-ci/ci/cli-release/tasks/copy-certificates.yml
+  - task: publish-rpm
+    file: cli-ci/ci/cli-release/tasks/publish-rpm.yml
+    params:
+      AWS_ACCESS_KEY_ID: {{cli-production-release-access-key-id}}
+      AWS_SECRET_ACCESS_KEY: {{cli-production-release-secret-access-key}}
+      GPG_KEY_LOCATION: {{gpg-key-location}}
