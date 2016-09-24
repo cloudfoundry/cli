@@ -39,7 +39,7 @@ run:
       .
 
     createrepo -s sha .
-    ./sign-repodata
+    # ./sign-repodata
 
     aws s3 sync \
       --delete \
