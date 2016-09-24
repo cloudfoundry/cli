@@ -11,7 +11,7 @@ inputs:
 - name: certificates
 - name: cli
 - name: extracted-binaries
-- name: winstallers
+# - name: winstallers
 
 outputs:
 - name: signed-windows-zips
