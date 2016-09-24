@@ -22,7 +22,7 @@ run:
     VERSION=$(cat cli/ci/VERSION)
 
     mkdir cf-cli-osx-tarball
-    curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${VERSION}&source=github-rel" > installers/cf-cli_${VERSION}_osx.tgz
+    curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&version=${VERSION}&source=github-rel" > cf-cli-osx-tarball/cf-cli_${VERSION}_osx.tgz
 
     pushd cf-cli-osx-tarball
       CLI_SHA256=$(shasum -a 256 cf-cli_*_osx.tgz | cut -d ' ' -f 1)
