@@ -1,3 +1,16 @@
+## 6.22.1
+* Bump version to 6.22.1
+* remove depths
+* move rpm publish into release pipeline
+* fix indentation
+* sign and create binaries and installers on windows
+* reintroduce backwards compatibility flag to bind-route-service
+* Add osslsigncode to ci container
+* update homebrew-tap after release
+* cli-ci should be independent from the rest of the pipeline
+* read version prior to upload-releases
+* Bump version to 6.22.0
+
 ## 6.22.0
 * Bump version to 6.22.0
 * runs the old api command unless EXPERIMENTAL is set to true
