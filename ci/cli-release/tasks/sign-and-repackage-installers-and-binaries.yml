@@ -23,7 +23,7 @@ run:
   - |
     set -ex
 
-    VERSION=$(cat cli/VERSION)
+    VERSION=$(cat cli/ci/VERSION)
 
     mkdir win32 win64
     cp extracted-binaries/cf-cli_win32.exe win32/cf.exe
