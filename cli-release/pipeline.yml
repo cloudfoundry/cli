@@ -164,7 +164,7 @@ jobs:
 #     - task: create-windows-installers
 #       file: cli-ci/ci/cli/tasks/create-installers-windows.yml
       - task: sign-and-repackage-installers-and-binaries
-        file: cli-ci/ci/cli/tasks/sign-and-repackage-installers-and-binaries.yml
+        file: cli-ci/ci/cli-release/tasks/sign-and-repackage-installers-and-binaries.yml
         params:
           CERT_LOCATION: {{windows-certificate-location}}
           CERT_PASSWORD_LOCATION: {{windows-certificate-password-location}}
