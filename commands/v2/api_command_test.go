@@ -6,10 +6,10 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
 	. "code.cloudfoundry.org/cli/commands/errors"
-	"code.cloudfoundry.org/cli/commands/ui"
 	. "code.cloudfoundry.org/cli/commands/v2"
 	"code.cloudfoundry.org/cli/commands/v2/v2fakes"
 	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/ui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
