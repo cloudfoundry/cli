@@ -51,16 +51,28 @@ Check out our [community contributed CLI plugins](https://plugins.cloudfoundry.o
 $ curl -L "https://cli.run.pivotal.io/stable?release=macosx64-binary&source=github" | tar -zx
 # ...or Linux 64-bit binary
 $ curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
-# ...and to confirm your cf CLI version
-$ ./cf --version
-cf version x.y.z-...
 ```
 
-**Via Homebrew:** Install CF for OSX through [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
+We recommend moving the CF CLI to ```/usr/local/bin``` or a location you know is in your $PATH
+```
+$ mv cf /usr/local/bin
+```
+
+**Via Homebrew:** Install CF CLI for OSX through [Homebrew](http://brew.sh/) via the [cloudfoundry tap](https://github.com/cloudfoundry/homebrew-tap):
 
 ```
 $ brew tap cloudfoundry/tap
 $ brew install cf-cli
+```
+
+# ...and to confirm your cf CLI version
+```
+$ cf --version
+```
+
+You should get a message like this, confirming the version that’s installed (it may not be this exact version):
+```
+cf version 6.18.1+a1103f0-2016-05-24
 ```
 
 **Releases:** 32 bit releases and information about all our releases can be found [here](https://github.com/cloudfoundry/cli/releases).
