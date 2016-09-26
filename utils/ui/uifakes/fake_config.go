@@ -4,16 +4,16 @@ package uifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/ui"
 )
 
 type FakeConfig struct {
-	ColorEnabledStub        func() config.ColorSetting
+	ColorEnabledStub        func() configv3.ColorSetting
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct{}
 	colorEnabledReturns     struct {
-		result1 config.ColorSetting
+		result1 configv3.ColorSetting
 	}
 	LocaleStub        func() string
 	localeMutex       sync.RWMutex
@@ -25,7 +25,7 @@ type FakeConfig struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConfig) ColorEnabled() config.ColorSetting {
+func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
 	fake.colorEnabledMutex.Lock()
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct{}{})
 	fake.recordInvocation("ColorEnabled", []interface{}{})
@@ -43,10 +43,10 @@ func (fake *FakeConfig) ColorEnabledCallCount() int {
 	return len(fake.colorEnabledArgsForCall)
 }
 
-func (fake *FakeConfig) ColorEnabledReturns(result1 config.ColorSetting) {
+func (fake *FakeConfig) ColorEnabledReturns(result1 configv3.ColorSetting) {
 	fake.ColorEnabledStub = nil
 	fake.colorEnabledReturns = struct {
-		result1 config.ColorSetting
+		result1 configv3.ColorSetting
 	}{result1}
 }
 

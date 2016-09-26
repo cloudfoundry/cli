@@ -1,4 +1,4 @@
-package config_test
+package configv3_test
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	. "code.cloudfoundry.org/cli/utils/config"
+	. "code.cloudfoundry.org/cli/utils/configv3"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -19,18 +19,11 @@ var _ = Describe("Config", func() {
 	var homeDir string
 
 	BeforeEach(func() {
-		var err error
-		homeDir, err = ioutil.TempDir("", "cli-config-tests")
-		Expect(err).NotTo(HaveOccurred())
-
-		os.Setenv("CF_HOME", homeDir)
+		homeDir = setup()
 	})
 
 	AfterEach(func() {
-		if homeDir != "" {
-			os.RemoveAll(homeDir)
-			os.Unsetenv("CF_HOME")
-		}
+		teardown(homeDir)
 	})
 
 	Context("when there isn't a config set", func() {
@@ -71,112 +64,7 @@ var _ = Describe("Config", func() {
 		})
 	})
 
-	DescribeTable("when the plugin config exists",
-		func(setup func() (string, string)) {
-			location, CFPluginHome := setup()
-			if CFPluginHome != "" {
-				os.Setenv("CF_PLUGIN_HOME", CFPluginHome)
-				defer os.Unsetenv("CF_PLUGIN_HOME")
-			}
-
-			rawConfig := `
-{
-  "Plugins": {
-    "Diego-Enabler": {
-      "Location": "~/.cf/plugins/diego-enabler_darwin_amd64",
-      "Version": {
-        "Major": 1,
-        "Minor": 0,
-        "Build": 1
-      },
-      "Commands": [
-        {
-          "Name": "enable-diego",
-          "Alias": "",
-          "HelpText": "enable Diego support for an app",
-          "UsageDetails": {
-            "Usage": "cf enable-diego APP_NAME",
-            "Options": null
-          }
-        },
-        {
-          "Name": "disable-diego",
-          "Alias": "",
-          "HelpText": "disable Diego support for an app",
-          "UsageDetails": {
-            "Usage": "cf disable-diego APP_NAME",
-            "Options": null
-          }
-        }
-			]
-		}
-	}
-}`
-			setPluginConfig(location, rawConfig)
-			config, err := LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(config).ToNot(BeNil())
-
-			plugins := config.Plugins()
-			Expect(plugins).ToNot(BeEmpty())
-
-			plugin := plugins["Diego-Enabler"]
-			Expect(plugin.Location).To(Equal("~/.cf/plugins/diego-enabler_darwin_amd64"))
-			Expect(plugin.Version.Major).To(Equal(1))
-			Expect(plugin.Commands).To(HaveLen(2))
-			Expect(plugin.Commands).To(ContainElement(
-				PluginCommand{
-					Name:     "enable-diego",
-					Alias:    "",
-					HelpText: "enable Diego support for an app",
-					UsageDetails: PluginUsageDetails{
-						Usage: "cf enable-diego APP_NAME",
-					},
-				},
-			))
-		},
-
-		Entry("standard location", func() (string, string) {
-			return filepath.Join(homeDir, ".cf", "plugins"), ""
-		}),
-
-		Entry("non-standard location", func() (string, string) {
-			return filepath.Join(homeDir, "foo", ".cf", "plugins"), filepath.Join(homeDir, "foo")
-		}),
-	)
-
 	Describe("getter functions", func() {
-		DescribeTable("ColorEnabled",
-			func(configVal string, envVal string, expected ColorSetting) {
-				rawConfig := fmt.Sprintf(`{"ColorEnabled":"%s"}`, configVal)
-				setConfig(homeDir, rawConfig)
-
-				defer os.Unsetenv("CF_COLOR")
-				if envVal == "" {
-					os.Unsetenv("CF_COLOR")
-				} else {
-					os.Setenv("CF_COLOR", envVal)
-				}
-
-				config, err := LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(config).ToNot(BeNil())
-
-				Expect(config.ColorEnabled()).To(Equal(expected))
-			},
-			Entry("config=true  env=true  enabled", "true", "true", ColorEnabled),
-			Entry("config=true  env=false disabled", "true", "false", ColorDisabled),
-			Entry("config=false env=true  enabled", "false", "true", ColorEnabled),
-			Entry("config=false env=false disabled", "false", "false", ColorDisabled),
-
-			Entry("config=unset env=false disabled", "", "false", ColorDisabled),
-			Entry("config=unset env=true  enabled", "", "true", ColorEnabled),
-			Entry("config=false env=unset disabled", "false", "", ColorDisabled),
-			Entry("config=true  env=unset disabled", "true", "", ColorEnabled),
-
-			Entry("config=unset env=unset falls back to default", "", "", ColorEnabled),
-		)
-
 		Describe("Target", func() {
 			var config *Config
 
@@ -219,39 +107,6 @@ var _ = Describe("Config", func() {
 			Entry("uses default value of false if an invalid environment value is set", "something-invalid", false),
 		)
 
-		DescribeTable("Locale",
-			func(langVal string, lcAllVall string, configVal string, expected string) {
-				rawConfig := fmt.Sprintf(`{"Locale":"%s"}`, configVal)
-				setConfig(homeDir, rawConfig)
-
-				defer os.Unsetenv("LANG")
-				if langVal == "" {
-					os.Unsetenv("LANG")
-				} else {
-					os.Setenv("LANG", langVal)
-				}
-
-				defer os.Unsetenv("LC_ALL")
-				if lcAllVall == "" {
-					os.Unsetenv("LC_ALL")
-				} else {
-					os.Setenv("LC_ALL", lcAllVall)
-				}
-
-				config, err := LoadConfig()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(config).ToNot(BeNil())
-
-				Expect(config.Locale()).To(Equal(expected))
-			},
-
-			Entry("LANG=ko-KO.UTF-8 LC_ALL=empty       config=empty ko-KO", "ko-KO.UTF-8", "", "", "ko-KO"),
-			Entry("LANG=ko-KO.UTF-8 LC_ALL=fr_FR.UTF-8 config=empty fr-FR", "ko-KO.UTF-8", "fr_FR.UTF-8", "", "fr-FR"),
-			Entry("LANG=ko-KO.UTF-8 LC_ALL=fr_FR.UTF-8 config=pt-BR pt-BR", "ko-KO.UTF-8", "fr_FR.UTF-8", "pt-BR", "pt-BR"),
-
-			Entry("config=empty LANG=empty       LC_ALL=empty       default", "", "", "", DefaultLocale),
-		)
-
 		Describe("BinaryName", func() {
 			It("returns the name used to invoke", func() {
 				config, err := LoadConfig()
@@ -260,7 +115,7 @@ var _ = Describe("Config", func() {
 
 				// Ginkgo will uses a config file as the first test argument, so that
 				// will be considered the binary name
-				Expect(config.BinaryName()).To(MatchRegexp("config\\.test$"))
+				Expect(config.BinaryName()).To(MatchRegexp("configv3\\.test$"))
 			})
 		})
 
@@ -341,33 +196,6 @@ var _ = Describe("Config", func() {
 				}
 
 				Expect(config.TargetedSpace()).To(Equal(space))
-			})
-		})
-
-		Describe("CurrentUser", func() {
-			Context("when the user token is set", func() {
-				It("returns the user", func() {
-					config := Config{
-						ConfigFile: CFConfig{
-							AccessToken: "bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImxlZ2FjeS10b2tlbi1rZXkiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI3YzZkMDA2MjA2OTI0NmViYWI0ZjBmZjY3NGQ3Zjk4OSIsInN1YiI6Ijk1MTliZTNlLTQ0ZDktNDBkMC1hYjlhLWY0YWNlMTFkZjE1OSIsInNjb3BlIjpbIm9wZW5pZCIsInJvdXRpbmcucm91dGVyX2dyb3Vwcy53cml0ZSIsInNjaW0ucmVhZCIsImNsb3VkX2NvbnRyb2xsZXIuYWRtaW4iLCJ1YWEudXNlciIsInJvdXRpbmcucm91dGVyX2dyb3Vwcy5yZWFkIiwiY2xvdWRfY29udHJvbGxlci5yZWFkIiwicGFzc3dvcmQud3JpdGUiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwiZG9wcGxlci5maXJlaG9zZSIsInNjaW0ud3JpdGUiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImF6cCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6Ijk1MTliZTNlLTQ0ZDktNDBkMC1hYjlhLWY0YWNlMTFkZjE1OSIsIm9yaWdpbiI6InVhYSIsInVzZXJfbmFtZSI6ImFkbWluIiwiZW1haWwiOiJhZG1pbiIsImF1dGhfdGltZSI6MTQ3MzI4NDU3NywicmV2X3NpZyI6IjZiMjdkYTZjIiwiaWF0IjoxNDczMjg0NTc3LCJleHAiOjE0NzMyODUxNzcsImlzcyI6Imh0dHBzOi8vdWFhLmJvc2gtbGl0ZS5jb20vb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJhdWQiOlsiY2YiLCJvcGVuaWQiLCJyb3V0aW5nLnJvdXRlcl9ncm91cHMiLCJzY2ltIiwiY2xvdWRfY29udHJvbGxlciIsInVhYSIsInBhc3N3b3JkIiwiZG9wcGxlciJdfQ.OcH_w9yIKJkEcTZMThIs-qJAHk3G0JwNjG-aomVH9hKye4ciFO6IMQMLKmCBrrAQVc7ST1SZZwq7gv12Dq__6Jp-hai0a2_ADJK-Vc9YXyNZKgYTWIeVNGM1JGdHgFSrBR2Lz7IIrH9HqeN8plrKV5HzU8uI9LL4lyOCjbXJ9cM",
-						},
-					}
-
-					user, err := config.CurrentUser()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(user).To(Equal(User{
-						Name: "admin",
-					}))
-				})
-			})
-
-			Context("when the user token is blank", func() {
-				It("returns the user", func() {
-					var config Config
-					user, err := config.CurrentUser()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(user).To(Equal(User{}))
-				})
 			})
 		})
 	})

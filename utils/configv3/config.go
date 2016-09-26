@@ -1,5 +1,5 @@
 // Package config package contains everything related to the CF CLI Configuration.
-package config
+package configv3
 
 import (
 	"encoding/json"
@@ -7,10 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
-
-	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
 const (
@@ -18,11 +15,7 @@ const (
 	DefaultStartupTimeout = 5 * time.Minute
 	// DefaultPingerThrottle = 5 * time.Second
 
-	DefaultTarget         = ""
-	DefaultColorEnabled   = "true"
-	DefaultLocale         = ""
-	DefaultPluginRepoName = "CF-Community"
-	DefaultPluginRepoURL  = "https://plugins.cloudfoundry.org"
+	DefaultTarget = ""
 )
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
@@ -178,12 +171,6 @@ type Space struct {
 	AllowSSH bool   `json:"AllowSSH"`
 }
 
-// PluginRepos is a saved plugin repository
-type PluginRepos struct {
-	Name string `json:"Name"`
-	URL  string `json:"URL"`
-}
-
 // EnvOverride represents all the environment variables read by the CF CLI
 type EnvOverride struct {
 	BinaryName       string
@@ -197,87 +184,6 @@ type EnvOverride struct {
 	Lang             string
 	LCAll            string
 	Experimental     string
-}
-
-// PluginsConfig represents the plugin configuration
-type PluginsConfig struct {
-	Plugins map[string]Plugin `json:"Plugins"`
-}
-
-// Plugin represents the plugin as a whole, not be confused with PluginCommand
-type Plugin struct {
-	Location string         `json:"Location"`
-	Version  PluginVersion  `json:"Version"`
-	Commands PluginCommands `json:"Commands"`
-}
-
-// PluginVersion is the plugin version information
-type PluginVersion struct {
-	Major int `json:"Major"`
-	Minor int `json:"Minor"`
-	Build int `json:"Build"`
-}
-
-// PluginCommands is a list of plugins that implements the sort.Interface
-type PluginCommands []PluginCommand
-
-func (p PluginCommands) Len() int               { return len(p) }
-func (p PluginCommands) Swap(i int, j int)      { p[i], p[j] = p[j], p[i] }
-func (p PluginCommands) Less(i int, j int) bool { return sortutils.SortAlphabetic(p[i].Name, p[j].Name) }
-
-// PluginCommand represents an individual command inside a plugin
-type PluginCommand struct {
-	Name         string             `json:"Name"`
-	Alias        string             `json:"Alias"`
-	HelpText     string             `json:"HelpText"`
-	UsageDetails PluginUsageDetails `json:"UsageDetails"`
-}
-
-// PluginUsageDetails contains the usage metadata provided by the plugin
-type PluginUsageDetails struct {
-	Usage   string            `json:"Usage"`
-	Options map[string]string `json:"Options"`
-}
-
-// ColorSetting is a trinary operator that represents if the display should
-// have colors enabled, disabled, or automatically detected.
-type ColorSetting int
-
-const (
-	// ColorDisabled means that no colors/bolding will be displayed
-	ColorDisabled ColorSetting = iota
-	// ColorEnabled means colors/bolding will be displayed
-	ColorEnabled
-	// ColorAuto means that the UI should decide if colors/bolding will be
-	// enabled
-	ColorAuto
-)
-
-// ColorEnabled returns the color setting based off:
-//   1. The $CF_COLOR environment variable if set (0/1/t/f/true/false)
-//   2. The 'ColorEnabled' value in the .cf/config.json if set
-//   3. Defaults to ColorEnabled if nothing is set
-func (config *Config) ColorEnabled() ColorSetting {
-	if config.ENV.CFColor != "" {
-		val, err := strconv.ParseBool(config.ENV.CFColor)
-		if err == nil {
-			return config.boolToColorSetting(val)
-		}
-	}
-
-	val, err := strconv.ParseBool(config.ConfigFile.ColorEnabled)
-	if err != nil {
-		return ColorEnabled
-	}
-	return config.boolToColorSetting(val)
-}
-
-func (config *Config) boolToColorSetting(val bool) ColorSetting {
-	if val {
-		return ColorEnabled
-	}
-
-	return ColorDisabled
 }
 
 // Target returns the CC API URL
@@ -298,28 +204,6 @@ func (config *Config) TargetedOrganization() Organization {
 // TargetedSpace returns the currently targeted space
 func (config *Config) TargetedSpace() Space {
 	return config.ConfigFile.TargetedSpace
-}
-
-// CurrentUser returns user information decoded from the JWT access token in
-// .cf/config.json
-func (config *Config) CurrentUser() (User, error) {
-	return decodeUserFromJWT(config.ConfigFile.AccessToken)
-}
-
-// PluginHome returns the plugin configuration directory based off:
-//   1. The $CF_PLUGIN_HOME environment variable if set
-//   2. Defaults to the home diretory (outlined in LoadConfig)/.cf/plugins
-func (config *Config) PluginHome() string {
-	if config.ENV.CFPluginHome != "" {
-		return filepath.Join(config.ENV.CFPluginHome, ".cf", "plugins")
-	}
-
-	return filepath.Join(homeDirectory(), ".cf", "plugins")
-}
-
-// Plugins returns back the plugin configuration read from the plugin home
-func (config *Config) Plugins() map[string]Plugin {
-	return config.pluginConfig.Plugins
 }
 
 // StagingTimeout returns the max time an application staging should take. The
@@ -362,28 +246,6 @@ func (config *Config) HTTPSProxy() string {
 	}
 
 	return ""
-}
-
-// Locale returns the locale/language the UI should be displayed in. This value
-// is based off of:
-//   1. The 'Locale' setting in the .cf/config.json
-//   2. The $LC_ALL environment variable if set
-//   3. The $LANG environment variable if set
-//   4. Defaults to DefaultLocale
-func (config *Config) Locale() string {
-	if config.ConfigFile.Locale != "" {
-		return config.ConfigFile.Locale
-	}
-
-	if config.ENV.LCAll != "" {
-		return config.convertLocale(config.ENV.LCAll)
-	}
-
-	if config.ENV.Lang != "" {
-		return config.convertLocale(config.ENV.Lang)
-	}
-
-	return DefaultLocale
 }
 
 // BinaryName returns the running name of the CF CLI
@@ -440,15 +302,4 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 	config.ConfigFile.AccessToken = accessToken
 	config.ConfigFile.RefreshToken = refreshToken
 	config.ConfigFile.SSHOAuthClient = sshOAuthClient
-}
-
-// PluginRepos returns the currently configured plugin repositories from the
-// .cf/config.json
-func (config *Config) PluginRepos() []PluginRepos {
-	return config.ConfigFile.PluginRepos
-}
-
-func (config *Config) convertLocale(local string) string {
-	lang := strings.Split(local, ".")[0]
-	return strings.Replace(lang, "_", "-", -1)
 }

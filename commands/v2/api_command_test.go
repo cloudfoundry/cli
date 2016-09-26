@@ -5,10 +5,10 @@ import (
 
 	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
-	. "code.cloudfoundry.org/cli/commands/errors"
+	cmdErrors "code.cloudfoundry.org/cli/commands/errors"
 	. "code.cloudfoundry.org/cli/commands/v2"
 	"code.cloudfoundry.org/cli/commands/v2/v2fakes"
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/ui"
 
 	. "github.com/onsi/ginkgo"
@@ -56,13 +56,13 @@ var _ = Describe("API Command", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("some-api-target")
 				fakeConfig.APIVersionReturns("some-version")
-				fakeConfig.TargetedOrganizationReturns(config.Organization{
+				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 					Name: "some-org",
 				})
-				fakeConfig.TargetedSpaceReturns(config.Space{
+				fakeConfig.TargetedSpaceReturns(configv3.Space{
 					Name: "some-space",
 				})
-				fakeConfig.CurrentUserReturns(config.User{
+				fakeConfig.CurrentUserReturns(configv3.User{
 					Name: "admin",
 				}, nil)
 			})
@@ -160,7 +160,7 @@ var _ = Describe("API Command", func() {
 						})
 
 						It("returns an error with a --skip-ssl-validation tip", func() {
-							Expect(err).To(MatchError(InvalidSSLCertError{API: CCAPI}))
+							Expect(err).To(MatchError(cmdErrors.InvalidSSLCertError{API: CCAPI}))
 							Expect(fakeUI.Out).ToNot(Say("API endpoint:\\s+some-api-target"))
 						})
 					})
@@ -205,7 +205,7 @@ var _ = Describe("API Command", func() {
 
 			It("sets the target with a warning", func() {
 				err := cmd.Execute([]string{})
-				Expect(err).To(MatchError(APIRequestError{Err: expectedError}))
+				Expect(err).To(MatchError(cmdErrors.APIRequestError{Err: expectedError}))
 			})
 		})
 	})

@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/v2"
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/panichandler"
 	"code.cloudfoundry.org/cli/utils/ui"
 	"github.com/jessevdk/go-flags"
@@ -124,11 +124,11 @@ func isOption(s string) bool {
 }
 
 func executionWrapper(cmd flags.Commander, args []string) error {
-	cfConfig, err := config.LoadConfig()
+	cfConfig, err := configv3.LoadConfig()
 	if err != nil {
 		return err
 	}
-	defer config.WriteConfig(cfConfig)
+	defer configv3.WriteConfig(cfConfig)
 
 	if extendedCmd, ok := cmd.(commands.ExtendedCommander); ok {
 		commandUI, err := ui.NewUI(cfConfig)

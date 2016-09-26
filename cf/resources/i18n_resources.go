@@ -92,7 +92,7 @@ func cfI18nResourcesDeDeAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/de-de.all.json", size: 244389, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/de-de.all.json", size: 244389, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -112,7 +112,7 @@ func cfI18nResourcesEnUsAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/en-us.all.json", size: 262471, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/en-us.all.json", size: 262471, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -132,7 +132,7 @@ func cfI18nResourcesEsEsAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/es-es.all.json", size: 244136, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/es-es.all.json", size: 244136, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -152,7 +152,7 @@ func cfI18nResourcesFrFrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/fr-fr.all.json", size: 254912, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/fr-fr.all.json", size: 254912, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -172,7 +172,7 @@ func cfI18nResourcesItItAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/it-it.all.json", size: 252053, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/it-it.all.json", size: 252053, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -192,7 +192,7 @@ func cfI18nResourcesJaJpAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/ja-jp.all.json", size: 265263, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/ja-jp.all.json", size: 265263, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -212,7 +212,7 @@ func cfI18nResourcesKoKrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/ko-kr.all.json", size: 244657, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/ko-kr.all.json", size: 244657, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -232,7 +232,7 @@ func cfI18nResourcesPtBrAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/pt-br.all.json", size: 239740, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/pt-br.all.json", size: 239740, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -252,7 +252,7 @@ func cfI18nResourcesZhHansAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/zh-hans.all.json", size: 229127, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/zh-hans.all.json", size: 229127, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -272,7 +272,7 @@ func cfI18nResourcesZhHantAllJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cf/i18n/resources/zh-hant.all.json", size: 230574, mode: os.FileMode(420), modTime: time.Unix(1474905100, 0)}
+	info := bindataFileInfo{name: "cf/i18n/resources/zh-hant.all.json", size: 230574, mode: os.FileMode(420), modTime: time.Unix(1474930596, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

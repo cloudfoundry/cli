@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/commands"
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 )
 
 type FakeConfig struct {
@@ -21,17 +21,17 @@ type FakeConfig struct {
 	binaryNameReturns     struct {
 		result1 string
 	}
-	ColorEnabledStub        func() config.ColorSetting
+	ColorEnabledStub        func() configv3.ColorSetting
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct{}
 	colorEnabledReturns     struct {
-		result1 config.ColorSetting
+		result1 configv3.ColorSetting
 	}
-	CurrentUserStub        func() (config.User, error)
+	CurrentUserStub        func() (configv3.User, error)
 	currentUserMutex       sync.RWMutex
 	currentUserArgsForCall []struct{}
 	currentUserReturns     struct {
-		result1 config.User
+		result1 configv3.User
 		result2 error
 	}
 	LocaleStub        func() string
@@ -40,11 +40,11 @@ type FakeConfig struct {
 	localeReturns     struct {
 		result1 string
 	}
-	PluginsStub        func() map[string]config.Plugin
+	PluginsStub        func() map[string]configv3.Plugin
 	pluginsMutex       sync.RWMutex
 	pluginsArgsForCall []struct{}
 	pluginsReturns     struct {
-		result1 map[string]config.Plugin
+		result1 map[string]configv3.Plugin
 	}
 	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
@@ -71,17 +71,17 @@ type FakeConfig struct {
 	targetReturns     struct {
 		result1 string
 	}
-	TargetedOrganizationStub        func() config.Organization
+	TargetedOrganizationStub        func() configv3.Organization
 	targetedOrganizationMutex       sync.RWMutex
 	targetedOrganizationArgsForCall []struct{}
 	targetedOrganizationReturns     struct {
-		result1 config.Organization
+		result1 configv3.Organization
 	}
-	TargetedSpaceStub        func() config.Space
+	TargetedSpaceStub        func() configv3.Space
 	targetedSpaceMutex       sync.RWMutex
 	targetedSpaceArgsForCall []struct{}
 	targetedSpaceReturns     struct {
-		result1 config.Space
+		result1 configv3.Space
 	}
 	ExperimentalStub        func() bool
 	experimentalMutex       sync.RWMutex
@@ -143,7 +143,7 @@ func (fake *FakeConfig) BinaryNameReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) ColorEnabled() config.ColorSetting {
+func (fake *FakeConfig) ColorEnabled() configv3.ColorSetting {
 	fake.colorEnabledMutex.Lock()
 	fake.colorEnabledArgsForCall = append(fake.colorEnabledArgsForCall, struct{}{})
 	fake.recordInvocation("ColorEnabled", []interface{}{})
@@ -161,14 +161,14 @@ func (fake *FakeConfig) ColorEnabledCallCount() int {
 	return len(fake.colorEnabledArgsForCall)
 }
 
-func (fake *FakeConfig) ColorEnabledReturns(result1 config.ColorSetting) {
+func (fake *FakeConfig) ColorEnabledReturns(result1 configv3.ColorSetting) {
 	fake.ColorEnabledStub = nil
 	fake.colorEnabledReturns = struct {
-		result1 config.ColorSetting
+		result1 configv3.ColorSetting
 	}{result1}
 }
 
-func (fake *FakeConfig) CurrentUser() (config.User, error) {
+func (fake *FakeConfig) CurrentUser() (configv3.User, error) {
 	fake.currentUserMutex.Lock()
 	fake.currentUserArgsForCall = append(fake.currentUserArgsForCall, struct{}{})
 	fake.recordInvocation("CurrentUser", []interface{}{})
@@ -186,10 +186,10 @@ func (fake *FakeConfig) CurrentUserCallCount() int {
 	return len(fake.currentUserArgsForCall)
 }
 
-func (fake *FakeConfig) CurrentUserReturns(result1 config.User, result2 error) {
+func (fake *FakeConfig) CurrentUserReturns(result1 configv3.User, result2 error) {
 	fake.CurrentUserStub = nil
 	fake.currentUserReturns = struct {
-		result1 config.User
+		result1 configv3.User
 		result2 error
 	}{result1, result2}
 }
@@ -219,7 +219,7 @@ func (fake *FakeConfig) LocaleReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) Plugins() map[string]config.Plugin {
+func (fake *FakeConfig) Plugins() map[string]configv3.Plugin {
 	fake.pluginsMutex.Lock()
 	fake.pluginsArgsForCall = append(fake.pluginsArgsForCall, struct{}{})
 	fake.recordInvocation("Plugins", []interface{}{})
@@ -237,10 +237,10 @@ func (fake *FakeConfig) PluginsCallCount() int {
 	return len(fake.pluginsArgsForCall)
 }
 
-func (fake *FakeConfig) PluginsReturns(result1 map[string]config.Plugin) {
+func (fake *FakeConfig) PluginsReturns(result1 map[string]configv3.Plugin) {
 	fake.PluginsStub = nil
 	fake.pluginsReturns = struct {
-		result1 map[string]config.Plugin
+		result1 map[string]configv3.Plugin
 	}{result1}
 }
 
@@ -326,7 +326,7 @@ func (fake *FakeConfig) TargetReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) TargetedOrganization() config.Organization {
+func (fake *FakeConfig) TargetedOrganization() configv3.Organization {
 	fake.targetedOrganizationMutex.Lock()
 	fake.targetedOrganizationArgsForCall = append(fake.targetedOrganizationArgsForCall, struct{}{})
 	fake.recordInvocation("TargetedOrganization", []interface{}{})
@@ -344,14 +344,14 @@ func (fake *FakeConfig) TargetedOrganizationCallCount() int {
 	return len(fake.targetedOrganizationArgsForCall)
 }
 
-func (fake *FakeConfig) TargetedOrganizationReturns(result1 config.Organization) {
+func (fake *FakeConfig) TargetedOrganizationReturns(result1 configv3.Organization) {
 	fake.TargetedOrganizationStub = nil
 	fake.targetedOrganizationReturns = struct {
-		result1 config.Organization
+		result1 configv3.Organization
 	}{result1}
 }
 
-func (fake *FakeConfig) TargetedSpace() config.Space {
+func (fake *FakeConfig) TargetedSpace() configv3.Space {
 	fake.targetedSpaceMutex.Lock()
 	fake.targetedSpaceArgsForCall = append(fake.targetedSpaceArgsForCall, struct{}{})
 	fake.recordInvocation("TargetedSpace", []interface{}{})
@@ -369,10 +369,10 @@ func (fake *FakeConfig) TargetedSpaceCallCount() int {
 	return len(fake.targetedSpaceArgsForCall)
 }
 
-func (fake *FakeConfig) TargetedSpaceReturns(result1 config.Space) {
+func (fake *FakeConfig) TargetedSpaceReturns(result1 configv3.Space) {
 	fake.TargetedSpaceStub = nil
 	fake.targetedSpaceReturns = struct {
-		result1 config.Space
+		result1 configv3.Space
 	}{result1}
 }
 

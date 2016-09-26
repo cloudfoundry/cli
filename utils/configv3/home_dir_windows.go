@@ -1,11 +1,15 @@
 // +build windows
 
-package config
+package configv3
 
 import (
 	"os"
 	"path/filepath"
 )
+
+func ConfigFilePath() string {
+	return filepath.Join(homeDirectory(), ".cf", "config.json")
+}
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
 // we can't cross compile using cgo and use user.Current()
@@ -20,8 +24,4 @@ func homeDirectory() string {
 		homeDir = os.Getenv("USERPROFILE")
 	}
 	return homeDir
-}
-
-func ConfigFilePath() string {
-	return filepath.Join(homeDirectory(), ".cf", "config.json")
 }
