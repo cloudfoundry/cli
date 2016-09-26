@@ -11,7 +11,7 @@ inputs:
 - name: certificates
 - name: cli
 - name: extracted-binaries
-# - name: winstallers
+- name: winstallers
 
 outputs:
 - name: signed-windows-zips
@@ -31,29 +31,29 @@ run:
     zip -j signed-windows-zips/cf-cli_${VERSION}_win32.zip win32/cf.exe
     zip -j signed-windows-zips/cf-cli_${VERSION}_winx64.zip win64/cf.exe
 
-    # unzip winstallers/cf-cli-installer_edge_winx64.zip
+    unzip winstallers/cf-cli-installer_edge_winx64.zip # Not really edge, see pipeline
 
-    # mkdir signed-64
-    # osslsigncode sign \
-    #   -pkcs12 certificates/$CERT_LOCATION \
-    #   -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
-    #   -t http://timestamp.comodoca.com/authenticode \
-    #   -h sha256 \
-    #   -in cf_installer.exe \
-    #   -out signed-64/cf_installer.exe
-    # rm -f cf_installer.exe
+    mkdir signed-64
+    osslsigncode sign \
+      -pkcs12 certificates/$CERT_LOCATION \
+      -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
+      -t http://timestamp.comodoca.com/authenticode \
+      -h sha256 \
+      -in cf_installer.exe \
+      -out signed-64/cf_installer.exe
+    rm -f cf_installer.exe
 
-    # zip -j signed-windows-zips/cf-cli-installer_${VERSION}_winx64.zip signed-64/cf_installer.exe
+    zip -j signed-windows-zips/cf-cli-installer_${VERSION}_winx64.zip signed-64/cf_installer.exe
 
-    # unzip winstallers/cf-cli-installer_edge_win32.zip
+    unzip winstallers/cf-cli-installer_edge_win32.zip # Not really edge, see pipeline
 
-    # mkdir signed-32
-    # osslsigncode sign \
-    #   -pkcs12 certificates/$CERT_LOCATION \
-    #   -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
-    #   -t http://timestamp.comodoca.com/authenticode \
-    #   -h sha256 \
-    #   -in cf_installer.exe \
-    #   -out signed-32/cf_installer.exe
+    mkdir signed-32
+    osslsigncode sign \
+      -pkcs12 certificates/$CERT_LOCATION \
+      -pass $(cat certificates/$CERT_PASSWORD_LOCATION) \
+      -t http://timestamp.comodoca.com/authenticode \
+      -h sha256 \
+      -in cf_installer.exe \
+      -out signed-32/cf_installer.exe
 
-    # zip -j signed-windows-zips/cf-cli-installer_${VERSION}_win32.zip signed-32/cf_installer.exe
+    zip -j signed-windows-zips/cf-cli-installer_${VERSION}_win32.zip signed-32/cf_installer.exe
