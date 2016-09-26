@@ -5248,6 +5248,10 @@
     "translation": "Ce domaine est partagé dans toutes les organisations.\nSi vous le supprimez, vous supprimez toutes les routes associées, et toutes les applications liées à ce domaine deviendront inaccessibles.\nVoulez-vous vraiment supprimer le domaine {{.DomainName}} ? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "Ce service ne prend pas en charge la création de clés."
   },

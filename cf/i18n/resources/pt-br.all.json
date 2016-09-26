@@ -5248,6 +5248,10 @@
     "translation": "Esse domínio está compartilhado entre todas as organizações.\nExcluí-lo removerá todas as rotas associadas e tornará qualquer app com esse domínio inacessível.\nTem certeza de que deseja excluir o domínio {{.DomainName}}? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "Este serviço não suporta a criação de chaves."
   },

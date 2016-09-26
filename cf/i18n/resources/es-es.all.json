@@ -5248,6 +5248,10 @@
     "translation": "Este dominio se comparte a través de todas las organizaciones.\nLa supresión eliminará todas las rutas asociadas, y convertirá en inalcanzable cualquier app con este dominio.\n¿Está seguro de que desea suprimir el dominio {{.DomainName}}? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "Este servicio no da soporte a la creación de claves."
   },

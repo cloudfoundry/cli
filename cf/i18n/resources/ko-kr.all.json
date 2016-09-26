@@ -5248,6 +5248,10 @@
     "translation": "모든 조직에서 이 도메인을 공유합니다.\n이 도메인을 삭제하면 연관된 모든 라우트가 제거되고 이 도메인이 있는 앱에 도달할 수 없습니다.\n{{.DomainName}} 도메인을 삭제하시겠습니까? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "이 서비스에서는 키 작성을 지원하지 않습니다."
   },

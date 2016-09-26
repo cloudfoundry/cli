@@ -5248,6 +5248,10 @@
     "translation": "此網域是在所有組織之間共用。\n刪除它會移除所有關聯的路徑，並且將具有此網域的任何應用程式設為無法連接。\n您確定要刪除網域 {{.DomainName}} 嗎？"
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "此服務不支援建立金鑰。"
   },

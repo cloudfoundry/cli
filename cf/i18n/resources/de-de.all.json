@@ -5248,6 +5248,10 @@
     "translation": "Die Domäne wird von allen Organisationen gemeinsam genutzt.\nDurch das Löschen der Domäne werden alle zugehörigen Routen entfernt und alle Apps dieser Domäne werden unerreichbar.\nSind Sie sicher, dass Sie die Domäne {{.DomainName}} löschen möchten? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "Der Service unterstützt die Erstellung von Schlüsseln nicht."
   },

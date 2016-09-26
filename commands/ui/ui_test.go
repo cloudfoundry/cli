@@ -247,8 +247,7 @@ var _ = Describe("UI", func() {
 
 		BeforeEach(func() {
 			fakeTranslateErr = new(uifakes.FakeTranslatableError)
-			fakeTranslateErr.SetTranslationReturns(fakeTranslateErr)
-			fakeTranslateErr.ErrorReturns("I am an error")
+			fakeTranslateErr.TranslateReturns("I am an error")
 
 			ui.DisplayError(fakeTranslateErr)
 		})
@@ -260,8 +259,8 @@ var _ = Describe("UI", func() {
 
 		Context("when the locale is not set to 'en-us'", func() {
 			It("translates the error text and the FAILED text", func() {
-				Expect(fakeTranslateErr.SetTranslationCallCount()).To(Equal(1))
-				Expect(fakeTranslateErr.SetTranslationArgsForCall(0)).NotTo(BeNil())
+				Expect(fakeTranslateErr.TranslateCallCount()).To(Equal(1))
+				Expect(fakeTranslateErr.TranslateArgsForCall(0)).NotTo(BeNil())
 			})
 		})
 	})
