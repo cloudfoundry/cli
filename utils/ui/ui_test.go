@@ -1,7 +1,7 @@
 package ui_test
 
 import (
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 	. "code.cloudfoundry.org/cli/utils/ui"
 	"code.cloudfoundry.org/cli/utils/ui/uifakes"
 
@@ -18,7 +18,7 @@ var _ = Describe("UI", func() {
 
 	BeforeEach(func() {
 		fakeConfig = new(uifakes.FakeConfig)
-		fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+		fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
 
 		var err error
 		ui, err = NewUI(fakeConfig)
@@ -49,7 +49,7 @@ var _ = Describe("UI", func() {
 			Context("when the local is not set to 'en-us'", func() {
 				BeforeEach(func() {
 					fakeConfig = new(uifakes.FakeConfig)
-					fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+					fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
 					fakeConfig.LocaleReturns("fr-FR")
 
 					var err error
@@ -87,7 +87,7 @@ var _ = Describe("UI", func() {
 		Context("when the local is not set to 'en-us'", func() {
 			BeforeEach(func() {
 				fakeConfig = new(uifakes.FakeConfig)
-				fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+				fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
 				fakeConfig.LocaleReturns("fr-FR")
 
 				var err error
@@ -132,7 +132,7 @@ var _ = Describe("UI", func() {
 		Context("when the local is not set to 'en-us'", func() {
 			BeforeEach(func() {
 				fakeConfig = new(uifakes.FakeConfig)
-				fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+				fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
 				fakeConfig.LocaleReturns("fr-FR")
 
 				var err error
@@ -161,7 +161,7 @@ var _ = Describe("UI", func() {
 		Context("when the local is not set to 'en-us'", func() {
 			BeforeEach(func() {
 				fakeConfig = new(uifakes.FakeConfig)
-				fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+				fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
 				fakeConfig.LocaleReturns("fr-FR")
 
 				var err error
@@ -218,7 +218,7 @@ var _ = Describe("UI", func() {
 			Context("when the local is not set to 'en-us'", func() {
 				BeforeEach(func() {
 					fakeConfig = new(uifakes.FakeConfig)
-					fakeConfig.ColorEnabledReturns(config.ColorEnabled)
+					fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
 					fakeConfig.LocaleReturns("fr-FR")
 
 					var err error

@@ -1,6 +1,6 @@
 package commands
 
-import "code.cloudfoundry.org/cli/utils/config"
+import "code.cloudfoundry.org/cli/utils/configv3"
 
 //go:generate counterfeiter . Config
 
@@ -8,14 +8,14 @@ import "code.cloudfoundry.org/cli/utils/config"
 type Config interface {
 	APIVersion() string
 	BinaryName() string
-	ColorEnabled() config.ColorSetting
-	CurrentUser() (config.User, error)
+	ColorEnabled() configv3.ColorSetting
+	CurrentUser() (configv3.User, error)
 	Locale() string
-	Plugins() map[string]config.Plugin
+	Plugins() map[string]configv3.Plugin
 	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	Target() string
-	TargetedOrganization() config.Organization
-	TargetedSpace() config.Space
+	TargetedOrganization() configv3.Organization
+	TargetedSpace() configv3.Space
 	Experimental() bool
 }

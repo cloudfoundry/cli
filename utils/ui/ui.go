@@ -12,9 +12,10 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"code.cloudfoundry.org/cli/utils/configv3"
+
 	"github.com/fatih/color"
 
-	"code.cloudfoundry.org/cli/utils/config"
 	"github.com/nicksnyder/go-i18n/i18n"
 )
 
@@ -33,7 +34,7 @@ const (
 // Config is the UI configuration
 type Config interface {
 	// ColorEnabled enables or disabled color
-	ColorEnabled() config.ColorSetting
+	ColorEnabled() configv3.ColorSetting
 
 	// Locale is the language to translate the output to
 	Locale() string
@@ -57,7 +58,7 @@ type UI struct {
 	// Err is the error buffer
 	Err io.Writer
 
-	colorEnabled config.ColorSetting
+	colorEnabled configv3.ColorSetting
 
 	translate i18n.TranslateFunc
 }
@@ -84,7 +85,7 @@ func NewTestUI(out io.Writer, err io.Writer) UI {
 	return UI{
 		Out:          out,
 		Err:          err,
-		colorEnabled: config.ColorDisabled,
+		colorEnabled: configv3.ColorDisabled,
 		translate:    translationWrapper(i18n.IdentityTfunc()),
 	}
 }
@@ -189,9 +190,9 @@ func (ui UI) templateValuesFromKeys(keys []map[string]interface{}) map[string]in
 func (ui UI) colorize(message string, textColor color.Attribute, bold bool) string {
 	colorPrinter := color.New(textColor)
 	switch ui.colorEnabled {
-	case config.ColorEnabled:
+	case configv3.ColorEnabled:
 		colorPrinter.EnableColor()
-	case config.ColorDisabled:
+	case configv3.ColorDisabled:
 		colorPrinter.DisableColor()
 	}
 

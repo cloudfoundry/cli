@@ -1,11 +1,16 @@
 // +build !windows
 
-package config
+package configv3
 
 import (
 	"os"
 	"path/filepath"
 )
+
+// ConfigFilePath returns the location of the config file
+func ConfigFilePath() string {
+	return filepath.Join(homeDirectory(), ".cf", "config.json")
+}
 
 func homeDirectory() string {
 	var homeDir string
@@ -16,9 +21,4 @@ func homeDirectory() string {
 		homeDir = os.Getenv("HOME")
 	}
 	return homeDir
-}
-
-// ConfigFilePath returns the location of the config file
-func ConfigFilePath() string {
-	return filepath.Join(homeDirectory(), ".cf", "config.json")
 }

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actors/v2actions"
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
@@ -17,7 +17,7 @@ type HelpCategory struct {
 
 // const BLANKLINE = ""
 
-func ConvertPluginToCommandInfo(plugin config.PluginCommand) v2actions.CommandInfo {
+func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2actions.CommandInfo {
 	commandInfo := v2actions.CommandInfo{
 		Name:        plugin.Name,
 		Description: plugin.HelpText,
@@ -54,7 +54,7 @@ func ConvertPluginToCommandInfo(plugin config.PluginCommand) v2actions.CommandIn
 	return commandInfo
 }
 
-func LongestCommandName(cmds map[string]v2actions.CommandInfo, pluginCmds []config.PluginCommand) int {
+func LongestCommandName(cmds map[string]v2actions.CommandInfo, pluginCmds []configv3.PluginCommand) int {
 	longest := 0
 	for name, _ := range cmds {
 		if len(name) > longest {

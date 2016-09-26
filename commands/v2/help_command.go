@@ -11,7 +11,7 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
 	"code.cloudfoundry.org/cli/commands/v2/internal"
-	"code.cloudfoundry.org/cli/utils/config"
+	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/sortutils"
 )
 
@@ -363,7 +363,7 @@ func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
 	return v2actions.CommandInfo{}, false
 }
 
-func (cmd HelpCommand) getSortedPluginCommands() config.PluginCommands {
+func (cmd HelpCommand) getSortedPluginCommands() configv3.PluginCommands {
 	plugins := cmd.Config.Plugins()
 
 	sortedPluginNames := sortutils.Alphabetic{}
@@ -372,7 +372,7 @@ func (cmd HelpCommand) getSortedPluginCommands() config.PluginCommands {
 	}
 	sort.Sort(sortedPluginNames)
 
-	pluginCommands := config.PluginCommands{}
+	pluginCommands := configv3.PluginCommands{}
 	for _, pluginName := range sortedPluginNames {
 		sortedCommands := plugins[pluginName].Commands
 		sort.Sort(sortedCommands)

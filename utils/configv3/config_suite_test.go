@@ -1,4 +1,4 @@
-package config_test
+package configv3_test
 
 import (
 	"io/ioutil"
@@ -14,6 +14,20 @@ import (
 func TestConfig(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Config Suite")
+}
+
+func setup() string {
+	homeDir, err := ioutil.TempDir("", "cli-config-tests")
+	Expect(err).NotTo(HaveOccurred())
+	os.Setenv("CF_HOME", homeDir)
+	return homeDir
+}
+
+func teardown(homeDir string) {
+	if homeDir != "" {
+		os.RemoveAll(homeDir)
+		os.Unsetenv("CF_HOME")
+	}
 }
 
 func setConfig(homeDir string, rawConfig string) {
