@@ -4,7 +4,7 @@ package uifakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/commands/ui"
+	"code.cloudfoundry.org/cli/utils/ui"
 )
 
 type FakeTranslatableError struct {

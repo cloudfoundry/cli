@@ -1,8 +1,8 @@
 package ui_test
 
 import (
-	. "code.cloudfoundry.org/cli/commands/ui"
-	"code.cloudfoundry.org/cli/commands/ui/uifakes"
+	. "code.cloudfoundry.org/cli/utils/ui"
+	"code.cloudfoundry.org/cli/utils/ui/uifakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
