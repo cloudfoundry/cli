@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/commands/ui"
-	"github.com/nicksnyder/go-i18n/i18n"
 )
 
 type FakeTranslatableError struct {
@@ -15,13 +14,13 @@ type FakeTranslatableError struct {
 	errorReturns     struct {
 		result1 string
 	}
-	SetTranslationStub        func(i18n.TranslateFunc) error
-	setTranslationMutex       sync.RWMutex
-	setTranslationArgsForCall []struct {
-		arg1 i18n.TranslateFunc
+	TranslateStub        func(func(string, ...interface{}) string) string
+	translateMutex       sync.RWMutex
+	translateArgsForCall []struct {
+		arg1 func(string, ...interface{}) string
 	}
-	setTranslationReturns struct {
-		result1 error
+	translateReturns struct {
+		result1 string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -52,36 +51,36 @@ func (fake *FakeTranslatableError) ErrorReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeTranslatableError) SetTranslation(arg1 i18n.TranslateFunc) error {
-	fake.setTranslationMutex.Lock()
-	fake.setTranslationArgsForCall = append(fake.setTranslationArgsForCall, struct {
-		arg1 i18n.TranslateFunc
+func (fake *FakeTranslatableError) Translate(arg1 func(string, ...interface{}) string) string {
+	fake.translateMutex.Lock()
+	fake.translateArgsForCall = append(fake.translateArgsForCall, struct {
+		arg1 func(string, ...interface{}) string
 	}{arg1})
-	fake.recordInvocation("SetTranslation", []interface{}{arg1})
-	fake.setTranslationMutex.Unlock()
-	if fake.SetTranslationStub != nil {
-		return fake.SetTranslationStub(arg1)
+	fake.recordInvocation("Translate", []interface{}{arg1})
+	fake.translateMutex.Unlock()
+	if fake.TranslateStub != nil {
+		return fake.TranslateStub(arg1)
 	} else {
-		return fake.setTranslationReturns.result1
+		return fake.translateReturns.result1
 	}
 }
 
-func (fake *FakeTranslatableError) SetTranslationCallCount() int {
-	fake.setTranslationMutex.RLock()
-	defer fake.setTranslationMutex.RUnlock()
-	return len(fake.setTranslationArgsForCall)
+func (fake *FakeTranslatableError) TranslateCallCount() int {
+	fake.translateMutex.RLock()
+	defer fake.translateMutex.RUnlock()
+	return len(fake.translateArgsForCall)
 }
 
-func (fake *FakeTranslatableError) SetTranslationArgsForCall(i int) i18n.TranslateFunc {
-	fake.setTranslationMutex.RLock()
-	defer fake.setTranslationMutex.RUnlock()
-	return fake.setTranslationArgsForCall[i].arg1
+func (fake *FakeTranslatableError) TranslateArgsForCall(i int) func(string, ...interface{}) string {
+	fake.translateMutex.RLock()
+	defer fake.translateMutex.RUnlock()
+	return fake.translateArgsForCall[i].arg1
 }
 
-func (fake *FakeTranslatableError) SetTranslationReturns(result1 error) {
-	fake.SetTranslationStub = nil
-	fake.setTranslationReturns = struct {
-		result1 error
+func (fake *FakeTranslatableError) TranslateReturns(result1 string) {
+	fake.TranslateStub = nil
+	fake.translateReturns = struct {
+		result1 string
 	}{result1}
 }
 
@@ -90,8 +89,8 @@ func (fake *FakeTranslatableError) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.errorMutex.RLock()
 	defer fake.errorMutex.RUnlock()
-	fake.setTranslationMutex.RLock()
-	defer fake.setTranslationMutex.RUnlock()
+	fake.translateMutex.RLock()
+	defer fake.translateMutex.RUnlock()
 	return fake.invocations
 }
 

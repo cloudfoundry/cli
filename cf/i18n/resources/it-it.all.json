@@ -5248,6 +5248,10 @@
     "translation": "Questo dominio è condiviso tra tutte le organizzazioni.\nLa sua eliminazione rimuoverà tutte le rotte associate e renderà irraggiungibile le applicazioni con questo dominio.\nSei sicuro di voler eliminare il dominio {{.DomainName}}? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "Questo servizio non supporta la creazione di chiavi."
   },

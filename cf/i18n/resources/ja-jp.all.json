@@ -5248,6 +5248,10 @@
     "translation": "このドメインはすべての組織で共有されています。\nこれを削除すると、関連するすべての経路が除去されるので、このドメインを持つアプリには到達できなくなります。\nドメイン {{.DomainName}} を削除しますか? "
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "このサービスはキーの作成をサポートしません。"
   },

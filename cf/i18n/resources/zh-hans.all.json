@@ -5248,6 +5248,10 @@
     "translation": "此域在所有组织之间共享。\n将其删除会除去所有关联的路径，并将导致使用此域的任何应用程序都不可访问。\n确定要删除域 {{.DomainName}} 吗？"
   },
   {
+    "id": "This is for backwards compatibility",
+    "translation": ""
+  },
+  {
     "id": "This service doesn't support creation of keys.",
     "translation": "此服务不支持创建密钥。"
   },
