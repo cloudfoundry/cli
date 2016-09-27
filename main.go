@@ -89,7 +89,7 @@ func parse(args []string) {
 			}
 		case flags.ErrRequired:
 			fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Error())
-			parse(append([]string{"help"}, args...))
+			parse([]string{"help", args[0]})
 			os.Exit(1)
 		case flags.ErrUnknownCommand:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
