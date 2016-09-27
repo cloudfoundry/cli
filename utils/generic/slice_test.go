@@ -7,6 +7,10 @@ import (
 )
 
 var _ = Describe("IsSliceable", func() {
+	It("returns false if the type is nil", func() {
+		Expect(generic.IsSliceable(nil)).To(BeFalse())
+	})
+
 	It("should return false when the type cannot be sliced", func() {
 		Expect(generic.IsSliceable("bad slicing")).To(BeFalse())
 	})
