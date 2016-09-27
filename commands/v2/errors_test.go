@@ -1,7 +1,7 @@
-package errors_test
+package v2_test
 
 import (
-	. "code.cloudfoundry.org/cli/commands/errors"
+	. "code.cloudfoundry.org/cli/commands/v2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
