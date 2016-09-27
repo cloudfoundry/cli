@@ -7,44 +7,78 @@ import (
 )
 
 var _ = Describe("generic maps", func() {
-	It("deep merges, with the last map taking precedence in conflicts", func() {
-		map1 := NewMap(map[interface{}]interface{}{
-			"key1": "val1",
-			"key2": "val2",
-			"nest1": map[interface{}]interface{}{
-				"nestKey1": "nest1Val1",
-				"nestKey2": "nest1Val2",
-			},
-			"nest2": []interface{}{
-				"nest2Val1",
-			},
+	Describe("DeepMerge", func() {
+		It("deep merges, with the last map taking precedence in conflicts", func() {
+			map1 := NewMap(map[interface{}]interface{}{
+				"key1": "val1",
+				"key2": "val2",
+				"nest1": map[interface{}]interface{}{
+					"nestKey1": "nest1Val1",
+					"nestKey2": "nest1Val2",
+				},
+				"nest2": []interface{}{
+					"nest2Val1",
+				},
+			})
+
+			map2 := NewMap(map[interface{}]interface{}{
+				"key1": "newVal1",
+				"nest1": map[interface{}]interface{}{
+					"nestKey1": "newNest1Val1",
+				},
+				"nest2": []interface{}{
+					"something",
+				},
+			})
+
+			expectedMap := NewMap(map[interface{}]interface{}{
+				"key1": "newVal1",
+				"key2": "val2",
+				"nest1": NewMap(map[interface{}]interface{}{
+					"nestKey1": "newNest1Val1",
+					"nestKey2": "nest1Val2",
+				}),
+				"nest2": []interface{}{
+					"nest2Val1",
+					"something",
+				},
+			})
+
+			mergedMap := DeepMerge(map1, map2)
+			Expect(mergedMap).To(Equal(expectedMap))
 		})
 
-		map2 := NewMap(map[interface{}]interface{}{
-			"key1": "newVal1",
-			"nest1": map[interface{}]interface{}{
-				"nestKey1": "newNest1Val1",
-			},
-			"nest2": []interface{}{
-				"something",
-			},
+		Context("when the second map overwrites a value in the first map with nil", func() {
+			It("sets the value to nil", func() {
+				map1 := NewMap(map[interface{}]interface{}{
+					"nest1": map[interface{}]interface{}{},
+				})
+
+				map2 := NewMap(map[interface{}]interface{}{
+					"nest1": nil,
+				})
+
+				mergedMap := DeepMerge(map1, map2)
+				Expect(mergedMap.Get("nest1")).To(BeNil())
+			})
 		})
 
-		expectedMap := NewMap(map[interface{}]interface{}{
-			"key1": "newVal1",
-			"key2": "val2",
-			"nest1": NewMap(map[interface{}]interface{}{
-				"nestKey1": "newNest1Val1",
-				"nestKey2": "nest1Val2",
-			}),
-			"nest2": []interface{}{
-				"nest2Val1",
-				"something",
-			},
-		})
+		Context("when the second map overwrites a nil value in the first map", func() {
+			It("overwrites the nil value", func() {
+				expected := map[interface{}]interface{}{}
 
-		mergedMap := DeepMerge(map1, map2)
-		Expect(mergedMap).To(Equal(expectedMap))
+				map1 := NewMap(map[interface{}]interface{}{
+					"nest1": nil,
+				})
+
+				map2 := NewMap(map[interface{}]interface{}{
+					"nest1": expected,
+				})
+
+				mergedMap := DeepMerge(map1, map2)
+				Expect(mergedMap.Get("nest1")).To(BeEquivalentTo(&expected))
+			})
+		})
 	})
 
 	Describe("IsMappable", func() {
@@ -69,6 +103,7 @@ var _ = Describe("generic maps", func() {
 			Expect(IsMappable("2")).To(BeFalse())
 			Expect(IsMappable(true)).To(BeFalse())
 			Expect(IsMappable([]string{"hello"})).To(BeFalse())
+			Expect(IsMappable(nil)).To(BeFalse())
 		})
 	})
 })

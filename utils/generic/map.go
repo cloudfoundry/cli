@@ -33,6 +33,8 @@ func NewMap(data ...interface{}) Map {
 	}
 
 	switch data := data[0].(type) {
+	case nil:
+		return newEmptyMap()
 	case Map:
 		return data
 	case map[string]string:
@@ -115,6 +117,9 @@ func (data *ConcreteMap) String() string {
 }
 
 func IsMappable(value interface{}) bool {
+	if value == nil {
+		return false
+	}
 	switch value.(type) {
 	case Map:
 		return true

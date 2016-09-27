@@ -111,6 +111,42 @@ var _ = Describe("Manifests", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	It("allows nil value for global env if env is present in the app", func() {
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+			"env": nil,
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"name": "bad app",
+					"env": map[interface{}]interface{}{
+						"foo": "bar",
+					},
+				},
+			},
+		}))
+
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(*apps[0].EnvironmentVars).To(Equal(map[string]interface{}{"foo": "bar"}))
+	})
+
+	It("does not allow nil value for env in application", func() {
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+			"env": generic.NewMap(map[interface{}]interface{}{
+				"foo": "bar",
+			}),
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"name": "bad app",
+					"env":  nil,
+				},
+			},
+		}))
+
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("env should not be null"))
+	})
+
 	It("does not allow nil values for environment variables", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"env": generic.NewMap(map[interface{}]interface{}{
