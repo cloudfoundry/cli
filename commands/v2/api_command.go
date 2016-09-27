@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
-	"code.cloudfoundry.org/cli/commands/errors"
 	"code.cloudfoundry.org/cli/commands/flags"
 )
 
@@ -122,10 +121,10 @@ func (_ ApiCommand) processURL(apiURL string) string {
 func (cmd ApiCommand) handleError(err error) error {
 	switch e := err.(type) {
 	case cloudcontrollerv2.UnverifiedServerError:
-		return errors.InvalidSSLCertError{API: cmd.OptionalArgs.URL}
+		return InvalidSSLCertError{API: cmd.OptionalArgs.URL}
 
 	case cloudcontrollerv2.RequestError:
-		return errors.APIRequestError{Err: e}
+		return APIRequestError{Err: e}
 	}
 	return err
 }
