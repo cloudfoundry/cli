@@ -1,6 +1,6 @@
 # Cloud Foundry CLI
 
-[![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://badge.fury.io/gh/cloudfoundry%2Fcli)
+[![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://github.com/cloudfoundry/cli/releases)
 [![Apache License 2.0](https://img.shields.io/github/license/cloudfoundry/cli.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
 [![Code Climate](https://codeclimate.com/github/cloudfoundry/cli/badges/gpa.svg)](https://codeclimate.com/github/cloudfoundry/cli)
 
