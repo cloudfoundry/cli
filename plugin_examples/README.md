@@ -1,3 +1,5 @@
+If you have any questions about developing a CLI plugin, ask away on the [cf-dev mailing list](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) (many plugin developers there!) or the #cli channel in our Slack community.
+
 # Changes in v6.17.0
 - `-v` is now a global flag to enable verbose logging of API calls, equivalent to `CF_TRACE=true`. This means that the `-v` flag will no longer be passed to plugins.
 
