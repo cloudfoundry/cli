@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 
 	"github.com/cloudfoundry/noaa"
-	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
@@ -23,6 +22,7 @@ type NoaaLogsRepository struct {
 }
 
 func NewNoaaLogsRepository(config coreconfig.Reader, consumer NoaaConsumer, tr authentication.TokenRefresher) *NoaaLogsRepository {
+	consumer.RefreshTokenFrom(tr)
 	return &NoaaLogsRepository{
 		config:         config,
 		consumer:       consumer,
@@ -49,15 +49,9 @@ func loggableMessagesFromNoaaMessages(messages []*events.LogMessage) []Loggable 
 func (repo *NoaaLogsRepository) RecentLogsFor(appGUID string) ([]Loggable, error) {
 	logs, err := repo.consumer.RecentLogs(appGUID, repo.config.AccessToken())
 
-	switch err.(type) {
-	case nil: // do nothing
-	case *noaa_errors.UnauthorizedError:
-		_, _ = repo.tokenRefresher.RefreshAuthToken()
-		return repo.RecentLogsFor(appGUID)
-	default:
+	if err != nil {
 		return loggableMessagesFromNoaaMessages(logs), err
 	}
-
 	return loggableMessagesFromNoaaMessages(noaa.SortRecent(logs)), err
 }
 
@@ -70,7 +64,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 	}
 
 	repo.consumer.SetOnConnectCallback(onConnect)
-	c, e := repo.consumer.TailingLogsWithoutReconnect(appGUID, repo.config.AccessToken())
+	c, e := repo.consumer.TailingLogs(appGUID, repo.config.AccessToken())
 
 	go func() {
 		for {
@@ -86,14 +80,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 
 				repo.messageQueue.PushMessage(msg)
 			case err := <-e:
-				switch err.(type) {
-				case nil:
-				case *noaa_errors.UnauthorizedError:
-					_, _ = repo.tokenRefresher.RefreshAuthToken()
-					ticker.Stop()
-					repo.TailLogsFor(appGUID, onConnect, logChan, errChan)
-					return
-				default:
+				if err != nil {
 					errChan <- err
 
 					ticker.Stop()
