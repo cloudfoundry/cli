@@ -5,17 +5,18 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/cf/api/logs"
+	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
 type FakeNoaaConsumer struct {
-	TailingLogsWithoutReconnectStub        func(string, string) (<-chan *events.LogMessage, <-chan error)
-	tailingLogsWithoutReconnectMutex       sync.RWMutex
-	tailingLogsWithoutReconnectArgsForCall []struct {
+	TailingLogsStub        func(string, string) (<-chan *events.LogMessage, <-chan error)
+	tailingLogsMutex       sync.RWMutex
+	tailingLogsArgsForCall []struct {
 		arg1 string
 		arg2 string
 	}
-	tailingLogsWithoutReconnectReturns struct {
+	tailingLogsReturns struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}
@@ -40,40 +41,45 @@ type FakeNoaaConsumer struct {
 	setOnConnectCallbackArgsForCall []struct {
 		cb func()
 	}
+	RefreshTokenFromStub        func(tr consumer.TokenRefresher)
+	refreshTokenFromMutex       sync.RWMutex
+	refreshTokenFromArgsForCall []struct {
+		tr consumer.TokenRefresher
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnect(arg1 string, arg2 string) (<-chan *events.LogMessage, <-chan error) {
-	fake.tailingLogsWithoutReconnectMutex.Lock()
-	fake.tailingLogsWithoutReconnectArgsForCall = append(fake.tailingLogsWithoutReconnectArgsForCall, struct {
+func (fake *FakeNoaaConsumer) TailingLogs(arg1 string, arg2 string) (<-chan *events.LogMessage, <-chan error) {
+	fake.tailingLogsMutex.Lock()
+	fake.tailingLogsArgsForCall = append(fake.tailingLogsArgsForCall, struct {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
-	fake.recordInvocation("TailingLogsWithoutReconnect", []interface{}{arg1, arg2})
-	fake.tailingLogsWithoutReconnectMutex.Unlock()
-	if fake.TailingLogsWithoutReconnectStub != nil {
-		return fake.TailingLogsWithoutReconnectStub(arg1, arg2)
+	fake.recordInvocation("TailingLogs", []interface{}{arg1, arg2})
+	fake.tailingLogsMutex.Unlock()
+	if fake.TailingLogsStub != nil {
+		return fake.TailingLogsStub(arg1, arg2)
 	} else {
-		return fake.tailingLogsWithoutReconnectReturns.result1, fake.tailingLogsWithoutReconnectReturns.result2
+		return fake.tailingLogsReturns.result1, fake.tailingLogsReturns.result2
 	}
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnectCallCount() int {
-	fake.tailingLogsWithoutReconnectMutex.RLock()
-	defer fake.tailingLogsWithoutReconnectMutex.RUnlock()
-	return len(fake.tailingLogsWithoutReconnectArgsForCall)
+func (fake *FakeNoaaConsumer) TailingLogsCallCount() int {
+	fake.tailingLogsMutex.RLock()
+	defer fake.tailingLogsMutex.RUnlock()
+	return len(fake.tailingLogsArgsForCall)
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnectArgsForCall(i int) (string, string) {
-	fake.tailingLogsWithoutReconnectMutex.RLock()
-	defer fake.tailingLogsWithoutReconnectMutex.RUnlock()
-	return fake.tailingLogsWithoutReconnectArgsForCall[i].arg1, fake.tailingLogsWithoutReconnectArgsForCall[i].arg2
+func (fake *FakeNoaaConsumer) TailingLogsArgsForCall(i int) (string, string) {
+	fake.tailingLogsMutex.RLock()
+	defer fake.tailingLogsMutex.RUnlock()
+	return fake.tailingLogsArgsForCall[i].arg1, fake.tailingLogsArgsForCall[i].arg2
 }
 
-func (fake *FakeNoaaConsumer) TailingLogsWithoutReconnectReturns(result1 <-chan *events.LogMessage, result2 <-chan error) {
-	fake.TailingLogsWithoutReconnectStub = nil
-	fake.tailingLogsWithoutReconnectReturns = struct {
+func (fake *FakeNoaaConsumer) TailingLogsReturns(result1 <-chan *events.LogMessage, result2 <-chan error) {
+	fake.TailingLogsStub = nil
+	fake.tailingLogsReturns = struct {
 		result1 <-chan *events.LogMessage
 		result2 <-chan error
 	}{result1, result2}
@@ -163,17 +169,43 @@ func (fake *FakeNoaaConsumer) SetOnConnectCallbackArgsForCall(i int) func() {
 	return fake.setOnConnectCallbackArgsForCall[i].cb
 }
 
+func (fake *FakeNoaaConsumer) RefreshTokenFrom(tr consumer.TokenRefresher) {
+	fake.refreshTokenFromMutex.Lock()
+	fake.refreshTokenFromArgsForCall = append(fake.refreshTokenFromArgsForCall, struct {
+		tr consumer.TokenRefresher
+	}{tr})
+	fake.recordInvocation("RefreshTokenFrom", []interface{}{tr})
+	fake.refreshTokenFromMutex.Unlock()
+	if fake.RefreshTokenFromStub != nil {
+		fake.RefreshTokenFromStub(tr)
+	}
+}
+
+func (fake *FakeNoaaConsumer) RefreshTokenFromCallCount() int {
+	fake.refreshTokenFromMutex.RLock()
+	defer fake.refreshTokenFromMutex.RUnlock()
+	return len(fake.refreshTokenFromArgsForCall)
+}
+
+func (fake *FakeNoaaConsumer) RefreshTokenFromArgsForCall(i int) consumer.TokenRefresher {
+	fake.refreshTokenFromMutex.RLock()
+	defer fake.refreshTokenFromMutex.RUnlock()
+	return fake.refreshTokenFromArgsForCall[i].tr
+}
+
 func (fake *FakeNoaaConsumer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.tailingLogsWithoutReconnectMutex.RLock()
-	defer fake.tailingLogsWithoutReconnectMutex.RUnlock()
+	fake.tailingLogsMutex.RLock()
+	defer fake.tailingLogsMutex.RUnlock()
 	fake.recentLogsMutex.RLock()
 	defer fake.recentLogsMutex.RUnlock()
 	fake.closeMutex.RLock()
 	defer fake.closeMutex.RUnlock()
 	fake.setOnConnectCallbackMutex.RLock()
 	defer fake.setOnConnectCallbackMutex.RUnlock()
+	fake.refreshTokenFromMutex.RLock()
+	defer fake.refreshTokenFromMutex.RUnlock()
 	return fake.invocations
 }
 
