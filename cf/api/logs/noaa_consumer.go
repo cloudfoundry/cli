@@ -1,6 +1,7 @@
 package logs
 
 import (
+	"github.com/cloudfoundry/noaa/consumer"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
@@ -8,8 +9,9 @@ import (
 //go:generate counterfeiter . NoaaConsumer
 
 type NoaaConsumer interface {
-	TailingLogsWithoutReconnect(string, string) (<-chan *events.LogMessage, <-chan error)
+	TailingLogs(string, string) (<-chan *events.LogMessage, <-chan error)
 	RecentLogs(appGUID string, authToken string) ([]*events.LogMessage, error)
 	Close() error
 	SetOnConnectCallback(cb func())
+	RefreshTokenFrom(tr consumer.TokenRefresher)
 }
