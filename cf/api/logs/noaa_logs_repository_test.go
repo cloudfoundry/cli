@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 
@@ -39,35 +38,14 @@ var _ = Describe("logs with noaa repository", func() {
 		repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
 	})
 
+	Describe("Authentication Token Refresh", func() {
+		It("sets the noaa token refresher", func() {
+			Expect(fakeNoaaConsumer.RefreshTokenFromCallCount()).To(Equal(1))
+			Expect(fakeNoaaConsumer.RefreshTokenFromArgsForCall(0)).To(Equal(fakeTokenRefresher))
+		})
+	})
+
 	Describe("RecentLogsFor", func() {
-		It("refreshes token and get metric once more if token has expired.", func() {
-			var recentLogsCallCount int
-
-			fakeNoaaConsumer.RecentLogsStub = func(appGuid, authToken string) ([]*events.LogMessage, error) {
-				defer func() {
-					recentLogsCallCount += 1
-				}()
-
-				if recentLogsCallCount == 0 {
-					return []*events.LogMessage{}, noaa_errors.NewUnauthorizedError("Unauthorized token")
-				}
-
-				return []*events.LogMessage{}, nil
-			}
-
-			repo.RecentLogsFor("app-guid")
-			Expect(fakeTokenRefresher.RefreshAuthTokenCallCount()).To(Equal(1))
-			Expect(fakeNoaaConsumer.RecentLogsCallCount()).To(Equal(2))
-		})
-
-		It("refreshes token and get metric once more if token has expired.", func() {
-			fakeNoaaConsumer.RecentLogsReturns([]*events.LogMessage{}, errors.New("error error error"))
-
-			_, err := repo.RecentLogsFor("app-guid")
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal("error error error"))
-		})
-
 		Context("when an error does not occur", func() {
 			var msg1, msg2, msg3 *events.LogMessage
 
@@ -133,7 +111,7 @@ var _ = Describe("logs with noaa repository", func() {
 				defer repo.Close()
 				err := errors.New("oops")
 
-				fakeNoaaConsumer.TailingLogsWithoutReconnectStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
 					go func() {
 						e <- err
 					}()
@@ -142,63 +120,6 @@ var _ = Describe("logs with noaa repository", func() {
 				go repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
 				Eventually(errChan).Should(Receive(&err))
-
-				close(done)
-			})
-		})
-
-		Context("when a noaa_errors.UnauthorizedError occurs", func() {
-			var e chan error
-			var c chan *events.LogMessage
-
-			BeforeEach(func() {
-				errChan = make(chan error)
-				logChan = make(chan logs.Loggable)
-
-				e = make(chan error)
-				c = make(chan *events.LogMessage)
-
-				fakeNoaaConsumer.CloseStub = func() error {
-					close(e)
-					close(c)
-					return nil
-				}
-			})
-
-			It("refreshes the access token and tail logs once more", func(done Done) {
-				defer repo.Close()
-				calledOnce := false
-				err := errors.New("2nd Error")
-				synchronization := make(chan bool)
-
-				fakeNoaaConsumer.CloseStub = func() error {
-					synchronization <- true
-					return nil
-				}
-
-				fakeNoaaConsumer.TailingLogsWithoutReconnectStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					ec := make(chan error)
-					lc := make(chan *events.LogMessage)
-
-					go func() {
-						if !calledOnce {
-							calledOnce = true
-							ec <- noaa_errors.NewUnauthorizedError("i'm sorry dave")
-						} else {
-							ec <- err
-							<-synchronization
-							close(ec)
-							close(lc)
-						}
-					}()
-
-					return lc, ec
-				}
-
-				go repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
-
-				Eventually(errChan).Should(Receive(&err))
-				Eventually(fakeTokenRefresher.RefreshAuthTokenCallCount).Should(Equal(1))
 
 				close(done)
 			})
@@ -225,12 +146,12 @@ var _ = Describe("logs with noaa repository", func() {
 			It("asks for the logs for the given app", func(done Done) {
 				defer repo.Close()
 
-				fakeNoaaConsumer.TailingLogsWithoutReconnectReturns(c, e)
+				fakeNoaaConsumer.TailingLogsReturns(c, e)
 
 				repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
 
-				Eventually(fakeNoaaConsumer.TailingLogsWithoutReconnectCallCount).Should(Equal(1))
-				appGuid, token := fakeNoaaConsumer.TailingLogsWithoutReconnectArgsForCall(0)
+				Eventually(fakeNoaaConsumer.TailingLogsCallCount).Should(Equal(1))
+				appGuid, token := fakeNoaaConsumer.TailingLogsArgsForCall(0)
 				Expect(appGuid).To(Equal("app-guid"))
 				Expect(token).To(Equal("the-access-token"))
 
@@ -240,7 +161,7 @@ var _ = Describe("logs with noaa repository", func() {
 			It("sets the on connect callback", func() {
 				defer repo.Close()
 
-				fakeNoaaConsumer.TailingLogsWithoutReconnectReturns(c, e)
+				fakeNoaaConsumer.TailingLogsReturns(c, e)
 
 				var cb = func() { return }
 				repo.TailLogsFor("app-guid", cb, logChan, errChan)
@@ -270,7 +191,7 @@ var _ = Describe("logs with noaa repository", func() {
 				lc = make(chan *events.LogMessage)
 				syncMu.Unlock()
 
-				fakeNoaaConsumer.TailingLogsWithoutReconnectStub = func(string, string) (<-chan *events.LogMessage, <-chan error) {
+				fakeNoaaConsumer.TailingLogsStub = func(string, string) (<-chan *events.LogMessage, <-chan error) {
 					go func() {
 						syncMu.Lock()
 						lc <- msg3
