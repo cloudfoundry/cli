@@ -1,5 +1,5 @@
 echo {> config.json
-echo "api": "https://api.%DOMAIN%",>> config.json
+echo "api": "api.%DOMAIN%",>> config.json
 echo "apps_domain": "%DOMAIN%",>> config.json
 echo "admin_user": "%ADMIN_USER%",>> config.json
 echo "admin_password": "%ADMIN_PASSWORD%",>> config.json
