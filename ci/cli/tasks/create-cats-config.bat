@@ -9,5 +9,6 @@ echo "default_timeout": 120,>> config.json
 echo "cf_push_timeout": 210,>> config.json
 echo "long_curl_timeout": 210,>> config.json
 echo "broker_start_timeout": 330,>> config.json
-echo "use_http": false>> config.json
+echo "use_http": false,>> config.json
+echo "include_v3": false>> config.json
 echo }>> config.json
