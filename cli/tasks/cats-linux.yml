@@ -49,7 +49,7 @@ params:
   PERSISTENT_APP_SPACE:
   SKIP_SSL_VALIDATION: true
   SKIP_SSO: true
-  USE_HTTP: true
+  USE_HTTP: false
 
 run:
   path: bash
@@ -61,7 +61,7 @@ run:
     ###########################################################
     # Added by CLI
     export DOMAIN=`cat bosh-lite-lock/name`
-    export CF_API="https://api.${DOMAIN}"
+    export CF_API="api.${DOMAIN}"
     export CF_APPS_DOMAIN="${DOMAIN}"
     ###########################################################
 
