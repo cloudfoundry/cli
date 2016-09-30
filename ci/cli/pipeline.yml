@@ -366,24 +366,11 @@ jobs:
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: dea
-        INCLUDE_DEFAULT: true
-        INCLUDE_INTERNET_DEPENDENT: true
-        INCLUDE_ROUTE_SERVICES: true
-        INCLUDE_SECURITY_GROUPS: true
       on_failure:
          put: slack-alert
          params:
            channel: '#cli-firehose'
            text: "cats linux failed OR errored :("
-    - task: cats-services
-      file: cli-ci/ci/cli/tasks/cats-linux.yml
-      params:
-        INCLUDE_SERVICES: true
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "cats services linux failed OR errored :("
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -413,13 +400,6 @@ jobs:
     file: cli-ci/ci/cli/tasks/cats-linux.yml
     params:
       BACKEND: diego
-      INCLUDE_DEFAULT: true
-      INCLUDE_BACKEND_COMPATIBILITY: true
-      INCLUDE_DIEGO_DOCKER: true
-      INCLUDE_DIEGO_SSH: true
-      INCLUDE_INTERNET_DEPENDENT: true
-      INCLUDE_ROUTE_SERVICES: true
-      INCLUDE_SECURITY_GROUPS: true
     ensure:
       put: bosh-lites-diego-pool
       params:

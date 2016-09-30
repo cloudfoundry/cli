@@ -12,19 +12,6 @@ params:
   CF_ADMIN_PASSWORD: admin
   CF_ADMIN_USER: admin
 
-  INCLUDE_DEFAULT: false
-  INCLUDE_BACKEND_COMPATIBILITY: false
-  INCLUDE_DIEGO_DOCKER: false
-  INCLUDE_DIEGO_SSH: false
-  INCLUDE_INTERNET_DEPENDENT: false
-  INCLUDE_LOGGING: false
-  INCLUDE_OPERATOR: false
-  INCLUDE_ROUTE_SERVICES: false
-  INCLUDE_SECURITY_GROUPS: false
-  INCLUDE_SERVICES: false
-  INCLUDE_TASKS: false
-  INCLUDE_V3: false
-
   BINARY_BUILDPACK_NAME:
   GO_BUILDPACK_NAME:
   JAVA_BUILDPACK_NAME:
@@ -141,27 +128,6 @@ run:
 
     export CONFIG=$PWD/integration_config.json
 
-    SKIP_PACKAGES="-skipPackage=helpers,"
-    $INCLUDE_DIEGO_SSH || SKIP_PACKAGES="${SKIP_PACKAGES}ssh,"
-    $INCLUDE_V3 || SKIP_PACKAGES="${SKIP_PACKAGES}v3,"
-    $INCLUDE_DIEGO_DOCKER || SKIP_PACKAGES="${SKIP_PACKAGES}docker,"
-    $INCLUDE_BACKEND_COMPATIBILITY || SKIP_PACKAGES="${SKIP_PACKAGES}backend_compatibility,"
-    $INCLUDE_SECURITY_GROUPS || SKIP_PACKAGES="${SKIP_PACKAGES}security_groups,"
-    $INCLUDE_LOGGING || SKIP_PACKAGES="${SKIP_PACKAGES}logging,"
-    $INCLUDE_OPERATOR || SKIP_PACKAGES="${SKIP_PACKAGES}operator,"
-    $INCLUDE_INTERNET_DEPENDENT || SKIP_PACKAGES="${SKIP_PACKAGES}internet_dependent,"
-    $INCLUDE_SERVICES || SKIP_PACKAGES="${SKIP_PACKAGES}services,"
-    $INCLUDE_ROUTE_SERVICES || SKIP_PACKAGES="${SKIP_PACKAGES}route_services,"
-
-    ###########################################################
-    # Added by CLI
-    $INCLUDE_DEFAULT || SKIP_PACKAGES="${SKIP_PACKAGES}apps,detect,routing,"
-    ###########################################################
-
-    # Remove trailing comma
-    SKIP_PACKAGES=$(echo $SKIP_PACKAGES | sed -E 's/(.*)(,)/\1/')
-
-
     SKIPS="-skip="
     $SKIP_SSO && SKIPS="${SKIPS}SSO|"
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
@@ -176,6 +142,5 @@ run:
       -r \
       -slowSpecThreshold=120 -randomizeAllSpecs \
       -nodes "${NODES}" \
-      "${SKIP_PACKAGES}" \
       "${SKIPS}" \
       -keepGoing
