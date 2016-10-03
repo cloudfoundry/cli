@@ -3580,6 +3580,10 @@
     "translation": "ビルドパック・ステージングの最大待ち時間 (分)"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "1 つのアプリケーション・インスタンスが占有できる最大メモリー量 (例: 1024M、1G、10G)"
   },

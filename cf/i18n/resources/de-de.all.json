@@ -3580,6 +3580,10 @@
     "translation": "Maximale Wartezeit auf das Staging des Buildpacks in Minuten"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Maximalwert für den möglichen Speicher einer Anwendungsinstanz (z.B. 1024M, 1G, 10G)"
   },

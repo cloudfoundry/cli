@@ -206,6 +206,7 @@
     "LC_ALL",
     "CF_COLOR=false",
     "CF_DIAL_TIMEOUT",
+    "CF_DIAL_TIMEOUT=5",
     "CF_HOME",
     "CF_HOME=path/to/dir/",
     "win32",
