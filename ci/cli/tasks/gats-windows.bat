@@ -22,6 +22,4 @@ popd
 go get -v github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-ginkgo.exe -r -nodes=4 -slowSpecThreshold=30 -randomizeSuites ./integration
-ginkgo.exe -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites -skipPackage application ./gats
-ginkgo.exe -r -nodes=4 -slowSpecThreshold=120 -randomizeSuites ./gats/application
+ginkgo.exe -r -nodes=4 $GINKGO_ARGS
