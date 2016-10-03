@@ -22,4 +22,4 @@ popd
 go get -v github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-ginkgo.exe -r -nodes=4 $GINKGO_ARGS
+ginkgo.exe -r -nodes=4 %GINKGO_ARGS%
