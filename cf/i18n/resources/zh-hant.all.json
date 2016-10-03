@@ -3580,6 +3580,10 @@
     "translation": "建置套件編譯打包的最長等待時間（分鐘）"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "應用程式實例可以具有的記憶體數量上限（例如 1024M、1G、10G）"
   },

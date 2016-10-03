@@ -3580,6 +3580,10 @@
     "translation": "Tempo massimo di attesa per la preparazione del pacchetto di build, in minuti"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Quantità massima di memoria che può avere un'istanza dell'applicazione (ad esempio, 1024M, 1G, 10G)"
   },

@@ -1164,6 +1164,10 @@
     "translation": "Map an HTTP route:\\n      CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\\n\\n   Map a TCP route:\\n      CF_NAME map-route APP_NAME DOMAIN (--port PORT | --random-port)\\n\\nEXAMPLES:\\n   CF_NAME map-route my-app example.com                              # example.com\\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME map-route my-app example.com --port 5000                  # example.com:5000"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": "Max wait time to establish a connection, including name resolution, in seconds"
+  },
+  {
     "id": "NEW_NAME",
     "translation": "NEW_NAME"
   },

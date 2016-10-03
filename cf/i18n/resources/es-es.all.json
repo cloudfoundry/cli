@@ -3580,6 +3580,10 @@
     "translation": "Tiempo de espera máximo para la transferencia del paquete de compilación, en minutos"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Cantidad máxima de memoria que puede tener una instancia de la aplicación (p. ej. 1024M, 1G, 10G)"
   },

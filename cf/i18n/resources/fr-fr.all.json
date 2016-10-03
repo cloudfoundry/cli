@@ -3580,6 +3580,10 @@
     "translation": "Temps d'attente maximal pour la constitution du pack de construction, en minutes"
   },
   {
+    "id": "Max wait time to establish a connection, including name resolution, in seconds",
+    "translation": ""
+  },
+  {
     "id": "Maximum amount of memory an application instance can have (e.g. 1024M, 1G, 10G)",
     "translation": "Quantité maximale de mémoire dont une instance d'application peut disposer (par exemple 1024M, 1G, 10G)"
   },
