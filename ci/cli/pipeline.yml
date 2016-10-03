@@ -326,11 +326,24 @@ jobs:
     - do:
       - task: linux
         file: cli-ci/ci/cli/tasks/gats-linux.yml
-      - task: windows
+      - task: windows-integration
         file: cli-ci/ci/cli/tasks/gats-windows.yml
         params:
           ADMIN_USER: {{bosh-lite-admin-username}}
           ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+          GINKGO_ARGS: -slowSpecThreshold=30 -randomizeSuites ./integration
+      - task: windows-gats
+        file: cli-ci/ci/cli/tasks/gats-windows.yml
+        params:
+          ADMIN_USER: {{bosh-lite-admin-username}}
+          ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+          GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites -skipPackage application ./gats
+      - task: windows-gats-application
+        file: cli-ci/ci/cli/tasks/gats-windows.yml
+        params:
+          ADMIN_USER: {{bosh-lite-admin-username}}
+          ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+          GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites ./gats/application
       on_failure:
          put: slack-alert
          params:
