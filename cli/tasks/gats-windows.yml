@@ -4,6 +4,7 @@ platform: windows
 params:
   ADMIN_USER:
   ADMIN_PASSWORD:
+  GINKGO_ARGS:
 
 inputs:
 - name: cli-acceptance-tests
