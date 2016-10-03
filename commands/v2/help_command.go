@@ -216,6 +216,12 @@ func (cmd HelpCommand) displayHelpFooter() {
 			"ENVName":     "CF_COLOR=false",
 			"Description": "Do not colorize output",
 		})
+	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}                  {{.Description}}",
+		[]string{"Description"},
+		map[string]interface{}{
+			"ENVName":     "CF_DIAL_TIMEOUT=5",
+			"Description": "Max wait time to establish a connection, including name resolution, in seconds",
+		})
 	cmd.UI.DisplayTextWithKeyTranslations("   {{.ENVName}}               {{.Description}}",
 		[]string{"Description"},
 		map[string]interface{}{

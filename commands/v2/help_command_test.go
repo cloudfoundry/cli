@@ -515,6 +515,7 @@ var _ = Describe("Help Command", func() {
 
 				Expect(fakeUI.Out).To(Say("ENVIRONMENT VARIABLES:"))
 				Expect(fakeUI.Out).To(Say("CF_COLOR=false\\s+Do not colorize output"))
+				Expect(fakeUI.Out).To(Say("CF_DIAL_TIMEOUT=5\\s+Max wait time to establish a connection, including name resolution, in seconds"))
 
 				Expect(fakeUI.Out).To(Say("GLOBAL OPTIONS:"))
 				Expect(fakeUI.Out).To(Say("--help, -h\\s+Show help"))
