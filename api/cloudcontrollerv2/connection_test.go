@@ -153,7 +153,7 @@ var _ = Describe("Connection", func() {
 
 					requestErr, ok := err.(RequestError)
 					Expect(ok).To(BeTrue())
-					Expect(requestErr).To(MatchError("Get http://i.hope.this.doesnt.exist.com/v2/info: dial tcp: lookup i.hope.this.doesnt.exist.com: no such host"))
+					Expect(requestErr.Error()).To(MatchRegexp(".*http://i.hope.this.doesnt.exist.com/v2/info.*[nN]o such host"))
 				})
 			})
 
