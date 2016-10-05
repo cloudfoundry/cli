@@ -26,7 +26,7 @@ type UnbindServiceCommand struct {
 	Config commands.Config
 }
 
-func (cmd UnbindServiceCommand) Setup(config commands.Config, ui commands.UI) error {
+func (cmd *UnbindServiceCommand) Setup(config commands.Config, ui commands.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
