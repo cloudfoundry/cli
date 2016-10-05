@@ -60,6 +60,10 @@
     "translation": "App "
   },
   {
+    "id": "App {{.AppName}} not found",
+    "translation": ""
+  },
+  {
     "id": "Application lifecycle:",
     "translation": "Application lifecycle:"
   },
@@ -1328,6 +1332,10 @@
     "translation": "ROUTE_PATH"
   },
   {
+    "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
+    "translation": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"
+  },
+  {
     "id": "Route and domain management:",
     "translation": "Route and domain management:"
   },
@@ -1352,6 +1360,10 @@
     "translation": "Service instance"
   },
   {
+    "id": "Service instance {{.ServiceInstance}} not found",
+    "translation": ""
+  },
+  {
     "id": "Service offering",
     "translation": "Service offering"
   },
@@ -1374,6 +1386,10 @@
   {
     "id": "Status: {{.State}}",
     "translation": "Status: {{.State}}"
+  },
+  {
+    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
   },
   {
     "id": "TOTAL_MEMORY",

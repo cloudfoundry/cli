@@ -328,6 +328,10 @@
     "translation": "应用程序 {{.AppName}} 已绑定到 {{.ServiceName}}。"
   },
   {
+    "id": "App {{.AppName}} not found",
+    "translation": ""
+  },
+  {
     "id": "Append API request diagnostics to a log file",
     "translation": "将 API 请求诊断附加到日志文件"
   },
@@ -4212,6 +4216,10 @@
     "translation": "从以下源收到的 SSL 证书无效"
   },
   {
+    "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
+    "translation": ""
+  },
+  {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
     "translation": "以递归方式从 Cloud Foundry 数据库中除去某个服务和子对象，而不对服务代理程序发起请求"
   },
@@ -4612,6 +4620,10 @@
     "translation": "服务实例 {{.ServiceInstanceName}} 不存在。"
   },
   {
+    "id": "Service instance {{.ServiceInstance}} not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance: {{.ServiceName}}",
     "translation": "服务实例: {{.ServiceName}}"
   },
@@ -4858,6 +4870,10 @@
   {
     "id": "Status: {{.State}}",
     "translation": "状态: {{.State}}"
+  },
+  {
+    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
   },
   {
     "id": "Stop an app",

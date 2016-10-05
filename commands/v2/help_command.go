@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
-	"code.cloudfoundry.org/cli/commands/v2/internal"
+	"code.cloudfoundry.org/cli/commands/v2/common"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/sortutils"
 )
@@ -38,7 +38,7 @@ type HelpCommand struct {
 }
 
 func (cmd *HelpCommand) Setup(config commands.Config, ui commands.UI) error {
-	cmd.Actor = v2actions.NewActor()
+	cmd.Actor = v2actions.NewActor(nil)
 	cmd.Config = config
 	cmd.UI = ui
 
@@ -115,7 +115,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 		})
 	cmd.UI.DisplayNewline()
 
-	for _, category := range internal.CommonHelpCategoryList {
+	for _, category := range common.CommonHelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 		table := [][]string{}
 
@@ -177,9 +177,9 @@ func (cmd HelpCommand) displayCommonCommands() {
 func (cmd HelpCommand) displayAllCommands() {
 	pluginCommands := cmd.getSortedPluginCommands()
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
-	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
+	longestCmd := common.LongestCommandName(cmdInfo, pluginCommands)
 
-	for _, category := range internal.HelpCategoryList {
+	for _, category := range common.HelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 
 		for _, row := range category.CommandList {
@@ -311,7 +311,7 @@ func (cmd HelpCommand) displayCommand() error {
 	if len(cmdInfo.Flags) != 0 {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("OPTIONS:")
-		nameWidth := internal.LongestFlagWidth(cmdInfo.Flags) + 6
+		nameWidth := common.LongestFlagWidth(cmdInfo.Flags) + 6
 		for _, flag := range cmdInfo.Flags {
 			var name string
 			if flag.Short != "" && flag.Long != "" {
@@ -361,7 +361,7 @@ func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
 	for _, pluginConfig := range cmd.Config.Plugins() {
 		for _, command := range pluginConfig.Commands {
 			if command.Name == cmd.OptionalArgs.CommandName {
-				return internal.ConvertPluginToCommandInfo(command), true
+				return common.ConvertPluginToCommandInfo(command), true
 			}
 		}
 	}

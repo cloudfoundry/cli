@@ -328,6 +328,10 @@
     "translation": "{{.AppName}} 앱이 이미 {{.ServiceName}}에 바인딩되어 있습니다."
   },
   {
+    "id": "App {{.AppName}} not found",
+    "translation": ""
+  },
+  {
     "id": "Append API request diagnostics to a log file",
     "translation": "로그 파일에 API 요청 진단 추가"
   },
@@ -4212,6 +4216,10 @@
     "translation": "수신한 올바르지 않은 SSL 인증서의 원래 위치 "
   },
   {
+    "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
+    "translation": ""
+  },
+  {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
     "translation": "서비스 브로커에 요청하지 않고 Cloud Foundry 데이터베이스에서 서비스와 하위 오브젝트를 재귀적으로 제거"
   },
@@ -4612,6 +4620,10 @@
     "translation": "서비스 인스턴스 {{.ServiceInstanceName}}이(가) 없습니다."
   },
   {
+    "id": "Service instance {{.ServiceInstance}} not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance: {{.ServiceName}}",
     "translation": "서비스 인스턴스: {{.ServiceName}}"
   },
@@ -4858,6 +4870,10 @@
   {
     "id": "Status: {{.State}}",
     "translation": "상태: {{.State}}"
+  },
+  {
+    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
   },
   {
     "id": "Stop an app",

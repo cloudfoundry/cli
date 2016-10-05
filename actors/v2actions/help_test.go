@@ -2,24 +2,44 @@ package v2actions_test
 
 import (
 	. "code.cloudfoundry.org/cli/actors/v2actions"
-	"code.cloudfoundry.org/cli/commands/v2"
 
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
+
+type commandList struct {
+	App     appCommand     `command:"app" description:"Display health and status for app"`
+	Restage restageCommand `command:"restage" alias:"rg" description:"Restage an app"`
+	Help    helpCommand    `command:"help" alias:"h" description:"Show help"`
+}
+
+type appCommand struct {
+	GUID            bool        `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
+	usage           interface{} `usage:"CF_NAME app APP_NAME"`
+	relatedCommands interface{} `related_commands:"apps, events, logs, map-route, unmap-route, push"`
+}
+
+type restageCommand struct {
+	envCFStagingTimeout interface{} `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{} `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+}
+
+type helpCommand struct {
+	AllCommands bool        `short:"a" description:"All available CLI commands"`
+	usage       interface{} `usage:"CF_NAME help [COMMAND]"`
+}
 
 var _ = Describe("Help Actions", func() {
 	var actor Actor
 	BeforeEach(func() {
-		actor = NewActor()
+		actor = NewActor(nil)
 	})
 
 	Describe("CommandInfoByName", func() {
 		Context("when the command exists", func() {
 			Context("when passed the command name", func() {
 				It("returns command info", func() {
-					commandInfo, err := actor.CommandInfoByName(v2.Commands, "app")
+					commandInfo, err := actor.CommandInfoByName(commandList{}, "app")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(commandInfo.Name).To(Equal("app"))
@@ -38,49 +58,27 @@ var _ = Describe("Help Actions", func() {
 				})
 
 				Context("when the command uses timeout environment variables", func() {
-					DescribeTable("has timeout environment variables",
-						func(setup func() (CommandInfo, error)) {
-							commandInfo, err := setup()
-							Expect(err).NotTo(HaveOccurred())
+					It("has timeout environment variables", func() {
+						commandInfo, err := actor.CommandInfoByName(commandList{}, "restage")
+						Expect(err).NotTo(HaveOccurred())
 
-							Expect(commandInfo.Environment).To(ConsistOf(
-								EnvironmentVariable{
-									Name:         "CF_STAGING_TIMEOUT",
-									Description:  "Max wait time for buildpack staging, in minutes",
-									DefaultValue: "15",
-								},
-								EnvironmentVariable{
-									Name:         "CF_STARTUP_TIMEOUT",
-									Description:  "Max wait time for app instance startup, in minutes",
-									DefaultValue: "5",
-								}))
-						},
-
-						Entry("push command", func() (CommandInfo, error) {
-							return actor.CommandInfoByName(v2.Commands, "push")
-						}),
-
-						Entry("start command", func() (CommandInfo, error) {
-							return actor.CommandInfoByName(v2.Commands, "start")
-						}),
-
-						Entry("restart command", func() (CommandInfo, error) {
-							return actor.CommandInfoByName(v2.Commands, "restart")
-						}),
-
-						Entry("restage command", func() (CommandInfo, error) {
-							return actor.CommandInfoByName(v2.Commands, "restage")
-						}),
-
-						Entry("copy-source command", func() (CommandInfo, error) {
-							return actor.CommandInfoByName(v2.Commands, "copy-source")
-						}),
-					)
+						Expect(commandInfo.Environment).To(ConsistOf(
+							EnvironmentVariable{
+								Name:         "CF_STAGING_TIMEOUT",
+								Description:  "Max wait time for buildpack staging, in minutes",
+								DefaultValue: "15",
+							},
+							EnvironmentVariable{
+								Name:         "CF_STARTUP_TIMEOUT",
+								Description:  "Max wait time for app instance startup, in minutes",
+								DefaultValue: "5",
+							}))
+					})
 				})
 
 				Context("when the command does not use environment variables", func() {
 					It("does not have environment variables", func() {
-						commandInfo, err := actor.CommandInfoByName(v2.Commands, "app")
+						commandInfo, err := actor.CommandInfoByName(commandList{}, "app")
 						Expect(err).NotTo(HaveOccurred())
 
 						Expect(commandInfo.Environment).To(BeEmpty())
@@ -90,7 +88,7 @@ var _ = Describe("Help Actions", func() {
 
 			Context("when passed the command alias", func() {
 				It("returns command info", func() {
-					commandInfo, err := actor.CommandInfoByName(v2.Commands, "h")
+					commandInfo, err := actor.CommandInfoByName(commandList{}, "h")
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(commandInfo.Name).To(Equal("help"))
@@ -110,7 +108,7 @@ var _ = Describe("Help Actions", func() {
 
 		Context("when the command does not exist", func() {
 			It("returns err", func() {
-				_, err := actor.CommandInfoByName(v2.Commands, "does-not-exist")
+				_, err := actor.CommandInfoByName(commandList{}, "does-not-exist")
 
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(MatchError(ErrorInvalidCommand{CommandName: "does-not-exist"}))
@@ -120,26 +118,21 @@ var _ = Describe("Help Actions", func() {
 
 	Describe("CommandInfos", func() {
 		It("returns back all the command's names and descriptions", func() {
-			commands := actor.CommandInfos(v2.Commands)
+			commands := actor.CommandInfos(commandList{})
 
-			Expect(len(commands)).To(BeNumerically(">=", 153))
 			Expect(commands["app"]).To(Equal(CommandInfo{
 				Name:        "app",
 				Description: "Display health and status for app",
 			}))
-			Expect(commands["curl"]).To(Equal(CommandInfo{
-				Name:        "curl",
-				Description: "Executes a request to the targeted API endpoint",
+			Expect(commands["help"]).To(Equal(CommandInfo{
+				Name:        "help",
+				Description: "Show help",
+				Alias:       "h",
 			}))
-			Expect(commands["apps"]).To(Equal(CommandInfo{
-				Name:        "apps",
-				Description: "List all apps in the target space",
-				Alias:       "a",
-			}))
-			Expect(commands["routes"]).To(Equal(CommandInfo{
-				Name:        "routes",
-				Description: "List all routes in the current space or the current organization",
-				Alias:       "r",
+			Expect(commands["restage"]).To(Equal(CommandInfo{
+				Name:        "restage",
+				Description: "Restage an app",
+				Alias:       "rg",
 			}))
 		})
 	})

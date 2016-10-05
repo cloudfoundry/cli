@@ -15,6 +15,12 @@ type FakeConfig struct {
 	aPIVersionReturns     struct {
 		result1 string
 	}
+	AccessTokenStub        func() string
+	accessTokenMutex       sync.RWMutex
+	accessTokenArgsForCall []struct{}
+	accessTokenReturns     struct {
+		result1 string
+	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct{}
@@ -34,6 +40,12 @@ type FakeConfig struct {
 		result1 configv3.User
 		result2 error
 	}
+	ExperimentalStub        func() bool
+	experimentalMutex       sync.RWMutex
+	experimentalArgsForCall []struct{}
+	experimentalReturns     struct {
+		result1 bool
+	}
 	LocaleStub        func() string
 	localeMutex       sync.RWMutex
 	localeArgsForCall []struct{}
@@ -45,6 +57,12 @@ type FakeConfig struct {
 	pluginsArgsForCall []struct{}
 	pluginsReturns     struct {
 		result1 map[string]configv3.Plugin
+	}
+	RefreshTokenStub        func() string
+	refreshTokenMutex       sync.RWMutex
+	refreshTokenArgsForCall []struct{}
+	refreshTokenReturns     struct {
+		result1 string
 	}
 	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
@@ -65,6 +83,12 @@ type FakeConfig struct {
 		refreshToken   string
 		sshOAuthClient string
 	}
+	SkipSSLValidationStub        func() bool
+	skipSSLValidationMutex       sync.RWMutex
+	skipSSLValidationArgsForCall []struct{}
+	skipSSLValidationReturns     struct {
+		result1 bool
+	}
 	TargetStub        func() string
 	targetMutex       sync.RWMutex
 	targetArgsForCall []struct{}
@@ -82,12 +106,6 @@ type FakeConfig struct {
 	targetedSpaceArgsForCall []struct{}
 	targetedSpaceReturns     struct {
 		result1 configv3.Space
-	}
-	ExperimentalStub        func() bool
-	experimentalMutex       sync.RWMutex
-	experimentalArgsForCall []struct{}
-	experimentalReturns     struct {
-		result1 bool
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -114,6 +132,31 @@ func (fake *FakeConfig) APIVersionCallCount() int {
 func (fake *FakeConfig) APIVersionReturns(result1 string) {
 	fake.APIVersionStub = nil
 	fake.aPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) AccessToken() string {
+	fake.accessTokenMutex.Lock()
+	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.recordInvocation("AccessToken", []interface{}{})
+	fake.accessTokenMutex.Unlock()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
+	} else {
+		return fake.accessTokenReturns.result1
+	}
+}
+
+func (fake *FakeConfig) AccessTokenCallCount() int {
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	return len(fake.accessTokenArgsForCall)
+}
+
+func (fake *FakeConfig) AccessTokenReturns(result1 string) {
+	fake.AccessTokenStub = nil
+	fake.accessTokenReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -194,6 +237,31 @@ func (fake *FakeConfig) CurrentUserReturns(result1 configv3.User, result2 error)
 	}{result1, result2}
 }
 
+func (fake *FakeConfig) Experimental() bool {
+	fake.experimentalMutex.Lock()
+	fake.experimentalArgsForCall = append(fake.experimentalArgsForCall, struct{}{})
+	fake.recordInvocation("Experimental", []interface{}{})
+	fake.experimentalMutex.Unlock()
+	if fake.ExperimentalStub != nil {
+		return fake.ExperimentalStub()
+	} else {
+		return fake.experimentalReturns.result1
+	}
+}
+
+func (fake *FakeConfig) ExperimentalCallCount() int {
+	fake.experimentalMutex.RLock()
+	defer fake.experimentalMutex.RUnlock()
+	return len(fake.experimentalArgsForCall)
+}
+
+func (fake *FakeConfig) ExperimentalReturns(result1 bool) {
+	fake.ExperimentalStub = nil
+	fake.experimentalReturns = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *FakeConfig) Locale() string {
 	fake.localeMutex.Lock()
 	fake.localeArgsForCall = append(fake.localeArgsForCall, struct{}{})
@@ -241,6 +309,31 @@ func (fake *FakeConfig) PluginsReturns(result1 map[string]configv3.Plugin) {
 	fake.PluginsStub = nil
 	fake.pluginsReturns = struct {
 		result1 map[string]configv3.Plugin
+	}{result1}
+}
+
+func (fake *FakeConfig) RefreshToken() string {
+	fake.refreshTokenMutex.Lock()
+	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
+	fake.recordInvocation("RefreshToken", []interface{}{})
+	fake.refreshTokenMutex.Unlock()
+	if fake.RefreshTokenStub != nil {
+		return fake.RefreshTokenStub()
+	} else {
+		return fake.refreshTokenReturns.result1
+	}
+}
+
+func (fake *FakeConfig) RefreshTokenCallCount() int {
+	fake.refreshTokenMutex.RLock()
+	defer fake.refreshTokenMutex.RUnlock()
+	return len(fake.refreshTokenArgsForCall)
+}
+
+func (fake *FakeConfig) RefreshTokenReturns(result1 string) {
+	fake.RefreshTokenStub = nil
+	fake.refreshTokenReturns = struct {
+		result1 string
 	}{result1}
 }
 
@@ -299,6 +392,31 @@ func (fake *FakeConfig) SetTokenInformationArgsForCall(i int) (string, string, s
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
 	return fake.setTokenInformationArgsForCall[i].accessToken, fake.setTokenInformationArgsForCall[i].refreshToken, fake.setTokenInformationArgsForCall[i].sshOAuthClient
+}
+
+func (fake *FakeConfig) SkipSSLValidation() bool {
+	fake.skipSSLValidationMutex.Lock()
+	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
+	fake.recordInvocation("SkipSSLValidation", []interface{}{})
+	fake.skipSSLValidationMutex.Unlock()
+	if fake.SkipSSLValidationStub != nil {
+		return fake.SkipSSLValidationStub()
+	} else {
+		return fake.skipSSLValidationReturns.result1
+	}
+}
+
+func (fake *FakeConfig) SkipSSLValidationCallCount() int {
+	fake.skipSSLValidationMutex.RLock()
+	defer fake.skipSSLValidationMutex.RUnlock()
+	return len(fake.skipSSLValidationArgsForCall)
+}
+
+func (fake *FakeConfig) SkipSSLValidationReturns(result1 bool) {
+	fake.SkipSSLValidationStub = nil
+	fake.skipSSLValidationReturns = struct {
+		result1 bool
+	}{result1}
 }
 
 func (fake *FakeConfig) Target() string {
@@ -376,58 +494,39 @@ func (fake *FakeConfig) TargetedSpaceReturns(result1 configv3.Space) {
 	}{result1}
 }
 
-func (fake *FakeConfig) Experimental() bool {
-	fake.experimentalMutex.Lock()
-	fake.experimentalArgsForCall = append(fake.experimentalArgsForCall, struct{}{})
-	fake.recordInvocation("Experimental", []interface{}{})
-	fake.experimentalMutex.Unlock()
-	if fake.ExperimentalStub != nil {
-		return fake.ExperimentalStub()
-	} else {
-		return fake.experimentalReturns.result1
-	}
-}
-
-func (fake *FakeConfig) ExperimentalCallCount() int {
-	fake.experimentalMutex.RLock()
-	defer fake.experimentalMutex.RUnlock()
-	return len(fake.experimentalArgsForCall)
-}
-
-func (fake *FakeConfig) ExperimentalReturns(result1 bool) {
-	fake.ExperimentalStub = nil
-	fake.experimentalReturns = struct {
-		result1 bool
-	}{result1}
-}
-
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.aPIVersionMutex.RLock()
 	defer fake.aPIVersionMutex.RUnlock()
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()
 	defer fake.currentUserMutex.RUnlock()
+	fake.experimentalMutex.RLock()
+	defer fake.experimentalMutex.RUnlock()
 	fake.localeMutex.RLock()
 	defer fake.localeMutex.RUnlock()
 	fake.pluginsMutex.RLock()
 	defer fake.pluginsMutex.RUnlock()
+	fake.refreshTokenMutex.RLock()
+	defer fake.refreshTokenMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()
 	defer fake.setTokenInformationMutex.RUnlock()
+	fake.skipSSLValidationMutex.RLock()
+	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.targetMutex.RLock()
 	defer fake.targetMutex.RUnlock()
 	fake.targetedOrganizationMutex.RLock()
 	defer fake.targetedOrganizationMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
-	fake.experimentalMutex.RLock()
-	defer fake.experimentalMutex.RUnlock()
 	return fake.invocations
 }
 

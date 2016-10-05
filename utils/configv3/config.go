@@ -191,6 +191,22 @@ func (config *Config) Target() string {
 	return config.ConfigFile.Target
 }
 
+// SkipSSLValidation returns whether or not to skip SSL validation when
+// targeting an API endpoint
+func (config *Config) SkipSSLValidation() bool {
+	return config.ConfigFile.SkipSSLValidation
+}
+
+// AccessToken returns the access token for making authenticated API calls
+func (config *Config) AccessToken() string {
+	return config.ConfigFile.AccessToken
+}
+
+// RefreshToken returns the refresh token for getting a new access token
+func (config *Config) RefreshToken() string {
+	return config.ConfigFile.RefreshToken
+}
+
 // APIVersion returns the CC API Version
 func (config *Config) APIVersion() string {
 	return config.ConfigFile.APIVersion

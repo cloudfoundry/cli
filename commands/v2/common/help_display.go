@@ -1,4 +1,4 @@
-package internal
+package common
 
 import (
 	"fmt"
@@ -14,8 +14,6 @@ type HelpCategory struct {
 	CategoryName string
 	CommandList  [][]string
 }
-
-// const BLANKLINE = ""
 
 func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2actions.CommandInfo {
 	commandInfo := v2actions.CommandInfo{
