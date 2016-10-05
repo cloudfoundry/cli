@@ -328,6 +328,10 @@
     "translation": "アプリ {{.AppName}} は既に {{.ServiceName}} にバインドされています。"
   },
   {
+    "id": "App {{.AppName}} not found",
+    "translation": ""
+  },
+  {
     "id": "Append API request diagnostics to a log file",
     "translation": "API 要求診断をログ・ファイルに付加します"
   },
@@ -4212,6 +4216,10 @@
     "translation": "次のものから無効な SSL 証明書を受け取りました: "
   },
   {
+    "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
+    "translation": ""
+  },
+  {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
     "translation": "サービス・ブローカーに要請することなく Cloud Foundry データベースからサービスと子オブジェクトを再帰的に削除します"
   },
@@ -4612,6 +4620,10 @@
     "translation": "サービス・インスタンス {{.ServiceInstanceName}} が存在していません。"
   },
   {
+    "id": "Service instance {{.ServiceInstance}} not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance: {{.ServiceName}}",
     "translation": "サービス・インスタンス: {{.ServiceName}}"
   },
@@ -4858,6 +4870,10 @@
   {
     "id": "Status: {{.State}}",
     "translation": "状況: {{.State}}"
+  },
+  {
+    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
   },
   {
     "id": "Stop an app",

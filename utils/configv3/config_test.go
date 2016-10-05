@@ -48,6 +48,7 @@ var _ = Describe("Config", func() {
 
 			Expect(config).ToNot(BeNil())
 			Expect(config.Target()).To(Equal(DefaultTarget))
+			Expect(config.SkipSSLValidation()).To(BeFalse())
 			Expect(config.ColorEnabled()).To(Equal(ColorEnabled))
 			Expect(config.PluginHome()).To(Equal(filepath.Join(homeDir, ".cf", "plugins")))
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
@@ -80,6 +81,59 @@ var _ = Describe("Config", func() {
 
 			It("returns fields directly from config", func() {
 				Expect(config.Target()).To(Equal("https://api.foo.com"))
+			})
+		})
+
+		Describe("SkipSSLValidation", func() {
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `{ "SSLDisabled":true }`
+				setConfig(homeDir, rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+			})
+
+			It("returns fields directly from config", func() {
+				Expect(config.SkipSSLValidation()).To(BeTrue())
+			})
+		})
+		Describe("AccessToken", func() {
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `{ "AccessToken":"some-token" }`
+				setConfig(homeDir, rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+			})
+
+			It("returns fields directly from config", func() {
+				Expect(config.AccessToken()).To(Equal("some-token"))
+			})
+		})
+
+		Describe("RefreshToken", func() {
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `{ "RefreshToken":"some-token" }`
+				setConfig(homeDir, rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+			})
+
+			It("returns fields directly from config", func() {
+				Expect(config.RefreshToken()).To(Equal("some-token"))
 			})
 		})
 

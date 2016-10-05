@@ -2,8 +2,13 @@ package cloudcontrollerv2
 
 import "fmt"
 
+type CCErrorResponse struct {
+	Code        int    `json:"code"`
+	Description string `json:"description"`
+	ErrorCode   string `json:"error_code"`
+}
+
 type UnexpectedResponseError struct {
-	error
 	StatusCode int
 	Status     string
 	Body       string
@@ -14,15 +19,14 @@ func (e UnexpectedResponseError) Error() string {
 }
 
 type ResourceNotFoundError struct {
-	error
+	CCErrorResponse
 }
 
 func (e ResourceNotFoundError) Error() string {
-	return "resource not found"
+	return e.Description
 }
 
 type UnauthorizedError struct {
-	error
 }
 
 func (e UnauthorizedError) Error() string {
@@ -30,7 +34,6 @@ func (e UnauthorizedError) Error() string {
 }
 
 type ForbiddenError struct {
-	error
 }
 
 func (e ForbiddenError) Error() string {
@@ -40,11 +43,17 @@ func (e ForbiddenError) Error() string {
 // UnverifiedServerError replaces x509.UnknownAuthorityError when the server
 // has SSL but the client is unable to verify it's certificate
 type UnverifiedServerError struct {
-	error
+	URL string
 }
 
 func (e UnverifiedServerError) Error() string {
 	return "x509: certificate signed by unknown authority"
 }
 
-type RequestError error
+type RequestError struct {
+	Err error
+}
+
+func (e RequestError) Error() string {
+	return e.Err.Error()
+}

@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("UI", func() {
 	var (
-		ui         UI
+		ui         *UI
 		fakeConfig *uifakes.FakeConfig
 	)
 
@@ -261,6 +261,69 @@ var _ = Describe("UI", func() {
 			It("translates the error text and the FAILED text", func() {
 				Expect(fakeTranslateErr.TranslateCallCount()).To(Equal(1))
 				Expect(fakeTranslateErr.TranslateArgsForCall(0)).NotTo(BeNil())
+			})
+		})
+	})
+
+	Describe("DisplayWarning", func() {
+		It("displays the warning", func() {
+			ui.DisplayWarning("some template string with value = {{.SomeKey}}", map[string]interface{}{
+				"SomeKey": "some-value",
+			})
+
+			Expect(ui.Err).To(Say("some template string with value = some-value"))
+		})
+
+		Context("when the locale is not set to en-US", func() {
+			BeforeEach(func() {
+				fakeConfig = new(uifakes.FakeConfig)
+				fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+				ui.Out = NewBuffer()
+				ui.Err = NewBuffer()
+			})
+
+			It("displays the translated warning", func() {
+				ui.DisplayWarning("'{{.VersionShort}}' and '{{.VersionLong}}' are also accepted.", map[string]interface{}{
+					"VersionShort": "some-value",
+					"VersionLong":  "some-other-value",
+				})
+
+				Expect(ui.Err).To(Say("'some-value' et 'some-other-value' sont également acceptés.\n"))
+			})
+		})
+	})
+
+	Describe("DisplayWarnings", func() {
+		It("displays the warnings", func() {
+			ui.DisplayWarnings([]string{"warnings-1", "warnings-2"})
+
+			Expect(ui.Err).To(Say("warnings-1\n"))
+			Expect(ui.Err).To(Say("warnings-2\n"))
+		})
+
+		Context("when the locale is not set to en-US", func() {
+			BeforeEach(func() {
+				fakeConfig = new(uifakes.FakeConfig)
+				fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+				ui.Out = NewBuffer()
+				ui.Err = NewBuffer()
+			})
+
+			It("displays the translated warnings", func() {
+				ui.DisplayWarnings([]string{"warnings-1", "FEATURE FLAGS"})
+
+				Expect(ui.Err).To(Say("warnings-1\n"))
+				Expect(ui.Err).To(Say("INDICATEURS DE FONCTION\n"))
 			})
 		})
 	})

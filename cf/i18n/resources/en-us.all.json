@@ -328,6 +328,10 @@
     "translation": "App {{.AppName}} is already bound to {{.ServiceName}}."
   },
   {
+    "id": "App {{.AppName}} not found",
+    "translation": ""
+  },
+  {
     "id": "Append API request diagnostics to a log file",
     "translation": "Append API request diagnostics to a log file"
   },
@@ -4212,6 +4216,10 @@
     "translation": "Received invalid SSL certificate from "
   },
   {
+    "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",
+    "translation": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"
+  },
+  {
     "id": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
     "translation": "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker"
   },
@@ -4612,6 +4620,10 @@
     "translation": "Service instance {{.ServiceInstanceName}} does not exist."
   },
   {
+    "id": "Service instance {{.ServiceInstance}} not found",
+    "translation": ""
+  },
+  {
     "id": "Service instance: {{.ServiceName}}",
     "translation": "Service instance: {{.ServiceName}}"
   },
@@ -4858,6 +4870,10 @@
   {
     "id": "Status: {{.State}}",
     "translation": "Status: {{.State}}"
+  },
+  {
+    "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
   },
   {
     "id": "Stop an app",

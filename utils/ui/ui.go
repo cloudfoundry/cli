@@ -65,13 +65,13 @@ type UI struct {
 
 // NewUI will return a UI object where Out is set to STDOUT and Err is set to
 // STDERR
-func NewUI(c Config) (UI, error) {
+func NewUI(c Config) (*UI, error) {
 	translateFunc, err := GetTranslationFunc(c)
 	if err != nil {
-		return UI{}, err
+		return nil, err
 	}
 
-	return UI{
+	return &UI{
 		Out:          color.Output,
 		Err:          os.Stderr,
 		colorEnabled: c.ColorEnabled(),
@@ -81,8 +81,8 @@ func NewUI(c Config) (UI, error) {
 
 // NewTestUI will return a UI object where Out and Err are customizable, and
 // colors are disabled
-func NewTestUI(out io.Writer, err io.Writer) UI {
-	return UI{
+func NewTestUI(out io.Writer, err io.Writer) *UI {
+	return &UI{
 		Out:          out,
 		Err:          err,
 		colorEnabled: configv3.ColorDisabled,
@@ -91,7 +91,7 @@ func NewTestUI(out io.Writer, err io.Writer) UI {
 }
 
 // DisplayTable presents a two dimensional array of strings as a table to UI.Out
-func (ui UI) DisplayTable(prefix string, table [][]string) {
+func (ui *UI) DisplayTable(prefix string, table [][]string) {
 	tw := tabwriter.NewWriter(ui.Out, 0, 1, 4, ' ', 0)
 
 	for _, row := range table {
@@ -106,7 +106,7 @@ func (ui UI) DisplayTable(prefix string, table [][]string) {
 // outputs it to the UI.Out file. Prior to outputting the formattedString, it
 // is run through an internationalization function to translate it to a
 // pre-configured language. Only the first map in keys is used.
-func (ui UI) DisplayText(formattedString string, keys ...map[string]interface{}) {
+func (ui *UI) DisplayText(formattedString string, keys ...map[string]interface{}) {
 	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
 	fmt.Fprintf(ui.Out, "%s\n", translatedValue)
 }
@@ -114,7 +114,7 @@ func (ui UI) DisplayText(formattedString string, keys ...map[string]interface{})
 // DisplayTextWithKeyTranslations translates the keys listed in
 // keysToTranslate, and then passes these values to DisplayText. Only the first
 // map in keys is used.
-func (ui UI) DisplayTextWithKeyTranslations(formattedString string, keysToTranslate []string, keys ...map[string]interface{}) {
+func (ui *UI) DisplayTextWithKeyTranslations(formattedString string, keysToTranslate []string, keys ...map[string]interface{}) {
 	templateValues := ui.templateValuesFromKeys(keys)
 	for _, key := range keysToTranslate {
 		templateValues[key] = ui.translate(templateValues[key].(string))
@@ -123,27 +123,27 @@ func (ui UI) DisplayTextWithKeyTranslations(formattedString string, keysToTransl
 }
 
 // DisplayNewline outputs a newline to UI.Out.
-func (ui UI) DisplayNewline() {
+func (ui *UI) DisplayNewline() {
 	fmt.Fprintf(ui.Out, "\n")
 }
 
 // DisplayPair outputs the "attribute: formattedString" pair to UI.Out. keys
 // are applied to the translation of formattedString, while attribute is
 // translated directly.
-func (ui UI) DisplayPair(attribute string, formattedString string, keys ...map[string]interface{}) {
+func (ui *UI) DisplayPair(attribute string, formattedString string, keys ...map[string]interface{}) {
 	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
 	fmt.Fprintf(ui.Out, "%s: %s\n", ui.translate(attribute), translatedValue)
 }
 
 // DisplayHelpHeader translates and then bolds the help header. Sends output to
 // UI.Out.
-func (ui UI) DisplayHelpHeader(text string) {
+func (ui *UI) DisplayHelpHeader(text string) {
 	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(ui.translate(text), defaultFgColor, true))
 }
 
 // DisplayHeaderFlavorText outputs the translated text, with cyan color keys,
 // to UI.Out.
-func (ui UI) DisplayHeaderFlavorText(formattedString string, keys ...map[string]interface{}) {
+func (ui *UI) DisplayHeaderFlavorText(formattedString string, keys ...map[string]interface{}) {
 	templateValues := ui.templateValuesFromKeys(keys)
 	for key, value := range templateValues {
 		templateValues[key] = ui.colorize(fmt.Sprint(value), cyan, true)
@@ -154,7 +154,7 @@ func (ui UI) DisplayHeaderFlavorText(formattedString string, keys ...map[string]
 }
 
 // DisplayOK outputs a green translated "OK" message to UI.Out.
-func (ui UI) DisplayOK() {
+func (ui *UI) DisplayOK() {
 	translatedFormatString := ui.translate("OK", nil)
 	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, green, true))
 }
@@ -163,7 +163,7 @@ func (ui UI) DisplayOK() {
 // outputs it to the UI.Err file. It will then output a red translated "FAILED"
 // to UI.Out. Prior to outputting the err, it is run through an
 // internationalization function to translate it to a pre-configured language.
-func (ui UI) DisplayErrorMessage(err string, keys ...map[string]interface{}) {
+func (ui *UI) DisplayErrorMessage(err string, keys ...map[string]interface{}) {
 	translatedValue := ui.translate(err, ui.templateValuesFromKeys(keys))
 	fmt.Fprintf(ui.Err, "%s\n", translatedValue)
 
@@ -173,21 +173,35 @@ func (ui UI) DisplayErrorMessage(err string, keys ...map[string]interface{}) {
 
 // DisplayError outputs the error to UI.Err and outputs a red translated
 // "FAILED" to UI.Out.
-func (ui UI) DisplayError(err TranslatableError) {
+func (ui *UI) DisplayError(err TranslatableError) {
 	fmt.Fprintf(ui.Err, "%s\n", err.Translate(ui.translate))
 
 	translatedFormatString := ui.translate("FAILED", nil)
 	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, red, true))
 }
 
-func (ui UI) templateValuesFromKeys(keys []map[string]interface{}) map[string]interface{} {
+// DisplayWarning applies translation to formattedString and displays the
+// translated warning to UI.Err.
+func (ui *UI) DisplayWarning(formattedString string, keys ...map[string]interface{}) {
+	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
+	fmt.Fprintf(ui.Err, "%s\n", translatedValue)
+}
+
+// DisplayWarnings translates and displays the warnings.
+func (ui *UI) DisplayWarnings(warnings []string) {
+	for _, warning := range warnings {
+		fmt.Fprintf(ui.Err, "%s\n", ui.translate(warning, nil))
+	}
+}
+
+func (ui *UI) templateValuesFromKeys(keys []map[string]interface{}) map[string]interface{} {
 	if len(keys) > 0 {
 		return keys[0]
 	}
 	return map[string]interface{}{}
 }
 
-func (ui UI) colorize(message string, textColor color.Attribute, bold bool) string {
+func (ui *UI) colorize(message string, textColor color.Attribute, bold bool) string {
 	colorPrinter := color.New(textColor)
 	switch ui.colorEnabled {
 	case configv3.ColorEnabled:

@@ -16,7 +16,7 @@ import (
 
 var _ = Describe("Help Command", func() {
 	var (
-		fakeUI     ui.UI
+		fakeUI     *ui.UI
 		fakeActor  *v2fakes.FakeHelpActor
 		cmd        HelpCommand
 		fakeConfig *commandsfakes.FakeConfig
@@ -317,7 +317,7 @@ var _ = Describe("Help Command", func() {
 				CommandName: "",
 			}
 			cmd.AllCommands = false
-			cmd.Actor = v2actions.NewActor()
+			cmd.Actor = v2actions.NewActor(nil)
 		})
 
 		It("returns a list of only the common commands", func() {
@@ -414,7 +414,7 @@ var _ = Describe("Help Command", func() {
 				}
 				cmd.AllCommands = true
 
-				cmd.Actor = v2actions.NewActor()
+				cmd.Actor = v2actions.NewActor(nil)
 				fakeConfig.PluginsReturns(map[string]configv3.Plugin{
 					"Diego-Enabler": configv3.Plugin{
 						Commands: []configv3.PluginCommand{
