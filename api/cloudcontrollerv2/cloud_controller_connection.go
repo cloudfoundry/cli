@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -14,33 +15,35 @@ import (
 )
 
 type Request struct {
-	RequestName string
+	Header      http.Header
 	Params      rata.Params
 	Query       url.Values
+	RequestName string
 
 	URI    string
 	Method string
 }
 
 type Response struct {
-	Result   interface{}
-	Warnings []string
+	Result      interface{}
+	RawResponse []byte
+	Warnings    []string
 }
 
-type Connection struct {
+type CloudControllerConnection struct {
 	HTTPClient       *http.Client
 	URL              string
 	requestGenerator *rata.RequestGenerator
 }
 
-func NewConnection(APIURL string, skipSSLValidation bool) *Connection {
+func NewConnection(APIURL string, skipSSLValidation bool) *CloudControllerConnection {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
 		},
 	}
 
-	return &Connection{
+	return &CloudControllerConnection{
 		HTTPClient: &http.Client{Transport: tr},
 
 		URL:              strings.TrimRight(APIURL, "/"),
@@ -48,7 +51,7 @@ func NewConnection(APIURL string, skipSSLValidation bool) *Connection {
 	}
 }
 
-func (connection *Connection) Make(passedRequest Request, passedResponse *Response) error {
+func (connection *CloudControllerConnection) Make(passedRequest Request, passedResponse *Response) error {
 	req, err := connection.createHTTPRequest(passedRequest)
 	if err != nil {
 		return err
@@ -64,37 +67,41 @@ func (connection *Connection) Make(passedRequest Request, passedResponse *Respon
 	return connection.populateResponse(response, passedResponse)
 }
 
-func (connection *Connection) createHTTPRequest(passedRequest Request) (*http.Request, error) {
-	var req *http.Request
+func (connection *CloudControllerConnection) createHTTPRequest(passedRequest Request) (*http.Request, error) {
+	var request *http.Request
 	var err error
 	if passedRequest.URI != "" {
-		req, err = http.NewRequest(
+		request, err = http.NewRequest(
 			passedRequest.Method,
 			fmt.Sprintf("%s%s", connection.URL, passedRequest.URI),
 			&bytes.Buffer{},
 		)
 	} else {
-		req, err = connection.requestGenerator.CreateRequest(
+		request, err = connection.requestGenerator.CreateRequest(
 			passedRequest.RequestName,
 			passedRequest.Params,
 			&bytes.Buffer{},
 		)
-		req.URL.RawQuery = passedRequest.Query.Encode()
+		request.URL.RawQuery = passedRequest.Query.Encode()
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	// for h, vs := range passedRequest.Header {
-	// 	for _, v := range vs {
-	// 		req.Header.Add(h, v)
-	// 	}
-	// }
+	if passedRequest.Header != nil {
+		request.Header = passedRequest.Header
+	}
 
-	return req, nil
+	request.Header.Set("accept", "application/json")
+	request.Header.Set("content-type", "application/json")
+
+	// request.Header.Set("Connection", "close")
+	// request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
+
+	return request, nil
 }
 
-func (connection *Connection) processRequestErrors(err error) error {
+func (connection *CloudControllerConnection) processRequestErrors(err error) error {
 	switch e := err.(type) {
 	case *url.Error:
 		if _, ok := e.Err.(x509.UnknownAuthorityError); ok {
@@ -108,7 +115,7 @@ func (connection *Connection) processRequestErrors(err error) error {
 	}
 }
 
-func (connection *Connection) populateResponse(response *http.Response, passedResponse *Response) error {
+func (connection *CloudControllerConnection) populateResponse(response *http.Response, passedResponse *Response) error {
 	if rawWarnings := response.Header.Get("X-Cf-Warnings"); rawWarnings != "" {
 		passedResponse.Warnings = []string{}
 		for _, warning := range strings.Split(rawWarnings, ",") {
@@ -123,7 +130,10 @@ func (connection *Connection) populateResponse(response *http.Response, passedRe
 	}
 
 	if passedResponse.Result != nil {
-		decoder := json.NewDecoder(response.Body)
+		rawBytes, _ := ioutil.ReadAll(response.Body)
+		passedResponse.RawResponse = rawBytes
+
+		decoder := json.NewDecoder(bytes.NewBuffer(rawBytes))
 		decoder.UseNumber()
 		err = decoder.Decode(passedResponse.Result)
 		if err != nil {
@@ -134,7 +144,7 @@ func (connection *Connection) populateResponse(response *http.Response, passedRe
 	return nil
 }
 
-func (*Connection) handleStatusCodes(response *http.Response) error {
+func (*CloudControllerConnection) handleStatusCodes(response *http.Response) error {
 	switch response.StatusCode {
 	case http.StatusNotFound:
 		var notFoundErr ResourceNotFoundError

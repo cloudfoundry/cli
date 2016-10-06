@@ -24,7 +24,8 @@ var _ = Describe("Application", func() {
 				"resources": [
 					{
 						"metadata": {
-							"guid": "some-app-guid-1"
+							"guid": "some-app-guid-1",
+							"updated_at": null
 						},
 						"entity": {
 							"name": "some-app-name-1"
@@ -32,7 +33,8 @@ var _ = Describe("Application", func() {
 					},
 					{
 						"metadata": {
-							"guid": "some-app-guid-2"
+							"guid": "some-app-guid-2",
+							"updated_at": null
 						},
 						"entity": {
 							"name": "some-app-name-2"
@@ -45,7 +47,8 @@ var _ = Describe("Application", func() {
 				"resources": [
 					{
 						"metadata": {
-							"guid": "some-app-guid-3"
+							"guid": "some-app-guid-3",
+							"updated_at": null
 						},
 						"entity": {
 							"name": "some-app-name-3"
@@ -53,7 +56,8 @@ var _ = Describe("Application", func() {
 					},
 					{
 						"metadata": {
-							"guid": "some-app-guid-4"
+							"guid": "some-app-guid-4",
+							"updated_at": null
 						},
 						"entity": {
 							"name": "some-app-name-4"
