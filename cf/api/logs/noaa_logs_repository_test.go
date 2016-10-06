@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	noaaerrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 
@@ -90,21 +91,31 @@ var _ = Describe("logs with noaa repository", func() {
 		})
 
 		Context("when an error occurs", func() {
-			var e chan error
-			var c chan *events.LogMessage
+			var (
+				e       chan error
+				c       chan *events.LogMessage
+				closeWg *sync.WaitGroup
+			)
 
 			BeforeEach(func() {
+				closeWg = new(sync.WaitGroup)
 				errChan = make(chan error)
 				logChan = make(chan logs.Loggable)
 
-				e = make(chan error)
+				e = make(chan error, 1)
 				c = make(chan *events.LogMessage)
 
+				closeWg.Add(1)
 				fakeNoaaConsumer.CloseStub = func() error {
+					defer closeWg.Done()
 					close(e)
 					close(c)
 					return nil
 				}
+			})
+
+			AfterEach(func() {
+				closeWg.Wait()
 			})
 
 			It("returns an error when it occurs", func(done Done) {
@@ -112,15 +123,41 @@ var _ = Describe("logs with noaa repository", func() {
 				err := errors.New("oops")
 
 				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					go func() {
-						e <- err
-					}()
+					e <- err
 					return c, e
 				}
-				go repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				defer wg.Wait()
+				go func() {
+					defer wg.Done()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				}()
 
 				Eventually(errChan).Should(Receive(&err))
 
+				close(done)
+			})
+
+			It("does not return a RetryError", func(done Done) {
+				defer repo.Close()
+				err := noaaerrors.NewRetryError(errors.New("oops"))
+
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					e <- err
+					return c, e
+				}
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				defer wg.Wait()
+				go func() {
+					defer wg.Done()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				}()
+
+				Consistently(errChan).ShouldNot(Receive())
 				close(done)
 			})
 		})

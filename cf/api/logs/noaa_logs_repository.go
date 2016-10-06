@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 
 	"github.com/cloudfoundry/noaa"
+	noaaerrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
@@ -81,6 +82,10 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 				repo.messageQueue.PushMessage(msg)
 			case err := <-e:
 				if err != nil {
+					if _, ok := err.(noaaerrors.RetryError); ok {
+						continue
+					}
+
 					errChan <- err
 
 					ticker.Stop()
