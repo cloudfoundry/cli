@@ -8,5 +8,10 @@ import (
 func NewCloudControllerClient(config commands.Config) (*cloudcontrollerv2.CloudControllerClient, error) {
 	client := cloudcontrollerv2.NewCloudControllerClient()
 	_, err := client.TargetCF(config.Target(), config.SkipSSLValidation())
+	if err != nil {
+		return nil, err
+	}
+	client.WrapConnection(cloudcontrollerv2.NewTokenRefreshWrapper(config))
+	//Retry Wrapper
 	return client, err
 }

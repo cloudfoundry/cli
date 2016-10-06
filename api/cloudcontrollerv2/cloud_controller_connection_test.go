@@ -15,9 +15,9 @@ type DummyResponse struct {
 	Val2 int    `json:"val2"`
 }
 
-var _ = Describe("Connection", func() {
+var _ = Describe("Cloud Controller Connection", func() {
 	var (
-		connection *Connection
+		connection *CloudControllerConnection
 	)
 
 	BeforeEach(func() {
@@ -25,16 +25,12 @@ var _ = Describe("Connection", func() {
 	})
 
 	Describe("Make", func() {
-		Describe("GETs", func() {
+		Describe("URL Generation", func() {
 			BeforeEach(func() {
-				response := `{
-					"val1":"2.59.0",
-					"val2":2
-				}`
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest("GET", "/v2/apps", "q=a:b&q=c:d"),
-						RespondWith(http.StatusOK, response),
+						RespondWith(http.StatusOK, "{}"),
 					),
 				)
 			})
@@ -57,18 +53,10 @@ var _ = Describe("Connection", func() {
 						}),
 					}
 
-					var body DummyResponse
-					response := Response{
-						Result: &body,
-					}
-
-					err := connection.Make(request, &response)
+					err := connection.Make(request, &Response{})
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
-
-					Expect(body.Val1).To(Equal("2.59.0"))
-					Expect(body.Val2).To(Equal(2))
 				})
 			})
 
@@ -79,6 +67,68 @@ var _ = Describe("Connection", func() {
 						Method: "GET",
 					}
 
+					err := connection.Make(request, &Response{})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
+				})
+			})
+		})
+
+		Describe("Request Headers", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/apps", ""),
+						VerifyHeaderKV("foo", "bar"),
+						VerifyHeaderKV("accept", "application/json"),
+						VerifyHeaderKV("content-type", "application/json"),
+						RespondWith(http.StatusOK, "{}"),
+					),
+				)
+			})
+
+			Context("when passed a response with a result set", func() {
+				It("unmarshals the data into a struct", func() {
+					request := Request{
+						URI:    "/v2/apps",
+						Method: "GET",
+						Header: http.Header{
+							"foo": {"bar"},
+						},
+					}
+
+					err := connection.Make(request, &Response{})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
+				})
+			})
+		})
+
+		Describe("Data Unmarshalling", func() {
+			var request Request
+
+			BeforeEach(func() {
+				response := `{
+					"val1":"2.59.0",
+					"val2":2
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/apps", ""),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+
+				request = Request{
+					URI:    "/v2/apps",
+					Method: "GET",
+				}
+			})
+
+			Context("when passed a response with a result set", func() {
+				It("unmarshals the data into a struct", func() {
 					var body DummyResponse
 					response := Response{
 						Result: &body,
@@ -87,48 +137,50 @@ var _ = Describe("Connection", func() {
 					err := connection.Make(request, &response)
 					Expect(err).NotTo(HaveOccurred())
 
-					Expect(server.ReceivedRequests()).To(HaveLen(1))
-
 					Expect(body.Val1).To(Equal("2.59.0"))
 					Expect(body.Val2).To(Equal(2))
 				})
 			})
+
+			Context("when passed an empty response", func() {
+				It("skips the unmarshalling step", func() {
+					var response Response
+					err := connection.Make(request, &response)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(response.Result).To(BeNil())
+				})
+			})
 		})
 
-		Describe("X-Cf-Warnings", func() {
-			BeforeEach(func() {
-				response := `{
-					"val1":"2.59.0"
-				}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest("GET", "/v2/info"),
-						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"42, Ed McMann, the 1942 doggers"}}),
-					),
-				)
-			})
+		Describe("Response Headers", func() {
+			Describe("X-Cf-Warnings", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest("GET", "/v2/info"),
+							RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42, Ed McMann, the 1942 doggers"}}),
+						),
+					)
+				})
 
-			It("returns them in Response", func() {
-				request := Request{
-					RequestName: InfoRequest,
-				}
+				It("returns them in Response", func() {
+					request := Request{
+						RequestName: InfoRequest,
+					}
 
-				var body DummyResponse
-				response := Response{
-					Result: &body,
-				}
+					var response Response
+					err := connection.Make(request, &response)
+					Expect(err).NotTo(HaveOccurred())
 
-				err := connection.Make(request, &response)
-				Expect(err).NotTo(HaveOccurred())
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
 
-				Expect(server.ReceivedRequests()).To(HaveLen(1))
-
-				warnings := response.Warnings
-				Expect(warnings).ToNot(BeNil())
-				Expect(warnings).To(HaveLen(3))
-				Expect(warnings).To(ContainElement("42"))
-				Expect(warnings).To(ContainElement("Ed McMann"))
-				Expect(warnings).To(ContainElement("the 1942 doggers"))
+					warnings := response.Warnings
+					Expect(warnings).ToNot(BeNil())
+					Expect(warnings).To(HaveLen(3))
+					Expect(warnings).To(ContainElement("42"))
+					Expect(warnings).To(ContainElement("Ed McMann"))
+					Expect(warnings).To(ContainElement("the 1942 doggers"))
+				})
 			})
 		})
 
@@ -143,11 +195,7 @@ var _ = Describe("Connection", func() {
 						RequestName: InfoRequest,
 					}
 
-					var body DummyResponse
-					response := Response{
-						Result: &body,
-					}
-
+					var response Response
 					err := connection.Make(request, &response)
 					Expect(err).To(HaveOccurred())
 
@@ -163,7 +211,6 @@ var _ = Describe("Connection", func() {
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest("GET", "/v2/info"),
-								//RespondWith(http.StatusOK, "{}"),
 							),
 						)
 
@@ -175,11 +222,7 @@ var _ = Describe("Connection", func() {
 							RequestName: InfoRequest,
 						}
 
-						var body DummyResponse
-						response := Response{
-							Result: &body,
-						}
-
+						var response Response
 						err := connection.Make(request, &response)
 						Expect(err).To(MatchError(UnverifiedServerError{URL: server.URL()}))
 					})
@@ -207,11 +250,7 @@ var _ = Describe("Connection", func() {
 						RequestName: InfoRequest,
 					}
 
-					var body DummyResponse
-					response := Response{
-						Result: &body,
-					}
-
+					var response Response
 					err := connection.Make(request, &response)
 					Expect(err).To(MatchError(ResourceNotFoundError{
 						CCErrorResponse{
@@ -241,11 +280,7 @@ var _ = Describe("Connection", func() {
 						RequestName: InfoRequest,
 					}
 
-					var body DummyResponse
-					response := Response{
-						Result: &body,
-					}
-
+					var response Response
 					err := connection.Make(request, &response)
 					Expect(err).To(MatchError(UnauthorizedError{}))
 
@@ -268,11 +303,7 @@ var _ = Describe("Connection", func() {
 						RequestName: InfoRequest,
 					}
 
-					var body DummyResponse
-					response := Response{
-						Result: &body,
-					}
-
+					var response Response
 					err := connection.Make(request, &response)
 					Expect(err).To(MatchError(ForbiddenError{}))
 
