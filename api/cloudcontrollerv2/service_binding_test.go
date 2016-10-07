@@ -119,11 +119,7 @@ var _ = Describe("Service Binding", func() {
 		It("returns a not found error", func() {
 			warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
 			Expect(err).To(MatchError(ResourceNotFoundError{
-				CCErrorResponse{
-					Code:        90004,
-					Description: "The service binding could not be found: some-guid",
-					ErrorCode:   "CF-ServiceBindingNotFound",
-				},
+				Message: "The service binding could not be found: some-guid",
 			}))
 			Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 		})

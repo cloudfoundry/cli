@@ -229,9 +229,10 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
-			Describe("Status Not Found", func() {
+			Describe("RawCCError", func() {
+				var ccResponse string
 				BeforeEach(func() {
-					response := `{
+					ccResponse = `{
 						"code": 90004,
 						"description": "The service binding could not be found: some-guid",
 						"error_code": "CF-ServiceBindingNotFound"
@@ -240,72 +241,22 @@ var _ = Describe("Cloud Controller Connection", func() {
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest("GET", "/v2/info"),
-							RespondWith(http.StatusNotFound, response),
+							RespondWith(http.StatusNotFound, ccResponse),
 						),
 					)
 				})
 
-				It("returns a ResourceNotFoundError", func() {
+				It("returns a CCRawResponse", func() {
 					request := Request{
 						RequestName: InfoRequest,
 					}
 
 					var response Response
 					err := connection.Make(request, &response)
-					Expect(err).To(MatchError(ResourceNotFoundError{
-						CCErrorResponse{
-							Code:        90004,
-							Description: "The service binding could not be found: some-guid",
-							ErrorCode:   "CF-ServiceBindingNotFound",
-						},
+					Expect(err).To(MatchError(RawCCError{
+						StatusCode:  http.StatusNotFound,
+						RawResponse: []byte(ccResponse),
 					}))
-					Expect(err.Error()).To(Equal("The service binding could not be found: some-guid"))
-
-					Expect(server.ReceivedRequests()).To(HaveLen(1))
-				})
-			})
-
-			Describe("Status Unauthorized", func() {
-				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest("GET", "/v2/info"),
-							RespondWith(http.StatusUnauthorized, ""),
-						),
-					)
-				})
-
-				It("returns a UnauthorizedError", func() {
-					request := Request{
-						RequestName: InfoRequest,
-					}
-
-					var response Response
-					err := connection.Make(request, &response)
-					Expect(err).To(MatchError(UnauthorizedError{}))
-
-					Expect(server.ReceivedRequests()).To(HaveLen(1))
-				})
-			})
-
-			Describe("Status Forbidden", func() {
-				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest("GET", "/v2/info"),
-							RespondWith(http.StatusForbidden, ""),
-						),
-					)
-				})
-
-				It("returns a ForbiddenError", func() {
-					request := Request{
-						RequestName: InfoRequest,
-					}
-
-					var response Response
-					err := connection.Make(request, &response)
-					Expect(err).To(MatchError(ForbiddenError{}))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
 				})
