@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actors/v2actions"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/commands/v2/common"
 
 	. "github.com/onsi/ginkgo"
@@ -21,13 +21,13 @@ var _ = Describe("HandleError", func() {
 			Expect(actualErr).To(MatchError(expectedErr))
 		},
 
-		Entry("cloudcontrollerv2.RequestError -> APIRequestError", ccv2.RequestError{
+		Entry("cloudcontroller.RequestError -> APIRequestError", cloudcontroller.RequestError{
 			Err: err,
 		}, APIRequestError{
 			Err: err,
 		}),
 
-		Entry("cloudcontrollerv2.UnverifiedServerError -> InvalidSSLCertError", ccv2.UnverifiedServerError{
+		Entry("cloudcontroller.UnverifiedServerError -> InvalidSSLCertError", cloudcontroller.UnverifiedServerError{
 			URL: "some-url",
 		}, InvalidSSLCertError{
 			API: "some-url",

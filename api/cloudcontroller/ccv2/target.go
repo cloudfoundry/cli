@@ -1,5 +1,7 @@
 package ccv2
 
+import "code.cloudfoundry.org/cli/api/cloudcontroller"
+
 type APIInformation struct {
 	APIVersion                   string `json:"api_version"`
 	AuthorizationEndpoint        string `json:"authorization_endpoint"`
@@ -15,15 +17,15 @@ type APIInformation struct {
 func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
 	client.cloudControllerURL = APIURL
 
-	client.connection = NewConnection(client.cloudControllerURL, skipSSLValidation)
+	client.connection = cloudcontroller.NewConnection(client.cloudControllerURL, routes, skipSSLValidation)
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
-	request := Request{
+	request := cloudcontroller.Request{
 		RequestName: InfoRequest,
 	}
 
 	var info APIInformation
-	response := Response{
+	response := cloudcontroller.Response{
 		Result: &info,
 	}
 	err := client.connection.Make(request, &response)

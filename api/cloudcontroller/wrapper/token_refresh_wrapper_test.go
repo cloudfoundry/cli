@@ -1,11 +1,13 @@
-package ccv2_test
+package wrapper_test
 
 import (
 	"errors"
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/cloudcontrollerv2fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
+	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,15 +15,15 @@ import (
 
 var _ = Describe("Token Refresh Wrapper", func() {
 	var (
-		fakeConnection *cloudcontrollerv2fakes.FakeConnection
-		fakeStore      *cloudcontrollerv2fakes.FakeAuthenticationStore
+		fakeConnection *cloudcontrollerfakes.FakeConnection
+		fakeStore      *wrapperfakes.FakeAuthenticationStore
 
-		wrapper Connection
+		wrapper cloudcontroller.Connection
 	)
 
 	BeforeEach(func() {
-		fakeConnection = new(cloudcontrollerv2fakes.FakeConnection)
-		fakeStore = new(cloudcontrollerv2fakes.FakeAuthenticationStore)
+		fakeConnection = new(cloudcontrollerfakes.FakeConnection)
+		fakeStore = new(wrapperfakes.FakeAuthenticationStore)
 		fakeStore.AccessTokenReturns("foobar")
 
 		inner := NewTokenRefreshWrapper(fakeStore)
@@ -30,7 +32,7 @@ var _ = Describe("Token Refresh Wrapper", func() {
 
 	Describe("Make", func() {
 		It("adds authentication headers", func() {
-			request := Request{}
+			request := cloudcontroller.Request{}
 			wrapper.Make(request, nil)
 
 			Expect(fakeConnection.MakeCallCount()).To(Equal(1))
@@ -44,7 +46,7 @@ var _ = Describe("Token Refresh Wrapper", func() {
 				header := http.Header{}
 				header.Add("Existing", "header")
 
-				request := Request{
+				request := cloudcontroller.Request{
 					Header: header,
 				}
 				wrapper.Make(request, nil)
@@ -60,7 +62,7 @@ var _ = Describe("Token Refresh Wrapper", func() {
 			It("returns nil", func() {
 				fakeConnection.MakeReturns(nil)
 
-				request := Request{}
+				request := cloudcontroller.Request{}
 				err := wrapper.Make(request, nil)
 				Expect(err).ToNot(HaveOccurred())
 			})
@@ -71,7 +73,7 @@ var _ = Describe("Token Refresh Wrapper", func() {
 				innerError := errors.New("inner error")
 				fakeConnection.MakeReturns(innerError)
 
-				request := Request{}
+				request := cloudcontroller.Request{}
 				err := wrapper.Make(request, nil)
 				Expect(err).To(Equal(innerError))
 			})

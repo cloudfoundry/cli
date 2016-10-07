@@ -3,6 +3,7 @@ package ccv2
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -28,7 +29,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 }
 
 func (client *CloudControllerClient) GetApplications(queryParams []Query) ([]Application, Warnings, error) {
-	request := Request{
+	request := cloudcontroller.Request{
 		RequestName: AppsRequest,
 		Query:       FormatQueryParameters(queryParams),
 	}
@@ -41,7 +42,7 @@ func (client *CloudControllerClient) GetApplications(queryParams []Query) ([]App
 		wrapper := PaginatedWrapper{
 			Resources: &apps,
 		}
-		response := Response{
+		response := cloudcontroller.Response{
 			Result: &wrapper,
 		}
 
@@ -55,7 +56,7 @@ func (client *CloudControllerClient) GetApplications(queryParams []Query) ([]App
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = Request{
+		request = cloudcontroller.Request{
 			URI:    wrapper.NextURL,
 			Method: "GET",
 		}

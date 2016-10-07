@@ -3,6 +3,7 @@ package ccv2
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -29,7 +30,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 }
 
 func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
-	request := Request{
+	request := cloudcontroller.Request{
 		RequestName: ServiceInstancesRequest,
 		Query:       FormatQueryParameters(queries),
 	}
@@ -42,7 +43,7 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 		wrapper := PaginatedWrapper{
 			Resources: &serviceInstances,
 		}
-		response := Response{
+		response := cloudcontroller.Response{
 			Result: &wrapper,
 		}
 
@@ -57,7 +58,7 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = Request{
+		request = cloudcontroller.Request{
 			URI:    wrapper.NextURL,
 			Method: "GET",
 		}

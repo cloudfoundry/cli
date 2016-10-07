@@ -2,7 +2,7 @@ package ccv2_test
 
 import (
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/cloudcontrollerv2fakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/ccv2fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,10 +18,10 @@ var _ = Describe("Cloud Controller Client", func() {
 	})
 
 	Describe("WrapConnection", func() {
-		var fakeConnectionWrapper *cloudcontrollerv2fakes.FakeConnectionWrapper
+		var fakeConnectionWrapper *ccv2fakes.FakeConnectionWrapper
 
 		BeforeEach(func() {
-			fakeConnectionWrapper = new(cloudcontrollerv2fakes.FakeConnectionWrapper)
+			fakeConnectionWrapper = new(ccv2fakes.FakeConnectionWrapper)
 			fakeConnectionWrapper.WrapReturns(fakeConnectionWrapper)
 		})
 

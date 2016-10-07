@@ -3,6 +3,7 @@ package ccv2
 import (
 	"encoding/json"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
@@ -24,7 +25,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 }
 
 func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
-	request := Request{
+	request := cloudcontroller.Request{
 		RequestName: ServiceBindingsRequest,
 		Query:       FormatQueryParameters(queries),
 	}
@@ -37,7 +38,7 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 		wrapper := PaginatedWrapper{
 			Resources: &serviceBindings,
 		}
-		response := Response{
+		response := cloudcontroller.Response{
 			Result: &wrapper,
 		}
 
@@ -52,7 +53,7 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = Request{
+		request = cloudcontroller.Request{
 			URI:    wrapper.NextURL,
 			Method: "GET",
 		}
@@ -62,12 +63,12 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 }
 
 func (client *CloudControllerClient) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
-	request := Request{
+	request := cloudcontroller.Request{
 		RequestName: DeleteServiceBindingRequest,
 		Params:      map[string]string{"service_binding_guid": serviceBindingGUID},
 	}
 
-	var response Response
+	var response cloudcontroller.Response
 	err := client.connection.Make(request, &response)
 	return response.Warnings, err
 }

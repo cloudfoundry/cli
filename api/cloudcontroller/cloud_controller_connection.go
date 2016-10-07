@@ -1,4 +1,4 @@
-package ccv2
+package cloudcontroller
 
 import (
 	"bytes"
@@ -14,56 +14,13 @@ import (
 	"github.com/tedsuo/rata"
 )
 
-type Request struct {
-	Header      http.Header
-	Params      rata.Params
-	Query       url.Values
-	RequestName string
-
-	URI    string
-	Method string
-}
-
-type Response struct {
-	Result      interface{}
-	RawResponse []byte
-	Warnings    []string
-}
-
-// UnverifiedServerError replaces x509.UnknownAuthorityError when the server
-// has SSL but the client is unable to verify it's certificate
-type UnverifiedServerError struct {
-	URL string
-}
-
-func (e UnverifiedServerError) Error() string {
-	return "x509: certificate signed by unknown authority"
-}
-
-type RequestError struct {
-	Err error
-}
-
-func (e RequestError) Error() string {
-	return e.Err.Error()
-}
-
-type RawCCError struct {
-	StatusCode  int
-	RawResponse []byte
-}
-
-func (r RawCCError) Error() string {
-	return fmt.Sprintf("Error Code: %i\nRaw Response: %s\n", r.StatusCode, string(r.RawResponse))
-}
-
 type CloudControllerConnection struct {
 	HTTPClient       *http.Client
 	URL              string
 	requestGenerator *rata.RequestGenerator
 }
 
-func NewConnection(APIURL string, skipSSLValidation bool) *CloudControllerConnection {
+func NewConnection(APIURL string, routes rata.Routes, skipSSLValidation bool) *CloudControllerConnection {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
@@ -74,7 +31,7 @@ func NewConnection(APIURL string, skipSSLValidation bool) *CloudControllerConnec
 		HTTPClient: &http.Client{Transport: tr},
 
 		URL:              strings.TrimRight(APIURL, "/"),
-		requestGenerator: rata.NewRequestGenerator(APIURL, Routes),
+		requestGenerator: rata.NewRequestGenerator(APIURL, routes),
 	}
 }
 

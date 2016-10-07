@@ -2,6 +2,7 @@ package common
 
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/commands"
 )
 
@@ -11,7 +12,7 @@ func NewCloudControllerClient(config commands.Config) (*ccv2.CloudControllerClie
 	if err != nil {
 		return nil, err
 	}
-	client.WrapConnection(ccv2.NewTokenRefreshWrapper(config))
+	client.WrapConnection(wrapper.NewTokenRefreshWrapper(config))
 	//Retry Wrapper
 	return client, err
 }

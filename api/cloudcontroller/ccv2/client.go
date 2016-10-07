@@ -1,21 +1,16 @@
 package ccv2
 
+import "code.cloudfoundry.org/cli/api/cloudcontroller"
+
 type Warnings []string
-
-//go:generate counterfeiter . Connection
-
-// Connection creates and executes http requests
-type Connection interface {
-	Make(passedRequest Request, passedResponse *Response) error
-}
 
 //go:generate counterfeiter . ConnectionWrapper
 
 // ConnectionWrapper can wrap a given connection allowing the wrapper to modify
 // all requests going in and out of the given connection.
 type ConnectionWrapper interface {
-	Connection
-	Wrap(innerconnection Connection) Connection
+	cloudcontroller.Connection
+	Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection
 }
 
 type CloudControllerClient struct {
@@ -27,7 +22,7 @@ type CloudControllerClient struct {
 	routingEndpoint           string
 	tokenEndpoint             string
 
-	connection Connection
+	connection cloudcontroller.Connection
 }
 
 // NewCloudControllerClient returns a new CloudControllerClient
