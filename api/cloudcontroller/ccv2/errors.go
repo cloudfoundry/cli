@@ -12,28 +12,19 @@ type CCErrorResponse struct {
 	ErrorCode   string `json:"error_code"`
 }
 
-type UnexpectedResponseError struct {
-	ResponseCode int
-	CCErrorResponse
-}
-
-func (e UnexpectedResponseError) Error() string {
-	return fmt.Sprintf("Unexpected Response\nResponse Code: %s\nCC Code: %i\nCC ErrorCode: %s\nDescription: %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
-}
-
-type ResourceNotFoundError struct {
-	Message string
-}
-
-func (e ResourceNotFoundError) Error() string {
-	return e.Message
-}
-
 type UnauthorizedError struct {
 	Message string
 }
 
 func (e UnauthorizedError) Error() string {
+	return e.Message
+}
+
+type InvalidAuthTokenError struct {
+	Message string
+}
+
+func (e InvalidAuthTokenError) Error() string {
 	return e.Message
 }
 
@@ -45,12 +36,29 @@ func (e ForbiddenError) Error() string {
 	return e.Message
 }
 
-func newErrorWrapper() *errorWrapper {
-	return &errorWrapper{}
+type ResourceNotFoundError struct {
+	Message string
+}
+
+func (e ResourceNotFoundError) Error() string {
+	return e.Message
+}
+
+type UnexpectedResponseError struct {
+	ResponseCode int
+	CCErrorResponse
+}
+
+func (e UnexpectedResponseError) Error() string {
+	return fmt.Sprintf("Unexpected Response\nResponse Code: %s\nCC Code: %i\nCC ErrorCode: %s\nDescription: %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
 }
 
 type errorWrapper struct {
 	connection Connection
+}
+
+func newErrorWrapper() *errorWrapper {
+	return &errorWrapper{}
 }
 
 func (e *errorWrapper) Wrap(innerconnection Connection) Connection {
@@ -76,6 +84,9 @@ func (e errorWrapper) convert(rawErr RawCCError) error {
 
 	switch rawErr.StatusCode {
 	case http.StatusUnauthorized:
+		if errorResponse.ErrorCode == "CF-InvalidAuthToken" {
+			return InvalidAuthTokenError{Message: errorResponse.Description}
+		}
 		return UnauthorizedError{Message: errorResponse.Description}
 	case http.StatusForbidden:
 		return ForbiddenError{Message: errorResponse.Description}

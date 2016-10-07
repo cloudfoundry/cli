@@ -43,9 +43,26 @@ var _ = Describe("Cloud Controller Connection", func() {
 				serverResponseCode = http.StatusUnauthorized
 			})
 
-			It("returns a UnauthorizedError", func() {
-				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(UnauthorizedError{Message: "SomeCC Error Message"}))
+			Context("generic 401", func() {
+				It("returns a UnauthorizedError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(UnauthorizedError{Message: "SomeCC Error Message"}))
+				})
+			})
+
+			Context("invalid token", func() {
+				BeforeEach(func() {
+					response = `{
+						"code": 1000,
+						"description": "Invalid Auth Token",
+						"error_code": "CF-InvalidAuthToken"
+					}`
+				})
+
+				It("returns a UnauthorizedError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+				})
 			})
 		})
 
