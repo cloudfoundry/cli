@@ -14,6 +14,7 @@ var _ = Describe("UI", func() {
 	var (
 		ui         *UI
 		fakeConfig *uifakes.FakeConfig
+		inBuffer   *Buffer
 	)
 
 	BeforeEach(func() {
@@ -24,6 +25,8 @@ var _ = Describe("UI", func() {
 		ui, err = NewUI(fakeConfig)
 		Expect(err).NotTo(HaveOccurred())
 
+		inBuffer = NewBuffer()
+		ui.In = inBuffer
 		ui.Out = NewBuffer()
 		ui.Err = NewBuffer()
 	})
@@ -148,6 +151,67 @@ var _ = Describe("UI", func() {
 						"AppName": "some-app-name",
 					})
 				Expect(ui.Out).To(Say("AVANCE: L'application some-app-name n'existe pas.\n"))
+			})
+		})
+	})
+
+	Describe("DisplayBoolPrompt", func() {
+		It("displays the prompt", func() {
+			ui.DisplayBoolPrompt("some-prompt", false)
+			Expect(ui.Out).To(Say("some-prompt\x1b\\[36;1m>>\x1b\\[0m"))
+		})
+
+		Context("when the interact library returns an error", func() {
+			It("returns the error", func() {
+				inBuffer.Write([]byte("invalid\n"))
+				_, err := ui.DisplayBoolPrompt("some-prompt", false)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when the user chooses yes", func() {
+			BeforeEach(func() {
+				inBuffer.Write([]byte("y\n"))
+			})
+
+			It("returns true", func() {
+				response, err := ui.DisplayBoolPrompt("some-prompt", false)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(response).To(BeTrue())
+			})
+		})
+
+		Context("when the user chooses no", func() {
+			BeforeEach(func() {
+				inBuffer.Write([]byte("n\n"))
+			})
+
+			It("returns true", func() {
+				response, err := ui.DisplayBoolPrompt("some-prompt", true)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(response).To(BeFalse())
+			})
+		})
+
+		Context("when the user chooses the default", func() {
+			BeforeEach(func() {
+				inBuffer.Write([]byte("\n"))
+			})
+
+			Context("when the default is false", func() {
+				It("return false", func() {
+					response, err := ui.DisplayBoolPrompt("some-prompt", false)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(response).To(BeFalse())
+				})
+			})
+
+			Context("when the default is true", func() {
+				It("returns true", func() {
+					response, err := ui.DisplayBoolPrompt("some-prompt", true)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(response).To(BeTrue())
+				})
 			})
 		})
 	})

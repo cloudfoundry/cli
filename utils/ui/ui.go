@@ -17,6 +17,7 @@ import (
 	"github.com/fatih/color"
 
 	"github.com/nicksnyder/go-i18n/i18n"
+	"github.com/vito/go-interact/interact"
 )
 
 const (
@@ -52,6 +53,9 @@ type TranslatableError interface {
 
 // UI is interface to interact with the user
 type UI struct {
+	// In is the input buffer
+	In io.Reader
+
 	// Out is the output buffer
 	Out io.Writer
 
@@ -63,8 +67,8 @@ type UI struct {
 	translate i18n.TranslateFunc
 }
 
-// NewUI will return a UI object where Out is set to STDOUT and Err is set to
-// STDERR
+// NewUI will return a UI object where Out is set to STDOUT, In is set to STDIN,
+// and Err is set to STDERR
 func NewUI(c Config) (*UI, error) {
 	translateFunc, err := GetTranslationFunc(c)
 	if err != nil {
@@ -72,6 +76,7 @@ func NewUI(c Config) (*UI, error) {
 	}
 
 	return &UI{
+		In:           os.Stdin,
 		Out:          color.Output,
 		Err:          os.Stderr,
 		colorEnabled: c.ColorEnabled(),
@@ -79,10 +84,11 @@ func NewUI(c Config) (*UI, error) {
 	}, nil
 }
 
-// NewTestUI will return a UI object where Out and Err are customizable, and
+// NewTestUI will return a UI object where Out, In, and Err are customizable, and
 // colors are disabled
-func NewTestUI(out io.Writer, err io.Writer) *UI {
+func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 	return &UI{
+		In:           in,
 		Out:          out,
 		Err:          err,
 		colorEnabled: configv3.ColorDisabled,
@@ -133,6 +139,19 @@ func (ui *UI) DisplayNewline() {
 func (ui *UI) DisplayPair(attribute string, formattedString string, keys ...map[string]interface{}) {
 	translatedValue := ui.translate(formattedString, ui.templateValuesFromKeys(keys))
 	fmt.Fprintf(ui.Out, "%s: %s\n", ui.translate(attribute), translatedValue)
+}
+
+// DisplayBoolPrompt outputs the prompt and waits for user input. It only
+// allows for a boolean response. A default boolean response can be set with
+// defaultResponse.
+func (ui *UI) DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error) {
+	response := defaultResponse
+	fullPrompt := fmt.Sprintf("%s%s", prompt, ui.colorize(">>", cyan, true))
+	interactivePrompt := interact.NewInteraction(fullPrompt)
+	interactivePrompt.Input = ui.In
+	interactivePrompt.Output = ui.Out
+	err := interactivePrompt.Resolve(&response)
+	return response, err
 }
 
 // DisplayHelpHeader translates and then bolds the help header. Sends output to
