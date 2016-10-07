@@ -9,6 +9,7 @@ type UI interface {
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})
+	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
 	DisplayTable(prefix string, table [][]string)
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextWithKeyTranslations(template string, keysToTranslate []string, data ...map[string]interface{})

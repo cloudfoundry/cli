@@ -27,7 +27,7 @@ var _ = Describe("Unbind Service Command", func() {
 
 	BeforeEach(func() {
 		out := NewBuffer()
-		fakeUI = ui.NewTestUI(out, out)
+		fakeUI = ui.NewTestUI(nil, out, out)
 		fakeActor = new(v2fakes.FakeUnbindServiceActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)

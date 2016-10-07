@@ -23,7 +23,7 @@ var _ = Describe("Help Command", func() {
 	)
 
 	BeforeEach(func() {
-		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer())
+		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeHelpActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
