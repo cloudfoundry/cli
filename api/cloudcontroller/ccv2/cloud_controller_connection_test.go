@@ -1,9 +1,9 @@
-package cloudcontrollerv2_test
+package ccv2_test
 
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

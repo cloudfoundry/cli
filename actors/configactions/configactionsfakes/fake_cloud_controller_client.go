@@ -5,18 +5,18 @@ import (
 	"sync"
 
 	"code.cloudfoundry.org/cli/actors/configactions"
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type FakeCloudControllerClient struct {
-	TargetCFStub        func(APIURL string, skipSSLValidation bool) (cloudcontrollerv2.Warnings, error)
+	TargetCFStub        func(APIURL string, skipSSLValidation bool) (ccv2.Warnings, error)
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
 		APIURL            string
 		skipSSLValidation bool
 	}
 	targetCFReturns struct {
-		result1 cloudcontrollerv2.Warnings
+		result1 ccv2.Warnings
 		result2 error
 	}
 	APIStub        func() string
@@ -65,7 +65,7 @@ type FakeCloudControllerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (cloudcontrollerv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (ccv2.Warnings, error) {
 	fake.targetCFMutex.Lock()
 	fake.targetCFArgsForCall = append(fake.targetCFArgsForCall, struct {
 		APIURL            string
@@ -92,10 +92,10 @@ func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) (string, bool)
 	return fake.targetCFArgsForCall[i].APIURL, fake.targetCFArgsForCall[i].skipSSLValidation
 }
 
-func (fake *FakeCloudControllerClient) TargetCFReturns(result1 cloudcontrollerv2.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) TargetCFReturns(result1 ccv2.Warnings, result2 error) {
 	fake.TargetCFStub = nil
 	fake.targetCFReturns = struct {
-		result1 cloudcontrollerv2.Warnings
+		result1 ccv2.Warnings
 		result2 error
 	}{result1, result2}
 }

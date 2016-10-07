@@ -1,12 +1,12 @@
 package v2actions
 
-import "code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 //go:generate counterfeiter . CloudControllerClient
 
 type CloudControllerClient interface {
-	GetApplications([]cloudcontrollerv2.Query) ([]cloudcontrollerv2.Application, cloudcontrollerv2.Warnings, error)
-	GetServiceInstances([]cloudcontrollerv2.Query) ([]cloudcontrollerv2.ServiceInstance, cloudcontrollerv2.Warnings, error)
-	GetServiceBindings([]cloudcontrollerv2.Query) ([]cloudcontrollerv2.ServiceBinding, cloudcontrollerv2.Warnings, error)
-	DeleteServiceBinding(serviceBindingGUID string) (cloudcontrollerv2.Warnings, error)
+	GetApplications([]ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
+	GetServiceInstances([]ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
+	GetServiceBindings([]ccv2.Query) ([]ccv2.ServiceBinding, ccv2.Warnings, error)
+	DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error)
 }

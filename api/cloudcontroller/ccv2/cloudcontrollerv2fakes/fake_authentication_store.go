@@ -4,7 +4,7 @@ package cloudcontrollerv2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type FakeAuthenticationStore struct {
@@ -96,4 +96,4 @@ func (fake *FakeAuthenticationStore) recordInvocation(key string, args []interfa
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ cloudcontrollerv2.AuthenticationStore = new(FakeAuthenticationStore)
+var _ ccv2.AuthenticationStore = new(FakeAuthenticationStore)

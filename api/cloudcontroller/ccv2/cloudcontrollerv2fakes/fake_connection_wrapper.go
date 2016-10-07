@@ -4,36 +4,36 @@ package cloudcontrollerv2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type FakeConnectionWrapper struct {
-	MakeStub        func(passedRequest cloudcontrollerv2.Request, passedResponse *cloudcontrollerv2.Response) error
+	MakeStub        func(passedRequest ccv2.Request, passedResponse *ccv2.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		passedRequest  cloudcontrollerv2.Request
-		passedResponse *cloudcontrollerv2.Response
+		passedRequest  ccv2.Request
+		passedResponse *ccv2.Response
 	}
 	makeReturns struct {
 		result1 error
 	}
-	WrapStub        func(innerconnection cloudcontrollerv2.Connection) cloudcontrollerv2.Connection
+	WrapStub        func(innerconnection ccv2.Connection) ccv2.Connection
 	wrapMutex       sync.RWMutex
 	wrapArgsForCall []struct {
-		innerconnection cloudcontrollerv2.Connection
+		innerconnection ccv2.Connection
 	}
 	wrapReturns struct {
-		result1 cloudcontrollerv2.Connection
+		result1 ccv2.Connection
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnectionWrapper) Make(passedRequest cloudcontrollerv2.Request, passedResponse *cloudcontrollerv2.Response) error {
+func (fake *FakeConnectionWrapper) Make(passedRequest ccv2.Request, passedResponse *ccv2.Response) error {
 	fake.makeMutex.Lock()
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		passedRequest  cloudcontrollerv2.Request
-		passedResponse *cloudcontrollerv2.Response
+		passedRequest  ccv2.Request
+		passedResponse *ccv2.Response
 	}{passedRequest, passedResponse})
 	fake.recordInvocation("Make", []interface{}{passedRequest, passedResponse})
 	fake.makeMutex.Unlock()
@@ -50,7 +50,7 @@ func (fake *FakeConnectionWrapper) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
-func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (cloudcontrollerv2.Request, *cloudcontrollerv2.Response) {
+func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (ccv2.Request, *ccv2.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
 	return fake.makeArgsForCall[i].passedRequest, fake.makeArgsForCall[i].passedResponse
@@ -63,10 +63,10 @@ func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakeConnectionWrapper) Wrap(innerconnection cloudcontrollerv2.Connection) cloudcontrollerv2.Connection {
+func (fake *FakeConnectionWrapper) Wrap(innerconnection ccv2.Connection) ccv2.Connection {
 	fake.wrapMutex.Lock()
 	fake.wrapArgsForCall = append(fake.wrapArgsForCall, struct {
-		innerconnection cloudcontrollerv2.Connection
+		innerconnection ccv2.Connection
 	}{innerconnection})
 	fake.recordInvocation("Wrap", []interface{}{innerconnection})
 	fake.wrapMutex.Unlock()
@@ -83,16 +83,16 @@ func (fake *FakeConnectionWrapper) WrapCallCount() int {
 	return len(fake.wrapArgsForCall)
 }
 
-func (fake *FakeConnectionWrapper) WrapArgsForCall(i int) cloudcontrollerv2.Connection {
+func (fake *FakeConnectionWrapper) WrapArgsForCall(i int) ccv2.Connection {
 	fake.wrapMutex.RLock()
 	defer fake.wrapMutex.RUnlock()
 	return fake.wrapArgsForCall[i].innerconnection
 }
 
-func (fake *FakeConnectionWrapper) WrapReturns(result1 cloudcontrollerv2.Connection) {
+func (fake *FakeConnectionWrapper) WrapReturns(result1 ccv2.Connection) {
 	fake.WrapStub = nil
 	fake.wrapReturns = struct {
-		result1 cloudcontrollerv2.Connection
+		result1 ccv2.Connection
 	}{result1}
 }
 
@@ -118,4 +118,4 @@ func (fake *FakeConnectionWrapper) recordInvocation(key string, args []interface
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ cloudcontrollerv2.ConnectionWrapper = new(FakeConnectionWrapper)
+var _ ccv2.ConnectionWrapper = new(FakeConnectionWrapper)

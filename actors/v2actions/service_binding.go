@@ -3,7 +3,7 @@ package v2actions
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type ServiceBinding struct {
@@ -20,15 +20,15 @@ func (e ServiceBindingNotFoundError) Error() string {
 }
 
 func (actor Actor) GetServiceBindingByApplicationAndServiceInstance(appGUID string, serviceInstanceGUID string) (ServiceBinding, Warnings, error) {
-	serviceBindings, warnings, err := actor.CloudControllerClient.GetServiceBindings([]cloudcontrollerv2.Query{
-		cloudcontrollerv2.Query{
-			Filter:   cloudcontrollerv2.AppGUIDFilter,
-			Operator: cloudcontrollerv2.EqualOperator,
+	serviceBindings, warnings, err := actor.CloudControllerClient.GetServiceBindings([]ccv2.Query{
+		ccv2.Query{
+			Filter:   ccv2.AppGUIDFilter,
+			Operator: ccv2.EqualOperator,
 			Value:    appGUID,
 		},
-		cloudcontrollerv2.Query{
-			Filter:   cloudcontrollerv2.ServiceInstanceGUIDFilter,
-			Operator: cloudcontrollerv2.EqualOperator,
+		ccv2.Query{
+			Filter:   ccv2.ServiceInstanceGUIDFilter,
+			Operator: ccv2.EqualOperator,
 			Value:    serviceInstanceGUID,
 		},
 	})

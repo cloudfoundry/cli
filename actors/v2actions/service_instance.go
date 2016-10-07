@@ -3,7 +3,7 @@ package v2actions
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type ServiceInstance struct {
@@ -20,15 +20,15 @@ func (e ServiceInstanceNotFoundError) Error() string {
 }
 
 func (actor Actor) GetServiceInstanceBySpace(name string, spaceGUID string) (ServiceInstance, Warnings, error) {
-	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances([]cloudcontrollerv2.Query{
-		cloudcontrollerv2.Query{
-			Filter:   cloudcontrollerv2.NameFilter,
-			Operator: cloudcontrollerv2.EqualOperator,
+	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances([]ccv2.Query{
+		ccv2.Query{
+			Filter:   ccv2.NameFilter,
+			Operator: ccv2.EqualOperator,
 			Value:    name,
 		},
-		cloudcontrollerv2.Query{
-			Filter:   cloudcontrollerv2.SpaceGUIDFilter,
-			Operator: cloudcontrollerv2.EqualOperator,
+		ccv2.Query{
+			Filter:   ccv2.SpaceGUIDFilter,
+			Operator: ccv2.EqualOperator,
 			Value:    spaceGUID,
 		},
 	})

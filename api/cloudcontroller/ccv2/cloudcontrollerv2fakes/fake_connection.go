@@ -4,15 +4,15 @@ package cloudcontrollerv2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 type FakeConnection struct {
-	MakeStub        func(passedRequest cloudcontrollerv2.Request, passedResponse *cloudcontrollerv2.Response) error
+	MakeStub        func(passedRequest ccv2.Request, passedResponse *ccv2.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		passedRequest  cloudcontrollerv2.Request
-		passedResponse *cloudcontrollerv2.Response
+		passedRequest  ccv2.Request
+		passedResponse *ccv2.Response
 	}
 	makeReturns struct {
 		result1 error
@@ -21,11 +21,11 @@ type FakeConnection struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnection) Make(passedRequest cloudcontrollerv2.Request, passedResponse *cloudcontrollerv2.Response) error {
+func (fake *FakeConnection) Make(passedRequest ccv2.Request, passedResponse *ccv2.Response) error {
 	fake.makeMutex.Lock()
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		passedRequest  cloudcontrollerv2.Request
-		passedResponse *cloudcontrollerv2.Response
+		passedRequest  ccv2.Request
+		passedResponse *ccv2.Response
 	}{passedRequest, passedResponse})
 	fake.recordInvocation("Make", []interface{}{passedRequest, passedResponse})
 	fake.makeMutex.Unlock()
@@ -42,7 +42,7 @@ func (fake *FakeConnection) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
-func (fake *FakeConnection) MakeArgsForCall(i int) (cloudcontrollerv2.Request, *cloudcontrollerv2.Response) {
+func (fake *FakeConnection) MakeArgsForCall(i int) (ccv2.Request, *ccv2.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
 	return fake.makeArgsForCall[i].passedRequest, fake.makeArgsForCall[i].passedResponse
@@ -75,4 +75,4 @@ func (fake *FakeConnection) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ cloudcontrollerv2.Connection = new(FakeConnection)
+var _ ccv2.Connection = new(FakeConnection)

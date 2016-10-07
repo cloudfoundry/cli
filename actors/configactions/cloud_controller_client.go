@@ -1,11 +1,11 @@
 package configactions
 
-import "code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 //go:generate counterfeiter . CloudControllerClient
 
 type CloudControllerClient interface {
-	TargetCF(APIURL string, skipSSLValidation bool) (cloudcontrollerv2.Warnings, error)
+	TargetCF(APIURL string, skipSSLValidation bool) (ccv2.Warnings, error)
 
 	API() string
 	APIVersion() string
