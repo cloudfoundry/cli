@@ -22,6 +22,7 @@ var _ = Describe("API Command", func() {
 		fakeUI     *ui.UI
 		fakeActor  *v2fakes.FakeAPIConfigActor
 		fakeConfig *commandsfakes.FakeConfig
+		err        error
 	)
 
 	BeforeEach(func() {
@@ -38,11 +39,15 @@ var _ = Describe("API Command", func() {
 		}
 	})
 
+	JustBeforeEach(func() {
+		err = cmd.Execute(nil)
+	})
+
+	It("Displays the experimental warning message", func() {
+		Expect(fakeUI.Out).To(Say(ExperimentalWarning))
+	})
+
 	Context("when the API URL is not provided", func() {
-		var err error
-		JustBeforeEach(func() {
-			err = cmd.Execute([]string{})
-		})
 
 		Context("when the API is not set", func() {
 			It("displays a tip", func() {
@@ -96,7 +101,6 @@ var _ = Describe("API Command", func() {
 			Context("with no protocol", func() {
 				var (
 					CCAPI string
-					err   error
 				)
 
 				BeforeEach(func() {
@@ -105,10 +109,6 @@ var _ = Describe("API Command", func() {
 
 					fakeConfig.TargetReturns("some-api-target")
 					fakeConfig.APIVersionReturns("some-version")
-				})
-
-				JustBeforeEach(func() {
-					err = cmd.Execute([]string{})
 				})
 
 				Context("when the url has verified SSL", func() {
@@ -176,7 +176,6 @@ var _ = Describe("API Command", func() {
 				})
 
 				It("sets the target with a warning", func() {
-					err := cmd.Execute([]string{})
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
@@ -206,7 +205,6 @@ var _ = Describe("API Command", func() {
 			})
 
 			It("sets the target with a warning", func() {
-				err := cmd.Execute([]string{})
 				Expect(err).To(MatchError(common.APIRequestError{Err: requestErr.Err}))
 			})
 		})
