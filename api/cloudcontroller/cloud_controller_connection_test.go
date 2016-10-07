@@ -1,13 +1,14 @@
-package ccv2_test
+package cloudcontroller_test
 
 import (
 	"net/http"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	. "code.cloudfoundry.org/cli/api/cloudcontroller"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
+	"github.com/tedsuo/rata"
 )
 
 type DummyResponse struct {
@@ -18,10 +19,16 @@ type DummyResponse struct {
 var _ = Describe("Cloud Controller Connection", func() {
 	var (
 		connection *CloudControllerConnection
+		FooRequest string
+		routes     rata.Routes
 	)
 
 	BeforeEach(func() {
-		connection = NewConnection(server.URL(), true)
+		FooRequest = "Foo"
+		routes = rata.Routes{
+			{Path: "/v2/foo", Method: "GET", Name: FooRequest},
+		}
+		connection = NewConnection(server.URL(), routes, true)
 	})
 
 	Describe("Make", func() {
@@ -29,7 +36,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/apps", "q=a:b&q=c:d"),
+						VerifyRequest("GET", "/v2/foo", "q=a:b&q=c:d"),
 						RespondWith(http.StatusOK, "{}"),
 					),
 				)
@@ -38,19 +45,10 @@ var _ = Describe("Cloud Controller Connection", func() {
 			Context("when passing a RequestName", func() {
 				It("sends the request to the server", func() {
 					request := Request{
-						RequestName: AppsRequest,
-						Query: FormatQueryParameters([]Query{
-							{
-								Filter:   "a",
-								Operator: EqualOperator,
-								Value:    "b",
-							},
-							{
-								Filter:   "c",
-								Operator: EqualOperator,
-								Value:    "d",
-							},
-						}),
+						RequestName: FooRequest,
+						Query: map[string][]string{
+							"q": {"a:b", "c:d"},
+						},
 					}
 
 					err := connection.Make(request, &Response{})
@@ -63,7 +61,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			Context("when passing a URI", func() {
 				It("sends the request to the server", func() {
 					request := Request{
-						URI:    "/v2/apps?q=a:b&q=c:d",
+						URI:    "/v2/foo?q=a:b&q=c:d",
 						Method: "GET",
 					}
 
@@ -79,7 +77,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/apps", ""),
+						VerifyRequest("GET", "/v2/foo", ""),
 						VerifyHeaderKV("foo", "bar"),
 						VerifyHeaderKV("accept", "application/json"),
 						VerifyHeaderKV("content-type", "application/json"),
@@ -91,7 +89,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			Context("when passed a response with a result set", func() {
 				It("unmarshals the data into a struct", func() {
 					request := Request{
-						URI:    "/v2/apps",
+						URI:    "/v2/foo",
 						Method: "GET",
 						Header: http.Header{
 							"foo": {"bar"},
@@ -116,13 +114,13 @@ var _ = Describe("Cloud Controller Connection", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/apps", ""),
+						VerifyRequest("GET", "/v2/foo", ""),
 						RespondWith(http.StatusOK, response),
 					),
 				)
 
 				request = Request{
-					URI:    "/v2/apps",
+					URI:    "/v2/foo",
 					Method: "GET",
 				}
 			})
@@ -157,7 +155,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest("GET", "/v2/info"),
+							VerifyRequest("GET", "/v2/foo"),
 							RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42, Ed McMann, the 1942 doggers"}}),
 						),
 					)
@@ -165,7 +163,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 				It("returns them in Response", func() {
 					request := Request{
-						RequestName: InfoRequest,
+						RequestName: FooRequest,
 					}
 
 					var response Response
@@ -187,12 +185,12 @@ var _ = Describe("Cloud Controller Connection", func() {
 		Describe("Errors", func() {
 			Context("when the server does not exist", func() {
 				BeforeEach(func() {
-					connection = NewConnection("http://i.hope.this.doesnt.exist.com", false)
+					connection = NewConnection("http://i.hope.this.doesnt.exist.com", routes, false)
 				})
 
 				It("returns a RequestError", func() {
 					request := Request{
-						RequestName: InfoRequest,
+						RequestName: FooRequest,
 					}
 
 					var response Response
@@ -201,7 +199,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					requestErr, ok := err.(RequestError)
 					Expect(ok).To(BeTrue())
-					Expect(requestErr.Error()).To(MatchRegexp(".*http://i.hope.this.doesnt.exist.com/v2/info.*[nN]o such host"))
+					Expect(requestErr.Error()).To(MatchRegexp(".*http://i.hope.this.doesnt.exist.com/v2/foo.*[nN]o such host"))
 				})
 			})
 
@@ -210,16 +208,16 @@ var _ = Describe("Cloud Controller Connection", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
 							CombineHandlers(
-								VerifyRequest("GET", "/v2/info"),
+								VerifyRequest("GET", "/v2/foo"),
 							),
 						)
 
-						connection = NewConnection(server.URL(), false)
+						connection = NewConnection(server.URL(), routes, false)
 					})
 
 					It("returns a UnverifiedServerError", func() {
 						request := Request{
-							RequestName: InfoRequest,
+							RequestName: FooRequest,
 						}
 
 						var response Response
@@ -240,7 +238,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest("GET", "/v2/info"),
+							VerifyRequest("GET", "/v2/foo"),
 							RespondWith(http.StatusNotFound, ccResponse),
 						),
 					)
@@ -248,7 +246,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 				It("returns a CCRawResponse", func() {
 					request := Request{
-						RequestName: InfoRequest,
+						RequestName: FooRequest,
 					}
 
 					var response Response

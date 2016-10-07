@@ -10,7 +10,7 @@ const (
 	DeleteServiceBindingRequest = "DeleteServiceBinding"
 )
 
-var Routes = rata.Routes{
+var routes = rata.Routes{
 	{Path: "/v2/info", Method: "GET", Name: InfoRequest},
 	{Path: "/v2/apps", Method: "GET", Name: AppsRequest},
 	{Path: "/v2/service_instances", Method: "GET", Name: ServiceInstancesRequest},

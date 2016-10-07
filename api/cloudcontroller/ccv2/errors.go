@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
 type CCErrorResponse struct {
@@ -54,28 +56,28 @@ func (e UnexpectedResponseError) Error() string {
 }
 
 type errorWrapper struct {
-	connection Connection
+	connection cloudcontroller.Connection
 }
 
 func newErrorWrapper() *errorWrapper {
 	return &errorWrapper{}
 }
 
-func (e *errorWrapper) Wrap(innerconnection Connection) Connection {
+func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	e.connection = innerconnection
 	return e
 }
 
-func (e *errorWrapper) Make(passedRequest Request, passedResponse *Response) error {
+func (e *errorWrapper) Make(passedRequest cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(passedRequest, passedResponse)
 
-	if rawErr, ok := err.(RawCCError); ok {
+	if rawErr, ok := err.(cloudcontroller.RawCCError); ok {
 		return e.convert(rawErr)
 	}
 	return err
 }
 
-func (e errorWrapper) convert(rawErr RawCCError) error {
+func (e errorWrapper) convert(rawErr cloudcontroller.RawCCError) error {
 	var errorResponse CCErrorResponse
 	err := json.Unmarshal(rawErr.RawResponse, &errorResponse)
 	if err != nil {

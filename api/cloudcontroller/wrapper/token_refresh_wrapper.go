@@ -1,11 +1,28 @@
-package ccv2
+package wrapper
 
-import "net/http"
+import (
+	"net/http"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+)
+
+//go:generate counterfeiter . AuthenticationStore
+
+type AuthenticationStore interface {
+	AccessToken() string
+	RefreshToken() string
+	// SetAccessToken(token string)
+	// SetRefreshToken(token string)
+
+	// ClientName() string
+	// ClientSecret() string
+	// SkipSSLValidation() bool
+}
 
 // TokenRefreshWrapper wraps connections and adds authentication headers to all
 // requests
 type TokenRefreshWrapper struct {
-	connection Connection
+	connection cloudcontroller.Connection
 	store      AuthenticationStore
 }
 
@@ -18,14 +35,14 @@ func NewTokenRefreshWrapper(store AuthenticationStore) *TokenRefreshWrapper {
 }
 
 // Wrap sets the connection on the TokenRefreshWrapper and returns itself
-func (t *TokenRefreshWrapper) Wrap(innerconnection Connection) Connection {
+func (t *TokenRefreshWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	t.connection = innerconnection
 	return t
 }
 
 // Make adds authentication headers to the passed in request and then calls the
 // wrapped connection's Make
-func (t *TokenRefreshWrapper) Make(passedRequest Request, passedResponse *Response) error {
+func (t *TokenRefreshWrapper) Make(passedRequest cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
 	if passedRequest.Header == nil {
 		passedRequest.Header = http.Header{}
 	}

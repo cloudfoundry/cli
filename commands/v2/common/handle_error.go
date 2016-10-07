@@ -2,14 +2,14 @@ package common
 
 import (
 	"code.cloudfoundry.org/cli/actors/v2actions"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
 func HandleError(err error) error {
 	switch e := err.(type) {
-	case ccv2.RequestError:
+	case cloudcontroller.RequestError:
 		return APIRequestError{Err: e.Err}
-	case ccv2.UnverifiedServerError:
+	case cloudcontroller.UnverifiedServerError:
 		return InvalidSSLCertError{API: e.URL}
 
 	case v2actions.ApplicationNotFoundError:
