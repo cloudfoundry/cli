@@ -45,7 +45,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		return nil
 	}
 
-	cmd.UI.DisplayText("This command is in EXPERIMENTAL stage and may change without notice")
+	cmd.UI.DisplayText(ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
 	err := common.CheckTarget(cmd.Config, true, true)

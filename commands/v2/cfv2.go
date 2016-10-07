@@ -2,6 +2,8 @@ package v2
 
 var Commands commandList
 
+const ExperimentalWarning = "This command is in EXPERIMENTAL stage and may change without notice"
+
 type commandList struct {
 	VerboseOrVersion                   bool                                      `short:"v" long:"version" description:"verbose and version flag"`
 	App                                AppCommand                                `command:"app" description:"Display health and status for app"`
