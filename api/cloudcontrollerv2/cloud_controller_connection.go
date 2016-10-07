@@ -30,6 +30,33 @@ type Response struct {
 	Warnings    []string
 }
 
+// UnverifiedServerError replaces x509.UnknownAuthorityError when the server
+// has SSL but the client is unable to verify it's certificate
+type UnverifiedServerError struct {
+	URL string
+}
+
+func (e UnverifiedServerError) Error() string {
+	return "x509: certificate signed by unknown authority"
+}
+
+type RequestError struct {
+	Err error
+}
+
+func (e RequestError) Error() string {
+	return e.Err.Error()
+}
+
+type RawCCError struct {
+	StatusCode  int
+	RawResponse []byte
+}
+
+func (r RawCCError) Error() string {
+	return fmt.Sprintf("Error Code: %i\nRaw Response: %s\n", r.StatusCode, string(r.RawResponse))
+}
+
 type CloudControllerConnection struct {
 	HTTPClient       *http.Client
 	URL              string
@@ -145,21 +172,17 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 }
 
 func (*CloudControllerConnection) handleStatusCodes(response *http.Response) error {
-	switch response.StatusCode {
-	case http.StatusNotFound:
-		var notFoundErr ResourceNotFoundError
-
-		decoder := json.NewDecoder(response.Body)
-		err := decoder.Decode(&notFoundErr)
+	if response.StatusCode >= 400 {
+		body, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			return err
 		}
 
-		return notFoundErr
-	case http.StatusUnauthorized:
-		return UnauthorizedError{}
-	case http.StatusForbidden:
-		return ForbiddenError{}
+		return RawCCError{
+			StatusCode:  response.StatusCode,
+			RawResponse: body,
+		}
 	}
+
 	return nil
 }

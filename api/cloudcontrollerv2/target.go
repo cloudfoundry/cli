@@ -16,6 +16,8 @@ func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation b
 	client.cloudControllerURL = APIURL
 
 	client.connection = NewConnection(client.cloudControllerURL, skipSSLValidation)
+	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
+
 	request := Request{
 		RequestName: InfoRequest,
 	}

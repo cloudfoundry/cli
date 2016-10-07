@@ -1,6 +1,10 @@
 package cloudcontrollerv2
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
 
 type CCErrorResponse struct {
 	Code        int    `json:"code"`
@@ -9,51 +13,79 @@ type CCErrorResponse struct {
 }
 
 type UnexpectedResponseError struct {
-	StatusCode int
-	Status     string
-	Body       string
-}
-
-func (e UnexpectedResponseError) Error() string {
-	return fmt.Sprintf("Unexpected Response\nStatus: %s\nBody:\n%s", e.Status, e.Body)
-}
-
-type ResourceNotFoundError struct {
+	ResponseCode int
 	CCErrorResponse
 }
 
+func (e UnexpectedResponseError) Error() string {
+	return fmt.Sprintf("Unexpected Response\nResponse Code: %s\nCC Code: %i\nCC ErrorCode: %s\nDescription: %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
+}
+
+type ResourceNotFoundError struct {
+	Message string
+}
+
 func (e ResourceNotFoundError) Error() string {
-	return e.Description
+	return e.Message
 }
 
 type UnauthorizedError struct {
+	Message string
 }
 
 func (e UnauthorizedError) Error() string {
-	return "unauthorized"
+	return e.Message
 }
 
 type ForbiddenError struct {
+	Message string
 }
 
 func (e ForbiddenError) Error() string {
-	return "forbidden"
+	return e.Message
 }
 
-// UnverifiedServerError replaces x509.UnknownAuthorityError when the server
-// has SSL but the client is unable to verify it's certificate
-type UnverifiedServerError struct {
-	URL string
+func newErrorWrapper() *errorWrapper {
+	return &errorWrapper{}
 }
 
-func (e UnverifiedServerError) Error() string {
-	return "x509: certificate signed by unknown authority"
+type errorWrapper struct {
+	connection Connection
 }
 
-type RequestError struct {
-	Err error
+func (e *errorWrapper) Wrap(innerconnection Connection) Connection {
+	e.connection = innerconnection
+	return e
 }
 
-func (e RequestError) Error() string {
-	return e.Err.Error()
+func (e *errorWrapper) Make(passedRequest Request, passedResponse *Response) error {
+	err := e.connection.Make(passedRequest, passedResponse)
+
+	if rawErr, ok := err.(RawCCError); ok {
+		return e.convert(rawErr)
+	}
+	return err
+}
+
+func (e errorWrapper) convert(rawErr RawCCError) error {
+	var errorResponse CCErrorResponse
+	err := json.Unmarshal(rawErr.RawResponse, &errorResponse)
+	if err != nil {
+		return err
+	}
+
+	switch rawErr.StatusCode {
+	case http.StatusUnauthorized:
+		return UnauthorizedError{Message: errorResponse.Description}
+	case http.StatusForbidden:
+		return ForbiddenError{Message: errorResponse.Description}
+	case http.StatusNotFound:
+		return ResourceNotFoundError{Message: errorResponse.Description}
+	default:
+		return UnexpectedResponseError{
+			ResponseCode:    rawErr.StatusCode,
+			CCErrorResponse: errorResponse,
+		}
+	}
+	return nil
 }
