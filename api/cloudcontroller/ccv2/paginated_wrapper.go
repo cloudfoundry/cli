@@ -1,4 +1,4 @@
-package cloudcontrollerv2
+package ccv2
 
 type PaginatedWrapper struct {
 	NextURL   string      `json:"next_url"`

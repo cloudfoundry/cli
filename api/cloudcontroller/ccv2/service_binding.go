@@ -1,9 +1,9 @@
-package cloudcontrollerv2
+package ccv2
 
 import (
 	"encoding/json"
 
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2/internal"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
 type ServiceBinding struct {

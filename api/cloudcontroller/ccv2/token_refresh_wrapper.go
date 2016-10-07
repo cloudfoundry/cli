@@ -1,4 +1,4 @@
-package cloudcontrollerv2
+package ccv2
 
 import "net/http"
 

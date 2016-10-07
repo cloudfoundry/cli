@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/actors/v2actions/v2actionsfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,12 +26,12 @@ var _ = Describe("Service Binding Actions", func() {
 		Context("when the service binding exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceBindingsReturns(
-					[]cloudcontrollerv2.ServiceBinding{
+					[]ccv2.ServiceBinding{
 						{
 							GUID: "some-service-binding-guid",
 						},
 					},
-					cloudcontrollerv2.Warnings{"foo"},
+					ccv2.Warnings{"foo"},
 					nil,
 				)
 			})
@@ -45,15 +45,15 @@ var _ = Describe("Service Binding Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"foo"}))
 
 				Expect(fakeCloudControllerClient.GetServiceBindingsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceBindingsArgsForCall(0)).To(ConsistOf([]cloudcontrollerv2.Query{
-					cloudcontrollerv2.Query{
-						Filter:   cloudcontrollerv2.AppGUIDFilter,
-						Operator: cloudcontrollerv2.EqualOperator,
+				Expect(fakeCloudControllerClient.GetServiceBindingsArgsForCall(0)).To(ConsistOf([]ccv2.Query{
+					ccv2.Query{
+						Filter:   ccv2.AppGUIDFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "some-app-guid",
 					},
-					cloudcontrollerv2.Query{
-						Filter:   cloudcontrollerv2.ServiceInstanceGUIDFilter,
-						Operator: cloudcontrollerv2.EqualOperator,
+					ccv2.Query{
+						Filter:   ccv2.ServiceInstanceGUIDFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "some-service-instance-guid",
 					},
 				}))
@@ -62,7 +62,7 @@ var _ = Describe("Service Binding Actions", func() {
 
 		Context("when the service binding does not exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceBindingsReturns([]cloudcontrollerv2.ServiceBinding{}, nil, nil)
+				fakeCloudControllerClient.GetServiceBindingsReturns([]ccv2.ServiceBinding{}, nil, nil)
 			})
 
 			It("returns a ServiceBindingNotFoundError", func() {
@@ -79,7 +79,7 @@ var _ = Describe("Service Binding Actions", func() {
 
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
-				fakeCloudControllerClient.GetServiceBindingsReturns([]cloudcontrollerv2.ServiceBinding{}, nil, expectedError)
+				fakeCloudControllerClient.GetServiceBindingsReturns([]ccv2.ServiceBinding{}, nil, expectedError)
 			})
 
 			It("returns the error", func() {
@@ -93,37 +93,37 @@ var _ = Describe("Service Binding Actions", func() {
 		Context("when the service binding exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]cloudcontrollerv2.Application{
+					[]ccv2.Application{
 						{
 							GUID: "some-app-guid",
 							Name: "some-app",
 						},
 					},
-					cloudcontrollerv2.Warnings{"foo-1"},
+					ccv2.Warnings{"foo-1"},
 					nil,
 				)
 				fakeCloudControllerClient.GetServiceInstancesReturns(
-					[]cloudcontrollerv2.ServiceInstance{
+					[]ccv2.ServiceInstance{
 						{
 							GUID: "some-service-instance-guid",
 							Name: "some-service-instance",
 						},
 					},
-					cloudcontrollerv2.Warnings{"foo-2"},
+					ccv2.Warnings{"foo-2"},
 					nil,
 				)
 				fakeCloudControllerClient.GetServiceBindingsReturns(
-					[]cloudcontrollerv2.ServiceBinding{
+					[]ccv2.ServiceBinding{
 						{
 							GUID: "some-service-binding-guid",
 						},
 					},
-					cloudcontrollerv2.Warnings{"foo-3"},
+					ccv2.Warnings{"foo-3"},
 					nil,
 				)
 
 				fakeCloudControllerClient.DeleteServiceBindingReturns(
-					cloudcontrollerv2.Warnings{"foo-4", "foo-5"},
+					ccv2.Warnings{"foo-4", "foo-5"},
 					nil,
 				)
 			})
@@ -140,7 +140,7 @@ var _ = Describe("Service Binding Actions", func() {
 				var expectedError error
 				BeforeEach(func() {
 					expectedError = errors.New("I am a CC error")
-					fakeCloudControllerClient.DeleteServiceBindingReturns(cloudcontrollerv2.Warnings{"foo-4"}, expectedError)
+					fakeCloudControllerClient.DeleteServiceBindingReturns(ccv2.Warnings{"foo-4"}, expectedError)
 				})
 
 				It("returns the error", func() {

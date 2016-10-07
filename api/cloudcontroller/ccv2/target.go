@@ -1,4 +1,4 @@
-package cloudcontrollerv2
+package ccv2
 
 type APIInformation struct {
 	APIVersion                   string `json:"api_version"`

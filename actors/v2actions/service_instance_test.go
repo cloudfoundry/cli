@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/actors/v2actions/v2actionsfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,13 +26,13 @@ var _ = Describe("Service Instance Actions", func() {
 		Context("when the service instance exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetServiceInstancesReturns(
-					[]cloudcontrollerv2.ServiceInstance{
+					[]ccv2.ServiceInstance{
 						{
 							GUID: "some-service-instance-guid",
 							Name: "some-service-instance",
 						},
 					},
-					cloudcontrollerv2.Warnings{"foo"},
+					ccv2.Warnings{"foo"},
 					nil,
 				)
 			})
@@ -47,15 +47,15 @@ var _ = Describe("Service Instance Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"foo"}))
 
 				Expect(fakeCloudControllerClient.GetServiceInstancesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf([]cloudcontrollerv2.Query{
-					cloudcontrollerv2.Query{
-						Filter:   cloudcontrollerv2.NameFilter,
-						Operator: cloudcontrollerv2.EqualOperator,
+				Expect(fakeCloudControllerClient.GetServiceInstancesArgsForCall(0)).To(ConsistOf([]ccv2.Query{
+					ccv2.Query{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "some-service-instance",
 					},
-					cloudcontrollerv2.Query{
-						Filter:   cloudcontrollerv2.SpaceGUIDFilter,
-						Operator: cloudcontrollerv2.EqualOperator,
+					ccv2.Query{
+						Filter:   ccv2.SpaceGUIDFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "some-space-guid",
 					},
 				}))
@@ -64,7 +64,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 		Context("when the service instance does not exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetServiceInstancesReturns([]cloudcontrollerv2.ServiceInstance{}, nil, nil)
+				fakeCloudControllerClient.GetServiceInstancesReturns([]ccv2.ServiceInstance{}, nil, nil)
 			})
 
 			It("returns a ServiceInstanceNotFoundError", func() {
@@ -78,7 +78,7 @@ var _ = Describe("Service Instance Actions", func() {
 
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
-				fakeCloudControllerClient.GetServiceInstancesReturns([]cloudcontrollerv2.ServiceInstance{}, nil, expectedError)
+				fakeCloudControllerClient.GetServiceInstancesReturns([]ccv2.ServiceInstance{}, nil, expectedError)
 			})
 
 			It("returns the error", func() {

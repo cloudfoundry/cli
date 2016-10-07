@@ -5,7 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/actors/v2actions/v2actionsfakes"
-	"code.cloudfoundry.org/cli/api/cloudcontrollerv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,13 +26,13 @@ var _ = Describe("Application Actions", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetApplicationsReturns(
-					[]cloudcontrollerv2.Application{
+					[]ccv2.Application{
 						{
 							GUID: "some-app-guid",
 							Name: "some-app",
 						},
 					},
-					cloudcontrollerv2.Warnings{"foo"},
+					ccv2.Warnings{"foo"},
 					nil,
 				)
 			})
@@ -47,15 +47,15 @@ var _ = Describe("Application Actions", func() {
 				Expect(warnings).To(Equal(Warnings{"foo"}))
 
 				Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]cloudcontrollerv2.Query{
-					cloudcontrollerv2.Query{
-						Filter:   cloudcontrollerv2.NameFilter,
-						Operator: cloudcontrollerv2.EqualOperator,
+				Expect(fakeCloudControllerClient.GetApplicationsArgsForCall(0)).To(ConsistOf([]ccv2.Query{
+					ccv2.Query{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "some-app",
 					},
-					cloudcontrollerv2.Query{
-						Filter:   cloudcontrollerv2.SpaceGUIDFilter,
-						Operator: cloudcontrollerv2.EqualOperator,
+					ccv2.Query{
+						Filter:   ccv2.SpaceGUIDFilter,
+						Operator: ccv2.EqualOperator,
 						Value:    "some-space-guid",
 					},
 				}))
@@ -64,7 +64,7 @@ var _ = Describe("Application Actions", func() {
 
 		Context("when the application does not exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetApplicationsReturns([]cloudcontrollerv2.Application{}, nil, nil)
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv2.Application{}, nil, nil)
 			})
 
 			It("returns an ApplicationNotFoundError", func() {
@@ -78,7 +78,7 @@ var _ = Describe("Application Actions", func() {
 
 			BeforeEach(func() {
 				expectedError = errors.New("I am a CloudControllerClient Error")
-				fakeCloudControllerClient.GetApplicationsReturns([]cloudcontrollerv2.Application{}, nil, expectedError)
+				fakeCloudControllerClient.GetApplicationsReturns([]ccv2.Application{}, nil, expectedError)
 			})
 
 			It("returns the error", func() {
