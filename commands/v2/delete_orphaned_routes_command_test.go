@@ -108,8 +108,8 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 				It("does not delete orphaned routes", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeActor.GetOrphanedRoutesCallCount()).To(Equal(0))
-					Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
+					Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(0))
+					Expect(fakeActor.DeleteRouteByGUIDCallCount()).To(Equal(0))
 				})
 			})
 
@@ -137,7 +137,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 						},
 					}
 
-					fakeActor.GetOrphanedRoutesReturns(routes, nil, nil)
+					fakeActor.GetOrphanedRoutesBySpaceReturns(routes, nil, nil)
 				})
 
 				Context("when getting the current user returns an error", func() {
@@ -162,11 +162,11 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 				It("deletes the routes and displays that they are deleted", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeActor.GetOrphanedRoutesCallCount()).To(Equal(1))
-					Expect(fakeActor.GetOrphanedRoutesArgsForCall(0)).To(Equal("some-space-guid"))
-					Expect(fakeActor.DeleteRouteCallCount()).To(Equal(2))
-					Expect(fakeActor.DeleteRouteArgsForCall(0)).To(Equal(routes[0].GUID))
-					Expect(fakeActor.DeleteRouteArgsForCall(1)).To(Equal(routes[1].GUID))
+					Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(1))
+					Expect(fakeActor.GetOrphanedRoutesBySpaceArgsForCall(0)).To(Equal("some-space-guid"))
+					Expect(fakeActor.DeleteRouteByGUIDCallCount()).To(Equal(2))
+					Expect(fakeActor.DeleteRouteByGUIDArgsForCall(0)).To(Equal(routes[0].GUID))
+					Expect(fakeActor.DeleteRouteByGUIDArgsForCall(1)).To(Equal(routes[1].GUID))
 
 					Expect(fakeUI.Out).To(Say("Deleting route route-1.bosh-lite.com/path..."))
 					Expect(fakeUI.Out).To(Say("Deleting route route-2.bosh-lite.com..."))
@@ -175,10 +175,10 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 				Context("when there are warnings", func() {
 					BeforeEach(func() {
-						fakeActor.GetOrphanedRoutesReturns([]v2actions.Route{
+						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2actions.Route{
 							{GUID: "some-route-guid"},
 						}, []string{"foo", "bar"}, nil)
-						fakeActor.DeleteRouteReturns([]string{"baz"}, nil)
+						fakeActor.DeleteRouteByGUIDReturns([]string{"baz"}, nil)
 					})
 
 					It("displays the warnings", func() {
@@ -195,7 +195,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("getting orphaned routes error")
-						fakeActor.GetOrphanedRoutesReturns(nil, nil, expectedErr)
+						fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
 					})
 
 					It("returns the error", func() {
@@ -208,10 +208,10 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("deleting route error")
-						fakeActor.GetOrphanedRoutesReturns([]v2actions.Route{
+						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2actions.Route{
 							{GUID: "some-route-guid"},
 						}, nil, nil)
-						fakeActor.DeleteRouteReturns(nil, expectedErr)
+						fakeActor.DeleteRouteByGUIDReturns(nil, expectedErr)
 					})
 
 					It("returns the error", func() {
