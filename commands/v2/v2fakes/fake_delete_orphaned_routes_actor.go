@@ -9,22 +9,22 @@ import (
 )
 
 type FakeDeleteOrphanedRoutesActor struct {
-	GetOrphanedRoutesStub        func(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error)
-	getOrphanedRoutesMutex       sync.RWMutex
-	getOrphanedRoutesArgsForCall []struct {
+	GetOrphanedRoutesBySpaceStub        func(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error)
+	getOrphanedRoutesBySpaceMutex       sync.RWMutex
+	getOrphanedRoutesBySpaceArgsForCall []struct {
 		spaceGUID string
 	}
-	getOrphanedRoutesReturns struct {
+	getOrphanedRoutesBySpaceReturns struct {
 		result1 []v2actions.Route
 		result2 v2actions.Warnings
 		result3 error
 	}
-	DeleteRouteStub        func(routeGUID string) (v2actions.Warnings, error)
-	deleteRouteMutex       sync.RWMutex
-	deleteRouteArgsForCall []struct {
+	DeleteRouteByGUIDStub        func(routeGUID string) (v2actions.Warnings, error)
+	deleteRouteByGUIDMutex       sync.RWMutex
+	deleteRouteByGUIDArgsForCall []struct {
 		routeGUID string
 	}
-	deleteRouteReturns struct {
+	deleteRouteByGUIDReturns struct {
 		result1 v2actions.Warnings
 		result2 error
 	}
@@ -32,70 +32,70 @@ type FakeDeleteOrphanedRoutesActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutes(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error) {
-	fake.getOrphanedRoutesMutex.Lock()
-	fake.getOrphanedRoutesArgsForCall = append(fake.getOrphanedRoutesArgsForCall, struct {
+func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesBySpace(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error) {
+	fake.getOrphanedRoutesBySpaceMutex.Lock()
+	fake.getOrphanedRoutesBySpaceArgsForCall = append(fake.getOrphanedRoutesBySpaceArgsForCall, struct {
 		spaceGUID string
 	}{spaceGUID})
-	fake.recordInvocation("GetOrphanedRoutes", []interface{}{spaceGUID})
-	fake.getOrphanedRoutesMutex.Unlock()
-	if fake.GetOrphanedRoutesStub != nil {
-		return fake.GetOrphanedRoutesStub(spaceGUID)
+	fake.recordInvocation("GetOrphanedRoutesBySpace", []interface{}{spaceGUID})
+	fake.getOrphanedRoutesBySpaceMutex.Unlock()
+	if fake.GetOrphanedRoutesBySpaceStub != nil {
+		return fake.GetOrphanedRoutesBySpaceStub(spaceGUID)
 	} else {
-		return fake.getOrphanedRoutesReturns.result1, fake.getOrphanedRoutesReturns.result2, fake.getOrphanedRoutesReturns.result3
+		return fake.getOrphanedRoutesBySpaceReturns.result1, fake.getOrphanedRoutesBySpaceReturns.result2, fake.getOrphanedRoutesBySpaceReturns.result3
 	}
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesCallCount() int {
-	fake.getOrphanedRoutesMutex.RLock()
-	defer fake.getOrphanedRoutesMutex.RUnlock()
-	return len(fake.getOrphanedRoutesArgsForCall)
+func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesBySpaceCallCount() int {
+	fake.getOrphanedRoutesBySpaceMutex.RLock()
+	defer fake.getOrphanedRoutesBySpaceMutex.RUnlock()
+	return len(fake.getOrphanedRoutesBySpaceArgsForCall)
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesArgsForCall(i int) string {
-	fake.getOrphanedRoutesMutex.RLock()
-	defer fake.getOrphanedRoutesMutex.RUnlock()
-	return fake.getOrphanedRoutesArgsForCall[i].spaceGUID
+func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesBySpaceArgsForCall(i int) string {
+	fake.getOrphanedRoutesBySpaceMutex.RLock()
+	defer fake.getOrphanedRoutesBySpaceMutex.RUnlock()
+	return fake.getOrphanedRoutesBySpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesReturns(result1 []v2actions.Route, result2 v2actions.Warnings, result3 error) {
-	fake.GetOrphanedRoutesStub = nil
-	fake.getOrphanedRoutesReturns = struct {
+func (fake *FakeDeleteOrphanedRoutesActor) GetOrphanedRoutesBySpaceReturns(result1 []v2actions.Route, result2 v2actions.Warnings, result3 error) {
+	fake.GetOrphanedRoutesBySpaceStub = nil
+	fake.getOrphanedRoutesBySpaceReturns = struct {
 		result1 []v2actions.Route
 		result2 v2actions.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) DeleteRoute(routeGUID string) (v2actions.Warnings, error) {
-	fake.deleteRouteMutex.Lock()
-	fake.deleteRouteArgsForCall = append(fake.deleteRouteArgsForCall, struct {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteByGUID(routeGUID string) (v2actions.Warnings, error) {
+	fake.deleteRouteByGUIDMutex.Lock()
+	fake.deleteRouteByGUIDArgsForCall = append(fake.deleteRouteByGUIDArgsForCall, struct {
 		routeGUID string
 	}{routeGUID})
-	fake.recordInvocation("DeleteRoute", []interface{}{routeGUID})
-	fake.deleteRouteMutex.Unlock()
-	if fake.DeleteRouteStub != nil {
-		return fake.DeleteRouteStub(routeGUID)
+	fake.recordInvocation("DeleteRouteByGUID", []interface{}{routeGUID})
+	fake.deleteRouteByGUIDMutex.Unlock()
+	if fake.DeleteRouteByGUIDStub != nil {
+		return fake.DeleteRouteByGUIDStub(routeGUID)
 	} else {
-		return fake.deleteRouteReturns.result1, fake.deleteRouteReturns.result2
+		return fake.deleteRouteByGUIDReturns.result1, fake.deleteRouteByGUIDReturns.result2
 	}
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteCallCount() int {
-	fake.deleteRouteMutex.RLock()
-	defer fake.deleteRouteMutex.RUnlock()
-	return len(fake.deleteRouteArgsForCall)
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteByGUIDCallCount() int {
+	fake.deleteRouteByGUIDMutex.RLock()
+	defer fake.deleteRouteByGUIDMutex.RUnlock()
+	return len(fake.deleteRouteByGUIDArgsForCall)
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteArgsForCall(i int) string {
-	fake.deleteRouteMutex.RLock()
-	defer fake.deleteRouteMutex.RUnlock()
-	return fake.deleteRouteArgsForCall[i].routeGUID
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteByGUIDArgsForCall(i int) string {
+	fake.deleteRouteByGUIDMutex.RLock()
+	defer fake.deleteRouteByGUIDMutex.RUnlock()
+	return fake.deleteRouteByGUIDArgsForCall[i].routeGUID
 }
 
-func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteReturns(result1 v2actions.Warnings, result2 error) {
-	fake.DeleteRouteStub = nil
-	fake.deleteRouteReturns = struct {
+func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteByGUIDReturns(result1 v2actions.Warnings, result2 error) {
+	fake.DeleteRouteByGUIDStub = nil
+	fake.deleteRouteByGUIDReturns = struct {
 		result1 v2actions.Warnings
 		result2 error
 	}{result1, result2}
@@ -104,10 +104,10 @@ func (fake *FakeDeleteOrphanedRoutesActor) DeleteRouteReturns(result1 v2actions.
 func (fake *FakeDeleteOrphanedRoutesActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getOrphanedRoutesMutex.RLock()
-	defer fake.getOrphanedRoutesMutex.RUnlock()
-	fake.deleteRouteMutex.RLock()
-	defer fake.deleteRouteMutex.RUnlock()
+	fake.getOrphanedRoutesBySpaceMutex.RLock()
+	defer fake.getOrphanedRoutesBySpaceMutex.RUnlock()
+	fake.deleteRouteByGUIDMutex.RLock()
+	defer fake.deleteRouteByGUIDMutex.RUnlock()
 	return fake.invocations
 }
 

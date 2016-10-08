@@ -12,8 +12,8 @@ import (
 //go:generate counterfeiter . DeleteOrphanedRoutesActor
 
 type DeleteOrphanedRoutesActor interface {
-	GetOrphanedRoutes(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error)
-	DeleteRoute(routeGUID string) (v2actions.Warnings, error)
+	GetOrphanedRoutesBySpace(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error)
+	DeleteRouteByGUID(routeGUID string) (v2actions.Warnings, error)
 }
 
 type DeleteOrphanedRoutesCommand struct {
@@ -73,7 +73,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	routes, warnings, err := cmd.Actor.GetOrphanedRoutes(cmd.Config.TargetedSpace().GUID)
+	routes, warnings, err := cmd.Actor.GetOrphanedRoutesBySpace(cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 			"Route": route.String(),
 		})
 
-		warnings, err = cmd.Actor.DeleteRoute(route.GUID)
+		warnings, err = cmd.Actor.DeleteRouteByGUID(route.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return err

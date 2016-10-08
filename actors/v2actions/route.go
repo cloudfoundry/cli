@@ -10,11 +10,11 @@ type Route struct {
 	Port     int
 }
 
-func (actor Actor) GetOrphanedRoutes(spaceGUID string) ([]Route, Warnings, error) {
+func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings, error) {
 	return nil, nil, nil
 }
 
-func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
+func (actor Actor) DeleteRouteByGUID(routeGUID string) (Warnings, error) {
 	return nil, nil
 }
 
