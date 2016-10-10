@@ -30,7 +30,7 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 
 func (client *CloudControllerClient) GetApplications(queryParams []Query) ([]Application, Warnings, error) {
 	request := cloudcontroller.Request{
-		RequestName: AppsRequest,
+		RequestName: internal.AppsRequest,
 		Query:       FormatQueryParameters(queryParams),
 	}
 

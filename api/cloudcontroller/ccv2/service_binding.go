@@ -26,7 +26,7 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 
 func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
 	request := cloudcontroller.Request{
-		RequestName: ServiceBindingsRequest,
+		RequestName: internal.ServiceBindingsRequest,
 		Query:       FormatQueryParameters(queries),
 	}
 
@@ -64,7 +64,7 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 
 func (client *CloudControllerClient) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
 	request := cloudcontroller.Request{
-		RequestName: DeleteServiceBindingRequest,
+		RequestName: internal.DeleteServiceBindingRequest,
 		Params:      map[string]string{"service_binding_guid": serviceBindingGUID},
 	}
 
