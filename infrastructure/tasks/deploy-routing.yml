@@ -36,16 +36,12 @@ run:
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD upload release cf-routing-release/release.tgz --skip-if-exists
 
-    pushd cf-release-repo
-      ./scripts/generate-bosh-lite-dev-manifest
-    popd
-
     cd cf-routing-release-repo
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $cf_deployment_name $cf_deployment_file
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD download manifest $diego_deployment_name $diego_deployment_file
 
-    ./scripts/generate-bosh-lite-manifest $cf_deployment_file $diego_deployment_file
+    ./scripts/generate-bosh-lite-manifest -c $cf_deployment_file -d $diego_deployment_file
 
     bosh -n -u $ADMIN_USER -p $ADMIN_PASSWORD deploy
 
