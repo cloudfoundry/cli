@@ -101,6 +101,7 @@ var _ = Describe("Config", func() {
 				Expect(config.SkipSSLValidation()).To(BeTrue())
 			})
 		})
+
 		Describe("AccessToken", func() {
 			var config *Config
 
@@ -134,6 +135,20 @@ var _ = Describe("Config", func() {
 
 			It("returns fields directly from config", func() {
 				Expect(config.RefreshToken()).To(Equal("some-token"))
+			})
+		})
+
+		Describe("ClientID", func() {
+			It("returns the client ID", func() {
+				var config Config
+				Expect(config.ClientID()).To(Equal("cf"))
+			})
+		})
+
+		Describe("ClientSecret", func() {
+			It("returns the client secret", func() {
+				var config Config
+				Expect(config.ClientSecret()).To(BeEmpty())
 			})
 		})
 
@@ -338,6 +353,14 @@ var _ = Describe("Config", func() {
 				Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
 				Expect(config.ConfigFile.RefreshToken).To(Equal("I am the refresh token"))
 				Expect(config.ConfigFile.SSHOAuthClient).To(Equal("I am the SSH OAuth client"))
+			})
+		})
+
+		Describe("SetAccessToken", func() {
+			It("sets the authentication token information", func() {
+				var config Config
+				config.SetAccessToken("I am the access token")
+				Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
 			})
 		})
 
