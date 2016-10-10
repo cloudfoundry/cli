@@ -17,7 +17,7 @@ type APIInformation struct {
 func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
 	client.cloudControllerURL = APIURL
 
-	client.connection = cloudcontroller.NewConnection(client.cloudControllerURL, routes, skipSSLValidation)
+	client.connection = cloudcontroller.NewConnection(client.cloudControllerURL, apiRoutes, skipSSLValidation)
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
 	request := cloudcontroller.Request{
