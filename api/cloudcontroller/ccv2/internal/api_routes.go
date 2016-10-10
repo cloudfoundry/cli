@@ -1,4 +1,4 @@
-package ccv2
+package internal
 
 import "github.com/tedsuo/rata"
 
@@ -10,7 +10,7 @@ const (
 	DeleteServiceBindingRequest = "DeleteServiceBinding"
 )
 
-var apiRoutes = rata.Routes{
+var APIRoutes = rata.Routes{
 	{Path: "/v2/info", Method: "GET", Name: InfoRequest},
 	{Path: "/v2/apps", Method: "GET", Name: AppsRequest},
 	{Path: "/v2/service_instances", Method: "GET", Name: ServiceInstancesRequest},

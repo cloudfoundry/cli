@@ -31,7 +31,7 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 
 func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
 	request := cloudcontroller.Request{
-		RequestName: ServiceInstancesRequest,
+		RequestName: internal.ServiceInstancesRequest,
 		Query:       FormatQueryParameters(queries),
 	}
 
