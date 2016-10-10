@@ -7,24 +7,24 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 )
 
-type FakeAuthenticationStore struct {
+type FakeUAAClient struct {
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct{}
 	accessTokenReturns     struct {
 		result1 string
 	}
-	RefreshTokenStub        func() string
+	RefreshTokenStub        func() error
 	refreshTokenMutex       sync.RWMutex
 	refreshTokenArgsForCall []struct{}
 	refreshTokenReturns     struct {
-		result1 string
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeAuthenticationStore) AccessToken() string {
+func (fake *FakeUAAClient) AccessToken() string {
 	fake.accessTokenMutex.Lock()
 	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
 	fake.recordInvocation("AccessToken", []interface{}{})
@@ -36,20 +36,20 @@ func (fake *FakeAuthenticationStore) AccessToken() string {
 	}
 }
 
-func (fake *FakeAuthenticationStore) AccessTokenCallCount() int {
+func (fake *FakeUAAClient) AccessTokenCallCount() int {
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
 	return len(fake.accessTokenArgsForCall)
 }
 
-func (fake *FakeAuthenticationStore) AccessTokenReturns(result1 string) {
+func (fake *FakeUAAClient) AccessTokenReturns(result1 string) {
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeAuthenticationStore) RefreshToken() string {
+func (fake *FakeUAAClient) RefreshToken() error {
 	fake.refreshTokenMutex.Lock()
 	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
 	fake.recordInvocation("RefreshToken", []interface{}{})
@@ -61,20 +61,20 @@ func (fake *FakeAuthenticationStore) RefreshToken() string {
 	}
 }
 
-func (fake *FakeAuthenticationStore) RefreshTokenCallCount() int {
+func (fake *FakeUAAClient) RefreshTokenCallCount() int {
 	fake.refreshTokenMutex.RLock()
 	defer fake.refreshTokenMutex.RUnlock()
 	return len(fake.refreshTokenArgsForCall)
 }
 
-func (fake *FakeAuthenticationStore) RefreshTokenReturns(result1 string) {
+func (fake *FakeUAAClient) RefreshTokenReturns(result1 error) {
 	fake.RefreshTokenStub = nil
 	fake.refreshTokenReturns = struct {
-		result1 string
+		result1 error
 	}{result1}
 }
 
-func (fake *FakeAuthenticationStore) Invocations() map[string][][]interface{} {
+func (fake *FakeUAAClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
@@ -84,7 +84,7 @@ func (fake *FakeAuthenticationStore) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *FakeAuthenticationStore) recordInvocation(key string, args []interface{}) {
+func (fake *FakeUAAClient) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -96,4 +96,4 @@ func (fake *FakeAuthenticationStore) recordInvocation(key string, args []interfa
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ wrapper.AuthenticationStore = new(FakeAuthenticationStore)
+var _ wrapper.UAAClient = new(FakeUAAClient)

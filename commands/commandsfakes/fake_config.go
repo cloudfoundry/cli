@@ -27,6 +27,18 @@ type FakeConfig struct {
 	binaryNameReturns     struct {
 		result1 string
 	}
+	ClientIDStub        func() string
+	clientIDMutex       sync.RWMutex
+	clientIDArgsForCall []struct{}
+	clientIDReturns     struct {
+		result1 string
+	}
+	ClientSecretStub        func() string
+	clientSecretMutex       sync.RWMutex
+	clientSecretArgsForCall []struct{}
+	clientSecretReturns     struct {
+		result1 string
+	}
 	ColorEnabledStub        func() configv3.ColorSetting
 	colorEnabledMutex       sync.RWMutex
 	colorEnabledArgsForCall []struct{}
@@ -63,6 +75,11 @@ type FakeConfig struct {
 	refreshTokenArgsForCall []struct{}
 	refreshTokenReturns     struct {
 		result1 string
+	}
+	SetAccessTokenStub        func(token string)
+	setAccessTokenMutex       sync.RWMutex
+	setAccessTokenArgsForCall []struct {
+		token string
 	}
 	SetTargetInformationStub        func(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	setTargetInformationMutex       sync.RWMutex
@@ -182,6 +199,56 @@ func (fake *FakeConfig) BinaryNameCallCount() int {
 func (fake *FakeConfig) BinaryNameReturns(result1 string) {
 	fake.BinaryNameStub = nil
 	fake.binaryNameReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) ClientID() string {
+	fake.clientIDMutex.Lock()
+	fake.clientIDArgsForCall = append(fake.clientIDArgsForCall, struct{}{})
+	fake.recordInvocation("ClientID", []interface{}{})
+	fake.clientIDMutex.Unlock()
+	if fake.ClientIDStub != nil {
+		return fake.ClientIDStub()
+	} else {
+		return fake.clientIDReturns.result1
+	}
+}
+
+func (fake *FakeConfig) ClientIDCallCount() int {
+	fake.clientIDMutex.RLock()
+	defer fake.clientIDMutex.RUnlock()
+	return len(fake.clientIDArgsForCall)
+}
+
+func (fake *FakeConfig) ClientIDReturns(result1 string) {
+	fake.ClientIDStub = nil
+	fake.clientIDReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) ClientSecret() string {
+	fake.clientSecretMutex.Lock()
+	fake.clientSecretArgsForCall = append(fake.clientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("ClientSecret", []interface{}{})
+	fake.clientSecretMutex.Unlock()
+	if fake.ClientSecretStub != nil {
+		return fake.ClientSecretStub()
+	} else {
+		return fake.clientSecretReturns.result1
+	}
+}
+
+func (fake *FakeConfig) ClientSecretCallCount() int {
+	fake.clientSecretMutex.RLock()
+	defer fake.clientSecretMutex.RUnlock()
+	return len(fake.clientSecretArgsForCall)
+}
+
+func (fake *FakeConfig) ClientSecretReturns(result1 string) {
+	fake.ClientSecretStub = nil
+	fake.clientSecretReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -335,6 +402,30 @@ func (fake *FakeConfig) RefreshTokenReturns(result1 string) {
 	fake.refreshTokenReturns = struct {
 		result1 string
 	}{result1}
+}
+
+func (fake *FakeConfig) SetAccessToken(token string) {
+	fake.setAccessTokenMutex.Lock()
+	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
+		token string
+	}{token})
+	fake.recordInvocation("SetAccessToken", []interface{}{token})
+	fake.setAccessTokenMutex.Unlock()
+	if fake.SetAccessTokenStub != nil {
+		fake.SetAccessTokenStub(token)
+	}
+}
+
+func (fake *FakeConfig) SetAccessTokenCallCount() int {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return len(fake.setAccessTokenArgsForCall)
+}
+
+func (fake *FakeConfig) SetAccessTokenArgsForCall(i int) string {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return fake.setAccessTokenArgsForCall[i].token
 }
 
 func (fake *FakeConfig) SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool) {
@@ -503,6 +594,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.accessTokenMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
+	fake.clientIDMutex.RLock()
+	defer fake.clientIDMutex.RUnlock()
+	fake.clientSecretMutex.RLock()
+	defer fake.clientSecretMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()
@@ -515,6 +610,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.pluginsMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
 	defer fake.refreshTokenMutex.RUnlock()
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setTargetInformationMutex.RLock()
 	defer fake.setTargetInformationMutex.RUnlock()
 	fake.setTokenInformationMutex.RLock()

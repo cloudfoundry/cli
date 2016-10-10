@@ -15,7 +15,9 @@ const (
 	DefaultStartupTimeout = 5 * time.Minute
 	// DefaultPingerThrottle = 5 * time.Second
 
-	DefaultTarget = ""
+	DefaultTarget   = ""
+	UAAClientID     = "cf"
+	UAAClientSecret = ""
 )
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
@@ -207,6 +209,16 @@ func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
 }
 
+// ClientID returns the CLI's UAA client ID
+func (config *Config) ClientID() string {
+	return UAAClientID
+}
+
+// ClientSecret returns the CLI's secret
+func (config *Config) ClientSecret() string {
+	return UAAClientSecret
+}
+
 // APIVersion returns the CC API Version
 func (config *Config) APIVersion() string {
 	return config.ConfigFile.APIVersion
@@ -318,4 +330,9 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 	config.ConfigFile.AccessToken = accessToken
 	config.ConfigFile.RefreshToken = refreshToken
 	config.ConfigFile.SSHOAuthClient = sshOAuthClient
+}
+
+// SetAccessToken sets the current access token
+func (config *Config) SetAccessToken(accessToken string) {
+	config.ConfigFile.AccessToken = accessToken
 }
