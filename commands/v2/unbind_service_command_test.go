@@ -49,7 +49,7 @@ var _ = Describe("Unbind Service Command", func() {
 		})
 
 		It("returns an error if the check fails", func() {
-			Expect(executeErr).To(MatchError(common.NoAPISetError{
+			Expect(executeErr).To(MatchError(common.NotLoggedInError{
 				BinaryName: "faceman",
 			}))
 		})

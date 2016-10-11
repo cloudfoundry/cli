@@ -22,15 +22,6 @@ var _ = Describe("CheckTarget", func() {
 		fakeConfig.BinaryNameReturns(binaryName)
 	})
 
-	Context("when the api endpoint is not set", func() {
-		It("returns an error", func() {
-			err := CheckTarget(fakeConfig, false, false)
-			Expect(err).To(MatchError(NoAPISetError{
-				BinaryName: binaryName,
-			}))
-		})
-	})
-
 	Context("when the api endpoint is set", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")

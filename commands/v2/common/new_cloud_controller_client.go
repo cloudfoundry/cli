@@ -8,6 +8,12 @@ import (
 )
 
 func NewCloudControllerClient(config commands.Config) (*ccv2.CloudControllerClient, error) {
+	if config.Target() == "" {
+		return nil, NoAPISetError{
+			BinaryName: config.BinaryName(),
+		}
+	}
+
 	client := ccv2.NewCloudControllerClient()
 	_, err := client.TargetCF(config.Target(), config.SkipSSLValidation())
 	if err != nil {
