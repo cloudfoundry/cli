@@ -128,7 +128,7 @@ run:
 
     export CONFIG=$PWD/integration_config.json
 
-    SKIPS="-skip="
+    SKIPS="-skip=Config|"
     $SKIP_SSO && SKIPS="${SKIPS}SSO|"
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
