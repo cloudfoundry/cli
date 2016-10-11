@@ -69,7 +69,7 @@ func (e NoTargetedOrgError) Error() string {
 
 func (e NoTargetedOrgError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"Command": fmt.Sprintf("%s login", e.BinaryName),
+		"Command": fmt.Sprintf("%s target -o ORG", e.BinaryName),
 	})
 }
 
@@ -83,7 +83,7 @@ func (e NoTargetedSpaceError) Error() string {
 
 func (e NoTargetedSpaceError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
-		"Command": fmt.Sprintf("%s login", e.BinaryName),
+		"Command": fmt.Sprintf("%s target -s SPACE", e.BinaryName),
 	})
 }
 
