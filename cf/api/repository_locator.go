@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 	"net/http"
+	"time"
 
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/appevents"
@@ -82,6 +83,8 @@ type RepositoryLocator struct {
 	v3Repository repository.Repository
 }
 
+const noaaRetryTimeout = 15 * time.Second
+
 func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer) (loc RepositoryLocator) {
 	strategy := strategy.NewEndpointStrategy(config.APIVersion())
 
@@ -112,7 +115,7 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	if apiVersion.GTE(cf.NoaaMinimumAPIVersion) {
 		consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
-		loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo)
+		loc.logsRepo = logs.NewNoaaLogsRepository(config, consumer, loc.authRepo, noaaRetryTimeout)
 	} else {
 		consumer := loggregator_consumer.New(config.LoggregatorEndpoint(), tlsConfig, http.ProxyFromEnvironment)
 		consumer.SetDebugPrinter(terminal.DebugPrinter{Logger: logger})
