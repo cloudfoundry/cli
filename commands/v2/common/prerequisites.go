@@ -7,12 +7,6 @@ import (
 // CheckTarget confirms that the config has an API set and the user is logged
 // in. Optionally it will also check if an organization and space are targeted.
 func CheckTarget(config commands.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
-	if config.Target() == "" {
-		return NoAPISetError{
-			BinaryName: config.BinaryName(),
-		}
-	}
-
 	if config.AccessToken() == "" && config.RefreshToken() == "" {
 		return NotLoggedInError{
 			BinaryName: config.BinaryName(),
