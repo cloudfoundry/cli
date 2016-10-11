@@ -1,0 +1,53 @@
+package uaa
+
+import (
+	"fmt"
+	"net/http"
+	"net/url"
+	"strings"
+
+	"code.cloudfoundry.org/cli/api/uaa/internal"
+)
+
+// RefreshTokenResponse represents the UAA refresh token response
+type RefreshTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+}
+
+// AuthorizationToken returns formatted authorization header
+func (refreshTokenResponse RefreshTokenResponse) AuthorizationToken() string {
+	return fmt.Sprintf("%s %s", refreshTokenResponse.TokenType, refreshTokenResponse.AccessToken)
+}
+
+// RefreshToken refreshes the current access token
+func (client *Client) RefreshToken() error {
+	body := strings.NewReader(url.Values{
+		"client_id":     {client.store.ClientID()},
+		"client_secret": {client.store.ClientSecret()},
+		"grant_type":    {"refresh_token"},
+		"refresh_token": {client.store.RefreshToken()},
+	}.Encode())
+
+	request := NewRequest(
+		internal.RefreshTokenRequest,
+		nil,
+		http.Header{
+			"Content-Type": {"application/x-www-form-urlencoded"},
+		},
+		nil,
+		body,
+	)
+
+	var refreshResponse RefreshTokenResponse
+	response := Response{
+		Result: &refreshResponse,
+	}
+	err := client.connection.Make(request, &response)
+	if err != nil {
+		return err
+	}
+
+	client.store.SetAccessToken(refreshResponse.AuthorizationToken())
+	return nil
+}

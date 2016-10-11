@@ -60,7 +60,7 @@ type errorWrapper struct {
 }
 
 func newErrorWrapper() *errorWrapper {
-	return &errorWrapper{}
+	return new(errorWrapper)
 }
 
 func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
