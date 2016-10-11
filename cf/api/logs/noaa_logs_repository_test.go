@@ -2,7 +2,6 @@ package logs_test
 
 import (
 	"errors"
-	"reflect"
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -185,7 +184,7 @@ var _ = Describe("logs with noaa repository", func() {
 				Eventually(errChan, time.Second).Should(Receive(Equal(expectedErr)))
 			})
 
-			It("Resets the retry timeout after receiving a valid message", func() {
+			It("Resets the retry timeout after a successful reconnection", func() {
 				defer repo.Close()
 				err := noaaerrors.NewRetryError(errors.New("oops"))
 
@@ -203,6 +202,8 @@ var _ = Describe("logs with noaa repository", func() {
 				}()
 
 				Consistently(errChan, time.Second).ShouldNot(Receive())
+				fakeNoaaConsumer.SetOnConnectCallbackArgsForCall(0)()
+
 				c <- makeNoaaLogMessage("foo", 100)
 				Eventually(logChan).Should(Receive())
 				Consistently(errChan, time.Second).ShouldNot(Receive())
@@ -251,12 +252,17 @@ var _ = Describe("logs with noaa repository", func() {
 
 				fakeNoaaConsumer.TailingLogsReturns(c, e)
 
-				var cb = func() { return }
+				callbackCalled := make(chan struct{})
+				var cb = func() {
+					close(callbackCalled)
+					return
+				}
 				repo.TailLogsFor("app-guid", cb, logChan, errChan)
 
 				Expect(fakeNoaaConsumer.SetOnConnectCallbackCallCount()).To(Equal(1))
 				arg := fakeNoaaConsumer.SetOnConnectCallbackArgsForCall(0)
-				Expect(reflect.ValueOf(arg).Pointer() == reflect.ValueOf(cb).Pointer()).To(BeTrue())
+				arg()
+				Expect(callbackCalled).To(BeClosed())
 			})
 		})
 

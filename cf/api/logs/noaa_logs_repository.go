@@ -61,13 +61,17 @@ func (repo *NoaaLogsRepository) RecentLogsFor(appGUID string) ([]Loggable, error
 func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
 	ticker := time.NewTicker(repo.BufferTime)
 	retryTimer := newUnstartedTimer()
+
 	endpoint := repo.config.DopplerEndpoint()
 	if endpoint == "" {
 		errChan <- errors.New(T("Loggregator endpoint missing from config file"))
 		return
 	}
 
-	repo.consumer.SetOnConnectCallback(onConnect)
+	repo.consumer.SetOnConnectCallback(func() {
+		retryTimer.Stop()
+		onConnect()
+	})
 	c, e := repo.consumer.TailingLogs(appGUID, repo.config.AccessToken())
 
 	go func() {
@@ -84,7 +88,6 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 					return
 				}
 				timerRunning = false
-				retryTimer.Stop()
 				repo.messageQueue.PushMessage(msg)
 			case err := <-e:
 				if err != nil {
