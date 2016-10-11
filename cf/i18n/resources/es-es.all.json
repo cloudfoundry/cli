@@ -5284,6 +5284,10 @@
     "translation": "Esto hará que la app se reinicie. ¿Está seguro de que desea escalar {{.AppName}}?"
   },
   {
+    "id": "Timed out waiting for connection to Loggregator",
+    "translation": ""
+  },
+  {
     "id": "Timeout for async HTTP requests",
     "translation": "Tiempo de espera excedido para solicitudes HTTP asíncronas"
   },

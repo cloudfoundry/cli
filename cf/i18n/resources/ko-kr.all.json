@@ -5284,6 +5284,10 @@
     "translation": "앱이 다시 시작되도록 합니다. {{.AppName}}을(를) 스케일링하시겠습니까?"
   },
   {
+    "id": "Timed out waiting for connection to Loggregator",
+    "translation": ""
+  },
+  {
     "id": "Timeout for async HTTP requests",
     "translation": "비동기 HTTP 요청의 제한시간 초과"
   },
