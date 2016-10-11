@@ -22,4 +22,4 @@ popd
 go get -v github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-ginkgo.exe -r -slowSpecThreshold=120 -nodes=2 -skip="NO_DIEGO_SUPPORT|Downloading droplets" . apps backend_compatibility detect docker internet_dependent security_groups ssh routing
+ginkgo.exe -r -slowSpecThreshold=120 -nodes=2 -skip="NO_DIEGO_SUPPORT|Downloading droplets|Config" . apps backend_compatibility detect docker internet_dependent security_groups ssh routing
