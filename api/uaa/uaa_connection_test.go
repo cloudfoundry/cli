@@ -1,9 +1,11 @@
-package cloudcontroller_test
+package uaa_test
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 
-	. "code.cloudfoundry.org/cli/api/cloudcontroller"
+	. "code.cloudfoundry.org/cli/api/uaa"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,9 +18,9 @@ type DummyResponse struct {
 	Val2 int    `json:"val2"`
 }
 
-var _ = Describe("Cloud Controller Connection", func() {
+var _ = Describe("UAA Connection", func() {
 	var (
-		connection *CloudControllerConnection
+		connection *UAAConnection
 		FooRequest string
 		routes     rata.Routes
 	)
@@ -44,26 +46,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 			Context("when passing a RequestName", func() {
 				It("sends the request to the server", func() {
-					request := Request{
-						RequestName: FooRequest,
-						Query: map[string][]string{
-							"q": {"a:b", "c:d"},
-						},
-					}
-
-					err := connection.Make(request, &Response{})
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(server.ReceivedRequests()).To(HaveLen(1))
-				})
-			})
-
-			Context("when passing a URI", func() {
-				It("sends the request to the server", func() {
-					request := Request{
-						URI:    "/v2/foo?q=a:b&q=c:d",
-						Method: "GET",
-					}
+					request := NewRequest(FooRequest, nil, nil, url.Values{"q": {"a:b", "c:d"}})
 
 					err := connection.Make(request, &Response{})
 					Expect(err).NotTo(HaveOccurred())
@@ -77,24 +60,40 @@ var _ = Describe("Cloud Controller Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo", ""),
+						VerifyRequest("GET", "/v2/foo"),
 						VerifyHeaderKV("foo", "bar"),
 						VerifyHeaderKV("accept", "application/json"),
-						VerifyHeaderKV("content-type", "application/json"),
 						RespondWith(http.StatusOK, "{}"),
 					),
 				)
 			})
 
-			Context("when passed headers", func() {
-				It("passes headers to the server", func() {
-					request := Request{
-						URI:    "/v2/foo",
-						Method: "GET",
-						Header: http.Header{
-							"foo": {"bar"},
-						},
-					}
+			Context("when passed request headers", func() {
+				It("merges the request headers and passes them to the server", func() {
+					request := NewRequest(FooRequest, nil, http.Header{"foo": {"bar"}}, nil)
+
+					err := connection.Make(request, &Response{})
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(server.ReceivedRequests()).To(HaveLen(1))
+				})
+			})
+		})
+
+		Describe("Request body", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/foo"),
+						VerifyBody([]byte("some-body-parameters")),
+						RespondWith(http.StatusOK, "{}"),
+					),
+				)
+			})
+
+			Context("when passing a Request body", func() {
+				It("sends the request body to the server", func() {
+					request := NewRequest(FooRequest, nil, nil, nil, strings.NewReader("some-body-parameters"))
 
 					err := connection.Make(request, &Response{})
 					Expect(err).NotTo(HaveOccurred())
@@ -119,10 +118,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					),
 				)
 
-				request = Request{
-					URI:    "/v2/foo",
-					Method: "GET",
-				}
+				request = NewRequest(FooRequest, nil, nil, nil)
 			})
 
 			Context("when passed a response with a result set", func() {
@@ -150,38 +146,6 @@ var _ = Describe("Cloud Controller Connection", func() {
 			})
 		})
 
-		Describe("Response Headers", func() {
-			Describe("X-Cf-Warnings", func() {
-				BeforeEach(func() {
-					server.AppendHandlers(
-						CombineHandlers(
-							VerifyRequest("GET", "/v2/foo"),
-							RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42, Ed McMann, the 1942 doggers"}}),
-						),
-					)
-				})
-
-				It("returns them in Response", func() {
-					request := Request{
-						RequestName: FooRequest,
-					}
-
-					var response Response
-					err := connection.Make(request, &response)
-					Expect(err).NotTo(HaveOccurred())
-
-					Expect(server.ReceivedRequests()).To(HaveLen(1))
-
-					warnings := response.Warnings
-					Expect(warnings).ToNot(BeNil())
-					Expect(warnings).To(HaveLen(3))
-					Expect(warnings).To(ContainElement("42"))
-					Expect(warnings).To(ContainElement("Ed McMann"))
-					Expect(warnings).To(ContainElement("the 1942 doggers"))
-				})
-			})
-		})
-
 		Describe("Errors", func() {
 			Context("when the server does not exist", func() {
 				BeforeEach(func() {
@@ -189,9 +153,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns a RequestError", func() {
-					request := Request{
-						RequestName: FooRequest,
-					}
+					request := NewRequest(FooRequest, nil, nil, nil)
 
 					var response Response
 					err := connection.Make(request, &response)
@@ -216,9 +178,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					})
 
 					It("returns a UnverifiedServerError", func() {
-						request := Request{
-							RequestName: FooRequest,
-						}
+						request := NewRequest(FooRequest, nil, nil, nil)
 
 						var response Response
 						err := connection.Make(request, &response)
@@ -227,33 +187,30 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
-			Describe("RawCCError", func() {
-				var ccResponse string
+			Describe("UAAError", func() {
+				var uaaResponse string
 				BeforeEach(func() {
-					ccResponse = `{
-						"code": 90004,
-						"description": "The service binding could not be found: some-guid",
-						"error_code": "CF-ServiceBindingNotFound"
+					uaaResponse = `{
+						"error":"unauthorized",
+						"error_description":"Bad credentials"
 					}`
 
 					server.AppendHandlers(
 						CombineHandlers(
 							VerifyRequest("GET", "/v2/foo"),
-							RespondWith(http.StatusNotFound, ccResponse),
+							RespondWith(http.StatusUnauthorized, uaaResponse),
 						),
 					)
 				})
 
-				It("returns a CCRawResponse", func() {
-					request := Request{
-						RequestName: FooRequest,
-					}
+				It("returns a UAAError", func() {
+					request := NewRequest(FooRequest, nil, nil, nil)
 
 					var response Response
 					err := connection.Make(request, &response)
-					Expect(err).To(MatchError(RawCCError{
-						StatusCode:  http.StatusNotFound,
-						RawResponse: []byte(ccResponse),
+					Expect(err).To(MatchError(Error{
+						Type:        "unauthorized",
+						Description: "Bad credentials",
 					}))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
