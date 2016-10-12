@@ -1,0 +1,12 @@
+---
+platform: windows
+
+inputs:
+- name: cli-integration
+  path: go/src/code.cloudfoundry.org/cli
+- name: cf-cli-binaries
+- name: bosh-lite-lock
+- name: cli-ci
+
+run:
+  path: cli-ci/ci/cli/tasks/integration-windows.bat
