@@ -66,7 +66,7 @@ func (connection *CloudControllerConnection) createHTTPRequest(passedRequest Req
 			passedRequest.Params,
 			&bytes.Buffer{},
 		)
-		if err == nil {
+		if err == nil && passedRequest.Query != nil { //TODO: write test for this
 			request.URL.RawQuery = passedRequest.Query.Encode()
 		}
 	}

@@ -68,3 +68,40 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 
 	return fullAppsList, fullWarningsList, nil
 }
+
+func (client *CloudControllerClient) GetRouteApplications(routeGUID string) ([]Application, Warnings, error) {
+	request := cloudcontroller.Request{
+		RequestName: internal.AppsFromRouteRequest,
+		Params:      map[string]string{"route_guid": routeGUID},
+	}
+
+	fullAppsList := []Application{}
+	fullWarningsList := Warnings{}
+
+	for {
+		var apps []Application
+		wrapper := PaginatedWrapper{
+			Resources: &apps,
+		}
+		response := cloudcontroller.Response{
+			Result: &wrapper,
+		}
+
+		err := client.connection.Make(request, &response)
+		fullWarningsList = append(fullWarningsList, response.Warnings...)
+		if err != nil {
+			return nil, fullWarningsList, err
+		}
+		fullAppsList = append(fullAppsList, apps...)
+
+		if wrapper.NextURL == "" {
+			break
+		}
+		request = cloudcontroller.Request{
+			URI:    wrapper.NextURL,
+			Method: "GET",
+		}
+	}
+
+	return fullAppsList, fullWarningsList, nil
+}

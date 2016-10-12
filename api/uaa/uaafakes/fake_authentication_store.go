@@ -8,23 +8,6 @@ import (
 )
 
 type FakeAuthenticationStore struct {
-	AccessTokenStub        func() string
-	accessTokenMutex       sync.RWMutex
-	accessTokenArgsForCall []struct{}
-	accessTokenReturns     struct {
-		result1 string
-	}
-	RefreshTokenStub        func() string
-	refreshTokenMutex       sync.RWMutex
-	refreshTokenArgsForCall []struct{}
-	refreshTokenReturns     struct {
-		result1 string
-	}
-	SetAccessTokenStub        func(token string)
-	setAccessTokenMutex       sync.RWMutex
-	setAccessTokenArgsForCall []struct {
-		token string
-	}
 	ClientIDStub        func() string
 	clientIDMutex       sync.RWMutex
 	clientIDArgsForCall []struct{}
@@ -43,82 +26,25 @@ type FakeAuthenticationStore struct {
 	skipSSLValidationReturns     struct {
 		result1 bool
 	}
+	AccessTokenStub        func() string
+	accessTokenMutex       sync.RWMutex
+	accessTokenArgsForCall []struct{}
+	accessTokenReturns     struct {
+		result1 string
+	}
+	RefreshTokenStub        func() string
+	refreshTokenMutex       sync.RWMutex
+	refreshTokenArgsForCall []struct{}
+	refreshTokenReturns     struct {
+		result1 string
+	}
+	SetAccessTokenStub        func(token string)
+	setAccessTokenMutex       sync.RWMutex
+	setAccessTokenArgsForCall []struct {
+		token string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeAuthenticationStore) AccessToken() string {
-	fake.accessTokenMutex.Lock()
-	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
-	fake.recordInvocation("AccessToken", []interface{}{})
-	fake.accessTokenMutex.Unlock()
-	if fake.AccessTokenStub != nil {
-		return fake.AccessTokenStub()
-	} else {
-		return fake.accessTokenReturns.result1
-	}
-}
-
-func (fake *FakeAuthenticationStore) AccessTokenCallCount() int {
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	return len(fake.accessTokenArgsForCall)
-}
-
-func (fake *FakeAuthenticationStore) AccessTokenReturns(result1 string) {
-	fake.AccessTokenStub = nil
-	fake.accessTokenReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeAuthenticationStore) RefreshToken() string {
-	fake.refreshTokenMutex.Lock()
-	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
-	fake.recordInvocation("RefreshToken", []interface{}{})
-	fake.refreshTokenMutex.Unlock()
-	if fake.RefreshTokenStub != nil {
-		return fake.RefreshTokenStub()
-	} else {
-		return fake.refreshTokenReturns.result1
-	}
-}
-
-func (fake *FakeAuthenticationStore) RefreshTokenCallCount() int {
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
-	return len(fake.refreshTokenArgsForCall)
-}
-
-func (fake *FakeAuthenticationStore) RefreshTokenReturns(result1 string) {
-	fake.RefreshTokenStub = nil
-	fake.refreshTokenReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeAuthenticationStore) SetAccessToken(token string) {
-	fake.setAccessTokenMutex.Lock()
-	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
-		token string
-	}{token})
-	fake.recordInvocation("SetAccessToken", []interface{}{token})
-	fake.setAccessTokenMutex.Unlock()
-	if fake.SetAccessTokenStub != nil {
-		fake.SetAccessTokenStub(token)
-	}
-}
-
-func (fake *FakeAuthenticationStore) SetAccessTokenCallCount() int {
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
-	return len(fake.setAccessTokenArgsForCall)
-}
-
-func (fake *FakeAuthenticationStore) SetAccessTokenArgsForCall(i int) string {
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
-	return fake.setAccessTokenArgsForCall[i].token
 }
 
 func (fake *FakeAuthenticationStore) ClientID() string {
@@ -196,21 +122,95 @@ func (fake *FakeAuthenticationStore) SkipSSLValidationReturns(result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeAuthenticationStore) AccessToken() string {
+	fake.accessTokenMutex.Lock()
+	fake.accessTokenArgsForCall = append(fake.accessTokenArgsForCall, struct{}{})
+	fake.recordInvocation("AccessToken", []interface{}{})
+	fake.accessTokenMutex.Unlock()
+	if fake.AccessTokenStub != nil {
+		return fake.AccessTokenStub()
+	} else {
+		return fake.accessTokenReturns.result1
+	}
+}
+
+func (fake *FakeAuthenticationStore) AccessTokenCallCount() int {
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	return len(fake.accessTokenArgsForCall)
+}
+
+func (fake *FakeAuthenticationStore) AccessTokenReturns(result1 string) {
+	fake.AccessTokenStub = nil
+	fake.accessTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeAuthenticationStore) RefreshToken() string {
+	fake.refreshTokenMutex.Lock()
+	fake.refreshTokenArgsForCall = append(fake.refreshTokenArgsForCall, struct{}{})
+	fake.recordInvocation("RefreshToken", []interface{}{})
+	fake.refreshTokenMutex.Unlock()
+	if fake.RefreshTokenStub != nil {
+		return fake.RefreshTokenStub()
+	} else {
+		return fake.refreshTokenReturns.result1
+	}
+}
+
+func (fake *FakeAuthenticationStore) RefreshTokenCallCount() int {
+	fake.refreshTokenMutex.RLock()
+	defer fake.refreshTokenMutex.RUnlock()
+	return len(fake.refreshTokenArgsForCall)
+}
+
+func (fake *FakeAuthenticationStore) RefreshTokenReturns(result1 string) {
+	fake.RefreshTokenStub = nil
+	fake.refreshTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeAuthenticationStore) SetAccessToken(token string) {
+	fake.setAccessTokenMutex.Lock()
+	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
+		token string
+	}{token})
+	fake.recordInvocation("SetAccessToken", []interface{}{token})
+	fake.setAccessTokenMutex.Unlock()
+	if fake.SetAccessTokenStub != nil {
+		fake.SetAccessTokenStub(token)
+	}
+}
+
+func (fake *FakeAuthenticationStore) SetAccessTokenCallCount() int {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return len(fake.setAccessTokenArgsForCall)
+}
+
+func (fake *FakeAuthenticationStore) SetAccessTokenArgsForCall(i int) string {
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
+	return fake.setAccessTokenArgsForCall[i].token
+}
+
 func (fake *FakeAuthenticationStore) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.accessTokenMutex.RLock()
-	defer fake.accessTokenMutex.RUnlock()
-	fake.refreshTokenMutex.RLock()
-	defer fake.refreshTokenMutex.RUnlock()
-	fake.setAccessTokenMutex.RLock()
-	defer fake.setAccessTokenMutex.RUnlock()
 	fake.clientIDMutex.RLock()
 	defer fake.clientIDMutex.RUnlock()
 	fake.clientSecretMutex.RLock()
 	defer fake.clientSecretMutex.RUnlock()
 	fake.skipSSLValidationMutex.RLock()
 	defer fake.skipSSLValidationMutex.RUnlock()
+	fake.accessTokenMutex.RLock()
+	defer fake.accessTokenMutex.RUnlock()
+	fake.refreshTokenMutex.RLock()
+	defer fake.refreshTokenMutex.RUnlock()
+	fake.setAccessTokenMutex.RLock()
+	defer fake.setAccessTokenMutex.RUnlock()
 	return fake.invocations
 }
 

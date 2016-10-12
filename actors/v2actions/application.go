@@ -6,10 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-type Application struct {
-	GUID string
-	Name string
-}
+type Application ccv2.Application
 
 type ApplicationNotFoundError struct {
 	Name string

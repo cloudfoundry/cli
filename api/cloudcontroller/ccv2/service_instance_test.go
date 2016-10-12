@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"

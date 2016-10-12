@@ -7,6 +7,7 @@ import (
 )
 
 type ServiceInstance ccv2.ServiceInstance
+
 type ServiceInstanceNotFoundError struct {
 	Name string
 }

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -24,12 +23,12 @@ var _ = Describe("Service Binding", func() {
 				"resources": [
 					{
 						"metadata": {
-							"guid": "some-service-binding-guid-1"
+							"guid": "service-binding-guid-1"
 						}
 					},
 					{
 						"metadata": {
-							"guid": "some-service-binding-guid-2"
+							"guid": "service-binding-guid-2"
 						}
 					}
 				]
@@ -39,12 +38,12 @@ var _ = Describe("Service Binding", func() {
 				"resources": [
 					{
 						"metadata": {
-							"guid": "some-service-binding-guid-3"
+							"guid": "service-binding-guid-3"
 						}
 					},
 					{
 						"metadata": {
-							"guid": "some-service-binding-guid-4"
+							"guid": "service-binding-guid-4"
 						}
 					}
 				]
@@ -72,10 +71,10 @@ var _ = Describe("Service Binding", func() {
 				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(serviceBindings).To(ConsistOf([]ServiceBinding{
-					{GUID: "some-service-binding-guid-1"},
-					{GUID: "some-service-binding-guid-2"},
-					{GUID: "some-service-binding-guid-3"},
-					{GUID: "some-service-binding-guid-4"},
+					{GUID: "service-binding-guid-1"},
+					{GUID: "service-binding-guid-2"},
+					{GUID: "service-binding-guid-3"},
+					{GUID: "service-binding-guid-4"},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
@@ -105,7 +104,7 @@ var _ = Describe("Service Binding", func() {
 		BeforeEach(func() {
 			response := `{
 				"code": 90004,
-				"description": "The service binding could not be found: some-guid",
+				"description": "The service binding could not be found: some-service-binding-guid",
 				"error_code": "CF-ServiceBindingNotFound"
 			}`
 			server.AppendHandlers(
@@ -119,7 +118,7 @@ var _ = Describe("Service Binding", func() {
 		It("returns a not found error", func() {
 			warnings, err := client.DeleteServiceBinding("some-service-binding-guid")
 			Expect(err).To(MatchError(ResourceNotFoundError{
-				Message: "The service binding could not be found: some-guid",
+				Message: "The service binding could not be found: some-service-binding-guid",
 			}))
 			Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 		})
