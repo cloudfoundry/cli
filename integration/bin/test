@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ginkgo -r --slowSpecThreshold=60

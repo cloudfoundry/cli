@@ -1,0 +1,81 @@
+action,sleep seconds,status,body,output
+#provision,0,200,"foo",XXX
+#provision,0,200,"{}",XXX
+#provision,0,200,"{""foo"": ""bar""}",XXX
+#provision,0,200,"{""description"": ""some error message""}",XXX
+
+#provision,0,201,"foo",XXX
+#provision,0,201,"{}",XXX
+#provision,0,201,"{""foo"": ""bar""}",XXX
+#provision,0,201,"{""description"": ""some error message""}",XXX
+
+#provision,0,202,"foo",XXX
+#provision,0,202,"{}",XXX
+#provision,0,202,"{""foo"": ""bar""}",XXX
+#provision,0,202,"{""description"": ""some error message""}",XXX
+
+#provision,0,400,"foo",XXX
+#provision,0,400,"{}",XXX
+#provision,0,400,"{""foo"": ""bar""}",XXX
+#provision,0,400,"{""description"": ""some error message""}",XXX
+
+#provision,0,500,"foo",XXX
+#provision,0,500,"{}",XXX
+#provision,0,500,"{""foo"": ""bar""}",XXX
+#provision,0,500,"{""description"": ""some error message""}",XXX
+
+#provision,70,500,"I will timeout",XXX
+
+#update,0,200,"foo",XXX
+#update,0,200,"{}",XXX
+#update,0,200,"{""foo"": ""bar""}",XXX
+#update,0,200,"{""description"": ""some error message""}",XXX
+
+#update,0,201,"foo",XXX
+#update,0,201,"{}",XXX
+#update,0,201,"{""foo"": ""bar""}",XXX
+#update,0,201,"{""description"": ""some error message""}",XXX
+
+#update,0,202,"foo",XXX
+#update,0,202,"{}",XXX
+#update,0,202,"{""foo"": ""bar""}",XXX
+#update,0,202,"{""description"": ""some error message""}",XXX
+
+#update,0,400,"foo",XXX
+#update,0,400,"{}",XXX
+#update,0,400,"{""foo"": ""bar""}",XXX
+#update,0,400,"{""description"": ""some error message""}",XXX
+
+#update,0,500,"foo",XXX
+#update,0,500,"{}",XXX
+#update,0,500,"{""foo"": ""bar""}",XXX
+#update,0,500,"{""description"": ""some error message""}",XXX
+
+#update,70,500,"I will timeout",XXX
+
+#deprovision,0,200,"foo",XXX
+#deprovision,0,200,"{}",XXX
+#deprovision,0,200,"{""foo"": ""bar""}",XXX
+#deprovision,0,200,"{""description"": ""some error message""}",XXX
+
+#deprovision,0,201,"foo",XXX
+#deprovision,0,201,"{}",XXX
+#deprovision,0,201,"{""foo"": ""bar""}",XXX
+#deprovision,0,201,"{""description"": ""some error message""}",XXX
+
+#deprovision,0,202,"foo",XXX
+#deprovision,0,202,"{}",XXX
+#deprovision,0,202,"{""foo"": ""bar""}",XXX
+#deprovision,0,202,"{""description"": ""some error message""}",XXX
+
+#deprovision,0,400,"foo",XXX
+#deprovision,0,400,"{}",XXX
+#deprovision,0,400,"{""foo"": ""bar""}",XXX
+#deprovision,0,400,"{""description"": ""some error message""}",XXX
+
+#deprovision,0,500,"foo",XXX
+#deprovision,0,500,"{}",XXX
+#deprovision,0,500,"{""foo"": ""bar""}",XXX
+#deprovision,0,500,"{""description"": ""some error message""}",XXX
+
+#deprovision,70,500,"I will timeout",XXX

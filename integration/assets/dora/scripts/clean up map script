@@ -1,0 +1,57 @@
+[done] clean up map script
+[done] script the actual running of the performance test
+[done] add log endpoint to dora
+
+maybe script the set-up of the syslog drain server, and the grabbing of the
+drain server logs at the end of the test.
+
+
+performance test:
+start drain server on vm
+
+cf delete-service sc -f
+cf cups sc -l syslog://10.10.16.15:4567
+
+
+
+cf push dora
+cf bind-service dora sc
+
+
+
+cf start dora
+scripts/scale_dora -i 8
+
+## replaced commands below with map_cookie_jars_to_instances.rb
+## run get_instance_cookie_jars.sh 
+##rm cookie_jars/*
+##./get_instance_cookie_jars.sh -e 8 -m 40 -d cookie_jars
+##scripts/map_cookie_jars_to_instances.sh > capture_map
+##cjars=`cat capture_map  | sort -k 9 | head -2 | awk '{print $1}'`
+
+
+
+setup complete====================================================
+## replaced commands below with run_performance_test_single_dea.rb
+## pipe output from map_cookie_jars_to_instances.rb into that script
+
+
+### pick 2 instances on a single dea
+##cjar1=`echo $cjars | awk '{print $1}'`
+##cjar2=`echo $cjars | awk '{print $2}'`
+##
+##
+### run test
+##
+##curl dora.sunset.cf-app.com/log/sleep/100000 -b $cjar1 > /dev/null 2>&1 &
+##sleep 5
+##curl dora.sunset.cf-app.com/loglines/1000/TAG1TAG -b $cjar2
+##sleep 5 
+##curl dora.sunset.cf-app.com/log/stop -b $cjar1
+
+
+# grab logs
+
+cd drain_logs
+bosh logs router_z1
+tar xvfz router_z1*tgz

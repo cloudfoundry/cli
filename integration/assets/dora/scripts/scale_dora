@@ -1,0 +1,30 @@
+#!/bin/bash
+
+DESIRED_INSTANCES=
+APP_NAME=dora
+
+usage() { echo "Usage: $0 -i <desired number of instances> [-n <name of app to scale>]" 1>&2; exit 1; }
+
+while getopts ":i:n:" o; do
+    case "${o}" in
+        i)
+            DESIRED_INSTANCES=${OPTARG}
+            ;;
+        n)
+            APP_NAME=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${DESIRED_INSTANCES}" ]; then
+    usage
+fi
+
+for i in $(seq 1 ${DESIRED_INSTANCES}); do
+   cf scale $APP_NAME -i $i
+   sleep 2
+done
