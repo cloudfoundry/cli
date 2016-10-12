@@ -7,4 +7,4 @@ powershell -command set-executionpolicy remotesigned
 
 go get github.com/onsi/ginkgo/ginkgo
 
-ginkgo -r -randomizeAllSpecs -randomizeSuites .
+ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration .
