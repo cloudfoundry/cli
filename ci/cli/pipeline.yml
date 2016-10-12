@@ -15,6 +15,7 @@ resources:
     branch: master
     ignore_paths:
     - ci
+    - integration
 
 - name: final-cli
   type: git
@@ -47,6 +48,15 @@ resources:
     uri: git@github.com:cloudfoundry/cli-acceptance-tests
     private_key: {{cf-cli-eng-github-private-key}}
     branch: master
+
+- name: cli-integration
+  type: git
+  source:
+    uri: git@github.com:cloudfoundry/cli
+    private_key: {{cf-cli-eng-github-private-key}}
+    branch: master
+    paths:
+    - integration
 
 - name: cf-release-repo
   type: git
@@ -324,14 +334,12 @@ jobs:
         acquire: true
   - aggregate:
     - do:
-      - task: linux
+      - task: linux-integration
+        file: cli-ci/ci/cli/tasks/integration-linux.yml
+      - task: linux-gats
         file: cli-ci/ci/cli/tasks/gats-linux.yml
       - task: windows-integration
-        file: cli-ci/ci/cli/tasks/gats-windows.yml
-        params:
-          ADMIN_USER: {{bosh-lite-admin-username}}
-          ADMIN_PASSWORD: {{bosh-lite-admin-password}}
-          GINKGO_ARGS: -slowSpecThreshold=30 -randomizeSuites ./integration
+        file: cli-ci/ci/cli/tasks/integration-windows.yml
       - task: windows-gats
         file: cli-ci/ci/cli/tasks/gats-windows.yml
         params:
