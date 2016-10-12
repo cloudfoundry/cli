@@ -1,0 +1,216 @@
+{
+  "behaviors": {
+    "catalog": {
+      "sleep_seconds": 0,
+      "status": 200,
+      "body": {
+        "services": [
+          {
+            "name": "<fake-service>",
+            "id": "<fake-service-guid>",
+            "description": "fake service",
+            "tags": [
+              "no-sql",
+              "relational"
+            ],
+            "max_db_per_node": 5,
+            "bindable": true,
+            "metadata": {
+              "provider": {
+                "name": "The name"
+              },
+              "listing": {
+                "imageUrl": "http://catgifpage.com/cat.gif",
+                "blurb": "fake broker that is fake",
+                "longDescription": "A long time ago, in a galaxy far far away..."
+              },
+              "displayName": "The Fake Broker"
+            },
+            "dashboard_client": {
+              "id": "<sso-test>",
+              "secret": "<sso-secret>",
+              "redirect_uri": "http://example.com"
+            },
+            "plan_updateable": true,
+            "plans": [
+              {
+                "name": "<fake-plan>",
+                "id": "<fake-plan-guid>",
+                "description": "Shared fake Server, 5tb persistent disk, 40 max concurrent connections",
+                "max_storage_tb": 5,
+                "metadata": {
+                  "cost": 0,
+                  "bullets": [
+                    {
+                      "content": "Shared fake server"
+                    },
+                    {
+                      "content": "5 TB storage"
+                    },
+                    {
+                      "content": "40 concurrent connections"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "<fake-plan-2>",
+                "id": "<fake-plan-2-guid>",
+                "description": "Shared fake Server, 5tb persistent disk, 40 max concurrent connections",
+                "max_storage_tb": 5,
+                "metadata": {
+                  "cost": 0,
+                  "bullets": [
+                    {
+                      "content": "Shared fake server"
+                    },
+                    {
+                      "content": "5 TB storage"
+                    },
+                    {
+                      "content": "40 concurrent connections"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "<fake-async-plan>",
+                "id": "<fake-async-plan-guid>",
+                "description": "Shared fake Server, 5tb persistent disk, 40 max concurrent connections. 100 async",
+                "max_storage_tb": 5,
+                "metadata": {
+                  "cost": 0,
+                  "bullets": [
+                    {
+                      "content": "40 concurrent connections"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "<fake-async-plan-2>",
+                "id": "<fake-async-plan-2-guid>",
+                "description": "Shared fake Server, 5tb persistent disk, 40 max concurrent connections. 100 async",
+                "max_storage_tb": 5,
+                "metadata": {
+                  "cost": 0,
+                  "bullets": [
+                    {
+                      "content": "40 concurrent connections"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "provision": {
+      "<fake-async-plan-guid>": {
+        "sleep_seconds": 0,
+        "status": 202,
+        "body": {
+        }
+      },
+      "<fake-async-plan-2-guid>": {
+        "sleep_seconds": 0,
+        "status": 202,
+        "body": {
+        }
+      },
+      "default": {
+        "sleep_seconds": 0,
+        "status": 200,
+        "body": {
+          "dashboard_url": "http://example.com"
+        }
+      }
+    },
+    "fetch": {
+      "default": {
+        "in_progress": {
+          "sleep_seconds": 0,
+          "status": 200,
+          "body": {
+            "state": "in progress",
+            "description": "not 100 percent done"
+          }
+        },
+        "finished": {
+          "sleep_seconds": 0,
+          "status": 200,
+          "body": {
+            "state": "succeeded",
+            "description": "100 percent done"
+          }
+        }
+      }
+    },
+    "update": {
+      "<fake-async-plan-guid>": {
+        "sleep_seconds": 0,
+        "status": 202,
+        "body": {
+        }
+      },
+      "<fake-async-plan-2-guid>": {
+        "sleep_seconds": 0,
+        "status": 202,
+        "body": {
+        }
+      },
+      "default": {
+        "sleep_seconds": 0,
+        "status": 200,
+        "body": {
+        }
+      }
+    },
+    "deprovision": {
+      "<fake-async-plan-guid>": {
+        "sleep_seconds": 0,
+        "status": 202,
+        "body": {
+        }
+      },
+      "<fake-async-plan-2-guid>": {
+        "sleep_seconds": 0,
+        "status": 202,
+        "body": {
+        }
+      },
+      "default": {
+        "sleep_seconds": 0,
+        "status": 200,
+        "body": {}
+      }
+    },
+    "bind": {
+      "default": {
+        "sleep_seconds": 0,
+        "status": 201,
+        "body": {
+          "credentials": {
+            "uri": "fake-service://fake-user:fake-password@fake-host:3306/fake-dbname",
+            "username": "fake-user",
+            "password": "fake-password",
+            "host": "fake-host",
+            "port": 3306,
+            "database": "fake-dbname"
+          }
+        }
+      }
+    },
+    "unbind": {
+      "default": {
+        "sleep_seconds": 0,
+        "status": 200,
+        "body": {}
+      }
+    }
+  },
+  "service_instances": {},
+  "service_bindings": {},
+  "max_fetch_service_instance_requests": 1
+}
