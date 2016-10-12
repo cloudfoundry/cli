@@ -328,6 +328,7 @@ jobs:
       passed: [build-binaries]
     - get: cli-acceptance-tests
     - get: cli-ci
+    - get: cli-integration
     - put: bosh-lite-lock
       resource: bosh-lites-dea-pool
       params:
