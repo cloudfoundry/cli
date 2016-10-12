@@ -38,7 +38,7 @@ do
   go tool vet -all -shadow=true $file
 done
 
-CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites $@
+CF_HOME=$(pwd)/fixtures ginkgo -r -randomizeAllSpecs -randomizeSuites -skipPackage integration $@
 
 echo -e "\n Running build script to confirm everything compiles..."
 bin/build
