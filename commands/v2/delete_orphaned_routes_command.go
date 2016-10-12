@@ -72,11 +72,19 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	cmd.UI.DisplayHeaderFlavorText("Getting routes as {{.CurrentUser}} ...", map[string]interface{}{
 		"CurrentUser": user.Name,
 	})
+	cmd.UI.DisplayNewline()
 
 	routes, warnings, err := cmd.Actor.GetOrphanedRoutesBySpace(cmd.Config.TargetedSpace().GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		switch err.(type) {
+		case v2actions.DomainNotFoundError:
+			return err // Should this error be handled differently? Note: it will 99.99% never occur.
+		case v2actions.OrphanedRoutesNotFoundError:
+			// Do nothing to parity the existing behavior
+		default:
+			return common.HandleError(err)
+		}
 	}
 
 	for _, route := range routes {

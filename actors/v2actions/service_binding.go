@@ -6,9 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-type ServiceBinding struct {
-	GUID string
-}
+type ServiceBinding ccv2.ServiceBinding
 
 type ServiceBindingNotFoundError struct {
 	AppGUID             string

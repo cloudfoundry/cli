@@ -132,21 +132,23 @@ var _ = Describe("Service Binding Actions", func() {
 				warnings, err := actor.UnbindServiceBySpace("some-app", "some-service-instance", "some-space-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"foo-1", "foo-2", "foo-3", "foo-4", "foo-5"}))
+
 				Expect(fakeCloudControllerClient.DeleteServiceBindingCallCount()).To(Equal(1))
 				Expect(fakeCloudControllerClient.DeleteServiceBindingArgsForCall(0)).To(Equal("some-service-binding-guid"))
 			})
 
-			Context("when the cloud controller API returns and error", func() {
+			Context("when the cloud controller API returns warnings and an error", func() {
 				var expectedError error
+
 				BeforeEach(func() {
 					expectedError = errors.New("I am a CC error")
-					fakeCloudControllerClient.DeleteServiceBindingReturns(ccv2.Warnings{"foo-4"}, expectedError)
+					fakeCloudControllerClient.DeleteServiceBindingReturns(ccv2.Warnings{"foo-4", "foo-5"}, expectedError)
 				})
 
-				It("returns the error", func() {
+				It("returns the warnings and the error", func() {
 					warnings, err := actor.UnbindServiceBySpace("some-app", "some-service-instance", "some-space-guid")
 					Expect(err).To(MatchError(expectedError))
-					Expect(warnings).To(ConsistOf(Warnings{"foo-1", "foo-2", "foo-3", "foo-4"}))
+					Expect(warnings).To(ConsistOf(Warnings{"foo-1", "foo-2", "foo-3", "foo-4", "foo-5"}))
 				})
 			})
 		})
