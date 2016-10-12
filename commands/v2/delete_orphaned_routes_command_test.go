@@ -48,19 +48,19 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 		Expect(fakeUI.Out).To(Say(v2.ExperimentalWarning))
 	})
 
-	Context("when checking that the api endpoint is set, the user is logged in, and an org and space are targeted", func() {
+	Context("when checking that the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.BinaryNameReturns("faceman")
 		})
 
 		It("returns an error if the check fails", func() {
-			Expect(executeErr).To(MatchError(common.NoAPISetError{
+			Expect(executeErr).To(MatchError(common.NotLoggedInError{
 				BinaryName: "faceman",
 			}))
 		})
 	})
 
-	Context("when the api endpoint is set, the user is logged in, and an org and space are targeted", func() {
+	Context("when the user is logged in, and org and space are targeted", func() {
 		BeforeEach(func() {
 			fakeConfig.TargetReturns("some-url")
 			fakeConfig.AccessTokenReturns("some-access-token")
