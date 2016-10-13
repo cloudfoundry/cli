@@ -9,7 +9,10 @@ import (
 )
 
 func CF(args ...string) *Session {
-	session, err := Start(exec.Command("cf", args...), GinkgoWriter, GinkgoWriter)
+	session, err := Start(
+		exec.Command("cf", args...),
+		NewPrefixedWriter("OUT: ", GinkgoWriter),
+		NewPrefixedWriter("ERR: ", GinkgoWriter))
 	Expect(err).NotTo(HaveOccurred())
 	return session
 }
