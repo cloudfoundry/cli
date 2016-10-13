@@ -388,6 +388,7 @@ jobs:
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: dea
+        CF_PUSH_TIMEOUT: 60
       on_failure:
          put: slack-alert
          params:
