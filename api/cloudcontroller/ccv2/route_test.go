@@ -17,8 +17,9 @@ var _ = Describe("Route", func() {
 	})
 
 	Describe("GetSpaceRoutes", func() {
-		BeforeEach(func() {
-			response1 := `{
+		Context("when there are routes in this space", func() {
+			BeforeEach(func() {
+				response1 := `{
 				"next_url": "/v2/spaces/some-space-guid/routes?page=2",
 				"resources": [
 					{
@@ -47,7 +48,7 @@ var _ = Describe("Route", func() {
 					}
 				]
 			}`
-			response2 := `{
+				response2 := `{
 				"next_url": null,
 				"resources": [
 					{
@@ -76,22 +77,21 @@ var _ = Describe("Route", func() {
 					}
 				]
 			}`
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
-					RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-				),
-			)
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "page=2"),
-					RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
-				),
-			)
-		})
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
+						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+					),
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "page=2"),
+						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
+					),
+				)
+			})
 
-		Context("when routes exist in this space", func() {
-			It("returns all the routes", func() {
+			It("returns all the routes and all warnings", func() {
 				routes, warnings, err := client.GetSpaceRoutes("some-space-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
@@ -127,6 +127,51 @@ var _ = Describe("Route", func() {
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
 		})
+
+		Context("when there are no routes in this space", func() {
+			BeforeEach(func() {
+				response := `{
+				"next_url": "",
+				"resources": []
+			}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+			})
+
+			It("returns an empty list of routes", func() {
+				routes, _, err := client.GetSpaceRoutes("some-space-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(routes).To(BeEmpty())
+			})
+		})
+
+		Context("when the space is not found", func() {
+			BeforeEach(func() {
+				response := `{
+					"code": 40004,
+					"description": "The app space could not be found: some-space-guid",
+					"error_code": "CF-SpaceNotFound"
+				}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
+						RespondWith(http.StatusNotFound, response),
+					),
+				)
+			})
+
+			It("returns an error", func() {
+				routes, _, err := client.GetSpaceRoutes("some-space-guid")
+				Expect(err).To(MatchError(ResourceNotFoundError{
+					Message: "The app space could not be found: some-space-guid",
+				}))
+				Expect(routes).To(BeEmpty())
+			})
+		})
 	})
 
 	Describe("DeleteRoute", func() {
@@ -140,35 +185,34 @@ var _ = Describe("Route", func() {
 				)
 			})
 
-			It("deletes the route", func() {
+			It("deletes the route and returns all warnings", func() {
 				warnings, err := client.DeleteRoute("some-route-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 			})
 		})
-	})
 
-	Context("when the route does not exist", func() {
-		BeforeEach(func() {
-			response := `{
+		Context("when the route does not exist", func() {
+			BeforeEach(func() {
+				response := `{
 				"code": 210002,
 				"description": "The route could not be found: some-route-guid",
 				"error_code": "CF-RouteNotFound"
 			}`
-			server.AppendHandlers(
-				CombineHandlers(
-					VerifyRequest("DELETE", "/v2/routes/some-route-guid"),
-					RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
-				),
-			)
-		})
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest("DELETE", "/v2/routes/some-route-guid"),
+						RespondWith(http.StatusNotFound, response),
+					),
+				)
+			})
 
-		It("returns a not found error", func() {
-			warnings, err := client.DeleteRoute("some-route-guid")
-			Expect(err).To(MatchError(ResourceNotFoundError{
-				Message: "The route could not be found: some-route-guid",
-			}))
-			Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
+			It("returns an error", func() {
+				_, err := client.DeleteRoute("some-route-guid")
+				Expect(err).To(MatchError(ResourceNotFoundError{
+					Message: "The route could not be found: some-route-guid",
+				}))
+			})
 		})
 	})
 })
