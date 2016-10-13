@@ -25,7 +25,7 @@ var _ = Describe("unbind-service command", func() {
 		space = PrefixedRandomName("SPACE")
 		service = PrefixedRandomName("SERVICE")
 		servicePlan = PrefixedRandomName("SERVICE-PLAN")
-		serviceInstance = "service-instance"
+		serviceInstance = PrefixedRandomName("si")
 		appName = PrefixedRandomName("app")
 
 		setupCF(org, space)
@@ -80,82 +80,154 @@ var _ = Describe("unbind-service command", func() {
 	})
 
 	Context("when the environment is setup correctly", func() {
-		BeforeEach(func() {
-			broker = NewServiceBroker(PrefixedRandomName("SERVICE-BROKER"), NewAssets().ServiceBroker, "bosh-lite.com", service, servicePlan)
-			broker.Push()
-			broker.Configure()
-			broker.Create()
-
-			Eventually(CF("enable-service-access", service)).Should(Exit(0))
-		})
-
-		AfterEach(func() {
-			broker.Destroy()
-		})
-
-		Context("when the service is bound to an app", func() {
+		Context("when the service is provided by a user", func() {
 			BeforeEach(func() {
-				Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+				Eventually(CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))
+			})
+
+			AfterEach(func() {
+				Eventually(CF("delete-service", serviceInstance, "-f")).Should(Exit(0))
+			})
+
+			Context("when the service is bound to an app", func() {
+				BeforeEach(func() {
+					WithSimpleApp(func(appDir string) {
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+					})
+					Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
 				})
-				Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
-			})
 
-			It("unbinds the service", func() {
-				Eventually(CF("services")).Should(SatisfyAll(
-					Exit(0),
-					Say("%s.*%s", serviceInstance, appName)),
-				)
-				Eventually(CF("unbind-service", appName, serviceInstance), CFLongTimeout).Should(Exit(0))
-				Eventually(CF("services")).Should(SatisfyAll(
-					Exit(0),
-					Not(Say("%s.*%s", serviceInstance, appName)),
-				))
-			})
-		})
-
-		Context("when the service is not bound to an app", func() {
-			BeforeEach(func() {
-				Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route"), CFLongTimeout).Should(Exit(0))
+				It("unbinds the service", func() {
+					Eventually(CF("services")).Should(SatisfyAll(
+						Exit(0),
+						Say("%s.*%s", serviceInstance, appName)),
+					)
+					Eventually(CF("unbind-service", appName, serviceInstance), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("services")).Should(SatisfyAll(
+						Exit(0),
+						Not(Say("%s.*%s", serviceInstance, appName)),
+					))
 				})
 			})
 
-			It("returns a warning and continues", func() {
-				session := CF("unbind-service", appName, serviceInstance)
-				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say("OK"))
-				Expect(session.Err).To(Say("Binding between %s and %s did not exist", serviceInstance, appName))
-			})
-		})
+			Context("when the service is not bound to an app", func() {
+				BeforeEach(func() {
+					WithSimpleApp(func(appDir string) {
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route"), CFLongTimeout).Should(Exit(0))
+					})
+				})
 
-		Context("when the service does not exist", func() {
-			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+				It("returns a warning and continues", func() {
+					session := CF("unbind-service", appName, serviceInstance)
+					Eventually(session).Should(Exit(0))
+					Expect(session.Out).To(Say("OK"))
+					Expect(session.Err).To(Say("Binding between %s and %s did not exist", serviceInstance, appName))
 				})
 			})
 
-			It("fails to unbind the service", func() {
-				session := CF("unbind-service", appName, serviceInstance)
-				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("Service instance %s not found", serviceInstance))
+			Context("when the service does not exist", func() {
+				BeforeEach(func() {
+					WithSimpleApp(func(appDir string) {
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+					})
+				})
+
+				It("fails to unbind the service", func() {
+					session := CF("unbind-service", appName, "does-not-exist")
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).To(Say("FAILED"))
+					Expect(session.Err).To(Say("Service instance %s not found", "does-not-exist"))
+				})
+			})
+
+			Context("when the app does not exist", func() {
+				It("fails to unbind the service", func() {
+					session := CF("unbind-service", "does-not-exist", serviceInstance)
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).To(Say("FAILED"))
+					Expect(session.Err).To(Say("App %s not found", "does-not-exist"))
+				})
 			})
 		})
 
-		Context("when the app does not exist", func() {
+		Context("when the service is provided by a broker", func() {
 			BeforeEach(func() {
-				Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+				broker = NewServiceBroker(PrefixedRandomName("SERVICE-BROKER"), NewAssets().ServiceBroker, "bosh-lite.com", service, servicePlan)
+				broker.Push()
+				broker.Configure()
+				broker.Create()
+
+				Eventually(CF("enable-service-access", service)).Should(Exit(0))
 			})
 
-			It("fails to unbind the service", func() {
-				session := CF("unbind-service", appName, serviceInstance)
-				Eventually(session).Should(Exit(1))
-				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say("App %s not found", appName))
+			AfterEach(func() {
+				broker.Destroy()
+			})
+
+			Context("when the service is bound to an app", func() {
+				BeforeEach(func() {
+					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					WithSimpleApp(func(appDir string) {
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+					})
+					Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
+				})
+
+				It("unbinds the service", func() {
+					Eventually(CF("services")).Should(SatisfyAll(
+						Exit(0),
+						Say("%s.*%s", serviceInstance, appName)),
+					)
+					Eventually(CF("unbind-service", appName, serviceInstance), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("services")).Should(SatisfyAll(
+						Exit(0),
+						Not(Say("%s.*%s", serviceInstance, appName)),
+					))
+				})
+			})
+
+			Context("when the service is not bound to an app", func() {
+				BeforeEach(func() {
+					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+					WithSimpleApp(func(appDir string) {
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route"), CFLongTimeout).Should(Exit(0))
+					})
+				})
+
+				It("returns a warning and continues", func() {
+					session := CF("unbind-service", appName, serviceInstance)
+					Eventually(session).Should(Exit(0))
+					Expect(session.Out).To(Say("OK"))
+					Expect(session.Err).To(Say("Binding between %s and %s did not exist", serviceInstance, appName))
+				})
+			})
+
+			Context("when the service does not exist", func() {
+				BeforeEach(func() {
+					WithSimpleApp(func(appDir string) {
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+					})
+				})
+
+				It("fails to unbind the service", func() {
+					session := CF("unbind-service", appName, serviceInstance)
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).To(Say("FAILED"))
+					Expect(session.Err).To(Say("Service instance %s not found", serviceInstance))
+				})
+			})
+
+			Context("when the app does not exist", func() {
+				BeforeEach(func() {
+					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
+				})
+
+				It("fails to unbind the service", func() {
+					session := CF("unbind-service", appName, serviceInstance)
+					Eventually(session).Should(Exit(1))
+					Expect(session.Out).To(Say("FAILED"))
+					Expect(session.Err).To(Say("App %s not found", appName))
+				})
 			})
 		})
 	})

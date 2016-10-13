@@ -80,7 +80,6 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayOK()
 
 	return nil

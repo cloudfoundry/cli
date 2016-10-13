@@ -102,7 +102,7 @@ var _ = Describe("Service Binding Actions", func() {
 					ccv2.Warnings{"foo-1"},
 					nil,
 				)
-				fakeCloudControllerClient.GetServiceInstancesReturns(
+				fakeCloudControllerClient.GetSpaceServiceInstancesReturns(
 					[]ccv2.ServiceInstance{
 						{
 							GUID: "some-service-instance-guid",
