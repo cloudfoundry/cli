@@ -205,9 +205,7 @@ var _ = Describe("Route Actions", func() {
 				Path:   path,
 				Port:   port,
 			}
-			actualValue := route.String()
-
-			Expect(actualValue).To(Equal(expectedValue))
+			Expect(route.String()).To(Equal(expectedValue))
 		},
 
 			Entry("has domain", "", "domain.com", "", 0, "domain.com"),
@@ -215,6 +213,7 @@ var _ = Describe("Route Actions", func() {
 			Entry("has domain, path", "", "domain.com", "path", 0, "domain.com/path"),
 			Entry("has host, domain, path", "host", "domain.com", "path", 0, "host.domain.com/path"),
 			Entry("has domain, port", "", "domain.com", "", 3333, "domain.com:3333"),
+			Entry("has host, domain, path, port", "host", "domain.com", "path", 3333, "domain.com:3333"),
 		)
 	})
 })
