@@ -6,11 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
-type ServiceInstance struct {
-	GUID string
-	Name string
-}
-
+type ServiceInstance ccv2.ServiceInstance
 type ServiceInstanceNotFoundError struct {
 	Name string
 }
