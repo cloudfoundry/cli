@@ -15,7 +15,7 @@ func (e ServiceInstanceNotFoundError) Error() string {
 	return fmt.Sprintf("Service instance '%s' not found.", e.Name)
 }
 
-func (actor Actor) GetServiceInstanceBySpace(name string, spaceGUID string) (ServiceInstance, Warnings, error) {
+func (actor Actor) GetServiceInstanceByNameAndSpace(name string, spaceGUID string) (ServiceInstance, Warnings, error) {
 	serviceInstances, warnings, err := actor.CloudControllerClient.GetServiceInstances([]ccv2.Query{
 		ccv2.Query{
 			Filter:   ccv2.NameFilter,

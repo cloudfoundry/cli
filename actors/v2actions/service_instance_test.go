@@ -38,7 +38,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns the service instance and warnings", func() {
-				serviceInstance, warnings, err := actor.GetServiceInstanceBySpace("some-service-instance", "some-space-guid")
+				serviceInstance, warnings, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(serviceInstance).To(Equal(ServiceInstance{
 					GUID: "some-service-instance-guid",
@@ -68,7 +68,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns a ServiceInstanceNotFoundError", func() {
-				_, _, err := actor.GetServiceInstanceBySpace("some-service-instance", "some-space-guid")
+				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
 				Expect(err).To(MatchError(ServiceInstanceNotFoundError{Name: "some-service-instance"}))
 			})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("Service Instance Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, _, err := actor.GetServiceInstanceBySpace("some-service-instance", "some-space-guid")
+				_, _, err := actor.GetServiceInstanceByNameAndSpace("some-service-instance", "some-space-guid")
 				Expect(err).To(MatchError(expectedError))
 			})
 		})

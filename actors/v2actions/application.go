@@ -19,7 +19,7 @@ func (e ApplicationNotFoundError) Error() string {
 	return fmt.Sprintf("Application '%s' not found.", e.Name)
 }
 
-func (actor Actor) GetApplicationBySpace(name string, spaceGUID string) (Application, Warnings, error) {
+func (actor Actor) GetApplicationByNameAndSpace(name string, spaceGUID string) (Application, Warnings, error) {
 	app, warnings, err := actor.CloudControllerClient.GetApplications([]ccv2.Query{
 		ccv2.Query{
 			Filter:   ccv2.NameFilter,

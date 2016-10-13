@@ -38,7 +38,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the application and warnings", func() {
-				app, warnings, err := actor.GetApplicationBySpace("some-app", "some-space-guid")
+				app, warnings, err := actor.GetApplicationByNameAndSpace("some-app", "some-space-guid")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(app).To(Equal(Application{
 					GUID: "some-app-guid",
@@ -68,7 +68,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns an ApplicationNotFoundError", func() {
-				_, _, err := actor.GetApplicationBySpace("some-app", "some-space-guid")
+				_, _, err := actor.GetApplicationByNameAndSpace("some-app", "some-space-guid")
 				Expect(err).To(MatchError(ApplicationNotFoundError{Name: "some-app"}))
 			})
 		})
@@ -82,7 +82,7 @@ var _ = Describe("Application Actions", func() {
 			})
 
 			It("returns the error", func() {
-				_, _, err := actor.GetApplicationBySpace("some-app", "some-space-guid")
+				_, _, err := actor.GetApplicationByNameAndSpace("some-app", "some-space-guid")
 				Expect(err).To(MatchError(expectedError))
 			})
 		})
