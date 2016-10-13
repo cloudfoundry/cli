@@ -21,14 +21,14 @@ var _ = Describe("Service Instance", func() {
 		Describe("UserProvided", func() {
 			Context("when type is USER_PROVIDED_SERVICE", func() {
 				It("returns true", func() {
-					service := ServiceInstance{Type: USER_PROVIDED_SERVICE}
+					service := ServiceInstance{Type: UserProvidedService}
 					Expect(service.UserProvided()).To(BeTrue())
 				})
 			})
 
 			Context("when type is MANAGED_SERVICE", func() {
 				It("returns false", func() {
-					service := ServiceInstance{Type: MANAGED_SERVICE}
+					service := ServiceInstance{Type: ManagedService}
 					Expect(service.UserProvided()).To(BeFalse())
 				})
 			})
@@ -37,14 +37,14 @@ var _ = Describe("Service Instance", func() {
 		Describe("Managed", func() {
 			Context("when type is MANAGED_SERVICE", func() {
 				It("returns false", func() {
-					service := ServiceInstance{Type: MANAGED_SERVICE}
+					service := ServiceInstance{Type: ManagedService}
 					Expect(service.Managed()).To(BeTrue())
 				})
 			})
 
 			Context("when type is USER_PROVIDED_SERVICE", func() {
 				It("returns true", func() {
-					service := ServiceInstance{Type: USER_PROVIDED_SERVICE}
+					service := ServiceInstance{Type: UserProvidedService}
 					Expect(service.Managed()).To(BeFalse())
 				})
 			})
@@ -126,10 +126,10 @@ var _ = Describe("Service Instance", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-					{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: MANAGED_SERVICE},
-					{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: MANAGED_SERVICE},
-					{Name: "some-service-name-3", GUID: "some-service-guid-3", Type: MANAGED_SERVICE},
-					{Name: "some-service-name-4", GUID: "some-service-guid-4", Type: MANAGED_SERVICE},
+					{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: ManagedService},
+					{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: ManagedService},
+					{Name: "some-service-name-3", GUID: "some-service-guid-3", Type: ManagedService},
+					{Name: "some-service-name-4", GUID: "some-service-guid-4", Type: ManagedService},
 				}))
 				Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 			})
@@ -212,10 +212,10 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: MANAGED_SERVICE},
-						{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: USER_PROVIDED_SERVICE},
-						{Name: "some-service-name-3", GUID: "some-service-guid-3", Type: MANAGED_SERVICE},
-						{Name: "some-service-name-4", GUID: "some-service-guid-4", Type: USER_PROVIDED_SERVICE},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: ManagedService},
+						{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: UserProvidedService},
+						{Name: "some-service-name-3", GUID: "some-service-guid-3", Type: ManagedService},
+						{Name: "some-service-name-4", GUID: "some-service-guid-4", Type: UserProvidedService},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning", "this is another warning"}))
 				})
@@ -266,8 +266,8 @@ var _ = Describe("Service Instance", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(serviceInstances).To(ConsistOf([]ServiceInstance{
-						{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: MANAGED_SERVICE},
-						{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: MANAGED_SERVICE},
+						{Name: "some-service-name-1", GUID: "some-service-guid-1", Type: ManagedService},
+						{Name: "some-service-name-2", GUID: "some-service-guid-2", Type: ManagedService},
 					}))
 					Expect(warnings).To(ConsistOf(Warnings{"this is a warning"}))
 				})

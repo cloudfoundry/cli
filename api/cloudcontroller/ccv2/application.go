@@ -7,11 +7,13 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// Application represents a Cloud Controller Application.
 type Application struct {
 	GUID string
 	Name string
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Application response.
 func (application *Application) UnmarshalJSON(data []byte) error {
 	var ccApp struct {
 		Metadata internal.Metadata `json:"metadata"`
@@ -28,10 +30,12 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (client *CloudControllerClient) GetApplications(queryParams []Query) ([]Application, Warnings, error) {
+// GetApplications returns back a list of Applications based off of the
+// provided queries.
+func (client *CloudControllerClient) GetApplications(queries []Query) ([]Application, Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.AppsRequest,
-		Query:       FormatQueryParameters(queryParams),
+		Query:       FormatQueryParameters(queries),
 	}
 
 	fullAppsList := []Application{}

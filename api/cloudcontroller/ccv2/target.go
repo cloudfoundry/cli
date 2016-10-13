@@ -5,18 +5,14 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-type APIInformation struct {
-	APIVersion                   string `json:"api_version"`
-	AuthorizationEndpoint        string `json:"authorization_endpoint"`
-	DopplerEndpoint              string `json:"doppler_logging_endpoint"`
-	LoggregatorEndpoint          string `json:"logging_endpoint"`
-	MinimumCLIVersion            string `json:"min_cli_version"`
-	MinimumRecommendedCLIVersion string `json:"min_recommended_cli_version"`
-	Name                         string `json:"name"`
-	RoutingEndpoint              string `json:"routing_endpoint"`
-	TokenEndpoint                string `json:"token_endpoint"`
-}
-
+// TargetCF sets the client to use the Cloud Controller at the fully qualified
+// API URL. skipSSLValidation controls whether a client verifies the server's
+// certificate chain and host name. If skipSSLValidation is true, TLS accepts
+// any certificate presented by the server and any host name in that
+// certificate for *all* client requests going forward.
+//
+// In this mode, TLS is susceptible to man-in-the-middle attacks. This should
+// be used only for testing.
 func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
 	client.cloudControllerURL = APIURL
 

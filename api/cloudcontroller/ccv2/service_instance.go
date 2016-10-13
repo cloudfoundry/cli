@@ -7,15 +7,25 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-const USER_PROVIDED_SERVICE = "user_provided_service_instance"
-const MANAGED_SERVICE = "managed_service_instance"
+// ServiceInstanceType is the type of the Service Instance.
+type ServiceInstanceType string
 
+const (
+	// UserProvidedService is a Service Instance that is created by a user.
+	UserProvidedService ServiceInstanceType = "user_provided_service_instance"
+
+	// ManagedService is a Service Instance that is managed by a service broker.
+	ManagedService ServiceInstanceType = "managed_service_instance"
+)
+
+// ServiceInstance represents a Cloud Controller Service Instance.
 type ServiceInstance struct {
 	GUID string
 	Name string
-	Type string
+	Type ServiceInstanceType
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Service Instance response.
 func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 	var ccServiceInstance struct {
 		Metadata internal.Metadata
@@ -31,18 +41,23 @@ func (serviceInstance *ServiceInstance) UnmarshalJSON(data []byte) error {
 
 	serviceInstance.GUID = ccServiceInstance.Metadata.GUID
 	serviceInstance.Name = ccServiceInstance.Entity.Name
-	serviceInstance.Type = ccServiceInstance.Entity.Type
+	serviceInstance.Type = ServiceInstanceType(ccServiceInstance.Entity.Type)
 	return nil
 }
 
+// UserProvidedService returns true if the Service Instance is a user provided
+// service.
 func (serviceInstance ServiceInstance) UserProvided() bool {
-	return serviceInstance.Type == USER_PROVIDED_SERVICE
+	return serviceInstance.Type == UserProvidedService
 }
 
+// Managed returns true if the Service Instance is a managed service.
 func (serviceInstance ServiceInstance) Managed() bool {
-	return serviceInstance.Type == MANAGED_SERVICE
+	return serviceInstance.Type == ManagedService
 }
 
+// GetServiceInstances returns back a list of *managed* Service Instances based
+// off of the provided queries.
 func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.ServiceInstancesRequest,
@@ -81,6 +96,9 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 	return allServiceInstancesList, allWarningsList, nil
 }
 
+// GetSpaceServiceInstances returns back a list of Service Instances based off
+// of the space and queries provided. User provided services will be included
+// if includeUserProvidedServices is set to true.
 func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []Query) ([]ServiceInstance, Warnings, error) {
 	query := FormatQueryParameters(queries)
 

@@ -7,10 +7,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// ServiceBinding represents a Cloud Controller Service Binding.
 type ServiceBinding struct {
 	GUID string
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Service Binding response.
 func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 	var ccServiceBinding struct {
 		Metadata internal.Metadata
@@ -24,6 +26,8 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// GetServiceBindings returns back a list of Service Bindings based off of the
+// provided queries.
 func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.ServiceBindingsRequest,
@@ -62,6 +66,7 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 	return allServiceBindingsList, allWarningsList, nil
 }
 
+// DeleteServiceBinding will destroy the requested Service Binding.
 func (client *CloudControllerClient) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.DeleteServiceBindingRequest,

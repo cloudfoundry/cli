@@ -5,7 +5,10 @@ import (
 	"net/url"
 )
 
+// QueryFilter is the type of filter a Query uses.
 type QueryFilter string
+
+// QueryOperator is the type of operation a Query uses.
 type QueryOperator string
 
 const (
@@ -20,6 +23,8 @@ const (
 	EqualOperator QueryOperator = ":"
 )
 
+// Query is a type of filter that can be passed to specific request to narrow
+// down the return set.
 type Query struct {
 	Filter   QueryFilter
 	Operator QueryOperator
@@ -30,6 +35,8 @@ func (query Query) format() string {
 	return fmt.Sprintf("%s%s%s", query.Filter, query.Operator, query.Value)
 }
 
+// FormatQueryParameters converts a Query object into a collection that
+// cloudcontroller.Request can accept.
 func FormatQueryParameters(queries []Query) url.Values {
 	params := url.Values{"q": []string{}}
 	for _, query := range queries {
