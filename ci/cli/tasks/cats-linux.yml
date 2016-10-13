@@ -97,10 +97,10 @@ run:
     EOF
 
     [ -n "$BACKEND" ] && echo "  \"backend\": \"${BACKEND}\"," >> integration_config.json
-    [ -n "$DEFAULT_TIMEOUT" ] && echo "  \"default_timeout\": \"${DEFAULT_TIMEOUT}\"," >> integration_config.json
+    [ -n "$DEFAULT_TIMEOUT" ] && echo "  \"default_timeout\": ${DEFAULT_TIMEOUT}," >> integration_config.json
     [ -n "$CF_PUSH_TIMEOUT" ] && echo "  \"cf_push_timeout\": ${CF_PUSH_TIMEOUT}," >> integration_config.json
-    [ -n "$LONG_CURL_TIMEOUT" ] && echo "  \"long_curl_timeout\": \"${LONG_CURL_TIMEOUT}\"," >> integration_config.json
-    [ -n "$BROKER_START_TIMEOUT" ] && echo "  \"broker_start_timeout\": \"${BROKER_START_TIMEOUT}\"," >> integration_config.json
+    [ -n "$LONG_CURL_TIMEOUT" ] && echo "  \"long_curl_timeout\": ${LONG_CURL_TIMEOUT}," >> integration_config.json
+    [ -n "$BROKER_START_TIMEOUT" ] && echo "  \"broker_start_timeout\": ${BROKER_START_TIMEOUT}," >> integration_config.json
 
     [ -n "$STATICFILE_BUILDPACK_NAME" ] && echo "  \"staticfile_buildpack_name\": \"${STATICFILE_BUILDPACK_NAME}\"," >> integration_config.json
     [ -n "$JAVA_BUILDPACK_NAME" ] && echo "  \"java_buildpack_name\": \"${JAVA_BUILDPACK_NAME}\"," >> integration_config.json
