@@ -24,7 +24,7 @@ var _ = Describe("Route Actions", func() {
 
 	Describe("GetOrphanedRoutesBySpace", func() {
 		BeforeEach(func() {
-			fakeCloudControllerClient.GetRouteApplicationsStub = func(routeGUID string) ([]ccv2.Application, ccv2.Warnings, error) {
+			fakeCloudControllerClient.GetRouteApplicationsStub = func(routeGUID string, queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error) {
 				switch routeGUID {
 				case "orphaned-route-guid-1":
 					return []ccv2.Application{}, nil, nil
@@ -88,11 +88,24 @@ var _ = Describe("Route Actions", func() {
 				}))
 
 				Expect(fakeCloudControllerClient.GetSpaceRoutesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetSpaceRoutesArgsForCall(0)).To(Equal("space-guid"))
+
+				spaceGUID, queries := fakeCloudControllerClient.GetSpaceRoutesArgsForCall(0)
+				Expect(spaceGUID).To(Equal("space-guid"))
+				Expect(queries).To(BeNil())
+
 				Expect(fakeCloudControllerClient.GetRouteApplicationsCallCount()).To(Equal(3))
-				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)).To(Equal("orphaned-route-guid-1"))
-				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(1)).To(Equal("orphaned-route-guid-2"))
-				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(2)).To(Equal("not-orphaned-route-guid-3"))
+
+				routeGUID, queries := fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)
+				Expect(routeGUID).To(Equal("orphaned-route-guid-1"))
+				Expect(queries).To(BeNil())
+
+				routeGUID, queries = fakeCloudControllerClient.GetRouteApplicationsArgsForCall(1)
+				Expect(routeGUID).To(Equal("orphaned-route-guid-2"))
+				Expect(queries).To(BeNil())
+
+				routeGUID, queries = fakeCloudControllerClient.GetRouteApplicationsArgsForCall(2)
+				Expect(routeGUID).To(Equal("not-orphaned-route-guid-3"))
+				Expect(queries).To(BeNil())
 			})
 		})
 
@@ -111,9 +124,16 @@ var _ = Describe("Route Actions", func() {
 				Expect(orphanedRoutes).To(BeNil())
 
 				Expect(fakeCloudControllerClient.GetSpaceRoutesCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetSpaceRoutesArgsForCall(0)).To(Equal("space-guid"))
+
+				spaceGUID, queries := fakeCloudControllerClient.GetSpaceRoutesArgsForCall(0)
+				Expect(spaceGUID).To(Equal("space-guid"))
+				Expect(queries).To(BeNil())
+
 				Expect(fakeCloudControllerClient.GetRouteApplicationsCallCount()).To(Equal(1))
-				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)).To(Equal("not-orphaned-route-guid-3"))
+
+				routeGUID, queries := fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)
+				Expect(routeGUID).To(Equal("not-orphaned-route-guid-3"))
+				Expect(queries).To(BeNil())
 			})
 		})
 

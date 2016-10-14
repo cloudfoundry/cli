@@ -7,11 +7,13 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// Domain represents a Cloud Controller Domain.
 type Domain struct {
 	GUID string
 	Name string
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Domain response.
 func (domain *Domain) UnmarshalJSON(data []byte) error {
 	var ccDomain struct {
 		Metadata internal.Metadata `json:"metadata"`
@@ -28,6 +30,8 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// GetSharedDomain returns the Shared Domain associated with the provided
+// Domain GUID.
 func (client *CloudControllerClient) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.SharedDomainRequest,
@@ -47,6 +51,8 @@ func (client *CloudControllerClient) GetSharedDomain(domainGUID string) (Domain,
 	return domain, response.Warnings, nil
 }
 
+// GetPrivateDomain returns the Private Domain associated with the provided
+// Domain GUID.
 func (client *CloudControllerClient) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.PrivateDomainRequest,

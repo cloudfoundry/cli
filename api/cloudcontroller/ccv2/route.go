@@ -7,6 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
+// Route represents a Cloud Controller Route.
 type Route struct {
 	GUID         string
 	Host         string
@@ -16,6 +17,7 @@ type Route struct {
 	DomainFields Domain
 }
 
+// UnmarshalJSON helps unmarshal a Cloud Controller Route response.
 func (route *Route) UnmarshalJSON(data []byte) error {
 	var ccRoute struct {
 		Metadata internal.Metadata `json:"metadata"`
@@ -38,10 +40,13 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string) ([]Route, Warnings, error) {
+// GetSpaceRoutes returns a list of Routes associated with the provided Space
+// GUID, and filtered by the provided queries.
+func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.RoutesFromSpaceRequest,
 		Params:      map[string]string{"space_guid": spaceGUID},
+		Query:       FormatQueryParameters(queryParams),
 	}
 
 	fullRoutesList := []Route{}
@@ -75,6 +80,7 @@ func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string) ([]Route, 
 	return fullRoutesList, fullWarningsList, nil
 }
 
+// DeleteRoute deletes the Route associated with the provided Route GUID.
 func (client *CloudControllerClient) DeleteRoute(routeGUID string) (Warnings, error) {
 	request := cloudcontroller.Request{
 		RequestName: internal.DeleteRouteRequest,

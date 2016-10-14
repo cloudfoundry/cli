@@ -116,7 +116,7 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns an error", func() {
-				_, _, err := client.GetRouteApplications("some-route-guid")
+				_, _, err := client.GetRouteApplications("some-route-guid", nil)
 				Expect(err).To(MatchError(ResourceNotFoundError{
 					Message: "The route could not be found: some-route-guid",
 				}))
@@ -126,7 +126,7 @@ var _ = Describe("Application", func() {
 		Context("when there are applications associated with this route", func() {
 			BeforeEach(func() {
 				response1 := `{
-				"next_url": "/v2/routes/some-route-guid/apps?page=2",
+				"next_url": "/v2/routes/some-route-guid/apps?q=space_guid:some-space-guid&page=2",
 				"resources": [
 					{
 						"metadata": {
@@ -173,20 +173,24 @@ var _ = Describe("Application", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/routes/some-route-guid/apps"),
+						VerifyRequest("GET", "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/routes/some-route-guid/apps", "page=2"),
+						VerifyRequest("GET", "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
 			})
 
 			It("returns all the applications and all warnings", func() {
-				apps, warnings, err := client.GetRouteApplications("some-route-guid")
+				apps, warnings, err := client.GetRouteApplications("some-route-guid", []Query{{
+					Filter:   SpaceGUIDFilter,
+					Operator: EqualOperator,
+					Value:    "some-space-guid",
+				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(apps).To(ConsistOf([]Application{
 					{Name: "app-name-1", GUID: "app-guid-1"},
@@ -213,7 +217,7 @@ var _ = Describe("Application", func() {
 			})
 
 			It("returns an empty list of applications", func() {
-				apps, _, err := client.GetRouteApplications("some-route-guid")
+				apps, _, err := client.GetRouteApplications("some-route-guid", nil)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(apps).To(BeEmpty())
 			})

@@ -20,7 +20,7 @@ var _ = Describe("Route", func() {
 		Context("when there are routes in this space", func() {
 			BeforeEach(func() {
 				response1 := `{
-				"next_url": "/v2/spaces/some-space-guid/routes?page=2",
+				"next_url": "/v2/spaces/some-space-guid/routes?q=space_guid:some-space-guid&page=2",
 				"resources": [
 					{
 						"metadata": {
@@ -79,20 +79,24 @@ var _ = Describe("Route", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
+						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "q=space_guid:some-space-guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "page=2"),
+						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "q=space_guid:some-space-guid&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
 			})
 
 			It("returns all the routes and all warnings", func() {
-				routes, warnings, err := client.GetSpaceRoutes("some-space-guid")
+				routes, warnings, err := client.GetSpaceRoutes("some-space-guid", []Query{{
+					Filter:   SpaceGUIDFilter,
+					Operator: EqualOperator,
+					Value:    "some-space-guid",
+				}})
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(ConsistOf([]Route{
 					{
@@ -143,7 +147,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an empty list of routes", func() {
-				routes, _, err := client.GetSpaceRoutes("some-space-guid")
+				routes, _, err := client.GetSpaceRoutes("some-space-guid", nil)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(routes).To(BeEmpty())
 			})
@@ -165,7 +169,7 @@ var _ = Describe("Route", func() {
 			})
 
 			It("returns an error", func() {
-				routes, _, err := client.GetSpaceRoutes("some-space-guid")
+				routes, _, err := client.GetSpaceRoutes("some-space-guid", nil)
 				Expect(err).To(MatchError(ResourceNotFoundError{
 					Message: "The app space could not be found: some-space-guid",
 				}))
