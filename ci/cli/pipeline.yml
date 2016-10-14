@@ -389,6 +389,7 @@ jobs:
       params:
         BACKEND: dea
         DEFAULT_TIMEOUT: 60
+        NODES: 6
       on_failure:
          put: slack-alert
          params:
@@ -424,6 +425,7 @@ jobs:
     params:
       BACKEND: diego
       DEFAULT_TIMEOUT: 60
+      NODES: 6
     ensure:
       put: bosh-lites-diego-pool
       params:
