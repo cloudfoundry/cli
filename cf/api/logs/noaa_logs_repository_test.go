@@ -2,10 +2,10 @@ package logs_test
 
 import (
 	"errors"
-	"reflect"
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
+	noaaerrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 	"github.com/gogo/protobuf/proto"
 
@@ -25,6 +25,7 @@ var _ = Describe("logs with noaa repository", func() {
 		fakeNoaaConsumer   *testapi.FakeNoaaConsumer
 		config             coreconfig.ReadWriter
 		fakeTokenRefresher *authenticationfakes.FakeRepository
+		retryTimeout       time.Duration
 		repo               *logs.NoaaLogsRepository
 	)
 
@@ -35,7 +36,8 @@ var _ = Describe("logs with noaa repository", func() {
 		config.SetDopplerEndpoint("doppler.test.com")
 		config.SetAccessToken("the-access-token")
 		fakeTokenRefresher = &authenticationfakes.FakeRepository{}
-		repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
+		retryTimeout = time.Second + 500*time.Millisecond
+		repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher, retryTimeout)
 	})
 
 	Describe("Authentication Token Refresh", func() {
@@ -90,21 +92,31 @@ var _ = Describe("logs with noaa repository", func() {
 		})
 
 		Context("when an error occurs", func() {
-			var e chan error
-			var c chan *events.LogMessage
+			var (
+				e       chan error
+				c       chan *events.LogMessage
+				closeWg *sync.WaitGroup
+			)
 
 			BeforeEach(func() {
+				closeWg = new(sync.WaitGroup)
 				errChan = make(chan error)
 				logChan = make(chan logs.Loggable)
 
-				e = make(chan error)
+				e = make(chan error, 1)
 				c = make(chan *events.LogMessage)
 
+				closeWg.Add(1)
 				fakeNoaaConsumer.CloseStub = func() error {
+					defer closeWg.Done()
 					close(e)
 					close(c)
 					return nil
 				}
+			})
+
+			AfterEach(func() {
+				closeWg.Wait()
 			})
 
 			It("returns an error when it occurs", func(done Done) {
@@ -112,16 +124,93 @@ var _ = Describe("logs with noaa repository", func() {
 				err := errors.New("oops")
 
 				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
-					go func() {
-						e <- err
-					}()
+					e <- err
 					return c, e
 				}
-				go repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				defer wg.Wait()
+				go func() {
+					defer wg.Done()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				}()
 
 				Eventually(errChan).Should(Receive(&err))
 
 				close(done)
+			})
+
+			It("does not return a RetryError before RetryTimeout", func(done Done) {
+				defer repo.Close()
+				err := noaaerrors.NewRetryError(errors.New("oops"))
+
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					e <- err
+					return c, e
+				}
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				defer wg.Wait()
+				go func() {
+					defer wg.Done()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				}()
+
+				Consistently(errChan).ShouldNot(Receive())
+				close(done)
+			})
+
+			It("returns a RetryError if no data is received before RetryTimeout", func() {
+				defer repo.Close()
+				err := noaaerrors.NewRetryError(errors.New("oops"))
+
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					e <- err
+					return c, e
+				}
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				defer wg.Wait()
+				go func() {
+					defer wg.Done()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				}()
+
+				Consistently(errChan, time.Second).ShouldNot(Receive())
+				expectedErr := errors.New("Timed out waiting for connection to Loggregator")
+				Eventually(errChan, time.Second).Should(Receive(Equal(expectedErr)))
+			})
+
+			It("Resets the retry timeout after a successful reconnection", func() {
+				defer repo.Close()
+				err := noaaerrors.NewRetryError(errors.New("oops"))
+
+				fakeNoaaConsumer.TailingLogsStub = func(appGuid string, authToken string) (<-chan *events.LogMessage, <-chan error) {
+					e <- err
+					return c, e
+				}
+
+				var wg sync.WaitGroup
+				wg.Add(1)
+				defer wg.Wait()
+				go func() {
+					defer wg.Done()
+					repo.TailLogsFor("app-guid", func() {}, logChan, errChan)
+				}()
+
+				Consistently(errChan, time.Second).ShouldNot(Receive())
+				fakeNoaaConsumer.SetOnConnectCallbackArgsForCall(0)()
+
+				c <- makeNoaaLogMessage("foo", 100)
+				Eventually(logChan).Should(Receive())
+				Consistently(errChan, time.Second).ShouldNot(Receive())
+
+				e <- err
+				expectedErr := errors.New("Timed out waiting for connection to Loggregator")
+				Eventually(errChan, 2*time.Second).Should(Receive(Equal(expectedErr)))
 			})
 		})
 
@@ -163,12 +252,17 @@ var _ = Describe("logs with noaa repository", func() {
 
 				fakeNoaaConsumer.TailingLogsReturns(c, e)
 
-				var cb = func() { return }
+				callbackCalled := make(chan struct{})
+				var cb = func() {
+					close(callbackCalled)
+					return
+				}
 				repo.TailLogsFor("app-guid", cb, logChan, errChan)
 
 				Expect(fakeNoaaConsumer.SetOnConnectCallbackCallCount()).To(Equal(1))
 				arg := fakeNoaaConsumer.SetOnConnectCallbackArgsForCall(0)
-				Expect(reflect.ValueOf(arg).Pointer() == reflect.ValueOf(cb).Pointer()).To(BeTrue())
+				arg()
+				Expect(callbackCalled).To(BeClosed())
 			})
 		})
 
@@ -205,7 +299,7 @@ var _ = Describe("logs with noaa repository", func() {
 			})
 
 			JustBeforeEach(func() {
-				repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher)
+				repo = logs.NewNoaaLogsRepository(config, fakeNoaaConsumer, fakeTokenRefresher, retryTimeout)
 
 				fakeNoaaConsumer.CloseStub = func() error {
 					syncMu.Lock()

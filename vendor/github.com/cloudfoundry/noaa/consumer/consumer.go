@@ -16,11 +16,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const (
-	reconnectTimeout      = 500 * time.Millisecond
-	maxRetries       uint = 5
-)
-
 var (
 	// KeepAlive sets the interval between keep-alive messages sent by the client to loggregator.
 	KeepAlive = 25 * time.Second
@@ -64,6 +59,8 @@ type Consumer struct {
 	refreshTokens  bool
 	refresherMutex sync.RWMutex
 	tokenRefresher TokenRefresher
+
+	minRetryDelay, maxRetryDelay int64
 }
 
 // New creates a new consumer to a trafficcontroller.
@@ -77,6 +74,8 @@ func New(trafficControllerUrl string, tlsConfig *tls.Config, proxy func(*http.Re
 			Transport: transport,
 			Timeout:   internal.Timeout,
 		},
+		minRetryDelay: int64(DefaultMinRetryDelay),
+		maxRetryDelay: int64(DefaultMaxRetryDelay),
 	}
 	consumer.dialer = websocket.Dialer{HandshakeTimeout: internal.Timeout, NetDial: consumer.proxyDial, TLSClientConfig: tlsConfig}
 	return consumer
