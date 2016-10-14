@@ -230,10 +230,10 @@ var _ = Describe("Route Actions", func() {
 
 			Entry("has domain", "", "domain.com", "", 0, "domain.com"),
 			Entry("has host, domain", "host", "domain.com", "", 0, "host.domain.com"),
-			Entry("has domain, path", "", "domain.com", "path", 0, "domain.com/path"),
-			Entry("has host, domain, path", "host", "domain.com", "path", 0, "host.domain.com/path"),
+			Entry("has domain, path", "", "domain.com", "/path", 0, "domain.com/path"),
+			Entry("has host, domain, path", "host", "domain.com", "/path", 0, "host.domain.com/path"),
 			Entry("has domain, port", "", "domain.com", "", 3333, "domain.com:3333"),
-			Entry("has host, domain, path, port", "host", "domain.com", "path", 3333, "domain.com:3333"),
+			Entry("has host, domain, path, port", "host", "domain.com", "/path", 3333, "domain.com:3333"),
 		)
 	})
 })

@@ -82,7 +82,7 @@ func (r Route) String() string {
 	}
 
 	if r.Path != "" {
-		routeString = fmt.Sprintf("%s/%s", routeString, r.Path)
+		routeString = fmt.Sprintf("%s%s", routeString, r.Path)
 	}
 
 	return routeString
