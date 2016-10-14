@@ -128,7 +128,7 @@ run:
 
     export CONFIG=$PWD/integration_config.json
 
-    SKIPS="-skip=Config|"
+    SKIPS="-skip="
     $SKIP_SSO && SKIPS="${SKIPS}SSO|"
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
@@ -139,7 +139,6 @@ run:
     SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
 
     ./bin/test \
-      -r \
       -slowSpecThreshold=120 -randomizeAllSpecs \
       -nodes "${NODES}" \
       "${SKIPS}" \
