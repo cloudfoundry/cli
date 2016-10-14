@@ -20,14 +20,14 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 		allWarnings    Warnings
 	)
 
-	routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID)
+	routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID, nil)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
 	for _, route := range routes {
-		apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(route.GUID)
+		apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(route.GUID, nil)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err
