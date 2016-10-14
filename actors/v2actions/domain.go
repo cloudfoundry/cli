@@ -2,10 +2,14 @@ package v2actions
 
 import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
+// Domain represents a CLI Domain.
 type Domain ccv2.Domain
 
+// DomainNotFoundError is an error wrapper that represents the case
+// when the domain is not found.
 type DomainNotFoundError struct{}
 
+// Error method to display the error message.
 func (e DomainNotFoundError) Error() string {
 	return "Domain not found."
 }
@@ -16,6 +20,7 @@ func isResourceNotFoundError(err error) bool {
 	return isResourceNotFound
 }
 
+// GetDomainByGUID returns a shared or private domain with the domain GUID.
 func (actor Actor) GetDomainByGUID(domainGUID string) (Domain, Warnings, error) {
 	var allWarnings Warnings
 
