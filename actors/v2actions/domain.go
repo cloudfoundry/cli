@@ -10,28 +10,34 @@ func (e DomainNotFoundError) Error() string {
 	return "Domain not found."
 }
 
+func isResourceNotFoundError(err error) bool {
+	_, isResourceNotFound := err.(ccv2.ResourceNotFoundError)
+
+	return isResourceNotFound
+}
+
 func (actor Actor) GetDomainByGUID(domainGUID string) (Domain, Warnings, error) {
 	var allWarnings Warnings
 
 	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
 	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return Domain{}, allWarnings, err
+	if err == nil {
+		return Domain(domain), allWarnings, nil
 	}
 
-	if domain.GUID != "" {
-		return Domain(domain), allWarnings, nil
+	if !isResourceNotFoundError(err) {
+		return Domain{}, allWarnings, err
 	}
 
 	domain, warnings, err = actor.CloudControllerClient.GetPrivateDomain(domainGUID)
 	allWarnings = append(allWarnings, warnings...)
-	if err != nil {
-		return Domain{}, allWarnings, err
+	if err == nil {
+		return Domain(domain), allWarnings, nil
 	}
 
-	if domain.GUID == "" {
+	if isResourceNotFoundError(err) {
 		return Domain{}, allWarnings, DomainNotFoundError{}
 	}
 
-	return Domain(domain), allWarnings, nil
+	return Domain{}, allWarnings, err
 }

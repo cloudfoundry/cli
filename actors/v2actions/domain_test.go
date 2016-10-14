@@ -52,7 +52,7 @@ var _ = Describe("Domain Actions", func() {
 					GUID: "private-domain-guid",
 					Name: "private-domain",
 				}
-				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, ccv2.ResourceNotFoundError{})
 				fakeCloudControllerClient.GetPrivateDomainReturns(expectedDomain, nil, nil)
 			})
 
@@ -72,8 +72,8 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, nil)
-				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, nil, nil)
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, ccv2.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, nil, ccv2.ResourceNotFoundError{})
 			})
 
 			It("returns a DomainNotFoundError", func() {
@@ -116,9 +116,9 @@ var _ = Describe("Domain Actions", func() {
 			),
 
 			Entry(
-				"shared domain warning; private domain warning & error",
+				"shared domain warning and resource not found; private domain warning & error",
 				func() {
-					fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, []string{"shared-domain-warning"}, nil)
+					fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, []string{"shared-domain-warning"}, ccv2.ResourceNotFoundError{})
 				},
 				func() {
 					fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, []string{"private-domain-warning"}, errors.New("private domain error"))
@@ -127,20 +127,6 @@ var _ = Describe("Domain Actions", func() {
 				Warnings{"shared-domain-warning", "private-domain-warning"},
 				true,
 				errors.New("private domain error"),
-			),
-
-			Entry(
-				"shared domain warning; private domain warning",
-				func() {
-					fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, []string{"shared-domain-warning"}, nil)
-				},
-				func() {
-					fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{GUID: "some-guid"}, []string{"private-domain-warning"}, nil)
-				},
-				Domain{GUID: "some-guid"},
-				Warnings{"shared-domain-warning", "private-domain-warning"},
-				false,
-				nil,
 			),
 		)
 	})
