@@ -153,10 +153,10 @@ resources:
   source:
     repository: cloudfoundry-incubator/etcd-release
 
-- name: garden-linux-release
+- name: garden-runc-release
   type: bosh-io-release
   source:
-    repository: cloudfoundry/garden-linux-release
+    repository: cloudfoundry/garden-runc-release
 
 groups:
 - name: bosh-lites
@@ -296,7 +296,7 @@ jobs:
       params:
         claim: {{lite-1-hostname}}
     - get: etcd-release
-    - get: garden-linux-release
+    - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
@@ -442,7 +442,7 @@ jobs:
       params:
         claim: {{lite-2-hostname}}
     - get: etcd-release
-    - get: garden-linux-release
+    - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
@@ -588,7 +588,7 @@ jobs:
       params:
         claim: {{lite-3-hostname}}
     - get: etcd-release
-    - get: garden-linux-release
+    - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
@@ -734,7 +734,7 @@ jobs:
       params:
         claim: {{lite-4-hostname}}
     - get: etcd-release
-    - get: garden-linux-release
+    - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
@@ -885,7 +885,7 @@ jobs:
       params:
         claim: {{lite-acceptance-hostname}}
     - get: etcd-release
-    - get: garden-linux-release
+    - get: garden-runc-release
     - get: diego-release
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
