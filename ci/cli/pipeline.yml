@@ -423,6 +423,7 @@ jobs:
     file: cli-ci/ci/cli/tasks/cats-linux.yml
     params:
       BACKEND: diego
+      DEFAULT_TIMEOUT: 60
     ensure:
       put: bosh-lites-diego-pool
       params:
