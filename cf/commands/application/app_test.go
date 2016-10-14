@@ -443,47 +443,104 @@ var _ = Describe("App", func() {
 				cmd.SetDependency(deps, true)
 			})
 
-			It("populates the plugin model", func() {
-				Expect(err).NotTo(HaveOccurred())
+			Context("when the app is running", func() {
+				It("populates the plugin model", func() {
+					Expect(err).NotTo(HaveOccurred())
 
-				// from AppRequirement model
-				Expect(getAppModel.Stack.Name).To(Equal("fake-stack-name"))
-				Expect(getAppModel.Stack.Guid).To(Equal("fake-stack-guid"))
+					// from AppRequirement model
+					Expect(getAppModel.Stack.Name).To(Equal("fake-stack-name"))
+					Expect(getAppModel.Stack.Guid).To(Equal("fake-stack-guid"))
 
-				// from GetAppSummary model
-				Expect(getAppModel.Name).To(Equal("fake-app-name"))
-				Expect(getAppModel.State).To(Equal("started"))
-				Expect(getAppModel.Guid).To(Equal("fake-app-guid"))
-				Expect(getAppModel.Command).To(Equal("fake-command"))
-				Expect(getAppModel.Diego).To(BeTrue())
-				Expect(getAppModel.DetectedStartCommand).To(Equal("fake-detected-start-command"))
-				Expect(getAppModel.DiskQuota).To(Equal(int64(1024)))
-				Expect(getAppModel.EnvironmentVars).To(Equal(map[string]interface{}{"fake-env-var": "fake-env-var-value"}))
-				Expect(getAppModel.InstanceCount).To(Equal(1))
-				Expect(getAppModel.Memory).To(Equal(int64(1024)))
-				Expect(getAppModel.RunningInstances).To(Equal(1))
-				Expect(getAppModel.HealthCheckTimeout).To(Equal(0))
-				Expect(getAppModel.SpaceGuid).To(Equal("fake-space-guid"))
-				Expect(getAppModel.PackageUpdatedAt.String()).To(Equal(time.Date(2015, time.November, 19, 1, 0, 15, 0, time.UTC).String()))
-				Expect(getAppModel.PackageState).To(Equal("STAGED"))
-				Expect(getAppModel.StagingFailedReason).To(BeEmpty())
-				Expect(getAppModel.BuildpackUrl).To(Equal("fake-buildpack"))
-				Expect(getAppModel.AppPorts).To(Equal([]int{8080, 9090}))
-				Expect(getAppModel.Routes[0].Host).To(Equal("fake-route-host"))
-				Expect(getAppModel.Routes[0].Guid).To(Equal("fake-route-guid"))
-				Expect(getAppModel.Routes[0].Domain.Name).To(Equal("fake-route-domain-name"))
-				Expect(getAppModel.Routes[0].Domain.Guid).To(Equal("fake-route-domain-guid"))
-				Expect(getAppModel.Services[0].Guid).To(Equal("fake-service-guid"))
-				Expect(getAppModel.Services[0].Name).To(Equal("fake-service-name"))
+					// from GetAppSummary model
+					Expect(getAppModel.Name).To(Equal("fake-app-name"))
+					Expect(getAppModel.State).To(Equal("started"))
+					Expect(getAppModel.Guid).To(Equal("fake-app-guid"))
+					Expect(getAppModel.Command).To(Equal("fake-command"))
+					Expect(getAppModel.Diego).To(BeTrue())
+					Expect(getAppModel.DetectedStartCommand).To(Equal("fake-detected-start-command"))
+					Expect(getAppModel.DiskQuota).To(Equal(int64(1024)))
+					Expect(getAppModel.EnvironmentVars).To(Equal(map[string]interface{}{"fake-env-var": "fake-env-var-value"}))
+					Expect(getAppModel.InstanceCount).To(Equal(1))
+					Expect(getAppModel.Memory).To(Equal(int64(1024)))
+					Expect(getAppModel.RunningInstances).To(Equal(1))
+					Expect(getAppModel.HealthCheckTimeout).To(Equal(0))
+					Expect(getAppModel.SpaceGuid).To(Equal("fake-space-guid"))
+					Expect(getAppModel.PackageUpdatedAt.String()).To(Equal(time.Date(2015, time.November, 19, 1, 0, 15, 0, time.UTC).String()))
+					Expect(getAppModel.PackageState).To(Equal("STAGED"))
+					Expect(getAppModel.StagingFailedReason).To(BeEmpty())
+					Expect(getAppModel.BuildpackUrl).To(Equal("fake-buildpack"))
+					Expect(getAppModel.AppPorts).To(Equal([]int{8080, 9090}))
+					Expect(getAppModel.Routes[0].Host).To(Equal("fake-route-host"))
+					Expect(getAppModel.Routes[0].Guid).To(Equal("fake-route-guid"))
+					Expect(getAppModel.Routes[0].Domain.Name).To(Equal("fake-route-domain-name"))
+					Expect(getAppModel.Routes[0].Domain.Guid).To(Equal("fake-route-domain-guid"))
+					Expect(getAppModel.Services[0].Guid).To(Equal("fake-service-guid"))
+					Expect(getAppModel.Services[0].Name).To(Equal("fake-service-name"))
 
-				// from GetInstances model
-				Expect(getAppModel.Instances[0].State).To(Equal("running"))
-				Expect(getAppModel.Instances[0].Details).To(Equal("fake-instance-details"))
-				Expect(getAppModel.Instances[0].CpuUsage).To(Equal(float64(0.25)))
-				Expect(getAppModel.Instances[0].DiskUsage).To(Equal(int64(1 * formatters.GIGABYTE)))
-				Expect(getAppModel.Instances[0].DiskQuota).To(Equal(int64(2 * formatters.GIGABYTE)))
-				Expect(getAppModel.Instances[0].MemUsage).To(Equal(int64(24 * formatters.MEGABYTE)))
-				Expect(getAppModel.Instances[0].MemQuota).To(Equal(int64(32 * formatters.MEGABYTE)))
+					// from GetInstances model
+					Expect(getAppModel.Instances[0].State).To(Equal("running"))
+					Expect(getAppModel.Instances[0].Details).To(Equal("fake-instance-details"))
+					Expect(getAppModel.Instances[0].CpuUsage).To(Equal(float64(0.25)))
+					Expect(getAppModel.Instances[0].DiskUsage).To(Equal(int64(1 * formatters.GIGABYTE)))
+					Expect(getAppModel.Instances[0].DiskQuota).To(Equal(int64(2 * formatters.GIGABYTE)))
+					Expect(getAppModel.Instances[0].MemUsage).To(Equal(int64(24 * formatters.MEGABYTE)))
+					Expect(getAppModel.Instances[0].MemQuota).To(Equal(int64(32 * formatters.MEGABYTE)))
+				})
+			})
+
+			Context("when the app is stopped but instance is returning back an error", func() {
+				BeforeEach(func() {
+					getAppSummaryModel.State = "stopped"
+					appSummaryRepo.GetSummaryReturns(getAppSummaryModel, nil)
+
+					var instances []models.AppInstanceFields //Very important since this is a nil body
+					appInstancesRepo.GetInstancesReturns(instances, errors.New("Bonzi"))
+				})
+
+				It("populates the plugin model with empty sets", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(getAppModel.Instances).ToNot(BeNil())
+					Expect(getAppModel.Instances).To(BeEmpty())
+				})
+			})
+
+			Context("when the there are no routes", func() {
+				BeforeEach(func() {
+					app := models.Application{
+						Stack: &models.Stack{
+							GUID: "stack-guid",
+							Name: "stack-name",
+						},
+					}
+					appSummaryRepo.GetSummaryReturns(app, nil)
+				})
+
+				It("populates the plugin model with empty sets", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(getAppModel.Routes).ToNot(BeNil())
+					Expect(getAppModel.Routes).To(BeEmpty())
+				})
+			})
+
+			Context("when the there are no services", func() {
+				BeforeEach(func() {
+					app := models.Application{
+						Stack: &models.Stack{
+							GUID: "stack-guid",
+							Name: "stack-name",
+						},
+					}
+					appSummaryRepo.GetSummaryReturns(app, nil)
+				})
+
+				It("populates the plugin model with empty sets", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(getAppModel.Services).ToNot(BeNil())
+					Expect(getAppModel.Services).To(BeEmpty())
+				})
 			})
 		})
 	})
