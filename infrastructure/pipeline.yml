@@ -890,10 +890,15 @@ jobs:
     - get: diego-repo
     - get: cflinuxfs2-rootfs-release
     - get: cli
-  - task: deploy-diego
-    file: cli/ci/infrastructure/tasks/deploy-diego.yml
-    params:
-      LITE_IP_ADDRESS: {{lite-acceptance-public-ip}}
+  - do:
+    - task: deploy-diego
+      file: cli/ci/infrastructure/tasks/deploy-diego.yml
+      params:
+        LITE_IP_ADDRESS: {{lite-acceptance-public-ip}}
+    - task: default-to-diego
+      file: cli/ci/infrastructure/tasks/set-cf-backend-to-diego.yml
+      params:
+        LITE_IP_ADDRESS: {{lite-acceptance-public-ip}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
