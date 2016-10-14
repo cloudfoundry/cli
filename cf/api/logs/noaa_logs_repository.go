@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 
 	"github.com/cloudfoundry/noaa"
+	noaaerrors "github.com/cloudfoundry/noaa/errors"
 	"github.com/cloudfoundry/sonde-go/events"
 )
 
@@ -19,9 +20,10 @@ type NoaaLogsRepository struct {
 	tokenRefresher authentication.TokenRefresher
 	messageQueue   *NoaaMessageQueue
 	BufferTime     time.Duration
+	retryTimeout   time.Duration
 }
 
-func NewNoaaLogsRepository(config coreconfig.Reader, consumer NoaaConsumer, tr authentication.TokenRefresher) *NoaaLogsRepository {
+func NewNoaaLogsRepository(config coreconfig.Reader, consumer NoaaConsumer, tr authentication.TokenRefresher, retryTimeout time.Duration) *NoaaLogsRepository {
 	consumer.RefreshTokenFrom(tr)
 	return &NoaaLogsRepository{
 		config:         config,
@@ -29,6 +31,7 @@ func NewNoaaLogsRepository(config coreconfig.Reader, consumer NoaaConsumer, tr a
 		tokenRefresher: tr,
 		messageQueue:   NewNoaaMessageQueue(),
 		BufferTime:     defaultBufferTime,
+		retryTimeout:   retryTimeout,
 	}
 }
 
@@ -57,37 +60,54 @@ func (repo *NoaaLogsRepository) RecentLogsFor(appGUID string) ([]Loggable, error
 
 func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), logChan chan<- Loggable, errChan chan<- error) {
 	ticker := time.NewTicker(repo.BufferTime)
+	retryTimer := newUnstartedTimer()
+
 	endpoint := repo.config.DopplerEndpoint()
 	if endpoint == "" {
 		errChan <- errors.New(T("Loggregator endpoint missing from config file"))
 		return
 	}
 
-	repo.consumer.SetOnConnectCallback(onConnect)
+	repo.consumer.SetOnConnectCallback(func() {
+		retryTimer.Stop()
+		onConnect()
+	})
 	c, e := repo.consumer.TailingLogs(appGUID, repo.config.AccessToken())
 
 	go func() {
+		defer close(logChan)
+		defer close(errChan)
+
+		timerRunning := false
 		for {
 			select {
 			case msg, ok := <-c:
 				if !ok {
 					ticker.Stop()
 					repo.flushMessages(logChan)
-					close(logChan)
-					close(errChan)
 					return
 				}
-
+				timerRunning = false
 				repo.messageQueue.PushMessage(msg)
 			case err := <-e:
 				if err != nil {
+					if _, ok := err.(noaaerrors.RetryError); ok {
+						if !timerRunning {
+							timerRunning = true
+							retryTimer.Reset(repo.retryTimeout)
+						}
+						continue
+					}
+
 					errChan <- err
 
 					ticker.Stop()
-					close(logChan)
-					close(errChan)
 					return
 				}
+			case <-retryTimer.C:
+				errChan <- errors.New("Timed out waiting for connection to Loggregator")
+				ticker.Stop()
+				return
 			}
 		}
 	}()
@@ -103,4 +123,12 @@ func (repo *NoaaLogsRepository) flushMessages(c chan<- Loggable) {
 	repo.messageQueue.EnumerateAndClear(func(m *events.LogMessage) {
 		c <- NewNoaaLogMessage(m)
 	})
+}
+
+// newUnstartedTimer returns a *time.Timer that is in an unstarted
+// state.
+func newUnstartedTimer() *time.Timer {
+	timer := time.NewTimer(time.Second)
+	timer.Stop()
+	return timer
 }
