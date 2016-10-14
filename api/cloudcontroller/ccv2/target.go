@@ -19,17 +19,9 @@ func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation b
 	client.connection = cloudcontroller.NewConnection(client.cloudControllerURL, internal.APIRoutes, skipSSLValidation)
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
-	request := cloudcontroller.Request{
-		RequestName: internal.InfoRequest,
-	}
-
-	var info APIInformation
-	response := cloudcontroller.Response{
-		Result: &info,
-	}
-	err := client.connection.Make(request, &response)
+	info, warnings, err := client.Info()
 	if err != nil {
-		return response.Warnings, err
+		return warnings, err
 	}
 
 	client.authorizationEndpoint = info.AuthorizationEndpoint
@@ -39,5 +31,5 @@ func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation b
 	client.routingEndpoint = info.RoutingEndpoint
 	client.tokenEndpoint = info.TokenEndpoint
 
-	return response.Warnings, nil
+	return warnings, nil
 }
