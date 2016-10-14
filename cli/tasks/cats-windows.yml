@@ -4,6 +4,7 @@ platform: windows
 params:
   ADMIN_USER:
   ADMIN_PASSWORD:
+  NODES:
 
 inputs:
 - name: cf-release-repo

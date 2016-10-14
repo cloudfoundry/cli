@@ -389,7 +389,7 @@ jobs:
       params:
         BACKEND: dea
         DEFAULT_TIMEOUT: 60
-        NODES: 6
+        NODES: 5
       on_failure:
          put: slack-alert
          params:
@@ -461,6 +461,7 @@ jobs:
     params:
       ADMIN_USER: {{bosh-lite-admin-username}}
       ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+      NODES: 5
     ensure:
       put: bosh-lites-dea-pool
       params:

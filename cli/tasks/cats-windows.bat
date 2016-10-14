@@ -24,4 +24,4 @@ popd
 go get -v github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
-ginkgo.exe -slowSpecThreshold=120 -skip="NO_DEA_SUPPORT|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB|exercises basic loggregator|firehose data|Users can manage droplet bits for an app" -nodes=6
+ginkgo.exe -slowSpecThreshold=120 -skip="NO_DEA_SUPPORT|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB|exercises basic loggregator|firehose data|Users can manage droplet bits for an app" -nodes=%NODES%
