@@ -30,4 +30,4 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
-    CF_API=$API_ENDPOINT ginkgo -r -nodes=4 -slowSpecThreshold=30 -randomizeSuites integration
+    CF_API=$API_ENDPOINT ginkgo -r -nodes=4 -slowSpecThreshold=30 -randomizeSuites -skip "Users can manage droplet bits for an app" integration
