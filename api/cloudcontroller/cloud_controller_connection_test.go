@@ -2,6 +2,7 @@ package cloudcontroller_test
 
 import (
 	"net/http"
+	"net/url"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller"
 
@@ -32,7 +33,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 	})
 
 	Describe("Make", func() {
-		Describe("URL Generation", func() {
+		Describe("HTTP request generation", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
@@ -42,7 +43,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				)
 			})
 
-			Context("when passing a RequestName", func() {
+			Context("when generating the request via a RequestName", func() {
 				It("sends the request to the server", func() {
 					request := Request{
 						RequestName: FooRequest,
@@ -56,9 +57,21 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
 				})
+
+				Context("when an error is encountered", func() {
+					It("returns the error", func() {
+						request := Request{
+							RequestName: "some-invalid-request-name",
+							Query:       url.Values{},
+						}
+
+						err := connection.Make(request, &Response{})
+						Expect(err).To(MatchError("No route exists with the name some-invalid-request-name"))
+					})
+				})
 			})
 
-			Context("when passing a URI", func() {
+			Context("when generating the request via an URI", func() {
 				It("sends the request to the server", func() {
 					request := Request{
 						URI:    "/v2/foo?q=a:b&q=c:d",
@@ -69,6 +82,18 @@ var _ = Describe("Cloud Controller Connection", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
+				})
+
+				Context("when an error is encountered", func() {
+					It("returns the error", func() {
+						request := Request{
+							URI:    "/v2/foo?q=a:b&q=c:d",
+							Method: "INVALID:METHOD",
+						}
+
+						err := connection.Make(request, &Response{})
+						Expect(err).To(MatchError("net/http: invalid method \"INVALID:METHOD\""))
+					})
 				})
 			})
 		})
