@@ -78,10 +78,8 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case v2actions.DomainNotFoundError:
-			return err // Should this error be handled differently? Note: it will 99.99% never occur.
 		case v2actions.OrphanedRoutesNotFoundError:
-			// Do nothing to parity the existing behavior
+		// Do nothing to parity the existing behavior
 		default:
 			return common.HandleError(err)
 		}

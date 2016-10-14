@@ -193,13 +193,39 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 				Context("when getting the routes returns an error", func() {
 					var expectedErr error
 
-					BeforeEach(func() {
-						expectedErr = errors.New("getting orphaned routes error")
-						fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
+					Context("when the error is a DomainNotFoundError", func() {
+						BeforeEach(func() {
+							expectedErr = v2actions.DomainNotFoundError{}
+							fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
+						})
+
+						It("should return the DomainNotFoundError", func() {
+							Expect(executeErr).To(MatchError(expectedErr))
+						})
 					})
 
-					It("returns the error", func() {
-						Expect(executeErr).To(MatchError(expectedErr))
+					Context("when the error is an OrphanedRoutesNotFoundError", func() {
+						BeforeEach(func() {
+							expectedErr = v2actions.OrphanedRoutesNotFoundError{}
+							fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
+						})
+
+						It("should not return an error and only display 'OK'", func() {
+							Expect(executeErr).ToNot(HaveOccurred())
+
+							Expect(fakeActor.DeleteRouteByGUIDCallCount()).To(Equal(0))
+						})
+					})
+
+					Context("when there is a generic error", func() {
+						BeforeEach(func() {
+							expectedErr = errors.New("getting orphaned routes error")
+							fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
+						})
+
+						It("returns the error", func() {
+							Expect(executeErr).To(MatchError(expectedErr))
+						})
 					})
 				})
 
