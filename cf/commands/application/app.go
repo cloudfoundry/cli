@@ -256,6 +256,9 @@ func (cmd *ShowApp) populatePluginModel(
 		}
 		cmd.pluginAppModel.Instances = append(cmd.pluginAppModel.Instances, instanceFields)
 	}
+	if cmd.pluginAppModel.Instances == nil {
+		cmd.pluginAppModel.Instances = []plugin_models.GetApp_AppInstanceFields{}
+	}
 
 	for i := range getSummaryApp.Routes {
 		routeSummary := plugin_models.GetApp_RouteSummary{
@@ -268,6 +271,9 @@ func (cmd *ShowApp) populatePluginModel(
 		}
 		cmd.pluginAppModel.Routes = append(cmd.pluginAppModel.Routes, routeSummary)
 	}
+	if cmd.pluginAppModel.Routes == nil {
+		cmd.pluginAppModel.Routes = []plugin_models.GetApp_RouteSummary{}
+	}
 
 	for i := range getSummaryApp.Services {
 		serviceSummary := plugin_models.GetApp_ServiceSummary{
@@ -275,5 +281,8 @@ func (cmd *ShowApp) populatePluginModel(
 			Guid: getSummaryApp.Services[i].GUID,
 		}
 		cmd.pluginAppModel.Services = append(cmd.pluginAppModel.Services, serviceSummary)
+	}
+	if cmd.pluginAppModel.Services == nil {
+		cmd.pluginAppModel.Services = []plugin_models.GetApp_ServiceSummary{}
 	}
 }
