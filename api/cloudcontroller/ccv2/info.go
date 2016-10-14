@@ -1,10 +1,8 @@
 package ccv2
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
 // APIInformation represents the information returned back from /v2/info
@@ -62,23 +60,15 @@ func (client *CloudControllerClient) TokenEndpoint() string {
 
 // Info returns back endpoint and API information from /v2/info.
 func (client *CloudControllerClient) Info() (APIInformation, Warnings, error) {
-	response, err := http.Get(fmt.Sprintf("http://%s/v2/info", client.cloudControllerURL))
-	if err != nil {
-		return APIInformation{}, nil, err
-	}
-
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return APIInformation{}, nil, err
+	request := cloudcontroller.Request{
+		RequestName: internal.InfoRequest,
 	}
 
 	var info APIInformation
-	err = json.Unmarshal(body, &info)
-	if err != nil {
-		return APIInformation{}, nil, err
+	response := cloudcontroller.Response{
+		Result: &info,
 	}
 
-	return info, nil, nil
+	err := client.connection.Make(request, &response)
+	return info, response.Warnings, err
 }
