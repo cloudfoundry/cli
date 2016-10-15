@@ -32,6 +32,8 @@ var _ = Describe("delete-orphaned-routes command", func() {
 	})
 
 	AfterEach(func() {
+		setAPI()
+		loginCF()
 		Eventually(CF("delete-org", "-f", orgName), CFLongTimeout).Should(Exit(0))
 	})
 
@@ -41,16 +43,11 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				unsetAPI()
 			})
 
-			AfterEach(func() {
-				setAPI()
-				loginCF()
-			})
-
 			It("fails with no API endpoint set message", func() {
-				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
-					Exit(1),
-					Say("FAILED\nNo API endpoint set. Use 'cf login' or 'cf api' to target an endpoint.")),
-				)
+				session := CF("delete-orphaned-routes", "-f")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 			})
 		})
 
@@ -59,29 +56,43 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				logoutCF()
 			})
 
-			AfterEach(func() {
-				loginCF()
-			})
-
 			It("fails with not logged in message", func() {
-				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
-					Exit(1),
-					Say("FAILED\nNot logged in. Use 'cf login' to log in.")),
-				)
+				session := CF("delete-orphaned-routes", "-f")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
 			})
 		})
 
-		Context("when there no space set", func() {
+		Context("when there no org set", func() {
 			BeforeEach(func() {
 				logoutCF()
 				loginCF()
 			})
 
-			It("fails with no targeted space error message", func() {
-				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
-					Exit(1),
-					Say("FAILED\nFailed fetching routes.\nServer error, status code: 404, error code: 40004, message: The app space could not be found: routes")),
-				)
+			It("fails with no targeted org error message", func() {
+				session := CF("delete-orphaned-routes", "-f")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
+			})
+		})
+
+		Context("when there no space set", func() {
+			BeforeEach(func() {
+				// create a another space, because if the org has only one space it
+				// will be automatically targetted
+				createSpace(PrefixedRandomName("SPACE"))
+				logoutCF()
+				loginCF()
+				targetOrg(orgName)
+			})
+
+			It("fails with no space targeted error message", func() {
+				session := CF("delete-orphaned-routes", "-f")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space"))
 			})
 		})
 	})
@@ -120,8 +131,10 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			var boundRoute Route
 
 			BeforeEach(func() {
-				Eventually(CF("push", appName, "-p", "./assets/dora", "-m", DefaultMemoryLimit, "-k", DefaultDiskLimit, "--no-route"), CFLongTimeout).Should(Exit(0))
-				Eventually(CF("apps"), CFLongTimeout).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+started\\s+1/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
+				WithSimpleApp(func(appDir string) {
+					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+				})
+				Eventually(CF("apps"), CFLongTimeout).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
 
 				boundRoute = NewRoute(spaceName, domainName, "bound-1", "path-3")
 				boundRoute.Create()
