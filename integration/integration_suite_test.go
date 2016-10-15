@@ -132,8 +132,16 @@ func createOrgAndSpace(org string, space string) {
 	Eventually(helpers.CF("create-space", space, "-o", org)).Should(Exit(0))
 }
 
+func createSpace(space string) {
+	Eventually(helpers.CF("create-space", space)).Should(Exit(0))
+}
+
 func targetOrgAndSpace(org string, space string) {
 	Eventually(helpers.CF("target", "-o", org, "-s", space)).Should(Exit(0))
+}
+
+func targetOrg(org string) {
+	Eventually(helpers.CF("target", "-o", org)).Should(Exit(0))
 }
 
 func setupCF(org string, space string) {
