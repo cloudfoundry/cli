@@ -40,7 +40,7 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 		}
 
 		if len(apps) == 0 {
-			domain, warnings, err := actor.GetDomainByGUID(route.DomainFields.GUID)
+			domain, warnings, err := actor.GetDomain(route.DomainFields.GUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return nil, allWarnings, err

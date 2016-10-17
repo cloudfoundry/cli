@@ -20,8 +20,8 @@ func isResourceNotFoundError(err error) bool {
 	return isResourceNotFound
 }
 
-// GetDomainByGUID returns a shared or private domain with the domain GUID.
-func (actor Actor) GetDomainByGUID(domainGUID string) (Domain, Warnings, error) {
+// GetDomain returns a shared or private domain with the domain GUID.
+func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	var allWarnings Warnings
 
 	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
