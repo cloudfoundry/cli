@@ -13,7 +13,7 @@ import (
 
 type DeleteOrphanedRoutesActor interface {
 	GetOrphanedRoutesBySpace(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error)
-	DeleteRouteByGUID(routeGUID string) (v2actions.Warnings, error)
+	DeleteRoute(routeGUID string) (v2actions.Warnings, error)
 }
 
 type DeleteOrphanedRoutesCommand struct {
@@ -90,7 +90,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 			"Route": route.String(),
 		})
 
-		warnings, err = cmd.Actor.DeleteRouteByGUID(route.GUID)
+		warnings, err = cmd.Actor.DeleteRoute(route.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
 			return common.HandleError(err)

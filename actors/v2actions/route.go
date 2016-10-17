@@ -63,8 +63,8 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 	return orphanedRoutes, allWarnings, err
 }
 
-// DeleteRouteByGUID deletes the Route associated with the provided Route GUID.
-func (actor Actor) DeleteRouteByGUID(routeGUID string) (Warnings, error) {
+// DeleteRoute deletes the Route associated with the provided Route GUID.
+func (actor Actor) DeleteRoute(routeGUID string) (Warnings, error) {
 	warnings, err := actor.CloudControllerClient.DeleteRoute(routeGUID)
 	return Warnings(warnings), err
 }
