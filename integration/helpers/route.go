@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"time"
 
 	. "github.com/onsi/gomega"
@@ -31,7 +30,6 @@ func NewRoute(space string, domain string, hostname string, path string) Route {
 
 func (r Route) Create() {
 	Eventually(CF("create-route", r.Space, r.Domain, "--hostname", r.Host, "--path", r.Path), CFRouteLongTimeout).Should(Exit(0))
-	Eventually(CF("routes"), CFRouteLongTimeout).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+%s\\s+/%s", r.Host, r.Domain, r.Path))))
 }
 
 func (r Route) Delete() {
@@ -53,6 +51,10 @@ func NewDomain(org string, name string) Domain {
 func (d Domain) Create() {
 	Eventually(CF("create-domain", d.Org, d.Name), CFRouteLongTimeout).Should(Exit(0))
 	Eventually(CF("domains"), CFRouteLongTimeout).Should(And(Exit(0), Say(d.Name)))
+}
+
+func (d Domain) Share() {
+	Eventually(CF("share-private-domain", d.Org, d.Name), CFRouteLongTimeout).Should(Exit(0))
 }
 
 func (d Domain) Delete() {
