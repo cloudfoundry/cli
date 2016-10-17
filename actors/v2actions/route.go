@@ -1,13 +1,15 @@
 package v2actions
 
-import (
-	"fmt"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-)
+import "fmt"
 
 // Route represents a CLI Route.
-type Route ccv2.Route
+type Route struct {
+	GUID   string
+	Host   string
+	Domain string
+	Path   string
+	Port   int
+}
 
 // OrphanedRoutesNotFoundError is an error wrapper that represents the case
 // when no orphaned routes are found.
@@ -40,7 +42,7 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 		}
 
 		if len(apps) == 0 {
-			domain, warnings, err := actor.GetDomain(route.DomainFields.GUID)
+			domain, warnings, err := actor.GetDomain(route.DomainGUID)
 			allWarnings = append(allWarnings, warnings...)
 			if err != nil {
 				return nil, allWarnings, err

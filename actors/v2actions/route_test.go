@@ -44,12 +44,12 @@ var _ = Describe("Route Actions", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetSpaceRoutesReturns([]ccv2.Route{
 					{
-						GUID:         "orphaned-route-guid-1",
-						DomainFields: ccv2.Domain{GUID: "some-domain-guid", Name: " some-domain.com"},
+						GUID:       "orphaned-route-guid-1",
+						DomainGUID: "some-domain-guid",
 					},
 					{
-						GUID:         "orphaned-route-guid-2",
-						DomainFields: ccv2.Domain{GUID: "some-other-domain-guid", Name: "some-other-domain.com"},
+						GUID:       "orphaned-route-guid-2",
+						DomainGUID: "some-other-domain-guid",
 					},
 					{
 						GUID: "not-orphaned-route-guid-3",

@@ -9,12 +9,11 @@ import (
 
 // Route represents a Cloud Controller Route.
 type Route struct {
-	GUID         string
-	Host         string
-	Domain       string
-	Path         string
-	Port         int
-	DomainFields Domain
+	GUID       string
+	Host       string
+	Path       string
+	Port       int
+	DomainGUID string
 }
 
 // UnmarshalJSON helps unmarshal a Cloud Controller Route response.
@@ -36,7 +35,7 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 	route.Host = ccRoute.Entity.Host
 	route.Path = ccRoute.Entity.Path
 	route.Port = ccRoute.Entity.Port
-	route.DomainFields.GUID = ccRoute.Entity.DomainGUID
+	route.DomainGUID = ccRoute.Entity.DomainGUID
 	return nil
 }
 
