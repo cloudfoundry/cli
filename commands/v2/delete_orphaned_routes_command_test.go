@@ -128,7 +128,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 							GUID:   "route-1-guid",
 							Host:   "route-1",
 							Domain: "bosh-lite.com",
-							Path:   "path",
+							Path:   "/path",
 						},
 						{
 							GUID:   "route-2-guid",
