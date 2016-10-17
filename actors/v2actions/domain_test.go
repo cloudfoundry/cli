@@ -22,7 +22,7 @@ var _ = Describe("Domain Actions", func() {
 		actor = NewActor(fakeCloudControllerClient)
 	})
 
-	Describe("GetDomainByGUID", func() {
+	Describe("GetDomain", func() {
 		Context("when the domain exists and is a shared domain", func() {
 			var expectedDomain ccv2.Domain
 
@@ -35,7 +35,7 @@ var _ = Describe("Domain Actions", func() {
 			})
 
 			It("returns the shared domain", func() {
-				domain, _, err := actor.GetDomainByGUID("shared-domain-guid")
+				domain, _, err := actor.GetDomain("shared-domain-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domain).To(Equal(Domain(expectedDomain)))
 
@@ -57,7 +57,7 @@ var _ = Describe("Domain Actions", func() {
 			})
 
 			It("returns the private domain", func() {
-				domain, _, err := actor.GetDomainByGUID("private-domain-guid")
+				domain, _, err := actor.GetDomain("private-domain-guid")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(domain).To(Equal(Domain(expectedDomain)))
 
@@ -77,7 +77,7 @@ var _ = Describe("Domain Actions", func() {
 			})
 
 			It("returns a DomainNotFoundError", func() {
-				domain, _, err := actor.GetDomainByGUID("private-domain-guid")
+				domain, _, err := actor.GetDomain("private-domain-guid")
 				Expect(err).To(MatchError(expectedErr))
 				Expect(domain).To(Equal(Domain(ccv2.Domain{})))
 			})
@@ -93,7 +93,7 @@ var _ = Describe("Domain Actions", func() {
 		) {
 			stubGetSharedDomain()
 			stubGetPrivateDomain()
-			domain, warnings, err := actor.GetDomainByGUID("some-domain-guid")
+			domain, warnings, err := actor.GetDomain("some-domain-guid")
 			Expect(domain).To(Equal(expectedDomain))
 			Expect(warnings).To(ConsistOf(expectedWarnings))
 			if expectingError {
