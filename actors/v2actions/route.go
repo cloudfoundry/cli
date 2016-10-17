@@ -1,6 +1,10 @@
 package v2actions
 
-import "fmt"
+import (
+	"fmt"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+)
 
 // Route represents a CLI Route.
 type Route struct {
@@ -28,30 +32,24 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 		allWarnings    Warnings
 	)
 
-	routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID, nil)
+	routes, warnings, err := actor.GetSpaceRoutes(spaceGUID, nil)
 	allWarnings = append(allWarnings, warnings...)
 	if err != nil {
 		return nil, allWarnings, err
 	}
 
 	for _, route := range routes {
-		apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(route.GUID, nil)
+		apps, warnings, err := actor.GetRouteApplications(route.GUID, nil)
 		allWarnings = append(allWarnings, warnings...)
 		if err != nil {
 			return nil, allWarnings, err
 		}
 
 		if len(apps) == 0 {
-			domain, warnings, err := actor.GetDomain(route.DomainGUID)
-			allWarnings = append(allWarnings, warnings...)
-			if err != nil {
-				return nil, allWarnings, err
-			}
-
 			orphanedRoutes = append(orphanedRoutes, Route{
 				GUID:   route.GUID,
 				Host:   route.Host,
-				Domain: domain.Name,
+				Domain: route.Domain,
 				Path:   route.Path,
 				Port:   route.Port,
 			})
@@ -62,7 +60,50 @@ func (actor Actor) GetOrphanedRoutesBySpace(spaceGUID string) ([]Route, Warnings
 		return nil, allWarnings, OrphanedRoutesNotFoundError{}
 	}
 
-	return orphanedRoutes, allWarnings, err
+	return orphanedRoutes, allWarnings, nil
+}
+
+// GetSpaceRoutes returns a list of routes associated with the provided Space GUID
+func (actor Actor) GetSpaceRoutes(spaceGUID string, query []ccv2.Query) ([]Route, Warnings, error) {
+	var (
+		allWarnings Warnings
+		routes      []Route
+	)
+	ccv2Routes, warnings, err := actor.CloudControllerClient.GetSpaceRoutes(spaceGUID, query)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return nil, allWarnings, err
+	}
+
+	for _, ccv2Route := range ccv2Routes {
+		domain, warnings, err := actor.GetDomain(ccv2Route.DomainGUID)
+		allWarnings = append(allWarnings, warnings...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
+		routes = append(routes, Route{
+			GUID:   ccv2Route.GUID,
+			Host:   ccv2Route.Host,
+			Domain: domain.Name,
+			Path:   ccv2Route.Path,
+			Port:   ccv2Route.Port,
+		})
+	}
+
+	return routes, allWarnings, nil
+}
+
+// GetRouteApplications returns a list of apps associated with the provided Route GUID
+func (actor Actor) GetRouteApplications(routeGUID string, query []ccv2.Query) ([]Application, Warnings, error) {
+	apps, warnings, err := actor.CloudControllerClient.GetRouteApplications(routeGUID, query)
+	if err != nil {
+		return nil, Warnings(warnings), err
+	}
+	allApplications := []Application{}
+	for _, app := range apps {
+		allApplications = append(allApplications, Application(app))
+	}
+	return allApplications, Warnings(warnings), nil
 }
 
 // DeleteRoute deletes the Route associated with the provided Route GUID.
