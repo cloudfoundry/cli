@@ -109,7 +109,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(0))
-					Expect(fakeActor.DeleteRouteByGUIDCallCount()).To(Equal(0))
+					Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
 				})
 			})
 
@@ -164,9 +164,9 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(1))
 					Expect(fakeActor.GetOrphanedRoutesBySpaceArgsForCall(0)).To(Equal("some-space-guid"))
-					Expect(fakeActor.DeleteRouteByGUIDCallCount()).To(Equal(2))
-					Expect(fakeActor.DeleteRouteByGUIDArgsForCall(0)).To(Equal(routes[0].GUID))
-					Expect(fakeActor.DeleteRouteByGUIDArgsForCall(1)).To(Equal(routes[1].GUID))
+					Expect(fakeActor.DeleteRouteCallCount()).To(Equal(2))
+					Expect(fakeActor.DeleteRouteArgsForCall(0)).To(Equal(routes[0].GUID))
+					Expect(fakeActor.DeleteRouteArgsForCall(1)).To(Equal(routes[1].GUID))
 
 					Expect(fakeUI.Out).To(Say("Deleting route route-1.bosh-lite.com/path..."))
 					Expect(fakeUI.Out).To(Say("Deleting route route-2.bosh-lite.com..."))
@@ -178,7 +178,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2actions.Route{
 							{GUID: "some-route-guid"},
 						}, []string{"foo", "bar"}, nil)
-						fakeActor.DeleteRouteByGUIDReturns([]string{"baz"}, nil)
+						fakeActor.DeleteRouteReturns([]string{"baz"}, nil)
 					})
 
 					It("displays the warnings", func() {
@@ -213,7 +213,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 						It("should not return an error and only display 'OK'", func() {
 							Expect(executeErr).ToNot(HaveOccurred())
 
-							Expect(fakeActor.DeleteRouteByGUIDCallCount()).To(Equal(0))
+							Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
 						})
 					})
 
@@ -237,7 +237,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2actions.Route{
 							{GUID: "some-route-guid"},
 						}, nil, nil)
-						fakeActor.DeleteRouteByGUIDReturns(nil, expectedErr)
+						fakeActor.DeleteRouteReturns(nil, expectedErr)
 					})
 
 					It("returns the error", func() {

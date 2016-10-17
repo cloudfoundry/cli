@@ -186,14 +186,14 @@ var _ = Describe("Route Actions", func() {
 		})
 	})
 
-	Describe("DeleteRouteByGUID", func() {
+	Describe("DeleteRoute", func() {
 		Context("when the route exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.DeleteRouteReturns(nil, nil)
 			})
 
 			It("deletes the route", func() {
-				_, err := actor.DeleteRouteByGUID("some-route-guid")
+				_, err := actor.DeleteRoute("some-route-guid")
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.DeleteRouteCallCount()).To(Equal(1))
@@ -210,7 +210,7 @@ var _ = Describe("Route Actions", func() {
 			})
 
 			It("returns both the warnings and the error", func() {
-				warnings, err := actor.DeleteRouteByGUID("some-route-guid")
+				warnings, err := actor.DeleteRoute("some-route-guid")
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("foo", "bar"))
 			})
