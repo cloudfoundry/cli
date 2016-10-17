@@ -86,7 +86,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	}
 
 	for _, route := range routes {
-		cmd.UI.DisplayHeaderFlavorText("Deleting route {{.Route}} ...", map[string]interface{}{
+		cmd.UI.DisplayText("Deleting route {{.Route}} ...", map[string]interface{}{
 			"Route": route.String(),
 		})
 
