@@ -2100,6 +2100,10 @@
     "translation": "Löschen von Größenbeschränkung {{.QuotaName}} als {{.Username}}..."
   },
   {
+    "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
     "id": "Deleting route {{.Route}}...",
     "translation": "Löschen von Route {{.Route}}..."
   },
@@ -2878,6 +2882,10 @@
   {
     "id": "Getting router groups as {{.Username}} ...\n",
     "translation": "Abrufen von Routergruppen als {{.Username}} ...\n"
+  },
+  {
+    "id": "Getting routes as {{.CurrentUser}} ...",
+    "translation": ""
   },
   {
     "id": "Getting routes as {{.Username}} ...\n",
@@ -4186,6 +4194,10 @@
   {
     "id": "Read-only access to org info and reports\n",
     "translation": "Lesezugriff auf Organisationsinformationen und auf Berichte\n"
+  },
+  {
+    "id": "Really delete orphaned routes?",
+    "translation": ""
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",

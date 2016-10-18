@@ -2100,6 +2100,10 @@
     "translation": "{{.Username}}(으)로 {{.QuotaName}} 할당량 삭제 중..."
   },
   {
+    "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
     "id": "Deleting route {{.Route}}...",
     "translation": "{{.Route}} 라우트 삭제 중..."
   },
@@ -2878,6 +2882,10 @@
   {
     "id": "Getting router groups as {{.Username}} ...\n",
     "translation": "{{.Username}}(으)로 라우터 그룹을 가져오는 중...\n"
+  },
+  {
+    "id": "Getting routes as {{.CurrentUser}} ...",
+    "translation": ""
   },
   {
     "id": "Getting routes as {{.Username}} ...\n",
@@ -4186,6 +4194,10 @@
   {
     "id": "Read-only access to org info and reports\n",
     "translation": "조직 정보 및 보고서에 대한 읽기 전용 액세스\n"
+  },
+  {
+    "id": "Really delete orphaned routes?",
+    "translation": ""
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",

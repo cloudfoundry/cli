@@ -688,6 +688,10 @@
     "translation": "Delete an HTTP route:\\n      CF_NAME delete-route DOMAIN [--hostname HOSTNAME] [--path PATH] [-f]\\n\\n   Delete a TCP route:\\n      CF_NAME delete-route DOMAIN --port PORT [-f]\\n\\nEXAMPLES:\\n   CF_NAME delete-route example.com                              # example.com\\n   CF_NAME delete-route example.com --hostname myhost            # myhost.example.com\\n   CF_NAME delete-route example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME delete-route example.com --port 5000                  # example.com:5000"
   },
   {
+    "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
     "id": "ENVIRONMENT:",
     "translation": ""
   },
@@ -718,6 +722,10 @@
   {
     "id": "Failed to create a local temporary zip file for the buildpack",
     "translation": "Failed to create a local temporary zip file for the buildpack"
+  },
+  {
+    "id": "Getting routes as {{.CurrentUser}} ...",
+    "translation": ""
   },
   {
     "id": "Global options:",
@@ -834,6 +842,10 @@
   {
     "id": "ROUTES",
     "translation": "ROUTES"
+  },
+  {
+    "id": "Really delete orphaned routes?",
+    "translation": ""
   },
   {
     "id": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)",

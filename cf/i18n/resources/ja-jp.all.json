@@ -2100,6 +2100,10 @@
     "translation": "{{.Username}} として割り当て量 {{.QuotaName}} を削除しています..."
   },
   {
+    "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
     "id": "Deleting route {{.Route}}...",
     "translation": "経路 {{.Route}} を削除しています..."
   },
@@ -2878,6 +2882,10 @@
   {
     "id": "Getting router groups as {{.Username}} ...\n",
     "translation": "{{.Username}} としてルーター・グループを取得しています...\n"
+  },
+  {
+    "id": "Getting routes as {{.CurrentUser}} ...",
+    "translation": ""
   },
   {
     "id": "Getting routes as {{.Username}} ...\n",
@@ -4186,6 +4194,10 @@
   {
     "id": "Read-only access to org info and reports\n",
     "translation": "組織の情報およびレポートに対する読み取り専用アクセス\n"
+  },
+  {
+    "id": "Really delete orphaned routes?",
+    "translation": ""
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",

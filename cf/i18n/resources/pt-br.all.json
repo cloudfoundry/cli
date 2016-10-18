@@ -2100,6 +2100,10 @@
     "translation": "Excluindo a cota {{.QuotaName}} como {{.Username}}..."
   },
   {
+    "id": "Deleting route {{.Route}} ...",
+    "translation": ""
+  },
+  {
     "id": "Deleting route {{.Route}}...",
     "translation": "Excluindo a rota {{.Route}}..."
   },
@@ -2878,6 +2882,10 @@
   {
     "id": "Getting router groups as {{.Username}} ...\n",
     "translation": "Obtendo grupos do roteadores como {{.Username}}...\n"
+  },
+  {
+    "id": "Getting routes as {{.CurrentUser}} ...",
+    "translation": ""
   },
   {
     "id": "Getting routes as {{.Username}} ...\n",
@@ -4186,6 +4194,10 @@
   {
     "id": "Read-only access to org info and reports\n",
     "translation": "Acesso somente leitura a informações e relatórios da organização\n"
+  },
+  {
+    "id": "Really delete orphaned routes?",
+    "translation": ""
   },
   {
     "id": "Really delete orphaned routes?{{.Prompt}}",
