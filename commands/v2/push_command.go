@@ -16,7 +16,7 @@ type PushCommand struct {
 	PathToManifest       string      `short:"f" description:"Path to manifest"` //TODO: Custom Path flag that does validation
 	HealthCheckType      string      `long:"health-check-type" short:"u" description:"Application health check type (e.g. 'port' or 'none')"`
 	Hostname             string      `long:"hostname" short:"n" description:"Hostname (e.g. my-subdomain)"`
-	NumInstances         string      `short:"i" description:"Number of instances"`
+	NumInstances         int         `short:"i" description:"Number of instances"`
 	DiskLimit            string      `short:"k" description:"Disk limit (e.g. 256M, 1024M, 1G)"`
 	MemoryLimit          string      `short:"m" description:"Memory limit (e.g. 256M, 1024M, 1G)"`
 	NoHostname           bool        `long:"no-hostname" description:"Map the root domain to this app"`
