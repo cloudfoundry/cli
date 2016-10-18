@@ -2,6 +2,7 @@ package integration
 
 import (
 	"path"
+	"runtime"
 
 	. "code.cloudfoundry.org/cli/integration/helpers"
 
@@ -59,7 +60,11 @@ var _ = Describe("trace", func() {
 			Eventually(CF("apps"), CFLongTimeout).Should(Exit(0))
 			stat, err := os.Stat(traceFile)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
+			if runtime.GOOS == "windows" {
+				Expect(stat.Mode().String()).To(Equal(os.FileMode(0666).String()))
+			} else {
+				Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
+			}
 		})
 	})
 })
