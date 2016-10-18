@@ -844,6 +844,10 @@
     "translation": "Path to file of JSON describing security group rules"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Provider",
     "translation": "Provider"
   },

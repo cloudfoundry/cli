@@ -4008,6 +4008,10 @@
     "translation": "Manifest의 경로"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the HTTP route",
     "translation": "HTTP 라우트를 식별하는 데 사용되는 경로"
   },

@@ -4008,6 +4008,10 @@
     "translation": "清单路径"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the HTTP route",
     "translation": "用于识别 HTTP 路径的路径"
   },

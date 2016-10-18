@@ -4008,6 +4008,10 @@
     "translation": "資訊清單的路徑"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the HTTP route",
     "translation": "用來識別 HTTP 路徑 (route) 的路徑 (path)"
   },
