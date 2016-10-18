@@ -87,4 +87,65 @@ var _ = Describe("Application Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetRouteApplications", func() {
+		Context("when the CC client returns no errors", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteApplicationsReturns(
+					[]ccv2.Application{
+						{
+							GUID: "application-guid",
+							Name: "application-name",
+						},
+					}, ccv2.Warnings{"route-applications-warning"}, nil)
+			})
+			It("returns the applications bound to the route and warnings", func() {
+				applications, warnings, err := actor.GetRouteApplications("route-guid", nil)
+				Expect(fakeCloudControllerClient.GetRouteApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)).To(Equal("route-guid"))
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(warnings).To(ConsistOf("route-applications-warning"))
+				Expect(applications).To(ConsistOf(
+					Application{
+						GUID: "application-guid",
+						Name: "application-name",
+					},
+				))
+			})
+		})
+
+		Context("when the CC client returns an error", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetRouteApplicationsReturns(
+					[]ccv2.Application{}, ccv2.Warnings{"route-applications-warning"}, errors.New("get-route-applications-error"))
+			})
+
+			It("returns the error and warnings", func() {
+				apps, warnings, err := actor.GetRouteApplications("route-guid", nil)
+				Expect(fakeCloudControllerClient.GetRouteApplicationsCallCount()).To(Equal(1))
+				Expect(fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)).To(Equal("route-guid"))
+
+				Expect(err).To(MatchError("get-route-applications-error"))
+				Expect(warnings).To(ConsistOf("route-applications-warning"))
+				Expect(apps).To(BeNil())
+			})
+		})
+
+		Context("when a query parameter exists", func() {
+			It("passes the query to the client", func() {
+				expectedQuery := []ccv2.Query{
+					{
+						Filter:   "route_guid",
+						Operator: ":",
+						Value:    "route-guid",
+					}}
+
+				_, _, err := actor.GetRouteApplications("route-guid", expectedQuery)
+				Expect(err).ToNot(HaveOccurred())
+				_, query := fakeCloudControllerClient.GetRouteApplicationsArgsForCall(0)
+				Expect(query).To(Equal(expectedQuery))
+			})
+		})
+	})
 })
