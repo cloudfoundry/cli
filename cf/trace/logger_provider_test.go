@@ -106,7 +106,11 @@ var _ = Describe("NewLogger", func() {
 
 			stat, err := os.Stat(fileName)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
+			if runtime.GOOS == "windows" {
+				Expect(stat.Mode().String()).To(Equal(os.FileMode(0666).String()))
+			} else {
+				Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
+			}
 		})
 	})
 
