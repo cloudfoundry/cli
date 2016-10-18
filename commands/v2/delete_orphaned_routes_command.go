@@ -54,9 +54,9 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	}
 
 	if !cmd.Force {
-		deleteOrphanedRoutes, err := cmd.UI.DisplayBoolPrompt("Really delete orphaned routes?", false)
+		deleteOrphanedRoutes, promptErr := cmd.UI.DisplayBoolPrompt("Really delete orphaned routes?", false)
 		if err != nil {
-			return err
+			return promptErr
 		}
 
 		if !deleteOrphanedRoutes {
