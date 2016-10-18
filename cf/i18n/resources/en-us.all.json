@@ -4008,6 +4008,10 @@
     "translation": "Path to manifest"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the HTTP route",
     "translation": "Path used to identify the HTTP route"
   },

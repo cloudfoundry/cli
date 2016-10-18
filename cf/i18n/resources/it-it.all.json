@@ -4008,6 +4008,10 @@
     "translation": "Percorso del manifest"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the HTTP route",
     "translation": "Percorso utilizzato per identificare la rotta HTTP"
   },

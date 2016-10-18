@@ -4008,6 +4008,10 @@
     "translation": "Vía de acceso al manifiesto"
   },
   {
+    "id": "Path used in combination with HOSTNAME and DOMAIN to specify the route to bind",
+    "translation": ""
+  },
+  {
     "id": "Path used to identify the HTTP route",
     "translation": "Vía de acceso utilizada para identificar la ruta HTTP"
   },
