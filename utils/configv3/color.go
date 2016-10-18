@@ -3,7 +3,7 @@ package configv3
 import "strconv"
 
 const (
-	DefaultColorEnabled = "true"
+	DefaultColorEnabled = ""
 	// ColorDisabled means that no colors/bolding will be displayed
 	ColorDisabled ColorSetting = iota
 	// ColorEnabled means colors/bolding will be displayed
