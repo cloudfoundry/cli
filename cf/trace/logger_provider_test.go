@@ -2,6 +2,7 @@ package trace_test
 
 import (
 	"io/ioutil"
+	"path"
 	"runtime"
 
 	. "code.cloudfoundry.org/cli/cf/trace"
@@ -90,6 +91,22 @@ var _ = Describe("NewLogger", func() {
 
 			fileContents, _ := ioutil.ReadAll(file)
 			Expect(fileContents).To(ContainSubstring("Hello World"))
+		})
+	})
+
+	It("creates the file with 0600 permission", func() {
+		// cannot use fileutils.TempFile because it sets the permissions to 0600
+		// itself
+		fileutils.TempDir("trace_test", func(tmpDir string, err error) {
+			Expect(err).ToNot(HaveOccurred())
+
+			fileName := path.Join(tmpDir, "trace_test")
+			logger := NewLogger(buffer, true, fileName, "")
+			logger.Print("Hello World")
+
+			stat, err := os.Stat(fileName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
 		})
 	})
 
