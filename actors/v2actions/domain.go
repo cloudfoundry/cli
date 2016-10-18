@@ -16,33 +16,60 @@ func (e DomainNotFoundError) Error() string {
 
 func isResourceNotFoundError(err error) bool {
 	_, isResourceNotFound := err.(ccv2.ResourceNotFoundError)
-
 	return isResourceNotFound
 }
 
-// GetDomain returns a shared or private domain with the domain GUID.
+// GetDomain returns the shared or private domain associated with the provided
+// Domain GUID.
 func (actor Actor) GetDomain(domainGUID string) (Domain, Warnings, error) {
 	var allWarnings Warnings
 
-	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
+	domain, warnings, err := actor.GetSharedDomain(domainGUID)
 	allWarnings = append(allWarnings, warnings...)
-	if err == nil {
-		return Domain(domain), allWarnings, nil
-	}
-
-	if !isResourceNotFoundError(err) {
+	switch err.(type) {
+	case nil:
+		return domain, allWarnings, nil
+	case DomainNotFoundError:
+	default:
 		return Domain{}, allWarnings, err
 	}
 
-	domain, warnings, err = actor.CloudControllerClient.GetPrivateDomain(domainGUID)
+	domain, warnings, err = actor.GetPrivateDomain(domainGUID)
 	allWarnings = append(allWarnings, warnings...)
+	switch err.(type) {
+	case nil:
+		return domain, allWarnings, nil
+	default:
+		return Domain{}, allWarnings, err
+	}
+}
+
+// GetSharedDomain returns the shared domain associated with the provided
+// Domain GUID.
+func (actor Actor) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
+	domain, warnings, err := actor.CloudControllerClient.GetSharedDomain(domainGUID)
 	if err == nil {
-		return Domain(domain), allWarnings, nil
+		return Domain(domain), Warnings(warnings), nil
 	}
 
 	if isResourceNotFoundError(err) {
-		return Domain{}, allWarnings, DomainNotFoundError{}
+		return Domain{}, Warnings(warnings), DomainNotFoundError{}
 	}
 
-	return Domain{}, allWarnings, err
+	return Domain{}, Warnings(warnings), err
+}
+
+// GetPrivateDomain returns the private domain associated with the provided
+// Domain GUID.
+func (actor Actor) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
+	domain, warnings, err := actor.CloudControllerClient.GetPrivateDomain(domainGUID)
+	if err == nil {
+		return Domain(domain), Warnings(warnings), nil
+	}
+
+	if isResourceNotFoundError(err) {
+		return Domain{}, Warnings(warnings), DomainNotFoundError{}
+	}
+
+	return Domain{}, Warnings(warnings), err
 }
