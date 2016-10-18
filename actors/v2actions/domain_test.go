@@ -130,4 +130,108 @@ var _ = Describe("Domain Actions", func() {
 			),
 		)
 	})
+
+	Describe("GetSharedDomain", func() {
+		Context("when the shared domain exists", func() {
+			var expectedDomain ccv2.Domain
+
+			BeforeEach(func() {
+				expectedDomain = ccv2.Domain{
+					GUID: "shared-domain-guid",
+					Name: "shared-domain",
+				}
+				fakeCloudControllerClient.GetSharedDomainReturns(expectedDomain, ccv2.Warnings{"shared domain warning"}, nil)
+			})
+
+			It("returns the shared domain and all warnings", func() {
+				domain, warnings, err := actor.GetSharedDomain("shared-domain-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(domain).To(Equal(Domain(expectedDomain)))
+				Expect(warnings).To(ConsistOf("shared domain warning"))
+			})
+		})
+
+		Context("when the API returns a not found error", func() {
+			var expectedErr DomainNotFoundError
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, ccv2.Warnings{"shared domain warning"}, ccv2.ResourceNotFoundError{})
+			})
+
+			It("returns a DomainNotFoundError and all warnings", func() {
+				domain, warnings, err := actor.GetSharedDomain("shared-domain-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(domain).To(Equal(Domain{}))
+				Expect(warnings).To(ConsistOf("shared domain warning"))
+			})
+		})
+
+		Context("when the API returns any other error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("shared domain error")
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, ccv2.Warnings{"shared domain warning"}, expectedErr)
+			})
+
+			It("returns the same error and all warnings", func() {
+				domain, warnings, err := actor.GetSharedDomain("shared-domain-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(domain).To(Equal(Domain{}))
+				Expect(warnings).To(ConsistOf("shared domain warning"))
+			})
+		})
+	})
+
+	Describe("GetPrivateDomain", func() {
+		Context("when the private domain exists", func() {
+			var expectedDomain ccv2.Domain
+
+			BeforeEach(func() {
+				expectedDomain = ccv2.Domain{
+					GUID: "private-domain-guid",
+					Name: "private-domain",
+				}
+				fakeCloudControllerClient.GetPrivateDomainReturns(expectedDomain, ccv2.Warnings{"private domain warning"}, nil)
+			})
+
+			It("returns the private domain and all warnings", func() {
+				domain, warnings, err := actor.GetPrivateDomain("private-domain-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(domain).To(Equal(Domain(expectedDomain)))
+				Expect(warnings).To(ConsistOf("private domain warning"))
+			})
+		})
+
+		Context("when the API returns a not found error", func() {
+			var expectedErr DomainNotFoundError
+
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, ccv2.Warnings{"private domain warning"}, ccv2.ResourceNotFoundError{})
+			})
+
+			It("returns a DomainNotFoundError and all warnings", func() {
+				domain, warnings, err := actor.GetPrivateDomain("private-domain-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(domain).To(Equal(Domain{}))
+				Expect(warnings).To(ConsistOf("private domain warning"))
+			})
+		})
+
+		Context("when the API returns any other error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("private domain error")
+				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, ccv2.Warnings{"private domain warning"}, expectedErr)
+			})
+
+			It("returns the same error and all warnings", func() {
+				domain, warnings, err := actor.GetPrivateDomain("private-domain-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(domain).To(Equal(Domain{}))
+				Expect(warnings).To(ConsistOf("private domain warning"))
+			})
+		})
+	})
 })
