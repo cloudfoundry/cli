@@ -60,6 +60,21 @@ var _ = Describe("Configuration Repository", func() {
 		Eventually(finishReadCh).Should(BeClosed())
 	})
 
+	Context("when the doppler endpoint does not exist", func() {
+		It("should regex the loggregator endpoint value", func() {
+			config.SetLoggregatorEndpoint("http://loggregator.the-endpoint")
+			Expect(config.DopplerEndpoint()).To(Equal("http://doppler.the-endpoint"))
+		})
+	})
+
+	Context("when the doppler endpoint does not exist", func() {
+		It("should regex the loggregator endpoint value", func() {
+			config.SetLoggregatorEndpoint("http://loggregator.the-endpointffff")
+			config.SetDopplerEndpoint("http://doppler.the-endpoint")
+			Expect(config.DopplerEndpoint()).To(Equal("http://doppler.the-endpoint"))
+		})
+	})
+
 	It("has acccessor methods for all config fields", func() {
 		config.SetAPIEndpoint("http://api.the-endpoint")
 		Expect(config.APIEndpoint()).To(Equal("http://api.the-endpoint"))
@@ -72,9 +87,6 @@ var _ = Describe("Configuration Repository", func() {
 
 		config.SetLoggregatorEndpoint("http://loggregator.the-endpoint")
 		Expect(config.LoggregatorEndpoint()).To(Equal("http://loggregator.the-endpoint"))
-
-		config.SetDopplerEndpoint("http://doppler.the-endpoint")
-		Expect(config.DopplerEndpoint()).To(Equal("http://doppler.the-endpoint"))
 
 		config.SetUaaEndpoint("http://uaa.the-endpoint")
 		Expect(config.UaaEndpoint()).To(Equal("http://uaa.the-endpoint"))

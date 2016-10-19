@@ -38,9 +38,7 @@ func (a APIConfigRefresher) Refresh() (Warning, error) {
 	a.Config.SetMinRecommendedCLIVersion(ccInfo.MinRecommendedCLIVersion)
 	a.Config.SetLoggregatorEndpoint(a.LoggregatorEndpoint(ccInfo, endpoint))
 
-	//* 3/5/15: loggregator endpoint will be renamed to doppler eventually,
-	//          we just have to use the loggregator endpoint as doppler for now
-	a.Config.SetDopplerEndpoint(strings.Replace(a.Config.LoggregatorEndpoint(), "loggregator", "doppler", 1))
+	a.Config.SetDopplerEndpoint(ccInfo.DopplerEndpoint)
 	a.Config.SetRoutingAPIEndpoint(ccInfo.RoutingAPIEndpoint)
 
 	if !strings.HasPrefix(endpoint, "https://") {
