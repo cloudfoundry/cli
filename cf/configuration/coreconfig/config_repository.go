@@ -21,6 +21,7 @@ type CCInfo struct {
 	APIVersion               string `json:"api_version"`
 	AuthorizationEndpoint    string `json:"authorization_endpoint"`
 	LoggregatorEndpoint      string `json:"logging_endpoint"`
+	DopplerEndpoint          string `json:"doppler_logging_endpoint"`
 	MinCLIVersion            string `json:"min_cli_version"`
 	MinRecommendedCLIVersion string `json:"min_recommended_cli_version"`
 	SSHOAuthClient           string `json:"app_ssh_oauth_client"`
@@ -191,18 +192,17 @@ func (c *ConfigRepository) LoggregatorEndpoint() (logEndpoint string) {
 	return
 }
 
-func (c *ConfigRepository) DopplerEndpoint() (logEndpoint string) {
+func (c *ConfigRepository) DopplerEndpoint() (dopplerEndpoint string) {
 	//revert this in v7.0, once CC advertise doppler endpoint, and
 	//everyone has migrated from loggregator to doppler
-
-	// c.read(func() {
-	// 	logEndpoint = c.data.DopplerEndPoint
-	// })
 	c.read(func() {
-		logEndpoint = c.data.LoggregatorEndPoint
+		dopplerEndpoint = c.data.DopplerEndPoint
 	})
 
-	return strings.Replace(logEndpoint, "loggregator", "doppler", 1)
+	if dopplerEndpoint == "" {
+		return strings.Replace(c.LoggregatorEndpoint(), "loggregator", "doppler", 1)
+	}
+	return
 }
 
 func (c *ConfigRepository) UaaEndpoint() (uaaEndpoint string) {
