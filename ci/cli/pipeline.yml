@@ -231,11 +231,6 @@ resources:
   source:
     url: https://hooks.slack.com/services/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
 
-- name: publish-rpm-timer
-  type: time
-  source:
-    interval: 1h
-
 groups:
 - name: cli
   jobs:
