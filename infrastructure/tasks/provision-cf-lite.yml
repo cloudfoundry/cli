@@ -15,7 +15,7 @@ params:
   BOSH_LITE_SECURITY_GROUP:
   BOSH_LITE_SUBNET_ID:
   LITE_PRIVATE_KEY_PATH:
-  BOSH_LITE_INSTANCE_TYPE: r3.2xlarge
+  BOSH_LITE_INSTANCE_TYPE: r3.xlarge
 
 inputs:
   - name: cli-private
