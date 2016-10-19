@@ -157,11 +157,11 @@ var _ = Describe("Config", func() {
 				rawConfig := fmt.Sprintf(`{}`)
 				setConfig(homeDir, rawConfig)
 
-				defer os.Unsetenv("EXPERIMENTAL")
+				defer os.Unsetenv("CF_CLI_EXPERIMENTAL")
 				if envVal == "" {
-					os.Unsetenv("EXPERIMENTAL")
+					os.Unsetenv("CF_CLI_EXPERIMENTAL")
 				} else {
-					os.Setenv("EXPERIMENTAL", envVal)
+					os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
 				}
 
 				config, err := LoadConfig()

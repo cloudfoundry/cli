@@ -71,7 +71,7 @@ func LoadConfig() (*Config, error) {
 		HTTPSProxy:       os.Getenv("https_proxy"),
 		Lang:             os.Getenv("LANG"),
 		LCAll:            os.Getenv("LC_ALL"),
-		Experimental:     os.Getenv("EXPERIMENTAL"),
+		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
