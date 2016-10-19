@@ -20,7 +20,7 @@ func NewCloudControllerClient(config commands.Config) (*ccv2.CloudControllerClie
 		return nil, err
 	}
 
-	uaaClient := uaa.NewClient(client.AuthorizationEndpoint(), config)
+	uaaClient := uaa.NewClient(client.TokenEndpoint(), config)
 	client.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 	//Retry Wrapper
 	return client, err
