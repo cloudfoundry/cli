@@ -15,6 +15,7 @@ params:
   BOSH_LITE_SECURITY_GROUP:
   BOSH_LITE_SUBNET_ID:
   LITE_PRIVATE_KEY_PATH:
+  BOSH_LITE_INSTANCE_TYPE: r3.2xlarge
 
 inputs:
   - name: cli-private
@@ -33,6 +34,6 @@ run:
 
     env | sort -
 
-    BOSH_LITE_INSTANCE_TYPE="m3.2xlarge" vagrant up --provider aws --destroy-on-error
+    vagrant up --provider aws --destroy-on-error
 
     popd
