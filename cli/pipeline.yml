@@ -384,7 +384,7 @@ jobs:
       params:
         BACKEND: dea
         DEFAULT_TIMEOUT: 60
-        NODES: 3
+        NODES: 10
       on_failure:
          put: slack-alert
          params:
@@ -454,9 +454,7 @@ jobs:
   - task: cats
     file: cli-ci/ci/cli/tasks/cats-windows.yml
     params:
-      ADMIN_USER: {{bosh-lite-admin-username}}
-      ADMIN_PASSWORD: {{bosh-lite-admin-password}}
-      NODES: 3
+      NODES: 10
     ensure:
       put: bosh-lites-dea-pool
       params:
