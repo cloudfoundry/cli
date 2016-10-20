@@ -2,8 +2,8 @@
 platform: windows
 
 params:
-  ADMIN_USER:
-  ADMIN_PASSWORD:
+  ADMIN_USER: admin
+  ADMIN_PASSWORD: admin
   NODES:
 
 inputs:
