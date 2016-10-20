@@ -251,6 +251,7 @@ jobs:
       params:
         LITE_IP_ADDRESS: {{lite-1-public-ip-address}}
         LITE_HOSTNAME: {{lite-1-hostname}}
+        LITE_EXTRA_STUB: 'properties: { dea_next : { memory_mb : 20480 } }'
     - put: bosh-lite-1-deploy-cf
       params:
         manifest: bosh-lite-cf-manifest/cf.yml
@@ -397,6 +398,7 @@ jobs:
       params:
         LITE_IP_ADDRESS: {{lite-2-public-ip-address}}
         LITE_HOSTNAME: {{lite-2-hostname}}
+        LITE_EXTRA_STUB: 'properties: { dea_next : { memory_mb : 20480 } }'
     - put: bosh-lite-2-deploy-cf
       params:
         manifest: bosh-lite-cf-manifest/cf.yml
@@ -543,6 +545,7 @@ jobs:
       params:
         LITE_IP_ADDRESS: {{lite-3-public-ip-address}}
         LITE_HOSTNAME: {{lite-3-hostname}}
+        LITE_EXTRA_STUB: 'properties: { dea_next : { memory_mb : 20480 } }'
     - put: bosh-lite-3-deploy-cf
       params:
         manifest: bosh-lite-cf-manifest/cf.yml
