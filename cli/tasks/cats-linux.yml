@@ -141,5 +141,4 @@ run:
     ./bin/test \
       -slowSpecThreshold=120 -randomizeAllSpecs \
       -nodes "${NODES}" \
-      "${SKIPS}" \
-      -keepGoing
+      "${SKIPS}"
