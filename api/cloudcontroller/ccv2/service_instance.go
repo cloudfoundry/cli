@@ -59,10 +59,12 @@ func (serviceInstance ServiceInstance) Managed() bool {
 // GetServiceInstances returns back a list of *managed* Service Instances based
 // off of the provided queries.
 func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
-	request := cloudcontroller.Request{
-		RequestName: internal.ServiceInstancesRequest,
-		Query:       FormatQueryParameters(queries),
-	}
+	request := cloudcontroller.NewRequest(
+		internal.ServiceInstancesRequest,
+		nil,
+		nil,
+		FormatQueryParameters(queries),
+	)
 
 	allServiceInstancesList := []ServiceInstance{}
 	allWarningsList := Warnings{}
@@ -87,10 +89,11 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.Request{
-			URI:    wrapper.NextURL,
-			Method: "GET",
-		}
+		request = cloudcontroller.NewRequestFromURI(
+			wrapper.NextURL,
+			"GET",
+			nil,
+		)
 	}
 
 	return allServiceInstancesList, allWarningsList, nil
@@ -106,13 +109,14 @@ func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, 
 		query.Add("return_user_provided_service_instances", "true")
 	}
 
-	request := cloudcontroller.Request{
-		RequestName: internal.SpaceServiceInstancesRequest,
-		Params: map[string]string{
+	request := cloudcontroller.NewRequest(
+		internal.SpaceServiceInstancesRequest,
+		map[string]string{
 			"guid": spaceGUID,
 		},
-		Query: query,
-	}
+		nil,
+		query,
+	)
 
 	allServiceInstancesList := []ServiceInstance{}
 	allWarningsList := Warnings{}
@@ -137,10 +141,11 @@ func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, 
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.Request{
-			URI:    wrapper.NextURL,
-			Method: "GET",
-		}
+		request = cloudcontroller.NewRequestFromURI(
+			wrapper.NextURL,
+			"GET",
+			nil,
+		)
 	}
 
 	return allServiceInstancesList, allWarningsList, nil
