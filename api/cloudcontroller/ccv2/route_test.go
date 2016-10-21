@@ -79,13 +79,13 @@ var _ = Describe("Route", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "q=space_guid:some-space-guid"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/routes", "q=space_guid:some-space-guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes", "q=space_guid:some-space-guid&page=2"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/routes", "q=space_guid:some-space-guid&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
@@ -140,7 +140,7 @@ var _ = Describe("Route", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/routes"),
 						RespondWith(http.StatusOK, response),
 					),
 				)
@@ -162,7 +162,7 @@ var _ = Describe("Route", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/routes"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/routes"),
 						RespondWith(http.StatusNotFound, response),
 					),
 				)
@@ -183,7 +183,7 @@ var _ = Describe("Route", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("DELETE", "/v2/routes/some-route-guid"),
+						VerifyRequest(http.MethodDelete, "/v2/routes/some-route-guid"),
 						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -205,7 +205,7 @@ var _ = Describe("Route", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("DELETE", "/v2/routes/some-route-guid"),
+						VerifyRequest(http.MethodDelete, "/v2/routes/some-route-guid"),
 						RespondWith(http.StatusNotFound, response),
 					),
 				)

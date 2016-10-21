@@ -102,14 +102,14 @@ var _ = Describe("Service Instance", func() {
 
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/v2/service_instances", "q=space_guid:some-space-guid"),
+					VerifyRequest(http.MethodGet, "/v2/service_instances", "q=space_guid:some-space-guid"),
 					RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
 			)
 
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/v2/service_instances", "q=space_guid:some-space-guid&page=2"),
+					VerifyRequest(http.MethodGet, "/v2/service_instances", "q=space_guid:some-space-guid&page=2"),
 					RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 				),
 			)
@@ -188,14 +188,14 @@ var _ = Describe("Service Instance", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/service_instances", "return_user_provided_service_instances=true&q=name:foobar"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/service_instances", "return_user_provided_service_instances=true&q=name:foobar"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/service_instances", "return_user_provided_service_instances=true&q=name:foobar&page=2"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/service_instances", "return_user_provided_service_instances=true&q=name:foobar&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
@@ -249,7 +249,7 @@ var _ = Describe("Service Instance", func() {
 
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/spaces/some-space-guid/service_instances", "q=name:foobar"),
+						VerifyRequest(http.MethodGet, "/v2/spaces/some-space-guid/service_instances", "q=name:foobar"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)

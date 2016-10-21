@@ -71,7 +71,7 @@ func SetupV2InfoResponse() {
 	response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
 	server.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest("GET", "/v2/info"),
+			VerifyRequest(http.MethodGet, "/v2/info"),
 			RespondWith(http.StatusOK, response),
 		),
 	)

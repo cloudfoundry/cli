@@ -2,6 +2,7 @@ package ccv2
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -73,7 +74,7 @@ func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParam
 		}
 		request = cloudcontroller.NewRequestFromURI(
 			wrapper.NextURL,
-			"GET",
+			http.MethodGet,
 			nil,
 		)
 	}

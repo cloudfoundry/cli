@@ -28,7 +28,7 @@ var _ = Describe("UAA Connection", func() {
 	BeforeEach(func() {
 		FooRequest = "Foo"
 		routes = rata.Routes{
-			{Path: "/v2/foo", Method: "GET", Name: FooRequest},
+			{Path: "/v2/foo", Method: http.MethodGet, Name: FooRequest},
 		}
 		connection = NewConnection(server.URL(), routes, true)
 	})
@@ -38,7 +38,7 @@ var _ = Describe("UAA Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo", "q=a:b&q=c:d"),
+						VerifyRequest(http.MethodGet, "/v2/foo", "q=a:b&q=c:d"),
 						RespondWith(http.StatusOK, "{}"),
 					),
 				)
@@ -60,7 +60,7 @@ var _ = Describe("UAA Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo"),
+						VerifyRequest(http.MethodGet, "/v2/foo"),
 						VerifyHeaderKV("foo", "bar"),
 						VerifyHeaderKV("accept", "application/json"),
 						RespondWith(http.StatusOK, "{}"),
@@ -84,7 +84,7 @@ var _ = Describe("UAA Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo"),
+						VerifyRequest(http.MethodGet, "/v2/foo"),
 						VerifyBody([]byte("some-body-parameters")),
 						RespondWith(http.StatusOK, "{}"),
 					),
@@ -113,7 +113,7 @@ var _ = Describe("UAA Connection", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo", ""),
+						VerifyRequest(http.MethodGet, "/v2/foo", ""),
 						RespondWith(http.StatusOK, response),
 					),
 				)
@@ -170,7 +170,7 @@ var _ = Describe("UAA Connection", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
 							CombineHandlers(
-								VerifyRequest("GET", "/v2/foo"),
+								VerifyRequest(http.MethodGet, "/v2/foo"),
 							),
 						)
 
@@ -197,7 +197,7 @@ var _ = Describe("UAA Connection", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest("GET", "/v2/foo"),
+							VerifyRequest(http.MethodGet, "/v2/foo"),
 							RespondWith(http.StatusUnauthorized, uaaResponse),
 						),
 					)

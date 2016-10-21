@@ -50,13 +50,13 @@ var _ = Describe("Service Binding", func() {
 			}`
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/v2/service_bindings", "q=app_guid:some-app-guid"),
+					VerifyRequest(http.MethodGet, "/v2/service_bindings", "q=app_guid:some-app-guid"),
 					RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
 			)
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/v2/service_bindings", "q=app_guid:some-app-guid&page=2"),
+					VerifyRequest(http.MethodGet, "/v2/service_bindings", "q=app_guid:some-app-guid&page=2"),
 					RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 				),
 			)
@@ -86,7 +86,7 @@ var _ = Describe("Service Binding", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("DELETE", "/v2/service_bindings/some-service-binding-guid"),
+						VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"),
 						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -109,7 +109,7 @@ var _ = Describe("Service Binding", func() {
 			}`
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("DELETE", "/v2/service_bindings/some-service-binding-guid"),
+					VerifyRequest(http.MethodDelete, "/v2/service_bindings/some-service-binding-guid"),
 					RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
 			)

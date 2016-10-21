@@ -36,7 +36,7 @@ var _ = Describe("UAA Client", func() {
 			}`
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("POST", "/oauth/token"),
+					VerifyRequest(http.MethodPost, "/oauth/token"),
 					VerifyHeaderKV("Accept", "application/json"),
 					VerifyHeaderKV("Content-Type", "application/x-www-form-urlencoded"),
 					VerifyBody([]byte("client_id=client-id&client_secret=client-secret&grant_type=refresh_token&refresh_token=refresh-token")),
