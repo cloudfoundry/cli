@@ -103,7 +103,7 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 		"uaa":              net.NewUAAGateway(deps.Config, deps.UI, logger, envDialTimeout),
 		"routing-api":      net.NewRoutingAPIGateway(deps.Config, time.Now, deps.UI, logger, envDialTimeout),
 	}
-	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways, logger)
+	deps.RepoLocator = api.NewRepositoryLocator(deps.Config, deps.Gateways, logger, envDialTimeout)
 
 	deps.PluginModels = &PluginModels{Application: nil}
 
