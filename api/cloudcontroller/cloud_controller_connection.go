@@ -25,6 +25,7 @@ func NewConnection(APIURL string, routes rata.Routes, skipSSLValidation bool) *C
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
 		},
+		Proxy: http.ProxyFromEnvironment,
 	}
 
 	return &CloudControllerConnection{
