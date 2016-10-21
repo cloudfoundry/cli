@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 	"net/http"
+	"strconv"
 	"time"
 
 	"code.cloudfoundry.org/cli/cf"
@@ -83,9 +84,9 @@ type RepositoryLocator struct {
 	v3Repository repository.Repository
 }
 
-const noaaRetryTimeout = 15 * time.Second
+const noaaRetryDefaultTimeout = 5 * time.Second
 
-func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer) (loc RepositoryLocator) {
+func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[string]net.Gateway, logger trace.Printer, envDialTimeout string) (loc RepositoryLocator) {
 	strategy := strategy.NewEndpointStrategy(config.APIVersion())
 
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
@@ -111,6 +112,14 @@ func NewRepositoryLocator(config coreconfig.ReadWriter, gatewaysByName map[strin
 	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
 
 	apiVersion, _ := semver.Make(config.APIVersion())
+
+	var noaaRetryTimeout time.Duration
+	convertedTime, err := strconv.Atoi(envDialTimeout)
+	if err != nil {
+		noaaRetryTimeout = noaaRetryDefaultTimeout
+	} else {
+		noaaRetryTimeout = time.Duration(convertedTime) * 3 * time.Second
+	}
 
 	if apiVersion.GTE(cf.NoaaMinimumAPIVersion) {
 		consumer := consumer.New(config.DopplerEndpoint(), tlsConfig, http.ProxyFromEnvironment)
