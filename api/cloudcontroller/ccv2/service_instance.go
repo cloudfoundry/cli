@@ -2,6 +2,7 @@ package ccv2
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -91,7 +92,7 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 		}
 		request = cloudcontroller.NewRequestFromURI(
 			wrapper.NextURL,
-			"GET",
+			http.MethodGet,
 			nil,
 		)
 	}
@@ -143,7 +144,7 @@ func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, 
 		}
 		request = cloudcontroller.NewRequestFromURI(
 			wrapper.NextURL,
-			"GET",
+			http.MethodGet,
 			nil,
 		)
 	}

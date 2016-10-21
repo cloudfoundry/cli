@@ -30,7 +30,7 @@ var _ = Describe("Domain", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/shared_domains/shared-domain-guid"),
+						VerifyRequest(http.MethodGet, "/v2/shared_domains/shared-domain-guid"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -53,7 +53,7 @@ var _ = Describe("Domain", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/shared_domains/shared-domain-guid"),
+						VerifyRequest(http.MethodGet, "/v2/shared_domains/shared-domain-guid"),
 						RespondWith(http.StatusNotFound, response),
 					),
 				)
@@ -83,7 +83,7 @@ var _ = Describe("Domain", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/private_domains/private-domain-guid"),
+						VerifyRequest(http.MethodGet, "/v2/private_domains/private-domain-guid"),
 						RespondWith(http.StatusOK, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
@@ -106,7 +106,7 @@ var _ = Describe("Domain", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/private_domains/private-domain-guid"),
+						VerifyRequest(http.MethodGet, "/v2/private_domains/private-domain-guid"),
 						RespondWith(http.StatusNotFound, response),
 					),
 				)

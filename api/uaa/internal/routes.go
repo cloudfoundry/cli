@@ -1,11 +1,15 @@
 package internal
 
-import "github.com/tedsuo/rata"
+import (
+	"net/http"
+
+	"github.com/tedsuo/rata"
+)
 
 const (
 	RefreshTokenRequest = "RefreshToken"
 )
 
 var Routes = rata.Routes{
-	{Path: "/oauth/token", Method: "POST", Name: RefreshTokenRequest},
+	{Path: "/oauth/token", Method: http.MethodPost, Name: RefreshTokenRequest},
 }

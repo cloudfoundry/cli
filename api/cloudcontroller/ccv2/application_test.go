@@ -66,13 +66,13 @@ var _ = Describe("Application", func() {
 			}`
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/v2/apps", "q=space_guid:some-space-guid"),
+					VerifyRequest(http.MethodGet, "/v2/apps", "q=space_guid:some-space-guid"),
 					RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 				),
 			)
 			server.AppendHandlers(
 				CombineHandlers(
-					VerifyRequest("GET", "/v2/apps", "q=space_guid:some-space-guid&page=2"),
+					VerifyRequest(http.MethodGet, "/v2/apps", "q=space_guid:some-space-guid&page=2"),
 					RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 				),
 			)
@@ -109,7 +109,7 @@ var _ = Describe("Application", func() {
 			`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/routes/some-route-guid/apps"),
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps"),
 						RespondWith(http.StatusNotFound, response),
 					),
 				)
@@ -173,13 +173,13 @@ var _ = Describe("Application", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid"),
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid"),
 						RespondWith(http.StatusOK, response1, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid&page=2"),
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps", "q=space_guid:some-space-guid&page=2"),
 						RespondWith(http.StatusOK, response2, http.Header{"X-Cf-Warnings": {"this is another warning"}}),
 					),
 				)
@@ -210,7 +210,7 @@ var _ = Describe("Application", func() {
 			}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/routes/some-route-guid/apps"),
+						VerifyRequest(http.MethodGet, "/v2/routes/some-route-guid/apps"),
 						RespondWith(http.StatusOK, response),
 					),
 				)

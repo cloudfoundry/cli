@@ -31,7 +31,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 	JustBeforeEach(func() {
 		server.AppendHandlers(
 			CombineHandlers(
-				VerifyRequest("GET", "/v2/apps"),
+				VerifyRequest(http.MethodGet, "/v2/apps"),
 				RespondWith(serverResponseCode, response),
 			),
 		)

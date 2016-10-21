@@ -26,7 +26,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 	BeforeEach(func() {
 		FooRequest = "Foo"
 		routes = rata.Routes{
-			{Path: "/v2/foo", Method: "GET", Name: FooRequest},
+			{Path: "/v2/foo", Method: http.MethodGet, Name: FooRequest},
 		}
 		connection = NewConnection(server.URL(), routes, true)
 	})
@@ -36,7 +36,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo", "q=a:b&q=c:d"),
+						VerifyRequest(http.MethodGet, "/v2/foo", "q=a:b&q=c:d"),
 						RespondWith(http.StatusOK, "{}"),
 					),
 				)
@@ -78,7 +78,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				It("sends the request to the server", func() {
 					request := NewRequestFromURI(
 						"/v2/foo?q=a:b&q=c:d",
-						"GET",
+						http.MethodGet,
 						nil,
 					)
 
@@ -107,7 +107,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo", ""),
+						VerifyRequest(http.MethodGet, "/v2/foo", ""),
 						VerifyHeaderKV("foo", "bar"),
 						VerifyHeaderKV("accept", "application/json"),
 						VerifyHeaderKV("content-type", "application/json"),
@@ -120,7 +120,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				It("passes headers to the server", func() {
 					request := NewRequestFromURI(
 						"/v2/foo",
-						"GET",
+						http.MethodGet,
 						http.Header{
 							"foo": {"bar"},
 						},
@@ -144,14 +144,14 @@ var _ = Describe("Cloud Controller Connection", func() {
 				}`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest("GET", "/v2/foo", ""),
+						VerifyRequest(http.MethodGet, "/v2/foo", ""),
 						RespondWith(http.StatusOK, response),
 					),
 				)
 
 				request = NewRequestFromURI(
 					"/v2/foo",
-					"GET",
+					http.MethodGet,
 					nil,
 				)
 			})
@@ -186,7 +186,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				BeforeEach(func() {
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest("GET", "/v2/foo"),
+							VerifyRequest(http.MethodGet, "/v2/foo"),
 							RespondWith(http.StatusOK, "{}", http.Header{"X-Cf-Warnings": {"42, Ed McMann, the 1942 doggers"}}),
 						),
 					)
@@ -245,7 +245,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 					BeforeEach(func() {
 						server.AppendHandlers(
 							CombineHandlers(
-								VerifyRequest("GET", "/v2/foo"),
+								VerifyRequest(http.MethodGet, "/v2/foo"),
 							),
 						)
 
@@ -278,7 +278,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					server.AppendHandlers(
 						CombineHandlers(
-							VerifyRequest("GET", "/v2/foo"),
+							VerifyRequest(http.MethodGet, "/v2/foo"),
 							RespondWith(http.StatusNotFound, ccResponse),
 						),
 					)
