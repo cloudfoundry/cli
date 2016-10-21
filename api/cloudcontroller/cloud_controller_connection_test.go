@@ -2,7 +2,6 @@ package cloudcontroller_test
 
 import (
 	"net/http"
-	"net/url"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller"
 
@@ -45,12 +44,14 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 			Context("when generating the request via a RequestName", func() {
 				It("sends the request to the server", func() {
-					request := Request{
-						RequestName: FooRequest,
-						Query: map[string][]string{
+					request := NewRequest(
+						FooRequest,
+						nil,
+						nil,
+						map[string][]string{
 							"q": {"a:b", "c:d"},
 						},
-					}
+					)
 
 					err := connection.Make(request, &Response{})
 					Expect(err).NotTo(HaveOccurred())
@@ -60,10 +61,12 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 				Context("when an error is encountered", func() {
 					It("returns the error", func() {
-						request := Request{
-							RequestName: "some-invalid-request-name",
-							Query:       url.Values{},
-						}
+						request := NewRequest(
+							"some-invalid-request-name",
+							nil,
+							nil,
+							nil,
+						)
 
 						err := connection.Make(request, &Response{})
 						Expect(err).To(MatchError("No route exists with the name some-invalid-request-name"))
@@ -73,10 +76,11 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 			Context("when generating the request via an URI", func() {
 				It("sends the request to the server", func() {
-					request := Request{
-						URI:    "/v2/foo?q=a:b&q=c:d",
-						Method: "GET",
-					}
+					request := NewRequestFromURI(
+						"/v2/foo?q=a:b&q=c:d",
+						"GET",
+						nil,
+					)
 
 					err := connection.Make(request, &Response{})
 					Expect(err).NotTo(HaveOccurred())
@@ -86,10 +90,11 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 				Context("when an error is encountered", func() {
 					It("returns the error", func() {
-						request := Request{
-							URI:    "/v2/foo?q=a:b&q=c:d",
-							Method: "INVALID:METHOD",
-						}
+						request := NewRequestFromURI(
+							"/v2/foo?q=a:b&q=c:d",
+							"INVALID:METHOD",
+							nil,
+						)
 
 						err := connection.Make(request, &Response{})
 						Expect(err).To(MatchError("net/http: invalid method \"INVALID:METHOD\""))
@@ -113,13 +118,13 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 			Context("when passed headers", func() {
 				It("passes headers to the server", func() {
-					request := Request{
-						URI:    "/v2/foo",
-						Method: "GET",
-						Header: http.Header{
+					request := NewRequestFromURI(
+						"/v2/foo",
+						"GET",
+						http.Header{
 							"foo": {"bar"},
 						},
-					}
+					)
 
 					err := connection.Make(request, &Response{})
 					Expect(err).NotTo(HaveOccurred())
@@ -144,10 +149,11 @@ var _ = Describe("Cloud Controller Connection", func() {
 					),
 				)
 
-				request = Request{
-					URI:    "/v2/foo",
-					Method: "GET",
-				}
+				request = NewRequestFromURI(
+					"/v2/foo",
+					"GET",
+					nil,
+				)
 			})
 
 			Context("when passed a response with a result set", func() {
@@ -187,9 +193,12 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns them in Response", func() {
-					request := Request{
-						RequestName: FooRequest,
-					}
+					request := NewRequest(
+						FooRequest,
+						nil,
+						nil,
+						nil,
+					)
 
 					var response Response
 					err := connection.Make(request, &response)
@@ -214,9 +223,12 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns a RequestError", func() {
-					request := Request{
-						RequestName: FooRequest,
-					}
+					request := NewRequest(
+						FooRequest,
+						nil,
+						nil,
+						nil,
+					)
 
 					var response Response
 					err := connection.Make(request, &response)
@@ -241,9 +253,12 @@ var _ = Describe("Cloud Controller Connection", func() {
 					})
 
 					It("returns a UnverifiedServerError", func() {
-						request := Request{
-							RequestName: FooRequest,
-						}
+						request := NewRequest(
+							FooRequest,
+							nil,
+							nil,
+							nil,
+						)
 
 						var response Response
 						err := connection.Make(request, &response)
@@ -270,9 +285,12 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 
 				It("returns a CCRawResponse", func() {
-					request := Request{
-						RequestName: FooRequest,
-					}
+					request := NewRequest(
+						FooRequest,
+						nil,
+						nil,
+						nil,
+					)
 
 					var response Response
 					err := connection.Make(request, &response)

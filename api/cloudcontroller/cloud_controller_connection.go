@@ -63,7 +63,7 @@ func (connection *CloudControllerConnection) createHTTPRequest(passedRequest Req
 	} else {
 		request, err = connection.requestGenerator.CreateRequest(
 			passedRequest.RequestName,
-			passedRequest.Params,
+			passedRequest.URIParams,
 			&bytes.Buffer{},
 		)
 		if err == nil {
@@ -77,12 +77,6 @@ func (connection *CloudControllerConnection) createHTTPRequest(passedRequest Req
 	if passedRequest.Header != nil {
 		request.Header = passedRequest.Header
 	}
-
-	request.Header.Set("accept", "application/json")
-	request.Header.Set("content-type", "application/json")
-
-	// request.Header.Set("Connection", "close")
-	// request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
 
 	return request, nil
 }

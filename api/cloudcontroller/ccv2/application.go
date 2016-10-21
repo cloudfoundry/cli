@@ -33,10 +33,12 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 // GetApplications returns back a list of Applications based off of the
 // provided queries.
 func (client *CloudControllerClient) GetApplications(queries []Query) ([]Application, Warnings, error) {
-	request := cloudcontroller.Request{
-		RequestName: internal.AppsRequest,
-		Query:       FormatQueryParameters(queries),
-	}
+	request := cloudcontroller.NewRequest(
+		internal.AppsRequest,
+		nil,
+		nil,
+		FormatQueryParameters(queries),
+	)
 
 	fullAppsList := []Application{}
 	fullWarningsList := Warnings{}
@@ -60,10 +62,11 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.Request{
-			URI:    wrapper.NextURL,
-			Method: "GET",
-		}
+		request = cloudcontroller.NewRequestFromURI(
+			wrapper.NextURL,
+			"GET",
+			nil,
+		)
 	}
 
 	return fullAppsList, fullWarningsList, nil
@@ -72,11 +75,12 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 // GetRouteApplications returns a list of Applications associated with a route
 // GUID, filtered by provided queries.
 func (client *CloudControllerClient) GetRouteApplications(routeGUID string, queryParams []Query) ([]Application, Warnings, error) {
-	request := cloudcontroller.Request{
-		RequestName: internal.AppsFromRouteRequest,
-		Params:      map[string]string{"route_guid": routeGUID},
-		Query:       FormatQueryParameters(queryParams),
-	}
+	request := cloudcontroller.NewRequest(
+		internal.AppsFromRouteRequest,
+		map[string]string{"route_guid": routeGUID},
+		nil,
+		FormatQueryParameters(queryParams),
+	)
 
 	fullAppsList := []Application{}
 	fullWarningsList := Warnings{}
@@ -100,10 +104,11 @@ func (client *CloudControllerClient) GetRouteApplications(routeGUID string, quer
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.Request{
-			URI:    wrapper.NextURL,
-			Method: "GET",
-		}
+		request = cloudcontroller.NewRequestFromURI(
+			wrapper.NextURL,
+			"GET",
+			nil,
+		)
 	}
 
 	return fullAppsList, fullWarningsList, nil
