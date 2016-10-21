@@ -26,6 +26,7 @@ func NewConnection(APIURL string, routes rata.Routes, skipSSLValidation bool) *U
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
 		},
+		Proxy: http.ProxyFromEnvironment,
 	}
 
 	return &UAAConnection{
