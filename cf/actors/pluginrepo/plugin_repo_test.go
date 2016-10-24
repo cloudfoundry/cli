@@ -7,7 +7,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/actors/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/models"
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

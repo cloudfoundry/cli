@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/net"
 
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 
 	"github.com/onsi/gomega/ghttp"
 

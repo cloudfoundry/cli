@@ -6,7 +6,7 @@ import (
 
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/plugin/models"
-	"code.cloudfoundry.org/cli/testhelpers/rpcserver"
+	"code.cloudfoundry.org/cli/utils/testhelpers/rpcserver"
 )
 
 type FakeHandlers struct {

@@ -10,9 +10,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	"code.cloudfoundry.org/cli/plugin"
-	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

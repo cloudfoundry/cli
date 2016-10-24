@@ -3,7 +3,7 @@ package matchers
 import (
 	"fmt"
 
-	"code.cloudfoundry.org/cli/testhelpers/net"
+	"code.cloudfoundry.org/cli/utils/testhelpers/net"
 	"github.com/onsi/gomega"
 )
 

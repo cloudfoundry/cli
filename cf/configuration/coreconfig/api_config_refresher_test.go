@@ -2,7 +2,7 @@ package coreconfig_test
 
 import (
 	. "code.cloudfoundry.org/cli/cf/configuration/coreconfig"
-	"code.cloudfoundry.org/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"code.cloudfoundry.org/cli/cf/i18n"

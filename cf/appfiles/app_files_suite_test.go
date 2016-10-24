@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -7,7 +7,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/cf/commandregistry/fakecommand"
 
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	. "github.com/onsi/ginkgo"

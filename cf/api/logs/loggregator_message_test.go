@@ -3,7 +3,7 @@ package logs_test
 import (
 	"time"
 
-	testlogs "code.cloudfoundry.org/cli/testhelpers/logs"
+	testlogs "code.cloudfoundry.org/cli/utils/testhelpers/logs"
 
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"

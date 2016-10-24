@@ -796,11 +796,11 @@
 * github.com/cloudfoundry/cli/cf/configuration/core_config
 * github.com/cloudfoundry/cli/cf/configuration/config_helpers
 * github.com/cloudfoundry/cli/cf/commands/plugin_repo
-* github.com/cloudfoundry/cli/testhelpers/rpc_server
+* github.com/cloudfoundry/cli/utils/testhelpers/rpc_server
 * github.com/cloudfoundry/cli/cf/configuration/plugin_config
-* github.com/cloudfoundry/cli/testhelpers/plugin_builder
+* github.com/cloudfoundry/cli/utils/testhelpers/plugin_builder
 * Update bin/test
-* github.com/cloudfoundry/cli/testhelpers/cloud_controller_gateway
+* github.com/cloudfoundry/cli/utils/testhelpers/cloud_controller_gateway
 * github.com/cloudfoundry/cli/commands_loader
 * github.com/cloudfoundry/cli/cf/ui_helpers
 * github.com/cloudfoundry/cli/cf/panic_printer
@@ -2465,7 +2465,7 @@ updated without talking to the service broker.
 * Update README.md Add Releases info to Download section of the README [#78473546]
 * Show whether a service is paid in `cf m` [#76373558]
 * Add script to improve release cutting process [#79626744]
-* edit cli/plugin_examples README.md 
+* edit cli/plugin/plugin_examples README.md
 * Remove inline-relations-depth calls from service_builder calls [#81535612]
 * `cf m -s service-name` works when unauthenticated [#81535612]
 * Begin adding -s flag to `cf m` [#81535612]

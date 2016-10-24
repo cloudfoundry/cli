@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/testhelpers/net"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/utils/testhelpers/net"
 	"github.com/onsi/gomega/ghttp"
 
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"

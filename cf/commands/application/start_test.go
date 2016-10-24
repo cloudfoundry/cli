@@ -20,12 +20,12 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/applications/applicationsfakes"
 	"code.cloudfoundry.org/cli/cf/api/logs"
 	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
-	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testlogs "code.cloudfoundry.org/cli/testhelpers/logs"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testlogs "code.cloudfoundry.org/cli/utils/testhelpers/logs"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 
 	"sync"
 

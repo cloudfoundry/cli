@@ -11,7 +11,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
 	testapi "code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 
 	"sync"
 

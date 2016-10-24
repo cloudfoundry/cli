@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
