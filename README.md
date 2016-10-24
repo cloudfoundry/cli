@@ -1,15 +1,15 @@
 <p align="center">
-<b><a href="#features">Getting Started</a></b>
+<b><a href="#getting-started">Getting Started</a></b>
 |
-<b><a href="#installation">Download</a></b>
+<b><a href="#downloads">Download</a></b>
 |
-<b><a href="#updating">Known Issues</a></b>
+<b><a href="#known-issues">Known Issues</a></b>
 |
-<b><a href="#setup">Bugs/Feature Requests</a></b>
+<b><a href="#filing-issues--feature-requests">Bugs/Feature Requests</a></b>
 |
-<b><a href="#structure">Plugin Development</a></b>
+<b><a href="#plugin-development">Plugin Development</a></b>
 |
-<b><a href="#license">Contributing</a></b>
+<b><a href="#contributing--build-instructions">Contributing</a></b>
 </p>
 
 # Cloud Foundry CLI
