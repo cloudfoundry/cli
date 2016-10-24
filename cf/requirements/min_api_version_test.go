@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"github.com/blang/semver"
 
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

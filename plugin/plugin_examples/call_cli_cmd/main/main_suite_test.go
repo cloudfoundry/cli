@@ -1,7 +1,7 @@
 package main_test
 
 import (
-	"code.cloudfoundry.org/cli/testhelpers/pluginbuilder"
+	"code.cloudfoundry.org/cli/utils/testhelpers/pluginbuilder"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 

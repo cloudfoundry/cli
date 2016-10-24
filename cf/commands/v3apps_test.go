@@ -14,9 +14,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/apifakes"
 	"code.cloudfoundry.org/cli/cf/v3/models"
 	"code.cloudfoundry.org/cli/cf/v3/repository/repositoryfakes"
-	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

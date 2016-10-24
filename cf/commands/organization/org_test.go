@@ -6,13 +6,13 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/plugin/models"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commands/organization"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

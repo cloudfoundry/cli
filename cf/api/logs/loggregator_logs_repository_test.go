@@ -5,7 +5,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/api/logs/logsfakes"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	noaa_errors "github.com/cloudfoundry/noaa/errors"
 	"github.com/gogo/protobuf/proto"

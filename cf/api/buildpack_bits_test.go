@@ -17,13 +17,13 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/testhelpers/net"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/utils/testhelpers/net"
 
 	. "code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
 	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

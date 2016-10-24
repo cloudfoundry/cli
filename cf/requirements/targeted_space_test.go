@@ -4,7 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/models"
 	. "code.cloudfoundry.org/cli/cf/requirements"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

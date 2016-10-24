@@ -12,13 +12,13 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig/coreconfigfakes"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/models"
-	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 )
 
 var _ = Describe("Login Command", func() {

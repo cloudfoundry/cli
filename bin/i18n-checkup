@@ -29,8 +29,8 @@ fi
 
 IGNORE_FILES_REGEX=".*test.go|.*resources.go|fake.*\.go|template.go"
 
-i18n4go -c extract-strings -e excluded.json -s specialStrings.json -o ${tmpdir} -d commands -r --ignore-regexp $IGNORE_FILES_REGEX
-i18n4go -c extract-strings -e excluded.json -s specialStrings.json -o ${tmpdir} -d cf -r --ignore-regexp $IGNORE_FILES_REGEX
+i18n4go -c extract-strings -e strings/excluded.json -s strings/specialStrings.json -o ${tmpdir} -d commands -r --ignore-regexp $IGNORE_FILES_REGEX
+i18n4go -c extract-strings -e strings/excluded.json -s strings/specialStrings.json -o ${tmpdir} -d cf -r --ignore-regexp $IGNORE_FILES_REGEX
 i18n4go -c merge-strings -d ${tmpdir}
 
 i18n4go -c fixup --source-language-file ${tmpdir}/en.all.json

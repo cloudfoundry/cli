@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/v3/models"
 	"code.cloudfoundry.org/cli/cf/v3/repository"
-	"code.cloudfoundry.org/cli/testhelpers/configuration"
+	"code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 
 	ccClientFakes "github.com/cloudfoundry/go-ccapi/v3/client/fakes"
 

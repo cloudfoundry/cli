@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 )
 
 func NewManifest(path string, data generic.Map) (m *manifest.Manifest) {

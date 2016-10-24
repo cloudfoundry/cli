@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/flags"
 	"code.cloudfoundry.org/cli/cf/requirements"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 )
 
 type RunCommandResult int

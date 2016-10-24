@@ -11,11 +11,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	testcmd "code.cloudfoundry.org/cli/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
 
-	. "code.cloudfoundry.org/cli/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
 )
 
 var _ = Describe("delete-service-auth-token command", func() {

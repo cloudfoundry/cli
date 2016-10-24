@@ -19,7 +19,7 @@ import (
 	cmdRunner "code.cloudfoundry.org/cli/plugin/rpc"
 	. "code.cloudfoundry.org/cli/plugin/rpc/fakecommand"
 	"code.cloudfoundry.org/cli/plugin/rpc/rpcfakes"
-	testconfig "code.cloudfoundry.org/cli/testhelpers/configuration"
+	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
