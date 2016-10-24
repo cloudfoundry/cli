@@ -123,7 +123,7 @@ If the error remains or feature still missing, check the [open issues](https://g
 
 ## Plugin Development
 
-For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin_examples).
+For development guide on writing a cli plugin, see [here](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples).
 
 ## Contributing & Build Instructions
 
