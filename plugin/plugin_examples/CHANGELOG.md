@@ -1,11 +1,11 @@
-[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
+[Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/DOC.md)
 
 # Changes in v6.17.0
 - `-v` is now a global flag to enable verbose logging of API calls, equivalent to `CF_TRACE=true`. This means that the `-v` flag will no longer be passed to plugins.
 
 # Changes in v6.14.0
 - API `AccessToken()` now provides a refreshed o-auth token.
-- [Examples](https://github.com/cloudfoundry/cli/tree/master/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
+- [Examples](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
 - Fix Plugin API file descriptors leakage.
 - Fix bug where some CLI versions does not respect `PluginMetadata.MinCliVersion`.
 - The field `PackageUpdatedAt` returned by `GetApp()` API is now populated.
@@ -67,9 +67,9 @@ Added the following commands to cli_connection.go:
 - Plugins in the community repo can be browsed and installed from the CLI
 
 # Changes in v6.9.0
-- Plugins can now have versions, i.e. 1.2.3, [code example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/basic_plugin.go)
+- Plugins can now have versions, i.e. 1.2.3, [code example](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/basic_plugin.go)
 - `cf plugins` now displays plugin versions
-- `-h` and `--help` flags work with plugin commands. e.g. `cf <plugin-command> -h`. [code example](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/echo.go)
+- `-h` and `--help` flags work with plugin commands. e.g. `cf <plugin-command> -h`. [code example](https://github.com/cloudfoundry/cli/blob/master/plugin/plugin_examples/echo.go)
 - Allow `cf help <plugin-command>`
 
 # Changes in v6.8.0
