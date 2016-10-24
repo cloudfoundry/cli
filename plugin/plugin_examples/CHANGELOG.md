@@ -1,5 +1,8 @@
 [Go here for documentation of the plugin API](https://github.com/cloudfoundry/cli/blob/master/plugin_examples/DOC.md)
 
+# Changes in v6.17.0
+- `-v` is now a global flag to enable verbose logging of API calls, equivalent to `CF_TRACE=true`. This means that the `-v` flag will no longer be passed to plugins.
+
 # Changes in v6.14.0
 - API `AccessToken()` now provides a refreshed o-auth token.
 - [Examples](https://github.com/cloudfoundry/cli/tree/master/plugin_examples#test-driven-development-tdd) on how to use fake `CliConnection` and test RPC server for TDD development.
