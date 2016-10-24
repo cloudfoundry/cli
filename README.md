@@ -1,5 +1,18 @@
-# Cloud Foundry CLI
+<p align="center">
+<b><a href="#features">Getting Started</a></b>
+|
+<b><a href="#installation">Download</a></b>
+|
+<b><a href="#updating">Known Issues</a></b>
+|
+<b><a href="#setup">Bugs/Feature Requests</a></b>
+|
+<b><a href="#structure">Plugin Development</a></b>
+|
+<b><a href="#license">Contributing</a></b>
+</p>
 
+# Cloud Foundry CLI
 [![GitHub version](https://badge.fury.io/gh/cloudfoundry%2Fcli.svg)](https://github.com/cloudfoundry/cli/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cloudfoundry/cli/blob/master/LICENSE)
 [![Code Climate](https://codeclimate.com/github/cloudfoundry/cli/badges/gpa.svg)](https://codeclimate.com/github/cloudfoundry/cli)
