@@ -2,6 +2,7 @@ package logs
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	. "code.cloudfoundry.org/cli/cf/i18n"
@@ -105,7 +106,7 @@ func (repo *NoaaLogsRepository) TailLogsFor(appGUID string, onConnect func(), lo
 					return
 				}
 			case <-retryTimer.C:
-				errChan <- errors.New("Timed out waiting for connection to Loggregator")
+				errChan <- fmt.Errorf("Timed out waiting for connection to Loggregator (%s).", repo.config.DopplerEndpoint())
 				ticker.Stop()
 				return
 			}
