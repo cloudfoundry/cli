@@ -5304,10 +5304,6 @@
     "translation": "This will cause the app to restart. Are you sure you want to scale {{.AppName}}?"
   },
   {
-    "id": "Timed out waiting for connection to Loggregator",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "Timeout for async HTTP requests"
   },

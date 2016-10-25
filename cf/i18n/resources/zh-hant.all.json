@@ -5304,10 +5304,6 @@
     "translation": "這會導致重新啟動應用程式。您確定要調整 {{.AppName}} 嗎？"
   },
   {
-    "id": "Timed out waiting for connection to Loggregator",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "非同步 HTTP 要求的逾時"
   },

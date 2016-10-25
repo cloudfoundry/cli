@@ -5304,10 +5304,6 @@
     "translation": "这将导致应用程序重新启动。确定要扩展 {{.AppName}} 吗？"
   },
   {
-    "id": "Timed out waiting for connection to Loggregator",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "异步 HTTP 请求超时"
   },
