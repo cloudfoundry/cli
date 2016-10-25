@@ -180,7 +180,7 @@ var _ = Describe("logs with noaa repository", func() {
 				}()
 
 				Consistently(errChan, time.Second).ShouldNot(Receive())
-				expectedErr := errors.New("Timed out waiting for connection to Loggregator")
+				expectedErr := errors.New("Timed out waiting for connection to Loggregator (doppler.test.com).")
 				Eventually(errChan, time.Second).Should(Receive(Equal(expectedErr)))
 			})
 
@@ -209,7 +209,7 @@ var _ = Describe("logs with noaa repository", func() {
 				Consistently(errChan, time.Second).ShouldNot(Receive())
 
 				e <- err
-				expectedErr := errors.New("Timed out waiting for connection to Loggregator")
+				expectedErr := errors.New("Timed out waiting for connection to Loggregator (doppler.test.com).")
 				Eventually(errChan, 2*time.Second).Should(Receive(Equal(expectedErr)))
 			})
 		})
