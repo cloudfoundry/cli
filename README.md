@@ -127,7 +127,7 @@ For development guide on writing a cli plugin, see [here](https://github.com/clo
 
 ## Contributing & Build Instructions
 
-Please read the [contributors' guide](CONTRIBUTING.md)
+Please read the [contributors' guide](.github/CONTRIBUTING.md)
 
 If you'd like to submit updated translations, please see the [i18n README](https://github.com/cloudfoundry/cli/blob/master/cf/i18n/README-i18n.md) for instructions on how to submit an update.
 
