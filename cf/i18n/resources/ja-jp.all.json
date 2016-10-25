@@ -5304,10 +5304,6 @@
     "translation": "このため、このアプリは再始動されます。 {{.AppName}} をスケーリングしますか?"
   },
   {
-    "id": "Timed out waiting for connection to Loggregator",
-    "translation": ""
-  },
-  {
     "id": "Timeout for async HTTP requests",
     "translation": "非同期 HTTP 要求のタイムアウト"
   },
