@@ -26,7 +26,7 @@ run:
 
     export DOMAIN=`cat bosh-lite-lock/name`
 
-    cat << EOF > cats-config/integration_config.json | jq .
+    cat << EOF | jq -S . > cats-config/integration_config.json
     {
       "admin_password": "admin",
       "admin_user": "admin",
