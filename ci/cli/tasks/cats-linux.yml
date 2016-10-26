@@ -40,7 +40,6 @@ run:
     sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
 
     SKIPS="-skip="
-    $SKIP_SSO && SKIPS="${SKIPS}SSO|"
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
     [[ "$BACKEND" = "" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|NO_DIEGO_SUPPORT|"
