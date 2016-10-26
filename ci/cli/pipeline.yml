@@ -229,7 +229,7 @@ resources:
 - name: slack-alert
   type: slack-notification
   source:
-    url: https://hooks.slack.com/services/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
+    url: {{slack-webhook-url}}
 
 groups:
 - name: cli
