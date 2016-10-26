@@ -21,6 +21,7 @@ run:
 
     export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
+    export CONFIG=$PWD/cats-config/integration_config.json
 
     mkdir -p gopath/bin
     pushd cf-cli-binaries
@@ -34,7 +35,6 @@ run:
 
     go get github.com/onsi/ginkgo/ginkgo
 
-    export CONFIG=$PWD/cats-config/integration_config.json
 
     # Redact passwords in output
     sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
