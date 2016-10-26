@@ -6,37 +6,11 @@ inputs:
 - name: cf-release-repo
 - name: cf-cli-binaries
 - name: bosh-lite-lock
+- name: cats-config
 
 params:
   BACKEND:
-  CF_ADMIN_PASSWORD: admin
-  CF_ADMIN_USER: admin
-
-  BINARY_BUILDPACK_NAME:
-  GO_BUILDPACK_NAME:
-  JAVA_BUILDPACK_NAME:
-  NODEJS_BUILDPACK_NAME:
-  PHP_BUILDPACK_NAME:
-  PYTHON_BUILDPACK_NAME:
-  RUBY_BUILDPACK_NAME:
-  STATICFILE_BUILDPACK_NAME:
-
-  BROKER_START_TIMEOUT:
-  CF_API:
-  CF_APPS_DOMAIN:
-  CF_PUSH_TIMEOUT:
-  DEFAULT_TIMEOUT:
-  EXISTING_USER:
-  EXISTING_USER_PASSWORD:
-  LONG_CURL_TIMEOUT:
   NODES: 2
-  PERSISTENT_APP_HOST:
-  PERSISTENT_APP_ORG:
-  PERSISTENT_APP_QUOTA_NAME:
-  PERSISTENT_APP_SPACE:
-  SKIP_SSL_VALIDATION: true
-  SKIP_SSO: true
-  USE_HTTP: false
 
 run:
   path: bash
@@ -45,29 +19,9 @@ run:
   - |
     set -eux
 
-    ###########################################################
-    # Added by CLI
-    export DOMAIN=`cat bosh-lite-lock/name`
-    export CF_API="api.${DOMAIN}"
-    export CF_APPS_DOMAIN="${DOMAIN}"
-    ###########################################################
-
-    set +x
-    CF_ADMIN_PASSWORD="${CF_ADMIN_PASSWORD:?}"
-    set -x
-
-    CF_API="${CF_API:?}"
-    CF_ADMIN_USER="${CF_ADMIN_USER:?}"
-    CF_APPS_DOMAIN="${CF_APPS_DOMAIN:?}"
-    SKIP_SSL_VALIDATION="${SKIP_SSL_VALIDATION:?}"
-    USE_HTTP="${USE_HTTP:?}"
-    NODES="${NODES:?}"
-
     export GOPATH="${PWD}/gopath"
     export PATH="${GOPATH}/bin":${PATH}
 
-    ###########################################################
-    # Added by CLI
     mkdir -p gopath/bin
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
@@ -75,65 +29,21 @@ run:
       ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
     mv cf-release-repo/src $GOPATH
-    ###########################################################
 
     cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
     go get github.com/onsi/ginkgo/ginkgo
 
-    set +xu
-    cat > integration_config.json <<EOF
-    {
-      "api": "${CF_API}",
-      "admin_user": "${CF_ADMIN_USER}",
-      "admin_password": "${CF_ADMIN_PASSWORD}",
-      "apps_domain": "${CF_APPS_DOMAIN}",
-      "skip_ssl_validation": ${SKIP_SSL_VALIDATION},
-      "use_http": ${USE_HTTP},
-      "existing_user": "${EXISTING_USER}",
-      "use_existing_user": $( [ ! -z "${EXISTING_USER}" ] && echo true || echo false),
-      "keep_user_at_suite_end": $( [ ! -z "${EXISTING_USER}" ] && echo true || echo false),
-      "existing_user_password": "${EXISTING_USER_PASSWORD}",
-    EOF
-
-    [ -n "$BACKEND" ] && echo "  \"backend\": \"${BACKEND}\"," >> integration_config.json
-    [ -n "$DEFAULT_TIMEOUT" ] && echo "  \"default_timeout\": ${DEFAULT_TIMEOUT}," >> integration_config.json
-    [ -n "$CF_PUSH_TIMEOUT" ] && echo "  \"cf_push_timeout\": ${CF_PUSH_TIMEOUT}," >> integration_config.json
-    [ -n "$LONG_CURL_TIMEOUT" ] && echo "  \"long_curl_timeout\": ${LONG_CURL_TIMEOUT}," >> integration_config.json
-    [ -n "$BROKER_START_TIMEOUT" ] && echo "  \"broker_start_timeout\": ${BROKER_START_TIMEOUT}," >> integration_config.json
-
-    [ -n "$STATICFILE_BUILDPACK_NAME" ] && echo "  \"staticfile_buildpack_name\": \"${STATICFILE_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$JAVA_BUILDPACK_NAME" ] && echo "  \"java_buildpack_name\": \"${JAVA_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$RUBY_BUILDPACK_NAME" ] && echo "  \"ruby_buildpack_name\": \"${RUBY_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$NODEJS_BUILDPACK_NAME" ] && echo "  \"nodejs_buildpack_name\": \"${NODEJS_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$GO_BUILDPACK_NAME" ] && echo "  \"go_buildpack_name\": \"${GO_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$PYTHON_BUILDPACK_NAME" ] && echo "  \"python_buildpack_name\": \"${PYTHON_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$PHP_BUILDPACK_NAME" ] && echo "  \"php_buildpack_name\": \"${PHP_BUILDPACK_NAME}\"," >> integration_config.json
-    [ -n "$BINARY_BUILDPACK_NAME" ] && echo "  \"binary_buildpack_name\": \"${BINARY_BUILDPACK_NAME}\"," >> integration_config.json
-
-    [ -n "$PERSISTENT_APP_HOST" ] && echo "  \"persistent_app_host\": \"${PERSISTENT_APP_HOST}\"," >> integration_config.json
-    [ -n "$PERSISTENT_APP_SPACE" ] && echo "  \"persistent_app_space\": \"${PERSISTENT_APP_SPACE}\"," >> integration_config.json
-    [ -n "$PERSISTENT_APP_ORG" ] && echo "  \"persistent_app_org\": \"${PERSISTENT_APP_ORG}\"," >> integration_config.json
-    [ -n "$PERSISTENT_APP_QUOTA_NAME" ] && echo "  \"persistent_app_quota_name\": \"${PERSISTENT_APP_QUOTA_NAME}\"," >> integration_config.json
-    set -u
-    set -x
-
-    # Remove trailing comma
-    sed -ibak -E '$s/(.*),$/\1/' integration_config.json
-
-    echo "}" >> integration_config.json
+    export CONFIG=$PWD/cats-config/integration_config.json
 
     # Redact passwords in output
-    sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' integration_config.json
-
-    export CONFIG=$PWD/integration_config.json
+    sed -E 's/(.*(admin_password|existing_user_password).*\:)(.*)/\1 [REDACTED]/' $CONFIG
 
     SKIPS="-skip="
     $SKIP_SSO && SKIPS="${SKIPS}SSO|"
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
     [[ "$BACKEND" = "" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|NO_DIEGO_SUPPORT|"
-
 
     # Remove trailing |
     SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
