@@ -1,3 +1,168 @@
+## 6.22.2
+* Bump version to 6.22.2
+* Revert "Bump version to 6.23.0"
+* Bump version to 6.23.0
+* adds task to debug windows installer in the release pipeline
+* cats tasks get config from cats-config task
+* Update windows and linux cats config setup
+* Fix some issues with the cats-config job
+* remove SKIP_SSO from CATs Linux
+* reorder where CONFIG is set
+* cats linux uses cats config task
+* add task to generate cats config
+* update contributing document
+* update Slack incoming webhook
+* Fix link to contributors' guide on README
+* update translations
+* add doppler endpoint to error message
+* Update README.md
+* fix the last link, hopefully...
+* fix readme links, add how to debug cf curls for plugins
+* change default timeout to 5 seconds for integration tests
+* reduce number of files in repository root
+* renamed docs badge
+* added badges for docs and cmd ref guide
+* fixed links
+* added TOC to top of page
+* use CF_DIAL_TIMEOUT to generate noaa timeout
+* use http constants for http method names
+* follow proxy if it is set in the environment
+* wrap all request creation in NewRequest method
+* better description for the path flag in unbind route service command
+* replaced license badge url
+* removed Appendix
+* updated as per Chip's instructions
+* increase cats-linux and cat-windows nodes to 10
+* remove duplicate go get ginkgo
+* set default username and password for cats-windows task
+* inlined the stub to be compatible with echo
+* r3 instances are not compatible with the bosh-lite AMI
+* use the correct instance type
+* change bosh-lite instance type to r3.2xlarge
+* remove unused publish-rpm-timer resource
+* use the doppler endpoint... for doppler
+* use the token endpoint to talk to the UAA
+* change create-buildpack position argument to int
+* improve help description for bind-route-service --path option
+* refactor v2actions.GetDomain
+* on Windows the trace permissions come back as 0666
+* change default to empty
+* remove dora app from integration tests
+* Update translations and unshadow error
+* move GetRouteApplications to app actor, simplify route appending
+* add integration tests for delete-orphaned-routes
+* Extract GetSpaceRoutes and GetRouteApplications into actor methods
+* Use ui.DisplayText for deleting route message
+* separated out the ccv2.Route struct from the v2actions.Route struct
+* Rename DeleteRouteByGUID to DeleteRoute
+* Rename GetDomainByGUID to GetDomain
+* Add / to path in test
+* Update delete orphaned routes integration tests with patterns from unbind service
+* Route paths already have a leading slash
+* Remove query nil check
+* godoc comments for actor methods
+* corrected the godoc comment for CheckTarget
+* backfilled tests in the actors and command packages
+* adds queries for api methods
+* backfills tests for the api layer
+* additional test for String method on Route
+* handle the error properly
+* update the delete-orphaned-routes tests after rebase with master
+* adds the actors and api layers for delete-orphaned-routes command
+* Update delete orphaned routes actor methods to be consistent with other
+* Add test for experimental warning
+* Add delete orphaned routes command
+* Add boolean user prompt function to UI
+* reduce nodes to 3 :(
+* reduce down to 3 :(
+* backfill tests for cloud controller connection
+* Delete Windows Diego CATs tasks
+* switch to 5 nodes for DEA tests
+* opt into garden-runc-release
+* switch to using 6 nodes for CATs tests
+* default dies-lite to diego backend
+* switch everything over to use garden-runc
+* Merge pull request #974 from iplay88keys/master
+* skipping test
+* Increase default timeout for Diego CATs
+* Remove -r from CATs ginkgo command
+* added hyperlink to New Issue page
+* force empty lists for plugin app model
+* changed the wrong timeout, should be default timeout instead
+* increase the push timeout which is causing our linux CATs tests to fail
+* rename get methods to follow conventions
+* skips a cats app test that depends on tar and is breaking in our windows environment
+* user provided services can now be unbound
+* add godoc to API package
+* add api call to get service instances from space endpoint
+* use the correct path
+* run windows unit test script from cli-ci instead of cli
+* skip integration during units on windows
+* skip integration tests in bin/test
+* pull integration before running tests
+* run integration tests from cli repo on Linux and Windows
+* move integration test from cli-acceptance repo
+* better error for unset org or space
+* move target check to NewCloudControllerClient
+* Reset timeout in callback
+* Add localization resources for timeout err message
+* Stop retrying the loggregator connection after 15 seconds
+* add new line to display
+* separate out the UAA client
+* Skip config_test.go in CATs
+* Use flag arguments to generate bosh-lite manifest
+* Move api routes to internal and export APIRoutes
+* generate bosh-lite cf manifest for routing-release
+* refresh logic to the authentication wrapper
+* rename routes to api_routes
+* TailingLogs does not exit when noaa returns RetryError
+* separate wrappers and connections into their own packages
+* use specific error for an invalid auth token
+* rename package api/cloudcontrollerv2 -> api/cloudcontroller/ccv2
+* move error handling into a private wrapper
+* add authorization to CC requests
+* setup should always be a pointer reciever
+* switch to string check as these error differ by platform
+* refactor unbind-service command
+* Use Windows environment variable substitution
+* Translation placeholders for CF_DIAL_TIMEOUT help
+* Split Windows GATs into separate tasks
+* Readd CF_DIAL_TIMEOUT to 'cf help -a' output
+* remove skipPackages ginkgo flag from pipeline and tasks
+* Use acceptance BOSH public IP instead of private IP
+* use the pipeline tasks from cli-ci resource instead of the cli resource
+* Do not run v3 CATs on Windows
+* update descriptions for restage and restart
+* Remove https:// from API url in Linux CATS
+* Use https in CATs config
+* Remove https:// from api URL
+* Merge pull request #966 from iplay88keys/master
+* Use noaa token refresher and retry logic for logs
+* Update go repo name
+* added note to ask questions on CF Dev or slack
+* corrected link to release notes page
+* Handle app environment being nil in manifest
+* Replace init() function with more idiomatic var _
+* shows help for a subcommand when running cf with missing required arg
+* swapped order of release notes and 32 bit releases
+* updating resources maybe?
+* friends don't let friends make packages called errors
+* break config into separate files
+* moved the ui package into the utils subdir
+* path should be a string, not an int
+* use correct filenames
+* add windows installers back in
+* Remove dependency on i18n for TranslatableError
+* Fix 'Disbled' typo
+* revised download section to include apt-get and yum
+* added version badge, removed travis CI badge
+* disable signing of RPM metadata for now
+* fix directory
+* use the correct directory
+* fix errors
+* windows installer creation still does not work
+* use cli instead of cli-ci
+
 ## 6.22.1
 * Bump version to 6.22.1
 * remove depths
