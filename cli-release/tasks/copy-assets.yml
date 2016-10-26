@@ -1,0 +1,15 @@
+---
+platform: darwin
+
+inputs:
+- name: signed-windows-zips
+
+run:
+  path: bash
+  args:
+  - -c
+  - |
+    set -ex
+
+    mkdir /tmp/release-assets
+    cp signed-windows-zips/* /tmp/release-assets
