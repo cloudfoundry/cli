@@ -8,9 +8,7 @@ SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=%CD%;%PATH%
 
-SET /p DOMAIN=<%CD%\bosh-lite-lock\name
-call %CD%\cli-ci\ci\cli\tasks\create-cats-config.bat
-SET CONFIG=%CD%\config.json
+SET CONFIG=%CD%\cats-config\integration_config.json
 
 go get -v github.com/onsi/ginkgo/ginkgo
 
