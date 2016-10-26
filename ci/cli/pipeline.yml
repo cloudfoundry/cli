@@ -378,12 +378,20 @@ jobs:
       resource: bosh-lites-dea-pool
       params:
         acquire: true
-  - aggregate:
+  - do:
+    - task: cats-config
+      file: cli-ci/ci/cli/tasks/cats-config.yml
+      params:
+        BACKEND: dea
+        INCLUDE_V3: true
+        BROKER_START_TIMEOUT: 330
+        CF_PUSH_TIMEOUT: 210
+        DEFAULT_TIMEOUT: 60
+        LONG_CURL_TIMEOUT: 210
     - task: cats
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: dea
-        DEFAULT_TIMEOUT: 60
         NODES: 10
       on_failure:
          put: slack-alert
@@ -415,12 +423,21 @@ jobs:
       resource: bosh-lites-diego-pool
       params:
         acquire: true
-  - task: linux
-    file: cli-ci/ci/cli/tasks/cats-linux.yml
-    params:
-      BACKEND: diego
-      DEFAULT_TIMEOUT: 60
-      NODES: 6
+  - do:
+    - task: cats-config
+      file: cli-ci/ci/cli/tasks/cats-config.yml
+      params:
+        BACKEND: diego
+        INCLUDE_V3: true
+        BROKER_START_TIMEOUT: 330
+        CF_PUSH_TIMEOUT: 210
+        DEFAULT_TIMEOUT: 60
+        LONG_CURL_TIMEOUT: 210
+    - task: linux
+      file: cli-ci/ci/cli/tasks/cats-linux.yml
+      params:
+        BACKEND: diego
+        NODES: 6
     ensure:
       put: bosh-lites-diego-pool
       params:
@@ -451,10 +468,20 @@ jobs:
       resource: bosh-lites-dea-pool
       params:
         acquire: true
-  - task: cats
-    file: cli-ci/ci/cli/tasks/cats-windows.yml
-    params:
-      NODES: 10
+  - do:
+    - task: cats-config
+      file: cli-ci/ci/cli/tasks/cats-config.yml
+      params:
+        BACKEND: dea
+        INCLUDE_V3: false
+        BROKER_START_TIMEOUT: 330
+        CF_PUSH_TIMEOUT: 210
+        DEFAULT_TIMEOUT: 60
+        LONG_CURL_TIMEOUT: 210
+    - task: cats
+      file: cli-ci/ci/cli/tasks/cats-windows.yml
+      params:
+        NODES: 10
     ensure:
       put: bosh-lites-dea-pool
       params:
