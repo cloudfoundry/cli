@@ -60,18 +60,18 @@ func (client *CloudControllerClient) TokenEndpoint() string {
 
 // Info returns back endpoint and API information from /v2/info.
 func (client *CloudControllerClient) Info() (APIInformation, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.InfoRequest,
-		nil,
-		nil,
-		nil,
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.InfoRequest,
+	})
+	if err != nil {
+		return APIInformation{}, nil, err
+	}
 
 	var info APIInformation
 	response := cloudcontroller.Response{
 		Result: &info,
 	}
 
-	err := client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response)
 	return info, response.Warnings, err
 }

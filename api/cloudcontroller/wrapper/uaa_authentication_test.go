@@ -21,6 +21,7 @@ var _ = Describe("UAA Authentication", func() {
 		fakeClient     *wrapperfakes.FakeUAAClient
 
 		wrapper cloudcontroller.Connection
+		request *http.Request
 	)
 
 	BeforeEach(func() {
@@ -30,12 +31,15 @@ var _ = Describe("UAA Authentication", func() {
 
 		inner := NewUAAAuthentication(fakeClient)
 		wrapper = inner.Wrap(fakeConnection)
+
+		request = &http.Request{
+			Header: http.Header{},
+		}
 	})
 
 	Describe("Make", func() {
 		Context("when the token is valid", func() {
 			It("adds authentication headers", func() {
-				request := cloudcontroller.Request{}
 				wrapper.Make(request, nil)
 
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
@@ -46,12 +50,7 @@ var _ = Describe("UAA Authentication", func() {
 
 			Context("when the request already has headers", func() {
 				It("preserves existing headers", func() {
-					header := http.Header{}
-					header.Add("Existing", "header")
-
-					request := cloudcontroller.Request{
-						Header: header,
-					}
+					request.Header.Add("Existing", "header")
 					wrapper.Make(request, nil)
 
 					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
@@ -65,7 +64,6 @@ var _ = Describe("UAA Authentication", func() {
 				It("returns nil", func() {
 					fakeConnection.MakeReturns(nil)
 
-					request := cloudcontroller.Request{}
 					err := wrapper.Make(request, nil)
 					Expect(err).ToNot(HaveOccurred())
 				})
@@ -76,7 +74,6 @@ var _ = Describe("UAA Authentication", func() {
 					innerError := errors.New("inner error")
 					fakeConnection.MakeReturns(innerError)
 
-					request := cloudcontroller.Request{}
 					err := wrapper.Make(request, nil)
 					Expect(err).To(Equal(innerError))
 				})
@@ -93,7 +90,6 @@ var _ = Describe("UAA Authentication", func() {
 					return fmt.Sprintf("foobar-%d", count)
 				}
 
-				request := cloudcontroller.Request{}
 				wrapper.Make(request, nil)
 			})
 

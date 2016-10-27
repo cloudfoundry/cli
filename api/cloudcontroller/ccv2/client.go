@@ -47,7 +47,10 @@
 // endpoint they use.
 package ccv2
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"github.com/tedsuo/rata"
+)
 
 // Warnings are a collection of warnings that the Cloud Controller can return
 // back from an API request.
@@ -64,6 +67,7 @@ type CloudControllerClient struct {
 	routingEndpoint           string
 	tokenEndpoint             string
 
+	router     *rata.RequestGenerator
 	connection cloudcontroller.Connection
 }
 

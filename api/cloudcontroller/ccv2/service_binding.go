@@ -30,12 +30,13 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 // GetServiceBindings returns back a list of Service Bindings based off of the
 // provided queries.
 func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.ServiceBindingsRequest,
-		nil,
-		nil,
-		FormatQueryParameters(queries),
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.ServiceBindingsRequest,
+		Query:       FormatQueryParameters(queries),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	allServiceBindingsList := []ServiceBinding{}
 	allWarningsList := Warnings{}
@@ -60,11 +61,13 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.NewRequestFromURI(
-			wrapper.NextURL,
-			http.MethodGet,
-			nil,
-		)
+		request, err = client.newHTTPRequest(Request{
+			URI:    wrapper.NextURL,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, allWarningsList, err
+		}
 	}
 
 	return allServiceBindingsList, allWarningsList, nil
@@ -72,14 +75,15 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 
 // DeleteServiceBinding will destroy the requested Service Binding.
 func (client *CloudControllerClient) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.DeleteServiceBindingRequest,
-		map[string]string{"service_binding_guid": serviceBindingGUID},
-		nil,
-		nil,
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.DeleteServiceBindingRequest,
+		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	var response cloudcontroller.Response
-	err := client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response)
 	return response.Warnings, err
 }

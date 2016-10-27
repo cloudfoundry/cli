@@ -3,6 +3,7 @@ package ccv2
 import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
+	"github.com/tedsuo/rata"
 )
 
 // TargetCF sets the client to use the Cloud Controller at the fully qualified
@@ -15,8 +16,9 @@ import (
 // be used only for testing.
 func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
 	client.cloudControllerURL = APIURL
+	client.router = rata.NewRequestGenerator(APIURL, internal.APIRoutes)
 
-	client.connection = cloudcontroller.NewConnection(client.cloudControllerURL, internal.APIRoutes, skipSSLValidation)
+	client.connection = cloudcontroller.NewConnection(skipSSLValidation)
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
 	info, warnings, err := client.Info()

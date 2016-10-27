@@ -79,8 +79,8 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 	return e
 }
 
-func (e *errorWrapper) Make(passedRequest cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	err := e.connection.Make(passedRequest, passedResponse)
+func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+	err := e.connection.Make(request, passedResponse)
 
 	if rawErr, ok := err.(cloudcontroller.RawCCError); ok {
 		return e.convert(rawErr)
