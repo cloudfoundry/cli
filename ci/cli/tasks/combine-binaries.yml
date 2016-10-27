@@ -21,14 +21,13 @@ run:
     mkdir combined
 
     pushd cross-compiled
-      tar -xzf *.tgz
+      tar -xvf *.tgz
       rm *.tgz
       mv * $cwd/combined
     popd
 
-
     pushd osx-compiled
-      tar -xzf *.tgz
+      tar -xvf *.tgz
       rm *.tgz
       mv * $cwd/combined
     popd
