@@ -34,7 +34,7 @@ on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
 ## Getting Started
 
-Download and run the installer for your platform from the [Downloads Section](#downloads).
+Download and install the cf CLI from the [Downloads Section](#downloads).
 
 Once installed, you can log in and push an app.
 ```sh
