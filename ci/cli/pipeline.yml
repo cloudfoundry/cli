@@ -302,10 +302,10 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cf-cli-binaries
+    - get: cli
       trigger: true
       passed: [build-binaries]
-    - get: cli
+    - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cli-acceptance-tests
     - get: cli-ci
@@ -349,13 +349,13 @@ jobs:
   plan:
   - aggregate:
     - get: cli
+      trigger: true
       passed: [build-binaries]
     - get: cf-release-repo
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
     - get: cf-cli-binaries
-      trigger: true
       passed: [build-binaries]
     - get: cli-ci
     - put: bosh-lite-lock
@@ -392,13 +392,13 @@ jobs:
   plan:
   - aggregate:
     - get: cli
+      trigger: true
       passed: [build-binaries]
     - get: cf-release-repo
       params:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
     - get: cf-cli-binaries
-      trigger: true
       passed: [build-binaries]
     - get: cli-ci
     - put: bosh-lite-lock
@@ -415,7 +415,7 @@ jobs:
         CF_PUSH_TIMEOUT: 210
         DEFAULT_TIMEOUT: 60
         LONG_CURL_TIMEOUT: 210
-    - task: linux
+    - task: cats
       file: cli-ci/ci/cli/tasks/cats-linux.yml
       params:
         BACKEND: diego
@@ -434,10 +434,10 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: cf-cli-binaries
+    - get: cli
       trigger: true
       passed: [build-binaries]
-    - get: cli
+    - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cf-release-repo
       params:
@@ -477,9 +477,9 @@ jobs:
   plan:
   - aggregate:
     - get: cli
+      trigger: true
       passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cf-cli-binaries
-      trigger: true
       passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cli-private
     - get: cli-ci
