@@ -1,6 +1,10 @@
 package configactions
 
 func (actor Actor) SetTarget(CCAPI string, skipSSLValidation bool) (Warnings, error) {
+	if actor.Config.Target() == CCAPI && actor.Config.SkipSSLValidation() == skipSSLValidation {
+		return nil, nil
+	}
+
 	warnings, err := actor.CloudControllerClient.TargetCF(CCAPI, skipSSLValidation)
 	if err != nil {
 		return Warnings(warnings), err
