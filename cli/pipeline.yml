@@ -245,6 +245,7 @@ jobs:
       trigger: true
       depth: 3
     - get: cli-ci
+      depth: 3
   - aggregate:
     - task: units-linux
       file: cli-ci/ci/cli/tasks/units-linux.yml
@@ -279,6 +280,7 @@ jobs:
       passed: [units]
       depth: 3
     - get: cli-ci
+      depth: 3
   - aggregate:
     - task: build
       file: cli-ci/ci/cli/tasks/build-binaries.yml
@@ -312,7 +314,9 @@ jobs:
       passed: [build-binaries]
     - get: cli-acceptance-tests
     - get: cli-ci
+      depth: 3
     - get: cli-integration
+      depth: 3
     - put: bosh-lite-lock
       resource: bosh-lites-dea-pool
       params:
@@ -362,6 +366,7 @@ jobs:
     - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cli-ci
+      depth: 3
     - put: bosh-lite-lock
       resource: bosh-lites-dea-pool
       params:
@@ -406,6 +411,7 @@ jobs:
     - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cli-ci
+      depth: 3
     - put: bosh-lite-lock
       resource: bosh-lites-diego-pool
       params:
@@ -450,6 +456,7 @@ jobs:
         submodules:
         - src/github.com/cloudfoundry/cf-acceptance-tests
     - get: cli-ci
+      depth: 3
     - put: bosh-lite-lock
       resource: bosh-lites-dea-pool
       params:
@@ -490,6 +497,7 @@ jobs:
       passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cli-private
     - get: cli-ci
+      depth: 3
   - task: extract-binaries
     file: cli-ci/ci/cli/tasks/extract-binaries.yml
     on_failure:
@@ -567,6 +575,7 @@ jobs:
   - aggregate:
     - get: cli-ci-dockerfile
       trigger: true
+      depth: 3
     - get: golang
       trigger: true
       params: {save: true}
