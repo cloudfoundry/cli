@@ -53,7 +53,7 @@ func (cmd *ApiCommand) Execute(args []string) error {
 	}
 
 	if cmd.OptionalArgs.URL != "" {
-		err := cmd.SetAPI()
+		err := cmd.setAPI()
 		if err != nil {
 			return err
 		}
@@ -90,19 +90,19 @@ func DisplayCurrentTargetInformation(config commands.Config, commandUI commands.
 	return nil
 }
 
-func (cmd *ApiCommand) SetAPI() error {
+func (cmd *ApiCommand) setAPI() error {
 	cmd.UI.DisplayHeaderFlavorText("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
 		"Endpoint": cmd.OptionalArgs.URL,
 	})
 
-	api := cmd.processURL(cmd.OptionalArgs.URL)
+	apiURL := processURL(cmd.OptionalArgs.URL)
 
-	_, err := cmd.Actor.SetTarget(api, cmd.SkipSSLValidation)
+	_, err := cmd.Actor.SetTarget(apiURL, cmd.SkipSSLValidation)
 	if err != nil {
 		return common.HandleError(err)
 	}
 
-	if strings.HasPrefix(api, "http:") {
+	if strings.HasPrefix(apiURL, "http:") {
 		cmd.UI.DisplayText("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended")
 	}
 
@@ -111,7 +111,7 @@ func (cmd *ApiCommand) SetAPI() error {
 	return nil
 }
 
-func (_ ApiCommand) processURL(apiURL string) string {
+func processURL(apiURL string) string {
 	if !strings.HasPrefix(apiURL, "http") {
 		return fmt.Sprintf("https://%s", apiURL)
 
