@@ -243,6 +243,7 @@ jobs:
   - aggregate:
     - get: cli
       trigger: true
+      depth: 3
     - get: cli-ci
   - aggregate:
     - task: units-linux
@@ -276,6 +277,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [units]
+      depth: 3
     - get: cli-ci
   - aggregate:
     - task: build
@@ -305,6 +307,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [build-binaries]
+      depth: 3
     - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cli-acceptance-tests
@@ -351,6 +354,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [build-binaries]
+      depth: 3
     - get: cf-release-repo
       params:
         submodules:
@@ -394,6 +398,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [build-binaries]
+      depth: 3
     - get: cf-release-repo
       params:
         submodules:
@@ -437,6 +442,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [build-binaries]
+      depth: 3
     - get: cf-cli-binaries
       passed: [build-binaries]
     - get: cf-release-repo
@@ -479,6 +485,7 @@ jobs:
     - get: cli
       trigger: true
       passed: [cats-linux, cats-windows, cats-diego, gats]
+      depth: 3
     - get: cf-cli-binaries
       passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cli-private
