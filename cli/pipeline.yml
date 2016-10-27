@@ -17,15 +17,6 @@ resources:
     - ci
     - integration
 
-- name: final-cli
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{cf-cli-eng-github-private-key}}
-    branch: master
-    paths:
-    - ci/VERSION
-
 - name: cli-private
   type: git
   source:
@@ -252,7 +243,6 @@ jobs:
   - aggregate:
     - get: cli
       trigger: true
-    - get: final-cli
     - get: cli-ci
   - aggregate:
     - task: units-linux
@@ -286,8 +276,6 @@ jobs:
     - get: cli
       trigger: true
       passed: [units]
-    - get: final-cli
-      passed: [units]
     - get: cli-ci
   - aggregate:
     - task: build
@@ -316,8 +304,6 @@ jobs:
   - aggregate:
     - get: cf-cli-binaries
       trigger: true
-      passed: [build-binaries]
-    - get: final-cli
       passed: [build-binaries]
     - get: cli
       passed: [build-binaries]
@@ -362,8 +348,6 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: final-cli
-      passed: [build-binaries]
     - get: cli
       passed: [build-binaries]
     - get: cf-release-repo
@@ -407,8 +391,6 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: final-cli
-      passed: [build-binaries]
     - get: cli
       passed: [build-binaries]
     - get: cf-release-repo
@@ -455,8 +437,6 @@ jobs:
     - get: cf-cli-binaries
       trigger: true
       passed: [build-binaries]
-    - get: final-cli
-      passed: [build-binaries]
     - get: cli
       passed: [build-binaries]
     - get: cf-release-repo
@@ -496,8 +476,6 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: final-cli
-      passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cli
       passed: [cats-linux, cats-windows, cats-diego, gats]
     - get: cf-cli-binaries
