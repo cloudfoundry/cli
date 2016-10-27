@@ -70,6 +70,24 @@ var _ = Describe("Targgeting", func() {
 			Expect(routing).To(Equal(expectedRouting))
 			Expect(sslDisabled).To(Equal(skipSSLValidation))
 		})
+
+		Context("when setting the same API and skip SSL configuration", func() {
+			var APIURL string
+
+			BeforeEach(func() {
+				APIURL = "https://some-api.com"
+				fakeConfig.TargetReturns(APIURL)
+				fakeConfig.SkipSSLValidationReturns(skipSSLValidation)
+			})
+
+			It("does not make any API calls", func() {
+				warnings, err := actor.SetTarget(APIURL, skipSSLValidation)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(BeNil())
+
+				Expect(fakeCloudControllerClient.TargetCFCallCount()).To(BeZero())
+			})
+		})
 	})
 
 	Describe("ClearTarget", func() {
