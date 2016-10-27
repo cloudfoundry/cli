@@ -33,19 +33,20 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 // GetSharedDomain returns the Shared Domain associated with the provided
 // Domain GUID.
 func (client *CloudControllerClient) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.SharedDomainRequest,
-		map[string]string{"shared_domain_guid": domainGUID},
-		nil,
-		nil,
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.SharedDomainRequest,
+		URIParams:   map[string]string{"shared_domain_guid": domainGUID},
+	})
+	if err != nil {
+		return Domain{}, nil, err
+	}
 
 	var domain Domain
 	response := cloudcontroller.Response{
 		Result: &domain,
 	}
 
-	err := client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response)
 	if err != nil {
 		return Domain{}, response.Warnings, err
 	}
@@ -56,19 +57,20 @@ func (client *CloudControllerClient) GetSharedDomain(domainGUID string) (Domain,
 // GetPrivateDomain returns the Private Domain associated with the provided
 // Domain GUID.
 func (client *CloudControllerClient) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.PrivateDomainRequest,
-		map[string]string{"private_domain_guid": domainGUID},
-		nil,
-		nil,
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.PrivateDomainRequest,
+		URIParams:   map[string]string{"private_domain_guid": domainGUID},
+	})
+	if err != nil {
+		return Domain{}, nil, err
+	}
 
 	var domain Domain
 	response := cloudcontroller.Response{
 		Result: &domain,
 	}
 
-	err := client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response)
 	if err != nil {
 		return Domain{}, response.Warnings, err
 	}

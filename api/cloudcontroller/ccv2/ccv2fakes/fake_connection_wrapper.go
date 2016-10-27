@@ -2,6 +2,7 @@
 package ccv2fakes
 
 import (
+	"net/http"
 	"sync"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -9,10 +10,10 @@ import (
 )
 
 type FakeConnectionWrapper struct {
-	MakeStub        func(passedRequest cloudcontroller.Request, passedResponse *cloudcontroller.Response) error
+	MakeStub        func(request *http.Request, passedResponse *cloudcontroller.Response) error
 	makeMutex       sync.RWMutex
 	makeArgsForCall []struct {
-		passedRequest  cloudcontroller.Request
+		request        *http.Request
 		passedResponse *cloudcontroller.Response
 	}
 	makeReturns struct {
@@ -30,16 +31,16 @@ type FakeConnectionWrapper struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConnectionWrapper) Make(passedRequest cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
+func (fake *FakeConnectionWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	fake.makeMutex.Lock()
 	fake.makeArgsForCall = append(fake.makeArgsForCall, struct {
-		passedRequest  cloudcontroller.Request
+		request        *http.Request
 		passedResponse *cloudcontroller.Response
-	}{passedRequest, passedResponse})
-	fake.recordInvocation("Make", []interface{}{passedRequest, passedResponse})
+	}{request, passedResponse})
+	fake.recordInvocation("Make", []interface{}{request, passedResponse})
 	fake.makeMutex.Unlock()
 	if fake.MakeStub != nil {
-		return fake.MakeStub(passedRequest, passedResponse)
+		return fake.MakeStub(request, passedResponse)
 	} else {
 		return fake.makeReturns.result1
 	}
@@ -51,10 +52,10 @@ func (fake *FakeConnectionWrapper) MakeCallCount() int {
 	return len(fake.makeArgsForCall)
 }
 
-func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (cloudcontroller.Request, *cloudcontroller.Response) {
+func (fake *FakeConnectionWrapper) MakeArgsForCall(i int) (*http.Request, *cloudcontroller.Response) {
 	fake.makeMutex.RLock()
 	defer fake.makeMutex.RUnlock()
-	return fake.makeArgsForCall[i].passedRequest, fake.makeArgsForCall[i].passedResponse
+	return fake.makeArgsForCall[i].request, fake.makeArgsForCall[i].passedResponse
 }
 
 func (fake *FakeConnectionWrapper) MakeReturns(result1 error) {

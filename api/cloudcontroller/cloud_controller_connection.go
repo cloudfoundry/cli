@@ -5,22 +5,17 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/tedsuo/rata"
 )
 
 type CloudControllerConnection struct {
-	HTTPClient       *http.Client
-	URL              string
-	requestGenerator *rata.RequestGenerator
+	HTTPClient *http.Client
 }
 
-func NewConnection(APIURL string, routes rata.Routes, skipSSLValidation bool) *CloudControllerConnection {
+func NewConnection(skipSSLValidation bool) *CloudControllerConnection {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
@@ -30,21 +25,13 @@ func NewConnection(APIURL string, routes rata.Routes, skipSSLValidation bool) *C
 
 	return &CloudControllerConnection{
 		HTTPClient: &http.Client{Transport: tr},
-
-		URL:              strings.TrimRight(APIURL, "/"),
-		requestGenerator: rata.NewRequestGenerator(APIURL, routes),
 	}
 }
 
-func (connection *CloudControllerConnection) Make(passedRequest Request, passedResponse *Response) error {
-	req, err := connection.createHTTPRequest(passedRequest)
+func (connection *CloudControllerConnection) Make(request *http.Request, passedResponse *Response) error {
+	response, err := connection.HTTPClient.Do(request)
 	if err != nil {
-		return err
-	}
-
-	response, err := connection.HTTPClient.Do(req)
-	if err != nil {
-		return connection.processRequestErrors(err)
+		return connection.processRequestErrors(request, err)
 	}
 
 	defer response.Body.Close()
@@ -52,42 +39,12 @@ func (connection *CloudControllerConnection) Make(passedRequest Request, passedR
 	return connection.populateResponse(response, passedResponse)
 }
 
-func (connection *CloudControllerConnection) createHTTPRequest(passedRequest Request) (*http.Request, error) {
-	var request *http.Request
-	var err error
-	if passedRequest.URI != "" {
-		request, err = http.NewRequest(
-			passedRequest.Method,
-			fmt.Sprintf("%s%s", connection.URL, passedRequest.URI),
-			&bytes.Buffer{},
-		)
-	} else {
-		request, err = connection.requestGenerator.CreateRequest(
-			passedRequest.RequestName,
-			passedRequest.URIParams,
-			&bytes.Buffer{},
-		)
-		if err == nil {
-			request.URL.RawQuery = passedRequest.Query.Encode()
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	if passedRequest.Header != nil {
-		request.Header = passedRequest.Header
-	}
-
-	return request, nil
-}
-
-func (connection *CloudControllerConnection) processRequestErrors(err error) error {
+func (connection *CloudControllerConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:
 		if _, ok := e.Err.(x509.UnknownAuthorityError); ok {
 			return UnverifiedServerError{
-				URL: connection.URL,
+				URL: request.URL.String(),
 			}
 		}
 		return RequestError{Err: e}

@@ -37,22 +37,18 @@ func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) clo
 
 // Make adds authentication headers to the passed in request and then calls the
 // wrapped connection's Make
-func (t *UAAAuthentication) Make(passedRequest cloudcontroller.Request, passedResponse *cloudcontroller.Response) error {
-	if passedRequest.Header == nil {
-		passedRequest.Header = http.Header{}
-	}
+func (t *UAAAuthentication) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+	request.Header.Set("Authorization", t.client.AccessToken())
 
-	passedRequest.Header.Set("Authorization", t.client.AccessToken())
-
-	err := t.connection.Make(passedRequest, passedResponse)
+	err := t.connection.Make(request, passedResponse)
 	if _, ok := err.(ccv2.InvalidAuthTokenError); ok {
 		err = t.client.RefreshToken()
 		if err != nil {
 			return err
 		}
 
-		passedRequest.Header.Set("Authorization", t.client.AccessToken())
-		err = t.connection.Make(passedRequest, passedResponse)
+		request.Header.Set("Authorization", t.client.AccessToken())
+		err = t.connection.Make(request, passedResponse)
 	}
 
 	return err

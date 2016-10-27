@@ -60,12 +60,13 @@ func (serviceInstance ServiceInstance) Managed() bool {
 // GetServiceInstances returns back a list of *managed* Service Instances based
 // off of the provided queries.
 func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.ServiceInstancesRequest,
-		nil,
-		nil,
-		FormatQueryParameters(queries),
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.ServiceInstancesRequest,
+		Query:       FormatQueryParameters(queries),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	allServiceInstancesList := []ServiceInstance{}
 	allWarningsList := Warnings{}
@@ -90,11 +91,13 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.NewRequestFromURI(
-			wrapper.NextURL,
-			http.MethodGet,
-			nil,
-		)
+		request, err = client.newHTTPRequest(Request{
+			URI:    wrapper.NextURL,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, allWarningsList, err
+		}
 	}
 
 	return allServiceInstancesList, allWarningsList, nil
@@ -110,14 +113,14 @@ func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, 
 		query.Add("return_user_provided_service_instances", "true")
 	}
 
-	request := cloudcontroller.NewRequest(
-		internal.SpaceServiceInstancesRequest,
-		map[string]string{
-			"guid": spaceGUID,
-		},
-		nil,
-		query,
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.SpaceServiceInstancesRequest,
+		URIParams:   map[string]string{"guid": spaceGUID},
+		Query:       query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	allServiceInstancesList := []ServiceInstance{}
 	allWarningsList := Warnings{}
@@ -142,11 +145,14 @@ func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, 
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.NewRequestFromURI(
-			wrapper.NextURL,
-			http.MethodGet,
-			nil,
-		)
+
+		request, err = client.newHTTPRequest(Request{
+			URI:    wrapper.NextURL,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, allWarningsList, err
+		}
 	}
 
 	return allServiceInstancesList, allWarningsList, nil

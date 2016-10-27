@@ -43,12 +43,14 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 // GetSpaceRoutes returns a list of Routes associated with the provided Space
 // GUID, and filtered by the provided queries.
 func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.RoutesFromSpaceRequest,
-		map[string]string{"space_guid": spaceGUID},
-		nil,
-		FormatQueryParameters(queryParams),
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.RoutesFromSpaceRequest,
+		URIParams:   map[string]string{"space_guid": spaceGUID},
+		Query:       FormatQueryParameters(queryParams),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	fullRoutesList := []Route{}
 	fullWarningsList := Warnings{}
@@ -72,11 +74,13 @@ func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParam
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.NewRequestFromURI(
-			wrapper.NextURL,
-			http.MethodGet,
-			nil,
-		)
+		request, err = client.newHTTPRequest(Request{
+			URI:    wrapper.NextURL,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, fullWarningsList, err
+		}
 	}
 
 	return fullRoutesList, fullWarningsList, nil
@@ -84,14 +88,15 @@ func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParam
 
 // DeleteRoute deletes the Route associated with the provided Route GUID.
 func (client *CloudControllerClient) DeleteRoute(routeGUID string) (Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.DeleteRouteRequest,
-		map[string]string{"route_guid": routeGUID},
-		nil,
-		nil,
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.DeleteRouteRequest,
+		URIParams:   map[string]string{"route_guid": routeGUID},
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	var response cloudcontroller.Response
-	err := client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response)
 	return response.Warnings, err
 }

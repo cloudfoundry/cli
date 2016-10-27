@@ -34,12 +34,13 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 // GetApplications returns back a list of Applications based off of the
 // provided queries.
 func (client *CloudControllerClient) GetApplications(queries []Query) ([]Application, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.AppsRequest,
-		nil,
-		nil,
-		FormatQueryParameters(queries),
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.AppsRequest,
+		Query:       FormatQueryParameters(queries),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	fullAppsList := []Application{}
 	fullWarningsList := Warnings{}
@@ -63,11 +64,13 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.NewRequestFromURI(
-			wrapper.NextURL,
-			http.MethodGet,
-			nil,
-		)
+		request, err = client.newHTTPRequest(Request{
+			URI:    wrapper.NextURL,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, fullWarningsList, err
+		}
 	}
 
 	return fullAppsList, fullWarningsList, nil
@@ -76,12 +79,14 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 // GetRouteApplications returns a list of Applications associated with a route
 // GUID, filtered by provided queries.
 func (client *CloudControllerClient) GetRouteApplications(routeGUID string, queryParams []Query) ([]Application, Warnings, error) {
-	request := cloudcontroller.NewRequest(
-		internal.AppsFromRouteRequest,
-		map[string]string{"route_guid": routeGUID},
-		nil,
-		FormatQueryParameters(queryParams),
-	)
+	request, err := client.newHTTPRequest(Request{
+		RequestName: internal.AppsFromRouteRequest,
+		URIParams:   map[string]string{"route_guid": routeGUID},
+		Query:       FormatQueryParameters(queryParams),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	fullAppsList := []Application{}
 	fullWarningsList := Warnings{}
@@ -105,11 +110,13 @@ func (client *CloudControllerClient) GetRouteApplications(routeGUID string, quer
 		if wrapper.NextURL == "" {
 			break
 		}
-		request = cloudcontroller.NewRequestFromURI(
-			wrapper.NextURL,
-			http.MethodGet,
-			nil,
-		)
+		request, err = client.newHTTPRequest(Request{
+			URI:    wrapper.NextURL,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, fullWarningsList, err
+		}
 	}
 
 	return fullAppsList, fullWarningsList, nil
