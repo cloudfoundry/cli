@@ -39,9 +39,9 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestClient() *CloudControllerClient {
+func NewTestClient() *Client {
 	SetupV2InfoResponse()
-	client := NewCloudControllerClient()
+	client := NewClient()
 	warnings, err := client.TargetCF(server.URL(), true)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(warnings).To(BeEmpty())

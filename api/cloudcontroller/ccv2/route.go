@@ -42,8 +42,8 @@ func (route *Route) UnmarshalJSON(data []byte) error {
 
 // GetSpaceRoutes returns a list of Routes associated with the provided Space
 // GUID, and filtered by the provided queries.
-func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]Route, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.RoutesFromSpaceRequest,
 		URIParams:   map[string]string{"space_guid": spaceGUID},
 		Query:       FormatQueryParameters(queryParams),
@@ -74,7 +74,7 @@ func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParam
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = client.newHTTPRequest(Request{
+		request, err = client.newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
@@ -87,8 +87,8 @@ func (client *CloudControllerClient) GetSpaceRoutes(spaceGUID string, queryParam
 }
 
 // DeleteRoute deletes the Route associated with the provided Route GUID.
-func (client *CloudControllerClient) DeleteRoute(routeGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) DeleteRoute(routeGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteRouteRequest,
 		URIParams:   map[string]string{"route_guid": routeGUID},
 	})

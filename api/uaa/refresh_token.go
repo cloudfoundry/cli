@@ -29,7 +29,7 @@ func (client *Client) RefreshToken() error {
 		"refresh_token": {client.store.RefreshToken()},
 	}.Encode())
 
-	request, err := client.newRequest(RequestOptions{
+	request, err := client.newRequest(requestOptions{
 		RequestName: internal.RefreshTokenRequest,
 		Header: http.Header{
 			"Content-Type": {"application/x-www-form-urlencoded"},

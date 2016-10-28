@@ -33,7 +33,7 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config commands.Config, ui commands.UI) error {
-	cmd.Actor = configactions.NewActor(config, ccv2.NewCloudControllerClient())
+	cmd.Actor = configactions.NewActor(config, ccv2.NewClient())
 	cmd.UI = ui
 	cmd.Config = config
 	return nil

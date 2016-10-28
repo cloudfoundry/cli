@@ -19,48 +19,48 @@ type APIInformation struct {
 }
 
 // API returns the Cloud Controller API URL for the targeted Cloud Controller.
-func (client *CloudControllerClient) API() string {
+func (client *Client) API() string {
 	return client.cloudControllerURL
 }
 
 // APIVersion returns Cloud Controller API Version for the targeted Cloud
 // Controller.
-func (client *CloudControllerClient) APIVersion() string {
+func (client *Client) APIVersion() string {
 	return client.cloudControllerAPIVersion
 }
 
 // AuthorizationEndpoint returns the authorization endpoint for the targeted
 // Cloud Controller.
-func (client *CloudControllerClient) AuthorizationEndpoint() string {
+func (client *Client) AuthorizationEndpoint() string {
 	return client.authorizationEndpoint
 }
 
 // DopplerEndpoint returns the Doppler endpoint for the targetd Cloud
 // Controller.
-func (client *CloudControllerClient) DopplerEndpoint() string {
+func (client *Client) DopplerEndpoint() string {
 	return client.dopplerEndpoint
 }
 
 // LoggregatorEndpoint returns the Loggregator endpoint for the targeted Cloud
 // Controller.
-func (client *CloudControllerClient) LoggregatorEndpoint() string {
+func (client *Client) LoggregatorEndpoint() string {
 	return client.loggregatorEndpoint
 }
 
 // RoutingEndpoint returns the Routing endpoint for the targeted Cloud
 // Controller.
-func (client *CloudControllerClient) RoutingEndpoint() string {
+func (client *Client) RoutingEndpoint() string {
 	return client.routingEndpoint
 }
 
 // TokenEndpoint returns the Token endpoint for the targeted Cloud Controller.
-func (client *CloudControllerClient) TokenEndpoint() string {
+func (client *Client) TokenEndpoint() string {
 	return client.tokenEndpoint
 }
 
 // Info returns back endpoint and API information from /v2/info.
-func (client *CloudControllerClient) Info() (APIInformation, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) Info() (APIInformation, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.InfoRequest,
 	})
 	if err != nil {

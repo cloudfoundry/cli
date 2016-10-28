@@ -29,8 +29,8 @@ func (serviceBinding *ServiceBinding) UnmarshalJSON(data []byte) error {
 
 // GetServiceBindings returns back a list of Service Bindings based off of the
 // provided queries.
-func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetServiceBindings(queries []Query) ([]ServiceBinding, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.ServiceBindingsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
@@ -61,7 +61,7 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = client.newHTTPRequest(Request{
+		request, err = client.newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
@@ -74,8 +74,8 @@ func (client *CloudControllerClient) GetServiceBindings(queries []Query) ([]Serv
 }
 
 // DeleteServiceBinding will destroy the requested Service Binding.
-func (client *CloudControllerClient) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) DeleteServiceBinding(serviceBindingGUID string) (Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteServiceBindingRequest,
 		URIParams:   map[string]string{"service_binding_guid": serviceBindingGUID},
 	})

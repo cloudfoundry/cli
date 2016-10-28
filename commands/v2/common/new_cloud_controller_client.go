@@ -7,14 +7,14 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 )
 
-func NewCloudControllerClient(config commands.Config) (*ccv2.CloudControllerClient, error) {
+func NewCloudControllerClient(config commands.Config) (*ccv2.Client, error) {
 	if config.Target() == "" {
 		return nil, NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
 
-	client := ccv2.NewCloudControllerClient()
+	client := ccv2.NewClient()
 	_, err := client.TargetCF(config.Target(), config.SkipSSLValidation())
 	if err != nil {
 		return nil, err

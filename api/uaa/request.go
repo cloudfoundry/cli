@@ -9,7 +9,7 @@ import (
 )
 
 // RequestOptions contains all the options to create an HTTP Request.
-type RequestOptions struct {
+type requestOptions struct {
 	// Header is the set of request headers
 	Header http.Header
 
@@ -27,7 +27,7 @@ type RequestOptions struct {
 }
 
 // newRequest returns a constructed http.Request with some defaults.
-func (client *Client) newRequest(passedRequest RequestOptions) (*http.Request, error) {
+func (client *Client) newRequest(passedRequest requestOptions) (*http.Request, error) {
 	request, err := client.router.CreateRequest(
 		passedRequest.RequestName,
 		passedRequest.Params,

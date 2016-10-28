@@ -10,7 +10,7 @@ import (
 
 var _ = Describe("Cloud Controller Client", func() {
 	var (
-		client *CloudControllerClient
+		client *Client
 	)
 
 	BeforeEach(func() {

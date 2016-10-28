@@ -13,6 +13,6 @@ type ConnectionWrapper interface {
 
 // WrapConnection wraps the current CloudControllerClient connection in the
 // wrapper.
-func (client *CloudControllerClient) WrapConnection(wrapper ConnectionWrapper) {
+func (client *Client) WrapConnection(wrapper ConnectionWrapper) {
 	client.connection = wrapper.Wrap(client.connection)
 }

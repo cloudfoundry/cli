@@ -33,8 +33,8 @@ func (application *Application) UnmarshalJSON(data []byte) error {
 
 // GetApplications returns back a list of Applications based off of the
 // provided queries.
-func (client *CloudControllerClient) GetApplications(queries []Query) ([]Application, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetApplications(queries []Query) ([]Application, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.AppsRequest,
 		Query:       FormatQueryParameters(queries),
 	})
@@ -64,7 +64,7 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = client.newHTTPRequest(Request{
+		request, err = client.newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
@@ -78,8 +78,8 @@ func (client *CloudControllerClient) GetApplications(queries []Query) ([]Applica
 
 // GetRouteApplications returns a list of Applications associated with a route
 // GUID, filtered by provided queries.
-func (client *CloudControllerClient) GetRouteApplications(routeGUID string, queryParams []Query) ([]Application, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetRouteApplications(routeGUID string, queryParams []Query) ([]Application, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.AppsFromRouteRequest,
 		URIParams:   map[string]string{"route_guid": routeGUID},
 		Query:       FormatQueryParameters(queryParams),
@@ -110,7 +110,7 @@ func (client *CloudControllerClient) GetRouteApplications(routeGUID string, quer
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = client.newHTTPRequest(Request{
+		request, err = client.newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
