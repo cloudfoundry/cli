@@ -7,8 +7,11 @@ import (
 )
 
 const (
+	// DefaultPluginRepoName is the name of the preinstalled plugin repository.
 	DefaultPluginRepoName = "CF-Community"
-	DefaultPluginRepoURL  = "https://plugins.cloudfoundry.org"
+
+	// DefaultPluginRepoURL is the URL of the preinstalled plugin repository.
+	DefaultPluginRepoURL = "https://plugins.cloudfoundry.org"
 )
 
 // PluginRepos is a saved plugin repository

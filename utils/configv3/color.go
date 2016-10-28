@@ -3,13 +3,17 @@ package configv3
 import "strconv"
 
 const (
+	// DefaultColorEnabled is the default CFConfig value for ColorEnabled.
 	DefaultColorEnabled = ""
-	// ColorDisabled means that no colors/bolding will be displayed
+
+	// ColorDisabled means that no colors/bolding will be displayed.
 	ColorDisabled ColorSetting = iota
-	// ColorEnabled means colors/bolding will be displayed
+
+	// ColorEnabled means colors/bolding will be displayed.
 	ColorEnabled
+
 	// ColorAuto means that the UI should decide if colors/bolding will be
-	// enabled
+	// enabled.
 	ColorAuto
 )
 

@@ -1,4 +1,4 @@
-// Package config package contains everything related to the CF CLI Configuration.
+// Package configv3 package contains everything related to the CF CLI Configuration.
 package configv3
 
 import (
@@ -11,12 +11,22 @@ import (
 )
 
 const (
+	// DefaultStagingTimeout is the default timeout for application staging.
 	DefaultStagingTimeout = 15 * time.Minute
+
+	// DefaultStartupTimeout is the default timeout for application starting.
 	DefaultStartupTimeout = 5 * time.Minute
 	// DefaultPingerThrottle = 5 * time.Second
 
-	DefaultTarget   = ""
-	UAAClientID     = "cf"
+	// DefaultTarget is the default CFConfig value for Target.
+	DefaultTarget = ""
+
+	// UAAClientID is the default client ID for the CLI when communicating with
+	// the UAA.
+	UAAClientID = "cf"
+
+	// UAAClientSecret is the default client secret for the CLI when
+	// communicating with the UAA.
 	UAAClientSecret = ""
 )
 

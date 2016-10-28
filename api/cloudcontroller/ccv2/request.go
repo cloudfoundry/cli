@@ -28,24 +28,19 @@ type requestOptions struct {
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request fields are not filled in.
 func (client Client) newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
-	var body io.Reader
-	if passedRequest.Body != nil {
-		body = passedRequest.Body
-	}
-
 	var request *http.Request
 	var err error
 	if passedRequest.URI != "" {
 		request, err = http.NewRequest(
 			passedRequest.Method,
 			fmt.Sprintf("%s%s", client.API(), passedRequest.URI),
-			body,
+			passedRequest.Body,
 		)
 	} else {
 		request, err = client.router.CreateRequest(
 			passedRequest.RequestName,
 			passedRequest.URIParams,
-			body,
+			passedRequest.Body,
 		)
 		if err == nil {
 			request.URL.RawQuery = passedRequest.Query.Encode()

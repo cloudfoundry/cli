@@ -2,6 +2,7 @@ package sortutils
 
 import "unicode"
 
+// Alphabetic is an array of strings that can be alphabetically sorted
 type Alphabetic []string
 
 func (s Alphabetic) Len() int      { return len(s) }
@@ -11,6 +12,7 @@ func (s Alphabetic) Less(i, j int) bool {
 	return SortAlphabetic(s[i], s[j])
 }
 
+// SortAlphabetic will return true if string a comes after string b
 func SortAlphabetic(a string, b string) bool {
 	iRunes := []rune(a)
 	jRunes := []rune(b)

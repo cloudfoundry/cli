@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+
+GOBIN=~/go/bin gometalinter --disable-all --enable=deadcode --enable=errcheck --enable=gocyclo --enable=goimports --enable=staticcheck --enable=vet --enable=gotype --enable=interfacer --enable=misspell --enable=test --enable=unused --enable=gofmt --enable=ineffassign --enable=structcheck --enable=testify --enable=vetshadow --enable=aligncheck --enable=gas --enable=goconst --enable=golint --enable=gosimple --enable=unconvert --enable=varcheck --deadline=30s ./actors/... ./api/... ./utils/{ui,panichandler,configv3,sortutils} | grep -v fake
+
+GOBIN=~/go/bin gometalinter --disable-all --enable=deadcode --enable=errcheck --enable=gocyclo --enable=goimports --enable=staticcheck --enable=vet --enable=gotype --enable=interfacer --enable=misspell --enable=test --enable=gofmt --enable=ineffassign --enable=testify --enable=vetshadow --enable=aligncheck --enable=gas --enable=goconst --enable=golint --enable=gosimple --enable=unconvert --enable=varcheck --deadline=30s ./commands/... | grep -v fake
