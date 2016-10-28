@@ -29,21 +29,22 @@ func (client *Client) RefreshToken() error {
 		"refresh_token": {client.store.RefreshToken()},
 	}.Encode())
 
-	request := NewRequest(
-		internal.RefreshTokenRequest,
-		nil,
-		http.Header{
+	request, err := client.newRequest(RequestOptions{
+		RequestName: internal.RefreshTokenRequest,
+		Header: http.Header{
 			"Content-Type": {"application/x-www-form-urlencoded"},
 		},
-		nil,
-		body,
-	)
+		Body: body,
+	})
+	if err != nil {
+		return err
+	}
 
 	var refreshResponse RefreshTokenResponse
 	response := Response{
 		Result: &refreshResponse,
 	}
-	err := client.connection.Make(request, &response)
+	err = client.connection.Make(request, &response)
 	if err != nil {
 		return err
 	}

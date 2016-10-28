@@ -1,6 +1,9 @@
 package uaa
 
-import "code.cloudfoundry.org/cli/api/uaa/internal"
+import (
+	"code.cloudfoundry.org/cli/api/uaa/internal"
+	"github.com/tedsuo/rata"
+)
 
 //go:generate counterfeiter . AuthenticationStore
 
@@ -18,17 +21,21 @@ type AuthenticationStore interface {
 
 // Client is the UAA client
 type Client struct {
-	store      AuthenticationStore
-	URL        string
+	store AuthenticationStore
+	URL   string
+
+	router     *rata.RequestGenerator
 	connection Connection
 }
 
 // NewClient returns a new UAA client
 func NewClient(URL string, store AuthenticationStore) *Client {
 	return &Client{
-		store:      store,
-		URL:        URL,
-		connection: NewConnection(URL, internal.Routes, store.SkipSSLValidation()),
+		store: store,
+		URL:   URL,
+
+		router:     rata.NewRequestGenerator(URL, internal.Routes),
+		connection: NewConnection(store.SkipSSLValidation()),
 	}
 }
 
