@@ -32,8 +32,8 @@ func (domain *Domain) UnmarshalJSON(data []byte) error {
 
 // GetSharedDomain returns the Shared Domain associated with the provided
 // Domain GUID.
-func (client *CloudControllerClient) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetSharedDomain(domainGUID string) (Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.SharedDomainRequest,
 		URIParams:   map[string]string{"shared_domain_guid": domainGUID},
 	})
@@ -56,8 +56,8 @@ func (client *CloudControllerClient) GetSharedDomain(domainGUID string) (Domain,
 
 // GetPrivateDomain returns the Private Domain associated with the provided
 // Domain GUID.
-func (client *CloudControllerClient) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetPrivateDomain(domainGUID string) (Domain, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.PrivateDomainRequest,
 		URIParams:   map[string]string{"private_domain_guid": domainGUID},
 	})

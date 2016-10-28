@@ -7,8 +7,8 @@ import (
 	"net/url"
 )
 
-// Request contains all the elements of a Cloud Controller request
-type Request struct {
+// requestOptions contains all the options to create an HTTP request.
+type requestOptions struct {
 	// URIParams are the list URI route parameters
 	URIParams map[string]string
 
@@ -27,7 +27,7 @@ type Request struct {
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request fields are not filled in.
-func (client CloudControllerClient) newHTTPRequest(passedRequest Request) (*http.Request, error) {
+func (client Client) newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
 	var body io.Reader
 	if passedRequest.Body != nil {
 		body = passedRequest.Body

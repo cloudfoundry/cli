@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("Service Instance", func() {
-	var client *CloudControllerClient
+	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestClient()

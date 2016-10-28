@@ -15,7 +15,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 		response           string
 		serverResponseCode int
 
-		client *CloudControllerClient
+		client *Client
 	)
 
 	BeforeEach(func() {

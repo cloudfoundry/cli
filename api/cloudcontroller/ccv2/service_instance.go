@@ -59,8 +59,8 @@ func (serviceInstance ServiceInstance) Managed() bool {
 
 // GetServiceInstances returns back a list of *managed* Service Instances based
 // off of the provided queries.
-func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
-	request, err := client.newHTTPRequest(Request{
+func (client *Client) GetServiceInstances(queries []Query) ([]ServiceInstance, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.ServiceInstancesRequest,
 		Query:       FormatQueryParameters(queries),
 	})
@@ -91,7 +91,7 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = client.newHTTPRequest(Request{
+		request, err = client.newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
@@ -106,14 +106,14 @@ func (client *CloudControllerClient) GetServiceInstances(queries []Query) ([]Ser
 // GetSpaceServiceInstances returns back a list of Service Instances based off
 // of the space and queries provided. User provided services will be included
 // if includeUserProvidedServices is set to true.
-func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []Query) ([]ServiceInstance, Warnings, error) {
+func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []Query) ([]ServiceInstance, Warnings, error) {
 	query := FormatQueryParameters(queries)
 
 	if includeUserProvidedServices {
 		query.Add("return_user_provided_service_instances", "true")
 	}
 
-	request, err := client.newHTTPRequest(Request{
+	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.SpaceServiceInstancesRequest,
 		URIParams:   map[string]string{"guid": spaceGUID},
 		Query:       query,
@@ -146,7 +146,7 @@ func (client *CloudControllerClient) GetSpaceServiceInstances(spaceGUID string, 
 			break
 		}
 
-		request, err = client.newHTTPRequest(Request{
+		request, err = client.newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})

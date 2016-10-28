@@ -14,7 +14,7 @@ import (
 //
 // In this mode, TLS is susceptible to man-in-the-middle attacks. This should
 // be used only for testing.
-func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
+func (client *Client) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
 	client.cloudControllerURL = APIURL
 	client.router = rata.NewRequestGenerator(APIURL, internal.APIRoutes)
 

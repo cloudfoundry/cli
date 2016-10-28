@@ -15,12 +15,12 @@ var _ = Describe("Target", func() {
 	var (
 		serverAPIURL string
 
-		client *CloudControllerClient
+		client *Client
 	)
 
 	BeforeEach(func() {
 		serverAPIURL = server.URL()[8:]
-		client = NewCloudControllerClient()
+		client = NewClient()
 	})
 
 	Describe("TargetCF", func() {

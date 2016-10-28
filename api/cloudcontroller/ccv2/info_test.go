@@ -15,7 +15,7 @@ var _ = Describe("Info", func() {
 	var (
 		serverAPIURL string
 
-		client *CloudControllerClient
+		client *Client
 	)
 
 	BeforeEach(func() {

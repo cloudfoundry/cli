@@ -56,9 +56,9 @@ import (
 // back from an API request.
 type Warnings []string
 
-// CloudControllerClient is a client that can be used to talk to a Cloud
-// Controller's V2 Endpoints.
-type CloudControllerClient struct {
+// Client is a client that can be used to talk to a Cloud Controller's V2
+// Endpoints.
+type Client struct {
 	authorizationEndpoint     string
 	cloudControllerAPIVersion string
 	cloudControllerURL        string
@@ -71,7 +71,7 @@ type CloudControllerClient struct {
 	connection cloudcontroller.Connection
 }
 
-// NewCloudControllerClient returns a new CloudControllerClient.
-func NewCloudControllerClient() *CloudControllerClient {
-	return new(CloudControllerClient)
+// NewClient returns a new Cloud Controller Client.
+func NewClient() *Client {
+	return new(Client)
 }
