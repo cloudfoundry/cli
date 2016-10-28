@@ -22,6 +22,8 @@ const (
 	underscore     = "_"
 )
 
+// GetTranslationFunc will return back a function that can be used to translate
+// strings into the currently set locale.
 func GetTranslationFunc(config Config) (i18n.TranslateFunc, error) {
 	t, err := getConfiguredLocal(config)
 	if err != nil {

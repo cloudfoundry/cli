@@ -1,4 +1,4 @@
-// package ui will provide hooks into STDOUT, STDERR and STDIN. It will also
+// Package ui will provide hooks into STDOUT, STDERR and STDIN. It will also
 // handle translation as necessary.
 //
 // This package is explicitly designed for the CF CLI and is *not* to be used
@@ -97,7 +97,7 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 }
 
 // DisplayTable presents a two dimensional array of strings as a table to UI.Out
-func (ui *UI) DisplayTable(prefix string, table [][]string) {
+func (ui *UI) DisplayTable(prefix string, table [][]string) error {
 	tw := tabwriter.NewWriter(ui.Out, 0, 1, 4, ' ', 0)
 
 	for _, row := range table {
@@ -105,7 +105,7 @@ func (ui *UI) DisplayTable(prefix string, table [][]string) {
 		fmt.Fprintln(tw, strings.Join(row, "\t"))
 	}
 
-	tw.Flush()
+	return tw.Flush()
 }
 
 // DisplayText combines the formattedString template with the key maps and then

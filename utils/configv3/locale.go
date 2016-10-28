@@ -3,6 +3,7 @@ package configv3
 import "strings"
 
 const (
+	// DefaultLocale is the default CFConfig value for Locale.
 	DefaultLocale = ""
 )
 
