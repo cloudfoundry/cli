@@ -880,7 +880,11 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME delete-space SPACE [-f]",
+    "id": "CF_NAME delete-space SPACE [-o ORG] [-f]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME delete-space SPACE [-o] [-f]",
     "translation": ""
   },
   {
@@ -2070,6 +2074,10 @@
   {
     "id": "Delete cancelled",
     "translation": "删除操作已取消"
+  },
+  {
+    "id": "Delete space within specified org",
+    "translation": ""
   },
   {
     "id": "Deletes a security group",

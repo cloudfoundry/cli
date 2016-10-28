@@ -3,6 +3,7 @@ package space_test
 import (
 	"errors"
 
+	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
 	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -24,6 +25,7 @@ var _ = Describe("delete-space command", func() {
 		space               models.Space
 		config              coreconfig.Repository
 		spaceRepo           *spacesfakes.FakeSpaceRepository
+		orgRepo             *organizationsfakes.FakeOrganizationRepository
 		requirementsFactory *requirementsfakes.FakeFactory
 		deps                commandregistry.Dependency
 	)
@@ -31,6 +33,7 @@ var _ = Describe("delete-space command", func() {
 	updateCommandDependency := func(pluginCall bool) {
 		deps.UI = ui
 		deps.RepoLocator = deps.RepoLocator.SetSpaceRepository(spaceRepo)
+		deps.RepoLocator = deps.RepoLocator.SetOrganizationRepository(orgRepo)
 		deps.Config = config
 		commandregistry.Commands.SetCommand(commandregistry.Commands.FindCommand("delete-space").SetDependency(deps, pluginCall))
 	}
@@ -42,6 +45,7 @@ var _ = Describe("delete-space command", func() {
 	BeforeEach(func() {
 		ui = &testterm.FakeUI{}
 		spaceRepo = new(spacesfakes.FakeSpaceRepository)
+		orgRepo = new(organizationsfakes.FakeOrganizationRepository)
 		config = testconfig.NewRepositoryWithDefaults()
 
 		space = models.Space{SpaceFields: models.SpaceFields{
@@ -67,12 +71,20 @@ var _ = Describe("delete-space command", func() {
 			Expect(runCommand("my-space")).To(BeFalse())
 		})
 
-		It("fails when not targeting a space", func() {
+		It("fails when not targeting an org and not providing -o", func() {
 			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
 			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
 			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
 
 			Expect(runCommand("my-space")).To(BeFalse())
+		})
+
+		It("succeeds if you use the -o flag but don't have an org targeted", func() {
+			targetedOrgReq := new(requirementsfakes.FakeTargetedOrgRequirement)
+			targetedOrgReq.ExecuteReturns(errors.New("no org targeted"))
+			requirementsFactory.NewTargetedOrgRequirementReturns(targetedOrgReq)
+
+			Expect(runCommand("-o", "other-org", "my-space")).To(BeTrue())
 		})
 	})
 
@@ -98,6 +110,39 @@ var _ = Describe("delete-space command", func() {
 			[]string{"OK"},
 		))
 		Expect(spaceRepo.DeleteArgsForCall(0)).To(Equal("space-to-delete-guid"))
+	})
+
+	It("deletes a space in a different org, given the dash-o flag and a space-name", func() {
+		otherSpace := models.Space{
+			SpaceFields: models.SpaceFields{
+				Name: "other-space-to-delete",
+				GUID: "other-space-to-delete-guid",
+			}}
+
+		otherOrg := models.Organization{
+			OrganizationFields: models.OrganizationFields{
+				Name: "other-org",
+				GUID: "other-org-guid",
+			}}
+		orgRepo.FindByNameReturns(otherOrg, nil)
+		spaceRepo.FindByNameInOrgReturns(otherSpace, nil)
+
+		ui.Inputs = []string{"yes"}
+		runCommand("-o", "other-org", "other-space-to-delete")
+
+		Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete the space other-space-to-delete"}))
+		Expect(ui.Outputs()).To(ContainSubstrings(
+			[]string{"Deleting space", "space-to-delete", "other-org", "my-user"},
+			[]string{"OK"},
+		))
+
+		Expect(orgRepo.FindByNameArgsForCall(0)).To(Equal("other-org"))
+
+		spaceArg, orgArg := spaceRepo.FindByNameInOrgArgsForCall(0)
+		Expect(spaceArg).To(Equal("other-space-to-delete"))
+		Expect(orgArg).To(Equal("other-org-guid"))
+		Expect(spaceRepo.DeleteArgsForCall(0)).To(Equal("other-space-to-delete-guid"))
+		Expect(config.HasSpace()).To(Equal(true))
 	})
 
 	It("clears the space from the config, when deleting the space currently targeted", func() {
