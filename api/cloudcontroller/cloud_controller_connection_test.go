@@ -69,6 +69,33 @@ var _ = Describe("Cloud Controller Connection", func() {
 			})
 		})
 
+		Describe("HTTP Response", func() {
+			var request *http.Request
+
+			BeforeEach(func() {
+				response := `{}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/foo", ""),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+
+				var err error
+				request, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns the status", func() {
+				response := Response{}
+
+				err := connection.Make(request, &response)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(response.HTTPResponse.Status).To(Equal("200 OK"))
+			})
+		})
+
 		Describe("Response Headers", func() {
 			Describe("X-Cf-Warnings", func() {
 				BeforeEach(func() {
@@ -170,6 +197,11 @@ var _ = Describe("Cloud Controller Connection", func() {
 						StatusCode:  http.StatusNotFound,
 						RawResponse: []byte(ccResponse),
 					}))
+
+					ccErr, ok := err.(RawCCError)
+					Expect(ok).To(BeTrue())
+					Expect(ccErr.RawResponse).To(Equal([]byte(ccResponse)))
+					Expect(ccErr.StatusCode).To(Equal(http.StatusNotFound))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
 				})

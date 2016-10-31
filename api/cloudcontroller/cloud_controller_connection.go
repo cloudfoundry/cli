@@ -34,8 +34,6 @@ func (connection *CloudControllerConnection) Make(request *http.Request, passedR
 		return connection.processRequestErrors(request, err)
 	}
 
-	defer response.Body.Close()
-
 	return connection.populateResponse(response, passedResponse)
 }
 
@@ -54,6 +52,8 @@ func (connection *CloudControllerConnection) processRequestErrors(request *http.
 }
 
 func (connection *CloudControllerConnection) populateResponse(response *http.Response, passedResponse *Response) error {
+	passedResponse.HTTPResponse = response
+
 	if rawWarnings := response.Header.Get("X-Cf-Warnings"); rawWarnings != "" {
 		passedResponse.Warnings = []string{}
 		for _, warning := range strings.Split(rawWarnings, ",") {
@@ -62,16 +62,21 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 		}
 	}
 
-	err := connection.handleStatusCodes(response)
+	rawBytes, err := ioutil.ReadAll(response.Body)
+	defer response.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	passedResponse.RawResponse = rawBytes
+
+	err = connection.handleStatusCodes(response, passedResponse)
 	if err != nil {
 		return err
 	}
 
 	if passedResponse.Result != nil {
-		rawBytes, _ := ioutil.ReadAll(response.Body)
-		passedResponse.RawResponse = rawBytes
-
-		decoder := json.NewDecoder(bytes.NewBuffer(rawBytes))
+		decoder := json.NewDecoder(bytes.NewBuffer(passedResponse.RawResponse))
 		decoder.UseNumber()
 		err = decoder.Decode(passedResponse.Result)
 		if err != nil {
@@ -82,16 +87,11 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 	return nil
 }
 
-func (*CloudControllerConnection) handleStatusCodes(response *http.Response) error {
+func (*CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
 	if response.StatusCode >= 400 {
-		body, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			return err
-		}
-
 		return RawCCError{
 			StatusCode:  response.StatusCode,
-			RawResponse: body,
+			RawResponse: passedResponse.RawResponse,
 		}
 	}
 

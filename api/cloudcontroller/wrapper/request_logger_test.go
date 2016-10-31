@@ -1,0 +1,218 @@
+package wrapper_test
+
+import (
+	"bytes"
+	"errors"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
+	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("Request Logger", func() {
+	var (
+		fakeConnection *cloudcontrollerfakes.FakeConnection
+		fakeOutput     *wrapperfakes.FakeRequestLoggerOutput
+
+		wrapper cloudcontroller.Connection
+
+		request  *http.Request
+		response *cloudcontroller.Response
+		err      error
+	)
+
+	BeforeEach(func() {
+		fakeConnection = new(cloudcontrollerfakes.FakeConnection)
+		fakeOutput = new(wrapperfakes.FakeRequestLoggerOutput)
+
+		wrapper = NewRequestLogger(fakeOutput).Wrap(fakeConnection)
+
+		var err error
+		request, err = http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
+		Expect(err).NotTo(HaveOccurred())
+
+		headers := http.Header{}
+		headers.Add("Aghi", "bar")
+		headers.Add("Abc", "json")
+		headers.Add("Adef", "application/json")
+		request.Header = headers
+
+		response = &cloudcontroller.Response{
+			RawResponse:  []byte("some-response-body"),
+			HTTPResponse: &http.Response{},
+		}
+	})
+
+	JustBeforeEach(func() {
+		err = wrapper.Make(request, response)
+	})
+
+	Describe("Make", func() {
+		It("outputs the request", func() {
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(fakeOutput.DisplayTypeCallCount()).To(BeNumerically(">=", 1))
+			name, date := fakeOutput.DisplayTypeArgsForCall(0)
+			Expect(name).To(Equal("REQUEST"))
+			Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+
+			Expect(fakeOutput.DisplayRequestCallCount()).To(Equal(1))
+			method, uri, protocol := fakeOutput.DisplayRequestArgsForCall(0)
+			Expect(method).To(Equal(http.MethodGet))
+			Expect(uri).To(Equal("/banana"))
+			Expect(protocol).To(Equal("HTTP/1.1"))
+
+			Expect(fakeOutput.DisplayHostCallCount()).To(Equal(1))
+			host := fakeOutput.DisplayHostArgsForCall(0)
+			Expect(host).To(Equal("foo.bar.com"))
+
+			Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 3))
+			name, value := fakeOutput.DisplayHeaderArgsForCall(0)
+			Expect(name).To(Equal("Abc"))
+			Expect(value).To(Equal("json"))
+			name, value = fakeOutput.DisplayHeaderArgsForCall(1)
+			Expect(name).To(Equal("Adef"))
+			Expect(value).To(Equal("application/json"))
+			name, value = fakeOutput.DisplayHeaderArgsForCall(2)
+			Expect(name).To(Equal("Aghi"))
+			Expect(value).To(Equal("bar"))
+		})
+
+		Context("when passed a body", func() {
+			var originalBody io.ReadCloser
+			BeforeEach(func() {
+				originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
+				request.Body = originalBody
+			})
+
+			It("outputs the body", func() {
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
+				Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("foo")))
+
+				bytes, err := ioutil.ReadAll(request.Body)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(bytes).To(Equal([]byte("foo")))
+			})
+		})
+
+		Context("when the request is successful", func() {
+			BeforeEach(func() {
+				response = &cloudcontroller.Response{
+					RawResponse: []byte("some-response-body"),
+					HTTPResponse: &http.Response{
+						Proto:  "HTTP/1.1",
+						Status: "200 OK",
+						Header: http.Header{
+							"BBBBB": {"second"},
+							"AAAAA": {"first"},
+							"CCCCC": {"third"},
+						},
+					},
+				}
+			})
+
+			It("outputs the response", func() {
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
+				name, date := fakeOutput.DisplayTypeArgsForCall(1)
+				Expect(name).To(Equal("RESPONSE"))
+				Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+
+				Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+				protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
+				Expect(protocol).To(Equal("HTTP/1.1"))
+				Expect(status).To(Equal("200 OK"))
+
+				Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
+				name, value := fakeOutput.DisplayHeaderArgsForCall(3)
+				Expect(name).To(Equal("AAAAA"))
+				Expect(value).To(Equal("first"))
+				name, value = fakeOutput.DisplayHeaderArgsForCall(4)
+				Expect(name).To(Equal("BBBBB"))
+				Expect(value).To(Equal("second"))
+				name, value = fakeOutput.DisplayHeaderArgsForCall(5)
+				Expect(name).To(Equal("CCCCC"))
+				Expect(value).To(Equal("third"))
+
+				Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
+				Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
+			})
+		})
+
+		Context("when the request is unsuccessful", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("banana")
+				fakeConnection.MakeReturns(expectedErr)
+			})
+
+			Context("when the http response is not set", func() {
+				BeforeEach(func() {
+					response = &cloudcontroller.Response{}
+				})
+
+				It("outputs nothing", func() {
+					Expect(err).To(MatchError(expectedErr))
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(0))
+				})
+			})
+
+			Context("when the http response is set", func() {
+				BeforeEach(func() {
+					response = &cloudcontroller.Response{
+						RawResponse: []byte("some-error-body"),
+						HTTPResponse: &http.Response{
+							Proto:  "HTTP/1.1",
+							Status: "200 OK",
+							Header: http.Header{
+								"BBBBB": {"second"},
+								"AAAAA": {"first"},
+								"CCCCC": {"third"},
+							},
+						},
+					}
+				})
+
+				It("outputs the response", func() {
+					Expect(err).To(MatchError(expectedErr))
+
+					Expect(fakeOutput.DisplayTypeCallCount()).To(Equal(2))
+					name, date := fakeOutput.DisplayTypeArgsForCall(1)
+					Expect(name).To(Equal("RESPONSE"))
+					Expect(date).To(BeTemporally("~", time.Now(), time.Second))
+
+					Expect(fakeOutput.DisplayResponseHeaderCallCount()).To(Equal(1))
+					protocol, status := fakeOutput.DisplayResponseHeaderArgsForCall(0)
+					Expect(protocol).To(Equal("HTTP/1.1"))
+					Expect(status).To(Equal("200 OK"))
+
+					Expect(fakeOutput.DisplayHeaderCallCount()).To(BeNumerically(">=", 6))
+					name, value := fakeOutput.DisplayHeaderArgsForCall(3)
+					Expect(name).To(Equal("AAAAA"))
+					Expect(value).To(Equal("first"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(4)
+					Expect(name).To(Equal("BBBBB"))
+					Expect(value).To(Equal("second"))
+					name, value = fakeOutput.DisplayHeaderArgsForCall(5)
+					Expect(name).To(Equal("CCCCC"))
+					Expect(value).To(Equal("third"))
+
+					Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))
+				})
+			})
+		})
+	})
+})
