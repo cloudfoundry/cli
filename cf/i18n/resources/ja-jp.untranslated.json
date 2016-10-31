@@ -412,10 +412,6 @@
     "translation": "CF_NAME delete-space SPACE [-o ORG] [-f]"
   },
   {
-    "id": "CF_NAME delete-space SPACE [-o] [-f]",
-    "translation": ""
-  },
-  {
     "id": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]",
     "translation": "CF_NAME delete-space-quota SPACE-QUOTA-NAME [-f]"
   },
