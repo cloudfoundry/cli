@@ -124,7 +124,9 @@ func isOption(s string) bool {
 }
 
 func executionWrapper(cmd flags.Commander, args []string) error {
-	cfConfig, err := configv3.LoadConfig()
+	cfConfig, err := configv3.LoadConfig(configv3.FlagOverride{
+		Verbose: v2.Commands.VerboseOrVersion,
+	})
 	if err != nil {
 		return err
 	}

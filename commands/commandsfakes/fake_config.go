@@ -124,6 +124,13 @@ type FakeConfig struct {
 	targetedSpaceReturns     struct {
 		result1 configv3.Space
 	}
+	VerboseStub        func() (bool, string)
+	verboseMutex       sync.RWMutex
+	verboseArgsForCall []struct{}
+	verboseReturns     struct {
+		result1 bool
+		result2 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -585,6 +592,32 @@ func (fake *FakeConfig) TargetedSpaceReturns(result1 configv3.Space) {
 	}{result1}
 }
 
+func (fake *FakeConfig) Verbose() (bool, string) {
+	fake.verboseMutex.Lock()
+	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct{}{})
+	fake.recordInvocation("Verbose", []interface{}{})
+	fake.verboseMutex.Unlock()
+	if fake.VerboseStub != nil {
+		return fake.VerboseStub()
+	} else {
+		return fake.verboseReturns.result1, fake.verboseReturns.result2
+	}
+}
+
+func (fake *FakeConfig) VerboseCallCount() int {
+	fake.verboseMutex.RLock()
+	defer fake.verboseMutex.RUnlock()
+	return len(fake.verboseArgsForCall)
+}
+
+func (fake *FakeConfig) VerboseReturns(result1 bool, result2 string) {
+	fake.VerboseStub = nil
+	fake.verboseReturns = struct {
+		result1 bool
+		result2 string
+	}{result1, result2}
+}
+
 func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -624,6 +657,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.targetedOrganizationMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
+	fake.verboseMutex.RLock()
+	defer fake.verboseMutex.RUnlock()
 	return fake.invocations
 }
 

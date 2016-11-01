@@ -7,7 +7,7 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 )
 
-func NewCloudControllerClient(config commands.Config) (*ccv2.Client, error) {
+func NewCloudControllerClient(config commands.Config, ui TerminalDisplay) (*ccv2.Client, error) {
 	if config.Target() == "" {
 		return nil, NoAPISetError{
 			BinaryName: config.BinaryName(),
@@ -22,6 +22,10 @@ func NewCloudControllerClient(config commands.Config) (*ccv2.Client, error) {
 
 	uaaClient := uaa.NewClient(client.TokenEndpoint(), config)
 	client.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
+
+	logger := wrapper.NewRequestLogger(NewRequestLoggerTerminalDisplay(ui))
+	client.WrapConnection(logger)
+
 	//Retry Wrapper
 	return client, err
 }

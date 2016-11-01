@@ -30,7 +30,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Setup(config commands.Config, ui command
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, err := common.NewCloudControllerClient(config)
+	client, err := common.NewCloudControllerClient(config, ui)
 	if err != nil {
 		return err
 	}
