@@ -4,12 +4,13 @@ package commands
 
 // UI is the interface to STDOUT
 type UI interface {
+	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
+	DisplayErrorMessage(err string, keys ...map[string]interface{})
 	DisplayHeaderFlavorText(text string, keys ...map[string]interface{})
 	DisplayHelpHeader(text string)
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})
-	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
 	DisplayTable(prefix string, table [][]string) error
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextWithKeyTranslations(template string, keysToTranslate []string, data ...map[string]interface{})

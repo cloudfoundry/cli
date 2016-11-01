@@ -32,6 +32,8 @@ const (
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
 // config.json does not exists, it will use a default config in it's place.
+// Takes in an optional FlagOverride, will only use the first one passed, that
+// can override the given flag values.
 //
 // The '.cf' directory will be read in one of the following locations on UNIX
 // Systems:
@@ -43,7 +45,7 @@ const (
 //   1. CF_HOME\.cf if CF_HOME is set
 //   2. HOMEDRIVE\HOMEPATH\.cf if HOMEDRIVE or HOMEPATH is set
 //   3. USERPROFILE\.cf as the default
-func LoadConfig() (*Config, error) {
+func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	filePath := ConfigFilePath()
 
 	var config Config
@@ -99,6 +101,10 @@ func LoadConfig() (*Config, error) {
 		}
 	}
 
+	if len(flags) > 0 {
+		config.Flags = flags[0]
+	}
+
 	return &config, nil
 }
 
@@ -127,6 +133,9 @@ type Config struct {
 
 	// ENV stores the configuration from os.ENV
 	ENV EnvOverride
+
+	// Flags stores the configuration from gobal flags
+	Flags FlagOverride
 
 	pluginConfig PluginsConfig
 }
@@ -196,6 +205,11 @@ type EnvOverride struct {
 	Lang             string
 	LCAll            string
 	Experimental     string
+}
+
+// FlagOverride represents all the global flags passed to the CF CLI
+type FlagOverride struct {
+	Verbose bool
 }
 
 // Target returns the CC API URL
@@ -291,18 +305,36 @@ func (config *Config) BinaryName() string {
 	return config.ENV.BinaryName
 }
 
-// Experimental returns whether or not to run experimental CLI commands
+// Experimental returns whether or not to run experimental CLI commands. This
+// is based off of:
+//   1. The $CF_CLI_EXPERIMENTAL environment variable if set
+//   2. Defaults to false
 func (config *Config) Experimental() bool {
-	envValStr := config.ENV.Experimental
-
-	if envValStr != "" {
-		envVal, err := strconv.ParseBool(envValStr)
+	if config.ENV.Experimental != "" {
+		envVal, err := strconv.ParseBool(config.ENV.Experimental)
 		if err == nil {
 			return envVal
 		}
 	}
 
 	return false
+}
+
+// Verbose returns true if verbose should be enabled and a location to log to.
+// This is based off of:
+//   1. The $CF_TRACE enviroment variable if set (true/false/file path)
+//   2. The '-v/--verbose' global flag
+//   3. Defaults to false
+func (config *Config) Verbose() (bool, string) {
+	if config.ENV.CFTrace != "" {
+		envVal, err := strconv.ParseBool(config.ENV.CFTrace)
+		if err == nil {
+			return envVal, ""
+		}
+		return true, config.ENV.CFTrace
+	}
+
+	return config.Flags.Verbose, ""
 }
 
 // SetOrganizationInformation sets the currently targeted organization

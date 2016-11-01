@@ -62,6 +62,10 @@ var _ = Describe("Config", func() {
 
 			pluginConfig := config.Plugins()
 			Expect(pluginConfig).To(BeEmpty())
+
+			trace, location := config.Verbose()
+			Expect(trace).To(BeFalse())
+			Expect(location).To(BeEmpty())
 		})
 	})
 
@@ -267,6 +271,36 @@ var _ = Describe("Config", func() {
 				Expect(config.TargetedSpace()).To(Equal(space))
 			})
 		})
+
+		DescribeTable("Verbose",
+			func(env string, flag bool, expected bool, location string) {
+				rawConfig := fmt.Sprintf(`{}`)
+				setConfig(homeDir, rawConfig)
+
+				defer os.Unsetenv("CF_TRACE")
+				if env == "" {
+					os.Unsetenv("CF_TRACE")
+				} else {
+					os.Setenv("CF_TRACE", env)
+				}
+
+				config, err := LoadConfig(FlagOverride{
+					Verbose: flag,
+				})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+
+				verbose, parsedLocation := config.Verbose()
+				Expect(verbose).To(Equal(expected))
+				Expect(parsedLocation).To(Equal(location))
+			},
+
+			Entry("CF_TRACE=true should enable verbose", "true", false, true, ""),
+			Entry("CF_TRACE=false should disable verbose", "false", false, false, ""),
+			Entry("CF_TRACE empty should disable verbose", "", false, false, ""),
+			Entry("CF_TRACE empty and '-v' should enable verbose", "", true, true, ""),
+			Entry("CF_TRACE set to filepath and '-v' should enable verbose", "/foo/bar", false, true, "/foo/bar"),
+		)
 	})
 
 	Describe("Write Config", func() {

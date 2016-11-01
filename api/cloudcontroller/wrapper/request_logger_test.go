@@ -64,8 +64,8 @@ var _ = Describe("Request Logger", func() {
 			Expect(name).To(Equal("REQUEST"))
 			Expect(date).To(BeTemporally("~", time.Now(), time.Second))
 
-			Expect(fakeOutput.DisplayRequestCallCount()).To(Equal(1))
-			method, uri, protocol := fakeOutput.DisplayRequestArgsForCall(0)
+			Expect(fakeOutput.DisplayRequestHeaderCallCount()).To(Equal(1))
+			method, uri, protocol := fakeOutput.DisplayRequestHeaderArgsForCall(0)
 			Expect(method).To(Equal(http.MethodGet))
 			Expect(uri).To(Equal("/banana"))
 			Expect(protocol).To(Equal("HTTP/1.1"))
@@ -102,6 +102,30 @@ var _ = Describe("Request Logger", func() {
 				bytes, err := ioutil.ReadAll(request.Body)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bytes).To(Equal([]byte("foo")))
+			})
+		})
+
+		Context("when an error occures while trying to log the request", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("this should never block the request")
+
+				calledOnce := false
+				fakeOutput.StartStub = func() error {
+					if !calledOnce {
+						calledOnce = true
+						return expectedErr
+					}
+					return nil
+				}
+			})
+
+			It("should display the error and continue on", func() {
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeOutput.HandleInternalErrorCallCount()).To(Equal(1))
+				Expect(fakeOutput.HandleInternalErrorArgsForCall(0)).To(MatchError(expectedErr))
 			})
 		})
 
@@ -213,6 +237,41 @@ var _ = Describe("Request Logger", func() {
 					Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))
 				})
 			})
+		})
+
+		Context("when an error occures while trying to log the response", func() {
+			var (
+				originalErr error
+				expectedErr error
+			)
+
+			BeforeEach(func() {
+				originalErr = errors.New("this error should not be overwritten")
+				fakeConnection.MakeReturns(originalErr)
+
+				expectedErr = errors.New("this should never block the request")
+
+				calledOnce := false
+				fakeOutput.StartStub = func() error {
+					if !calledOnce {
+						calledOnce = true
+						return nil
+					}
+					return expectedErr
+				}
+			})
+
+			It("should display the error and continue on", func() {
+				Expect(err).To(MatchError(originalErr))
+
+				Expect(fakeOutput.HandleInternalErrorCallCount()).To(Equal(1))
+				Expect(fakeOutput.HandleInternalErrorArgsForCall(0)).To(MatchError(expectedErr))
+			})
+		})
+
+		It("starts and stops the output", func() {
+			Expect(fakeOutput.StartCallCount()).To(Equal(2))
+			Expect(fakeOutput.StopCallCount()).To(Equal(2))
 		})
 	})
 })

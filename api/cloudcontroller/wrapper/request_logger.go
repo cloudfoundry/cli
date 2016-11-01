@@ -13,12 +13,15 @@ import (
 //go:generate counterfeiter . RequestLoggerOutput
 
 type RequestLoggerOutput interface {
-	DisplayType(name string, requestDate time.Time)
-	DisplayHost(name string)
-	DisplayRequest(method string, uri string, httpProtocol string)
-	DisplayHeader(name string, value string)
 	DisplayBody(body []byte)
+	DisplayHeader(name string, value string)
+	DisplayHost(name string)
+	DisplayRequestHeader(method string, uri string, httpProtocol string)
 	DisplayResponseHeader(httpProtocol string, status string)
+	DisplayType(name string, requestDate time.Time)
+	HandleInternalError(err error)
+	Start() error
+	Stop() error
 }
 
 type RequestLogger struct {
@@ -41,8 +44,32 @@ func (logger *RequestLogger) Wrap(innerconnection cloudcontroller.Connection) cl
 
 // Make records the request and the response to ui
 func (logger *RequestLogger) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+	err := logger.displayRequest(request)
+	if err != nil {
+		logger.output.HandleInternalError(err)
+	}
+
+	err = logger.connection.Make(request, passedResponse)
+
+	if passedResponse.HTTPResponse != nil {
+		displayErr := logger.displayResponse(passedResponse)
+		if err != nil {
+			logger.output.HandleInternalError(displayErr)
+		}
+	}
+
+	return err
+}
+
+func (logger *RequestLogger) displayRequest(request *http.Request) error {
+	err := logger.output.Start()
+	if err != nil {
+		return err
+	}
+	defer logger.output.Stop()
+
 	logger.output.DisplayType("REQUEST", time.Now())
-	logger.output.DisplayRequest(request.Method, request.URL.Path, request.Proto)
+	logger.output.DisplayRequestHeader(request.Method, request.URL.Path, request.Proto)
 	logger.output.DisplayHost(request.URL.Host)
 	logger.displaySortedHeaders(request.Header)
 
@@ -56,16 +83,21 @@ func (logger *RequestLogger) Make(request *http.Request, passedResponse *cloudco
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
 	}
 
-	err := logger.connection.Make(request, passedResponse)
+	return nil
+}
 
-	if passedResponse.HTTPResponse != nil {
-		logger.output.DisplayType("RESPONSE", time.Now())
-		logger.output.DisplayResponseHeader(passedResponse.HTTPResponse.Proto, passedResponse.HTTPResponse.Status)
-		logger.displaySortedHeaders(passedResponse.HTTPResponse.Header)
-		logger.output.DisplayBody(passedResponse.RawResponse)
+func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Response) error {
+	err := logger.output.Start()
+	if err != nil {
+		return err
 	}
+	defer logger.output.Stop()
 
-	return err
+	logger.output.DisplayType("RESPONSE", time.Now())
+	logger.output.DisplayResponseHeader(passedResponse.HTTPResponse.Proto, passedResponse.HTTPResponse.Status)
+	logger.displaySortedHeaders(passedResponse.HTTPResponse.Header)
+	logger.output.DisplayBody(passedResponse.RawResponse)
+	return nil
 }
 
 func (logger *RequestLogger) displaySortedHeaders(headers http.Header) {

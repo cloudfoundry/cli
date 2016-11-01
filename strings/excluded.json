@@ -555,7 +555,10 @@
     "\rDone uploading",
     ". Process to uninstall ...",
     "Error invoking plugin: ",
-    "An unexpected type of error"
+    "An unexpected type of error",
+
+    "(?i).*(?:token|password).*",
+    "Host"
   ],
   "excludedRegexps": [
     "^(?:\\s*{{.\\w+}}[^\\w{]*)+$",

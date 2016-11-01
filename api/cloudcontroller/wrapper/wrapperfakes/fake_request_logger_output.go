@@ -9,23 +9,10 @@ import (
 )
 
 type FakeRequestLoggerOutput struct {
-	DisplayTypeStub        func(name string, requestDate time.Time)
-	displayTypeMutex       sync.RWMutex
-	displayTypeArgsForCall []struct {
-		name        string
-		requestDate time.Time
-	}
-	DisplayHostStub        func(name string)
-	displayHostMutex       sync.RWMutex
-	displayHostArgsForCall []struct {
-		name string
-	}
-	DisplayRequestStub        func(method string, uri string, httpProtocol string)
-	displayRequestMutex       sync.RWMutex
-	displayRequestArgsForCall []struct {
-		method       string
-		uri          string
-		httpProtocol string
+	DisplayBodyStub        func(body []byte)
+	displayBodyMutex       sync.RWMutex
+	displayBodyArgsForCall []struct {
+		body []byte
 	}
 	DisplayHeaderStub        func(name string, value string)
 	displayHeaderMutex       sync.RWMutex
@@ -33,10 +20,17 @@ type FakeRequestLoggerOutput struct {
 		name  string
 		value string
 	}
-	DisplayBodyStub        func(body []byte)
-	displayBodyMutex       sync.RWMutex
-	displayBodyArgsForCall []struct {
-		body []byte
+	DisplayHostStub        func(name string)
+	displayHostMutex       sync.RWMutex
+	displayHostArgsForCall []struct {
+		name string
+	}
+	DisplayRequestHeaderStub        func(method string, uri string, httpProtocol string)
+	displayRequestHeaderMutex       sync.RWMutex
+	displayRequestHeaderArgsForCall []struct {
+		method       string
+		uri          string
+		httpProtocol string
 	}
 	DisplayResponseHeaderStub        func(httpProtocol string, status string)
 	displayResponseHeaderMutex       sync.RWMutex
@@ -44,108 +38,31 @@ type FakeRequestLoggerOutput struct {
 		httpProtocol string
 		status       string
 	}
-	invocations      map[string][][]interface{}
-	invocationsMutex sync.RWMutex
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.Time) {
-	fake.displayTypeMutex.Lock()
-	fake.displayTypeArgsForCall = append(fake.displayTypeArgsForCall, struct {
+	DisplayTypeStub        func(name string, requestDate time.Time)
+	displayTypeMutex       sync.RWMutex
+	displayTypeArgsForCall []struct {
 		name        string
 		requestDate time.Time
-	}{name, requestDate})
-	fake.recordInvocation("DisplayType", []interface{}{name, requestDate})
-	fake.displayTypeMutex.Unlock()
-	if fake.DisplayTypeStub != nil {
-		fake.DisplayTypeStub(name, requestDate)
 	}
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayTypeCallCount() int {
-	fake.displayTypeMutex.RLock()
-	defer fake.displayTypeMutex.RUnlock()
-	return len(fake.displayTypeArgsForCall)
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayTypeArgsForCall(i int) (string, time.Time) {
-	fake.displayTypeMutex.RLock()
-	defer fake.displayTypeMutex.RUnlock()
-	return fake.displayTypeArgsForCall[i].name, fake.displayTypeArgsForCall[i].requestDate
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayHost(name string) {
-	fake.displayHostMutex.Lock()
-	fake.displayHostArgsForCall = append(fake.displayHostArgsForCall, struct {
-		name string
-	}{name})
-	fake.recordInvocation("DisplayHost", []interface{}{name})
-	fake.displayHostMutex.Unlock()
-	if fake.DisplayHostStub != nil {
-		fake.DisplayHostStub(name)
+	HandleInternalErrorStub        func(err error)
+	handleInternalErrorMutex       sync.RWMutex
+	handleInternalErrorArgsForCall []struct {
+		err error
 	}
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayHostCallCount() int {
-	fake.displayHostMutex.RLock()
-	defer fake.displayHostMutex.RUnlock()
-	return len(fake.displayHostArgsForCall)
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayHostArgsForCall(i int) string {
-	fake.displayHostMutex.RLock()
-	defer fake.displayHostMutex.RUnlock()
-	return fake.displayHostArgsForCall[i].name
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayRequest(method string, uri string, httpProtocol string) {
-	fake.displayRequestMutex.Lock()
-	fake.displayRequestArgsForCall = append(fake.displayRequestArgsForCall, struct {
-		method       string
-		uri          string
-		httpProtocol string
-	}{method, uri, httpProtocol})
-	fake.recordInvocation("DisplayRequest", []interface{}{method, uri, httpProtocol})
-	fake.displayRequestMutex.Unlock()
-	if fake.DisplayRequestStub != nil {
-		fake.DisplayRequestStub(method, uri, httpProtocol)
+	StartStub        func() error
+	startMutex       sync.RWMutex
+	startArgsForCall []struct{}
+	startReturns     struct {
+		result1 error
 	}
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayRequestCallCount() int {
-	fake.displayRequestMutex.RLock()
-	defer fake.displayRequestMutex.RUnlock()
-	return len(fake.displayRequestArgsForCall)
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayRequestArgsForCall(i int) (string, string, string) {
-	fake.displayRequestMutex.RLock()
-	defer fake.displayRequestMutex.RUnlock()
-	return fake.displayRequestArgsForCall[i].method, fake.displayRequestArgsForCall[i].uri, fake.displayRequestArgsForCall[i].httpProtocol
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) {
-	fake.displayHeaderMutex.Lock()
-	fake.displayHeaderArgsForCall = append(fake.displayHeaderArgsForCall, struct {
-		name  string
-		value string
-	}{name, value})
-	fake.recordInvocation("DisplayHeader", []interface{}{name, value})
-	fake.displayHeaderMutex.Unlock()
-	if fake.DisplayHeaderStub != nil {
-		fake.DisplayHeaderStub(name, value)
+	StopStub        func() error
+	stopMutex       sync.RWMutex
+	stopArgsForCall []struct{}
+	stopReturns     struct {
+		result1 error
 	}
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayHeaderCallCount() int {
-	fake.displayHeaderMutex.RLock()
-	defer fake.displayHeaderMutex.RUnlock()
-	return len(fake.displayHeaderArgsForCall)
-}
-
-func (fake *FakeRequestLoggerOutput) DisplayHeaderArgsForCall(i int) (string, string) {
-	fake.displayHeaderMutex.RLock()
-	defer fake.displayHeaderMutex.RUnlock()
-	return fake.displayHeaderArgsForCall[i].name, fake.displayHeaderArgsForCall[i].value
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeRequestLoggerOutput) DisplayBody(body []byte) {
@@ -177,6 +94,81 @@ func (fake *FakeRequestLoggerOutput) DisplayBodyArgsForCall(i int) []byte {
 	return fake.displayBodyArgsForCall[i].body
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) {
+	fake.displayHeaderMutex.Lock()
+	fake.displayHeaderArgsForCall = append(fake.displayHeaderArgsForCall, struct {
+		name  string
+		value string
+	}{name, value})
+	fake.recordInvocation("DisplayHeader", []interface{}{name, value})
+	fake.displayHeaderMutex.Unlock()
+	if fake.DisplayHeaderStub != nil {
+		fake.DisplayHeaderStub(name, value)
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHeaderCallCount() int {
+	fake.displayHeaderMutex.RLock()
+	defer fake.displayHeaderMutex.RUnlock()
+	return len(fake.displayHeaderArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHeaderArgsForCall(i int) (string, string) {
+	fake.displayHeaderMutex.RLock()
+	defer fake.displayHeaderMutex.RUnlock()
+	return fake.displayHeaderArgsForCall[i].name, fake.displayHeaderArgsForCall[i].value
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHost(name string) {
+	fake.displayHostMutex.Lock()
+	fake.displayHostArgsForCall = append(fake.displayHostArgsForCall, struct {
+		name string
+	}{name})
+	fake.recordInvocation("DisplayHost", []interface{}{name})
+	fake.displayHostMutex.Unlock()
+	if fake.DisplayHostStub != nil {
+		fake.DisplayHostStub(name)
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHostCallCount() int {
+	fake.displayHostMutex.RLock()
+	defer fake.displayHostMutex.RUnlock()
+	return len(fake.displayHostArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHostArgsForCall(i int) string {
+	fake.displayHostMutex.RLock()
+	defer fake.displayHostMutex.RUnlock()
+	return fake.displayHostArgsForCall[i].name
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(method string, uri string, httpProtocol string) {
+	fake.displayRequestHeaderMutex.Lock()
+	fake.displayRequestHeaderArgsForCall = append(fake.displayRequestHeaderArgsForCall, struct {
+		method       string
+		uri          string
+		httpProtocol string
+	}{method, uri, httpProtocol})
+	fake.recordInvocation("DisplayRequestHeader", []interface{}{method, uri, httpProtocol})
+	fake.displayRequestHeaderMutex.Unlock()
+	if fake.DisplayRequestHeaderStub != nil {
+		fake.DisplayRequestHeaderStub(method, uri, httpProtocol)
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderCallCount() int {
+	fake.displayRequestHeaderMutex.RLock()
+	defer fake.displayRequestHeaderMutex.RUnlock()
+	return len(fake.displayRequestHeaderArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderArgsForCall(i int) (string, string, string) {
+	fake.displayRequestHeaderMutex.RLock()
+	defer fake.displayRequestHeaderMutex.RUnlock()
+	return fake.displayRequestHeaderArgsForCall[i].method, fake.displayRequestHeaderArgsForCall[i].uri, fake.displayRequestHeaderArgsForCall[i].httpProtocol
+}
+
 func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(httpProtocol string, status string) {
 	fake.displayResponseHeaderMutex.Lock()
 	fake.displayResponseHeaderArgsForCall = append(fake.displayResponseHeaderArgsForCall, struct {
@@ -202,21 +194,126 @@ func (fake *FakeRequestLoggerOutput) DisplayResponseHeaderArgsForCall(i int) (st
 	return fake.displayResponseHeaderArgsForCall[i].httpProtocol, fake.displayResponseHeaderArgsForCall[i].status
 }
 
+func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.Time) {
+	fake.displayTypeMutex.Lock()
+	fake.displayTypeArgsForCall = append(fake.displayTypeArgsForCall, struct {
+		name        string
+		requestDate time.Time
+	}{name, requestDate})
+	fake.recordInvocation("DisplayType", []interface{}{name, requestDate})
+	fake.displayTypeMutex.Unlock()
+	if fake.DisplayTypeStub != nil {
+		fake.DisplayTypeStub(name, requestDate)
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayTypeCallCount() int {
+	fake.displayTypeMutex.RLock()
+	defer fake.displayTypeMutex.RUnlock()
+	return len(fake.displayTypeArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayTypeArgsForCall(i int) (string, time.Time) {
+	fake.displayTypeMutex.RLock()
+	defer fake.displayTypeMutex.RUnlock()
+	return fake.displayTypeArgsForCall[i].name, fake.displayTypeArgsForCall[i].requestDate
+}
+
+func (fake *FakeRequestLoggerOutput) HandleInternalError(err error) {
+	fake.handleInternalErrorMutex.Lock()
+	fake.handleInternalErrorArgsForCall = append(fake.handleInternalErrorArgsForCall, struct {
+		err error
+	}{err})
+	fake.recordInvocation("HandleInternalError", []interface{}{err})
+	fake.handleInternalErrorMutex.Unlock()
+	if fake.HandleInternalErrorStub != nil {
+		fake.HandleInternalErrorStub(err)
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) HandleInternalErrorCallCount() int {
+	fake.handleInternalErrorMutex.RLock()
+	defer fake.handleInternalErrorMutex.RUnlock()
+	return len(fake.handleInternalErrorArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) HandleInternalErrorArgsForCall(i int) error {
+	fake.handleInternalErrorMutex.RLock()
+	defer fake.handleInternalErrorMutex.RUnlock()
+	return fake.handleInternalErrorArgsForCall[i].err
+}
+
+func (fake *FakeRequestLoggerOutput) Start() error {
+	fake.startMutex.Lock()
+	fake.startArgsForCall = append(fake.startArgsForCall, struct{}{})
+	fake.recordInvocation("Start", []interface{}{})
+	fake.startMutex.Unlock()
+	if fake.StartStub != nil {
+		return fake.StartStub()
+	} else {
+		return fake.startReturns.result1
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) StartCallCount() int {
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
+	return len(fake.startArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) StartReturns(result1 error) {
+	fake.StartStub = nil
+	fake.startReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) Stop() error {
+	fake.stopMutex.Lock()
+	fake.stopArgsForCall = append(fake.stopArgsForCall, struct{}{})
+	fake.recordInvocation("Stop", []interface{}{})
+	fake.stopMutex.Unlock()
+	if fake.StopStub != nil {
+		return fake.StopStub()
+	} else {
+		return fake.stopReturns.result1
+	}
+}
+
+func (fake *FakeRequestLoggerOutput) StopCallCount() int {
+	fake.stopMutex.RLock()
+	defer fake.stopMutex.RUnlock()
+	return len(fake.stopArgsForCall)
+}
+
+func (fake *FakeRequestLoggerOutput) StopReturns(result1 error) {
+	fake.StopStub = nil
+	fake.stopReturns = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeRequestLoggerOutput) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.displayTypeMutex.RLock()
-	defer fake.displayTypeMutex.RUnlock()
-	fake.displayHostMutex.RLock()
-	defer fake.displayHostMutex.RUnlock()
-	fake.displayRequestMutex.RLock()
-	defer fake.displayRequestMutex.RUnlock()
-	fake.displayHeaderMutex.RLock()
-	defer fake.displayHeaderMutex.RUnlock()
 	fake.displayBodyMutex.RLock()
 	defer fake.displayBodyMutex.RUnlock()
+	fake.displayHeaderMutex.RLock()
+	defer fake.displayHeaderMutex.RUnlock()
+	fake.displayHostMutex.RLock()
+	defer fake.displayHostMutex.RUnlock()
+	fake.displayRequestHeaderMutex.RLock()
+	defer fake.displayRequestHeaderMutex.RUnlock()
 	fake.displayResponseHeaderMutex.RLock()
 	defer fake.displayResponseHeaderMutex.RUnlock()
+	fake.displayTypeMutex.RLock()
+	defer fake.displayTypeMutex.RUnlock()
+	fake.handleInternalErrorMutex.RLock()
+	defer fake.handleInternalErrorMutex.RUnlock()
+	fake.startMutex.RLock()
+	defer fake.startMutex.RUnlock()
+	fake.stopMutex.RLock()
+	defer fake.stopMutex.RUnlock()
 	return fake.invocations
 }
 
