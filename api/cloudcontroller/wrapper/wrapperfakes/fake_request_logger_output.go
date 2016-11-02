@@ -9,40 +9,58 @@ import (
 )
 
 type FakeRequestLoggerOutput struct {
-	DisplayBodyStub        func(body []byte)
+	DisplayBodyStub        func(body []byte) error
 	displayBodyMutex       sync.RWMutex
 	displayBodyArgsForCall []struct {
 		body []byte
 	}
-	DisplayHeaderStub        func(name string, value string)
+	displayBodyReturns struct {
+		result1 error
+	}
+	DisplayHeaderStub        func(name string, value string) error
 	displayHeaderMutex       sync.RWMutex
 	displayHeaderArgsForCall []struct {
 		name  string
 		value string
 	}
-	DisplayHostStub        func(name string)
+	displayHeaderReturns struct {
+		result1 error
+	}
+	DisplayHostStub        func(name string) error
 	displayHostMutex       sync.RWMutex
 	displayHostArgsForCall []struct {
 		name string
 	}
-	DisplayRequestHeaderStub        func(method string, uri string, httpProtocol string)
+	displayHostReturns struct {
+		result1 error
+	}
+	DisplayRequestHeaderStub        func(method string, uri string, httpProtocol string) error
 	displayRequestHeaderMutex       sync.RWMutex
 	displayRequestHeaderArgsForCall []struct {
 		method       string
 		uri          string
 		httpProtocol string
 	}
-	DisplayResponseHeaderStub        func(httpProtocol string, status string)
+	displayRequestHeaderReturns struct {
+		result1 error
+	}
+	DisplayResponseHeaderStub        func(httpProtocol string, status string) error
 	displayResponseHeaderMutex       sync.RWMutex
 	displayResponseHeaderArgsForCall []struct {
 		httpProtocol string
 		status       string
 	}
-	DisplayTypeStub        func(name string, requestDate time.Time)
+	displayResponseHeaderReturns struct {
+		result1 error
+	}
+	DisplayTypeStub        func(name string, requestDate time.Time) error
 	displayTypeMutex       sync.RWMutex
 	displayTypeArgsForCall []struct {
 		name        string
 		requestDate time.Time
+	}
+	displayTypeReturns struct {
+		result1 error
 	}
 	HandleInternalErrorStub        func(err error)
 	handleInternalErrorMutex       sync.RWMutex
@@ -65,7 +83,7 @@ type FakeRequestLoggerOutput struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayBody(body []byte) {
+func (fake *FakeRequestLoggerOutput) DisplayBody(body []byte) error {
 	var bodyCopy []byte
 	if body != nil {
 		bodyCopy = make([]byte, len(body))
@@ -78,7 +96,9 @@ func (fake *FakeRequestLoggerOutput) DisplayBody(body []byte) {
 	fake.recordInvocation("DisplayBody", []interface{}{bodyCopy})
 	fake.displayBodyMutex.Unlock()
 	if fake.DisplayBodyStub != nil {
-		fake.DisplayBodyStub(body)
+		return fake.DisplayBodyStub(body)
+	} else {
+		return fake.displayBodyReturns.result1
 	}
 }
 
@@ -94,7 +114,14 @@ func (fake *FakeRequestLoggerOutput) DisplayBodyArgsForCall(i int) []byte {
 	return fake.displayBodyArgsForCall[i].body
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) {
+func (fake *FakeRequestLoggerOutput) DisplayBodyReturns(result1 error) {
+	fake.DisplayBodyStub = nil
+	fake.displayBodyReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) error {
 	fake.displayHeaderMutex.Lock()
 	fake.displayHeaderArgsForCall = append(fake.displayHeaderArgsForCall, struct {
 		name  string
@@ -103,7 +130,9 @@ func (fake *FakeRequestLoggerOutput) DisplayHeader(name string, value string) {
 	fake.recordInvocation("DisplayHeader", []interface{}{name, value})
 	fake.displayHeaderMutex.Unlock()
 	if fake.DisplayHeaderStub != nil {
-		fake.DisplayHeaderStub(name, value)
+		return fake.DisplayHeaderStub(name, value)
+	} else {
+		return fake.displayHeaderReturns.result1
 	}
 }
 
@@ -119,7 +148,14 @@ func (fake *FakeRequestLoggerOutput) DisplayHeaderArgsForCall(i int) (string, st
 	return fake.displayHeaderArgsForCall[i].name, fake.displayHeaderArgsForCall[i].value
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayHost(name string) {
+func (fake *FakeRequestLoggerOutput) DisplayHeaderReturns(result1 error) {
+	fake.DisplayHeaderStub = nil
+	fake.displayHeaderReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayHost(name string) error {
 	fake.displayHostMutex.Lock()
 	fake.displayHostArgsForCall = append(fake.displayHostArgsForCall, struct {
 		name string
@@ -127,7 +163,9 @@ func (fake *FakeRequestLoggerOutput) DisplayHost(name string) {
 	fake.recordInvocation("DisplayHost", []interface{}{name})
 	fake.displayHostMutex.Unlock()
 	if fake.DisplayHostStub != nil {
-		fake.DisplayHostStub(name)
+		return fake.DisplayHostStub(name)
+	} else {
+		return fake.displayHostReturns.result1
 	}
 }
 
@@ -143,7 +181,14 @@ func (fake *FakeRequestLoggerOutput) DisplayHostArgsForCall(i int) string {
 	return fake.displayHostArgsForCall[i].name
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(method string, uri string, httpProtocol string) {
+func (fake *FakeRequestLoggerOutput) DisplayHostReturns(result1 error) {
+	fake.DisplayHostStub = nil
+	fake.displayHostReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
 	fake.displayRequestHeaderMutex.Lock()
 	fake.displayRequestHeaderArgsForCall = append(fake.displayRequestHeaderArgsForCall, struct {
 		method       string
@@ -153,7 +198,9 @@ func (fake *FakeRequestLoggerOutput) DisplayRequestHeader(method string, uri str
 	fake.recordInvocation("DisplayRequestHeader", []interface{}{method, uri, httpProtocol})
 	fake.displayRequestHeaderMutex.Unlock()
 	if fake.DisplayRequestHeaderStub != nil {
-		fake.DisplayRequestHeaderStub(method, uri, httpProtocol)
+		return fake.DisplayRequestHeaderStub(method, uri, httpProtocol)
+	} else {
+		return fake.displayRequestHeaderReturns.result1
 	}
 }
 
@@ -169,7 +216,14 @@ func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderArgsForCall(i int) (str
 	return fake.displayRequestHeaderArgsForCall[i].method, fake.displayRequestHeaderArgsForCall[i].uri, fake.displayRequestHeaderArgsForCall[i].httpProtocol
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(httpProtocol string, status string) {
+func (fake *FakeRequestLoggerOutput) DisplayRequestHeaderReturns(result1 error) {
+	fake.DisplayRequestHeaderStub = nil
+	fake.displayRequestHeaderReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(httpProtocol string, status string) error {
 	fake.displayResponseHeaderMutex.Lock()
 	fake.displayResponseHeaderArgsForCall = append(fake.displayResponseHeaderArgsForCall, struct {
 		httpProtocol string
@@ -178,7 +232,9 @@ func (fake *FakeRequestLoggerOutput) DisplayResponseHeader(httpProtocol string, 
 	fake.recordInvocation("DisplayResponseHeader", []interface{}{httpProtocol, status})
 	fake.displayResponseHeaderMutex.Unlock()
 	if fake.DisplayResponseHeaderStub != nil {
-		fake.DisplayResponseHeaderStub(httpProtocol, status)
+		return fake.DisplayResponseHeaderStub(httpProtocol, status)
+	} else {
+		return fake.displayResponseHeaderReturns.result1
 	}
 }
 
@@ -194,7 +250,14 @@ func (fake *FakeRequestLoggerOutput) DisplayResponseHeaderArgsForCall(i int) (st
 	return fake.displayResponseHeaderArgsForCall[i].httpProtocol, fake.displayResponseHeaderArgsForCall[i].status
 }
 
-func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.Time) {
+func (fake *FakeRequestLoggerOutput) DisplayResponseHeaderReturns(result1 error) {
+	fake.DisplayResponseHeaderStub = nil
+	fake.displayResponseHeaderReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.Time) error {
 	fake.displayTypeMutex.Lock()
 	fake.displayTypeArgsForCall = append(fake.displayTypeArgsForCall, struct {
 		name        string
@@ -203,7 +266,9 @@ func (fake *FakeRequestLoggerOutput) DisplayType(name string, requestDate time.T
 	fake.recordInvocation("DisplayType", []interface{}{name, requestDate})
 	fake.displayTypeMutex.Unlock()
 	if fake.DisplayTypeStub != nil {
-		fake.DisplayTypeStub(name, requestDate)
+		return fake.DisplayTypeStub(name, requestDate)
+	} else {
+		return fake.displayTypeReturns.result1
 	}
 }
 
@@ -217,6 +282,13 @@ func (fake *FakeRequestLoggerOutput) DisplayTypeArgsForCall(i int) (string, time
 	fake.displayTypeMutex.RLock()
 	defer fake.displayTypeMutex.RUnlock()
 	return fake.displayTypeArgsForCall[i].name, fake.displayTypeArgsForCall[i].requestDate
+}
+
+func (fake *FakeRequestLoggerOutput) DisplayTypeReturns(result1 error) {
+	fake.DisplayTypeStub = nil
+	fake.displayTypeReturns = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeRequestLoggerOutput) HandleInternalError(err error) {
