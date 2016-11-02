@@ -1,5 +1,7 @@
 package v2
 
+import "code.cloudfoundry.org/cli/commands/v3"
+
 var Commands commandList
 
 const ExperimentalWarning = "This command is in EXPERIMENTAL stage and may change without notice"
@@ -159,4 +161,5 @@ type commandList struct {
 	Plugins                            PluginsCommand                            `command:"plugins" description:"List all available plugin commands"`
 	InstallPlugin                      InstallPluginCommand                      `command:"install-plugin" description:"Install CLI plugin"`
 	UninstallPlugin                    UninstallPluginCommand                    `command:"uninstall-plugin" description:"Uninstall the plugin defined in command argument"`
+	RunTask                            v3.RunTaskCommand                         `command:"run-task" description:"Run a one-off task on an app"`
 }

@@ -274,3 +274,8 @@ type InstallPluginArgs struct {
 	LocalPath string `positional-arg-name:"LOCAL_PATH/TO/PLUGIN" description:"The local path to the plugin, if the plugin exists locally"`
 	URL       string `positional-arg-name:"URL" description:"The URL to the plugin, if the plugin exists online"`
 }
+
+type RunTaskArgs struct {
+	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	Command string `positional-arg-name:"COMMAND" required:"true" description:"The command to execute"`
+}
