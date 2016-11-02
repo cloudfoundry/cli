@@ -23,9 +23,15 @@ func NewCloudControllerClient(config commands.Config, ui TerminalDisplay) (*ccv2
 	uaaClient := uaa.NewClient(client.TokenEndpoint(), config)
 	client.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 
-	logger := wrapper.NewRequestLogger(NewRequestLoggerTerminalDisplay(ui))
-	client.WrapConnection(logger)
-
+	if verbose, location := config.Verbose(); verbose {
+		var logger *wrapper.RequestLogger
+		if location == "" {
+			logger = wrapper.NewRequestLogger(NewRequestLoggerTerminalDisplay(ui))
+		} else {
+			logger = wrapper.NewRequestLogger(NewRequestLoggerFileWriter(ui, location))
+		}
+		client.WrapConnection(logger)
+	}
 	//Retry Wrapper
 	return client, err
 }

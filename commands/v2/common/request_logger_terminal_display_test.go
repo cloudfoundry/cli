@@ -31,44 +31,41 @@ var _ = Describe("Request Logger Terminal Display", func() {
   "a": "b",
   "c": "d"
 }`
-				display.DisplayBody([]byte(raw))
+				err := display.DisplayBody([]byte(raw))
+				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeUI.Out).To(Say(formatted))
-			})
-		})
-
-		Context("when provided anything else", func() {
-			It("displayed the raw output", func() {
-				raw := `{"a":"b", c:d}`
-				display.DisplayBody([]byte(raw))
-				Expect(fakeUI.Out).To(Say(raw))
 			})
 		})
 	})
 
 	Describe("DisplayHeader", func() {
 		It("displays the header key and value", func() {
-			display.DisplayHeader("Header", "Value")
+			err := display.DisplayHeader("Header", "Value")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(fakeUI.Out).To(Say("Header: Value"))
 		})
 	})
 
 	Describe("DisplayHost", func() {
 		It("displays the host", func() {
-			display.DisplayHost("banana")
+			err := display.DisplayHost("banana")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(fakeUI.Out).To(Say("Host: banana"))
 		})
 	})
 
 	Describe("DisplayRequestHeader", func() {
 		It("displays the method, uri and http protocal", func() {
-			display.DisplayRequestHeader("GET", "/v2/spaces/guid/summary", "HTTP/1.1")
+			err := display.DisplayRequestHeader("GET", "/v2/spaces/guid/summary", "HTTP/1.1")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(fakeUI.Out).To(Say("GET /v2/spaces/guid/summary HTTP/1.1"))
 		})
 	})
 
 	Describe("DisplayResponseHeader", func() {
 		It("displays the method, uri and http protocal", func() {
-			display.DisplayResponseHeader("HTTP/1.1", "200 OK")
+			err := display.DisplayResponseHeader("HTTP/1.1", "200 OK")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(fakeUI.Out).To(Say("HTTP/1.1 200 OK"))
 		})
 	})
@@ -76,7 +73,8 @@ var _ = Describe("Request Logger Terminal Display", func() {
 	Describe("DisplayType", func() {
 		It("displays the passed type and time in localized ISO 8601", func() {
 			passedTime := time.Now()
-			display.DisplayType("banana", passedTime)
+			err := display.DisplayType("banana", passedTime)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(fakeUI.Out).To(Say("banana: \\[%s\\]", passedTime.Format(time.RFC3339)))
 		})
 	})
