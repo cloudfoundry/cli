@@ -1,7 +1,6 @@
 package ccv3
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -9,29 +8,33 @@ import (
 
 // requestOptions contains all the options to create an HTTP request.
 type requestOptions struct {
-	// Query is a list of HTTP query parameters
+	// Query is a list of HTTP query parameters. Query will overwrite any
+	// existing query string in the URI. If you want to preserve the query
+	// string in URI make sure Query is nil.
 	Query url.Values
-
-	URI    string
+	// request path
+	URI string
+	// HTTP Method
 	Method string
-
-	// Body is the request body
+	// request body
 	Body io.Reader
 }
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
-// Defaults are applied when Request fields are not filled in.
-func (client CloudControllerClient) newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
+// Defaults are applied when Request options are not filled in.
+func newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
 	var request *http.Request
 	var err error
+
 	request, err = http.NewRequest(
 		passedRequest.Method,
-		fmt.Sprintf("%s%s", client.cloudControllerURL, passedRequest.URI),
+		passedRequest.URI,
 		passedRequest.Body,
 	)
 	if err != nil {
 		return nil, err
 	}
+
 	if passedRequest.Query != nil {
 		request.URL.RawQuery = passedRequest.Query.Encode()
 	}

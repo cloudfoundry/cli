@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("Task", func() {
-	var client *CloudControllerClient
+	var client *Client
 
 	BeforeEach(func() {
 		client = NewTestClient()
@@ -71,6 +71,5 @@ var _ = Describe("Task", func() {
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
-
 	})
 })

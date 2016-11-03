@@ -10,7 +10,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller"
 //
 // In this mode, TLS is susceptible to man-in-the-middle attacks. This should
 // be used only for testing.
-func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
+func (client *Client) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
 	client.cloudControllerURL = APIURL
 
 	client.connection = cloudcontroller.NewConnection(skipSSLValidation)
@@ -21,11 +21,6 @@ func (client *CloudControllerClient) TargetCF(APIURL string, skipSSLValidation b
 		return warnings, err
 	}
 
-	// client.authorizationEndpoint = info.AuthorizationEndpoint
-	// client.cloudControllerAPIVersion = info.APIVersion
-	// client.dopplerEndpoint = info.DopplerEndpoint
-	// client.loggregatorEndpoint = info.LoggregatorEndpoint
-	// client.routingEndpoint = info.RoutingEndpoint
 	client.UAA = info.Links.UAA.HREF
 
 	return warnings, nil

@@ -1096,6 +1096,10 @@
     "translation": "Create an HTTP route:\\n      CF_NAME create-route SPACE DOMAIN [--hostname HOSTNAME] [--path PATH]\\n\\n   Create a TCP route:\\n      CF_NAME create-route SPACE DOMAIN (--port PORT | --random-port)\\n\\nEXAMPLES:\\n   CF_NAME create-route my-space example.com                             # example.com\\n   CF_NAME create-route my-space example.com --hostname myapp            # myapp.example.com\\n   CF_NAME create-route my-space example.com --hostname myapp --path foo # myapp.example.com/foo\\n   CF_NAME create-route my-space example.com --port 5000                 # example.com:5000"
   },
   {
+    "id": "Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "DISK",
     "translation": "DISK"
   },
@@ -1324,6 +1328,10 @@
     "translation": "Route and domain management:"
   },
   {
+    "id": "Run a one-off task on an app",
+    "translation": ""
+  },
+  {
     "id": "SERVICE_INSTANCES",
     "translation": "SERVICE_INSTANCES"
   },
@@ -1376,6 +1384,10 @@
     "translation": "TOTAL_MEMORY"
   },
   {
+    "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
     "id": "The API endpoint",
     "translation": "The API endpoint"
   },
@@ -1410,6 +1422,10 @@
   {
     "id": "The command name",
     "translation": "The command name"
+  },
+  {
+    "id": "The command to execute",
+    "translation": ""
   },
   {
     "id": "The domain",

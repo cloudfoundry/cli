@@ -95,7 +95,8 @@ var _ = Describe("Application Actions", func() {
 		It("returns an ApplicationNotFoundError and the warnings", func() {
 			_, warnings, err := actor.GetApplicationByNameAndSpace("some-app-name", "some-space-guid")
 			Expect(warnings).To(ConsistOf("some-warning"))
-			Expect(err).To(MatchError("Application 'some-app-name' not found."))
+			Expect(err).To(MatchError(
+				ApplicationNotFoundError{Name: "some-app-name"}))
 			Expect(fakeCloudControllerClient.GetApplicationsCallCount()).To(Equal(1))
 			expectedQuery := url.Values{
 				"names":       []string{"some-app-name"},
