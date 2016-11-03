@@ -1184,6 +1184,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME run-task APP_NAME COMMAND\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\"",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME running-environment-variable-group",
     "translation": ""
   },
