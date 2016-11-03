@@ -7,14 +7,6 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 )
 
-type NoAPISetError struct {
-	BinaryName string
-}
-
-func (e NoAPISetError) Error() string {
-	return "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint."
-}
-
 // NewCloudControllerClient creates a new V3 Cloud Controller client using
 // the passed in config.
 func NewCloudControllerClient(config commands.Config) (*ccv3.Client, error) {
