@@ -61,7 +61,7 @@ func (display *RequestLoggerFileWriter) DisplayType(name string, requestDate tim
 }
 
 func (display *RequestLoggerFileWriter) HandleInternalError(err error) {
-	display.ui.DisplayErrorMessage(err.Error())
+	display.ui.DisplayError(err)
 }
 
 func (display *RequestLoggerFileWriter) Start() error {

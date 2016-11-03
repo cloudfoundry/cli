@@ -17,8 +17,7 @@ import (
 )
 
 type UI interface {
-	DisplayError(err ui.TranslatableError)
-	DisplayErrorMessage(err string, keys ...map[string]interface{})
+	DisplayError(err error)
 }
 
 var ErrFailed = errors.New("command failed")
@@ -153,10 +152,6 @@ func handleError(err error, commandUI UI) error {
 		return nil
 	}
 
-	if e, ok := err.(ui.TranslatableError); ok {
-		commandUI.DisplayError(e)
-	} else {
-		commandUI.DisplayErrorMessage(err.Error())
-	}
+	commandUI.DisplayError(err)
 	return ErrFailed
 }
