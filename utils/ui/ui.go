@@ -178,22 +178,14 @@ func (ui *UI) DisplayOK() {
 	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, green, true))
 }
 
-// DisplayErrorMessage combines the err template with the key maps and then
-// outputs it to the UI.Err file. It will then output a red translated "FAILED"
-// to UI.Out. Prior to outputting the err, it is run through an
-// internationalization function to translate it to a pre-configured language.
-func (ui *UI) DisplayErrorMessage(err string, keys ...map[string]interface{}) {
-	translatedValue := ui.translate(err, ui.templateValuesFromKeys(keys))
-	fmt.Fprintf(ui.Err, "%s\n", translatedValue)
-
-	translatedFormatString := ui.translate("FAILED", nil)
-	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, red, true))
-}
-
 // DisplayError outputs the error to UI.Err and outputs a red translated
 // "FAILED" to UI.Out.
-func (ui *UI) DisplayError(err TranslatableError) {
-	fmt.Fprintf(ui.Err, "%s\n", err.Translate(ui.translate))
+func (ui *UI) DisplayError(err error) {
+	if translatableError, ok := err.(TranslatableError); ok {
+		fmt.Fprintf(ui.Err, "%s\n", translatableError.Translate(ui.translate))
+	} else {
+		fmt.Fprintf(ui.Err, "%s\n", err.Error())
+	}
 
 	translatedFormatString := ui.translate("FAILED", nil)
 	fmt.Fprintf(ui.Out, "%s\n", ui.colorize(translatedFormatString, red, true))

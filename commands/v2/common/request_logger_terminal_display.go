@@ -64,7 +64,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayType(name string, requestDat
 }
 
 func (display *RequestLoggerTerminalDisplay) HandleInternalError(err error) {
-	display.ui.DisplayErrorMessage(err.Error())
+	display.ui.DisplayError(err)
 }
 
 func (display *RequestLoggerTerminalDisplay) Start() error { return nil }

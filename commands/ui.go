@@ -5,7 +5,7 @@ package commands
 // UI is the interface to STDOUT
 type UI interface {
 	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
-	DisplayErrorMessage(err string, keys ...map[string]interface{})
+	DisplayError(err error)
 	DisplayHeaderFlavorText(text string, keys ...map[string]interface{})
 	DisplayHelpHeader(text string)
 	DisplayNewline()
