@@ -4,9 +4,10 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
-	"code.cloudfoundry.org/cli/commands/v2/common"
 	"code.cloudfoundry.org/cli/commands/v3"
+	"code.cloudfoundry.org/cli/commands/v3/common"
 	"code.cloudfoundry.org/cli/commands/v3/v3fakes"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/ui"
@@ -152,50 +153,96 @@ var _ = Describe("RunTask Command", func() {
 				}, nil)
 			})
 
-			Context("when GetApplicationByNameAndSpace returns an error", func() {
-				var expectedErr error
+			Context("when a translated error is returned", func() {
+				Context("when GetApplicationByNameAndSpace returns a translatable error", func() {
+					var (
+						returnedError error
+						expectedErr   error
+					)
 
-				BeforeEach(func() {
-					expectedErr = errors.New("got bananapants??")
-					fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-						v3actions.Warnings{
-							"get-application-warning-1",
-							"get-application-warning-2",
-						}, expectedErr)
+					BeforeEach(func() {
+						expectedErr = errors.New("request-error")
+						returnedError = cloudcontroller.RequestError{
+							Err: expectedErr,
+						}
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							v3actions.Application{GUID: "some-app-guid"},
+							nil,
+							returnedError)
+					})
+
+					It("returns a translatable error", func() {
+						Expect(executeErr).To(MatchError(common.APIRequestError{Err: expectedErr}))
+					})
 				})
 
-				It("return the same error and outputs the warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
+				Context("when RunTask returns a translatable error", func() {
+					var returnedError error
 
-					Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-					Expect(fakeUI.Out).To(Say("get-application-warning-2"))
+					BeforeEach(func() {
+						returnedError = cloudcontroller.UnverifiedServerError{URL: "some-url"}
+						fakeActor.GetApplicationByNameAndSpaceReturns(
+							v3actions.Application{GUID: "some-app-guid"},
+							nil,
+							nil)
+						fakeActor.RunTaskReturns(
+							v3actions.Task{},
+							nil,
+							returnedError)
+					})
+
+					It("returns a translatable error", func() {
+						Expect(executeErr).To(MatchError(common.InvalidSSLCertError{API: "some-url"}))
+					})
 				})
 			})
 
-			Context("when RunTask returns an error", func() {
-				var expectedErr error
+			Context("when an untranslatable error is returned", func() {
+				Context("when GetApplicationByNameAndSpace returns an error", func() {
+					var returnedError error
 
-				BeforeEach(func() {
-					expectedErr = errors.New("got bananapants??")
-					fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-						v3actions.Warnings{
-							"get-application-warning-1",
-							"get-application-warning-2",
-						}, nil)
-					fakeActor.RunTaskReturns(v3actions.Task{SequenceID: 3},
-						v3actions.Warnings{
-							"run-task-warning-1",
-							"run-task-warning-2",
-						}, expectedErr)
+					BeforeEach(func() {
+						returnedError = errors.New("got bananapants??")
+						fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
+							v3actions.Warnings{
+								"get-application-warning-1",
+								"get-application-warning-2",
+							}, returnedError)
+					})
+
+					It("return the same error and outputs the warnings", func() {
+						Expect(executeErr).To(MatchError(returnedError))
+
+						Expect(fakeUI.Out).To(Say("get-application-warning-1"))
+						Expect(fakeUI.Out).To(Say("get-application-warning-2"))
+					})
 				})
 
-				It("returns the same error and outputs all warnings", func() {
-					Expect(executeErr).To(MatchError(expectedErr))
+				Context("when RunTask returns an error", func() {
+					var expectedErr error
 
-					Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-					Expect(fakeUI.Out).To(Say("get-application-warning-2"))
-					Expect(fakeUI.Out).To(Say("run-task-warning-1"))
-					Expect(fakeUI.Out).To(Say("run-task-warning-2"))
+					BeforeEach(func() {
+						expectedErr = errors.New("got bananapants??")
+						fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
+							v3actions.Warnings{
+								"get-application-warning-1",
+								"get-application-warning-2",
+							}, nil)
+						fakeActor.RunTaskReturns(v3actions.Task{},
+							v3actions.Warnings{
+								"run-task-warning-1",
+								"run-task-warning-2",
+							}, expectedErr)
+					})
+
+					It("returns the same error and outputs all warnings", func() {
+						Expect(executeErr).To(MatchError(expectedErr))
+
+						Expect(fakeUI.Out).To(Say("get-application-warning-1"))
+						Expect(fakeUI.Out).To(Say("get-application-warning-2"))
+						Expect(fakeUI.Out).To(Say("run-task-warning-1"))
+						Expect(fakeUI.Out).To(Say("run-task-warning-2"))
+					})
 				})
 			})
 		})

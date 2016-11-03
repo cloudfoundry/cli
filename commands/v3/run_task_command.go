@@ -4,8 +4,7 @@ import (
 	"code.cloudfoundry.org/cli/actors/v3actions"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
-	commonv2 "code.cloudfoundry.org/cli/commands/v2/common"
-	commonv3 "code.cloudfoundry.org/cli/commands/v3/common"
+	"code.cloudfoundry.org/cli/commands/v3/common"
 )
 
 //go:generate counterfeiter . RunTaskActor
@@ -29,7 +28,7 @@ func (cmd *RunTaskCommand) Setup(config commands.Config, ui commands.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, err := commonv3.NewCloudControllerClient(config)
+	client, err := common.NewCloudControllerClient(config)
 	if err != nil {
 		return err
 	}
@@ -39,7 +38,7 @@ func (cmd *RunTaskCommand) Setup(config commands.Config, ui commands.UI) error {
 }
 
 func (cmd RunTaskCommand) Execute(args []string) error {
-	err := commonv2.CheckTarget(cmd.Config, true, true)
+	err := common.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	application, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		return common.HandleError(err)
 	}
 
 	cmd.UI.DisplayHeaderFlavorText("Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
@@ -67,7 +66,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	task, warnings, err := cmd.Actor.RunTask(application.GUID, cmd.RequiredArgs.Command)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return err
+		return common.HandleError(err)
 	}
 
 	cmd.UI.DisplayOK()
