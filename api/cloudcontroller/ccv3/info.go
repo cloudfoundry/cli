@@ -50,7 +50,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 
 	request, err := newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
-		URI:    rootResponse.ccV3Href(),
+		URL:    rootResponse.ccV3Href(),
 	})
 	if err != nil {
 		return APIInformation{}, warnings, err
@@ -75,7 +75,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 func (client *Client) rootResponse() (RootResponse, Warnings, error) {
 	request, err := newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
-		URI:    client.cloudControllerURL,
+		URL:    client.cloudControllerURL,
 	})
 	if err != nil {
 		return RootResponse{}, nil, err

@@ -13,7 +13,7 @@ type requestOptions struct {
 	// string in URI make sure Query is nil.
 	Query url.Values
 	// request path
-	URI string
+	URL string
 	// HTTP Method
 	Method string
 	// request body
@@ -28,7 +28,7 @@ func newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
 
 	request, err = http.NewRequest(
 		passedRequest.Method,
-		passedRequest.URI,
+		passedRequest.URL,
 		passedRequest.Body,
 	)
 	if err != nil {
