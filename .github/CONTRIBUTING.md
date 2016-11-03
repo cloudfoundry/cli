@@ -63,41 +63,14 @@ The API package handles the HTTP requests to the API. The functions in this pack
 The CLI uses [GVT](https://github.com/FiloSottile/gvt) to manage vendored
 dependencies. Refer to the GVT documentation for managing dependencies.
 
-# Building the Binary
+# Compiling for Other Operating Systems and Architectures
 
 The supported platforms for the CF CLI are Linux (32-bit and 64-bit), Windows
-(32-bit and 64-bit) and OSX. These are the commands used to build the binaries
-for different platforms:
+(32-bit and 64-bit) and OSX. The commands that build the binaries can be seen
+in the [build binaries Concourse task](https://github.com/cloudfoundry/cli/blob/master/ci/cli/tasks/build-binaries.yml).
 
-## Linux 32-bit
-
-```
-CGO_ENABLED=0 GOARCH=386 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_i686 .
-```
-
-## Linux 64-bit
-
-```
-CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -tags netgo -installsuffix netgo -ldflags '-extldflags "-static"' -o out/cf-cli_linux_x86-64 .
-```
-
-## Windows 32-bit
-
-```
-GOARCH=386 GOOS=windows go build -tags="forceposix" -o out/cf-cli_win32.exe .
-```
-
-## Windows 64-bit
-
-```
-GOARCH=amd64 GOOS=windows go build -tags="forceposix" -o out/cf-cli_winx64.exe .
-```
-
-## OSX
-
-```
-GOARCH=amd64 GOOS=darwin go build -o out/cf-cli_osx .
-```
+See the [Go environment variables documentation](https://golang.org/doc/install/source#environment)
+for details on how to cross compile binaries for other architectures.
 
 # i18n translations
 
@@ -115,8 +88,12 @@ After running the above, be sure to commit the translations binary, `cf/resource
 
 # Plugins
 
-* [CF CLI plugin development guide](https://github.com/cloudfoundry/cli/tree/master/plugin_examples)
+* [CF CLI plugin development guide](https://github.com/cloudfoundry/cli/tree/master/plugin/plugin_examples)
 * [plugins repository](https://plugins.cloudfoundry.org/)
+
+When importing the plugin code use `import "code.cloudfoundry.org/cli/plugin"`.
+Older plugins that import `github.com/cloudfoundry/cli/plugin` will still work
+as long they vendor the plugins directory.
 
 # Contributing to CLI
 
