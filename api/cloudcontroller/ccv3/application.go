@@ -19,7 +19,7 @@ func (client *Client) GetApplications(query url.Values) ([]Application, Warnings
 	request, err := newHTTPRequest(requestOptions{
 		// TODO change this to use the apps link that /v3 returns when it's
 		// implemented
-		URI:    fmt.Sprintf("%s%s", client.cloudControllerURL, "/v3/apps"),
+		URL:    fmt.Sprintf("%s%s", client.cloudControllerURL, "/v3/apps"),
 		Method: http.MethodGet,
 		Query:  query,
 	})
@@ -50,7 +50,7 @@ func (client *Client) GetApplications(query url.Values) ([]Application, Warnings
 			break
 		}
 		request, err = newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
+			URL:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
 		if err != nil {
