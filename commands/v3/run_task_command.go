@@ -15,9 +15,9 @@ type RunTaskActor interface {
 }
 
 type RunTaskCommand struct {
-	RequiredArgs flags.RunTaskArgs `positional-args:"yes"`
-	// usage           interface{}           `usage:"CF_NAME unbind-service APP_NAME SERVICE_INSTANCE"`
-	// relatedCommands interface{}           `related_commands:"apps, delete-service, services"`
+	RequiredArgs    flags.RunTaskArgs `positional-args:"yes"`
+	usage           interface{}       `usage:"CF_NAME run-task APP_NAME COMMAND\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\""`
+	relatedCommands interface{}       `related_commands:"tasks, terminate-task"`
 
 	UI     commands.UI
 	Actor  RunTaskActor
