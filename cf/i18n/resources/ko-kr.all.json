@@ -1932,6 +1932,10 @@
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직의 {{.SpaceName}} 영역 작성 중..."
   },
   {
+    "id": "Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "{{.CurrentUser}}(으)로 {{.OrgName}} 조직/{{.SpaceName}} 영역에 사용자 제공 서비스 {{.ServiceName}} 작성 중..."
   },
@@ -4500,6 +4504,10 @@
     "translation": "규칙"
   },
   {
+    "id": "Run a one-off task on an app",
+    "translation": ""
+  },
+  {
     "id": "Running Environment Variable Groups:",
     "translation": "실행 환경 변수 그룹:"
   },
@@ -4976,6 +4984,10 @@
     "translation": "대상 지정된 영역 {{.SpaceName}}\n"
   },
   {
+    "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "주어진 색인에서 실행 중인 애플리케이션 인스턴스를 종료하고 애플리케이션의 새 인스턴스를 동일한 색인으로 인스턴스화합니다"
   },
@@ -5013,6 +5025,10 @@
   },
   {
     "id": "The command name",
+    "translation": ""
+  },
+  {
+    "id": "The command to execute",
     "translation": ""
   },
   {

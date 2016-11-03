@@ -2,6 +2,7 @@ package ccv3_test
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -37,22 +38,67 @@ var _ = BeforeEach(func() {
 	server.Reset()
 })
 
-func NewTestClient() *CloudControllerClient {
+func NewTestClient() *Client {
 	SetupV3Response()
-	client := NewCloudControllerClient()
+	client := NewClient()
 	warnings, err := client.TargetCF(server.URL(), true)
 	Expect(err).ToNot(HaveOccurred())
 	Expect(warnings).To(BeEmpty())
+
 	return client
 }
 
 func SetupV3Response() {
-	response := `{}`
-	// response = strings.Replace(response, "APISERVER", serverAPIURL, -1)
+	serverURL := server.URL()
+	rootResponse := fmt.Sprintf(`
+{
+  "links": {
+    "self": {
+      "href": "%s"
+    },
+    "cloud_controller_v2": {
+      "href": "%s/v2",
+      "meta": {
+        "version": "2.64.0"
+      }
+    },
+    "cloud_controller_v3": {
+      "href": "%s/v3",
+      "meta": {
+        "version": "3.0.0-alpha.5"
+      }
+    }
+  }
+}
+`, serverURL, serverURL, serverURL)
+
 	server.AppendHandlers(
 		CombineHandlers(
-			VerifyRequest(http.MethodGet, "/v3/"),
-			RespondWith(http.StatusOK, response),
+			VerifyRequest(http.MethodGet, "/"),
+			RespondWith(http.StatusOK, rootResponse),
+		),
+	)
+
+	v3Response := fmt.Sprintf(`
+{
+  "links": {
+    "self": {
+      "href": "%s/v3"
+    },
+    "tasks": {
+      "href": "%s/v3/tasks"
+    },
+    "uaa": {
+      "href": "https://uaa.bosh-lite.com"
+    }
+  }
+}
+`, serverURL, serverURL)
+
+	server.AppendHandlers(
+		CombineHandlers(
+			VerifyRequest(http.MethodGet, "/v3"),
+			RespondWith(http.StatusOK, v3Response),
 		),
 	)
 }

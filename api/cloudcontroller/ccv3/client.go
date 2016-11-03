@@ -53,21 +53,15 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller"
 // back from an API request.
 type Warnings []string
 
-// CloudControllerClient is a client that can be used to talk to a Cloud
-// Controller's V3 Endpoints.
-type CloudControllerClient struct {
-	// authorizationEndpoint     string
-	// cloudControllerAPIVersion string
+// Client can be used to talk to a Cloud Controller's V3 Endpoints.
+type Client struct {
 	cloudControllerURL string
-	// dopplerEndpoint           string
-	// loggregatorEndpoint       string
-	// routingEndpoint           string
-	UAA string
+	UAA                string
 
 	connection cloudcontroller.Connection
 }
 
-// NewCloudControllerClient returns a new CloudControllerClient.
-func NewCloudControllerClient() *CloudControllerClient {
-	return new(CloudControllerClient)
+// NewClient returns a new Client.
+func NewClient() *Client {
+	return new(Client)
 }

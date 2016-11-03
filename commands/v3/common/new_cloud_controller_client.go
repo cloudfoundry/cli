@@ -15,14 +15,16 @@ func (e NoAPISetError) Error() string {
 	return "No API endpoint set. Use '{{.LoginTip}}' or '{{.APITip}}' to target an endpoint."
 }
 
-func NewCloudControllerClient(config commands.Config) (*ccv3.CloudControllerClient, error) {
+// NewCloudControllerClient creates a new V3 Cloud Controller client using
+// the passed in config.
+func NewCloudControllerClient(config commands.Config) (*ccv3.Client, error) {
 	if config.Target() == "" {
 		return nil, NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
 
-	client := ccv3.NewCloudControllerClient()
+	client := ccv3.NewClient()
 	_, err := client.TargetCF(config.Target(), config.SkipSSLValidation())
 	if err != nil {
 		return nil, err

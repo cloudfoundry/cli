@@ -9,11 +9,12 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
-// CCErrorResponse represents a generic Cloud Controller V2 error response.
+// CCErrorResponse represents a generic Cloud Controller V3 error response.
 type CCErrorResponse struct {
-	Errors []CCError
+	Errors []CCError `json:"errors"`
 }
 
+// CCError represents a cloud controller error.
 type CCError struct {
 	Code   int    `json:"code"`
 	Detail string `json:"detail"`
@@ -87,11 +88,14 @@ func newErrorWrapper() *errorWrapper {
 	return new(errorWrapper)
 }
 
+// Wrap wraps a Cloud Controller connection in this error handling wrapper.
 func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	e.connection = innerconnection
 	return e
 }
 
+// Make creates a connection in the wrapped connection and handles errors
+// that it returns.
 func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 
@@ -110,8 +114,14 @@ func (e errorWrapper) convert(rawErr cloudcontroller.RawCCError) error {
 
 	errors := errorResponse.Errors
 	if len(errors) == 0 {
-
+		return UnexpectedResponseError{
+			ResponseCode:    rawErr.StatusCode,
+			CCErrorResponse: errorResponse,
+		}
 	}
+
+	// There could be multiple errors in the future but for now we only convert
+	// the first error.
 	switch rawErr.StatusCode {
 	case http.StatusUnauthorized:
 		if errors[0].Code == 10002 {

@@ -11,7 +11,6 @@ import (
 //go:generate counterfeiter . RunTaskActor
 
 type RunTaskActor interface {
-	//Move to application later
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3actions.Application, v3actions.Warnings, error)
 	RunTask(appGUID string, command string) (v3actions.Task, v3actions.Warnings, error)
 }

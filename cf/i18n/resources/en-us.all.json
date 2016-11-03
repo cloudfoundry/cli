@@ -1932,6 +1932,10 @@
     "translation": "Creating space {{.SpaceName}} in org {{.OrgName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}..."
   },
@@ -4500,6 +4504,10 @@
     "translation": "Rules"
   },
   {
+    "id": "Run a one-off task on an app",
+    "translation": ""
+  },
+  {
     "id": "Running Environment Variable Groups:",
     "translation": "Running Environment Variable Groups:"
   },
@@ -4976,6 +4984,10 @@
     "translation": "Targeted space {{.SpaceName}}\n"
   },
   {
+    "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index"
   },
@@ -5014,6 +5026,10 @@
   {
     "id": "The command name",
     "translation": "The command name"
+  },
+  {
+    "id": "The command to execute",
+    "translation": ""
   },
   {
     "id": "The domain",

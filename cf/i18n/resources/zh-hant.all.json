@@ -1932,6 +1932,10 @@
     "translation": "正在以 {{.CurrentUser}} 身分於組織 {{.OrgName}} 中建立空間 {{.SpaceName}}..."
   },
   {
+    "id": "Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Creating user provided service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": "正在以 {{.CurrentUser}} 身分於組織 {{.OrgName}}/空間 {{.SpaceName}} 中建立使用者提供的服務 {{.ServiceName}}..."
   },
@@ -4500,6 +4504,10 @@
     "translation": "規則"
   },
   {
+    "id": "Run a one-off task on an app",
+    "translation": ""
+  },
+  {
     "id": "Running Environment Variable Groups:",
     "translation": "執行環境變數群組: "
   },
@@ -4976,6 +4984,10 @@
     "translation": "已將目標空間設為 {{.SpaceName}}\n"
   },
   {
+    "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "終止給定索引處的執行中應用程式實例，並實例化具有相同索引之應用程式的新實例"
   },
@@ -5013,6 +5025,10 @@
   },
   {
     "id": "The command name",
+    "translation": ""
+  },
+  {
+    "id": "The command to execute",
     "translation": ""
   },
   {

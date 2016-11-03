@@ -1,20 +1,25 @@
 package ccv3
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
+// Application represents a Cloud Controller V3 Application.
 type Application struct {
 	Name string
 	GUID string
 }
 
-func (client *CloudControllerClient) GetApplications(query url.Values) ([]Application, Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		URI:    "/v3/apps",
+// GetApplications lists applications with optional filters.
+func (client *Client) GetApplications(query url.Values) ([]Application, Warnings, error) {
+	request, err := newHTTPRequest(requestOptions{
+		// TODO change this to use the apps link that /v3 returns when it's
+		// implemented
+		URI:    fmt.Sprintf("%s%s", client.cloudControllerURL, "/v3/apps"),
 		Method: http.MethodGet,
 		Query:  query,
 	})
@@ -44,7 +49,7 @@ func (client *CloudControllerClient) GetApplications(query url.Values) ([]Applic
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = client.newHTTPRequest(requestOptions{
+		request, err = newHTTPRequest(requestOptions{
 			URI:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})
