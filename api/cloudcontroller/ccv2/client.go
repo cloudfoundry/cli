@@ -48,6 +48,9 @@
 package ccv2
 
 import (
+	"fmt"
+	"runtime"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"github.com/tedsuo/rata"
 )
@@ -69,9 +72,13 @@ type Client struct {
 
 	router     *rata.RequestGenerator
 	connection cloudcontroller.Connection
+	userAgent  string
 }
 
 // NewClient returns a new Cloud Controller Client.
-func NewClient() *Client {
-	return new(Client)
+func NewClient(appName string, appVersion string) *Client {
+	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", appName, appVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
+	return &Client{
+		userAgent: userAgent,
+	}
 }

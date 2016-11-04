@@ -47,7 +47,12 @@
 // endpoint they use.
 package ccv3
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller"
+import (
+	"fmt"
+	"runtime"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+)
 
 // Warnings are a collection of warnings that the Cloud Controller can return
 // back from an API request.
@@ -59,9 +64,13 @@ type Client struct {
 	UAA                string
 
 	connection cloudcontroller.Connection
+	userAgent  string
 }
 
 // NewClient returns a new Client.
-func NewClient() *Client {
-	return new(Client)
+func NewClient(appName string, appVersion string) *Client {
+	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)", appName, appVersion, runtime.Version(), runtime.GOARCH, runtime.GOOS)
+	return &Client{
+		userAgent: userAgent,
+	}
 }
