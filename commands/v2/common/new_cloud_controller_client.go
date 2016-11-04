@@ -16,7 +16,10 @@ func NewCloudControllerClient(config commands.Config, ui TerminalDisplay) (*ccv2
 	}
 
 	client := ccv2.NewClient(config.BinaryName(), cf.Version)
-	_, err := client.TargetCF(config.Target(), config.SkipSSLValidation())
+	_, err := client.TargetCF(ccv2.TargetSettings{
+		URL:               config.Target(),
+		SkipSSLValidation: config.SkipSSLValidation(),
+	})
 	if err != nil {
 		return nil, err
 	}

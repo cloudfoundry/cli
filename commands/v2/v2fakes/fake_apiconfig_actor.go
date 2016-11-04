@@ -12,11 +12,10 @@ type FakeAPIConfigActor struct {
 	ClearTargetStub        func()
 	clearTargetMutex       sync.RWMutex
 	clearTargetArgsForCall []struct{}
-	SetTargetStub          func(CCAPI string, skipSSLValidation bool) (configactions.Warnings, error)
+	SetTargetStub          func(settings configactions.TargetSettings) (configactions.Warnings, error)
 	setTargetMutex         sync.RWMutex
 	setTargetArgsForCall   []struct {
-		CCAPI             string
-		skipSSLValidation bool
+		settings configactions.TargetSettings
 	}
 	setTargetReturns struct {
 		result1 configactions.Warnings
@@ -42,16 +41,15 @@ func (fake *FakeAPIConfigActor) ClearTargetCallCount() int {
 	return len(fake.clearTargetArgsForCall)
 }
 
-func (fake *FakeAPIConfigActor) SetTarget(CCAPI string, skipSSLValidation bool) (configactions.Warnings, error) {
+func (fake *FakeAPIConfigActor) SetTarget(settings configactions.TargetSettings) (configactions.Warnings, error) {
 	fake.setTargetMutex.Lock()
 	fake.setTargetArgsForCall = append(fake.setTargetArgsForCall, struct {
-		CCAPI             string
-		skipSSLValidation bool
-	}{CCAPI, skipSSLValidation})
-	fake.recordInvocation("SetTarget", []interface{}{CCAPI, skipSSLValidation})
+		settings configactions.TargetSettings
+	}{settings})
+	fake.recordInvocation("SetTarget", []interface{}{settings})
 	fake.setTargetMutex.Unlock()
 	if fake.SetTargetStub != nil {
-		return fake.SetTargetStub(CCAPI, skipSSLValidation)
+		return fake.SetTargetStub(settings)
 	} else {
 		return fake.setTargetReturns.result1, fake.setTargetReturns.result2
 	}
@@ -63,10 +61,10 @@ func (fake *FakeAPIConfigActor) SetTargetCallCount() int {
 	return len(fake.setTargetArgsForCall)
 }
 
-func (fake *FakeAPIConfigActor) SetTargetArgsForCall(i int) (string, bool) {
+func (fake *FakeAPIConfigActor) SetTargetArgsForCall(i int) configactions.TargetSettings {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
-	return fake.setTargetArgsForCall[i].CCAPI, fake.setTargetArgsForCall[i].skipSSLValidation
+	return fake.setTargetArgsForCall[i].settings
 }
 
 func (fake *FakeAPIConfigActor) SetTargetReturns(result1 configactions.Warnings, result2 error) {

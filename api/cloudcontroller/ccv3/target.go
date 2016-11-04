@@ -2,6 +2,11 @@ package ccv3
 
 import "code.cloudfoundry.org/cli/api/cloudcontroller"
 
+type TargetSettings struct {
+	SkipSSLValidation bool
+	URL               string
+}
+
 // TargetCF sets the client to use the Cloud Controller at the fully qualified
 // API URL. skipSSLValidation controls whether a client verifies the server's
 // certificate chain and host name. If skipSSLValidation is true, TLS accepts
@@ -10,10 +15,12 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller"
 //
 // In this mode, TLS is susceptible to man-in-the-middle attacks. This should
 // be used only for testing.
-func (client *Client) TargetCF(APIURL string, skipSSLValidation bool) (Warnings, error) {
-	client.cloudControllerURL = APIURL
+func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
+	client.cloudControllerURL = settings.URL
 
-	client.connection = cloudcontroller.NewConnection(skipSSLValidation)
+	client.connection = cloudcontroller.NewConnection(cloudcontroller.Config{
+		SkipSSLValidation: settings.SkipSSLValidation,
+	})
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
 	info, warnings, err := client.Info()

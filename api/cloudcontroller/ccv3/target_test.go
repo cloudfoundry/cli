@@ -91,7 +91,10 @@ var _ = Describe("Target", func() {
 			Context("when the server has unverified SSL", func() {
 				Context("when setting the skip ssl flag", func() {
 					It("sets all the endpoints on the client and returns all warnings", func() {
-						warnings, err := client.TargetCF(server.URL(), true)
+						warnings, err := client.TargetCF(TargetSettings{
+							SkipSSLValidation: true,
+							URL:               server.URL(),
+						})
 						Expect(err).NotTo(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning 1", "warning 2"))
 
@@ -115,7 +118,10 @@ var _ = Describe("Target", func() {
 			})
 
 			It("returns the same error", func() {
-				warnings, err := client.TargetCF(server.URL(), true)
+				warnings, err := client.TargetCF(TargetSettings{
+					SkipSSLValidation: true,
+					URL:               server.URL(),
+				})
 				Expect(err).To(MatchError(ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
 			})

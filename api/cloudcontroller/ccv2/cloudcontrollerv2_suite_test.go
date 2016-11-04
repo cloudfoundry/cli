@@ -42,7 +42,10 @@ var _ = BeforeEach(func() {
 func NewTestClient() *Client {
 	SetupV2InfoResponse()
 	client := NewClient("CF CLI API V2 Test", "Unknown")
-	warnings, err := client.TargetCF(server.URL(), true)
+	warnings, err := client.TargetCF(TargetSettings{
+		SkipSSLValidation: true,
+		URL:               server.URL(),
+	})
 	Expect(err).ToNot(HaveOccurred())
 	Expect(warnings).To(BeEmpty())
 	return client

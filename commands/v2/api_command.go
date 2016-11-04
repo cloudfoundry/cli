@@ -18,7 +18,7 @@ import (
 
 type APIConfigActor interface {
 	ClearTarget()
-	SetTarget(CCAPI string, skipSSLValidation bool) (configactions.Warnings, error)
+	SetTarget(settings configactions.TargetSettings) (configactions.Warnings, error)
 }
 
 type ApiCommand struct {
@@ -98,7 +98,10 @@ func (cmd *ApiCommand) setAPI() error {
 
 	apiURL := processURL(cmd.OptionalArgs.URL)
 
-	_, err := cmd.Actor.SetTarget(apiURL, cmd.SkipSSLValidation)
+	_, err := cmd.Actor.SetTarget(configactions.TargetSettings{
+		URL:               apiURL,
+		SkipSSLValidation: cmd.SkipSSLValidation,
+	})
 	if err != nil {
 		return common.HandleError(err)
 	}
