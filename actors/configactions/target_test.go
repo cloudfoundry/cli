@@ -15,12 +15,17 @@ var _ = Describe("Targgeting", func() {
 
 		fakeCloudControllerClient *configactionsfakes.FakeCloudControllerClient
 		fakeConfig                *configactionsfakes.FakeConfig
+		settings                  TargetSettings
 	)
 
 	BeforeEach(func() {
 		fakeCloudControllerClient = new(configactionsfakes.FakeCloudControllerClient)
 		fakeConfig = new(configactionsfakes.FakeConfig)
 		actor = NewActor(fakeConfig, fakeCloudControllerClient)
+
+		settings = TargetSettings{
+			SkipSSLValidation: skipSSLValidation,
+		}
 	})
 
 	Describe("SetTarget", func() {
@@ -35,6 +40,8 @@ var _ = Describe("Targgeting", func() {
 			expectedUAA = "https://uaa.foo.com"
 			expectedRouting = "https://api.foo.com/routing"
 
+			settings.URL = expectedAPI
+
 			fakeCloudControllerClient.APIReturns(expectedAPI)
 			fakeCloudControllerClient.APIVersionReturns(expectedAPIVersion)
 			fakeCloudControllerClient.AuthorizationEndpointReturns(expectedAuth)
@@ -45,17 +52,17 @@ var _ = Describe("Targgeting", func() {
 		})
 
 		It("targets the passed API", func() {
-			_, err := actor.SetTarget(expectedAPI, skipSSLValidation)
+			_, err := actor.SetTarget(settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeCloudControllerClient.TargetCFCallCount()).To(Equal(1))
-			api, skipSSL := fakeCloudControllerClient.TargetCFArgsForCall(0)
-			Expect(api).To(Equal(expectedAPI))
-			Expect(skipSSL).To(BeFalse())
+			connectionSettings := fakeCloudControllerClient.TargetCFArgsForCall(0)
+			Expect(connectionSettings.URL).To(Equal(expectedAPI))
+			Expect(connectionSettings.SkipSSLValidation).To(BeFalse())
 		})
 
 		It("sets all the target information", func() {
-			_, err := actor.SetTarget(expectedAPI, skipSSLValidation)
+			_, err := actor.SetTarget(settings)
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(fakeConfig.SetTargetInformationCallCount()).To(Equal(1))
@@ -76,12 +83,13 @@ var _ = Describe("Targgeting", func() {
 
 			BeforeEach(func() {
 				APIURL = "https://some-api.com"
+				settings.URL = APIURL
 				fakeConfig.TargetReturns(APIURL)
 				fakeConfig.SkipSSLValidationReturns(skipSSLValidation)
 			})
 
 			It("does not make any API calls", func() {
-				warnings, err := actor.SetTarget(APIURL, skipSSLValidation)
+				warnings, err := actor.SetTarget(settings)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(warnings).To(BeNil())
 

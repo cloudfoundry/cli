@@ -5,7 +5,7 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 //go:generate counterfeiter . CloudControllerClient
 
 type CloudControllerClient interface {
-	TargetCF(APIURL string, skipSSLValidation bool) (ccv2.Warnings, error)
+	TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 
 	API() string
 	APIVersion() string

@@ -1,11 +1,15 @@
 package configactions
 
-func (actor Actor) SetTarget(CCAPI string, skipSSLValidation bool) (Warnings, error) {
-	if actor.Config.Target() == CCAPI && actor.Config.SkipSSLValidation() == skipSSLValidation {
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+
+type TargetSettings ccv2.TargetSettings
+
+func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
+	if actor.Config.Target() == settings.URL && actor.Config.SkipSSLValidation() == settings.SkipSSLValidation {
 		return nil, nil
 	}
 
-	warnings, err := actor.CloudControllerClient.TargetCF(CCAPI, skipSSLValidation)
+	warnings, err := actor.CloudControllerClient.TargetCF(ccv2.TargetSettings(settings))
 	if err != nil {
 		return Warnings(warnings), err
 	}
@@ -18,7 +22,7 @@ func (actor Actor) SetTarget(CCAPI string, skipSSLValidation bool) (Warnings, er
 		actor.CloudControllerClient.DopplerEndpoint(),
 		actor.CloudControllerClient.TokenEndpoint(),
 		actor.CloudControllerClient.RoutingEndpoint(),
-		skipSSLValidation,
+		settings.SkipSSLValidation,
 	)
 
 	return Warnings(warnings), nil

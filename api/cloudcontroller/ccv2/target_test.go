@@ -56,7 +56,10 @@ var _ = Describe("Target", func() {
 			Context("when the api has unverified SSL", func() {
 				Context("when setting the skip ssl flat", func() {
 					It("sets all the endpoints on the client", func() {
-						_, err := client.TargetCF(server.URL(), true)
+						_, err := client.TargetCF(TargetSettings{
+							SkipSSLValidation: true,
+							URL:               server.URL(),
+						})
 						Expect(err).NotTo(HaveOccurred())
 
 						Expect(client.API()).To(MatchRegexp("https://%s", serverAPIURL))
@@ -70,7 +73,10 @@ var _ = Describe("Target", func() {
 				})
 
 				It("sets the http endpoint and warns user", func() {
-					warnings, err := client.TargetCF(server.URL(), true)
+					warnings, err := client.TargetCF(TargetSettings{
+						SkipSSLValidation: true,
+						URL:               server.URL(),
+					})
 					Expect(err).NotTo(HaveOccurred())
 					Expect(warnings).To(ContainElement("this is a warning"))
 				})

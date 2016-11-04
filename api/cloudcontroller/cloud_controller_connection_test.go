@@ -20,7 +20,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 	var connection *CloudControllerConnection
 
 	BeforeEach(func() {
-		connection = NewConnection(true)
+		connection = NewConnection(Config{SkipSSLValidation: true})
 	})
 
 	Describe("Make", func() {
@@ -130,7 +130,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 		Describe("Errors", func() {
 			Context("when the server does not exist", func() {
 				BeforeEach(func() {
-					connection = NewConnection(false)
+					connection = NewConnection(Config{})
 				})
 
 				It("returns a RequestError", func() {
@@ -156,7 +156,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 							),
 						)
 
-						connection = NewConnection(false)
+						connection = NewConnection(Config{})
 					})
 
 					It("returns a UnverifiedServerError", func() {

@@ -9,16 +9,23 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type CloudControllerConnection struct {
 	HTTPClient *http.Client
+	UserAgent  string
 }
 
-func NewConnection(skipSSLValidation bool) *CloudControllerConnection {
+type Config struct {
+	DialTimeout       time.Duration
+	SkipSSLValidation bool
+}
+
+func NewConnection(config Config) *CloudControllerConnection {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: skipSSLValidation,
+			InsecureSkipVerify: config.SkipSSLValidation,
 		},
 		Proxy: http.ProxyFromEnvironment,
 	}

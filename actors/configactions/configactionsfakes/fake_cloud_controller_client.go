@@ -9,11 +9,10 @@ import (
 )
 
 type FakeCloudControllerClient struct {
-	TargetCFStub        func(APIURL string, skipSSLValidation bool) (ccv2.Warnings, error)
+	TargetCFStub        func(settings ccv2.TargetSettings) (ccv2.Warnings, error)
 	targetCFMutex       sync.RWMutex
 	targetCFArgsForCall []struct {
-		APIURL            string
-		skipSSLValidation bool
+		settings ccv2.TargetSettings
 	}
 	targetCFReturns struct {
 		result1 ccv2.Warnings
@@ -65,16 +64,15 @@ type FakeCloudControllerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudControllerClient) TargetCF(APIURL string, skipSSLValidation bool) (ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) TargetCF(settings ccv2.TargetSettings) (ccv2.Warnings, error) {
 	fake.targetCFMutex.Lock()
 	fake.targetCFArgsForCall = append(fake.targetCFArgsForCall, struct {
-		APIURL            string
-		skipSSLValidation bool
-	}{APIURL, skipSSLValidation})
-	fake.recordInvocation("TargetCF", []interface{}{APIURL, skipSSLValidation})
+		settings ccv2.TargetSettings
+	}{settings})
+	fake.recordInvocation("TargetCF", []interface{}{settings})
 	fake.targetCFMutex.Unlock()
 	if fake.TargetCFStub != nil {
-		return fake.TargetCFStub(APIURL, skipSSLValidation)
+		return fake.TargetCFStub(settings)
 	} else {
 		return fake.targetCFReturns.result1, fake.targetCFReturns.result2
 	}
@@ -86,10 +84,10 @@ func (fake *FakeCloudControllerClient) TargetCFCallCount() int {
 	return len(fake.targetCFArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) (string, bool) {
+func (fake *FakeCloudControllerClient) TargetCFArgsForCall(i int) ccv2.TargetSettings {
 	fake.targetCFMutex.RLock()
 	defer fake.targetCFMutex.RUnlock()
-	return fake.targetCFArgsForCall[i].APIURL, fake.targetCFArgsForCall[i].skipSSLValidation
+	return fake.targetCFArgsForCall[i].settings
 }
 
 func (fake *FakeCloudControllerClient) TargetCFReturns(result1 ccv2.Warnings, result2 error) {
