@@ -48,7 +48,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 		return APIInformation{}, warnings, err
 	}
 
-	request, err := newHTTPRequest(requestOptions{
+	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    rootResponse.ccV3Href(),
 	})
@@ -73,7 +73,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 
 // rootResponse return the CC API root document.
 func (client *Client) rootResponse() (RootResponse, Warnings, error) {
-	request, err := newHTTPRequest(requestOptions{
+	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    client.cloudControllerURL,
 	})

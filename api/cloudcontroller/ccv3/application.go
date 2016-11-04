@@ -16,7 +16,7 @@ type Application struct {
 
 // GetApplications lists applications with optional filters.
 func (client *Client) GetApplications(query url.Values) ([]Application, Warnings, error) {
-	request, err := newHTTPRequest(requestOptions{
+	request, err := client.newHTTPRequest(requestOptions{
 		// TODO change this to use the apps link that /v3 returns when it's
 		// implemented
 		URL:    fmt.Sprintf("%s%s", client.cloudControllerURL, "/v3/apps"),
@@ -49,7 +49,7 @@ func (client *Client) GetApplications(query url.Values) ([]Application, Warnings
 		if wrapper.NextURL == "" {
 			break
 		}
-		request, err = newHTTPRequest(requestOptions{
+		request, err = client.newHTTPRequest(requestOptions{
 			URL:    wrapper.NextURL,
 			Method: http.MethodGet,
 		})

@@ -28,7 +28,7 @@ func (client *Client) RunTask(appGUID string, command string) (Task, Warnings, e
 	}
 
 	body := bytes.NewBuffer(bodyBytes)
-	request, err := newHTTPRequest(requestOptions{
+	request, err := client.newHTTPRequest(requestOptions{
 		URL:    fmt.Sprintf("%s/v3/apps/%s/tasks", client.cloudControllerURL, appGUID),
 		Method: http.MethodPost,
 		Body:   body,

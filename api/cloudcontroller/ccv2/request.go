@@ -53,6 +53,7 @@ func (client Client) newHTTPRequest(passedRequest requestOptions) (*http.Request
 	request.Header = http.Header{}
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("User-Agent", client.userAgent)
 
 	return request, nil
 }

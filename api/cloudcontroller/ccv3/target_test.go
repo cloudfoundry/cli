@@ -20,7 +20,7 @@ var _ = Describe("Target", func() {
 
 	BeforeEach(func() {
 		serverAPIURL = server.URL()[8:]
-		client = NewClient()
+		client = NewClient("CF CLI API V3 Target Test", "Unknown")
 	})
 
 	Describe("TargetCF", func() {

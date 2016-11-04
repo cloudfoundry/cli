@@ -22,7 +22,7 @@ type requestOptions struct {
 
 // newHTTPRequest returns a constructed HTTP.Request with some defaults.
 // Defaults are applied when Request options are not filled in.
-func newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
+func (client *Client) newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
 	var request *http.Request
 	var err error
 
@@ -42,6 +42,7 @@ func newHTTPRequest(passedRequest requestOptions) (*http.Request, error) {
 	request.Header = http.Header{}
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("User-Agent", client.userAgent)
 
 	return request, nil
 }
