@@ -124,8 +124,10 @@ SEE ALSO:
 				Eventually(session).Should(Exit(0))
 				userName, _ := getCredentials()
 				Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Expect(session.Out).To(Say("OK"))
-				Expect(session.Out).To(Say("Task 1 has been submitted successfully for execution."))
+				Expect(session.Out).To(Say(`OK
+
+Task 1 has been submitted successfully for execution.`,
+				))
 			})
 		})
 
@@ -160,8 +162,10 @@ Code: 10008, Title: CF-UnprocessableEntity, Detail: The request is semantically 
 				Eventually(session).Should(Exit(0))
 				userName, _ := getCredentials()
 				Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Expect(session.Out).To(Say("OK"))
-				Expect(session.Out).To(Say("Task 1 has been submitted successfully for execution."))
+				Expect(session.Out).To(Say(`OK
+
+Task 1 has been submitted successfully for execution.`,
+				))
 			})
 		})
 
@@ -173,7 +177,5 @@ Code: 10008, Title: CF-UnprocessableEntity, Detail: The request is semantically 
 				Expect(session.Err).To(Say(fmt.Sprintf("App %s not found", appName)))
 			})
 		})
-
-		//generic api errors(look at sotry AC)
 	})
 })
