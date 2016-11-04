@@ -137,12 +137,14 @@ var _ = Describe("RunTask Command", func() {
 				Expect(appGUID).To(Equal("some-app-guid"))
 				Expect(command).To(Equal("fake command"))
 
-				Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-				Expect(fakeUI.Out).To(Say("get-application-warning-2"))
-				Expect(fakeUI.Out).To(Say("Creating task for app some-app-name in org some-org / space some-space as some-user..."))
-				Expect(fakeUI.Out).To(Say("get-application-warning-3"))
-				Expect(fakeUI.Out).To(Say("OK"))
-				Expect(fakeUI.Out).To(Say("Task 3 has been submitted successfully for execution."))
+				Expect(fakeUI.Out).To(Say(`get-application-warning-1
+get-application-warning-2
+Creating task for app some-app-name in org some-org / space some-space as some-user...
+get-application-warning-3
+OK
+
+Task 3 has been submitted successfully for execution.`,
+				))
 			})
 		})
 

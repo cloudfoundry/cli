@@ -70,6 +70,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayOK()
+	cmd.UI.DisplayNewline()
 	cmd.UI.DisplayText("Task {{.TaskSequenceID}} has been submitted successfully for execution.",
 		map[string]interface{}{
 			"TaskSequenceID": task.SequenceID,
