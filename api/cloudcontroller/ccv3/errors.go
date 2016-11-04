@@ -99,30 +99,32 @@ func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcon
 func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 
-	if rawErr, ok := err.(cloudcontroller.RawCCError); ok {
-		return e.convert(rawErr)
+	if rawHTTPStatusErr, ok := err.(cloudcontroller.RawHTTPStatusError); ok {
+		return convert(rawHTTPStatusErr)
 	}
 	return err
 }
 
-func (e errorWrapper) convert(rawErr cloudcontroller.RawCCError) error {
+func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
+	// Try to unmarshal the raw error into a CC error. If unmarshaling fails,
+	// return the raw error.
 	var errorResponse CCErrorResponse
-	err := json.Unmarshal(rawErr.RawResponse, &errorResponse)
+	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
 	if err != nil {
-		return err
+		return rawHTTPStatusErr
 	}
 
 	errors := errorResponse.Errors
 	if len(errors) == 0 {
 		return UnexpectedResponseError{
-			ResponseCode:    rawErr.StatusCode,
+			ResponseCode:    rawHTTPStatusErr.StatusCode,
 			CCErrorResponse: errorResponse,
 		}
 	}
 
 	// There could be multiple errors in the future but for now we only convert
 	// the first error.
-	switch rawErr.StatusCode {
+	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized:
 		if errors[0].Code == 10002 {
 			return InvalidAuthTokenError{Message: errors[0].Detail}
@@ -134,7 +136,7 @@ func (e errorWrapper) convert(rawErr cloudcontroller.RawCCError) error {
 		return ResourceNotFoundError{Message: errors[0].Detail}
 	default:
 		return UnexpectedResponseError{
-			ResponseCode:    rawErr.StatusCode,
+			ResponseCode:    rawHTTPStatusErr.StatusCode,
 			CCErrorResponse: errorResponse,
 		}
 	}

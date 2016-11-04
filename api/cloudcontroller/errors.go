@@ -20,11 +20,11 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
-type RawCCError struct {
+type RawHTTPStatusError struct {
 	StatusCode  int
 	RawResponse []byte
 }
 
-func (r RawCCError) Error() string {
-	return fmt.Sprintf("Error Code: %i\nRaw Response: %s\n", r.StatusCode, string(r.RawResponse))
+func (r RawHTTPStatusError) Error() string {
+	return fmt.Sprintf("Error Code: %d\nRaw Response: %s", r.StatusCode, r.RawResponse)
 }

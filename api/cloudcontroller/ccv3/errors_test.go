@@ -3,6 +3,7 @@ package ccv3_test
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -17,30 +18,6 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 		client *Client
 	)
-
-	BeforeEach(func() {
-		response = `
-{
-  "errors": [
-    {
-      "code": 777,
-      "detail": "SomeCC Error Message",
-      "title": "CF-SomeError"
-    }
-  ]
-}`
-
-		client = NewTestClient()
-	})
-
-	JustBeforeEach(func() {
-		server.AppendHandlers(
-			CombineHandlers(
-				VerifyRequest(http.MethodGet, "/v3/apps"),
-				RespondWith(serverResponseCode, response),
-			),
-		)
-	})
 
 	Describe("UnexpectedResponseError", func() {
 		Describe("Error", func() {
@@ -72,36 +49,76 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 	})
 
 	Describe("Make", func() {
-		Context("when the cloud controller returns an empty list of errors", func() {
+		BeforeEach(func() {
+			response = `
+{
+  "errors": [
+    {
+      "code": 777,
+      "detail": "SomeCC Error Message",
+      "title": "CF-SomeError"
+    }
+  ]
+}`
+
+			client = NewTestClient()
+		})
+
+		JustBeforeEach(func() {
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v3/apps"),
+					RespondWith(serverResponseCode, response),
+				),
+			)
+		})
+
+		Context("when the error is not from the cloud controller", func() {
 			BeforeEach(func() {
-				serverResponseCode = http.StatusUnauthorized
-				response = `{ "errors": [] }`
+				serverResponseCode = http.StatusNotFound
+				response = "404 Not Found: Requested route ('some-url.com') does not exist."
 			})
 
-			It("returns an UnexpectedResponseError", func() {
+			It("returns a RawHTTPStatusError", func() {
 				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(UnexpectedResponseError{
-					ResponseCode:    http.StatusUnauthorized,
-					CCErrorResponse: CCErrorResponse{Errors: []CCError{}},
+				Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
+					StatusCode:  http.StatusNotFound,
+					RawResponse: []byte(response),
 				}))
 			})
 		})
 
-		Describe("(401) Unauthorized", func() {
-			BeforeEach(func() {
-				serverResponseCode = http.StatusUnauthorized
-			})
+		Context("when the error is from the cloud controller", func() {
+			Context("when an empty list of errors is returned", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusUnauthorized
+					response = `{ "errors": [] }`
+				})
 
-			Context("generic 401", func() {
-				It("returns a UnauthorizedError", func() {
+				It("returns an UnexpectedResponseError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(UnauthorizedError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(UnexpectedResponseError{
+						ResponseCode:    http.StatusUnauthorized,
+						CCErrorResponse: CCErrorResponse{Errors: []CCError{}},
+					}))
 				})
 			})
 
-			Context("invalid token", func() {
+			Context("(401) Unauthorized", func() {
 				BeforeEach(func() {
-					response = `
+					serverResponseCode = http.StatusUnauthorized
+				})
+
+				Context("generic 401", func() {
+					It("returns a UnauthorizedError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(UnauthorizedError{Message: "SomeCC Error Message"}))
+					})
+				})
+
+				Context("invalid token", func() {
+					BeforeEach(func() {
+						response = `
 {
   "errors": [
     {
@@ -111,56 +128,57 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
     }
   ]
 }`
+					})
+
+					It("returns an InvalidAuthTokenError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+					})
+				})
+			})
+
+			Context("(403) Forbidden", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusForbidden
 				})
 
-				It("returns an InvalidAuthTokenError", func() {
+				It("returns a ForbiddenError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+					Expect(err).To(MatchError(ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
-		})
 
-		Describe("(403) Forbidden", func() {
-			BeforeEach(func() {
-				serverResponseCode = http.StatusForbidden
+			Context("(404) Not Found", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusNotFound
+				})
+
+				It("returns a ResourceNotFoundError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(ResourceNotFoundError{Message: "SomeCC Error Message"}))
+				})
 			})
 
-			It("returns a ForbiddenError", func() {
-				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(ForbiddenError{Message: "SomeCC Error Message"}))
-			})
-		})
+			Context("Unhandled Error Codes", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusTeapot
+				})
 
-		Describe("(404) Not Found", func() {
-			BeforeEach(func() {
-				serverResponseCode = http.StatusNotFound
-			})
-
-			It("returns a ResourceNotFoundError", func() {
-				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(ResourceNotFoundError{Message: "SomeCC Error Message"}))
-			})
-		})
-
-		Describe("Unhandled Error Codes", func() {
-			BeforeEach(func() {
-				serverResponseCode = http.StatusTeapot
-			})
-
-			It("returns an UnexpectedResponseError", func() {
-				_, _, err := client.GetApplications(nil)
-				Expect(err).To(MatchError(UnexpectedResponseError{
-					ResponseCode: http.StatusTeapot,
-					CCErrorResponse: CCErrorResponse{
-						Errors: []CCError{
-							{
-								Code:   777,
-								Detail: "SomeCC Error Message",
-								Title:  "CF-SomeError",
+				It("returns an UnexpectedResponseError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(UnexpectedResponseError{
+						ResponseCode: http.StatusTeapot,
+						CCErrorResponse: CCErrorResponse{
+							Errors: []CCError{
+								{
+									Code:   777,
+									Detail: "SomeCC Error Message",
+									Title:  "CF-SomeError",
+								},
 							},
 						},
-					},
-				}))
+					}))
+				})
 			})
 		})
 	})

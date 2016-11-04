@@ -170,7 +170,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
-			Describe("RawCCError", func() {
+			Describe("RawHTTPStatusError", func() {
 				var ccResponse string
 				BeforeEach(func() {
 					ccResponse = `{
@@ -193,15 +193,10 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					var response Response
 					err = connection.Make(request, &response)
-					Expect(err).To(MatchError(RawCCError{
+					Expect(err).To(MatchError(RawHTTPStatusError{
 						StatusCode:  http.StatusNotFound,
 						RawResponse: []byte(ccResponse),
 					}))
-
-					ccErr, ok := err.(RawCCError)
-					Expect(ok).To(BeTrue())
-					Expect(ccErr.RawResponse).To(Equal([]byte(ccResponse)))
-					Expect(ccErr.StatusCode).To(Equal(http.StatusNotFound))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
 				})
