@@ -89,7 +89,7 @@ func (connection *CloudControllerConnection) populateResponse(response *http.Res
 
 func (*CloudControllerConnection) handleStatusCodes(response *http.Response, passedResponse *Response) error {
 	if response.StatusCode >= 400 {
-		return RawCCError{
+		return RawHTTPStatusError{
 			StatusCode:  response.StatusCode,
 			RawResponse: passedResponse.RawResponse,
 		}
