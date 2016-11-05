@@ -1,14 +1,18 @@
 package ccv2
 
 import (
+	"time"
+
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 	"github.com/tedsuo/rata"
 )
 
 type TargetSettings struct {
+	DialTimeout       time.Duration
 	SkipSSLValidation bool
-	URL               string
+
+	URL string
 }
 
 // TargetCF sets the client to use the Cloud Controller at the fully qualified
@@ -24,6 +28,7 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	client.router = rata.NewRequestGenerator(settings.URL, internal.APIRoutes)
 
 	client.connection = cloudcontroller.NewConnection(cloudcontroller.Config{
+		DialTimeout:       settings.DialTimeout,
 		SkipSSLValidation: settings.SkipSSLValidation,
 	})
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..

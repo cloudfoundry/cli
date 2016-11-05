@@ -1,10 +1,16 @@
 package ccv3
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller"
+import (
+	"time"
+
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+)
 
 type TargetSettings struct {
+	DialTimeout       time.Duration
 	SkipSSLValidation bool
-	URL               string
+
+	URL string
 }
 
 // TargetCF sets the client to use the Cloud Controller at the fully qualified
@@ -19,6 +25,7 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	client.cloudControllerURL = settings.URL
 
 	client.connection = cloudcontroller.NewConnection(cloudcontroller.Config{
+		DialTimeout:       settings.DialTimeout,
 		SkipSSLValidation: settings.SkipSSLValidation,
 	})
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..

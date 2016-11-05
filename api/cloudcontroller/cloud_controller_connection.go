@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -28,6 +29,9 @@ func NewConnection(config Config) *CloudControllerConnection {
 			InsecureSkipVerify: config.SkipSSLValidation,
 		},
 		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout: config.DialTimeout,
+		}).DialContext,
 	}
 
 	return &CloudControllerConnection{

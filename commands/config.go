@@ -1,6 +1,10 @@
 package commands
 
-import "code.cloudfoundry.org/cli/utils/configv3"
+import (
+	"time"
+
+	"code.cloudfoundry.org/cli/utils/configv3"
+)
 
 //go:generate counterfeiter . Config
 
@@ -13,6 +17,7 @@ type Config interface {
 	ClientSecret() string
 	ColorEnabled() configv3.ColorSetting
 	CurrentUser() (configv3.User, error)
+	DialTimeout() time.Duration
 	Experimental() bool
 	Locale() string
 	Plugins() map[string]configv3.Plugin

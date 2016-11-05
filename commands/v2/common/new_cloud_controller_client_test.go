@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
 	. "code.cloudfoundry.org/cli/commands/v2/common"
@@ -39,6 +40,18 @@ var _ = Describe("New Cloud Controller Client", func() {
 			Expect(err).To(MatchError(NoAPISetError{
 				BinaryName: binaryName,
 			}))
+		})
+	})
+
+	Context("when the DialTimeout is set", func() {
+		BeforeEach(func() {
+			fakeConfig.TargetReturns("https://potato.bananapants11122.co.uk")
+			fakeConfig.DialTimeoutReturns(time.Nanosecond)
+		})
+
+		It("passes the value to the target", func() {
+			_, err := NewCloudControllerClient(fakeConfig, fakeUI)
+			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk/v2/info: dial tcp: i/o timeout"))
 		})
 	})
 

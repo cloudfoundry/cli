@@ -101,6 +101,7 @@ func (cmd *ApiCommand) setAPI() error {
 	_, err := cmd.Actor.SetTarget(configactions.TargetSettings{
 		URL:               apiURL,
 		SkipSSLValidation: cmd.SkipSSLValidation,
+		DialTimeout:       cmd.Config.DialTimeout(),
 	})
 	if err != nil {
 		return common.HandleError(err)

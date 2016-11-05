@@ -18,6 +18,9 @@ const (
 	DefaultStartupTimeout = 5 * time.Minute
 	// DefaultPingerThrottle = 5 * time.Second
 
+	// DefaultDialTimeout is the default timeout for the dail.
+	DefaultDialTimeout = 5 * time.Second
+
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
 
@@ -84,6 +87,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		Lang:             os.Getenv("LANG"),
 		LCAll:            os.Getenv("LC_ALL"),
 		Experimental:     os.Getenv("CF_CLI_EXPERIMENTAL"),
+		CFDialTimeout:    os.Getenv("CF_DIAL_TIMEOUT"),
 	}
 
 	pluginFilePath := filepath.Join(config.PluginHome(), "config.json")
@@ -205,6 +209,7 @@ type EnvOverride struct {
 	Lang             string
 	LCAll            string
 	Experimental     string
+	CFDialTimeout    string
 }
 
 // FlagOverride represents all the global flags passed to the CF CLI
@@ -335,6 +340,20 @@ func (config *Config) Verbose() (bool, string) {
 	}
 
 	return config.Flags.Verbose, ""
+}
+
+// DialTimeout returns the timeout to use when dialing. This is based off of:
+//   1. The $CF_DIAL_TIMEOUT environment variable if set
+//   2. Defaults to 5 seconds
+func (config *Config) DialTimeout() time.Duration {
+	if config.ENV.CFDialTimeout != "" {
+		envVal, err := strconv.ParseInt(config.ENV.CFDialTimeout, 10, 64)
+		if err == nil {
+			return time.Duration(envVal) * time.Second
+		}
+	}
+
+	return DefaultDialTimeout
 }
 
 // SetOrganizationInformation sets the currently targeted organization

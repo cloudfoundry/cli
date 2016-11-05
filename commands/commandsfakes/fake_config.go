@@ -3,6 +3,7 @@ package commandsfakes
 
 import (
 	"sync"
+	"time"
 
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/utils/configv3"
@@ -51,6 +52,12 @@ type FakeConfig struct {
 	currentUserReturns     struct {
 		result1 configv3.User
 		result2 error
+	}
+	DialTimeoutStub        func() time.Duration
+	dialTimeoutMutex       sync.RWMutex
+	dialTimeoutArgsForCall []struct{}
+	dialTimeoutReturns     struct {
+		result1 time.Duration
 	}
 	ExperimentalStub        func() bool
 	experimentalMutex       sync.RWMutex
@@ -309,6 +316,31 @@ func (fake *FakeConfig) CurrentUserReturns(result1 configv3.User, result2 error)
 		result1 configv3.User
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeConfig) DialTimeout() time.Duration {
+	fake.dialTimeoutMutex.Lock()
+	fake.dialTimeoutArgsForCall = append(fake.dialTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("DialTimeout", []interface{}{})
+	fake.dialTimeoutMutex.Unlock()
+	if fake.DialTimeoutStub != nil {
+		return fake.DialTimeoutStub()
+	} else {
+		return fake.dialTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeConfig) DialTimeoutCallCount() int {
+	fake.dialTimeoutMutex.RLock()
+	defer fake.dialTimeoutMutex.RUnlock()
+	return len(fake.dialTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) DialTimeoutReturns(result1 time.Duration) {
+	fake.DialTimeoutStub = nil
+	fake.dialTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
 }
 
 func (fake *FakeConfig) Experimental() bool {
@@ -635,6 +667,8 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()
 	defer fake.currentUserMutex.RUnlock()
+	fake.dialTimeoutMutex.RLock()
+	defer fake.dialTimeoutMutex.RUnlock()
 	fake.experimentalMutex.RLock()
 	defer fake.experimentalMutex.RUnlock()
 	fake.localeMutex.RLock()
