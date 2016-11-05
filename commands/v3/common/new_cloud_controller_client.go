@@ -21,6 +21,7 @@ func NewCloudControllerClient(config commands.Config) (*ccv3.Client, error) {
 	_, err := client.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
+		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
 		return nil, err

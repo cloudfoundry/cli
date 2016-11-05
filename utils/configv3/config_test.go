@@ -301,6 +301,33 @@ var _ = Describe("Config", func() {
 			Entry("CF_TRACE empty and '-v' should enable verbose", "", true, true, ""),
 			Entry("CF_TRACE set to filepath and '-v' should enable verbose", "/foo/bar", false, true, "/foo/bar"),
 		)
+
+		Describe("DialTimeout", func() {
+			var (
+				originalDialTimeout string
+
+				config *Config
+			)
+
+			BeforeEach(func() {
+				originalDialTimeout = os.Getenv("CF_DIAL_TIMEOUT")
+				os.Setenv("CF_DIAL_TIMEOUT", "1234")
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+			})
+
+			AfterEach(func() {
+				os.Setenv("CF_DIAL_TIMEOUT", originalDialTimeout)
+			})
+
+			It("returns the dial timeout", func() {
+				Expect(config.DialTimeout()).To(Equal(1234 * time.Second))
+			})
+		})
+
 	})
 
 	Describe("Write Config", func() {

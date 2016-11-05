@@ -316,4 +316,8 @@ var _ = Describe("API Command", func() {
 		Expect(configFile.TargetedSpace.Name).To(BeEmpty())
 		Expect(configFile.TargetedSpace.AllowSSH).To(BeFalse())
 	})
+
+	It("write a dial timeout test", func() {
+		Skip("do it")
+	})
 })

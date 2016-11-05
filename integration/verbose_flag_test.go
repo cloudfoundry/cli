@@ -13,30 +13,25 @@ import (
 
 var _ = Describe("Verbose", func() {
 	DescribeTable("displays verbose output",
-		func(command func() *exec.Cmd) {
+		func(command func() *Session) {
 			login := exec.Command("cf", "auth", "admin", "admin")
 			loginSession, err := Start(login, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(loginSession).Should(Exit(0))
 
-			cmd := command()
-			session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
-			Expect(err).NotTo(HaveOccurred())
-
+			session := command()
 			Eventually(session).Should(Say("REQUEST:"))
 			Eventually(session).Should(Say("GET /v2/organizations"))
 			Eventually(session).Should(Say("RESPONSE:"))
 			Eventually(session).Should(Exit(0))
 		},
 
-		Entry("when the -v option is provided with additional command", func() *exec.Cmd {
-			return exec.Command("cf", "-v", "orgs")
+		Entry("when the -v option is provided with additional command", func() *Session {
+			return helpers.CF("-v", "orgs")
 		}),
 
-		Entry("when the CF_TRACE env variable is set", func() *exec.Cmd {
-			cmd := exec.Command("cf", "orgs")
-			cmd.Env = helpers.AddOrReplaceEnvironment("CF_TRACE", "true")
-			return cmd
+		Entry("when the CF_TRACE env variable is set", func() *Session {
+			return helpers.CFWithEnv(map[string]string{"CF_TRACE": "true"}, "orgs")
 		}),
 	)
 })

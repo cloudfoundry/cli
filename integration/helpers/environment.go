@@ -2,13 +2,11 @@ package helpers
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
-func AddOrReplaceEnvironment(newEnvName string, newEnvVal string) []string {
+func AddOrReplaceEnvironment(env []string, newEnvName string, newEnvVal string) []string {
 	var found bool
-	env := os.Environ()
 	for i, envPair := range env {
 		splitENV := strings.Split(envPair, "=")
 		if splitENV[0] == newEnvName {
