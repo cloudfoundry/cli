@@ -32,17 +32,7 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config commands.Config, ui commands.UI) error {
-	ccClient, _, err := common.NewCloudControllerClient(
-		config.BinaryName(),
-		config.Target(),
-		config.SkipSSLValidation(),
-		config.DialTimeout(),
-	)
-	if err != nil {
-		return err
-	}
-
-	cmd.Actor = configactions.NewActor(config, ccClient)
+	cmd.Actor = configactions.NewActor(config, common.NewCloudControllerClient(config.BinaryName()))
 	cmd.UI = ui
 	cmd.Config = config
 	return nil
