@@ -9,5 +9,5 @@ import (
 
 func TestV3(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V3 Suite")
+	RunSpecs(t, "V3 Command Suite")
 }

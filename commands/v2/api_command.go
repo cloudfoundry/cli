@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actors/configactions"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/cf"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/flags"
@@ -34,7 +32,17 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config commands.Config, ui commands.UI) error {
-	cmd.Actor = configactions.NewActor(config, ccv2.NewClient(config.BinaryName(), cf.Version))
+	ccClient, _, err := common.NewCloudControllerClient(
+		config.BinaryName(),
+		config.Target(),
+		config.SkipSSLValidation(),
+		config.DialTimeout(),
+	)
+	if err != nil {
+		return err
+	}
+
+	cmd.Actor = configactions.NewActor(config, ccClient)
 	cmd.UI = ui
 	cmd.Config = config
 	return nil

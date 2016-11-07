@@ -30,7 +30,7 @@ func (cmd *UnbindServiceCommand) Setup(config commands.Config, ui commands.UI) e
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, err := common.NewCloudControllerClient(config, ui)
+	client, _, err := common.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
