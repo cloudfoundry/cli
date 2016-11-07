@@ -6,7 +6,9 @@ package format
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // Use MaxDepth to set the maximum recursion depth when printing deeply nested objects
@@ -20,6 +22,25 @@ Set UseStringerRepresentation = true to use GoString (for fmt.GoStringers) or St
 Note that GoString and String don't always have all the information you need to understand why a test failed!
 */
 var UseStringerRepresentation = false
+
+/*
+Print the content of context objects. By default it will be suppressed.
+
+Set PrintContextObjects = true to enable printing of the context internals.
+*/
+var PrintContextObjects = false
+
+// Ctx interface defined here to keep backwards compatability with go < 1.7
+// It matches the context.Context interface
+type Ctx interface {
+	Deadline() (deadline time.Time, ok bool)
+	Done() <-chan struct{}
+	Err() error
+	Value(key interface{}) interface{}
+}
+
+var contextType = reflect.TypeOf((*Ctx)(nil)).Elem()
+var timeType = reflect.TypeOf(time.Time{})
 
 //The default indentation string emitted by the format package
 var Indent = "    "
@@ -56,6 +77,8 @@ Object recurses into deeply nested objects emitting pretty-printed representatio
 Modify format.MaxDepth to control how deep the recursion is allowed to go
 Set format.UseStringerRepresentation to true to return object.GoString() or object.String() when available instead of
 recursing into the object.
+
+Set PrintContextObjects to true to print the content of objects implementing context.Context
 */
 func Object(object interface{}, indentation uint) string {
 	indent := strings.Repeat(Indent, int(indentation))
@@ -123,6 +146,12 @@ func formatValue(value reflect.Value, indentation uint) string {
 		}
 	}
 
+	if !PrintContextObjects {
+		if value.Type().Implements(contextType) && indentation > 1 {
+			return "<suppressed context>"
+		}
+	}
+
 	switch value.Kind() {
 	case reflect.Bool:
 		return fmt.Sprintf("%v", value.Bool())
@@ -143,9 +172,6 @@ func formatValue(value reflect.Value, indentation uint) string {
 	case reflect.Ptr:
 		return formatValue(value.Elem(), indentation)
 	case reflect.Slice:
-		if value.Type().Elem().Kind() == reflect.Uint8 {
-			return formatString(value.Bytes(), indentation)
-		}
 		return formatSlice(value, indentation)
 	case reflect.String:
 		return formatString(value.String(), indentation)
@@ -154,6 +180,10 @@ func formatValue(value reflect.Value, indentation uint) string {
 	case reflect.Map:
 		return formatMap(value, indentation)
 	case reflect.Struct:
+		if value.Type() == timeType {
+			t, _ := value.Interface().(time.Time)
+			return t.Format(time.RFC3339Nano)
+		}
 		return formatStruct(value, indentation)
 	case reflect.Interface:
 		return formatValue(value.Elem(), indentation)
@@ -189,6 +219,10 @@ func formatString(object interface{}, indentation uint) string {
 }
 
 func formatSlice(v reflect.Value, indentation uint) string {
+	if v.Kind() == reflect.Slice && v.Type().Elem().Kind() == reflect.Uint8 && isPrintableString(string(v.Bytes())) {
+		return formatString(v.Bytes(), indentation)
+	}
+
 	l := v.Len()
 	result := make([]string, l)
 	longest := 0
@@ -214,7 +248,7 @@ func formatMap(v reflect.Value, indentation uint) string {
 	longest := 0
 	for i, key := range v.MapKeys() {
 		value := v.MapIndex(key)
-		result[i] = fmt.Sprintf("%s: %s", formatValue(key, 0), formatValue(value, indentation+1))
+		result[i] = fmt.Sprintf("%s: %s", formatValue(key, indentation+1), formatValue(value, indentation+1))
 		if len(result[i]) > longest {
 			longest = len(result[i])
 		}
@@ -260,4 +294,16 @@ func isNilValue(a reflect.Value) bool {
 	}
 
 	return false
+}
+
+/*
+Returns true when the string is entirely made of printable runes, false otherwise.
+*/
+func isPrintableString(str string) bool {
+	for _, runeValue := range str {
+		if !strconv.IsPrint(runeValue) {
+			return false
+		}
+	}
+	return true
 }
