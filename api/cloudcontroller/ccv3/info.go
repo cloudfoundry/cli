@@ -93,3 +93,8 @@ func (client *Client) rootResponse() (RootResponse, Warnings, error) {
 
 	return rootResponse, response.Warnings, nil
 }
+
+// UAA returns back the location of the UAA Endpoint
+func (client *Client) UAA() string {
+	return client.uaaLink
+}

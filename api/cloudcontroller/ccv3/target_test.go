@@ -13,13 +13,10 @@ import (
 
 var _ = Describe("Target", func() {
 	var (
-		serverAPIURL string
-
 		client *Client
 	)
 
 	BeforeEach(func() {
-		serverAPIURL = server.URL()[8:]
 		client = NewClient("CF CLI API V3 Target Test", "Unknown")
 	})
 
@@ -98,7 +95,7 @@ var _ = Describe("Target", func() {
 						Expect(err).NotTo(HaveOccurred())
 						Expect(warnings).To(ConsistOf("warning 1", "warning 2"))
 
-						Expect(client.UAA).To(Equal("https://uaa.bosh-lite.com"))
+						Expect(client.UAA()).To(Equal("https://uaa.bosh-lite.com"))
 					})
 				})
 			})

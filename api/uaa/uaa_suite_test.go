@@ -9,6 +9,9 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 
 	"testing"
+
+	. "code.cloudfoundry.org/cli/api/uaa"
+	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 )
 
 func TestUaa(t *testing.T) {
@@ -34,3 +37,14 @@ var _ = SynchronizedAfterSuite(func() {
 var _ = BeforeEach(func() {
 	server.Reset()
 })
+
+func NewTestUAAClientAndStore() (*Client, *uaafakes.FakeAuthenticationStore) {
+	fakeStore := new(uaafakes.FakeAuthenticationStore)
+	return NewClient(Config{
+		URL:               server.URL(),
+		SkipSSLValidation: true,
+		Store:             fakeStore,
+		AppName:           "CF CLI UAA API Test",
+		AppVersion:        "Unknown",
+	}), fakeStore
+}
