@@ -20,7 +20,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("New Cloud Controller Client", func() {
+var _ = Describe("New Clients", func() {
 	var (
 		binaryName string
 		fakeConfig *commandsfakes.FakeConfig
@@ -37,7 +37,7 @@ var _ = Describe("New Cloud Controller Client", func() {
 
 	Context("when the api endpoint is not set", func() {
 		It("returns an error", func() {
-			_, err := NewCloudControllerClient(fakeConfig, fakeUI)
+			_, _, err := NewClients(fakeConfig, fakeUI)
 			Expect(err).To(MatchError(NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -54,7 +54,7 @@ var _ = Describe("New Cloud Controller Client", func() {
 		})
 
 		It("passes the value to the target", func() {
-			_, err := NewCloudControllerClient(fakeConfig, fakeUI)
+			_, _, err := NewClients(fakeConfig, fakeUI)
 			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk/v2/info: dial tcp: i/o timeout"))
 		})
 	})
@@ -65,7 +65,7 @@ var _ = Describe("New Cloud Controller Client", func() {
 		})
 
 		It("returns an error", func() {
-			_, err := NewCloudControllerClient(fakeConfig, fakeUI)
+			_, _, err := NewClients(fakeConfig, fakeUI)
 			Expect(err).To(HaveOccurred())
 		})
 	})
@@ -103,7 +103,7 @@ var _ = Describe("New Cloud Controller Client", func() {
 			})
 
 			It("wraps the connection is a RequestLogger with TerminalDisplay", func() {
-				client, err := NewCloudControllerClient(fakeConfig, fakeUI)
+				client, _, err := NewClients(fakeConfig, fakeUI)
 				Expect(err).ToNot(HaveOccurred())
 
 				_, _, err = client.GetApplications(nil)
@@ -133,7 +133,7 @@ var _ = Describe("New Cloud Controller Client", func() {
 			})
 
 			It("wraps the connection is a RequestLogger with FileWriter", func() {
-				client, err := NewCloudControllerClient(fakeConfig, fakeUI)
+				client, _, err := NewClients(fakeConfig, fakeUI)
 				Expect(err).ToNot(HaveOccurred())
 
 				_, _, err = client.GetApplications(nil)

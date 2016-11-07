@@ -8,15 +8,18 @@ import (
 	"code.cloudfoundry.org/cli/commands"
 )
 
-// NewCloudControllerClient creates a new V3 Cloud Controller client using
-// the passed in config.
-func NewCloudControllerClient(config commands.Config) (*ccv3.Client, error) {
+// NewClients creates a new V3 Cloud Controller client and UAA client using the
+// passed in config.
+func NewClients(config commands.Config) (*ccv3.Client, error) {
 	if config.Target() == "" {
 		return nil, NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
 
+	// TODO: If there is ever a need to create a CC client without the config,
+	// this should be pulled out into a NewCloudControllerClient function similar
+	// to v2.NewCloudControllerClient
 	client := ccv3.NewClient(config.BinaryName(), cf.Version)
 	_, err := client.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),

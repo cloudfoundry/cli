@@ -1,6 +1,7 @@
 package common_test
 
 import (
+	"runtime"
 	"time"
 
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
@@ -10,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("New Cloud Controller Client", func() {
+var _ = Describe("New Clients", func() {
 	var (
 		binaryName string
 		fakeConfig *commandsfakes.FakeConfig
@@ -24,7 +25,7 @@ var _ = Describe("New Cloud Controller Client", func() {
 
 	Context("when the api endpoint is not set", func() {
 		It("returns an error", func() {
-			_, err := NewCloudControllerClient(fakeConfig)
+			_, err := NewClients(fakeConfig)
 			Expect(err).To(MatchError(NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -33,12 +34,15 @@ var _ = Describe("New Cloud Controller Client", func() {
 
 	Context("when the DialTimeout is set", func() {
 		BeforeEach(func() {
+			if runtime.GOOS == "windows" {
+				Skip("due to timing issues on windows")
+			}
 			fakeConfig.TargetReturns("https://potato.bananapants11122.co.uk")
 			fakeConfig.DialTimeoutReturns(time.Nanosecond)
 		})
 
 		It("passes the value to the target", func() {
-			_, err := NewCloudControllerClient(fakeConfig)
+			_, err := NewClients(fakeConfig)
 			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk: dial tcp: i/o timeout"))
 		})
 	})

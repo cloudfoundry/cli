@@ -16,7 +16,7 @@ import (
 
 func TestCcv3(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Ccv3 Suite")
+	RunSpecs(t, "Cloud Controller V3 Suite")
 }
 
 var server *Server
