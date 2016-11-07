@@ -6,8 +6,10 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 // UAAConnection represents the connection to UAA
@@ -16,12 +18,15 @@ type UAAConnection struct {
 }
 
 // NewConnection returns a pointer to a new UAA Connection
-func NewConnection(skipSSLValidation bool) *UAAConnection {
+func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *UAAConnection {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSSLValidation,
 		},
 		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout: dialTimeout,
+		}).DialContext,
 	}
 
 	return &UAAConnection{

@@ -26,9 +26,10 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 	}
 
 	uaaClient := uaa.NewClient(uaa.Config{
-		URL:               ccClient.TokenEndpoint(),
+		DialTimeout:       config.DialTimeout(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		Store:             config,
+		URL:               ccClient.TokenEndpoint(),
 	})
 	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 
