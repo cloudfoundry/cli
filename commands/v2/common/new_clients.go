@@ -27,7 +27,11 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 		return nil, nil, err
 	}
 
-	uaaClient := uaa.NewClient(ccClient.TokenEndpoint(), config)
+	uaaClient := uaa.NewClient(uaa.Config{
+		URL:               ccClient.TokenEndpoint(),
+		SkipSSLValidation: config.SkipSSLValidation(),
+		Store:             config,
+	})
 	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 
 	if verbose, location := config.Verbose(); verbose {

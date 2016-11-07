@@ -20,12 +20,6 @@ type FakeAuthenticationStore struct {
 	clientSecretReturns     struct {
 		result1 string
 	}
-	SkipSSLValidationStub        func() bool
-	skipSSLValidationMutex       sync.RWMutex
-	skipSSLValidationArgsForCall []struct{}
-	skipSSLValidationReturns     struct {
-		result1 bool
-	}
 	AccessTokenStub        func() string
 	accessTokenMutex       sync.RWMutex
 	accessTokenArgsForCall []struct{}
@@ -94,31 +88,6 @@ func (fake *FakeAuthenticationStore) ClientSecretReturns(result1 string) {
 	fake.ClientSecretStub = nil
 	fake.clientSecretReturns = struct {
 		result1 string
-	}{result1}
-}
-
-func (fake *FakeAuthenticationStore) SkipSSLValidation() bool {
-	fake.skipSSLValidationMutex.Lock()
-	fake.skipSSLValidationArgsForCall = append(fake.skipSSLValidationArgsForCall, struct{}{})
-	fake.recordInvocation("SkipSSLValidation", []interface{}{})
-	fake.skipSSLValidationMutex.Unlock()
-	if fake.SkipSSLValidationStub != nil {
-		return fake.SkipSSLValidationStub()
-	} else {
-		return fake.skipSSLValidationReturns.result1
-	}
-}
-
-func (fake *FakeAuthenticationStore) SkipSSLValidationCallCount() int {
-	fake.skipSSLValidationMutex.RLock()
-	defer fake.skipSSLValidationMutex.RUnlock()
-	return len(fake.skipSSLValidationArgsForCall)
-}
-
-func (fake *FakeAuthenticationStore) SkipSSLValidationReturns(result1 bool) {
-	fake.SkipSSLValidationStub = nil
-	fake.skipSSLValidationReturns = struct {
-		result1 bool
 	}{result1}
 }
 
@@ -203,8 +172,6 @@ func (fake *FakeAuthenticationStore) Invocations() map[string][][]interface{} {
 	defer fake.clientIDMutex.RUnlock()
 	fake.clientSecretMutex.RLock()
 	defer fake.clientSecretMutex.RUnlock()
-	fake.skipSSLValidationMutex.RLock()
-	defer fake.skipSSLValidationMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()

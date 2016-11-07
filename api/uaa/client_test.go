@@ -1,33 +1,69 @@
 package uaa_test
 
 import (
+	"fmt"
+	"net/http"
+	"runtime"
+
 	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 var _ = Describe("UAA Client", func() {
 	var (
-		fakeStore *uaafakes.FakeAuthenticationStore
 		client    *Client
+		fakeStore *uaafakes.FakeAuthenticationStore
 	)
 
 	BeforeEach(func() {
-		fakeStore = new(uaafakes.FakeAuthenticationStore)
-		fakeStore.SkipSSLValidationReturns(true)
-
-		client = NewClient(server.URL(), fakeStore)
+		client, fakeStore = NewTestUAAClientAndStore()
 	})
 
-	Describe("AccessToken", func() {
-		BeforeEach(func() {
-			fakeStore.AccessTokenReturns("access-token")
+	Describe("Request Headers", func() {
+		Describe("User-Agent", func() {
+			var userAgent string
+			BeforeEach(func() {
+				userAgent = fmt.Sprintf("CF CLI UAA API Test/Unknown (%s; %s %s)",
+					runtime.Version(),
+					runtime.GOARCH,
+					runtime.GOOS,
+				)
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/oauth/token"),
+						VerifyHeaderKV("User-Agent", userAgent),
+						RespondWith(http.StatusOK, "{}"),
+					))
+			})
+
+			It("adds the User-Agent header to requests", func() {
+				err := client.RefreshToken()
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
+			})
 		})
 
-		It("returns an access token", func() {
-			Expect(client.AccessToken()).To(Equal("access-token"))
+		Describe("Conection", func() {
+			BeforeEach(func() {
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPost, "/oauth/token"),
+						VerifyHeaderKV("Connection", "close"),
+						RespondWith(http.StatusOK, "{}"),
+					))
+			})
+
+			It("forcefully closes the connection after each request", func() {
+				err := client.RefreshToken()
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
+			})
 		})
 	})
 })

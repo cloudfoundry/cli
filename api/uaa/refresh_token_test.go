@@ -13,15 +13,12 @@ import (
 
 var _ = Describe("UAA Client", func() {
 	var (
-		fakeStore *uaafakes.FakeAuthenticationStore
 		client    *Client
+		fakeStore *uaafakes.FakeAuthenticationStore
 	)
 
 	BeforeEach(func() {
-		fakeStore = new(uaafakes.FakeAuthenticationStore)
-		fakeStore.SkipSSLValidationReturns(true)
-
-		client = NewClient(server.URL(), fakeStore)
+		client, fakeStore = NewTestUAAClientAndStore()
 	})
 
 	Describe("RefreshToken", func() {
@@ -45,7 +42,6 @@ var _ = Describe("UAA Client", func() {
 			fakeStore.RefreshTokenReturns("refresh-token")
 			fakeStore.ClientIDReturns("client-id")
 			fakeStore.ClientSecretReturns("client-secret")
-			fakeStore.SkipSSLValidationReturns(true)
 		})
 
 		It("refreshes the token", func() {

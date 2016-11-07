@@ -35,7 +35,7 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 		return warnings, err
 	}
 
-	client.UAA = info.Links.UAA.HREF
+	client.uaaLink = info.Links.UAA.HREF
 
 	return warnings, nil
 }

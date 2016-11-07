@@ -26,7 +26,9 @@ type requestOptions struct {
 	Body io.Reader
 }
 
-// newRequest returns a constructed http.Request with some defaults.
+// newRequest returns a constructed http.Request with some defaults. The
+// request will terminate the connection after it is sent (via a 'Connection:
+// close' header).
 func (client *Client) newRequest(passedRequest requestOptions) (*http.Request, error) {
 	request, err := client.router.CreateRequest(
 		passedRequest.RequestName,
@@ -45,8 +47,8 @@ func (client *Client) newRequest(passedRequest requestOptions) (*http.Request, e
 		request.Header = http.Header{}
 	}
 	request.Header.Set("Accept", "application/json")
-	// request.Header.Set("Connection", "close")
-	// request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
+	request.Header.Set("Connection", "close")
+	request.Header.Set("User-Agent", client.userAgent)
 
 	return request, nil
 }

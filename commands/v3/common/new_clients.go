@@ -20,8 +20,8 @@ func NewClients(config commands.Config) (*ccv3.Client, error) {
 	// TODO: If there is ever a need to create a CC client without the config,
 	// this should be pulled out into a NewCloudControllerClient function similar
 	// to v2.NewCloudControllerClient
-	client := ccv3.NewClient(config.BinaryName(), cf.Version)
-	_, err := client.TargetCF(ccv3.TargetSettings{
+	ccClient := ccv3.NewClient(config.BinaryName(), cf.Version)
+	_, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),
@@ -30,8 +30,12 @@ func NewClients(config commands.Config) (*ccv3.Client, error) {
 		return nil, err
 	}
 
-	uaaClient := uaa.NewClient(client.UAA, config)
-	client.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
+	uaaClient := uaa.NewClient(uaa.Config{
+		URL:               ccClient.UAA(),
+		SkipSSLValidation: config.SkipSSLValidation(),
+		Store:             config,
+	})
+	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 	//Retry Wrapper
-	return client, nil
+	return ccClient, nil
 }
