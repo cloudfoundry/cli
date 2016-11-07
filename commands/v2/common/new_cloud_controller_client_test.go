@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"code.cloudfoundry.org/cli/commands/commandsfakes"
@@ -45,6 +46,9 @@ var _ = Describe("New Cloud Controller Client", func() {
 
 	Context("when the DialTimeout is set", func() {
 		BeforeEach(func() {
+			if runtime.GOOS == "windows" {
+				Skip("due to timing issues on windows")
+			}
 			fakeConfig.TargetReturns("https://potato.bananapants11122.co.uk")
 			fakeConfig.DialTimeoutReturns(time.Nanosecond)
 		})
