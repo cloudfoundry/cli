@@ -8,6 +8,7 @@ package uaa
 import (
 	"fmt"
 	"runtime"
+	"time"
 
 	"code.cloudfoundry.org/cli/api/uaa/internal"
 	"github.com/tedsuo/rata"
@@ -38,6 +39,7 @@ type Client struct {
 type Config struct {
 	AppName           string
 	AppVersion        string
+	DialTimeout       time.Duration
 	SkipSSLValidation bool
 	Store             AuthenticationStore
 	URL               string
@@ -58,6 +60,6 @@ func NewClient(config Config) *Client {
 		userAgent: userAgent,
 
 		router:     rata.NewRequestGenerator(config.URL, internal.Routes),
-		connection: NewConnection(config.SkipSSLValidation),
+		connection: NewConnection(config.SkipSSLValidation, config.DialTimeout),
 	}
 }

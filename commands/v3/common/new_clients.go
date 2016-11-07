@@ -31,9 +31,10 @@ func NewClients(config commands.Config) (*ccv3.Client, error) {
 	}
 
 	uaaClient := uaa.NewClient(uaa.Config{
-		URL:               ccClient.UAA(),
+		DialTimeout:       config.DialTimeout(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		Store:             config,
+		URL:               ccClient.UAA(),
 	})
 	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 	//Retry Wrapper
