@@ -1,6 +1,6 @@
 // Package ccv3 represents a Cloud Controller V3 client.
 //
-// It is currently designed to support Cloud Controller API X.XX.X. However, it
+// It is currently designed to support Cloud Controller API 2.64.0. However, it
 // may include features and endpoints of later API versions.
 //
 // For more information on the Cloud Controller API see
