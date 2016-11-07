@@ -6,39 +6,38 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
+// APILink represents a generic link from a response object.
+type APILink struct {
+	// HREF is the fully qualified URL for the link.
+	HREF string `json:"href"`
+}
+
 // RootResponse represents a GET response from the '/' endpoint of the cloud
 // controller API.
 type RootResponse struct {
-	Links RootLinks `json:"links"`
+	// Links is a list of top level Cloud Controller APIs.
+	Links struct {
+		// CCV3 is the link to the Cloud Controller V3 API
+		CCV3 APILink `json:"cloud_controller_v3"`
+	} `json:"links"`
 }
 
-func (r RootResponse) ccV3Href() string {
+func (r RootResponse) ccV3Link() string {
 	return r.Links.CCV3.HREF
-}
-
-// RootLinks represents the links in RootResponse.
-type RootLinks struct {
-	CCV3 APILink `json:"cloud_controller_v3"`
 }
 
 // APIInformation represents the information returned back from /v3.
 type APIInformation struct {
-	Links APILinks `json:"links"`
+	// Links is a list of top level Cloud Controller resources endpoints.
+	Links struct {
+		// UAA is the link to the UAA API
+		UAA APILink `json:"uaa"`
+	} `json:"links"`
 }
 
 // Return the HREF for the UAA.
 func (a APIInformation) UAA() string {
 	return a.Links.UAA.HREF
-}
-
-// APILinks represents the links in APIInformation.
-type APILinks struct {
-	UAA APILink `json:"uaa"`
-}
-
-// APILink represents a generic link from a response object.
-type APILink struct {
-	HREF string `json:"href"`
 }
 
 // Info returns back endpoint and API information from /v3.
@@ -50,7 +49,7 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 
 	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
-		URL:    rootResponse.ccV3Href(),
+		URL:    rootResponse.ccV3Link(),
 	})
 	if err != nil {
 		return APIInformation{}, warnings, err
