@@ -1,8 +1,6 @@
 package common
 
 import (
-	"time"
-
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -17,12 +15,12 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 		}
 	}
 
-	ccClient, _, err := NewCloudControllerClient(
-		config.BinaryName(),
-		config.Target(),
-		config.SkipSSLValidation(),
-		config.DialTimeout(),
-	)
+	ccClient := NewCloudControllerClient(config.BinaryName())
+	_, err := ccClient.TargetCF(ccv2.TargetSettings{
+		URL:               config.Target(),
+		SkipSSLValidation: config.SkipSSLValidation(),
+		DialTimeout:       config.DialTimeout(),
+	})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -47,17 +45,6 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 	return ccClient, uaaClient, err
 }
 
-func NewCloudControllerClient(
-	binaryName string,
-	target string,
-	skipSSLValidation bool,
-	dialTimeout time.Duration,
-) (*ccv2.Client, ccv2.Warnings, error) {
-	ccClient := ccv2.NewClient(binaryName, cf.Version)
-	warnings, err := ccClient.TargetCF(ccv2.TargetSettings{
-		URL:               target,
-		SkipSSLValidation: skipSSLValidation,
-		DialTimeout:       dialTimeout,
-	})
-	return ccClient, warnings, err
+func NewCloudControllerClient(binaryName string) *ccv2.Client {
+	return ccv2.NewClient(binaryName, cf.Version)
 }
