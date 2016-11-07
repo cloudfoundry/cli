@@ -25,27 +25,25 @@ var _ = Describe("Target", func() {
 			server.Reset()
 
 			serverURL := server.URL()
-			rootResponse := fmt.Sprintf(`
-{
-  "links": {
-    "self": {
-      "href": "%s"
-    },
-    "cloud_controller_v2": {
-      "href": "%s/v2",
-      "meta": {
-        "version": "2.64.0"
-      }
-    },
-    "cloud_controller_v3": {
-      "href": "%s/v3",
-      "meta": {
-        "version": "3.0.0-alpha.5"
-      }
-    }
-  }
-}
-`, serverURL, serverURL, serverURL)
+			rootResponse := fmt.Sprintf(`{
+				"links": {
+					"self": {
+						"href": "%s"
+					},
+					"cloud_controller_v2": {
+						"href": "%s/v2",
+						"meta": {
+							"version": "2.64.0"
+						}
+					},
+					"cloud_controller_v3": {
+						"href": "%s/v3",
+						"meta": {
+							"version": "3.0.0-alpha.5"
+						}
+					}
+				}
+			}`, serverURL, serverURL, serverURL)
 
 			server.AppendHandlers(
 				CombineHandlers(
@@ -57,21 +55,19 @@ var _ = Describe("Target", func() {
 				),
 			)
 
-			v3Response := fmt.Sprintf(`
-{
-  "links": {
-    "self": {
-      "href": "%s/v3"
-    },
-    "tasks": {
-      "href": "%s/v3/tasks"
-    },
-    "uaa": {
-      "href": "https://uaa.bosh-lite.com"
-    }
-  }
-}
-`, serverURL, serverURL)
+			v3Response := fmt.Sprintf(`{
+				"links": {
+					"self": {
+						"href": "%s/v3"
+					},
+					"tasks": {
+						"href": "%s/v3/tasks"
+					},
+					"uaa": {
+						"href": "https://uaa.bosh-lite.com"
+					}
+				}
+			}`, serverURL, serverURL)
 
 			server.AppendHandlers(
 				CombineHandlers(
