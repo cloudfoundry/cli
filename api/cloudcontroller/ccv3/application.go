@@ -46,11 +46,11 @@ func (client *Client) GetApplications(query url.Values) ([]Application, Warnings
 		}
 		fullAppsList = append(fullAppsList, apps...)
 
-		if wrapper.NextURL == "" {
+		if wrapper.Pagination.Next.HREF == "" {
 			break
 		}
 		request, err = client.newHTTPRequest(requestOptions{
-			URL:    wrapper.NextURL,
+			URL:    wrapper.Pagination.Next.HREF,
 			Method: http.MethodGet,
 		})
 		if err != nil {

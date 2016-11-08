@@ -27,7 +27,6 @@ func (actor Actor) GetApplicationByNameAndSpace(appName string, spaceGUID string
 		"space_guids": []string{spaceGUID},
 		"names":       []string{appName},
 	})
-
 	if err != nil {
 		return Application{}, Warnings(warnings), err
 	}

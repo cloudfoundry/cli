@@ -5,13 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
 // Task represents a Cloud Controller V3 Task.
 type Task struct {
-	SequenceID int `json:"sequence_id"`
+	GUID       string `json:"guid"`
+	SequenceID int    `json:"sequence_id"`
+	Name       string `json:"name"`
+	Command    string `json:"command"`
+	State      string `json:"state"`
+	CreatedAt  string `json:"created_at"`
 }
 
 // RunTaskBody represents the body of the request to create a Task.
@@ -27,11 +33,10 @@ func (client *Client) RunTask(appGUID string, command string) (Task, Warnings, e
 		return Task{}, nil, err
 	}
 
-	body := bytes.NewBuffer(bodyBytes)
 	request, err := client.newHTTPRequest(requestOptions{
 		URL:    fmt.Sprintf("%s/v3/apps/%s/tasks", client.cloudControllerURL, appGUID),
 		Method: http.MethodPost,
-		Body:   body,
+		Body:   bytes.NewBuffer(bodyBytes),
 	})
 	if err != nil {
 		return Task{}, nil, err
@@ -48,4 +53,51 @@ func (client *Client) RunTask(appGUID string, command string) (Task, Warnings, e
 	}
 
 	return task, response.Warnings, nil
+}
+
+// GetApplicationTasks returns a list of tasks associated with the provided
+// application GUID. Results can be filtered by providing URL queries.
+func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]Task, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URL:    fmt.Sprintf("%s/v3/apps/%s/tasks", client.cloudControllerURL, appGUID),
+		Method: http.MethodGet,
+		Query:  query,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	allTasks := []Task{}
+	allWarnings := Warnings{}
+
+	for {
+		var tasks []Task
+		wrapper := PaginatedWrapper{
+			Resources: &tasks,
+		}
+		response := cloudcontroller.Response{
+			Result: &wrapper,
+		}
+
+		err = client.connection.Make(request, &response)
+		allWarnings = append(allWarnings, response.Warnings...)
+		if err != nil {
+			return nil, allWarnings, err
+		}
+		allTasks = append(allTasks, tasks...)
+
+		if wrapper.Pagination.Next.HREF == "" {
+			break
+		}
+
+		request, err = client.newHTTPRequest(requestOptions{
+			URL:    wrapper.Pagination.Next.HREF,
+			Method: http.MethodGet,
+		})
+		if err != nil {
+			return nil, allWarnings, err
+		}
+	}
+
+	return allTasks, allWarnings, nil
 }
