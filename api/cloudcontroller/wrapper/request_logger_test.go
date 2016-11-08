@@ -273,5 +273,21 @@ var _ = Describe("Request Logger", func() {
 			Expect(fakeOutput.StartCallCount()).To(Equal(2))
 			Expect(fakeOutput.StopCallCount()).To(Equal(2))
 		})
+
+		Context("when displaying the logs have an error", func() {
+			var expectedErr error
+			BeforeEach(func() {
+				expectedErr = errors.New("Display error on request")
+				fakeOutput.StartReturns(expectedErr)
+			})
+
+			It("calls handle internal error", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeOutput.HandleInternalErrorCallCount()).To(Equal(2))
+				Expect(fakeOutput.HandleInternalErrorArgsForCall(0)).To(MatchError(expectedErr))
+				Expect(fakeOutput.HandleInternalErrorArgsForCall(1)).To(MatchError(expectedErr))
+			})
+		})
 	})
 })
