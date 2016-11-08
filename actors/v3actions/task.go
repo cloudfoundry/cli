@@ -2,6 +2,7 @@ package v3actions
 
 import (
 	"fmt"
+	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
@@ -26,8 +27,13 @@ func (actor Actor) RunTask(appGUID string, command string) (Task, Warnings, erro
 
 // GetApplicationTasks returns a list of tasks associated with the provided
 // appplication GUID.
-func (actor Actor) GetApplicationTasks(appGUID string) ([]Task, Warnings, error) {
-	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID, nil)
+func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]Task, Warnings, error) {
+	query := url.Values{}
+	if sortOrder == Descending {
+		query.Add("order_by", "-created_at")
+	}
+
+	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID, query)
 	actorWarnings := Warnings(warnings)
 	if err != nil {
 		return nil, actorWarnings, err

@@ -1,7 +1,8 @@
 package v3
 
 import (
-	"fmt"
+	"net/url"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/actors/v3actions"
 	"code.cloudfoundry.org/cli/commands"
@@ -9,11 +10,19 @@ import (
 	"code.cloudfoundry.org/cli/commands/v3/common"
 )
 
+//These constants are only for filling in translations.
+const (
+	runningState   = "RUNNING"
+	cancelingState = "CANCELING"
+	pendingState   = "PENDING"
+	succeededState = "SUCCEEDED"
+)
+
 //go:generate counterfeiter . TasksActor
 
 type TasksActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3actions.Application, v3actions.Warnings, error)
-	GetApplicationTasks(appGUID string) ([]v3actions.Task, v3actions.Warnings, error)
+	GetApplicationTasks(appGUID string, sortOrder v3actions.SortOrder) ([]v3actions.Task, v3actions.Warnings, error)
 }
 
 type TasksCommand struct {
@@ -30,7 +39,7 @@ func (cmd *TasksCommand) Setup(config commands.Config, ui commands.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, err := common.NewCloudControllerClient(config)
+	client, err := common.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
@@ -65,7 +74,9 @@ func (cmd TasksCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID)
+	query := url.Values{}
+	query.Add("order_by", "-created_at")
+	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID, v3actions.Descending)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return common.HandleError(err)
@@ -74,8 +85,14 @@ func (cmd TasksCommand) Execute(args []string) error {
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
-	// display tasks in table
-	fmt.Println(tasks)
+	table := [][]string{
+		{"id", "name", "state", "start time", "command"},
+	}
+	for _, task := range tasks {
+		table = append(table, []string{strconv.Itoa(task.SequenceID), task.Name, cmd.UI.TranslateText(task.State), task.CreatedAt, task.Command})
+	}
+
+	cmd.UI.DisplayTable("", table, 3)
 
 	return nil
 }

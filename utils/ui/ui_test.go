@@ -362,4 +362,55 @@ var _ = Describe("UI", func() {
 			})
 		})
 	})
+
+	Describe("TranslateText", func() {
+		Context("when only a string is passed in", func() {
+			It("returns the string", func() {
+				Expect(ui.TranslateText("some-string")).To(Equal("some-string"))
+			})
+		})
+
+		Context("when a map is passed in", func() {
+			It("returns the string with values substituted", func() {
+				expected := ui.TranslateText(
+					"some-string {{.SomeMapValue}}",
+					map[string]interface{}{
+						"SomeMapValue": "my-map-value",
+					})
+
+				Expect(expected).To(Equal("some-string my-map-value"))
+			})
+		})
+
+		Context("when the locale is not set to 'en-us'", func() {
+			BeforeEach(func() {
+				fakeConfig = new(uifakes.FakeConfig)
+				fakeConfig.ColorEnabledReturns(configv3.ColorEnabled)
+				fakeConfig.LocaleReturns("fr-FR")
+
+				var err error
+				ui, err = NewUI(fakeConfig)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			Context("when only a string is passed in", func() {
+				It("returns the translated string", func() {
+					expected := ui.TranslateText("   View allowable quotas with 'CF_NAME quotas'")
+					Expect(expected).To(Equal("   Affichez les quotas pouvant être alloués avec 'CF_NAME quotas'"))
+				})
+			})
+
+			Context("when a map is passed in", func() {
+				It("returns the translated string with values substituted", func() {
+					expected := ui.TranslateText(
+						"\nTIP: Use '{{.Command}}' to target new org",
+						map[string]interface{}{
+							"Command": "foo",
+						},
+					)
+					Expect(expected).To(Equal("\nASTUCE : utilisez 'foo' pour cibler une nouvelle organisation"))
+				})
+			})
+		})
+	})
 })

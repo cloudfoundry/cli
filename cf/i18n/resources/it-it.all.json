@@ -520,6 +520,10 @@
     "translation": "La quantità di byte deve essere un numero intero con un'unità di misura come M, MB, G o GB"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1382,6 +1386,10 @@
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
     "translation": "CF_NAME target [-o ORG] [-s SPAZIO]"
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
@@ -2996,6 +3004,10 @@
     "translation": "Richiamo degli stack nell'organizzazione {{.OrganizationName}} / spazio {{.SpaceName}} come {{.Username}} in corso..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "Ottenimento degli utenti nell'organizzazione {{.TargetOrg}} / spazio {{.TargetSpace}} come {{.CurrentUser}}"
   },
@@ -3524,6 +3536,10 @@
     "translation": "Elenca i broker dei servizi"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "Elenco dei plug-in installati in corso..."
   },
@@ -3960,6 +3976,10 @@
     "translation": "PERCORSO"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": "PORTA"
   },
@@ -4210,6 +4230,10 @@
   {
     "id": "ROUTE_PATH",
     "translation": "PERCORSO_ROTTA"
+  },
+  {
+    "id": "RUNNING",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -4589,6 +4613,10 @@
   },
   {
     "id": "STACK",
+    "translation": ""
+  },
+  {
+    "id": "SUCCEEDED",
     "translation": ""
   },
   {
@@ -6052,6 +6080,10 @@
     "translation": "non valido per l'host richiesto"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": "organizzazione"
   },
@@ -6249,6 +6281,10 @@
   },
   {
     "id": "stack:",
+    "translation": ""
+  },
+  {
+    "id": "start time",
     "translation": ""
   },
   {

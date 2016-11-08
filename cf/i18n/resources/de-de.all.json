@@ -520,6 +520,10 @@
     "translation": "Die Bytemenge muss eine ganze Zahl mit einer Maßeinheit wie M, MB, G oder GB sein"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1381,6 +1385,10 @@
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
     "translation": ""
   },
   {
@@ -2996,6 +3004,10 @@
     "translation": "Abrufen von Stacks in Organisation {{.OrganizationName}} / Bereich {{.SpaceName}} als {{.Username}}..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "Abrufen von Benutzern in Organisation {{.TargetOrg}} / Bereich {{.TargetSpace}} als {{.CurrentUser}}"
   },
@@ -3524,6 +3536,10 @@
     "translation": "Service-Broker auflisten"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "Auflisten installierter Plug-ins..."
   },
@@ -3960,6 +3976,10 @@
     "translation": "PFAD"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": ""
   },
@@ -4210,6 +4230,10 @@
   {
     "id": "ROUTE_PATH",
     "translation": "ROUTENPFAD"
+  },
+  {
+    "id": "RUNNING",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -4589,6 +4613,10 @@
   },
   {
     "id": "STACK",
+    "translation": ""
+  },
+  {
+    "id": "SUCCEEDED",
     "translation": ""
   },
   {
@@ -6052,6 +6080,10 @@
     "translation": "für den angeforderten Host nicht gültig"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": "Organisation"
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "Stack:"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",

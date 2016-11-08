@@ -520,6 +520,10 @@
     "translation": "바이트 양은 M, MB, G 또는 GB와 같은 측정 단위를 사용하는 정수여야 함"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1381,6 +1385,10 @@
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
     "translation": ""
   },
   {
@@ -2996,6 +3004,10 @@
     "translation": "{{.Username}}(으)로 {{.OrganizationName}} 조직/{{.SpaceName}} 영역의 스택을 가져오는 중..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "{{.CurrentUser}}(으)로 {{.TargetOrg}} 조직/{{.TargetSpace}} 영역의 사용자 가져오기"
   },
@@ -3524,6 +3536,10 @@
     "translation": "서비스 브로커 나열"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "설치된 플러그인 나열 중..."
   },
@@ -3960,6 +3976,10 @@
     "translation": "경로"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": "포트"
   },
@@ -4209,6 +4229,10 @@
   },
   {
     "id": "ROUTE_PATH",
+    "translation": ""
+  },
+  {
+    "id": "RUNNING",
     "translation": ""
   },
   {
@@ -4590,6 +4614,10 @@
   {
     "id": "STACK",
     "translation": "스택"
+  },
+  {
+    "id": "SUCCEEDED",
+    "translation": ""
   },
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -6052,6 +6080,10 @@
     "translation": "요청된 호스트에 올바르지 않음"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": "조직"
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "스택:"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",

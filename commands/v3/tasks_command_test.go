@@ -123,10 +123,10 @@ var _ = Describe("Tasks Command", func() {
 					fakeActor.GetApplicationTasksReturns(
 						[]v3actions.Task{
 							{
-								GUID:       "task-1-guid",
-								SequenceID: 1,
-								Name:       "task-1",
-								State:      "SUCCEEDED",
+								GUID:       "task-3-guid",
+								SequenceID: 3,
+								Name:       "task-3",
+								State:      "RUNNING",
 								CreatedAt:  "some-time",
 								Command:    "some-command",
 							},
@@ -139,10 +139,10 @@ var _ = Describe("Tasks Command", func() {
 								Command:    "some-command",
 							},
 							{
-								GUID:       "task-3-guid",
-								SequenceID: 3,
-								Name:       "task-3",
-								State:      "RUNNING",
+								GUID:       "task-1-guid",
+								SequenceID: 1,
+								Name:       "task-1",
+								State:      "SUCCEEDED",
 								CreatedAt:  "some-time",
 								Command:    "some-command",
 							},
@@ -161,7 +161,9 @@ var _ = Describe("Tasks Command", func() {
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 
 					Expect(fakeActor.GetApplicationTasksCallCount()).To(Equal(1))
-					Expect(fakeActor.GetApplicationTasksArgsForCall(0)).To(Equal("some-app-guid"))
+					guid, order := fakeActor.GetApplicationTasksArgsForCall(0)
+					Expect(guid).To(Equal("some-app-guid"))
+					Expect(order).To(Equal(v3actions.Descending))
 
 					Expect(fakeUI.Out).To(Say(`get-application-warning-1
 get-application-warning-2
@@ -169,7 +171,10 @@ Getting tasks for app some-app-name in org some-org / space some-space as some-u
 get-tasks-warning-1
 OK
 
-TODO: display table of tasks`,
+id   name     state       start time   command
+3    task-3   RUNNING     some-time    some-command
+2    task-2   FAILED      some-time    some-command
+1    task-1   SUCCEEDED   some-time    some-command`,
 					))
 				})
 			})

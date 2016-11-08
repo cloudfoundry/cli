@@ -2,6 +2,7 @@ package v3actions_test
 
 import (
 	"errors"
+	"net/url"
 
 	. "code.cloudfoundry.org/cli/actors/v3actions"
 	"code.cloudfoundry.org/cli/actors/v3actions/v3actionsfakes"
@@ -114,7 +115,7 @@ var _ = Describe("Task Actions", func() {
 				})
 
 				It("returns all tasks associated with the application and all warnings", func() {
-					tasks, warnings, err := actor.GetApplicationTasks("some-app-guid")
+					tasks, warnings, err := actor.GetApplicationTasks("some-app-guid", Descending)
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(tasks).To(ConsistOf(Task(task1), Task(task2), Task(task3)))
@@ -123,7 +124,11 @@ var _ = Describe("Task Actions", func() {
 					Expect(fakeCloudControllerClient.GetApplicationTasksCallCount()).To(Equal(1))
 					appGUID, query := fakeCloudControllerClient.GetApplicationTasksArgsForCall(0)
 					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(query).To(BeNil())
+					Expect(query).To(Equal(
+						url.Values{
+							"order_by": []string{"-created_at"},
+						},
+					))
 				})
 			})
 
@@ -137,7 +142,7 @@ var _ = Describe("Task Actions", func() {
 				})
 
 				It("returns a TasksNotFoundError", func() {
-					_, _, err := actor.GetApplicationTasks("some-app-guid")
+					_, _, err := actor.GetApplicationTasks("some-app-guid", Descending)
 					Expect(err).To(MatchError(TasksNotFoundError{}))
 				})
 			})
@@ -156,7 +161,7 @@ var _ = Describe("Task Actions", func() {
 			})
 
 			It("returns the same error and all warnings", func() {
-				_, warnings, err := actor.GetApplicationTasks("some-app-guid")
+				_, warnings, err := actor.GetApplicationTasks("some-app-guid", Descending)
 				Expect(err).To(MatchError(expectedErr))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 			})

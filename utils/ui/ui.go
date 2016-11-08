@@ -97,8 +97,8 @@ func NewTestUI(in io.Reader, out io.Writer, err io.Writer) *UI {
 }
 
 // DisplayTable presents a two dimensional array of strings as a table to UI.Out
-func (ui *UI) DisplayTable(prefix string, table [][]string) error {
-	tw := tabwriter.NewWriter(ui.Out, 0, 1, 4, ' ', 0)
+func (ui *UI) DisplayTable(prefix string, table [][]string, padding int) error {
+	tw := tabwriter.NewWriter(ui.Out, 0, 1, padding, ' ', 0)
 
 	for _, row := range table {
 		fmt.Fprint(tw, prefix)
@@ -203,6 +203,12 @@ func (ui *UI) DisplayWarnings(warnings []string) {
 	for _, warning := range warnings {
 		fmt.Fprintf(ui.Err, "%s\n", ui.translate(warning, nil))
 	}
+}
+
+// TranslateText returns the translated string with keys substituted into the
+// template string.
+func (ui *UI) TranslateText(formattedString string, keys ...map[string]interface{}) string {
+	return ui.translate(formattedString, ui.templateValuesFromKeys(keys))
 }
 
 func (ui *UI) templateValuesFromKeys(keys []map[string]interface{}) map[string]interface{} {

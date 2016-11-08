@@ -64,6 +64,10 @@
     "translation": "Before getting started:"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
   },
@@ -880,6 +884,10 @@
     "translation": "CF_NAME target [-o ORG] [-s SPACE]"
   },
   {
+    "id": "CF_NAME tasks APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]"
   },
@@ -1164,6 +1172,10 @@
     "translation": ""
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Global options:",
     "translation": "Global options:"
   },
@@ -1198,6 +1210,10 @@
   {
     "id": "Invalid flag: ",
     "translation": "Invalid flag: "
+  },
+  {
+    "id": "List tasks of an app",
+    "translation": ""
   },
   {
     "id": "MANIFEST_PATH",
@@ -1284,6 +1300,10 @@
     "translation": "PATH"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": "PORT"
   },
@@ -1324,6 +1344,10 @@
     "translation": "ROUTE_PATH"
   },
   {
+    "id": "RUNNING",
+    "translation": ""
+  },
+  {
     "id": "Really delete orphaned routes?",
     "translation": ""
   },
@@ -1350,6 +1374,10 @@
   {
     "id": "STACK",
     "translation": "STACK"
+  },
+  {
+    "id": "SUCCEEDED",
+    "translation": ""
   },
   {
     "id": "Service instance",
@@ -1760,6 +1788,10 @@
     "translation": "name:"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "repo-plugins",
     "translation": "repo-plugins"
   },
@@ -1774,6 +1806,10 @@
   {
     "id": "service_guid IN ",
     "translation": "service_guid IN "
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "timeout connecting to log server, no log will be shown",

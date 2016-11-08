@@ -520,6 +520,10 @@
     "translation": "A quantidade de byte deve ser um número inteiro com uma unidade de medida como M, MB, G ou GB"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1381,6 +1385,10 @@
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
     "translation": ""
   },
   {
@@ -2996,6 +3004,10 @@
     "translation": "Obtendo pilhas na organização {{.OrganizationName}} / espaço {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "Obtendo usuários na organização {{.TargetOrg}} / espaço {{.TargetSpace}} como {{.CurrentUser}}..."
   },
@@ -3524,6 +3536,10 @@
     "translation": "Listar brokers de serviço"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "Listando plug-ins instalados..."
   },
@@ -3960,6 +3976,10 @@
     "translation": ""
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": ""
   },
@@ -4209,6 +4229,10 @@
   },
   {
     "id": "ROUTE_PATH",
+    "translation": ""
+  },
+  {
+    "id": "RUNNING",
     "translation": ""
   },
   {
@@ -4590,6 +4614,10 @@
   {
     "id": "STACK",
     "translation": "PILHA"
+  },
+  {
+    "id": "SUCCEEDED",
+    "translation": ""
   },
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -6052,6 +6080,10 @@
     "translation": "não é válido para o host solicitado"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": ""
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "pilha:"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",

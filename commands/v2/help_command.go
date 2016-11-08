@@ -135,7 +135,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 			table = append(table, finalRow)
 		}
 
-		cmd.UI.DisplayTable(prefix, table)
+		cmd.UI.DisplayTable(prefix, table, 4)
 		cmd.UI.DisplayNewline()
 	}
 
@@ -154,7 +154,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 		}
 	}
 
-	cmd.UI.DisplayTable(prefix, table)
+	cmd.UI.DisplayTable(prefix, table, 4)
 	cmd.UI.DisplayNewline()
 
 	cmd.UI.DisplayHelpHeader("Global options:")

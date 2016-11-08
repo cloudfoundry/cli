@@ -520,6 +520,10 @@
     "translation": "La cantidad de bytes debe ser un entero con una unidad de medida como M, MB, G o GB"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1381,6 +1385,10 @@
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
     "translation": ""
   },
   {
@@ -2996,6 +3004,10 @@
     "translation": "Obteniendo pilas de la organización {{.OrganizationName}} / espacio {{.SpaceName}} como {{.Username}}..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "Obteniendo usuarios en la organización {{.TargetOrg}} / espacio {{.TargetSpace}} como {{.CurrentUser}}"
   },
@@ -3524,6 +3536,10 @@
     "translation": "Listar intermediarios de servicio"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "Listando plugins instalados..."
   },
@@ -3960,6 +3976,10 @@
     "translation": "VÍA DE ACCESO"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": "PUERTO"
   },
@@ -4209,6 +4229,10 @@
   },
   {
     "id": "ROUTE_PATH",
+    "translation": ""
+  },
+  {
+    "id": "RUNNING",
     "translation": ""
   },
   {
@@ -4589,6 +4613,10 @@
   },
   {
     "id": "STACK",
+    "translation": ""
+  },
+  {
+    "id": "SUCCEEDED",
     "translation": ""
   },
   {
@@ -6052,6 +6080,10 @@
     "translation": "no es válido para el host solicitado"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": ""
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "pila:"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",
