@@ -42,7 +42,8 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 		}
 		ccClient.WrapConnection(logger)
 	}
-	//Retry Wrapper
+
+	ccClient.WrapConnection(wrapper.NewRetryRequest(2))
 	return ccClient, uaaClient, err
 }
 

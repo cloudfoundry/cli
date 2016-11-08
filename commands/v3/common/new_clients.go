@@ -44,6 +44,7 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv3.Client, error
 		}
 		ccClient.WrapConnection(logger)
 	}
-	//Retry Wrapper
+
+	ccClient.WrapConnection(wrapper.NewRetryRequest(2))
 	return ccClient, nil
 }
