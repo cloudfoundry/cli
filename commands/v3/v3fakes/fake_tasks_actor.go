@@ -20,10 +20,11 @@ type FakeTasksActor struct {
 		result2 v3actions.Warnings
 		result3 error
 	}
-	GetApplicationTasksStub        func(appGUID string) ([]v3actions.Task, v3actions.Warnings, error)
+	GetApplicationTasksStub        func(appGUID string, sortOrder v3actions.SortOrder) ([]v3actions.Task, v3actions.Warnings, error)
 	getApplicationTasksMutex       sync.RWMutex
 	getApplicationTasksArgsForCall []struct {
-		appGUID string
+		appGUID   string
+		sortOrder v3actions.SortOrder
 	}
 	getApplicationTasksReturns struct {
 		result1 []v3actions.Task
@@ -70,15 +71,16 @@ func (fake *FakeTasksActor) GetApplicationByNameAndSpaceReturns(result1 v3action
 	}{result1, result2, result3}
 }
 
-func (fake *FakeTasksActor) GetApplicationTasks(appGUID string) ([]v3actions.Task, v3actions.Warnings, error) {
+func (fake *FakeTasksActor) GetApplicationTasks(appGUID string, sortOrder v3actions.SortOrder) ([]v3actions.Task, v3actions.Warnings, error) {
 	fake.getApplicationTasksMutex.Lock()
 	fake.getApplicationTasksArgsForCall = append(fake.getApplicationTasksArgsForCall, struct {
-		appGUID string
-	}{appGUID})
-	fake.recordInvocation("GetApplicationTasks", []interface{}{appGUID})
+		appGUID   string
+		sortOrder v3actions.SortOrder
+	}{appGUID, sortOrder})
+	fake.recordInvocation("GetApplicationTasks", []interface{}{appGUID, sortOrder})
 	fake.getApplicationTasksMutex.Unlock()
 	if fake.GetApplicationTasksStub != nil {
-		return fake.GetApplicationTasksStub(appGUID)
+		return fake.GetApplicationTasksStub(appGUID, sortOrder)
 	} else {
 		return fake.getApplicationTasksReturns.result1, fake.getApplicationTasksReturns.result2, fake.getApplicationTasksReturns.result3
 	}
@@ -90,10 +92,10 @@ func (fake *FakeTasksActor) GetApplicationTasksCallCount() int {
 	return len(fake.getApplicationTasksArgsForCall)
 }
 
-func (fake *FakeTasksActor) GetApplicationTasksArgsForCall(i int) string {
+func (fake *FakeTasksActor) GetApplicationTasksArgsForCall(i int) (string, v3actions.SortOrder) {
 	fake.getApplicationTasksMutex.RLock()
 	defer fake.getApplicationTasksMutex.RUnlock()
-	return fake.getApplicationTasksArgsForCall[i].appGUID
+	return fake.getApplicationTasksArgsForCall[i].appGUID, fake.getApplicationTasksArgsForCall[i].sortOrder
 }
 
 func (fake *FakeTasksActor) GetApplicationTasksReturns(result1 []v3actions.Task, result2 v3actions.Warnings, result3 error) {

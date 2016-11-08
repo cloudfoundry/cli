@@ -520,6 +520,10 @@
     "translation": "バイト量は M、MB、G、GB などの単位を持つ整数でなければなりません"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1381,6 +1385,10 @@
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
     "translation": ""
   },
   {
@@ -2996,6 +3004,10 @@
     "translation": "{{.Username}} として組織 {{.OrganizationName}} / スペース {{.SpaceName}} 内のスタックを取得しています..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "{{.CurrentUser}} として組織 {{.TargetOrg}} / スペース {{.TargetSpace}} 内のユーザーを取得しています"
   },
@@ -3524,6 +3536,10 @@
     "translation": "サービス・ブローカーをリストします"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "インストール済みプラグインをリストしています..."
   },
@@ -3960,6 +3976,10 @@
     "translation": "パス"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": "ポート"
   },
@@ -4209,6 +4229,10 @@
   },
   {
     "id": "ROUTE_PATH",
+    "translation": ""
+  },
+  {
+    "id": "RUNNING",
     "translation": ""
   },
   {
@@ -4590,6 +4614,10 @@
   {
     "id": "STACK",
     "translation": "スタック"
+  },
+  {
+    "id": "SUCCEEDED",
+    "translation": ""
   },
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -6052,6 +6080,10 @@
     "translation": "要求されたホストには無効です"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": "組織"
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "スタック:"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",

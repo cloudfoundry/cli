@@ -520,6 +520,10 @@
     "translation": "La quantité d'octets doit être un entier associé à une unité de mesure telle que M, Mo, G ou Go"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1382,6 +1386,10 @@
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
     "translation": "CF_NAME target [-o ORG] [-s ESPACE]"
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
+    "translation": ""
   },
   {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
@@ -2996,6 +3004,10 @@
     "translation": "Obtention des piles dans l'organisation {{.OrganizationName}} / l'espace {{.SpaceName}} en tant que {{.Username}}..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "Obtention des utilisateurs dans l'organisation {{.TargetOrg}} / l'espace {{.TargetSpace}} en tant que {{.CurrentUser}}"
   },
@@ -3524,6 +3536,10 @@
     "translation": "Répertorier les courtiers de services"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "Liste des plug-in installés..."
   },
@@ -3960,6 +3976,10 @@
     "translation": "CHEMIN"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": ""
   },
@@ -4210,6 +4230,10 @@
   {
     "id": "ROUTE_PATH",
     "translation": "CHEMIN_ROUTE"
+  },
+  {
+    "id": "RUNNING",
+    "translation": ""
   },
   {
     "id": "Read-only access to org info and reports\n",
@@ -4590,6 +4614,10 @@
   {
     "id": "STACK",
     "translation": "PILE"
+  },
+  {
+    "id": "SUCCEEDED",
+    "translation": ""
   },
   {
     "id": "Scaling app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
@@ -6052,6 +6080,10 @@
     "translation": "non valide pour l'hôte demandé"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": "organisation"
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "pile :"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",

@@ -11,9 +11,10 @@ type UI interface {
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})
-	DisplayTable(prefix string, table [][]string) error
+	DisplayTable(prefix string, table [][]string, padding int) error
 	DisplayText(template string, data ...map[string]interface{})
 	DisplayTextWithKeyTranslations(template string, keysToTranslate []string, data ...map[string]interface{})
 	DisplayWarning(formattedString string, keys ...map[string]interface{})
 	DisplayWarnings(warnings []string)
+	TranslateText(template string, data ...map[string]interface{}) string
 }

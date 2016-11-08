@@ -520,6 +520,10 @@
     "translation": "字节数量必须是带计量单位（例如，M、MB、G 或 GB）的整数"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": ""
   },
@@ -1381,6 +1385,10 @@
   },
   {
     "id": "CF_NAME target [-o ORG] [-s SPACE]",
+    "translation": ""
+  },
+  {
+    "id": "CF_NAME tasks APP_NAME",
     "translation": ""
   },
   {
@@ -2996,6 +3004,10 @@
     "translation": "正在以 {{.Username}} 身份获取组织 {{.OrganizationName}}/空间 {{.SpaceName}} 中的堆栈..."
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Getting users in org {{.TargetOrg}} / space {{.TargetSpace}} as {{.CurrentUser}}",
     "translation": "正在以 {{.CurrentUser}} 身份获取组织 {{.TargetOrg}}/空间 {{.TargetSpace}} 中的用户"
   },
@@ -3524,6 +3536,10 @@
     "translation": "列出服务代理程序"
   },
   {
+    "id": "List tasks of an app",
+    "translation": ""
+  },
+  {
     "id": "Listing Installed Plugins...",
     "translation": "正在列出已安装的插件..."
   },
@@ -3960,6 +3976,10 @@
     "translation": ""
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "PORT",
     "translation": ""
   },
@@ -4209,6 +4229,10 @@
   },
   {
     "id": "ROUTE_PATH",
+    "translation": ""
+  },
+  {
+    "id": "RUNNING",
     "translation": ""
   },
   {
@@ -4589,6 +4613,10 @@
   },
   {
     "id": "STACK",
+    "translation": ""
+  },
+  {
+    "id": "SUCCEEDED",
     "translation": ""
   },
   {
@@ -6052,6 +6080,10 @@
     "translation": "对于请求的主机无效"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "org",
     "translation": "组织"
   },
@@ -6250,6 +6282,10 @@
   {
     "id": "stack:",
     "translation": "堆栈: "
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "starting",

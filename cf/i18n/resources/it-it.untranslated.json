@@ -52,6 +52,10 @@
     "translation": "Before getting started:"
   },
   {
+    "id": "CANCELING",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/",
     "translation": "CF_NAME add-plugin-repo PrivateRepo https://myprivaterepo.com/repo/"
   },
@@ -552,6 +556,10 @@
     "translation": "CF_NAME staging-security-groups"
   },
   {
+    "id": "CF_NAME tasks APP_NAME",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]\\n\\nEXAMPLES:\\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp --path foo",
     "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]\\n\\nEXAMPLES:\\n   CF_NAME unbind-route-service example.com myratelimiter --hostname myapp --path foo"
   },
@@ -756,6 +764,10 @@
     "translation": ""
   },
   {
+    "id": "Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
+  },
+  {
     "id": "Global options:",
     "translation": "Global options:"
   },
@@ -778,6 +790,10 @@
   {
     "id": "Invalid flag: ",
     "translation": "Invalid flag: "
+  },
+  {
+    "id": "List tasks of an app",
+    "translation": ""
   },
   {
     "id": "Map an HTTP route:\\n      CF_NAME map-route APP_NAME DOMAIN [--hostname HOSTNAME] [--path PATH]\\n\\n   Map a TCP route:\\n      CF_NAME map-route APP_NAME DOMAIN (--port PORT | --random-port)\\n\\nEXAMPLES:\\n   CF_NAME map-route my-app example.com                              # example.com\\n   CF_NAME map-route my-app example.com --hostname myhost            # myhost.example.com\\n   CF_NAME map-route my-app example.com --hostname myhost --path foo # myhost.example.com/foo\\n   CF_NAME map-route my-app example.com --port 5000                  # example.com:5000",
@@ -848,6 +864,10 @@
     "translation": "Org management:"
   },
   {
+    "id": "PENDING",
+    "translation": ""
+  },
+  {
     "id": "Parameters as JSON",
     "translation": "Parameters as JSON"
   },
@@ -880,6 +900,10 @@
     "translation": "QUOTA"
   },
   {
+    "id": "RUNNING",
+    "translation": ""
+  },
+  {
     "id": "Really delete orphaned routes?",
     "translation": ""
   },
@@ -902,6 +926,10 @@
   {
     "id": "STACK",
     "translation": "STACK"
+  },
+  {
+    "id": "SUCCEEDED",
+    "translation": ""
   },
   {
     "id": "Service instance",
@@ -1304,6 +1332,10 @@
     "translation": "name:"
   },
   {
+    "id": "order_by",
+    "translation": ""
+  },
+  {
     "id": "provider",
     "translation": "provider"
   },
@@ -1326,6 +1358,10 @@
   {
     "id": "stack:",
     "translation": "stack:"
+  },
+  {
+    "id": "start time",
+    "translation": ""
   },
   {
     "id": "timeout connecting to log server, no log will be shown",

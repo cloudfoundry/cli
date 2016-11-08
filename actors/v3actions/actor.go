@@ -1,6 +1,14 @@
 // Package v3actions contains the business logic for the commands/v3 package
 package v3actions
 
+// This is used for sorting.
+type SortOrder string
+
+const (
+	Ascending  SortOrder = "Ascending"
+	Descending SortOrder = "Descending"
+)
+
 // Warnings is a list of warnings returned back from the cloud controller
 type Warnings []string
 
