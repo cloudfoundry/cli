@@ -28,7 +28,7 @@ func (cmd *RunTaskCommand) Setup(config commands.Config, ui commands.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, err := common.NewClients(config)
+	client, err := common.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
