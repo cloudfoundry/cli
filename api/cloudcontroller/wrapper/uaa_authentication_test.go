@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper/wrapperfakes"
@@ -82,7 +81,7 @@ var _ = Describe("UAA Authentication", func() {
 
 		Context("when the token is invalid", func() {
 			BeforeEach(func() {
-				fakeConnection.MakeReturns(ccv2.InvalidAuthTokenError{})
+				fakeConnection.MakeReturns(cloudcontroller.InvalidAuthTokenError{})
 
 				count := 0
 				fakeClient.AccessTokenStub = func() string {

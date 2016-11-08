@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -41,6 +42,9 @@ var _ = Describe("Target", func() {
 						"meta": {
 							"version": "3.0.0-alpha.5"
 						}
+					},
+					"uaa": {
+						"href": "https://uaa.bosh-lite.com"
 					}
 				}
 			}`, serverURL, serverURL, serverURL)
@@ -62,9 +66,6 @@ var _ = Describe("Target", func() {
 					},
 					"tasks": {
 						"href": "%s/v3/tasks"
-					},
-					"uaa": {
-						"href": "https://uaa.bosh-lite.com"
 					}
 				}
 			}`, serverURL, serverURL)
@@ -115,7 +116,7 @@ var _ = Describe("Target", func() {
 					SkipSSLValidation: true,
 					URL:               server.URL(),
 				})
-				Expect(err).To(MatchError(ResourceNotFoundError{}))
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
 			})
 		})

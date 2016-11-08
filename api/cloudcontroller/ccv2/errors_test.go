@@ -63,7 +63,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 				Context("generic 401", func() {
 					It("returns a UnauthorizedError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(UnauthorizedError{Message: "SomeCC Error Message"}))
+						Expect(err).To(MatchError(cloudcontroller.UnauthorizedError{Message: "SomeCC Error Message"}))
 					})
 				})
 
@@ -78,7 +78,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 					It("returns an InvalidAuthTokenError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+						Expect(err).To(MatchError(cloudcontroller.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
 					})
 				})
 			})
@@ -90,7 +90,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 				It("returns a ForbiddenError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ForbiddenError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(cloudcontroller.ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -101,7 +101,7 @@ var _ = Describe("Cloud Controller Connection", func() {
 
 				It("returns a ResourceNotFoundError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ResourceNotFoundError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 				})
 			})
 

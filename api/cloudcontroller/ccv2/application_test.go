@@ -3,6 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -117,7 +118,7 @@ var _ = Describe("Application", func() {
 
 			It("returns an error", func() {
 				_, _, err := client.GetRouteApplications("some-route-guid", nil)
-				Expect(err).To(MatchError(ResourceNotFoundError{
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
 					Message: "The route could not be found: some-route-guid",
 				}))
 			})

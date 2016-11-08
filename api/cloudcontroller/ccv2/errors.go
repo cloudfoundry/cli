@@ -15,46 +15,6 @@ type CCErrorResponse struct {
 	ErrorCode   string `json:"error_code"`
 }
 
-// UnauthorizedError is returned when the client does not have the correct
-// permissions to execute the request.
-type UnauthorizedError struct {
-	Message string
-}
-
-func (e UnauthorizedError) Error() string {
-	return e.Message
-}
-
-// InvalidAuthTokenError is returned when the client has an invalid
-// authorization header.
-type InvalidAuthTokenError struct {
-	Message string
-}
-
-func (e InvalidAuthTokenError) Error() string {
-	return e.Message
-}
-
-// ForbiddenError is returned when the client is forbidden from executing the
-// request.
-type ForbiddenError struct {
-	Message string
-}
-
-func (e ForbiddenError) Error() string {
-	return e.Message
-}
-
-// ResourceNotFoundError is returned when the client requests a resource that
-// does not exist or does not have permissions to see.
-type ResourceNotFoundError struct {
-	Message string
-}
-
-func (e ResourceNotFoundError) Error() string {
-	return e.Message
-}
-
 // UnexpectedResponseError is returned when the client gets an error that has
 // not been accounted for.
 type UnexpectedResponseError struct {
@@ -100,13 +60,13 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized:
 		if errorResponse.ErrorCode == "CF-InvalidAuthToken" {
-			return InvalidAuthTokenError{Message: errorResponse.Description}
+			return cloudcontroller.InvalidAuthTokenError{Message: errorResponse.Description}
 		}
-		return UnauthorizedError{Message: errorResponse.Description}
+		return cloudcontroller.UnauthorizedError{Message: errorResponse.Description}
 	case http.StatusForbidden:
-		return ForbiddenError{Message: errorResponse.Description}
+		return cloudcontroller.ForbiddenError{Message: errorResponse.Description}
 	case http.StatusNotFound:
-		return ResourceNotFoundError{Message: errorResponse.Description}
+		return cloudcontroller.ResourceNotFoundError{Message: errorResponse.Description}
 	default:
 		return UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,

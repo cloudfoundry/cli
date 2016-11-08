@@ -21,46 +21,6 @@ type CCError struct {
 	Title  string `json:"title"`
 }
 
-// UnauthorizedError is returned when the client does not have the correct
-// permissions to execute the request.
-type UnauthorizedError struct {
-	Message string
-}
-
-func (e UnauthorizedError) Error() string {
-	return e.Message
-}
-
-// InvalidAuthTokenError is returned when the client has an invalid
-// authorization header.
-type InvalidAuthTokenError struct {
-	Message string
-}
-
-func (e InvalidAuthTokenError) Error() string {
-	return e.Message
-}
-
-// ForbiddenError is returned when the client is forbidden from executing the
-// request.
-type ForbiddenError struct {
-	Message string
-}
-
-func (e ForbiddenError) Error() string {
-	return e.Message
-}
-
-// ResourceNotFoundError is returned when the client requests a resource that
-// does not exist or does not have permissions to see.
-type ResourceNotFoundError struct {
-	Message string
-}
-
-func (e ResourceNotFoundError) Error() string {
-	return e.Message
-}
-
 // UnexpectedResponseError is returned when the client gets an error that has
 // not been accounted for.
 type UnexpectedResponseError struct {
@@ -126,14 +86,14 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	// the first error.
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized:
-		if errors[0].Code == 10002 {
-			return InvalidAuthTokenError{Message: errors[0].Detail}
+		if errors[0].Title == "CF-InvalidAuthToken" {
+			return cloudcontroller.InvalidAuthTokenError{Message: errors[0].Detail}
 		}
-		return UnauthorizedError{Message: errors[0].Detail}
+		return cloudcontroller.UnauthorizedError{Message: errors[0].Detail}
 	case http.StatusForbidden:
-		return ForbiddenError{Message: errors[0].Detail}
+		return cloudcontroller.ForbiddenError{Message: errors[0].Detail}
 	case http.StatusNotFound:
-		return ResourceNotFoundError{Message: errors[0].Detail}
+		return cloudcontroller.ResourceNotFoundError{Message: errors[0].Detail}
 	default:
 		return UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,

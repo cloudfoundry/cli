@@ -112,27 +112,26 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				Context("generic 401", func() {
 					It("returns a UnauthorizedError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(UnauthorizedError{Message: "SomeCC Error Message"}))
+						Expect(err).To(MatchError(cloudcontroller.UnauthorizedError{Message: "SomeCC Error Message"}))
 					})
 				})
 
 				Context("invalid token", func() {
 					BeforeEach(func() {
-						response = `
-{
-  "errors": [
-    {
-      "code": 10002,
-      "detail": "Invalid Auth Token",
-      "title": "CF-InvalidAuthToken"
-    }
-  ]
-}`
+						response = `{
+							"errors": [
+								{
+									"code": 1000,
+									"detail": "Invalid Auth Token",
+									"title": "CF-InvalidAuthToken"
+								}
+							]
+						}`
 					})
 
 					It("returns an InvalidAuthTokenError", func() {
 						_, _, err := client.GetApplications(nil)
-						Expect(err).To(MatchError(InvalidAuthTokenError{Message: "Invalid Auth Token"}))
+						Expect(err).To(MatchError(cloudcontroller.InvalidAuthTokenError{Message: "Invalid Auth Token"}))
 					})
 				})
 			})
@@ -144,7 +143,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a ForbiddenError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ForbiddenError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(cloudcontroller.ForbiddenError{Message: "SomeCC Error Message"}))
 				})
 			})
 
@@ -155,7 +154,7 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 				It("returns a ResourceNotFoundError", func() {
 					_, _, err := client.GetApplications(nil)
-					Expect(err).To(MatchError(ResourceNotFoundError{Message: "SomeCC Error Message"}))
+					Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "SomeCC Error Message"}))
 				})
 			})
 

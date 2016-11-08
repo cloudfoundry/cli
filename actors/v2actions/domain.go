@@ -1,6 +1,9 @@
 package v2actions
 
-import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+import (
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+)
 
 // Domain represents a CLI Domain.
 type Domain ccv2.Domain
@@ -15,7 +18,7 @@ func (e DomainNotFoundError) Error() string {
 }
 
 func isResourceNotFoundError(err error) bool {
-	_, isResourceNotFound := err.(ccv2.ResourceNotFoundError)
+	_, isResourceNotFound := err.(cloudcontroller.ResourceNotFoundError)
 	return isResourceNotFound
 }
 

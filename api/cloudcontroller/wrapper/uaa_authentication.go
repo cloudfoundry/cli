@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 )
 
 //go:generate counterfeiter . UAAClient
@@ -41,7 +40,7 @@ func (t *UAAAuthentication) Make(request *http.Request, passedResponse *cloudcon
 	request.Header.Set("Authorization", t.client.AccessToken())
 
 	err := t.connection.Make(request, passedResponse)
-	if _, ok := err.(ccv2.InvalidAuthTokenError); ok {
+	if _, ok := err.(cloudcontroller.InvalidAuthTokenError); ok {
 		err = t.client.RefreshToken()
 		if err != nil {
 			return err

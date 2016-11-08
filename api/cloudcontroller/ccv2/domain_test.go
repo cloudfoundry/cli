@@ -3,6 +3,7 @@ package ccv2_test
 import (
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -61,7 +62,7 @@ var _ = Describe("Domain", func() {
 
 			It("returns an error", func() {
 				domain, _, err := client.GetSharedDomain("shared-domain-guid")
-				Expect(err).To(MatchError(ResourceNotFoundError{
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
 					Message: "The domain could not be found: shared-domain-guid",
 				}))
 				Expect(domain).To(Equal(Domain{}))
@@ -114,7 +115,7 @@ var _ = Describe("Domain", func() {
 
 			It("returns an error", func() {
 				domain, _, err := client.GetPrivateDomain("private-domain-guid")
-				Expect(err).To(MatchError(ResourceNotFoundError{
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
 					Message: "The domain could not be found: private-domain-guid",
 				}))
 				Expect(domain).To(Equal(Domain{}))
