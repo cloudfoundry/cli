@@ -17,11 +17,11 @@ import (
 	. "github.com/onsi/gomega/gbytes"
 )
 
-var _ = Describe("RunTask Command", func() {
+var _ = Describe("Tasks Command", func() {
 	var (
-		cmd        v3.RunTaskCommand
+		cmd        v3.TasksCommand
 		fakeUI     *ui.UI
-		fakeActor  *v3fakes.FakeRunTaskActor
+		fakeActor  *v3fakes.FakeTasksActor
 		fakeConfig *commandsfakes.FakeConfig
 		executeErr error
 	)
@@ -29,11 +29,11 @@ var _ = Describe("RunTask Command", func() {
 	BeforeEach(func() {
 		out := NewBuffer()
 		fakeUI = ui.NewTestUI(nil, out, out)
-		fakeActor = new(v3fakes.FakeRunTaskActor)
+		fakeActor = new(v3fakes.FakeTasksActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
-		cmd = v3.RunTaskCommand{
+		cmd = v3.TasksCommand{
 			UI:     fakeUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
@@ -94,7 +94,7 @@ var _ = Describe("RunTask Command", func() {
 			var expectedErr error
 
 			BeforeEach(func() {
-				expectedErr = errors.New("got bananapants??")
+				expectedErr = errors.New("get current user error")
 				fakeConfig.CurrentUserReturns(configv3.User{}, expectedErr)
 			})
 
@@ -113,7 +113,6 @@ var _ = Describe("RunTask Command", func() {
 			Context("when provided a valid application name", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.AppName = "some-app-name"
-					cmd.RequiredArgs.Command = "fake command"
 
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3actions.Application{GUID: "some-app-guid"},
@@ -121,13 +120,39 @@ var _ = Describe("RunTask Command", func() {
 							"get-application-warning-1",
 							"get-application-warning-2",
 						}, nil)
-					fakeActor.RunTaskReturns(v3actions.Task{SequenceID: 3},
+					fakeActor.GetApplicationTasksReturns(
+						[]v3actions.Task{
+							{
+								GUID:       "task-1-guid",
+								SequenceID: 1,
+								Name:       "task-1",
+								State:      "SUCCEEDED",
+								CreatedAt:  "some-time",
+								Command:    "some-command",
+							},
+							{
+								GUID:       "task-2-guid",
+								SequenceID: 2,
+								Name:       "task-2",
+								State:      "FAILED",
+								CreatedAt:  "some-time",
+								Command:    "some-command",
+							},
+							{
+								GUID:       "task-3-guid",
+								SequenceID: 3,
+								Name:       "task-3",
+								State:      "RUNNING",
+								CreatedAt:  "some-time",
+								Command:    "some-command",
+							},
+						},
 						v3actions.Warnings{
-							"get-application-warning-3",
+							"get-tasks-warning-1",
 						}, nil)
 				})
 
-				It("runs a new task and outputs all warnings", func() {
+				It("outputs all tasks associated with the application and all warnings", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
 					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
@@ -135,18 +160,16 @@ var _ = Describe("RunTask Command", func() {
 					Expect(appName).To(Equal("some-app-name"))
 					Expect(spaceGUID).To(Equal("some-space-guid"))
 
-					Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-					appGUID, command := fakeActor.RunTaskArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(command).To(Equal("fake command"))
+					Expect(fakeActor.GetApplicationTasksCallCount()).To(Equal(1))
+					Expect(fakeActor.GetApplicationTasksArgsForCall(0)).To(Equal("some-app-guid"))
 
 					Expect(fakeUI.Out).To(Say(`get-application-warning-1
 get-application-warning-2
-Creating task for app some-app-name in org some-org / space some-space as some-user...
-get-application-warning-3
+Getting tasks for app some-app-name in org some-org / space some-space as some-user...
+get-tasks-warning-1
 OK
 
-Task 3 has been submitted successfully for execution.`,
+TODO: display table of tasks`,
 					))
 				})
 			})
@@ -175,7 +198,7 @@ Task 3 has been submitted successfully for execution.`,
 						})
 					})
 
-					Context("when RunTask returns a translatable error", func() {
+					Context("when GetApplicationTasks returns a translatable error", func() {
 						var returnedErr error
 
 						BeforeEach(func() {
@@ -184,8 +207,8 @@ Task 3 has been submitted successfully for execution.`,
 								v3actions.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
-							fakeActor.RunTaskReturns(
-								v3actions.Task{},
+							fakeActor.GetApplicationTasksReturns(
+								[]v3actions.Task{},
 								nil,
 								returnedErr)
 						})
@@ -201,7 +224,7 @@ Task 3 has been submitted successfully for execution.`,
 						var expectedErr error
 
 						BeforeEach(func() {
-							expectedErr = errors.New("got bananapants??")
+							expectedErr = errors.New("bananapants")
 							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
 								v3actions.Warnings{
 									"get-application-warning-1",
@@ -217,20 +240,20 @@ Task 3 has been submitted successfully for execution.`,
 						})
 					})
 
-					Context("when RunTask returns an error", func() {
+					Context("when GetApplicationTasks returns an error", func() {
 						var expectedErr error
 
 						BeforeEach(func() {
-							expectedErr = errors.New("got bananapants??")
+							expectedErr = errors.New("bananapants??")
 							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
 								v3actions.Warnings{
 									"get-application-warning-1",
 									"get-application-warning-2",
 								}, nil)
-							fakeActor.RunTaskReturns(v3actions.Task{},
+							fakeActor.GetApplicationTasksReturns(nil,
 								v3actions.Warnings{
-									"run-task-warning-1",
-									"run-task-warning-2",
+									"get-tasks-warning-1",
+									"get-tasks-warning-2",
 								}, expectedErr)
 						})
 
@@ -239,8 +262,8 @@ Task 3 has been submitted successfully for execution.`,
 
 							Expect(fakeUI.Out).To(Say("get-application-warning-1"))
 							Expect(fakeUI.Out).To(Say("get-application-warning-2"))
-							Expect(fakeUI.Out).To(Say("run-task-warning-1"))
-							Expect(fakeUI.Out).To(Say("run-task-warning-2"))
+							Expect(fakeUI.Out).To(Say("get-tasks-warning-1"))
+							Expect(fakeUI.Out).To(Say("get-tasks-warning-2"))
 						})
 					})
 				})
