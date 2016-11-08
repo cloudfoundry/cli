@@ -45,6 +45,10 @@ var _ = Describe("Retry", func() {
 
 	Describe("Make", func() {
 		Context("when no error occurs", func() {
+			BeforeEach(func() {
+				connectionErr = nil
+			})
+
 			It("does not retry", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
