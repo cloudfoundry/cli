@@ -53,7 +53,7 @@ func (logger *RequestLogger) Make(request *http.Request, passedResponse *cloudco
 
 	if passedResponse.HTTPResponse != nil {
 		displayErr := logger.displayResponse(passedResponse)
-		if err != nil {
+		if displayErr != nil {
 			logger.output.HandleInternalError(displayErr)
 		}
 	}
