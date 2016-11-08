@@ -30,12 +30,12 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	})
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
-	info, warnings, err := client.Info()
+	apis, _, warnings, err := client.Info()
 	if err != nil {
 		return warnings, err
 	}
 
-	client.uaaLink = info.Links.UAA.HREF
+	client.uaaLink = apis.UAA()
 
 	return warnings, nil
 }

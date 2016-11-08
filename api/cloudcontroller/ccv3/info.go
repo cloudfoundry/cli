@@ -19,32 +19,33 @@ type RootResponse struct {
 	Links struct {
 		// CCV3 is the link to the Cloud Controller V3 API
 		CCV3 APILink `json:"cloud_controller_v3"`
-	} `json:"links"`
-}
 
-func (r RootResponse) ccV3Link() string {
-	return r.Links.CCV3.HREF
-}
-
-// APIInformation represents the information returned back from /v3.
-type APIInformation struct {
-	// Links is a list of top level Cloud Controller resources endpoints.
-	Links struct {
 		// UAA is the link to the UAA API
 		UAA APILink `json:"uaa"`
 	} `json:"links"`
 }
 
 // Return the HREF for the UAA.
-func (a APIInformation) UAA() string {
-	return a.Links.UAA.HREF
+func (root RootResponse) UAA() string {
+	return root.Links.UAA.HREF
+}
+
+func (r RootResponse) ccV3Link() string {
+	return r.Links.CCV3.HREF
+}
+
+// ResourceLinks represents the information returned back from /v3.
+type ResourceLinks struct {
+	// Links is a list of top level Cloud Controller resources endpoints.
+	Links struct {
+	} `json:"links"`
 }
 
 // Info returns back endpoint and API information from /v3.
-func (client *Client) Info() (APIInformation, Warnings, error) {
+func (client *Client) Info() (RootResponse, ResourceLinks, Warnings, error) {
 	rootResponse, warnings, err := client.rootResponse()
 	if err != nil {
-		return APIInformation{}, warnings, err
+		return RootResponse{}, ResourceLinks{}, warnings, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -52,10 +53,10 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 		URL:    rootResponse.ccV3Link(),
 	})
 	if err != nil {
-		return APIInformation{}, warnings, err
+		return RootResponse{}, ResourceLinks{}, warnings, err
 	}
 
-	var info APIInformation
+	var info ResourceLinks
 	response := cloudcontroller.Response{
 		Result: &info,
 	}
@@ -64,10 +65,10 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 	warnings = append(warnings, response.Warnings...)
 
 	if err != nil {
-		return APIInformation{}, warnings, err
+		return RootResponse{}, ResourceLinks{}, warnings, err
 	}
 
-	return info, warnings, nil
+	return rootResponse, info, warnings, nil
 }
 
 // rootResponse return the CC API root document.

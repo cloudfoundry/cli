@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 
 	. "github.com/onsi/ginkgo"
@@ -50,6 +51,9 @@ var _ = Describe("Info", func() {
 						"meta": {
 							"version": "3.0.0-alpha.5"
 						}
+					},
+					"uaa": {
+						"href": "https://uaa.bosh-lite.com"
 					}
 				}
 			}
@@ -67,9 +71,6 @@ var _ = Describe("Info", func() {
 					},
 					"tasks": {
 						"href": "%s/v3/tasks"
-					},
-					"uaa": {
-						"href": "https://uaa.bosh-lite.com"
 					}
 				}
 			}
@@ -82,13 +83,13 @@ var _ = Describe("Info", func() {
 		})
 
 		It("returns back the CC Information", func() {
-			info, _, err := client.Info()
+			apis, _, _, err := client.Info()
 			Expect(err).NotTo(HaveOccurred())
-			Expect(info.UAA()).To(Equal("https://uaa.bosh-lite.com"))
+			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
 		})
 
 		It("returns all warnings", func() {
-			_, warnings, err := client.Info()
+			_, _, warnings, err := client.Info()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(warnings).To(ConsistOf("warning 1", "warning 2"))
 		})
@@ -104,8 +105,8 @@ var _ = Describe("Info", func() {
 			})
 
 			It("returns the same error", func() {
-				_, warnings, err := client.Info()
-				Expect(err).To(MatchError(ResourceNotFoundError{}))
+				_, _, warnings, err := client.Info()
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{}))
 				Expect(warnings).To(ConsistOf("this is a warning"))
 			})
 		})
@@ -128,6 +129,9 @@ var _ = Describe("Info", func() {
 							"meta": {
 								"version": "3.0.0-alpha.5"
 							}
+						},
+						"uaa": {
+							"href": "https://uaa.bosh-lite.com"
 						}
 					}
 				}
@@ -149,8 +153,8 @@ var _ = Describe("Info", func() {
 			})
 
 			It("returns the same error", func() {
-				_, warnings, err := client.Info()
-				Expect(err).To(MatchError(ResourceNotFoundError{Message: "Not found, lol"}))
+				_, _, warnings, err := client.Info()
+				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "Not found, lol"}))
 				Expect(warnings).To(ConsistOf("warning 1", "this is a warning"))
 			})
 		})

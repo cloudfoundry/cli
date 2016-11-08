@@ -5,6 +5,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actors/v2actions"
 	"code.cloudfoundry.org/cli/actors/v2actions/v2actionsfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -52,7 +53,7 @@ var _ = Describe("Domain Actions", func() {
 					GUID: "private-domain-guid",
 					Name: "private-domain",
 				}
-				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, ccv2.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, cloudcontroller.ResourceNotFoundError{})
 				fakeCloudControllerClient.GetPrivateDomainReturns(expectedDomain, nil, nil)
 			})
 
@@ -72,8 +73,8 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, ccv2.ResourceNotFoundError{})
-				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, nil, ccv2.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, nil, cloudcontroller.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, nil, cloudcontroller.ResourceNotFoundError{})
 			})
 
 			It("returns a DomainNotFoundError", func() {
@@ -118,7 +119,7 @@ var _ = Describe("Domain Actions", func() {
 			Entry(
 				"shared domain warning and resource not found; private domain warning & error",
 				func() {
-					fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, []string{"shared-domain-warning"}, ccv2.ResourceNotFoundError{})
+					fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, []string{"shared-domain-warning"}, cloudcontroller.ResourceNotFoundError{})
 				},
 				func() {
 					fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, []string{"private-domain-warning"}, errors.New("private domain error"))
@@ -155,7 +156,7 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, ccv2.Warnings{"shared domain warning"}, ccv2.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetSharedDomainReturns(ccv2.Domain{}, ccv2.Warnings{"shared domain warning"}, cloudcontroller.ResourceNotFoundError{})
 			})
 
 			It("returns a DomainNotFoundError and all warnings", func() {
@@ -207,7 +208,7 @@ var _ = Describe("Domain Actions", func() {
 			var expectedErr DomainNotFoundError
 
 			BeforeEach(func() {
-				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, ccv2.Warnings{"private domain warning"}, ccv2.ResourceNotFoundError{})
+				fakeCloudControllerClient.GetPrivateDomainReturns(ccv2.Domain{}, ccv2.Warnings{"private domain warning"}, cloudcontroller.ResourceNotFoundError{})
 			})
 
 			It("returns a DomainNotFoundError and all warnings", func() {
