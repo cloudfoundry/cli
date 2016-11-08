@@ -2,17 +2,22 @@ package panichandler
 
 import (
 	"fmt"
-	"html/template"
 	"os"
 	"runtime"
 	"strings"
+	"text/template"
 
 	"code.cloudfoundry.org/cli/cf"
 )
 
+const maxStackSizeLimit = 1024 * 1024
+
 // HandlePanic will recover from any panics and display a friendly error
 // message with additional information used for debugging the panic.
 func HandlePanic() {
+	stackTraceBytes := make([]byte, maxStackSizeLimit)
+	runtime.Stack(stackTraceBytes, true)
+	stackTrace := "\t" + strings.Replace(string(stackTraceBytes), "\n", "\n\t", -1)
 	if err := recover(); err != nil {
 		formattedString := `
 		Something unexpected happened. This is a bug in {{.Binary}}.
@@ -46,12 +51,11 @@ func HandlePanic() {
 		e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
 		`
 		formattedTemplate := template.Must(template.New("Panic Template").Parse(formattedString))
-		backtrace := generateBacktrace()
 		templateErr := formattedTemplate.Execute(os.Stderr, map[string]interface{}{
 			"Binary":     os.Args[0],
 			"Command":    strings.Join(os.Args, " "),
 			"Version":    cf.Version,
-			"StackTrace": backtrace,
+			"StackTrace": stackTrace,
 			"Error":      err,
 		})
 		if templateErr != nil {
@@ -64,22 +68,10 @@ func HandlePanic() {
 				"Version:%s\nCommand:%s\nOriginal Stack Trace:%s\nOriginal Error:%s\n",
 				cf.Version,
 				strings.Join(os.Args, " "),
-				backtrace,
+				stackTrace,
 				err,
 			)
 		}
 		os.Exit(1)
 	}
-}
-
-func generateBacktrace() string {
-	stackByteCount := 0
-	stackSizeLimit := 1024 * 1024
-	var bytes []byte
-	for stackSize := 1024; (stackByteCount == 0 || stackByteCount == stackSize) && stackSize < stackSizeLimit; stackSize = 2 * stackSize {
-		bytes = make([]byte, stackSize)
-		stackByteCount = runtime.Stack(bytes, true)
-	}
-	stackTrace := "\t" + strings.Replace(string(bytes), "\n", "\n\t", -1)
-	return stackTrace
 }
