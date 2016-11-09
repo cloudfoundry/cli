@@ -2,7 +2,9 @@ package wrapper_test
 
 import (
 	"errors"
+	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
@@ -19,9 +21,10 @@ var _ = Describe("Retry", func() {
 
 		wrapper cloudcontroller.Connection
 
-		request  *http.Request
-		response *cloudcontroller.Response
-		err      error
+		request        *http.Request
+		rawRequestBody string
+		response       *cloudcontroller.Response
+		err            error
 	)
 
 	BeforeEach(func() {
@@ -33,20 +36,21 @@ var _ = Describe("Retry", func() {
 		request, err = http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
 		Expect(err).NotTo(HaveOccurred())
 
+		rawRequestBody = "banana pants"
+		request.Body = ioutil.NopCloser(strings.NewReader(rawRequestBody))
+
 		response = &cloudcontroller.Response{
 			HTTPResponse: &http.Response{},
 		}
 	})
 
 	JustBeforeEach(func() {
-		fakeConnection.MakeReturns(connectionErr)
 		err = wrapper.Make(request, response)
 	})
 
 	Describe("Make", func() {
 		Context("when no error occurs", func() {
 			BeforeEach(func() {
-				connectionErr = nil
 			})
 
 			It("does not retry", func() {
@@ -57,8 +61,9 @@ var _ = Describe("Retry", func() {
 
 		Context("when an error occurs and there's no HTTP Response (aka protocol level error)", func() {
 			BeforeEach(func() {
-				connectionErr = errors.New("ZOMG WAAT")
 				response.HTTPResponse = nil
+				connectionErr = errors.New("ZOMG WAAT")
+				fakeConnection.MakeReturns(connectionErr)
 			})
 
 			It("does not retry", func() {
@@ -69,10 +74,11 @@ var _ = Describe("Retry", func() {
 
 		Context("when the request recieves a 4XX status code", func() {
 			BeforeEach(func() {
+				response.HTTPResponse.StatusCode = 400
 				connectionErr = cloudcontroller.RawHTTPStatusError{
 					StatusCode: 400,
 				}
-				response.HTTPResponse.StatusCode = 400
+				fakeConnection.MakeReturns(connectionErr)
 			})
 
 			It("does not retry", func() {
@@ -87,6 +93,14 @@ var _ = Describe("Retry", func() {
 					StatusCode: 500,
 				}
 				response.HTTPResponse.StatusCode = 500
+
+				fakeConnection.MakeStub = func(req *http.Request, passedResponse *cloudcontroller.Response) error {
+					defer req.Body.Close()
+					body, err := ioutil.ReadAll(request.Body)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(body)).To(Equal(rawRequestBody))
+					return connectionErr
+				}
 			})
 
 			It("retries maxRetries times", func() {
