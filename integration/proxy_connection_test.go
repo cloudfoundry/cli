@@ -19,7 +19,7 @@ var _ = Describe("proxy", func() {
 	Context("V2 Legacy", func() {
 		It("handles a proxy", func() {
 			session := helpers.CFWithEnv(map[string]string{"http_proxy": proxyURL}, "api", apiURL)
-			Eventually(session).Should(Say("Error performing request: Get %s/v2/info: http: error connecting to proxy http://%s: dial tcp %s: getsockopt: connection refused", apiRegexp, proxyURL, proxyURL))
+			Eventually(session).Should(Say("Error performing request: Get %s\\/v2\\/info: http: error connecting to proxy http:\\/\\/%s", apiRegexp, proxyURL))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -27,7 +27,7 @@ var _ = Describe("proxy", func() {
 	Context("V3", func() {
 		It("handles a proxy", func() {
 			session := helpers.CFWithEnv(map[string]string{"http_proxy": proxyURL}, "run-task", "app", "echo")
-			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy http://%s: dial tcp %s: getsockopt: connection refused", apiRegexp, proxyURL, proxyURL))
+			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy http:\\/\\/%s", apiRegexp, proxyURL))
 			Eventually(session).Should(Exit(1))
 		})
 	})
