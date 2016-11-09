@@ -9,15 +9,17 @@ import (
 )
 
 var _ = Describe("proxy", func() {
-	var proxyURL string
+	var proxyURL, apiRegexp string
+
 	BeforeEach(func() {
 		proxyURL = "127.0.0.1:9999"
+		apiRegexp = "(?:https:\\/\\/)*" + apiURL
 	})
 
 	Context("V2 Legacy", func() {
 		It("handles a proxy", func() {
 			session := helpers.CFWithEnv(map[string]string{"http_proxy": proxyURL}, "api", apiURL)
-			Eventually(session).Should(Say("Error performing request: Get %s/v2/info: http: error connecting to proxy http://%s: dial tcp %s: getsockopt: connection refused", apiURL, proxyURL, proxyURL))
+			Eventually(session).Should(Say("Error performing request: Get %s/v2/info: http: error connecting to proxy http://%s: dial tcp %s: getsockopt: connection refused", apiRegexp, proxyURL, proxyURL))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -25,7 +27,7 @@ var _ = Describe("proxy", func() {
 	Context("V3", func() {
 		It("handles a proxy", func() {
 			session := helpers.CFWithEnv(map[string]string{"http_proxy": proxyURL}, "run-task", "app", "echo")
-			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy http://%s: dial tcp %s: getsockopt: connection refused", apiURL, proxyURL, proxyURL))
+			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy http://%s: dial tcp %s: getsockopt: connection refused", apiRegexp, proxyURL, proxyURL))
 			Eventually(session).Should(Exit(1))
 		})
 	})
