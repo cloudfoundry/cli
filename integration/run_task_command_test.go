@@ -18,7 +18,6 @@ var _ = Describe("run-task command", func() {
 	)
 
 	BeforeEach(func() {
-		Skip("until bosh-lites are running CAPI V2.64")
 		orgName = PrefixedRandomName("ORG")
 		spaceName = PrefixedRandomName("SPACE")
 		appName = PrefixedRandomName("APP")
