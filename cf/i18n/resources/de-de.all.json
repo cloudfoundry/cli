@@ -2600,6 +2600,10 @@
     "translation": "Fehler beim Abrufen der Stacks: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Fehler beim Speichern des Manifests: {{.Error}}"
   },

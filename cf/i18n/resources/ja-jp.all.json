@@ -2600,6 +2600,10 @@
     "translation": "スタックの取得時にエラーが発生しました: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "マニフェストの保存中にエラーが発生しました: {{.Error}}"
   },
