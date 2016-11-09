@@ -1,6 +1,8 @@
 package wrapper
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -29,7 +31,20 @@ func (retry *RetryRequest) Wrap(innerconnection cloudcontroller.Connection) clou
 // Make retries the request if it comes back with a 5XX status code.
 func (retry *RetryRequest) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	var err error
+	var rawRequestBody []byte
+
+	if request.Body != nil {
+		rawRequestBody, err = ioutil.ReadAll(request.Body)
+		defer request.Body.Close()
+		if err != nil {
+			return err
+		}
+	}
+
 	for i := 0; i < retry.maxRetries+1; i += 1 {
+		if rawRequestBody != nil {
+			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+		}
 		err = retry.connection.Make(request, passedResponse)
 		if err == nil {
 			return nil
