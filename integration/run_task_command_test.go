@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("run-task command", func() {
+var _ = Describe("run-task command", func() {
 	var (
 		orgName   string
 		spaceName string
