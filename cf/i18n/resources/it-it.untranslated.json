@@ -1292,6 +1292,10 @@
     "translation": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "broker: {{.Name}}",
     "translation": "broker: {{.Name}}"
   },

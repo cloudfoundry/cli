@@ -5816,6 +5816,10 @@
     "translation": "[globale Optionen] Befehl [Argumente...] [Befehlsoptionen]"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "access",
     "translation": "Zugriff"
   },

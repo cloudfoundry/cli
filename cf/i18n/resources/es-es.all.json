@@ -5816,6 +5816,10 @@
     "translation": "[opciones globales] mandato [argumentos...] [opciones de mandato]"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "access",
     "translation": "acceso"
   },

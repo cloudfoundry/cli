@@ -5816,6 +5816,10 @@
     "translation": "[グローバル・オプション] コマンド [引数...] [コマンド・オプション]"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "access",
     "translation": "アクセス"
   },
