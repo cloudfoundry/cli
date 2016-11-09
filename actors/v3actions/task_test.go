@@ -141,9 +141,10 @@ var _ = Describe("Task Actions", func() {
 					)
 				})
 
-				It("returns a TasksNotFoundError", func() {
-					_, _, err := actor.GetApplicationTasks("some-app-guid", Descending)
-					Expect(err).To(MatchError(TasksNotFoundError{}))
+				It("returns an empty list of tasks", func() {
+					tasks, _, err := actor.GetApplicationTasks("some-app-guid", Descending)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(tasks).To(BeEmpty())
 				})
 			})
 		})
