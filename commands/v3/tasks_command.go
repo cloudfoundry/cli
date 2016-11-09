@@ -3,6 +3,7 @@ package v3
 import (
 	"net/url"
 	"strconv"
+	"time"
 
 	"code.cloudfoundry.org/cli/actors/v3actions"
 	"code.cloudfoundry.org/cli/commands"
@@ -79,17 +80,35 @@ func (cmd TasksCommand) Execute(args []string) error {
 	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID, v3actions.Descending)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return common.HandleError(err)
+		switch err.(type) {
+		case v3actions.TasksNotFoundError:
+			// Ignore error and output empty table
+		default:
+			return common.HandleError(err)
+		}
 	}
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
 
-	table := [][]string{
-		{"id", "name", "state", "start time", "command"},
-	}
+	table := [][]string{{"id", "name", "state", "start time", "command"}}
 	for _, task := range tasks {
-		table = append(table, []string{strconv.Itoa(task.SequenceID), task.Name, cmd.UI.TranslateText(task.State), task.CreatedAt, task.Command})
+		t, err := time.Parse(time.RFC3339, task.CreatedAt)
+		if err != nil {
+			return err
+		}
+
+		if task.Command == "" {
+			task.Command = "[hidden]"
+		}
+
+		table = append(table, []string{
+			strconv.Itoa(task.SequenceID),
+			task.Name,
+			cmd.UI.TranslateText(task.State),
+			t.Format(time.RFC1123),
+			task.Command,
+		})
 	}
 
 	cmd.UI.DisplayTable("", table, 3)

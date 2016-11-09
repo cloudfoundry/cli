@@ -1756,6 +1756,10 @@
     "translation": "[global options] command [arguments...] [command options]"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "cf --version",
     "translation": "cf --version"
   },

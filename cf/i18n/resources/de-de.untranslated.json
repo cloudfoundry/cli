@@ -1760,6 +1760,10 @@
     "translation": "[--no-hostname] [--no-manifest] [--no-route] [--no-start] [--random-route]\n"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "cf --version",
     "translation": "cf --version"
   },

@@ -5816,6 +5816,10 @@
     "translation": "[글로벌 옵션] 명령 [인수...] [명령 옵션]"
   },
   {
+    "id": "[hidden]",
+    "translation": ""
+  },
+  {
     "id": "access",
     "translation": "액세스"
   },

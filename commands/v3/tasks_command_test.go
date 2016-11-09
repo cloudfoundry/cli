@@ -11,7 +11,6 @@ import (
 	"code.cloudfoundry.org/cli/commands/v3/v3fakes"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/ui"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -113,13 +112,14 @@ var _ = Describe("Tasks Command", func() {
 			Context("when provided a valid application name", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.AppName = "some-app-name"
-
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3actions.Application{GUID: "some-app-guid"},
 						v3actions.Warnings{
 							"get-application-warning-1",
 							"get-application-warning-2",
-						}, nil)
+						},
+						nil,
+					)
 					fakeActor.GetApplicationTasksReturns(
 						[]v3actions.Task{
 							{
@@ -127,7 +127,7 @@ var _ = Describe("Tasks Command", func() {
 								SequenceID: 3,
 								Name:       "task-3",
 								State:      "RUNNING",
-								CreatedAt:  "some-time",
+								CreatedAt:  "2016-11-08T22:26:02Z",
 								Command:    "some-command",
 							},
 							{
@@ -135,7 +135,7 @@ var _ = Describe("Tasks Command", func() {
 								SequenceID: 2,
 								Name:       "task-2",
 								State:      "FAILED",
-								CreatedAt:  "some-time",
+								CreatedAt:  "2016-11-08T22:26:02Z",
 								Command:    "some-command",
 							},
 							{
@@ -143,13 +143,15 @@ var _ = Describe("Tasks Command", func() {
 								SequenceID: 1,
 								Name:       "task-1",
 								State:      "SUCCEEDED",
-								CreatedAt:  "some-time",
+								CreatedAt:  "2016-11-08T22:26:02Z",
 								Command:    "some-command",
 							},
 						},
 						v3actions.Warnings{
 							"get-tasks-warning-1",
-						}, nil)
+						},
+						nil,
+					)
 				})
 
 				It("outputs all tasks associated with the application and all warnings", func() {
@@ -171,11 +173,67 @@ Getting tasks for app some-app-name in org some-org / space some-space as some-u
 get-tasks-warning-1
 OK
 
-id   name     state       start time   command
-3    task-3   RUNNING     some-time    some-command
-2    task-2   FAILED      some-time    some-command
-1    task-1   SUCCEEDED   some-time    some-command`,
+id   name     state       start time                      command
+3    task-3   RUNNING     Tue, 08 Nov 2016 22:26:02 UTC   some-command
+2    task-2   FAILED      Tue, 08 Nov 2016 22:26:02 UTC   some-command
+1    task-1   SUCCEEDED   Tue, 08 Nov 2016 22:26:02 UTC   some-command`,
 					))
+				})
+
+				Context("when the tasks' command fields are returned as empty strings", func() {
+					BeforeEach(func() {
+						fakeActor.GetApplicationTasksReturns(
+							[]v3actions.Task{
+								{
+									GUID:       "task-2-guid",
+									SequenceID: 2,
+									Name:       "task-2",
+									State:      "FAILED",
+									CreatedAt:  "2016-11-08T22:26:02Z",
+									Command:    "",
+								},
+								{
+									GUID:       "task-1-guid",
+									SequenceID: 1,
+									Name:       "task-1",
+									State:      "SUCCEEDED",
+									CreatedAt:  "2016-11-08T22:26:02Z",
+									Command:    "",
+								},
+							},
+							v3actions.Warnings{
+								"get-tasks-warning-1",
+							},
+							nil,
+						)
+					})
+
+					It("outputs [hidden] for the tasks' commands", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeUI.Out).To(Say(`
+2    task-2   FAILED      Tue, 08 Nov 2016 22:26:02 UTC   \[hidden\]
+1    task-1   SUCCEEDED   Tue, 08 Nov 2016 22:26:02 UTC   \[hidden\]`,
+						))
+					})
+				})
+
+				Context("when there are no tasks associated with the application", func() {
+					BeforeEach(func() {
+						fakeActor.GetApplicationTasksReturns(
+							nil,
+							nil,
+							v3actions.TasksNotFoundError{},
+						)
+					})
+
+					It("outputs an empty table", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeUI.Out).To(Say(`
+id   name   state   start time   command\n`,
+						))
+					})
 				})
 			})
 
