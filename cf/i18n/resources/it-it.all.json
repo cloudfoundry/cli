@@ -2600,6 +2600,10 @@
     "translation": "Errore di recupero degli stack: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Errore di salvataggio del manifest: {{.Error}}"
   },

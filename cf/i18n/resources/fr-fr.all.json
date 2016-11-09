@@ -2600,6 +2600,10 @@
     "translation": "Erreur lors de l'extraction des piles : {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Erreur lors de la sauvegarde du manifeste : {{.Error}}"
   },

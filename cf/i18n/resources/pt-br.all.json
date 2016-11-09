@@ -2600,6 +2600,10 @@
     "translation": "Erro ao recuperar pilhas: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Erro ao salvar manifest: {{.Error}}"
   },

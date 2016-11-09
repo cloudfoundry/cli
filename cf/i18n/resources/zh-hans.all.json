@@ -2600,6 +2600,10 @@
     "translation": "检索堆栈时出错: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "保存清单时出错: {{.Error}}"
   },

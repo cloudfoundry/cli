@@ -2600,6 +2600,10 @@
     "translation": "Error retrieving stacks: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Error saving manifest: {{.Error}}"
   },

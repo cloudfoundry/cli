@@ -2600,6 +2600,10 @@
     "translation": "스택을 검색하는 중에 오류 발생: {{.Error}}"
   },
   {
+    "id": "Error running task: {{.CloudControllerMessage}}",
+    "translation": ""
+  },
+  {
     "id": "Error saving manifest: {{.Error}}",
     "translation": "Manifest 저장 중에 오류 발생: {{.Error}}"
   },
