@@ -142,9 +142,9 @@ SEE ALSO:
 					userName, _ := getCredentials()
 					Expect(session.Out).To(Say(fmt.Sprintf("Getting tasks for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
 					Expect(session.Out).To(Say("OK\n"))
-					Expect(session.Out).To(Say("id\\s+name\\s+state\\s+start time\\s+command"))
-					Expect(session.Out).To(Say("\\s+2\\s+[a-zA-Z-0-9 ,:]+echo foo bar"))
-					Expect(session.Out).To(Say("\\s+1\\s+[a-zA-Z-0-9 ,:]+echo hello world"))
+					Expect(session.Out).To(Say(`id\s+name\s+state\s+start time\s+command
+2\s+[a-zA-Z-0-9 ,:]+echo foo bar
+1\s+[a-zA-Z-0-9 ,:]+echo hello world`))
 				})
 
 				Context("when the logged in user does not have authorization to see task commands", func() {
@@ -167,8 +167,8 @@ SEE ALSO:
 					It("does not display task commands", func() {
 						session := CF("tasks", appName)
 						Eventually(session).Should(Exit(0))
-						Expect(session.Out).To(Say("\\s+2\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
-						Expect(session.Out).To(Say("\\s+1\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
+						Expect(session.Out).To(Say("2\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
+						Expect(session.Out).To(Say("1\\s+[a-zA-Z-0-9 ,:]+\\[hidden\\]"))
 					})
 				})
 			})
