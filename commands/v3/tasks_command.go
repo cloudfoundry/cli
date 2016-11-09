@@ -80,12 +80,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID, v3actions.Descending)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		switch err.(type) {
-		case v3actions.TasksNotFoundError:
-			// Ignore error and output empty table
-		default:
-			return common.HandleError(err)
-		}
+		return common.HandleError(err)
 	}
 
 	cmd.UI.DisplayOK()

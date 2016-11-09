@@ -221,9 +221,9 @@ id   name     state       start time                      command
 				Context("when there are no tasks associated with the application", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns(
+							[]v3actions.Task{},
 							nil,
 							nil,
-							v3actions.TasksNotFoundError{},
 						)
 					})
 
