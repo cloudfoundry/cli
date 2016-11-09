@@ -39,6 +39,12 @@ var _ = Describe("HandleError", func() {
 			Name: "some-app",
 		}),
 
+		Entry("v3actions.RunTaskError -> RunTaskError", v3actions.RunTaskError{
+			Message: "fooo: Banana Pants",
+		}, RunTaskError{
+			Message: "Banana Pants",
+		}),
+
 		Entry("default case -> original error", err, err),
 	)
 })

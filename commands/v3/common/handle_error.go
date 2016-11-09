@@ -14,6 +14,8 @@ func HandleError(err error) error {
 
 	case v3actions.ApplicationNotFoundError:
 		return ApplicationNotFoundError{Name: e.Name}
+	case v3actions.RunTaskError:
+		return RunTaskError{Message: e.Error()}
 	}
 
 	return err

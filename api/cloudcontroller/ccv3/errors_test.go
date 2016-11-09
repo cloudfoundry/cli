@@ -158,6 +158,17 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				})
 			})
 
+			Context("(422) Unprocessable Entity", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusUnprocessableEntity
+				})
+
+				It("returns a UnprocessableEntityError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+				})
+			})
+
 			Context("Unhandled Error Codes", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusTeapot

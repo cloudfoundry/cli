@@ -68,3 +68,13 @@ type ResourceNotFoundError struct {
 func (e ResourceNotFoundError) Error() string {
 	return e.Message
 }
+
+// UnprocessableEntityError is returned the request cannot be processed by the
+// cloud controller.
+type UnprocessableEntityError struct {
+	Message string
+}
+
+func (e UnprocessableEntityError) Error() string {
+	return e.Message
+}

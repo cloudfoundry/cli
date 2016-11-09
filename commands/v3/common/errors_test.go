@@ -41,5 +41,6 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
 
 		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
+		Entry("RunTaskError", RunTaskError{}),
 	)
 })

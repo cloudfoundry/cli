@@ -98,7 +98,7 @@ var _ = Describe("Application", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/apps"),
-						RespondWith(http.StatusUnprocessableEntity, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"this is a warning"}}),
 					),
 				)
 			})
@@ -106,7 +106,7 @@ var _ = Describe("Application", func() {
 			It("returns the error and all warnings", func() {
 				_, warnings, err := client.GetApplications(nil)
 				Expect(err).To(MatchError(UnexpectedResponseError{
-					ResponseCode: 422,
+					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{
 						[]CCError{
 							{
