@@ -78,7 +78,7 @@ func setSkipSSLValidation() {
 
 func getAPI() string {
 	if apiURL == "" {
-		apiURL = "api.bosh-lite.com"
+		apiURL = "https://api.bosh-lite.com"
 	}
 	return apiURL
 }
