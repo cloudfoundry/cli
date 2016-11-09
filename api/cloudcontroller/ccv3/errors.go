@@ -85,15 +85,17 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	// There could be multiple errors in the future but for now we only convert
 	// the first error.
 	switch rawHTTPStatusErr.StatusCode {
-	case http.StatusUnauthorized:
+	case http.StatusUnauthorized: // 401
 		if errors[0].Title == "CF-InvalidAuthToken" {
 			return cloudcontroller.InvalidAuthTokenError{Message: errors[0].Detail}
 		}
 		return cloudcontroller.UnauthorizedError{Message: errors[0].Detail}
-	case http.StatusForbidden:
+	case http.StatusForbidden: // 403
 		return cloudcontroller.ForbiddenError{Message: errors[0].Detail}
-	case http.StatusNotFound:
+	case http.StatusNotFound: // 404
 		return cloudcontroller.ResourceNotFoundError{Message: errors[0].Detail}
+	case http.StatusUnprocessableEntity: // 422
+		return cloudcontroller.UnprocessableEntityError{Message: errors[0].Detail}
 	default:
 		return UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,

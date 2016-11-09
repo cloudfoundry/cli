@@ -2,17 +2,36 @@ package v3actions
 
 import (
 	"net/url"
+	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 )
 
 // Task represents a V3 actor Task.
 type Task ccv3.Task
 
+// RunTaskError represents a generic error encountered when creating a task.
+type RunTaskError struct {
+	Message string
+}
+
+func (e RunTaskError) Error() string {
+	splitMessage := strings.Split(e.Message, ": ")
+	if len(splitMessage) > 1 {
+		return splitMessage[1]
+	}
+	return e.Message
+}
+
 // RunTask runs the provided command in the application environment associated
 // with the provided application GUID.
 func (actor Actor) RunTask(appGUID string, command string) (Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.RunTask(appGUID, command)
+	if e, ok := err.(cloudcontroller.UnprocessableEntityError); ok {
+		return Task{}, Warnings(warnings), RunTaskError{Message: e.Message}
+	}
+
 	return Task(task), Warnings(warnings), err
 }
 

@@ -87,7 +87,7 @@ var _ = Describe("Task", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
-						RespondWith(http.StatusUnprocessableEntity, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 					),
 				)
 			})
@@ -95,7 +95,7 @@ var _ = Describe("Task", func() {
 			It("returns the errors and all warnings", func() {
 				_, warnings, err := client.RunTask("some-app-guid", "some command")
 				Expect(err).To(MatchError(UnexpectedResponseError{
-					ResponseCode: 422,
+					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{
 						[]CCError{
 							{
@@ -251,7 +251,7 @@ var _ = Describe("Task", func() {
 				server.AppendHandlers(
 					CombineHandlers(
 						VerifyRequest(http.MethodGet, "/v3/apps/some-app-guid/tasks"),
-						RespondWith(http.StatusUnprocessableEntity, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning"}}),
 					),
 				)
 			})
@@ -259,7 +259,7 @@ var _ = Describe("Task", func() {
 			It("returns the errors and all warnings", func() {
 				_, warnings, err := client.GetApplicationTasks("some-app-guid", nil)
 				Expect(err).To(MatchError(UnexpectedResponseError{
-					ResponseCode: 422,
+					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{
 						[]CCError{
 							{

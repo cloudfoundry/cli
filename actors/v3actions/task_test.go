@@ -6,6 +6,7 @@ import (
 
 	. "code.cloudfoundry.org/cli/actors/v3actions"
 	"code.cloudfoundry.org/cli/actors/v3actions/v3actionsfakes"
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -23,6 +24,32 @@ var _ = Describe("Task Actions", func() {
 	})
 
 	Describe("RunTask", func() {
+		Describe("RunTaskError", func() {
+			Describe("Error", func() {
+				var err error
+
+				Context("when the original error message contains a prefix", func() {
+					BeforeEach(func() {
+						err = RunTaskError{Message: "some error message: the second half"}
+					})
+
+					It("splits the error message and returns the second half", func() {
+						Expect(err).To(MatchError("the second half"))
+					})
+				})
+
+				Context("when the original error message does not contain a prefix", func() {
+					BeforeEach(func() {
+						err = RunTaskError{Message: "some error message"}
+					})
+
+					It("returns the original error message", func() {
+						Expect(err).To(MatchError("some error message"))
+					})
+				})
+			})
+		})
+
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.RunTaskReturns(
@@ -54,21 +81,38 @@ var _ = Describe("Task Actions", func() {
 		})
 
 		Context("when the cloud controller client returns an error", func() {
-			var expectedErr error
+			Context("when the error is an UnprocessableEntityError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.RunTaskReturns(
+						ccv3.Task{},
+						nil,
+						cloudcontroller.UnprocessableEntityError{Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app."},
+					)
+				})
 
-			BeforeEach(func() {
-				expectedErr = errors.New("I am a CloudControllerClient Error")
-				fakeCloudControllerClient.RunTaskReturns(
-					ccv3.Task{},
-					ccv3.Warnings{"warning-1", "warning-2"},
-					expectedErr,
-				)
+				It("returns a wrapped error", func() {
+					_, _, err := actor.RunTask("some-app-guid", "some command")
+					Expect(err).To(MatchError(RunTaskError{Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app."}))
+				})
 			})
 
-			It("returns the same error and all warnings", func() {
-				_, warnings, err := actor.RunTask("some-app-guid", "some command")
-				Expect(err).To(MatchError(expectedErr))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+			Context("when the cloud controller error is generic", func() {
+				var expectedErr error
+
+				BeforeEach(func() {
+					expectedErr = errors.New("I am a CloudControllerClient Error")
+					fakeCloudControllerClient.RunTaskReturns(
+						ccv3.Task{},
+						ccv3.Warnings{"warning-1", "warning-2"},
+						expectedErr,
+					)
+				})
+
+				It("returns the same error and all warnings", func() {
+					_, warnings, err := actor.RunTask("some-app-guid", "some command")
+					Expect(err).To(MatchError(expectedErr))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				})
 			})
 		})
 	})

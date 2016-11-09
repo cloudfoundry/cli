@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("run-task command", func() {
+var _ = FDescribe("run-task command", func() {
 	var (
 		orgName   string
 		spaceName string
@@ -141,9 +141,7 @@ Task 1 has been submitted successfully for execution.`,
 				session := CF("run-task", appName, "echo hi")
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say(`Unexpected Response
-Response Code: 422
-Code: 10008, Title: CF-UnprocessableEntity, Detail: The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app`))
+				Expect(session.Err).To(Say(`Error running task: Task must have a droplet. Specify droplet or assign current droplet to app.`))
 			})
 		})
 

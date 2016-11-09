@@ -105,6 +105,17 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
+			Context("(422) Unprocessable Entity", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusUnprocessableEntity
+				})
+
+				It("returns a UnprocessableEntityError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.UnprocessableEntityError{Message: "SomeCC Error Message"}))
+				})
+			})
+
 			Context("unhandled Error Codes", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusTeapot
