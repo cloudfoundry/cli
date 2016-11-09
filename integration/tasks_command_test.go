@@ -126,7 +126,11 @@ SEE ALSO:
 				It("displays an empty table", func() {
 					session := CF("tasks", appName)
 					Eventually(session).Should(Exit(0))
-					Expect(session.Out).To(Say("id   name   state   start time   command\n"))
+					Expect(session.Out).To(Say(`
+id   name   state   start time   command
+`,
+					))
+					Expect(session.Out).NotTo(Say("1"))
 				})
 			})
 

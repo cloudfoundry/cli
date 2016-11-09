@@ -231,8 +231,10 @@ id   name     state       start time                      command
 						Expect(executeErr).ToNot(HaveOccurred())
 
 						Expect(fakeUI.Out).To(Say(`
-id   name   state   start time   command\n`,
+id   name   state   start time   command
+`,
 						))
+						Expect(fakeUI.Out).NotTo(Say("1"))
 					})
 				})
 			})
