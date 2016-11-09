@@ -6,6 +6,7 @@ SET PATH=C:\Program Files\Git\cmd\;%PATH%
 SET PATH=%CD%\cf-release-repo\bin;%PATH%
 SET PATH=C:\Program Files\GnuWin32\bin;%PATH%
 SET PATH=C:\Program Files\cURL\bin;%PATH%
+SET PATH=C:\Program Files\CloudFoundry;%PATH%
 SET PATH=%CD%;%PATH%
 
 SET CONFIG=%CD%\cats-config\integration_config.json
