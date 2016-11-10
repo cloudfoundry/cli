@@ -78,6 +78,18 @@ var _ = Describe("Targgeting", func() {
 			Expect(sslDisabled).To(Equal(skipSSLValidation))
 		})
 
+		It("clears all the token information", func() {
+			_, err := actor.SetTarget(settings)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(fakeConfig.SetTokenInformationCallCount()).To(Equal(1))
+			accessToken, refreshToken, sshOAuthClient := fakeConfig.SetTokenInformationArgsForCall(0)
+
+			Expect(accessToken).To(BeEmpty())
+			Expect(refreshToken).To(BeEmpty())
+			Expect(sshOAuthClient).To(BeEmpty())
+		})
+
 		Context("when setting the same API and skip SSL configuration", func() {
 			var APIURL string
 
