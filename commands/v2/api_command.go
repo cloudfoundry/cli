@@ -69,7 +69,14 @@ func (cmd *ApiCommand) Execute(args []string) error {
 		{cmd.UI.TranslateText("API endpoint:"), cmd.Config.Target()},
 		{cmd.UI.TranslateText("API version:"), cmd.Config.APIVersion()},
 	}, 3)
-	return nil
+
+	user, err := cmd.Config.CurrentUser()
+	if user.Name == "" {
+		cmd.UI.DisplayText("Not logged in. Use '{{.CFLoginCommand}}' to log in.", map[string]interface{}{
+			"CFLoginCommand": fmt.Sprintf("%s login", cmd.Config.BinaryName()),
+		})
+	}
+	return err
 }
 
 func (cmd *ApiCommand) ClearTarget() error {
