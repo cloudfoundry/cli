@@ -45,6 +45,10 @@ var _ = Describe("HandleError", func() {
 			Message: "Banana Pants",
 		}),
 
+		Entry("v3actions.TaskWorkersUnavailableError -> RunTaskError", v3actions.TaskWorkersUnavailableError{
+			Message: "fooo: Banana Pants",
+		}, RunTaskError{Message: "Task workers are unavailable."}),
+
 		Entry("default case -> original error", err, err),
 	)
 })

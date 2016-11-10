@@ -84,18 +84,25 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 
 	// There could be multiple errors in the future but for now we only convert
 	// the first error.
+	firstErr := errors[0]
+
 	switch rawHTTPStatusErr.StatusCode {
 	case http.StatusUnauthorized: // 401
-		if errors[0].Title == "CF-InvalidAuthToken" {
-			return cloudcontroller.InvalidAuthTokenError{Message: errors[0].Detail}
+		if firstErr.Title == "CF-InvalidAuthToken" {
+			return cloudcontroller.InvalidAuthTokenError{Message: firstErr.Detail}
 		}
-		return cloudcontroller.UnauthorizedError{Message: errors[0].Detail}
+		return cloudcontroller.UnauthorizedError{Message: firstErr.Detail}
 	case http.StatusForbidden: // 403
-		return cloudcontroller.ForbiddenError{Message: errors[0].Detail}
+		return cloudcontroller.ForbiddenError{Message: firstErr.Detail}
 	case http.StatusNotFound: // 404
-		return cloudcontroller.ResourceNotFoundError{Message: errors[0].Detail}
+		return cloudcontroller.ResourceNotFoundError{Message: firstErr.Detail}
 	case http.StatusUnprocessableEntity: // 422
-		return cloudcontroller.UnprocessableEntityError{Message: errors[0].Detail}
+		return cloudcontroller.UnprocessableEntityError{Message: firstErr.Detail}
+	case http.StatusServiceUnavailable: // 503
+		if firstErr.Title == "CF-TaskWorkersUnavailable" {
+			return cloudcontroller.TaskWorkersUnavailableError{Message: firstErr.Detail}
+		}
+		return cloudcontroller.ServiceUnavailableError{Message: firstErr.Detail}
 	default:
 		return UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,

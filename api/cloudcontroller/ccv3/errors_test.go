@@ -169,6 +169,36 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				})
 			})
 
+			Context("(503) Service Unavailable", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusServiceUnavailable
+				})
+
+				It("returns a ServiceUnavailableError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.ServiceUnavailableError{Message: "SomeCC Error Message"}))
+				})
+
+				Context("when the title is 'CF-TaskWorkersUnavailable'", func() {
+					BeforeEach(func() {
+						response = `{
+  "errors": [
+    {
+      "code": 170020,
+      "detail": "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)",
+      "title": "CF-TaskWorkersUnavailable"
+    }
+  ]
+}`
+					})
+
+					It("returns a TaskWorkersUnavailableError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(cloudcontroller.TaskWorkersUnavailableError{Message: "Task workers are unavailable: Failed to open TCP connection to nsync.service.cf.internal:8787 (getaddrinfo: Name or service not known)"}))
+					})
+				})
+			})
+
 			Context("Unhandled Error Codes", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusTeapot

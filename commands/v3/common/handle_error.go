@@ -16,6 +16,8 @@ func HandleError(err error) error {
 		return ApplicationNotFoundError{Name: e.Name}
 	case v3actions.RunTaskError:
 		return RunTaskError{Message: e.Error()}
+	case v3actions.TaskWorkersUnavailableError:
+		return RunTaskError{Message: "Task workers are unavailable."}
 	}
 
 	return err

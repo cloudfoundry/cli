@@ -116,6 +116,17 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
+			Context("(503) Service Unavailable", func() {
+				BeforeEach(func() {
+					serverResponseCode = http.StatusServiceUnavailable
+				})
+
+				It("returns a ServiceUnavailableError", func() {
+					_, _, err := client.GetApplications(nil)
+					Expect(err).To(MatchError(cloudcontroller.ServiceUnavailableError{Message: "SomeCC Error Message"}))
+				})
+			})
+
 			Context("unhandled Error Codes", func() {
 				BeforeEach(func() {
 					serverResponseCode = http.StatusTeapot
