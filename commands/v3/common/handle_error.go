@@ -16,6 +16,8 @@ func HandleError(err error) error {
 			return RunTaskError{
 				Message: "App is not staged."}
 		}
+	case cloudcontroller.APINotFoundError:
+		return APINotFoundError{URL: e.URL}
 	case v3actions.ApplicationNotFoundError:
 		return ApplicationNotFoundError{Name: e.Name}
 	case v3actions.TaskWorkersUnavailableError:

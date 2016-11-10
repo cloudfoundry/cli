@@ -33,6 +33,12 @@ var _ = Describe("HandleError", func() {
 			API: "some-url",
 		}),
 
+		Entry("cloudcontroller.APINotFoundError -> APINotFoundError", cloudcontroller.APINotFoundError{
+			URL: "some-url",
+		}, APINotFoundError{
+			URL: "some-url",
+		}),
+
 		Entry("v2actions.ApplicationNotFoundError -> ApplicationNotFoundError", v2actions.ApplicationNotFoundError{
 			Name: "some-app",
 		}, ApplicationNotFoundError{

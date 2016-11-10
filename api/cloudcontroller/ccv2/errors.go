@@ -54,6 +54,9 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 	var errorResponse CCErrorResponse
 	err := json.Unmarshal(rawHTTPStatusErr.RawResponse, &errorResponse)
 	if err != nil {
+		if rawHTTPStatusErr.StatusCode == http.StatusNotFound {
+			return cloudcontroller.NotFoundError{Message: string(rawHTTPStatusErr.RawResponse)}
+		}
 		return rawHTTPStatusErr
 	}
 

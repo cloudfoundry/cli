@@ -96,6 +96,20 @@ var _ = Describe("Info", func() {
 	})
 
 	Context("when the cloud controller encounters an error", func() {
+		Context("when the root response is invalid", func() {
+			BeforeEach(func() {
+				rootRespondWith = RespondWith(
+					http.StatusNotFound,
+					`i am google, bow down`,
+				)
+			})
+
+			It("returns an APINotFoundError", func() {
+				_, _, _, err := client.Info()
+				Expect(err).To(MatchError(cloudcontroller.APINotFoundError{URL: server.URL()}))
+			})
+		})
+
 		Context("when the error occurs making a request to '/'", func() {
 			BeforeEach(func() {
 				rootRespondWith = RespondWith(

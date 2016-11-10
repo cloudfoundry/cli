@@ -75,14 +75,14 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 
 		Context("when the error is not from the cloud controller", func() {
 			BeforeEach(func() {
-				serverResponseCode = http.StatusNotFound
-				response = "404 Not Found: Requested route ('some-url.com') does not exist."
+				serverResponseCode = http.StatusTeapot
+				response = "418 I'm a teapot: Requested route ('some-url.com') does not exist."
 			})
 
 			It("returns a RawHTTPStatusError", func() {
 				_, _, err := client.GetApplications(nil)
 				Expect(err).To(MatchError(cloudcontroller.RawHTTPStatusError{
-					StatusCode:  http.StatusNotFound,
+					StatusCode:  http.StatusTeapot,
 					RawResponse: []byte(response),
 				}))
 			})
@@ -155,6 +155,17 @@ Code: 10242013, Title: title-2, Detail: detail 2`))
 				It("returns a ResourceNotFoundError", func() {
 					_, _, err := client.GetApplications(nil)
 					Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "SomeCC Error Message"}))
+				})
+
+				Context("when the error is not from the cloud controller API", func() {
+					BeforeEach(func() {
+						response = "an error not from the CC API"
+					})
+
+					It("returns a NotFoundError", func() {
+						_, _, err := client.GetApplications(nil)
+						Expect(err).To(MatchError(cloudcontroller.NotFoundError{Message: response}))
+					})
 				})
 			})
 

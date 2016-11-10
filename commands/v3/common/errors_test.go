@@ -45,6 +45,7 @@ var _ = Describe("Translatable Errors", func() {
 		// Cloud controller errors.
 		Entry("APIRequestError", APIRequestError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
+		Entry("APINotFoundError", APINotFoundError{}),
 
 		// Actor errors.
 		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
