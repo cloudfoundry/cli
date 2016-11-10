@@ -45,6 +45,12 @@ var _ = Describe("HandleError", func() {
 
 		Entry("cloudcontroller.UnprocessableEntityError without droplet message -> original error", unprocessableEntityError, unprocessableEntityError),
 
+		Entry("cloudcontroller.APINotFoundError -> APINotFoundError", cloudcontroller.APINotFoundError{
+			URL: "some-url",
+		}, APINotFoundError{
+			URL: "some-url",
+		}),
+
 		Entry("v3actions.ApplicationNotFoundError -> ApplicationNotFoundError", v3actions.ApplicationNotFoundError{
 			Name: "some-app",
 		}, ApplicationNotFoundError{

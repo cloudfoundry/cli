@@ -88,6 +88,9 @@ func (client *Client) rootResponse() (RootResponse, Warnings, error) {
 
 	err = client.connection.Make(request, &response)
 	if err != nil {
+		if _, ok := err.(cloudcontroller.NotFoundError); ok {
+			return RootResponse{}, nil, cloudcontroller.APINotFoundError{URL: client.cloudControllerURL}
+		}
 		return RootResponse{}, response.Warnings, err
 	}
 

@@ -69,8 +69,8 @@ func (e ResourceNotFoundError) Error() string {
 	return e.Message
 }
 
-// UnprocessableEntityError is returned the request cannot be processed by the
-// cloud controller.
+// UnprocessableEntityError is returned when the request cannot be processed by
+// the cloud controller.
 type UnprocessableEntityError struct {
 	Message string
 }
@@ -96,4 +96,22 @@ type ServiceUnavailableError struct {
 
 func (e ServiceUnavailableError) Error() string {
 	return e.Message
+}
+
+// NotFoundError wraps a generic 404 error.
+type NotFoundError struct {
+	Message string
+}
+
+func (e NotFoundError) Error() string {
+	return e.Message
+}
+
+// APINotFoundError is returned when the API endpoint is not found.
+type APINotFoundError struct {
+	URL string
+}
+
+func (e APINotFoundError) Error() string {
+	return fmt.Sprintf("Unable to find API at %s", e.URL)
 }

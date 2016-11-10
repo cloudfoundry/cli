@@ -73,5 +73,8 @@ func (client *Client) Info() (APIInformation, Warnings, error) {
 	}
 
 	err = client.connection.Make(request, &response)
+	if _, ok := err.(cloudcontroller.NotFoundError); ok {
+		return APIInformation{}, nil, cloudcontroller.APINotFoundError{URL: client.cloudControllerURL}
+	}
 	return info, response.Warnings, err
 }

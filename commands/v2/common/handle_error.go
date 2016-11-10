@@ -11,6 +11,8 @@ func HandleError(err error) error {
 		return APIRequestError{Err: e.Err}
 	case cloudcontroller.UnverifiedServerError:
 		return InvalidSSLCertError{API: e.URL}
+	case cloudcontroller.APINotFoundError:
+		return APINotFoundError{URL: e.URL}
 
 	case v2actions.ApplicationNotFoundError:
 		return ApplicationNotFoundError{Name: e.Name}

@@ -212,6 +212,10 @@
     "translation": "API endpoint (e.g. https://api.example.com)"
   },
   {
+    "id": "API endpoint not found at '{{.URL}}'",
+    "translation": ""
+  },
+  {
     "id": "API endpoint:",
     "translation": "API endpoint:"
   },

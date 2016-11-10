@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 	. "github.com/onsi/ginkgo"
@@ -71,6 +72,23 @@ var _ = Describe("Info", func() {
 			_, warnings, err := client.Info()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(warnings).To(ContainElement("this is a warning"))
+		})
+	})
+
+	Context("when the API response gives a bad API endpoint", func() {
+		BeforeEach(func() {
+			response := `i am banana`
+			server.AppendHandlers(
+				CombineHandlers(
+					VerifyRequest(http.MethodGet, "/v2/info"),
+					RespondWith(http.StatusNotFound, response),
+				),
+			)
+		})
+
+		It("returns back an APINotFoundError", func() {
+			_, _, err := client.Info()
+			Expect(err).To(MatchError(cloudcontroller.APINotFoundError{URL: server.URL()}))
 		})
 	})
 })

@@ -24,6 +24,10 @@
     "translation": "API URL to target"
   },
   {
+    "id": "API endpoint not found at '{{.URL}}'",
+    "translation": ""
+  },
+  {
     "id": "API version:",
     "translation": "API version:"
   },
