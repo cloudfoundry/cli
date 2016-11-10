@@ -228,8 +228,8 @@
     "translation": "API endpoint: {{.Endpoint}}"
   },
   {
-    "id": "API version",
-    "translation": ""
+    "id": "API version:",
+    "translation": "API version:"
   },
   {
     "id": "APPS",
