@@ -312,6 +312,10 @@
     "translation": "App instance limit"
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "App name is a required field"
   },
@@ -5218,6 +5222,10 @@
   {
     "id": "The quota",
     "translation": "The quota"
+  },
+  {
+    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
   },
   {
     "id": "The route {{.RouteName}} did not match any existing domains.",

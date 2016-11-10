@@ -32,6 +32,10 @@
     "translation": "App"
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App {{.AppName}} not found",
     "translation": ""
   },
@@ -1158,6 +1162,10 @@
   {
     "id": "The quota",
     "translation": "The quota"
+  },
+  {
+    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
+    "translation": ""
   },
   {
     "id": "The security group",

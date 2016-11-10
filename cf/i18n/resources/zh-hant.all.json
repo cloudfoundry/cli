@@ -312,6 +312,10 @@
     "translation": "應用程式實例限制"
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "應用程式名稱是必要欄位"
   },
@@ -5217,6 +5221,10 @@
   },
   {
     "id": "The quota",
+    "translation": ""
+  },
+  {
+    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
     "translation": ""
   },
   {

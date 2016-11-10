@@ -15,6 +15,10 @@ import (
 var _ = Describe("HandleError", func() {
 	err := errors.New("some-error")
 
+	unprocessableEntityError := cloudcontroller.UnprocessableEntityError{
+		Message: "another message",
+	}
+
 	DescribeTable("error translations",
 		func(passedInErr error, expectedErr error) {
 			actualErr := HandleError(passedInErr)
@@ -33,16 +37,18 @@ var _ = Describe("HandleError", func() {
 			API: "some-url",
 		}),
 
+		Entry("cloudcontroller.UnprocessableEntityError with droplet message -> RunTaskError", cloudcontroller.UnprocessableEntityError{
+			Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
+		}, RunTaskError{
+			Message: "App is not staged.",
+		}),
+
+		Entry("cloudcontroller.UnprocessableEntityError without droplet message -> original error", unprocessableEntityError, unprocessableEntityError),
+
 		Entry("v3actions.ApplicationNotFoundError -> ApplicationNotFoundError", v3actions.ApplicationNotFoundError{
 			Name: "some-app",
 		}, ApplicationNotFoundError{
 			Name: "some-app",
-		}),
-
-		Entry("v3actions.RunTaskError -> RunTaskError", v3actions.RunTaskError{
-			Message: "fooo: Banana Pants",
-		}, RunTaskError{
-			Message: "Banana Pants",
 		}),
 
 		Entry("v3actions.TaskWorkersUnavailableError -> RunTaskError", v3actions.TaskWorkersUnavailableError{
