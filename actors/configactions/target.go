@@ -24,6 +24,7 @@ func (actor Actor) SetTarget(settings TargetSettings) (Warnings, error) {
 		actor.CloudControllerClient.RoutingEndpoint(),
 		settings.SkipSSLValidation,
 	)
+	actor.Config.SetTokenInformation("", "", "")
 
 	return Warnings(warnings), nil
 }
