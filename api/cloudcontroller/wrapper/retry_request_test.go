@@ -9,7 +9,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -50,9 +49,6 @@ var _ = Describe("Retry", func() {
 
 	Describe("Make", func() {
 		Context("when no error occurs", func() {
-			BeforeEach(func() {
-			})
-
 			It("does not retry", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeConnection.MakeCallCount()).To(Equal(1))

@@ -164,31 +164,31 @@ API version:    some-version`,
 					})
 				})
 			})
+		})
 
-			Context("when the API does not have SSL", func() {
-				var CCAPI string
+		Context("when the API does not have SSL", func() {
+			var CCAPI string
 
-				BeforeEach(func() {
-					CCAPI = "http://api.foo.com"
-					cmd.OptionalArgs.URL = CCAPI
-				})
+			BeforeEach(func() {
+				CCAPI = "http://api.foo.com"
+				cmd.OptionalArgs.URL = CCAPI
+			})
 
-				It("sets the target with a warning", func() {
-					Expect(err).ToNot(HaveOccurred())
+			It("sets the target with a warning", func() {
+				Expect(err).ToNot(HaveOccurred())
 
-					Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
-					settings := fakeActor.SetTargetArgsForCall(0)
-					Expect(settings.URL).To(Equal(CCAPI))
-					Expect(settings.SkipSSLValidation).To(BeFalse())
+				Expect(fakeActor.SetTargetCallCount()).To(Equal(1))
+				settings := fakeActor.SetTargetArgsForCall(0)
+				Expect(settings.URL).To(Equal(CCAPI))
+				Expect(settings.SkipSSLValidation).To(BeFalse())
 
-					Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-					Expect(fakeUI.Out).To(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
-					Expect(fakeUI.Out).To(Say("OK"))
-				})
+				Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+				Expect(fakeUI.Out).To(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+				Expect(fakeUI.Out).To(Say("OK"))
 			})
 		})
 
-		Context("when URL host does not exist", func() {
+		Context("when the URL host does not exist", func() {
 			var (
 				CCAPI      string
 				requestErr cloudcontroller.RequestError

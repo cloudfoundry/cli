@@ -75,23 +75,6 @@ func (cmd *ApiCommand) ClearTarget() error {
 	return nil
 }
 
-func displayCurrentTargetInformation(config commands.Config, ui commands.UI) error {
-	user, err := config.CurrentUser()
-	if err != nil {
-		return err
-	}
-
-	ui.DisplayTable("", [][]string{
-		{ui.TranslateText("API endpoint:"), config.Target()},
-		{ui.TranslateText("API version:"), config.APIVersion()},
-		{ui.TranslateText("User:"), user.Name},
-		{ui.TranslateText("Org:"), config.TargetedOrganization().Name},
-		{ui.TranslateText("Space:"), config.TargetedSpace().Name},
-	}, 3)
-
-	return nil
-}
-
 func (cmd *ApiCommand) setAPI() error {
 	cmd.UI.DisplayHeaderFlavorText("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
 		"Endpoint": cmd.OptionalArgs.URL,
@@ -114,6 +97,23 @@ func (cmd *ApiCommand) setAPI() error {
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
+	return nil
+}
+
+func displayCurrentTargetInformation(config commands.Config, ui commands.UI) error {
+	user, err := config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	ui.DisplayTable("", [][]string{
+		{ui.TranslateText("API endpoint:"), config.Target()},
+		{ui.TranslateText("API version:"), config.APIVersion()},
+		{ui.TranslateText("User:"), user.Name},
+		{ui.TranslateText("Org:"), config.TargetedOrganization().Name},
+		{ui.TranslateText("Space:"), config.TargetedSpace().Name},
+	}, 3)
+
 	return nil
 }
 
