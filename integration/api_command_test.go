@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/integration/helpers"
 	"code.cloudfoundry.org/cli/utils/configv3"
 
 	. "github.com/onsi/ginkgo"
@@ -27,12 +28,10 @@ var _ = Describe("API Command", func() {
 		Context("when the api is set", func() {
 			Context("when the user is not logged in", func() {
 				It("outputs the current api", func() {
-					command := exec.Command("cf", "api")
-					session, err := Start(command, GinkgoWriter, GinkgoWriter)
-					Expect(err).NotTo(HaveOccurred())
+					session := helpers.CF("api")
 
-					Eventually(session.Out).Should(Say("API endpoint:\\s+https://%s", getAPI()))
-					Eventually(session.Out).Should(Say("API version: \\d+\\.\\d+\\.\\d+"))
+					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", getAPI()))
+					Eventually(session.Out).Should(Say("API version:\\s+\\d+\\.\\d+\\.\\d+"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -70,7 +69,7 @@ var _ = Describe("API Command", func() {
 					Expect(err).NotTo(HaveOccurred())
 
 					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", target))
-					Eventually(session.Out).Should(Say("API version: %s", apiVersion))
+					Eventually(session.Out).Should(Say("API version:\\s+%s", apiVersion))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -174,8 +173,8 @@ var _ = Describe("API Command", func() {
 
 				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", getAPI()))
 				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("API endpoint:\\s+https://%s", getAPI()))
-				Eventually(session.Out).Should(Say("API version: \\d+\\.\\d+\\.\\d+"))
+				Eventually(session.Out).Should(Say("API endpoint:\\s+%s", getAPI()))
+				Eventually(session.Out).Should(Say("API version:\\s+\\d+\\.\\d+\\.\\d+"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -295,7 +294,7 @@ var _ = Describe("API Command", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(configFile.ConfigVersion).To(Equal(3))
-		Expect(configFile.Target).To(Equal("https://" + getAPI()))
+		Expect(configFile.Target).To(Equal(getAPI()))
 		Expect(configFile.APIVersion).To(MatchRegexp("\\d+\\.\\d+\\.\\d+"))
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.LoggregatorEndpoint).To(MatchRegexp("^wss://"))
