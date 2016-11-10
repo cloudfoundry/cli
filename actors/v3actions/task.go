@@ -2,7 +2,6 @@ package v3actions
 
 import (
 	"net/url"
-	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -10,19 +9,6 @@ import (
 
 // Task represents a V3 actor Task.
 type Task ccv3.Task
-
-// RunTaskError represents a generic error encountered when creating a task.
-type RunTaskError struct {
-	Message string
-}
-
-func (e RunTaskError) Error() string {
-	splitMessage := strings.Split(e.Message, ": ")
-	if len(splitMessage) > 1 {
-		return splitMessage[1]
-	}
-	return e.Message
-}
 
 // TaskWorkersUnavailableError is returned when there are no workers to run a
 // given task.
@@ -38,11 +24,10 @@ func (e TaskWorkersUnavailableError) Error() string {
 // with the provided application GUID.
 func (actor Actor) RunTask(appGUID string, command string) (Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.RunTask(appGUID, command)
-	switch err.(type) {
-	case cloudcontroller.UnprocessableEntityError:
-		return Task{}, Warnings(warnings), RunTaskError{Message: err.Error()}
-	case cloudcontroller.TaskWorkersUnavailableError:
-		return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: err.Error()}
+	if err != nil {
+		if e, ok := err.(cloudcontroller.TaskWorkersUnavailableError); ok {
+			return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: e.Error()}
+		}
 	}
 
 	return Task(task), Warnings(warnings), err

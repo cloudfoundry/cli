@@ -312,6 +312,10 @@
     "translation": "Limite de instância do app"
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "Nome do app é um campo obrigatório"
   },
@@ -5217,6 +5221,10 @@
   },
   {
     "id": "The quota",
+    "translation": ""
+  },
+  {
+    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
     "translation": ""
   },
   {

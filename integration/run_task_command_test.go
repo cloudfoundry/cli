@@ -141,7 +141,7 @@ Task 1 has been submitted successfully for execution.`,
 				session := CF("run-task", appName, "echo hi")
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
-				Expect(session.Err).To(Say(`Error running task: Task must have a droplet. Specify droplet or assign current droplet to app.`))
+				Expect(session.Err).To(Say(`Error running task: App is not staged.`))
 			})
 		})
 

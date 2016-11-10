@@ -312,6 +312,10 @@
     "translation": "앱 인스턴스 한계"
   },
   {
+    "id": "App is not staged.",
+    "translation": ""
+  },
+  {
     "id": "App name is a required field",
     "translation": "앱 이름은 필수 필드임"
   },
@@ -5217,6 +5221,10 @@
   },
   {
     "id": "The quota",
+    "translation": ""
+  },
+  {
+    "id": "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
     "translation": ""
   },
   {
