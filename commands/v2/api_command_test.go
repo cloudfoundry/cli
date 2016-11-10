@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/commands/v2/v2fakes"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/ui"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gbytes"
@@ -47,8 +46,7 @@ var _ = Describe("API Command", func() {
 		Expect(fakeUI.Out).To(Say(ExperimentalWarning))
 	})
 
-	Context("when the API URL is not provided", func() {
-
+	Context("when the API endpoint is not provided", func() {
 		Context("when the API is not set", func() {
 			It("displays a tip", func() {
 				Expect(err).ToNot(HaveOccurred())
@@ -57,28 +55,30 @@ var _ = Describe("API Command", func() {
 			})
 		})
 
-		Context("when the API is set", func() {
+		Context("when the API is set, the user is logged in and an org and space are targeted", func() {
 			BeforeEach(func() {
 				fakeConfig.TargetReturns("some-api-target")
 				fakeConfig.APIVersionReturns("some-version")
+				fakeConfig.CurrentUserReturns(configv3.User{
+					Name: "admin",
+				}, nil)
 				fakeConfig.TargetedOrganizationReturns(configv3.Organization{
 					Name: "some-org",
 				})
 				fakeConfig.TargetedSpaceReturns(configv3.Space{
 					Name: "some-space",
 				})
-				fakeConfig.CurrentUserReturns(configv3.User{
-					Name: "admin",
-				}, nil)
 			})
 
-			It("outputs the standard target information", func() {
+			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeUI.Out).To(Say("API endpoint:\\s+some-api-target"))
-				Expect(fakeUI.Out).To(Say("API version:\\s+some-version"))
-				Expect(fakeUI.Out).To(Say("User:\\s+admin"))
-				Expect(fakeUI.Out).To(Say("Org:\\s+some-org"))
-				Expect(fakeUI.Out).To(Say("Space:\\s+some-space"))
+				Expect(fakeUI.Out).To(Say(`
+API endpoint:   some-api-target
+API version:    some-version
+User:           admin
+Org:            some-org
+Space:          some-space`,
+				))
 			})
 		})
 
@@ -96,7 +96,7 @@ var _ = Describe("API Command", func() {
 		})
 	})
 
-	Context("when a valid api endpoint is specified", func() {
+	Context("when a valid API endpoint is provided", func() {
 		Context("when the API has SSL", func() {
 			Context("with no protocol", func() {
 				var (
@@ -121,12 +121,11 @@ var _ = Describe("API Command", func() {
 						Expect(settings.SkipSSLValidation).To(BeFalse())
 
 						Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-						Expect(fakeUI.Out).To(Say("OK"))
-						Expect(fakeUI.Out).To(Say("API endpoint:\\s+some-api-target"))
-						Expect(fakeUI.Out).To(Say("API version:\\s+some-version"))
-						Expect(fakeUI.Out).To(Say("User:"))
-						Expect(fakeUI.Out).To(Say("Org:"))
-						Expect(fakeUI.Out).To(Say("Space:"))
+						Expect(fakeUI.Out).To(Say(`OK
+
+API endpoint:   some-api-target
+API version:    some-version`,
+						))
 					})
 				})
 
@@ -145,12 +144,11 @@ var _ = Describe("API Command", func() {
 							Expect(settings.SkipSSLValidation).To(BeTrue())
 
 							Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-							Expect(fakeUI.Out).To(Say("OK"))
-							Expect(fakeUI.Out).To(Say("API endpoint:\\s+some-api-target"))
-							Expect(fakeUI.Out).To(Say("API version:\\s+some-version"))
-							Expect(fakeUI.Out).To(Say("User:"))
-							Expect(fakeUI.Out).To(Say("Org:"))
-							Expect(fakeUI.Out).To(Say("Space:"))
+							Expect(fakeUI.Out).To(Say(`OK
+
+API endpoint:   some-api-target
+API version:    some-version`,
+							))
 						})
 					})
 
@@ -204,7 +202,7 @@ var _ = Describe("API Command", func() {
 				fakeActor.SetTargetReturns(nil, requestErr)
 			})
 
-			It("sets the target with a warning", func() {
+			It("returns an APIRequestError", func() {
 				Expect(err).To(MatchError(common.APIRequestError{Err: requestErr.Err}))
 			})
 		})

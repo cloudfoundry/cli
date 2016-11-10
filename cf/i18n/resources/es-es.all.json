@@ -228,7 +228,7 @@
     "translation": "Punto final de la API: {{.Endpoint}}"
   },
   {
-    "id": "API version",
+    "id": "API version:",
     "translation": ""
   },
   {

@@ -65,7 +65,7 @@ func (cmd *ApiCommand) Execute(args []string) error {
 		return nil
 	}
 
-	return DisplayCurrentTargetInformation(cmd.Config, cmd.UI)
+	return displayCurrentTargetInformation(cmd.Config, cmd.UI)
 }
 
 func (cmd *ApiCommand) ClearTarget() error {
@@ -75,17 +75,20 @@ func (cmd *ApiCommand) ClearTarget() error {
 	return nil
 }
 
-func DisplayCurrentTargetInformation(config commands.Config, commandUI commands.UI) error {
+func displayCurrentTargetInformation(config commands.Config, ui commands.UI) error {
 	user, err := config.CurrentUser()
 	if err != nil {
 		return err
 	}
 
-	commandUI.DisplayPair("API endpoint", config.Target())
-	commandUI.DisplayPair("API version", config.APIVersion())
-	commandUI.DisplayPair("User", user.Name)
-	commandUI.DisplayPair("Org", config.TargetedOrganization().Name)
-	commandUI.DisplayPair("Space", config.TargetedSpace().Name)
+	ui.DisplayTable("", [][]string{
+		{ui.TranslateText("API endpoint:"), config.Target()},
+		{ui.TranslateText("API version:"), config.APIVersion()},
+		{ui.TranslateText("User:"), user.Name},
+		{ui.TranslateText("Org:"), config.TargetedOrganization().Name},
+		{ui.TranslateText("Space:"), config.TargetedSpace().Name},
+	}, 3)
+
 	return nil
 }
 

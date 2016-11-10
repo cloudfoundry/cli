@@ -228,7 +228,7 @@
     "translation": "API エンドポイント: {{.Endpoint}}"
   },
   {
-    "id": "API version",
+    "id": "API version:",
     "translation": ""
   },
   {
