@@ -33,9 +33,6 @@ var _ = Describe("API Command", func() {
 
 					Eventually(session.Out).Should(Say("API endpoint:\\s+https://%s", getAPI()))
 					Eventually(session.Out).Should(Say("API version: \\d+\\.\\d+\\.\\d+"))
-					Eventually(session.Out).Should(Say("User:"))
-					Eventually(session.Out).Should(Say("Org:"))
-					Eventually(session.Out).Should(Say("Space:"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
@@ -74,9 +71,6 @@ var _ = Describe("API Command", func() {
 
 					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", target))
 					Eventually(session.Out).Should(Say("API version: %s", apiVersion))
-					Eventually(session.Out).Should(Say("User: %s", user))
-					Eventually(session.Out).Should(Say("Org: %s", org))
-					Eventually(session.Out).Should(Say("Space: %s", space))
 					Eventually(session).Should(Exit(0))
 				})
 			})
