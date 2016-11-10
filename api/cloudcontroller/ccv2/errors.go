@@ -69,6 +69,8 @@ func convert(rawHTTPStatusErr cloudcontroller.RawHTTPStatusError) error {
 		return cloudcontroller.ResourceNotFoundError{Message: errorResponse.Description}
 	case http.StatusUnprocessableEntity: // 422
 		return cloudcontroller.UnprocessableEntityError{Message: errorResponse.Description}
+	case http.StatusServiceUnavailable: // 503
+		return cloudcontroller.ServiceUnavailableError{Message: errorResponse.Description}
 	default:
 		return UnexpectedResponseError{
 			ResponseCode:    rawHTTPStatusErr.StatusCode,

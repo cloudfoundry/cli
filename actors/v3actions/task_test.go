@@ -90,9 +90,24 @@ var _ = Describe("Task Actions", func() {
 					)
 				})
 
-				It("returns a wrapped error", func() {
+				It("returns a RunTaskError", func() {
 					_, _, err := actor.RunTask("some-app-guid", "some command")
 					Expect(err).To(MatchError(RunTaskError{Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app."}))
+				})
+			})
+
+			Context("when the error is a TaskWorkersUnavailableError", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.RunTaskReturns(
+						ccv3.Task{},
+						nil,
+						cloudcontroller.TaskWorkersUnavailableError{Message: "banana babans"},
+					)
+				})
+
+				It("returns a TaskWorkersUnavailableError", func() {
+					_, _, err := actor.RunTask("some-app-guid", "some command")
+					Expect(err).To(MatchError(TaskWorkersUnavailableError{Message: "banana babans"}))
 				})
 			})
 

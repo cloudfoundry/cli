@@ -19,10 +19,14 @@ var _ = Describe("Translatable Errors", func() {
 		formattedTemplate.Option("missingkey=error")
 
 		var buffer bytes.Buffer
-		err = formattedTemplate.Execute(&buffer, vars[0])
-		Expect(err).ToNot(HaveOccurred())
+		if len(vars) > 0 {
+			err = formattedTemplate.Execute(&buffer, vars[0])
+			Expect(err).ToNot(HaveOccurred())
 
-		return buffer.String()
+			return buffer.String()
+		} else {
+			return s
+		}
 	}
 
 	DescribeTable("translates error",
@@ -32,14 +36,17 @@ var _ = Describe("Translatable Errors", func() {
 			err.Translate(translateFunc)
 		},
 
+		// Command prerequisite errors.
 		Entry("NoAPISetError", NoAPISetError{}),
 		Entry("NotLoggedInError", NotLoggedInError{}),
 		Entry("NoTargetedOrgError", NoTargetedOrgError{}),
 		Entry("NoTargetedSpaceError", NoTargetedSpaceError{}),
 
+		// Cloud controller errors.
 		Entry("APIRequestError", APIRequestError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
 
+		// Actor errors.
 		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
 		Entry("RunTaskError", RunTaskError{}),
 	)

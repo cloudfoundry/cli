@@ -24,12 +24,25 @@ func (e RunTaskError) Error() string {
 	return e.Message
 }
 
+// TaskWorkersUnavailableError is returned when there are no workers to run a
+// given task.
+type TaskWorkersUnavailableError struct {
+	Message string
+}
+
+func (e TaskWorkersUnavailableError) Error() string {
+	return e.Message
+}
+
 // RunTask runs the provided command in the application environment associated
 // with the provided application GUID.
 func (actor Actor) RunTask(appGUID string, command string) (Task, Warnings, error) {
 	task, warnings, err := actor.CloudControllerClient.RunTask(appGUID, command)
-	if e, ok := err.(cloudcontroller.UnprocessableEntityError); ok {
-		return Task{}, Warnings(warnings), RunTaskError{Message: e.Message}
+	switch err.(type) {
+	case cloudcontroller.UnprocessableEntityError:
+		return Task{}, Warnings(warnings), RunTaskError{Message: err.Error()}
+	case cloudcontroller.TaskWorkersUnavailableError:
+		return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: err.Error()}
 	}
 
 	return Task(task), Warnings(warnings), err

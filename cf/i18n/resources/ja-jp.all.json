@@ -5020,6 +5020,10 @@
     "translation": "スペース {{.SpaceName}} をターゲットにしました\n"
   },
   {
+    "id": "Task workers are unavailable.",
+    "translation": ""
+  },
+  {
     "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
     "translation": ""
   },

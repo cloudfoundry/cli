@@ -32,13 +32,18 @@ var _ = Describe("Translatable Errors", func() {
 			err.Translate(translateFunc)
 		},
 
-		Entry("APIRequestError", APIRequestError{}),
-		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
-		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
+		// Command prerequisite errors.
 		Entry("NoAPISetError", NoAPISetError{}),
 		Entry("NoTargetedOrgError", NoTargetedOrgError{}),
 		Entry("NoTargetedSpaceError", NoTargetedSpaceError{}),
 		Entry("NotLoggedInError", NotLoggedInError{}),
+
+		// Cloud controller errors.
+		Entry("APIRequestError", APIRequestError{}),
+		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
+
+		// Actor errors.
+		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
 	)
 })
