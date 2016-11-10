@@ -74,10 +74,7 @@ var _ = Describe("API Command", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeUI.Out).To(Say(`
 API endpoint:   some-api-target
-API version:    some-version
-User:           admin
-Org:            some-org
-Space:          some-space`,
+API version:    some-version`,
 				))
 			})
 		})
