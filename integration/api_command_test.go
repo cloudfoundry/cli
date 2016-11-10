@@ -224,6 +224,7 @@ var _ = Describe("API Command", func() {
 				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", server.URL()))
 				Eventually(session.Out).Should(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(0))
 			})
 		})
@@ -260,6 +261,7 @@ var _ = Describe("API Command", func() {
 			Eventually(session.Out).Should(Say("Setting api endpoint to %s...", getAPI()))
 			Consistently(session.Out).ShouldNot(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 			Eventually(session.Out).Should(Say("OK"))
+			Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
 			Eventually(session).Should(Exit(0))
 		})
 

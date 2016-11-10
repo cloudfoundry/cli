@@ -30,6 +30,7 @@ var _ = Describe("API Command", func() {
 		fakeActor = new(v2fakes.FakeAPIConfigActor)
 		fakeConfig = new(commandsfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
+		fakeConfig.BinaryNameReturns("faceman")
 
 		cmd = ApiCommand{
 			UI:     fakeUI,
@@ -182,6 +183,33 @@ API version:    some-version`,
 				Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
 				Expect(fakeUI.Out).To(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 				Expect(fakeUI.Out).To(Say("OK"))
+			})
+		})
+
+		Context("when the API is set but the user is not logged in", func() {
+			BeforeEach(func() {
+				cmd.OptionalArgs.URL = "https://api.foo.com"
+				fakeConfig.TargetReturns("something")
+			})
+
+			It("outputs a 'not logged in' message", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeUI.Out).To(Say("Not logged in. Use 'faceman login' to log in."))
+			})
+		})
+
+		Context("when the API is set but the user is logged in", func() {
+			BeforeEach(func() {
+				cmd.OptionalArgs.URL = "https://api.foo.com"
+				fakeConfig.TargetReturns("something")
+				fakeConfig.CurrentUserReturns(configv3.User{Name: "banana"}, nil)
+			})
+
+			It("does not output a 'not logged in' message", func() {
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeUI.Out).ToNot(Say("Not logged in. Use 'faceman login' to log in."))
 			})
 		})
 
