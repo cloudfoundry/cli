@@ -896,6 +896,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME terminate-task APP_NAME TASK_ID\\n\\nEXAMPLES:\\n   CF_NAME terminate-task my-app 3",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]"
   },
@@ -1420,6 +1424,10 @@
     "translation": ""
   },
   {
+    "id": "TASKS:",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": "TIMEOUT"
   },
@@ -1433,6 +1441,14 @@
   },
   {
     "id": "Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+    "translation": ""
+  },
+  {
+    "id": "Terminate a running task of an app",
+    "translation": ""
+  },
+  {
+    "id": "Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
     "translation": ""
   },
   {
@@ -1684,6 +1700,10 @@
     "translation": "The stack name"
   },
   {
+    "id": "The task's unique sequence ID",
+    "translation": ""
+  },
+  {
     "id": "The token",
     "translation": "The token"
   },
@@ -1812,6 +1832,10 @@
     "translation": "repo-plugins"
   },
   {
+    "id": "run-task",
+    "translation": ""
+  },
+  {
     "id": "service-broker",
     "translation": "service-broker"
   },
@@ -1825,6 +1849,14 @@
   },
   {
     "id": "start time",
+    "translation": ""
+  },
+  {
+    "id": "tasks",
+    "translation": ""
+  },
+  {
+    "id": "terminate-task",
     "translation": ""
   },
   {
