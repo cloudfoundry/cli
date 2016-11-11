@@ -279,4 +279,87 @@ var _ = Describe("Task", func() {
 			})
 		})
 	})
+
+	Describe("UpdateTask", func() {
+		Context("when the request succeeds", func() {
+			BeforeEach(func() {
+				response := `{
+          "guid": "task-3-guid",
+          "sequence_id": 3,
+          "name": "task-3",
+          "command": "some-command",
+          "state": "CANCELING",
+          "created_at": "2016-11-07T07:59:01Z"
+        }`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v3/tasks/some-task-guid/cancel"),
+						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+					),
+				)
+			})
+
+			It("returns the task and warnings", func() {
+				task, warnings, err := client.UpdateTask("some-task-guid")
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(task).To(Equal(Task{
+					GUID:       "task-3-guid",
+					SequenceID: 3,
+					Name:       "task-3",
+					Command:    "some-command",
+					State:      "CANCELING",
+					CreatedAt:  "2016-11-07T07:59:01Z",
+				}))
+				Expect(warnings).To(ConsistOf("warning"))
+			})
+		})
+
+		Context("when the request fails", func() {
+			BeforeEach(func() {
+				response := `{
+  "errors": [
+    {
+      "code": 10008,
+      "detail": "The request is semantically invalid: command presence",
+      "title": "CF-UnprocessableEntity"
+    },
+    {
+      "code": 10010,
+      "detail": "App not found",
+      "title": "CF-ResourceNotFound"
+    }
+  ]
+}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodPut, "/v3/tasks/some-task-guid/cancel"),
+						RespondWith(http.StatusTeapot, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+					),
+				)
+			})
+
+			It("returns the errors and all warnings", func() {
+				_, warnings, err := client.UpdateTask("some-task-guid")
+				Expect(err).To(MatchError(UnexpectedResponseError{
+					ResponseCode: http.StatusTeapot,
+					CCErrorResponse: CCErrorResponse{
+						[]CCError{
+							{
+								Code:   10008,
+								Detail: "The request is semantically invalid: command presence",
+								Title:  "CF-UnprocessableEntity",
+							},
+							{
+								Code:   10010,
+								Detail: "App not found",
+								Title:  "CF-ResourceNotFound",
+							},
+						},
+					},
+				}))
+				Expect(warnings).To(ConsistOf("warning"))
+			})
+		})
+	})
 })

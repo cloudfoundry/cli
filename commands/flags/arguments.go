@@ -279,3 +279,8 @@ type RunTaskArgs struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	Command string `positional-arg-name:"COMMAND" required:"true" description:"The command to execute"`
 }
+
+type TerminateTaskArgs struct {
+	AppName    string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
+	SequenceID int    `positional-arg-name:"TASK_ID" required:"true" description:"The task's unique sequence ID"`
+}

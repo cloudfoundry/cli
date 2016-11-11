@@ -101,3 +101,26 @@ func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]T
 
 	return allTasks, allWarnings, nil
 }
+
+// UpdateTask cancels a task.
+func (client *Client) UpdateTask(taskGUID string) (Task, Warnings, error) {
+	request, err := client.newHTTPRequest(requestOptions{
+		URL:    fmt.Sprintf("%s/v3/tasks/%s/cancel", client.cloudControllerURL, taskGUID),
+		Method: http.MethodPut,
+	})
+	if err != nil {
+		return Task{}, nil, err
+	}
+
+	var task Task
+	response := cloudcontroller.Response{
+		Result: &task,
+	}
+
+	err = client.connection.Make(request, &response)
+	if err != nil {
+		return Task{}, response.Warnings, err
+	}
+
+	return task, response.Warnings, nil
+}

@@ -163,4 +163,5 @@ type commandList struct {
 	UninstallPlugin                    UninstallPluginCommand                    `command:"uninstall-plugin" description:"Uninstall the plugin defined in command argument"`
 	RunTask                            v3.RunTaskCommand                         `command:"run-task" alias:"rt" description:"Run a one-off task on an app"`
 	Tasks                              v3.TasksCommand                           `command:"tasks" description:"List tasks of an app"`
+	TerminateTask                      v3.TerminateTaskCommand                   `command:"terminate-task" description:"Terminate a running task of an app"`
 }

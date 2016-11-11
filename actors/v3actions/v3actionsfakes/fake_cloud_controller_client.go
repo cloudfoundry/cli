@@ -42,6 +42,16 @@ type FakeCloudControllerClient struct {
 		result2 ccv3.Warnings
 		result3 error
 	}
+	UpdateTaskStub        func(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
+	updateTaskMutex       sync.RWMutex
+	updateTaskArgsForCall []struct {
+		taskGUID string
+	}
+	updateTaskReturns struct {
+		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -153,6 +163,41 @@ func (fake *FakeCloudControllerClient) GetApplicationTasksReturns(result1 []ccv3
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error) {
+	fake.updateTaskMutex.Lock()
+	fake.updateTaskArgsForCall = append(fake.updateTaskArgsForCall, struct {
+		taskGUID string
+	}{taskGUID})
+	fake.recordInvocation("UpdateTask", []interface{}{taskGUID})
+	fake.updateTaskMutex.Unlock()
+	if fake.UpdateTaskStub != nil {
+		return fake.UpdateTaskStub(taskGUID)
+	} else {
+		return fake.updateTaskReturns.result1, fake.updateTaskReturns.result2, fake.updateTaskReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) UpdateTaskCallCount() int {
+	fake.updateTaskMutex.RLock()
+	defer fake.updateTaskMutex.RUnlock()
+	return len(fake.updateTaskArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) UpdateTaskArgsForCall(i int) string {
+	fake.updateTaskMutex.RLock()
+	defer fake.updateTaskMutex.RUnlock()
+	return fake.updateTaskArgsForCall[i].taskGUID
+}
+
+func (fake *FakeCloudControllerClient) UpdateTaskReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.UpdateTaskStub = nil
+	fake.updateTaskReturns = struct {
+		result1 ccv3.Task
+		result2 ccv3.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -162,6 +207,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getApplicationsMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()
 	defer fake.getApplicationTasksMutex.RUnlock()
+	fake.updateTaskMutex.RLock()
+	defer fake.updateTaskMutex.RUnlock()
 	return fake.invocations
 }
 
