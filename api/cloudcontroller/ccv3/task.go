@@ -20,15 +20,15 @@ type Task struct {
 	CreatedAt  string `json:"created_at"`
 }
 
-// RunTaskBody represents the body of the request to create a Task.
-type RunTaskBody struct {
+// NewTaskBody represents the body of the request to create a Task.
+type NewTaskBody struct {
 	Command string `json:"command"`
 }
 
-// RunTask runs a command in the Application environment associated with the
+// NewTask runs a command in the Application environment associated with the
 // provided Application GUID.
-func (client *Client) RunTask(appGUID string, command string) (Task, Warnings, error) {
-	bodyBytes, err := json.Marshal(RunTaskBody{Command: command})
+func (client *Client) NewTask(appGUID string, command string) (Task, Warnings, error) {
+	bodyBytes, err := json.Marshal(NewTaskBody{Command: command})
 	if err != nil {
 		return Task{}, nil, err
 	}

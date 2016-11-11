@@ -25,13 +25,13 @@
 //   Endpoint: /v3/service_instances
 //   Action Name: Get
 //   Top Level Endpoint: service_instances
-//   Return Value: []ServiceInstances
+//   Return Value: []ServiceInstance
 //
 //   Method Name: GetSpaceServiceInstances
 //   Endpoint: /v3/spaces/:guid/service_instances
 //   Action Name: Get
 //   Top Level Endpoint: spaces
-//   Return Value: []ServiceInstances
+//   Return Value: []ServiceInstance
 //
 // Use the following table to determine which HTTP Command equates to which
 // Action Name:

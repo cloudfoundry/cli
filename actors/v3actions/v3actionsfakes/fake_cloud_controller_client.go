@@ -10,13 +10,13 @@ import (
 )
 
 type FakeCloudControllerClient struct {
-	RunTaskStub        func(appGUID string, command string) (ccv3.Task, ccv3.Warnings, error)
-	runTaskMutex       sync.RWMutex
-	runTaskArgsForCall []struct {
+	NewTaskStub        func(appGUID string, command string) (ccv3.Task, ccv3.Warnings, error)
+	newTaskMutex       sync.RWMutex
+	newTaskArgsForCall []struct {
 		appGUID string
 		command string
 	}
-	runTaskReturns struct {
+	newTaskReturns struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error
@@ -46,36 +46,36 @@ type FakeCloudControllerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudControllerClient) RunTask(appGUID string, command string) (ccv3.Task, ccv3.Warnings, error) {
-	fake.runTaskMutex.Lock()
-	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
+func (fake *FakeCloudControllerClient) NewTask(appGUID string, command string) (ccv3.Task, ccv3.Warnings, error) {
+	fake.newTaskMutex.Lock()
+	fake.newTaskArgsForCall = append(fake.newTaskArgsForCall, struct {
 		appGUID string
 		command string
 	}{appGUID, command})
-	fake.recordInvocation("RunTask", []interface{}{appGUID, command})
-	fake.runTaskMutex.Unlock()
-	if fake.RunTaskStub != nil {
-		return fake.RunTaskStub(appGUID, command)
+	fake.recordInvocation("NewTask", []interface{}{appGUID, command})
+	fake.newTaskMutex.Unlock()
+	if fake.NewTaskStub != nil {
+		return fake.NewTaskStub(appGUID, command)
 	} else {
-		return fake.runTaskReturns.result1, fake.runTaskReturns.result2, fake.runTaskReturns.result3
+		return fake.newTaskReturns.result1, fake.newTaskReturns.result2, fake.newTaskReturns.result3
 	}
 }
 
-func (fake *FakeCloudControllerClient) RunTaskCallCount() int {
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
-	return len(fake.runTaskArgsForCall)
+func (fake *FakeCloudControllerClient) NewTaskCallCount() int {
+	fake.newTaskMutex.RLock()
+	defer fake.newTaskMutex.RUnlock()
+	return len(fake.newTaskArgsForCall)
 }
 
-func (fake *FakeCloudControllerClient) RunTaskArgsForCall(i int) (string, string) {
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
-	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].command
+func (fake *FakeCloudControllerClient) NewTaskArgsForCall(i int) (string, string) {
+	fake.newTaskMutex.RLock()
+	defer fake.newTaskMutex.RUnlock()
+	return fake.newTaskArgsForCall[i].appGUID, fake.newTaskArgsForCall[i].command
 }
 
-func (fake *FakeCloudControllerClient) RunTaskReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
-	fake.RunTaskStub = nil
-	fake.runTaskReturns = struct {
+func (fake *FakeCloudControllerClient) NewTaskReturns(result1 ccv3.Task, result2 ccv3.Warnings, result3 error) {
+	fake.NewTaskStub = nil
+	fake.newTaskReturns = struct {
 		result1 ccv3.Task
 		result2 ccv3.Warnings
 		result3 error
@@ -156,8 +156,8 @@ func (fake *FakeCloudControllerClient) GetApplicationTasksReturns(result1 []ccv3
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.runTaskMutex.RLock()
-	defer fake.runTaskMutex.RUnlock()
+	fake.newTaskMutex.RLock()
+	defer fake.newTaskMutex.RUnlock()
 	fake.getApplicationsMutex.RLock()
 	defer fake.getApplicationsMutex.RUnlock()
 	fake.getApplicationTasksMutex.RLock()

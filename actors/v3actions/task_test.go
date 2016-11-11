@@ -26,7 +26,7 @@ var _ = Describe("Task Actions", func() {
 	Describe("RunTask", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
-				fakeCloudControllerClient.RunTaskReturns(
+				fakeCloudControllerClient.NewTaskReturns(
 					ccv3.Task{
 						SequenceID: 3,
 					},
@@ -47,8 +47,8 @@ var _ = Describe("Task Actions", func() {
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-				Expect(fakeCloudControllerClient.RunTaskCallCount()).To(Equal(1))
-				appGUIDArg, commandArg := fakeCloudControllerClient.RunTaskArgsForCall(0)
+				Expect(fakeCloudControllerClient.NewTaskCallCount()).To(Equal(1))
+				appGUIDArg, commandArg := fakeCloudControllerClient.NewTaskArgsForCall(0)
 				Expect(appGUIDArg).To(Equal("some-app-guid"))
 				Expect(commandArg).To(Equal("some command"))
 			})
@@ -57,7 +57,7 @@ var _ = Describe("Task Actions", func() {
 		Context("when the cloud controller client returns an error", func() {
 			Context("when the error is a TaskWorkersUnavailableError", func() {
 				BeforeEach(func() {
-					fakeCloudControllerClient.RunTaskReturns(
+					fakeCloudControllerClient.NewTaskReturns(
 						ccv3.Task{},
 						nil,
 						cloudcontroller.TaskWorkersUnavailableError{Message: "banana babans"},
@@ -75,7 +75,7 @@ var _ = Describe("Task Actions", func() {
 
 				BeforeEach(func() {
 					expectedErr = errors.New("I am a CloudControllerClient Error")
-					fakeCloudControllerClient.RunTaskReturns(
+					fakeCloudControllerClient.NewTaskReturns(
 						ccv3.Task{},
 						ccv3.Warnings{"warning-1", "warning-2"},
 						expectedErr,
