@@ -186,4 +186,108 @@ var _ = Describe("Task Actions", func() {
 			})
 		})
 	})
+
+	Describe("GetTaskBySequenceIDAndApplication", func() {
+		Context("when the cloud controller client does not return an error", func() {
+			Context("when the task is found", func() {
+				var task1 ccv3.Task
+
+				BeforeEach(func() {
+					task1 = ccv3.Task{
+						GUID:       "task-1-guid",
+						SequenceID: 1,
+					}
+					fakeCloudControllerClient.GetApplicationTasksReturns(
+						[]ccv3.Task{task1},
+						ccv3.Warnings{"get-task-warning-1"},
+						nil,
+					)
+				})
+
+				It("returns the task and warnings", func() {
+					task, warnings, err := actor.GetTaskBySequenceIDAndApplication(1, "some-app-guid")
+					Expect(err).ToNot(HaveOccurred())
+					Expect(task).To(Equal(Task(task1)))
+					Expect(warnings).To(ConsistOf("get-task-warning-1"))
+				})
+			})
+
+			Context("when the task is not found", func() {
+				BeforeEach(func() {
+					fakeCloudControllerClient.GetApplicationTasksReturns(
+						[]ccv3.Task{},
+						ccv3.Warnings{"get-task-warning-1"},
+						nil,
+					)
+				})
+
+				It("returns a TaskNotFoundError and warnings", func() {
+					_, warnings, err := actor.GetTaskBySequenceIDAndApplication(1, "some-app-guid")
+					Expect(err).To(MatchError(TaskNotFoundError{SequenceID: 1}))
+					Expect(warnings).To(ConsistOf("get-task-warning-1"))
+				})
+			})
+		})
+
+		Context("when the cloud controller client returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("generic-error")
+				fakeCloudControllerClient.GetApplicationTasksReturns(
+					[]ccv3.Task{},
+					ccv3.Warnings{"get-task-warning-1"},
+					expectedErr,
+				)
+			})
+
+			It("returns the same error and warnings", func() {
+				_, warnings, err := actor.GetTaskBySequenceIDAndApplication(1, "some-app-guid")
+				Expect(err).To(Equal(expectedErr))
+				Expect(warnings).To(ConsistOf("get-task-warning-1"))
+			})
+		})
+	})
+
+	Describe("TerminateTask", func() {
+		Context("when the task exists", func() {
+			var returnedTask ccv3.Task
+
+			BeforeEach(func() {
+				returnedTask = ccv3.Task{
+					GUID:       "some-task-guid",
+					SequenceID: 1,
+				}
+				fakeCloudControllerClient.UpdateTaskReturns(
+					returnedTask,
+					ccv3.Warnings{"update-task-warning"},
+					nil)
+			})
+
+			It("returns the task and warnings", func() {
+				task, warnings, err := actor.TerminateTask("some-task-guid")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(warnings).To(ConsistOf("update-task-warning"))
+				Expect(task).To(Equal(Task(returnedTask)))
+			})
+		})
+
+		Context("when the cloud controller returns an error", func() {
+			var expectedErr error
+
+			BeforeEach(func() {
+				expectedErr = errors.New("cc-error")
+				fakeCloudControllerClient.UpdateTaskReturns(
+					ccv3.Task{},
+					ccv3.Warnings{"update-task-warning"},
+					expectedErr)
+			})
+
+			It("returns the same error and warnings", func() {
+				_, warnings, err := actor.TerminateTask("some-task-guid")
+				Expect(err).To(MatchError(expectedErr))
+				Expect(warnings).To(ConsistOf("update-task-warning"))
+			})
+		})
+	})
 })

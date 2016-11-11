@@ -1,7 +1,9 @@
 package v3actions
 
 import (
+	"fmt"
 	"net/url"
+	"strconv"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
@@ -18,6 +20,15 @@ type TaskWorkersUnavailableError struct {
 
 func (e TaskWorkersUnavailableError) Error() string {
 	return e.Message
+}
+
+// TaskNotFoundError is returned when no tasks matching the filters are found.
+type TaskNotFoundError struct {
+	SequenceID int
+}
+
+func (e TaskNotFoundError) Error() string {
+	return fmt.Sprintf("Task sequence ID %d not found.", e.SequenceID)
 }
 
 // RunTask runs the provided command in the application environment associated
@@ -53,4 +64,26 @@ func (actor Actor) GetApplicationTasks(appGUID string, sortOrder SortOrder) ([]T
 	}
 
 	return allTasks, actorWarnings, nil
+}
+
+func (actor Actor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (Task, Warnings, error) {
+	query := url.Values{
+		"sequence_ids": []string{strconv.Itoa(sequenceID)},
+	}
+
+	tasks, warnings, err := actor.CloudControllerClient.GetApplicationTasks(appGUID, query)
+	if err != nil {
+		return Task{}, Warnings(warnings), err
+	}
+
+	if len(tasks) == 0 {
+		return Task{}, Warnings(warnings), TaskNotFoundError{SequenceID: sequenceID}
+	}
+
+	return Task(tasks[0]), Warnings(warnings), nil
+}
+
+func (actor Actor) TerminateTask(taskGUID string) (Task, Warnings, error) {
+	task, warnings, err := actor.CloudControllerClient.UpdateTask(taskGUID)
+	return Task(task), Warnings(warnings), err
 }
