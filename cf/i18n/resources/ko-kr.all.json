@@ -1400,6 +1400,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME terminate-task APP_NAME TASK_ID\\n\\nEXAMPLES:\\n   CF_NAME terminate-task my-app 3",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": ""
   },
@@ -4964,6 +4968,10 @@
     "translation": "시스템 제공:"
   },
   {
+    "id": "TASKS:",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": "제한시간"
   },
@@ -5036,8 +5044,16 @@
     "translation": ""
   },
   {
+    "id": "Terminate a running task of an app",
+    "translation": ""
+  },
+  {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "주어진 색인에서 실행 중인 애플리케이션 인스턴스를 종료하고 애플리케이션의 새 인스턴스를 동일한 색인으로 인스턴스화합니다"
+  },
+  {
+    "id": "Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "The API endpoint",
@@ -5306,6 +5322,10 @@
   {
     "id": "The targeted API endpoint could not be reached.",
     "translation": "대상 API 엔드포인트에 도달할 수 없습니다. "
+  },
+  {
+    "id": "The task's unique sequence ID",
+    "translation": ""
   },
   {
     "id": "The token",
@@ -6196,6 +6216,10 @@
     "translation": "라우트"
   },
   {
+    "id": "run-task",
+    "translation": ""
+  },
+  {
     "id": "running",
     "translation": "실행 중"
   },
@@ -6330,6 +6354,14 @@
   {
     "id": "stopped after 1 redirect",
     "translation": "1회 경로 재지정 후 중지됨"
+  },
+  {
+    "id": "tasks",
+    "translation": ""
+  },
+  {
+    "id": "terminate-task",
+    "translation": ""
   },
   {
     "id": "time",

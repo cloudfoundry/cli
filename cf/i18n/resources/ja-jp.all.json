@@ -1400,6 +1400,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME terminate-task APP_NAME TASK_ID\\n\\nEXAMPLES:\\n   CF_NAME terminate-task my-app 3",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME unbind-route-service DOMAIN SERVICE_INSTANCE [--hostname HOSTNAME] [--path PATH] [-f]",
     "translation": ""
   },
@@ -4964,6 +4968,10 @@
     "translation": "システム提供:"
   },
   {
+    "id": "TASKS:",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": ""
   },
@@ -5036,8 +5044,16 @@
     "translation": ""
   },
   {
+    "id": "Terminate a running task of an app",
+    "translation": ""
+  },
+  {
     "id": "Terminate the running application Instance at the given index and instantiate a new instance of the application with the same index",
     "translation": "この実行アプリケーション・インスタンスを指定された索引で終了し、同じ索引でそのアプリケーションの新しいインスタンスをインスタンス化します"
+  },
+  {
+    "id": "Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+    "translation": ""
   },
   {
     "id": "The API endpoint",
@@ -5306,6 +5322,10 @@
   {
     "id": "The targeted API endpoint could not be reached.",
     "translation": "ターゲットの API エンドポイントに到達できませんでした。"
+  },
+  {
+    "id": "The task's unique sequence ID",
+    "translation": ""
   },
   {
     "id": "The token",
@@ -6196,6 +6216,10 @@
     "translation": "経路"
   },
   {
+    "id": "run-task",
+    "translation": ""
+  },
+  {
     "id": "running",
     "translation": "実行"
   },
@@ -6330,6 +6354,14 @@
   {
     "id": "stopped after 1 redirect",
     "translation": "1 リダイレクト後に停止されます"
+  },
+  {
+    "id": "tasks",
+    "translation": ""
+  },
+  {
+    "id": "terminate-task",
+    "translation": ""
   },
   {
     "id": "time",
