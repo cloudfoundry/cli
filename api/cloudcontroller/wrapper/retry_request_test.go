@@ -68,7 +68,7 @@ var _ = Describe("Retry", func() {
 			})
 		})
 
-		Context("when the request recieves a 4XX status code", func() {
+		Context("when the request receives a 4XX status code", func() {
 			BeforeEach(func() {
 				response.HTTPResponse.StatusCode = 400
 				connectionErr = cloudcontroller.RawHTTPStatusError{
@@ -83,7 +83,7 @@ var _ = Describe("Retry", func() {
 			})
 		})
 
-		Context("when the request recieves a 5XX status code", func() {
+		Context("when the request receives a 500 status code", func() {
 			BeforeEach(func() {
 				connectionErr = cloudcontroller.RawHTTPStatusError{
 					StatusCode: 500,
@@ -102,6 +102,28 @@ var _ = Describe("Retry", func() {
 			It("retries maxRetries times", func() {
 				Expect(err).To(Equal(connectionErr))
 				Expect(fakeConnection.MakeCallCount()).To(Equal(3))
+			})
+		})
+
+		Context("when the request receives a 5XX status code other than 500", func() {
+			BeforeEach(func() {
+				connectionErr = cloudcontroller.RawHTTPStatusError{
+					StatusCode: 501,
+				}
+				response.HTTPResponse.StatusCode = 501
+
+				fakeConnection.MakeStub = func(req *http.Request, passedResponse *cloudcontroller.Response) error {
+					defer req.Body.Close()
+					body, err := ioutil.ReadAll(request.Body)
+					Expect(err).ToNot(HaveOccurred())
+					Expect(string(body)).To(Equal(rawRequestBody))
+					return connectionErr
+				}
+			})
+
+			It("does not retry", func() {
+				Expect(err).To(Equal(connectionErr))
+				Expect(fakeConnection.MakeCallCount()).To(Equal(1))
 			})
 		})
 	})
