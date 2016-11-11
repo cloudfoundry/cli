@@ -137,4 +137,10 @@ var HelpCategoryList = []HelpCategory{
 			{"plugins", "install-plugin", "uninstall-plugin"},
 		},
 	},
+	{
+		CategoryName: "TASKS:",
+		CommandList: [][]string{
+			{"run-task", "tasks", "terminate-task"},
+		},
+	},
 }
