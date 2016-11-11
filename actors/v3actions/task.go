@@ -23,7 +23,7 @@ func (e TaskWorkersUnavailableError) Error() string {
 // RunTask runs the provided command in the application environment associated
 // with the provided application GUID.
 func (actor Actor) RunTask(appGUID string, command string) (Task, Warnings, error) {
-	task, warnings, err := actor.CloudControllerClient.RunTask(appGUID, command)
+	task, warnings, err := actor.CloudControllerClient.NewTask(appGUID, command)
 	if err != nil {
 		if e, ok := err.(cloudcontroller.TaskWorkersUnavailableError); ok {
 			return Task{}, Warnings(warnings), TaskWorkersUnavailableError{Message: e.Error()}

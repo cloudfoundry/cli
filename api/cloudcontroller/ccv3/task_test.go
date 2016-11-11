@@ -19,7 +19,7 @@ var _ = Describe("Task", func() {
 		client = NewTestClient()
 	})
 
-	Describe("RunTask", func() {
+	Describe("NewTask", func() {
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				//TODO: check if latest CC API returns this format
@@ -35,7 +35,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("creates and returns the task and all warnings", func() {
-				task, warnings, err := client.RunTask("some-app-guid", "some command")
+				task, warnings, err := client.NewTask("some-app-guid", "some command")
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(task).To(Equal(Task{SequenceID: 3}))
@@ -63,7 +63,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns a ResourceNotFoundError", func() {
-				_, _, err := client.RunTask("some-app-guid", "some command")
+				_, _, err := client.NewTask("some-app-guid", "some command")
 				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "App not found"}))
 			})
 		})
@@ -93,7 +93,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				_, warnings, err := client.RunTask("some-app-guid", "some command")
+				_, warnings, err := client.NewTask("some-app-guid", "some command")
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{
