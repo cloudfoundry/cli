@@ -50,7 +50,7 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *cloudcont
 			return nil
 		}
 
-		if passedResponse.HTTPResponse == nil || passedResponse.HTTPResponse.StatusCode < 500 {
+		if passedResponse.HTTPResponse == nil || passedResponse.HTTPResponse.StatusCode != 500 {
 			break
 		}
 	}
