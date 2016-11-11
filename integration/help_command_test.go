@@ -4,6 +4,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"code.cloudfoundry.org/cli/integration/helpers"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -71,6 +73,26 @@ var _ = Describe("Help Command", func() {
 			return exec.Command("cf", "--help", "-a")
 		}),
 	)
+
+	Describe("commands that appear in cf help -a", func() {
+		It("includes run-task", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say("run-task\\s+Run a one-off task on an app"))
+		})
+
+		It("includes list-task", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say("tasks\\s+List tasks of an app"))
+		})
+
+		It("includes terminate-task", func() {
+			session := helpers.CF("help", "-a")
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say("terminate-task\\s+Terminate a running task of an app"))
+		})
+	})
 
 	Context("displays the help text for a given command", func() {
 		DescribeTable("displays the help",
