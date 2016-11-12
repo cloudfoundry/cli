@@ -38,16 +38,20 @@ var _ = Describe("run-task command", func() {
    run-task - Run a one-off task on an app
 
 USAGE:
-   cf run-task APP_NAME COMMAND
+   cf run-task APP_NAME COMMAND \[--name TASK_NAME\]
 
 EXAMPLES:
-   cf run-task my-app "bundle exec rake db:migrate"
+   cf run-task my-app "bundle exec rake db:migrate" --name migrate
 
 ALIAS:
    rt
 
+OPTIONS:
+   --name      Name to give the task \(generated if omitted\)
+
 SEE ALSO:
-   tasks, terminate-task`))
+   tasks, terminate-task
+`))
 	})
 
 	Context("when the environment is not setup correctly", func() {
@@ -118,15 +122,36 @@ SEE ALSO:
 				})
 			})
 
-			It("creates a new task", func() {
-				session := CF("run-task", appName, "echo hi")
-				Eventually(session).Should(Exit(0))
-				userName, _ := getCredentials()
-				Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
-				Expect(session.Out).To(Say(`OK
+			Context("when the task name is not provided", func() {
+				It("creates a new task", func() {
+					session := CF("run-task", appName, "echo hi")
+					Eventually(session).Should(Exit(0))
+					userName, _ := getCredentials()
+					Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+					Expect(session.Out).To(Say(`OK
 
 Task 1 has been submitted successfully for execution.`,
-				))
+					))
+				})
+			})
+
+			Context("when the task name is provided", func() {
+				It("creates a new task with the provided name", func() {
+					session := CF("run-task", appName, "echo hi", "--name", "some-task-name")
+					Eventually(session).Should(Exit(0))
+					userName, _ := getCredentials()
+					Expect(session.Out).To(Say(fmt.Sprintf("Creating task for app %s in org %s / space %s as %s...", appName, orgName, spaceName, userName)))
+					Expect(session.Out).To(Say(`OK
+
+Task 1 has been submitted successfully for execution.`,
+					))
+
+					Eventually(func() *Buffer {
+						taskSession := CF("tasks", appName)
+						Eventually(taskSession).Should(Exit(0))
+						return taskSession.Out
+					}).Should(Say("1\\s+some-task-name"))
+				})
 			})
 		})
 

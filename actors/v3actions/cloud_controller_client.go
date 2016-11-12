@@ -12,6 +12,6 @@ import (
 type CloudControllerClient interface {
 	GetApplicationTasks(appGUID string, query url.Values) ([]ccv3.Task, ccv3.Warnings, error)
 	GetApplications(query url.Values) ([]ccv3.Application, ccv3.Warnings, error)
-	NewTask(appGUID string, command string) (ccv3.Task, ccv3.Warnings, error)
+	NewTask(appGUID string, command string, name string) (ccv3.Task, ccv3.Warnings, error)
 	UpdateTask(taskGUID string) (ccv3.Task, ccv3.Warnings, error)
 }
