@@ -38,19 +38,40 @@ var _ = Describe("Task Actions", func() {
 				)
 			})
 
-			It("creates and returns the task and all warnings", func() {
-				task, warnings, err := actor.RunTask("some-app-guid", "some command")
-				Expect(err).ToNot(HaveOccurred())
+			Context("when the task name is empty", func() {
+				It("creates and returns the task and all warnings", func() {
+					task, warnings, err := actor.RunTask("some-app-guid", "some command", "")
+					Expect(err).ToNot(HaveOccurred())
 
-				Expect(task).To(Equal(Task{
-					SequenceID: 3,
-				}))
-				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+					Expect(task).To(Equal(Task{
+						SequenceID: 3,
+					}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 
-				Expect(fakeCloudControllerClient.NewTaskCallCount()).To(Equal(1))
-				appGUIDArg, commandArg := fakeCloudControllerClient.NewTaskArgsForCall(0)
-				Expect(appGUIDArg).To(Equal("some-app-guid"))
-				Expect(commandArg).To(Equal("some command"))
+					Expect(fakeCloudControllerClient.NewTaskCallCount()).To(Equal(1))
+					appGUIDArg, commandArg, name := fakeCloudControllerClient.NewTaskArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(commandArg).To(Equal("some command"))
+					Expect(name).To(Equal(""))
+				})
+			})
+
+			Context("when the task name is not empty", func() {
+				It("creates and returns the task and all warnings", func() {
+					task, warnings, err := actor.RunTask("some-app-guid", "some command", "some-task-name")
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(task).To(Equal(Task{
+						SequenceID: 3,
+					}))
+					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+
+					Expect(fakeCloudControllerClient.NewTaskCallCount()).To(Equal(1))
+					appGUIDArg, commandArg, name := fakeCloudControllerClient.NewTaskArgsForCall(0)
+					Expect(appGUIDArg).To(Equal("some-app-guid"))
+					Expect(commandArg).To(Equal("some command"))
+					Expect(name).To(Equal("some-task-name"))
+				})
 			})
 		})
 
@@ -65,7 +86,7 @@ var _ = Describe("Task Actions", func() {
 				})
 
 				It("returns a TaskWorkersUnavailableError", func() {
-					_, _, err := actor.RunTask("some-app-guid", "some command")
+					_, _, err := actor.RunTask("some-app-guid", "some command", "")
 					Expect(err).To(MatchError(TaskWorkersUnavailableError{Message: "banana babans"}))
 				})
 			})
@@ -83,7 +104,7 @@ var _ = Describe("Task Actions", func() {
 				})
 
 				It("returns the same error and all warnings", func() {
-					_, warnings, err := actor.RunTask("some-app-guid", "some command")
+					_, warnings, err := actor.RunTask("some-app-guid", "some command", "")
 					Expect(err).To(MatchError(expectedErr))
 					Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
 				})

@@ -1196,7 +1196,7 @@
     "translation": ""
   },
   {
-    "id": "CF_NAME run-task APP_NAME COMMAND\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\"",
+    "id": "CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\" --name migrate",
     "translation": ""
   },
   {
@@ -3702,6 +3702,10 @@
   {
     "id": "Name of a registered repository where the specified plugin is located",
     "translation": "지정된 플러그인이 위치한 등록된 저장소 이름"
+  },
+  {
+    "id": "Name to give the task (generated if omitted)",
+    "translation": ""
   },
   {
     "id": "New Password",

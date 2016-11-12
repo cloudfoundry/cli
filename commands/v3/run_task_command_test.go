@@ -127,27 +127,60 @@ var _ = Describe("RunTask Command", func() {
 						}, nil)
 				})
 
-				It("runs a new task and outputs all warnings", func() {
-					Expect(executeErr).ToNot(HaveOccurred())
+				Context("when the task name is not provided", func() {
+					It("runs a new task and outputs all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
-					appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
-					Expect(appName).To(Equal("some-app-name"))
-					Expect(spaceGUID).To(Equal("some-space-guid"))
+						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+						Expect(appName).To(Equal("some-app-name"))
+						Expect(spaceGUID).To(Equal("some-space-guid"))
 
-					Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
-					appGUID, command := fakeActor.RunTaskArgsForCall(0)
-					Expect(appGUID).To(Equal("some-app-guid"))
-					Expect(command).To(Equal("fake command"))
+						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
+						appGUID, command, name := fakeActor.RunTaskArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(command).To(Equal("fake command"))
+						Expect(name).To(Equal(""))
 
-					Expect(fakeUI.Out).To(Say(`get-application-warning-1
+						Expect(fakeUI.Out).To(Say(`get-application-warning-1
 get-application-warning-2
 Creating task for app some-app-name in org some-org / space some-space as some-user...
 get-application-warning-3
 OK
 
 Task 3 has been submitted successfully for execution.`,
-					))
+						))
+					})
+				})
+
+				Context("when the task name is provided", func() {
+					BeforeEach(func() {
+						cmd.Name = "some-task-name"
+					})
+
+					It("runs a new task and outputs all warnings", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(fakeActor.GetApplicationByNameAndSpaceCallCount()).To(Equal(1))
+						appName, spaceGUID := fakeActor.GetApplicationByNameAndSpaceArgsForCall(0)
+						Expect(appName).To(Equal("some-app-name"))
+						Expect(spaceGUID).To(Equal("some-space-guid"))
+
+						Expect(fakeActor.RunTaskCallCount()).To(Equal(1))
+						appGUID, command, name := fakeActor.RunTaskArgsForCall(0)
+						Expect(appGUID).To(Equal("some-app-guid"))
+						Expect(command).To(Equal("fake command"))
+						Expect(name).To(Equal("some-task-name"))
+
+						Expect(fakeUI.Out).To(Say(`get-application-warning-1
+get-application-warning-2
+Creating task for app some-app-name in org some-org / space some-space as some-user...
+get-application-warning-3
+OK
+
+Task 3 has been submitted successfully for execution.`,
+						))
+					})
 				})
 			})
 

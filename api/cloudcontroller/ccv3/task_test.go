@@ -21,25 +21,53 @@ var _ = Describe("Task", func() {
 
 	Describe("NewTask", func() {
 		Context("when the application exists", func() {
+			var response string
+
 			BeforeEach(func() {
 				//TODO: check if latest CC API returns this format
-				response := `{
+				response = `{
   "sequence_id": 3
 }`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
-						RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
-					),
-				)
 			})
 
-			It("creates and returns the task and all warnings", func() {
-				task, warnings, err := client.NewTask("some-app-guid", "some command")
-				Expect(err).ToNot(HaveOccurred())
+			Context("when the name is empty", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
+							VerifyJSON(`{"command":"some command"}`),
+							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						),
+					)
+				})
 
-				Expect(task).To(Equal(Task{SequenceID: 3}))
-				Expect(warnings).To(ConsistOf("warning"))
+				It("creates and returns the task and all warnings", func() {
+					task, warnings, err := client.NewTask("some-app-guid", "some command", "")
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(task).To(Equal(Task{SequenceID: 3}))
+					Expect(warnings).To(ConsistOf("warning"))
+				})
+			})
+
+			Context("when the name is not empty", func() {
+				BeforeEach(func() {
+					server.AppendHandlers(
+						CombineHandlers(
+							VerifyRequest(http.MethodPost, "/v3/apps/some-app-guid/tasks"),
+							VerifyJSON(`{"command":"some command", "name":"some-task-name"}`),
+							RespondWith(http.StatusAccepted, response, http.Header{"X-Cf-Warnings": {"warning"}}),
+						),
+					)
+				})
+
+				It("creates and returns the task and all warnings", func() {
+					task, warnings, err := client.NewTask("some-app-guid", "some command", "some-task-name")
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(task).To(Equal(Task{SequenceID: 3}))
+					Expect(warnings).To(ConsistOf("warning"))
+				})
 			})
 		})
 
@@ -63,7 +91,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns a ResourceNotFoundError", func() {
-				_, _, err := client.NewTask("some-app-guid", "some command")
+				_, _, err := client.NewTask("some-app-guid", "some command", "")
 				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{Message: "App not found"}))
 			})
 		})
@@ -93,7 +121,7 @@ var _ = Describe("Task", func() {
 			})
 
 			It("returns the errors and all warnings", func() {
-				_, warnings, err := client.NewTask("some-app-guid", "some command")
+				_, warnings, err := client.NewTask("some-app-guid", "some command", "")
 				Expect(err).To(MatchError(UnexpectedResponseError{
 					ResponseCode: http.StatusTeapot,
 					CCErrorResponse: CCErrorResponse{

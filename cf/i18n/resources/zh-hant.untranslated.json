@@ -692,7 +692,7 @@
     "translation": "CF_NAME routes [--orglevel]"
   },
   {
-    "id": "CF_NAME run-task APP_NAME COMMAND\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\"",
+    "id": "CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\\n\\nEXAMPLES:\\n   CF_NAME run-task my-app \\\"bundle exec rake db:migrate\\\" --name migrate",
     "translation": ""
   },
   {
@@ -1254,6 +1254,10 @@
   {
     "id": "NUM_INSTANCES",
     "translation": "NUM_INSTANCES"
+  },
+  {
+    "id": "Name to give the task (generated if omitted)",
+    "translation": ""
   },
   {
     "id": "No value provided for flag: ",

@@ -11,12 +11,13 @@ import (
 
 type RunTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3actions.Application, v3actions.Warnings, error)
-	RunTask(appGUID string, command string) (v3actions.Task, v3actions.Warnings, error)
+	RunTask(appGUID string, command string, name string) (v3actions.Task, v3actions.Warnings, error)
 }
 
 type RunTaskCommand struct {
 	RequiredArgs    flags.RunTaskArgs `positional-args:"yes"`
-	usage           interface{}       `usage:"CF_NAME run-task APP_NAME COMMAND\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\""`
+	Name            string            `long:"name" description:"Name to give the task (generated if omitted)"`
+	usage           interface{}       `usage:"CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
 	relatedCommands interface{}       `related_commands:"tasks, terminate-task"`
 
 	UI     commands.UI
@@ -63,7 +64,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	task, warnings, err := cmd.Actor.RunTask(application.GUID, cmd.RequiredArgs.Command)
+	task, warnings, err := cmd.Actor.RunTask(application.GUID, cmd.RequiredArgs.Command, cmd.Name)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return common.HandleError(err)

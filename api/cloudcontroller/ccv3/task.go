@@ -23,12 +23,16 @@ type Task struct {
 // NewTaskBody represents the body of the request to create a Task.
 type NewTaskBody struct {
 	Command string `json:"command"`
+	Name    string `json:"name,omitempty"`
 }
 
 // NewTask runs a command in the Application environment associated with the
 // provided Application GUID.
-func (client *Client) NewTask(appGUID string, command string) (Task, Warnings, error) {
-	bodyBytes, err := json.Marshal(NewTaskBody{Command: command})
+func (client *Client) NewTask(appGUID string, command string, name string) (Task, Warnings, error) {
+	bodyBytes, err := json.Marshal(NewTaskBody{
+		Command: command,
+		Name:    name,
+	})
 	if err != nil {
 		return Task{}, nil, err
 	}

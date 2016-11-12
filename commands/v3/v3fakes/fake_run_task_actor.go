@@ -20,11 +20,12 @@ type FakeRunTaskActor struct {
 		result2 v3actions.Warnings
 		result3 error
 	}
-	RunTaskStub        func(appGUID string, command string) (v3actions.Task, v3actions.Warnings, error)
+	RunTaskStub        func(appGUID string, command string, name string) (v3actions.Task, v3actions.Warnings, error)
 	runTaskMutex       sync.RWMutex
 	runTaskArgsForCall []struct {
 		appGUID string
 		command string
+		name    string
 	}
 	runTaskReturns struct {
 		result1 v3actions.Task
@@ -71,16 +72,17 @@ func (fake *FakeRunTaskActor) GetApplicationByNameAndSpaceReturns(result1 v3acti
 	}{result1, result2, result3}
 }
 
-func (fake *FakeRunTaskActor) RunTask(appGUID string, command string) (v3actions.Task, v3actions.Warnings, error) {
+func (fake *FakeRunTaskActor) RunTask(appGUID string, command string, name string) (v3actions.Task, v3actions.Warnings, error) {
 	fake.runTaskMutex.Lock()
 	fake.runTaskArgsForCall = append(fake.runTaskArgsForCall, struct {
 		appGUID string
 		command string
-	}{appGUID, command})
-	fake.recordInvocation("RunTask", []interface{}{appGUID, command})
+		name    string
+	}{appGUID, command, name})
+	fake.recordInvocation("RunTask", []interface{}{appGUID, command, name})
 	fake.runTaskMutex.Unlock()
 	if fake.RunTaskStub != nil {
-		return fake.RunTaskStub(appGUID, command)
+		return fake.RunTaskStub(appGUID, command, name)
 	} else {
 		return fake.runTaskReturns.result1, fake.runTaskReturns.result2, fake.runTaskReturns.result3
 	}
@@ -92,10 +94,10 @@ func (fake *FakeRunTaskActor) RunTaskCallCount() int {
 	return len(fake.runTaskArgsForCall)
 }
 
-func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, string) {
+func (fake *FakeRunTaskActor) RunTaskArgsForCall(i int) (string, string, string) {
 	fake.runTaskMutex.RLock()
 	defer fake.runTaskMutex.RUnlock()
-	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].command
+	return fake.runTaskArgsForCall[i].appGUID, fake.runTaskArgsForCall[i].command, fake.runTaskArgsForCall[i].name
 }
 
 func (fake *FakeRunTaskActor) RunTaskReturns(result1 v3actions.Task, result2 v3actions.Warnings, result3 error) {
