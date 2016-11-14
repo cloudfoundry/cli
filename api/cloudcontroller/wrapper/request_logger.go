@@ -133,11 +133,18 @@ func (logger *RequestLogger) displaySortedHeaders(headers http.Header) error {
 
 	for _, key := range keys {
 		for _, value := range headers[key] {
-			err := logger.output.DisplayHeader(key, value)
+			err := logger.output.DisplayHeader(key, redactHeaders(key, value))
 			if err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func redactHeaders(key string, value string) string {
+	if key == "Authorization" {
+		return "[PRIVATE DATA HIDDEN]"
+	}
+	return value
 }

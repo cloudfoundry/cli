@@ -31,7 +31,6 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 		Store:             config,
 		URL:               ccClient.TokenEndpoint(),
 	})
-	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 
 	if verbose, location := config.Verbose(); verbose {
 		var logger *wrapper.RequestLogger
@@ -43,6 +42,7 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.
 		ccClient.WrapConnection(logger)
 	}
 
+	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 	ccClient.WrapConnection(wrapper.NewRetryRequest(2))
 	return ccClient, uaaClient, err
 }
