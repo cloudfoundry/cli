@@ -63,7 +63,7 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 		return common.HandleError(err)
 	}
 
-	cmd.UI.DisplayHeaderFlavorText("Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
+	cmd.UI.DisplayTextWithFlavor("Terminating task {{.TaskSequenceID}} of app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...",
 		map[string]interface{}{
 			"TaskSequenceID": cmd.RequiredArgs.SequenceID,
 			"AppName":        cmd.RequiredArgs.AppName,
