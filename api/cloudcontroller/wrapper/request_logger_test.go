@@ -86,6 +86,20 @@ var _ = Describe("Request Logger", func() {
 			Expect(value).To(Equal("bar"))
 		})
 
+		Context("when an authorization header is in the request", func() {
+			BeforeEach(func() {
+				request.Header = http.Header{"Authorization": []string{"should not be shown"}}
+			})
+
+			It("redacts the contents of the authorization header", func() {
+				Expect(err).NotTo(HaveOccurred())
+				Expect(fakeOutput.DisplayHeaderCallCount()).To(Equal(1))
+				key, value := fakeOutput.DisplayHeaderArgsForCall(0)
+				Expect(key).To(Equal("Authorization"))
+				Expect(value).To(Equal("[PRIVATE DATA HIDDEN]"))
+			})
+		})
+
 		Context("when passed a body", func() {
 			var originalBody io.ReadCloser
 			BeforeEach(func() {
