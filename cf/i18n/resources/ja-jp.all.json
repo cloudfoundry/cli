@@ -5696,10 +5696,6 @@
     "translation": "{{.ZipFileBytes}}、{{.FileCount}} 個のファイルをアップロードしています"
   },
   {
-    "id": "Usage",
-    "translation": ""
-  },
-  {
     "id": "Usage:",
     "translation": ""
   },

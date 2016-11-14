@@ -59,7 +59,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayHeaderFlavorText("Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Unbinding app {{.AppName}} from service {{.ServiceName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":     cmd.RequiredArgs.AppName,
 		"ServiceName": cmd.RequiredArgs.ServiceInstanceName,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,

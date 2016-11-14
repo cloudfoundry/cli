@@ -5696,10 +5696,6 @@
     "translation": "正在上傳 {{.ZipFileBytes}}，{{.FileCount}} 個檔案"
   },
   {
-    "id": "Usage",
-    "translation": ""
-  },
-  {
     "id": "Usage:",
     "translation": ""
   },

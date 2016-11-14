@@ -57,7 +57,7 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 		return common.HandleError(err)
 	}
 
-	cmd.UI.DisplayHeaderFlavorText("Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Creating task for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
 		"AppName":     cmd.RequiredArgs.AppName,
 		"OrgName":     cmd.Config.TargetedOrganization().Name,
 		"SpaceName":   space.Name,

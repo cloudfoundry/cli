@@ -5696,10 +5696,6 @@
     "translation": "Hochladen von {{.ZipFileBytes}}, {{.FileCount}} Dateien"
   },
   {
-    "id": "Usage",
-    "translation": ""
-  },
-  {
     "id": "Usage:",
     "translation": ""
   },

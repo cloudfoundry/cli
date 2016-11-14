@@ -5696,10 +5696,6 @@
     "translation": "{{.ZipFileBytes}}, {{.FileCount}} 파일 업로드"
   },
   {
-    "id": "Usage",
-    "translation": ""
-  },
-  {
     "id": "Usage:",
     "translation": ""
   },

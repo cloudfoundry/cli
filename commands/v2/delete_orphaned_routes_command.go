@@ -69,7 +69,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayHeaderFlavorText("Getting routes as {{.CurrentUser}} ...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Getting routes as {{.CurrentUser}} ...", map[string]interface{}{
 		"CurrentUser": user.Name,
 	})
 	cmd.UI.DisplayNewline()
