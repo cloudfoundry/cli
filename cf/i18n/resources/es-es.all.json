@@ -5696,10 +5696,6 @@
     "translation": "Subida de archivos {{.ZipFileBytes}}, {{.FileCount}}"
   },
   {
-    "id": "Usage",
-    "translation": ""
-  },
-  {
     "id": "Usage:",
     "translation": ""
   },

@@ -80,14 +80,14 @@ func (cmd *ApiCommand) Execute(args []string) error {
 }
 
 func (cmd *ApiCommand) ClearTarget() error {
-	cmd.UI.DisplayHeaderFlavorText("Unsetting api endpoint...")
+	cmd.UI.DisplayTextWithFlavor("Unsetting api endpoint...")
 	cmd.Actor.ClearTarget()
 	cmd.UI.DisplayOK()
 	return nil
 }
 
 func (cmd *ApiCommand) setAPI() error {
-	cmd.UI.DisplayHeaderFlavorText("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Setting api endpoint to {{.Endpoint}}...", map[string]interface{}{
 		"Endpoint": cmd.OptionalArgs.URL,
 	})
 

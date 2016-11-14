@@ -5696,10 +5696,6 @@
     "translation": "Téléchargement de {{.ZipFileBytes}}, {{.FileCount}} fichier(s)"
   },
   {
-    "id": "Usage",
-    "translation": ""
-  },
-  {
     "id": "Usage:",
     "translation": ""
   },
