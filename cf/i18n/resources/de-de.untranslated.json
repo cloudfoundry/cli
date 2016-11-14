@@ -1444,10 +1444,6 @@
     "translation": ""
   },
   {
-    "id": "TASKS:",
-    "translation": ""
-  },
-  {
     "id": "Tags: {{.Tags}}",
     "translation": "Tags: {{.Tags}}"
   },

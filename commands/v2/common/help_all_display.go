@@ -14,6 +14,7 @@ var HelpCategoryList = []HelpCategory{
 			{"apps", "app"},
 			{"push", "scale", "delete", "rename"},
 			{"start", "stop", "restart", "restage", "restart-app-instance"},
+			{"run-task", "tasks", "terminate-task"},
 			{"events", "files", "logs"},
 			{"env", "set-env", "unset-env"},
 			{"stacks", "stack"},
@@ -135,12 +136,6 @@ var HelpCategoryList = []HelpCategory{
 		CategoryName: "ADD/REMOVE PLUGIN:",
 		CommandList: [][]string{
 			{"plugins", "install-plugin", "uninstall-plugin"},
-		},
-	},
-	{
-		CategoryName: "TASKS:",
-		CommandList: [][]string{
-			{"run-task", "tasks", "terminate-task"},
 		},
 	},
 }
