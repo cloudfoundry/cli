@@ -108,6 +108,15 @@ SEE ALSO:
 	})
 
 	Context("when the environment is setup correctly", func() {
+		Context("when the task id argument is not an integer", func() {
+			It("outputs an error message to the user and exits 1", func() {
+				session := CF("terminate-task", appName, "not-an-integer")
+				Eventually(session).Should(Exit(1))
+				Expect(session.Err).To(Say("Incorrect usage: Value for TASK_ID must be integer"))
+				Expect(session.Out).To(Say("FAILED"))
+			})
+		})
+
 		Context("when the application does not exist", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := CF("terminate-task", appName, "1")

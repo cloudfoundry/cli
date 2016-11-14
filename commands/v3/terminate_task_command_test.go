@@ -37,10 +37,26 @@ var _ = Describe("Terminate Task Command", func() {
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
+
+		cmd.RequiredArgs.AppName = "some-app-name"
+		cmd.RequiredArgs.SequenceID = "1"
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	Context("when the task id argument is not an integer", func() {
+		BeforeEach(func() {
+			cmd.RequiredArgs.SequenceID = "not-an-integer"
+		})
+
+		It("returns an ParseArgumentError", func() {
+			Expect(executeErr).To(MatchError(common.ParseArgumentError{
+				ArgumentName: "TASK_ID",
+				ExpectedType: "integer",
+			}))
+		})
 	})
 
 	Context("when the user is not logged in", func() {
@@ -111,8 +127,6 @@ var _ = Describe("Terminate Task Command", func() {
 
 			Context("when provided a valid application name and task sequence ID", func() {
 				BeforeEach(func() {
-					cmd.RequiredArgs.AppName = "some-app-name"
-					cmd.RequiredArgs.SequenceID = 1
 					fakeActor.GetApplicationByNameAndSpaceReturns(
 						v3actions.Application{GUID: "some-app-guid"},
 						v3actions.Warnings{"get-application-warning"},

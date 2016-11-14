@@ -3312,6 +3312,10 @@
     "translation": "올바르지 않은 JSON 형식: 파일: {{.JSONFile}}\n\t\t\n올바른 JSON 파일 예:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: app-instance-index cannot be negative",
     "translation": ""
   },
@@ -4972,6 +4976,10 @@
     "translation": "시스템 제공:"
   },
   {
+    "id": "TASK_ID",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": "제한시간"
   },
@@ -6058,6 +6066,10 @@
   {
     "id": "instances:",
     "translation": "인스턴스:"
+  },
+  {
+    "id": "integer",
+    "translation": ""
   },
   {
     "id": "invalid inherit path in manifest",

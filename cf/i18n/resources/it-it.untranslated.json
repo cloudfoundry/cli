@@ -792,6 +792,10 @@
     "translation": "HOST"
   },
   {
+    "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: app-instance-index cannot be negative",
     "translation": "Incorrect usage: app-instance-index cannot be negative"
   },
@@ -981,6 +985,10 @@
   },
   {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
+  },
+  {
+    "id": "TASK_ID",
     "translation": ""
   },
   {
@@ -1366,6 +1374,10 @@
   {
     "id": "host",
     "translation": "host"
+  },
+  {
+    "id": "integer",
+    "translation": ""
   },
   {
     "id": "name:",

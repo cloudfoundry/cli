@@ -39,7 +39,15 @@ func (cmd *TerminateTaskCommand) Setup(config commands.Config, ui commands.UI) e
 }
 
 func (cmd TerminateTaskCommand) Execute(args []string) error {
-	err := common.CheckTarget(cmd.Config, true, true)
+	sequenceId, err := flags.ParseStringToInt(cmd.RequiredArgs.SequenceID)
+	if err != nil {
+		return common.ParseArgumentError{
+			ArgumentName: "TASK_ID",
+			ExpectedType: "integer",
+		}
+	}
+
+	err = common.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}
@@ -57,7 +65,7 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 		return common.HandleError(err)
 	}
 
-	task, warnings, err := cmd.Actor.GetTaskBySequenceIDAndApplication(cmd.RequiredArgs.SequenceID, application.GUID)
+	task, warnings, err := cmd.Actor.GetTaskBySequenceIDAndApplication(sequenceId, application.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		return common.HandleError(err)
