@@ -3312,6 +3312,10 @@
     "translation": "JSON 格式不正确: 文件: {{.JSONFile}}\n\t\t\n有效的 JSON 文件示例: \n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: app-instance-index cannot be negative",
     "translation": ""
   },
@@ -4972,6 +4976,10 @@
     "translation": "系统提供的项: "
   },
   {
+    "id": "TASK_ID",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": ""
   },
@@ -6058,6 +6066,10 @@
   {
     "id": "instances:",
     "translation": "实例: "
+  },
+  {
+    "id": "integer",
+    "translation": ""
   },
   {
     "id": "invalid inherit path in manifest",

@@ -3312,6 +3312,10 @@
     "translation": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: app-instance-index cannot be negative",
     "translation": "Incorrect usage: app-instance-index cannot be negative"
   },
@@ -4972,6 +4976,10 @@
     "translation": "System-Provided:"
   },
   {
+    "id": "TASK_ID",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": "TIMEOUT"
   },
@@ -6058,6 +6066,10 @@
   {
     "id": "instances:",
     "translation": "instances:"
+  },
+  {
+    "id": "integer",
+    "translation": ""
   },
   {
     "id": "invalid inherit path in manifest",

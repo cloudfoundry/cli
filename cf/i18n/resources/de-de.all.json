@@ -3312,6 +3312,10 @@
     "translation": "Falsches JSON-Format: Datei: {{.JSONFile}}\n\t\t\nBeispiel für gültige JSON-Datei:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
   {
+    "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: app-instance-index cannot be negative",
     "translation": ""
   },
@@ -4972,6 +4976,10 @@
     "translation": "Vom System zur Verfügung gestellt:"
   },
   {
+    "id": "TASK_ID",
+    "translation": ""
+  },
+  {
     "id": "TIMEOUT",
     "translation": "ZEITLIMIT"
   },
@@ -6058,6 +6066,10 @@
   {
     "id": "instances:",
     "translation": "Instanzen:"
+  },
+  {
+    "id": "integer",
+    "translation": ""
   },
   {
     "id": "invalid inherit path in manifest",

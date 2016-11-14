@@ -1200,6 +1200,10 @@
     "translation": "INSTANCE_MEMORY"
   },
   {
+    "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: app-instance-index cannot be negative",
     "translation": "Incorrect usage: app-instance-index cannot be negative"
   },
@@ -1393,6 +1397,10 @@
   },
   {
     "id": "Stop all instances of the app, then start them again. This may cause downtime.",
+    "translation": ""
+  },
+  {
+    "id": "TASK_ID",
     "translation": ""
   },
   {
@@ -1778,6 +1786,10 @@
   {
     "id": "does not exist",
     "translation": "does not exist"
+  },
+  {
+    "id": "integer",
+    "translation": ""
   },
   {
     "id": "name:",
