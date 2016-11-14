@@ -97,11 +97,11 @@ func (cmd *ServiceKey) Execute(c flags.FlagContext) error {
 		cmd.ui.Say(serviceKey.Fields.GUID)
 	} else {
 		if serviceKey.Fields.Name == "" {
-			cmd.ui.Say(T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
-				map[string]interface{}{
-					"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
-					"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
-			return nil
+			return errors.New(
+				T("No service key {{.ServiceKeyName}} found for service instance {{.ServiceInstanceName}}",
+					map[string]interface{}{
+						"ServiceKeyName":      terminal.EntityNameColor(serviceKeyName),
+						"ServiceInstanceName": terminal.EntityNameColor(serviceInstance.Name)}))
 		}
 
 		jsonBytes, err := json.MarshalIndent(serviceKey.Credentials, "", " ")

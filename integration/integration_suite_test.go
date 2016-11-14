@@ -128,7 +128,7 @@ func logoutCF() {
 }
 
 func createOrgAndSpace(org string, space string) {
-	Eventually(helpers.CF("create-org", org)).Should(Exit(0))
+	Eventually(helpers.CF("create-org", org), CFLongTimeout).Should(Exit(0))
 	Eventually(helpers.CF("create-space", space, "-o", org)).Should(Exit(0))
 }
 
