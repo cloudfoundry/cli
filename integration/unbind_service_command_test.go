@@ -36,7 +36,7 @@ var _ = Describe("unbind-service command", func() {
 	AfterEach(func() {
 		setAPI()
 		loginCF()
-		Eventually(CF("delete-org", "-f", org), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", org)).Should(Exit(0))
 	})
 
 	Context("when the environment is not setup correctly", func() {
@@ -94,7 +94,7 @@ var _ = Describe("unbind-service command", func() {
 			Context("when the service is bound to an app", func() {
 				BeforeEach(func() {
 					WithSimpleApp(func(appDir string) {
-						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 					Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
 				})
@@ -104,7 +104,7 @@ var _ = Describe("unbind-service command", func() {
 						Exit(0),
 						Say("%s.*%s", serviceInstance, appName)),
 					)
-					Eventually(CF("unbind-service", appName, serviceInstance), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("unbind-service", appName, serviceInstance)).Should(Exit(0))
 					Eventually(CF("services")).Should(SatisfyAll(
 						Exit(0),
 						Not(Say("%s.*%s", serviceInstance, appName)),
@@ -115,7 +115,7 @@ var _ = Describe("unbind-service command", func() {
 			Context("when the service is not bound to an app", func() {
 				BeforeEach(func() {
 					WithSimpleApp(func(appDir string) {
-						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
 					})
 				})
 
@@ -130,7 +130,7 @@ var _ = Describe("unbind-service command", func() {
 			Context("when the service does not exist", func() {
 				BeforeEach(func() {
 					WithSimpleApp(func(appDir string) {
-						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 				})
 
@@ -170,7 +170,7 @@ var _ = Describe("unbind-service command", func() {
 				BeforeEach(func() {
 					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 					WithSimpleApp(func(appDir string) {
-						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 					Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
 				})
@@ -180,7 +180,7 @@ var _ = Describe("unbind-service command", func() {
 						Exit(0),
 						Say("%s.*%s", serviceInstance, appName)),
 					)
-					Eventually(CF("unbind-service", appName, serviceInstance), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("unbind-service", appName, serviceInstance)).Should(Exit(0))
 					Eventually(CF("services")).Should(SatisfyAll(
 						Exit(0),
 						Not(Say("%s.*%s", serviceInstance, appName)),
@@ -192,7 +192,7 @@ var _ = Describe("unbind-service command", func() {
 				BeforeEach(func() {
 					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
 					WithSimpleApp(func(appDir string) {
-						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
 					})
 				})
 
@@ -207,7 +207,7 @@ var _ = Describe("unbind-service command", func() {
 			Context("when the service does not exist", func() {
 				BeforeEach(func() {
 					WithSimpleApp(func(appDir string) {
-						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 				})
 

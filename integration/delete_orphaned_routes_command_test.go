@@ -34,7 +34,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 	AfterEach(func() {
 		setAPI()
 		loginCF()
-		Eventually(CF("delete-org", "-f", orgName), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
 	})
 
 	Context("when the environment is not setup correctly", func() {
@@ -112,7 +112,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 
 			It("deletes all the orphaned routes", func() {
-				Eventually(CF("delete-orphaned-routes", "-f"), CFLongTimeout).Should(SatisfyAll(
+				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
 					Exit(0),
 					Say("Getting routes as"),
 					Say(fmt.Sprintf("Deleting route orphan-1.%s/path-1...", domainName)),
@@ -136,9 +136,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				orphanedRoute2.Create()
 
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
-				Eventually(CF("apps"), CFLongTimeout).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
+				Eventually(CF("apps")).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
 
 				boundRoute = NewRoute(spaceName, domainName, "bound-1", "path-3")
 				boundRoute.Create()
@@ -146,7 +146,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 
 			It("deletes only the orphaned routes", func() {
-				Eventually(CF("delete-orphaned-routes", "-f"), CFLongTimeout).Should(SatisfyAll(
+				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
 					Exit(0),
 					Say("Getting routes as"),
 					Say(fmt.Sprintf("Deleting route orphan-1.%s/path-1...", domainName)),
@@ -167,7 +167,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 			It("deletes all the orphaned routes", func() {
 				session := CF("delete-orphaned-routes", "-f")
-				Eventually(session, CFLongTimeout).Should(Exit(0))
+				Eventually(session).Should(Exit(0))
 
 				for i := 0; i < 51; i++ {
 					Expect(session.Out).To(Say(fmt.Sprintf("Deleting route orphan-multi-page-%d.%s...", i, domainName)))
@@ -226,9 +226,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
-				Eventually(CF("apps"), CFLongTimeout).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
+				Eventually(CF("apps")).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
 
 				boundRoute = NewRoute(spaceName, domainName, "bound-route", "bound-path")
 				boundRoute.Create()
@@ -236,7 +236,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 
 			It("displays OK without deleting any routes", func() {
-				Eventually(CF("delete-orphaned-routes", "-f"), CFLongTimeout).Should(SatisfyAll(
+				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
 					Exit(0),
 					Say("Getting routes as"),
 					Not(Say(fmt.Sprintf("Deleting route bound-route.%s/bound-path...", domainName))),
@@ -265,7 +265,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			})
 
 			It("deletes both the routes", func() {
-				Eventually(CF("delete-orphaned-routes", "-f"), CFLongTimeout).Should(SatisfyAll(
+				Eventually(CF("delete-orphaned-routes", "-f")).Should(SatisfyAll(
 					Exit(0),
 					Say("Getting routes as"),
 					Say(fmt.Sprintf("Deleting route orphan-1.%s/path-1...", domainName)),

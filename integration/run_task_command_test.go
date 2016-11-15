@@ -28,7 +28,7 @@ var _ = Describe("run-task command", func() {
 	AfterEach(func() {
 		setAPI()
 		loginCF()
-		Eventually(CF("delete-org", "-f", orgName), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
 	})
 
 	It("should display the command level help", func() {
@@ -118,7 +118,7 @@ SEE ALSO:
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
@@ -158,7 +158,7 @@ Task 1 has been submitted successfully for execution.`,
 		Context("when the application is not staged", func() {
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
@@ -173,7 +173,7 @@ Task 1 has been submitted successfully for execution.`,
 		Context("when the application is staged but stopped", func() {
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 				session := CF("stop", appName)
 				Eventually(session).Should(Exit(0))

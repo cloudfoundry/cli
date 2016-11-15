@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	CFLongTimeout = 30 * time.Second
+	CFEventuallyTimeout = 30 * time.Second
 )
 
 var (
@@ -38,7 +38,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	return nil
 }, func(_ []byte) {
 	// Ginkgo Globals
-	SetDefaultEventuallyTimeout(5 * time.Second)
+	SetDefaultEventuallyTimeout(CFEventuallyTimeout)
 
 	// Setup common environment variables
 	apiURL = os.Getenv("CF_API")
@@ -128,8 +128,8 @@ func logoutCF() {
 }
 
 func createOrgAndSpace(org string, space string) {
-	Eventually(helpers.CF("create-org", org), CFLongTimeout).Should(Exit(0))
-	Eventually(helpers.CF("create-space", space, "-o", org), CFLongTimeout).Should(Exit(0))
+	Eventually(helpers.CF("create-org", org)).Should(Exit(0))
+	Eventually(helpers.CF("create-space", space, "-o", org)).Should(Exit(0))
 }
 
 func createSpace(space string) {
