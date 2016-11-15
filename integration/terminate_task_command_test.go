@@ -28,7 +28,7 @@ var _ = Describe("terminate-task command", func() {
 	AfterEach(func() {
 		setAPI()
 		loginCF()
-		Eventually(CF("delete-org", "-f", orgName), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
 	})
 
 	It("should display the command level help", func() {
@@ -120,7 +120,7 @@ SEE ALSO:
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 

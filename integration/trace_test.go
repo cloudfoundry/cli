@@ -26,7 +26,7 @@ var _ = Describe("trace", func() {
 	})
 
 	AfterEach(func() {
-		Eventually(CF("delete-org", "-f", orgName), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
 	})
 
 	Context("writing the trace to the filesystem", func() {
@@ -57,7 +57,7 @@ var _ = Describe("trace", func() {
 		})
 
 		It("creates the file with 0600 permission", func() {
-			Eventually(CF("apps"), CFLongTimeout).Should(Exit(0))
+			Eventually(CF("apps")).Should(Exit(0))
 			stat, err := os.Stat(traceFile)
 			Expect(err).ToNot(HaveOccurred())
 			if runtime.GOOS == "windows" {

@@ -35,7 +35,7 @@ var _ = Describe("service-key command", func() {
 	AfterEach(func() {
 		setAPI()
 		loginCF()
-		Eventually(CF("delete-org", "-f", org), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", org)).Should(Exit(0))
 	})
 
 	Context("when the service key is not found", func() {

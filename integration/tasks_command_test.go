@@ -28,7 +28,7 @@ var _ = Describe("tasks command", func() {
 	AfterEach(func() {
 		setAPI()
 		loginCF()
-		Eventually(CF("delete-org", "-f", orgName), CFLongTimeout).Should(Exit(0))
+		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
 	})
 
 	It("should display the command level help", func() {
@@ -118,7 +118,7 @@ SEE ALSO:
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
-					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
 
@@ -136,8 +136,8 @@ id   name   state   start time   command
 
 			Context("when the application has associated tasks", func() {
 				BeforeEach(func() {
-					Eventually(CF("run-task", appName, "echo hello world"), CFLongTimeout).Should(Exit(0))
-					Eventually(CF("run-task", appName, "echo foo bar"), CFLongTimeout).Should(Exit(0))
+					Eventually(CF("run-task", appName, "echo hello world")).Should(Exit(0))
+					Eventually(CF("run-task", appName, "echo foo bar")).Should(Exit(0))
 				})
 
 				It("displays all the tasks in descending order", func() {
@@ -157,15 +157,15 @@ id   name   state   start time   command
 					BeforeEach(func() {
 						user = PrefixedRandomName("USER")
 						password := PrefixedRandomName("PASSWORD")
-						Eventually(CF("create-user", user, password), CFLongTimeout).Should(Exit(0))
-						Eventually(CF("set-space-role", user, orgName, spaceName, "SpaceAuditor"), CFLongTimeout).Should(Exit(0))
-						Eventually(CF("auth", user, password), CFLongTimeout).Should(Exit(0))
-						Eventually(CF("target", "-o", orgName, "-s", spaceName), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("create-user", user, password)).Should(Exit(0))
+						Eventually(CF("set-space-role", user, orgName, spaceName, "SpaceAuditor")).Should(Exit(0))
+						Eventually(CF("auth", user, password)).Should(Exit(0))
+						Eventually(CF("target", "-o", orgName, "-s", spaceName)).Should(Exit(0))
 					})
 
 					AfterEach(func() {
 						loginCF()
-						Eventually(CF("delete-user", user, "-f"), CFLongTimeout).Should(Exit(0))
+						Eventually(CF("delete-user", user, "-f")).Should(Exit(0))
 					})
 
 					It("does not display task commands", func() {
