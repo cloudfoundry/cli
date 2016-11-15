@@ -17,6 +17,7 @@ var _ = Describe("unbind-service command", func() {
 		serviceInstance string
 		appName         string
 		broker          ServiceBroker
+		domain          string
 	)
 
 	BeforeEach(func() {
@@ -29,6 +30,7 @@ var _ = Describe("unbind-service command", func() {
 		appName = PrefixedRandomName("app")
 
 		setupCF(org, space)
+		domain = DefaultDomain()
 	})
 
 	AfterEach(func() {
@@ -152,7 +154,7 @@ var _ = Describe("unbind-service command", func() {
 
 		Context("when the service is provided by a broker", func() {
 			BeforeEach(func() {
-				broker = NewServiceBroker(PrefixedRandomName("SERVICE-BROKER"), NewAssets().ServiceBroker, "bosh-lite.com", service, servicePlan)
+				broker = NewServiceBroker(PrefixedRandomName("SERVICE-BROKER"), NewAssets().ServiceBroker, domain, service, servicePlan)
 				broker.Push()
 				broker.Configure()
 				broker.Create()
