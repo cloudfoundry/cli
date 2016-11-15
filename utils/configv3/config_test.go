@@ -188,7 +188,7 @@ var _ = Describe("Config", func() {
 
 				// Ginkgo will uses a config file as the first test argument, so that
 				// will be considered the binary name
-				Expect(config.BinaryName()).To(MatchRegexp("configv3\\.test$"))
+				Expect(config.BinaryName()).To(Equal("configv3.test"))
 			})
 		})
 
