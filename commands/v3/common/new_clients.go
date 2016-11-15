@@ -35,13 +35,13 @@ func NewClients(config commands.Config, ui TerminalDisplay) (*ccv3.Client, error
 	})
 	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 
-	if verbose, location := config.Verbose(); verbose {
-		var logger *wrapper.RequestLogger
-		if location == "" {
-			logger = wrapper.NewRequestLogger(NewRequestLoggerTerminalDisplay(ui))
-		} else {
-			logger = wrapper.NewRequestLogger(NewRequestLoggerFileWriter(ui, location))
-		}
+	verbose, location := config.Verbose()
+	if verbose {
+		logger := wrapper.NewRequestLogger(NewRequestLoggerTerminalDisplay(ui))
+		ccClient.WrapConnection(logger)
+	}
+	if location != nil {
+		logger := wrapper.NewRequestLogger(NewRequestLoggerFileWriter(ui, location))
 		ccClient.WrapConnection(logger)
 	}
 

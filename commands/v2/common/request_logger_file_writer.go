@@ -8,15 +8,16 @@ import (
 )
 
 type RequestLoggerFileWriter struct {
-	ui       TerminalDisplay
-	filePath string
-	logFile  *os.File
+	ui        TerminalDisplay
+	filePaths []string
+	logFiles  []*os.File
 }
 
-func NewRequestLoggerFileWriter(ui TerminalDisplay, filePath string) *RequestLoggerFileWriter {
+func NewRequestLoggerFileWriter(ui TerminalDisplay, filePaths []string) *RequestLoggerFileWriter {
 	return &RequestLoggerFileWriter{
-		ui:       ui,
-		filePath: filePath,
+		ui:        ui,
+		filePaths: filePaths,
+		logFiles:  []*os.File{},
 	}
 }
 
@@ -31,33 +32,63 @@ func (display *RequestLoggerFileWriter) DisplayBody(body []byte) error {
 		return err
 	}
 
-	_, err = display.logFile.WriteString(string(pretty) + "\n")
-	return err
+	for _, logFile := range display.logFiles {
+		_, err = logFile.WriteString(string(pretty) + "\n")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (display *RequestLoggerFileWriter) DisplayHeader(name string, value string) error {
-	_, err := display.logFile.WriteString(fmt.Sprintf("%s: %s\n", name, value))
-	return err
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(fmt.Sprintf("%s: %s\n", name, value))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (display *RequestLoggerFileWriter) DisplayHost(name string) error {
-	_, err := display.logFile.WriteString(fmt.Sprintf("Host: %s\n", name))
-	return err
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(fmt.Sprintf("Host: %s\n", name))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (display *RequestLoggerFileWriter) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
-	_, err := display.logFile.WriteString(fmt.Sprintf("%s %s %s\n", method, uri, httpProtocol))
-	return err
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(fmt.Sprintf("%s %s %s\n", method, uri, httpProtocol))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (display *RequestLoggerFileWriter) DisplayResponseHeader(httpProtocol string, status string) error {
-	_, err := display.logFile.WriteString(fmt.Sprintf("%s %s\n", httpProtocol, status))
-	return err
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(fmt.Sprintf("%s %s\n", httpProtocol, status))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (display *RequestLoggerFileWriter) DisplayType(name string, requestDate time.Time) error {
-	_, err := display.logFile.WriteString(fmt.Sprintf("%s: [%s]\n", name, requestDate.Format(time.RFC3339)))
-	return err
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(fmt.Sprintf("%s: [%s]\n", name, requestDate.Format(time.RFC3339)))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (display *RequestLoggerFileWriter) HandleInternalError(err error) {
@@ -65,16 +96,25 @@ func (display *RequestLoggerFileWriter) HandleInternalError(err error) {
 }
 
 func (display *RequestLoggerFileWriter) Start() error {
-	logFile, err := os.OpenFile(display.filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
-	if err != nil {
-		return err
-	}
+	for _, filePath := range display.filePaths {
+		logFile, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+		if err != nil {
+			return err
+		}
 
-	display.logFile = logFile
+		display.logFiles = append(display.logFiles, logFile)
+	}
 	return nil
 }
 
 func (display *RequestLoggerFileWriter) Stop() error {
-	display.logFile.WriteString("\n")
-	return display.logFile.Close()
+	for _, logFile := range display.logFiles {
+		logFile.WriteString("\n")
+		err := logFile.Close()
+		if err != nil {
+			return err
+		}
+	}
+	display.logFiles = []*os.File{}
+	return nil
 }

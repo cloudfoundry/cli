@@ -18,10 +18,11 @@ import (
 
 var _ = Describe("Request Logger File Writer", func() {
 	var (
-		fakeUI  *ui.UI
-		display *RequestLoggerFileWriter
-		tmpdir  string
-		tmpfn   string
+		fakeUI   *ui.UI
+		display  *RequestLoggerFileWriter
+		tmpdir   string
+		logFile1 string
+		logFile2 string
 	)
 
 	BeforeEach(func() {
@@ -30,8 +31,9 @@ var _ = Describe("Request Logger File Writer", func() {
 		tmpdir, err = ioutil.TempDir("", "request_logger")
 		Expect(err).ToNot(HaveOccurred())
 
-		tmpfn = filepath.Join(tmpdir, "tmpfile")
-		display = NewRequestLoggerFileWriter(fakeUI, tmpfn)
+		logFile1 = filepath.Join(tmpdir, "tmpfile1")
+		logFile2 = filepath.Join(tmpdir, "tmpfile2")
+		display = NewRequestLoggerFileWriter(fakeUI, []string{logFile1, logFile2})
 		err = display.Start()
 		Expect(err).ToNot(HaveOccurred())
 	})
@@ -56,7 +58,11 @@ var _ = Describe("Request Logger File Writer", func() {
 				err = display.Stop()
 				Expect(err).ToNot(HaveOccurred())
 
-				contents, err := ioutil.ReadFile(tmpfn)
+				contents, err := ioutil.ReadFile(logFile1)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(Equal(formatted))
+
+				contents, err = ioutil.ReadFile(logFile2)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(string(contents)).To(Equal(formatted))
 			})
@@ -71,7 +77,11 @@ var _ = Describe("Request Logger File Writer", func() {
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			contents, err := ioutil.ReadFile(tmpfn)
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal("Header: Value\n\n"))
+
+			contents, err = ioutil.ReadFile(logFile2)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(contents)).To(Equal("Header: Value\n\n"))
 		})
@@ -85,7 +95,11 @@ var _ = Describe("Request Logger File Writer", func() {
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			contents, err := ioutil.ReadFile(tmpfn)
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal("Host: banana\n\n"))
+
+			contents, err = ioutil.ReadFile(logFile2)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(contents)).To(Equal("Host: banana\n\n"))
 		})
@@ -99,7 +113,11 @@ var _ = Describe("Request Logger File Writer", func() {
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			contents, err := ioutil.ReadFile(tmpfn)
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal("GET /v2/spaces/guid/summary HTTP/1.1\n\n"))
+
+			contents, err = ioutil.ReadFile(logFile2)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(contents)).To(Equal("GET /v2/spaces/guid/summary HTTP/1.1\n\n"))
 		})
@@ -113,7 +131,11 @@ var _ = Describe("Request Logger File Writer", func() {
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			contents, err := ioutil.ReadFile(tmpfn)
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal("HTTP/1.1 200 OK\n\n"))
+
+			contents, err = ioutil.ReadFile(logFile2)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(contents)).To(Equal("HTTP/1.1 200 OK\n\n"))
 		})
@@ -128,7 +150,11 @@ var _ = Describe("Request Logger File Writer", func() {
 			err = display.Stop()
 			Expect(err).ToNot(HaveOccurred())
 
-			contents, err := ioutil.ReadFile(tmpfn)
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal(fmt.Sprintf("banana: [%s]\n\n", passedTime.Format(time.RFC3339))))
+
+			contents, err = ioutil.ReadFile(logFile2)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(string(contents)).To(Equal(fmt.Sprintf("banana: [%s]\n\n", passedTime.Format(time.RFC3339))))
 		})
