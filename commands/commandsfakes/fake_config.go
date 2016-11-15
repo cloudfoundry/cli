@@ -131,12 +131,12 @@ type FakeConfig struct {
 	targetedSpaceReturns     struct {
 		result1 configv3.Space
 	}
-	VerboseStub        func() (bool, string)
+	VerboseStub        func() (bool, []string)
 	verboseMutex       sync.RWMutex
 	verboseArgsForCall []struct{}
 	verboseReturns     struct {
 		result1 bool
-		result2 string
+		result2 []string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -624,7 +624,7 @@ func (fake *FakeConfig) TargetedSpaceReturns(result1 configv3.Space) {
 	}{result1}
 }
 
-func (fake *FakeConfig) Verbose() (bool, string) {
+func (fake *FakeConfig) Verbose() (bool, []string) {
 	fake.verboseMutex.Lock()
 	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct{}{})
 	fake.recordInvocation("Verbose", []interface{}{})
@@ -642,11 +642,11 @@ func (fake *FakeConfig) VerboseCallCount() int {
 	return len(fake.verboseArgsForCall)
 }
 
-func (fake *FakeConfig) VerboseReturns(result1 bool, result2 string) {
+func (fake *FakeConfig) VerboseReturns(result1 bool, result2 []string) {
 	fake.VerboseStub = nil
 	fake.verboseReturns = struct {
 		result1 bool
-		result2 string
+		result2 []string
 	}{result1, result2}
 }
 

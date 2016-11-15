@@ -325,21 +325,37 @@ func (config *Config) Experimental() bool {
 	return false
 }
 
-// Verbose returns true if verbose should be enabled and a location to log to.
-// This is based off of:
+// Verbose returns true if verbose should be displayed to terminal and a
+// location to log to. This is based off of:
 //   1. The $CF_TRACE enviroment variable if set (true/false/file path)
-//   2. The '-v/--verbose' global flag
-//   3. Defaults to false
-func (config *Config) Verbose() (bool, string) {
+//   2. The config file's trace value (true/false/file path)
+//   3. The '-v/--verbose' global flag
+//   4. Defaults to false
+func (config *Config) Verbose() (bool, []string) {
+	var (
+		verbose  bool
+		filePath []string
+	)
 	if config.ENV.CFTrace != "" {
 		envVal, err := strconv.ParseBool(config.ENV.CFTrace)
-		if err == nil {
-			return envVal, ""
+		verbose = envVal
+		if err != nil {
+			filePath = []string{config.ENV.CFTrace}
 		}
-		return true, config.ENV.CFTrace
 	}
+	if config.ConfigFile.Trace != "" {
+		envVal, err := strconv.ParseBool(config.ConfigFile.Trace)
+		verbose = envVal || verbose
+		if err != nil {
+			if filePath == nil {
+				filePath = []string{}
+			}
+			filePath = append(filePath, config.ConfigFile.Trace)
+		}
+	}
+	verbose = config.Flags.Verbose || verbose
 
-	return config.Flags.Verbose, ""
+	return verbose, filePath
 }
 
 // DialTimeout returns the timeout to use when dialing. This is based off of:

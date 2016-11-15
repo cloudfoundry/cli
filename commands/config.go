@@ -29,5 +29,5 @@ type Config interface {
 	Target() string
 	TargetedOrganization() configv3.Organization
 	TargetedSpace() configv3.Space
-	Verbose() (bool, string)
+	Verbose() (bool, []string)
 }
