@@ -103,6 +103,17 @@ var _ = Describe("Retry", func() {
 				Expect(err).To(Equal(connectionErr))
 				Expect(fakeConnection.MakeCallCount()).To(Equal(3))
 			})
+
+			Context("when the request method is POST", func() {
+				BeforeEach(func() {
+					request.Method = http.MethodPost
+				})
+
+				It("does not retry", func() {
+					Expect(err).To(Equal(connectionErr))
+					Expect(fakeConnection.MakeCallCount()).To(Equal(1))
+				})
+			})
 		})
 
 		Context("when the request receives a 5XX status code other than 500", func() {
