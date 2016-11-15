@@ -77,7 +77,7 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 	}
 
 	config.ENV = EnvOverride{
-		BinaryName:       os.Args[0],
+		BinaryName:       filepath.Base(os.Args[0]),
 		CFColor:          os.Getenv("CF_COLOR"),
 		CFPluginHome:     os.Getenv("CF_PLUGIN_HOME"),
 		CFStagingTimeout: os.Getenv("CF_STAGING_TIMEOUT"),
