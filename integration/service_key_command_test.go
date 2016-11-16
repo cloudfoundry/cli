@@ -32,12 +32,6 @@ var _ = Describe("service-key command", func() {
 		domain = DefaultDomain()
 	})
 
-	AfterEach(func() {
-		setAPI()
-		loginCF()
-		Eventually(CF("delete-org", "-f", org)).Should(Exit(0))
-	})
-
 	Context("when the service key is not found", func() {
 		BeforeEach(func() {
 			broker = NewServiceBroker(PrefixedRandomName("SERVICE-BROKER"), NewAssets().ServiceBroker, domain, service, servicePlan)

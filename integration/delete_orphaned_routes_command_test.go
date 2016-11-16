@@ -31,12 +31,6 @@ var _ = Describe("delete-orphaned-routes command", func() {
 		domain.Create()
 	})
 
-	AfterEach(func() {
-		setAPI()
-		loginCF()
-		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
-	})
-
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
