@@ -44,6 +44,11 @@ func (nullDebugPrinter) Print(title, body string) {
 // Consumer represents the actions that can be performed against trafficcontroller.
 // See sync.go and async.go for trafficcontroller access methods.
 type Consumer struct {
+	// minRetryDelay and maxRetryDelay must be the first words in this struct
+	// in order to be used atomically by 32-bit systems.
+	// https://golang.org/src/sync/atomic/doc.go?#L50
+	minRetryDelay, maxRetryDelay int64
+
 	trafficControllerUrl string
 	idleTimeout          time.Duration
 	callback             func()
@@ -59,8 +64,6 @@ type Consumer struct {
 	refreshTokens  bool
 	refresherMutex sync.RWMutex
 	tokenRefresher TokenRefresher
-
-	minRetryDelay, maxRetryDelay int64
 }
 
 // New creates a new consumer to a trafficcontroller.
