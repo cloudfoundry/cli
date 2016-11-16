@@ -5,7 +5,7 @@ import (
 )
 
 func NewOrgName() string {
-	return PrefixedRandomName("ORG")
+	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
 func PrefixedRandomName(namePrefix string) string {
