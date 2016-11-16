@@ -119,11 +119,12 @@ SEE ALSO:
 			})
 
 			Context("when the wrong data type is provided to terminate-task", func() {
-				It("outputs an error message to the user and exits 1", func() {
+				It("outputs an error message to the user, provides help text, and exits 1", func() {
 					session := CF("terminate-task", appName, "not-an-integer")
 					Eventually(session).Should(Exit(1))
 					Expect(session.Err).To(Say("Incorrect usage: Value for TASK_ID must be integer"))
 					Expect(session.Out).To(Say("FAILED"))
+					Expect(session.Out).To(Say("terminate-task APP_NAME TASK_ID")) // help
 				})
 			})
 

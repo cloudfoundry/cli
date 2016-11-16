@@ -10,6 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/commands"
 	"code.cloudfoundry.org/cli/commands/v2"
+	"code.cloudfoundry.org/cli/commands/v3/common"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/panichandler"
 	"code.cloudfoundry.org/cli/utils/ui"
@@ -21,6 +22,7 @@ type UI interface {
 }
 
 var ErrFailed = errors.New("command failed")
+var ParseErr = errors.New("incorrect type for arg")
 
 func main() {
 	defer panichandler.HandlePanic()
@@ -91,7 +93,8 @@ func parse(args []string) {
 			parse([]string{"help", args[0]})
 			os.Exit(1)
 		case flags.ErrMarshal:
-			fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", flagErr.Message)
+			errMessage := strings.Split(flagErr.Message, ":")
+			fmt.Fprintf(os.Stderr, "Incorrect Usage: %s\n\n", errMessage[0])
 			parse([]string{"help", args[0]})
 			os.Exit(1)
 		case flags.ErrUnknownCommand:
@@ -106,6 +109,10 @@ func parse(args []string) {
 			fmt.Fprintf(os.Stderr, "Unexpected flag error\ntype: %s\nmessage: %s\n", flagErr.Type, flagErr.Error())
 		}
 	} else if err == ErrFailed {
+		os.Exit(1)
+	} else if err == ParseErr {
+		fmt.Println()
+		parse([]string{"help", args[0]})
 		os.Exit(1)
 	} else {
 		fmt.Fprintf(os.Stderr, "Unexpected error: %s\n", err.Error())
@@ -157,5 +164,9 @@ func handleError(err error, commandUI UI) error {
 	}
 
 	commandUI.DisplayError(err)
+	if _, isParseArgumentError := err.(common.ParseArgumentError); isParseArgumentError {
+		return ParseErr
+	}
+
 	return ErrFailed
 }
