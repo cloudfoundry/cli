@@ -50,7 +50,12 @@ func (retry *RetryRequest) Make(request *http.Request, passedResponse *cloudcont
 			return nil
 		}
 
-		if request.Method == http.MethodPost || passedResponse.HTTPResponse == nil || passedResponse.HTTPResponse.StatusCode != 500 {
+		if request.Method == http.MethodPost ||
+			passedResponse.HTTPResponse != nil &&
+				passedResponse.HTTPResponse.StatusCode != http.StatusInternalServerError &&
+				passedResponse.HTTPResponse.StatusCode != http.StatusBadGateway &&
+				passedResponse.HTTPResponse.StatusCode != http.StatusServiceUnavailable &&
+				passedResponse.HTTPResponse.StatusCode != http.StatusGatewayTimeout {
 			break
 		}
 	}
