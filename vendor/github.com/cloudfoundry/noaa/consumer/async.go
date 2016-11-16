@@ -266,10 +266,13 @@ func (c *Consumer) listenAction(conn *connection, streamPath, authToken string, 
 func (c *Consumer) retryAction(action func() (err error, done bool), errors chan<- error) {
 	oldConnectCallback := c.onConnectCallback()
 	defer c.SetOnConnectCallback(oldConnectCallback)
-	nextSleep := atomic.LoadInt64(&c.minRetryDelay)
+
+	context := retryContext{
+		sleep: atomic.LoadInt64(&c.minRetryDelay),
+	}
 
 	c.SetOnConnectCallback(func() {
-		atomic.StoreInt64(&nextSleep, atomic.LoadInt64(&c.minRetryDelay))
+		atomic.StoreInt64(&context.sleep, atomic.LoadInt64(&c.minRetryDelay))
 		if oldConnectCallback != nil {
 			oldConnectCallback()
 		}
@@ -294,12 +297,12 @@ func (c *Consumer) retryAction(action func() (err error, done bool), errors chan
 
 		errors <- err
 
-		ns := atomic.LoadInt64(&nextSleep)
+		ns := atomic.LoadInt64(&context.sleep)
 		time.Sleep(time.Duration(ns))
-		ns = atomic.AddInt64(&nextSleep, ns)
+		ns = atomic.AddInt64(&context.sleep, ns)
 		max := atomic.LoadInt64(&c.maxRetryDelay)
 		if ns > max {
-			atomic.StoreInt64(&nextSleep, max)
+			atomic.StoreInt64(&context.sleep, max)
 		}
 	}
 }
@@ -509,4 +512,13 @@ func (c *connection) closed() bool {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	return c.isClosed
+}
+
+// retryContext is a struct to keep track of a retryAction call's context.  We
+// use it primarily to guarantee 64-bit byte alignment on 32-bit systems.
+// https://golang.org/src/sync/atomic/doc.go?#L50
+type retryContext struct {
+	// sleep must be the first word within this struct to ensure 64-bit byte
+	// alignment.
+	sleep int64
 }
