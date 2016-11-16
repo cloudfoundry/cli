@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	helpers "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -42,6 +43,11 @@ var _ = Describe("Verbose", func() {
 	Context("v2 refactor", func() {
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
+				tmpDir, err := ioutil.TempDir("", "")
+				Expect(err).NotTo(HaveOccurred())
+
+				defer os.RemoveAll(tmpDir)
+
 				orgName := helpers.PrefixedRandomName("testorg")
 				spaceName := helpers.PrefixedRandomName("testspace")
 				setupCF(orgName, spaceName)
@@ -50,6 +56,9 @@ var _ = Describe("Verbose", func() {
 
 				var envMap map[string]string
 				if env != "" {
+					if string(env[0]) == "/" {
+						env = filepath.Join(tmpDir, env)
+					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
 				command := []string{"delete-orphaned-routes", "-f"}
@@ -57,6 +66,9 @@ var _ = Describe("Verbose", func() {
 					command = append(command, "-v")
 				}
 				if configTrace != "" {
+					if string(configTrace[0]) == "/" {
+						configTrace = filepath.Join(tmpDir, configTrace)
+					}
 					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
@@ -85,7 +97,7 @@ var _ = Describe("Verbose", func() {
 			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo/bar", "/baz", true),
 		)
 
-		DescribeTable("displays verbose output to file",
+		DescribeTable("displays verbose output to multiple files",
 			func(env string, configTrace string, flag bool, location []string) {
 				tmpDir, err := ioutil.TempDir("", "")
 				Expect(err).NotTo(HaveOccurred())
@@ -101,7 +113,7 @@ var _ = Describe("Verbose", func() {
 				var envMap map[string]string
 				if env != "" {
 					if string(env[0]) == "/" {
-						env = tmpDir + env
+						env = filepath.Join(tmpDir, env)
 					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
@@ -111,7 +123,10 @@ var _ = Describe("Verbose", func() {
 				}
 
 				if configTrace != "" {
-					session := helpers.CF("config", "--trace", tmpDir+configTrace)
+					if string(configTrace[0]) == "/" {
+						configTrace = filepath.Join(tmpDir, configTrace)
+					}
+					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
 				session := helpers.CFWithEnv(envMap, command...)
@@ -145,6 +160,11 @@ var _ = Describe("Verbose", func() {
 	Context("v3", func() {
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
+				tmpDir, err := ioutil.TempDir("", "")
+				Expect(err).NotTo(HaveOccurred())
+
+				defer os.RemoveAll(tmpDir)
+
 				orgName := helpers.PrefixedRandomName("testorg")
 				spaceName := helpers.PrefixedRandomName("testspace")
 				setupCF(orgName, spaceName)
@@ -153,6 +173,9 @@ var _ = Describe("Verbose", func() {
 
 				var envMap map[string]string
 				if env != "" {
+					if string(env[0]) == "/" {
+						env = filepath.Join(tmpDir, env)
+					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
 				command := []string{"run-task", "app", "echo"}
@@ -160,6 +183,9 @@ var _ = Describe("Verbose", func() {
 					command = append(command, "-v")
 				}
 				if configTrace != "" {
+					if string(configTrace[0]) == "/" {
+						configTrace = filepath.Join(tmpDir, configTrace)
+					}
 					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
@@ -188,7 +214,7 @@ var _ = Describe("Verbose", func() {
 			Entry("CF_TRACE filepath, config trace filepath, '-v': enables verbose AND logging to file for BOTH paths", "/foo/bar", "/baz", true),
 		)
 
-		DescribeTable("displays verbose output to file",
+		DescribeTable("displays verbose output to multiple files",
 			func(env string, configTrace string, flag bool, location []string) {
 				tmpDir, err := ioutil.TempDir("", "")
 				Expect(err).NotTo(HaveOccurred())
@@ -204,7 +230,7 @@ var _ = Describe("Verbose", func() {
 				var envMap map[string]string
 				if env != "" {
 					if string(env[0]) == "/" {
-						env = tmpDir + env
+						env = filepath.Join(tmpDir, env)
 					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
@@ -214,7 +240,10 @@ var _ = Describe("Verbose", func() {
 				}
 
 				if configTrace != "" {
-					session := helpers.CF("config", "--trace", tmpDir+configTrace)
+					if string(configTrace[0]) == "/" {
+						configTrace = filepath.Join(tmpDir, configTrace)
+					}
+					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
 				session := helpers.CFWithEnv(envMap, command...)
