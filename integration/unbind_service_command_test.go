@@ -33,12 +33,6 @@ var _ = Describe("unbind-service command", func() {
 		domain = DefaultDomain()
 	})
 
-	AfterEach(func() {
-		setAPI()
-		loginCF()
-		Eventually(CF("delete-org", "-f", org)).Should(Exit(0))
-	})
-
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {

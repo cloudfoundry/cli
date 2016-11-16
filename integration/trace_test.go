@@ -25,10 +25,6 @@ var _ = Describe("trace", func() {
 		setupCF(orgName, spaceName)
 	})
 
-	AfterEach(func() {
-		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
-	})
-
 	Context("writing the trace to the filesystem", func() {
 		var (
 			prevCfTrace string

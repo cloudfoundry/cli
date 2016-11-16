@@ -48,11 +48,9 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("testorg")
-				spaceName := helpers.PrefixedRandomName("testspace")
+				orgName := helpers.PrefixedRandomName("ORG")
+				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
-
-				defer helpers.CF("delete-org", "-f", orgName)
 
 				var envMap map[string]string
 				if env != "" {
@@ -104,11 +102,9 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("testorg")
-				spaceName := helpers.PrefixedRandomName("testspace")
+				orgName := helpers.PrefixedRandomName("ORG")
+				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
-
-				defer helpers.CF("delete-org", "-f", orgName)
 
 				var envMap map[string]string
 				if env != "" {
@@ -165,11 +161,9 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("testorg")
-				spaceName := helpers.PrefixedRandomName("testspace")
+				orgName := helpers.PrefixedRandomName("ORG")
+				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
-
-				defer helpers.CF("delete-org", "-f", orgName)
 
 				var envMap map[string]string
 				if env != "" {
@@ -221,11 +215,9 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("testorg")
-				spaceName := helpers.PrefixedRandomName("testspace")
+				orgName := helpers.PrefixedRandomName("ORG")
+				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
-
-				defer helpers.CF("delete-org", "-f", orgName)
 
 				var envMap map[string]string
 				if env != "" {

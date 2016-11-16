@@ -25,12 +25,6 @@ var _ = Describe("run-task command", func() {
 		setupCF(orgName, spaceName)
 	})
 
-	AfterEach(func() {
-		setAPI()
-		loginCF()
-		Eventually(CF("delete-org", "-f", orgName)).Should(Exit(0))
-	})
-
 	It("should display the command level help", func() {
 		session := CF("run-task", "-h")
 		Eventually(session).Should(Exit(0))
