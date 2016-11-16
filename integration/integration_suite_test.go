@@ -4,15 +4,13 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"testing"
 	"time"
 
 	"code.cloudfoundry.org/cli/integration/helpers"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
-
-	"testing"
 )
 
 const (
@@ -26,8 +24,7 @@ var (
 	originalColor     string
 
 	// Per Test Level
-	homeDir     string
-	createdOrgs []string
+	homeDir string
 )
 
 func TestIntegration(t *testing.T) {
@@ -47,7 +44,6 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 })
 
 var _ = SynchronizedAfterSuite(func() {
-	cleanUpOrgs()
 }, func() {
 	setColor()
 })
@@ -131,7 +127,6 @@ func logoutCF() {
 
 func createOrgAndSpace(org string, space string) {
 	Eventually(helpers.CF("create-org", org)).Should(Exit(0))
-	createdOrgs = append(createdOrgs, org)
 	Eventually(helpers.CF("create-space", space, "-o", org)).Should(Exit(0))
 }
 
@@ -151,14 +146,4 @@ func setupCF(org string, space string) {
 	loginCF()
 	createOrgAndSpace(org, space)
 	targetOrgAndSpace(org, space)
-}
-
-func cleanUpOrgs() {
-	setHomeDir()
-	setAPI()
-	loginCF()
-	for _, org := range createdOrgs {
-		Eventually(helpers.CF("delete-org", org, "-f")).Should(Exit())
-	}
-	destroyHomeDir()
 }

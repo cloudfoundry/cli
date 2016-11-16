@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -x
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=120 integration
+$DIR/cleanup-integration
