@@ -325,10 +325,14 @@ jobs:
     - do:
       - task: linux-integration
         file: cli-ci/ci/cli/tasks/integration-linux.yml
+      - task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       - task: linux-gats
         file: cli-ci/ci/cli/tasks/gats-linux.yml
       - task: windows-integration
         file: cli-ci/ci/cli/tasks/integration-windows.yml
+      - task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
       - task: windows-gats
         file: cli-ci/ci/cli/tasks/gats-windows.yml
         params:
