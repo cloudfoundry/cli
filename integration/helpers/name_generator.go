@@ -4,6 +4,14 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 )
 
+func NewOrgName() string {
+	return PrefixedRandomName("ORG")
+}
+
+func PrefixedRandomName(namePrefix string) string {
+	return namePrefix + "-" + RandomName()
+}
+
 func RandomName() string {
 	guid, err := uuid.NewV4()
 	if err != nil {
@@ -11,8 +19,4 @@ func RandomName() string {
 	}
 
 	return guid.String()
-}
-
-func PrefixedRandomName(namePrefix string) string {
-	return namePrefix + "-" + RandomName()
 }
