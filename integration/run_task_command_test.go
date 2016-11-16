@@ -18,7 +18,7 @@ var _ = Describe("run-task command", func() {
 	)
 
 	BeforeEach(func() {
-		orgName = PrefixedRandomName("ORG")
+		orgName = NewOrgName()
 		spaceName = PrefixedRandomName("SPACE")
 		appName = PrefixedRandomName("APP")
 

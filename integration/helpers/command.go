@@ -29,6 +29,7 @@ func CFWithStdin(stdin io.Reader, args ...string) *Session {
 	Expect(err).NotTo(HaveOccurred())
 	return session
 }
+
 func CFWithEnv(envVars map[string]string, args ...string) *Session {
 	env := os.Environ()
 	for key, val := range envVars {

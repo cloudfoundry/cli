@@ -21,7 +21,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 	BeforeEach(func() {
 		Skip("until #131127157")
-		orgName = PrefixedRandomName("ORG")
+		orgName = NewOrgName()
 		spaceName = PrefixedRandomName("SPACE")
 		domainName = fmt.Sprintf("%s.com", PrefixedRandomName("DOMAIN"))
 		appName = PrefixedRandomName("APP")

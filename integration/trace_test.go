@@ -19,7 +19,7 @@ var _ = Describe("trace", func() {
 	var orgName string
 
 	BeforeEach(func() {
-		orgName = PrefixedRandomName("ORG")
+		orgName = NewOrgName()
 		spaceName := PrefixedRandomName("SPACE")
 
 		setupCF(orgName, spaceName)

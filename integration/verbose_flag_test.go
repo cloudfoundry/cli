@@ -48,7 +48,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("ORG")
+				orgName := helpers.NewOrgName()
 				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
 
@@ -102,7 +102,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("ORG")
+				orgName := helpers.NewOrgName()
 				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
 
@@ -161,7 +161,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("ORG")
+				orgName := helpers.NewOrgName()
 				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
 
@@ -215,7 +215,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.PrefixedRandomName("ORG")
+				orgName := helpers.NewOrgName()
 				spaceName := helpers.PrefixedRandomName("SPACE")
 				setupCF(orgName, spaceName)
 
