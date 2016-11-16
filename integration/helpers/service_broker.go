@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 
 	"io/ioutil"
 
@@ -15,9 +14,8 @@ import (
 )
 
 const (
-	DefaultMemoryLimit         = "256M"
-	DefaultDiskLimit           = "1G"
-	CFServiceBrokerLongTimeout = 1 * time.Minute
+	DefaultMemoryLimit = "256M"
+	DefaultDiskLimit   = "1G"
 )
 
 type Plan struct {
@@ -70,9 +68,9 @@ func (b ServiceBroker) Push() {
 		"-m", DefaultMemoryLimit,
 		"-p", b.Path,
 		"-d", b.AppsDomain,
-	), CFServiceBrokerLongTimeout).Should(Exit(0))
+	)).Should(Exit(0))
 
-	Eventually(CF("start", b.Name), CFServiceBrokerLongTimeout).Should(Exit(0))
+	Eventually(CF("start", b.Name)).Should(Exit(0))
 }
 
 func (b ServiceBroker) Configure() {
@@ -89,19 +87,19 @@ func (b ServiceBroker) Configure() {
 
 func (b ServiceBroker) Create() {
 	appURI := fmt.Sprintf("http://%s.%s", b.Name, b.AppsDomain)
-	Eventually(CF("create-service-broker", b.Name, "username", "password", appURI), CFServiceBrokerLongTimeout).Should(Exit(0))
-	Eventually(CF("service-brokers"), CFServiceBrokerLongTimeout).Should(And(Exit(0), Say(b.Name)))
+	Eventually(CF("create-service-broker", b.Name, "username", "password", appURI)).Should(Exit(0))
+	Eventually(CF("service-brokers")).Should(And(Exit(0), Say(b.Name)))
 }
 
 func (b ServiceBroker) Delete() {
-	Eventually(CF("delete-service-broker", b.Name, "-f"), CFServiceBrokerLongTimeout).Should(Exit(0))
-	Eventually(CF("service-brokers"), CFServiceBrokerLongTimeout).Should(And(Exit(0), Not(Say(b.Name))))
+	Eventually(CF("delete-service-broker", b.Name, "-f")).Should(Exit(0))
+	Eventually(CF("service-brokers")).Should(And(Exit(0), Not(Say(b.Name))))
 }
 
 func (b ServiceBroker) Destroy() {
-	Eventually(CF("purge-service-offering", b.Service.Name, "-f"), CFServiceBrokerLongTimeout).Should(Exit(0))
+	Eventually(CF("purge-service-offering", b.Service.Name, "-f")).Should(Exit(0))
 	b.Delete()
-	Eventually(CF("delete", b.Name, "-f", "-r"), CFServiceBrokerLongTimeout).Should(Exit(0))
+	Eventually(CF("delete", b.Name, "-f", "-r")).Should(Exit(0))
 }
 
 func (b ServiceBroker) ToJSON() string {
