@@ -3824,7 +3824,7 @@
     "translation": "대상 지정된 영역이 없습니다. '{{.CFTargetCommand}}'을(를) 사용하십시오."
   },
   {
-    "id": "No space targeted, use '{{.Command}}' to target a space",
+    "id": "No space targeted, use '{{.Command}}' to target a space.",
     "translation": "대상 지정된 영역이 없습니다. 영역을 대상 지정하려면 '{{.Command}}'을(를) 사용하십시오."
   },
   {
@@ -5004,7 +5004,7 @@
     "translation": "팁: 방화벽 뒤에 있고 HTTP 프록시가 필요한 경우 https_proxy 환경 변수가 올바르게 설정되었는지 확인하십시오. 그렇지 않은 경우, 네트워크 연결을 확인하십시오. "
   },
   {
-    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "팁: 대상 지정된 영역이 없습니다. 영역을 대상 지정하려면 '{{.CfTargetCommand}}'을(를) 사용하십시오."
   },
   {

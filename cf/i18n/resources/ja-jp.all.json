@@ -3824,7 +3824,7 @@
     "translation": "スペースがターゲットになっていません、'{{.CFTargetCommand}}' を使用してください"
   },
   {
-    "id": "No space targeted, use '{{.Command}}' to target a space",
+    "id": "No space targeted, use '{{.Command}}' to target a space.",
     "translation": "スペースがターゲットになっていません、'{{.Command}}' を使用してスペースをターゲットにしてください"
   },
   {
@@ -5004,7 +5004,7 @@
     "translation": "ヒント: ファイアウォールで保護されていて、HTTP プロキシーが必要な場合は、https_proxy 環境変数が正しく設定されているかを確認してください。 それ以外の場合は、ネットワーク接続を確認してください。"
   },
   {
-    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "ヒント: スペースがターゲットになっていません、'{{.CfTargetCommand}}' を使用してスペースをターゲットにしてください"
   },
   {

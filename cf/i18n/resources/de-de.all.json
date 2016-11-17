@@ -3824,7 +3824,7 @@
     "translation": "Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.CFTargetCommand}}'"
   },
   {
-    "id": "No space targeted, use '{{.Command}}' to target a space",
+    "id": "No space targeted, use '{{.Command}}' to target a space.",
     "translation": "Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.Command}}', um einen Bereich als Ziel auszuwählen"
   },
   {
@@ -5004,7 +5004,7 @@
     "translation": "TIPP: Wenn Sie sich hinter einer Firewall befinden und ein HTTP-Proxy erforderlich ist, prüfen Sie, ob die Umgebungsvariable https_proxy ordnungsgemäß festgelegt ist. Oder überprüfen Sie die Netzverbindung."
   },
   {
-    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "TIPP: Kein Bereich als Ziel ausgewählt, verwenden Sie '{{.CfTargetCommand}}', um einen Bereich als Ziel auszuwählen"
   },
   {

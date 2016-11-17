@@ -3824,7 +3824,7 @@
     "translation": "Aucun espace ciblé ; utilisez '{{.CFTargetCommand}}'"
   },
   {
-    "id": "No space targeted, use '{{.Command}}' to target a space",
+    "id": "No space targeted, use '{{.Command}}' to target a space.",
     "translation": "Aucun espace ciblé ; utilisez '{{.Command}}' pour cibler un espace"
   },
   {
@@ -5004,7 +5004,7 @@
     "translation": "ASTUCE : si vous vous trouvez derrière un pare-feu et avez besoin d'un proxy HTTP, vérifiez que la variable d'environnement https_proxy est définie correctement. Sinon, vérifiez votre connexion réseau."
   },
   {
-    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "ASTUCE : aucun espace ciblé ; utilisez '{{.CfTargetCommand}}' pour cibler un espace"
   },
   {

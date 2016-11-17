@@ -3824,7 +3824,7 @@
     "translation": "Nessuno spazio specificato, utilizza '{{.CFTargetCommand}}'"
   },
   {
-    "id": "No space targeted, use '{{.Command}}' to target a space",
+    "id": "No space targeted, use '{{.Command}}' to target a space.",
     "translation": "Nessuno spazio specificato, utilizza '{{.Command}}' per specificare uno spazio"
   },
   {
@@ -5004,7 +5004,7 @@
     "translation": "SUGGERIMENTO: se ti trovi dietro un firewall e hai bisogno di un proxy HTTP, verifica che la variabile https_proxy sia impostata correttamente. Altrimenti, verifica la connessione di rete."
   },
   {
-    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "SUGGERIMENTO: nessuno spazio specificato, utilizza '{{.CfTargetCommand}}' per specificare uno spazio"
   },
   {

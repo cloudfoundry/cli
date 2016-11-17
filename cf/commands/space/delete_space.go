@@ -113,7 +113,7 @@ func (cmd *DeleteSpace) Execute(c flags.FlagContext) error {
 
 	if cmd.config.SpaceFields().GUID == space.GUID {
 		cmd.config.SetSpaceFields(models.SpaceFields{})
-		cmd.ui.Say(T("TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+		cmd.ui.Say(T("TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
 			map[string]interface{}{"CfTargetCommand": cf.Name + " target -s"}))
 	}
 

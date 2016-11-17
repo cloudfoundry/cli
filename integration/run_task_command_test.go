@@ -11,44 +11,11 @@ import (
 )
 
 var _ = Describe("run-task command", func() {
-	var (
-		orgName   string
-		spaceName string
-		appName   string
-	)
-
-	BeforeEach(func() {
-		orgName = NewOrgName()
-		spaceName = PrefixedRandomName("SPACE")
-		appName = PrefixedRandomName("APP")
-
-		setupCF(orgName, spaceName)
-	})
-
-	It("should display the command level help", func() {
-		session := CF("run-task", "-h")
-		Eventually(session).Should(Exit(0))
-		Expect(session.Out).To(Say(`NAME:
-   run-task - Run a one-off task on an app
-
-USAGE:
-   cf run-task APP_NAME COMMAND \[--name TASK_NAME\]
-
-EXAMPLES:
-   cf run-task my-app "bundle exec rake db:migrate" --name migrate
-
-ALIAS:
-   rt
-
-OPTIONS:
-   --name      Name to give the task \(generated if omitted\)
-
-SEE ALSO:
-   tasks, terminate-task
-`))
-	})
-
 	Context("when the environment is not setup correctly", func() {
+		BeforeEach(func() {
+			setAPI()
+		})
+
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
 				unsetAPI()
@@ -91,12 +58,9 @@ SEE ALSO:
 
 		Context("when there no space set", func() {
 			BeforeEach(func() {
-				// create a another space, because if the org has only one space it
-				// will be automatically targetted
-				createSpace(PrefixedRandomName("SPACE"))
 				logoutCF()
 				loginCF()
-				targetOrg(orgName)
+				targetOrg(ReadOnlyOrg)
 			})
 
 			It("fails with no space targeted error message", func() {
@@ -109,6 +73,20 @@ SEE ALSO:
 	})
 
 	Context("when the environment is setup correctly", func() {
+		var (
+			orgName   string
+			spaceName string
+			appName   string
+		)
+
+		BeforeEach(func() {
+			orgName = NewOrgName()
+			spaceName = PrefixedRandomName("SPACE")
+			appName = PrefixedRandomName("APP")
+
+			setupCF(orgName, spaceName)
+		})
+
 		Context("when the application exists", func() {
 			BeforeEach(func() {
 				WithSimpleApp(func(appDir string) {
