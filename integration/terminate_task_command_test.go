@@ -11,37 +11,11 @@ import (
 )
 
 var _ = Describe("terminate-task command", func() {
-	var (
-		orgName   string
-		spaceName string
-		appName   string
-	)
-
-	BeforeEach(func() {
-		orgName = NewOrgName()
-		spaceName = PrefixedRandomName("SPACE")
-		appName = PrefixedRandomName("APP")
-
-		setupCF(orgName, spaceName)
-	})
-
-	It("should display the command level help", func() {
-		session := CF("terminate-task", "-h")
-		Eventually(session).Should(Exit(0))
-		Expect(session.Out).To(Say(`NAME:
-   terminate-task - Terminate a running task of an app
-
-USAGE:
-   cf terminate-task APP_NAME TASK_ID
-
-EXAMPLES:
-   cf terminate-task my-app 3
-
-SEE ALSO:
-   tasks`))
-	})
-
 	Context("when the environment is not setup correctly", func() {
+		BeforeEach(func() {
+			setAPI()
+		})
+
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
 				unsetAPI()
@@ -84,12 +58,9 @@ SEE ALSO:
 
 		Context("when there no space set", func() {
 			BeforeEach(func() {
-				// create a another space, because if the org has only one space it
-				// will be automatically targetted
-				createSpace(PrefixedRandomName("SPACE"))
 				logoutCF()
 				loginCF()
-				targetOrg(orgName)
+				targetOrg(ReadOnlyOrg)
 			})
 
 			It("fails with no space targeted error message", func() {
@@ -102,6 +73,20 @@ SEE ALSO:
 	})
 
 	Context("when the environment is setup correctly", func() {
+		var (
+			orgName   string
+			spaceName string
+			appName   string
+		)
+
+		BeforeEach(func() {
+			orgName = NewOrgName()
+			spaceName = PrefixedRandomName("SPACE")
+			appName = PrefixedRandomName("APP")
+
+			setupCF(orgName, spaceName)
+		})
+
 		Context("when the application does not exist", func() {
 			It("fails to terminate task and outputs an error message", func() {
 				session := CF("terminate-task", appName, "1")

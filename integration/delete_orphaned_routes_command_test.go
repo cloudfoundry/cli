@@ -11,27 +11,15 @@ import (
 )
 
 var _ = Describe("delete-orphaned-routes command", func() {
-	var (
-		orgName    string
-		spaceName  string
-		domainName string
-		appName    string
-		domain     Domain
-	)
-
 	BeforeEach(func() {
 		Skip("until #131127157")
-		orgName = NewOrgName()
-		spaceName = PrefixedRandomName("SPACE")
-		domainName = fmt.Sprintf("%s.com", PrefixedRandomName("DOMAIN"))
-		appName = PrefixedRandomName("APP")
-
-		setupCF(orgName, spaceName)
-		domain = NewDomain(orgName, domainName)
-		domain.Create()
 	})
 
 	Context("when the environment is not setup correctly", func() {
+		BeforeEach(func() {
+			setAPI()
+		})
+
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
 				unsetAPI()
@@ -74,12 +62,9 @@ var _ = Describe("delete-orphaned-routes command", func() {
 
 		Context("when there no space set", func() {
 			BeforeEach(func() {
-				// create a another space, because if the org has only one space it
-				// will be automatically targetted
-				createSpace(PrefixedRandomName("SPACE"))
 				logoutCF()
 				loginCF()
-				targetOrg(orgName)
+				targetOrg(ReadOnlyOrg)
 			})
 
 			It("fails with no space targeted error message", func() {
@@ -92,6 +77,25 @@ var _ = Describe("delete-orphaned-routes command", func() {
 	})
 
 	Context("when the environment is setup correctly", func() {
+		var (
+			orgName    string
+			spaceName  string
+			domainName string
+			appName    string
+			domain     Domain
+		)
+
+		BeforeEach(func() {
+			orgName = NewOrgName()
+			spaceName = PrefixedRandomName("SPACE")
+			domainName = fmt.Sprintf("%s.com", PrefixedRandomName("DOMAIN"))
+			appName = PrefixedRandomName("APP")
+
+			setupCF(orgName, spaceName)
+			domain = NewDomain(orgName, domainName)
+			domain.Create()
+		})
+
 		Context("when there are orphaned routes", func() {
 			var (
 				orphanedRoute1 Route

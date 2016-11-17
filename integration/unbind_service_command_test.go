@@ -10,30 +10,21 @@ import (
 
 var _ = Describe("unbind-service command", func() {
 	var (
-		org             string
-		space           string
-		service         string
-		servicePlan     string
 		serviceInstance string
 		appName         string
-		broker          ServiceBroker
-		domain          string
 	)
 
 	BeforeEach(func() {
 		Skip("until #129631341")
-		org = NewOrgName()
-		space = PrefixedRandomName("SPACE")
-		service = PrefixedRandomName("SERVICE")
-		servicePlan = PrefixedRandomName("SERVICE-PLAN")
 		serviceInstance = PrefixedRandomName("si")
 		appName = PrefixedRandomName("app")
-
-		setupCF(org, space)
-		domain = DefaultDomain()
 	})
 
 	Context("when the environment is not setup correctly", func() {
+		BeforeEach(func() {
+			setAPI()
+		})
+
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
 				unsetAPI()
@@ -60,22 +51,56 @@ var _ = Describe("unbind-service command", func() {
 			})
 		})
 
-		Context("when there no space set", func() {
+		Context("when there no org set", func() {
 			BeforeEach(func() {
 				logoutCF()
 				loginCF()
 			})
 
-			It("fails with no targeted space error message", func() {
+			It("fails with no targeted org error message", func() {
 				session := CF("unbind-service", appName, serviceInstance)
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
 				Expect(session.Err).To(Say("No org targeted, use 'cf target -o ORG' to target an org."))
 			})
 		})
+
+		Context("when there no space set", func() {
+			BeforeEach(func() {
+				logoutCF()
+				loginCF()
+				targetOrg(ReadOnlyOrg)
+			})
+
+			It("fails with no targeted space error message", func() {
+				session := CF("unbind-service", appName, serviceInstance)
+				Eventually(session).Should(Exit(1))
+				Expect(session.Out).To(Say("FAILED"))
+				Expect(session.Err).To(Say("No space targeted, use 'cf target -s SPACE' to target a space."))
+			})
+		})
 	})
 
 	Context("when the environment is setup correctly", func() {
+		var (
+			org         string
+			space       string
+			service     string
+			servicePlan string
+			broker      ServiceBroker
+			domain      string
+		)
+
+		BeforeEach(func() {
+			org = NewOrgName()
+			space = PrefixedRandomName("SPACE")
+			service = PrefixedRandomName("SERVICE")
+			servicePlan = PrefixedRandomName("SERVICE-PLAN")
+
+			setupCF(org, space)
+			domain = DefaultDomain()
+		})
+
 		Context("when the service is provided by a user", func() {
 			BeforeEach(func() {
 				Eventually(CF("create-user-provided-service", serviceInstance, "-p", "{}")).Should(Exit(0))

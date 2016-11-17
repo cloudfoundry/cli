@@ -78,7 +78,7 @@ type NoTargetedSpaceError struct {
 }
 
 func (e NoTargetedSpaceError) Error() string {
-	return "No space targeted, use '{{.Command}}' to target a space"
+	return "No space targeted, use '{{.Command}}' to target a space."
 }
 
 func (e NoTargetedSpaceError) Translate(translate func(string, ...interface{}) string) string {

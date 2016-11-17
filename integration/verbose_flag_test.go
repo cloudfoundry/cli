@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 
 	helpers "code.cloudfoundry.org/cli/integration/helpers"
 	. "github.com/onsi/ginkgo"
@@ -48,9 +49,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.NewOrgName()
-				spaceName := helpers.PrefixedRandomName("SPACE")
-				setupCF(orgName, spaceName)
+				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
 				var envMap map[string]string
 				if env != "" {
@@ -102,9 +101,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.NewOrgName()
-				spaceName := helpers.PrefixedRandomName("SPACE")
-				setupCF(orgName, spaceName)
+				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
 				var envMap map[string]string
 				if env != "" {
@@ -134,6 +131,14 @@ var _ = Describe("Verbose", func() {
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("GET /v2/spaces"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+
+					stat, err := os.Stat(tmpDir + filePath)
+					Expect(err).ToNot(HaveOccurred())
+					if runtime.GOOS == "windows" {
+						Expect(stat.Mode().String()).To(Equal(os.FileMode(0666).String()))
+					} else {
+						Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
+					}
 				}
 			},
 
@@ -161,9 +166,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.NewOrgName()
-				spaceName := helpers.PrefixedRandomName("SPACE")
-				setupCF(orgName, spaceName)
+				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
 				var envMap map[string]string
 				if env != "" {
@@ -215,9 +218,7 @@ var _ = Describe("Verbose", func() {
 
 				defer os.RemoveAll(tmpDir)
 
-				orgName := helpers.NewOrgName()
-				spaceName := helpers.PrefixedRandomName("SPACE")
-				setupCF(orgName, spaceName)
+				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
 				var envMap map[string]string
 				if env != "" {
@@ -247,6 +248,14 @@ var _ = Describe("Verbose", func() {
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("GET /v3/apps"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+
+					stat, err := os.Stat(tmpDir + filePath)
+					Expect(err).ToNot(HaveOccurred())
+					if runtime.GOOS == "windows" {
+						Expect(stat.Mode().String()).To(Equal(os.FileMode(0666).String()))
+					} else {
+						Expect(stat.Mode().String()).To(Equal(os.FileMode(0600).String()))
+					}
 				}
 			},
 

@@ -3824,7 +3824,7 @@
     "translation": "No se ha colocado como destino ningún espacio, utilice '{{.CFTargetCommand}}'"
   },
   {
-    "id": "No space targeted, use '{{.Command}}' to target a space",
+    "id": "No space targeted, use '{{.Command}}' to target a space.",
     "translation": "No se ha colocado como destino ningún espacio, utilice '{{.Command}}' para colocar como destino un espacio"
   },
   {
@@ -5004,7 +5004,7 @@
     "translation": "CONSEJO: Si se encuentra detrás de un cortafuegos y requiere un proxy HTTP, verifique que se haya establecido correctamente la variable de entorno https_proxy. De lo contrario, compruebe la conexión de red."
   },
   {
-    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space",
+    "id": "TIP: No space targeted, use '{{.CfTargetCommand}}' to target a space.",
     "translation": "CONSEJO: No se ha colocado como destino ningún espacio; utilice '{{.CfTargetCommand}}' para colocar como destino un espacio"
   },
   {

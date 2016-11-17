@@ -22,6 +22,8 @@ var (
 	apiURL            string
 	skipSSLValidation string
 	originalColor     string
+	ReadOnlyOrg       string
+	ReadOnlySpace     string
 
 	// Per Test Level
 	homeDir string
@@ -41,6 +43,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Setup common environment variables
 	apiURL = os.Getenv("CF_API")
 	turnOffColors()
+
+	ReadOnlyOrg, ReadOnlySpace = setupReadOnlyOrgAndSpace()
 })
 
 var _ = SynchronizedAfterSuite(func() {
@@ -50,7 +54,6 @@ var _ = SynchronizedAfterSuite(func() {
 
 var _ = BeforeEach(func() {
 	setHomeDir()
-	setSkipSSLValidation()
 	setAPI()
 })
 
@@ -82,6 +85,7 @@ func getAPI() string {
 }
 
 func setAPI() {
+	setSkipSSLValidation()
 	Eventually(helpers.CF("api", getAPI(), skipSSLValidation)).Should(Exit(0))
 }
 
@@ -144,6 +148,22 @@ func targetOrg(org string) {
 
 func setupCF(org string, space string) {
 	loginCF()
-	createOrgAndSpace(org, space)
+	if org != ReadOnlyOrg && space != ReadOnlySpace {
+		createOrgAndSpace(org, space)
+	}
 	targetOrgAndSpace(org, space)
+}
+
+func setupReadOnlyOrgAndSpace() (string, string) {
+	setHomeDir()
+	setAPI()
+	loginCF()
+	orgName := helpers.NewOrgName()
+	spaceName1 := helpers.PrefixedRandomName("SPACE")
+	spaceName2 := helpers.PrefixedRandomName("SPACE")
+	Eventually(helpers.CF("create-org", orgName)).Should(Exit(0))
+	Eventually(helpers.CF("create-space", spaceName1, "-o", orgName)).Should(Exit(0))
+	Eventually(helpers.CF("create-space", spaceName2, "-o", orgName)).Should(Exit(0))
+	destroyHomeDir()
+	return orgName, spaceName1
 }
