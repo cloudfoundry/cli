@@ -10,8 +10,7 @@ resources:
 - name: cli
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cli
     branch: master
     ignore_paths:
     - ci
@@ -21,14 +20,13 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry/cli-private
-    private_key: {{cf-cli-eng-github-private-key}}
+    private_key: {{cli-private-github-private-key}}
     branch: master
 
 - name: cli-ci
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
     - ci
@@ -36,15 +34,13 @@ resources:
 - name: cli-acceptance-tests
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli-acceptance-tests
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cli-acceptance-tests
     branch: master
 
 - name: cli-integration
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cli-acceptance-tests
     branch: master
     paths:
     - integration
@@ -52,8 +48,7 @@ resources:
 - name: cf-release-repo
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cf-release
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cf-release
     branch: master
 
 - name: cf-cli-binaries
@@ -204,8 +199,7 @@ resources:
 - name: cli-ci-dockerfile
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cli
     branch: master
     paths: [ci/Dockerfile]
 
