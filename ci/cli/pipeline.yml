@@ -40,7 +40,7 @@ resources:
 - name: cli-integration
   type: git
   source:
-    uri: https://github.com/cloudfoundry/cli-acceptance-tests
+    uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
     - integration
