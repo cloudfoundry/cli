@@ -4,7 +4,6 @@ image: docker:///cloudfoundry/cli-ci
 
 inputs:
 - name: cli-ci
-- name: cli-private
 - name: extracted-binaries
 
 outputs:
