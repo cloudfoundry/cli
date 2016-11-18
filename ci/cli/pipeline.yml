@@ -49,7 +49,8 @@ resources:
   type: git
   source:
     uri: https://github.com/cloudfoundry/cf-release
-    branch: master
+    # TODO: change this back to master once 366101cbdd on cf-acceptance-tests makes its way into cf-release master branch
+    branch: develop
 
 - name: cf-cli-binaries
   type: s3
