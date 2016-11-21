@@ -40,7 +40,8 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(limit int) ([]models.
 	orgs := []models.Organization{}
 	err := repo.gateway.ListPaginatedResources(
 		repo.config.APIEndpoint(),
-		"/v2/organizations?order-by=name",
+//		"/v2/organizations?order-by=name",
+		"/v2/organizations",
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
 			if orgResource, ok := resource.(resources.OrganizationResource); ok {
