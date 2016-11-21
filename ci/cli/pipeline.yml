@@ -16,13 +16,6 @@ resources:
     - ci
     - integration
 
-- name: cli-private
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/cli-private
-    private_key: {{cli-private-github-private-key}}
-    branch: master
-
 - name: cli-ci
   type: git
   source:
@@ -494,7 +487,6 @@ jobs:
       depth: 3
     - get: cf-cli-binaries
       passed: [cats-linux, cats-windows, cats-diego, gats]
-    - get: cli-private
     - get: cli-ci
       depth: 3
   - task: extract-binaries
