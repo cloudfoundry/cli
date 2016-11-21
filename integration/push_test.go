@@ -1,0 +1,136 @@
+package integration
+
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"runtime"
+
+	"code.cloudfoundry.org/cli/integration/helpers"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gbytes"
+	. "github.com/onsi/gomega/gexec"
+)
+
+var _ = Describe("Push", func() {
+	Context("when the environment is set up correctly", func() {
+		var (
+			orgName   string
+			spaceName string
+		)
+
+		BeforeEach(func() {
+			orgName = helpers.NewOrgName()
+			spaceName = helpers.PrefixedRandomName("SPACE")
+
+			setupCF(orgName, spaceName)
+		})
+
+		Context("when the app has over 260 character paths", func() {
+			var (
+				tmpDir string
+				cwd    string
+			)
+
+			BeforeEach(func() {
+				dirName := "dir_name"
+				dirNames := []string{}
+				for i := 0; i < 32; i++ { // minimum 300 chars, including separators
+					dirNames = append(dirNames, dirName)
+				}
+
+				err := ioutil.WriteFile(filepath.Join(tmpDir, "index.html"), []byte("hello world"), 0666)
+				Expect(err).ToNot(HaveOccurred())
+				fullPath := filepath.Join(tmpDir, filepath.Join(dirNames...))
+
+				if runtime.GOOS == "windows" {
+					var err error
+					cwd, err = os.Getwd()
+					Expect(err).NotTo(HaveOccurred())
+
+					// `\\?\` is used to skip Windows' file name processor, which imposes
+					// length limits. Search MSDN for 'Maximum Path Length Limitation' for
+					// more.
+					err = os.MkdirAll(`\\?\`+filepath.Join(cwd, fullPath), os.ModeDir|os.ModePerm)
+					Expect(err).NotTo(HaveOccurred())
+				} else {
+					err := os.MkdirAll(fullPath, os.ModeDir|os.ModePerm)
+					Expect(err).NotTo(HaveOccurred())
+				}
+			})
+
+			It("successfully pushes the app", func() {
+				appName := helpers.PrefixedRandomName("APP")
+				session := helpers.CF("push", appName, "-p", tmpDir, "-b", "staticfile_buildpack")
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say("1 of 1 instances running"))
+				Expect(session.Out).To(Say("App %s was started using this command", appName))
+			})
+		})
+
+		Context("when pushing with manifest routes and specifying the -n flag", func() {
+			var (
+				quotaName     string
+				appDir        string
+				manifestPath  string
+				privateDomain helpers.Domain
+				sharedDomain  helpers.Domain
+				tcpDomain     helpers.Domain
+			)
+
+			BeforeEach(func() {
+				quotaName = helpers.PrefixedRandomName("INTEGRATION-QUOTA")
+
+				session := helpers.CF("create-quota", quotaName, "-m", "10G", "-r", "10", "--reserved-route-ports", "4")
+				Eventually(session).Should(Exit(0))
+				session = helpers.CF("set-quota", orgName, quotaName)
+				Eventually(session).Should(Exit(0))
+
+				privateDomain = helpers.NewDomain(orgName, helpers.DomainName("private"))
+				privateDomain.Create()
+				sharedDomain = helpers.NewDomain(orgName, helpers.DomainName("shared"))
+				sharedDomain.CreateShared()
+				tcpDomain = helpers.NewDomain(orgName, helpers.DomainName("tcp"))
+				tcpDomain.CreateWithRouterGroup("default-tcp")
+
+				var err error
+				appDir, err = ioutil.TempDir("", "simple-app")
+				Expect(err).ToNot(HaveOccurred())
+				manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: app-with-routes
+  memory: 100M
+  instances: 1
+  path: .
+  routes:
+  - route: %s
+  - route: %s
+  - route: manifest-host.%s/path
+  - route: %s:1100
+`, privateDomain.Name, sharedDomain.Name, sharedDomain.Name, tcpDomain.Name))
+				manifestPath = filepath.Join(appDir, "manifest.yml")
+				err = ioutil.WriteFile(manifestPath, manifestContents, 0666)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = ioutil.WriteFile(filepath.Join(appDir, "index.html"), []byte("hello world"), 0666)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("should set or replace the route's hostname with the flag value", func() {
+				defer os.RemoveAll(appDir)
+				var session *Session
+				session = helpers.CF("push", helpers.PrefixedRandomName("APP"), "-p", appDir, "-n", "flag-hostname", "-b", "staticfile_buildpack", "-f", manifestPath)
+
+				Eventually(session.Out).Should(Say("Creating route flag-hostname.%s...\nOK", privateDomain.Name))
+				Eventually(session.Out).Should(Say("Creating route flag-hostname.%s...\nOK", sharedDomain.Name))
+				Eventually(session.Out).Should(Say("Creating route flag-hostname.%s/path...\nOK", sharedDomain.Name))
+				Eventually(session.Out).Should(Say("Creating route %s:1100...\nOK", tcpDomain.Name))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+	})
+})
