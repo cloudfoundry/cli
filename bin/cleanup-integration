@@ -16,3 +16,11 @@ fi
 cf auth $CF_USERNAME $CF_PASSWORD
 
 cf orgs | grep -i ^integration-org | xargs -L 1 -P 7 cf delete-org -f
+
+cf quotas | grep -i ^integration-quota | cut -d " " -f1 | xargs -L 1 -P 7 cf delete-quota -f
+
+cf create-org temp-org
+cf target -o temp-org
+cf domains | grep -i ^integration- | cut -d " " -f1 | xargs -L 1 -P 7 cf delete-shared-domain -f
+
+cf delete-org -f temp-org
