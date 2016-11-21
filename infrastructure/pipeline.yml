@@ -105,37 +105,10 @@ resources:
 - name: cli
   type: git
   source:
-    uri: git@github.com:cloudfoundry/cli
-    private_key: {{cf-cli-eng-github-private-key}}
+    uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
     - ci
-
-- name: cli-private
-  type: git
-  source:
-    uri: git@github.com:cloudfoundry/cli-private
-    private_key: {{cf-cli-eng-github-private-key}}
-    branch: master
-
-- name: concourse-deployment
-  type: bosh-deployment
-  source:
-    target: {{concourse-bosh-target}}
-    username: {{concourse-bosh-username}}
-    password: {{concourse-bosh-password}}
-    deployment: {{concourse-bosh-deployment}}
-
-- name: concourse-release
-  type: github-release
-  source:
-    repository: concourse
-    user: concourse
-
-- name: concourse-stemcell
-  type: bosh-io-stemcell
-  source:
-    name: {{bosh-io-stemcell}}
 
 - name: diego-release
   type: bosh-io-release
@@ -188,9 +161,6 @@ groups:
   - smoke-test
   - deploy-diego-release
   - deploy-routing-release
-- name: concourse-redeploy
-  jobs:
-  - deploy-concourse
 
 jobs:
 - name: provision-bosh-lite-1
@@ -198,7 +168,6 @@ jobs:
   plan:
   - aggregate:
     - get: bosh-lites-dea-pool
-    - get: cli-private
     - get: bosh-lite
     - get: cli
     - put: bosh-lite-lock
@@ -224,7 +193,7 @@ jobs:
         BOSH_LITE_KEYPAIR: {{lite-keypair}}
         BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        LITE_PRIVATE_KEY: {{bosh-lite-private-key}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -345,7 +314,6 @@ jobs:
   plan:
   - aggregate:
     - get: bosh-lites-dea-pool
-    - get: cli-private
     - get: bosh-lite
     - get: cli
     - put: bosh-lite-lock
@@ -371,7 +339,7 @@ jobs:
         BOSH_LITE_KEYPAIR: {{lite-keypair}}
         BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        LITE_PRIVATE_KEY: {{bosh-lite-private-key}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -492,7 +460,6 @@ jobs:
   plan:
   - aggregate:
     - get: bosh-lites-dea-pool
-    - get: cli-private
     - get: bosh-lite
     - get: cli
     - put: bosh-lite-lock
@@ -518,7 +485,7 @@ jobs:
         BOSH_LITE_KEYPAIR: {{lite-keypair}}
         BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        LITE_PRIVATE_KEY: {{bosh-lite-private-key}}
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -639,7 +606,6 @@ jobs:
   plan:
   - aggregate:
     - get: bosh-lites-diego-pool
-    - get: cli-private
     - get: bosh-lite
     - get: cli
     - put: bosh-lite-lock
@@ -665,7 +631,7 @@ jobs:
         BOSH_LITE_KEYPAIR: {{lite-keypair}}
         BOSH_LITE_SECURITY_GROUP: {{lite-aws-security-group}}
         BOSH_LITE_SUBNET_ID: {{bosh-lite-subnet}}
-        LITE_PRIVATE_KEY_PATH: {{lite-private-key-path}}
+        LITE_PRIVATE_KEY: {{bosh-lite-private-key}}
     ensure:
       put: bosh-lites-diego-pool
       params:
@@ -790,7 +756,6 @@ jobs:
   plan:
   - aggregate:
     - get: bosh-lites-acceptance-pool
-    - get: cli-private
     - get: bosh-lite
     - get: cli
     - put: bosh-lite-lock
@@ -816,7 +781,7 @@ jobs:
         BOSH_LITE_KEYPAIR: {{acceptance-keypair}}
         BOSH_LITE_SECURITY_GROUP: {{lite-acceptance-security-group}}
         BOSH_LITE_SUBNET_ID: {{lite-acceptance-subnet-id}}
-        LITE_PRIVATE_KEY_PATH: {{acceptance-private-key-path}}
+        LITE_PRIVATE_KEY: {{dies-lite-private-key}}
     ensure:
       put: bosh-lites-acceptance-pool
       params:
@@ -935,27 +900,3 @@ jobs:
       put: bosh-lites-acceptance-pool
       params:
         release: bosh-lite-lock
-
-- name: deploy-concourse
-  serial: true
-  plan:
-  - aggregate:
-    - get: concourse-release
-      trigger: false
-      params:
-        globs:
-        - concourse-*.tgz
-        - garden-runc-*.tgz
-    - get: cli-private
-      trigger: false
-    - get: concourse-stemcell
-      trigger: false
-  - put: concourse-deployment
-    params:
-      manifest: {{concourse-config-manifest-location}}
-      releases:
-        - concourse-release/concourse-*.tgz
-        - concourse-release/garden-runc-*.tgz
-      stemcells:
-        - concourse-stemcell/*.tgz
-
