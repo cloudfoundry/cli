@@ -21,7 +21,7 @@ resources:
   type: git
   source:
     uri: git@github.com:cloudfoundry/homebrew-tap
-    private_key: {{release-pipeline-ssh-key}}
+    private_key: {{homebrew-tap-github-private-key}}
     branch: master
 
 - name: edge-linux-binary-32
