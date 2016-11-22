@@ -28,6 +28,8 @@ type Data struct {
 	UaaEndpoint              string
 	RoutingAPIEndpoint       string
 	AccessToken              string
+	CFOAuthClient            string
+	CFOAuthClientSecret      string
 	SSHOAuthClient           string
 	RefreshToken             string
 	OrganizationFields       models.OrganizationFields
