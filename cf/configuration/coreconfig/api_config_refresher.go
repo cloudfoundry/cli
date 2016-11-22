@@ -30,6 +30,10 @@ func (a APIConfigRefresher) Refresh() (Warning, error) {
 		a.Config.ClearSession()
 	}
 
+	if a.Config.CFOAuthClient() == "" {
+		a.Config.SetCFOAuthClient("cf")
+	}
+
 	a.Config.SetAPIEndpoint(endpoint)
 	a.Config.SetAPIVersion(ccInfo.APIVersion)
 	a.Config.SetAuthenticationEndpoint(ccInfo.AuthorizationEndpoint)
