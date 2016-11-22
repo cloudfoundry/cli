@@ -64,6 +64,18 @@ type FakeRepository struct {
 	accessTokenReturns     struct {
 		result1 string
 	}
+	CFOAuthClientStub        func() string
+	cFOAuthClientMutex       sync.RWMutex
+	cFOAuthClientArgsForCall []struct{}
+	cFOAuthClientReturns     struct {
+		result1 string
+	}
+	CFOAuthClientSecretStub        func() string
+	cFOAuthClientSecretMutex       sync.RWMutex
+	cFOAuthClientSecretArgsForCall []struct{}
+	cFOAuthClientSecretReturns     struct {
+		result1 string
+	}
 	SSHOAuthClientStub        func() string
 	sSHOAuthClientMutex       sync.RWMutex
 	sSHOAuthClientArgsForCall []struct{}
@@ -239,6 +251,16 @@ type FakeRepository struct {
 	SetAccessTokenStub        func(string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
+		arg1 string
+	}
+	SetCFOAuthClientStub        func(string)
+	setCFOAuthClientMutex       sync.RWMutex
+	setCFOAuthClientArgsForCall []struct {
+		arg1 string
+	}
+	SetCFOAuthClientSecretStub        func(string)
+	setCFOAuthClientSecretMutex       sync.RWMutex
+	setCFOAuthClientSecretArgsForCall []struct {
 		arg1 string
 	}
 	SetSSHOAuthClientStub        func(string)
@@ -524,6 +546,56 @@ func (fake *FakeRepository) AccessTokenCallCount() int {
 func (fake *FakeRepository) AccessTokenReturns(result1 string) {
 	fake.AccessTokenStub = nil
 	fake.accessTokenReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) CFOAuthClient() string {
+	fake.cFOAuthClientMutex.Lock()
+	fake.cFOAuthClientArgsForCall = append(fake.cFOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("CFOAuthClient", []interface{}{})
+	fake.cFOAuthClientMutex.Unlock()
+	if fake.CFOAuthClientStub != nil {
+		return fake.CFOAuthClientStub()
+	} else {
+		return fake.cFOAuthClientReturns.result1
+	}
+}
+
+func (fake *FakeRepository) CFOAuthClientCallCount() int {
+	fake.cFOAuthClientMutex.RLock()
+	defer fake.cFOAuthClientMutex.RUnlock()
+	return len(fake.cFOAuthClientArgsForCall)
+}
+
+func (fake *FakeRepository) CFOAuthClientReturns(result1 string) {
+	fake.CFOAuthClientStub = nil
+	fake.cFOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRepository) CFOAuthClientSecret() string {
+	fake.cFOAuthClientSecretMutex.Lock()
+	fake.cFOAuthClientSecretArgsForCall = append(fake.cFOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("CFOAuthClientSecret", []interface{}{})
+	fake.cFOAuthClientSecretMutex.Unlock()
+	if fake.CFOAuthClientSecretStub != nil {
+		return fake.CFOAuthClientSecretStub()
+	} else {
+		return fake.cFOAuthClientSecretReturns.result1
+	}
+}
+
+func (fake *FakeRepository) CFOAuthClientSecretCallCount() int {
+	fake.cFOAuthClientSecretMutex.RLock()
+	defer fake.cFOAuthClientSecretMutex.RUnlock()
+	return len(fake.cFOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeRepository) CFOAuthClientSecretReturns(result1 string) {
+	fake.CFOAuthClientSecretStub = nil
+	fake.cFOAuthClientSecretReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1300,6 +1372,54 @@ func (fake *FakeRepository) SetAccessTokenArgsForCall(i int) string {
 	return fake.setAccessTokenArgsForCall[i].arg1
 }
 
+func (fake *FakeRepository) SetCFOAuthClient(arg1 string) {
+	fake.setCFOAuthClientMutex.Lock()
+	fake.setCFOAuthClientArgsForCall = append(fake.setCFOAuthClientArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetCFOAuthClient", []interface{}{arg1})
+	fake.setCFOAuthClientMutex.Unlock()
+	if fake.SetCFOAuthClientStub != nil {
+		fake.SetCFOAuthClientStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetCFOAuthClientCallCount() int {
+	fake.setCFOAuthClientMutex.RLock()
+	defer fake.setCFOAuthClientMutex.RUnlock()
+	return len(fake.setCFOAuthClientArgsForCall)
+}
+
+func (fake *FakeRepository) SetCFOAuthClientArgsForCall(i int) string {
+	fake.setCFOAuthClientMutex.RLock()
+	defer fake.setCFOAuthClientMutex.RUnlock()
+	return fake.setCFOAuthClientArgsForCall[i].arg1
+}
+
+func (fake *FakeRepository) SetCFOAuthClientSecret(arg1 string) {
+	fake.setCFOAuthClientSecretMutex.Lock()
+	fake.setCFOAuthClientSecretArgsForCall = append(fake.setCFOAuthClientSecretArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetCFOAuthClientSecret", []interface{}{arg1})
+	fake.setCFOAuthClientSecretMutex.Unlock()
+	if fake.SetCFOAuthClientSecretStub != nil {
+		fake.SetCFOAuthClientSecretStub(arg1)
+	}
+}
+
+func (fake *FakeRepository) SetCFOAuthClientSecretCallCount() int {
+	fake.setCFOAuthClientSecretMutex.RLock()
+	defer fake.setCFOAuthClientSecretMutex.RUnlock()
+	return len(fake.setCFOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeRepository) SetCFOAuthClientSecretArgsForCall(i int) string {
+	fake.setCFOAuthClientSecretMutex.RLock()
+	defer fake.setCFOAuthClientSecretMutex.RUnlock()
+	return fake.setCFOAuthClientSecretArgsForCall[i].arg1
+}
+
 func (fake *FakeRepository) SetSSHOAuthClient(arg1 string) {
 	fake.setSSHOAuthClientMutex.Lock()
 	fake.setSSHOAuthClientArgsForCall = append(fake.setSSHOAuthClientArgsForCall, struct {
@@ -1601,6 +1721,10 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.routingAPIEndpointMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.cFOAuthClientMutex.RLock()
+	defer fake.cFOAuthClientMutex.RUnlock()
+	fake.cFOAuthClientSecretMutex.RLock()
+	defer fake.cFOAuthClientSecretMutex.RUnlock()
 	fake.sSHOAuthClientMutex.RLock()
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
@@ -1663,6 +1787,10 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.setRoutingAPIEndpointMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setCFOAuthClientMutex.RLock()
+	defer fake.setCFOAuthClientMutex.RUnlock()
+	fake.setCFOAuthClientSecretMutex.RLock()
+	defer fake.setCFOAuthClientSecretMutex.RUnlock()
 	fake.setSSHOAuthClientMutex.RLock()
 	defer fake.setSSHOAuthClientMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()
