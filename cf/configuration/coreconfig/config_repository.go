@@ -246,7 +246,11 @@ func (c *ConfigRepository) AccessToken() (accessToken string) {
 
 func (c *ConfigRepository) CFOAuthClient() (clientID string) {
 	c.read(func() {
-		clientID = c.data.CFOAuthClient
+		if c.data.CFOAuthClient == "" {
+			clientID = "cf"
+		} else {
+			clientID = c.data.CFOAuthClient
+		}
 	})
 	return
 }
