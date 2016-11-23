@@ -89,7 +89,7 @@ var _ = Describe("run-task command", func() {
 
 		Context("when the application exists", func() {
 			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
@@ -129,7 +129,7 @@ Task 1 has been submitted successfully for execution.`,
 
 		Context("when the application is not staged", func() {
 			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
@@ -144,7 +144,7 @@ Task 1 has been submitted successfully for execution.`,
 
 		Context("when the application is staged but stopped", func() {
 			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 				session := CF("stop", appName)

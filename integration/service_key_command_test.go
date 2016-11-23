@@ -29,7 +29,7 @@ var _ = Describe("service-key command", func() {
 		serviceInstance = PrefixedRandomName("si")
 
 		setupCF(org, space)
-		domain = DefaultDomain()
+		domain = defaultSharedDomain()
 	})
 
 	Context("when the service key is not found", func() {

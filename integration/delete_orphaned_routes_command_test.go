@@ -133,7 +133,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 				orphanedRoute1.Create()
 				orphanedRoute2.Create()
 
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
 				Eventually(CF("apps")).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
@@ -223,7 +223,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			)
 
 			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 				})
 				Eventually(CF("apps")).Should(And(Exit(0), Say(fmt.Sprintf("%s\\s+stopped\\s+0/1\\s+%s\\s+%s", appName, DefaultMemoryLimit, DefaultDiskLimit))))
