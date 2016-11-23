@@ -142,17 +142,48 @@ var _ = Describe("Config", func() {
 			})
 		})
 
-		Describe("ClientID", func() {
-			It("returns the client ID", func() {
-				var config Config
-				Expect(config.ClientID()).To(Equal("cf"))
+		Describe("CFOAuthClient", func() {
+			Context("when CFOAuthClient is not set in the config", func() {
+				It("return the default client ID", func() {
+					config := new(Config)
+					Expect(config.CFOAuthClient()).To(Equal("cf"))
+				})
+			})
+
+			Context("when CFOAuthClient is set in the config", func() {
+				var config *Config
+
+				BeforeEach(func() {
+					rawConfig := `{ "CFOAuthClient":"some-client" }`
+					setConfig(homeDir, rawConfig)
+
+					var err error
+					config, err = LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(config).ToNot(BeNil())
+				})
+
+				It("returns the client ID", func() {
+					Expect(config.CFOAuthClient()).To(Equal("some-client"))
+				})
 			})
 		})
 
-		Describe("ClientSecret", func() {
+		Describe("CFOAuthClientSecret", func() {
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `{ "CFOAuthClientSecret":"some-client-secret" }`
+				setConfig(homeDir, rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
+			})
+
 			It("returns the client secret", func() {
-				var config Config
-				Expect(config.ClientSecret()).To(BeEmpty())
+				Expect(config.CFOAuthClientSecret()).To(Equal("some-client-secret"))
 			})
 		})
 
@@ -437,6 +468,22 @@ var _ = Describe("Config", func() {
 				var config Config
 				config.SetAccessToken("I am the access token")
 				Expect(config.ConfigFile.AccessToken).To(Equal("I am the access token"))
+			})
+		})
+
+		Describe("SetCFOAuthClient", func() {
+			It("sets the OAuth client", func() {
+				var config Config
+				config.SetCFOAuthClient("I am the OAuth Client")
+				Expect(config.ConfigFile.CFOAuthClient).To(Equal("I am the OAuth Client"))
+			})
+		})
+
+		Describe("SetCFOAuthClientSecret", func() {
+			It("sets the OAuth client secret", func() {
+				var config Config
+				config.SetCFOAuthClientSecret("I am the OAuth Client Secret")
+				Expect(config.ConfigFile.CFOAuthClientSecret).To(Equal("I am the OAuth Client Secret"))
 			})
 		})
 

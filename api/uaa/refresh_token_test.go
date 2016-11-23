@@ -40,8 +40,8 @@ var _ = Describe("UAA Client", func() {
 					RespondWith(http.StatusOK, response),
 				))
 			fakeStore.RefreshTokenReturns("refresh-token")
-			fakeStore.ClientIDReturns("client-id")
-			fakeStore.ClientSecretReturns("client-secret")
+			fakeStore.CFOAuthClientReturns("client-id")
+			fakeStore.CFOAuthClientSecretReturns("client-secret")
 		})
 
 		It("refreshes the token", func() {

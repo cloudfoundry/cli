@@ -24,13 +24,13 @@ const (
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
 
-	// UAAClientID is the default client ID for the CLI when communicating with
-	// the UAA.
-	UAAClientID = "cf"
-
-	// UAAClientSecret is the default client secret for the CLI when
+	// DefaultCFOAuthClient is the default client ID for the CLI when
 	// communicating with the UAA.
-	UAAClientSecret = ""
+	DefaultCFOAuthClient = "cf"
+
+	// DefaultCFOClientSecret is the default client secret for the CLI when
+	// communicating with the UAA.
+	DefaultCFOAuthClientSecret = ""
 )
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
@@ -156,6 +156,8 @@ type CFConfig struct {
 	RoutingEndpoint          string        `json:"RoutingAPIEndpoint"`
 	AccessToken              string        `json:"AccessToken"`
 	SSHOAuthClient           string        `json:"SSHOAuthClient"`
+	CFOAuthClient            string        `json:"CFOAuthClient"`
+	CFOAuthClientSecret      string        `json:"CFOAuthClientSecret"`
 	RefreshToken             string        `json:"RefreshToken"`
 	TargetedOrganization     Organization  `json:"OrganizationFields"`
 	TargetedSpace            Space         `json:"SpaceFields"`
@@ -238,14 +240,17 @@ func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
 }
 
-// ClientID returns the CLI's UAA client ID
-func (config *Config) ClientID() string {
-	return UAAClientID
+// CFOAuthClient returns the CLI's UAA client ID
+func (config *Config) CFOAuthClient() string {
+	if config.ConfigFile.CFOAuthClient == "" {
+		return DefaultCFOAuthClient
+	}
+	return config.ConfigFile.CFOAuthClient
 }
 
-// ClientSecret returns the CLI's secret
-func (config *Config) ClientSecret() string {
-	return UAAClientSecret
+// CFOAuthClientSecret returns the CLI's UAA client secret
+func (config *Config) CFOAuthClientSecret() string {
+	return config.ConfigFile.CFOAuthClientSecret
 }
 
 // APIVersion returns the CC API Version
@@ -412,4 +417,14 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 // SetAccessToken sets the current access token
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
+}
+
+// SetCFOAuthClient sets the UAA OAuth client ID
+func (config *Config) SetCFOAuthClient(client string) {
+	config.ConfigFile.CFOAuthClient = client
+}
+
+// SetCFOAuthClientSecret sets the UAA OAuth client secret
+func (config *Config) SetCFOAuthClientSecret(secret string) {
+	config.ConfigFile.CFOAuthClientSecret = secret
 }
