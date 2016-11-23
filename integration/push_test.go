@@ -30,10 +30,7 @@ var _ = Describe("Push", func() {
 		})
 
 		Context("when the app has over 260 character paths", func() {
-			var (
-				tmpDir string
-				cwd    string
-			)
+			var tmpDir string
 
 			BeforeEach(func() {
 				var err error
@@ -46,33 +43,27 @@ var _ = Describe("Push", func() {
 					dirNames = append(dirNames, dirName)
 				}
 
-				err = ioutil.WriteFile(filepath.Join(tmpDir, "index.html"), []byte("hello world"), 0666)
-				Expect(err).ToNot(HaveOccurred())
 				fullPath := filepath.Join(tmpDir, filepath.Join(dirNames...))
-
 				if runtime.GOOS == "windows" {
-					var err error
-					cwd, err = os.Getwd()
-					Expect(err).NotTo(HaveOccurred())
-
 					// `\\?\` is used to skip Windows' file name processor, which imposes
 					// length limits. Search MSDN for 'Maximum Path Length Limitation' for
 					// more.
-					err = os.MkdirAll(`\\?\`+filepath.Join(cwd, fullPath), os.ModeDir|os.ModePerm)
-					Expect(err).NotTo(HaveOccurred())
-				} else {
-					err := os.MkdirAll(fullPath, os.ModeDir|os.ModePerm)
-					Expect(err).NotTo(HaveOccurred())
+					fullPath = `\\?\` + fullPath
 				}
+				err = os.MkdirAll(fullPath, os.ModeDir|os.ModePerm)
+				Expect(err).NotTo(HaveOccurred())
+
+				err = ioutil.WriteFile(filepath.Join(fullPath, "index.html"), []byte("hello world"), 0666)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("successfully pushes the app", func() {
 				defer os.RemoveAll(tmpDir)
 				appName := helpers.PrefixedRandomName("APP")
 				session := helpers.CF("push", appName, "-p", tmpDir, "-b", "staticfile_buildpack")
+				Eventually(session).Should(Say("1 of 1 instances running"))
+				Eventually(session).Should(Say("App %s was started using this command", appName))
 				Eventually(session).Should(Exit(0))
-				Expect(session).To(Say("1 of 1 instances running"))
-				Expect(session).To(Say("App %s was started using this command", appName))
 			})
 		})
 
