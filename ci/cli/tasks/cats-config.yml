@@ -26,7 +26,7 @@ run:
 
     export DOMAIN=`cat bosh-lite-lock/name`
 
-    if [[ $BACKEND == "diego"]]; then
+    if [[ $BACKEND == "diego" ]]; then
       export IS_DIEGO_ENABLED=true
     else
       export IS_DIEGO_ENABLED=false
