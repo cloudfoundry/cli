@@ -36,13 +36,17 @@ var _ = Describe("Push", func() {
 			)
 
 			BeforeEach(func() {
+				var err error
+				tmpDir, err = ioutil.TempDir("", "")
+				Expect(err).ToNot(HaveOccurred())
+
 				dirName := "dir_name"
 				dirNames := []string{}
 				for i := 0; i < 32; i++ { // minimum 300 chars, including separators
 					dirNames = append(dirNames, dirName)
 				}
 
-				err := ioutil.WriteFile(filepath.Join(tmpDir, "index.html"), []byte("hello world"), 0666)
+				err = ioutil.WriteFile(filepath.Join(tmpDir, "index.html"), []byte("hello world"), 0666)
 				Expect(err).ToNot(HaveOccurred())
 				fullPath := filepath.Join(tmpDir, filepath.Join(dirNames...))
 
@@ -63,11 +67,12 @@ var _ = Describe("Push", func() {
 			})
 
 			It("successfully pushes the app", func() {
+				defer os.RemoveAll(tmpDir)
 				appName := helpers.PrefixedRandomName("APP")
 				session := helpers.CF("push", appName, "-p", tmpDir, "-b", "staticfile_buildpack")
 				Eventually(session).Should(Exit(0))
-				Expect(session.Out).To(Say("1 of 1 instances running"))
-				Expect(session.Out).To(Say("App %s was started using this command", appName))
+				Expect(session).To(Say("1 of 1 instances running"))
+				Expect(session).To(Say("App %s was started using this command", appName))
 			})
 		})
 
@@ -125,10 +130,10 @@ applications:
 				var session *Session
 				session = helpers.CF("push", helpers.PrefixedRandomName("APP"), "-p", appDir, "-n", "flag-hostname", "-b", "staticfile_buildpack", "-f", manifestPath)
 
-				Eventually(session.Out).Should(Say("Creating route flag-hostname.%s...\nOK", privateDomain.Name))
-				Eventually(session.Out).Should(Say("Creating route flag-hostname.%s...\nOK", sharedDomain.Name))
-				Eventually(session.Out).Should(Say("Creating route flag-hostname.%s/path...\nOK", sharedDomain.Name))
-				Eventually(session.Out).Should(Say("Creating route %s:1100...\nOK", tcpDomain.Name))
+				Eventually(session).Should(Say("Creating route flag-hostname.%s...\nOK", privateDomain.Name))
+				Eventually(session).Should(Say("Creating route flag-hostname.%s...\nOK", sharedDomain.Name))
+				Eventually(session).Should(Say("Creating route flag-hostname.%s/path...\nOK", sharedDomain.Name))
+				Eventually(session).Should(Say("Creating route %s:1100...\nOK", tcpDomain.Name))
 				Eventually(session).Should(Exit(0))
 			})
 		})

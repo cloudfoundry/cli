@@ -98,7 +98,7 @@ var _ = Describe("terminate-task command", func() {
 
 		Context("when the application exists", func() {
 			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})
@@ -115,7 +115,7 @@ var _ = Describe("terminate-task command", func() {
 
 			Context("when the task is in the RUNNING state", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("run-task", appName, "sleep 1000")).Should(Exit(0))
 					})
 				})
@@ -136,7 +136,7 @@ var _ = Describe("terminate-task command", func() {
 
 			Context("when the task is in the SUCCEEDED state", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("run-task", appName, "echo test")).Should(Exit(0))
 					})
 				})
@@ -157,7 +157,7 @@ var _ = Describe("terminate-task command", func() {
 
 			Context("when the task is in the FAILED state", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("run-task", appName, "false")).Should(Exit(0))
 					})
 				})

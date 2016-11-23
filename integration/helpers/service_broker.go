@@ -3,7 +3,6 @@ package helpers
 import (
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"io/ioutil"
@@ -132,19 +131,6 @@ func GetAppGuid(appName string) string {
 	appGuid := strings.TrimSpace(string(session.Out.Contents()))
 	Expect(appGuid).NotTo(Equal(""))
 	return appGuid
-}
-
-func DefaultDomain() string {
-	session := CF("domains")
-	Eventually(session).Should(Exit(0))
-
-	regex, err := regexp.Compile(`(.+?)\s+shared`)
-	Expect(err).ToNot(HaveOccurred())
-
-	matches := regex.FindStringSubmatch(string(session.Out.Contents()))
-	Expect(matches).To(HaveLen(2))
-
-	return matches[1]
 }
 
 type Assets struct {

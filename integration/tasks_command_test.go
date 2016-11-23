@@ -98,7 +98,7 @@ var _ = Describe("tasks command", func() {
 
 		Context("when the application exists", func() {
 			BeforeEach(func() {
-				WithSimpleApp(func(appDir string) {
+				WithHelloWorldApp(func(appDir string) {
 					Eventually(CF("push", appName, "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
 				})
 			})

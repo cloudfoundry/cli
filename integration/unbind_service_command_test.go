@@ -98,7 +98,7 @@ var _ = Describe("unbind-service command", func() {
 			servicePlan = PrefixedRandomName("SERVICE-PLAN")
 
 			setupCF(org, space)
-			domain = DefaultDomain()
+			domain = defaultSharedDomain()
 		})
 
 		Context("when the service is provided by a user", func() {
@@ -112,7 +112,7 @@ var _ = Describe("unbind-service command", func() {
 
 			Context("when the service is bound to an app", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 					Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
@@ -133,7 +133,7 @@ var _ = Describe("unbind-service command", func() {
 
 			Context("when the service is not bound to an app", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
 					})
 				})
@@ -148,7 +148,7 @@ var _ = Describe("unbind-service command", func() {
 
 			Context("when the service does not exist", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 				})
@@ -188,7 +188,7 @@ var _ = Describe("unbind-service command", func() {
 			Context("when the service is bound to an app", func() {
 				BeforeEach(func() {
 					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 					Eventually(CF("bind-service", appName, serviceInstance)).Should(Exit(0))
@@ -210,7 +210,7 @@ var _ = Describe("unbind-service command", func() {
 			Context("when the service is not bound to an app", func() {
 				BeforeEach(func() {
 					Eventually(CF("create-service", service, servicePlan, serviceInstance)).Should(Exit(0))
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("push", appName, "--no-start", "-p", appDir, "--no-route")).Should(Exit(0))
 					})
 				})
@@ -225,7 +225,7 @@ var _ = Describe("unbind-service command", func() {
 
 			Context("when the service does not exist", func() {
 				BeforeEach(func() {
-					WithSimpleApp(func(appDir string) {
+					WithHelloWorldApp(func(appDir string) {
 						Eventually(CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 					})
 				})

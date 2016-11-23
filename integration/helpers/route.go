@@ -32,8 +32,11 @@ func (r Route) Delete() {
 	Eventually(CF("delete-route", r.Domain, "--hostname", r.Host, "--path", r.Path, "-f")).Should(Exit(0))
 }
 
-func DomainName(prefix string) string {
-	return fmt.Sprintf("integration-%s.com", PrefixedRandomName(prefix))
+func DomainName(prefix ...string) string {
+	if len(prefix) > 0 {
+		return fmt.Sprintf("integration-%s.com", PrefixedRandomName(prefix[0]))
+	}
+	return fmt.Sprintf("integration%s.com", PrefixedRandomName(""))
 }
 
 type Domain struct {
