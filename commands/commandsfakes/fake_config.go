@@ -28,16 +28,16 @@ type FakeConfig struct {
 	binaryNameReturns     struct {
 		result1 string
 	}
-	ClientIDStub        func() string
-	clientIDMutex       sync.RWMutex
-	clientIDArgsForCall []struct{}
-	clientIDReturns     struct {
+	CFOAuthClientStub        func() string
+	cFOAuthClientMutex       sync.RWMutex
+	cFOAuthClientArgsForCall []struct{}
+	cFOAuthClientReturns     struct {
 		result1 string
 	}
-	ClientSecretStub        func() string
-	clientSecretMutex       sync.RWMutex
-	clientSecretArgsForCall []struct{}
-	clientSecretReturns     struct {
+	CFOAuthClientSecretStub        func() string
+	cFOAuthClientSecretMutex       sync.RWMutex
+	cFOAuthClientSecretArgsForCall []struct{}
+	cFOAuthClientSecretReturns     struct {
 		result1 string
 	}
 	ColorEnabledStub        func() configv3.ColorSetting
@@ -217,52 +217,52 @@ func (fake *FakeConfig) BinaryNameReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) ClientID() string {
-	fake.clientIDMutex.Lock()
-	fake.clientIDArgsForCall = append(fake.clientIDArgsForCall, struct{}{})
-	fake.recordInvocation("ClientID", []interface{}{})
-	fake.clientIDMutex.Unlock()
-	if fake.ClientIDStub != nil {
-		return fake.ClientIDStub()
+func (fake *FakeConfig) CFOAuthClient() string {
+	fake.cFOAuthClientMutex.Lock()
+	fake.cFOAuthClientArgsForCall = append(fake.cFOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("CFOAuthClient", []interface{}{})
+	fake.cFOAuthClientMutex.Unlock()
+	if fake.CFOAuthClientStub != nil {
+		return fake.CFOAuthClientStub()
 	} else {
-		return fake.clientIDReturns.result1
+		return fake.cFOAuthClientReturns.result1
 	}
 }
 
-func (fake *FakeConfig) ClientIDCallCount() int {
-	fake.clientIDMutex.RLock()
-	defer fake.clientIDMutex.RUnlock()
-	return len(fake.clientIDArgsForCall)
+func (fake *FakeConfig) CFOAuthClientCallCount() int {
+	fake.cFOAuthClientMutex.RLock()
+	defer fake.cFOAuthClientMutex.RUnlock()
+	return len(fake.cFOAuthClientArgsForCall)
 }
 
-func (fake *FakeConfig) ClientIDReturns(result1 string) {
-	fake.ClientIDStub = nil
-	fake.clientIDReturns = struct {
+func (fake *FakeConfig) CFOAuthClientReturns(result1 string) {
+	fake.CFOAuthClientStub = nil
+	fake.cFOAuthClientReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeConfig) ClientSecret() string {
-	fake.clientSecretMutex.Lock()
-	fake.clientSecretArgsForCall = append(fake.clientSecretArgsForCall, struct{}{})
-	fake.recordInvocation("ClientSecret", []interface{}{})
-	fake.clientSecretMutex.Unlock()
-	if fake.ClientSecretStub != nil {
-		return fake.ClientSecretStub()
+func (fake *FakeConfig) CFOAuthClientSecret() string {
+	fake.cFOAuthClientSecretMutex.Lock()
+	fake.cFOAuthClientSecretArgsForCall = append(fake.cFOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("CFOAuthClientSecret", []interface{}{})
+	fake.cFOAuthClientSecretMutex.Unlock()
+	if fake.CFOAuthClientSecretStub != nil {
+		return fake.CFOAuthClientSecretStub()
 	} else {
-		return fake.clientSecretReturns.result1
+		return fake.cFOAuthClientSecretReturns.result1
 	}
 }
 
-func (fake *FakeConfig) ClientSecretCallCount() int {
-	fake.clientSecretMutex.RLock()
-	defer fake.clientSecretMutex.RUnlock()
-	return len(fake.clientSecretArgsForCall)
+func (fake *FakeConfig) CFOAuthClientSecretCallCount() int {
+	fake.cFOAuthClientSecretMutex.RLock()
+	defer fake.cFOAuthClientSecretMutex.RUnlock()
+	return len(fake.cFOAuthClientSecretArgsForCall)
 }
 
-func (fake *FakeConfig) ClientSecretReturns(result1 string) {
-	fake.ClientSecretStub = nil
-	fake.clientSecretReturns = struct {
+func (fake *FakeConfig) CFOAuthClientSecretReturns(result1 string) {
+	fake.CFOAuthClientSecretStub = nil
+	fake.cFOAuthClientSecretReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -659,10 +659,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.accessTokenMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
-	fake.clientIDMutex.RLock()
-	defer fake.clientIDMutex.RUnlock()
-	fake.clientSecretMutex.RLock()
-	defer fake.clientSecretMutex.RUnlock()
+	fake.cFOAuthClientMutex.RLock()
+	defer fake.cFOAuthClientMutex.RUnlock()
+	fake.cFOAuthClientSecretMutex.RLock()
+	defer fake.cFOAuthClientSecretMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()

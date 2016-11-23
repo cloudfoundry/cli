@@ -18,8 +18,8 @@ import (
 
 // AuthenticationStore represents the storage the UAA client
 type AuthenticationStore interface {
-	ClientID() string
-	ClientSecret() string
+	CFOAuthClient() string
+	CFOAuthClientSecret() string
 
 	AccessToken() string
 	RefreshToken() string

@@ -23,8 +23,8 @@ func (refreshTokenResponse RefreshTokenResponse) AuthorizationToken() string {
 // RefreshToken refreshes the current access token
 func (client *Client) RefreshToken() error {
 	body := strings.NewReader(url.Values{
-		"client_id":     {client.store.ClientID()},
-		"client_secret": {client.store.ClientSecret()},
+		"client_id":     {client.store.CFOAuthClient()},
+		"client_secret": {client.store.CFOAuthClientSecret()},
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {client.store.RefreshToken()},
 	}.Encode())
