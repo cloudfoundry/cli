@@ -18,11 +18,11 @@ var _ = Describe("copy-source command", func() {
 	BeforeEach(func() {
 		setupCF(helpers.NewOrgName(), helpers.PrefixedRandomName("SPACE"))
 
-		appName1 = "hello"
-		appName2 = "banana"
+		appName1 = helpers.PrefixedRandomName("hello")
+		appName2 = helpers.PrefixedRandomName("banana")
 
 		helpers.WithHelloWorldApp(func(appDir string) {
-			Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")).Should(Exit(0))
+			Eventually(helpers.CF("push", appName1, "--no-start", "-p", appDir, "-b", "staticfile_buildpack", "--no-route")).Should(Exit(0))
 		})
 
 		helpers.WithBananaPantsApp(func(appDir string) {
