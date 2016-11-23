@@ -3,6 +3,7 @@ package integration
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strconv"
 	"testing"
 	"time"
@@ -89,19 +90,22 @@ func setAPI() {
 	Eventually(helpers.CF("api", getAPI(), skipSSLValidation)).Should(Exit(0))
 }
 
+var foundDefaultDomain string
+
 func defaultSharedDomain() string {
-	return apiURL[12:]
-	// If the hack above becomes a problem, use the following instead
-	// session := CF("domains")
-	// Eventually(session).Should(Exit(0))
+	if foundDefaultDomain == "" {
+		session := helpers.CF("domains")
+		Eventually(session).Should(Exit(0))
 
-	// regex, err := regexp.Compile(`(.+?)\s+shared`)
-	// Expect(err).ToNot(HaveOccurred())
+		regex, err := regexp.Compile(`(.+?)\s+shared`)
+		Expect(err).ToNot(HaveOccurred())
 
-	// matches := regex.FindStringSubmatch(string(session.Out.Contents()))
-	// Expect(matches).To(HaveLen(2))
+		matches := regex.FindStringSubmatch(string(session.Out.Contents()))
+		Expect(matches).To(HaveLen(2))
 
-	// return matches[1]
+		foundDefaultDomain = matches[1]
+	}
+	return foundDefaultDomain
 }
 
 func unsetAPI() {
