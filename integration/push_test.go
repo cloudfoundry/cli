@@ -33,6 +33,7 @@ var _ = Describe("Push", func() {
 			var tmpDir string
 
 			BeforeEach(func() {
+				Skip("Unskip when #134888875 is complete")
 				var err error
 				tmpDir, err = ioutil.TempDir("", "")
 				Expect(err).ToNot(HaveOccurred())
