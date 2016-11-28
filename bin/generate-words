@@ -2,5 +2,5 @@
 
 set -e
 go install github.com/jteeuwen/go-bindata/go-bindata
-go-bindata -pkg=words -o utils/words/words.go utils/words/dict
-go fmt ./utils/words/...
+go-bindata -pkg=words -o util/words/words.go util/words/dict
+go fmt ./util/words/...

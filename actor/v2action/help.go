@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/utils/sortutils"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 // CommandInfo contains the help details of a command
@@ -88,7 +88,7 @@ func (_ Actor) CommandInfoByName(commandList interface{}, commandName string) (C
 		}
 
 		if fieldTag.Get("related_commands") != "" {
-			relatedCommands := sortutils.Alphabetic(strings.Split(fieldTag.Get("related_commands"), ", "))
+			relatedCommands := sorting.Alphabetic(strings.Split(fieldTag.Get("related_commands"), ", "))
 			sort.Sort(relatedCommands)
 			cmd.RelatedCommands = relatedCommands
 			continue

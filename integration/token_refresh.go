@@ -2,7 +2,7 @@ package integration
 
 import (
 	"code.cloudfoundry.org/cli/integration/helpers"
-	"code.cloudfoundry.org/cli/utils/configv3"
+	"code.cloudfoundry.org/cli/util/configv3"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

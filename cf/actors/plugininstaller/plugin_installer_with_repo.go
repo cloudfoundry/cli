@@ -8,7 +8,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/utils"
+	"code.cloudfoundry.org/cli/util"
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
 )
 
@@ -17,7 +17,7 @@ type pluginInstallerWithRepo struct {
 	PluginDownloader *PluginDownloader
 	DownloadFromPath downloadFromPath
 	RepoName         string
-	Checksummer      utils.Sha1Checksum
+	Checksummer      util.Sha1Checksum
 	PluginRepo       pluginrepo.PluginRepo
 	GetPluginRepos   pluginReposFetcher
 }

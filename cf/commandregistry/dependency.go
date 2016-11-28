@@ -24,8 +24,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/plugin/models"
-	"code.cloudfoundry.org/cli/utils"
-	"code.cloudfoundry.org/cli/utils/words/generator"
+	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/util/words/generator"
 )
 
 type Dependency struct {
@@ -49,7 +49,7 @@ type Dependency struct {
 	AppFiles           appfiles.AppFiles
 	PushActor          actors.PushActor
 	RouteActor         actors.RouteActor
-	ChecksumUtil       utils.Sha1Checksum
+	ChecksumUtil       util.Sha1Checksum
 	WildcardDependency interface{} //use for injecting fakes
 	Logger             trace.Printer
 }
@@ -147,7 +147,7 @@ func NewDependency(writer io.Writer, logger trace.Printer, envDialTimeout string
 	deps.RouteActor = actors.NewRouteActor(deps.UI, deps.RepoLocator.GetRouteRepository(), deps.RepoLocator.GetDomainRepository())
 	deps.PushActor = actors.NewPushActor(deps.RepoLocator.GetApplicationBitsRepository(), deps.AppZipper, deps.AppFiles, deps.RouteActor)
 
-	deps.ChecksumUtil = utils.NewSha1Checksum("")
+	deps.ChecksumUtil = util.NewSha1Checksum("")
 
 	deps.Logger = logger
 

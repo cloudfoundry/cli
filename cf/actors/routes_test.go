@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/errors/errorsfakes"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	"code.cloudfoundry.org/cli/utils/words/generator/generatorfakes"
+	"code.cloudfoundry.org/cli/util/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -3,7 +3,7 @@ package common_test
 import (
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v3/common"
-	"code.cloudfoundry.org/cli/utils/configv3"
+	"code.cloudfoundry.org/cli/util/configv3"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

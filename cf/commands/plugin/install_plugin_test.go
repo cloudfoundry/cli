@@ -20,14 +20,14 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	"code.cloudfoundry.org/cli/plugin"
-	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
-	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
-	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
-	"code.cloudfoundry.org/cli/utils/utilsfakes"
+	testcmd "code.cloudfoundry.org/cli/util/testhelpers/commands"
+	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
+	"code.cloudfoundry.org/cli/util/utilfakes"
 
 	clipr "github.com/cloudfoundry-incubator/cli-plugin-repo/web"
 
-	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -39,7 +39,7 @@ var _ = Describe("Install", func() {
 		config              coreconfig.Repository
 		pluginConfig        *pluginconfigfakes.FakePluginConfiguration
 		fakePluginRepo      *pluginrepofakes.FakePluginRepo
-		fakeChecksum        *utilsfakes.FakeSha1Checksum
+		fakeChecksum        *utilfakes.FakeSha1Checksum
 
 		pluginFile *os.File
 		homeDir    string
@@ -71,7 +71,7 @@ var _ = Describe("Install", func() {
 		pluginConfig = new(pluginconfigfakes.FakePluginConfiguration)
 		config = testconfig.NewRepositoryWithDefaults()
 		fakePluginRepo = new(pluginrepofakes.FakePluginRepo)
-		fakeChecksum = new(utilsfakes.FakeSha1Checksum)
+		fakeChecksum = new(utilfakes.FakeSha1Checksum)
 
 		dir, err := os.Getwd()
 		if err != nil {

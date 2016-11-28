@@ -10,7 +10,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/utils/words/generator"
+	"code.cloudfoundry.org/cli/util/words/generator"
 )
 
 //go:generate counterfeiter . RouteActor

@@ -11,8 +11,8 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flags"
 	"code.cloudfoundry.org/cli/command/v2/common"
-	"code.cloudfoundry.org/cli/utils/configv3"
-	"code.cloudfoundry.org/cli/utils/sortutils"
+	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 //go:generate counterfeiter . HelpActor
@@ -352,7 +352,7 @@ func (cmd HelpCommand) findPlugin() (v2action.CommandInfo, bool) {
 func (cmd HelpCommand) getSortedPluginCommands() configv3.PluginCommands {
 	plugins := cmd.Config.Plugins()
 
-	sortedPluginNames := sortutils.Alphabetic{}
+	sortedPluginNames := sorting.Alphabetic{}
 	for plugin, _ := range plugins {
 		sortedPluginNames = append(sortedPluginNames, plugin)
 	}

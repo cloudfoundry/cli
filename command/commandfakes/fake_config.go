@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/utils/configv3"
+	"code.cloudfoundry.org/cli/util/configv3"
 )
 
 type FakeConfig struct {
