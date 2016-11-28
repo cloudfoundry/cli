@@ -1,10 +1,10 @@
-package util_test
+package flagcontext_test
 
 import (
 	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/util"
+	"code.cloudfoundry.org/cli/cf/flagcontext"
 
 	"code.cloudfoundry.org/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
@@ -14,7 +14,7 @@ import (
 var _ = Describe("Flag Content Helpers", func() {
 	Describe("GetContentsFromOptionalFlagValue", func() {
 		It("returns an empty byte slice when given an empty string", func() {
-			bs, err := util.GetContentsFromOptionalFlagValue("")
+			bs, err := flagcontext.GetContentsFromOptionalFlagValue("")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(bs).To(Equal([]byte{}))
 		})
@@ -24,7 +24,7 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromOptionalFlagValue("@" + tmpFile.Name())
+				bs, err := flagcontext.GetContentsFromOptionalFlagValue("@" + tmpFile.Name())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
@@ -35,7 +35,7 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromOptionalFlagValue(tmpFile.Name())
+				bs, err := flagcontext.GetContentsFromOptionalFlagValue(tmpFile.Name())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
@@ -47,7 +47,7 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromOptionalFlagValue(fmt.Sprintf(`"%s"`, tmpFile.Name()))
+				bs, err := flagcontext.GetContentsFromOptionalFlagValue(fmt.Sprintf(`"%s"`, tmpFile.Name()))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
@@ -59,33 +59,33 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromOptionalFlagValue(fmt.Sprintf(`@"%s"`, tmpFile.Name()))
+				bs, err := flagcontext.GetContentsFromOptionalFlagValue(fmt.Sprintf(`@"%s"`, tmpFile.Name()))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
 		})
 
 		It("returns bytes when given something that isn't a file wrapped with single quotes", func() {
-			bs, err := util.GetContentsFromOptionalFlagValue(`'param1=value1&param2=value2'`)
+			bs, err := flagcontext.GetContentsFromOptionalFlagValue(`'param1=value1&param2=value2'`)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(bs).To(Equal([]byte("param1=value1&param2=value2")))
 		})
 
 		It("returns bytes when given something that isn't a file wrapped with double quotes", func() {
-			bs, err := util.GetContentsFromOptionalFlagValue(`"param1=value1&param2=value2"`)
+			bs, err := flagcontext.GetContentsFromOptionalFlagValue(`"param1=value1&param2=value2"`)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(bs).To(Equal([]byte("param1=value1&param2=value2")))
 		})
 
 		It("returns an error when it cannot read the file prefixed with @", func() {
-			_, err := util.GetContentsFromOptionalFlagValue("@nonexistent-file")
+			_, err := flagcontext.GetContentsFromOptionalFlagValue("@nonexistent-file")
 			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe("GetContentsFromFlagValue", func() {
 		It("returns an error when given an empty string", func() {
-			_, err := util.GetContentsFromFlagValue("")
+			_, err := flagcontext.GetContentsFromFlagValue("")
 			Expect(err).To(HaveOccurred())
 		})
 
@@ -94,7 +94,7 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromFlagValue("@" + tmpFile.Name())
+				bs, err := flagcontext.GetContentsFromFlagValue("@" + tmpFile.Name())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
@@ -105,7 +105,7 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromFlagValue(tmpFile.Name())
+				bs, err := flagcontext.GetContentsFromFlagValue(tmpFile.Name())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
@@ -117,7 +117,7 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromFlagValue(fmt.Sprintf(`"%s"`, tmpFile.Name()))
+				bs, err := flagcontext.GetContentsFromFlagValue(fmt.Sprintf(`"%s"`, tmpFile.Name()))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
@@ -129,26 +129,26 @@ var _ = Describe("Flag Content Helpers", func() {
 				fileData := `{"foo": "bar"}`
 				tmpFile.WriteString(fileData)
 
-				bs, err := util.GetContentsFromFlagValue(fmt.Sprintf(`@"%s"`, tmpFile.Name()))
+				bs, err := flagcontext.GetContentsFromFlagValue(fmt.Sprintf(`@"%s"`, tmpFile.Name()))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(bs).To(Equal([]byte(fileData)))
 			})
 		})
 
 		It("returns bytes when given something that isn't a file wrapped with single quotes", func() {
-			bs, err := util.GetContentsFromFlagValue(`'param1=value1&param2=value2'`)
+			bs, err := flagcontext.GetContentsFromFlagValue(`'param1=value1&param2=value2'`)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(bs).To(Equal([]byte("param1=value1&param2=value2")))
 		})
 
 		It("returns bytes when given something that isn't a file wrapped with double quotes", func() {
-			bs, err := util.GetContentsFromFlagValue(`"param1=value1&param2=value2"`)
+			bs, err := flagcontext.GetContentsFromFlagValue(`"param1=value1&param2=value2"`)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(bs).To(Equal([]byte("param1=value1&param2=value2")))
 		})
 
 		It("returns an error when it cannot read the file prefixed with @", func() {
-			_, err := util.GetContentsFromFlagValue("@nonexistent-file")
+			_, err := flagcontext.GetContentsFromFlagValue("@nonexistent-file")
 			Expect(err).To(HaveOccurred())
 		})
 	})

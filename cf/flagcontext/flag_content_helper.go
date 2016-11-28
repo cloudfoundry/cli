@@ -1,4 +1,4 @@
-package util
+package flagcontext
 
 import (
 	"fmt"
