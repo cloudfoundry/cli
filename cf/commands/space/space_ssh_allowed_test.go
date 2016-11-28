@@ -7,9 +7,9 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
-	testcmd "code.cloudfoundry.org/cli/utils/testhelpers/commands"
-	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
-	testterm "code.cloudfoundry.org/cli/utils/testhelpers/terminal"
+	testcmd "code.cloudfoundry.org/cli/util/testhelpers/commands"
+	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
+	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

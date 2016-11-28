@@ -10,8 +10,8 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/utils"
-	"code.cloudfoundry.org/cli/utils/sortutils"
+	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 type Plugins struct {
@@ -72,7 +72,7 @@ func (cmd *Plugins) Execute(c flags.FlagContext) error {
 		table = cmd.ui.Table([]string{T("Plugin Name"), T("Version"), T("Command Name"), T("Command Help")})
 	}
 
-	var sortedPluginNames sortutils.Alphabetic
+	var sortedPluginNames sorting.Alphabetic
 	for k := range plugins {
 		sortedPluginNames = append(sortedPluginNames, k)
 	}
@@ -96,7 +96,7 @@ func (cmd *Plugins) Execute(c flags.FlagContext) error {
 			}
 
 			if c.Bool("checksum") {
-				checksum := utils.NewSha1Checksum(metadata.Location)
+				checksum := util.NewSha1Checksum(metadata.Location)
 				sha1, err := checksum.ComputeFileSha1()
 				if err != nil {
 					args = append(args, "n/a")

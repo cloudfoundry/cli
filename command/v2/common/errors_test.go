@@ -5,7 +5,7 @@ import (
 	"text/template"
 
 	. "code.cloudfoundry.org/cli/command/v2/common"
-	"code.cloudfoundry.org/cli/utils/ui"
+	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"

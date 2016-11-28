@@ -4,8 +4,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/actors/pluginrepo"
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/utils"
-	"code.cloudfoundry.org/cli/utils/downloader"
+	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/util/downloader"
 )
 
 //go:generate counterfeiter . PluginInstaller
@@ -15,7 +15,7 @@ type PluginInstaller interface {
 }
 
 type Context struct {
-	Checksummer    utils.Sha1Checksum
+	Checksummer    util.Sha1Checksum
 	FileDownloader downloader.Downloader
 	GetPluginRepos pluginReposFetcher
 	PluginRepo     pluginrepo.PluginRepo

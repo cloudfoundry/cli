@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/utils/configv3"
+	"code.cloudfoundry.org/cli/util/configv3"
 
 	. "code.cloudfoundry.org/cli/cf/terminal"
 )

@@ -18,8 +18,8 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
-	"code.cloudfoundry.org/cli/utils"
-	"code.cloudfoundry.org/cli/utils/downloader"
+	"code.cloudfoundry.org/cli/util"
+	"code.cloudfoundry.org/cli/util/downloader"
 	"code.cloudfoundry.org/gofileutils/fileutils"
 
 	pluginRPCService "code.cloudfoundry.org/cli/plugin/rpc"
@@ -30,7 +30,7 @@ type PluginInstall struct {
 	config       coreconfig.Reader
 	pluginConfig pluginconfig.PluginConfiguration
 	pluginRepo   pluginrepo.PluginRepo
-	checksum     utils.Sha1Checksum
+	checksum     util.Sha1Checksum
 	rpcService   *pluginRPCService.CliRpcService
 }
 

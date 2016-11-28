@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
-	"code.cloudfoundry.org/cli/utils/configv3"
-	"code.cloudfoundry.org/cli/utils/sortutils"
+	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/sorting"
 )
 
 type HelpCategory struct {
@@ -24,7 +24,7 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2action.CommandI
 		Flags:       []v2action.CommandFlag{},
 	}
 
-	flagNames := sortutils.Alphabetic{}
+	flagNames := sorting.Alphabetic{}
 	for flag := range plugin.UsageDetails.Options {
 		flagNames = append(flagNames, flag)
 	}

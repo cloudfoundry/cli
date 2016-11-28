@@ -22,7 +22,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/plugin/rpc"
-	"code.cloudfoundry.org/cli/utils/spellcheck"
+	"code.cloudfoundry.org/cli/util/spellcheck"
 
 	netrpc "net/rpc"
 )

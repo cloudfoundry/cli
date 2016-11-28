@@ -12,8 +12,8 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/formatters"
 	"code.cloudfoundry.org/cli/cf/models"
-	"code.cloudfoundry.org/cli/utils/generic"
-	"code.cloudfoundry.org/cli/utils/words/generator"
+	"code.cloudfoundry.org/cli/util/generic"
+	"code.cloudfoundry.org/cli/util/words/generator"
 )
 
 type Manifest struct {

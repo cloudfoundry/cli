@@ -11,9 +11,9 @@ import (
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v3/common"
-	"code.cloudfoundry.org/cli/utils/configv3"
-	"code.cloudfoundry.org/cli/utils/panichandler"
-	"code.cloudfoundry.org/cli/utils/ui"
+	"code.cloudfoundry.org/cli/util/configv3"
+	"code.cloudfoundry.org/cli/util/panichandler"
+	"code.cloudfoundry.org/cli/util/ui"
 	"github.com/jessevdk/go-flags"
 )
 
