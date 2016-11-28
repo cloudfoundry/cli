@@ -1,7 +1,7 @@
 package v2_test
 
 import (
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/flags"
 	. "code.cloudfoundry.org/cli/command/v2"
@@ -42,7 +42,7 @@ var _ = Describe("Help Command", func() {
 					CommandName: "help",
 				}
 
-				commandInfo := v2actions.CommandInfo{
+				commandInfo := v2action.CommandInfo{
 					Name:        "help",
 					Description: "Show help",
 					Usage:       "CF_NAME help [COMMAND]",
@@ -75,7 +75,7 @@ var _ = Describe("Help Command", func() {
 			Describe("related commands", func() {
 				Context("when the command has related commands", func() {
 					BeforeEach(func() {
-						commandInfo := v2actions.CommandInfo{
+						commandInfo := v2action.CommandInfo{
 							Name:            "app",
 							RelatedCommands: []string{"broccoli", "tomato"},
 						}
@@ -121,7 +121,7 @@ var _ = Describe("Help Command", func() {
 							CommandName: "app",
 						}
 
-						commandInfo := v2actions.CommandInfo{
+						commandInfo := v2action.CommandInfo{
 							Name: "app",
 						}
 						fakeActor.CommandInfoByNameReturns(commandInfo, nil)
@@ -142,9 +142,9 @@ var _ = Describe("Help Command", func() {
 						cmd.OptionalArgs = flags.CommandName{
 							CommandName: "push",
 						}
-						commandInfo := v2actions.CommandInfo{
+						commandInfo := v2action.CommandInfo{
 							Name: "push",
-							Flags: []v2actions.CommandFlag{
+							Flags: []v2action.CommandFlag{
 								{
 									Long:        "no-hostname",
 									Description: "Map the root domain to this app",
@@ -210,25 +210,25 @@ var _ = Describe("Help Command", func() {
 
 		Describe("Environment", func() {
 			Context("has environment variables", func() {
-				var envVars []v2actions.EnvironmentVariable
+				var envVars []v2action.EnvironmentVariable
 
 				BeforeEach(func() {
 					cmd.OptionalArgs = flags.CommandName{
 						CommandName: "push",
 					}
-					envVars = []v2actions.EnvironmentVariable{
-						v2actions.EnvironmentVariable{
+					envVars = []v2action.EnvironmentVariable{
+						v2action.EnvironmentVariable{
 							Name:         "CF_STAGING_TIMEOUT",
 							Description:  "Max wait time for buildpack staging, in minutes",
 							DefaultValue: "15",
 						},
-						v2actions.EnvironmentVariable{
+						v2action.EnvironmentVariable{
 							Name:         "CF_STARTUP_TIMEOUT",
 							Description:  "Max wait time for app instance startup, in minutes",
 							DefaultValue: "5",
 						},
 					}
-					commandInfo := v2actions.CommandInfo{
+					commandInfo := v2action.CommandInfo{
 						Name:        "push",
 						Environment: envVars,
 					}
@@ -253,7 +253,7 @@ var _ = Describe("Help Command", func() {
 					cmd.OptionalArgs = flags.CommandName{
 						CommandName: "app",
 					}
-					commandInfo := v2actions.CommandInfo{
+					commandInfo := v2action.CommandInfo{
 						Name: "app",
 					}
 
@@ -293,8 +293,8 @@ var _ = Describe("Help Command", func() {
 					},
 				})
 
-				fakeActor.CommandInfoByNameReturns(v2actions.CommandInfo{},
-					v2actions.ErrorInvalidCommand{CommandName: "enable-diego"})
+				fakeActor.CommandInfoByNameReturns(v2action.CommandInfo{},
+					v2action.ErrorInvalidCommand{CommandName: "enable-diego"})
 			})
 
 			It("displays the plugin's help", func() {
@@ -317,7 +317,7 @@ var _ = Describe("Help Command", func() {
 				CommandName: "",
 			}
 			cmd.AllCommands = false
-			cmd.Actor = v2actions.NewActor(nil)
+			cmd.Actor = v2action.NewActor(nil)
 		})
 
 		It("returns a list of only the common commands", func() {
@@ -414,7 +414,7 @@ var _ = Describe("Help Command", func() {
 				}
 				cmd.AllCommands = true
 
-				cmd.Actor = v2actions.NewActor(nil)
+				cmd.Actor = v2action.NewActor(nil)
 				fakeConfig.PluginsReturns(map[string]configv3.Plugin{
 					"Diego-Enabler": configv3.Plugin{
 						Commands: []configv3.PluginCommand{

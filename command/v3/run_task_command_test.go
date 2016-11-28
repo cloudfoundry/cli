@@ -3,7 +3,7 @@ package v3_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v3"
@@ -116,13 +116,13 @@ var _ = Describe("RunTask Command", func() {
 					cmd.RequiredArgs.Command = "fake command"
 
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v3actions.Application{GUID: "some-app-guid"},
-						v3actions.Warnings{
+						v3action.Application{GUID: "some-app-guid"},
+						v3action.Warnings{
 							"get-application-warning-1",
 							"get-application-warning-2",
 						}, nil)
-					fakeActor.RunTaskReturns(v3actions.Task{SequenceID: 3},
-						v3actions.Warnings{
+					fakeActor.RunTaskReturns(v3action.Task{SequenceID: 3},
+						v3action.Warnings{
 							"get-application-warning-3",
 						}, nil)
 				})
@@ -198,7 +198,7 @@ Task 3 has been submitted successfully for execution.`,
 								Err: expectedErr,
 							}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								returnedErr)
 						})
@@ -214,11 +214,11 @@ Task 3 has been submitted successfully for execution.`,
 						BeforeEach(func() {
 							returnedErr = cloudcontroller.UnverifiedServerError{URL: "some-url"}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.RunTaskReturns(
-								v3actions.Task{},
+								v3action.Task{},
 								nil,
 								returnedErr)
 						})
@@ -235,8 +235,8 @@ Task 3 has been submitted successfully for execution.`,
 
 						BeforeEach(func() {
 							expectedErr = errors.New("got bananapants??")
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-								v3actions.Warnings{
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{
 									"get-application-warning-1",
 									"get-application-warning-2",
 								}, expectedErr)
@@ -255,13 +255,13 @@ Task 3 has been submitted successfully for execution.`,
 
 						BeforeEach(func() {
 							expectedErr = errors.New("got bananapants??")
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-								v3actions.Warnings{
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{
 									"get-application-warning-1",
 									"get-application-warning-2",
 								}, nil)
-							fakeActor.RunTaskReturns(v3actions.Task{},
-								v3actions.Warnings{
+							fakeActor.RunTaskReturns(v3action.Task{},
+								v3action.Warnings{
 									"run-task-warning-1",
 									"run-task-warning-2",
 								}, expectedErr)

@@ -3,7 +3,7 @@ package v3_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v3"
@@ -128,18 +128,18 @@ var _ = Describe("Terminate Task Command", func() {
 			Context("when provided a valid application name and task sequence ID", func() {
 				BeforeEach(func() {
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v3actions.Application{GUID: "some-app-guid"},
-						v3actions.Warnings{"get-application-warning"},
+						v3action.Application{GUID: "some-app-guid"},
+						v3action.Warnings{"get-application-warning"},
 						nil,
 					)
 					fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-						v3actions.Task{GUID: "some-task-guid"},
-						v3actions.Warnings{"get-task-warning"},
+						v3action.Task{GUID: "some-task-guid"},
+						v3action.Warnings{"get-task-warning"},
 						nil,
 					)
 					fakeActor.TerminateTaskReturns(
-						v3actions.Task{},
-						v3actions.Warnings{"terminate-task-warning"},
+						v3action.Task{},
+						v3action.Warnings{"terminate-task-warning"},
 						nil,
 					)
 				})
@@ -184,7 +184,7 @@ var _ = Describe("Terminate Task Command", func() {
 					Context("when GetApplicationByNameAndSpace returns a translatable error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								returnedErr)
 						})
@@ -197,11 +197,11 @@ var _ = Describe("Terminate Task Command", func() {
 					Context("when GetTaskBySequenceIDAndApplication returns a translatable error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v3actions.Task{},
+								v3action.Task{},
 								nil,
 								returnedErr)
 						})
@@ -214,15 +214,15 @@ var _ = Describe("Terminate Task Command", func() {
 					Context("when TerminateTask returns a translatable error", func() {
 						BeforeEach(func() {
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetTaskBySequenceIDAndApplicationReturns(
-								v3actions.Task{GUID: "some-task-guid"},
+								v3action.Task{GUID: "some-task-guid"},
 								nil,
 								nil)
 							fakeActor.TerminateTaskReturns(
-								v3actions.Task{GUID: "some-task-guid"},
+								v3action.Task{GUID: "some-task-guid"},
 								nil,
 								returnedErr)
 						})
@@ -242,8 +242,8 @@ var _ = Describe("Terminate Task Command", func() {
 
 					Context("when GetApplicationByNameAndSpace returns an error", func() {
 						BeforeEach(func() {
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-								v3actions.Warnings{
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{
 									"get-application-warning-1",
 									"get-application-warning-2",
 								}, expectedErr)
@@ -259,11 +259,11 @@ var _ = Describe("Terminate Task Command", func() {
 
 					Context("when GetTaskBySequenceIDAndApplication returns an error", func() {
 						BeforeEach(func() {
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
-							fakeActor.GetTaskBySequenceIDAndApplicationReturns(v3actions.Task{},
-								v3actions.Warnings{
+							fakeActor.GetTaskBySequenceIDAndApplicationReturns(v3action.Task{},
+								v3action.Warnings{
 									"get-task-warning-1",
 									"get-task-warning-2",
 								}, expectedErr)
@@ -279,15 +279,15 @@ var _ = Describe("Terminate Task Command", func() {
 
 					Context("when TerminateTask returns an error", func() {
 						BeforeEach(func() {
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
-							fakeActor.GetTaskBySequenceIDAndApplicationReturns(v3actions.Task{GUID: "some-task-guid"},
+							fakeActor.GetTaskBySequenceIDAndApplicationReturns(v3action.Task{GUID: "some-task-guid"},
 								nil,
 								nil)
 							fakeActor.TerminateTaskReturns(
-								v3actions.Task{},
-								v3actions.Warnings{
+								v3action.Task{},
+								v3action.Warnings{
 									"terminate-task-warning-1",
 									"terminate-task-warning-2",
 								}, expectedErr)

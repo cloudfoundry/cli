@@ -4,48 +4,48 @@ package v3fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command/v3"
 )
 
 type FakeTerminateTaskActor struct {
-	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3actions.Application, v3actions.Warnings, error)
+	GetApplicationByNameAndSpaceStub        func(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	getApplicationByNameAndSpaceMutex       sync.RWMutex
 	getApplicationByNameAndSpaceArgsForCall []struct {
 		appName   string
 		spaceGUID string
 	}
 	getApplicationByNameAndSpaceReturns struct {
-		result1 v3actions.Application
-		result2 v3actions.Warnings
+		result1 v3action.Application
+		result2 v3action.Warnings
 		result3 error
 	}
-	GetTaskBySequenceIDAndApplicationStub        func(sequenceID int, appGUID string) (v3actions.Task, v3actions.Warnings, error)
+	GetTaskBySequenceIDAndApplicationStub        func(sequenceID int, appGUID string) (v3action.Task, v3action.Warnings, error)
 	getTaskBySequenceIDAndApplicationMutex       sync.RWMutex
 	getTaskBySequenceIDAndApplicationArgsForCall []struct {
 		sequenceID int
 		appGUID    string
 	}
 	getTaskBySequenceIDAndApplicationReturns struct {
-		result1 v3actions.Task
-		result2 v3actions.Warnings
+		result1 v3action.Task
+		result2 v3action.Warnings
 		result3 error
 	}
-	TerminateTaskStub        func(taskGUID string) (v3actions.Task, v3actions.Warnings, error)
+	TerminateTaskStub        func(taskGUID string) (v3action.Task, v3action.Warnings, error)
 	terminateTaskMutex       sync.RWMutex
 	terminateTaskArgsForCall []struct {
 		taskGUID string
 	}
 	terminateTaskReturns struct {
-		result1 v3actions.Task
-		result2 v3actions.Warnings
+		result1 v3action.Task
+		result2 v3action.Warnings
 		result3 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3actions.Application, v3actions.Warnings, error) {
+func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error) {
 	fake.getApplicationByNameAndSpaceMutex.Lock()
 	fake.getApplicationByNameAndSpaceArgsForCall = append(fake.getApplicationByNameAndSpaceArgsForCall, struct {
 		appName   string
@@ -72,16 +72,16 @@ func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpaceArgsForCall(i in
 	return fake.getApplicationByNameAndSpaceArgsForCall[i].appName, fake.getApplicationByNameAndSpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpaceReturns(result1 v3actions.Application, result2 v3actions.Warnings, result3 error) {
+func (fake *FakeTerminateTaskActor) GetApplicationByNameAndSpaceReturns(result1 v3action.Application, result2 v3action.Warnings, result3 error) {
 	fake.GetApplicationByNameAndSpaceStub = nil
 	fake.getApplicationByNameAndSpaceReturns = struct {
-		result1 v3actions.Application
-		result2 v3actions.Warnings
+		result1 v3action.Application
+		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v3actions.Task, v3actions.Warnings, error) {
+func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v3action.Task, v3action.Warnings, error) {
 	fake.getTaskBySequenceIDAndApplicationMutex.Lock()
 	fake.getTaskBySequenceIDAndApplicationArgsForCall = append(fake.getTaskBySequenceIDAndApplicationArgsForCall, struct {
 		sequenceID int
@@ -108,16 +108,16 @@ func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplicationArgsForCall
 	return fake.getTaskBySequenceIDAndApplicationArgsForCall[i].sequenceID, fake.getTaskBySequenceIDAndApplicationArgsForCall[i].appGUID
 }
 
-func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplicationReturns(result1 v3actions.Task, result2 v3actions.Warnings, result3 error) {
+func (fake *FakeTerminateTaskActor) GetTaskBySequenceIDAndApplicationReturns(result1 v3action.Task, result2 v3action.Warnings, result3 error) {
 	fake.GetTaskBySequenceIDAndApplicationStub = nil
 	fake.getTaskBySequenceIDAndApplicationReturns = struct {
-		result1 v3actions.Task
-		result2 v3actions.Warnings
+		result1 v3action.Task
+		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }
 
-func (fake *FakeTerminateTaskActor) TerminateTask(taskGUID string) (v3actions.Task, v3actions.Warnings, error) {
+func (fake *FakeTerminateTaskActor) TerminateTask(taskGUID string) (v3action.Task, v3action.Warnings, error) {
 	fake.terminateTaskMutex.Lock()
 	fake.terminateTaskArgsForCall = append(fake.terminateTaskArgsForCall, struct {
 		taskGUID string
@@ -143,11 +143,11 @@ func (fake *FakeTerminateTaskActor) TerminateTaskArgsForCall(i int) string {
 	return fake.terminateTaskArgsForCall[i].taskGUID
 }
 
-func (fake *FakeTerminateTaskActor) TerminateTaskReturns(result1 v3actions.Task, result2 v3actions.Warnings, result3 error) {
+func (fake *FakeTerminateTaskActor) TerminateTaskReturns(result1 v3action.Task, result2 v3action.Warnings, result3 error) {
 	fake.TerminateTaskStub = nil
 	fake.terminateTaskReturns = struct {
-		result1 v3actions.Task
-		result2 v3actions.Warnings
+		result1 v3action.Task
+		result2 v3action.Warnings
 		result3 error
 	}{result1, result2, result3}
 }

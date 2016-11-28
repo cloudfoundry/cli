@@ -1,7 +1,7 @@
 package common
 
 import (
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
@@ -14,9 +14,9 @@ func HandleError(err error) error {
 	case cloudcontroller.APINotFoundError:
 		return APINotFoundError{URL: e.URL}
 
-	case v2actions.ApplicationNotFoundError:
+	case v2action.ApplicationNotFoundError:
 		return ApplicationNotFoundError{Name: e.Name}
-	case v2actions.ServiceInstanceNotFoundError:
+	case v2action.ServiceInstanceNotFoundError:
 		return ServiceInstanceNotFoundError{Name: e.Name}
 	}
 

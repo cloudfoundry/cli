@@ -4,7 +4,7 @@ package v2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actors/configactions"
+	"code.cloudfoundry.org/cli/actor/configaction"
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
@@ -12,13 +12,13 @@ type FakeAPIConfigActor struct {
 	ClearTargetStub        func()
 	clearTargetMutex       sync.RWMutex
 	clearTargetArgsForCall []struct{}
-	SetTargetStub          func(settings configactions.TargetSettings) (configactions.Warnings, error)
+	SetTargetStub          func(settings configaction.TargetSettings) (configaction.Warnings, error)
 	setTargetMutex         sync.RWMutex
 	setTargetArgsForCall   []struct {
-		settings configactions.TargetSettings
+		settings configaction.TargetSettings
 	}
 	setTargetReturns struct {
-		result1 configactions.Warnings
+		result1 configaction.Warnings
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -41,10 +41,10 @@ func (fake *FakeAPIConfigActor) ClearTargetCallCount() int {
 	return len(fake.clearTargetArgsForCall)
 }
 
-func (fake *FakeAPIConfigActor) SetTarget(settings configactions.TargetSettings) (configactions.Warnings, error) {
+func (fake *FakeAPIConfigActor) SetTarget(settings configaction.TargetSettings) (configaction.Warnings, error) {
 	fake.setTargetMutex.Lock()
 	fake.setTargetArgsForCall = append(fake.setTargetArgsForCall, struct {
-		settings configactions.TargetSettings
+		settings configaction.TargetSettings
 	}{settings})
 	fake.recordInvocation("SetTarget", []interface{}{settings})
 	fake.setTargetMutex.Unlock()
@@ -61,16 +61,16 @@ func (fake *FakeAPIConfigActor) SetTargetCallCount() int {
 	return len(fake.setTargetArgsForCall)
 }
 
-func (fake *FakeAPIConfigActor) SetTargetArgsForCall(i int) configactions.TargetSettings {
+func (fake *FakeAPIConfigActor) SetTargetArgsForCall(i int) configaction.TargetSettings {
 	fake.setTargetMutex.RLock()
 	defer fake.setTargetMutex.RUnlock()
 	return fake.setTargetArgsForCall[i].settings
 }
 
-func (fake *FakeAPIConfigActor) SetTargetReturns(result1 configactions.Warnings, result2 error) {
+func (fake *FakeAPIConfigActor) SetTargetReturns(result1 configaction.Warnings, result2 error) {
 	fake.SetTargetStub = nil
 	fake.setTargetReturns = struct {
-		result1 configactions.Warnings
+		result1 configaction.Warnings
 		result2 error
 	}{result1, result2}
 }

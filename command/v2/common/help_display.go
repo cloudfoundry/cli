@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/sortutils"
 )
@@ -15,13 +15,13 @@ type HelpCategory struct {
 	CommandList  [][]string
 }
 
-func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2actions.CommandInfo {
-	commandInfo := v2actions.CommandInfo{
+func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2action.CommandInfo {
+	commandInfo := v2action.CommandInfo{
 		Name:        plugin.Name,
 		Description: plugin.HelpText,
 		Alias:       plugin.Alias,
 		Usage:       plugin.UsageDetails.Usage,
-		Flags:       []v2actions.CommandFlag{},
+		Flags:       []v2action.CommandFlag{},
 	}
 
 	flagNames := sortutils.Alphabetic{}
@@ -36,13 +36,13 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2actions.Command
 		switch len(flag) {
 		case 1:
 			commandInfo.Flags = append(commandInfo.Flags,
-				v2actions.CommandFlag{
+				v2action.CommandFlag{
 					Short:       strippedFlag,
 					Description: description,
 				})
 		default:
 			commandInfo.Flags = append(commandInfo.Flags,
-				v2actions.CommandFlag{
+				v2action.CommandFlag{
 					Long:        strippedFlag,
 					Description: description,
 				})
@@ -52,7 +52,7 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2actions.Command
 	return commandInfo
 }
 
-func LongestCommandName(cmds map[string]v2actions.CommandInfo, pluginCmds []configv3.PluginCommand) int {
+func LongestCommandName(cmds map[string]v2action.CommandInfo, pluginCmds []configv3.PluginCommand) int {
 	longest := 0
 	for name, _ := range cmds {
 		if len(name) > longest {
@@ -67,7 +67,7 @@ func LongestCommandName(cmds map[string]v2actions.CommandInfo, pluginCmds []conf
 	return longest
 }
 
-func LongestFlagWidth(flags []v2actions.CommandFlag) int {
+func LongestFlagWidth(flags []v2action.CommandFlag) int {
 	longest := 0
 	for _, flag := range flags {
 		var name string

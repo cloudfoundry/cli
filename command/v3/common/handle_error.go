@@ -1,7 +1,7 @@
 package common
 
 import (
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
@@ -18,9 +18,9 @@ func HandleError(err error) error {
 		}
 	case cloudcontroller.APINotFoundError:
 		return APINotFoundError{URL: e.URL}
-	case v3actions.ApplicationNotFoundError:
+	case v3action.ApplicationNotFoundError:
 		return ApplicationNotFoundError{Name: e.Name}
-	case v3actions.TaskWorkersUnavailableError:
+	case v3action.TaskWorkersUnavailableError:
 		return RunTaskError{Message: "Task workers are unavailable."}
 	}
 

@@ -3,7 +3,7 @@ package common_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/command/v2/common"
 
@@ -39,13 +39,13 @@ var _ = Describe("HandleError", func() {
 			URL: "some-url",
 		}),
 
-		Entry("v2actions.ApplicationNotFoundError -> ApplicationNotFoundError", v2actions.ApplicationNotFoundError{
+		Entry("v2action.ApplicationNotFoundError -> ApplicationNotFoundError", v2action.ApplicationNotFoundError{
 			Name: "some-app",
 		}, ApplicationNotFoundError{
 			Name: "some-app",
 		}),
 
-		Entry("v2actions.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError", v2actions.ServiceInstanceNotFoundError{
+		Entry("v2action.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError", v2action.ServiceInstanceNotFoundError{
 			Name: "some-service-instance",
 		}, ServiceInstanceNotFoundError{
 			Name: "some-service-instance",

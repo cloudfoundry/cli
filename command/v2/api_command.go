@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actors/configactions"
+	"code.cloudfoundry.org/cli/actor/configaction"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flags"
@@ -16,7 +16,7 @@ import (
 
 type APIConfigActor interface {
 	ClearTarget()
-	SetTarget(settings configactions.TargetSettings) (configactions.Warnings, error)
+	SetTarget(settings configaction.TargetSettings) (configaction.Warnings, error)
 }
 
 type ApiCommand struct {
@@ -32,7 +32,7 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Actor = configactions.NewActor(config, common.NewCloudControllerClient(config.BinaryName()))
+	cmd.Actor = configaction.NewActor(config, common.NewCloudControllerClient(config.BinaryName()))
 	cmd.UI = ui
 	cmd.Config = config
 	return nil
@@ -93,7 +93,7 @@ func (cmd *ApiCommand) setAPI() error {
 
 	apiURL := processURL(cmd.OptionalArgs.URL)
 
-	_, err := cmd.Actor.SetTarget(configactions.TargetSettings{
+	_, err := cmd.Actor.SetTarget(configaction.TargetSettings{
 		URL:               apiURL,
 		SkipSSLValidation: cmd.SkipSSLValidation,
 		DialTimeout:       cmd.Config.DialTimeout(),
