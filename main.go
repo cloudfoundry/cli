@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf/cmd"
-	"code.cloudfoundry.org/cli/commands"
-	"code.cloudfoundry.org/cli/commands/v2"
-	"code.cloudfoundry.org/cli/commands/v3/common"
+	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/v2"
+	"code.cloudfoundry.org/cli/command/v3/common"
 	"code.cloudfoundry.org/cli/utils/configv3"
 	"code.cloudfoundry.org/cli/utils/panichandler"
 	"code.cloudfoundry.org/cli/utils/ui"
@@ -142,7 +142,7 @@ func executionWrapper(cmd flags.Commander, args []string) error {
 	}
 	defer configv3.WriteConfig(cfConfig)
 
-	if extendedCmd, ok := cmd.(commands.ExtendedCommander); ok {
+	if extendedCmd, ok := cmd.(command.ExtendedCommander); ok {
 		commandUI, err := ui.NewUI(cfConfig)
 		if err != nil {
 			return err
