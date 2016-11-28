@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/common"
@@ -105,7 +105,7 @@ var _ = Describe("Unbind Service Command", func() {
 
 			Context("when unbinding the service instance results in an error not related to service binding", func() {
 				BeforeEach(func() {
-					fakeActor.UnbindServiceBySpaceReturns(nil, v2actions.ApplicationNotFoundError{
+					fakeActor.UnbindServiceBySpaceReturns(nil, v2action.ApplicationNotFoundError{
 						Name: "some-app",
 					})
 				})
@@ -119,7 +119,7 @@ var _ = Describe("Unbind Service Command", func() {
 
 			Context("when the service binding does not exist", func() {
 				BeforeEach(func() {
-					fakeActor.UnbindServiceBySpaceReturns([]string{"foo", "bar"}, v2actions.ServiceBindingNotFoundError{})
+					fakeActor.UnbindServiceBySpaceReturns([]string{"foo", "bar"}, v2action.ServiceBindingNotFoundError{})
 				})
 
 				It("displays warnings and 'OK'", func() {

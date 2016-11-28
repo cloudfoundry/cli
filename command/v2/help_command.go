@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flags"
@@ -21,10 +21,10 @@ import (
 type HelpActor interface {
 	// CommandInfoByName returns back a help command information for the given
 	// command
-	CommandInfoByName(interface{}, string) (v2actions.CommandInfo, error)
+	CommandInfoByName(interface{}, string) (v2action.CommandInfo, error)
 
 	// CommandInfos returns a list of all commands
-	CommandInfos(interface{}) map[string]v2actions.CommandInfo
+	CommandInfos(interface{}) map[string]v2action.CommandInfo
 }
 
 type HelpCommand struct {
@@ -38,7 +38,7 @@ type HelpCommand struct {
 }
 
 func (cmd *HelpCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Actor = v2actions.NewActor(nil)
+	cmd.Actor = v2action.NewActor(nil)
 	cmd.Config = config
 	cmd.UI = ui
 
@@ -256,7 +256,7 @@ func (cmd HelpCommand) displayHelpFooter() {
 func (cmd HelpCommand) displayCommand() error {
 	cmdInfo, err := cmd.Actor.CommandInfoByName(Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
-		if err, ok := err.(v2actions.ErrorInvalidCommand); ok {
+		if err, ok := err.(v2action.ErrorInvalidCommand); ok {
 			var found bool
 			if cmdInfo, found = cmd.findPlugin(); !found {
 				return err
@@ -337,7 +337,7 @@ func (cmd HelpCommand) displayCommand() error {
 	return nil
 }
 
-func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
+func (cmd HelpCommand) findPlugin() (v2action.CommandInfo, bool) {
 	for _, pluginConfig := range cmd.Config.Plugins() {
 		for _, command := range pluginConfig.Commands {
 			if command.Name == cmd.OptionalArgs.CommandName {
@@ -346,7 +346,7 @@ func (cmd HelpCommand) findPlugin() (v2actions.CommandInfo, bool) {
 		}
 	}
 
-	return v2actions.CommandInfo{}, false
+	return v2action.CommandInfo{}, false
 }
 
 func (cmd HelpCommand) getSortedPluginCommands() configv3.PluginCommands {

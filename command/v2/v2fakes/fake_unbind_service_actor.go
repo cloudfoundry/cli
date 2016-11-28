@@ -4,12 +4,12 @@ package v2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
 type FakeUnbindServiceActor struct {
-	UnbindServiceBySpaceStub        func(appName string, serviceInstanceName string, spaceGUID string) (v2actions.Warnings, error)
+	UnbindServiceBySpaceStub        func(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error)
 	unbindServiceBySpaceMutex       sync.RWMutex
 	unbindServiceBySpaceArgsForCall []struct {
 		appName             string
@@ -17,14 +17,14 @@ type FakeUnbindServiceActor struct {
 		spaceGUID           string
 	}
 	unbindServiceBySpaceReturns struct {
-		result1 v2actions.Warnings
+		result1 v2action.Warnings
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2actions.Warnings, error) {
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error) {
 	fake.unbindServiceBySpaceMutex.Lock()
 	fake.unbindServiceBySpaceArgsForCall = append(fake.unbindServiceBySpaceArgsForCall, struct {
 		appName             string
@@ -52,10 +52,10 @@ func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceArgsForCall(i int) (stri
 	return fake.unbindServiceBySpaceArgsForCall[i].appName, fake.unbindServiceBySpaceArgsForCall[i].serviceInstanceName, fake.unbindServiceBySpaceArgsForCall[i].spaceGUID
 }
 
-func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2actions.Warnings, result2 error) {
+func (fake *FakeUnbindServiceActor) UnbindServiceBySpaceReturns(result1 v2action.Warnings, result2 error) {
 	fake.UnbindServiceBySpaceStub = nil
 	fake.unbindServiceBySpaceReturns = struct {
-		result1 v2actions.Warnings
+		result1 v2action.Warnings
 		result2 error
 	}{result1, result2}
 }

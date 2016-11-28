@@ -1,7 +1,7 @@
 package v3
 
 import (
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flags"
 	"code.cloudfoundry.org/cli/command/v3/common"
@@ -10,8 +10,8 @@ import (
 //go:generate counterfeiter . RunTaskActor
 
 type RunTaskActor interface {
-	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3actions.Application, v3actions.Warnings, error)
-	RunTask(appGUID string, command string, name string) (v3actions.Task, v3actions.Warnings, error)
+	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
+	RunTask(appGUID string, command string, name string) (v3action.Task, v3action.Warnings, error)
 }
 
 type RunTaskCommand struct {
@@ -33,7 +33,7 @@ func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v3actions.NewActor(client)
+	cmd.Actor = v3action.NewActor(client)
 
 	return nil
 }

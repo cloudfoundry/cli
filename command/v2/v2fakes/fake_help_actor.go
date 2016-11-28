@@ -4,34 +4,34 @@ package v2fakes
 import (
 	"sync"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/v2"
 )
 
 type FakeHelpActor struct {
-	CommandInfoByNameStub        func(interface{}, string) (v2actions.CommandInfo, error)
+	CommandInfoByNameStub        func(interface{}, string) (v2action.CommandInfo, error)
 	commandInfoByNameMutex       sync.RWMutex
 	commandInfoByNameArgsForCall []struct {
 		arg1 interface{}
 		arg2 string
 	}
 	commandInfoByNameReturns struct {
-		result1 v2actions.CommandInfo
+		result1 v2action.CommandInfo
 		result2 error
 	}
-	CommandInfosStub        func(interface{}) map[string]v2actions.CommandInfo
+	CommandInfosStub        func(interface{}) map[string]v2action.CommandInfo
 	commandInfosMutex       sync.RWMutex
 	commandInfosArgsForCall []struct {
 		arg1 interface{}
 	}
 	commandInfosReturns struct {
-		result1 map[string]v2actions.CommandInfo
+		result1 map[string]v2action.CommandInfo
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHelpActor) CommandInfoByName(arg1 interface{}, arg2 string) (v2actions.CommandInfo, error) {
+func (fake *FakeHelpActor) CommandInfoByName(arg1 interface{}, arg2 string) (v2action.CommandInfo, error) {
 	fake.commandInfoByNameMutex.Lock()
 	fake.commandInfoByNameArgsForCall = append(fake.commandInfoByNameArgsForCall, struct {
 		arg1 interface{}
@@ -58,15 +58,15 @@ func (fake *FakeHelpActor) CommandInfoByNameArgsForCall(i int) (interface{}, str
 	return fake.commandInfoByNameArgsForCall[i].arg1, fake.commandInfoByNameArgsForCall[i].arg2
 }
 
-func (fake *FakeHelpActor) CommandInfoByNameReturns(result1 v2actions.CommandInfo, result2 error) {
+func (fake *FakeHelpActor) CommandInfoByNameReturns(result1 v2action.CommandInfo, result2 error) {
 	fake.CommandInfoByNameStub = nil
 	fake.commandInfoByNameReturns = struct {
-		result1 v2actions.CommandInfo
+		result1 v2action.CommandInfo
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeHelpActor) CommandInfos(arg1 interface{}) map[string]v2actions.CommandInfo {
+func (fake *FakeHelpActor) CommandInfos(arg1 interface{}) map[string]v2action.CommandInfo {
 	fake.commandInfosMutex.Lock()
 	fake.commandInfosArgsForCall = append(fake.commandInfosArgsForCall, struct {
 		arg1 interface{}
@@ -92,10 +92,10 @@ func (fake *FakeHelpActor) CommandInfosArgsForCall(i int) interface{} {
 	return fake.commandInfosArgsForCall[i].arg1
 }
 
-func (fake *FakeHelpActor) CommandInfosReturns(result1 map[string]v2actions.CommandInfo) {
+func (fake *FakeHelpActor) CommandInfosReturns(result1 map[string]v2action.CommandInfo) {
 	fake.CommandInfosStub = nil
 	fake.commandInfosReturns = struct {
-		result1 map[string]v2actions.CommandInfo
+		result1 map[string]v2action.CommandInfo
 	}{result1}
 }
 

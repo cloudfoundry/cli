@@ -3,7 +3,7 @@ package v3_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v3"
@@ -113,15 +113,15 @@ var _ = Describe("Tasks Command", func() {
 				BeforeEach(func() {
 					cmd.RequiredArgs.AppName = "some-app-name"
 					fakeActor.GetApplicationByNameAndSpaceReturns(
-						v3actions.Application{GUID: "some-app-guid"},
-						v3actions.Warnings{
+						v3action.Application{GUID: "some-app-guid"},
+						v3action.Warnings{
 							"get-application-warning-1",
 							"get-application-warning-2",
 						},
 						nil,
 					)
 					fakeActor.GetApplicationTasksReturns(
-						[]v3actions.Task{
+						[]v3action.Task{
 							{
 								GUID:       "task-3-guid",
 								SequenceID: 3,
@@ -147,7 +147,7 @@ var _ = Describe("Tasks Command", func() {
 								Command:    "some-command",
 							},
 						},
-						v3actions.Warnings{
+						v3action.Warnings{
 							"get-tasks-warning-1",
 						},
 						nil,
@@ -165,7 +165,7 @@ var _ = Describe("Tasks Command", func() {
 					Expect(fakeActor.GetApplicationTasksCallCount()).To(Equal(1))
 					guid, order := fakeActor.GetApplicationTasksArgsForCall(0)
 					Expect(guid).To(Equal("some-app-guid"))
-					Expect(order).To(Equal(v3actions.Descending))
+					Expect(order).To(Equal(v3action.Descending))
 
 					Expect(fakeUI.Out).To(Say(`get-application-warning-1
 get-application-warning-2
@@ -183,7 +183,7 @@ id   name     state       start time                      command
 				Context("when the tasks' command fields are returned as empty strings", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns(
-							[]v3actions.Task{
+							[]v3action.Task{
 								{
 									GUID:       "task-2-guid",
 									SequenceID: 2,
@@ -201,7 +201,7 @@ id   name     state       start time                      command
 									Command:    "",
 								},
 							},
-							v3actions.Warnings{
+							v3action.Warnings{
 								"get-tasks-warning-1",
 							},
 							nil,
@@ -221,7 +221,7 @@ id   name     state       start time                      command
 				Context("when there are no tasks associated with the application", func() {
 					BeforeEach(func() {
 						fakeActor.GetApplicationTasksReturns(
-							[]v3actions.Task{},
+							[]v3action.Task{},
 							nil,
 							nil,
 						)
@@ -253,7 +253,7 @@ id   name   state   start time   command
 								Err: expectedErr,
 							}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								returnedErr)
 						})
@@ -269,11 +269,11 @@ id   name   state   start time   command
 						BeforeEach(func() {
 							returnedErr = cloudcontroller.UnverifiedServerError{URL: "some-url"}
 							fakeActor.GetApplicationByNameAndSpaceReturns(
-								v3actions.Application{GUID: "some-app-guid"},
+								v3action.Application{GUID: "some-app-guid"},
 								nil,
 								nil)
 							fakeActor.GetApplicationTasksReturns(
-								[]v3actions.Task{},
+								[]v3action.Task{},
 								nil,
 								returnedErr)
 						})
@@ -290,8 +290,8 @@ id   name   state   start time   command
 
 						BeforeEach(func() {
 							expectedErr = errors.New("bananapants")
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-								v3actions.Warnings{
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{
 									"get-application-warning-1",
 									"get-application-warning-2",
 								}, expectedErr)
@@ -310,13 +310,13 @@ id   name   state   start time   command
 
 						BeforeEach(func() {
 							expectedErr = errors.New("bananapants??")
-							fakeActor.GetApplicationByNameAndSpaceReturns(v3actions.Application{GUID: "some-app-guid"},
-								v3actions.Warnings{
+							fakeActor.GetApplicationByNameAndSpaceReturns(v3action.Application{GUID: "some-app-guid"},
+								v3action.Warnings{
 									"get-application-warning-1",
 									"get-application-warning-2",
 								}, nil)
 							fakeActor.GetApplicationTasksReturns(nil,
-								v3actions.Warnings{
+								v3action.Warnings{
 									"get-tasks-warning-1",
 									"get-tasks-warning-2",
 								}, expectedErr)

@@ -3,7 +3,7 @@ package v2
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2/common"
@@ -12,8 +12,8 @@ import (
 //go:generate counterfeiter . DeleteOrphanedRoutesActor
 
 type DeleteOrphanedRoutesActor interface {
-	GetOrphanedRoutesBySpace(spaceGUID string) ([]v2actions.Route, v2actions.Warnings, error)
-	DeleteRoute(routeGUID string) (v2actions.Warnings, error)
+	GetOrphanedRoutesBySpace(spaceGUID string) ([]v2action.Route, v2action.Warnings, error)
+	DeleteRoute(routeGUID string) (v2action.Warnings, error)
 }
 
 type DeleteOrphanedRoutesCommand struct {
@@ -34,7 +34,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Setup(config command.Config, ui command.
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2actions.NewActor(client)
+	cmd.Actor = v2action.NewActor(client)
 
 	return nil
 }
@@ -78,7 +78,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
 		switch err.(type) {
-		case v2actions.OrphanedRoutesNotFoundError:
+		case v2action.OrphanedRoutesNotFoundError:
 		// Do nothing to parity the existing behavior
 		default:
 			return common.HandleError(err)

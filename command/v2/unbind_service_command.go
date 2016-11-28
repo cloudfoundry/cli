@@ -3,7 +3,7 @@ package v2
 import (
 	"os"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flags"
@@ -13,7 +13,7 @@ import (
 //go:generate counterfeiter . UnbindServiceActor
 
 type UnbindServiceActor interface {
-	UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2actions.Warnings, error)
+	UnbindServiceBySpace(appName string, serviceInstanceName string, spaceGUID string) (v2action.Warnings, error)
 }
 
 type UnbindServiceCommand struct {
@@ -34,7 +34,7 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2actions.NewActor(client)
+	cmd.Actor = v2action.NewActor(client)
 
 	return nil
 }
@@ -70,7 +70,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 	warnings, err := cmd.Actor.UnbindServiceBySpace(cmd.RequiredArgs.AppName, cmd.RequiredArgs.ServiceInstanceName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		if _, ok := err.(v2actions.ServiceBindingNotFoundError); ok {
+		if _, ok := err.(v2action.ServiceBindingNotFoundError); ok {
 			cmd.UI.DisplayWarning("Binding between {{.InstanceName}} and {{.AppName}} did not exist", map[string]interface{}{
 				"AppName":      cmd.RequiredArgs.AppName,
 				"InstanceName": cmd.RequiredArgs.ServiceInstanceName,

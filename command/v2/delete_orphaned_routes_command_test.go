@@ -3,7 +3,7 @@ package v2_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v2actions"
+	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/common"
@@ -114,7 +114,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 			})
 
 			Context("when the user inputs yes", func() {
-				var routes []v2actions.Route
+				var routes []v2action.Route
 
 				BeforeEach(func() {
 					fakeConfig.CurrentUserReturns(configv3.User{
@@ -123,7 +123,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					input.Write([]byte("y\n"))
 
-					routes = []v2actions.Route{
+					routes = []v2action.Route{
 						{
 							GUID:   "route-1-guid",
 							Host:   "route-1",
@@ -175,7 +175,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 				Context("when there are warnings", func() {
 					BeforeEach(func() {
-						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2actions.Route{
+						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2action.Route{
 							{GUID: "some-route-guid"},
 						}, []string{"foo", "bar"}, nil)
 						fakeActor.DeleteRouteReturns([]string{"baz"}, nil)
@@ -195,7 +195,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					Context("when the error is a DomainNotFoundError", func() {
 						BeforeEach(func() {
-							expectedErr = v2actions.DomainNotFoundError{}
+							expectedErr = v2action.DomainNotFoundError{}
 							fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
 						})
 
@@ -206,7 +206,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					Context("when the error is an OrphanedRoutesNotFoundError", func() {
 						BeforeEach(func() {
-							expectedErr = v2actions.OrphanedRoutesNotFoundError{}
+							expectedErr = v2action.OrphanedRoutesNotFoundError{}
 							fakeActor.GetOrphanedRoutesBySpaceReturns(nil, nil, expectedErr)
 						})
 
@@ -234,7 +234,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 					BeforeEach(func() {
 						expectedErr = errors.New("deleting route error")
-						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2actions.Route{
+						fakeActor.GetOrphanedRoutesBySpaceReturns([]v2action.Route{
 							{GUID: "some-route-guid"},
 						}, nil, nil)
 						fakeActor.DeleteRouteReturns(nil, expectedErr)

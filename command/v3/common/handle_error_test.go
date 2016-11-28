@@ -3,7 +3,7 @@ package common_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/actors/v3actions"
+	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/command/v3/common"
 
@@ -51,13 +51,13 @@ var _ = Describe("HandleError", func() {
 			URL: "some-url",
 		}),
 
-		Entry("v3actions.ApplicationNotFoundError -> ApplicationNotFoundError", v3actions.ApplicationNotFoundError{
+		Entry("v3action.ApplicationNotFoundError -> ApplicationNotFoundError", v3action.ApplicationNotFoundError{
 			Name: "some-app",
 		}, ApplicationNotFoundError{
 			Name: "some-app",
 		}),
 
-		Entry("v3actions.TaskWorkersUnavailableError -> RunTaskError", v3actions.TaskWorkersUnavailableError{
+		Entry("v3action.TaskWorkersUnavailableError -> RunTaskError", v3action.TaskWorkersUnavailableError{
 			Message: "fooo: Banana Pants",
 		}, RunTaskError{Message: "Task workers are unavailable."}),
 
