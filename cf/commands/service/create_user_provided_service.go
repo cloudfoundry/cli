@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/cf/flagcontext"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/util"
 
 	"fmt"
 
@@ -102,7 +102,7 @@ func (cmd *CreateUserProvidedService) Execute(c flags.FlagContext) error {
 	credentialsMap := make(map[string]interface{})
 
 	if c.IsSet("p") {
-		jsonBytes, err := util.GetContentsFromFlagValue(credentials)
+		jsonBytes, err := flagcontext.GetContentsFromFlagValue(credentials)
 		if err != nil {
 			return err
 		}

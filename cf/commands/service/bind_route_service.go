@@ -9,11 +9,11 @@ import (
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
+	"code.cloudfoundry.org/cli/cf/flagcontext"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/util"
 )
 
 type BindRouteService struct {
@@ -112,7 +112,7 @@ func (cmd *BindRouteService) Execute(c flags.FlagContext) error {
 	var parameters string
 
 	if c.IsSet("parameters") {
-		jsonBytes, err := util.GetContentsFromFlagValue(c.String("parameters"))
+		jsonBytes, err := flagcontext.GetContentsFromFlagValue(c.String("parameters"))
 		if err != nil {
 			return err
 		}

@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"code.cloudfoundry.org/cli/cf/flagcontext"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
-	"code.cloudfoundry.org/cli/cf/util"
 
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -93,7 +93,7 @@ func (cmd *Curl) Execute(c flags.FlagContext) error {
 	if c.IsSet("d") {
 		method = "POST"
 
-		jsonBytes, err := util.GetContentsFromOptionalFlagValue(c.String("d"))
+		jsonBytes, err := flagcontext.GetContentsFromOptionalFlagValue(c.String("d"))
 		if err != nil {
 			return err
 		}
