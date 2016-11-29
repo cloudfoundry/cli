@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/configaction"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/common"
 )
 
@@ -20,11 +20,11 @@ type APIConfigActor interface {
 }
 
 type ApiCommand struct {
-	OptionalArgs      flags.APITarget `positional-args:"yes"`
-	SkipSSLValidation bool            `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`
-	Unset             bool            `long:"unset" description:"Remove all api endpoint targeting"`
-	usage             interface{}     `usage:"CF_NAME api [URL]"`
-	relatedCommands   interface{}     `related_commands:"auth, login, target"`
+	OptionalArgs      flag.APITarget `positional-args:"yes"`
+	SkipSSLValidation bool           `long:"skip-ssl-validation" description:"Skip verification of the API endpoint. Not recommended!"`
+	Unset             bool           `long:"unset" description:"Remove all api endpoint targeting"`
+	usage             interface{}    `usage:"CF_NAME api [URL]"`
+	relatedCommands   interface{}    `related_commands:"auth, login, target"`
 
 	UI     command.UI
 	Actor  APIConfigActor

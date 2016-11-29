@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type UnsharePrivateDomainCommand struct {
-	RequiredArgs    flags.OrgDomain `positional-args:"yes"`
-	usage           interface{}     `usage:"CF_NAME unshare-private-domain ORG DOMAIN"`
-	relatedCommands interface{}     `related_commands:"delete-domain, domains"`
+	RequiredArgs    flag.OrgDomain `positional-args:"yes"`
+	usage           interface{}    `usage:"CF_NAME unshare-private-domain ORG DOMAIN"`
+	relatedCommands interface{}    `related_commands:"delete-domain, domains"`
 }
 
 func (_ UnsharePrivateDomainCommand) Setup(config command.Config, ui command.UI) error {

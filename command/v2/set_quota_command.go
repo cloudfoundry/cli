@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type SetQuotaCommand struct {
-	RequiredArgs    flags.SetOrgQuotaArgs `positional-args:"yes"`
-	usage           interface{}           `usage:"CF_NAME set-quota ORG QUOTA\n\nTIP:\n   View allowable quotas with 'CF_NAME quotas'"`
-	relatedCommands interface{}           `related_commands:"orgs, quotas"`
+	RequiredArgs    flag.SetOrgQuotaArgs `positional-args:"yes"`
+	usage           interface{}          `usage:"CF_NAME set-quota ORG QUOTA\n\nTIP:\n   View allowable quotas with 'CF_NAME quotas'"`
+	relatedCommands interface{}          `related_commands:"orgs, quotas"`
 }
 
 func (_ SetQuotaCommand) Setup(config command.Config, ui command.UI) error {

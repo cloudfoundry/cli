@@ -3,7 +3,7 @@ package v3
 import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/common"
 )
 
@@ -16,9 +16,9 @@ type TerminateTaskActor interface {
 }
 
 type TerminateTaskCommand struct {
-	RequiredArgs    flags.TerminateTaskArgs `positional-args:"yes"`
-	usage           interface{}             `usage:"CF_NAME terminate-task APP_NAME TASK_ID\n\nEXAMPLES:\n   CF_NAME terminate-task my-app 3"`
-	relatedCommands interface{}             `related_commands:"tasks"`
+	RequiredArgs    flag.TerminateTaskArgs `positional-args:"yes"`
+	usage           interface{}            `usage:"CF_NAME terminate-task APP_NAME TASK_ID\n\nEXAMPLES:\n   CF_NAME terminate-task my-app 3"`
+	relatedCommands interface{}            `related_commands:"tasks"`
 
 	UI     command.UI
 	Actor  TerminateTaskActor
@@ -39,7 +39,7 @@ func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) err
 }
 
 func (cmd TerminateTaskCommand) Execute(args []string) error {
-	sequenceId, err := flags.ParseStringToInt(cmd.RequiredArgs.SequenceID)
+	sequenceId, err := flag.ParseStringToInt(cmd.RequiredArgs.SequenceID)
 	if err != nil {
 		return command.ParseArgumentError{
 			ArgumentName: "TASK_ID",

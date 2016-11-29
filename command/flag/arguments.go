@@ -1,4 +1,4 @@
-package flags
+package flag
 
 type AppName struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`

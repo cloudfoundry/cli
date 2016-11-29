@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type EnvCommand struct {
-	RequiredArgs    flags.AppName `positional-args:"yes"`
-	usage           interface{}   `usage:"CF_NAME env APP_NAME"`
-	relatedCommands interface{}   `related_commands:"app, apps, set-env, unset-env, running-environment-variable-group, staging-environment-variable-group"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	usage           interface{}  `usage:"CF_NAME env APP_NAME"`
+	relatedCommands interface{}  `related_commands:"app, apps, set-env, unset-env, running-environment-variable-group, staging-environment-variable-group"`
 }
 
 func (_ EnvCommand) Setup(config command.Config, ui command.UI) error {

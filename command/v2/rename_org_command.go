@@ -5,12 +5,12 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type RenameOrgCommand struct {
-	RequiredArgs flags.RenameOrgArgs `positional-args:"yes"`
-	usage        interface{}         `usage:"CF_NAME rename-org ORG NEW_ORG"`
+	RequiredArgs flag.RenameOrgArgs `positional-args:"yes"`
+	usage        interface{}        `usage:"CF_NAME rename-org ORG NEW_ORG"`
 }
 
 func (_ RenameOrgCommand) Setup(config command.Config, ui command.UI) error {

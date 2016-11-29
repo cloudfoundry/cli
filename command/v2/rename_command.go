@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type RenameCommand struct {
-	RequiredArgs    flags.AppRenameArgs `positional-args:"yes"`
-	usage           interface{}         `usage:"CF_NAME rename APP_NAME NEW_APP_NAME"`
-	relatedCommands interface{}         `related_commands:"apps, delete"`
+	RequiredArgs    flag.AppRenameArgs `positional-args:"yes"`
+	usage           interface{}        `usage:"CF_NAME rename APP_NAME NEW_APP_NAME"`
+	relatedCommands interface{}        `related_commands:"apps, delete"`
 }
 
 func (_ RenameCommand) Setup(config command.Config, ui command.UI) error {

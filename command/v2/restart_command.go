@@ -5,15 +5,15 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type RestartCommand struct {
-	RequiredArgs        flags.AppName `positional-args:"yes"`
-	usage               interface{}   `usage:"CF_NAME restart APP_NAME"`
-	relatedCommands     interface{}   `related_commands:"restage, restart-app-instance"`
-	envCFStagingTimeout interface{}   `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
-	envCFStartupTimeout interface{}   `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
+	RequiredArgs        flag.AppName `positional-args:"yes"`
+	usage               interface{}  `usage:"CF_NAME restart APP_NAME"`
+	relatedCommands     interface{}  `related_commands:"restage, restart-app-instance"`
+	envCFStagingTimeout interface{}  `environmentName:"CF_STAGING_TIMEOUT" environmentDescription:"Max wait time for buildpack staging, in minutes" environmentDefault:"15"`
+	envCFStartupTimeout interface{}  `environmentName:"CF_STARTUP_TIMEOUT" environmentDescription:"Max wait time for app instance startup, in minutes" environmentDefault:"5"`
 }
 
 func (_ RestartCommand) Setup(config command.Config, ui command.UI) error {

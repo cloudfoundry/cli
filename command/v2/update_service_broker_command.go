@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type UpdateServiceBrokerCommand struct {
-	RequiredArgs    flags.ServiceBrokerArgs `positional-args:"yes"`
-	usage           interface{}             `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"`
-	relatedCommands interface{}             `related_commands:"rename-service-broker, service-brokers"`
+	RequiredArgs    flag.ServiceBrokerArgs `positional-args:"yes"`
+	usage           interface{}            `usage:"CF_NAME update-service-broker SERVICE_BROKER USERNAME PASSWORD URL"`
+	relatedCommands interface{}            `related_commands:"rename-service-broker, service-brokers"`
 }
 
 func (_ UpdateServiceBrokerCommand) Setup(config command.Config, ui command.UI) error {

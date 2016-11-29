@@ -5,14 +5,14 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type OrgUsersCommand struct {
-	RequiredArgs    flags.Organization `positional-args:"yes"`
-	AllUsers        bool               `short:"a" description:"List all users in the org"`
-	usage           interface{}        `usage:"CF_NAME org-users ORG"`
-	relatedCommands interface{}        `related_commands:"orgs"`
+	RequiredArgs    flag.Organization `positional-args:"yes"`
+	AllUsers        bool              `short:"a" description:"List all users in the org"`
+	usage           interface{}       `usage:"CF_NAME org-users ORG"`
+	relatedCommands interface{}       `related_commands:"orgs"`
 }
 
 func (_ OrgUsersCommand) Setup(config command.Config, ui command.UI) error {

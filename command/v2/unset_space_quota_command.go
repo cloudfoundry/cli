@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type UnsetSpaceQuotaCommand struct {
-	RequiredArgs    flags.SetSpaceQuotaArgs `positional-args:"yes"`
-	usage           interface{}             `usage:"CF_NAME unset-space-quota SPACE SPACE_QUOTA"`
-	relatedCommands interface{}             `related_commands:"space"`
+	RequiredArgs    flag.SetSpaceQuotaArgs `positional-args:"yes"`
+	usage           interface{}            `usage:"CF_NAME unset-space-quota SPACE SPACE_QUOTA"`
+	relatedCommands interface{}            `related_commands:"space"`
 }
 
 func (_ UnsetSpaceQuotaCommand) Setup(config command.Config, ui command.UI) error {

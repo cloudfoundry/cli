@@ -5,14 +5,14 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type AppCommand struct {
-	RequiredArgs    flags.AppName `positional-args:"yes"`
-	GUID            bool          `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
-	usage           interface{}   `usage:"CF_NAME app APP_NAME"`
-	relatedCommands interface{}   `related_commands:"apps, events, logs, map-route, unmap-route, push"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	GUID            bool         `long:"guid" description:"Retrieve and display the given app's guid.  All other health and status output for the app is suppressed."`
+	usage           interface{}  `usage:"CF_NAME app APP_NAME"`
+	relatedCommands interface{}  `related_commands:"apps, events, logs, map-route, unmap-route, push"`
 }
 
 func (_ AppCommand) Setup(config command.Config, ui command.UI) error {

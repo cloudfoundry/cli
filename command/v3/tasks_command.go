@@ -7,7 +7,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v3/common"
 )
 
@@ -27,9 +27,9 @@ type TasksActor interface {
 }
 
 type TasksCommand struct {
-	RequiredArgs    flags.AppName `positional-args:"yes"`
-	usage           interface{}   `usage:"CF_NAME tasks APP_NAME"`
-	relatedCommands interface{}   `related_commands:"apps, run-task, terminate-task"`
+	RequiredArgs    flag.AppName `positional-args:"yes"`
+	usage           interface{}  `usage:"CF_NAME tasks APP_NAME"`
+	relatedCommands interface{}  `related_commands:"apps, run-task, terminate-task"`
 
 	UI     command.UI
 	Actor  TasksActor
