@@ -418,13 +418,3 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
 }
-
-// SetCFOAuthClient sets the UAA OAuth client ID
-func (config *Config) SetCFOAuthClient(client string) {
-	config.ConfigFile.CFOAuthClient = client
-}
-
-// SetCFOAuthClientSecret sets the UAA OAuth client secret
-func (config *Config) SetCFOAuthClientSecret(secret string) {
-	config.ConfigFile.CFOAuthClientSecret = secret
-}

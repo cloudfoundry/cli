@@ -471,22 +471,6 @@ var _ = Describe("Config", func() {
 			})
 		})
 
-		Describe("SetCFOAuthClient", func() {
-			It("sets the OAuth client", func() {
-				var config Config
-				config.SetCFOAuthClient("I am the OAuth Client")
-				Expect(config.ConfigFile.CFOAuthClient).To(Equal("I am the OAuth Client"))
-			})
-		})
-
-		Describe("SetCFOAuthClientSecret", func() {
-			It("sets the OAuth client secret", func() {
-				var config Config
-				config.SetCFOAuthClientSecret("I am the OAuth Client Secret")
-				Expect(config.ConfigFile.CFOAuthClientSecret).To(Equal("I am the OAuth Client Secret"))
-			})
-		})
-
 		Describe("SetOrganizationInformation", func() {
 			It("sets the organization GUID and name", func() {
 				config := Config{}
