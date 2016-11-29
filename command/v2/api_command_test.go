@@ -4,9 +4,9 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/common"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -156,7 +156,7 @@ API version:    some-version`,
 						})
 
 						It("returns an error with a --skip-ssl-validation tip", func() {
-							Expect(err).To(MatchError(common.InvalidSSLCertError{API: CCAPI}))
+							Expect(err).To(MatchError(command.InvalidSSLCertError{API: CCAPI}))
 							Expect(fakeUI.Out).ToNot(Say("API endpoint:\\s+some-api-target"))
 						})
 					})
@@ -228,7 +228,7 @@ API version:    some-version`,
 			})
 
 			It("returns an APIRequestError", func() {
-				Expect(err).To(MatchError(common.APIRequestError{Err: requestErr.Err}))
+				Expect(err).To(MatchError(command.APIRequestError{Err: requestErr.Err}))
 			})
 		})
 	})

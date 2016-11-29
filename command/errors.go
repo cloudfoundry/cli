@@ -1,4 +1,4 @@
-package common
+package command
 
 import "fmt"
 
@@ -126,5 +126,21 @@ func (e APINotFoundError) Error() string {
 func (e APINotFoundError) Translate(translate func(string, ...interface{}) string) string {
 	return translate(e.Error(), map[string]interface{}{
 		"URL": e.URL,
+	})
+}
+
+type ParseArgumentError struct {
+	ArgumentName string
+	ExpectedType string
+}
+
+func (e ParseArgumentError) Error() string {
+	return "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}"
+}
+
+func (e ParseArgumentError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"ArgumentName": e.ArgumentName,
+		"ExpectedType": e.ExpectedType,
 	})
 }

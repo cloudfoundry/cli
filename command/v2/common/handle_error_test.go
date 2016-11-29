@@ -5,6 +5,7 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/command"
 	. "code.cloudfoundry.org/cli/command/v2/common"
 
 	. "github.com/onsi/ginkgo"
@@ -23,31 +24,31 @@ var _ = Describe("HandleError", func() {
 
 		Entry("cloudcontroller.RequestError -> APIRequestError", cloudcontroller.RequestError{
 			Err: err,
-		}, APIRequestError{
+		}, command.APIRequestError{
 			Err: err,
 		}),
 
 		Entry("cloudcontroller.UnverifiedServerError -> InvalidSSLCertError", cloudcontroller.UnverifiedServerError{
 			URL: "some-url",
-		}, InvalidSSLCertError{
+		}, command.InvalidSSLCertError{
 			API: "some-url",
 		}),
 
 		Entry("cloudcontroller.APINotFoundError -> APINotFoundError", cloudcontroller.APINotFoundError{
 			URL: "some-url",
-		}, APINotFoundError{
+		}, command.APINotFoundError{
 			URL: "some-url",
 		}),
 
 		Entry("v2action.ApplicationNotFoundError -> ApplicationNotFoundError", v2action.ApplicationNotFoundError{
 			Name: "some-app",
-		}, ApplicationNotFoundError{
+		}, command.ApplicationNotFoundError{
 			Name: "some-app",
 		}),
 
 		Entry("v2action.ServiceInstanceNotFoundError -> ServiceInstanceNotFoundError", v2action.ServiceInstanceNotFoundError{
 			Name: "some-service-instance",
-		}, ServiceInstanceNotFoundError{
+		}, command.ServiceInstanceNotFoundError{
 			Name: "some-service-instance",
 		}),
 

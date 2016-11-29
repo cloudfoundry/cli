@@ -1,4 +1,4 @@
-package common
+package command
 
 import (
 	"encoding/json"
@@ -7,10 +7,10 @@ import (
 )
 
 type RequestLoggerTerminalDisplay struct {
-	ui TerminalDisplay
+	ui UI
 }
 
-func NewRequestLoggerTerminalDisplay(ui TerminalDisplay) *RequestLoggerTerminalDisplay {
+func NewRequestLoggerTerminalDisplay(ui UI) *RequestLoggerTerminalDisplay {
 	return &RequestLoggerTerminalDisplay{
 		ui: ui,
 	}

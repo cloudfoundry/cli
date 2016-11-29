@@ -1,4 +1,4 @@
-package common
+package command
 
 import (
 	"encoding/json"
@@ -8,12 +8,12 @@ import (
 )
 
 type RequestLoggerFileWriter struct {
-	ui        TerminalDisplay
+	ui        UI
 	filePaths []string
 	logFiles  []*os.File
 }
 
-func NewRequestLoggerFileWriter(ui TerminalDisplay, filePaths []string) *RequestLoggerFileWriter {
+func NewRequestLoggerFileWriter(ui UI, filePaths []string) *RequestLoggerFileWriter {
 	return &RequestLoggerFileWriter{
 		ui:        ui,
 		filePaths: filePaths,

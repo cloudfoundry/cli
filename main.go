@@ -10,7 +10,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v3/common"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -164,7 +163,7 @@ func handleError(err error, commandUI UI) error {
 	}
 
 	commandUI.DisplayError(err)
-	if _, isParseArgumentError := err.(common.ParseArgumentError); isParseArgumentError {
+	if _, isParseArgumentError := err.(command.ParseArgumentError); isParseArgumentError {
 		return ParseErr
 	}
 

@@ -48,7 +48,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 	cmd.UI.DisplayText(ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
-	err := common.CheckTarget(cmd.Config, true, true)
+	err := command.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}

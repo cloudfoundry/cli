@@ -3,21 +3,22 @@ package common
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/command"
 )
 
 func HandleError(err error) error {
 	switch e := err.(type) {
 	case cloudcontroller.RequestError:
-		return APIRequestError{Err: e.Err}
+		return command.APIRequestError{Err: e.Err}
 	case cloudcontroller.UnverifiedServerError:
-		return InvalidSSLCertError{API: e.URL}
+		return command.InvalidSSLCertError{API: e.URL}
 	case cloudcontroller.APINotFoundError:
-		return APINotFoundError{URL: e.URL}
+		return command.APINotFoundError{URL: e.URL}
 
 	case v2action.ApplicationNotFoundError:
-		return ApplicationNotFoundError{Name: e.Name}
+		return command.ApplicationNotFoundError{Name: e.Name}
 	case v2action.ServiceInstanceNotFoundError:
-		return ServiceInstanceNotFoundError{Name: e.Name}
+		return command.ServiceInstanceNotFoundError{Name: e.Name}
 	}
 
 	return err

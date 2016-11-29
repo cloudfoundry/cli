@@ -1,12 +1,8 @@
-package common
-
-import (
-	"code.cloudfoundry.org/cli/command"
-)
+package command
 
 // CheckTarget confirms that the user is logged in. Optionally it will also
 // check if an organization and space are targeted.
-func CheckTarget(config command.Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
+func CheckTarget(config Config, targetedOrganizationRequired bool, targetedSpaceRequired bool) error {
 	if config.AccessToken() == "" && config.RefreshToken() == "" {
 		return NotLoggedInError{
 			BinaryName: config.BinaryName(),

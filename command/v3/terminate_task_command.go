@@ -41,13 +41,13 @@ func (cmd *TerminateTaskCommand) Setup(config command.Config, ui command.UI) err
 func (cmd TerminateTaskCommand) Execute(args []string) error {
 	sequenceId, err := flags.ParseStringToInt(cmd.RequiredArgs.SequenceID)
 	if err != nil {
-		return common.ParseArgumentError{
+		return command.ParseArgumentError{
 			ArgumentName: "TASK_ID",
 			ExpectedType: "integer",
 		}
 	}
 
-	err = common.CheckTarget(cmd.Config, true, true)
+	err = command.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}

@@ -1,10 +1,10 @@
-package common_test
+package command_test
 
 import (
 	"bytes"
 	"text/template"
 
-	. "code.cloudfoundry.org/cli/command/v2/common"
+	. "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"
@@ -46,5 +46,8 @@ var _ = Describe("Translatable Errors", func() {
 		// Actor errors.
 		Entry("ApplicationNotFoundError", ApplicationNotFoundError{}),
 		Entry("ServiceInstanceNotFoundError", ServiceInstanceNotFoundError{}),
+
+		// Parse errors.
+		Entry("ParseArgumentError", ParseArgumentError{}),
 	)
 })

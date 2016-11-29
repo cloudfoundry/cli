@@ -8,9 +8,11 @@ import (
 	"code.cloudfoundry.org/cli/command"
 )
 
-func NewClients(config command.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.Client, error) {
+// NewClients creates a new V2 Cloud Controller client and UAA client using the
+// passed in config.
+func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client, error) {
 	if config.Target() == "" {
-		return nil, nil, NoAPISetError{
+		return nil, nil, command.NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
@@ -34,11 +36,11 @@ func NewClients(config command.Config, ui TerminalDisplay) (*ccv2.Client, *uaa.C
 
 	verbose, location := config.Verbose()
 	if verbose {
-		logger := wrapper.NewRequestLogger(NewRequestLoggerTerminalDisplay(ui))
+		logger := wrapper.NewRequestLogger(command.NewRequestLoggerTerminalDisplay(ui))
 		ccClient.WrapConnection(logger)
 	}
 	if location != nil {
-		logger := wrapper.NewRequestLogger(NewRequestLoggerFileWriter(ui, location))
+		logger := wrapper.NewRequestLogger(command.NewRequestLoggerFileWriter(ui, location))
 		ccClient.WrapConnection(logger)
 	}
 
