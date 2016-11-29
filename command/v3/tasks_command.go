@@ -50,7 +50,7 @@ func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd TasksCommand) Execute(args []string) error {
-	err := common.CheckTarget(cmd.Config, true, true)
+	err := command.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}

@@ -5,9 +5,9 @@ import (
 
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v3"
-	"code.cloudfoundry.org/cli/command/v3/common"
 	"code.cloudfoundry.org/cli/command/v3/v3fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -45,7 +45,7 @@ var _ = Describe("Tasks Command", func() {
 
 	Context("when the user is not logged in", func() {
 		It("returns a NotLoggedInError", func() {
-			Expect(executeErr).To(MatchError(common.NotLoggedInError{}))
+			Expect(executeErr).To(MatchError(command.NotLoggedInError{}))
 		})
 	})
 
@@ -56,7 +56,7 @@ var _ = Describe("Tasks Command", func() {
 		})
 
 		It("returns a NoTargetedOrgError", func() {
-			Expect(executeErr).To(MatchError(common.NoTargetedOrgError{}))
+			Expect(executeErr).To(MatchError(command.NoTargetedOrgError{}))
 		})
 	})
 
@@ -71,7 +71,7 @@ var _ = Describe("Tasks Command", func() {
 		})
 
 		It("returns a NoTargetedSpaceError", func() {
-			Expect(executeErr).To(MatchError(common.NoTargetedSpaceError{}))
+			Expect(executeErr).To(MatchError(command.NoTargetedSpaceError{}))
 		})
 	})
 
@@ -259,7 +259,7 @@ id   name   state   start time   command
 						})
 
 						It("returns a translatable error", func() {
-							Expect(executeErr).To(MatchError(common.APIRequestError{Err: expectedErr}))
+							Expect(executeErr).To(MatchError(command.APIRequestError{Err: expectedErr}))
 						})
 					})
 
@@ -279,7 +279,7 @@ id   name   state   start time   command
 						})
 
 						It("returns a translatable error", func() {
-							Expect(executeErr).To(MatchError(common.InvalidSSLCertError{API: "some-url"}))
+							Expect(executeErr).To(MatchError(command.InvalidSSLCertError{API: "some-url"}))
 						})
 					})
 				})

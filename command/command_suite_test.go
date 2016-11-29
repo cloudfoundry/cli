@@ -1,4 +1,4 @@
-package common_test
+package command_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestInternal(t *testing.T) {
+func TestCommand(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V2 Command's Common Suite")
+	RunSpecs(t, "Command Suite")
 }

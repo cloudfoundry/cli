@@ -1,8 +1,8 @@
-package common_test
+package command_test
 
 import (
+	. "code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	. "code.cloudfoundry.org/cli/command/v2/common"
 	"code.cloudfoundry.org/cli/util/configv3"
 
 	. "github.com/onsi/ginkgo"

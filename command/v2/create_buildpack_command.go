@@ -6,7 +6,6 @@ import (
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flags"
-	"code.cloudfoundry.org/cli/command/v3/common"
 )
 
 type CreateBuildpackCommand struct {
@@ -24,7 +23,7 @@ func (_ CreateBuildpackCommand) Setup(config command.Config, ui command.UI) erro
 func (c CreateBuildpackCommand) Execute(args []string) error {
 	_, err := flags.ParseStringToInt(c.RequiredArgs.Position)
 	if err != nil {
-		return common.ParseArgumentError{
+		return command.ParseArgumentError{
 			ArgumentName: "POSITION",
 			ExpectedType: "integer",
 		}

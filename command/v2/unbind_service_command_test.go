@@ -4,9 +4,9 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/common"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
@@ -53,7 +53,7 @@ var _ = Describe("Unbind Service Command", func() {
 		})
 
 		It("returns an error if the check fails", func() {
-			Expect(executeErr).To(MatchError(common.NotLoggedInError{
+			Expect(executeErr).To(MatchError(command.NotLoggedInError{
 				BinaryName: "faceman",
 			}))
 		})
@@ -111,7 +111,7 @@ var _ = Describe("Unbind Service Command", func() {
 				})
 
 				It("should return the error", func() {
-					Expect(executeErr).To(MatchError(common.ApplicationNotFoundError{
+					Expect(executeErr).To(MatchError(command.ApplicationNotFoundError{
 						Name: "some-app",
 					}))
 				})
