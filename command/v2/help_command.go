@@ -10,7 +10,7 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v2/common"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
@@ -111,7 +111,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 		})
 	cmd.UI.DisplayNewline()
 
-	for _, category := range common.CommonHelpCategoryList {
+	for _, category := range shared.CommonHelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 		table := [][]string{}
 
@@ -171,9 +171,9 @@ func (cmd HelpCommand) displayCommonCommands() {
 func (cmd HelpCommand) displayAllCommands() {
 	pluginCommands := cmd.getSortedPluginCommands()
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
-	longestCmd := common.LongestCommandName(cmdInfo, pluginCommands)
+	longestCmd := shared.LongestCommandName(cmdInfo, pluginCommands)
 
-	for _, category := range common.HelpCategoryList {
+	for _, category := range shared.HelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 
 		for _, row := range category.CommandList {
@@ -293,7 +293,7 @@ func (cmd HelpCommand) displayCommand() error {
 	if len(cmdInfo.Flags) != 0 {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("OPTIONS:")
-		nameWidth := common.LongestFlagWidth(cmdInfo.Flags) + 6
+		nameWidth := shared.LongestFlagWidth(cmdInfo.Flags) + 6
 		for _, flag := range cmdInfo.Flags {
 			var name string
 			if flag.Short != "" && flag.Long != "" {
@@ -341,7 +341,7 @@ func (cmd HelpCommand) findPlugin() (v2action.CommandInfo, bool) {
 	for _, pluginConfig := range cmd.Config.Plugins() {
 		for _, command := range pluginConfig.Commands {
 			if command.Name == cmd.OptionalArgs.CommandName {
-				return common.ConvertPluginToCommandInfo(command), true
+				return shared.ConvertPluginToCommandInfo(command), true
 			}
 		}
 	}

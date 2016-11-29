@@ -1,4 +1,4 @@
-package common
+package shared
 
 type RunTaskError struct {
 	Message string

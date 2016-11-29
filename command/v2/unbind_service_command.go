@@ -7,7 +7,7 @@ import (
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v2/common"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
 //go:generate counterfeiter . UnbindServiceActor
@@ -30,7 +30,7 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, _, err := common.NewClients(config, ui)
+	client, _, err := shared.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (cmd UnbindServiceCommand) Execute(args []string) error {
 				"InstanceName": cmd.RequiredArgs.ServiceInstanceName,
 			})
 		} else {
-			return common.HandleError(err)
+			return shared.HandleError(err)
 		}
 	}
 

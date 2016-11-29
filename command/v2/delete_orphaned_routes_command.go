@@ -6,7 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/v2/common"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
 //go:generate counterfeiter . DeleteOrphanedRoutesActor
@@ -30,7 +30,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Setup(config command.Config, ui command.
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, _, err := common.NewClients(config, ui)
+	client, _, err := shared.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		case v2action.OrphanedRoutesNotFoundError:
 		// Do nothing to parity the existing behavior
 		default:
-			return common.HandleError(err)
+			return shared.HandleError(err)
 		}
 	}
 
@@ -93,7 +93,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		warnings, err = cmd.Actor.DeleteRoute(route.GUID)
 		cmd.UI.DisplayWarnings(warnings)
 		if err != nil {
-			return common.HandleError(err)
+			return shared.HandleError(err)
 		}
 	}
 
