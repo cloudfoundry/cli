@@ -9,7 +9,7 @@ import (
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v2/common"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 )
 
 //go:generate counterfeiter . APIConfigActor
@@ -32,7 +32,7 @@ type ApiCommand struct {
 }
 
 func (cmd *ApiCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Actor = configaction.NewActor(config, common.NewCloudControllerClient(config.BinaryName()))
+	cmd.Actor = configaction.NewActor(config, shared.NewCloudControllerClient(config.BinaryName()))
 	cmd.UI = ui
 	cmd.Config = config
 	return nil
@@ -99,7 +99,7 @@ func (cmd *ApiCommand) setAPI() error {
 		DialTimeout:       cmd.Config.DialTimeout(),
 	})
 	if err != nil {
-		return common.HandleError(err)
+		return shared.HandleError(err)
 	}
 
 	if strings.HasPrefix(apiURL, "http:") {

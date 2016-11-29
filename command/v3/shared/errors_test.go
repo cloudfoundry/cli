@@ -1,10 +1,10 @@
-package common_test
+package shared_test
 
 import (
 	"bytes"
 	"text/template"
 
-	. "code.cloudfoundry.org/cli/command/v3/common"
+	. "code.cloudfoundry.org/cli/command/v3/shared"
 	"code.cloudfoundry.org/cli/util/ui"
 
 	. "github.com/onsi/ginkgo"

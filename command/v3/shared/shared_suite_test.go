@@ -1,4 +1,4 @@
-package common_test
+package shared_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCommon(t *testing.T) {
+func TestShared(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "V3 Command's Common Suite")
+	RunSpecs(t, "V3 Command's Shared Suite")
 }

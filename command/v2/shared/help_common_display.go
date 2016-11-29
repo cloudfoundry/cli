@@ -1,4 +1,4 @@
-package common
+package shared
 
 var CommonHelpCategoryList = []HelpCategory{
 	{

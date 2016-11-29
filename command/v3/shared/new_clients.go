@@ -1,37 +1,37 @@
-package common
+package shared
 
 import (
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
 )
 
-// NewClients creates a new V2 Cloud Controller client and UAA client using the
+// NewClients creates a new V3 Cloud Controller client and UAA client using the
 // passed in config.
-func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client, error) {
+func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 	if config.Target() == "" {
-		return nil, nil, command.NoAPISetError{
+		return nil, command.NoAPISetError{
 			BinaryName: config.BinaryName(),
 		}
 	}
 
-	ccClient := NewCloudControllerClient(config.BinaryName())
-	_, err := ccClient.TargetCF(ccv2.TargetSettings{
+	ccClient := ccv3.NewClient(config.BinaryName(), cf.Version)
+	_, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	uaaClient := uaa.NewClient(uaa.Config{
 		DialTimeout:       config.DialTimeout(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		Store:             config,
-		URL:               ccClient.TokenEndpoint(),
+		URL:               ccClient.UAA(),
 	})
 
 	verbose, location := config.Verbose()
@@ -46,9 +46,5 @@ func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client
 
 	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 	ccClient.WrapConnection(wrapper.NewRetryRequest(2))
-	return ccClient, uaaClient, err
-}
-
-func NewCloudControllerClient(binaryName string) *ccv2.Client {
-	return ccv2.NewClient(binaryName, cf.Version)
+	return ccClient, nil
 }

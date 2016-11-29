@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v3action"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v3/common"
+	"code.cloudfoundry.org/cli/command/v3/shared"
 )
 
 //These constants are only for filling in translations.
@@ -40,7 +40,7 @@ func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, err := common.NewClients(config, ui)
+	client, err := shared.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 	application, warnings, err := cmd.Actor.GetApplicationByNameAndSpace(cmd.RequiredArgs.AppName, space.GUID)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return common.HandleError(err)
+		return shared.HandleError(err)
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Getting tasks for app {{.AppName}} in org {{.OrgName}} / space {{.SpaceName}} as {{.CurrentUser}}...", map[string]interface{}{
@@ -80,7 +80,7 @@ func (cmd TasksCommand) Execute(args []string) error {
 	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID, v3action.Descending)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {
-		return common.HandleError(err)
+		return shared.HandleError(err)
 	}
 
 	cmd.UI.DisplayOK()
