@@ -62,6 +62,8 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 					Name: DefaultPluginRepoName,
 					URL:  DefaultPluginRepoURL,
 				}},
+				CFOAuthClient:       DefaultCFOAuthClient,
+				CFOAuthClientSecret: DefaultCFOAuthClientSecret,
 			},
 		}
 	} else {
@@ -73,6 +75,11 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 		err = json.Unmarshal(file, &config.ConfigFile)
 		if err != nil {
 			return nil, err
+		}
+
+		if config.ConfigFile.CFOAuthClient == "" {
+			config.ConfigFile.CFOAuthClient = DefaultCFOAuthClient
+			config.ConfigFile.CFOAuthClientSecret = DefaultCFOAuthClientSecret
 		}
 	}
 
@@ -242,9 +249,6 @@ func (config *Config) RefreshToken() string {
 
 // CFOAuthClient returns the CLI's UAA client ID
 func (config *Config) CFOAuthClient() string {
-	if config.ConfigFile.CFOAuthClient == "" {
-		return DefaultCFOAuthClient
-	}
 	return config.ConfigFile.CFOAuthClient
 }
 
