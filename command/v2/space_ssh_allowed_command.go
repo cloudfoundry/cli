@@ -5,11 +5,11 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type SpaceSSHAllowedCommand struct {
-	RequiredArgs    flags.Space `positional-args:"yes"`
+	RequiredArgs    flag.Space  `positional-args:"yes"`
 	usage           interface{} `usage:"CF_NAME space-ssh-allowed SPACE_NAME"`
 	relatedCommands interface{} `related_commands:"allow-space-ssh, ssh-enabled, ssh"`
 }

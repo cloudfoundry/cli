@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type RemovePluginRepoCommand struct {
-	RequiredArgs    flags.PluginRepoName `positional-args:"yes"`
-	usage           interface{}          `usage:"CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLES:\n   CF_NAME remove-plugin-repo PrivateRepo"`
-	relatedCommands interface{}          `related_commands:"list-plugin-repos"`
+	RequiredArgs    flag.PluginRepoName `positional-args:"yes"`
+	usage           interface{}         `usage:"CF_NAME remove-plugin-repo REPO_NAME\n\nEXAMPLES:\n   CF_NAME remove-plugin-repo PrivateRepo"`
+	relatedCommands interface{}         `related_commands:"list-plugin-repos"`
 }
 
 func (_ RemovePluginRepoCommand) Setup(config command.Config, ui command.UI) error {

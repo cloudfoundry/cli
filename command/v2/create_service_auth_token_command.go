@@ -5,12 +5,12 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type CreateServiceAuthTokenCommand struct {
-	RequiredArgs flags.ServiceAuthTokenArgs `positional-args:"yes"`
-	usage        interface{}                `usage:"CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"`
+	RequiredArgs flag.ServiceAuthTokenArgs `positional-args:"yes"`
+	usage        interface{}               `usage:"CF_NAME create-service-auth-token LABEL PROVIDER TOKEN"`
 }
 
 func (_ CreateServiceAuthTokenCommand) Setup(config command.Config, ui command.UI) error {

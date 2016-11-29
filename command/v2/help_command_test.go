@@ -3,7 +3,7 @@ package v2_test
 import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/command/commandfakes"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 	. "code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
@@ -38,7 +38,7 @@ var _ = Describe("Help Command", func() {
 	Context("providing help for a specific command", func() {
 		Describe("built-in command", func() {
 			BeforeEach(func() {
-				cmd.OptionalArgs = flags.CommandName{
+				cmd.OptionalArgs = flag.CommandName{
 					CommandName: "help",
 				}
 
@@ -117,7 +117,7 @@ var _ = Describe("Help Command", func() {
 
 				Context("when the command does not have an alias", func() {
 					BeforeEach(func() {
-						cmd.OptionalArgs = flags.CommandName{
+						cmd.OptionalArgs = flag.CommandName{
 							CommandName: "app",
 						}
 
@@ -139,7 +139,7 @@ var _ = Describe("Help Command", func() {
 			Describe("options", func() {
 				Context("when the command has options", func() {
 					BeforeEach(func() {
-						cmd.OptionalArgs = flags.CommandName{
+						cmd.OptionalArgs = flag.CommandName{
 							CommandName: "push",
 						}
 						commandInfo := v2action.CommandInfo{
@@ -213,7 +213,7 @@ var _ = Describe("Help Command", func() {
 				var envVars []v2action.EnvironmentVariable
 
 				BeforeEach(func() {
-					cmd.OptionalArgs = flags.CommandName{
+					cmd.OptionalArgs = flag.CommandName{
 						CommandName: "push",
 					}
 					envVars = []v2action.EnvironmentVariable{
@@ -250,7 +250,7 @@ var _ = Describe("Help Command", func() {
 
 			Context("does not have any associated environment variables", func() {
 				BeforeEach(func() {
-					cmd.OptionalArgs = flags.CommandName{
+					cmd.OptionalArgs = flag.CommandName{
 						CommandName: "app",
 					}
 					commandInfo := v2action.CommandInfo{
@@ -270,7 +270,7 @@ var _ = Describe("Help Command", func() {
 
 		Describe("plug-in command", func() {
 			BeforeEach(func() {
-				cmd.OptionalArgs = flags.CommandName{
+				cmd.OptionalArgs = flag.CommandName{
 					CommandName: "enable-diego",
 				}
 
@@ -313,7 +313,7 @@ var _ = Describe("Help Command", func() {
 
 	Describe("help for common commands", func() {
 		BeforeEach(func() {
-			cmd.OptionalArgs = flags.CommandName{
+			cmd.OptionalArgs = flag.CommandName{
 				CommandName: "",
 			}
 			cmd.AllCommands = false
@@ -409,7 +409,7 @@ var _ = Describe("Help Command", func() {
 	Describe("providing help for all commands", func() {
 		Context("when a command is not provided", func() {
 			BeforeEach(func() {
-				cmd.OptionalArgs = flags.CommandName{
+				cmd.OptionalArgs = flag.CommandName{
 					CommandName: "",
 				}
 				cmd.AllCommands = true

@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type SetOrgRoleCommand struct {
-	RequiredArgs    flags.SetOrgRoleArgs `positional-args:"yes"`
-	usage           interface{}          `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n\nROLES:\n   'OrgManager' - Invite and manage users, select and change plans, and set spending limits\n   'BillingManager' - Create and manage the billing account and payment info\n   'OrgAuditor' - Read-only access to org info and reports"`
-	relatedCommands interface{}          `related_commands:"org-users, set-space-role"`
+	RequiredArgs    flag.SetOrgRoleArgs `positional-args:"yes"`
+	usage           interface{}         `usage:"CF_NAME set-org-role USERNAME ORG ROLE\n\nROLES:\n   'OrgManager' - Invite and manage users, select and change plans, and set spending limits\n   'BillingManager' - Create and manage the billing account and payment info\n   'OrgAuditor' - Read-only access to org info and reports"`
+	relatedCommands interface{}         `related_commands:"org-users, set-space-role"`
 }
 
 func (_ SetOrgRoleCommand) Setup(config command.Config, ui command.UI) error {

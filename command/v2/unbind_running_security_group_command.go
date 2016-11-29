@@ -5,13 +5,13 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type UnbindRunningSecurityGroupCommand struct {
-	RequiredArgs    flags.SecurityGroup `positional-args:"yes"`
-	usage           interface{}         `usage:"CF_NAME unbind-running-security-group SECURITY_GROUP\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
-	relatedCommands interface{}         `related_commands:"apps, restart, running-security-groups"`
+	RequiredArgs    flag.SecurityGroup `positional-args:"yes"`
+	usage           interface{}        `usage:"CF_NAME unbind-running-security-group SECURITY_GROUP\n\nTIP: Changes will not apply to existing running applications until they are restarted."`
+	relatedCommands interface{}        `related_commands:"apps, restart, running-security-groups"`
 }
 
 func (_ UnbindRunningSecurityGroupCommand) Setup(config command.Config, ui command.UI) error {

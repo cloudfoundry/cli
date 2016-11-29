@@ -9,7 +9,7 @@ import (
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/common"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/sorting"
@@ -32,9 +32,9 @@ type HelpCommand struct {
 	Actor  HelpActor
 	Config command.Config
 
-	OptionalArgs flags.CommandName `positional-args:"yes"`
-	AllCommands  bool              `short:"a" description:"All available CLI commands"`
-	usage        interface{}       `usage:"CF_NAME help [COMMAND]"`
+	OptionalArgs flag.CommandName `positional-args:"yes"`
+	AllCommands  bool             `short:"a" description:"All available CLI commands"`
+	usage        interface{}      `usage:"CF_NAME help [COMMAND]"`
 }
 
 func (cmd *HelpCommand) Setup(config command.Config, ui command.UI) error {

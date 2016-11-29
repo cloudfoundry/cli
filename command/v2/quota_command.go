@@ -5,11 +5,11 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
-	"code.cloudfoundry.org/cli/command/flags"
+	"code.cloudfoundry.org/cli/command/flag"
 )
 
 type QuotaCommand struct {
-	RequiredArgs    flags.Quota `positional-args:"yes"`
+	RequiredArgs    flag.Quota  `positional-args:"yes"`
 	usage           interface{} `usage:"CF_NAME quota QUOTA"`
 	relatedCommands interface{} `related_commands:"org, quotas"`
 }
