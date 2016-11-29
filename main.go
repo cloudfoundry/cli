@@ -9,6 +9,7 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/common"
 	"code.cloudfoundry.org/cli/command/v2"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/panichandler"
@@ -29,7 +30,7 @@ func main() {
 }
 
 func parse(args []string) {
-	parser := flags.NewParser(&v2.Commands, flags.HelpFlag)
+	parser := flags.NewParser(&common.Commands, flags.HelpFlag)
 	parser.CommandHandler = executionWrapper
 	extraArgs, err := parser.ParseArgs(args)
 	if err == nil {
@@ -39,9 +40,9 @@ func parse(args []string) {
 	if flagErr, ok := err.(*flags.Error); ok {
 		switch flagErr.Type {
 		case flags.ErrHelp, flags.ErrUnknownFlag, flags.ErrExpectedArgument:
-			_, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
+			_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
 				func(fieldName string) bool {
-					field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
+					field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
 					return parser.Active != nil && parser.Active.Name == field.Tag.Get("command")
 				},
 			)
@@ -99,7 +100,7 @@ func parse(args []string) {
 		case flags.ErrUnknownCommand:
 			cmd.Main(os.Getenv("CF_TRACE"), os.Args)
 		case flags.ErrCommandRequired:
-			if v2.Commands.VerboseOrVersion {
+			if common.Commands.VerboseOrVersion {
 				parse([]string{"version"})
 			} else {
 				parse([]string{"help"})
@@ -120,9 +121,9 @@ func parse(args []string) {
 }
 
 func isCommand(s string) bool {
-	_, found := reflect.TypeOf(v2.Commands).FieldByNameFunc(
+	_, found := reflect.TypeOf(common.Commands).FieldByNameFunc(
 		func(fieldName string) bool {
-			field, _ := reflect.TypeOf(v2.Commands).FieldByName(fieldName)
+			field, _ := reflect.TypeOf(common.Commands).FieldByName(fieldName)
 			return s == field.Tag.Get("command") || s == field.Tag.Get("alias")
 		})
 
@@ -134,7 +135,7 @@ func isOption(s string) bool {
 
 func executionWrapper(cmd flags.Commander, args []string) error {
 	cfConfig, err := configv3.LoadConfig(configv3.FlagOverride{
-		Verbose: v2.Commands.VerboseOrVersion,
+		Verbose: common.Commands.VerboseOrVersion,
 	})
 	if err != nil {
 		return err

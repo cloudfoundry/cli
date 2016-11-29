@@ -1,4 +1,4 @@
-package v2
+package common
 
 import (
 	"fmt"
@@ -6,11 +6,11 @@ import (
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
+	"code.cloudfoundry.org/cli/command/common/internal"
 	"code.cloudfoundry.org/cli/command/flag"
-	"code.cloudfoundry.org/cli/command/v2/shared"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
@@ -21,10 +21,10 @@ import (
 type HelpActor interface {
 	// CommandInfoByName returns back a help command information for the given
 	// command
-	CommandInfoByName(interface{}, string) (v2action.CommandInfo, error)
+	CommandInfoByName(interface{}, string) (sharedaction.CommandInfo, error)
 
 	// CommandInfos returns a list of all commands
-	CommandInfos(interface{}) map[string]v2action.CommandInfo
+	CommandInfos(interface{}) map[string]sharedaction.CommandInfo
 }
 
 type HelpCommand struct {
@@ -38,7 +38,7 @@ type HelpCommand struct {
 }
 
 func (cmd *HelpCommand) Setup(config command.Config, ui command.UI) error {
-	cmd.Actor = v2action.NewActor(nil)
+	cmd.Actor = sharedaction.NewActor()
 	cmd.Config = config
 	cmd.UI = ui
 
@@ -111,7 +111,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 		})
 	cmd.UI.DisplayNewline()
 
-	for _, category := range shared.CommonHelpCategoryList {
+	for _, category := range internal.CommonHelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 		table := [][]string{}
 
@@ -171,9 +171,9 @@ func (cmd HelpCommand) displayCommonCommands() {
 func (cmd HelpCommand) displayAllCommands() {
 	pluginCommands := cmd.getSortedPluginCommands()
 	cmdInfo := cmd.Actor.CommandInfos(Commands)
-	longestCmd := shared.LongestCommandName(cmdInfo, pluginCommands)
+	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
 
-	for _, category := range shared.HelpCategoryList {
+	for _, category := range internal.HelpCategoryList {
 		cmd.UI.DisplayHelpHeader(category.CategoryName)
 
 		for _, row := range category.CommandList {
@@ -256,7 +256,7 @@ func (cmd HelpCommand) displayHelpFooter() {
 func (cmd HelpCommand) displayCommand() error {
 	cmdInfo, err := cmd.Actor.CommandInfoByName(Commands, cmd.OptionalArgs.CommandName)
 	if err != nil {
-		if err, ok := err.(v2action.ErrorInvalidCommand); ok {
+		if err, ok := err.(sharedaction.ErrorInvalidCommand); ok {
 			var found bool
 			if cmdInfo, found = cmd.findPlugin(); !found {
 				return err
@@ -293,7 +293,7 @@ func (cmd HelpCommand) displayCommand() error {
 	if len(cmdInfo.Flags) != 0 {
 		cmd.UI.DisplayNewline()
 		cmd.UI.DisplayText("OPTIONS:")
-		nameWidth := shared.LongestFlagWidth(cmdInfo.Flags) + 6
+		nameWidth := internal.LongestFlagWidth(cmdInfo.Flags) + 6
 		for _, flag := range cmdInfo.Flags {
 			var name string
 			if flag.Short != "" && flag.Long != "" {
@@ -337,16 +337,16 @@ func (cmd HelpCommand) displayCommand() error {
 	return nil
 }
 
-func (cmd HelpCommand) findPlugin() (v2action.CommandInfo, bool) {
+func (cmd HelpCommand) findPlugin() (sharedaction.CommandInfo, bool) {
 	for _, pluginConfig := range cmd.Config.Plugins() {
 		for _, command := range pluginConfig.Commands {
 			if command.Name == cmd.OptionalArgs.CommandName {
-				return shared.ConvertPluginToCommandInfo(command), true
+				return internal.ConvertPluginToCommandInfo(command), true
 			}
 		}
 	}
 
-	return v2action.CommandInfo{}, false
+	return sharedaction.CommandInfo{}, false
 }
 
 func (cmd HelpCommand) getSortedPluginCommands() configv3.PluginCommands {

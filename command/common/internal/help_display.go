@@ -1,11 +1,11 @@
-package shared
+package internal
 
 import (
 	"fmt"
 	"sort"
 	"strings"
 
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/sorting"
 )
@@ -15,13 +15,13 @@ type HelpCategory struct {
 	CommandList  [][]string
 }
 
-func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2action.CommandInfo {
-	commandInfo := v2action.CommandInfo{
+func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) sharedaction.CommandInfo {
+	commandInfo := sharedaction.CommandInfo{
 		Name:        plugin.Name,
 		Description: plugin.HelpText,
 		Alias:       plugin.Alias,
 		Usage:       plugin.UsageDetails.Usage,
-		Flags:       []v2action.CommandFlag{},
+		Flags:       []sharedaction.CommandFlag{},
 	}
 
 	flagNames := sorting.Alphabetic{}
@@ -36,13 +36,13 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2action.CommandI
 		switch len(flag) {
 		case 1:
 			commandInfo.Flags = append(commandInfo.Flags,
-				v2action.CommandFlag{
+				sharedaction.CommandFlag{
 					Short:       strippedFlag,
 					Description: description,
 				})
 		default:
 			commandInfo.Flags = append(commandInfo.Flags,
-				v2action.CommandFlag{
+				sharedaction.CommandFlag{
 					Long:        strippedFlag,
 					Description: description,
 				})
@@ -52,7 +52,7 @@ func ConvertPluginToCommandInfo(plugin configv3.PluginCommand) v2action.CommandI
 	return commandInfo
 }
 
-func LongestCommandName(cmds map[string]v2action.CommandInfo, pluginCmds []configv3.PluginCommand) int {
+func LongestCommandName(cmds map[string]sharedaction.CommandInfo, pluginCmds []configv3.PluginCommand) int {
 	longest := 0
 	for name, _ := range cmds {
 		if len(name) > longest {
@@ -67,7 +67,7 @@ func LongestCommandName(cmds map[string]v2action.CommandInfo, pluginCmds []confi
 	return longest
 }
 
-func LongestFlagWidth(flags []v2action.CommandFlag) int {
+func LongestFlagWidth(flags []sharedaction.CommandFlag) int {
 	longest := 0
 	for _, flag := range flags {
 		var name string

@@ -44,7 +44,7 @@ var _ = Describe("API Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(ExperimentalWarning))
+		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when the API endpoint is not provided", func() {

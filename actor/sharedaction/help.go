@@ -1,4 +1,4 @@
-package v2action
+package sharedaction
 
 import (
 	"reflect"
