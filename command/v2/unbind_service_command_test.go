@@ -44,7 +44,7 @@ var _ = Describe("Unbind Service Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(ExperimentalWarning))
+		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking that the api endpoint is set, the user is logged in, and an org and space are targeted", func() {

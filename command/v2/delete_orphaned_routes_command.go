@@ -45,7 +45,7 @@ func (cmd *DeleteOrphanedRoutesCommand) Execute(args []string) error {
 		return nil
 	}
 
-	cmd.UI.DisplayText(ExperimentalWarning)
+	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
 	err := command.CheckTarget(cmd.Config, true, true)

@@ -1,7 +1,7 @@
-package v2action_test
+package sharedaction_test
 
 import (
-	. "code.cloudfoundry.org/cli/actor/v2action"
+	. "code.cloudfoundry.org/cli/actor/sharedaction"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,7 +32,7 @@ type helpCommand struct {
 var _ = Describe("Help Actions", func() {
 	var actor Actor
 	BeforeEach(func() {
-		actor = NewActor(nil)
+		actor = NewActor()
 	})
 
 	Describe("CommandInfoByName", func() {

@@ -1,11 +1,11 @@
-package v2_test
+package common_test
 
 import (
-	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/actor/sharedaction"
 	"code.cloudfoundry.org/cli/command/commandfakes"
+	. "code.cloudfoundry.org/cli/command/common"
+	"code.cloudfoundry.org/cli/command/common/commonfakes"
 	"code.cloudfoundry.org/cli/command/flag"
-	. "code.cloudfoundry.org/cli/command/v2"
-	"code.cloudfoundry.org/cli/command/v2/v2fakes"
 	"code.cloudfoundry.org/cli/util/configv3"
 	"code.cloudfoundry.org/cli/util/ui"
 
@@ -17,14 +17,14 @@ import (
 var _ = Describe("Help Command", func() {
 	var (
 		fakeUI     *ui.UI
-		fakeActor  *v2fakes.FakeHelpActor
+		fakeActor  *commonfakes.FakeHelpActor
 		cmd        HelpCommand
 		fakeConfig *commandfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
 		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
-		fakeActor = new(v2fakes.FakeHelpActor)
+		fakeActor = new(commonfakes.FakeHelpActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
 
@@ -42,7 +42,7 @@ var _ = Describe("Help Command", func() {
 					CommandName: "help",
 				}
 
-				commandInfo := v2action.CommandInfo{
+				commandInfo := sharedaction.CommandInfo{
 					Name:        "help",
 					Description: "Show help",
 					Usage:       "CF_NAME help [COMMAND]",
@@ -75,7 +75,7 @@ var _ = Describe("Help Command", func() {
 			Describe("related commands", func() {
 				Context("when the command has related commands", func() {
 					BeforeEach(func() {
-						commandInfo := v2action.CommandInfo{
+						commandInfo := sharedaction.CommandInfo{
 							Name:            "app",
 							RelatedCommands: []string{"broccoli", "tomato"},
 						}
@@ -121,7 +121,7 @@ var _ = Describe("Help Command", func() {
 							CommandName: "app",
 						}
 
-						commandInfo := v2action.CommandInfo{
+						commandInfo := sharedaction.CommandInfo{
 							Name: "app",
 						}
 						fakeActor.CommandInfoByNameReturns(commandInfo, nil)
@@ -142,9 +142,9 @@ var _ = Describe("Help Command", func() {
 						cmd.OptionalArgs = flag.CommandName{
 							CommandName: "push",
 						}
-						commandInfo := v2action.CommandInfo{
+						commandInfo := sharedaction.CommandInfo{
 							Name: "push",
-							Flags: []v2action.CommandFlag{
+							Flags: []sharedaction.CommandFlag{
 								{
 									Long:        "no-hostname",
 									Description: "Map the root domain to this app",
@@ -210,25 +210,25 @@ var _ = Describe("Help Command", func() {
 
 		Describe("Environment", func() {
 			Context("has environment variables", func() {
-				var envVars []v2action.EnvironmentVariable
+				var envVars []sharedaction.EnvironmentVariable
 
 				BeforeEach(func() {
 					cmd.OptionalArgs = flag.CommandName{
 						CommandName: "push",
 					}
-					envVars = []v2action.EnvironmentVariable{
-						v2action.EnvironmentVariable{
+					envVars = []sharedaction.EnvironmentVariable{
+						sharedaction.EnvironmentVariable{
 							Name:         "CF_STAGING_TIMEOUT",
 							Description:  "Max wait time for buildpack staging, in minutes",
 							DefaultValue: "15",
 						},
-						v2action.EnvironmentVariable{
+						sharedaction.EnvironmentVariable{
 							Name:         "CF_STARTUP_TIMEOUT",
 							Description:  "Max wait time for app instance startup, in minutes",
 							DefaultValue: "5",
 						},
 					}
-					commandInfo := v2action.CommandInfo{
+					commandInfo := sharedaction.CommandInfo{
 						Name:        "push",
 						Environment: envVars,
 					}
@@ -253,7 +253,7 @@ var _ = Describe("Help Command", func() {
 					cmd.OptionalArgs = flag.CommandName{
 						CommandName: "app",
 					}
-					commandInfo := v2action.CommandInfo{
+					commandInfo := sharedaction.CommandInfo{
 						Name: "app",
 					}
 
@@ -293,8 +293,8 @@ var _ = Describe("Help Command", func() {
 					},
 				})
 
-				fakeActor.CommandInfoByNameReturns(v2action.CommandInfo{},
-					v2action.ErrorInvalidCommand{CommandName: "enable-diego"})
+				fakeActor.CommandInfoByNameReturns(sharedaction.CommandInfo{},
+					sharedaction.ErrorInvalidCommand{CommandName: "enable-diego"})
 			})
 
 			It("displays the plugin's help", func() {
@@ -317,7 +317,7 @@ var _ = Describe("Help Command", func() {
 				CommandName: "",
 			}
 			cmd.AllCommands = false
-			cmd.Actor = v2action.NewActor(nil)
+			cmd.Actor = sharedaction.NewActor()
 		})
 
 		It("returns a list of only the common commands", func() {
@@ -414,7 +414,7 @@ var _ = Describe("Help Command", func() {
 				}
 				cmd.AllCommands = true
 
-				cmd.Actor = v2action.NewActor(nil)
+				cmd.Actor = sharedaction.NewActor()
 				fakeConfig.PluginsReturns(map[string]configv3.Plugin{
 					"Diego-Enabler": configv3.Plugin{
 						Commands: []configv3.PluginCommand{

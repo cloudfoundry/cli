@@ -44,7 +44,7 @@ func (cmd *ApiCommand) Execute(args []string) error {
 		return nil
 	}
 
-	cmd.UI.DisplayText(ExperimentalWarning)
+	cmd.UI.DisplayText(command.ExperimentalWarning)
 	cmd.UI.DisplayNewline()
 
 	if cmd.Unset {

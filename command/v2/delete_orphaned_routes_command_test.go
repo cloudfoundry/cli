@@ -45,7 +45,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(v2.ExperimentalWarning))
+		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking that the user is logged in, and org and space are targeted", func() {
