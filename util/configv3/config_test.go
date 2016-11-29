@@ -54,6 +54,9 @@ var _ = Describe("Config", func() {
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
 			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
 			Expect(config.Locale()).To(BeEmpty())
+			Expect(config.CFOAuthClient()).To(Equal(DefaultCFOAuthClient))
+			Expect(config.CFOAuthClientSecret()).To(Equal(DefaultCFOAuthClientSecret))
+
 			Expect(config.PluginRepos()).To(Equal([]PluginRepos{{
 				Name: "CF-Community",
 				URL:  "https://plugins.cloudfoundry.org",
@@ -66,6 +69,52 @@ var _ = Describe("Config", func() {
 			trace, location := config.Verbose()
 			Expect(trace).To(BeFalse())
 			Expect(location).To(BeEmpty())
+		})
+	})
+
+	Context("when there is a config set", func() {
+		var (
+			config *Config
+			err    error
+		)
+
+		Context("when CFOAuthClient is not present", func() {
+			BeforeEach(func() {
+				rawConfig := `{}`
+				setConfig(homeDir, rawConfig)
+
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("sets CFOAuthClient to the default", func() {
+				Expect(config.CFOAuthClient()).To(Equal(DefaultCFOAuthClient))
+			})
+
+			It("sets CFOAuthClientSecret to the default", func() {
+				Expect(config.CFOAuthClientSecret()).To(Equal(DefaultCFOAuthClientSecret))
+			})
+		})
+
+		Context("when CFOAuthClient is empty", func() {
+			BeforeEach(func() {
+				rawConfig := `
+					{
+						"CFOAuthClient": ""
+					}`
+				setConfig(homeDir, rawConfig)
+
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("sets CFOAuthClient to the default", func() {
+				Expect(config.CFOAuthClient()).To(Equal(DefaultCFOAuthClient))
+			})
+
+			It("sets CFOAuthClientSecret to the default", func() {
+				Expect(config.CFOAuthClientSecret()).To(Equal(DefaultCFOAuthClientSecret))
+			})
 		})
 	})
 
@@ -143,29 +192,20 @@ var _ = Describe("Config", func() {
 		})
 
 		Describe("CFOAuthClient", func() {
-			Context("when CFOAuthClient is not set in the config", func() {
-				It("return the default client ID", func() {
-					config := new(Config)
-					Expect(config.CFOAuthClient()).To(Equal("cf"))
-				})
+			var config *Config
+
+			BeforeEach(func() {
+				rawConfig := `{ "CFOAuthClient":"some-client" }`
+				setConfig(homeDir, rawConfig)
+
+				var err error
+				config, err = LoadConfig()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(config).ToNot(BeNil())
 			})
 
-			Context("when CFOAuthClient is set in the config", func() {
-				var config *Config
-
-				BeforeEach(func() {
-					rawConfig := `{ "CFOAuthClient":"some-client" }`
-					setConfig(homeDir, rawConfig)
-
-					var err error
-					config, err = LoadConfig()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(config).ToNot(BeNil())
-				})
-
-				It("returns the client ID", func() {
-					Expect(config.CFOAuthClient()).To(Equal("some-client"))
-				})
+			It("returns the client ID", func() {
+				Expect(config.CFOAuthClient()).To(Equal("some-client"))
 			})
 		})
 
@@ -173,7 +213,11 @@ var _ = Describe("Config", func() {
 			var config *Config
 
 			BeforeEach(func() {
-				rawConfig := `{ "CFOAuthClientSecret":"some-client-secret" }`
+				rawConfig := `
+					{
+						"CFOAuthClient": "some-client-id",
+						"CFOAuthClientSecret": "some-client-secret"
+					}`
 				setConfig(homeDir, rawConfig)
 
 				var err error
