@@ -45,6 +45,7 @@ run:
     [[ "$BACKEND" = "" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|NO_DIEGO_SUPPORT|"
     SKIPS="${SKIPS}can delete the key|"
     SKIPS="${SKIPS}dotnet-core|"
+    SKIPS="${SKIPS}transparently proxies both reserved|"
 
     # Remove trailing |
     SKIPS=$(echo $SKIPS | sed -E 's/(.*)(\|)/\1/')
