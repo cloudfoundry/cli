@@ -45,7 +45,12 @@ type Data struct {
 }
 
 func NewData() *Data {
-	return new(Data)
+	data := new(Data)
+
+	data.CFOAuthClient = "cf"
+	data.CFOAuthClientSecret = ""
+
+	return data
 }
 
 func (d *Data) JSONMarshalV3() ([]byte, error) {
