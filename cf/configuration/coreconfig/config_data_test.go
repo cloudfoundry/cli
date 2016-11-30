@@ -105,6 +105,14 @@ var _ = Describe("V3 Config files", func() {
 		"MinRecommendedCLIVersion": "6.9.0"
 	}`
 
+	Describe("NewData", func() {
+		It("sets default values for CFOAuthClient and CFOAUthCLientSecret", func() {
+			data := coreconfig.NewData()
+			Expect(data.CFOAuthClient).To(Equal("cf"))
+			Expect(data.CFOAuthClientSecret).To(Equal(""))
+		})
+	})
+
 	Describe("JSONMarshalV3", func() {
 		It("creates a JSON string from the config object", func() {
 			data := &coreconfig.Data{
