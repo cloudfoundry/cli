@@ -207,7 +207,7 @@ func (uaa UAARepository) getAuthToken(data url.Values) error {
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
-	accessToken := "Basic " + base64.StdEncoding.EncodeToString([]byte(uaa.config.CFOAuthClient()+":"+uaa.config.CFOAuthClientSecret()))
+	accessToken := "Basic " + base64.StdEncoding.EncodeToString([]byte(uaa.config.UAAOAuthClient()+":"+uaa.config.UAAOAuthClientSecret()))
 	request, err := uaa.gateway.NewRequest("POST", path, accessToken, strings.NewReader(data.Encode()))
 	if err != nil {
 		return fmt.Errorf("%s: %s", T("Failed to start oauth request"), err.Error())

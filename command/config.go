@@ -13,8 +13,8 @@ type Config interface {
 	APIVersion() string
 	AccessToken() string
 	BinaryName() string
-	CFOAuthClient() string
-	CFOAuthClientSecret() string
+	UAAOAuthClient() string
+	UAAOAuthClientSecret() string
 	ColorEnabled() configv3.ColorSetting
 	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration
