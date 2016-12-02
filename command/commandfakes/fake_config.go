@@ -28,16 +28,16 @@ type FakeConfig struct {
 	binaryNameReturns     struct {
 		result1 string
 	}
-	CFOAuthClientStub        func() string
-	cFOAuthClientMutex       sync.RWMutex
-	cFOAuthClientArgsForCall []struct{}
-	cFOAuthClientReturns     struct {
+	UAAOAuthClientStub        func() string
+	uAAOAuthClientMutex       sync.RWMutex
+	uAAOAuthClientArgsForCall []struct{}
+	uAAOAuthClientReturns     struct {
 		result1 string
 	}
-	CFOAuthClientSecretStub        func() string
-	cFOAuthClientSecretMutex       sync.RWMutex
-	cFOAuthClientSecretArgsForCall []struct{}
-	cFOAuthClientSecretReturns     struct {
+	UAAOAuthClientSecretStub        func() string
+	uAAOAuthClientSecretMutex       sync.RWMutex
+	uAAOAuthClientSecretArgsForCall []struct{}
+	uAAOAuthClientSecretReturns     struct {
 		result1 string
 	}
 	ColorEnabledStub        func() configv3.ColorSetting
@@ -217,52 +217,52 @@ func (fake *FakeConfig) BinaryNameReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) CFOAuthClient() string {
-	fake.cFOAuthClientMutex.Lock()
-	fake.cFOAuthClientArgsForCall = append(fake.cFOAuthClientArgsForCall, struct{}{})
-	fake.recordInvocation("CFOAuthClient", []interface{}{})
-	fake.cFOAuthClientMutex.Unlock()
-	if fake.CFOAuthClientStub != nil {
-		return fake.CFOAuthClientStub()
+func (fake *FakeConfig) UAAOAuthClient() string {
+	fake.uAAOAuthClientMutex.Lock()
+	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClient", []interface{}{})
+	fake.uAAOAuthClientMutex.Unlock()
+	if fake.UAAOAuthClientStub != nil {
+		return fake.UAAOAuthClientStub()
 	} else {
-		return fake.cFOAuthClientReturns.result1
+		return fake.uAAOAuthClientReturns.result1
 	}
 }
 
-func (fake *FakeConfig) CFOAuthClientCallCount() int {
-	fake.cFOAuthClientMutex.RLock()
-	defer fake.cFOAuthClientMutex.RUnlock()
-	return len(fake.cFOAuthClientArgsForCall)
+func (fake *FakeConfig) UAAOAuthClientCallCount() int {
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	return len(fake.uAAOAuthClientArgsForCall)
 }
 
-func (fake *FakeConfig) CFOAuthClientReturns(result1 string) {
-	fake.CFOAuthClientStub = nil
-	fake.cFOAuthClientReturns = struct {
+func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
+	fake.UAAOAuthClientStub = nil
+	fake.uAAOAuthClientReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeConfig) CFOAuthClientSecret() string {
-	fake.cFOAuthClientSecretMutex.Lock()
-	fake.cFOAuthClientSecretArgsForCall = append(fake.cFOAuthClientSecretArgsForCall, struct{}{})
-	fake.recordInvocation("CFOAuthClientSecret", []interface{}{})
-	fake.cFOAuthClientSecretMutex.Unlock()
-	if fake.CFOAuthClientSecretStub != nil {
-		return fake.CFOAuthClientSecretStub()
+func (fake *FakeConfig) UAAOAuthClientSecret() string {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
+	fake.uAAOAuthClientSecretMutex.Unlock()
+	if fake.UAAOAuthClientSecretStub != nil {
+		return fake.UAAOAuthClientSecretStub()
 	} else {
-		return fake.cFOAuthClientSecretReturns.result1
+		return fake.uAAOAuthClientSecretReturns.result1
 	}
 }
 
-func (fake *FakeConfig) CFOAuthClientSecretCallCount() int {
-	fake.cFOAuthClientSecretMutex.RLock()
-	defer fake.cFOAuthClientSecretMutex.RUnlock()
-	return len(fake.cFOAuthClientSecretArgsForCall)
+func (fake *FakeConfig) UAAOAuthClientSecretCallCount() int {
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
+	return len(fake.uAAOAuthClientSecretArgsForCall)
 }
 
-func (fake *FakeConfig) CFOAuthClientSecretReturns(result1 string) {
-	fake.CFOAuthClientSecretStub = nil
-	fake.cFOAuthClientSecretReturns = struct {
+func (fake *FakeConfig) UAAOAuthClientSecretReturns(result1 string) {
+	fake.UAAOAuthClientSecretStub = nil
+	fake.uAAOAuthClientSecretReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -659,10 +659,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.accessTokenMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
-	fake.cFOAuthClientMutex.RLock()
-	defer fake.cFOAuthClientMutex.RUnlock()
-	fake.cFOAuthClientSecretMutex.RLock()
-	defer fake.cFOAuthClientSecretMutex.RUnlock()
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()

@@ -43,9 +43,9 @@ var _ = Describe("custom oauth client id", func() {
 		Context("when the client id and secret keys are set in the config", func() {
 			BeforeEach(func() {
 				replaceConfig(
-					configPath, `"CFOAuthClient": ".*"`, `"CFOAuthClient": "cf2"`)
+					configPath, `"UAAOAuthClient": ".*"`, `"UAAOAuthClient": "cf2"`)
 				replaceConfig(
-					configPath, `"CFOAuthClientSecret": ".*"`, `"CFOAuthClientSecret": "secret2"`)
+					configPath, `"UAAOAuthClientSecret": ".*"`, `"UAAOAuthClientSecret": "secret2"`)
 			})
 
 			Context("oauth-token", func() {
@@ -81,7 +81,7 @@ var _ = Describe("custom oauth client id", func() {
 		Context("when the client id in the config is empty", func() {
 			BeforeEach(func() {
 				replaceConfig(
-					configPath, `"CFOAuthClient": ".*",`, `"CFOAuthClient": "",`)
+					configPath, `"UAAOAuthClient": ".*",`, `"UAAOAuthClient": "",`)
 			})
 
 			Context("v2 command", func() {
@@ -90,7 +90,7 @@ var _ = Describe("custom oauth client id", func() {
 					Eventually(session).Should(Exit(1))
 
 					configString := fileAsString(configPath)
-					Expect(configString).To(ContainSubstring(`"CFOAuthClient": ""`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClient": ""`))
 				})
 			})
 
@@ -100,8 +100,8 @@ var _ = Describe("custom oauth client id", func() {
 					Eventually(session).Should(Exit(1))
 
 					configString := fileAsString(configPath)
-					Expect(configString).To(ContainSubstring(`"CFOAuthClient": "cf"`))
-					Expect(configString).To(ContainSubstring(`"CFOAuthClientSecret": ""`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClient": "cf"`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClientSecret": ""`))
 				})
 			})
 		})
@@ -109,9 +109,9 @@ var _ = Describe("custom oauth client id", func() {
 		Context("when there are no client id and secret keys in the config", func() {
 			BeforeEach(func() {
 				replaceConfig(
-					configPath, `"CFOAuthClient": ".*",`, "")
+					configPath, `"UAAOAuthClient": ".*",`, "")
 				replaceConfig(
-					configPath, `"CFOAuthClientSecret": ".*",`, "")
+					configPath, `"UAAOAuthClientSecret": ".*",`, "")
 			})
 
 			Context("v2 command", func() {
@@ -120,8 +120,8 @@ var _ = Describe("custom oauth client id", func() {
 					Eventually(session).Should(Exit(0))
 
 					configString := fileAsString(configPath)
-					Expect(configString).To(ContainSubstring(`"CFOAuthClient": "cf"`))
-					Expect(configString).To(ContainSubstring(`"CFOAuthClientSecret": ""`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClient": "cf"`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClientSecret": ""`))
 				})
 			})
 
@@ -131,8 +131,8 @@ var _ = Describe("custom oauth client id", func() {
 					Eventually(session).Should(Exit(1))
 
 					configString := fileAsString(configPath)
-					Expect(configString).To(ContainSubstring(`"CFOAuthClient": "cf"`))
-					Expect(configString).To(ContainSubstring(`"CFOAuthClientSecret": ""`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClient": "cf"`))
+					Expect(configString).To(ContainSubstring(`"UAAOAuthClientSecret": ""`))
 				})
 			})
 		})
@@ -152,8 +152,8 @@ var _ = Describe("custom oauth client id", func() {
 				Eventually(session).Should(Exit(0))
 
 				configString := fileAsString(configPath)
-				Expect(configString).To(ContainSubstring(`"CFOAuthClient": "cf"`))
-				Expect(configString).To(ContainSubstring(`"CFOAuthClientSecret": ""`))
+				Expect(configString).To(ContainSubstring(`"UAAOAuthClient": "cf"`))
+				Expect(configString).To(ContainSubstring(`"UAAOAuthClientSecret": ""`))
 			})
 		})
 
@@ -165,8 +165,8 @@ var _ = Describe("custom oauth client id", func() {
 				Eventually(session).Should(Exit(1))
 
 				configString := fileAsString(configPath)
-				Expect(configString).To(ContainSubstring(`"CFOAuthClient": "cf"`))
-				Expect(configString).To(ContainSubstring(`"CFOAuthClientSecret": ""`))
+				Expect(configString).To(ContainSubstring(`"UAAOAuthClient": "cf"`))
+				Expect(configString).To(ContainSubstring(`"UAAOAuthClientSecret": ""`))
 			})
 		})
 	})

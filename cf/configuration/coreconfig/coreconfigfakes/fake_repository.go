@@ -64,16 +64,16 @@ type FakeRepository struct {
 	accessTokenReturns     struct {
 		result1 string
 	}
-	CFOAuthClientStub        func() string
-	cFOAuthClientMutex       sync.RWMutex
-	cFOAuthClientArgsForCall []struct{}
-	cFOAuthClientReturns     struct {
+	UAAOAuthClientStub        func() string
+	uAAOAuthClientMutex       sync.RWMutex
+	uAAOAuthClientArgsForCall []struct{}
+	uAAOAuthClientReturns     struct {
 		result1 string
 	}
-	CFOAuthClientSecretStub        func() string
-	cFOAuthClientSecretMutex       sync.RWMutex
-	cFOAuthClientSecretArgsForCall []struct{}
-	cFOAuthClientSecretReturns     struct {
+	UAAOAuthClientSecretStub        func() string
+	uAAOAuthClientSecretMutex       sync.RWMutex
+	uAAOAuthClientSecretArgsForCall []struct{}
+	uAAOAuthClientSecretReturns     struct {
 		result1 string
 	}
 	SSHOAuthClientStub        func() string
@@ -253,14 +253,14 @@ type FakeRepository struct {
 	setAccessTokenArgsForCall []struct {
 		arg1 string
 	}
-	SetCFOAuthClientStub        func(string)
-	setCFOAuthClientMutex       sync.RWMutex
-	setCFOAuthClientArgsForCall []struct {
+	SetUAAOAuthClientStub        func(string)
+	setUAAOAuthClientMutex       sync.RWMutex
+	setUAAOAuthClientArgsForCall []struct {
 		arg1 string
 	}
-	SetCFOAuthClientSecretStub        func(string)
-	setCFOAuthClientSecretMutex       sync.RWMutex
-	setCFOAuthClientSecretArgsForCall []struct {
+	SetUAAOAuthClientSecretStub        func(string)
+	setUAAOAuthClientSecretMutex       sync.RWMutex
+	setUAAOAuthClientSecretArgsForCall []struct {
 		arg1 string
 	}
 	SetSSHOAuthClientStub        func(string)
@@ -550,52 +550,52 @@ func (fake *FakeRepository) AccessTokenReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeRepository) CFOAuthClient() string {
-	fake.cFOAuthClientMutex.Lock()
-	fake.cFOAuthClientArgsForCall = append(fake.cFOAuthClientArgsForCall, struct{}{})
-	fake.recordInvocation("CFOAuthClient", []interface{}{})
-	fake.cFOAuthClientMutex.Unlock()
-	if fake.CFOAuthClientStub != nil {
-		return fake.CFOAuthClientStub()
+func (fake *FakeRepository) UAAOAuthClient() string {
+	fake.uAAOAuthClientMutex.Lock()
+	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClient", []interface{}{})
+	fake.uAAOAuthClientMutex.Unlock()
+	if fake.UAAOAuthClientStub != nil {
+		return fake.UAAOAuthClientStub()
 	} else {
-		return fake.cFOAuthClientReturns.result1
+		return fake.uAAOAuthClientReturns.result1
 	}
 }
 
-func (fake *FakeRepository) CFOAuthClientCallCount() int {
-	fake.cFOAuthClientMutex.RLock()
-	defer fake.cFOAuthClientMutex.RUnlock()
-	return len(fake.cFOAuthClientArgsForCall)
+func (fake *FakeRepository) UAAOAuthClientCallCount() int {
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	return len(fake.uAAOAuthClientArgsForCall)
 }
 
-func (fake *FakeRepository) CFOAuthClientReturns(result1 string) {
-	fake.CFOAuthClientStub = nil
-	fake.cFOAuthClientReturns = struct {
+func (fake *FakeRepository) UAAOAuthClientReturns(result1 string) {
+	fake.UAAOAuthClientStub = nil
+	fake.uAAOAuthClientReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeRepository) CFOAuthClientSecret() string {
-	fake.cFOAuthClientSecretMutex.Lock()
-	fake.cFOAuthClientSecretArgsForCall = append(fake.cFOAuthClientSecretArgsForCall, struct{}{})
-	fake.recordInvocation("CFOAuthClientSecret", []interface{}{})
-	fake.cFOAuthClientSecretMutex.Unlock()
-	if fake.CFOAuthClientSecretStub != nil {
-		return fake.CFOAuthClientSecretStub()
+func (fake *FakeRepository) UAAOAuthClientSecret() string {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
+	fake.uAAOAuthClientSecretMutex.Unlock()
+	if fake.UAAOAuthClientSecretStub != nil {
+		return fake.UAAOAuthClientSecretStub()
 	} else {
-		return fake.cFOAuthClientSecretReturns.result1
+		return fake.uAAOAuthClientSecretReturns.result1
 	}
 }
 
-func (fake *FakeRepository) CFOAuthClientSecretCallCount() int {
-	fake.cFOAuthClientSecretMutex.RLock()
-	defer fake.cFOAuthClientSecretMutex.RUnlock()
-	return len(fake.cFOAuthClientSecretArgsForCall)
+func (fake *FakeRepository) UAAOAuthClientSecretCallCount() int {
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
+	return len(fake.uAAOAuthClientSecretArgsForCall)
 }
 
-func (fake *FakeRepository) CFOAuthClientSecretReturns(result1 string) {
-	fake.CFOAuthClientSecretStub = nil
-	fake.cFOAuthClientSecretReturns = struct {
+func (fake *FakeRepository) UAAOAuthClientSecretReturns(result1 string) {
+	fake.UAAOAuthClientSecretStub = nil
+	fake.uAAOAuthClientSecretReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1372,52 +1372,52 @@ func (fake *FakeRepository) SetAccessTokenArgsForCall(i int) string {
 	return fake.setAccessTokenArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SetCFOAuthClient(arg1 string) {
-	fake.setCFOAuthClientMutex.Lock()
-	fake.setCFOAuthClientArgsForCall = append(fake.setCFOAuthClientArgsForCall, struct {
+func (fake *FakeRepository) SetUAAOAuthClient(arg1 string) {
+	fake.setUAAOAuthClientMutex.Lock()
+	fake.setUAAOAuthClientArgsForCall = append(fake.setUAAOAuthClientArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("SetCFOAuthClient", []interface{}{arg1})
-	fake.setCFOAuthClientMutex.Unlock()
-	if fake.SetCFOAuthClientStub != nil {
-		fake.SetCFOAuthClientStub(arg1)
+	fake.recordInvocation("SetUAAOAuthClient", []interface{}{arg1})
+	fake.setUAAOAuthClientMutex.Unlock()
+	if fake.SetUAAOAuthClientStub != nil {
+		fake.SetUAAOAuthClientStub(arg1)
 	}
 }
 
-func (fake *FakeRepository) SetCFOAuthClientCallCount() int {
-	fake.setCFOAuthClientMutex.RLock()
-	defer fake.setCFOAuthClientMutex.RUnlock()
-	return len(fake.setCFOAuthClientArgsForCall)
+func (fake *FakeRepository) SetUAAOAuthClientCallCount() int {
+	fake.setUAAOAuthClientMutex.RLock()
+	defer fake.setUAAOAuthClientMutex.RUnlock()
+	return len(fake.setUAAOAuthClientArgsForCall)
 }
 
-func (fake *FakeRepository) SetCFOAuthClientArgsForCall(i int) string {
-	fake.setCFOAuthClientMutex.RLock()
-	defer fake.setCFOAuthClientMutex.RUnlock()
-	return fake.setCFOAuthClientArgsForCall[i].arg1
+func (fake *FakeRepository) SetUAAOAuthClientArgsForCall(i int) string {
+	fake.setUAAOAuthClientMutex.RLock()
+	defer fake.setUAAOAuthClientMutex.RUnlock()
+	return fake.setUAAOAuthClientArgsForCall[i].arg1
 }
 
-func (fake *FakeRepository) SetCFOAuthClientSecret(arg1 string) {
-	fake.setCFOAuthClientSecretMutex.Lock()
-	fake.setCFOAuthClientSecretArgsForCall = append(fake.setCFOAuthClientSecretArgsForCall, struct {
+func (fake *FakeRepository) SetUAAOAuthClientSecret(arg1 string) {
+	fake.setUAAOAuthClientSecretMutex.Lock()
+	fake.setUAAOAuthClientSecretArgsForCall = append(fake.setUAAOAuthClientSecretArgsForCall, struct {
 		arg1 string
 	}{arg1})
-	fake.recordInvocation("SetCFOAuthClientSecret", []interface{}{arg1})
-	fake.setCFOAuthClientSecretMutex.Unlock()
-	if fake.SetCFOAuthClientSecretStub != nil {
-		fake.SetCFOAuthClientSecretStub(arg1)
+	fake.recordInvocation("SetUAAOAuthClientSecret", []interface{}{arg1})
+	fake.setUAAOAuthClientSecretMutex.Unlock()
+	if fake.SetUAAOAuthClientSecretStub != nil {
+		fake.SetUAAOAuthClientSecretStub(arg1)
 	}
 }
 
-func (fake *FakeRepository) SetCFOAuthClientSecretCallCount() int {
-	fake.setCFOAuthClientSecretMutex.RLock()
-	defer fake.setCFOAuthClientSecretMutex.RUnlock()
-	return len(fake.setCFOAuthClientSecretArgsForCall)
+func (fake *FakeRepository) SetUAAOAuthClientSecretCallCount() int {
+	fake.setUAAOAuthClientSecretMutex.RLock()
+	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
+	return len(fake.setUAAOAuthClientSecretArgsForCall)
 }
 
-func (fake *FakeRepository) SetCFOAuthClientSecretArgsForCall(i int) string {
-	fake.setCFOAuthClientSecretMutex.RLock()
-	defer fake.setCFOAuthClientSecretMutex.RUnlock()
-	return fake.setCFOAuthClientSecretArgsForCall[i].arg1
+func (fake *FakeRepository) SetUAAOAuthClientSecretArgsForCall(i int) string {
+	fake.setUAAOAuthClientSecretMutex.RLock()
+	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
+	return fake.setUAAOAuthClientSecretArgsForCall[i].arg1
 }
 
 func (fake *FakeRepository) SetSSHOAuthClient(arg1 string) {
@@ -1721,10 +1721,10 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.routingAPIEndpointMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
-	fake.cFOAuthClientMutex.RLock()
-	defer fake.cFOAuthClientMutex.RUnlock()
-	fake.cFOAuthClientSecretMutex.RLock()
-	defer fake.cFOAuthClientSecretMutex.RUnlock()
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
 	fake.sSHOAuthClientMutex.RLock()
 	defer fake.sSHOAuthClientMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
@@ -1787,10 +1787,10 @@ func (fake *FakeRepository) Invocations() map[string][][]interface{} {
 	defer fake.setRoutingAPIEndpointMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
-	fake.setCFOAuthClientMutex.RLock()
-	defer fake.setCFOAuthClientMutex.RUnlock()
-	fake.setCFOAuthClientSecretMutex.RLock()
-	defer fake.setCFOAuthClientSecretMutex.RUnlock()
+	fake.setUAAOAuthClientMutex.RLock()
+	defer fake.setUAAOAuthClientMutex.RUnlock()
+	fake.setUAAOAuthClientSecretMutex.RLock()
+	defer fake.setUAAOAuthClientSecretMutex.RUnlock()
 	fake.setSSHOAuthClientMutex.RLock()
 	defer fake.setSSHOAuthClientMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()

@@ -54,8 +54,8 @@ var _ = Describe("Config", func() {
 			Expect(config.StagingTimeout()).To(Equal(DefaultStagingTimeout))
 			Expect(config.StartupTimeout()).To(Equal(DefaultStartupTimeout))
 			Expect(config.Locale()).To(BeEmpty())
-			Expect(config.CFOAuthClient()).To(Equal(DefaultCFOAuthClient))
-			Expect(config.CFOAuthClientSecret()).To(Equal(DefaultCFOAuthClientSecret))
+			Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
+			Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 
 			Expect(config.PluginRepos()).To(Equal([]PluginRepos{{
 				Name: "CF-Community",
@@ -78,7 +78,7 @@ var _ = Describe("Config", func() {
 			err    error
 		)
 
-		Context("when CFOAuthClient is not present", func() {
+		Context("when UAAOAuthClient is not present", func() {
 			BeforeEach(func() {
 				rawConfig := `{}`
 				setConfig(homeDir, rawConfig)
@@ -87,20 +87,20 @@ var _ = Describe("Config", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("sets CFOAuthClient to the default", func() {
-				Expect(config.CFOAuthClient()).To(Equal(DefaultCFOAuthClient))
+			It("sets UAAOAuthClient to the default", func() {
+				Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
 			})
 
-			It("sets CFOAuthClientSecret to the default", func() {
-				Expect(config.CFOAuthClientSecret()).To(Equal(DefaultCFOAuthClientSecret))
+			It("sets UAAOAuthClientSecret to the default", func() {
+				Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 			})
 		})
 
-		Context("when CFOAuthClient is empty", func() {
+		Context("when UAAOAuthClient is empty", func() {
 			BeforeEach(func() {
 				rawConfig := `
 					{
-						"CFOAuthClient": ""
+						"UAAOAuthClient": ""
 					}`
 				setConfig(homeDir, rawConfig)
 
@@ -108,12 +108,12 @@ var _ = Describe("Config", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("sets CFOAuthClient to the default", func() {
-				Expect(config.CFOAuthClient()).To(Equal(DefaultCFOAuthClient))
+			It("sets UAAOAuthClient to the default", func() {
+				Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
 			})
 
-			It("sets CFOAuthClientSecret to the default", func() {
-				Expect(config.CFOAuthClientSecret()).To(Equal(DefaultCFOAuthClientSecret))
+			It("sets UAAOAuthClientSecret to the default", func() {
+				Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
 			})
 		})
 	})
@@ -191,11 +191,11 @@ var _ = Describe("Config", func() {
 			})
 		})
 
-		Describe("CFOAuthClient", func() {
+		Describe("UAAOAuthClient", func() {
 			var config *Config
 
 			BeforeEach(func() {
-				rawConfig := `{ "CFOAuthClient":"some-client" }`
+				rawConfig := `{ "UAAOAuthClient":"some-client" }`
 				setConfig(homeDir, rawConfig)
 
 				var err error
@@ -205,18 +205,18 @@ var _ = Describe("Config", func() {
 			})
 
 			It("returns the client ID", func() {
-				Expect(config.CFOAuthClient()).To(Equal("some-client"))
+				Expect(config.UAAOAuthClient()).To(Equal("some-client"))
 			})
 		})
 
-		Describe("CFOAuthClientSecret", func() {
+		Describe("UAAOAuthClientSecret", func() {
 			var config *Config
 
 			BeforeEach(func() {
 				rawConfig := `
 					{
-						"CFOAuthClient": "some-client-id",
-						"CFOAuthClientSecret": "some-client-secret"
+						"UAAOAuthClient": "some-client-id",
+						"UAAOAuthClientSecret": "some-client-secret"
 					}`
 				setConfig(homeDir, rawConfig)
 
@@ -227,7 +227,7 @@ var _ = Describe("Config", func() {
 			})
 
 			It("returns the client secret", func() {
-				Expect(config.CFOAuthClientSecret()).To(Equal("some-client-secret"))
+				Expect(config.UAAOAuthClientSecret()).To(Equal("some-client-secret"))
 			})
 		})
 

@@ -24,13 +24,13 @@ const (
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
 
-	// DefaultCFOAuthClient is the default client ID for the CLI when
+	// DefaultUAAOAuthClient is the default client ID for the CLI when
 	// communicating with the UAA.
-	DefaultCFOAuthClient = "cf"
+	DefaultUAAOAuthClient = "cf"
 
 	// DefaultCFOClientSecret is the default client secret for the CLI when
 	// communicating with the UAA.
-	DefaultCFOAuthClientSecret = ""
+	DefaultUAAOAuthClientSecret = ""
 )
 
 // LoadConfig loads the config from the .cf/config.json and os.ENV. If the
@@ -62,8 +62,8 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 					Name: DefaultPluginRepoName,
 					URL:  DefaultPluginRepoURL,
 				}},
-				CFOAuthClient:       DefaultCFOAuthClient,
-				CFOAuthClientSecret: DefaultCFOAuthClientSecret,
+				UAAOAuthClient:       DefaultUAAOAuthClient,
+				UAAOAuthClientSecret: DefaultUAAOAuthClientSecret,
 			},
 		}
 	} else {
@@ -77,9 +77,9 @@ func LoadConfig(flags ...FlagOverride) (*Config, error) {
 			return nil, err
 		}
 
-		if config.ConfigFile.CFOAuthClient == "" {
-			config.ConfigFile.CFOAuthClient = DefaultCFOAuthClient
-			config.ConfigFile.CFOAuthClientSecret = DefaultCFOAuthClientSecret
+		if config.ConfigFile.UAAOAuthClient == "" {
+			config.ConfigFile.UAAOAuthClient = DefaultUAAOAuthClient
+			config.ConfigFile.UAAOAuthClientSecret = DefaultUAAOAuthClientSecret
 		}
 	}
 
@@ -163,8 +163,8 @@ type CFConfig struct {
 	RoutingEndpoint          string        `json:"RoutingAPIEndpoint"`
 	AccessToken              string        `json:"AccessToken"`
 	SSHOAuthClient           string        `json:"SSHOAuthClient"`
-	CFOAuthClient            string        `json:"CFOAuthClient"`
-	CFOAuthClientSecret      string        `json:"CFOAuthClientSecret"`
+	UAAOAuthClient           string        `json:"UAAOAuthClient"`
+	UAAOAuthClientSecret     string        `json:"UAAOAuthClientSecret"`
 	RefreshToken             string        `json:"RefreshToken"`
 	TargetedOrganization     Organization  `json:"OrganizationFields"`
 	TargetedSpace            Space         `json:"SpaceFields"`
@@ -247,14 +247,14 @@ func (config *Config) RefreshToken() string {
 	return config.ConfigFile.RefreshToken
 }
 
-// CFOAuthClient returns the CLI's UAA client ID
-func (config *Config) CFOAuthClient() string {
-	return config.ConfigFile.CFOAuthClient
+// UAAOAuthClient returns the CLI's UAA client ID
+func (config *Config) UAAOAuthClient() string {
+	return config.ConfigFile.UAAOAuthClient
 }
 
-// CFOAuthClientSecret returns the CLI's UAA client secret
-func (config *Config) CFOAuthClientSecret() string {
-	return config.ConfigFile.CFOAuthClientSecret
+// UAAOAuthClientSecret returns the CLI's UAA client secret
+func (config *Config) UAAOAuthClientSecret() string {
+	return config.ConfigFile.UAAOAuthClientSecret
 }
 
 // APIVersion returns the CC API Version

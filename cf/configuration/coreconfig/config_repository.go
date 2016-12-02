@@ -65,8 +65,8 @@ type Reader interface {
 	UaaEndpoint() string
 	RoutingAPIEndpoint() string
 	AccessToken() string
-	CFOAuthClient() string
-	CFOAuthClientSecret() string
+	UAAOAuthClient() string
+	UAAOAuthClientSecret() string
 	SSHOAuthClient() string
 	RefreshToken() string
 
@@ -111,8 +111,8 @@ type ReadWriter interface {
 	SetUaaEndpoint(string)
 	SetRoutingAPIEndpoint(string)
 	SetAccessToken(string)
-	SetCFOAuthClient(string)
-	SetCFOAuthClientSecret(string)
+	SetUAAOAuthClient(string)
+	SetUAAOAuthClientSecret(string)
 	SetSSHOAuthClient(string)
 	SetRefreshToken(string)
 	SetOrganizationFields(models.OrganizationFields)
@@ -244,16 +244,16 @@ func (c *ConfigRepository) AccessToken() (accessToken string) {
 	return
 }
 
-func (c *ConfigRepository) CFOAuthClient() (clientID string) {
+func (c *ConfigRepository) UAAOAuthClient() (clientID string) {
 	c.read(func() {
-		clientID = c.data.CFOAuthClient
+		clientID = c.data.UAAOAuthClient
 	})
 	return
 }
 
-func (c *ConfigRepository) CFOAuthClientSecret() (clientID string) {
+func (c *ConfigRepository) UAAOAuthClientSecret() (clientID string) {
 	c.read(func() {
-		clientID = c.data.CFOAuthClientSecret
+		clientID = c.data.UAAOAuthClientSecret
 	})
 	return
 }
@@ -491,15 +491,15 @@ func (c *ConfigRepository) SetAccessToken(token string) {
 	})
 }
 
-func (c *ConfigRepository) SetCFOAuthClient(clientID string) {
+func (c *ConfigRepository) SetUAAOAuthClient(clientID string) {
 	c.write(func() {
-		c.data.CFOAuthClient = clientID
+		c.data.UAAOAuthClient = clientID
 	})
 }
 
-func (c *ConfigRepository) SetCFOAuthClientSecret(clientID string) {
+func (c *ConfigRepository) SetUAAOAuthClientSecret(clientID string) {
 	c.write(func() {
-		c.data.CFOAuthClientSecret = clientID
+		c.data.UAAOAuthClientSecret = clientID
 	})
 }
 

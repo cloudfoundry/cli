@@ -28,8 +28,8 @@ type Data struct {
 	UaaEndpoint              string
 	RoutingAPIEndpoint       string
 	AccessToken              string
-	CFOAuthClient            string
-	CFOAuthClientSecret      string
+	UAAOAuthClient           string
+	UAAOAuthClientSecret     string
 	SSHOAuthClient           string
 	RefreshToken             string
 	OrganizationFields       models.OrganizationFields
@@ -47,8 +47,8 @@ type Data struct {
 func NewData() *Data {
 	data := new(Data)
 
-	data.CFOAuthClient = "cf"
-	data.CFOAuthClientSecret = ""
+	data.UAAOAuthClient = "cf"
+	data.UAAOAuthClientSecret = ""
 
 	return data
 }
