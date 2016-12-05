@@ -128,6 +128,10 @@ var _ = Describe("Help Command", func() {
 				return exec.Command("cf", "--help", "create-user-provided-service"), 0
 			}),
 
+			Entry("when the -h flag is passed with a command name", func() (*exec.Cmd, int) {
+				return exec.Command("cf", "-h", "create-user-provided-service"), 0
+			}),
+
 			Entry("when the help command is passed a command alias", func() (*exec.Cmd, int) {
 				return exec.Command("cf", "help", "cups"), 0
 			}),
