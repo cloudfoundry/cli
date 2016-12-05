@@ -30,7 +30,8 @@ func NewConnection(config Config) *CloudControllerConnection {
 		},
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout: config.DialTimeout,
+			KeepAlive: 30 * time.Second,
+			Timeout:   config.DialTimeout,
 		}).DialContext,
 	}
 
