@@ -300,13 +300,13 @@ func (u *UITable) Print() error {
 }
 
 func (ui *terminalUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
-	if !config.IsMinCLIVersion(cf.Version) {
+	if !config.IsMinCLIVersion(config.CLIVersion()) {
 		ui.Say("")
 		ui.Say(T("Cloud Foundry API version {{.APIVer}} requires CLI version {{.CLIMin}}.  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
 			map[string]interface{}{
 				"APIVer": config.APIVersion(),
 				"CLIMin": config.MinCLIVersion(),
-				"CLIVer": cf.Version,
+				"CLIVer": config.CLIVersion(),
 			}))
 	}
 }

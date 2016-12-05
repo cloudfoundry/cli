@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
 )
 
@@ -17,7 +16,7 @@ func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client
 		}
 	}
 
-	ccClient := NewCloudControllerClient(config.BinaryName())
+	ccClient := ccv2.NewClient(config.BinaryName(), config.BinaryVersion())
 	_, err := ccClient.TargetCF(ccv2.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),
@@ -47,8 +46,4 @@ func NewClients(config command.Config, ui command.UI) (*ccv2.Client, *uaa.Client
 	ccClient.WrapConnection(wrapper.NewUAAAuthentication(uaaClient))
 	ccClient.WrapConnection(wrapper.NewRetryRequest(2))
 	return ccClient, uaaClient, err
-}
-
-func NewCloudControllerClient(binaryName string) *ccv2.Client {
-	return ccv2.NewClient(binaryName, cf.Version)
 }

@@ -94,20 +94,6 @@ var _ = Describe("main", func() {
 		})
 	})
 
-	Describe("Shows version with -v or --version", func() {
-		It("prints the cf version if '-v' flag is provided", func() {
-			output := Cf("-v")
-			Eventually(output.Out.Contents).Should(ContainSubstring("cf version"))
-			Eventually(output).Should(Exit(0))
-		})
-
-		It("prints the cf version if '--version' flag is provided", func() {
-			output := Cf("--version")
-			Eventually(output.Out.Contents).Should(ContainSubstring("cf version"))
-			Eventually(output).Should(Exit(0))
-		})
-	})
-
 	Describe("Enables verbose output with -v", func() {
 		BeforeEach(func() {
 			client := http.Client{Timeout: 3 * time.Second}

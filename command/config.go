@@ -12,9 +12,9 @@ import (
 type Config interface {
 	APIVersion() string
 	AccessToken() string
+	BinaryBuildDate() string
 	BinaryName() string
-	UAAOAuthClient() string
-	UAAOAuthClientSecret() string
+	BinaryVersion() string
 	ColorEnabled() configv3.ColorSetting
 	CurrentUser() (configv3.User, error)
 	DialTimeout() time.Duration
@@ -29,5 +29,7 @@ type Config interface {
 	Target() string
 	TargetedOrganization() configv3.Organization
 	TargetedSpace() configv3.Space
+	UAAOAuthClient() string
+	UAAOAuthClientSecret() string
 	Verbose() (bool, []string)
 }

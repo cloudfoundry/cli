@@ -418,6 +418,21 @@ var _ = Describe("Config", func() {
 				Expect(config.DialTimeout()).To(Equal(1234 * time.Second))
 			})
 		})
+
+		Describe("BinaryVersion", func() {
+			It("returns back version.BinaryVersion", func() {
+				conf := Config{}
+				Expect(conf.BinaryVersion()).To(Equal("BUILT_FROM_SOURCE"))
+			})
+		})
+
+		Describe("BinaryBuildDate", func() {
+			It("returns back version.BinaryBuildDate", func() {
+				conf := Config{}
+				Expect(conf.BinaryBuildDate()).To(Equal("BUILT_AT_UNKNOWN_TIME"))
+			})
+		})
+
 	})
 
 	Describe("Write Config", func() {

@@ -9,6 +9,7 @@ import (
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/version"
 )
 
 type Version struct {
@@ -45,6 +46,6 @@ func (cmd *Version) Requirements(requirementsFactory requirements.Factory, conte
 }
 
 func (cmd *Version) Execute(context flags.FlagContext) error {
-	cmd.ui.Say(fmt.Sprintf("%s version %s-%s", cf.Name, cf.Version, cf.BuiltOnDate))
+	cmd.ui.Say(fmt.Sprintf("%s version %s-%s", cf.Name, version.BinaryVersion, version.BinaryBuildDate))
 	return nil
 }

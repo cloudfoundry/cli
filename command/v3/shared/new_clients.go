@@ -4,7 +4,6 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/wrapper"
 	"code.cloudfoundry.org/cli/api/uaa"
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
 )
 
@@ -17,7 +16,7 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		}
 	}
 
-	ccClient := ccv3.NewClient(config.BinaryName(), cf.Version)
+	ccClient := ccv3.NewClient(config.BinaryName(), config.BinaryVersion())
 	_, err := ccClient.TargetCF(ccv3.TargetSettings{
 		URL:               config.Target(),
 		SkipSSLValidation: config.SkipSSLValidation(),

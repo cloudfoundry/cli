@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"code.cloudfoundry.org/cli/version"
 )
 
 const (
@@ -379,6 +381,14 @@ func (config *Config) DialTimeout() time.Duration {
 	}
 
 	return DefaultDialTimeout
+}
+
+func (config *Config) BinaryVersion() string {
+	return version.BinaryVersion
+}
+
+func (config *Config) BinaryBuildDate() string {
+	return version.BinaryBuildDate
 }
 
 // SetOrganizationInformation sets the currently targeted organization

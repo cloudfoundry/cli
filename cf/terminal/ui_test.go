@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/models"
@@ -395,7 +394,7 @@ var _ = Describe("UI", func() {
 			config.SetMinCLIVersion("6.0.0")
 			config.SetMinRecommendedCLIVersion("6.5.0")
 			config.SetAPIVersion("2.15.1")
-			cf.Version = "5.0.0"
+			config.SetCLIVersion("5.0.0")
 			output = io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.NotifyUpdateIfNeeded(config)
@@ -412,7 +411,7 @@ var _ = Describe("UI", func() {
 			config.SetMinCLIVersion("6.0.0")
 			config.SetMinRecommendedCLIVersion("6.5.0")
 			config.SetAPIVersion("2.15.1")
-			cf.Version = "6.0.0"
+			config.SetCLIVersion("6.0.0")
 			output = io_helpers.CaptureOutput(func() {
 				ui := NewUI(os.Stdin, os.Stdout, NewTeePrinter(os.Stdout), fakeLogger)
 				ui.NotifyUpdateIfNeeded(config)

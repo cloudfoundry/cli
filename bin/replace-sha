@@ -6,10 +6,10 @@ VERSION_STRING="${CURRENT_VERSION}+${CURRENT_SHA}"
 
 if [ $(uname) == darwin ]; then
     DATE_STRING=$(date -u +"%Y-%m-%d")
-    sed -i "" -e "s/BUILT_FROM_SOURCE/$VERSION_STRING/g" $(dirname $0)/../cf/app_constants.go
-    sed -i "" -e "s/BUILT_AT_UNKNOWN_TIME/$DATE_STRING/g" $(dirname $0)/../cf/app_constants.go
+    sed -i "" -e "s/BUILT_FROM_SOURCE/$VERSION_STRING/g" $(dirname $0)/../version/version.go
+    sed -i "" -e "s/BUILT_AT_UNKNOWN_TIME/$DATE_STRING/g" $(dirname $0)/../version/version.go
 else
     DATE_STRING=$(date -u +"%Y-%m-%d")
-    sed -i -e "s/BUILT_FROM_SOURCE/$VERSION_STRING/g" $(dirname $0)/../cf/app_constants.go
-    sed -i -e "s/BUILT_AT_UNKNOWN_TIME/$DATE_STRING/g" $(dirname $0)/../cf/app_constants.go
+    sed -i -e "s/BUILT_FROM_SOURCE/$VERSION_STRING/g" $(dirname $0)/../version/version.go
+    sed -i -e "s/BUILT_AT_UNKNOWN_TIME/$DATE_STRING/g" $(dirname $0)/../version/version.go
 fi

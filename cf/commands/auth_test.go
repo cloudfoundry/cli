@@ -3,7 +3,6 @@ package commands_test
 import (
 	"errors"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
@@ -91,17 +90,9 @@ var _ = Describe("auth command", func() {
 			}))
 		})
 
-		It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-			config.SetMinCLIVersion("5.0.0")
-			config.SetMinRecommendedCLIVersion("5.5.0")
-			cf.Version = "4.5.0"
-
+		It("displays an update notification", func() {
 			testcmd.RunCLICommand("auth", []string{"foo@example.com", "password"}, requirementsFactory, updateCommandDependency, false, ui)
-
-			Expect(ui.Outputs()).To(ContainSubstrings(
-				[]string{"To upgrade your CLI"},
-				[]string{"5.0.0"},
-			))
+			Expect(ui.NotifyUpdateIfNeededCallCount).To(Equal(1))
 		})
 
 		It("gets the UAA endpoint and saves it to the config file", func() {

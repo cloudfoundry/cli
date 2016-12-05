@@ -558,7 +558,8 @@
     "An unexpected type of error",
 
     "(?i).*(?:token|password).*",
-    "Host"
+    "Host",
+    "{{.BinaryName}} version {{.BinaryVersion}}-{{.BinaryBuildDate}}"
   ],
   "excludedRegexps": [
     "^(?:\\s*{{.\\w+}}[^\\w{]*)+$",

@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/sharedaction"
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/common/internal"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -85,8 +84,8 @@ func (cmd HelpCommand) displayHelpPreamble() {
 
 	cmd.UI.DisplayHelpHeader("VERSION:")
 	cmd.UI.DisplayText("   {{.Version}}-{{.Time}}", map[string]interface{}{
-		"Version": cf.Version,
-		"Time":    cf.BuiltOnDate,
+		"Version": cmd.Config.BinaryVersion(),
+		"Time":    cmd.Config.BinaryBuildDate(),
 	})
 	cmd.UI.DisplayNewline()
 }
@@ -99,8 +98,8 @@ func (cmd HelpCommand) displayCommonCommands() {
 		map[string]interface{}{
 			"CommandName":    cmd.Config.BinaryName(),
 			"VersionCommand": cmd.UI.TranslateText("version"),
-			"Version":        cf.Version,
-			"Time":           cf.BuiltOnDate,
+			"Version":        cmd.Config.BinaryVersion(),
+			"Time":           cmd.Config.BinaryBuildDate(),
 			"CLI":            cmd.UI.TranslateText("Cloud Foundry command line tool"),
 		})
 	cmd.UI.DisplayText("{{.Usage}} {{.CommandName}} {{.CommandUsage}}",

@@ -3,7 +3,6 @@ package commands_test
 import (
 	"strconv"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/authentication/authenticationfakes"
 	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
 	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
@@ -260,23 +259,10 @@ var _ = Describe("Login Command", func() {
 			})
 		})
 
-		Describe("when the CLI version is below the minimum required", func() {
-			BeforeEach(func() {
-				minCLIVersion = "5.0.0"
-				minRecommendedCLIVersion = "5.5.0"
-			})
-
-			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-				ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-				cf.Version = "4.5.0"
-
-				testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
-
-				Expect(ui.Outputs()).To(ContainSubstrings(
-					[]string{"To upgrade your CLI"},
-					[]string{"5.0.0"},
-				))
-			})
+		It("displays an update notification", func() {
+			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+			testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
+			Expect(ui.NotifyUpdateIfNeededCallCount).To(Equal(1))
 		})
 
 		It("tries to get the organizations", func() {
