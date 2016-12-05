@@ -25,7 +25,8 @@ func NewConnection(skipSSLValidation bool, dialTimeout time.Duration) *UAAConnec
 		},
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout: dialTimeout,
+			KeepAlive: 30 * time.Second,
+			Timeout:   dialTimeout,
 		}).DialContext,
 	}
 

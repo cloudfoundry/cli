@@ -447,7 +447,10 @@ func (gateway Gateway) doRequest(request *http.Request) (*http.Response, error) 
 
 func makeHTTPTransport(gateway *Gateway) {
 	gateway.transport = &http.Transport{
-		Dial:            (&net.Dialer{Timeout: gateway.DialTimeout}).Dial,
+		Dial: (&net.Dialer{
+			KeepAlive: 30 * time.Second,
+			Timeout:   gateway.DialTimeout,
+		}).Dial,
 		TLSClientConfig: NewTLSConfig(gateway.trustedCerts, gateway.config.IsSSLDisabled()),
 		Proxy:           http.ProxyFromEnvironment,
 	}
