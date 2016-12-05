@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/errors"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/version"
 )
 
 type PanicPrinter struct {
@@ -66,5 +67,5 @@ func CrashDialog(errorMessage string, commandArgs string, stackTrace string) str
 		e.g. Terminal, iTerm, Powershell, Cygwin, gnome-terminal, terminator
 `
 
-	return fmt.Sprintf(formattedString, cf.Name, commandArgs, cf.Version, errorMessage, stackTrace)
+	return fmt.Sprintf(formattedString, cf.Name, commandArgs, version.BinaryVersion, errorMessage, stackTrace)
 }

@@ -27,6 +27,8 @@ var _ = Describe("Help Command", func() {
 		fakeActor = new(commonfakes.FakeHelpActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
+		fakeConfig.BinaryVersionReturns("face2.0")
+		fakeConfig.BinaryBuildDateReturns("yesterday")
 
 		cmd = HelpCommand{
 			UI:     fakeUI,
@@ -324,7 +326,7 @@ var _ = Describe("Help Command", func() {
 			err := cmd.Execute(nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fakeUI.Out).To(Say("faceman version BUILT_FROM_SOURCE-BUILT_AT_UNKNOWN_TIME, Cloud Foundry command line tool"))
+			Expect(fakeUI.Out).To(Say("faceman version face2.0-yesterday, Cloud Foundry command line tool"))
 			Expect(fakeUI.Out).To(Say("Usage: faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
 
 			Expect(fakeUI.Out).To(Say("Before getting started:"))
@@ -436,7 +438,7 @@ var _ = Describe("Help Command", func() {
 				Expect(fakeUI.Out).To(Say("USAGE:"))
 				Expect(fakeUI.Out).To(Say("faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
 				Expect(fakeUI.Out).To(Say("VERSION:"))
-				Expect(fakeUI.Out).To(Say("BUILT_FROM_SOURCE-BUILT_AT_UNKNOWN_TIME"))
+				Expect(fakeUI.Out).To(Say("face2.0-yesterday"))
 
 				Expect(fakeUI.Out).To(Say("GETTING STARTED:"))
 				Expect(fakeUI.Out).To(Say("help\\s+Show help"))

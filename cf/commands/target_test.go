@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/organizations/organizationsfakes"
 	"code.cloudfoundry.org/cli/cf/api/spaces/spacesfakes"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
@@ -243,17 +242,9 @@ var _ = Describe("target command", func() {
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 
-			It("prompts users to upgrade if CLI version < min cli version requirement", func() {
-				config.SetMinCLIVersion("5.0.0")
-				config.SetMinRecommendedCLIVersion("5.5.0")
-				cf.Version = "4.5.0"
-
+			It("displays an update notification", func() {
 				callTarget([]string{"-o", "my-organization"})
-
-				Expect(ui.Outputs()).To(ContainSubstrings(
-					[]string{"To upgrade your CLI"},
-					[]string{"5.0.0"},
-				))
+				Expect(ui.NotifyUpdateIfNeededCallCount).To(Equal(1))
 			})
 		})
 

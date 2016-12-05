@@ -4,13 +4,13 @@ import (
 	"os"
 	"strings"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/terminal"
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/plugin/models"
+	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 
 	"fmt"
@@ -133,18 +133,18 @@ func (cli *CliRpcService) Start() error {
 	return nil
 }
 
-func (cmd *CliRpcCmd) IsMinCliVersion(version string, retVal *bool) error {
-	if cf.Version == "BUILT_FROM_SOURCE" {
+func (cmd *CliRpcCmd) IsMinCliVersion(passedVersion string, retVal *bool) error {
+	if version.BinaryVersion == "BUILT_FROM_SOURCE" {
 		*retVal = true
 		return nil
 	}
 
-	actualVersion, err := semver.Make(cf.Version)
+	actualVersion, err := semver.Make(version.BinaryVersion)
 	if err != nil {
 		return err
 	}
 
-	requiredVersion, err := semver.Make(version)
+	requiredVersion, err := semver.Make(passedVersion)
 	if err != nil {
 		return err
 	}

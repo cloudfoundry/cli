@@ -6,15 +6,17 @@ import (
 
 	"code.cloudfoundry.org/cli/cf/configuration"
 	"code.cloudfoundry.org/cli/cf/models"
+	"code.cloudfoundry.org/cli/version"
 	"github.com/blang/semver"
 )
 
 type ConfigRepository struct {
-	data      *Data
-	mutex     *sync.RWMutex
-	initOnce  *sync.Once
-	persistor configuration.Persistor
-	onError   func(error)
+	CFCLIVersion string
+	data         *Data
+	mutex        *sync.RWMutex
+	initOnce     *sync.Once
+	persistor    configuration.Persistor
+	onError      func(error)
 }
 
 type CCInfo struct {
@@ -85,6 +87,7 @@ type Reader interface {
 	IsMinCLIVersion(string) bool
 	MinCLIVersion() string
 	MinRecommendedCLIVersion() string
+	CLIVersion() string
 
 	AsyncTimeout() uint
 	Trace() string
@@ -124,6 +127,7 @@ type ReadWriter interface {
 	SetLocale(string)
 	SetPluginRepo(models.PluginRepo)
 	UnSetPluginRepo(int)
+	SetCLIVersion(string)
 }
 
 //go:generate counterfeiter . Repository
@@ -333,6 +337,19 @@ func (c *ConfigRepository) IsSSLDisabled() (isSSLDisabled bool) {
 		isSSLDisabled = c.data.SSLDisabled
 	})
 	return
+}
+
+// SetCLIVersion should only be used in testing
+func (c *ConfigRepository) SetCLIVersion(v string) {
+	c.CFCLIVersion = v
+}
+
+func (c *ConfigRepository) CLIVersion() string {
+	if c.CFCLIVersion == "" {
+		return version.BinaryVersion
+	} else {
+		return c.CFCLIVersion
+	}
 }
 
 func (c *ConfigRepository) IsMinAPIVersion(requiredVersion semver.Version) bool {

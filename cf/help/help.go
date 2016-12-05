@@ -11,13 +11,13 @@ import (
 
 	"path/filepath"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration"
 	"code.cloudfoundry.org/cli/cf/configuration/confighelpers"
 	"code.cloudfoundry.org/cli/cf/configuration/pluginconfig"
 	. "code.cloudfoundry.org/cli/cf/i18n"
 	"code.cloudfoundry.org/cli/cf/terminal"
+	"code.cloudfoundry.org/cli/version"
 )
 
 type appPresenter struct {
@@ -104,7 +104,7 @@ func newAppPresenter() appPresenter {
 
 	presenter.Name = os.Args[0]
 	presenter.Usage = T("A command line tool to interact with Cloud Foundry")
-	presenter.Version = cf.Version + "-" + cf.BuiltOnDate
+	presenter.Version = version.BinaryVersion + "-" + version.BinaryBuildDate
 	presenter.Commands = []groupedCommands{
 		{
 			Name: T("GETTING STARTED"),

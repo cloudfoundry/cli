@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/api/authentication"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/errors"
@@ -23,6 +22,7 @@ import (
 	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
 	testnet "code.cloudfoundry.org/cli/util/testhelpers/net"
+	"code.cloudfoundry.org/cli/version"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
@@ -123,7 +123,7 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("sets the user agent header", func() {
-				Expect(request.HTTPReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+				Expect(request.HTTPReq.Header.Get("User-Agent")).To(Equal("go-cli " + version.BinaryVersion + " / " + runtime.GOOS))
 			})
 		})
 

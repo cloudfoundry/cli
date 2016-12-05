@@ -170,6 +170,12 @@ type FakeReadWriter struct {
 	minRecommendedCLIVersionReturns     struct {
 		result1 string
 	}
+	CLIVersionStub        func() string
+	cLIVersionMutex       sync.RWMutex
+	cLIVersionArgsForCall []struct{}
+	cLIVersionReturns     struct {
+		result1 string
+	}
 	AsyncTimeoutStub        func() uint
 	asyncTimeoutMutex       sync.RWMutex
 	asyncTimeoutArgsForCall []struct{}
@@ -317,6 +323,11 @@ type FakeReadWriter struct {
 	unSetPluginRepoMutex       sync.RWMutex
 	unSetPluginRepoArgsForCall []struct {
 		arg1 int
+	}
+	SetCLIVersionStub        func(string)
+	setCLIVersionMutex       sync.RWMutex
+	setCLIVersionArgsForCall []struct {
+		arg1 string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -984,6 +995,31 @@ func (fake *FakeReadWriter) MinRecommendedCLIVersionCallCount() int {
 func (fake *FakeReadWriter) MinRecommendedCLIVersionReturns(result1 string) {
 	fake.MinRecommendedCLIVersionStub = nil
 	fake.minRecommendedCLIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeReadWriter) CLIVersion() string {
+	fake.cLIVersionMutex.Lock()
+	fake.cLIVersionArgsForCall = append(fake.cLIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CLIVersion", []interface{}{})
+	fake.cLIVersionMutex.Unlock()
+	if fake.CLIVersionStub != nil {
+		return fake.CLIVersionStub()
+	} else {
+		return fake.cLIVersionReturns.result1
+	}
+}
+
+func (fake *FakeReadWriter) CLIVersionCallCount() int {
+	fake.cLIVersionMutex.RLock()
+	defer fake.cLIVersionMutex.RUnlock()
+	return len(fake.cLIVersionArgsForCall)
+}
+
+func (fake *FakeReadWriter) CLIVersionReturns(result1 string) {
+	fake.CLIVersionStub = nil
+	fake.cLIVersionReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -1681,6 +1717,30 @@ func (fake *FakeReadWriter) UnSetPluginRepoArgsForCall(i int) int {
 	return fake.unSetPluginRepoArgsForCall[i].arg1
 }
 
+func (fake *FakeReadWriter) SetCLIVersion(arg1 string) {
+	fake.setCLIVersionMutex.Lock()
+	fake.setCLIVersionArgsForCall = append(fake.setCLIVersionArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("SetCLIVersion", []interface{}{arg1})
+	fake.setCLIVersionMutex.Unlock()
+	if fake.SetCLIVersionStub != nil {
+		fake.SetCLIVersionStub(arg1)
+	}
+}
+
+func (fake *FakeReadWriter) SetCLIVersionCallCount() int {
+	fake.setCLIVersionMutex.RLock()
+	defer fake.setCLIVersionMutex.RUnlock()
+	return len(fake.setCLIVersionArgsForCall)
+}
+
+func (fake *FakeReadWriter) SetCLIVersionArgsForCall(i int) string {
+	fake.setCLIVersionMutex.RLock()
+	defer fake.setCLIVersionMutex.RUnlock()
+	return fake.setCLIVersionArgsForCall[i].arg1
+}
+
 func (fake *FakeReadWriter) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -1736,6 +1796,8 @@ func (fake *FakeReadWriter) Invocations() map[string][][]interface{} {
 	defer fake.minCLIVersionMutex.RUnlock()
 	fake.minRecommendedCLIVersionMutex.RLock()
 	defer fake.minRecommendedCLIVersionMutex.RUnlock()
+	fake.cLIVersionMutex.RLock()
+	defer fake.cLIVersionMutex.RUnlock()
 	fake.asyncTimeoutMutex.RLock()
 	defer fake.asyncTimeoutMutex.RUnlock()
 	fake.traceMutex.RLock()
@@ -1794,6 +1856,8 @@ func (fake *FakeReadWriter) Invocations() map[string][][]interface{} {
 	defer fake.setPluginRepoMutex.RUnlock()
 	fake.unSetPluginRepoMutex.RLock()
 	defer fake.unSetPluginRepoMutex.RUnlock()
+	fake.setCLIVersionMutex.RLock()
+	defer fake.setCLIVersionMutex.RUnlock()
 	return fake.invocations
 }
 

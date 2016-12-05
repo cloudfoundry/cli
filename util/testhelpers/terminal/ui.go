@@ -9,21 +9,21 @@ import (
 
 	"os"
 
-	"code.cloudfoundry.org/cli/cf"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	term "code.cloudfoundry.org/cli/cf/terminal"
 )
 
 type FakeUI struct {
-	outputs                    []string
-	uncapturedOutput           []string
-	WarnOutputs                []string
-	Prompts                    []string
-	PasswordPrompts            []string
-	Inputs                     []string
-	FailedWithUsage            bool
-	FailedWithUsageCommandName string
-	ShowConfigurationCalled    bool
+	outputs                       []string
+	uncapturedOutput              []string
+	WarnOutputs                   []string
+	Prompts                       []string
+	PasswordPrompts               []string
+	Inputs                        []string
+	FailedWithUsage               bool
+	FailedWithUsageCommandName    string
+	ShowConfigurationCalled       bool
+	NotifyUpdateIfNeededCallCount int
 
 	sayMutex sync.Mutex
 }
@@ -175,7 +175,5 @@ func (ui *FakeUI) Table(headers []string) *term.UITable {
 }
 
 func (ui *FakeUI) NotifyUpdateIfNeeded(config coreconfig.Reader) {
-	if !config.IsMinCLIVersion(cf.Version) {
-		ui.Say("Cloud Foundry API version {{.APIVer}} requires CLI version " + config.MinCLIVersion() + "  You are currently on version {{.CLIVer}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads")
-	}
+	ui.NotifyUpdateIfNeededCallCount += 1
 }

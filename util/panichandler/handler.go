@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"code.cloudfoundry.org/cli/cf"
+	"code.cloudfoundry.org/cli/version"
 )
 
 const maxStackSizeLimit = 1024 * 1024
@@ -54,7 +54,7 @@ func HandlePanic() {
 		templateErr := formattedTemplate.Execute(os.Stderr, map[string]interface{}{
 			"Binary":     os.Args[0],
 			"Command":    strings.Join(os.Args, " "),
-			"Version":    cf.Version,
+			"Version":    version.BinaryVersion,
 			"StackTrace": stackTrace,
 			"Error":      err,
 		})
@@ -66,7 +66,7 @@ func HandlePanic() {
 
 			fmt.Fprintf(os.Stderr,
 				"Version:%s\nCommand:%s\nOriginal Stack Trace:%s\nOriginal Error:%s\n",
-				cf.Version,
+				version.BinaryVersion,
 				strings.Join(os.Args, " "),
 				stackTrace,
 				err,

@@ -22,22 +22,22 @@ type FakeConfig struct {
 	accessTokenReturns     struct {
 		result1 string
 	}
+	BinaryBuildDateStub        func() string
+	binaryBuildDateMutex       sync.RWMutex
+	binaryBuildDateArgsForCall []struct{}
+	binaryBuildDateReturns     struct {
+		result1 string
+	}
 	BinaryNameStub        func() string
 	binaryNameMutex       sync.RWMutex
 	binaryNameArgsForCall []struct{}
 	binaryNameReturns     struct {
 		result1 string
 	}
-	UAAOAuthClientStub        func() string
-	uAAOAuthClientMutex       sync.RWMutex
-	uAAOAuthClientArgsForCall []struct{}
-	uAAOAuthClientReturns     struct {
-		result1 string
-	}
-	UAAOAuthClientSecretStub        func() string
-	uAAOAuthClientSecretMutex       sync.RWMutex
-	uAAOAuthClientSecretArgsForCall []struct{}
-	uAAOAuthClientSecretReturns     struct {
+	BinaryVersionStub        func() string
+	binaryVersionMutex       sync.RWMutex
+	binaryVersionArgsForCall []struct{}
+	binaryVersionReturns     struct {
 		result1 string
 	}
 	ColorEnabledStub        func() configv3.ColorSetting
@@ -131,6 +131,18 @@ type FakeConfig struct {
 	targetedSpaceReturns     struct {
 		result1 configv3.Space
 	}
+	UAAOAuthClientStub        func() string
+	uAAOAuthClientMutex       sync.RWMutex
+	uAAOAuthClientArgsForCall []struct{}
+	uAAOAuthClientReturns     struct {
+		result1 string
+	}
+	UAAOAuthClientSecretStub        func() string
+	uAAOAuthClientSecretMutex       sync.RWMutex
+	uAAOAuthClientSecretArgsForCall []struct{}
+	uAAOAuthClientSecretReturns     struct {
+		result1 string
+	}
 	VerboseStub        func() (bool, []string)
 	verboseMutex       sync.RWMutex
 	verboseArgsForCall []struct{}
@@ -192,6 +204,31 @@ func (fake *FakeConfig) AccessTokenReturns(result1 string) {
 	}{result1}
 }
 
+func (fake *FakeConfig) BinaryBuildDate() string {
+	fake.binaryBuildDateMutex.Lock()
+	fake.binaryBuildDateArgsForCall = append(fake.binaryBuildDateArgsForCall, struct{}{})
+	fake.recordInvocation("BinaryBuildDate", []interface{}{})
+	fake.binaryBuildDateMutex.Unlock()
+	if fake.BinaryBuildDateStub != nil {
+		return fake.BinaryBuildDateStub()
+	} else {
+		return fake.binaryBuildDateReturns.result1
+	}
+}
+
+func (fake *FakeConfig) BinaryBuildDateCallCount() int {
+	fake.binaryBuildDateMutex.RLock()
+	defer fake.binaryBuildDateMutex.RUnlock()
+	return len(fake.binaryBuildDateArgsForCall)
+}
+
+func (fake *FakeConfig) BinaryBuildDateReturns(result1 string) {
+	fake.BinaryBuildDateStub = nil
+	fake.binaryBuildDateReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) BinaryName() string {
 	fake.binaryNameMutex.Lock()
 	fake.binaryNameArgsForCall = append(fake.binaryNameArgsForCall, struct{}{})
@@ -217,52 +254,27 @@ func (fake *FakeConfig) BinaryNameReturns(result1 string) {
 	}{result1}
 }
 
-func (fake *FakeConfig) UAAOAuthClient() string {
-	fake.uAAOAuthClientMutex.Lock()
-	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
-	fake.recordInvocation("UAAOAuthClient", []interface{}{})
-	fake.uAAOAuthClientMutex.Unlock()
-	if fake.UAAOAuthClientStub != nil {
-		return fake.UAAOAuthClientStub()
+func (fake *FakeConfig) BinaryVersion() string {
+	fake.binaryVersionMutex.Lock()
+	fake.binaryVersionArgsForCall = append(fake.binaryVersionArgsForCall, struct{}{})
+	fake.recordInvocation("BinaryVersion", []interface{}{})
+	fake.binaryVersionMutex.Unlock()
+	if fake.BinaryVersionStub != nil {
+		return fake.BinaryVersionStub()
 	} else {
-		return fake.uAAOAuthClientReturns.result1
+		return fake.binaryVersionReturns.result1
 	}
 }
 
-func (fake *FakeConfig) UAAOAuthClientCallCount() int {
-	fake.uAAOAuthClientMutex.RLock()
-	defer fake.uAAOAuthClientMutex.RUnlock()
-	return len(fake.uAAOAuthClientArgsForCall)
+func (fake *FakeConfig) BinaryVersionCallCount() int {
+	fake.binaryVersionMutex.RLock()
+	defer fake.binaryVersionMutex.RUnlock()
+	return len(fake.binaryVersionArgsForCall)
 }
 
-func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
-	fake.UAAOAuthClientStub = nil
-	fake.uAAOAuthClientReturns = struct {
-		result1 string
-	}{result1}
-}
-
-func (fake *FakeConfig) UAAOAuthClientSecret() string {
-	fake.uAAOAuthClientSecretMutex.Lock()
-	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct{}{})
-	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
-	fake.uAAOAuthClientSecretMutex.Unlock()
-	if fake.UAAOAuthClientSecretStub != nil {
-		return fake.UAAOAuthClientSecretStub()
-	} else {
-		return fake.uAAOAuthClientSecretReturns.result1
-	}
-}
-
-func (fake *FakeConfig) UAAOAuthClientSecretCallCount() int {
-	fake.uAAOAuthClientSecretMutex.RLock()
-	defer fake.uAAOAuthClientSecretMutex.RUnlock()
-	return len(fake.uAAOAuthClientSecretArgsForCall)
-}
-
-func (fake *FakeConfig) UAAOAuthClientSecretReturns(result1 string) {
-	fake.UAAOAuthClientSecretStub = nil
-	fake.uAAOAuthClientSecretReturns = struct {
+func (fake *FakeConfig) BinaryVersionReturns(result1 string) {
+	fake.BinaryVersionStub = nil
+	fake.binaryVersionReturns = struct {
 		result1 string
 	}{result1}
 }
@@ -624,6 +636,56 @@ func (fake *FakeConfig) TargetedSpaceReturns(result1 configv3.Space) {
 	}{result1}
 }
 
+func (fake *FakeConfig) UAAOAuthClient() string {
+	fake.uAAOAuthClientMutex.Lock()
+	fake.uAAOAuthClientArgsForCall = append(fake.uAAOAuthClientArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClient", []interface{}{})
+	fake.uAAOAuthClientMutex.Unlock()
+	if fake.UAAOAuthClientStub != nil {
+		return fake.UAAOAuthClientStub()
+	} else {
+		return fake.uAAOAuthClientReturns.result1
+	}
+}
+
+func (fake *FakeConfig) UAAOAuthClientCallCount() int {
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	return len(fake.uAAOAuthClientArgsForCall)
+}
+
+func (fake *FakeConfig) UAAOAuthClientReturns(result1 string) {
+	fake.UAAOAuthClientStub = nil
+	fake.uAAOAuthClientReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeConfig) UAAOAuthClientSecret() string {
+	fake.uAAOAuthClientSecretMutex.Lock()
+	fake.uAAOAuthClientSecretArgsForCall = append(fake.uAAOAuthClientSecretArgsForCall, struct{}{})
+	fake.recordInvocation("UAAOAuthClientSecret", []interface{}{})
+	fake.uAAOAuthClientSecretMutex.Unlock()
+	if fake.UAAOAuthClientSecretStub != nil {
+		return fake.UAAOAuthClientSecretStub()
+	} else {
+		return fake.uAAOAuthClientSecretReturns.result1
+	}
+}
+
+func (fake *FakeConfig) UAAOAuthClientSecretCallCount() int {
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
+	return len(fake.uAAOAuthClientSecretArgsForCall)
+}
+
+func (fake *FakeConfig) UAAOAuthClientSecretReturns(result1 string) {
+	fake.UAAOAuthClientSecretStub = nil
+	fake.uAAOAuthClientSecretReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeConfig) Verbose() (bool, []string) {
 	fake.verboseMutex.Lock()
 	fake.verboseArgsForCall = append(fake.verboseArgsForCall, struct{}{})
@@ -657,12 +719,12 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.aPIVersionMutex.RUnlock()
 	fake.accessTokenMutex.RLock()
 	defer fake.accessTokenMutex.RUnlock()
+	fake.binaryBuildDateMutex.RLock()
+	defer fake.binaryBuildDateMutex.RUnlock()
 	fake.binaryNameMutex.RLock()
 	defer fake.binaryNameMutex.RUnlock()
-	fake.uAAOAuthClientMutex.RLock()
-	defer fake.uAAOAuthClientMutex.RUnlock()
-	fake.uAAOAuthClientSecretMutex.RLock()
-	defer fake.uAAOAuthClientSecretMutex.RUnlock()
+	fake.binaryVersionMutex.RLock()
+	defer fake.binaryVersionMutex.RUnlock()
 	fake.colorEnabledMutex.RLock()
 	defer fake.colorEnabledMutex.RUnlock()
 	fake.currentUserMutex.RLock()
@@ -691,6 +753,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.targetedOrganizationMutex.RUnlock()
 	fake.targetedSpaceMutex.RLock()
 	defer fake.targetedSpaceMutex.RUnlock()
+	fake.uAAOAuthClientMutex.RLock()
+	defer fake.uAAOAuthClientMutex.RUnlock()
+	fake.uAAOAuthClientSecretMutex.RLock()
+	defer fake.uAAOAuthClientSecretMutex.RUnlock()
 	fake.verboseMutex.RLock()
 	defer fake.verboseMutex.RUnlock()
 	return fake.invocations
