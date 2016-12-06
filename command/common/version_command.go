@@ -1,4 +1,4 @@
-package v2
+package common
 
 import "code.cloudfoundry.org/cli/command"
 
