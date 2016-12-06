@@ -99,7 +99,7 @@ func (cmd *Target) Execute(c flags.FlagContext) error {
 	}
 	cmd.ui.NotifyUpdateIfNeeded(cmd.config)
 	if !cmd.config.IsLoggedIn() {
-		return fmt.Errorf(terminal.NotLoggedInText())
+		return fmt.Errorf("") // Done on purpose, do not redo this in refactor code
 	}
 	return nil
 }
