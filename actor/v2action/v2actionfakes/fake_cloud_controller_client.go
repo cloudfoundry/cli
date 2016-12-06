@@ -111,6 +111,16 @@ type FakeCloudControllerClient struct {
 		result2 ccv2.Warnings
 		result3 error
 	}
+	NewUserStub        func(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
+	newUserMutex       sync.RWMutex
+	newUserArgsForCall []struct {
+		uaaUserID string
+	}
+	newUserReturns struct {
+		result1 ccv2.User
+		result2 ccv2.Warnings
+		result3 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -497,6 +507,41 @@ func (fake *FakeCloudControllerClient) GetSpaceServiceInstancesReturns(result1 [
 	}{result1, result2, result3}
 }
 
+func (fake *FakeCloudControllerClient) NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error) {
+	fake.newUserMutex.Lock()
+	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
+		uaaUserID string
+	}{uaaUserID})
+	fake.recordInvocation("NewUser", []interface{}{uaaUserID})
+	fake.newUserMutex.Unlock()
+	if fake.NewUserStub != nil {
+		return fake.NewUserStub(uaaUserID)
+	} else {
+		return fake.newUserReturns.result1, fake.newUserReturns.result2, fake.newUserReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) NewUserCallCount() int {
+	fake.newUserMutex.RLock()
+	defer fake.newUserMutex.RUnlock()
+	return len(fake.newUserArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) NewUserArgsForCall(i int) string {
+	fake.newUserMutex.RLock()
+	defer fake.newUserMutex.RUnlock()
+	return fake.newUserArgsForCall[i].uaaUserID
+}
+
+func (fake *FakeCloudControllerClient) NewUserReturns(result1 ccv2.User, result2 ccv2.Warnings, result3 error) {
+	fake.NewUserStub = nil
+	fake.newUserReturns = struct {
+		result1 ccv2.User
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -520,6 +565,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.getSpaceRoutesMutex.RUnlock()
 	fake.getSpaceServiceInstancesMutex.RLock()
 	defer fake.getSpaceServiceInstancesMutex.RUnlock()
+	fake.newUserMutex.RLock()
+	defer fake.newUserMutex.RUnlock()
 	return fake.invocations
 }
 

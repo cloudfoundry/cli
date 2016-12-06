@@ -44,6 +44,7 @@ func (client *Client) RefreshToken() error {
 	response := Response{
 		Result: &refreshResponse,
 	}
+
 	err = client.connection.Make(request, &response)
 	if err != nil {
 		return err

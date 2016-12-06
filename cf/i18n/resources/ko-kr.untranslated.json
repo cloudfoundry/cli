@@ -1396,6 +1396,10 @@
     "translation": ""
   },
   {
+    "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
     "id": "TOTAL_MEMORY",
     "translation": "TOTAL_MEMORY"
   },

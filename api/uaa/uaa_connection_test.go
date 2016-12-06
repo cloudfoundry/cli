@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
@@ -70,6 +69,33 @@ var _ = Describe("UAA Connection", func() {
 			})
 		})
 
+		Describe("HTTP Response", func() {
+			var request *http.Request
+
+			BeforeEach(func() {
+				response := `{}`
+				server.AppendHandlers(
+					CombineHandlers(
+						VerifyRequest(http.MethodGet, "/v2/foo", ""),
+						RespondWith(http.StatusOK, response),
+					),
+				)
+
+				var err error
+				request, err = http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
+				Expect(err).ToNot(HaveOccurred())
+			})
+
+			It("returns the status", func() {
+				response := Response{}
+
+				err := connection.Make(request, &response)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(response.HTTPResponse.Status).To(Equal("200 OK"))
+			})
+		})
+
 		Describe("Errors", func() {
 			Context("when the server does not exist", func() {
 				BeforeEach(func() {
@@ -113,8 +139,9 @@ var _ = Describe("UAA Connection", func() {
 				})
 			})
 
-			Describe("UAAError", func() {
+			Describe("RawHTTPStatusError", func() {
 				var uaaResponse string
+
 				BeforeEach(func() {
 					uaaResponse = `{
 						"error":"unauthorized",
@@ -129,15 +156,15 @@ var _ = Describe("UAA Connection", func() {
 					)
 				})
 
-				It("returns a UAAError", func() {
+				It("returns a RawHTTPStatusError", func() {
 					request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/v2/foo", server.URL()), nil)
 					Expect(err).ToNot(HaveOccurred())
 
 					var response Response
 					err = connection.Make(request, &response)
-					Expect(err).To(MatchError(Error{
-						Type:        "unauthorized",
-						Description: "Bad credentials",
+					Expect(err).To(MatchError(RawHTTPStatusError{
+						StatusCode:  http.StatusUnauthorized,
+						RawResponse: []byte(uaaResponse),
 					}))
 
 					Expect(server.ReceivedRequests()).To(HaveLen(1))
