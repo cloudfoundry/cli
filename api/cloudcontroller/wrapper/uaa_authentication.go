@@ -1,6 +1,8 @@
 package wrapper
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -37,15 +39,32 @@ func (t *UAAAuthentication) Wrap(innerconnection cloudcontroller.Connection) clo
 // Make adds authentication headers to the passed in request and then calls the
 // wrapped connection's Make
 func (t *UAAAuthentication) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
+	var (
+		err            error
+		rawRequestBody []byte
+	)
+
+	if request.Body != nil {
+		rawRequestBody, err = ioutil.ReadAll(request.Body)
+		defer request.Body.Close()
+		if err != nil {
+			return err
+		}
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+	}
+
 	request.Header.Set("Authorization", t.client.AccessToken())
 
-	err := t.connection.Make(request, passedResponse)
+	err = t.connection.Make(request, passedResponse)
 	if _, ok := err.(cloudcontroller.InvalidAuthTokenError); ok {
 		err = t.client.RefreshToken()
 		if err != nil {
 			return err
 		}
 
+		if rawRequestBody != nil {
+			request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
+		}
 		request.Header.Set("Authorization", t.client.AccessToken())
 		err = t.connection.Make(request, passedResponse)
 	}
