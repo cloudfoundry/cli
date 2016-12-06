@@ -11,7 +11,7 @@ type commandList struct {
 	VerboseOrVersion                   bool                                         `short:"v" long:"version" description:"verbose and version flag"`
 	App                                v2.AppCommand                                `command:"app" description:"Display health and status for app"`
 	Help                               HelpCommand                                  `command:"help" alias:"h" description:"Show help"`
-	Version                            v2.VersionCommand                            `command:"version" description:"Print the version"`
+	Version                            VersionCommand                               `command:"version" description:"Print the version"`
 	Login                              v2.LoginCommand                              `command:"login" alias:"l" description:"Log user in"`
 	Logout                             v2.LogoutCommand                             `command:"logout" alias:"lo" description:"Log user out"`
 	Passwd                             v2.PasswdCommand                             `command:"passwd" alias:"pw" description:"Change user password"`
