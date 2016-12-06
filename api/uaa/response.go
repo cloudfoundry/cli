@@ -8,3 +8,7 @@ type Response struct {
 	// RawResponse is the raw bytes of the HTTP Response
 	RawResponse []byte
 }
+
+func (r *Response) reset() {
+	r.RawResponse = []byte{}
+}
