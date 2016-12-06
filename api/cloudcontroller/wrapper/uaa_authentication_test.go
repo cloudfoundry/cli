@@ -3,7 +3,9 @@ package wrapper_test
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/cloudcontrollerfakes"
@@ -80,8 +82,25 @@ var _ = Describe("UAA Authentication", func() {
 		})
 
 		Context("when the token is invalid", func() {
+			var expectedBody string
+
 			BeforeEach(func() {
-				fakeConnection.MakeReturns(cloudcontroller.InvalidAuthTokenError{})
+				expectedBody = "this body content should be preserved"
+				request.Body = ioutil.NopCloser(strings.NewReader(expectedBody))
+
+				makeCount := 0
+				fakeConnection.MakeStub = func(request *http.Request, response *cloudcontroller.Response) error {
+					body, err := ioutil.ReadAll(request.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(string(body)).To(Equal(expectedBody))
+
+					if makeCount == 0 {
+						makeCount += 1
+						return cloudcontroller.InvalidAuthTokenError{}
+					} else {
+						return nil
+					}
+				}
 
 				count := 0
 				fakeClient.AccessTokenStub = func() string {
@@ -89,7 +108,8 @@ var _ = Describe("UAA Authentication", func() {
 					return fmt.Sprintf("foobar-%d", count)
 				}
 
-				wrapper.Make(request, nil)
+				err := wrapper.Make(request, nil)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("should refresh the token", func() {
