@@ -4996,6 +4996,10 @@
     "translation": "提示:\n   使用 'CF_NAME create-user-provided-service'，讓使用者提供的服務可供 CF 應用程式使用"
   },
   {
+    "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
     "translation": "提示: 除非已重新啟動現有執行中應用程式，否則不會對它們套用變更。"
   },

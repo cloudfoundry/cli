@@ -4996,6 +4996,10 @@
     "translation": "CONSEJO:\n   Utilice 'CF_NAME create-user-provided-service' para que los servicios proporcionados por el usuario estén disponibles para las app de CF"
   },
   {
+    "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
     "translation": "CONSEJO: Los cambios no se aplicarán a aplicaciones en ejecución existentes hasta que se reinicien."
   },

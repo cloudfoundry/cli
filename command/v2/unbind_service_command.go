@@ -34,7 +34,7 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(client)
+	cmd.Actor = v2action.NewActor(client, nil)
 
 	return nil
 }

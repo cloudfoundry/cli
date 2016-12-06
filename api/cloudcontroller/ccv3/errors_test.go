@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("Cloud Controller Connection", func() {
+var _ = Describe("Error Wrapper", func() {
 	var (
 		response           string
 		serverResponseCode int

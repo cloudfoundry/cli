@@ -1000,6 +1000,10 @@
     "translation": "TIMEOUT"
   },
   {
+    "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
     "id": "Task workers are unavailable.",
     "translation": ""
   },

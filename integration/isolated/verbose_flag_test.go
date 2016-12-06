@@ -45,9 +45,8 @@ var _ = Describe("Verbose", func() {
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
 				tmpDir, err := ioutil.TempDir("", "")
-				Expect(err).NotTo(HaveOccurred())
-
 				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
 
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
@@ -58,10 +57,18 @@ var _ = Describe("Verbose", func() {
 					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
-				command := []string{"delete-orphaned-routes", "-f"}
+
+				// We use 'create-user' because it makes a request via the UAA client
+				// and a request via the CC client, testing the logging wrapper in both
+				// clients.
+				randomUsername := helpers.PrefixedRandomName("user")
+				randomPassword := helpers.PrefixedRandomName("password")
+				command := []string{"create-user", randomUsername, randomPassword}
+
 				if flag {
 					command = append(command, "-v")
 				}
+
 				if configTrace != "" {
 					if string(configTrace[0]) == "/" {
 						configTrace = filepath.Join(tmpDir, configTrace)
@@ -69,10 +76,14 @@ var _ = Describe("Verbose", func() {
 					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
+
 				session := helpers.CFWithEnv(envMap, command...)
 
 				Eventually(session).Should(Say("REQUEST:"))
-				Eventually(session).Should(Say("GET /v2/spaces"))
+				Eventually(session).Should(Say("POST /Users"))
+				Eventually(session).Should(Say("RESPONSE:"))
+				Eventually(session).Should(Say("REQUEST:"))
+				Eventually(session).Should(Say("POST /v2/users"))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Exit(0))
 			},
@@ -97,9 +108,8 @@ var _ = Describe("Verbose", func() {
 		DescribeTable("displays verbose output to multiple files",
 			func(env string, configTrace string, flag bool, location []string) {
 				tmpDir, err := ioutil.TempDir("", "")
-				Expect(err).NotTo(HaveOccurred())
-
 				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
 
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
@@ -110,7 +120,14 @@ var _ = Describe("Verbose", func() {
 					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
-				command := []string{"delete-orphaned-routes", "-f"}
+
+				// We use 'create-user' because it makes a request via the UAA client
+				// and a request via the CC client, testing the logging wrapper in both
+				// clients.
+				randomUsername := helpers.PrefixedRandomName("user")
+				randomPassword := helpers.PrefixedRandomName("password")
+				command := []string{"create-user", randomUsername, randomPassword}
+
 				if flag {
 					command = append(command, "-v")
 				}
@@ -122,18 +139,24 @@ var _ = Describe("Verbose", func() {
 					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
+
 				session := helpers.CFWithEnv(envMap, command...)
 				Eventually(session).Should(Exit(0))
 
 				for _, filePath := range location {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
+
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
-					Expect(string(contents)).To(MatchRegexp("GET /v2/spaces"))
+					Expect(string(contents)).To(MatchRegexp("POST /Users"))
+					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+					Expect(string(contents)).To(MatchRegexp("POST /v2/users"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
 
 					stat, err := os.Stat(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
+
 					if runtime.GOOS == "windows" {
 						Expect(stat.Mode().String()).To(Equal(os.FileMode(0666).String()))
 					} else {
@@ -162,9 +185,8 @@ var _ = Describe("Verbose", func() {
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
 				tmpDir, err := ioutil.TempDir("", "")
-				Expect(err).NotTo(HaveOccurred())
-
 				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
 
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
@@ -175,10 +197,13 @@ var _ = Describe("Verbose", func() {
 					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
+
 				command := []string{"run-task", "app", "echo"}
+
 				if flag {
 					command = append(command, "-v")
 				}
+
 				if configTrace != "" {
 					if string(configTrace[0]) == "/" {
 						configTrace = filepath.Join(tmpDir, configTrace)
@@ -186,6 +211,7 @@ var _ = Describe("Verbose", func() {
 					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
+
 				session := helpers.CFWithEnv(envMap, command...)
 
 				Eventually(session).Should(Say("REQUEST:"))
@@ -214,9 +240,8 @@ var _ = Describe("Verbose", func() {
 		DescribeTable("displays verbose output to multiple files",
 			func(env string, configTrace string, flag bool, location []string) {
 				tmpDir, err := ioutil.TempDir("", "")
-				Expect(err).NotTo(HaveOccurred())
-
 				defer os.RemoveAll(tmpDir)
+				Expect(err).NotTo(HaveOccurred())
 
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
@@ -227,7 +252,9 @@ var _ = Describe("Verbose", func() {
 					}
 					envMap = map[string]string{"CF_TRACE": env}
 				}
+
 				command := []string{"run-task", "app", "echo"}
+
 				if flag {
 					command = append(command, "-v")
 				}
@@ -239,18 +266,21 @@ var _ = Describe("Verbose", func() {
 					session := helpers.CF("config", "--trace", configTrace)
 					Eventually(session).Should(Exit(0))
 				}
+
 				session := helpers.CFWithEnv(envMap, command...)
 				Eventually(session).Should(Exit(1))
 
 				for _, filePath := range location {
 					contents, err := ioutil.ReadFile(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
+
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("GET /v3/apps"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
 
 					stat, err := os.Stat(tmpDir + filePath)
 					Expect(err).ToNot(HaveOccurred())
+
 					if runtime.GOOS == "windows" {
 						Expect(stat.Mode().String()).To(Equal(os.FileMode(0666).String()))
 					} else {

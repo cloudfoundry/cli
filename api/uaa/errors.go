@@ -2,6 +2,36 @@ package uaa
 
 import "fmt"
 
+// RawHTTPStatusError wraps HTTP responses with 4xx and 5xx status codes.
+type RawHTTPStatusError struct {
+	StatusCode  int
+	RawResponse []byte
+}
+
+func (r RawHTTPStatusError) Error() string {
+	return fmt.Sprintf("Error Code: %d\nRaw Response: %s", r.StatusCode, r.RawResponse)
+}
+
+// UAAErrorResponse represents a generic UAA error response.
+type UAAErrorResponse struct {
+	Type        string `json:"error"`
+	Description string `json:"error_description"`
+}
+
+func (e UAAErrorResponse) Error() string {
+	return fmt.Sprintf("Error Type: %s\nDescription: %s", e.Type, e.Description)
+}
+
+// ConflictError is returned when the response status code is 409. It
+// represents when there is a conflict in the state of the requested resource.
+type ConflictError struct {
+	Message string
+}
+
+func (e ConflictError) Error() string {
+	return e.Message
+}
+
 // UnverifiedServerError replaces x509.UnknownAuthorityError when the server
 // has SSL but the client is unable to verify it's certificate
 type UnverifiedServerError struct {
@@ -21,12 +51,12 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
-// Error is an error returned by the UAA
-type Error struct {
-	Type        string `json:"error"`
-	Description string `json:"error_description"`
+// InvalidAuthTokenError is returned when the client has an invalid
+// authorization header.
+type InvalidAuthTokenError struct {
+	Message string
 }
 
-func (r Error) Error() string {
-	return fmt.Sprintf("Error Type: %s\nDescription: %s", r.Type, r.Description)
+func (e InvalidAuthTokenError) Error() string {
+	return e.Message
 }

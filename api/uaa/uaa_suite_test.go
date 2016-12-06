@@ -3,15 +3,14 @@ package uaa_test
 import (
 	"bytes"
 	"log"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/ghttp"
-
 	"testing"
 
 	. "code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/api/uaa/uaafakes"
+	"code.cloudfoundry.org/cli/api/uaa/wrapper"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/ghttp"
 )
 
 func TestUaa(t *testing.T) {
@@ -40,11 +39,13 @@ var _ = BeforeEach(func() {
 
 func NewTestUAAClientAndStore() (*Client, *uaafakes.FakeAuthenticationStore) {
 	fakeStore := new(uaafakes.FakeAuthenticationStore)
-	return NewClient(Config{
+	client := NewClient(Config{
 		URL:               server.URL(),
 		SkipSSLValidation: true,
 		Store:             fakeStore,
 		AppName:           "CF CLI UAA API Test",
 		AppVersion:        "Unknown",
-	}), fakeStore
+	})
+	client.WrapConnection(wrapper.NewErrorWrapper())
+	return client, fakeStore
 }

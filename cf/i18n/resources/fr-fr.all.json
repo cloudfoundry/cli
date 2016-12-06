@@ -4996,6 +4996,10 @@
     "translation": "ASTUCE :\n Utilisez 'CF_NAME create-user-provided-service' pour mettre les services fournis par l'utilisateur à la disposition des applications CF"
   },
   {
+    "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
     "id": "TIP: Changes will not apply to existing running applications until they are restarted.",
     "translation": "ASTUCE : les modifications ne sont pas appliquées aux applications en cours d'exécution existantes tant que ces dernières ne sont pas redémarrées."
   },

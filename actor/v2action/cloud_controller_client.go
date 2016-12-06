@@ -15,4 +15,5 @@ type CloudControllerClient interface {
 	GetSharedDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
 	GetSpaceRoutes(spaceGUID string, queries []ccv2.Query) ([]ccv2.Route, ccv2.Warnings, error)
 	GetSpaceServiceInstances(spaceGUID string, includeUserProvidedServices bool, queries []ccv2.Query) ([]ccv2.ServiceInstance, ccv2.Warnings, error)
+	NewUser(uaaUserID string) (ccv2.User, ccv2.Warnings, error)
 }

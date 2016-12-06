@@ -1456,6 +1456,10 @@
     "translation": ""
   },
   {
+    "id": "TIP: Assign roles with '{{.BinaryName}} set-org-role' and '{{.BinaryName}} set-space-role'.",
+    "translation": ""
+  },
+  {
     "id": "Tags: {{.Tags}}",
     "translation": "Tags: {{.Tags}}"
   },

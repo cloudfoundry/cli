@@ -41,8 +41,9 @@ func NewConnection(config Config) *CloudControllerConnection {
 }
 
 func (connection *CloudControllerConnection) Make(request *http.Request, passedResponse *Response) error {
-	// In case this function is called from a retry,  passedResponse may already be populated with a previous response
-	// We reset in case there's an HTTP error and we don't repopulate it in populateResponse
+	// In case this function is called from a retry, passedResponse may already
+	// be populated with a previous response. We reset in case there's an HTTP
+	// error and we don't repopulate it in populateResponse.
 	passedResponse.reset()
 
 	response, err := connection.HTTPClient.Do(request)
@@ -70,6 +71,8 @@ func (connection *CloudControllerConnection) processRequestErrors(request *http.
 func (connection *CloudControllerConnection) populateResponse(response *http.Response, passedResponse *Response) error {
 	passedResponse.HTTPResponse = response
 
+	// The cloud controller returns warnings with key "X-Cf-Warnings", and the
+	// value is a comma seperated string.
 	if rawWarnings := response.Header.Get("X-Cf-Warnings"); rawWarnings != "" {
 		passedResponse.Warnings = []string{}
 		for _, warning := range strings.Split(rawWarnings, ",") {

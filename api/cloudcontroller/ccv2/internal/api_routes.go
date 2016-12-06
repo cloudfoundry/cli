@@ -19,6 +19,7 @@ const (
 	ServiceInstancesRequest       = "ServiceInstances"
 	SharedDomainRequest           = "SharedDomain"
 	SpaceServiceInstancesRequest  = "SpaceServiceInstances"
+	UsersRequest                  = "Users"
 )
 
 var APIRoutes = rata.Routes{
@@ -34,4 +35,5 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: SharedDomainRequest},
 	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: SpaceServiceInstancesRequest},
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: RoutesFromSpaceRequest},
+	{Path: "/v2/users", Method: http.MethodPost, Name: UsersRequest},
 }
