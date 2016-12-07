@@ -3,5 +3,5 @@
 set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 $@ integration
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 $@ integration/isolated
 $DIR/cleanup-integration
