@@ -247,10 +247,14 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 	var connectionStatus atomic.Value
 	connectionStatus.Store(NoConnection)
 
+	var once sync.Once
+
 	onConnect := func() {
 		if connectionStatus.Load() != StoppedTrying {
 			connectionStatus.Store(ConnectionWasEstablished)
-			startWait.Done()
+			once.Do(func() {
+				startWait.Done()
+			})
 		}
 	}
 
