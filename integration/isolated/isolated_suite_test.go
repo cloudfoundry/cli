@@ -26,9 +26,9 @@ var (
 	homeDir string
 )
 
-func TestIntegration(t *testing.T) {
+func TestIsolated(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Integration Suite")
+	RunSpecs(t, "Isolated Integration Suite")
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
