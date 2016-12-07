@@ -15,8 +15,8 @@ fi
 
 cf auth $CF_USERNAME $CF_PASSWORD
 
-cf orgs | grep -i ^integration-org | xargs -L 1 -P 5 cf delete-org -f
-cf orgs | grep -i ^integration-org | xargs -L 1 -P 5 cf delete-org -f #done twice due to flakiness
+cf orgs | grep -i ^integration-org | xargs -L 1 -P 4 cf delete-org -f
+cf orgs | grep -i ^integration-org | xargs -L 1 -P 4 cf delete-org -f #done twice due to flakiness
 
 cf quotas | grep -i ^integration-quota | cut -d " " -f1 | xargs -L 1 -P 5 cf delete-quota -f
 
