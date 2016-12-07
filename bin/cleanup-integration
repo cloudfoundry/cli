@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -ex
-set -o pipefail
 
 CF_API=${CF_API:-"api.bosh-lite.com"}
 CF_USERNAME=${CF_USERNAME:-"admin"}
