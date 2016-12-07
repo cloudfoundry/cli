@@ -13,8 +13,8 @@ import (
 var _ = Describe("Token Refreshing", func() {
 	Context("when running a v2 command with an invalid token", func() {
 		BeforeEach(func() {
-			Skip("skip #133310639")
-			loginCF()
+			helpers.RunIfExperimental("remove in #133310639")
+			helpers.LoginCF()
 
 			config, err := configv3.LoadConfig()
 			Expect(err).ToNot(HaveOccurred())
@@ -34,7 +34,7 @@ var _ = Describe("Token Refreshing", func() {
 
 	Context("when running a v3 command with an invalid token", func() {
 		BeforeEach(func() {
-			loginCF()
+			helpers.LoginCF()
 
 			config, err := configv3.LoadConfig()
 			Expect(err).ToNot(HaveOccurred())

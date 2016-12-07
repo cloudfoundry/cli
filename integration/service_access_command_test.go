@@ -9,10 +9,6 @@ import (
 )
 
 var _ = Describe("service-access command", func() {
-	BeforeEach(func() {
-		setAPI()
-	})
-
 	Context("when the environment is setup correctly", func() {
 		var (
 			orgName   string

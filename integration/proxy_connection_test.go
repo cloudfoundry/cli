@@ -9,17 +9,26 @@ import (
 )
 
 var _ = Describe("proxy", func() {
-	var proxyURL, apiRegexp string
+	var proxyURL string
 
 	BeforeEach(func() {
-		proxyURL = "127.0.0.1:9999"
-		apiRegexp = "(?:https:\\/\\/)*" + apiURL
+		proxyURL = "http://127.0.0.1:9999"
 	})
 
 	Context("V2 Legacy", func() {
 		It("handles a proxy", func() {
+			helpers.SkipIfExperimental("error messages have changed in refactored code")
 			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "api", apiURL)
-			Eventually(session).Should(Say("Error performing request: Get %s\\/v2\\/info: http: error connecting to proxy http:\\/\\/%s", apiRegexp, proxyURL))
+			Eventually(session).Should(Say("Error performing request: Get %s/v2/info: http: error connecting to proxy %s", apiURL, proxyURL))
+			Eventually(session).Should(Exit(1))
+		})
+	})
+
+	Context("V2", func() {
+		It("handles a proxy", func() {
+			helpers.RunIfExperimental("remove after #133310639")
+			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "api", apiURL)
+			Eventually(session.Err).Should(Say("Get %s/v2/info: http: error connecting to proxy %s", apiURL, proxyURL))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -27,7 +36,7 @@ var _ = Describe("proxy", func() {
 	Context("V3", func() {
 		It("handles a proxy", func() {
 			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "run-task", "app", "echo")
-			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy http:\\/\\/%s", apiRegexp, proxyURL))
+			Eventually(session.Err).Should(Say("Get %s: http: error connecting to proxy %s", apiURL, proxyURL))
 			Eventually(session).Should(Exit(1))
 		})
 	})

@@ -59,7 +59,7 @@ var _ = Describe("custom oauth client id", func() {
 
 			Context("auth", func() {
 				It("uses the custom client id and secret", func() {
-					username, password := getCredentials()
+					username, password := helpers.GetCredentials()
 					session := helpers.CF("auth", username, password)
 					Eventually(session).Should(Exit(1))
 					Expect(session.Out).To(Say(
@@ -69,7 +69,7 @@ var _ = Describe("custom oauth client id", func() {
 
 			Context("login", func() {
 				It("uses the custom client id and secret", func() {
-					username, password := getCredentials()
+					username, password := helpers.GetCredentials()
 					session := helpers.CF("login", "-u", username, "-p", password)
 					Eventually(session).Should(Exit(1))
 					Expect(session.Out).To(Say(
