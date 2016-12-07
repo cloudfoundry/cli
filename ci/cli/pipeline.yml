@@ -22,6 +22,7 @@ resources:
     uri: https://github.com/cloudfoundry/cli
     branch: master
     paths:
+    - bin
     - ci
 
 - name: cli-acceptance-tests
@@ -308,37 +309,38 @@ jobs:
       resource: bosh-lites-dea-pool
       params:
         acquire: true
-  - aggregate:
-    - do:
-      - task: linux-integration
-        file: cli-ci/ci/cli/tasks/integration-linux.yml
-        ensure:
-          task: cleanup-integration
-          file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      - task: linux-gats
-        file: cli-ci/ci/cli/tasks/gats-linux.yml
-      - task: windows-integration
-        file: cli-ci/ci/cli/tasks/integration-windows.yml
-        ensure:
-          task: cleanup-integration
-          file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-      - task: windows-gats
-        file: cli-ci/ci/cli/tasks/gats-windows.yml
-        params:
-          ADMIN_USER: {{bosh-lite-admin-username}}
-          ADMIN_PASSWORD: {{bosh-lite-admin-password}}
-          GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites -skipPackage application ./gats
-      - task: windows-gats-application
-        file: cli-ci/ci/cli/tasks/gats-windows.yml
-        params:
-          ADMIN_USER: {{bosh-lite-admin-username}}
-          ADMIN_PASSWORD: {{bosh-lite-admin-password}}
-          GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites ./gats/application
-      on_failure:
-         put: slack-alert
-         params:
-           channel: '#cli-firehose'
-           text: "gats failed OR errored :("
+  - do:
+    - task: cleanup-integration
+      file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: linux-integration
+      file: cli-ci/ci/cli/tasks/integration-linux.yml
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: linux-gats
+      file: cli-ci/ci/cli/tasks/gats-linux.yml
+    - task: windows-integration
+      file: cli-ci/ci/cli/tasks/integration-windows.yml
+      ensure:
+        task: cleanup-integration
+        file: cli-ci/ci/cli/tasks/cleanup-integration.yml
+    - task: windows-gats
+      file: cli-ci/ci/cli/tasks/gats-windows.yml
+      params:
+        ADMIN_USER: {{bosh-lite-admin-username}}
+        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+        GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites -skipPackage application ./gats
+    - task: windows-gats-application
+      file: cli-ci/ci/cli/tasks/gats-windows.yml
+      params:
+        ADMIN_USER: {{bosh-lite-admin-username}}
+        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
+        GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites ./gats/application
+    on_failure:
+       put: slack-alert
+       params:
+         channel: '#cli-firehose'
+         text: "gats failed OR errored :("
     ensure:
       put: bosh-lites-dea-pool
       params:
