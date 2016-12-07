@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
 xargs_func () {
   if [[ $(uname) == "Darwin" ]]; then

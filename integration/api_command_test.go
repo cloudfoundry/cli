@@ -21,7 +21,7 @@ import (
 
 var _ = Describe("API Command", func() {
 	BeforeEach(func() {
-		Skip("Skipping until #126256625 is complete")
+		helpers.RunIfExperimental("remove in #133310639")
 	})
 
 	Context("no arguments", func() {
@@ -30,7 +30,7 @@ var _ = Describe("API Command", func() {
 				It("outputs the current api", func() {
 					session := helpers.CF("api")
 
-					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", getAPI()))
+					Eventually(session.Out).Should(Say("API endpoint:\\s+%s", apiURL))
 					Eventually(session.Out).Should(Say("API version:\\s+\\d+\\.\\d+\\.\\d+"))
 					Eventually(session).Should(Exit(0))
 				})
@@ -155,25 +155,25 @@ var _ = Describe("API Command", func() {
 			})
 
 			It("warns about skip SSL", func() {
-				command := exec.Command("cf", "api", getAPI())
+				command := exec.Command("cf", "api", apiURL)
 				session, err := Start(command, GinkgoWriter, GinkgoWriter)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", getAPI()))
-				Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", getAPI()))
+				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
+				Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))
 			})
 
 			It("sets the API endpoint", func() {
-				command := exec.Command("cf", "api", getAPI(), "--skip-ssl-validation")
+				command := exec.Command("cf", "api", apiURL, "--skip-ssl-validation")
 				session, err := Start(command, GinkgoWriter, GinkgoWriter)
 				Expect(err).NotTo(HaveOccurred())
 
-				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", getAPI()))
+				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
 				Eventually(session.Out).Should(Say("OK"))
-				Eventually(session.Out).Should(Say("API endpoint:\\s+%s", getAPI()))
+				Eventually(session.Out).Should(Say("API endpoint:\\s+%s", apiURL))
 				Eventually(session.Out).Should(Say("API version:\\s+\\d+\\.\\d+\\.\\d+"))
 				Eventually(session).Should(Exit(0))
 			})
@@ -230,7 +230,7 @@ var _ = Describe("API Command", func() {
 		})
 
 		It("sets SSL Disabled in the config file to true", func() {
-			command := exec.Command("cf", "api", getAPI(), "--skip-ssl-validation")
+			command := exec.Command("cf", "api", apiURL, "--skip-ssl-validation")
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(Exit(0))
@@ -254,11 +254,11 @@ var _ = Describe("API Command", func() {
 		})
 
 		It("logs in without any warnings", func() {
-			command := exec.Command("cf", "api", getAPI())
+			command := exec.Command("cf", "api", apiURL)
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 
-			Eventually(session.Out).Should(Say("Setting api endpoint to %s...", getAPI()))
+			Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
 			Consistently(session.Out).ShouldNot(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
 			Eventually(session.Out).Should(Say("OK"))
 			Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
@@ -266,7 +266,7 @@ var _ = Describe("API Command", func() {
 		})
 
 		It("sets SSL Disabled in the config file to false", func() {
-			command := exec.Command("cf", "api", getAPI(), skipSSLValidation)
+			command := exec.Command("cf", "api", apiURL, skipSSLValidation)
 			session, err := Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(Exit(0))
@@ -283,7 +283,7 @@ var _ = Describe("API Command", func() {
 	})
 
 	It("sets the config file", func() {
-		command := exec.Command("cf", "api", getAPI(), skipSSLValidation)
+		command := exec.Command("cf", "api", apiURL, skipSSLValidation)
 		session, err := Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(Exit(0))
@@ -296,7 +296,7 @@ var _ = Describe("API Command", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(configFile.ConfigVersion).To(Equal(3))
-		Expect(configFile.Target).To(Equal(getAPI()))
+		Expect(configFile.Target).To(Equal(apiURL))
 		Expect(configFile.APIVersion).To(MatchRegexp("\\d+\\.\\d+\\.\\d+"))
 		Expect(configFile.AuthorizationEndpoint).ToNot(BeEmpty())
 		Expect(configFile.LoggregatorEndpoint).To(MatchRegexp("^wss://"))
