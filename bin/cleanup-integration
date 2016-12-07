@@ -2,6 +2,14 @@
 
 set -ex
 
+xargs_func () {
+  if [[ $(uname) == "Darwin" ]]; then
+    xargs -L 1 -P 4 $@
+  else
+    xargs -L 1 -P 4 -r $@
+  fi
+}
+
 CF_API=${CF_API:-"api.bosh-lite.com"}
 CF_USERNAME=${CF_USERNAME:-"admin"}
 CF_PASSWORD=${CF_PASSWORD:-"admin"}
@@ -14,13 +22,13 @@ fi
 
 cf auth $CF_USERNAME $CF_PASSWORD
 
-cf orgs | grep -i ^integration-org | xargs -L 1 -P 4 cf delete-org -f
-cf orgs | grep -i ^integration-org | xargs -L 1 -P 4 cf delete-org -f #done twice due to flakiness
+cf orgs | grep -i ^integration-org | xargs_func cf delete-org -f
+cf orgs | grep -i ^integration-org | xargs_func cf delete-org -f
 
-cf quotas | grep -i ^integration-quota | cut -d " " -f1 | xargs -L 1 -P 5 cf delete-quota -f
+cf quotas | grep -i ^integration-quota | cut -d " " -f1 | xargs_func cf delete-quota -f
 
 cf create-org temp-org
 cf target -o temp-org
-cf domains | grep -i ^integration- | cut -d " " -f1 | xargs -L 1 -P 5 cf delete-shared-domain -f
+cf domains | grep -i ^integration- | cut -d " " -f1 | xargs_func cf delete-shared-domain -f
 
 cf delete-org -f temp-org
