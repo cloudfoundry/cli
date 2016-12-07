@@ -311,6 +311,41 @@ var _ = Describe("start command", func() {
 				cmd.TailStagingLogs(defaultAppForStart, make(chan bool, 1), startWait, doneWait)
 			})
 		})
+
+		Context("when the noaa library reconnects", func() {
+			var app models.Application
+			BeforeEach(func() {
+				app = defaultAppForStart
+				app.PackageState = "FAILED"
+				app.StagingFailedReason = "BLAH, FAILED"
+
+				requirementsFactory.NewLoginRequirementReturns(requirements.Passing{})
+				requirementsFactory.NewTargetedSpaceRequirementReturns(requirements.Passing{})
+				applicationReq := new(requirementsfakes.FakeApplicationRequirement)
+				applicationReq.GetApplicationReturns(app)
+				requirementsFactory.NewApplicationRequirementReturns(applicationReq)
+
+				appRepo.GetAppReturns(app, nil)
+				appRepo.UpdateReturns(app, nil)
+
+				cmd := commandregistry.Commands.FindCommand("start").(*Start)
+				cmd.StagingTimeout = 1
+				cmd.PingerThrottle = 1
+				cmd.StartupTimeout = 1
+				commandregistry.Register(cmd)
+
+				logRepo.TailLogsForStub = func(appGUID string, onConnect func(), logChan chan<- logs.Loggable, errChan chan<- error) {
+					onConnect()
+					onConnect()
+					onConnect()
+				}
+				updateCommandDependency(logRepo)
+			})
+
+			It("it doesn't cause a negative wait group - github#1019", func() {
+				testcmd.RunCLICommandWithoutDependency("start", []string{"my-app"}, requirementsFactory, ui)
+			})
+		})
 	})
 
 	Context("when logged in", func() {
