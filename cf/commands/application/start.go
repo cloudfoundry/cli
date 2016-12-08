@@ -248,13 +248,14 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 	connectionStatus.Store(NoConnection)
 
 	var once sync.Once
+	startWaitDone := func() {
+		startWait.Done()
+	}
 
 	onConnect := func() {
 		if connectionStatus.Load() != StoppedTrying {
 			connectionStatus.Store(ConnectionWasEstablished)
-			once.Do(func() {
-				startWait.Done()
-			})
+			once.Do(startWaitDone)
 		}
 	}
 
@@ -273,7 +274,7 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 			if connectionStatus.Load() == NoConnection {
 				connectionStatus.Store(StoppedTrying)
 				cmd.ui.Warn("timeout connecting to log server, no log will be shown")
-				startWait.Done()
+				once.Do(startWaitDone)
 				return
 			}
 		case msg, ok := <-c:
@@ -288,9 +289,7 @@ func (cmd *Start) TailStagingLogs(app models.Application, stopChan chan bool, st
 				if connectionStatus.Load() != ConnectionWasClosed {
 					cmd.ui.Warn(T("Warning: error tailing logs"))
 					cmd.ui.Say("%s", err)
-					if connectionStatus.Load() == NoConnection {
-						startWait.Done()
-					}
+					once.Do(startWaitDone)
 					return
 				}
 			}
