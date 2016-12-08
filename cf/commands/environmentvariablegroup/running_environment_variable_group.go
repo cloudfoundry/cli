@@ -1,11 +1,14 @@
 package environmentvariablegroup
 
 import (
+	"sort"
+
 	"code.cloudfoundry.org/cli/cf/api/environmentvariablegroups"
 	"code.cloudfoundry.org/cli/cf/commandregistry"
 	"code.cloudfoundry.org/cli/cf/configuration/coreconfig"
 	"code.cloudfoundry.org/cli/cf/flags"
 	. "code.cloudfoundry.org/cli/cf/i18n"
+	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/terminal"
 )
@@ -65,7 +68,9 @@ func (cmd *RunningEnvironmentVariableGroup) Execute(c flags.FlagContext) error {
 	cmd.ui.Ok()
 
 	table := cmd.ui.Table([]string{T("Variable Name"), T("Assigned Value")})
-	for _, envVar := range runningEnvVars {
+	sortedEnvVars := models.EnvironmentVariableList(runningEnvVars)
+	sort.Sort(sortedEnvVars)
+	for _, envVar := range sortedEnvVars {
 		table.Add(envVar.Name, envVar.Value)
 	}
 	err = table.Print()
