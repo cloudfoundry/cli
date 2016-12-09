@@ -139,6 +139,6 @@ type Assets struct {
 
 func NewAssets() Assets {
 	return Assets{
-		ServiceBroker: "assets/service_broker",
+		ServiceBroker: "../assets/service_broker",
 	}
 }
