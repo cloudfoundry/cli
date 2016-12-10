@@ -2,7 +2,6 @@ package v2action_test
 
 import (
 	"errors"
-	"fmt"
 
 	. "code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/actor/v2action/v2actionfakes"
@@ -77,31 +76,20 @@ var _ = Describe("User Actions", func() {
 		})
 
 		Context("when a create user request to the UAA returns an error", func() {
-			Context("when we get a 409 status code because the user already exists", func() {
-				BeforeEach(func() {
-					fakeUAAClient.NewUserReturns(
-						uaa.User{},
-						uaa.ConflictError{Message: "Username already in use: some-new-user"},
-					)
-				})
+			var returnedErr error
 
-				It("does not return an error and returns a user already exists warning", func() {
-					Expect(actualErr).NotTo(HaveOccurred())
-					Expect(actualWarnings).To(ConsistOf(fmt.Sprintf("user some-new-user already exists")))
-				})
+			BeforeEach(func() {
+				returnedErr = errors.New("some UAA error")
+				fakeUAAClient.NewUserReturns(
+					uaa.User{
+						ID: "new-user-uaa-id",
+					},
+					returnedErr,
+				)
 			})
 
-			Context("when the user does not exist", func() {
-				var returnedErr error
-
-				BeforeEach(func() {
-					returnedErr = errors.New("UAA error")
-					fakeUAAClient.NewUserReturns(uaa.User{}, returnedErr)
-				})
-
-				It("returns the error", func() {
-					Expect(actualErr).To(MatchError(returnedErr))
-				})
+			It("returns the same error", func() {
+				Expect(actualErr).To(MatchError(returnedErr))
 			})
 		})
 

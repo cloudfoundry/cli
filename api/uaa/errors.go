@@ -60,3 +60,21 @@ type InvalidAuthTokenError struct {
 func (e InvalidAuthTokenError) Error() string {
 	return e.Message
 }
+
+// InsufficientScopeError is returned when the client has insufficient scope
+type InsufficientScopeError struct {
+	Message string
+}
+
+func (e InsufficientScopeError) Error() string {
+	return e.Message
+}
+
+// InvalidSCIMResourceError is returned usually when the client tries to create an inproperly formatted username
+type InvalidSCIMResourceError struct {
+	Message string
+}
+
+func (e InvalidSCIMResourceError) Error() string {
+	return e.Message
+}
