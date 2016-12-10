@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/uaa"
 	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
@@ -53,14 +54,24 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 		return err
 	}
 
-	cmd.UI.DisplayText("Creating user {{.TargetUser}}...", map[string]interface{}{
+	cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{
 		"TargetUser": cmd.RequiredArgs.Username,
 	})
 
 	_, warnings, err := cmd.Actor.NewUser(cmd.RequiredArgs.Username, cmd.RequiredArgs.Password)
 	cmd.UI.DisplayWarnings(warnings)
+
 	if err != nil {
-		return err
+		if _, ok := err.(uaa.ConflictError); ok {
+			cmd.UI.DisplayWarning("user {{.User}} already exists", map[string]interface{}{
+				"User": cmd.RequiredArgs.Username,
+			})
+		} else {
+			cmd.UI.DisplayTextWithFlavor("Error creating user {{.User}}.", map[string]interface{}{
+				"User": cmd.RequiredArgs.Username,
+			})
+			return err
+		}
 	}
 
 	cmd.UI.DisplayOK()

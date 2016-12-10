@@ -1,11 +1,6 @@
 package v2action
 
-import (
-	"fmt"
-
-	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
-	"code.cloudfoundry.org/cli/api/uaa"
-)
+import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 
 // User represents a CLI user.
 type User ccv2.User
@@ -14,9 +9,6 @@ type User ccv2.User
 func (actor Actor) NewUser(username string, password string) (User, Warnings, error) {
 	uaaUser, err := actor.UAAClient.NewUser(username, password)
 	if err != nil {
-		if _, ok := err.(uaa.ConflictError); ok {
-			return User{}, Warnings{fmt.Sprintf("user %s already exists", username)}, nil
-		}
 		return User{}, nil, err
 	}
 

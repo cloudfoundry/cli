@@ -40,9 +40,19 @@ func convert(rawHTTPStatusErr uaa.RawHTTPStatusError) error {
 	}
 
 	switch rawHTTPStatusErr.StatusCode {
+	case http.StatusBadRequest: // 400
+		if uaaErrorResponse.Type == "invalid_scim_resource" {
+			return uaa.InvalidSCIMResourceError{Message: uaaErrorResponse.Description}
+		}
+		return rawHTTPStatusErr
 	case http.StatusUnauthorized: // 401
 		if uaaErrorResponse.Type == "invalid_token" {
 			return uaa.InvalidAuthTokenError{Message: uaaErrorResponse.Description}
+		}
+		return rawHTTPStatusErr
+	case http.StatusForbidden: // 403
+		if uaaErrorResponse.Type == "insufficient_scope" {
+			return uaa.InsufficientScopeError{Message: uaaErrorResponse.Description}
 		}
 		return rawHTTPStatusErr
 	case http.StatusConflict: // 409

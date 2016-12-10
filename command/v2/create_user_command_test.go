@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
+	"code.cloudfoundry.org/cli/api/uaa"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/commandfakes"
 	"code.cloudfoundry.org/cli/command/v2"
@@ -76,7 +77,6 @@ var _ = Describe("CreateUser Command", func() {
 						GUID: "new-user-cc-guid",
 					},
 					v2action.Warnings{
-						"user already exists",
 						"warning-2",
 					},
 					nil,
@@ -93,7 +93,6 @@ var _ = Describe("CreateUser Command", func() {
 
 				Expect(fakeUI.Out).To(Say(`
 Creating user some-user...
-user already exists
 warning-2
 OK
 
@@ -121,6 +120,29 @@ TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
 					Expect(executeErr).To(MatchError(returnedErr))
 					Expect(fakeUI.Err).To(Say("warning-1"))
 					Expect(fakeUI.Err).To(Say("warning-2"))
+				})
+			})
+
+			Context("when the error is a uaa.ConflictError", func() {
+				var returnedErr error
+
+				BeforeEach(func() {
+					returnedErr = uaa.ConflictError{}
+					fakeActor.NewUserReturns(
+						v2action.User{},
+						v2action.Warnings{
+							"warning-1",
+							"warning-2",
+						},
+						returnedErr,
+					)
+				})
+
+				It("displays the error and all warnings", func() {
+					Expect(executeErr).To(BeNil())
+					Expect(fakeUI.Err).To(Say("warning-1"))
+					Expect(fakeUI.Err).To(Say("warning-2"))
+					Expect(fakeUI.Err).To(Say("user some-user already exists"))
 				})
 			})
 		})
