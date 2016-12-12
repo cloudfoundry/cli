@@ -17,6 +17,10 @@ func NewRequestLoggerTerminalDisplay(ui UI) *RequestLoggerTerminalDisplay {
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayBody(body []byte) error {
+	if body == nil || len(body) == 0 {
+		return nil
+	}
+
 	sanitized, err := SanitizeJSON(body)
 	if err != nil {
 		display.ui.DisplayText(string(body))
@@ -42,7 +46,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayHost(name string) error {
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayRequestHeader(method string, uri string, httpProtocol string) error {
-	display.ui.DisplayText("{{.Method}} {{.URI}} {{.Proto}}}", map[string]interface{}{
+	display.ui.DisplayText("{{.Method}} {{.URI}} {{.Proto}}", map[string]interface{}{
 		"Method": method,
 		"URI":    uri,
 		"Proto":  httpProtocol,

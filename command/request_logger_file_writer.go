@@ -22,6 +22,10 @@ func NewRequestLoggerFileWriter(ui UI, filePaths []string) *RequestLoggerFileWri
 }
 
 func (display *RequestLoggerFileWriter) DisplayBody(body []byte) error {
+	if body == nil || len(body) == 0 {
+		return nil
+	}
+
 	sanitized, err := SanitizeJSON(body)
 	if err != nil {
 		return err
