@@ -1148,6 +1148,10 @@
     "translation": "Endpoint deprecated"
   },
   {
+    "id": "Error creating user {{.User}}.",
+    "translation": ""
+  },
+  {
     "id": "Error parsing response",
     "translation": "Error parsing response"
   },
@@ -1814,6 +1818,10 @@
   {
     "id": "timeout connecting to log server, no log will be shown",
     "translation": "timeout connecting to log server, no log will be shown"
+  },
+  {
+    "id": "user {{.User}} already exists",
+    "translation": ""
   },
   {
     "id": "username",
