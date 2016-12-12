@@ -61,8 +61,8 @@ var _ = Describe("Verbose", func() {
 				// We use 'create-user' because it makes a request via the UAA client
 				// and a request via the CC client, testing the logging wrapper in both
 				// clients.
-				randomUsername := helpers.PrefixedRandomName("user")
-				randomPassword := helpers.PrefixedRandomName("password")
+				randomUsername := helpers.RandomUsername()
+				randomPassword := helpers.RandomPassword()
 				command := []string{"create-user", randomUsername, randomPassword}
 
 				if flag {
@@ -124,8 +124,8 @@ var _ = Describe("Verbose", func() {
 				// We use 'create-user' because it makes a request via the UAA client
 				// and a request via the CC client, testing the logging wrapper in both
 				// clients.
-				randomUsername := helpers.PrefixedRandomName("user")
-				randomPassword := helpers.PrefixedRandomName("password")
+				randomUsername := helpers.RandomUsername()
+				randomPassword := helpers.RandomPassword()
 				command := []string{"create-user", randomUsername, randomPassword}
 
 				if flag {
