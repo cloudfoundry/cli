@@ -67,6 +67,25 @@ var _ = Describe("Request Logger File Writer", func() {
 				Expect(string(contents)).To(Equal(formatted))
 			})
 		})
+
+		Context("when the body is empty", func() {
+			It("does not write the body", func() {
+				err := display.DisplayBody(nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				err = display.Stop()
+				Expect(err).ToNot(HaveOccurred())
+
+				contents, err := ioutil.ReadFile(logFile1)
+				Expect(err).ToNot(HaveOccurred())
+				// display.Stop() writes "\n" to the file
+				Expect(string(contents)).To(Equal("\n"))
+
+				contents, err = ioutil.ReadFile(logFile2)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(contents)).To(Equal("\n"))
+			})
+		})
 	})
 
 	Describe("DisplayHeader", func() {

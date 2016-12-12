@@ -14,12 +14,14 @@ import (
 
 var _ = Describe("Request Logger Terminal Display", func() {
 	var (
+		out     *Buffer
 		fakeUI  *ui.UI
 		display *RequestLoggerTerminalDisplay
 	)
 
 	BeforeEach(func() {
-		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		out = NewBuffer()
+		fakeUI = ui.NewTestUI(nil, out, NewBuffer())
 		display = NewRequestLoggerTerminalDisplay(fakeUI)
 	})
 
@@ -34,6 +36,15 @@ var _ = Describe("Request Logger Terminal Display", func() {
 				err := display.DisplayBody([]byte(raw))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fakeUI.Out).To(Say(formatted))
+			})
+		})
+
+		Context("when the body is empty", func() {
+			It("does not display the body", func() {
+				err := display.DisplayBody(nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(out.Contents()).To(BeEmpty())
 			})
 		})
 	})
