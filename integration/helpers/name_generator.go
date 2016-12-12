@@ -8,6 +8,14 @@ func NewOrgName() string {
 	return PrefixedRandomName("INTEGRATION-ORG")
 }
 
+func RandomUsername() string {
+	return PrefixedRandomName("integration-user")
+}
+
+func RandomPassword() string {
+	return PrefixedRandomName("password")
+}
+
 func PrefixedRandomName(namePrefix string) string {
 	return namePrefix + "-" + RandomName()
 }

@@ -43,7 +43,7 @@ var _ = Describe("Token Refreshing", func() {
 
 				It("refreshes the token", func() {
 					username, _ := helpers.GetCredentials()
-					session := helpers.CF("create-user", username, helpers.PrefixedRandomName("password"))
+					session := helpers.CF("create-user", username, helpers.RandomPassword())
 					Eventually(session.Out).Should(Say(fmt.Sprintf("user %s already exists", username)))
 					Eventually(session).Should(Exit(0))
 				})
@@ -56,7 +56,7 @@ var _ = Describe("Token Refreshing", func() {
 
 				It("refreshes the token", func() {
 					username, _ := helpers.GetCredentials()
-					session := helpers.CF("create-user", username, helpers.PrefixedRandomName("password"))
+					session := helpers.CF("create-user", username, helpers.RandomPassword())
 					Eventually(session.Err).Should(Say(fmt.Sprintf("user %s already exists", username)))
 					Eventually(session).Should(Exit(0))
 				})

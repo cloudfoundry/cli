@@ -21,7 +21,7 @@ var _ = Describe("create-user command", func() {
 			})
 
 			It("fails with no API endpoint set message", func() {
-				session := helpers.CF("create-user", helpers.PrefixedRandomName("integration-user"), helpers.PrefixedRandomName("password"))
+				session := helpers.CF("create-user", helpers.RandomUsername(), helpers.RandomPassword())
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
 				Expect(session.Err).To(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
@@ -34,7 +34,7 @@ var _ = Describe("create-user command", func() {
 			})
 
 			It("fails with not logged in message", func() {
-				session := helpers.CF("create-user", helpers.PrefixedRandomName("integration-user"), helpers.PrefixedRandomName("password"))
+				session := helpers.CF("create-user", helpers.RandomUsername(), helpers.RandomPassword())
 				Eventually(session).Should(Exit(1))
 				Expect(session.Out).To(Say("FAILED"))
 				Expect(session.Err).To(Say("Not logged in. Use 'cf login' to log in."))
@@ -51,14 +51,14 @@ var _ = Describe("create-user command", func() {
 
 			BeforeEach(func() {
 				helpers.LoginCF()
-				noobUser := helpers.PrefixedRandomName("integration-user")
-				noobPassword := helpers.PrefixedRandomName("password")
+				noobUser := helpers.RandomUsername()
+				noobPassword := helpers.RandomPassword()
 				session := helpers.CF("create-user", noobUser, noobPassword)
 				Eventually(session).Should(Exit(0))
 				session = helpers.CF("auth", noobUser, noobPassword)
 				Eventually(session).Should(Exit(0))
-				newUser = helpers.PrefixedRandomName("integration-user")
-				newPassword = helpers.PrefixedRandomName("password")
+				newUser = helpers.RandomUsername()
+				newPassword = helpers.RandomPassword()
 			})
 
 			It("fails with insufficient scope error", func() {
@@ -78,7 +78,7 @@ var _ = Describe("create-user command", func() {
 			Context("when passed invalid username", func() {
 				DescribeTable("when passed funkyUsername",
 					func(funkyUsername string) {
-						session := helpers.CF("create-user", funkyUsername, helpers.PrefixedRandomName("password"))
+						session := helpers.CF("create-user", funkyUsername, helpers.RandomPassword())
 						Eventually(session).Should(Exit(1))
 						Expect(session.Out).To(Say("Error creating user %s.", funkyUsername))
 						Expect(session.Err).To(Say("Username must match pattern: \\[\\\\p\\{L\\}\\+0\\-9\\+\\\\\\-_\\.@'!\\]\\+"))
@@ -90,7 +90,7 @@ var _ = Describe("create-user command", func() {
 
 				Context("when the username is empty", func() {
 					It("fails with a username must be provided error", func() {
-						session := helpers.CF("create-user", "", helpers.PrefixedRandomName("password"))
+						session := helpers.CF("create-user", "", helpers.RandomPassword())
 						Eventually(session).Should(Exit(1))
 						Expect(session.Out).To(Say("Error creating user ."))
 						Expect(session.Err).To(Say("A username must be provided."))
@@ -105,8 +105,8 @@ var _ = Describe("create-user command", func() {
 					newPassword string
 				)
 				BeforeEach(func() {
-					newUser = helpers.PrefixedRandomName("integration-user")
-					newPassword = helpers.PrefixedRandomName("password")
+					newUser = helpers.RandomUsername()
+					newPassword = helpers.RandomPassword()
 					session := helpers.CF("create-user", newUser, newPassword)
 					Eventually(session).Should(Exit(0))
 				})
@@ -121,8 +121,8 @@ var _ = Describe("create-user command", func() {
 
 			Context("when the user does not already exist", func() {
 				It("creates the new user", func() {
-					newUser := helpers.PrefixedRandomName("integration-user")
-					newPassword := helpers.PrefixedRandomName("password")
+					newUser := helpers.RandomUsername()
+					newPassword := helpers.RandomPassword()
 					session := helpers.CF("create-user", newUser, newPassword)
 					Eventually(session).Should(Exit(0))
 					Expect(session.Out).To(Say("Creating user %s...", newUser))

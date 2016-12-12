@@ -132,17 +132,12 @@ id   name   state   start time   command
 					var user string
 
 					BeforeEach(func() {
-						user = helpers.PrefixedRandomName("USER")
-						password := helpers.PrefixedRandomName("PASSWORD")
+						user = helpers.RandomUsername()
+						password := helpers.RandomPassword()
 						Eventually(helpers.CF("create-user", user, password)).Should(Exit(0))
 						Eventually(helpers.CF("set-space-role", user, orgName, spaceName, "SpaceAuditor")).Should(Exit(0))
 						Eventually(helpers.CF("auth", user, password)).Should(Exit(0))
 						Eventually(helpers.CF("target", "-o", orgName, "-s", spaceName)).Should(Exit(0))
-					})
-
-					AfterEach(func() {
-						helpers.LoginCF()
-						Eventually(helpers.CF("delete-user", user, "-f")).Should(Exit(0))
 					})
 
 					It("does not display task commands", func() {
