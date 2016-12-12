@@ -30,6 +30,6 @@ run:
     popd
 
     cd $GOPATH/src/code.cloudfoundry.org/cli
-    CF_API=$API_ENDPOINT ginkgo -r -nodes=4 -slowSpecThreshold=30 -randomizeSuites integration/isolated
-    CF_API=$API_ENDPOINT ginkgo -r -slowSpecThreshold=30 -randomizeSuites integration/global
-    CF_API=$API_ENDPOINT ginkgo -r -slowSpecThreshold=30 -randomizeSuites integration/plugin
+    CF_API=$API_ENDPOINT ginkgo -r -nodes=4 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeSuites integration/isolated
+    CF_API=$API_ENDPOINT ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeSuites integration/global
+    CF_API=$API_ENDPOINT ginkgo -r -flakeAttempts=2 -slowSpecThreshold=30 -randomizeSuites integration/plugin
