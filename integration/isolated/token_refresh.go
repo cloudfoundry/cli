@@ -36,11 +36,30 @@ var _ = Describe("Token Refreshing", func() {
 		})
 
 		Context("when the UAA client encounters an invalid token response", func() {
-			It("refreshes the token", func() {
-				username, _ := helpers.GetCredentials()
-				session := helpers.CF("create-user", username, helpers.PrefixedRandomName("password"))
-				Eventually(session.Out).Should(Say(fmt.Sprintf("user %s already exists", username)))
-				Eventually(session).Should(Exit(0))
+			Context("when not experimental", func() {
+				BeforeEach(func() {
+					helpers.SkipIfExperimental("warnings written to stdout")
+				})
+
+				It("refreshes the token", func() {
+					username, _ := helpers.GetCredentials()
+					session := helpers.CF("create-user", username, helpers.PrefixedRandomName("password"))
+					Eventually(session.Out).Should(Say(fmt.Sprintf("user %s already exists", username)))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when experimental", func() {
+				BeforeEach(func() {
+					helpers.RunIfExperimental("warnings written to stderr")
+				})
+
+				It("refreshes the token", func() {
+					username, _ := helpers.GetCredentials()
+					session := helpers.CF("create-user", username, helpers.PrefixedRandomName("password"))
+					Eventually(session.Err).Should(Say(fmt.Sprintf("user %s already exists", username)))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})
