@@ -215,7 +215,7 @@ groups:
   jobs:
   - units
   - build-binaries
-  - gats
+  - integration
   - cats-linux
   - cats-diego
   - cats-windows
@@ -290,7 +290,7 @@ jobs:
     params:
       file: compiled/cf-cli-binaries.tgz
 
-- name: gats
+- name: integration
   serial: true
   plan:
   - aggregate:
@@ -317,24 +317,16 @@ jobs:
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: linux-gats
-      file: cli-ci/ci/cli/tasks/gats-linux.yml
     - task: windows-integration
       file: cli-ci/ci/cli/tasks/integration-windows.yml
       ensure:
         task: cleanup-integration
         file: cli-ci/ci/cli/tasks/cleanup-integration.yml
-    - task: windows-gats
-      file: cli-ci/ci/cli/tasks/gats-windows.yml
-      params:
-        ADMIN_USER: {{bosh-lite-admin-username}}
-        ADMIN_PASSWORD: {{bosh-lite-admin-password}}
-        GINKGO_ARGS: -slowSpecThreshold=120 -randomizeSuites ./gats
     on_failure:
        put: slack-alert
        params:
          channel: '#cli-firehose'
-         text: "gats failed OR errored :("
+         text: "integration failed OR errored :("
     ensure:
       put: bosh-lites-dea-pool
       params:
@@ -480,10 +472,10 @@ jobs:
   - aggregate:
     - get: cli
       trigger: true
-      passed: [cats-linux, cats-windows, cats-diego, gats]
+      passed: [cats-linux, cats-windows, cats-diego, integration]
       depth: 3
     - get: cf-cli-binaries
-      passed: [cats-linux, cats-windows, cats-diego, gats]
+      passed: [cats-linux, cats-windows, cats-diego, integration]
     - get: cli-ci
       depth: 3
   - task: extract-binaries
