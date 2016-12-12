@@ -4,5 +4,9 @@ set -x
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 $@ integration/isolated
+
+# The following two test suites **cannot** be run in parallel!!!
 ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 integration/global
+ginkgo -r -randomizeAllSpecs -slowSpecThreshold=30 integration/plugin
+
 $DIR/cleanup-integration

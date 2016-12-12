@@ -17,6 +17,7 @@ func SetHomeDir() string {
 	Expect(err).NotTo(HaveOccurred())
 
 	os.Setenv("CF_HOME", homeDir)
+	os.Setenv("CF_PLUGIN_HOME", homeDir)
 	return homeDir
 }
 
