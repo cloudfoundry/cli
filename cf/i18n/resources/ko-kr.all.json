@@ -2404,6 +2404,10 @@
     "translation": "사용자 {{.TargetUser}} 작성 중에 오류가 발생했습니다.\n{{.Error}}"
   },
   {
+    "id": "Error creating user {{.User}}.",
+    "translation": ""
+  },
+  {
     "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
     "translation": "{{.Name}} 빌드팩 삭제 중에 오류 발생\n{{.Error}}"
   },
@@ -6426,6 +6430,10 @@
   {
     "id": "user",
     "translation": "사용자"
+  },
+  {
+    "id": "user {{.User}} already exists",
+    "translation": ""
   },
   {
     "id": "user-provided",

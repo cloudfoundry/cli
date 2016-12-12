@@ -2404,6 +2404,10 @@
     "translation": "Erreur lors de la création de l'utilisateur {{.TargetUser}}.\n{{.Error}}"
   },
   {
+    "id": "Error creating user {{.User}}.",
+    "translation": ""
+  },
+  {
     "id": "Error deleting buildpack {{.Name}}\n{{.Error}}",
     "translation": "Erreur lors de la suppression du pack de construction {{.Name}}\n{{.Error}}"
   },
@@ -6426,6 +6430,10 @@
   {
     "id": "user",
     "translation": "utilisateur"
+  },
+  {
+    "id": "user {{.User}} already exists",
+    "translation": ""
   },
   {
     "id": "user-provided",

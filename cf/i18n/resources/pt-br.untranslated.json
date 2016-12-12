@@ -1196,6 +1196,10 @@
     "translation": "Endpoint deprecated"
   },
   {
+    "id": "Error creating user {{.User}}.",
+    "translation": ""
+  },
+  {
     "id": "Error parsing response",
     "translation": "Error parsing response"
   },
@@ -1982,6 +1986,10 @@
   {
     "id": "urls",
     "translation": "urls"
+  },
+  {
+    "id": "user {{.User}} already exists",
+    "translation": ""
   },
   {
     "id": "username",
