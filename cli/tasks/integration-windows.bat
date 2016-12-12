@@ -24,3 +24,4 @@ go get -v github.com/onsi/ginkgo/ginkgo
 cd %GATSPATH%
 ginkgo.exe -r -nodes=4 -slowSpecThreshold=30 -randomizeSuites ./integration/isolated
 ginkgo.exe -r -slowSpecThreshold=30 -randomizeSuites ./integration/global
+ginkgo.exe -r -slowSpecThreshold=30 -randomizeSuites ./integration/plugin
