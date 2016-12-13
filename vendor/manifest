@@ -56,7 +56,7 @@
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
-			"revision": "a283a10442df8dc09befd873fab202bf8a253d6a",
+			"revision": "881bee4e20a5d11a6a88a5667c6f292072ac1963",
 			"branch": "master",
 			"notests": true
 		},
@@ -166,7 +166,7 @@
 			"importpath": "github.com/docker/docker/pkg/term",
 			"repository": "https://github.com/docker/docker",
 			"vcs": "git",
-			"revision": "e6a97db2c932a2b80180c10f2896d7594108a406",
+			"revision": "39473dad5425d734fdc73df0a678c6edc3d4054b",
 			"branch": "master",
 			"path": "/pkg/term",
 			"notests": true
@@ -183,7 +183,7 @@
 			"importpath": "github.com/gogo/protobuf/gogoproto",
 			"repository": "https://github.com/gogo/protobuf",
 			"vcs": "git",
-			"revision": "e57a569e1882958f6b188cb42231d6db87701f2a",
+			"revision": "06ec6c31ff1bac6ed4e205a547a3d72934813ef3",
 			"branch": "master",
 			"path": "/gogoproto",
 			"notests": true
@@ -192,7 +192,7 @@
 			"importpath": "github.com/gogo/protobuf/proto",
 			"repository": "https://github.com/gogo/protobuf",
 			"vcs": "git",
-			"revision": "e57a569e1882958f6b188cb42231d6db87701f2a",
+			"revision": "06ec6c31ff1bac6ed4e205a547a3d72934813ef3",
 			"branch": "master",
 			"path": "proto",
 			"notests": true
@@ -201,7 +201,7 @@
 			"importpath": "github.com/golang/protobuf/proto",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
-			"revision": "874264fbbb43f4d91e999fecb4b40143ed611400",
+			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
 			"branch": "master",
 			"path": "/proto",
 			"notests": true
@@ -210,7 +210,7 @@
 			"importpath": "github.com/golang/protobuf/ptypes/any",
 			"repository": "https://github.com/golang/protobuf",
 			"vcs": "git",
-			"revision": "874264fbbb43f4d91e999fecb4b40143ed611400",
+			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
 			"branch": "master",
 			"path": "ptypes/any",
 			"notests": true
@@ -228,7 +228,7 @@
 			"importpath": "github.com/gorilla/websocket",
 			"repository": "https://github.com/gorilla/websocket",
 			"vcs": "git",
-			"revision": "5e2e56d5dfd46884df1036f828777ee6273f2cff",
+			"revision": "0868951cdb8e69bc42df4598bdc6164ff2f1a072",
 			"branch": "master",
 			"notests": true
 		},
@@ -397,7 +397,7 @@
 			"importpath": "gopkg.in/airbrake/gobrake.v2",
 			"repository": "https://gopkg.in/airbrake/gobrake.v2",
 			"vcs": "git",
-			"revision": "31c8ff1fb8b79a6947e6565e9a6df535f98a6b94",
+			"revision": "668876711219e8b0206e2994bf0a59d889c775aa",
 			"branch": "master",
 			"notests": true
 		},
@@ -405,7 +405,7 @@
 			"importpath": "gopkg.in/check.v1",
 			"repository": "https://gopkg.in/check.v1",
 			"vcs": "git",
-			"revision": "4f90aeace3a26ad7021961c297b22c42160c7b25",
+			"revision": "20d25e2804050c1cd24a7eea1e7a6447dd0e74ec",
 			"branch": "v1",
 			"notests": true
 		},
@@ -413,7 +413,7 @@
 			"importpath": "gopkg.in/gemnasium/logrus-airbrake-hook.v2",
 			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
 			"vcs": "git",
-			"revision": "31e6fd4bd5a98d8ee7673d24bc54ec73c31810dd",
+			"revision": "bfee1239d796830ca346767650cce5ba90d58c57",
 			"branch": "master",
 			"notests": true
 		},
@@ -421,7 +421,7 @@
 			"importpath": "gopkg.in/yaml.v2",
 			"repository": "https://gopkg.in/yaml.v2",
 			"vcs": "git",
-			"revision": "e4d366fc3c7938e2958e662b4258c7a89e1f0e3e",
+			"revision": "a5b47d31c556af34a302ce5d659e6fea44d90de0",
 			"branch": "v2",
 			"notests": true
 		}
