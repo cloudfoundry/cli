@@ -100,16 +100,14 @@ func (c *Test1) Run(cliConnection plugin.CliConnection, args []string) {
 	case "GetService":
 		result, _ := cliConnection.GetService(args[1])
 		fmt.Println("Done GetService:", result)
+	case "TestPluginCommandWithAlias", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF":
+		fmt.Println("You called Test Plugin Command With Alias!")
 	}
-
-	// } else if args[0] == "CLI-MESSAGE-UNINSTALL" {
-	// uninstalling()
-	// }
 }
 
 func (c *Test1) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name: "GatsPlugin",
+		Name: "CF-CLI-Integration-Test-Plugin",
 		Version: plugin.VersionType{
 			Major: 1,
 			Minor: 2,
@@ -148,6 +146,17 @@ func (c *Test1) GetMetadata() plugin.PluginMetadata {
 			{Name: "GetSpaceUsers"},
 			{Name: "GetServices"},
 			{Name: "GetService"},
+			{
+				Name:     "TestPluginCommandWithAlias",
+				Alias:    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+				HelpText: "This is my plugin help test. Banana.",
+				UsageDetails: plugin.Usage{
+					Usage: "I R Usage",
+					Options: map[string]string{
+						"--dis-flag": "is a flag",
+					},
+				},
+			},
 		},
 	}
 }
