@@ -19,7 +19,7 @@ pushd %CD%\cf-cli-binaries
 	MOVE %CD%\cf-cli_winx64.exe ..\cf.exe
 popd
 
-go get -v github.com/onsi/ginkgo/ginkgo
+go get -v -u github.com/onsi/ginkgo/ginkgo
 
 cd %GATSPATH%
 ginkgo.exe -r -nodes=4 -flakeAttempts=2 -slowSpecThreshold=30 -randomizeSuites ./integration/isolated

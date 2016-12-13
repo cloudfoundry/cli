@@ -21,7 +21,7 @@ run:
     export GOPATH=$PWD/go
     export PATH=$GOPATH/bin:$PATH
 
-    go get github.com/onsi/ginkgo/ginkgo
+    go get -u github.com/onsi/ginkgo/ginkgo
 
     pushd cf-cli-binaries
       tar xvzf cf-cli-binaries.tgz
