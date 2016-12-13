@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Plugin API", func() {
+var _ = Describe("plugin API", func() {
 	Describe("AccessToken", func() {
 		It("returns the access token", func() {
 			confirmTestPluginOutput("AccessToken", "bearer [\\w\\d\\.]+")

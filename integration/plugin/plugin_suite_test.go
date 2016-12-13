@@ -20,9 +20,11 @@ const (
 
 var (
 	// Suite Level
-	testPluginPath    string
-	apiURL            string
-	skipSSLValidation string
+	testPluginPath         string
+	overrideTestPluginPath string
+	panicTestPluginPath    string
+	apiURL                 string
+	skipSSLValidation      string
 
 	// Per Test Level
 	homeDir string
@@ -40,12 +42,17 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Setup common environment variables
 	helpers.TurnOffColors()
 
-	testPluginPath, err := Build("code.cloudfoundry.org/cli/integration/assets/test_plugin")
+	var err error
+	testPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin")
 	Expect(err).ToNot(HaveOccurred())
-	return []byte(testPluginPath)
-}, func(path []byte) {
-	testPluginPath = string(path)
 
+	overrideTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_command_overrides")
+	Expect(err).ToNot(HaveOccurred())
+
+	panicTestPluginPath, err = Build("code.cloudfoundry.org/cli/integration/assets/test_plugin_with_panic")
+	Expect(err).ToNot(HaveOccurred())
+	return nil
+}, func(path []byte) {
 	if GinkgoParallelNode() != 1 {
 		Fail("Test suite cannot run in parallel")
 	}
