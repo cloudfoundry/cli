@@ -175,7 +175,7 @@
 			"importpath": "github.com/fatih/color",
 			"repository": "https://github.com/fatih/color",
 			"vcs": "git",
-			"revision": "533cd7fd8a85905f67a1753afb4deddc85ea174f",
+			"revision": "bf82308e8c8546dc2b945157173eb8a959ae9505",
 			"branch": "master",
 			"notests": true
 		},
@@ -252,7 +252,7 @@
 			"importpath": "github.com/mattn/go-colorable",
 			"repository": "https://github.com/mattn/go-colorable",
 			"vcs": "git",
-			"revision": "bc69d6cebca8dd5675346a34a1c545b67dc74d5e",
+			"revision": "d228849504861217f796da67fae4f6e347643f15",
 			"branch": "master",
 			"notests": true
 		},
@@ -260,7 +260,7 @@
 			"importpath": "github.com/mattn/go-isatty",
 			"repository": "https://github.com/mattn/go-isatty",
 			"vcs": "git",
-			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"revision": "30a891c33c7cde7b02a981314b4228ec99380cca",
 			"branch": "master",
 			"notests": true
 		},
