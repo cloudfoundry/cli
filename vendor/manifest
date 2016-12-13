@@ -5,7 +5,7 @@
 			"importpath": "code.cloudfoundry.org/diego-ssh/server",
 			"repository": "https://github.com/cloudfoundry/diego-ssh",
 			"vcs": "git",
-			"revision": "46bd01f4f8219bd02f3c2e02c2565f7095dc4a2f",
+			"revision": "a3d710cd04a82f94d69378b03a3ba1851dede932",
 			"branch": "master",
 			"path": "/server",
 			"notests": true
@@ -23,7 +23,7 @@
 			"importpath": "code.cloudfoundry.org/gofileutils/fileutils",
 			"repository": "https://github.com/cloudfoundry/gofileutils",
 			"vcs": "git",
-			"revision": "68670d8076e64cabf01bd23efde055acc36a33c1",
+			"revision": "9cc1c2584bed48590cb019b4ac5b962b2a81278a",
 			"branch": "master",
 			"path": "/fileutils",
 			"notests": true
@@ -32,7 +32,7 @@
 			"importpath": "code.cloudfoundry.org/lager",
 			"repository": "https://github.com/cloudfoundry/lager",
 			"vcs": "git",
-			"revision": "62951a8009ab331bb21dc418074fa54e66eb9b6a",
+			"revision": "6cfe365fb6bb84343f0034b4a53cd250d173b61f",
 			"branch": "master",
 			"notests": true
 		},
