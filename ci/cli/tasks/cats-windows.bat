@@ -11,7 +11,7 @@ SET PATH=%CD%;%PATH%
 
 SET CONFIG=%CD%\cats-config\integration_config.json
 
-go get -v github.com/onsi/ginkgo/ginkgo
+go get -v -u github.com/onsi/ginkgo/ginkgo
 
 pushd %CD%\cf-cli-binaries
 	gzip -d cf-cli-binaries.tgz
