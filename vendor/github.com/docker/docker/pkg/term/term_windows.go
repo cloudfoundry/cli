@@ -44,9 +44,11 @@ func StdStreams() (stdIn io.ReadCloser, stdOut, stdErr io.Writer) {
 		if err = winterm.SetConsoleMode(fd, mode|enableVirtualTerminalInput); err != nil {
 			emulateStdin = true
 		} else {
-			winterm.SetConsoleMode(fd, mode)
 			vtInputSupported = true
 		}
+		// Unconditionally set the console mode back even on failure because SetConsoleMode
+		// remembers invalid bits on input handles.
+		winterm.SetConsoleMode(fd, mode)
 	}
 
 	fd = os.Stdout.Fd()
@@ -69,8 +71,9 @@ func StdStreams() (stdIn io.ReadCloser, stdOut, stdErr io.Writer) {
 		}
 	}
 
-	if os.Getenv("ConEmuANSI") == "ON" {
-		// The ConEmu terminal emulates ANSI on output streams well.
+	if os.Getenv("ConEmuANSI") == "ON" || os.Getenv("ConsoleZVersion") != "" {
+		// The ConEmu and ConsoleZ terminals emulate ANSI on output streams well.
+		emulateStdin = true
 		emulateStdout = false
 		emulateStderr = false
 	}

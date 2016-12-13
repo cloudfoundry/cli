@@ -8,19 +8,19 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"os"
-	"runtime"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
 
 const defaultAirbrakeHost = "https://airbrake.io"
-
-const statusTooManyRequests = 429
+const waitTimeout = 5 * time.Second
+const httpStatusTooManyRequests = 429
 
 var (
 	errClosed      = errors.New("gobrake: notifier is closed")
-	errRateLimited = errors.New("gobrake: you are rate limited")
+	errRateLimited = errors.New("gobrake: rate limited")
 )
 
 var httpClient = &http.Client{
@@ -56,7 +56,6 @@ type Notifier struct {
 	projectKey      string
 	createNoticeURL string
 
-	context map[string]string
 	filters []filter
 
 	wg       sync.WaitGroup
@@ -66,26 +65,16 @@ type Notifier struct {
 
 func NewNotifier(projectId int64, projectKey string) *Notifier {
 	n := &Notifier{
+		Client: httpClient,
+
 		projectId:       projectId,
 		projectKey:      projectKey,
 		createNoticeURL: getCreateNoticeURL(defaultAirbrakeHost, projectId, projectKey),
 
-		Client: httpClient,
-
-		context: map[string]string{
-			"language":     runtime.Version(),
-			"os":           runtime.GOOS,
-			"architecture": runtime.GOARCH,
-		},
+		filters: []filter{noticeBacktraceFilter},
 
 		noticeCh: make(chan *Notice, 1000),
 		closed:   make(chan struct{}),
-	}
-	if hostname, err := os.Hostname(); err == nil {
-		n.context["hostname"] = hostname
-	}
-	if wd, err := os.Getwd(); err == nil {
-		n.context["rootDirectory"] = wd
 	}
 	for i := 0; i < 10; i++ {
 		go n.worker()
@@ -112,11 +101,7 @@ func (n *Notifier) Notify(e interface{}, req *http.Request) {
 // Notice returns Aibrake notice created from error and request. depth
 // determines which call frame to use when constructing backtrace.
 func (n *Notifier) Notice(err interface{}, req *http.Request, depth int) *Notice {
-	notice := NewNotice(err, req, depth+3)
-	for k, v := range n.context {
-		notice.Context[k] = v
-	}
-	return notice
+	return NewNotice(err, req, depth+3)
 }
 
 type sendResponse struct {
@@ -154,10 +139,10 @@ func (n *Notifier) SendNotice(notice *Notice) (string, error) {
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		if resp.StatusCode == statusTooManyRequests {
+		if resp.StatusCode == httpStatusTooManyRequests {
 			return "", errRateLimited
 		}
-		err := fmt.Errorf("gobrake: got response code=%d, wanted 201 CREATED", resp.StatusCode)
+		err := fmt.Errorf("gobrake: got response status=%q, wanted 201 CREATED", resp.Status)
 		return "", err
 	}
 
@@ -170,9 +155,22 @@ func (n *Notifier) SendNotice(notice *Notice) (string, error) {
 	return sendResp.Id, nil
 }
 
+func (n *Notifier) sendNotice(notice *Notice) {
+	if _, err := n.SendNotice(notice); err != nil && err != errRateLimited {
+		logger.Printf("gobrake failed reporting notice=%q: %s", notice, err)
+	}
+	n.wg.Done()
+}
+
 // SendNoticeAsync acts as SendNotice, but sends notice asynchronously
 // and pending notices can be flushed with Flush.
 func (n *Notifier) SendNoticeAsync(notice *Notice) {
+	select {
+	case <-n.closed:
+		return
+	default:
+	}
+
 	n.wg.Add(1)
 	select {
 	case n.noticeCh <- notice:
@@ -189,12 +187,14 @@ func (n *Notifier) worker() {
 	for {
 		select {
 		case notice := <-n.noticeCh:
-			if _, err := n.SendNotice(notice); err != nil && err != errRateLimited {
-				logger.Printf("gobrake failed reporting notice=%q: error=%q", notice, err)
-			}
-			n.wg.Done()
+			n.sendNotice(notice)
 		case <-n.closed:
-			return
+			select {
+			case notice := <-n.noticeCh:
+				n.sendNotice(notice)
+			default:
+				return
+			}
 		}
 	}
 }
@@ -209,25 +209,43 @@ func (n *Notifier) NotifyOnPanic() {
 	}
 }
 
-// Flush does nothing.
-//
-// Deprecated. Use CloseAndWait instead.
-func (n *Notifier) Flush() {}
+// Flush waits for pending requests to finish.
+func (n *Notifier) Flush() {
+	n.waitTimeout(waitTimeout)
+}
 
-// WaitAndClose waits for pending requests to finish and then closes the notifier.
+// Deprecated. Use CloseTimeout instead.
 func (n *Notifier) WaitAndClose(timeout time.Duration) error {
+	return n.CloseTimeout(timeout)
+}
+
+// CloseTimeout waits for pending requests to finish and then closes the notifier.
+func (n *Notifier) CloseTimeout(timeout time.Duration) error {
+	select {
+	case <-n.closed:
+	default:
+		close(n.closed)
+	}
+	return n.waitTimeout(timeout)
+}
+
+func (n *Notifier) waitTimeout(timeout time.Duration) error {
 	done := make(chan struct{})
 	go func() {
 		n.wg.Wait()
 		close(done)
 	}()
+
 	select {
 	case <-done:
+		return nil
 	case <-time.After(timeout):
+		return fmt.Errorf("Wait timed out after %s", timeout)
 	}
+}
 
-	close(n.closed)
-	return nil
+func (n *Notifier) Close() error {
+	return n.CloseTimeout(waitTimeout)
 }
 
 func getCreateNoticeURL(host string, projectId int64, key string) string {
@@ -235,4 +253,28 @@ func getCreateNoticeURL(host string, projectId int64, key string) string {
 		"%s/api/v3/projects/%d/notices?key=%s",
 		host, projectId, key,
 	)
+}
+
+func noticeBacktraceFilter(notice *Notice) *Notice {
+	v, ok := notice.Context["rootDirectory"]
+	if !ok {
+		return notice
+	}
+
+	dir, ok := v.(string)
+	if !ok {
+		return notice
+	}
+
+	dir = filepath.Join(dir, "src")
+	for i := range notice.Errors {
+		replaceRootDirectory(notice.Errors[i].Backtrace, dir)
+	}
+	return notice
+}
+
+func replaceRootDirectory(backtrace []StackFrame, rootDir string) {
+	for i := range backtrace {
+		backtrace[i].File = strings.Replace(backtrace[i].File, rootDir, "[PROJECT_ROOT]", 1)
+	}
 }
