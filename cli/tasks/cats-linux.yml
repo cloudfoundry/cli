@@ -19,17 +19,16 @@ run:
   - |
     set -eux
 
-    export GOPATH="${PWD}/gopath"
+    export GOPATH="${PWD}/cf-release-repo"
     export PATH="${GOPATH}/bin":${PATH}
     export CONFIG=$PWD/cats-config/integration_config.json
 
-    mkdir -p gopath/bin
+    mkdir -p cf-release-repo/bin
     pushd cf-cli-binaries
       tar xvf cf-cli-binaries.tgz
       chmod +x cf-cli_linux_x86-64
       ln -s $PWD/cf-cli_linux_x86-64 $GOPATH/bin/cf
     popd
-    mv cf-release-repo/src $GOPATH
 
     cd "${GOPATH}/src/github.com/cloudfoundry/cf-acceptance-tests"
 
