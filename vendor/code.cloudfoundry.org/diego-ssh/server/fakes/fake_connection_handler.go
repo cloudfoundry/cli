@@ -14,6 +14,8 @@ type FakeConnectionHandler struct {
 	handleConnectionArgsForCall []struct {
 		arg1 net.Conn
 	}
+	invocations      map[string][][]interface{}
+	invocationsMutex sync.RWMutex
 }
 
 func (fake *FakeConnectionHandler) HandleConnection(arg1 net.Conn) {
@@ -21,6 +23,7 @@ func (fake *FakeConnectionHandler) HandleConnection(arg1 net.Conn) {
 	fake.handleConnectionArgsForCall = append(fake.handleConnectionArgsForCall, struct {
 		arg1 net.Conn
 	}{arg1})
+	fake.recordInvocation("HandleConnection", []interface{}{arg1})
 	fake.handleConnectionMutex.Unlock()
 	if fake.HandleConnectionStub != nil {
 		fake.HandleConnectionStub(arg1)
@@ -37,6 +40,26 @@ func (fake *FakeConnectionHandler) HandleConnectionArgsForCall(i int) net.Conn {
 	fake.handleConnectionMutex.RLock()
 	defer fake.handleConnectionMutex.RUnlock()
 	return fake.handleConnectionArgsForCall[i].arg1
+}
+
+func (fake *FakeConnectionHandler) Invocations() map[string][][]interface{} {
+	fake.invocationsMutex.RLock()
+	defer fake.invocationsMutex.RUnlock()
+	fake.handleConnectionMutex.RLock()
+	defer fake.handleConnectionMutex.RUnlock()
+	return fake.invocations
+}
+
+func (fake *FakeConnectionHandler) recordInvocation(key string, args []interface{}) {
+	fake.invocationsMutex.Lock()
+	defer fake.invocationsMutex.Unlock()
+	if fake.invocations == nil {
+		fake.invocations = map[string][][]interface{}{}
+	}
+	if fake.invocations[key] == nil {
+		fake.invocations[key] = [][]interface{}{}
+	}
+	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
 var _ server.ConnectionHandler = new(FakeConnectionHandler)
