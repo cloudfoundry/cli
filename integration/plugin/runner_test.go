@@ -14,7 +14,7 @@ var _ = Describe("running plugins", func() {
 		})
 	})
 
-	FDescribe("panic handling", func() {
+	Describe("panic handling", func() {
 		BeforeEach(func() {
 			session := helpers.CF("install-plugin", "-f", panicTestPluginPath)
 			Eventually(session).Should(Exit(0))

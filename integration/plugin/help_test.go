@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = FDescribe("help", func() {
+var _ = Describe("help", func() {
 	It("displays the plugin commands in master help", func() {
 		session := helpers.CF("help")
 		Eventually(session).Should(Say("TestPluginCommandWithAlias"))
