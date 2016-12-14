@@ -14,6 +14,24 @@ var _ = Describe("create-user command", func() {
 		helpers.RunIfExperimental("")
 	})
 
+	Describe("help", func() {
+		Context("when --help flag is set", func() {
+			It("Displays command usage to output", func() {
+				session := helpers.CF("create-user", "--help")
+				Eventually(session).Should(Exit(0))
+				Expect(session.Out).To(Say("NAME:"))
+				Expect(session.Out).To(Say("create-user - Create a new user"))
+				Expect(session.Out).To(Say("USAGE:"))
+				Expect(session.Out).To(Say("cf create-user USERNAME PASSWORD"))
+				Expect(session.Out).To(Say("cf create-user USERNAME --origin ORIGIN"))
+				Expect(session.Out).To(Say("OPTIONS:"))
+				Expect(session.Out).To(Say("--origin      Origin for mapping a user account to a user in an external identity provider"))
+				Expect(session.Out).To(Say("SEE ALSO:"))
+				Expect(session.Out).To(Say("passwd, set-org-role, set-space-role"))
+			})
+		})
+	})
+
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {
@@ -84,6 +102,7 @@ var _ = Describe("create-user command", func() {
 						Expect(session.Err).To(Say("Username must match pattern: \\[\\\\p\\{L\\}\\+0\\-9\\+\\\\\\-_\\.@'!\\]\\+"))
 						Expect(session.Out).To(Say("FAILED"))
 					},
+
 					Entry("fails when passed an emoji", "😀"),
 					Entry("fails when passed a backtick", "`"),
 				)
@@ -99,24 +118,81 @@ var _ = Describe("create-user command", func() {
 				})
 			})
 
+			Context("when the user passes in an origin flag", func() {
+				Context("when the origin is UAA", func() {
+					Context("when password is not present", func() {
+						It("errors and prints usage", func() {
+							newUser := helpers.RandomUsername()
+							session := helpers.CF("create-user", newUser, "--origin", "UAA")
+							Eventually(session).Should(Exit(1))
+							Expect(session.Err).To(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
+							Expect(session.Out).To(Say("FAILED"))
+							Expect(session.Out).To(Say("USAGE"))
+						})
+					})
+				})
+				Context("when the origin is the empty string", func() {
+					Context("when password is not present", func() {
+						It("errors and prints usage", func() {
+							newUser := helpers.RandomUsername()
+							session := helpers.CF("create-user", newUser, "--origin", "")
+							Eventually(session).Should(Exit(1))
+							Expect(session.Err).To(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
+							Expect(session.Out).To(Say("FAILED"))
+							Expect(session.Out).To(Say("USAGE"))
+						})
+					})
+				})
+
+				Context("when the origin is not UAA or empty", func() {
+					It("creates the new user in the specified origin", func() {
+						newUser := helpers.RandomUsername()
+						session := helpers.CF("create-user", newUser, "--origin", "ldap")
+						Eventually(session).Should(Exit(0))
+						Expect(session.Out).To(Say("Creating user %s...", newUser))
+						Expect(session.Out).To(Say("OK"))
+						Expect(session.Out).To(Say("TIP: Assign roles with 'cf set-org-role' and 'cf set-space-role'"))
+					})
+				})
+
+				Context("when argument for flag is not present", func() {
+					It("fails with incorrect usage error", func() {
+						session := helpers.CF("create-user", helpers.RandomUsername(), "--origin")
+						Eventually(session).Should(Exit(1))
+						Expect(session.Err).To(Say("Incorrect Usage: expected argument for flag `--origin'"))
+					})
+				})
+			})
+
+			Context("when password is not present", func() {
+				It("fails with incorrect usage error", func() {
+					session := helpers.CF("create-user", helpers.RandomUsername())
+					Eventually(session).Should(Exit(1))
+					Expect(session.Err).To(Say("Incorrect Usage: the required argument `PASSWORD` was not provided"))
+					Expect(session.Out).To(Say("FAILED"))
+					Expect(session.Out).To(Say("USAGE"))
+				})
+			})
+
 			Context("when the user already exists", func() {
 				var (
 					newUser     string
 					newPassword string
 				)
+
 				BeforeEach(func() {
 					newUser = helpers.RandomUsername()
 					newPassword = helpers.RandomPassword()
 					session := helpers.CF("create-user", newUser, newPassword)
 					Eventually(session).Should(Exit(0))
 				})
+
 				It("fails with the user already exists message", func() {
 					session := helpers.CF("create-user", newUser, newPassword)
 					Eventually(session).Should(Exit(0))
 					Expect(session.Err).To(Say("user %s already exists", newUser))
 					Expect(session.Out).To(Say("OK"))
 				})
-
 			})
 
 			Context("when the user does not already exist", func() {

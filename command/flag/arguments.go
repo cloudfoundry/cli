@@ -85,6 +85,11 @@ type Authentication struct {
 	Password string `positional-arg-name:"PASSWORD" required:"true" description:"The password"`
 }
 
+type CreateUser struct {
+	Username string  `positional-arg-name:"USERNAME" required:"true" description:"The username"`
+	Password *string `positional-arg-name:"PASSWORD" description:"The password"`
+}
+
 type AppInstance struct {
 	AppName string `positional-arg-name:"APP_NAME" required:"true" description:"The application name"`
 	Index   int    `positional-arg-name:"INDEX" required:"true" description:"The index of the application instance"`

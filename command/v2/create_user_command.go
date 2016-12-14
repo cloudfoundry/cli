@@ -2,6 +2,7 @@ package v2
 
 import (
 	"os"
+	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -14,13 +15,14 @@ import (
 //go:generate counterfeiter . CreateUserActor
 
 type CreateUserActor interface {
-	NewUser(username string, password string) (v2action.User, v2action.Warnings, error)
+	NewUser(username string, password string, origin string) (v2action.User, v2action.Warnings, error)
 }
 
 type CreateUserCommand struct {
-	RequiredArgs    flag.Authentication `positional-args:"yes"`
-	usage           interface{}         `usage:"CF_NAME create-user USERNAME PASSWORD"`
-	relatedCommands interface{}         `related_commands:"passwd, set-org-role, set-space-role"`
+	Args            flag.CreateUser `positional-args:"yes"`
+	Origin          string          `long:"origin" description:"Origin for mapping a user account to a user in an external identity provider"`
+	usage           interface{}     `usage:"CF_NAME create-user USERNAME PASSWORD \n   CF_NAME create-user USERNAME --origin ORIGIN"`
+	relatedCommands interface{}     `related_commands:"passwd, set-org-role, set-space-role"`
 
 	UI     command.UI
 	Config command.Config
@@ -41,9 +43,27 @@ func (cmd *CreateUserCommand) Setup(config command.Config, ui command.UI) error 
 }
 
 func (cmd *CreateUserCommand) Execute(args []string) error {
+	// cmd.Args.Password is intentionally set to a pointer such that we can check
+	// if it is passed (otherwise we can't differentiate between the default
+	// empty string and a passed in empty string.
+	var (
+		password string
+	)
 	if cmd.Config.Experimental() == false {
 		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
 		return nil
+	}
+
+	if (cmd.Origin == "" || strings.ToLower(cmd.Origin) == "uaa") && cmd.Args.Password == nil {
+		return command.RequiredArgumentError{
+			ArgumentName: "PASSWORD",
+		}
+	}
+
+	if cmd.Args.Password != nil {
+		password = *cmd.Args.Password
+	} else {
+		password = ""
 	}
 
 	cmd.UI.DisplayText(command.ExperimentalWarning)
@@ -55,20 +75,20 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	}
 
 	cmd.UI.DisplayTextWithFlavor("Creating user {{.TargetUser}}...", map[string]interface{}{
-		"TargetUser": cmd.RequiredArgs.Username,
+		"TargetUser": cmd.Args.Username,
 	})
 
-	_, warnings, err := cmd.Actor.NewUser(cmd.RequiredArgs.Username, cmd.RequiredArgs.Password)
+	_, warnings, err := cmd.Actor.NewUser(cmd.Args.Username, password, cmd.Origin)
 	cmd.UI.DisplayWarnings(warnings)
 
 	if err != nil {
 		if _, ok := err.(uaa.ConflictError); ok {
 			cmd.UI.DisplayWarning("user {{.User}} already exists", map[string]interface{}{
-				"User": cmd.RequiredArgs.Username,
+				"User": cmd.Args.Username,
 			})
 		} else {
 			cmd.UI.DisplayTextWithFlavor("Error creating user {{.User}}.", map[string]interface{}{
-				"User": cmd.RequiredArgs.Username,
+				"User": cmd.Args.Username,
 			})
 			return err
 		}

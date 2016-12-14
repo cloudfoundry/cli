@@ -36,8 +36,9 @@ var _ = Describe("CreateUser Command", func() {
 			Actor:  fakeActor,
 		}
 
-		cmd.RequiredArgs.Username = "some-user"
-		cmd.RequiredArgs.Password = "some-password"
+		cmd.Args.Username = "some-user"
+		password := "some-password"
+		cmd.Args.Password = &password
 
 		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.BinaryNameReturns("faceman")
@@ -70,6 +71,65 @@ var _ = Describe("CreateUser Command", func() {
 			fakeConfig.RefreshTokenReturns("some-refresh-token")
 		})
 
+		Context("when password is not provided", func() {
+			BeforeEach(func() {
+				cmd.Args.Password = nil
+			})
+
+			Context("when origin is empty string", func() {
+				BeforeEach(func() {
+					cmd.Origin = ""
+				})
+				It("returns the RequiredArgumentError", func() {
+					Expect(executeErr).To(MatchError(command.RequiredArgumentError{
+						ArgumentName: "PASSWORD",
+					}))
+				})
+			})
+
+			Context("when origin is UAA", func() {
+				BeforeEach(func() {
+					cmd.Origin = "UAA"
+				})
+				It("returns the RequiredArgumentError", func() {
+					Expect(executeErr).To(MatchError(command.RequiredArgumentError{
+						ArgumentName: "PASSWORD",
+					}))
+				})
+			})
+
+			Context("when origin is not UAA or the empty string", func() {
+				BeforeEach(func() {
+					fakeActor.NewUserReturns(
+						v2action.User{
+							GUID: "new-user-cc-guid",
+						},
+						v2action.Warnings{
+							"warning-2",
+						},
+						nil,
+					)
+					cmd.Origin = "some-origin"
+				})
+				It("creates the user and displays all warnings", func() {
+					Expect(executeErr).ToNot(HaveOccurred())
+
+					Expect(fakeActor.NewUserCallCount()).To(Equal(1))
+					username, password, origin := fakeActor.NewUserArgsForCall(0)
+					Expect(username).To(Equal("some-user"))
+					Expect(password).To(Equal(""))
+					Expect(origin).To(Equal("some-origin"))
+
+					Expect(fakeUI.Out).To(Say(`
+Creating user some-user...
+warning-2
+OK
+
+TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
+				})
+			})
+		})
+
 		Context("when no errors occur", func() {
 			BeforeEach(func() {
 				fakeActor.NewUserReturns(
@@ -81,15 +141,17 @@ var _ = Describe("CreateUser Command", func() {
 					},
 					nil,
 				)
+				cmd.Origin = "some-origin"
 			})
 
 			It("creates the user and displays all warnings", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
 				Expect(fakeActor.NewUserCallCount()).To(Equal(1))
-				username, password := fakeActor.NewUserArgsForCall(0)
+				username, password, origin := fakeActor.NewUserArgsForCall(0)
 				Expect(username).To(Equal("some-user"))
 				Expect(password).To(Equal("some-password"))
+				Expect(origin).To(Equal("some-origin"))
 
 				Expect(fakeUI.Out).To(Say(`
 Creating user some-user...

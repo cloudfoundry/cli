@@ -312,6 +312,10 @@
     "translation": "CF_NAME create-user USERNAME PASSWORD"
   },
   {
+    "id": "CF_NAME create-user USERNAME PASSWORD \\n   CF_NAME create-user USERNAME --origin ORIGIN",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\\n\\n   Pass comma separated credential parameter names to enable interactive mode:\\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \\\"comma, separated, parameter, names\\\"\\n\\n   Pass credential parameters as JSON to create a service non-interactively:\\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\\\"key1\\\":\\\"value1\\\",\\\"key2\\\":\\\"value2\\\"}'\\n\\n   Specify a path to a file containing JSON:\\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\\n\\nEXAMPLES:\\n   CF_NAME create-user-provided-service my-db-mine -p \\\"username, password\\\"\\n   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json\\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\\n   CF_NAME create-user-provided-service my-route-service -r https://example.com\\n\\n   Linux/Mac:\\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\\n\\n   Windows Command Line:\\n      CF_NAME create-user-provided-service my-db-mine -p \\\"{\\\\\\\"username\\\\\\\":\\\\\\\"admin\\\\\\\",\\\\\\\"password\\\\\\\":\\\\\\\"pa55woRD\\\\\\\"}\\\"\\n\\n   Windows PowerShell:\\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\\\\\"username\\\\\\\":\\\\\\\"admin\\\\\\\",\\\\\\\"password\\\\\\\":\\\\\\\"pa55woRD\\\\\\\"}'",
     "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\\n\\n   Pass comma separated credential parameter names to enable interactive mode:\\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \\\"comma, separated, parameter, names\\\"\\n\\n   Pass credential parameters as JSON to create a service non-interactively:\\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\\\"key1\\\":\\\"value1\\\",\\\"key2\\\":\\\"value2\\\"}'\\n\\n   Specify a path to a file containing JSON:\\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE\\n\\nEXAMPLES:\\n   CF_NAME create-user-provided-service my-db-mine -p \\\"username, password\\\"\\n   CF_NAME create-user-provided-service my-db-mine -p /path/to/credentials.json\\n   CF_NAME create-user-provided-service my-drain-service -l syslog://example.com\\n   CF_NAME create-user-provided-service my-route-service -r https://example.com\\n\\n   Linux/Mac:\\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\"username\\\":\\\"admin\\\",\\\"password\\\":\\\"pa55woRD\\\"}'\\n\\n   Windows Command Line:\\n      CF_NAME create-user-provided-service my-db-mine -p \\\"{\\\\\\\"username\\\\\\\":\\\\\\\"admin\\\\\\\",\\\\\\\"password\\\\\\\":\\\\\\\"pa55woRD\\\\\\\"}\\\"\\n\\n   Windows PowerShell:\\n      CF_NAME create-user-provided-service my-db-mine -p '{\\\\\\\"username\\\\\\\":\\\\\\\"admin\\\\\\\",\\\\\\\"password\\\\\\\":\\\\\\\"pa55woRD\\\\\\\"}'"
   },
@@ -1204,6 +1208,10 @@
     "translation": "INSTANCE_MEMORY"
   },
   {
+    "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
+    "translation": ""
+  },
+  {
     "id": "Incorrect usage: Value for {{.ArgumentName}} must be {{.ExpectedType}}",
     "translation": ""
   },
@@ -1310,6 +1318,10 @@
   {
     "id": "Org management:",
     "translation": "Org management:"
+  },
+  {
+    "id": "Origin for mapping a user account to a user in an external identity provider",
+    "translation": ""
   },
   {
     "id": "PENDING",

@@ -6,8 +6,8 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 type User ccv2.User
 
 // NewUser creates a new user in UAA and registers it with cloud controller.
-func (actor Actor) NewUser(username string, password string) (User, Warnings, error) {
-	uaaUser, err := actor.UAAClient.NewUser(username, password)
+func (actor Actor) NewUser(username string, password string, origin string) (User, Warnings, error) {
+	uaaUser, err := actor.UAAClient.NewUser(username, password, origin)
 	if err != nil {
 		return User{}, nil, err
 	}

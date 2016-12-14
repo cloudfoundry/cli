@@ -9,11 +9,12 @@ import (
 )
 
 type FakeCreateUserActor struct {
-	NewUserStub        func(username string, password string) (v2action.User, v2action.Warnings, error)
+	NewUserStub        func(username string, password string, origin string) (v2action.User, v2action.Warnings, error)
 	newUserMutex       sync.RWMutex
 	newUserArgsForCall []struct {
 		username string
 		password string
+		origin   string
 	}
 	newUserReturns struct {
 		result1 v2action.User
@@ -24,16 +25,17 @@ type FakeCreateUserActor struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCreateUserActor) NewUser(username string, password string) (v2action.User, v2action.Warnings, error) {
+func (fake *FakeCreateUserActor) NewUser(username string, password string, origin string) (v2action.User, v2action.Warnings, error) {
 	fake.newUserMutex.Lock()
 	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
 		username string
 		password string
-	}{username, password})
-	fake.recordInvocation("NewUser", []interface{}{username, password})
+		origin   string
+	}{username, password, origin})
+	fake.recordInvocation("NewUser", []interface{}{username, password, origin})
 	fake.newUserMutex.Unlock()
 	if fake.NewUserStub != nil {
-		return fake.NewUserStub(username, password)
+		return fake.NewUserStub(username, password, origin)
 	} else {
 		return fake.newUserReturns.result1, fake.newUserReturns.result2, fake.newUserReturns.result3
 	}
@@ -45,10 +47,10 @@ func (fake *FakeCreateUserActor) NewUserCallCount() int {
 	return len(fake.newUserArgsForCall)
 }
 
-func (fake *FakeCreateUserActor) NewUserArgsForCall(i int) (string, string) {
+func (fake *FakeCreateUserActor) NewUserArgsForCall(i int) (string, string, string) {
 	fake.newUserMutex.RLock()
 	defer fake.newUserMutex.RUnlock()
-	return fake.newUserArgsForCall[i].username, fake.newUserArgsForCall[i].password
+	return fake.newUserArgsForCall[i].username, fake.newUserArgsForCall[i].password, fake.newUserArgsForCall[i].origin
 }
 
 func (fake *FakeCreateUserActor) NewUserReturns(result1 v2action.User, result2 v2action.Warnings, result3 error) {
