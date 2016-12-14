@@ -18,13 +18,11 @@ var _ = Describe("Token Refreshing", func() {
 			helpers.RunIfExperimental("remove in #133310639")
 			helpers.LoginCF()
 
-			config, err := configv3.LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			config.ConfigFile.AccessToken = config.ConfigFile.AccessToken + "foo"
-			config.ConfigFile.TargetedOrganization.GUID = "fake-org"
-			config.ConfigFile.TargetedSpace.GUID = "fake-space"
-			err = configv3.WriteConfig(config)
-			Expect(err).ToNot(HaveOccurred())
+			helpers.SetConfig(func(config *configv3.Config) {
+				config.ConfigFile.AccessToken = config.ConfigFile.AccessToken + "foo"
+				config.ConfigFile.TargetedOrganization.GUID = "fake-org"
+				config.ConfigFile.TargetedSpace.GUID = "fake-space"
+			})
 		})
 
 		Context("when the cloud controller client encounters an invalid token response", func() {
@@ -68,13 +66,11 @@ var _ = Describe("Token Refreshing", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()
 
-			config, err := configv3.LoadConfig()
-			Expect(err).ToNot(HaveOccurred())
-			config.ConfigFile.AccessToken = config.ConfigFile.AccessToken + "foo"
-			config.ConfigFile.TargetedOrganization.GUID = "fake-org"
-			config.ConfigFile.TargetedSpace.GUID = "fake-space"
-			err = configv3.WriteConfig(config)
-			Expect(err).ToNot(HaveOccurred())
+			helpers.SetConfig(func(config *configv3.Config) {
+				config.ConfigFile.AccessToken = config.ConfigFile.AccessToken + "foo"
+				config.ConfigFile.TargetedOrganization.GUID = "fake-org"
+				config.ConfigFile.TargetedSpace.GUID = "fake-space"
+			})
 		})
 
 		Context("when the cloud controller client encounters an invalid token response", func() {

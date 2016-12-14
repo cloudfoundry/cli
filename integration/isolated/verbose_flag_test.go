@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -8,6 +9,7 @@ import (
 	"runtime"
 
 	helpers "code.cloudfoundry.org/cli/integration/helpers"
+	"code.cloudfoundry.org/cli/util/configv3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -190,6 +192,12 @@ var _ = Describe("Verbose", func() {
 
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
 
+				// Invalidate the access token to cause a token refresh in order to
+				// test the call to the UAA.
+				helpers.SetConfig(func(config *configv3.Config) {
+					config.ConfigFile.AccessToken = fmt.Sprintf("%sfoo", config.ConfigFile.AccessToken)
+				})
+
 				var envMap map[string]string
 				if env != "" {
 					if string(env[0]) == "/" {
@@ -216,6 +224,9 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("GET /v3/apps"))
+				Eventually(session).Should(Say("RESPONSE:"))
+				Eventually(session).Should(Say("REQUEST:"))
+				Eventually(session).Should(Say("POST /oauth/token"))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Exit(1))
 			},
@@ -244,6 +255,12 @@ var _ = Describe("Verbose", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				setupCF(ReadOnlyOrg, ReadOnlySpace)
+
+				// Invalidate the access token to cause a token refresh in order to
+				// test the call to the UAA.
+				helpers.SetConfig(func(config *configv3.Config) {
+					config.ConfigFile.AccessToken = fmt.Sprintf("%sfoo", config.ConfigFile.AccessToken)
+				})
 
 				var envMap map[string]string
 				if env != "" {
@@ -276,6 +293,9 @@ var _ = Describe("Verbose", func() {
 
 					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
 					Expect(string(contents)).To(MatchRegexp("GET /v3/apps"))
+					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
+					Expect(string(contents)).To(MatchRegexp("REQUEST:"))
+					Expect(string(contents)).To(MatchRegexp("POST /oauth/token"))
 					Expect(string(contents)).To(MatchRegexp("RESPONSE:"))
 
 					stat, err := os.Stat(tmpDir + filePath)
