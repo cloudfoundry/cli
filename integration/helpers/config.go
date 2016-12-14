@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"code.cloudfoundry.org/cli/util/configv3"
+
 	. "github.com/onsi/gomega"
 )
 
@@ -25,4 +27,14 @@ func DestroyHomeDir(homeDir string) {
 	if homeDir != "" {
 		os.RemoveAll(homeDir)
 	}
+}
+
+func SetConfig(cb func(conf *configv3.Config)) {
+	config, err := configv3.LoadConfig()
+	Expect(err).ToNot(HaveOccurred())
+
+	cb(config)
+
+	err = configv3.WriteConfig(config)
+	Expect(err).ToNot(HaveOccurred())
 }
