@@ -9,6 +9,8 @@ SET PATH=C:\Program Files\cURL\bin;%PATH%
 SET PATH=C:\Program Files\CloudFoundry;%PATH%
 SET PATH=%CD%;%PATH%
 
+curl ifconfig.co/json
+
 SET CONFIG=%CD%\cats-config\integration_config.json
 
 pushd %CD%\cf-cli-binaries
