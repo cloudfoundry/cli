@@ -113,6 +113,19 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 				})
 			})
 
+			Context("when the user inputs returns an error", func() {
+				BeforeEach(func() {
+					input.Write([]byte("e\n"))
+				})
+
+				It("returns the error", func() {
+					Expect(executeErr).To(HaveOccurred())
+
+					Expect(fakeActor.GetOrphanedRoutesBySpaceCallCount()).To(Equal(0))
+					Expect(fakeActor.DeleteRouteCallCount()).To(Equal(0))
+				})
+			})
+
 			Context("when the user inputs yes", func() {
 				var routes []v2action.Route
 
