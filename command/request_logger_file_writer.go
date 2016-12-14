@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -31,13 +32,17 @@ func (display *RequestLoggerFileWriter) DisplayBody(body []byte) error {
 		return err
 	}
 
-	pretty, err := json.MarshalIndent(sanitized, "", "  ")
+	buff := new(bytes.Buffer)
+	encoder := json.NewEncoder(buff)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(sanitized)
 	if err != nil {
 		return err
 	}
 
 	for _, logFile := range display.logFiles {
-		_, err = logFile.WriteString(string(pretty) + "\n")
+		_, err = logFile.Write(buff.Bytes())
 		if err != nil {
 			return err
 		}

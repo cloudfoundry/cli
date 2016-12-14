@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -26,12 +27,16 @@ func (display *RequestLoggerTerminalDisplay) DisplayBody(body []byte) error {
 		display.ui.DisplayText(string(body))
 	}
 
-	pretty, err := json.MarshalIndent(sanitized, "", "  ")
+	buff := new(bytes.Buffer)
+	encoder := json.NewEncoder(buff)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(sanitized)
 	if err != nil {
 		display.ui.DisplayText(string(body))
 	}
 
-	display.ui.DisplayText(string(pretty))
+	display.ui.DisplayText(buff.String())
 	return nil
 }
 

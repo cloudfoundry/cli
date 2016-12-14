@@ -45,10 +45,11 @@ var _ = Describe("Request Logger File Writer", func() {
 	Describe("DisplayBody", func() {
 		Context("when provided well formed JSON", func() {
 			It("writes a formated output", func() {
-				raw := `{"a":"b", "c":"d"}`
+				raw := `{"a":"b", "c":"d", "don't escape HTML":"<&>"}`
 				formatted := `{
   "a": "b",
-  "c": "d"
+  "c": "d",
+  "don't escape HTML": "<&>"
 }
 
 ` // Additonal spaces required
