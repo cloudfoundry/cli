@@ -10,12 +10,12 @@ import (
 	"code.cloudfoundry.org/cli/cf/models"
 	"code.cloudfoundry.org/cli/cf/net"
 	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
-	testconfig "code.cloudfoundry.org/cli/utils/testhelpers/configuration"
-	testnet "code.cloudfoundry.org/cli/utils/testhelpers/net"
+	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
+	testnet "code.cloudfoundry.org/cli/util/testhelpers/net"
 
 	. "code.cloudfoundry.org/cli/cf/api/organizations"
 	"code.cloudfoundry.org/cli/cf/trace/tracefakes"
-	. "code.cloudfoundry.org/cli/utils/testhelpers/matchers"
+	. "code.cloudfoundry.org/cli/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
@@ -37,7 +37,7 @@ var _ = Describe("Organization Repository", func() {
 				repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/organizations", "order-by=name"),
+						ghttp.VerifyRequest("GET", "/v2/organizations"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
@@ -45,7 +45,7 @@ var _ = Describe("Organization Repository", func() {
 						"total_results": 3,
 						"total_pages": 2,
 						"prev_url": null,
-						"next_url": "/v2/organizations?order-by=name&page=2",
+						"next_url": "/v2/organizations?page=2",
 						"resources": [
 							{
 								"metadata": { "guid": "org3-guid" },
@@ -62,7 +62,7 @@ var _ = Describe("Organization Repository", func() {
 
 				ccServer.AppendHandlers(
 					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/v2/organizations", "order-by=name&page=2"),
+						ghttp.VerifyRequest("GET", "/v2/organizations", "page=2"),
 						ghttp.VerifyHeader(http.Header{
 							"accept": []string{"application/json"},
 						}),
