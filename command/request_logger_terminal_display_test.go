@@ -28,10 +28,11 @@ var _ = Describe("Request Logger Terminal Display", func() {
 	Describe("DisplayBody", func() {
 		Context("when provided well formed JSON", func() {
 			It("displayed a formated output", func() {
-				raw := `{"a":"b", "c":"d"}`
+				raw := `{"a":"b", "c":"d", "don't html escape":"<&>"}`
 				formatted := `{
   "a": "b",
-  "c": "d"
+  "c": "d",
+  "don't html escape": "<&>"
 }`
 				err := display.DisplayBody([]byte(raw))
 				Expect(err).ToNot(HaveOccurred())
