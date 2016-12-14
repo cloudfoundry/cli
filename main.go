@@ -167,6 +167,9 @@ func handleError(err error, commandUI UI) error {
 	if _, isParseArgumentError := err.(command.ParseArgumentError); isParseArgumentError {
 		return ParseErr
 	}
+	if _, isRequiredArgumentError := err.(command.RequiredArgumentError); isRequiredArgumentError {
+		return ParseErr
+	}
 
 	return ErrFailed
 }

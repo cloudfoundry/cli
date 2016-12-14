@@ -9,11 +9,12 @@ import (
 )
 
 type FakeUAAClient struct {
-	NewUserStub        func(username string, password string) (uaa.User, error)
+	NewUserStub        func(username string, password string, origin string) (uaa.User, error)
 	newUserMutex       sync.RWMutex
 	newUserArgsForCall []struct {
 		username string
 		password string
+		origin   string
 	}
 	newUserReturns struct {
 		result1 uaa.User
@@ -23,16 +24,17 @@ type FakeUAAClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeUAAClient) NewUser(username string, password string) (uaa.User, error) {
+func (fake *FakeUAAClient) NewUser(username string, password string, origin string) (uaa.User, error) {
 	fake.newUserMutex.Lock()
 	fake.newUserArgsForCall = append(fake.newUserArgsForCall, struct {
 		username string
 		password string
-	}{username, password})
-	fake.recordInvocation("NewUser", []interface{}{username, password})
+		origin   string
+	}{username, password, origin})
+	fake.recordInvocation("NewUser", []interface{}{username, password, origin})
 	fake.newUserMutex.Unlock()
 	if fake.NewUserStub != nil {
-		return fake.NewUserStub(username, password)
+		return fake.NewUserStub(username, password, origin)
 	} else {
 		return fake.newUserReturns.result1, fake.newUserReturns.result2
 	}
@@ -44,10 +46,10 @@ func (fake *FakeUAAClient) NewUserCallCount() int {
 	return len(fake.newUserArgsForCall)
 }
 
-func (fake *FakeUAAClient) NewUserArgsForCall(i int) (string, string) {
+func (fake *FakeUAAClient) NewUserArgsForCall(i int) (string, string, string) {
 	fake.newUserMutex.RLock()
 	defer fake.newUserMutex.RUnlock()
-	return fake.newUserArgsForCall[i].username, fake.newUserArgsForCall[i].password
+	return fake.newUserArgsForCall[i].username, fake.newUserArgsForCall[i].password, fake.newUserArgsForCall[i].origin
 }
 
 func (fake *FakeUAAClient) NewUserReturns(result1 uaa.User, result2 error) {

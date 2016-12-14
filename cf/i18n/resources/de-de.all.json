@@ -776,6 +776,10 @@
     "translation": ""
   },
   {
+    "id": "CF_NAME create-user USERNAME PASSWORD \\n   CF_NAME create-user USERNAME --origin ORIGIN",
+    "translation": ""
+  },
+  {
     "id": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Pass comma separated credential parameter names to enable interactive mode:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Pass credential parameters as JSON to create a service non-interactively:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Specify a path to a file containing JSON:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE",
     "translation": "CF_NAME create-user-provided-service SERVICE_INSTANCE [-p CREDENTIALS] [-l SYSLOG_DRAIN_URL] [-r ROUTE_SERVICE_URL]\n\n   Durch Kommas getrennte Parameternamen für Berechtigungsnachweise übergeben, um den interaktiven Modus zu aktivieren:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n\n   Parameter für Berechtigungsnachweise als JSON übergeben, um einen Service nicht interaktiv zu erstellen:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p '{\"key1\":\"value1\",\"key2\":\"value2\"}'\n\n   Einen Pfad zu einer Datei mit JSON angeben:\n   CF_NAME create-user-provided-service SERVICE_INSTANCE -p PATH_TO_FILE"
   },
@@ -3312,6 +3316,10 @@
     "translation": "Falsche Verwendung:"
   },
   {
+    "id": "Incorrect Usage: the required argument `{{.ArgumentName}}` was not provided",
+    "translation": ""
+  },
+  {
     "id": "Incorrect json format: file: {{.JSONFile}}\n\t\t\nValid json file example:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]",
     "translation": "Falsches JSON-Format: Datei: {{.JSONFile}}\n\t\t\nBeispiel für gültige JSON-Datei:\n[\n  {\n    \"protocol\": \"tcp\",\n    \"destination\": \"10.244.1.18\",\n    \"ports\": \"3306\"\n  }\n]"
   },
@@ -3986,6 +3994,10 @@
   {
     "id": "Organization",
     "translation": "Organisation"
+  },
+  {
+    "id": "Origin for mapping a user account to a user in an external identity provider",
+    "translation": ""
   },
   {
     "id": "Override path to default config directory",

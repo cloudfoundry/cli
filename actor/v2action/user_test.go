@@ -32,7 +32,7 @@ var _ = Describe("User Actions", func() {
 		)
 
 		JustBeforeEach(func() {
-			actualUser, actualWarnings, actualErr = actor.NewUser("some-new-user", "some-password")
+			actualUser, actualWarnings, actualErr = actor.NewUser("some-new-user", "some-password", "some-origin")
 		})
 
 		Context("when no API errors occur", func() {
@@ -65,9 +65,10 @@ var _ = Describe("User Actions", func() {
 				Expect(actualWarnings).To(ConsistOf("warning-1", "warning-2"))
 
 				Expect(fakeUAAClient.NewUserCallCount()).To(Equal(1))
-				username, password := fakeUAAClient.NewUserArgsForCall(0)
+				username, password, origin := fakeUAAClient.NewUserArgsForCall(0)
 				Expect(username).To(Equal("some-new-user"))
 				Expect(password).To(Equal("some-password"))
+				Expect(origin).To(Equal("some-origin"))
 
 				Expect(fakeCloudControllerClient.NewUserCallCount()).To(Equal(1))
 				uaaUserID := fakeCloudControllerClient.NewUserArgsForCall(0)
