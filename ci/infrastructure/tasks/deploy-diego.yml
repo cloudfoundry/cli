@@ -37,7 +37,8 @@ run:
           -p manifest-generation/bosh-lite-stubs/property-overrides.yml \
           -n manifest-generation/bosh-lite-stubs/instance-count-overrides.yml \
           -v manifest-generation/bosh-lite-stubs/release-versions.yml \
-          -g \
+          -s manifest-generation/bosh-lite-stubs/diego-sql.yml \
+          -x \
           > diego.yml
     popd
 
