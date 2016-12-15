@@ -5404,6 +5404,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "這個指令需要「遞送 API」。您的目標端點回報它尚未啟用。"
   },
@@ -6156,10 +6160,6 @@
     "translation": "不適用於所要求的主機"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "org",
     "translation": "組織"
   },
@@ -6414,6 +6414,10 @@
   {
     "id": "type",
     "translation": "類型"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "unknown authority",

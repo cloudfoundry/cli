@@ -10,6 +10,7 @@ import (
 
 // CloudControllerClient is the interface to the cloud controller V3 API.
 type CloudControllerClient interface {
+	CloudControllerAPIVersion() string
 	GetApplicationTasks(appGUID string, query url.Values) ([]ccv3.Task, ccv3.Warnings, error)
 	GetApplications(query url.Values) ([]ccv3.Application, ccv3.Warnings, error)
 	NewTask(appGUID string, command string, name string) (ccv3.Task, ccv3.Warnings, error)

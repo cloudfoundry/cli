@@ -1312,6 +1312,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This is for backwards compatibility",
     "translation": ""
   },
@@ -1404,10 +1408,6 @@
     "translation": "name:"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "plan",
     "translation": "plan"
   },
@@ -1470,6 +1470,10 @@
   {
     "id": "type",
     "translation": "type"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "user {{.User}} already exists",

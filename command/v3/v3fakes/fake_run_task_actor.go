@@ -32,6 +32,12 @@ type FakeRunTaskActor struct {
 		result2 v3action.Warnings
 		result3 error
 	}
+	CloudControllerAPIVersionStub        func() string
+	cloudControllerAPIVersionMutex       sync.RWMutex
+	cloudControllerAPIVersionArgsForCall []struct{}
+	cloudControllerAPIVersionReturns     struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -109,6 +115,31 @@ func (fake *FakeRunTaskActor) RunTaskReturns(result1 v3action.Task, result2 v3ac
 	}{result1, result2, result3}
 }
 
+func (fake *FakeRunTaskActor) CloudControllerAPIVersion() string {
+	fake.cloudControllerAPIVersionMutex.Lock()
+	fake.cloudControllerAPIVersionArgsForCall = append(fake.cloudControllerAPIVersionArgsForCall, struct{}{})
+	fake.recordInvocation("CloudControllerAPIVersion", []interface{}{})
+	fake.cloudControllerAPIVersionMutex.Unlock()
+	if fake.CloudControllerAPIVersionStub != nil {
+		return fake.CloudControllerAPIVersionStub()
+	} else {
+		return fake.cloudControllerAPIVersionReturns.result1
+	}
+}
+
+func (fake *FakeRunTaskActor) CloudControllerAPIVersionCallCount() int {
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
+	return len(fake.cloudControllerAPIVersionArgsForCall)
+}
+
+func (fake *FakeRunTaskActor) CloudControllerAPIVersionReturns(result1 string) {
+	fake.CloudControllerAPIVersionStub = nil
+	fake.cloudControllerAPIVersionReturns = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeRunTaskActor) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -116,6 +147,8 @@ func (fake *FakeRunTaskActor) Invocations() map[string][][]interface{} {
 	defer fake.getApplicationByNameAndSpaceMutex.RUnlock()
 	fake.runTaskMutex.RLock()
 	defer fake.runTaskMutex.RUnlock()
+	fake.cloudControllerAPIVersionMutex.RLock()
+	defer fake.cloudControllerAPIVersionMutex.RUnlock()
 	return fake.invocations
 }
 

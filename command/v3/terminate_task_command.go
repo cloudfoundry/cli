@@ -13,6 +13,7 @@ type TerminateTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetTaskBySequenceIDAndApplication(sequenceID int, appGUID string) (v3action.Task, v3action.Warnings, error)
 	TerminateTask(taskGUID string) (v3action.Task, v3action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type TerminateTaskCommand struct {
@@ -45,6 +46,11 @@ func (cmd TerminateTaskCommand) Execute(args []string) error {
 			ArgumentName: "TASK_ID",
 			ExpectedType: "integer",
 		}
+	}
+
+	err = command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
+	if err != nil {
+		return err
 	}
 
 	err = command.CheckTarget(cmd.Config, true, true)

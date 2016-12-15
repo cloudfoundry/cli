@@ -29,6 +29,7 @@ var _ = Describe("Tasks Command", func() {
 		out := NewBuffer()
 		fakeUI = ui.NewTestUI(nil, out, out)
 		fakeActor = new(v3fakes.FakeTasksActor)
+		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
@@ -41,6 +42,19 @@ var _ = Describe("Tasks Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
+	})
+
+	Context("when the API version is too small", func() {
+		BeforeEach(func() {
+			fakeActor.CloudControllerAPIVersionReturns("0.0.0")
+		})
+
+		It("returns a MinimumAPIVersionError", func() {
+			Expect(executeErr).To(MatchError(command.MinimumAPIVersionError{
+				CurrentVersion: "0.0.0",
+				MinimumVersion: "3.0.0",
+			}))
+		})
 	})
 
 	Context("when the user is not logged in", func() {

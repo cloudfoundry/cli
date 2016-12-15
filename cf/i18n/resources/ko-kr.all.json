@@ -5404,6 +5404,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "이 명령에는 라우팅 API가 필요합니다. 대상 엔드포인트에서 해당 항목이 사용으로 설정되지 않았음을 보고합니다."
   },
@@ -6156,10 +6160,6 @@
     "translation": "요청된 호스트에 올바르지 않음"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "org",
     "translation": "조직"
   },
@@ -6414,6 +6414,10 @@
   {
     "id": "type",
     "translation": "유형"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "unknown authority",

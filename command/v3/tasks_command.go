@@ -1,7 +1,6 @@
 package v3
 
 import (
-	"net/url"
 	"strconv"
 	"time"
 
@@ -24,6 +23,7 @@ const (
 type TasksActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	GetApplicationTasks(appGUID string, sortOrder v3action.SortOrder) ([]v3action.Task, v3action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type TasksCommand struct {
@@ -50,7 +50,12 @@ func (cmd *TasksCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd TasksCommand) Execute(args []string) error {
-	err := command.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
+	if err != nil {
+		return err
+	}
+
+	err = command.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}
@@ -75,8 +80,6 @@ func (cmd TasksCommand) Execute(args []string) error {
 		"CurrentUser": user.Name,
 	})
 
-	query := url.Values{}
-	query.Add("order_by", "-created_at")
 	tasks, warnings, err := cmd.Actor.GetApplicationTasks(application.GUID, v3action.Descending)
 	cmd.UI.DisplayWarnings(warnings)
 	if err != nil {

@@ -1728,6 +1728,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This is for backwards compatibility",
     "translation": ""
   },
@@ -1820,10 +1824,6 @@
     "translation": "name:"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "repo-plugins",
     "translation": "repo-plugins"
   },
@@ -1854,6 +1854,10 @@
   {
     "id": "timeout connecting to log server, no log will be shown",
     "translation": "timeout connecting to log server, no log will be shown"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "user {{.User}} already exists",
