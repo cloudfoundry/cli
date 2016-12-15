@@ -5404,6 +5404,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "此命令需要路由 API。但您的目标端点报告称并未启用路由 API。"
   },
@@ -6156,10 +6160,6 @@
     "translation": "对于请求的主机无效"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "org",
     "translation": "组织"
   },
@@ -6414,6 +6414,10 @@
   {
     "id": "type",
     "translation": "类型"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "unknown authority",

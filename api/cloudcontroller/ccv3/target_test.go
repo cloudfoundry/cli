@@ -93,6 +93,7 @@ var _ = Describe("Target", func() {
 						Expect(warnings).To(ConsistOf("warning 1", "warning 2"))
 
 						Expect(client.UAA()).To(Equal("https://uaa.bosh-lite.com"))
+						Expect(client.CloudControllerAPIVersion()).To(Equal("3.0.0-alpha.5"))
 					})
 				})
 			})

@@ -5404,6 +5404,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This command requires the Routing API. Your targeted endpoint reports it is not enabled.",
     "translation": "Esta mandato requiere la API de direccionamiento. Los informes de puntos finales de destino no están habilitados."
   },
@@ -6156,10 +6160,6 @@
     "translation": "no es válido para el host solicitado"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "org",
     "translation": ""
   },
@@ -6414,6 +6414,10 @@
   {
     "id": "type",
     "translation": "tipo"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "unknown authority",

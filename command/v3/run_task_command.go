@@ -12,6 +12,7 @@ import (
 type RunTaskActor interface {
 	GetApplicationByNameAndSpace(appName string, spaceGUID string) (v3action.Application, v3action.Warnings, error)
 	RunTask(appGUID string, command string, name string) (v3action.Task, v3action.Warnings, error)
+	CloudControllerAPIVersion() string
 }
 
 type RunTaskCommand struct {
@@ -39,7 +40,12 @@ func (cmd *RunTaskCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd RunTaskCommand) Execute(args []string) error {
-	err := command.CheckTarget(cmd.Config, true, true)
+	err := command.MinimumAPIVersionCheck(cmd.Actor.CloudControllerAPIVersion(), "3.0.0")
+	if err != nil {
+		return err
+	}
+
+	err = command.CheckTarget(cmd.Config, true, true)
 	if err != nil {
 		return err
 	}

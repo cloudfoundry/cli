@@ -158,3 +158,19 @@ func (e RequiredArgumentError) Translate(translate func(string, ...interface{}) 
 		"ArgumentName": e.ArgumentName,
 	})
 }
+
+type MinimumAPIVersionError struct {
+	CurrentVersion string
+	MinimumVersion string
+}
+
+func (e MinimumAPIVersionError) Error() string {
+	return "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}."
+}
+
+func (e MinimumAPIVersionError) Translate(translate func(string, ...interface{}) string) string {
+	return translate(e.Error(), map[string]interface{}{
+		"CurrentVersion": e.CurrentVersion,
+		"MinimumVersion": e.MinimumVersion,
+	})
+}

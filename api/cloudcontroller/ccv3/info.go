@@ -10,11 +10,17 @@ import (
 type APILink struct {
 	// HREF is the fully qualified URL for the link.
 	HREF string `json:"href"`
+
+	// Meta contains additional metadata about the API.
+	Meta struct {
+		// Version of the API
+		Version string `json:"version"`
+	} `json:"meta"`
 }
 
-// RootResponse represents a GET response from the '/' endpoint of the cloud
+// APIInfo represents a GET response from the '/' endpoint of the cloud
 // controller API.
-type RootResponse struct {
+type APIInfo struct {
 	// Links is a list of top level Cloud Controller APIs.
 	Links struct {
 		// CCV3 is the link to the Cloud Controller V3 API
@@ -25,13 +31,18 @@ type RootResponse struct {
 	} `json:"links"`
 }
 
-// Return the HREF for the UAA.
-func (root RootResponse) UAA() string {
-	return root.Links.UAA.HREF
+// UAA return the HREF for the UAA.
+func (info APIInfo) UAA() string {
+	return info.Links.UAA.HREF
 }
 
-func (r RootResponse) ccV3Link() string {
-	return r.Links.CCV3.HREF
+// CloudControllerAPIVersion return the version for the CloudController.
+func (info APIInfo) CloudControllerAPIVersion() string {
+	return info.Links.CCV3.Meta.Version
+}
+
+func (info APIInfo) ccV3Link() string {
+	return info.Links.CCV3.HREF
 }
 
 // ResourceLinks represents the information returned back from /v3.
@@ -42,10 +53,10 @@ type ResourceLinks struct {
 }
 
 // Info returns back endpoint and API information from /v3.
-func (client *Client) Info() (RootResponse, ResourceLinks, Warnings, error) {
+func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 	rootResponse, warnings, err := client.rootResponse()
 	if err != nil {
-		return RootResponse{}, ResourceLinks{}, warnings, err
+		return APIInfo{}, ResourceLinks{}, warnings, err
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
@@ -53,7 +64,7 @@ func (client *Client) Info() (RootResponse, ResourceLinks, Warnings, error) {
 		URL:    rootResponse.ccV3Link(),
 	})
 	if err != nil {
-		return RootResponse{}, ResourceLinks{}, warnings, err
+		return APIInfo{}, ResourceLinks{}, warnings, err
 	}
 
 	var info ResourceLinks
@@ -65,23 +76,23 @@ func (client *Client) Info() (RootResponse, ResourceLinks, Warnings, error) {
 	warnings = append(warnings, response.Warnings...)
 
 	if err != nil {
-		return RootResponse{}, ResourceLinks{}, warnings, err
+		return APIInfo{}, ResourceLinks{}, warnings, err
 	}
 
 	return rootResponse, info, warnings, nil
 }
 
 // rootResponse return the CC API root document.
-func (client *Client) rootResponse() (RootResponse, Warnings, error) {
+func (client *Client) rootResponse() (APIInfo, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		Method: http.MethodGet,
 		URL:    client.cloudControllerURL,
 	})
 	if err != nil {
-		return RootResponse{}, nil, err
+		return APIInfo{}, nil, err
 	}
 
-	var rootResponse RootResponse
+	var rootResponse APIInfo
 	response := cloudcontroller.Response{
 		Result: &rootResponse,
 	}
@@ -89,15 +100,10 @@ func (client *Client) rootResponse() (RootResponse, Warnings, error) {
 	err = client.connection.Make(request, &response)
 	if err != nil {
 		if _, ok := err.(cloudcontroller.NotFoundError); ok {
-			return RootResponse{}, nil, cloudcontroller.APINotFoundError{URL: client.cloudControllerURL}
+			return APIInfo{}, nil, cloudcontroller.APINotFoundError{URL: client.cloudControllerURL}
 		}
-		return RootResponse{}, response.Warnings, err
+		return APIInfo{}, response.Warnings, err
 	}
 
 	return rootResponse, response.Warnings, nil
-}
-
-// UAA returns back the location of the UAA Endpoint
-func (client *Client) UAA() string {
-	return client.uaaLink
 }

@@ -60,8 +60,8 @@ type Warnings []string
 
 // Client can be used to talk to a Cloud Controller's V3 Endpoints.
 type Client struct {
+	APIInfo
 	cloudControllerURL string
-	uaaLink            string
 
 	connection cloudcontroller.Connection
 	userAgent  string

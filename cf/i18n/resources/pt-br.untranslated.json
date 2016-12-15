@@ -1808,6 +1808,10 @@
     "translation": ""
   },
   {
+    "id": "This command requires CF API version {{.MinimumVersion}}. Your target is {{.CurrentVersion}}.",
+    "translation": ""
+  },
+  {
     "id": "This is for backwards compatibility",
     "translation": ""
   },
@@ -1944,10 +1948,6 @@
     "translation": "none"
   },
   {
-    "id": "order_by",
-    "translation": ""
-  },
-  {
     "id": "org",
     "translation": "org"
   },
@@ -1990,6 +1990,10 @@
   {
     "id": "type",
     "translation": "type"
+  },
+  {
+    "id": "uaa",
+    "translation": ""
   },
   {
     "id": "url",
