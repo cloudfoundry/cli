@@ -46,6 +46,7 @@ var _ = Describe("Verbose", func() {
 	Context("v2 refactor", func() {
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
+				helpers.RunIfExperimental("remove after #133310639")
 				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())
@@ -83,9 +84,11 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /Users"))
+				Eventually(session).Should(Say("User-Agent: cf/[\\w.+]+ \\(%s; %s %s\\)", runtime.Version(), runtime.GOARCH, runtime.GOOS))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /v2/users"))
+				Eventually(session).Should(Say("User-Agent: cf/[\\w.+]+ \\(%s; %s %s\\)", runtime.Version(), runtime.GOARCH, runtime.GOOS))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Exit(0))
 			},
@@ -224,9 +227,12 @@ var _ = Describe("Verbose", func() {
 
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("GET /v3/apps"))
+				Eventually(session).Should(Say("User-Agent: cf/[\\w.+]+ \\(%s; %s %s\\)", runtime.Version(), runtime.GOARCH, runtime.GOOS))
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Say("REQUEST:"))
 				Eventually(session).Should(Say("POST /oauth/token"))
+				Eventually(session).Should(Say("User-Agent: cf/[\\w.+]+ \\(%s; %s %s\\)", runtime.Version(), runtime.GOARCH, runtime.GOOS))
+				Eventually(session).Should(Say("grant_type=refresh_token")) //This is required to test the previous line. If it fails, the previous matcher went too far.
 				Eventually(session).Should(Say("RESPONSE:"))
 				Eventually(session).Should(Exit(1))
 			},

@@ -28,6 +28,8 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 	}
 
 	uaaClient := uaa.NewClient(uaa.Config{
+		AppName:           config.BinaryName(),
+		AppVersion:        config.BinaryVersion(),
 		DialTimeout:       config.DialTimeout(),
 		SkipSSLValidation: config.SkipSSLValidation(),
 		Store:             config,
