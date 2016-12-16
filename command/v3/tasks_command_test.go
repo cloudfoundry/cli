@@ -19,22 +19,21 @@ import (
 var _ = Describe("Tasks Command", func() {
 	var (
 		cmd        v3.TasksCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *v3fakes.FakeTasksActor
 		fakeConfig *commandfakes.FakeConfig
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, out)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v3fakes.FakeTasksActor)
 		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
 		cmd = v3.TasksCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -181,10 +180,7 @@ var _ = Describe("Tasks Command", func() {
 					Expect(guid).To(Equal("some-app-guid"))
 					Expect(order).To(Equal(v3action.Descending))
 
-					Expect(fakeUI.Out).To(Say(`get-application-warning-1
-get-application-warning-2
-Getting tasks for app some-app-name in org some-org / space some-space as some-user...
-get-tasks-warning-1
+					Expect(testUI.Out).To(Say(`Getting tasks for app some-app-name in org some-org / space some-space as some-user...
 OK
 
 id   name     state       start time                      command
@@ -192,6 +188,9 @@ id   name     state       start time                      command
 2    task-2   FAILED      Tue, 08 Nov 2016 22:26:02 UTC   some-command
 1    task-1   SUCCEEDED   Tue, 08 Nov 2016 22:26:02 UTC   some-command`,
 					))
+					Expect(testUI.Err).To(Say(`get-application-warning-1
+get-application-warning-2
+get-tasks-warning-1`))
 				})
 
 				Context("when the tasks' command fields are returned as empty strings", func() {
@@ -225,7 +224,7 @@ id   name     state       start time                      command
 					It("outputs [hidden] for the tasks' commands", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Out).To(Say(`
+						Expect(testUI.Out).To(Say(`
 2    task-2   FAILED      Tue, 08 Nov 2016 22:26:02 UTC   \[hidden\]
 1    task-1   SUCCEEDED   Tue, 08 Nov 2016 22:26:02 UTC   \[hidden\]`,
 						))
@@ -244,11 +243,11 @@ id   name     state       start time                      command
 					It("outputs an empty table", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Out).To(Say(`
+						Expect(testUI.Out).To(Say(`
 id   name   state   start time   command
 `,
 						))
-						Expect(fakeUI.Out).NotTo(Say("1"))
+						Expect(testUI.Out).NotTo(Say("1"))
 					})
 				})
 			})
@@ -314,8 +313,8 @@ id   name   state   start time   command
 						It("return the same error and outputs the warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-application-warning-2"))
+							Expect(testUI.Err).To(Say("get-application-warning-1"))
+							Expect(testUI.Err).To(Say("get-application-warning-2"))
 						})
 					})
 
@@ -339,10 +338,10 @@ id   name   state   start time   command
 						It("returns the same error and outputs all warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-application-warning-2"))
-							Expect(fakeUI.Out).To(Say("get-tasks-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-tasks-warning-2"))
+							Expect(testUI.Err).To(Say("get-application-warning-1"))
+							Expect(testUI.Err).To(Say("get-application-warning-2"))
+							Expect(testUI.Err).To(Say("get-tasks-warning-1"))
+							Expect(testUI.Err).To(Say("get-tasks-warning-2"))
 						})
 					})
 				})

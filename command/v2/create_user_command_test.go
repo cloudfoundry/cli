@@ -18,20 +18,19 @@ import (
 var _ = Describe("CreateUser Command", func() {
 	var (
 		cmd        v2.CreateUserCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeConfig *commandfakes.FakeConfig
 		fakeActor  *v2fakes.FakeCreateUserActor
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, out)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeActor = new(v2fakes.FakeCreateUserActor)
 
 		cmd = v2.CreateUserCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Config: fakeConfig,
 			Actor:  fakeActor,
 		}
@@ -49,7 +48,7 @@ var _ = Describe("CreateUser Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
+		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when the user is not logged in", func() {
@@ -105,7 +104,7 @@ var _ = Describe("CreateUser Command", func() {
 							GUID: "new-user-cc-guid",
 						},
 						v2action.Warnings{
-							"warning-2",
+							"warning",
 						},
 						nil,
 					)
@@ -120,12 +119,12 @@ var _ = Describe("CreateUser Command", func() {
 					Expect(password).To(Equal(""))
 					Expect(origin).To(Equal("some-origin"))
 
-					Expect(fakeUI.Out).To(Say(`
+					Expect(testUI.Out).To(Say(`
 Creating user some-user...
-warning-2
 OK
 
 TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
+					Expect(testUI.Err).To(Say("warning"))
 				})
 			})
 		})
@@ -137,7 +136,7 @@ TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
 						GUID: "new-user-cc-guid",
 					},
 					v2action.Warnings{
-						"warning-2",
+						"warning",
 					},
 					nil,
 				)
@@ -153,12 +152,12 @@ TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
 				Expect(password).To(Equal("some-password"))
 				Expect(origin).To(Equal("some-origin"))
 
-				Expect(fakeUI.Out).To(Say(`
+				Expect(testUI.Out).To(Say(`
 Creating user some-user...
-warning-2
 OK
 
 TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
+				Expect(testUI.Err).To(Say("warning"))
 			})
 		})
 
@@ -180,8 +179,8 @@ TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
 
 				It("returns the same error and all warnings", func() {
 					Expect(executeErr).To(MatchError(returnedErr))
-					Expect(fakeUI.Err).To(Say("warning-1"))
-					Expect(fakeUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
 				})
 			})
 
@@ -202,9 +201,9 @@ TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
 
 				It("displays the error and all warnings", func() {
 					Expect(executeErr).To(BeNil())
-					Expect(fakeUI.Err).To(Say("warning-1"))
-					Expect(fakeUI.Err).To(Say("warning-2"))
-					Expect(fakeUI.Err).To(Say("user some-user already exists"))
+					Expect(testUI.Err).To(Say("warning-1"))
+					Expect(testUI.Err).To(Say("warning-2"))
+					Expect(testUI.Err).To(Say("user some-user already exists"))
 				})
 			})
 		})

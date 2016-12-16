@@ -18,22 +18,21 @@ import (
 var _ = Describe("API Command", func() {
 	var (
 		cmd        ApiCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *v2fakes.FakeAPIConfigActor
 		fakeConfig *commandfakes.FakeConfig
 		err        error
 	)
 
 	BeforeEach(func() {
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, out)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeAPIConfigActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.BinaryNameReturns("faceman")
 
 		cmd = ApiCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -44,7 +43,7 @@ var _ = Describe("API Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
+		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when the API endpoint is not provided", func() {
@@ -52,7 +51,7 @@ var _ = Describe("API Command", func() {
 			It("displays a tip", func() {
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
+				Expect(testUI.Out).To(Say("No api endpoint set. Use 'cf api' to set an endpoint"))
 			})
 		})
 
@@ -73,7 +72,7 @@ var _ = Describe("API Command", func() {
 
 			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeUI.Out).To(Say(`
+				Expect(testUI.Out).To(Say(`
 API endpoint:   some-api-target
 API version:    some-version`,
 				))
@@ -87,8 +86,8 @@ API version:    some-version`,
 
 			It("clears the target", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeUI.Out).To(Say("Unsetting api endpoint..."))
-				Expect(fakeUI.Out).To(Say("OK"))
+				Expect(testUI.Out).To(Say("Unsetting api endpoint..."))
+				Expect(testUI.Out).To(Say("OK"))
 				Expect(fakeActor.ClearTargetCallCount()).To(Equal(1))
 			})
 		})
@@ -118,8 +117,8 @@ API version:    some-version`,
 						Expect(settings.URL).To(Equal("https://" + CCAPI))
 						Expect(settings.SkipSSLValidation).To(BeFalse())
 
-						Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-						Expect(fakeUI.Out).To(Say(`OK
+						Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+						Expect(testUI.Out).To(Say(`OK
 
 API endpoint:   some-api-target
 API version:    some-version`,
@@ -141,8 +140,8 @@ API version:    some-version`,
 							Expect(settings.URL).To(Equal("https://" + CCAPI))
 							Expect(settings.SkipSSLValidation).To(BeTrue())
 
-							Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-							Expect(fakeUI.Out).To(Say(`OK
+							Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+							Expect(testUI.Out).To(Say(`OK
 
 API endpoint:   some-api-target
 API version:    some-version`,
@@ -157,7 +156,7 @@ API version:    some-version`,
 
 						It("returns an error with a --skip-ssl-validation tip", func() {
 							Expect(err).To(MatchError(command.InvalidSSLCertError{API: CCAPI}))
-							Expect(fakeUI.Out).ToNot(Say("API endpoint:\\s+some-api-target"))
+							Expect(testUI.Out).ToNot(Say("API endpoint:\\s+some-api-target"))
 						})
 					})
 				})
@@ -180,9 +179,9 @@ API version:    some-version`,
 				Expect(settings.URL).To(Equal(CCAPI))
 				Expect(settings.SkipSSLValidation).To(BeFalse())
 
-				Expect(fakeUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
-				Expect(fakeUI.Out).To(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
-				Expect(fakeUI.Out).To(Say("OK"))
+				Expect(testUI.Out).To(Say("Setting api endpoint to %s...", CCAPI))
+				Expect(testUI.Out).To(Say("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended"))
+				Expect(testUI.Out).To(Say("OK"))
 			})
 		})
 
@@ -195,7 +194,7 @@ API version:    some-version`,
 			It("outputs a 'not logged in' message", func() {
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("Not logged in. Use 'faceman login' to log in."))
+				Expect(testUI.Out).To(Say("Not logged in. Use 'faceman login' to log in."))
 			})
 		})
 
@@ -209,7 +208,7 @@ API version:    some-version`,
 			It("does not output a 'not logged in' message", func() {
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).ToNot(Say("Not logged in. Use 'faceman login' to log in."))
+				Expect(testUI.Out).ToNot(Say("Not logged in. Use 'faceman login' to log in."))
 			})
 		})
 

@@ -19,22 +19,21 @@ import (
 var _ = Describe("Terminate Task Command", func() {
 	var (
 		cmd        v3.TerminateTaskCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *v3fakes.FakeTerminateTaskActor
 		fakeConfig *commandfakes.FakeConfig
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, out)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v3fakes.FakeTerminateTaskActor)
 		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
 		cmd = v3.TerminateTaskCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -175,11 +174,11 @@ var _ = Describe("Terminate Task Command", func() {
 					taskGUID := fakeActor.TerminateTaskArgsForCall(0)
 					Expect(taskGUID).To(Equal("some-task-guid"))
 
-					Expect(fakeUI.Out).To(Say("get-application-warning"))
-					Expect(fakeUI.Out).To(Say("get-task-warning"))
-					Expect(fakeUI.Out).To(Say("Terminating task 1 of app some-app-name in org some-org / space some-space as some-user..."))
-					Expect(fakeUI.Out).To(Say("terminate-task-warning"))
-					Expect(fakeUI.Out).To(Say("OK"))
+					Expect(testUI.Err).To(Say("get-application-warning"))
+					Expect(testUI.Err).To(Say("get-task-warning"))
+					Expect(testUI.Out).To(Say("Terminating task 1 of app some-app-name in org some-org / space some-space as some-user..."))
+					Expect(testUI.Err).To(Say("terminate-task-warning"))
+					Expect(testUI.Out).To(Say("OK"))
 				})
 			})
 
@@ -266,8 +265,8 @@ var _ = Describe("Terminate Task Command", func() {
 						It("return the same error and outputs the warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-application-warning-2"))
+							Expect(testUI.Err).To(Say("get-application-warning-1"))
+							Expect(testUI.Err).To(Say("get-application-warning-2"))
 						})
 					})
 
@@ -286,8 +285,8 @@ var _ = Describe("Terminate Task Command", func() {
 						It("return the same error and outputs the warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("get-task-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-task-warning-2"))
+							Expect(testUI.Err).To(Say("get-task-warning-1"))
+							Expect(testUI.Err).To(Say("get-task-warning-2"))
 						})
 					})
 
@@ -310,8 +309,8 @@ var _ = Describe("Terminate Task Command", func() {
 						It("returns the same error and outputs all warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("terminate-task-warning-1"))
-							Expect(fakeUI.Out).To(Say("terminate-task-warning-2"))
+							Expect(testUI.Err).To(Say("terminate-task-warning-1"))
+							Expect(testUI.Err).To(Say("terminate-task-warning-2"))
 						})
 					})
 				})

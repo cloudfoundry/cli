@@ -18,7 +18,7 @@ import (
 
 var _ = Describe("Request Logger File Writer", func() {
 	var (
-		fakeUI   *ui.UI
+		testUI   *ui.UI
 		display  *RequestLoggerFileWriter
 		tmpdir   string
 		logFile1 string
@@ -26,14 +26,14 @@ var _ = Describe("Request Logger File Writer", func() {
 	)
 
 	BeforeEach(func() {
-		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		var err error
 		tmpdir, err = ioutil.TempDir("", "request_logger")
 		Expect(err).ToNot(HaveOccurred())
 
 		logFile1 = filepath.Join(tmpdir, "tmpfile1")
 		logFile2 = filepath.Join(tmpdir, "tmpfile2")
-		display = NewRequestLoggerFileWriter(fakeUI, []string{logFile1, logFile2})
+		display = NewRequestLoggerFileWriter(testUI, []string{logFile1, logFile2})
 		err = display.Start()
 		Expect(err).ToNot(HaveOccurred())
 	})
@@ -184,7 +184,7 @@ var _ = Describe("Request Logger File Writer", func() {
 		It("sends error to standard error", func() {
 			err := errors.New("foobar")
 			display.HandleInternalError(err)
-			Expect(fakeUI.Err).To(Say("foobar"))
+			Expect(testUI.Err).To(Say("foobar"))
 		})
 	})
 })
