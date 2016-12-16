@@ -19,7 +19,7 @@ type RunTaskCommand struct {
 	RequiredArgs    flag.RunTaskArgs `positional-args:"yes"`
 	Name            string           `long:"name" description:"Name to give the task (generated if omitted)"`
 	usage           interface{}      `usage:"CF_NAME run-task APP_NAME COMMAND [--name TASK_NAME]\n\nEXAMPLES:\n   CF_NAME run-task my-app \"bundle exec rake db:migrate\" --name migrate"`
-	relatedCommands interface{}      `related_commands:"tasks, terminate-task"`
+	relatedCommands interface{}      `related_commands:"logs, tasks, terminate-task"`
 
 	UI     command.UI
 	Actor  RunTaskActor

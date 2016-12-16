@@ -11,6 +11,25 @@ import (
 )
 
 var _ = Describe("run-task command", func() {
+	Context("when --help flag is set", func() {
+		It("Displays command usage to output", func() {
+			session := helpers.CF("run-task", "--help")
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say("NAME:"))
+			Expect(session.Out).To(Say("   run-task - Run a one-off task on an app"))
+			Expect(session.Out).To(Say("USAGE:"))
+			Expect(session.Out).To(Say("   cf run-task APP_NAME COMMAND [--name TASK_NAME]"))
+			Expect(session.Out).To(Say("EXAMPLES:"))
+			Expect(session.Out).To(Say(`   cf run-task my-app "bundle exec rake db:migrate" --name migrate`))
+			Expect(session.Out).To(Say("ALIAS:"))
+			Expect(session.Out).To(Say("   rt"))
+			Expect(session.Out).To(Say("OPTIONS:"))
+			Expect(session.Out).To(Say("   --name      Name to give the task \\(generated if omitted\\)"))
+			Expect(session.Out).To(Say("SEE ALSO:"))
+			Expect(session.Out).To(Say("   logs, tasks, terminate-task"))
+		})
+	})
+
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {

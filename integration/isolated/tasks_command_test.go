@@ -11,6 +11,18 @@ import (
 )
 
 var _ = Describe("tasks command", func() {
+	Context("when --help flag is set", func() {
+		It("Displays command usage to output", func() {
+			session := helpers.CF("tasks", "--help")
+			Eventually(session).Should(Exit(0))
+			Expect(session.Out).To(Say("NAME:"))
+			Expect(session.Out).To(Say("   tasks - List tasks of an app"))
+			Expect(session.Out).To(Say("USAGE:"))
+			Expect(session.Out).To(Say("   cf tasks APP_NAME"))
+			Expect(session.Out).To(Say("SEE ALSO:"))
+			Expect(session.Out).To(Say("   apps, logs, run-task, terminate-task"))
+		})
+	})
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {

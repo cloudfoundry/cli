@@ -29,7 +29,7 @@ type TasksActor interface {
 type TasksCommand struct {
 	RequiredArgs    flag.AppName `positional-args:"yes"`
 	usage           interface{}  `usage:"CF_NAME tasks APP_NAME"`
-	relatedCommands interface{}  `related_commands:"apps, run-task, terminate-task"`
+	relatedCommands interface{}  `related_commands:"apps, logs, run-task, terminate-task"`
 
 	UI     command.UI
 	Actor  TasksActor
