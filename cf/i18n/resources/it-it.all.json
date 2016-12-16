@@ -776,7 +776,7 @@
     "translation": "CF_NAME create-user NOMEUTENTE PASSWORD"
   },
   {
-    "id": "CF_NAME create-user USERNAME PASSWORD \\n   CF_NAME create-user USERNAME --origin ORIGIN",
+    "id": "CF_NAME create-user USERNAME PASSWORD\\n   CF_NAME create-user USERNAME --origin ORIGIN\\n\\nEXAMPLES:\\n   cf create-user j.smith@example.com S3cr3t                  # internal user\\n   cf create-user j.smith@example.com --origin ldap           # LDAP user\\n   cf create-user j.smith@example.com --origin provider-alias # SAML or OpenID Connect federated user",
     "translation": ""
   },
   {
