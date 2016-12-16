@@ -144,9 +144,9 @@ func (ui *UI) DisplayPair(attribute string, template string, templateValues ...m
 	fmt.Fprintf(ui.Out, "%s: %s\n", ui.TranslateText(attribute), ui.TranslateText(template, templateValues...))
 }
 
-// DisplayHelpHeader translates the header, bolds and adds the default color to
-// the header, and outputs the result to ui.Out.
-func (ui *UI) DisplayHelpHeader(text string) {
+// DisplayHeader translates the header, bolds and adds the default color to the
+// header, and outputs the result to ui.Out.
+func (ui *UI) DisplayHeader(text string) {
 	fmt.Fprintf(ui.Out, "%s\n", ui.addFlavor(ui.TranslateText(text), defaultFgColor, true))
 }
 

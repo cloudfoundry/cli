@@ -68,7 +68,7 @@ func (display *RequestLoggerTerminalDisplay) DisplayResponseHeader(httpProtocol 
 }
 
 func (display *RequestLoggerTerminalDisplay) DisplayType(name string, requestDate time.Time) error {
-	display.ui.DisplayPair(name, fmt.Sprintf("[%s]", requestDate.Format(time.RFC3339)))
+	display.ui.DisplayHeader(fmt.Sprintf("%s: [%s]", name, requestDate.Format(time.RFC3339)))
 	return nil
 }
 

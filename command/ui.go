@@ -6,7 +6,7 @@ package command
 type UI interface {
 	DisplayBoolPrompt(prompt string, defaultResponse bool) (bool, error)
 	DisplayError(err error)
-	DisplayHelpHeader(text string)
+	DisplayHeader(text string)
 	DisplayNewline()
 	DisplayOK()
 	DisplayPair(attribute string, formattedString string, keys ...map[string]interface{})
