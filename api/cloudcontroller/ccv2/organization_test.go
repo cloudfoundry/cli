@@ -117,7 +117,7 @@ var _ = Describe("Organization", func() {
 			BeforeEach(func() {
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true"),
+						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true&async=true"),
 						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
 					))
 			})
@@ -139,7 +139,7 @@ var _ = Describe("Organization", func() {
 }`
 				server.AppendHandlers(
 					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true"),
+						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true&async=true"),
 						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
 					))
 			})

@@ -80,7 +80,10 @@ func (client *Client) DeleteOrganization(orgGUID string) (Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
 		RequestName: internal.DeleteOrganizationRequest,
 		URIParams:   map[string]string{"organization_guid": orgGUID},
-		Query:       url.Values{"recursive": {"true"}},
+		Query: url.Values{
+			"recursive": {"true"},
+			"async":     {"true"},
+		},
 	})
 	if err != nil {
 		return nil, err
