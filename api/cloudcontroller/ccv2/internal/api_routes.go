@@ -9,9 +9,11 @@ import (
 const (
 	AppsFromRouteRequest          = "AppsFromRoute"
 	AppsRequest                   = "Apps"
+	DeleteOrganizationRequest     = "DeleteOrganization"
 	DeleteRouteRequest            = "DeleteRoute"
 	DeleteServiceBindingRequest   = "DeleteServiceBinding"
 	InfoRequest                   = "Info"
+	OrganizationsRequest          = "Organizations"
 	PrivateDomainRequest          = "PrivateDomain"
 	RouteMappingsFromRouteRequest = "RouteMappingsFromRoute"
 	RoutesFromSpaceRequest        = "RoutesFromSpace"
@@ -25,6 +27,8 @@ const (
 var APIRoutes = rata.Routes{
 	{Path: "/v2/apps", Method: http.MethodGet, Name: AppsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: InfoRequest},
+	{Path: "/v2/organizations", Method: http.MethodGet, Name: OrganizationsRequest},
+	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: PrivateDomainRequest},
 	{Path: "/v2/routes/:route_guid", Method: http.MethodDelete, Name: DeleteRouteRequest},
 	{Path: "/v2/routes/:route_guid/apps", Method: http.MethodGet, Name: AppsFromRouteRequest},

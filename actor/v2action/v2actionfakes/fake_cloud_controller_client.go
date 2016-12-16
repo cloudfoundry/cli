@@ -9,6 +9,15 @@ import (
 )
 
 type FakeCloudControllerClient struct {
+	DeleteOrganizationStub        func(orgGUID string) (ccv2.Warnings, error)
+	deleteOrganizationMutex       sync.RWMutex
+	deleteOrganizationArgsForCall []struct {
+		orgGUID string
+	}
+	deleteOrganizationReturns struct {
+		result1 ccv2.Warnings
+		result2 error
+	}
 	DeleteRouteStub        func(routeGUID string) (ccv2.Warnings, error)
 	deleteRouteMutex       sync.RWMutex
 	deleteRouteArgsForCall []struct {
@@ -34,6 +43,16 @@ type FakeCloudControllerClient struct {
 	}
 	getApplicationsReturns struct {
 		result1 []ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}
+	GetOrganizationsStub        func(queries []ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error)
+	getOrganizationsMutex       sync.RWMutex
+	getOrganizationsArgsForCall []struct {
+		queries []ccv2.Query
+	}
+	getOrganizationsReturns struct {
+		result1 []ccv2.Organization
 		result2 ccv2.Warnings
 		result3 error
 	}
@@ -123,6 +142,40 @@ type FakeCloudControllerClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganization(orgGUID string) (ccv2.Warnings, error) {
+	fake.deleteOrganizationMutex.Lock()
+	fake.deleteOrganizationArgsForCall = append(fake.deleteOrganizationArgsForCall, struct {
+		orgGUID string
+	}{orgGUID})
+	fake.recordInvocation("DeleteOrganization", []interface{}{orgGUID})
+	fake.deleteOrganizationMutex.Unlock()
+	if fake.DeleteOrganizationStub != nil {
+		return fake.DeleteOrganizationStub(orgGUID)
+	} else {
+		return fake.deleteOrganizationReturns.result1, fake.deleteOrganizationReturns.result2
+	}
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationCallCount() int {
+	fake.deleteOrganizationMutex.RLock()
+	defer fake.deleteOrganizationMutex.RUnlock()
+	return len(fake.deleteOrganizationArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationArgsForCall(i int) string {
+	fake.deleteOrganizationMutex.RLock()
+	defer fake.deleteOrganizationMutex.RUnlock()
+	return fake.deleteOrganizationArgsForCall[i].orgGUID
+}
+
+func (fake *FakeCloudControllerClient) DeleteOrganizationReturns(result1 ccv2.Warnings, result2 error) {
+	fake.DeleteOrganizationStub = nil
+	fake.deleteOrganizationReturns = struct {
+		result1 ccv2.Warnings
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeCloudControllerClient) DeleteRoute(routeGUID string) (ccv2.Warnings, error) {
@@ -228,6 +281,46 @@ func (fake *FakeCloudControllerClient) GetApplicationsReturns(result1 []ccv2.App
 	fake.GetApplicationsStub = nil
 	fake.getApplicationsReturns = struct {
 		result1 []ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizations(queries []ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error) {
+	var queriesCopy []ccv2.Query
+	if queries != nil {
+		queriesCopy = make([]ccv2.Query, len(queries))
+		copy(queriesCopy, queries)
+	}
+	fake.getOrganizationsMutex.Lock()
+	fake.getOrganizationsArgsForCall = append(fake.getOrganizationsArgsForCall, struct {
+		queries []ccv2.Query
+	}{queriesCopy})
+	fake.recordInvocation("GetOrganizations", []interface{}{queriesCopy})
+	fake.getOrganizationsMutex.Unlock()
+	if fake.GetOrganizationsStub != nil {
+		return fake.GetOrganizationsStub(queries)
+	} else {
+		return fake.getOrganizationsReturns.result1, fake.getOrganizationsReturns.result2, fake.getOrganizationsReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationsCallCount() int {
+	fake.getOrganizationsMutex.RLock()
+	defer fake.getOrganizationsMutex.RUnlock()
+	return len(fake.getOrganizationsArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationsArgsForCall(i int) []ccv2.Query {
+	fake.getOrganizationsMutex.RLock()
+	defer fake.getOrganizationsMutex.RUnlock()
+	return fake.getOrganizationsArgsForCall[i].queries
+}
+
+func (fake *FakeCloudControllerClient) GetOrganizationsReturns(result1 []ccv2.Organization, result2 ccv2.Warnings, result3 error) {
+	fake.GetOrganizationsStub = nil
+	fake.getOrganizationsReturns = struct {
+		result1 []ccv2.Organization
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -545,12 +638,16 @@ func (fake *FakeCloudControllerClient) NewUserReturns(result1 ccv2.User, result2
 func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.deleteOrganizationMutex.RLock()
+	defer fake.deleteOrganizationMutex.RUnlock()
 	fake.deleteRouteMutex.RLock()
 	defer fake.deleteRouteMutex.RUnlock()
 	fake.deleteServiceBindingMutex.RLock()
 	defer fake.deleteServiceBindingMutex.RUnlock()
 	fake.getApplicationsMutex.RLock()
 	defer fake.getApplicationsMutex.RUnlock()
+	fake.getOrganizationsMutex.RLock()
+	defer fake.getOrganizationsMutex.RUnlock()
 	fake.getPrivateDomainMutex.RLock()
 	defer fake.getPrivateDomainMutex.RUnlock()
 	fake.getRouteApplicationsMutex.RLock()

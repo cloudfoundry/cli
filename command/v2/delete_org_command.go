@@ -1,24 +1,95 @@
 package v2
 
 import (
+	"fmt"
 	"os"
 
-	"code.cloudfoundry.org/cli/cf/cmd"
+	"code.cloudfoundry.org/cli/actor/v2action"
+	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
+	"code.cloudfoundry.org/cli/command/v2/shared"
 )
+
+//go:generate counterfeiter . DeleteOrganizationActor
+
+type DeleteOrganizationActor interface {
+	DeleteOrganization(orgName string) (v2action.Warnings, error)
+}
 
 type DeleteOrgCommand struct {
 	RequiredArgs flag.Organization `positional-args:"yes"`
 	Force        bool              `short:"f" description:"Force deletion without confirmation"`
 	usage        interface{}       `usage:"CF_NAME delete-org ORG [-f]"`
+
+	Config command.Config
+	UI     command.UI
+	Actor  DeleteOrganizationActor
 }
 
-func (_ DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
+func (cmd *DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
+	cmd.Config = config
+	cmd.UI = ui
+
+	client, _, err := shared.NewClients(config, ui)
+	if err != nil {
+		return err
+	}
+	cmd.Actor = v2action.NewActor(client, nil)
+
 	return nil
 }
 
-func (_ DeleteOrgCommand) Execute(args []string) error {
-	cmd.Main(os.Getenv("CF_TRACE"), os.Args)
+func (cmd *DeleteOrgCommand) Execute(args []string) error {
+	if cmd.Config.Experimental() == false {
+		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
+		return nil
+	}
+
+	cmd.UI.DisplayText(command.ExperimentalWarning)
+	cmd.UI.DisplayNewline()
+
+	err := command.CheckTarget(cmd.Config, false, false)
+	if err != nil {
+		return err
+	}
+
+	user, err := cmd.Config.CurrentUser()
+	if err != nil {
+		return err
+	}
+
+	if !cmd.Force {
+		deleteOrg, promptErr := cmd.UI.DisplayBoolPrompt(fmt.Sprintf("Really delete the org %s and everything associated with it?", cmd.RequiredArgs.Organization), false)
+		if promptErr != nil {
+			return promptErr
+		}
+
+		if !deleteOrg {
+			cmd.UI.DisplayText("Delete cancelled")
+			return nil
+		}
+	}
+
+	cmd.UI.DisplayText("Deleting org {{.OrgName}} as {{.UserName}}...", map[string]interface{}{
+		"OrgName":  cmd.RequiredArgs.Organization,
+		"UserName": user.Name,
+	})
+
+	warnings, err := cmd.Actor.DeleteOrganization(cmd.RequiredArgs.Organization)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		switch err.(type) {
+		case v2action.OrganizationNotFoundError:
+			cmd.UI.DisplayText("Org {{.OrgName}} does not exist.", map[string]interface{}{
+				"OrgName": cmd.RequiredArgs.Organization,
+			})
+		default:
+			return err
+		}
+	}
+
+	cmd.UI.DisplayOK()
+
 	return nil
 }

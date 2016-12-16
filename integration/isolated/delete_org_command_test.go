@@ -21,8 +21,8 @@ var _ = Describe("delete-org command", func() {
 
 			It("fails with no API endpoint set message", func() {
 				session := helpers.CF("delete-org", "banana")
-				Eventually(session).Should(Say("FAILED"))
-				Eventually(session).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
+				Eventually(session.Out).Should(Say("FAILED"))
+				Eventually(session.Err).Should(Say("No API endpoint set. Use 'cf login' or 'cf api' to target an endpoint."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -35,7 +35,7 @@ var _ = Describe("delete-org command", func() {
 			It("fails with not logged in message", func() {
 				session := helpers.CF("delete-org", "banana")
 				Eventually(session.Out).Should(Say("FAILED"))
-				Eventually(session.Out).Should(Say("Not logged in. Use 'cf login' to log in."))
+				Eventually(session.Err).Should(Say("Not logged in. Use 'cf login' to log in."))
 				Eventually(session).Should(Exit(1))
 			})
 		})
@@ -45,7 +45,7 @@ var _ = Describe("delete-org command", func() {
 		It("displays an error and help", func() {
 			session := helpers.CF("delete-org")
 			Eventually(session.Err).Should(Say("Incorrect Usage: the required argument `ORG` was not provided"))
-			Eventually(session).Should(Say("USAGE"))
+			Eventually(session.Out).Should(Say("USAGE"))
 			Eventually(session).Should(Exit(1))
 		})
 	})
@@ -58,9 +58,9 @@ var _ = Describe("delete-org command", func() {
 		It("displays a warning and exits 0", func() {
 			username, _ := helpers.GetCredentials()
 			session := helpers.CF("delete-org", "-f", "please-do-not-exist-in-real-life")
-			Eventually(session).Should(Say("Deleting org please-do-not-exist-in-real-life as %s...", username))
-			Eventually(session).Should(Say("OK"))
-			Eventually(session).Should(Say("Org please-do-not-exist-in-real-life does not exist."))
+			Eventually(session.Out).Should(Say("Deleting org please-do-not-exist-in-real-life as %s...", username))
+			Eventually(session.Out).Should(Say("Org please-do-not-exist-in-real-life does not exist."))
+			Eventually(session.Out).Should(Say("OK"))
 			Eventually(session).Should(Exit(0))
 		})
 	})
@@ -82,7 +82,7 @@ var _ = Describe("delete-org command", func() {
 				buffer = NewBuffer()
 			})
 
-			Context("when the user enters y", func() {
+			Context("when the user enters 'y'", func() {
 				BeforeEach(func() {
 					buffer.Write([]byte("y\n"))
 				})
@@ -90,32 +90,53 @@ var _ = Describe("delete-org command", func() {
 				It("deletes the org", func() {
 					username, _ := helpers.GetCredentials()
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
-					Eventually(session).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
-					Eventually(session).Should(Say("Deleting org %s as %s...", orgName, username))
-					Eventually(session).Should(Say("OK"))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Deleting org %s as %s...", orgName, username))
+					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
-			Context("when the user enters n", func() {
+			Context("when the user enters 'n'", func() {
 				BeforeEach(func() {
 					buffer.Write([]byte("n\n"))
 				})
 
 				It("does not delete the org", func() {
 					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
-					Eventually(session).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
-					Eventually(session).Should(Say("Delete cancelled"))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Delete cancelled"))
+					Eventually(session).Should(Exit(0))
+				})
+			})
+
+			Context("when the user enters the default input (hits return)", func() {
+				BeforeEach(func() {
+					buffer.Write([]byte("\n"))
+				})
+
+				It("does not delete the org", func() {
+					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
 				})
 			})
 
 			Context("when the user enters an invalid answer", func() {
 				BeforeEach(func() {
-					buffer.Write([]byte("wat\n"))
+					// The second '\n' is intentional. Otherwise the buffer will be
+					// closed while the interaction is still waiting for input; it gets
+					// an EOF and causes an error.
+					buffer.Write([]byte("wat\n\n"))
 				})
 
 				It("asks again", func() {
+					session := helpers.CFWithStdin(buffer, "delete-org", orgName)
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session.Out).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
+					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
+					Eventually(session).Should(Exit(0))
 				})
 			})
 		})
@@ -124,8 +145,8 @@ var _ = Describe("delete-org command", func() {
 			It("deletes the org", func() {
 				username, _ := helpers.GetCredentials()
 				session := helpers.CF("delete-org", orgName, "-f")
-				Eventually(session).Should(Say("Deleting org %s as %s...", orgName, username))
-				Eventually(session).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("Deleting org %s as %s...", orgName, username))
+				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
 			})
 		})
