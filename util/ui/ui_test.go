@@ -241,9 +241,9 @@ some-prefixgg          hh            ii`))
 		})
 	})
 
-	Describe("DisplayHelpHeader", func() {
+	Describe("DisplayHeader", func() {
 		It("displays the header colorized and bolded to ui.Out", func() {
-			ui.DisplayHelpHeader("some-header")
+			ui.DisplayHeader("some-header")
 			Expect(ui.Out).To(Say("\x1b\\[38;1msome-header\x1b\\[0m"))
 		})
 
@@ -259,7 +259,7 @@ some-prefixgg          hh            ii`))
 			})
 
 			It("displays the translated header colorized and bolded to ui.Out", func() {
-				ui.DisplayHelpHeader("FEATURE FLAGS")
+				ui.DisplayHeader("FEATURE FLAGS")
 				Expect(ui.Out).To(Say("\x1b\\[38;1mINDICATEURS DE FONCTION\x1b\\[0m"))
 			})
 		})

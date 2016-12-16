@@ -66,7 +66,7 @@ func (cmd HelpCommand) displayFullHelp() {
 }
 
 func (cmd HelpCommand) displayHelpPreamble() {
-	cmd.UI.DisplayHelpHeader("NAME:")
+	cmd.UI.DisplayHeader("NAME:")
 	cmd.UI.DisplayText("   {{.CommandName}} - {{.CommandDescription}}",
 		map[string]interface{}{
 			"CommandName":        cmd.Config.BinaryName(),
@@ -74,7 +74,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 		})
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayHelpHeader("USAGE:")
+	cmd.UI.DisplayHeader("USAGE:")
 	cmd.UI.DisplayText("   {{.CommandName}} {{.CommandUsage}}",
 		map[string]interface{}{
 			"CommandName":  cmd.Config.BinaryName(),
@@ -82,7 +82,7 @@ func (cmd HelpCommand) displayHelpPreamble() {
 		})
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayHelpHeader("VERSION:")
+	cmd.UI.DisplayHeader("VERSION:")
 	cmd.UI.DisplayText("   {{.Version}}-{{.Time}}", map[string]interface{}{
 		"Version": cmd.Config.BinaryVersion(),
 		"Time":    cmd.Config.BinaryBuildDate(),
@@ -111,7 +111,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 	cmd.UI.DisplayNewline()
 
 	for _, category := range internal.CommonHelpCategoryList {
-		cmd.UI.DisplayHelpHeader(category.CategoryName)
+		cmd.UI.DisplayHeader(category.CategoryName)
 		table := [][]string{}
 
 		for _, row := range category.CommandList {
@@ -135,7 +135,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 	}
 
 	pluginCommands := cmd.getSortedPluginCommands()
-	cmd.UI.DisplayHelpHeader("Commands offered by installed plugins:")
+	cmd.UI.DisplayHeader("Commands offered by installed plugins:")
 
 	size := int(math.Ceil(float64(len(pluginCommands)) / 3))
 	table := make([][]string, size)
@@ -152,7 +152,7 @@ func (cmd HelpCommand) displayCommonCommands() {
 	cmd.UI.DisplayTable(prefix, table, 4)
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayHelpHeader("Global options:")
+	cmd.UI.DisplayHeader("Global options:")
 	cmd.UI.DisplayText(prefix+"{{.ENVName}}                         {{.Description}}",
 		map[string]interface{}{
 			"ENVName":     "--help, -h",
@@ -173,7 +173,7 @@ func (cmd HelpCommand) displayAllCommands() {
 	longestCmd := internal.LongestCommandName(cmdInfo, pluginCommands)
 
 	for _, category := range internal.HelpCategoryList {
-		cmd.UI.DisplayHelpHeader(category.CategoryName)
+		cmd.UI.DisplayHeader(category.CategoryName)
 
 		for _, row := range category.CommandList {
 			for _, command := range row {
@@ -189,7 +189,7 @@ func (cmd HelpCommand) displayAllCommands() {
 		}
 	}
 
-	cmd.UI.DisplayHelpHeader("INSTALLED PLUGIN COMMANDS:")
+	cmd.UI.DisplayHeader("INSTALLED PLUGIN COMMANDS:")
 	for _, pluginCommand := range pluginCommands {
 		cmd.UI.DisplayText("   {{.CommandName}}{{.Gap}}{{.CommandDescription}}", map[string]interface{}{
 			"CommandName":        pluginCommand.Name,
@@ -201,7 +201,7 @@ func (cmd HelpCommand) displayAllCommands() {
 }
 
 func (cmd HelpCommand) displayHelpFooter() {
-	cmd.UI.DisplayHelpHeader("ENVIRONMENT VARIABLES:")
+	cmd.UI.DisplayHeader("ENVIRONMENT VARIABLES:")
 	cmd.UI.DisplayText("   {{.ENVName}}                     {{.Description}}",
 		map[string]interface{}{
 			"ENVName":     "CF_COLOR=false",
@@ -239,7 +239,7 @@ func (cmd HelpCommand) displayHelpFooter() {
 		})
 	cmd.UI.DisplayNewline()
 
-	cmd.UI.DisplayHelpHeader("GLOBAL OPTIONS:")
+	cmd.UI.DisplayHeader("GLOBAL OPTIONS:")
 	cmd.UI.DisplayText("   {{.ENVName}}                         {{.Description}}",
 		map[string]interface{}{
 			"ENVName":     "--help, -h",
