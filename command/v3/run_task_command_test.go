@@ -20,22 +20,21 @@ import (
 var _ = Describe("RunTask Command", func() {
 	var (
 		cmd        v3.RunTaskCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *v3fakes.FakeRunTaskActor
 		fakeConfig *commandfakes.FakeConfig
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, out)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v3fakes.FakeRunTaskActor)
 		fakeActor.CloudControllerAPIVersionReturns("3.0.0")
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
 		cmd = v3.RunTaskCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -156,14 +155,13 @@ var _ = Describe("RunTask Command", func() {
 						Expect(command).To(Equal("fake command"))
 						Expect(name).To(Equal(""))
 
-						Expect(fakeUI.Out).To(Say(`get-application-warning-1
-get-application-warning-2
-Creating task for app some-app-name in org some-org / space some-space as some-user...
-get-application-warning-3
+						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
 
-Task 3 has been submitted successfully for execution.`,
-						))
+Task 3 has been submitted successfully for execution.`))
+						Expect(testUI.Err).To(Say(`get-application-warning-1
+get-application-warning-2
+get-application-warning-3`))
 					})
 				})
 
@@ -186,14 +184,14 @@ Task 3 has been submitted successfully for execution.`,
 						Expect(command).To(Equal("fake command"))
 						Expect(name).To(Equal("some-task-name"))
 
-						Expect(fakeUI.Out).To(Say(`get-application-warning-1
-get-application-warning-2
-Creating task for app some-app-name in org some-org / space some-space as some-user...
-get-application-warning-3
+						Expect(testUI.Out).To(Say(`Creating task for app some-app-name in org some-org / space some-space as some-user...
 OK
 
 Task 3 has been submitted successfully for execution.`,
 						))
+						Expect(testUI.Err).To(Say(`get-application-warning-1
+get-application-warning-2
+get-application-warning-3`))
 					})
 				})
 			})
@@ -259,8 +257,8 @@ Task 3 has been submitted successfully for execution.`,
 						It("return the same error and outputs the warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-application-warning-2"))
+							Expect(testUI.Err).To(Say("get-application-warning-1"))
+							Expect(testUI.Err).To(Say("get-application-warning-2"))
 						})
 					})
 
@@ -284,10 +282,10 @@ Task 3 has been submitted successfully for execution.`,
 						It("returns the same error and outputs all warnings", func() {
 							Expect(executeErr).To(MatchError(expectedErr))
 
-							Expect(fakeUI.Out).To(Say("get-application-warning-1"))
-							Expect(fakeUI.Out).To(Say("get-application-warning-2"))
-							Expect(fakeUI.Out).To(Say("run-task-warning-1"))
-							Expect(fakeUI.Out).To(Say("run-task-warning-2"))
+							Expect(testUI.Err).To(Say("get-application-warning-1"))
+							Expect(testUI.Err).To(Say("get-application-warning-2"))
+							Expect(testUI.Err).To(Say("run-task-warning-1"))
+							Expect(testUI.Err).To(Say("run-task-warning-2"))
 						})
 					})
 				})

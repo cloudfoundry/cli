@@ -13,20 +13,20 @@ import (
 var _ = Describe("Version Command", func() {
 	var (
 		cmd        VersionCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeConfig *commandfakes.FakeConfig
 		err        error
 	)
 
 	BeforeEach(func() {
-		fakeUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
 		fakeConfig.BinaryVersionReturns("face2.0")
 		fakeConfig.BinaryBuildDateReturns("yesterday")
 
 		cmd = VersionCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Config: fakeConfig,
 		}
 	})
@@ -34,6 +34,6 @@ var _ = Describe("Version Command", func() {
 	It("displays correct version", func() {
 		err = cmd.Execute(nil)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(fakeUI.Out).To(Say("faceman version face2.0-yesterday"))
+		Expect(testUI.Out).To(Say("faceman version face2.0-yesterday"))
 	})
 })

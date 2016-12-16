@@ -15,14 +15,14 @@ import (
 var _ = Describe("Request Logger Terminal Display", func() {
 	var (
 		out     *Buffer
-		fakeUI  *ui.UI
+		testUI  *ui.UI
 		display *RequestLoggerTerminalDisplay
 	)
 
 	BeforeEach(func() {
 		out = NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, NewBuffer())
-		display = NewRequestLoggerTerminalDisplay(fakeUI)
+		testUI = ui.NewTestUI(nil, out, NewBuffer())
+		display = NewRequestLoggerTerminalDisplay(testUI)
 	})
 
 	Describe("DisplayBody", func() {
@@ -36,7 +36,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 }`
 				err := display.DisplayBody([]byte(raw))
 				Expect(err).ToNot(HaveOccurred())
-				Expect(fakeUI.Out).To(Say(formatted))
+				Expect(testUI.Out).To(Say(formatted))
 			})
 		})
 
@@ -54,7 +54,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		It("displays the header key and value", func() {
 			err := display.DisplayHeader("Header", "Value")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeUI.Out).To(Say("Header: Value"))
+			Expect(testUI.Out).To(Say("Header: Value"))
 		})
 	})
 
@@ -62,7 +62,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		It("displays the host", func() {
 			err := display.DisplayHost("banana")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeUI.Out).To(Say("Host: banana"))
+			Expect(testUI.Out).To(Say("Host: banana"))
 		})
 	})
 
@@ -70,7 +70,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		It("displays the method, uri and http protocal", func() {
 			err := display.DisplayRequestHeader("GET", "/v2/spaces/guid/summary", "HTTP/1.1")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeUI.Out).To(Say("GET /v2/spaces/guid/summary HTTP/1.1"))
+			Expect(testUI.Out).To(Say("GET /v2/spaces/guid/summary HTTP/1.1"))
 		})
 	})
 
@@ -78,7 +78,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		It("displays the method, uri and http protocal", func() {
 			err := display.DisplayResponseHeader("HTTP/1.1", "200 OK")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeUI.Out).To(Say("HTTP/1.1 200 OK"))
+			Expect(testUI.Out).To(Say("HTTP/1.1 200 OK"))
 		})
 	})
 
@@ -87,7 +87,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 			passedTime := time.Now()
 			err := display.DisplayType("banana", passedTime)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(fakeUI.Out).To(Say("banana: \\[%s\\]", passedTime.Format(time.RFC3339)))
+			Expect(testUI.Out).To(Say("banana: \\[%s\\]", passedTime.Format(time.RFC3339)))
 		})
 	})
 
@@ -95,7 +95,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 		It("sends error to standard error", func() {
 			err := errors.New("foobar")
 			display.HandleInternalError(err)
-			Expect(fakeUI.Err).To(Say("foobar"))
+			Expect(testUI.Err).To(Say("foobar"))
 		})
 	})
 })

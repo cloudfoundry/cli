@@ -18,7 +18,7 @@ import (
 var _ = Describe("DeletedOrphanedRoutes Command", func() {
 	var (
 		cmd        v2.DeleteOrphanedRoutesCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *v2fakes.FakeDeleteOrphanedRoutesActor
 		fakeConfig *commandfakes.FakeConfig
 		input      *Buffer
@@ -27,14 +27,13 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 	BeforeEach(func() {
 		input = NewBuffer()
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(input, out, out)
+		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeDeleteOrphanedRoutesActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
 		cmd = v2.DeleteOrphanedRoutesCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -45,7 +44,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
+		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking that the user is logged in, and org and space are targeted", func() {
@@ -83,7 +82,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 			It("does not prompt for user confirmation", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).ToNot(Say("Really delete orphaned routes\\?>> \\[yN\\]:"))
+				Expect(testUI.Out).ToNot(Say("Really delete orphaned routes\\?>> \\[yN\\]:"))
 			})
 		})
 
@@ -96,7 +95,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 				It("displays the interactive prompt", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeUI.Out).To(Say("Really delete orphaned routes\\?>> \\[yN\\]:"))
+					Expect(testUI.Out).To(Say("Really delete orphaned routes\\?>> \\[yN\\]:"))
 				})
 			})
 
@@ -169,7 +168,7 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 				It("displays getting routes message", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeUI.Out).To(Say("Getting routes as some-user ...\n"))
+					Expect(testUI.Out).To(Say("Getting routes as some-user ...\n"))
 				})
 
 				It("deletes the routes and displays that they are deleted", func() {
@@ -181,9 +180,9 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 					Expect(fakeActor.DeleteRouteArgsForCall(0)).To(Equal(routes[0].GUID))
 					Expect(fakeActor.DeleteRouteArgsForCall(1)).To(Equal(routes[1].GUID))
 
-					Expect(fakeUI.Out).To(Say("Deleting route route-1.bosh-lite.com/path..."))
-					Expect(fakeUI.Out).To(Say("Deleting route route-2.bosh-lite.com..."))
-					Expect(fakeUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("Deleting route route-1.bosh-lite.com/path..."))
+					Expect(testUI.Out).To(Say("Deleting route route-2.bosh-lite.com..."))
+					Expect(testUI.Out).To(Say("OK"))
 				})
 
 				Context("when there are warnings", func() {
@@ -197,9 +196,9 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 					It("displays the warnings", func() {
 						Expect(executeErr).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Err).To(Say("foo"))
-						Expect(fakeUI.Err).To(Say("bar"))
-						Expect(fakeUI.Err).To(Say("baz"))
+						Expect(testUI.Err).To(Say("foo"))
+						Expect(testUI.Err).To(Say("bar"))
+						Expect(testUI.Err).To(Say("baz"))
 					})
 				})
 

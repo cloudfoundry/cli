@@ -19,21 +19,20 @@ import (
 var _ = Describe("Unbind Service Command", func() {
 	var (
 		cmd        UnbindServiceCommand
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *v2fakes.FakeUnbindServiceActor
 		fakeConfig *commandfakes.FakeConfig
 		executeErr error
 	)
 
 	BeforeEach(func() {
-		out := NewBuffer()
-		fakeUI = ui.NewTestUI(nil, out, out)
+		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeUnbindServiceActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.ExperimentalReturns(true)
 
 		cmd = UnbindServiceCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -44,7 +43,7 @@ var _ = Describe("Unbind Service Command", func() {
 	})
 
 	It("Displays the experimental warning message", func() {
-		Expect(fakeUI.Out).To(Say(command.ExperimentalWarning))
+		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking that the api endpoint is set, the user is logged in, and an org and space are targeted", func() {
@@ -100,7 +99,7 @@ var _ = Describe("Unbind Service Command", func() {
 			It("displays flavor text", func() {
 				Expect(executeErr).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("Unbinding app some-app from service some-service in org some-org / space some-space as some-user..."))
+				Expect(testUI.Out).To(Say("Unbinding app some-app from service some-service in org some-org / space some-space as some-user..."))
 			})
 
 			Context("when unbinding the service instance results in an error not related to service binding", func() {
@@ -125,10 +124,10 @@ var _ = Describe("Unbind Service Command", func() {
 				It("displays warnings and 'OK'", func() {
 					Expect(executeErr).NotTo(HaveOccurred())
 
-					Expect(fakeUI.Err).To(Say("foo"))
-					Expect(fakeUI.Err).To(Say("bar"))
-					Expect(fakeUI.Err).To(Say("Binding between some-service and some-app did not exist"))
-					Expect(fakeUI.Out).To(Say("OK"))
+					Expect(testUI.Err).To(Say("foo"))
+					Expect(testUI.Err).To(Say("bar"))
+					Expect(testUI.Err).To(Say("Binding between some-service and some-app did not exist"))
+					Expect(testUI.Out).To(Say("OK"))
 				})
 			})
 
@@ -136,8 +135,8 @@ var _ = Describe("Unbind Service Command", func() {
 				It("displays OK", func() {
 					Expect(executeErr).ToNot(HaveOccurred())
 
-					Expect(fakeUI.Out).To(Say("OK"))
-					Expect(fakeUI.Err).NotTo(Say("Binding between some-service and some-app did not exist"))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Err).NotTo(Say("Binding between some-service and some-app did not exist"))
 
 					Expect(fakeActor.UnbindServiceBySpaceCallCount()).To(Equal(1))
 					appName, serviceInstanceName, spaceGUID := fakeActor.UnbindServiceBySpaceArgsForCall(0)

@@ -16,14 +16,14 @@ import (
 
 var _ = Describe("Help Command", func() {
 	var (
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 		fakeActor  *commonfakes.FakeHelpActor
 		cmd        HelpCommand
 		fakeConfig *commandfakes.FakeConfig
 	)
 
 	BeforeEach(func() {
-		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 		fakeActor = new(commonfakes.FakeHelpActor)
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns("faceman")
@@ -31,7 +31,7 @@ var _ = Describe("Help Command", func() {
 		fakeConfig.BinaryBuildDateReturns("yesterday")
 
 		cmd = HelpCommand{
-			UI:     fakeUI,
+			UI:     testUI,
 			Actor:  fakeActor,
 			Config: fakeConfig,
 		}
@@ -57,8 +57,8 @@ var _ = Describe("Help Command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("NAME:"))
-				Expect(fakeUI.Out).To(Say("   help - Show help"))
+				Expect(testUI.Out).To(Say("NAME:"))
+				Expect(testUI.Out).To(Say("   help - Show help"))
 
 				Expect(fakeActor.CommandInfoByNameCallCount()).To(Equal(1))
 				_, commandName := fakeActor.CommandInfoByNameArgsForCall(0)
@@ -69,9 +69,9 @@ var _ = Describe("Help Command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("NAME:"))
-				Expect(fakeUI.Out).To(Say("USAGE:"))
-				Expect(fakeUI.Out).To(Say("   faceman help \\[COMMAND\\]"))
+				Expect(testUI.Out).To(Say("NAME:"))
+				Expect(testUI.Out).To(Say("USAGE:"))
+				Expect(testUI.Out).To(Say("   faceman help \\[COMMAND\\]"))
 			})
 
 			Describe("related commands", func() {
@@ -88,9 +88,9 @@ var _ = Describe("Help Command", func() {
 						err := cmd.Execute(nil)
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Out).To(Say("NAME:"))
-						Expect(fakeUI.Out).To(Say("SEE ALSO:"))
-						Expect(fakeUI.Out).To(Say("   broccoli, tomato"))
+						Expect(testUI.Out).To(Say("NAME:"))
+						Expect(testUI.Out).To(Say("SEE ALSO:"))
+						Expect(testUI.Out).To(Say("   broccoli, tomato"))
 					})
 				})
 
@@ -99,8 +99,8 @@ var _ = Describe("Help Command", func() {
 						err := cmd.Execute(nil)
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Out).To(Say("NAME:"))
-						Expect(fakeUI.Out).NotTo(Say("SEE ALSO:"))
+						Expect(testUI.Out).To(Say("NAME:"))
+						Expect(testUI.Out).NotTo(Say("SEE ALSO:"))
 					})
 				})
 			})
@@ -111,9 +111,9 @@ var _ = Describe("Help Command", func() {
 						err := cmd.Execute(nil)
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Out).To(Say("USAGE:"))
-						Expect(fakeUI.Out).To(Say("ALIAS:"))
-						Expect(fakeUI.Out).To(Say("   h"))
+						Expect(testUI.Out).To(Say("USAGE:"))
+						Expect(testUI.Out).To(Say("ALIAS:"))
+						Expect(testUI.Out).To(Say("   h"))
 					})
 				})
 
@@ -133,7 +133,7 @@ var _ = Describe("Help Command", func() {
 						err := cmd.Execute(nil)
 						Expect(err).ToNot(HaveOccurred())
 
-						Expect(fakeUI.Out).ToNot(Say("ALIAS:"))
+						Expect(testUI.Out).ToNot(Say("ALIAS:"))
 					})
 				})
 			})
@@ -170,9 +170,9 @@ var _ = Describe("Help Command", func() {
 							err := cmd.Execute(nil)
 							Expect(err).ToNot(HaveOccurred())
 
-							Expect(fakeUI.Out).To(Say("USAGE:"))
-							Expect(fakeUI.Out).To(Say("OPTIONS:"))
-							Expect(fakeUI.Out).To(Say("--no-hostname\\s+Map the root domain to this app"))
+							Expect(testUI.Out).To(Say("USAGE:"))
+							Expect(testUI.Out).To(Say("OPTIONS:"))
+							Expect(testUI.Out).To(Say("--no-hostname\\s+Map the root domain to this app"))
 						})
 					})
 
@@ -181,9 +181,9 @@ var _ = Describe("Help Command", func() {
 							err := cmd.Execute(nil)
 							Expect(err).ToNot(HaveOccurred())
 
-							Expect(fakeUI.Out).To(Say("USAGE:"))
-							Expect(fakeUI.Out).To(Say("OPTIONS:"))
-							Expect(fakeUI.Out).To(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
+							Expect(testUI.Out).To(Say("USAGE:"))
+							Expect(testUI.Out).To(Say("OPTIONS:"))
+							Expect(testUI.Out).To(Say("-b\\s+Custom buildpack by name \\(e.g. my-buildpack\\) or Git URL \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git'\\) or Git URL with a branch or tag \\(e.g. 'https://github.com/cloudfoundry/java-buildpack.git#v3.3.0' for 'v3.3.0' tag\\). To use built-in buildpacks only, specify 'default' or 'null'"))
 						})
 					})
 
@@ -192,9 +192,9 @@ var _ = Describe("Help Command", func() {
 							err := cmd.Execute(nil)
 							Expect(err).ToNot(HaveOccurred())
 
-							Expect(fakeUI.Out).To(Say("USAGE:"))
-							Expect(fakeUI.Out).To(Say("OPTIONS:"))
-							Expect(fakeUI.Out).To(Say("--hostname, -n\\s+Hostname \\(e.g. my-subdomain\\)"))
+							Expect(testUI.Out).To(Say("USAGE:"))
+							Expect(testUI.Out).To(Say("OPTIONS:"))
+							Expect(testUI.Out).To(Say("--hostname, -n\\s+Hostname \\(e.g. my-subdomain\\)"))
 						})
 					})
 
@@ -203,7 +203,7 @@ var _ = Describe("Help Command", func() {
 							err := cmd.Execute(nil)
 							Expect(err).ToNot(HaveOccurred())
 
-							Expect(fakeUI.Out).ToNot(Say("--app-ports"))
+							Expect(testUI.Out).ToNot(Say("--app-ports"))
 						})
 					})
 				})
@@ -242,8 +242,8 @@ var _ = Describe("Help Command", func() {
 					err := cmd.Execute(nil)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(fakeUI.Out).To(Say("ENVIRONMENT:"))
-					Expect(fakeUI.Out).To(Say(`
+					Expect(testUI.Out).To(Say("ENVIRONMENT:"))
+					Expect(testUI.Out).To(Say(`
    CF_STAGING_TIMEOUT=15        Max wait time for buildpack staging, in minutes
    CF_STARTUP_TIMEOUT=5         Max wait time for app instance startup, in minutes
 `))
@@ -265,7 +265,7 @@ var _ = Describe("Help Command", func() {
 				It("does not show the environment section", func() {
 					err := cmd.Execute(nil)
 					Expect(err).ToNot(HaveOccurred())
-					Expect(fakeUI.Out).ToNot(Say("ENVIRONMENT:"))
+					Expect(testUI.Out).ToNot(Say("ENVIRONMENT:"))
 				})
 			})
 		})
@@ -303,12 +303,12 @@ var _ = Describe("Help Command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("enable-diego - enable Diego support for an app"))
-				Expect(fakeUI.Out).To(Say("faceman diego-enabler this and that and a little stuff"))
-				Expect(fakeUI.Out).To(Say("ALIAS:"))
-				Expect(fakeUI.Out).To(Say("ed"))
-				Expect(fakeUI.Out).To(Say("--first\\s+foobar"))
-				Expect(fakeUI.Out).To(Say("--second-third\\s+baz"))
+				Expect(testUI.Out).To(Say("enable-diego - enable Diego support for an app"))
+				Expect(testUI.Out).To(Say("faceman diego-enabler this and that and a little stuff"))
+				Expect(testUI.Out).To(Say("ALIAS:"))
+				Expect(testUI.Out).To(Say("ed"))
+				Expect(testUI.Out).To(Say("--first\\s+foobar"))
+				Expect(testUI.Out).To(Say("--second-third\\s+baz"))
 			})
 		})
 	})
@@ -326,36 +326,36 @@ var _ = Describe("Help Command", func() {
 			err := cmd.Execute(nil)
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(fakeUI.Out).To(Say("faceman version face2.0-yesterday, Cloud Foundry command line tool"))
-			Expect(fakeUI.Out).To(Say("Usage: faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
+			Expect(testUI.Out).To(Say("faceman version face2.0-yesterday, Cloud Foundry command line tool"))
+			Expect(testUI.Out).To(Say("Usage: faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
 
-			Expect(fakeUI.Out).To(Say("Before getting started:"))
-			Expect(fakeUI.Out).To(Say("help,h\\s+logout,lo"))
+			Expect(testUI.Out).To(Say("Before getting started:"))
+			Expect(testUI.Out).To(Say("help,h\\s+logout,lo"))
 
-			Expect(fakeUI.Out).To(Say("Application lifecycle:"))
-			Expect(fakeUI.Out).To(Say("apps,a\\s+logs\\s+set-env,se"))
+			Expect(testUI.Out).To(Say("Application lifecycle:"))
+			Expect(testUI.Out).To(Say("apps,a\\s+logs\\s+set-env,se"))
 
-			Expect(fakeUI.Out).To(Say("Services integration:"))
-			Expect(fakeUI.Out).To(Say("marketplace,m\\s+create-user-provided-service,cups"))
-			Expect(fakeUI.Out).To(Say("services,s\\s+update-user-provided-service,uups"))
+			Expect(testUI.Out).To(Say("Services integration:"))
+			Expect(testUI.Out).To(Say("marketplace,m\\s+create-user-provided-service,cups"))
+			Expect(testUI.Out).To(Say("services,s\\s+update-user-provided-service,uups"))
 
-			Expect(fakeUI.Out).To(Say("Route and domain management:"))
-			Expect(fakeUI.Out).To(Say("routes,r\\s+delete-route\\s+create-domain"))
-			Expect(fakeUI.Out).To(Say("domains\\s+map-route"))
+			Expect(testUI.Out).To(Say("Route and domain management:"))
+			Expect(testUI.Out).To(Say("routes,r\\s+delete-route\\s+create-domain"))
+			Expect(testUI.Out).To(Say("domains\\s+map-route"))
 
-			Expect(fakeUI.Out).To(Say("Space management:"))
-			Expect(fakeUI.Out).To(Say("spaces\\s+create-space\\s+set-space-role"))
+			Expect(testUI.Out).To(Say("Space management:"))
+			Expect(testUI.Out).To(Say("spaces\\s+create-space\\s+set-space-role"))
 
-			Expect(fakeUI.Out).To(Say("Org management:"))
-			Expect(fakeUI.Out).To(Say("orgs,o\\s+set-org-role"))
+			Expect(testUI.Out).To(Say("Org management:"))
+			Expect(testUI.Out).To(Say("orgs,o\\s+set-org-role"))
 
-			Expect(fakeUI.Out).To(Say("CLI plugin management:"))
-			Expect(fakeUI.Out).To(Say("plugins\\s+add-plugin-repo\\s+repo-plugins"))
+			Expect(testUI.Out).To(Say("CLI plugin management:"))
+			Expect(testUI.Out).To(Say("plugins\\s+add-plugin-repo\\s+repo-plugins"))
 
-			Expect(fakeUI.Out).To(Say("Global options:"))
-			Expect(fakeUI.Out).To(Say("--help, -h\\s+Show help"))
+			Expect(testUI.Out).To(Say("Global options:"))
+			Expect(testUI.Out).To(Say("--help, -h\\s+Show help"))
 
-			Expect(fakeUI.Out).To(Say("'cf help -a' lists all commands with short descriptions. See 'cf help <command>'"))
+			Expect(testUI.Out).To(Say("'cf help -a' lists all commands with short descriptions. See 'cf help <command>'"))
 		})
 
 		Context("when there are multiple installed plugins", func() {
@@ -400,9 +400,9 @@ var _ = Describe("Help Command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("Commands offered by installed plugins:"))
-				Expect(fakeUI.Out).To(Say("some-other-plugin-command\\s+enable\\s+last-plugin-command"))
-				Expect(fakeUI.Out).To(Say("disable\\s+some-other-command"))
+				Expect(testUI.Out).To(Say("Commands offered by installed plugins:"))
+				Expect(testUI.Out).To(Say("some-other-plugin-command\\s+enable\\s+last-plugin-command"))
+				Expect(testUI.Out).To(Say("disable\\s+some-other-command"))
 
 			})
 		})
@@ -433,95 +433,95 @@ var _ = Describe("Help Command", func() {
 				err := cmd.Execute(nil)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(fakeUI.Out).To(Say("NAME:"))
-				Expect(fakeUI.Out).To(Say("faceman - A command line tool to interact with Cloud Foundry"))
-				Expect(fakeUI.Out).To(Say("USAGE:"))
-				Expect(fakeUI.Out).To(Say("faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
-				Expect(fakeUI.Out).To(Say("VERSION:"))
-				Expect(fakeUI.Out).To(Say("face2.0-yesterday"))
+				Expect(testUI.Out).To(Say("NAME:"))
+				Expect(testUI.Out).To(Say("faceman - A command line tool to interact with Cloud Foundry"))
+				Expect(testUI.Out).To(Say("USAGE:"))
+				Expect(testUI.Out).To(Say("faceman \\[global options\\] command \\[arguments...\\] \\[command options\\]"))
+				Expect(testUI.Out).To(Say("VERSION:"))
+				Expect(testUI.Out).To(Say("face2.0-yesterday"))
 
-				Expect(fakeUI.Out).To(Say("GETTING STARTED:"))
-				Expect(fakeUI.Out).To(Say("help\\s+Show help"))
-				Expect(fakeUI.Out).To(Say("api\\s+Set or view target api url"))
+				Expect(testUI.Out).To(Say("GETTING STARTED:"))
+				Expect(testUI.Out).To(Say("help\\s+Show help"))
+				Expect(testUI.Out).To(Say("api\\s+Set or view target api url"))
 
-				Expect(fakeUI.Out).To(Say("APPS:"))
-				Expect(fakeUI.Out).To(Say("apps\\s+List all apps in the target space"))
-				Expect(fakeUI.Out).To(Say("ssh-enabled\\s+Reports whether SSH is enabled on an application container instance"))
+				Expect(testUI.Out).To(Say("APPS:"))
+				Expect(testUI.Out).To(Say("apps\\s+List all apps in the target space"))
+				Expect(testUI.Out).To(Say("ssh-enabled\\s+Reports whether SSH is enabled on an application container instance"))
 
-				Expect(fakeUI.Out).To(Say("SERVICES:"))
-				Expect(fakeUI.Out).To(Say("marketplace\\s+List available offerings in the marketplace"))
-				Expect(fakeUI.Out).To(Say("create-service\\s+Create a service instance"))
+				Expect(testUI.Out).To(Say("SERVICES:"))
+				Expect(testUI.Out).To(Say("marketplace\\s+List available offerings in the marketplace"))
+				Expect(testUI.Out).To(Say("create-service\\s+Create a service instance"))
 
-				Expect(fakeUI.Out).To(Say("ORGS:"))
-				Expect(fakeUI.Out).To(Say("orgs\\s+List all orgs"))
-				Expect(fakeUI.Out).To(Say("delete-org\\s+Delete an org"))
+				Expect(testUI.Out).To(Say("ORGS:"))
+				Expect(testUI.Out).To(Say("orgs\\s+List all orgs"))
+				Expect(testUI.Out).To(Say("delete-org\\s+Delete an org"))
 
-				Expect(fakeUI.Out).To(Say("SPACES:"))
-				Expect(fakeUI.Out).To(Say("spaces\\s+List all spaces in an org"))
-				Expect(fakeUI.Out).To(Say("allow-space-ssh\\s+Allow SSH access for the space"))
+				Expect(testUI.Out).To(Say("SPACES:"))
+				Expect(testUI.Out).To(Say("spaces\\s+List all spaces in an org"))
+				Expect(testUI.Out).To(Say("allow-space-ssh\\s+Allow SSH access for the space"))
 
-				Expect(fakeUI.Out).To(Say("DOMAINS:"))
-				Expect(fakeUI.Out).To(Say("domains\\s+List domains in the target org"))
-				Expect(fakeUI.Out).To(Say("router-groups\\s+List router groups"))
+				Expect(testUI.Out).To(Say("DOMAINS:"))
+				Expect(testUI.Out).To(Say("domains\\s+List domains in the target org"))
+				Expect(testUI.Out).To(Say("router-groups\\s+List router groups"))
 
-				Expect(fakeUI.Out).To(Say("ROUTES:"))
-				Expect(fakeUI.Out).To(Say("routes\\s+List all routes in the current space or the current organization"))
-				Expect(fakeUI.Out).To(Say("unmap-route\\s+Remove a url route from an app"))
+				Expect(testUI.Out).To(Say("ROUTES:"))
+				Expect(testUI.Out).To(Say("routes\\s+List all routes in the current space or the current organization"))
+				Expect(testUI.Out).To(Say("unmap-route\\s+Remove a url route from an app"))
 
-				Expect(fakeUI.Out).To(Say("BUILDPACKS:"))
-				Expect(fakeUI.Out).To(Say("buildpacks\\s+List all buildpacks"))
-				Expect(fakeUI.Out).To(Say("delete-buildpack\\s+Delete a buildpack"))
+				Expect(testUI.Out).To(Say("BUILDPACKS:"))
+				Expect(testUI.Out).To(Say("buildpacks\\s+List all buildpacks"))
+				Expect(testUI.Out).To(Say("delete-buildpack\\s+Delete a buildpack"))
 
-				Expect(fakeUI.Out).To(Say("USER ADMIN:"))
-				Expect(fakeUI.Out).To(Say("create-user\\s+Create a new user"))
-				Expect(fakeUI.Out).To(Say("space-users\\s+Show space users by role"))
+				Expect(testUI.Out).To(Say("USER ADMIN:"))
+				Expect(testUI.Out).To(Say("create-user\\s+Create a new user"))
+				Expect(testUI.Out).To(Say("space-users\\s+Show space users by role"))
 
-				Expect(fakeUI.Out).To(Say("ORG ADMIN:"))
-				Expect(fakeUI.Out).To(Say("quotas\\s+List available usage quotas"))
-				Expect(fakeUI.Out).To(Say("delete-quota\\s+Delete a quota"))
+				Expect(testUI.Out).To(Say("ORG ADMIN:"))
+				Expect(testUI.Out).To(Say("quotas\\s+List available usage quotas"))
+				Expect(testUI.Out).To(Say("delete-quota\\s+Delete a quota"))
 
-				Expect(fakeUI.Out).To(Say("SPACE ADMIN:"))
-				Expect(fakeUI.Out).To(Say("space-quotas\\s+List available space resource quotas"))
-				Expect(fakeUI.Out).To(Say("set-space-quota\\s+Assign a space quota definition to a space"))
+				Expect(testUI.Out).To(Say("SPACE ADMIN:"))
+				Expect(testUI.Out).To(Say("space-quotas\\s+List available space resource quotas"))
+				Expect(testUI.Out).To(Say("set-space-quota\\s+Assign a space quota definition to a space"))
 
-				Expect(fakeUI.Out).To(Say("SERVICE ADMIN:"))
-				Expect(fakeUI.Out).To(Say("service-auth-tokens\\s+List service auth tokens"))
-				Expect(fakeUI.Out).To(Say("service-access\\s+List service access settings"))
+				Expect(testUI.Out).To(Say("SERVICE ADMIN:"))
+				Expect(testUI.Out).To(Say("service-auth-tokens\\s+List service auth tokens"))
+				Expect(testUI.Out).To(Say("service-access\\s+List service access settings"))
 
-				Expect(fakeUI.Out).To(Say("SECURITY GROUP:"))
-				Expect(fakeUI.Out).To(Say("security-group\\s+Show a single security group"))
-				Expect(fakeUI.Out).To(Say("staging-security-groups\\s+List security groups in the staging set for applications"))
+				Expect(testUI.Out).To(Say("SECURITY GROUP:"))
+				Expect(testUI.Out).To(Say("security-group\\s+Show a single security group"))
+				Expect(testUI.Out).To(Say("staging-security-groups\\s+List security groups in the staging set for applications"))
 
-				Expect(fakeUI.Out).To(Say("ENVIRONMENT VARIABLE GROUPS:"))
-				Expect(fakeUI.Out).To(Say("running-environment-variable-group\\s+Retrieve the contents of the running environment variable group"))
-				Expect(fakeUI.Out).To(Say("set-running-environment-variable-group\\s+Pass parameters as JSON to create a running environment variable group"))
+				Expect(testUI.Out).To(Say("ENVIRONMENT VARIABLE GROUPS:"))
+				Expect(testUI.Out).To(Say("running-environment-variable-group\\s+Retrieve the contents of the running environment variable group"))
+				Expect(testUI.Out).To(Say("set-running-environment-variable-group\\s+Pass parameters as JSON to create a running environment variable group"))
 
-				Expect(fakeUI.Out).To(Say("FEATURE FLAGS:"))
-				Expect(fakeUI.Out).To(Say("feature-flags\\s+Retrieve list of feature flags with status of each flag-able feature"))
-				Expect(fakeUI.Out).To(Say("disable-feature-flag\\s+Disable the use of a feature so that users have access to and can use the feature"))
+				Expect(testUI.Out).To(Say("FEATURE FLAGS:"))
+				Expect(testUI.Out).To(Say("feature-flags\\s+Retrieve list of feature flags with status of each flag-able feature"))
+				Expect(testUI.Out).To(Say("disable-feature-flag\\s+Disable the use of a feature so that users have access to and can use the feature"))
 
-				Expect(fakeUI.Out).To(Say("ADVANCED:"))
-				Expect(fakeUI.Out).To(Say("curl\\s+Executes a request to the targeted API endpoint"))
-				Expect(fakeUI.Out).To(Say("ssh-code\\s+Get a one time password for ssh clients"))
+				Expect(testUI.Out).To(Say("ADVANCED:"))
+				Expect(testUI.Out).To(Say("curl\\s+Executes a request to the targeted API endpoint"))
+				Expect(testUI.Out).To(Say("ssh-code\\s+Get a one time password for ssh clients"))
 
-				Expect(fakeUI.Out).To(Say("ADD/REMOVE PLUGIN REPOSITORY:"))
-				Expect(fakeUI.Out).To(Say("add-plugin-repo\\s+Add a new plugin repository"))
-				Expect(fakeUI.Out).To(Say("repo-plugins\\s+List all available plugins in specified repository or in all added repositories"))
+				Expect(testUI.Out).To(Say("ADD/REMOVE PLUGIN REPOSITORY:"))
+				Expect(testUI.Out).To(Say("add-plugin-repo\\s+Add a new plugin repository"))
+				Expect(testUI.Out).To(Say("repo-plugins\\s+List all available plugins in specified repository or in all added repositories"))
 
-				Expect(fakeUI.Out).To(Say("ADD/REMOVE PLUGIN:"))
-				Expect(fakeUI.Out).To(Say("plugins\\s+List all available plugin commands"))
-				Expect(fakeUI.Out).To(Say("uninstall-plugin\\s+Uninstall the plugin defined in command argument"))
+				Expect(testUI.Out).To(Say("ADD/REMOVE PLUGIN:"))
+				Expect(testUI.Out).To(Say("plugins\\s+List all available plugin commands"))
+				Expect(testUI.Out).To(Say("uninstall-plugin\\s+Uninstall the plugin defined in command argument"))
 
-				Expect(fakeUI.Out).To(Say("INSTALLED PLUGIN COMMANDS:"))
-				Expect(fakeUI.Out).To(Say("enable-diego\\s+enable Diego support for an app"))
+				Expect(testUI.Out).To(Say("INSTALLED PLUGIN COMMANDS:"))
+				Expect(testUI.Out).To(Say("enable-diego\\s+enable Diego support for an app"))
 
-				Expect(fakeUI.Out).To(Say("ENVIRONMENT VARIABLES:"))
-				Expect(fakeUI.Out).To(Say("CF_COLOR=false\\s+Do not colorize output"))
-				Expect(fakeUI.Out).To(Say("CF_DIAL_TIMEOUT=5\\s+Max wait time to establish a connection, including name resolution, in seconds"))
-				Expect(fakeUI.Out).To(Say("CF_TRACE=true"))
+				Expect(testUI.Out).To(Say("ENVIRONMENT VARIABLES:"))
+				Expect(testUI.Out).To(Say("CF_COLOR=false\\s+Do not colorize output"))
+				Expect(testUI.Out).To(Say("CF_DIAL_TIMEOUT=5\\s+Max wait time to establish a connection, including name resolution, in seconds"))
+				Expect(testUI.Out).To(Say("CF_TRACE=true"))
 
-				Expect(fakeUI.Out).To(Say("GLOBAL OPTIONS:"))
-				Expect(fakeUI.Out).To(Say("--help, -h\\s+Show help"))
+				Expect(testUI.Out).To(Say("GLOBAL OPTIONS:"))
+				Expect(testUI.Out).To(Say("--help, -h\\s+Show help"))
 			})
 
 			Context("when there are multiple installed plugins", func() {
@@ -566,7 +566,7 @@ var _ = Describe("Help Command", func() {
 					err := cmd.Execute(nil)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(fakeUI.Out).To(Say(`INSTALLED PLUGIN COMMANDS:.*
+					Expect(testUI.Out).To(Say(`INSTALLED PLUGIN COMMANDS:.*
 \s+some-other-plugin-command\s+does some other thing.*
 \s+disable\s+disable command.*
 \s+enable\s+enable command.*

@@ -18,7 +18,7 @@ var _ = Describe("New Clients", func() {
 	var (
 		binaryName string
 		fakeConfig *commandfakes.FakeConfig
-		fakeUI     *ui.UI
+		testUI     *ui.UI
 	)
 
 	BeforeEach(func() {
@@ -26,12 +26,12 @@ var _ = Describe("New Clients", func() {
 		fakeConfig = new(commandfakes.FakeConfig)
 		fakeConfig.BinaryNameReturns(binaryName)
 
-		fakeUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
+		testUI = ui.NewTestUI(NewBuffer(), NewBuffer(), NewBuffer())
 	})
 
 	Context("when the api endpoint is not set", func() {
 		It("returns an error", func() {
-			_, err := NewClients(fakeConfig, fakeUI)
+			_, err := NewClients(fakeConfig, testUI)
 			Expect(err).To(MatchError(command.NoAPISetError{
 				BinaryName: binaryName,
 			}))
@@ -48,7 +48,7 @@ var _ = Describe("New Clients", func() {
 		})
 
 		It("passes the value to the target", func() {
-			_, err := NewClients(fakeConfig, fakeUI)
+			_, err := NewClients(fakeConfig, testUI)
 			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk: dial tcp: i/o timeout"))
 		})
 	})
