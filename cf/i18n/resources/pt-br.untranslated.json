@@ -1184,6 +1184,10 @@
     "translation": ""
   },
   {
+    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Deleting route {{.Route}} ...",
     "translation": ""
   },

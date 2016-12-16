@@ -2128,6 +2128,10 @@
     "translation": "{{.CurrentUser}} としてサービス・インスタンス {{.ServiceInstanceName}} のキー {{.ServiceKeyName}} を削除しています..."
   },
   {
+    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Deleting org {{.OrgName}} as {{.Username}}...",
     "translation": "{{.Username}} として組織 {{.OrgName}} を削除しています..."
   },

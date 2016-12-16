@@ -2128,6 +2128,10 @@
     "translation": "Deleting key {{.ServiceKeyName}} for service instance {{.ServiceInstanceName}} as {{.CurrentUser}}..."
   },
   {
+    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Deleting org {{.OrgName}} as {{.Username}}...",
     "translation": "Deleting org {{.OrgName}} as {{.Username}}..."
   },

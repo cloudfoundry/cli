@@ -2128,6 +2128,10 @@
     "translation": "Eliminazione della chiave {{.ServiceKeyName}} per l'istanza del servizio {{.ServiceInstanceName}} come {{.CurrentUser}} in corso..."
   },
   {
+    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
+    "translation": ""
+  },
+  {
     "id": "Deleting org {{.OrgName}} as {{.Username}}...",
     "translation": "Eliminazione dell'organizzazione {{.OrgName}} come {{.Username}} in corso..."
   },
