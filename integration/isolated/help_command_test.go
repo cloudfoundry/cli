@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Help Command", func() {
+var _ = Describe("help command", func() {
 	DescribeTable("displays help for common commands",
 		func(setup func() *exec.Cmd) {
 			cmd := setup()

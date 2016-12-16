@@ -19,7 +19,7 @@ import (
 	"github.com/onsi/gomega/ghttp"
 )
 
-var _ = Describe("API Command", func() {
+var _ = Describe("api command", func() {
 	BeforeEach(func() {
 		helpers.RunIfExperimental("remove in #133310639")
 	})
