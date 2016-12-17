@@ -160,7 +160,7 @@ var _ = Describe("api command", func() {
 				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(session.Out).Should(Say("Setting api endpoint to %s...", apiURL))
-				Eventually(session.Err).Should(Say("Invalid SSL Cert for %s", apiURL))
+				Eventually(session.Err).Should(Say("SSL Certificate Error x509: certificate is valid for|Invalid SSL Cert for %s", apiURL))
 				Eventually(session.Err).Should(Say("TIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint"))
 				Eventually(session.Out).Should(Say("FAILED"))
 				Eventually(session).Should(Exit(1))

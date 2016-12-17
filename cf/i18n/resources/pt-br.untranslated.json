@@ -1464,6 +1464,10 @@
     "translation": "SPACE"
   },
   {
+    "id": "SSL Certificate Error {{.Message}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
+    "translation": ""
+  },
+  {
     "id": "SUCCEEDED",
     "translation": ""
   },

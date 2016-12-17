@@ -12,6 +12,8 @@ func HandleError(err error) error {
 		return command.APIRequestError{Err: e.Err}
 	case cloudcontroller.UnverifiedServerError:
 		return command.InvalidSSLCertError{API: e.URL}
+	case cloudcontroller.SSLValidationHostnameError:
+		return command.SSLCertErrorError{Message: e.Message}
 	case cloudcontroller.UnprocessableEntityError:
 		if e.Message == "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app." {
 			return RunTaskError{

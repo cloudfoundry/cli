@@ -169,6 +169,30 @@ var _ = Describe("Cloud Controller Connection", func() {
 				})
 			})
 
+			Context("when the server's certificate does not match the hostname", func() {
+				Context("skipSSLValidation is false", func() {
+					BeforeEach(func() {
+						Skip("figure out how to test this!!!")
+						server.AppendHandlers(
+							CombineHandlers(
+								VerifyRequest(http.MethodGet, "/v2/foo"),
+							),
+						)
+
+						connection = NewConnection(Config{})
+					})
+
+					It("returns a SSLValidationHostnameError", func() {
+						request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s", server.URL()), nil)
+						Expect(err).ToNot(HaveOccurred())
+
+						var response Response
+						err = connection.Make(request, &response)
+						Expect(err).To(MatchError(SSLValidationHostnameError{Message: "banana"}))
+					})
+				})
+			})
+
 			Describe("RawHTTPStatusError", func() {
 				var ccResponse string
 				BeforeEach(func() {

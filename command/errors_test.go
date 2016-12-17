@@ -38,9 +38,10 @@ var _ = Describe("Translatable Errors", func() {
 		Entry("NoTargetedSpaceError", NoTargetedSpaceError{}),
 		Entry("NotLoggedInError", NotLoggedInError{}),
 
-		// Cloud controller errors.
+		// Cloud Controller errors.
 		Entry("APIRequestError", APIRequestError{}),
 		Entry("InvalidSSLCertError", InvalidSSLCertError{}),
+		Entry("SSLCertErrorError", SSLCertErrorError{}),
 		Entry("APINotFoundError", APINotFoundError{}),
 
 		// Actor errors.
