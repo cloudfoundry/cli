@@ -38,6 +38,12 @@ var _ = Describe("HandleError", func() {
 			API: "some-url",
 		}),
 
+		Entry("cloudcontroller.SSLValidationHostnameError -> SSLCertErrorError", cloudcontroller.SSLValidationHostnameError{
+			Message: "some-message",
+		}, command.SSLCertErrorError{
+			Message: "some-message",
+		}),
+
 		Entry("cloudcontroller.UnprocessableEntityError with droplet message -> RunTaskError", cloudcontroller.UnprocessableEntityError{
 			Message: "The request is semantically invalid: Task must have a droplet. Specify droplet or assign current droplet to app.",
 		}, RunTaskError{

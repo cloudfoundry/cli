@@ -4660,6 +4660,10 @@
     "translation": "애플리케이션 컨테이너 인스턴스에 대한 SSH"
   },
   {
+    "id": "SSL Certificate Error {{.Message}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
+    "translation": ""
+  },
+  {
     "id": "STACK",
     "translation": "스택"
   },

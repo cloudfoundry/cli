@@ -57,12 +57,18 @@ func (connection *CloudControllerConnection) Make(request *http.Request, passedR
 func (connection *CloudControllerConnection) processRequestErrors(request *http.Request, err error) error {
 	switch e := err.(type) {
 	case *url.Error:
-		if _, ok := e.Err.(x509.UnknownAuthorityError); ok {
+		switch urlErr := e.Err.(type) {
+		case x509.UnknownAuthorityError:
 			return UnverifiedServerError{
 				URL: request.URL.String(),
 			}
+		case x509.HostnameError:
+			return SSLValidationHostnameError{
+				Message: urlErr.Error(),
+			}
+		default:
+			return RequestError{Err: e}
 		}
-		return RequestError{Err: e}
 	default:
 		return err
 	}

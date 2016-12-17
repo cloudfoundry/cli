@@ -34,6 +34,12 @@ var _ = Describe("HandleError", func() {
 			API: "some-url",
 		}),
 
+		Entry("cloudcontroller.SSLValidationHostnameError -> SSLCertErrorError", cloudcontroller.SSLValidationHostnameError{
+			Message: "some-message",
+		}, command.SSLCertErrorError{
+			Message: "some-message",
+		}),
+
 		Entry("cloudcontroller.APINotFoundError -> APINotFoundError", cloudcontroller.APINotFoundError{
 			URL: "some-url",
 		}, command.APINotFoundError{

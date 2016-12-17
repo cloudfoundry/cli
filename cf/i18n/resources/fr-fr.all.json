@@ -4660,6 +4660,10 @@
     "translation": "Utilisation de SSH pour une instance de conteneur d'applications"
   },
   {
+    "id": "SSL Certificate Error {{.Message}}\nTIP: Use 'cf api --skip-ssl-validation' to continue with an insecure API endpoint",
+    "translation": ""
+  },
+  {
     "id": "STACK",
     "translation": "PILE"
   },

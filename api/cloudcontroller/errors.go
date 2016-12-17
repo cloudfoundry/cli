@@ -12,6 +12,16 @@ func (e UnverifiedServerError) Error() string {
 	return "x509: certificate signed by unknown authority"
 }
 
+// SSLValidationHostnameError replaces x509.HostnameError when the server has
+// SSL certificate that does not match the hostname.
+type SSLValidationHostnameError struct {
+	Message string
+}
+
+func (e SSLValidationHostnameError) Error() string {
+	return fmt.Sprintf("Hostname does not match SSL Certificate (%s)", e.Message)
+}
+
 type RequestError struct {
 	Err error
 }
