@@ -2128,10 +2128,6 @@
     "translation": "Excluindo a chave {{.ServiceKeyName}} para a instância de serviço {{.ServiceInstanceName}} como {{.CurrentUser}}..."
   },
   {
-    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
-    "translation": ""
-  },
-  {
     "id": "Deleting org {{.OrgName}} as {{.Username}}...",
     "translation": "Excluindo a organização {{.OrgName}} como {{.Username}}..."
   },

@@ -2128,10 +2128,6 @@
     "translation": "正在以 {{.CurrentUser}} 身分刪除服務實例 {{.ServiceInstanceName}} 的金鑰 {{.ServiceKeyName}}..."
   },
   {
-    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
-    "translation": ""
-  },
-  {
     "id": "Deleting org {{.OrgName}} as {{.Username}}...",
     "translation": "正在以 {{.Username}} 身分刪除組織 {{.OrgName}}..."
   },

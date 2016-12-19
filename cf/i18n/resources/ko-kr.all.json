@@ -2128,10 +2128,6 @@
     "translation": "{{.CurrentUser}}(으)로 서비스 인스턴스 {{.ServiceInstanceName}}의 {{.ServiceKeyName}} 키 삭제 중..."
   },
   {
-    "id": "Deleting org {{.OrgName}} as {{.UserName}}...",
-    "translation": ""
-  },
-  {
     "id": "Deleting org {{.OrgName}} as {{.Username}}...",
     "translation": "{{.Username}}(으)로 {{.OrgName}} 조직 삭제 중..."
   },
