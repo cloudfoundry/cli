@@ -22,6 +22,8 @@ func (e SSLValidationHostnameError) Error() string {
 	return fmt.Sprintf("Hostname does not match SSL Certificate (%s)", e.Message)
 }
 
+// RequestError represents a generic error encountered while performing the
+// HTTP request. This generic error occurs before a HTTP response is obtained.
 type RequestError struct {
 	Err error
 }
@@ -30,6 +32,7 @@ func (e RequestError) Error() string {
 	return e.Err.Error()
 }
 
+// RawHTTPStatusError represents any response with a 4xx or 5xx status code.
 type RawHTTPStatusError struct {
 	StatusCode  int
 	RawResponse []byte

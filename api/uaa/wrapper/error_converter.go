@@ -7,19 +7,25 @@ import (
 	"code.cloudfoundry.org/cli/api/uaa"
 )
 
+// errorWrapper is the wrapper that converts responses with 4xx and 5xx status
+// codes to an error.
 type errorWrapper struct {
 	connection uaa.Connection
 }
 
+// NewErrorWrapper returns a new error wrapper.
 func NewErrorWrapper() *errorWrapper {
 	return new(errorWrapper)
 }
 
+// Wrap wraps a UAA connection in this error handling wrapper.
 func (e *errorWrapper) Wrap(innerconnection uaa.Connection) uaa.Connection {
 	e.connection = innerconnection
 	return e
 }
 
+// Make converts RawHTTPStatusError, which represents responses with 4xx and
+// 5xx status codes, to specific errors.
 func (e *errorWrapper) Make(request *http.Request, passedResponse *uaa.Response) error {
 	err := e.connection.Make(request, passedResponse)
 

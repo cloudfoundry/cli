@@ -2,14 +2,16 @@ package uaa
 
 import "net/http"
 
-// Response contains the result of a UAA request
+// Response represents an UAA response object.
 type Response struct {
-	// Result is the unserialized response of the UAA request
+	// Result represents the resource entity type that is expected in the
+	// response JSON.
 	Result interface{}
 
-	// RawResponse is the raw bytes of the HTTP Response
+	// RawResponse represents the response body.
 	RawResponse []byte
 
+	// HTTPResponse represents the HTTP response object.
 	HTTPResponse *http.Response
 }
 

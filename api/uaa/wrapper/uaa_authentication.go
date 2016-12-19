@@ -11,6 +11,7 @@ import (
 
 //go:generate counterfeiter . UAAClient
 
+// UAAClient is the interface for getting a valid access token
 type UAAClient interface {
 	AccessToken() string
 	RefreshToken() error

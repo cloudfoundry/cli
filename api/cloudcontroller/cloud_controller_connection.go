@@ -13,16 +13,21 @@ import (
 	"time"
 )
 
+// CloudControllerConnection represents a connection to the Cloud Controller
+// server.
 type CloudControllerConnection struct {
 	HTTPClient *http.Client
 	UserAgent  string
 }
 
+// Config is for configuring a CloudControllerConnection.
 type Config struct {
 	DialTimeout       time.Duration
 	SkipSSLValidation bool
 }
 
+// NewConnection returns a new CloudControllerConnection with provided
+// configuration.
 func NewConnection(config Config) *CloudControllerConnection {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -40,6 +45,7 @@ func NewConnection(config Config) *CloudControllerConnection {
 	}
 }
 
+// Make performs the request and parses the response.
 func (connection *CloudControllerConnection) Make(request *http.Request, passedResponse *Response) error {
 	// In case this function is called from a retry, passedResponse may already
 	// be populated with a previous response. We reset in case there's an HTTP

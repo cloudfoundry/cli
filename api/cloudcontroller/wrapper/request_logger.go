@@ -12,6 +12,7 @@ import (
 
 //go:generate counterfeiter . RequestLoggerOutput
 
+// RequestLoggerOutput is the interface for displaying logs
 type RequestLoggerOutput interface {
 	DisplayBody(body []byte) error
 	DisplayHeader(name string, value string) error
@@ -24,6 +25,8 @@ type RequestLoggerOutput interface {
 	Stop() error
 }
 
+// RequestLogger is the wrapper that logs requests to and responses from the
+// Cloud Controller server
 type RequestLogger struct {
 	connection cloudcontroller.Connection
 	output     RequestLoggerOutput
@@ -42,7 +45,7 @@ func (logger *RequestLogger) Wrap(innerconnection cloudcontroller.Connection) cl
 	return logger
 }
 
-// Make records the request and the response to ui
+// Make records the request and the response to UI
 func (logger *RequestLogger) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	err := logger.displayRequest(request)
 	if err != nil {

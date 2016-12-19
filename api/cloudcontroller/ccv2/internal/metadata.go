@@ -2,6 +2,8 @@ package internal
 
 import "time"
 
+// Metadata represents the "metadata" object of a resource item in a Cloud
+// Controller response.
 type Metadata struct {
 	GUID      string    `json:"guid"`
 	URL       string    `json:"url"`

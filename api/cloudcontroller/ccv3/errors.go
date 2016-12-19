@@ -40,6 +40,8 @@ func (e UnexpectedResponseError) Error() string {
 	return strings.Join(messages, "\n")
 }
 
+// errorWrapper is the wrapper that converts responses with 4xx and 5xx status
+// codes to an error.
 type errorWrapper struct {
 	connection cloudcontroller.Connection
 }
