@@ -71,9 +71,9 @@ func (cmd *DeleteOrgCommand) Execute(args []string) error {
 		}
 	}
 
-	cmd.UI.DisplayText("Deleting org {{.OrgName}} as {{.UserName}}...", map[string]interface{}{
+	cmd.UI.DisplayText("Deleting org {{.OrgName}} as {{.Username}}...", map[string]interface{}{
 		"OrgName":  cmd.RequiredArgs.Organization,
-		"UserName": user.Name,
+		"Username": user.Name,
 	})
 
 	warnings, err := cmd.Actor.DeleteOrganization(cmd.RequiredArgs.Organization)
