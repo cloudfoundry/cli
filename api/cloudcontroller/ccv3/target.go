@@ -6,6 +6,8 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
 
+// TargetSettings represents configuration for establishing a connection to the
+// Cloud Controller server.
 type TargetSettings struct {
 	DialTimeout       time.Duration
 	SkipSSLValidation bool

@@ -2,7 +2,7 @@ package uaa
 
 import "fmt"
 
-// RawHTTPStatusError wraps HTTP responses with 4xx and 5xx status codes.
+// RawHTTPStatusError represents any response with a 4xx or 5xx status code.
 type RawHTTPStatusError struct {
 	StatusCode  int
 	RawResponse []byte
@@ -42,7 +42,8 @@ func (e UnverifiedServerError) Error() string {
 	return "x509: certificate signed by unknown authority"
 }
 
-// RequestError represents a connection level request error
+// RequestError represents a generic error encountered while performing the
+// HTTP request. This generic error occurs before a HTTP response is obtained.
 type RequestError struct {
 	Err error
 }

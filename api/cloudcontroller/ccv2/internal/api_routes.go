@@ -24,6 +24,8 @@ const (
 	UsersRequest                  = "Users"
 )
 
+// APIRoutes is a list of routes used by the rata library to construct request
+// URLs.
 var APIRoutes = rata.Routes{
 	{Path: "/v2/apps", Method: http.MethodGet, Name: AppsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: InfoRequest},

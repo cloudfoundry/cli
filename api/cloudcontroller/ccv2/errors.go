@@ -26,6 +26,8 @@ func (e UnexpectedResponseError) Error() string {
 	return fmt.Sprintf("Unexpected Response\nResponse Code: %s\nCC Code: %i\nCC ErrorCode: %s\nDescription: %s", e.ResponseCode, e.Code, e.ErrorCode, e.Description)
 }
 
+// errorWrapper is the wrapper that converts responses with 4xx and 5xx status
+// codes to an error.
 type errorWrapper struct {
 	connection cloudcontroller.Connection
 }
@@ -34,11 +36,14 @@ func newErrorWrapper() *errorWrapper {
 	return new(errorWrapper)
 }
 
+// Wrap wraps a Cloud Controller connection in this error handling wrapper.
 func (e *errorWrapper) Wrap(innerconnection cloudcontroller.Connection) cloudcontroller.Connection {
 	e.connection = innerconnection
 	return e
 }
 
+// Make converts RawHTTPStatusError, which represents responses with 4xx and
+// 5xx status codes, to specific errors.
 func (e *errorWrapper) Make(request *http.Request, passedResponse *cloudcontroller.Response) error {
 	err := e.connection.Make(request, passedResponse)
 

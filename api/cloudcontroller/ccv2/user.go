@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
 )
 
-// User represents a cloud controller user.
+// User represents a Cloud Controller User.
 type User struct {
 	GUID string
 }
@@ -31,7 +31,7 @@ func (user *User) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// NewUser creates a new cloud controller user from the provided UAA user ID.
+// NewUser creates a new Cloud Controller User from the provided UAA user ID.
 func (client *Client) NewUser(uaaUserID string) (User, Warnings, error) {
 	bodyBytes, err := json.Marshal(userRequestBody{
 		GUID: uaaUserID,

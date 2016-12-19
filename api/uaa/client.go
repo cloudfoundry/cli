@@ -36,6 +36,7 @@ type Client struct {
 	connection Connection
 }
 
+// Config allows the Client to be configured
 type Config struct {
 	AppName           string
 	AppVersion        string
@@ -45,7 +46,7 @@ type Config struct {
 	URL               string
 }
 
-// NewClient returns a new UAA client
+// NewClient returns a new UAA Client with the provided configuration
 func NewClient(config Config) *Client {
 	userAgent := fmt.Sprintf("%s/%s (%s; %s %s)",
 		config.AppName,
