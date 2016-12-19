@@ -376,7 +376,7 @@ var _ = Describe("Config", func() {
 
 			Entry("CF_TRACE false: disables verbose", "false", "", false, false, nil),
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true, true, nil),
-			Entry("CF_TRACE false, config trace true: enables verbose", "false", "true", false, true, nil),
+			Entry("CF_TRACE false, config trace true: disables verbose", "false", "true", false, false, nil),
 			Entry("CF_TRACE false, config trace file path: enables logging to file", "false", "/foo/bar", false, false, []string{"/foo/bar"}),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo/bar", true, true, []string{"/foo/bar"}),
 
