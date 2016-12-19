@@ -3,6 +3,7 @@ package cloudcontroller_test
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "github.com/onsi/ginkgo"
@@ -172,10 +173,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 			Context("when the server's certificate does not match the hostname", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
-						Skip("figure out how to test this!!!")
 						server.AppendHandlers(
 							CombineHandlers(
-								VerifyRequest(http.MethodGet, "/v2/foo"),
+								VerifyRequest(http.MethodGet, "/"),
 							),
 						)
 
@@ -183,12 +183,15 @@ var _ = Describe("Cloud Controller Connection", func() {
 					})
 
 					It("returns a SSLValidationHostnameError", func() {
-						request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s", server.URL()), nil)
+						altHostURL := strings.Replace(server.URL(), "127.0.0.1", "127.0.0.1.xip.io", -1)
+						request, err := http.NewRequest(http.MethodGet, altHostURL, nil)
 						Expect(err).ToNot(HaveOccurred())
 
 						var response Response
 						err = connection.Make(request, &response)
-						Expect(err).To(MatchError(SSLValidationHostnameError{Message: "banana"}))
+						Expect(err).To(MatchError(SSLValidationHostnameError{
+							Message: "x509: certificate is valid for example.com, not 127.0.0.1.xip.io",
+						}))
 					})
 				})
 			})
