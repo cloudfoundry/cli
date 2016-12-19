@@ -69,10 +69,10 @@ var _ = Describe("delete-user command", func() {
 
 	Context("when the given user exists", func() {
 		BeforeEach(func() {
-			userRepo.FindByUsernameReturns(models.UserFields{
+			userRepo.FindAllByUsernameReturns([]models.UserFields{{
 				Username: "user-name",
 				GUID:     "user-guid",
-			}, nil)
+			}}, nil)
 		})
 
 		It("deletes a user with the given name", func() {
@@ -85,7 +85,7 @@ var _ = Describe("delete-user command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(userRepo.FindByUsernameArgsForCall(0)).To(Equal("user-name"))
+			Expect(userRepo.FindAllByUsernameArgsForCall(0)).To(Equal("user-name"))
 			Expect(userRepo.DeleteArgsForCall(0)).To(Equal("user-guid"))
 		})
 
@@ -94,7 +94,7 @@ var _ = Describe("delete-user command", func() {
 			runCommand("user")
 
 			Expect(ui.Prompts).To(ContainSubstrings([]string{"Really delete"}))
-			Expect(userRepo.FindByUsernameCallCount()).To(BeZero())
+			Expect(userRepo.FindAllByUsernameCallCount()).To(BeZero())
 			Expect(userRepo.DeleteCallCount()).To(BeZero())
 		})
 
@@ -107,14 +107,14 @@ var _ = Describe("delete-user command", func() {
 				[]string{"OK"},
 			))
 
-			Expect(userRepo.FindByUsernameArgsForCall(0)).To(Equal("user-name"))
+			Expect(userRepo.FindAllByUsernameArgsForCall(0)).To(Equal("user-name"))
 			Expect(userRepo.DeleteArgsForCall(0)).To(Equal("user-guid"))
 		})
 	})
 
 	Context("when the given user does not exist", func() {
 		BeforeEach(func() {
-			userRepo.FindByUsernameReturns(models.UserFields{}, errors.NewModelNotFoundError("User", ""))
+			userRepo.FindAllByUsernameReturns(nil, errors.NewModelNotFoundError("User", ""))
 		})
 
 		It("prints a warning", func() {
@@ -127,7 +127,7 @@ var _ = Describe("delete-user command", func() {
 
 			Expect(ui.WarnOutputs).To(ContainSubstrings([]string{"user-name", "does not exist"}))
 
-			Expect(userRepo.FindByUsernameArgsForCall(0)).To(Equal("user-name"))
+			Expect(userRepo.FindAllByUsernameArgsForCall(0)).To(Equal("user-name"))
 			Expect(userRepo.DeleteCallCount()).To(BeZero())
 		})
 	})

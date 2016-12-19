@@ -760,6 +760,10 @@
     "translation": ""
   },
   {
+    "id": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.",
+    "translation": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead."
+  },
+  {
     "id": "Error parsing response",
     "translation": "Error parsing response"
   },
