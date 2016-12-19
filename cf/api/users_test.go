@@ -637,6 +637,120 @@ var _ = Describe("UserRepository", func() {
 		})
 	})
 
+	Describe("FindAllByUsername", func() {
+		Context("when the user exists", func() {
+			BeforeEach(func() {
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`userName Eq "damien+user1@pivotallabs.com"`))),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusOK, `{
+								"resources": [
+								{ "id": "my-guid", "userName": "my-full-username" },
+								{ "id": "my-guid-2", "userName": "my-full-username-2" }
+								]}`),
+					),
+				)
+			})
+
+			It("makes a request to UAA", func() {
+				_, err := client.FindAllByUsername("damien+user1@pivotallabs.com")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("returns the users", func() {
+				users, err := client.FindAllByUsername("damien+user1@pivotallabs.com")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(users).To(Equal([]models.UserFields{
+					{
+						Username: "my-full-username",
+						GUID:     "my-guid",
+					},
+					{
+						Username: "my-full-username-2",
+						GUID:     "my-guid-2",
+					},
+				}))
+			})
+		})
+
+		Context("when the user does not exist", func() {
+			BeforeEach(func() {
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`userName Eq "damien+user1@pivotallabs.com"`))),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusOK, `{"resources": []}`),
+					),
+				)
+			})
+
+			It("makes a request to UAA", func() {
+				client.FindByUsername("damien+user1@pivotallabs.com")
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("returns an error", func() {
+				_, err := client.FindByUsername("damien+user1@pivotallabs.com")
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+			})
+		})
+
+		Context("when the cli user is not authorized", func() {
+			BeforeEach(func() {
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`userName Eq "damien+user1@pivotallabs.com"`))),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusForbidden, `{"error":"access_denied","error_description":"Access is denied"}`),
+					),
+				)
+			})
+
+			It("makes a request to UAA", func() {
+				client.FindByUsername("damien+user1@pivotallabs.com")
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("returns an error", func() {
+				_, err := client.FindByUsername("damien+user1@pivotallabs.com")
+				Expect(err).To(BeAssignableToTypeOf(&errors.AccessDeniedError{}))
+			})
+		})
+
+		Context("when UAA returns a non-403 error", func() {
+			BeforeEach(func() {
+				uaaServer.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/Users", fmt.Sprintf("attributes=id,userName&filter=%s", url.QueryEscape(`userName Eq "damien+user1@pivotallabs.com"`))),
+						ghttp.VerifyHeader(http.Header{
+							"accept": []string{"application/json"},
+						}),
+						ghttp.RespondWith(http.StatusInternalServerError, nil),
+					),
+				)
+			})
+
+			It("makes a request to UAA", func() {
+				client.FindByUsername("damien+user1@pivotallabs.com")
+				Expect(uaaServer.ReceivedRequests()).To(HaveLen(1))
+			})
+
+			It("returns an error", func() {
+				_, err := client.FindByUsername("damien+user1@pivotallabs.com")
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
 	Describe("FindByUsername", func() {
 		Context("when the user exists", func() {
 			BeforeEach(func() {

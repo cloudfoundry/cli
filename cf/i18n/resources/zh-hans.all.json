@@ -2424,6 +2424,10 @@
     "translation": "删除域 {{.DomainName}} 时出错\n{{.Err}}"
   },
   {
+    "id": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "禁用对以下项的 SSH 支持时出错: "
   },

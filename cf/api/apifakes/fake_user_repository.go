@@ -18,6 +18,15 @@ type FakeUserRepository struct {
 		result1 models.UserFields
 		result2 error
 	}
+	FindAllByUsernameStub        func(username string) (users []models.UserFields, apiErr error)
+	findAllByUsernameMutex       sync.RWMutex
+	findAllByUsernameArgsForCall []struct {
+		username string
+	}
+	findAllByUsernameReturns struct {
+		result1 []models.UserFields
+		result2 error
+	}
 	ListUsersInOrgForRoleStub        func(orgGUID string, role models.Role) ([]models.UserFields, error)
 	listUsersInOrgForRoleMutex       sync.RWMutex
 	listUsersInOrgForRoleArgsForCall []struct {
@@ -191,6 +200,40 @@ func (fake *FakeUserRepository) FindByUsernameReturns(result1 models.UserFields,
 	fake.FindByUsernameStub = nil
 	fake.findByUsernameReturns = struct {
 		result1 models.UserFields
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeUserRepository) FindAllByUsername(username string) (users []models.UserFields, apiErr error) {
+	fake.findAllByUsernameMutex.Lock()
+	fake.findAllByUsernameArgsForCall = append(fake.findAllByUsernameArgsForCall, struct {
+		username string
+	}{username})
+	fake.recordInvocation("FindAllByUsername", []interface{}{username})
+	fake.findAllByUsernameMutex.Unlock()
+	if fake.FindAllByUsernameStub != nil {
+		return fake.FindAllByUsernameStub(username)
+	} else {
+		return fake.findAllByUsernameReturns.result1, fake.findAllByUsernameReturns.result2
+	}
+}
+
+func (fake *FakeUserRepository) FindAllByUsernameCallCount() int {
+	fake.findAllByUsernameMutex.RLock()
+	defer fake.findAllByUsernameMutex.RUnlock()
+	return len(fake.findAllByUsernameArgsForCall)
+}
+
+func (fake *FakeUserRepository) FindAllByUsernameArgsForCall(i int) string {
+	fake.findAllByUsernameMutex.RLock()
+	defer fake.findAllByUsernameMutex.RUnlock()
+	return fake.findAllByUsernameArgsForCall[i].username
+}
+
+func (fake *FakeUserRepository) FindAllByUsernameReturns(result1 []models.UserFields, result2 error) {
+	fake.FindAllByUsernameStub = nil
+	fake.findAllByUsernameReturns = struct {
+		result1 []models.UserFields
 		result2 error
 	}{result1, result2}
 }
@@ -689,6 +732,8 @@ func (fake *FakeUserRepository) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.findByUsernameMutex.RLock()
 	defer fake.findByUsernameMutex.RUnlock()
+	fake.findAllByUsernameMutex.RLock()
+	defer fake.findAllByUsernameMutex.RUnlock()
 	fake.listUsersInOrgForRoleMutex.RLock()
 	defer fake.listUsersInOrgForRoleMutex.RUnlock()
 	fake.listUsersInOrgForRoleWithNoUAAMutex.RLock()

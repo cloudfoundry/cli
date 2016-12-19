@@ -71,9 +71,13 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) error {
 			"CurrentUser": terminal.EntityNameColor(cmd.config.Username()),
 		}))
 
-	user, err := cmd.userRepo.FindByUsername(username)
+	users, err := cmd.userRepo.FindAllByUsername(username)
+
 	switch err.(type) {
 	case nil:
+		if len(users) > 1 {
+			return fmt.Errorf(T("Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.", map[string]interface{}{"Username": username}))
+		}
 	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(T("User {{.TargetUser}} does not exist.", map[string]interface{}{"TargetUser": username}))
@@ -82,7 +86,7 @@ func (cmd *DeleteUser) Execute(c flags.FlagContext) error {
 		return err
 	}
 
-	err = cmd.userRepo.Delete(user.GUID)
+	err = cmd.userRepo.Delete(users[0].GUID)
 	if err != nil {
 		return err
 	}

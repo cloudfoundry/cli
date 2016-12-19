@@ -2424,6 +2424,10 @@
     "translation": "Errore durante l'eliminazione del dominio {{.DomainName}}\n{{.Err}}"
   },
   {
+    "id": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead.",
+    "translation": ""
+  },
+  {
     "id": "Error disabling ssh support for ",
     "translation": "Errore durante la disabilitazione del supporto ssh per "
   },

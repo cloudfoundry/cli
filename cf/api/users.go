@@ -40,6 +40,7 @@ type apiErrResponse struct {
 
 type UserRepository interface {
 	FindByUsername(username string) (user models.UserFields, apiErr error)
+	FindAllByUsername(username string) (users []models.UserFields, apiErr error)
 	ListUsersInOrgForRole(orgGUID string, role models.Role) ([]models.UserFields, error)
 	ListUsersInOrgForRoleWithNoUAA(orgGUID string, role models.Role) ([]models.UserFields, error)
 	ListUsersInSpaceForRole(spaceGUID string, role models.Role) ([]models.UserFields, error)
@@ -69,30 +70,39 @@ func NewCloudControllerUserRepository(config coreconfig.Reader, uaaGateway net.G
 	return
 }
 
-func (repo CloudControllerUserRepository) FindByUsername(username string) (models.UserFields, error) {
-	uaaEndpoint, apiErr := repo.getAuthEndpoint()
-	var user models.UserFields
+func (repo CloudControllerUserRepository) FindByUsername(username string) (user models.UserFields, apiErr error) {
+	users, apiErr := repo.FindAllByUsername(username)
 	if apiErr != nil {
 		return user, apiErr
+	}
+	user = users[0]
+
+	return user, nil
+}
+
+func (repo CloudControllerUserRepository) FindAllByUsername(username string) (users []models.UserFields, apiErr error) {
+	uaaEndpoint, apiErr := repo.getAuthEndpoint()
+	if apiErr != nil {
+		return users, apiErr
 	}
 
 	usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
 	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
-	users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
+	users, apiErr = repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
 
 	if apiErr != nil {
 		errType, ok := apiErr.(errors.HTTPError)
 		if ok {
 			if errType.StatusCode() == 403 {
-				return user, errors.NewAccessDeniedError()
+				return users, errors.NewAccessDeniedError()
 			}
 		}
-		return user, apiErr
+		return users, apiErr
 	} else if len(users) == 0 {
-		return user, errors.NewModelNotFoundError("User", username)
+		return users, errors.NewModelNotFoundError("User", username)
 	}
 
-	return users[0], apiErr
+	return users, apiErr
 }
 
 func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGUID string, roleName models.Role) (users []models.UserFields, apiErr error) {
