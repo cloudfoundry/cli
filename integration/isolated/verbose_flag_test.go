@@ -98,7 +98,6 @@ var _ = Describe("Verbose", func() {
 			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo/bar", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
-			Entry("CF_TRACE false, config trace true: enables verbose", "false", "true", false),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo/bar", true),
 
 			Entry("CF_TRACE empty:, '-v': enables verbose", "", "", true),
@@ -242,7 +241,6 @@ var _ = Describe("Verbose", func() {
 			Entry("CF_Trace true, config trace file path: enables verbose AND logging to file", "true", "/foo/bar", false),
 
 			Entry("CF_TRACE false, '-v': enables verbose", "false", "", true),
-			Entry("CF_TRACE false, config trace true: enables verbose", "false", "true", false),
 			Entry("CF_TRACE false, config trace file path, '-v': enables verbose AND logging to file", "false", "/foo/bar", true),
 
 			Entry("CF_TRACE empty:, '-v': enables verbose", "", "", true),
