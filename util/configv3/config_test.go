@@ -43,7 +43,17 @@ var _ = Describe("Config", func() {
 			defer os.Setenv("LANG", oldLang)
 			defer os.Setenv("LC_ALL", oldLCAll)
 
+			// specifically for when we run unit tests locally
+			// we save and unset this variable in case it's present
+			// since we want to load a default config
+			envVal := os.Getenv("CF_CLI_EXPERIMENTAL")
+			os.Unsetenv("CF_CLI_EXPERIMENTAL")
+
 			config, err := LoadConfig()
+
+			// then we reset the env variable
+			os.Setenv("CF_CLI_EXPERIMENTAL", envVal)
+
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(config).ToNot(BeNil())
