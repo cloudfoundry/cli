@@ -349,6 +349,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/vito/go-interact",
+			"repository": "https://github.com/vito/go-interact",
+			"vcs": "git",
+			"revision": "e3c86ac934ea9d6f1c6ad6e42e316a6e8fe6a807",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "golang.org/x/crypto/curve25519",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
@@ -370,7 +378,7 @@
 			"importpath": "golang.org/x/crypto/ssh",
 			"repository": "https://go.googlesource.com/crypto",
 			"vcs": "git",
-			"revision": "9a6f0a01987842989747adff311d80750ba25530",
+			"revision": "d8e61c69ab46ca38328da2f4995abaf93b252290",
 			"branch": "master",
 			"path": "/ssh",
 			"notests": true
@@ -388,7 +396,7 @@
 			"importpath": "golang.org/x/sys/unix",
 			"repository": "https://go.googlesource.com/sys",
 			"vcs": "git",
-			"revision": "478fcf54317e52ab69f40bb4c7a1520288d7f7ea",
+			"revision": "d75a52659825e75fff6158388dddc6a5b04f9ba5",
 			"branch": "master",
 			"path": "/unix",
 			"notests": true
