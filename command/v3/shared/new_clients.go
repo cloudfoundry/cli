@@ -24,7 +24,7 @@ func NewClients(config command.Config, ui command.UI) (*ccv3.Client, error) {
 		DialTimeout:       config.DialTimeout(),
 	})
 	if err != nil {
-		return nil, err
+		return nil, ClientTargetError{Message: err.Error()}
 	}
 
 	uaaClient := uaa.NewClient(uaa.Config{

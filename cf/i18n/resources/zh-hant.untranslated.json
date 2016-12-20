@@ -1938,5 +1938,9 @@
   {
     "id": "{{.DownCount}} down",
     "translation": "{{.DownCount}} down"
+  },
+  {
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
   }
 ]
