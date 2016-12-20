@@ -39,16 +39,11 @@ var _ = Describe("CreateUser Command", func() {
 		password := "some-password"
 		cmd.Args.Password = &password
 
-		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.BinaryNameReturns("faceman")
 	})
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when the user is not logged in", func() {
@@ -119,11 +114,9 @@ var _ = Describe("CreateUser Command", func() {
 					Expect(password).To(Equal(""))
 					Expect(origin).To(Equal("some-origin"))
 
-					Expect(testUI.Out).To(Say(`
-Creating user some-user...
-OK
-
-TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
+					Expect(testUI.Out).To(Say("Creating user some-user..."))
+					Expect(testUI.Out).To(Say("OK"))
+					Expect(testUI.Out).To(Say("TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'."))
 					Expect(testUI.Err).To(Say("warning"))
 				})
 			})
@@ -152,11 +145,9 @@ TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
 				Expect(password).To(Equal("some-password"))
 				Expect(origin).To(Equal("some-origin"))
 
-				Expect(testUI.Out).To(Say(`
-Creating user some-user...
-OK
-
-TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'.`))
+				Expect(testUI.Out).To(Say("Creating user some-user..."))
+				Expect(testUI.Out).To(Say("OK"))
+				Expect(testUI.Out).To(Say("TIP: Assign roles with 'faceman set-org-role' and 'faceman set-space-role'."))
 				Expect(testUI.Err).To(Say("warning"))
 			})
 		})

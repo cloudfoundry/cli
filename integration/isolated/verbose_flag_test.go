@@ -46,7 +46,6 @@ var _ = Describe("Verbose", func() {
 	Context("v2 refactor", func() {
 		DescribeTable("displays verbose output to terminal",
 			func(env string, configTrace string, flag bool) {
-				helpers.RunIfExperimental("remove after #133310639")
 				tmpDir, err := ioutil.TempDir("", "")
 				defer os.RemoveAll(tmpDir)
 				Expect(err).NotTo(HaveOccurred())

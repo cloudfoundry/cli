@@ -12,10 +12,6 @@ import (
 )
 
 var _ = Describe("delete-user command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("skip until #133310639")
-	})
-
 	Context("when the logged in user is authorized to delete-users", func() {
 		BeforeEach(func() {
 			helpers.LoginCF()

@@ -30,7 +30,6 @@ var _ = Describe("delete-org Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeDeleteOrganizationActor)
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.ExperimentalReturns(true)
 
 		cmd = v2.DeleteOrgCommand{
 			UI:     testUI,
@@ -43,10 +42,6 @@ var _ = Describe("delete-org Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when the user is not logged in", func() {
