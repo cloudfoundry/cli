@@ -15,7 +15,6 @@ var _ = Describe("unbind-service command", func() {
 	)
 
 	BeforeEach(func() {
-		helpers.RunIfExperimental("remove after #133310639")
 		serviceInstance = helpers.PrefixedRandomName("si")
 		appName = helpers.PrefixedRandomName("app")
 	})

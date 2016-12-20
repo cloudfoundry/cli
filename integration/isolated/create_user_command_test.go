@@ -10,10 +10,6 @@ import (
 )
 
 var _ = Describe("create-user command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("")
-	})
-
 	Describe("help", func() {
 		Context("when --help flag is set", func() {
 			It("Displays command usage to output", func() {

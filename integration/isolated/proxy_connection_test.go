@@ -17,6 +17,7 @@ var _ = Describe("proxy", func() {
 
 	Context("V2 Legacy", func() {
 		It("handles a proxy", func() {
+			Skip("Figure out how to test not using API command")
 			helpers.SkipIfExperimental("error messages have changed in refactored code")
 			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "api", apiURL)
 			Eventually(session).Should(Say("Error performing request: Get %s/v2/info: http: error connecting to proxy %s", apiURL, proxyURL))
@@ -26,7 +27,6 @@ var _ = Describe("proxy", func() {
 
 	Context("V2", func() {
 		It("handles a proxy", func() {
-			helpers.RunIfExperimental("remove after #133310639")
 			session := helpers.CFWithEnv(map[string]string{"https_proxy": proxyURL}, "api", apiURL)
 			Eventually(session.Err).Should(Say("Get %s/v2/info: http: error connecting to proxy %s", apiURL, proxyURL))
 			Eventually(session).Should(Exit(1))

@@ -29,7 +29,6 @@ var _ = Describe("Unbind Service Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeUnbindServiceActor)
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.ExperimentalReturns(true)
 
 		cmd = UnbindServiceCommand{
 			UI:     testUI,
@@ -40,10 +39,6 @@ var _ = Describe("Unbind Service Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking that the api endpoint is set, the user is logged in, and an org and space are targeted", func() {

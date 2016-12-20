@@ -1,12 +1,10 @@
 package v2
 
 import (
-	"os"
 	"strings"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
 	"code.cloudfoundry.org/cli/api/uaa"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -46,13 +44,7 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	// cmd.Args.Password is intentionally set to a pointer such that we can check
 	// if it is passed (otherwise we can't differentiate between the default
 	// empty string and a passed in empty string.
-	var (
-		password string
-	)
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
+	var password string
 
 	if (cmd.Origin == "" || strings.ToLower(cmd.Origin) == "uaa") && cmd.Args.Password == nil {
 		return command.RequiredArgumentError{
@@ -65,9 +57,6 @@ func (cmd *CreateUserCommand) Execute(args []string) error {
 	} else {
 		password = ""
 	}
-
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
 
 	err := command.CheckTarget(cmd.Config, false, false)
 	if err != nil {

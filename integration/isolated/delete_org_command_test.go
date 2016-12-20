@@ -9,10 +9,6 @@ import (
 )
 
 var _ = Describe("delete-org command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("remove after #133310639")
-	})
-
 	Context("when the environment is not setup correctly", func() {
 		Context("when no API endpoint is set", func() {
 			BeforeEach(func() {

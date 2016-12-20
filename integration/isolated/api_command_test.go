@@ -20,10 +20,6 @@ import (
 )
 
 var _ = Describe("api command", func() {
-	BeforeEach(func() {
-		helpers.RunIfExperimental("remove in #133310639")
-	})
-
 	Context("no arguments", func() {
 		Context("when the api is set", func() {
 			Context("when the user is not logged in", func() {

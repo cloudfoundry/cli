@@ -2,10 +2,8 @@ package v2
 
 import (
 	"fmt"
-	"os"
 
 	"code.cloudfoundry.org/cli/actor/v2action"
-	oldCmd "code.cloudfoundry.org/cli/cf/cmd"
 	"code.cloudfoundry.org/cli/command"
 	"code.cloudfoundry.org/cli/command/flag"
 	"code.cloudfoundry.org/cli/command/v2/shared"
@@ -41,14 +39,6 @@ func (cmd *DeleteOrgCommand) Setup(config command.Config, ui command.UI) error {
 }
 
 func (cmd *DeleteOrgCommand) Execute(args []string) error {
-	if cmd.Config.Experimental() == false {
-		oldCmd.Main(os.Getenv("CF_TRACE"), os.Args)
-		return nil
-	}
-
-	cmd.UI.DisplayText(command.ExperimentalWarning)
-	cmd.UI.DisplayNewline()
-
 	err := command.CheckTarget(cmd.Config, false, false)
 	if err != nil {
 		return err

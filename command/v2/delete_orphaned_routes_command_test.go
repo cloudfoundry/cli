@@ -30,7 +30,6 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 		testUI = ui.NewTestUI(input, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeDeleteOrphanedRoutesActor)
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.ExperimentalReturns(true)
 
 		cmd = v2.DeleteOrphanedRoutesCommand{
 			UI:     testUI,
@@ -41,10 +40,6 @@ var _ = Describe("DeletedOrphanedRoutes Command", func() {
 
 	JustBeforeEach(func() {
 		executeErr = cmd.Execute(nil)
-	})
-
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when checking that the user is logged in, and org and space are targeted", func() {

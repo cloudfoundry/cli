@@ -28,7 +28,6 @@ var _ = Describe("API Command", func() {
 		testUI = ui.NewTestUI(nil, NewBuffer(), NewBuffer())
 		fakeActor = new(v2fakes.FakeAPIConfigActor)
 		fakeConfig = new(commandfakes.FakeConfig)
-		fakeConfig.ExperimentalReturns(true)
 		fakeConfig.BinaryNameReturns("faceman")
 
 		cmd = ApiCommand{
@@ -40,10 +39,6 @@ var _ = Describe("API Command", func() {
 
 	JustBeforeEach(func() {
 		err = cmd.Execute(nil)
-	})
-
-	It("Displays the experimental warning message", func() {
-		Expect(testUI.Out).To(Say(command.ExperimentalWarning))
 	})
 
 	Context("when the API endpoint is not provided", func() {
@@ -72,10 +67,8 @@ var _ = Describe("API Command", func() {
 
 			It("outputs target information", func() {
 				Expect(err).ToNot(HaveOccurred())
-				Expect(testUI.Out).To(Say(`
-API endpoint:   some-api-target
-API version:    some-version`,
-				))
+				Expect(testUI.Out).To(Say("API endpoint:\\s+some-api-target"))
+				Expect(testUI.Out).To(Say("API version:\\s+some-version"))
 			})
 		})
 
