@@ -3,6 +3,7 @@ package cloudcontroller_test
 import (
 	"fmt"
 	"net/http"
+	"runtime"
 	"strings"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller"
@@ -173,6 +174,9 @@ var _ = Describe("Cloud Controller Connection", func() {
 			Context("when the server's certificate does not match the hostname", func() {
 				Context("skipSSLValidation is false", func() {
 					BeforeEach(func() {
+						if runtime.GOOS == "windows" {
+							Skip("ssl validation has a different order on windows, will not be returned properly")
+						}
 						server.AppendHandlers(
 							CombineHandlers(
 								VerifyRequest(http.MethodGet, "/"),
