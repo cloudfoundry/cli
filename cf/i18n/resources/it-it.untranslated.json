@@ -1482,5 +1482,9 @@
   {
     "id": "verbose and version flag",
     "translation": "verbose and version flag"
+  },
+  {
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
   }
 ]

@@ -1500,6 +1500,10 @@
     "translation": "version"
   },
   {
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
     "id": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances",
     "translation": "{{.Usage}} {{.FormattedMemory}} x {{.InstanceCount}} instances"
   }

@@ -30,11 +30,22 @@ var _ = Describe("New Clients", func() {
 	})
 
 	Context("when the api endpoint is not set", func() {
-		It("returns an error", func() {
+		It("returns the NoAPISetError", func() {
 			_, err := NewClients(fakeConfig, testUI)
 			Expect(err).To(MatchError(command.NoAPISetError{
 				BinaryName: binaryName,
 			}))
+		})
+	})
+
+	Context("when the api does not exist", func() {
+		BeforeEach(func() {
+			fakeConfig.TargetReturns("http://4012493825site.com")
+		})
+
+		It("returns the ClientTargetError", func() {
+			_, err := NewClients(fakeConfig, testUI)
+			Expect(err.Error()).To(MatchRegexp("Note that this command requires CF API version 3.0.0+."))
 		})
 	})
 
@@ -49,7 +60,11 @@ var _ = Describe("New Clients", func() {
 
 		It("passes the value to the target", func() {
 			_, err := NewClients(fakeConfig, testUI)
-			Expect(err).To(MatchError("Get https://potato.bananapants11122.co.uk: dial tcp: i/o timeout"))
+			if e, ok := err.(ClientTargetError); ok {
+				Expect(e.Message).To(Equal("Get https://potato.bananapants11122.co.uk: dial tcp: i/o timeout"))
+			} else {
+				Fail("Expected err to be type ClientTargetError")
+			}
 		})
 	})
 })

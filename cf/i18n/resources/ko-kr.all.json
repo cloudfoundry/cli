@@ -6552,6 +6552,10 @@
     "translation": "{{.MemoryLimit}}M 메모리 한계"
   },
   {
+    "id": "{{.Message}}\nNote that this command requires CF API version 3.0.0+.",
+    "translation": ""
+  },
+  {
     "id": "{{.ModelType}} {{.ModelName}} already exists",
     "translation": "{{.ModelType}} {{.ModelName}}이(가) 이미 있음"
   },
