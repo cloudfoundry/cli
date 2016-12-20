@@ -8,6 +8,8 @@ ArchitecturesInstallIn64BitMode=x64 ia64
 ArchitecturesAllowed=x64 ia64
 PrivilegesRequired=none
 DefaultDirName={pf}\CloudFoundry
+SetupIconFile=cf.ico
+UninstallDisplayIcon={app}\cf.ico
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"; Check: IsAdminLoggedOn and Uninstall32Bit() and NeedsAddPath(ExpandConstant('{app}'))
@@ -15,6 +17,7 @@ Root: HKCU; Subkey: "Environment"; ValueType: expandsz; ValueName: "Path"; Value
 
 [Files]
 Source: CF_SOURCE; DestDir: "{app}"
+Source: CF_ICON; DestDir: "{app}"
 
 [Code]
 function Uninstall32Bit(): Boolean;

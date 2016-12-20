@@ -9,8 +9,10 @@ SET PATH=C:\Program Files (x86)\Windows Kits\10\bin\x64;%PATH%
 
 sed -i -e "s/VERSION/%VERSION%/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
+sed -i -e "s/CF_ICON/%ESCAPED_ROOT_DIR%\\cf.ico/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 
 MOVE %ROOT_DIR%\extracted-binaries\cf-cli_winx64.exe cf.exe
+COPY %ROOT_DIR%\cli-ci\ci\installers\windows\cf.ico cf.ico
 
 ISCC %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x64.iss
 
@@ -20,8 +22,10 @@ zip %ROOT_DIR%\winstallers\cf-cli-installer_winx64.zip cf_installer.exe
 
 sed -i -e "s/VERSION/%VERSION%/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 sed -i -e "s/CF_SOURCE/%ESCAPED_ROOT_DIR%\\cf.exe/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
+sed -i -e "s/CF_ICON/%ESCAPED_ROOT_DIR%\\cf.ico/" %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 
 MOVE %ROOT_DIR%\extracted-binaries\cf-cli_win32.exe cf.exe
+COPY %ROOT_DIR%\cli-ci\ci\installers\windows\cf.ico cf.ico
 
 ISCC %ROOT_DIR%\cli-ci\ci\installers\windows\windows-installer-x86.iss
 
