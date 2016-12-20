@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	"code.cloudfoundry.org/cli/api/uaa"
@@ -39,6 +40,11 @@ var _ = Describe("Request Logger", func() {
 		request, err = http.NewRequest(http.MethodGet, "https://foo.bar.com/banana", nil)
 		Expect(err).NotTo(HaveOccurred())
 
+		request.URL.RawQuery = url.Values{
+			"query1": {"a"},
+			"query2": {"b"},
+		}.Encode()
+
 		headers := http.Header{}
 		headers.Add("Aghi", "bar")
 		headers.Add("Abc", "json")
@@ -67,7 +73,7 @@ var _ = Describe("Request Logger", func() {
 			Expect(fakeOutput.DisplayRequestHeaderCallCount()).To(Equal(1))
 			method, uri, protocol := fakeOutput.DisplayRequestHeaderArgsForCall(0)
 			Expect(method).To(Equal(http.MethodGet))
-			Expect(uri).To(Equal("/banana"))
+			Expect(uri).To(MatchRegexp("/banana\\?(?:query1=a&query2=b|query2=b&query1=a)"))
 			Expect(protocol).To(Equal("HTTP/1.1"))
 
 			Expect(fakeOutput.DisplayHostCallCount()).To(Equal(1))

@@ -75,7 +75,7 @@ func (logger *RequestLogger) displayRequest(request *http.Request) error {
 	if err != nil {
 		return err
 	}
-	err = logger.output.DisplayRequestHeader(request.Method, request.URL.Path, request.Proto)
+	err = logger.output.DisplayRequestHeader(request.Method, request.URL.RequestURI(), request.Proto)
 	if err != nil {
 		return err
 	}
