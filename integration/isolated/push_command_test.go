@@ -29,6 +29,45 @@ var _ = Describe("Push", func() {
 			setupCF(orgName, spaceName)
 		})
 
+		Context("when manifest contains non-string env values", func() {
+			var appName string
+
+			BeforeEach(func() {
+				appName = helpers.PrefixedRandomName("app")
+				helpers.WithHelloWorldApp(func(appDir string) {
+					manifestContents := []byte(fmt.Sprintf(`
+---
+applications:
+- name: %s
+  memory: 128M
+  env:
+    big_float: 123456789.12345678
+    big_int: 123412341234
+    bool: true
+    small_int: 7
+    string: "some-string"
+`, appName))
+					manifestPath := filepath.Join(appDir, "manifest.yml")
+					err := ioutil.WriteFile(manifestPath, manifestContents, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					// Create manifest and add big numbers
+					Eventually(helpers.CF("push", appName, "--no-start", "-p", appDir, "-f", manifestPath, "-b", "staticfile_buildpack")).Should(Exit(0))
+				})
+			})
+
+			It("converts all env values to string", func() {
+				session := helpers.CF("env", appName)
+				Eventually(session.Out).Should(Say("OK"))
+				Eventually(session.Out).Should(Say("big_float: 123456789.12345678"))
+				Eventually(session.Out).Should(Say("big_int: 123412341234"))
+				Eventually(session.Out).Should(Say("bool: true"))
+				Eventually(session.Out).Should(Say("small_int: 7"))
+				Eventually(session.Out).Should(Say("string: some-string"))
+				Eventually(session).Should(Exit(0))
+			})
+		})
+
 		Context("when the app has over 260 character paths", func() {
 			var tmpDir string
 
