@@ -108,20 +108,45 @@ var _ = Describe("Request Logger", func() {
 
 		Context("when passed a body", func() {
 			var originalBody io.ReadCloser
-			BeforeEach(func() {
-				originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
-				request.Body = originalBody
+
+			Context("when the body is not JSON", func() {
+				BeforeEach(func() {
+					originalBody = ioutil.NopCloser(bytes.NewReader([]byte("foo")))
+					request.Body = originalBody
+				})
+
+				It("outputs the body", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("foo")))
+
+					bytes, err := ioutil.ReadAll(request.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(bytes).To(Equal([]byte("foo")))
+				})
 			})
 
-			It("outputs the body", func() {
-				Expect(err).NotTo(HaveOccurred())
+			Context("when the body is JSON", func() {
+				var jsonBody string
 
-				Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("foo")))
+				BeforeEach(func() {
+					jsonBody = `{"some-key": "some-value"}`
+					originalBody = ioutil.NopCloser(bytes.NewReader([]byte(jsonBody)))
+					request.Body = originalBody
+					request.Header.Add("Content-Type", "application/json")
+				})
 
-				bytes, err := ioutil.ReadAll(request.Body)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(bytes).To(Equal([]byte("foo")))
+				It("properly displays the JSON body", func() {
+					Expect(err).NotTo(HaveOccurred())
+
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte(jsonBody)))
+
+					bytes, err := ioutil.ReadAll(request.Body)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(bytes).To(Equal([]byte(jsonBody)))
+				})
 			})
 		})
 
@@ -189,8 +214,8 @@ var _ = Describe("Request Logger", func() {
 				Expect(name).To(Equal("CCCCC"))
 				Expect(value).To(Equal("third"))
 
-				Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
+				Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+				Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
 			})
 		})
 
@@ -253,8 +278,8 @@ var _ = Describe("Request Logger", func() {
 					Expect(name).To(Equal("CCCCC"))
 					Expect(value).To(Equal("third"))
 
-					Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
-					Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))
 				})
 			})
 		})

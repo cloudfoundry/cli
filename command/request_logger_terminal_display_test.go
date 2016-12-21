@@ -26,6 +26,14 @@ var _ = Describe("Request Logger Terminal Display", func() {
 	})
 
 	Describe("DisplayBody", func() {
+		It("displays the redacted value", func() {
+			err := display.DisplayBody([]byte("some-string body"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(testUI.Out).To(Say("\\[PRIVATE DATA HIDDEN\\]"))
+		})
+	})
+
+	Describe("DisplayJSONBody", func() {
 		Context("when provided well formed JSON", func() {
 			It("displayed a formated output", func() {
 				raw := `{"a":"b", "c":"d", "don't html escape":"<&>"}`
@@ -34,7 +42,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
   "c": "d",
   "don't html escape": "<&>"
 }`
-				err := display.DisplayBody([]byte(raw))
+				err := display.DisplayJSONBody([]byte(raw))
 				Expect(err).ToNot(HaveOccurred())
 				Expect(testUI.Out).To(Say(formatted))
 			})
@@ -42,7 +50,7 @@ var _ = Describe("Request Logger Terminal Display", func() {
 
 		Context("when the body is empty", func() {
 			It("does not display the body", func() {
-				err := display.DisplayBody(nil)
+				err := display.DisplayJSONBody(nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(out.Contents()).To(BeEmpty())

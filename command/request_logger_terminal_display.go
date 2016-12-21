@@ -17,7 +17,12 @@ func NewRequestLoggerTerminalDisplay(ui UI) *RequestLoggerTerminalDisplay {
 	}
 }
 
-func (display *RequestLoggerTerminalDisplay) DisplayBody(body []byte) error {
+func (display *RequestLoggerTerminalDisplay) DisplayBody(_ []byte) error {
+	display.ui.DisplayText(RedactedValue)
+	return nil
+}
+
+func (display *RequestLoggerTerminalDisplay) DisplayJSONBody(body []byte) error {
 	if body == nil || len(body) == 0 {
 		return nil
 	}

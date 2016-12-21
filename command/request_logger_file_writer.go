@@ -22,7 +22,17 @@ func NewRequestLoggerFileWriter(ui UI, filePaths []string) *RequestLoggerFileWri
 	}
 }
 
-func (display *RequestLoggerFileWriter) DisplayBody(body []byte) error {
+func (display *RequestLoggerFileWriter) DisplayBody(_ []byte) error {
+	for _, logFile := range display.logFiles {
+		_, err := logFile.WriteString(RedactedValue)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (display *RequestLoggerFileWriter) DisplayJSONBody(body []byte) error {
 	if body == nil || len(body) == 0 {
 		return nil
 	}
