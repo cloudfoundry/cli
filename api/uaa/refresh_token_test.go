@@ -44,7 +44,7 @@ var _ = Describe("UAA Client", func() {
 			fakeStore.UAAOAuthClientSecretReturns("client-secret")
 		})
 
-		It("refreshes the token", func() {
+		It("refreshes the tokens", func() {
 			err := client.RefreshToken()
 			Expect(err).ToNot(HaveOccurred())
 
@@ -52,6 +52,9 @@ var _ = Describe("UAA Client", func() {
 
 			Expect(fakeStore.SetAccessTokenCallCount()).To(Equal(1))
 			Expect(fakeStore.SetAccessTokenArgsForCall(0)).To(Equal("bearer access-token"))
+
+			Expect(fakeStore.SetRefreshTokenCallCount()).To(Equal(1))
+			Expect(fakeStore.SetRefreshTokenArgsForCall(0)).To(Equal("refresh-token"))
 		})
 	})
 })

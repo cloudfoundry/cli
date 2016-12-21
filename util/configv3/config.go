@@ -434,3 +434,8 @@ func (config *Config) SetTokenInformation(accessToken string, refreshToken strin
 func (config *Config) SetAccessToken(accessToken string) {
 	config.ConfigFile.AccessToken = accessToken
 }
+
+// SetRefreshToken sets the current refresh token
+func (config *Config) SetRefreshToken(refreshToken string) {
+	config.ConfigFile.RefreshToken = refreshToken
+}

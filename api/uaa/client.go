@@ -24,6 +24,7 @@ type AuthenticationStore interface {
 	AccessToken() string
 	RefreshToken() string
 	SetAccessToken(token string)
+	SetRefreshToken(token string)
 }
 
 // Client is the UAA client

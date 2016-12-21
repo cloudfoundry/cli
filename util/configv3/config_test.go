@@ -540,6 +540,14 @@ var _ = Describe("Config", func() {
 			})
 		})
 
+		Describe("SetRefreshToken", func() {
+			It("sets the refresh token information", func() {
+				var config Config
+				config.SetRefreshToken("I am the refresh token")
+				Expect(config.ConfigFile.RefreshToken).To(Equal("I am the refresh token"))
+			})
+		})
+
 		Describe("SetOrganizationInformation", func() {
 			It("sets the organization GUID and name", func() {
 				config := Config{}
