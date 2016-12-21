@@ -514,9 +514,12 @@ var _ = Describe("Manifests", func() {
 				"applications": []interface{}{
 					generic.NewMap(map[interface{}]interface{}{
 						"env": map[interface{}]interface{}{
-							"string-key": "value",
-							"int-key":    1,
-							"float-key":  11.1,
+							"string-key":      "value",
+							"int-key":         1,
+							"float-key":       11.1,
+							"large-int-key":   123456789,
+							"large-float-key": 123456789.12345678,
+							"bool-key":        false,
 						},
 					}),
 				},
@@ -526,8 +529,11 @@ var _ = Describe("Manifests", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect((*app[0].EnvironmentVars)["string-key"]).To(Equal("value"))
-			Expect((*app[0].EnvironmentVars)["int-key"]).To(Equal(1))
-			Expect((*app[0].EnvironmentVars)["float-key"]).To(Equal(11.1))
+			Expect((*app[0].EnvironmentVars)["int-key"]).To(Equal("1"))
+			Expect((*app[0].EnvironmentVars)["float-key"]).To(Equal("11.1"))
+			Expect((*app[0].EnvironmentVars)["large-int-key"]).To(Equal("123456789"))
+			Expect((*app[0].EnvironmentVars)["large-float-key"]).To(Equal("123456789.12345678"))
+			Expect((*app[0].EnvironmentVars)["bool-key"]).To(Equal("false"))
 		})
 	})
 

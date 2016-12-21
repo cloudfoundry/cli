@@ -466,7 +466,7 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]interface{
 
 		result := make(map[string]interface{}, envVars.Count())
 		generic.Each(envVars, func(key, value interface{}) {
-			result[key.(string)] = value
+			result[key.(string)] = interfaceToString(value)
 		})
 
 		return &result
@@ -485,6 +485,14 @@ func validateEnvVars(input generic.Map) (errs []error) {
 		}
 	})
 	return
+}
+
+func interfaceToString(value interface{}) string {
+	if f, ok := value.(float64); ok {
+		return strconv.FormatFloat(f, 'f', -1, 64)
+	}
+
+	return fmt.Sprint(value)
 }
 
 func parseRoutes(input generic.Map, errs *[]error) []models.ManifestRoute {
