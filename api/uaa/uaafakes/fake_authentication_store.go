@@ -37,6 +37,11 @@ type FakeAuthenticationStore struct {
 	setAccessTokenArgsForCall []struct {
 		token string
 	}
+	SetRefreshTokenStub        func(token string)
+	setRefreshTokenMutex       sync.RWMutex
+	setRefreshTokenArgsForCall []struct {
+		token string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -165,6 +170,30 @@ func (fake *FakeAuthenticationStore) SetAccessTokenArgsForCall(i int) string {
 	return fake.setAccessTokenArgsForCall[i].token
 }
 
+func (fake *FakeAuthenticationStore) SetRefreshToken(token string) {
+	fake.setRefreshTokenMutex.Lock()
+	fake.setRefreshTokenArgsForCall = append(fake.setRefreshTokenArgsForCall, struct {
+		token string
+	}{token})
+	fake.recordInvocation("SetRefreshToken", []interface{}{token})
+	fake.setRefreshTokenMutex.Unlock()
+	if fake.SetRefreshTokenStub != nil {
+		fake.SetRefreshTokenStub(token)
+	}
+}
+
+func (fake *FakeAuthenticationStore) SetRefreshTokenCallCount() int {
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	return len(fake.setRefreshTokenArgsForCall)
+}
+
+func (fake *FakeAuthenticationStore) SetRefreshTokenArgsForCall(i int) string {
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
+	return fake.setRefreshTokenArgsForCall[i].token
+}
+
 func (fake *FakeAuthenticationStore) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -178,6 +207,8 @@ func (fake *FakeAuthenticationStore) Invocations() map[string][][]interface{} {
 	defer fake.refreshTokenMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
+	fake.setRefreshTokenMutex.RLock()
+	defer fake.setRefreshTokenMutex.RUnlock()
 	return fake.invocations
 }
 

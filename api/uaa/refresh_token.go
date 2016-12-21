@@ -11,8 +11,9 @@ import (
 
 // RefreshTokenResponse represents the UAA refresh token response
 type RefreshTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type"`
 }
 
 // AuthorizationToken returns formatted authorization header
@@ -51,5 +52,6 @@ func (client *Client) RefreshToken() error {
 	}
 
 	client.store.SetAccessToken(refreshResponse.AuthorizationToken())
+	client.store.SetRefreshToken(refreshResponse.RefreshToken)
 	return nil
 }

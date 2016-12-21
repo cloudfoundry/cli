@@ -23,6 +23,7 @@ type Config interface {
 	Plugins() map[string]configv3.Plugin
 	RefreshToken() string
 	SetAccessToken(token string)
+	SetRefreshToken(token string)
 	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)
 	SkipSSLValidation() bool
