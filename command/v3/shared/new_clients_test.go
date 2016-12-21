@@ -61,7 +61,7 @@ var _ = Describe("New Clients", func() {
 		It("passes the value to the target", func() {
 			_, err := NewClients(fakeConfig, testUI)
 			if e, ok := err.(ClientTargetError); ok {
-				Expect(e.Message).To(Equal("Get https://potato.bananapants11122.co.uk: dial tcp: i/o timeout"))
+				Expect(e.Message).To(MatchRegexp("https://potato.bananapants11122.co.uk: dial tcp.*i/o timeout"))
 			} else {
 				Fail("Expected err to be type ClientTargetError")
 			}
