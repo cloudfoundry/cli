@@ -14,7 +14,7 @@ import (
 
 // RequestLoggerOutput is the interface for displaying logs
 type RequestLoggerOutput interface {
-	DisplayBody(body []byte) error
+	DisplayJSONBody(body []byte) error
 	DisplayHeader(name string, value string) error
 	DisplayHost(name string) error
 	DisplayRequestHeader(method string, uri string, httpProtocol string) error
@@ -96,7 +96,7 @@ func (logger *RequestLogger) displayRequest(request *http.Request) error {
 		}
 
 		request.Body = ioutil.NopCloser(bytes.NewBuffer(rawRequestBody))
-		err = logger.output.DisplayBody(rawRequestBody)
+		err = logger.output.DisplayJSONBody(rawRequestBody)
 		if err != nil {
 			return err
 		}
@@ -124,7 +124,7 @@ func (logger *RequestLogger) displayResponse(passedResponse *cloudcontroller.Res
 	if err != nil {
 		return err
 	}
-	return logger.output.DisplayBody(passedResponse.RawResponse)
+	return logger.output.DisplayJSONBody(passedResponse.RawResponse)
 }
 
 func (logger *RequestLogger) displaySortedHeaders(headers http.Header) error {

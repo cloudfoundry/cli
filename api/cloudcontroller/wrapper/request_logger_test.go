@@ -116,8 +116,8 @@ var _ = Describe("Request Logger", func() {
 			It("outputs the body", func() {
 				Expect(err).NotTo(HaveOccurred())
 
-				Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("foo")))
+				Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+				Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("foo")))
 
 				bytes, err := ioutil.ReadAll(request.Body)
 				Expect(err).NotTo(HaveOccurred())
@@ -189,8 +189,8 @@ var _ = Describe("Request Logger", func() {
 				Expect(name).To(Equal("CCCCC"))
 				Expect(value).To(Equal("third"))
 
-				Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
-				Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
+				Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+				Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-response-body")))
 			})
 		})
 
@@ -253,8 +253,8 @@ var _ = Describe("Request Logger", func() {
 					Expect(name).To(Equal("CCCCC"))
 					Expect(value).To(Equal("third"))
 
-					Expect(fakeOutput.DisplayBodyCallCount()).To(BeNumerically(">=", 1))
-					Expect(fakeOutput.DisplayBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))
+					Expect(fakeOutput.DisplayJSONBodyCallCount()).To(BeNumerically(">=", 1))
+					Expect(fakeOutput.DisplayJSONBodyArgsForCall(0)).To(Equal([]byte("some-error-body")))
 				})
 			})
 		})

@@ -14,7 +14,8 @@ var _ = Describe("SanitizeJSON", func() {
 			"next_level": {
 				"next_pAssword_all": "bar",
 				"again": {
-					"real password ": "Don't tell nobody, it's banana"
+					"real password ": "Don't tell nobody, it's banana",
+					"testtokentest": "banana pants"
 				}
 			}
 		}`)
@@ -25,6 +26,7 @@ var _ = Describe("SanitizeJSON", func() {
 				"next_pAssword_all": RedactedValue,
 				"again": map[string]interface{}{
 					"real password ": RedactedValue,
+					"testtokentest":  RedactedValue,
 				},
 			},
 		}

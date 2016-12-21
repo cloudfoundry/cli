@@ -43,6 +43,24 @@ var _ = Describe("Request Logger File Writer", func() {
 	})
 
 	Describe("DisplayBody", func() {
+		It("writes the redacted value", func() {
+			err := display.DisplayBody([]byte("this is a body"))
+			Expect(err).ToNot(HaveOccurred())
+
+			err = display.Stop()
+			Expect(err).ToNot(HaveOccurred())
+
+			contents, err := ioutil.ReadFile(logFile1)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+
+			contents, err = ioutil.ReadFile(logFile2)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(contents)).To(Equal(RedactedValue + "\n"))
+		})
+	})
+
+	Describe("DisplayJSONBody", func() {
 		Context("when provided well formed JSON", func() {
 			It("writes a formated output", func() {
 				raw := `{"a":"b", "c":"d", "don't escape HTML":"<&>"}`
@@ -53,7 +71,7 @@ var _ = Describe("Request Logger File Writer", func() {
 }
 
 ` // Additonal spaces required
-				err := display.DisplayBody([]byte(raw))
+				err := display.DisplayJSONBody([]byte(raw))
 				Expect(err).ToNot(HaveOccurred())
 
 				err = display.Stop()
@@ -71,7 +89,7 @@ var _ = Describe("Request Logger File Writer", func() {
 
 		Context("when the body is empty", func() {
 			It("does not write the body", func() {
-				err := display.DisplayBody(nil)
+				err := display.DisplayJSONBody(nil)
 				Expect(err).ToNot(HaveOccurred())
 
 				err = display.Stop()
