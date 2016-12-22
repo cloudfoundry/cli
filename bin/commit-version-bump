@@ -1,7 +1,7 @@
 echo "Adding CHANGELOG"
 git add CHANGELOG.md
 echo "Ammending commit with CHANGELOG update"
-git commit --amend --no-edit
+git ci --amend --no-edit
 
 echo "Retagging"
 git tag -d v$(cat ci/VERSION)
