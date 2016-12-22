@@ -1,3 +1,253 @@
+## 6.23.0
+* Bump version to 6.23.0
+* increase the dial timeout
+* the verbose integration test should be testing against a redacted request body
+* fix flakyness
+* properly display non-json request body in the loggers
+* Converts all everinoment variables in manifest to string
+* renamed push_test to push_command_test
+* display with flavor
+* save refresh token when refreshing auth token
+* added the logo
+* remove experimental flag from several commands
+* update go-interact and dependancy
+* switching to using a custom DNS record instead of xip.io
+* display request parameters when logging
+* display extra tip with client errors for V3 commands
+* skipping in windows
+* test SSLValidationHostnameError using xip.io
+* integration tests for delete-user cleans up after itself
+* Unset and reset environment variables during config unit tests
+* `delete-user` errors when deleting a non-unique user belonging to multiple origins
+* fix translation
+* always have CF_TRACE override config
+* added godocs comments to API layer
+* increasing dial timeout due to test flakiness
+* get a better error message from x509.HostnameError
+* run with experimental turned on
+* bold the request and response headers in trace output
+* added translations to updated `tasks` and `run-tasks` --help message
+* `tasks` and `run-tasks` "see-also" message recommends logs
+* add examples to create-user usage
+* set async to true for the delete
+* test display output in the correct buffer
+* consistent command names in integration tests
+* refactor delete-org command
+* v3 commands verify minimum API version
+* add postgres directory to diego-sql.yml path
+* add sql stubs to deploy-diego task
+* add app name/version to UAA client
+* add integration test for delete org
+* do not . import helpers
+* test the experimental code
+* create-user has support for --origin flag
+* do not escape HTML when printing JSON body
+* return the correct error when go-interact errors
+* wrap UAA errors for v3 commands
+* add logging to the UAA client for v3 commands
+* output external IP in CATs tests
+* switch to display warning to avoid printing 'FAILED'
+* update color dependancies
+* update proto buff, web sockets and ssh related packages
+* update golang extensions packages
+* update code.cloudfoundry.org vendored packages
+* use cf-release-repo as gopath, use gvt on windows
+* update ginkgo to support the -flakeAttempts flag
+* update ginkgo and gomega
+* move final cmd tests into plugins
+* adding -flakeAttempts flag to integration tests
+* remove GATs, it is no more it has ceased to be
+* moved GATs plugin tests into integration
+* added a common prefix for all users created in integration tests
+* remove application gats
+* clean up terminal logger output
+* refresh token tests check std.err for warnings if `CF_CLI_EXPERIMENTAL` is true
+* clean up user created in integration tests
+* added integration tests that verify refactored create-user command behaves correctly
+* add the create-user command to the refactor branch
+* add https:// to CF_API in windows integration test
+* the CATs version with the tar fix is not in cf-release master yet
+* this suite file was useless, so I'm removing it.
+* only call startWait.Done once in total
+* global tests have their own package
+* rename suite file
+* update paths
+* move tests into 'isolated' package
+* move helpers from suite to helpers package
+* adds the create-user command integration tests
+* stop skippin'
+* add cleanup as prep for running tests
+* xargs is dumb
+* clean up correctly, Anand screwed up
+* don't pipefail
+* 5 was too many
+* prevents a negative wait group counter from occurring
+* cloudcontroller and uaa connections reset previous http responses on retries and log correct response state
+* additional cleanup, just in case
+* don't display error twice, doing the hacky thing
+* authentication middleware resets original http body in retries
+* move version into common
+* rewrite some cmd unit tests as integration tests
+* set KeepAlive to 30 seconds in all Dialers
+* godoc warning people not to import these packages
+* refactored version command
+* git hook to prevent pushing commits with anonymous Pivotal user
+* disable broken character encoding cats
+* integration test for custom oauth client id and secret
+* set OAuth client and secret defaults in NewData
+* set OAuth client and secret defaults in LoadConfig
+* remove SetCFOAuthClient and SetCFOAuthClientSecret
+* move help and command list into common package
+* rename packages {v2,v3}/common -> {v2,v3}/shared
+* rename package command/flags -> command/flag
+* skipping these CATs tests since they don't actually work
+* share common code from commands/v2 and commands/v3
+* switch back to master, looks like the commit has been merged
+* rename commands to command
+* skipping test as it hasn't actually worked in a long time
+* Fix linux cat SKIPS variable setting
+* pend service key test from running
+* skip tasks tests for now, since they're borked
+* we don't need to run these tests
+* spaces are dumb
+* run all the tests?
+* find the default shared domain directly instead of using API URL
+* use random names for apps
+* ensure cleanup always occurs, also reduce parallelism
+* enables use of custom client id and secret when authenticating with UAA
+* moved most of the cli/cli-acceptance-tests over to integration
+* remove default CF OAuth Client
+* update ports to be comma separated in security group help text
+* default CFOAuthClient to "cf" if empty
+* Merge branch 's-matyukevich-cf-oauth-client2'
+* Merge branch 'cf-oauth-client' of git://github.com/s-matyukevich/cli into s-matyukevich-cf-oauth-client2
+* remove cli-private resource
+* add push test to integration suite
+* rotate homebrew tap github key
+* remove cli-private resource
+* remove unused sign-windows-binary task
+* remove dependency on the cli-private repo
+* use the develop branch of cf-release for cf-acceptance-tests
+* fix cli-integration resource uri
+* change public git resource URLs to https
+* created a read only org that is shared across tests
+* fix description on update-security-group-command
+* use more of the default eventually timeout
+* cleanup task for pipeline integration tests
+* add description to update-security-group help json
+* move integration test cleanup to a script
+* use the same org name prefix
+* add description to create-security-group help json
+* handle int parsing if passed in string
+* Bump NOAA
+* clean up all the orgs - integration tests
+* files are created in a tmp dir and cleaned up properly
+* why not just set the timeout higher?
+* does not retry on any POST requests
+* user-agent only contains the base command name
+* catch ErrMarshal in main to print help
+* update the flags parse integer error to be more user friendly
+* read verbose from config now, tell your friends.
+* display redacted authorization header in trace output
+* use default domain for service integration tests
+* skip portion of test because the test setup is incorrect
+* service-key command exits with 1 when not found
+* fix incorrect method call
+* refactor utils/ui package
+* move task commands under APPS in help -a output
+* add --name option to run-task command
+* add task commands to help -a
+* added the terminate-task command
+* change retry request logic to only trigger for 500
+* renamed ccv3 RunTask to NewTask per client naming convention
+* add message when targetting api without being logged in
+* update integration tests
+* handle errors for API endpoint mismatches
+* don't display extra target information in API cmd
+* align table display in API command
+* change the error message when the app is not staged
+* pretty prints the output from the api command
+* return a friendlier error when creating tasks in a diegoless environment
+* add cloudfoundry to windows worker path
+* pass the original body on every http request retry
+* update translations for the RunTaskError
+* remove focus
+* test empty tables properly for v3 tasks command
+* task running related errors are now displayed cleanly
+* windows has a slightly different message, so don't check the whole thing
+* task actor no longer returns TasksNotFoundError
+* update expected tables in integration tests for better match
+* optional protocal cuz of windows
+* add scheme to default apiURL for integration tests
+* changed name as it seems to work in preview but not after commit
+* added slack badge
+* added integration tests for v3 tasks command
+* added additional behavior to v3 tasks command
+* do not hardcode api URL in proxy integration tests
+* integration tests for verbose flag and proxy
+* added CF logo
+* add table display to tasks command
+* added the v3 tasks command
+* move common errors into cloudcontroller package
+* display full stack trace for panics
+* uaa client will adhere to the CF_DIAL_TIMEOUT
+* forgot that API won't have the config set, this should fix it
+* embed some structures and add some documentation
+* pass user-agent and connection headers to UAA requests
+* create new NewCloudControllerClient method and rename old one
+* skipping test in windows due to timing issues
+* update golang.org/x packages
+* update ginkgo/gomega
+* refactor ccv3 info test to reduce flakiness
+* CF_DIAL_TIMEOUT works with api/cloudcontroller/cloud_controller_connection
+* move API URL and SkipSSLValidation into TargetSettings struct
+* add User-Agent header to CloudControllerClient
+* return non CC errors in a generic wrapped error
+* adds newline in run-task output
+* clean up error handling
+* add run-task integration tests
+* rename requestOptions URI to URL
+* remove v2 dependency in v3 commands
+* refactor and backfill tests for run-task command
+* add CCv3 run-task command
+* remove build commands and link to Concourse task
+* add file logging to new CF_TRACE
+* add verbose logging to v2 commands
+* add a request logger wrapper
+* add ORG to usage message
+* Merge branch 'hyenaspots-delete-space-o-redux'
+* add comments about what we're skipping
+* take care of some gometalinter warnings
+* rename all the things
+* change Make interface to take in http.Request in UAA Client
+* change Make interface to take in http.Request
+* clean up in api command
+* exit early if target api and skip ssl configuration is the same
+* reduced time taken to get all resources pointing to cli repo
+* shortened wording
+* reducing time taken by concourse to get the cli repo
+* Revert "the integration package is not in the cli resource"
+* remove the final-cli resource because it is not used
+* re-add create-cats-config.bat to fix pipeline
+* Bump version to 6.22.2
+* Revert "Bump version to 6.23.0"
+* Merge branch 'delete-space-o-redux' of git://github.com/hyenaspots/cli into hyenaspots-delete-space-o-redux
+* Merge branch 'master' into delete-space-o-redux
+* Update translation strings
+* Update translation files
+* Remove unnecessary/redundant translation strings
+* Refactor delete-space to clean up after adding -o
+* Add the results of bin/test i18n translation resource updates
+* Add delete-space -o flag to V2 command list
+* Re-add symlink fixture that was somehow deleted during rebase on master
+* Fix bug needing space w/ same name in current org with -o flag
+* Remove targeted org requirement from delete-space when -o is present
+* Add -o flag (but still requires an org to be targeted)
+* build fixed
+* client password added
+* Merge branch 'master' of https://github.com/cloudfoundry/cli into cf-oauth-client
+* cf OAuth client added to config file
+
 ## 6.22.2
 * Bump version to 6.22.2
 * Revert "Bump version to 6.23.0"
