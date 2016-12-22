@@ -15,6 +15,7 @@ CF_USERNAME=${CF_USERNAME:-"admin"}
 CF_PASSWORD=${CF_PASSWORD:-"admin"}
 
 export CF_CLI_EXPERIMENTAL=true
+export CF_DIAL_TIMEOUT=15
 
 if [[ -z $SKIP_SSL_VALIDATION || $SKIP_SSL_VALIDATION == "true" ]]; then
   cf api $CF_API --skip-ssl-validation
