@@ -5,10 +5,11 @@ import "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 //go:generate counterfeiter . CloudControllerClient
 
 type CloudControllerClient interface {
-	DeleteOrganization(orgGUID string) (ccv2.Warnings, error)
+	DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	DeleteRoute(routeGUID string) (ccv2.Warnings, error)
 	DeleteServiceBinding(serviceBindingGUID string) (ccv2.Warnings, error)
 	GetApplications(queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)
+	GetJob(jobGUID string) (ccv2.Job, ccv2.Warnings, error)
 	GetOrganizations(queries []ccv2.Query) ([]ccv2.Organization, ccv2.Warnings, error)
 	GetPrivateDomain(domainGUID string) (ccv2.Domain, ccv2.Warnings, error)
 	GetRouteApplications(routeGUID string, queries []ccv2.Query) ([]ccv2.Application, ccv2.Warnings, error)

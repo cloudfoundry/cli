@@ -9,14 +9,15 @@ import (
 )
 
 type FakeCloudControllerClient struct {
-	DeleteOrganizationStub        func(orgGUID string) (ccv2.Warnings, error)
+	DeleteOrganizationStub        func(orgGUID string) (ccv2.Job, ccv2.Warnings, error)
 	deleteOrganizationMutex       sync.RWMutex
 	deleteOrganizationArgsForCall []struct {
 		orgGUID string
 	}
 	deleteOrganizationReturns struct {
-		result1 ccv2.Warnings
-		result2 error
+		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
 	}
 	DeleteRouteStub        func(routeGUID string) (ccv2.Warnings, error)
 	deleteRouteMutex       sync.RWMutex
@@ -43,6 +44,16 @@ type FakeCloudControllerClient struct {
 	}
 	getApplicationsReturns struct {
 		result1 []ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}
+	GetJobStub        func(jobGUID string) (ccv2.Job, ccv2.Warnings, error)
+	getJobMutex       sync.RWMutex
+	getJobArgsForCall []struct {
+		jobGUID string
+	}
+	getJobReturns struct {
+		result1 ccv2.Job
 		result2 ccv2.Warnings
 		result3 error
 	}
@@ -144,7 +155,7 @@ type FakeCloudControllerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCloudControllerClient) DeleteOrganization(orgGUID string) (ccv2.Warnings, error) {
+func (fake *FakeCloudControllerClient) DeleteOrganization(orgGUID string) (ccv2.Job, ccv2.Warnings, error) {
 	fake.deleteOrganizationMutex.Lock()
 	fake.deleteOrganizationArgsForCall = append(fake.deleteOrganizationArgsForCall, struct {
 		orgGUID string
@@ -154,7 +165,7 @@ func (fake *FakeCloudControllerClient) DeleteOrganization(orgGUID string) (ccv2.
 	if fake.DeleteOrganizationStub != nil {
 		return fake.DeleteOrganizationStub(orgGUID)
 	} else {
-		return fake.deleteOrganizationReturns.result1, fake.deleteOrganizationReturns.result2
+		return fake.deleteOrganizationReturns.result1, fake.deleteOrganizationReturns.result2, fake.deleteOrganizationReturns.result3
 	}
 }
 
@@ -170,12 +181,13 @@ func (fake *FakeCloudControllerClient) DeleteOrganizationArgsForCall(i int) stri
 	return fake.deleteOrganizationArgsForCall[i].orgGUID
 }
 
-func (fake *FakeCloudControllerClient) DeleteOrganizationReturns(result1 ccv2.Warnings, result2 error) {
+func (fake *FakeCloudControllerClient) DeleteOrganizationReturns(result1 ccv2.Job, result2 ccv2.Warnings, result3 error) {
 	fake.DeleteOrganizationStub = nil
 	fake.deleteOrganizationReturns = struct {
-		result1 ccv2.Warnings
-		result2 error
-	}{result1, result2}
+		result1 ccv2.Job
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
 }
 
 func (fake *FakeCloudControllerClient) DeleteRoute(routeGUID string) (ccv2.Warnings, error) {
@@ -281,6 +293,41 @@ func (fake *FakeCloudControllerClient) GetApplicationsReturns(result1 []ccv2.App
 	fake.GetApplicationsStub = nil
 	fake.getApplicationsReturns = struct {
 		result1 []ccv2.Application
+		result2 ccv2.Warnings
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *FakeCloudControllerClient) GetJob(jobGUID string) (ccv2.Job, ccv2.Warnings, error) {
+	fake.getJobMutex.Lock()
+	fake.getJobArgsForCall = append(fake.getJobArgsForCall, struct {
+		jobGUID string
+	}{jobGUID})
+	fake.recordInvocation("GetJob", []interface{}{jobGUID})
+	fake.getJobMutex.Unlock()
+	if fake.GetJobStub != nil {
+		return fake.GetJobStub(jobGUID)
+	} else {
+		return fake.getJobReturns.result1, fake.getJobReturns.result2, fake.getJobReturns.result3
+	}
+}
+
+func (fake *FakeCloudControllerClient) GetJobCallCount() int {
+	fake.getJobMutex.RLock()
+	defer fake.getJobMutex.RUnlock()
+	return len(fake.getJobArgsForCall)
+}
+
+func (fake *FakeCloudControllerClient) GetJobArgsForCall(i int) string {
+	fake.getJobMutex.RLock()
+	defer fake.getJobMutex.RUnlock()
+	return fake.getJobArgsForCall[i].jobGUID
+}
+
+func (fake *FakeCloudControllerClient) GetJobReturns(result1 ccv2.Job, result2 ccv2.Warnings, result3 error) {
+	fake.GetJobStub = nil
+	fake.getJobReturns = struct {
+		result1 ccv2.Job
 		result2 ccv2.Warnings
 		result3 error
 	}{result1, result2, result3}
@@ -646,6 +693,8 @@ func (fake *FakeCloudControllerClient) Invocations() map[string][][]interface{} 
 	defer fake.deleteServiceBindingMutex.RUnlock()
 	fake.getApplicationsMutex.RLock()
 	defer fake.getApplicationsMutex.RUnlock()
+	fake.getJobMutex.RLock()
+	defer fake.getJobMutex.RUnlock()
 	fake.getOrganizationsMutex.RLock()
 	defer fake.getOrganizationsMutex.RUnlock()
 	fake.getPrivateDomainMutex.RLock()

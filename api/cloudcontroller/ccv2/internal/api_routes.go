@@ -13,6 +13,7 @@ const (
 	DeleteRouteRequest            = "DeleteRoute"
 	DeleteServiceBindingRequest   = "DeleteServiceBinding"
 	InfoRequest                   = "Info"
+	JobRequest                    = "Job"
 	OrganizationsRequest          = "Organizations"
 	PrivateDomainRequest          = "PrivateDomain"
 	RouteMappingsFromRouteRequest = "RouteMappingsFromRoute"
@@ -29,6 +30,7 @@ const (
 var APIRoutes = rata.Routes{
 	{Path: "/v2/apps", Method: http.MethodGet, Name: AppsRequest},
 	{Path: "/v2/info", Method: http.MethodGet, Name: InfoRequest},
+	{Path: "/v2/jobs/:job_guid", Method: http.MethodGet, Name: JobRequest},
 	{Path: "/v2/organizations", Method: http.MethodGet, Name: OrganizationsRequest},
 	{Path: "/v2/organizations/:organization_guid", Method: http.MethodDelete, Name: DeleteOrganizationRequest},
 	{Path: "/v2/private_domains/:private_domain_guid", Method: http.MethodGet, Name: PrivateDomainRequest},

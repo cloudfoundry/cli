@@ -3472,6 +3472,14 @@
     "translation": "사용자 초대 및 관리, 플랜 선택 및 변경, 지출 한계 설정\n"
   },
   {
+    "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
+    "translation": ""
+  },
+  {
+    "id": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance, please contact your operator for more information.",
+    "translation": ""
+  },
+  {
     "id": "Last Operation",
     "translation": "마지막 조작"
   },

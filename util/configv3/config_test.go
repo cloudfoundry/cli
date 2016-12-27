@@ -66,6 +66,7 @@ var _ = Describe("Config", func() {
 			Expect(config.Locale()).To(BeEmpty())
 			Expect(config.UAAOAuthClient()).To(Equal(DefaultUAAOAuthClient))
 			Expect(config.UAAOAuthClientSecret()).To(Equal(DefaultUAAOAuthClientSecret))
+			Expect(config.OverallPollingTimeout()).To(Equal(DefaultOverallPollingTimeout))
 
 			Expect(config.PluginRepos()).To(Equal([]PluginRepos{{
 				Name: "CF-Community",
@@ -144,6 +145,26 @@ var _ = Describe("Config", func() {
 
 			It("returns fields directly from config", func() {
 				Expect(config.Target()).To(Equal("https://api.foo.com"))
+			})
+		})
+
+		Describe("OverallPollingTimeout", func() {
+			var config *Config
+
+			Context("when AsyncTimeout is set in config", func() {
+				BeforeEach(func() {
+					rawConfig := `{ "AsyncTimeout":5 }`
+					setConfig(homeDir, rawConfig)
+
+					var err error
+					config, err = LoadConfig()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(config).ToNot(BeNil())
+				})
+
+				It("returns the timeout in duration form", func() {
+					Expect(config.OverallPollingTimeout()).To(Equal(5 * time.Minute))
+				})
 			})
 		})
 

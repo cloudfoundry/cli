@@ -3,7 +3,6 @@ package ccv2_test
 import (
 	"net/http"
 
-	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -108,49 +107,6 @@ var _ = Describe("Organization", func() {
 					},
 				}))
 				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
-			})
-		})
-	})
-
-	Describe("DeleteOrganization", func() {
-		Context("when no errors are encountered", func() {
-			BeforeEach(func() {
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true&async=true"),
-						RespondWith(http.StatusNoContent, "{}", http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
-					))
-			})
-
-			It("deletes the org and returns all warnings", func() {
-				warnings, err := client.DeleteOrganization("some-org-guid")
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
-			})
-		})
-
-		Context("when an error is encountered", func() {
-			BeforeEach(func() {
-				response := `{
-  "code": 30003,
-  "description": "The organization could not be found: some-org-guid",
-  "error_code": "CF-OrganizationNotFound"
-}`
-				server.AppendHandlers(
-					CombineHandlers(
-						VerifyRequest(http.MethodDelete, "/v2/organizations/some-org-guid", "recursive=true&async=true"),
-						RespondWith(http.StatusNotFound, response, http.Header{"X-Cf-Warnings": {"warning-1, warning-2"}}),
-					))
-			})
-
-			It("returns an error and all warnings", func() {
-				warnings, err := client.DeleteOrganization("some-org-guid")
-
-				Expect(err).To(MatchError(cloudcontroller.ResourceNotFoundError{
-					Message: "The organization could not be found: some-org-guid",
-				}))
-				Expect(warnings).To(ConsistOf(Warnings{"warning-1", "warning-2"}))
 			})
 		})
 	})

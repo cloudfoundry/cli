@@ -19,6 +19,10 @@ func HandleError(err error) error {
 
 	case v2action.ApplicationNotFoundError:
 		return command.ApplicationNotFoundError{Name: e.Name}
+	case v2action.JobFailedError:
+		return JobFailedError{JobGUID: e.JobGUID}
+	case v2action.JobTimeoutError:
+		return JobTimeoutError{JobGUID: e.JobGUID}
 	case v2action.ServiceInstanceNotFoundError:
 		return command.ServiceInstanceNotFoundError{Name: e.Name}
 	}

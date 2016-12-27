@@ -3472,6 +3472,14 @@
     "translation": "Inviter et gérer des utilisateurs, sélectionner et changer les plans, et définir des limites relatives aux dépenses\n"
   },
   {
+    "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
+    "translation": ""
+  },
+  {
+    "id": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance, please contact your operator for more information.",
+    "translation": ""
+  },
+  {
     "id": "Last Operation",
     "translation": "Dernière opération"
   },

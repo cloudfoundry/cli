@@ -22,6 +22,8 @@ type Config interface {
 	Locale() string
 	Plugins() map[string]configv3.Plugin
 	RefreshToken() string
+	PollingInterval() time.Duration
+	OverallPollingTimeout() time.Duration
 	SetAccessToken(token string)
 	SetRefreshToken(token string)
 	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
