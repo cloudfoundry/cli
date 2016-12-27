@@ -442,6 +442,19 @@ var _ = Describe("Login Command", func() {
 						"passcode": "the-one-time-code",
 					}))
 				})
+
+				It("does not prompt the user for the passcode type prompts", func() {
+					Flags = []string{"--sso", "--sso-passcode", "the-one-time-code", "-a", "api.example.com"}
+
+					testcmd.RunCLICommand("login", Flags, nil, updateCommandDependency, false, ui)
+
+					Expect(ui.Prompts).To(BeEmpty())
+					Expect(ui.PasswordPrompts).To(BeEmpty())
+					Expect(authRepo.AuthenticateCallCount()).To(Equal(1))
+					Expect(authRepo.AuthenticateArgsForCall(0)).To(Equal(map[string]string{
+						"passcode": "the-one-time-code",
+					}))
+				})
 			})
 
 			It("takes the password from the -p flag", func() {
