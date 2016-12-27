@@ -1228,6 +1228,14 @@
     "translation": "Invalid flag: "
   },
   {
+    "id": "Job ({{.JobGUID}}) failed: {{.Message}}",
+    "translation": ""
+  },
+  {
+    "id": "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance, please contact your operator for more information.",
+    "translation": ""
+  },
+  {
     "id": "List tasks of an app",
     "translation": ""
   },

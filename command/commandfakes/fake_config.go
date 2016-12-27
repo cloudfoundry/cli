@@ -83,6 +83,18 @@ type FakeConfig struct {
 	refreshTokenReturns     struct {
 		result1 string
 	}
+	PollingIntervalStub        func() time.Duration
+	pollingIntervalMutex       sync.RWMutex
+	pollingIntervalArgsForCall []struct{}
+	pollingIntervalReturns     struct {
+		result1 time.Duration
+	}
+	OverallPollingTimeoutStub        func() time.Duration
+	overallPollingTimeoutMutex       sync.RWMutex
+	overallPollingTimeoutArgsForCall []struct{}
+	overallPollingTimeoutReturns     struct {
+		result1 time.Duration
+	}
 	SetAccessTokenStub        func(token string)
 	setAccessTokenMutex       sync.RWMutex
 	setAccessTokenArgsForCall []struct {
@@ -460,6 +472,56 @@ func (fake *FakeConfig) RefreshTokenReturns(result1 string) {
 	}{result1}
 }
 
+func (fake *FakeConfig) PollingInterval() time.Duration {
+	fake.pollingIntervalMutex.Lock()
+	fake.pollingIntervalArgsForCall = append(fake.pollingIntervalArgsForCall, struct{}{})
+	fake.recordInvocation("PollingInterval", []interface{}{})
+	fake.pollingIntervalMutex.Unlock()
+	if fake.PollingIntervalStub != nil {
+		return fake.PollingIntervalStub()
+	} else {
+		return fake.pollingIntervalReturns.result1
+	}
+}
+
+func (fake *FakeConfig) PollingIntervalCallCount() int {
+	fake.pollingIntervalMutex.RLock()
+	defer fake.pollingIntervalMutex.RUnlock()
+	return len(fake.pollingIntervalArgsForCall)
+}
+
+func (fake *FakeConfig) PollingIntervalReturns(result1 time.Duration) {
+	fake.PollingIntervalStub = nil
+	fake.pollingIntervalReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
+func (fake *FakeConfig) OverallPollingTimeout() time.Duration {
+	fake.overallPollingTimeoutMutex.Lock()
+	fake.overallPollingTimeoutArgsForCall = append(fake.overallPollingTimeoutArgsForCall, struct{}{})
+	fake.recordInvocation("OverallPollingTimeout", []interface{}{})
+	fake.overallPollingTimeoutMutex.Unlock()
+	if fake.OverallPollingTimeoutStub != nil {
+		return fake.OverallPollingTimeoutStub()
+	} else {
+		return fake.overallPollingTimeoutReturns.result1
+	}
+}
+
+func (fake *FakeConfig) OverallPollingTimeoutCallCount() int {
+	fake.overallPollingTimeoutMutex.RLock()
+	defer fake.overallPollingTimeoutMutex.RUnlock()
+	return len(fake.overallPollingTimeoutArgsForCall)
+}
+
+func (fake *FakeConfig) OverallPollingTimeoutReturns(result1 time.Duration) {
+	fake.OverallPollingTimeoutStub = nil
+	fake.overallPollingTimeoutReturns = struct {
+		result1 time.Duration
+	}{result1}
+}
+
 func (fake *FakeConfig) SetAccessToken(token string) {
 	fake.setAccessTokenMutex.Lock()
 	fake.setAccessTokenArgsForCall = append(fake.setAccessTokenArgsForCall, struct {
@@ -768,6 +830,10 @@ func (fake *FakeConfig) Invocations() map[string][][]interface{} {
 	defer fake.pluginsMutex.RUnlock()
 	fake.refreshTokenMutex.RLock()
 	defer fake.refreshTokenMutex.RUnlock()
+	fake.pollingIntervalMutex.RLock()
+	defer fake.pollingIntervalMutex.RUnlock()
+	fake.overallPollingTimeoutMutex.RLock()
+	defer fake.overallPollingTimeoutMutex.RUnlock()
 	fake.setAccessTokenMutex.RLock()
 	defer fake.setAccessTokenMutex.RUnlock()
 	fake.setRefreshTokenMutex.RLock()

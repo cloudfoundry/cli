@@ -27,11 +27,11 @@ func (cmd *UnbindServiceCommand) Setup(config command.Config, ui command.UI) err
 	cmd.UI = ui
 	cmd.Config = config
 
-	client, _, err := shared.NewClients(config, ui)
+	ccClient, uaaClient, err := shared.NewClients(config, ui)
 	if err != nil {
 		return err
 	}
-	cmd.Actor = v2action.NewActor(client, nil)
+	cmd.Actor = v2action.NewActor(ccClient, uaaClient, config)
 
 	return nil
 }

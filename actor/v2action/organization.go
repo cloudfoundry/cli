@@ -34,7 +34,8 @@ func (e MultipleOrganizationsFoundError) Error() string {
 }
 
 // DeleteOrganization deletes the Organization associated with the provided
-// GUID.
+// GUID. Once the deletion request is sent, it polls the deletion job until
+// it's finished.
 func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 	orgs, getWarnings, err := actor.CloudControllerClient.GetOrganizations([]ccv2.Query{
 		{
@@ -62,11 +63,14 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 	var allWarnings Warnings
 	allWarnings = append(allWarnings, getWarnings...)
 
-	deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(orgs[0].GUID)
+	job, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(orgs[0].GUID)
 	allWarnings = append(allWarnings, deleteWarnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	return allWarnings, nil
+	warnings, err := actor.PollJob(job)
+	allWarnings = append(allWarnings, warnings...)
+
+	return allWarnings, err
 }

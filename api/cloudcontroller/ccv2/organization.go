@@ -3,7 +3,6 @@ package ccv2
 import (
 	"encoding/json"
 	"net/http"
-	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -72,24 +71,4 @@ func (client *Client) GetOrganizations(queries []Query) ([]Organization, Warning
 	}
 
 	return fullOrgsList, fullWarningsList, nil
-}
-
-// DeleteOrganization deletes the Organization associated with the provided
-// GUID.
-func (client *Client) DeleteOrganization(orgGUID string) (Warnings, error) {
-	request, err := client.newHTTPRequest(requestOptions{
-		RequestName: internal.DeleteOrganizationRequest,
-		URIParams:   map[string]string{"organization_guid": orgGUID},
-		Query: url.Values{
-			"recursive": {"true"},
-			"async":     {"true"},
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	var response cloudcontroller.Response
-	err = client.connection.Make(request, &response)
-	return response.Warnings, err
 }

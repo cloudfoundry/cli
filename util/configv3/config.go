@@ -23,6 +23,13 @@ const (
 	// DefaultDialTimeout is the default timeout for the dail.
 	DefaultDialTimeout = 5 * time.Second
 
+	// DefaultOverallPollingTimeout is the default maximum time that the CLI will
+	// poll a job running on the Cloud Controller. By default it's infinit, which
+	// is represented by MaxInt64.
+	DefaultOverallPollingTimeout = time.Duration(1<<63 - 1) // math.MaxInt64
+	// Developer note about constant above ^^^ do not replace with math.MaxInt64
+	// This will require the math package which is a dynamically linked library.
+
 	// DefaultTarget is the default CFConfig value for Target.
 	DefaultTarget = ""
 
@@ -231,6 +238,22 @@ type FlagOverride struct {
 // Target returns the CC API URL
 func (config *Config) Target() string {
 	return config.ConfigFile.Target
+}
+
+// PollingInterval returns the time between polls.
+func (config *Config) PollingInterval() time.Duration {
+	return 5 * time.Second
+}
+
+// OverallPollingTimeout returns the overall polling timeout for async
+// operations. The time is based off of:
+//   1. The config file's AsyncTimeout value (integer) is > 0
+//   2. Defaults to the DefaultOverallPollingTimeout
+func (config *Config) OverallPollingTimeout() time.Duration {
+	if config.ConfigFile.AsyncTimeout == 0 {
+		return DefaultOverallPollingTimeout
+	}
+	return time.Duration(config.ConfigFile.AsyncTimeout) * time.Minute
 }
 
 // SkipSSLValidation returns whether or not to skip SSL validation when

@@ -7,11 +7,13 @@ type Warnings []string
 type Actor struct {
 	CloudControllerClient CloudControllerClient
 	UAAClient             UAAClient
+	Config                Config
 }
 
-func NewActor(ccClient CloudControllerClient, uaaClient UAAClient) Actor {
+func NewActor(ccClient CloudControllerClient, uaaClient UAAClient, config Config) Actor {
 	return Actor{
 		CloudControllerClient: ccClient,
+		Config:                config,
 		UAAClient:             uaaClient,
 	}
 }

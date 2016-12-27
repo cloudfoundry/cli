@@ -58,6 +58,18 @@ var _ = Describe("HandleError", func() {
 			Name: "some-service-instance",
 		}),
 
+		Entry("v2action.JobFailedError -> JobFailedError", v2action.JobFailedError{
+			JobGUID: "some-job-guid",
+		}, JobFailedError{
+			JobGUID: "some-job-guid",
+		}),
+
+		Entry("v2action.JobTimeoutError -> JobTimeoutError", v2action.JobTimeoutError{
+			JobGUID: "some-job-guid",
+		}, JobTimeoutError{
+			JobGUID: "some-job-guid",
+		}),
+
 		Entry("default case -> original error", err, err),
 	)
 })
