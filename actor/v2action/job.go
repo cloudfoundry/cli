@@ -39,22 +39,30 @@ func (actor Actor) PollJob(job ccv2.Job) (Warnings, error) {
 	var err error
 
 	finished := make(chan bool, 1)
+	stopPolling := make(chan bool, 1)
 	go func() {
+	Polling:
 		for {
-			var warnings ccv2.Warnings
-			job, warnings, err = actor.CloudControllerClient.GetJob(job.GUID)
-			allWarnings = append(allWarnings, warnings...)
+			select {
+			case <-stopPolling:
+				break Polling
+			default:
+				var warnings ccv2.Warnings
+				job, warnings, err = actor.CloudControllerClient.GetJob(job.GUID)
+				allWarnings = append(allWarnings, warnings...)
 
-			if err != nil || job.Terminated() {
-				finished <- true
-				break
+				if err != nil || job.Terminated() {
+					finished <- true
+					break Polling
+				}
+				time.Sleep(actor.Config.PollingInterval())
 			}
-			time.Sleep(actor.Config.PollingInterval())
 		}
 	}()
 
 	select {
 	case <-time.After(actor.Config.OverallPollingTimeout()):
+		stopPolling <- true
 		return Warnings(allWarnings), JobTimeoutError{
 			JobGUID: originalJobGUID,
 			Timeout: actor.Config.OverallPollingTimeout(),
