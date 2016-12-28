@@ -90,6 +90,7 @@ var _ = Describe("delete-org command", func() {
 					Eventually(session.Out).Should(Say("Deleting org %s as %s...", orgName, username))
 					Eventually(session.Out).Should(Say("OK"))
 					Eventually(session).Should(Exit(0))
+					Eventually(helpers.CF("org", orgName)).Should(Exit(1))
 				})
 			})
 
@@ -103,6 +104,7 @@ var _ = Describe("delete-org command", func() {
 					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
 					Eventually(session.Out).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
+					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
 				})
 			})
 
@@ -116,6 +118,7 @@ var _ = Describe("delete-org command", func() {
 					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
 					Eventually(session.Out).Should(Say("Delete cancelled"))
 					Eventually(session).Should(Exit(0))
+					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
 				})
 			})
 
@@ -133,6 +136,7 @@ var _ = Describe("delete-org command", func() {
 					Eventually(session.Out).Should(Say("invalid input \\(not y, n, yes, or no\\)"))
 					Eventually(session.Out).Should(Say("Really delete the org %s and everything associated with it\\?>", orgName))
 					Eventually(session).Should(Exit(0))
+					Eventually(helpers.CF("org", orgName)).Should(Exit(0))
 				})
 			})
 		})
@@ -144,6 +148,7 @@ var _ = Describe("delete-org command", func() {
 				Eventually(session.Out).Should(Say("Deleting org %s as %s...", orgName, username))
 				Eventually(session.Out).Should(Say("OK"))
 				Eventually(session).Should(Exit(0))
+				Eventually(helpers.CF("org", orgName)).Should(Exit(1))
 			})
 		})
 	})

@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Version", func() {
+var _ = Describe("version command", func() {
 	DescribeTable("displays version",
 		func(arg string) {
 			session := helpers.CF(arg)
