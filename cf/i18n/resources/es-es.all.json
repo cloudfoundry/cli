@@ -3924,6 +3924,10 @@
     "translation": "ORGANIZACIONES:"
   },
   {
+    "id": "One-time password",
+    "translation": "Contraseña de un solo uso"
+  },
+  {
     "id": "Option '--app-ports'",
     "translation": ""
   },
@@ -5754,10 +5758,6 @@
   {
     "id": "Use a one-time password to login",
     "translation": "Utilizar una contraseña de un solo uso para iniciar sesión"
-  },
-  {
-    "id": "One-time password",
-    "translation": "Contraseña de un solo uso"
   },
   {
     "id": "User provided tags",
