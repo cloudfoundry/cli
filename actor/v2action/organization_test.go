@@ -24,6 +24,103 @@ var _ = Describe("Org Actions", func() {
 		actor = NewActor(fakeCloudControllerClient, nil, fakeConfig)
 	})
 
+	Describe("GetOrganizationByName", func() {
+		var (
+			org      Organization
+			warnings Warnings
+			err      error
+		)
+
+		JustBeforeEach(func() {
+			org, warnings, err = actor.GetOrganizationByName("some-org")
+		})
+
+		Context("there is only one organization by a given name", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{
+						{GUID: "some-org-guid"},
+					},
+					ccv2.Warnings{"warning-1", "warning-2"},
+					nil)
+			})
+
+			It("returns the requested org", func() {
+				Expect(warnings).To(ConsistOf("warning-1", "warning-2"))
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(fakeCloudControllerClient.GetOrganizationsCallCount()).To(Equal(1))
+				query := fakeCloudControllerClient.GetOrganizationsArgsForCall(0)
+				Expect(query).To(Equal(
+					[]ccv2.Query{{
+						Filter:   ccv2.NameFilter,
+						Operator: ccv2.EqualOperator,
+						Value:    "some-org",
+					}}))
+			})
+		})
+
+		Context("when the org is not found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{},
+					ccv2.Warnings{
+						"get-org-warning",
+					},
+					nil,
+				)
+			})
+
+			It("returns an error and all warnings", func() {
+				Expect(warnings).To(ConsistOf("get-org-warning"))
+				Expect(err).To(MatchError(OrganizationNotFoundError{
+					Name: "some-org",
+				}))
+			})
+		})
+
+		Context("when more than one org is found", func() {
+			BeforeEach(func() {
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{
+						{GUID: "org-1-guid"},
+						{GUID: "org-2-guid"},
+					},
+					ccv2.Warnings{
+						"get-org-warning",
+					},
+					nil,
+				)
+			})
+
+			It("returns an error and all warnings", func() {
+				Expect(warnings).To(ConsistOf("get-org-warning"))
+				Expect(err).To(MatchError(
+					"Organization name 'some-org' matches multiple GUIDs: org-1-guid, org-2-guid"))
+			})
+		})
+
+		Context("when getting the org returns an error", func() {
+			var returnedErr error
+
+			BeforeEach(func() {
+				returnedErr = errors.New("get-orgs-error")
+				fakeCloudControllerClient.GetOrganizationsReturns(
+					[]ccv2.Organization{},
+					ccv2.Warnings{
+						"get-org-warning",
+					},
+					returnedErr,
+				)
+			})
+
+			It("returns the error and all warnings", func() {
+				Expect(warnings).To(ConsistOf("get-org-warning"))
+				Expect(err).To(MatchError(returnedErr))
+			})
+		})
+	})
+
 	Describe("DeleteOrganization", func() {
 		var (
 			warnings     Warnings
@@ -75,7 +172,7 @@ var _ = Describe("Org Actions", func() {
 			})
 		})
 
-		Context("when the org is not found", func() {
+		Context("when getting the org returns an error", func() {
 			BeforeEach(func() {
 				fakeCloudControllerClient.GetOrganizationsReturns(
 					[]ccv2.Organization{},
@@ -91,47 +188,6 @@ var _ = Describe("Org Actions", func() {
 				Expect(deleteOrgErr).To(MatchError(OrganizationNotFoundError{
 					Name: "some-org",
 				}))
-			})
-		})
-
-		Context("when more than one org is found", func() {
-			BeforeEach(func() {
-				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv2.Organization{
-						{GUID: "org-1-guid"},
-						{GUID: "org-2-guid"},
-					},
-					ccv2.Warnings{
-						"get-org-warning",
-					},
-					nil,
-				)
-			})
-
-			It("returns an error and all warnings", func() {
-				Expect(warnings).To(ConsistOf("get-org-warning"))
-				Expect(deleteOrgErr).To(MatchError(
-					"Organization name 'some-org' matches multiple GUIDs: org-1-guid, org-2-guid"))
-			})
-		})
-
-		Context("when getting the org returns an error", func() {
-			var returnedErr error
-
-			BeforeEach(func() {
-				returnedErr = errors.New("get-orgs-error")
-				fakeCloudControllerClient.GetOrganizationsReturns(
-					[]ccv2.Organization{},
-					ccv2.Warnings{
-						"get-org-warning",
-					},
-					returnedErr,
-				)
-			})
-
-			It("returns the error and all warnings", func() {
-				Expect(deleteOrgErr).To(MatchError(returnedErr))
-				Expect(warnings).To(ConsistOf("get-org-warning"))
 			})
 		})
 
