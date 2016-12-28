@@ -3992,6 +3992,10 @@
     "translation": "ORGS:"
   },
   {
+    "id": "One-time password",
+    "translation": "One-time password"
+  },
+  {
     "id": "Option '--app-ports'",
     "translation": "Option '--app-ports'"
   },
@@ -5890,10 +5894,6 @@
   {
     "id": "Use a one-time password to login",
     "translation": "Use a one-time password to login"
-  },
-  {
-    "id": "One-time password",
-    "translation": "One-time password"
   },
   {
     "id": "User provided tags",

@@ -1328,6 +1328,10 @@
     "translation": "Not supported on windows"
   },
   {
+    "id": "One-time password",
+    "translation": "One-time password"
+  },
+  {
     "id": "Option '--app-ports'",
     "translation": "Option '--app-ports'"
   },
