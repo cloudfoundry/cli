@@ -24,7 +24,7 @@ type JobTimeoutError struct {
 }
 
 func (e JobTimeoutError) Error() string {
-	return "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance, please contact your operator for more information."
+	return "Job ({{.JobGUID}}) polling timeout has been reached. The operation may still be running on the CF instance. Your CF operator may have more information."
 }
 
 func (e JobTimeoutError) Translate(translate func(string, ...interface{}) string) string {
