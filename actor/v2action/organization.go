@@ -33,11 +33,9 @@ func (e MultipleOrganizationsFoundError) Error() string {
 	return fmt.Sprintf("Organization name '%s' matches multiple GUIDs: %s", e.Name, guids)
 }
 
-// DeleteOrganization deletes the Organization associated with the provided
-// GUID. Once the deletion request is sent, it polls the deletion job until
-// it's finished.
-func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
-	orgs, getWarnings, err := actor.CloudControllerClient.GetOrganizations([]ccv2.Query{
+// GetOrganizationByName returns an Organization based off of the name given.
+func (actor Actor) GetOrganizationByName(orgName string) (Organization, Warnings, error) {
+	orgs, warnings, err := actor.CloudControllerClient.GetOrganizations([]ccv2.Query{
 		{
 			Filter:   ccv2.NameFilter,
 			Operator: ccv2.EqualOperator,
@@ -45,11 +43,11 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 		},
 	})
 	if err != nil {
-		return Warnings(getWarnings), err
+		return Organization{}, Warnings(warnings), err
 	}
 
 	if len(orgs) == 0 {
-		return Warnings(getWarnings), OrganizationNotFoundError{Name: orgName}
+		return Organization{}, Warnings(warnings), OrganizationNotFoundError{Name: orgName}
 	}
 
 	if len(orgs) > 1 {
@@ -57,19 +55,31 @@ func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
 		for _, org := range orgs {
 			guids = append(guids, org.GUID)
 		}
-		return Warnings(getWarnings), MultipleOrganizationsFoundError{Name: orgName, GUIDs: guids}
+		return Organization{}, Warnings(warnings), MultipleOrganizationsFoundError{Name: orgName, GUIDs: guids}
 	}
 
-	var allWarnings Warnings
-	allWarnings = append(allWarnings, getWarnings...)
+	return Organization(orgs[0]), Warnings(warnings), nil
+}
 
-	job, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(orgs[0].GUID)
+// DeleteOrganization deletes the Organization associated with the provided
+// GUID. Once the deletion request is sent, it polls the deletion job until
+// it's finished.
+func (actor Actor) DeleteOrganization(orgName string) (Warnings, error) {
+	var allWarnings Warnings
+
+	org, warnings, err := actor.GetOrganizationByName(orgName)
+	allWarnings = append(allWarnings, warnings...)
+	if err != nil {
+		return allWarnings, err
+	}
+
+	job, deleteWarnings, err := actor.CloudControllerClient.DeleteOrganization(org.GUID)
 	allWarnings = append(allWarnings, deleteWarnings...)
 	if err != nil {
 		return allWarnings, err
 	}
 
-	warnings, err := actor.PollJob(job)
+	warnings, err = actor.PollJob(job)
 	allWarnings = append(allWarnings, warnings...)
 
 	return allWarnings, err
