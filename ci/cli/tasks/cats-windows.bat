@@ -24,4 +24,4 @@ cd %GATSPATH%
 go get -v -u github.com/FiloSottile/gvt
 gvt update github.com/onsi/ginkgo
 
-ginkgo.exe -flakeAttempts=2 -slowSpecThreshold=120 -skip="NO_DEA_SUPPORT|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB|exercises basic loggregator|firehose data|Users can manage droplet bits for an app|can delete the key|dotnet-core|transparently proxies both reserved" -nodes=%NODES%
+ginkgo.exe -flakeAttempts=2 -slowSpecThreshold=120 -skip="NO_DEA_SUPPORT|go makes the app reachable via its bound route|SSO|takes effect after a restart, not requiring a push|doesn't die when printing 32MB|exercises basic loggregator|firehose data|Users can manage droplet bits for an app|dotnet-core|transparently proxies both reserved" -nodes=%NODES%
