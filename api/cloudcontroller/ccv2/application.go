@@ -2,7 +2,6 @@ package ccv2
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -42,38 +41,20 @@ func (client *Client) GetApplications(queries []Query) ([]Application, Warnings,
 		return nil, nil, err
 	}
 
-	fullAppsList := []Application{}
-	fullWarningsList := Warnings{}
+	var fullAppsList []Application
+	warnings, err := client.paginate(request, Application{}, func(item interface{}) error {
+		if app, ok := item.(Application); ok {
+			fullAppsList = append(fullAppsList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Application{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
 
-	for {
-		var apps []Application
-		wrapper := PaginatedWrapper{
-			Resources: &apps,
-		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
-
-		err := client.connection.Make(request, &response)
-		fullWarningsList = append(fullWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-		fullAppsList = append(fullAppsList, apps...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-	}
-
-	return fullAppsList, fullWarningsList, nil
+	return fullAppsList, warnings, err
 }
 
 // GetRouteApplications returns a list of Applications associated with a route
@@ -88,36 +69,18 @@ func (client *Client) GetRouteApplications(routeGUID string, queryParams []Query
 		return nil, nil, err
 	}
 
-	fullAppsList := []Application{}
-	fullWarningsList := Warnings{}
+	var fullAppsList []Application
+	warnings, err := client.paginate(request, Application{}, func(item interface{}) error {
+		if app, ok := item.(Application); ok {
+			fullAppsList = append(fullAppsList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Application{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
 
-	for {
-		var apps []Application
-		wrapper := PaginatedWrapper{
-			Resources: &apps,
-		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
-
-		err := client.connection.Make(request, &response)
-		fullWarningsList = append(fullWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-		fullAppsList = append(fullAppsList, apps...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-	}
-
-	return fullAppsList, fullWarningsList, nil
+	return fullAppsList, warnings, err
 }

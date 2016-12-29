@@ -2,7 +2,6 @@ package ccv2
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -37,38 +36,18 @@ func (client *Client) GetOrganizations(queries []Query) ([]Organization, Warning
 		return nil, nil, err
 	}
 
-	fullOrgsList := []Organization{}
-	fullWarningsList := Warnings{}
-
-	for {
-		var orgs []Organization
-		wrapper := PaginatedWrapper{
-			Resources: &orgs,
+	var fullOrgsList []Organization
+	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
+		if app, ok := item.(Organization); ok {
+			fullOrgsList = append(fullOrgsList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Organization{},
+				Unexpected: item,
+			}
 		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
+		return nil
+	})
 
-		err = client.connection.Make(request, &response)
-		fullWarningsList = append(fullWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-
-		fullOrgsList = append(fullOrgsList, orgs...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-	}
-
-	return fullOrgsList, fullWarningsList, nil
+	return fullOrgsList, warnings, err
 }
