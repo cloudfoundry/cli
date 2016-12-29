@@ -201,7 +201,7 @@ var _ = Describe("Job Actions", func() {
 				It("raises a JobTimeoutError", func() {
 					warnings, err := actor.PollJob(ccv2.Job{GUID: "some-job-guid"})
 
-					Expect(warnings).To(ConsistOf("warning-1", "warning-2", "warning-3"))
+					Expect(warnings).To(ContainElement("warning-1"))
 					Expect(err).To(MatchError(JobTimeoutError{
 						Timeout: overallPollingTimeout,
 						JobGUID: "some-job-guid",
