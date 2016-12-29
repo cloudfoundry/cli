@@ -2,7 +2,6 @@ package ccv2
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -52,38 +51,20 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]R
 		return nil, nil, err
 	}
 
-	fullRoutesList := []Route{}
-	fullWarningsList := Warnings{}
+	var fullRoutesList []Route
+	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
+		if app, ok := item.(Route); ok {
+			fullRoutesList = append(fullRoutesList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Route{},
+				Unexpected: item,
+			}
+		}
+		return nil
+	})
 
-	for {
-		var routes []Route
-		wrapper := PaginatedWrapper{
-			Resources: &routes,
-		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
-
-		err := client.connection.Make(request, &response)
-		fullWarningsList = append(fullWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-		fullRoutesList = append(fullRoutesList, routes...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, fullWarningsList, err
-		}
-	}
-
-	return fullRoutesList, fullWarningsList, nil
+	return fullRoutesList, warnings, err
 }
 
 // DeleteRoute deletes the Route associated with the provided Route GUID.

@@ -2,7 +2,6 @@ package ccv2
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -38,39 +37,20 @@ func (client *Client) GetServiceBindings(queries []Query) ([]ServiceBinding, War
 		return nil, nil, err
 	}
 
-	allServiceBindingsList := []ServiceBinding{}
-	allWarningsList := Warnings{}
-
-	for {
-		var serviceBindings []ServiceBinding
-		wrapper := PaginatedWrapper{
-			Resources: &serviceBindings,
+	var fullBindingsList []ServiceBinding
+	warnings, err := client.paginate(request, ServiceBinding{}, func(item interface{}) error {
+		if app, ok := item.(ServiceBinding); ok {
+			fullBindingsList = append(fullBindingsList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   ServiceBinding{},
+				Unexpected: item,
+			}
 		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
+		return nil
+	})
 
-		err := client.connection.Make(request, &response)
-		allWarningsList = append(allWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, allWarningsList, err
-		}
-
-		allServiceBindingsList = append(allServiceBindingsList, serviceBindings...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, allWarningsList, err
-		}
-	}
-
-	return allServiceBindingsList, allWarningsList, nil
+	return fullBindingsList, warnings, err
 }
 
 // DeleteServiceBinding will destroy the requested Service Binding.

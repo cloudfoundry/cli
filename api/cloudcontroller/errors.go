@@ -1,6 +1,9 @@
 package cloudcontroller
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+)
 
 // UnverifiedServerError replaces x509.UnknownAuthorityError when the server
 // has SSL but the client is unable to verify it's certificate
@@ -127,4 +130,20 @@ type APINotFoundError struct {
 
 func (e APINotFoundError) Error() string {
 	return fmt.Sprintf("Unable to find API at %s", e.URL)
+}
+
+// UnknownObjectInListError is returned when iterating through a paginated
+// list. Assuming tests are written for the paginated function, this should be
+// impossible to get.
+type UnknownObjectInListError struct {
+	Expected   interface{}
+	Unexpected interface{}
+}
+
+func (e UnknownObjectInListError) Error() string {
+	return fmt.Sprintf(
+		"Error while processing a paginated list. Expected %s but %s was returned",
+		reflect.TypeOf(e.Expected),
+		reflect.TypeOf(e.Unexpected),
+	)
 }

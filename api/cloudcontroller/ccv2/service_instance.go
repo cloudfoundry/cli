@@ -2,7 +2,6 @@ package ccv2
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv2/internal"
@@ -68,39 +67,20 @@ func (client *Client) GetServiceInstances(queries []Query) ([]ServiceInstance, W
 		return nil, nil, err
 	}
 
-	allServiceInstancesList := []ServiceInstance{}
-	allWarningsList := Warnings{}
-
-	for {
-		var serviceInstances []ServiceInstance
-		wrapper := PaginatedWrapper{
-			Resources: &serviceInstances,
+	var fullInstancesList []ServiceInstance
+	warnings, err := client.paginate(request, ServiceInstance{}, func(item interface{}) error {
+		if app, ok := item.(ServiceInstance); ok {
+			fullInstancesList = append(fullInstancesList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   ServiceInstance{},
+				Unexpected: item,
+			}
 		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
+		return nil
+	})
 
-		err := client.connection.Make(request, &response)
-		allWarningsList = append(allWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, allWarningsList, err
-		}
-
-		allServiceInstancesList = append(allServiceInstancesList, serviceInstances...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, allWarningsList, err
-		}
-	}
-
-	return allServiceInstancesList, allWarningsList, nil
+	return fullInstancesList, warnings, err
 }
 
 // GetSpaceServiceInstances returns back a list of Service Instances based off
@@ -122,38 +102,18 @@ func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProv
 		return nil, nil, err
 	}
 
-	allServiceInstancesList := []ServiceInstance{}
-	allWarningsList := Warnings{}
-
-	for {
-		var serviceInstances []ServiceInstance
-		wrapper := PaginatedWrapper{
-			Resources: &serviceInstances,
+	var fullInstancesList []ServiceInstance
+	warnings, err := client.paginate(request, ServiceInstance{}, func(item interface{}) error {
+		if app, ok := item.(ServiceInstance); ok {
+			fullInstancesList = append(fullInstancesList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   ServiceInstance{},
+				Unexpected: item,
+			}
 		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
+		return nil
+	})
 
-		err := client.connection.Make(request, &response)
-		allWarningsList = append(allWarningsList, response.Warnings...)
-		if err != nil {
-			return nil, allWarningsList, err
-		}
-
-		allServiceInstancesList = append(allServiceInstancesList, serviceInstances...)
-
-		if wrapper.NextURL == "" {
-			break
-		}
-
-		request, err = client.newHTTPRequest(requestOptions{
-			URI:    wrapper.NextURL,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, allWarningsList, err
-		}
-	}
-
-	return allServiceInstancesList, allWarningsList, nil
+	return fullInstancesList, warnings, err
 }
