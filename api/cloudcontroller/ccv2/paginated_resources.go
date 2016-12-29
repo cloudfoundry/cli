@@ -1,4 +1,4 @@
-package cloudcontroller
+package ccv2
 
 import (
 	"encoding/json"

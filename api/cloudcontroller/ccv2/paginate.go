@@ -10,7 +10,7 @@ func (client Client) paginate(request *http.Request, obj interface{}, appendToEx
 	fullWarningsList := Warnings{}
 
 	for {
-		wrapper := cloudcontroller.NewPaginatedResources(obj)
+		wrapper := NewPaginatedResources(obj)
 		response := cloudcontroller.Response{
 			Result: &wrapper,
 		}
