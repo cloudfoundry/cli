@@ -44,7 +44,6 @@ run:
     [[ "$BACKEND" = "diego" ]] && SKIPS="${SKIPS}NO_DIEGO_SUPPORT|"
     [[ "$BACKEND" = "dea" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|"
     [[ "$BACKEND" = "" ]] && SKIPS="${SKIPS}NO_DEA_SUPPORT|NO_DIEGO_SUPPORT|"
-    SKIPS="${SKIPS}can delete the key|"
     SKIPS="${SKIPS}dotnet-core|"
     SKIPS="${SKIPS}transparently proxies both reserved|"
 
