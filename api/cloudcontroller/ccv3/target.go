@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
 // TargetSettings represents configuration for establishing a connection to the
@@ -32,12 +33,18 @@ func (client *Client) TargetCF(settings TargetSettings) (Warnings, error) {
 	})
 	client.WrapConnection(newErrorWrapper()) //Pretty Sneaky, Sis..
 
-	apiInfo, _, warnings, err := client.Info()
+	apiInfo, resourceLinks, warnings, err := client.Info()
 	if err != nil {
 		return warnings, err
 	}
 
 	client.APIInfo = apiInfo
+
+	resources := map[string]string{}
+	for resource, link := range resourceLinks {
+		resources[resource] = link.HREF
+	}
+	client.router = internal.NewRouter(internal.APIRoutes, resources)
 
 	return warnings, nil
 }

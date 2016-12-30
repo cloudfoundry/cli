@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 )
 
 // Task represents a Cloud Controller V3 Task.
@@ -38,9 +39,11 @@ func (client *Client) NewTask(appGUID string, command string, name string) (Task
 	}
 
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    fmt.Sprintf("%s/v3/apps/%s/tasks", client.cloudControllerURL, appGUID),
-		Method: http.MethodPost,
-		Body:   bytes.NewBuffer(bodyBytes),
+		RequestName: internal.NewAppTaskRequest,
+		URIParams: internal.Params{
+			"guid": appGUID,
+		},
+		Body: bytes.NewBuffer(bodyBytes),
 	})
 	if err != nil {
 		return Task{}, nil, err
@@ -63,9 +66,11 @@ func (client *Client) NewTask(appGUID string, command string, name string) (Task
 // application GUID. Results can be filtered by providing URL queries.
 func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]Task, Warnings, error) {
 	request, err := client.newHTTPRequest(requestOptions{
-		URL:    fmt.Sprintf("%s/v3/apps/%s/tasks", client.cloudControllerURL, appGUID),
-		Method: http.MethodGet,
-		Query:  query,
+		RequestName: internal.GetAppTasksRequest,
+		URIParams: internal.Params{
+			"guid": appGUID,
+		},
+		Query: query,
 	})
 	if err != nil {
 		return nil, nil, err

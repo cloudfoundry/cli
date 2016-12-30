@@ -8,15 +8,22 @@ import (
 
 // requestOptions contains all the options to create an HTTP request.
 type requestOptions struct {
+	// URIParams are the list URI route parameters
+	URIParams map[string]string
+
 	// Query is a list of HTTP query parameters. Query will overwrite any
 	// existing query string in the URI. If you want to preserve the query
 	// string in URI make sure Query is nil.
 	Query url.Values
-	// request path
+
+	// RequestName is the name of the request (see routes)
+	RequestName string
+
+	// URL is the request path.
 	URL string
-	// HTTP Method
+	// Method is the HTTP method.
 	Method string
-	// request body
+	// Body is the content of the request.
 	Body io.Reader
 }
 
@@ -26,11 +33,19 @@ func (client *Client) newHTTPRequest(passedRequest requestOptions) (*http.Reques
 	var request *http.Request
 	var err error
 
-	request, err = http.NewRequest(
-		passedRequest.Method,
-		passedRequest.URL,
-		passedRequest.Body,
-	)
+	if passedRequest.URL != "" {
+		request, err = http.NewRequest(
+			passedRequest.Method,
+			passedRequest.URL,
+			passedRequest.Body,
+		)
+	} else {
+		request, err = client.router.CreateRequest(
+			passedRequest.RequestName,
+			passedRequest.URIParams,
+			passedRequest.Body,
+		)
+	}
 	if err != nil {
 		return nil, err
 	}
