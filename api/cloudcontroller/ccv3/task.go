@@ -76,39 +76,20 @@ func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]T
 		return nil, nil, err
 	}
 
-	allTasks := []Task{}
-	allWarnings := Warnings{}
-
-	for {
-		var tasks []Task
-		wrapper := PaginatedWrapper{
-			Resources: &tasks,
+	var fullTasksList []Task
+	warnings, err := client.paginate(request, Task{}, func(item interface{}) error {
+		if app, ok := item.(Task); ok {
+			fullTasksList = append(fullTasksList, app)
+		} else {
+			return cloudcontroller.UnknownObjectInListError{
+				Expected:   Task{},
+				Unexpected: item,
+			}
 		}
-		response := cloudcontroller.Response{
-			Result: &wrapper,
-		}
+		return nil
+	})
 
-		err = client.connection.Make(request, &response)
-		allWarnings = append(allWarnings, response.Warnings...)
-		if err != nil {
-			return nil, allWarnings, err
-		}
-		allTasks = append(allTasks, tasks...)
-
-		if wrapper.Pagination.Next.HREF == "" {
-			break
-		}
-
-		request, err = client.newHTTPRequest(requestOptions{
-			URL:    wrapper.Pagination.Next.HREF,
-			Method: http.MethodGet,
-		})
-		if err != nil {
-			return nil, allWarnings, err
-		}
-	}
-
-	return allTasks, allWarnings, nil
+	return fullTasksList, warnings, err
 }
 
 // UpdateTask cancels a task.
