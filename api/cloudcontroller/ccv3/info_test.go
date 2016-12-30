@@ -3,9 +3,11 @@ package ccv3_test
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
+	"code.cloudfoundry.org/cli/api/cloudcontroller/ccv3/internal"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -35,19 +37,19 @@ var _ = Describe("Info", func() {
 
 	Describe("when all requests are successful", func() {
 		BeforeEach(func() {
-			rootResponse := fmt.Sprintf(`{
+			rootResponse := strings.Replace(`{
 				"links": {
 					"self": {
-						"href": "%s"
+						"href": "SERVER_URL"
 					},
 					"cloud_controller_v2": {
-						"href": "%s/v2",
+						"href": "SERVER_URL/v2",
 						"meta": {
 							"version": "2.64.0"
 						}
 					},
 					"cloud_controller_v3": {
-						"href": "%s/v3",
+						"href": "SERVER_URL/v3",
 						"meta": {
 							"version": "3.0.0-alpha.5"
 						}
@@ -56,25 +58,26 @@ var _ = Describe("Info", func() {
 						"href": "https://uaa.bosh-lite.com"
 					}
 				}
-			}
-			`, server.URL(), server.URL(), server.URL())
+			}`, "SERVER_URL", server.URL(), -1)
 
 			rootRespondWith = RespondWith(
 				http.StatusOK,
 				rootResponse,
 				http.Header{"X-Cf-Warnings": {"warning 1"}})
 
-			v3Response := fmt.Sprintf(`{
+			v3Response := strings.Replace(`{
 				"links": {
 					"self": {
-						"href": "%s/v3"
+						"href": "SERVER_URL/v3"
+					},
+					"apps": {
+						"href": "SERVER_URL/v3/apps"
 					},
 					"tasks": {
-						"href": "%s/v3/tasks"
+						"href": "SERVER_URL/v3/tasks"
 					}
 				}
-			}
-			`, server.URL(), server.URL())
+			}`, "SERVER_URL", server.URL(), -1)
 
 			v3RespondWith = RespondWith(
 				http.StatusOK,
@@ -86,6 +89,13 @@ var _ = Describe("Info", func() {
 			apis, _, _, err := client.Info()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(apis.UAA()).To(Equal("https://uaa.bosh-lite.com"))
+		})
+
+		It("returns back the resource links", func() {
+			_, resources, _, err := client.Info()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resources[internal.AppsResource].HREF).To(Equal(server.URL() + "/v3/apps"))
+			Expect(resources[internal.TasksResource].HREF).To(Equal(server.URL() + "/v3/tasks"))
 		})
 
 		It("returns all warnings", func() {

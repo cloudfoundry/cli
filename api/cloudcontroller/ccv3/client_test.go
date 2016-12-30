@@ -34,8 +34,8 @@ var _ = Describe("Cloud Controller Client", func() {
 			client.WrapConnection(fakeConnectionWrapper)
 			Expect(fakeConnectionWrapper.WrapCallCount()).To(Equal(1))
 
-			client.Info()
-			Expect(fakeConnectionWrapper.MakeCallCount()).To(Equal(2))
+			client.GetApplicationTasks("fake-guid", nil)
+			Expect(fakeConnectionWrapper.MakeCallCount()).To(Equal(1))
 		})
 	})
 

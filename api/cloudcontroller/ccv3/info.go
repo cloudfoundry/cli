@@ -1,22 +1,11 @@
 package ccv3
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 )
-
-// APILink represents a generic link from a response object.
-type APILink struct {
-	// HREF is the fully qualified URL for the link.
-	HREF string `json:"href"`
-
-	// Meta contains additional metadata about the API.
-	Meta struct {
-		// Version of the API
-		Version string `json:"version"`
-	} `json:"meta"`
-}
 
 // APIInfo represents a GET response from the '/' endpoint of the cloud
 // controller API.
@@ -46,10 +35,22 @@ func (info APIInfo) ccV3Link() string {
 }
 
 // ResourceLinks represents the information returned back from /v3.
-type ResourceLinks struct {
-	// Links is a list of top level Cloud Controller resources endpoints.
-	Links struct {
-	} `json:"links"`
+type ResourceLinks map[string]APILink
+
+// UnmarshalJSON helps unmarshal a Cloud Controller /v3 response.
+func (resources ResourceLinks) UnmarshalJSON(data []byte) error {
+	var ccResourceLinks struct {
+		Links map[string]APILink `json:"links"`
+	}
+	if err := json.Unmarshal(data, &ccResourceLinks); err != nil {
+		return err
+	}
+
+	for key, val := range ccResourceLinks.Links {
+		resources[key] = val
+	}
+
+	return nil
 }
 
 // Info returns back endpoint and API information from /v3.
@@ -67,7 +68,7 @@ func (client *Client) Info() (APIInfo, ResourceLinks, Warnings, error) {
 		return APIInfo{}, ResourceLinks{}, warnings, err
 	}
 
-	var info ResourceLinks
+	info := ResourceLinks{} // Explicitly initializing
 	response := cloudcontroller.Response{
 		Result: &info,
 	}

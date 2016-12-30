@@ -2,9 +2,9 @@ package ccv3_test
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv3"
 	. "github.com/onsi/ginkgo"
@@ -53,27 +53,28 @@ func NewTestClient() *Client {
 
 func SetupV3Response() {
 	serverURL := server.URL()
-	rootResponse := fmt.Sprintf(`
-{
-  "links": {
-    "self": {
-      "href": "%s"
-    },
-    "cloud_controller_v2": {
-      "href": "%s/v2",
-      "meta": {
-        "version": "2.64.0"
-      }
-    },
-    "cloud_controller_v3": {
-      "href": "%s/v3",
-      "meta": {
-        "version": "3.0.0-alpha.5"
-      }
-    }
-  }
-}
-`, serverURL, serverURL, serverURL)
+	rootResponse := strings.Replace(`{
+		"links": {
+			"self": {
+				"href": "SERVER_URL"
+			},
+			"cloud_controller_v2": {
+				"href": "SERVER_URL/v2",
+				"meta": {
+					"version": "2.64.0"
+				}
+			},
+			"cloud_controller_v3": {
+				"href": "SERVER_URL/v3",
+				"meta": {
+					"version": "3.0.0-alpha.5"
+				}
+			},
+			"uaa": {
+				"href": "https://uaa.bosh-lite.com"
+			}
+		}
+	}`, "SERVER_URL", serverURL, -1)
 
 	server.AppendHandlers(
 		CombineHandlers(
@@ -82,21 +83,19 @@ func SetupV3Response() {
 		),
 	)
 
-	v3Response := fmt.Sprintf(`
-{
-  "links": {
-    "self": {
-      "href": "%s/v3"
-    },
-    "tasks": {
-      "href": "%s/v3/tasks"
-    },
-    "uaa": {
-      "href": "https://uaa.bosh-lite.com"
-    }
-  }
-}
-`, serverURL, serverURL)
+	v3Response := strings.Replace(`{
+		"links": {
+			"self": {
+				"href": "SERVER_URL/v3"
+			},
+			"apps": {
+				"href": "SERVER_URL/v3/apps"
+			},
+			"tasks": {
+				"href": "SERVER_URL/v3/tasks"
+			}
+		}
+	}`, "SERVER_URL", serverURL, -1)
 
 	server.AppendHandlers(
 		CombineHandlers(
