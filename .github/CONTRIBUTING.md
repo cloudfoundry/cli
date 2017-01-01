@@ -99,16 +99,18 @@ as long they vendor the plugins directory.
 
 The Cloud Foundry team uses GitHub and accepts code contributions via
 [pull requests](https://help.github.com/articles/using-pull-requests).
-If your contribution includes a change that is exposed to cf CLI users
-(e.g. introducing a new command or flag), please submit an issue
-to discuss it first.
-Major new feature proposals generally entail a publicly viewable
-google document with commenting allowed to be discussed on the [cf-dev](https://lists.cloudfoundry.org/archives/list/cf-dev@lists.cloudfoundry.org/) mailing list.
-
-## Contributor License Agreement
 
 Follow these steps to make a contribution to any of our open source repositories:
 
-1. Ensure that you have completed our CLA Agreement for
-  [individuals](https://www.cloudfoundry.org/wp-content/uploads/2015/09/CFF_Individual_CLA.pdf) or
-  [corporations](https://www.cloudfoundry.org/wp-content/uploads/2015/09/CFF_Corporate_CLA.pdf).
+1. If your contribution includes a change that is exposed to cf CLI users
+  (e.g. introducing a new command or flag), please submit an issue
+  to discuss it first.
+1. Ensure that you have either completed our CLA Agreement for [individuals](https://www.cloudfoundry.org/pdfs/CFF_Individual_CLA.pdf) or are a [public member](https://help.github.com/articles/publicizing-or-hiding-organization-membership/) of an organization that has signed the [corporate](https://www.cloudfoundry.org/pdfs/CFF_Corporate_CLA.pdf) CLA.
+1. Fork the project’s repository
+1. Create a feature branch (e.g. `git checkout -b better_cli`) and make changes on your branch
+  * Follow the previous sections on this page to set up your development environment, build `cf` and run the tests.
+1. Push to your fork (e.g. `git push origin better_cli`) and [submit a pull request](https://help.github.com/articles/creating-a-pull-request)
+
+If you have a CLA on file, your contribution will be analyzed for product fit and engineering quality prior to merging.  
+Note: All contributions need to be sent using GitHub Pull Requests, and we favor pull requests with very small, single commits with a single purpose.  
+**Your pull request is much more likely to be accepted if it is small and focused with a clear message that conveys the intent of your change.** Tests are required for any changes.
