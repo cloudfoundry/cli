@@ -6,6 +6,7 @@ import (
 	"code.cloudfoundry.org/cli/api/cloudcontroller"
 	. "code.cloudfoundry.org/cli/api/cloudcontroller/ccv2"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/ghttp"
 )
@@ -15,6 +16,32 @@ var _ = Describe("Job", func() {
 
 	BeforeEach(func() {
 		client = NewTestClient()
+	})
+
+	Describe("Job", func() {
+		DescribeTable("Finished",
+			func(status JobStatus, expected bool) {
+				job := Job{Status: status}
+				Expect(job.Finished()).To(Equal(expected))
+			},
+
+			Entry("when failed, it returns false", JobStatusFailed, false),
+			Entry("when finished, it returns true", JobStatusFinished, true),
+			Entry("when queued, it returns false", JobStatusQueued, false),
+			Entry("when running, it returns false", JobStatusRunning, false),
+		)
+
+		DescribeTable("Failed",
+			func(status JobStatus, expected bool) {
+				job := Job{Status: status}
+				Expect(job.Failed()).To(Equal(expected))
+			},
+
+			Entry("when failed, it returns true", JobStatusFailed, true),
+			Entry("when finished, it returns false", JobStatusFinished, false),
+			Entry("when queued, it returns false", JobStatusQueued, false),
+			Entry("when running, it returns false", JobStatusRunning, false),
+		)
 	})
 
 	Describe("GetJob", func() {

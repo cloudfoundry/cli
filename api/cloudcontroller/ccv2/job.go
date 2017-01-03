@@ -52,11 +52,13 @@ func (job *Job) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (job Job) Terminated() bool { // TODO: Add Test
-	return job.Status == JobStatusFinished || job.Status == JobStatusFailed
+// Finished returns true when the job has completed successfully.
+func (job Job) Finished() bool {
+	return job.Status == JobStatusFinished
 }
 
-func (job Job) Failed() bool { // TODO: Add Test
+// Failed returns true when the job has completed with an error/failure.
+func (job Job) Failed() bool {
 	return job.Status == JobStatusFailed
 }
 

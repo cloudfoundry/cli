@@ -161,7 +161,7 @@ var _ = Describe("Job Actions", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeCloudControllerClient.GetJobCallCount()).To(Equal(3))
-				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(2))
+				Expect(fakeConfig.PollingIntervalCallCount()).To(Equal(4))
 			})
 		})
 

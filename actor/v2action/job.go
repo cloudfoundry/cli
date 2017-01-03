@@ -35,48 +35,35 @@ func (e JobTimeoutError) Error() string {
 func (actor Actor) PollJob(job ccv2.Job) (Warnings, error) {
 	originalJobGUID := job.GUID
 
-	var allWarnings ccv2.Warnings
-	var err error
+	var (
+		err         error
+		warnings    ccv2.Warnings
+		allWarnings Warnings
+	)
 
-	finished := make(chan bool, 1)
-	stopPolling := make(chan bool, 1)
-	go func() {
-	Polling:
-		for {
-			select {
-			case <-stopPolling:
-				break Polling
-			default:
-				var warnings ccv2.Warnings
-				job, warnings, err = actor.CloudControllerClient.GetJob(job.GUID)
-				allWarnings = append(allWarnings, warnings...)
-
-				if err != nil || job.Terminated() {
-					finished <- true
-					break Polling
-				}
-				time.Sleep(actor.Config.PollingInterval())
-			}
-		}
-	}()
-
-	select {
-	case <-time.After(actor.Config.OverallPollingTimeout()):
-		stopPolling <- true
-		return Warnings(allWarnings), JobTimeoutError{
-			JobGUID: originalJobGUID,
-			Timeout: actor.Config.OverallPollingTimeout(),
-		}
-	case <-finished:
+	for timeSlept := 0 * time.Second; timeSlept < actor.Config.OverallPollingTimeout(); timeSlept += actor.Config.PollingInterval() {
+		job, warnings, err = actor.CloudControllerClient.GetJob(job.GUID)
+		allWarnings = append(allWarnings, Warnings(warnings)...)
 		if err != nil {
-			return Warnings(allWarnings), err
+			return allWarnings, err
 		}
+
 		if job.Failed() {
-			return Warnings(allWarnings), JobFailedError{
+			return allWarnings, JobFailedError{
 				JobGUID: originalJobGUID,
 				Message: job.Error,
 			}
 		}
+
+		if job.Finished() {
+			return allWarnings, nil
+		}
+
+		time.Sleep(actor.Config.PollingInterval())
 	}
-	return Warnings(allWarnings), nil
+
+	return allWarnings, JobTimeoutError{
+		JobGUID: originalJobGUID,
+		Timeout: actor.Config.OverallPollingTimeout(),
+	}
 }
