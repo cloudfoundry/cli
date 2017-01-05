@@ -53,8 +53,8 @@ func (client *Client) GetSpaceRoutes(spaceGUID string, queryParams []Query) ([]R
 
 	var fullRoutesList []Route
 	warnings, err := client.paginate(request, Route{}, func(item interface{}) error {
-		if app, ok := item.(Route); ok {
-			fullRoutesList = append(fullRoutesList, app)
+		if route, ok := item.(Route); ok {
+			fullRoutesList = append(fullRoutesList, route)
 		} else {
 			return cloudcontroller.UnknownObjectInListError{
 				Expected:   Route{},

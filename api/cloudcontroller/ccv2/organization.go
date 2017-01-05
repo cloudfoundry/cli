@@ -38,8 +38,8 @@ func (client *Client) GetOrganizations(queries []Query) ([]Organization, Warning
 
 	var fullOrgsList []Organization
 	warnings, err := client.paginate(request, Organization{}, func(item interface{}) error {
-		if app, ok := item.(Organization); ok {
-			fullOrgsList = append(fullOrgsList, app)
+		if org, ok := item.(Organization); ok {
+			fullOrgsList = append(fullOrgsList, org)
 		} else {
 			return cloudcontroller.UnknownObjectInListError{
 				Expected:   Organization{},

@@ -69,8 +69,8 @@ func (client *Client) GetServiceInstances(queries []Query) ([]ServiceInstance, W
 
 	var fullInstancesList []ServiceInstance
 	warnings, err := client.paginate(request, ServiceInstance{}, func(item interface{}) error {
-		if app, ok := item.(ServiceInstance); ok {
-			fullInstancesList = append(fullInstancesList, app)
+		if instance, ok := item.(ServiceInstance); ok {
+			fullInstancesList = append(fullInstancesList, instance)
 		} else {
 			return cloudcontroller.UnknownObjectInListError{
 				Expected:   ServiceInstance{},
@@ -104,8 +104,8 @@ func (client *Client) GetSpaceServiceInstances(spaceGUID string, includeUserProv
 
 	var fullInstancesList []ServiceInstance
 	warnings, err := client.paginate(request, ServiceInstance{}, func(item interface{}) error {
-		if app, ok := item.(ServiceInstance); ok {
-			fullInstancesList = append(fullInstancesList, app)
+		if instance, ok := item.(ServiceInstance); ok {
+			fullInstancesList = append(fullInstancesList, instance)
 		} else {
 			return cloudcontroller.UnknownObjectInListError{
 				Expected:   ServiceInstance{},
