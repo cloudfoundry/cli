@@ -78,8 +78,8 @@ func (client *Client) GetApplicationTasks(appGUID string, query url.Values) ([]T
 
 	var fullTasksList []Task
 	warnings, err := client.paginate(request, Task{}, func(item interface{}) error {
-		if app, ok := item.(Task); ok {
-			fullTasksList = append(fullTasksList, app)
+		if task, ok := item.(Task); ok {
+			fullTasksList = append(fullTasksList, task)
 		} else {
 			return cloudcontroller.UnknownObjectInListError{
 				Expected:   Task{},

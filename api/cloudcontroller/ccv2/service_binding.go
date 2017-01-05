@@ -39,8 +39,8 @@ func (client *Client) GetServiceBindings(queries []Query) ([]ServiceBinding, War
 
 	var fullBindingsList []ServiceBinding
 	warnings, err := client.paginate(request, ServiceBinding{}, func(item interface{}) error {
-		if app, ok := item.(ServiceBinding); ok {
-			fullBindingsList = append(fullBindingsList, app)
+		if binding, ok := item.(ServiceBinding); ok {
+			fullBindingsList = append(fullBindingsList, binding)
 		} else {
 			return cloudcontroller.UnknownObjectInListError{
 				Expected:   ServiceBinding{},
