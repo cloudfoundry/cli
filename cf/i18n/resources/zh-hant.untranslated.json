@@ -1172,6 +1172,10 @@
     "translation": "Error deleting user {{.Username}} \nMultiple users with that username returned. Please use 'cf curl' with specific origin instead."
   },
   {
+    "id": "Error getting spaces in organization.\n{{.APIErr}}",
+    "translation": ""
+  },
+  {
     "id": "Error parsing response",
     "translation": "Error parsing response"
   },
@@ -1186,6 +1190,10 @@
   {
     "id": "Error removing plugin binary: ",
     "translation": "Error removing plugin binary: "
+  },
+  {
+    "id": "Error retrieving current user:\n{{.Message}}",
+    "translation": ""
   },
   {
     "id": "Error running task: {{.CloudControllerMessage}}",

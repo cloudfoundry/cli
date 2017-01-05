@@ -20,8 +20,13 @@ func SetupReadOnlyOrgAndSpace() (string, string) {
 }
 
 func CreateOrgAndSpace(org string, space string) {
+	CreateOrg(org)
+	TargetOrg(org)
+	CreateSpace(space)
+}
+
+func CreateOrg(org string) {
 	Eventually(CF("create-org", org)).Should(Exit(0))
-	Eventually(CF("create-space", space, "-o", org)).Should(Exit(0))
 }
 
 func CreateSpace(space string) {

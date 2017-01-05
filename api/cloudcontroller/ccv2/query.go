@@ -15,6 +15,7 @@ const (
 	AppGUIDFilter             QueryFilter = "app_guid"
 	ServiceInstanceGUIDFilter QueryFilter = "service_instance_guid"
 	SpaceGUIDFilter           QueryFilter = "space_guid"
+	OrganizationGUIDFilter    QueryFilter = "organization_guid"
 
 	NameFilter QueryFilter = "name"
 )
