@@ -2516,6 +2516,10 @@
     "translation": "Error al obtener metadatos de plugin desde el repositorio: "
   },
   {
+    "id": "Error getting spaces in organization.\n{{.APIErr}}",
+    "translation": ""
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "Error al obtener la ubicación redirigida: {{.Error}}"
   },
@@ -2614,6 +2618,10 @@
   {
     "id": "Error restarting application: {{.Error}}",
     "translation": "Error al reiniciar la aplicación: {{.Error}}"
+  },
+  {
+    "id": "Error retrieving current user:\n{{.Message}}",
+    "translation": ""
   },
   {
     "id": "Error retrieving stack: ",

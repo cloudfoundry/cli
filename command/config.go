@@ -25,6 +25,8 @@ type Config interface {
 	PollingInterval() time.Duration
 	OverallPollingTimeout() time.Duration
 	SetAccessToken(token string)
+	SetOrganizationInformation(guid string, name string)
+	SetSpaceInformation(guid string, name string, allowSSH bool)
 	SetRefreshToken(token string)
 	SetTargetInformation(api string, apiVersion string, auth string, loggregator string, doppler string, uaa string, routing string, skipSSLValidation bool)
 	SetTokenInformation(accessToken string, refreshToken string, sshOAuthClient string)

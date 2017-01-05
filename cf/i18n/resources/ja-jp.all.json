@@ -2516,6 +2516,10 @@
     "translation": "リポジトリーからプラグイン・メタデータを取得しようとしたときエラーが発生しました: "
   },
   {
+    "id": "Error getting spaces in organization.\n{{.APIErr}}",
+    "translation": ""
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "リダイレクトされたロケーションを取得中にエラーが発生しました: {{.Error}}"
   },
@@ -2614,6 +2618,10 @@
   {
     "id": "Error restarting application: {{.Error}}",
     "translation": "アプリケーションの再始動時にエラーが発生しました: {{.Error}}"
+  },
+  {
+    "id": "Error retrieving current user:\n{{.Message}}",
+    "translation": ""
   },
   {
     "id": "Error retrieving stack: ",

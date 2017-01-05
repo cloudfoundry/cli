@@ -2516,6 +2516,10 @@
     "translation": "從儲存庫取得外掛程式 meta 資料時發生錯誤: "
   },
   {
+    "id": "Error getting spaces in organization.\n{{.APIErr}}",
+    "translation": ""
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "取得重新導向的位置時發生錯誤: {{.Error}}"
   },
@@ -2614,6 +2618,10 @@
   {
     "id": "Error restarting application: {{.Error}}",
     "translation": "重新啟動應用程式時發生錯誤: {{.Error}}"
+  },
+  {
+    "id": "Error retrieving current user:\n{{.Message}}",
+    "translation": ""
   },
   {
     "id": "Error retrieving stack: ",

@@ -2516,6 +2516,10 @@
     "translation": "从存储库获取插件元数据时出错: "
   },
   {
+    "id": "Error getting spaces in organization.\n{{.APIErr}}",
+    "translation": ""
+  },
+  {
     "id": "Error getting the redirected location: {{.Error}}",
     "translation": "获取重定向的位置时出错: {{.Error}}"
   },
@@ -2614,6 +2618,10 @@
   {
     "id": "Error restarting application: {{.Error}}",
     "translation": "重新启动应用程序时出错: {{.Error}}"
+  },
+  {
+    "id": "Error retrieving current user:\n{{.Message}}",
+    "translation": ""
   },
   {
     "id": "Error retrieving stack: ",

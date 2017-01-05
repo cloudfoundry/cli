@@ -64,3 +64,8 @@ func TargetOrgAndSpace(org string, space string) {
 func TargetOrg(org string) {
 	Eventually(CF("target", "-o", org)).Should(Exit(0))
 }
+
+func ClearTarget() {
+	LogoutCF()
+	LoginCF()
+}
