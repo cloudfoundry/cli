@@ -110,7 +110,7 @@ Follow these download links for [Mac OS X 64 bit](https://cli.run.pivotal.io/edg
 
 ## Known Issues
 
-* In Cygwin and Git Bash on Windows, interactive prompts (such as in `cf login`) do not work (see [issue #171](https://github.com/cloudfoundry/cli/issues/171)). Please use alternative commands (e.g. `cf api` and `cf auth` to `cf login`) or option `-f` to suppress the prompts.
+* In Cygwin and Git Bash on Windows, interactive password prompts (in `cf login`) do not work (see [issue #171](https://github.com/cloudfoundry/cli/issues/171)). Please use alternative commands (`cf api` and `cf auth` to `cf login`) to work around this.
 * .cfignore used in `cf push` must be in UTF8 encoding for CLI to interpret correctly.
 * On Linux, when encountering message "bash: .cf: No such file or directory", ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
 
