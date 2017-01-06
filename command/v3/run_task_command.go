@@ -78,8 +78,11 @@ func (cmd RunTaskCommand) Execute(args []string) error {
 
 	cmd.UI.DisplayOK()
 	cmd.UI.DisplayNewline()
-	cmd.UI.DisplayText("Task {{.TaskSequenceID}} has been submitted successfully for execution.",
+	cmd.UI.DisplayText(`Task has been submitted successfully for execution.
+Task name:   {{.TaskName}}
+Task id:     {{.TaskSequenceID}}`,
 		map[string]interface{}{
+			"TaskName":       task.Name,
 			"TaskSequenceID": task.SequenceID,
 		})
 
