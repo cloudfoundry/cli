@@ -40,18 +40,6 @@ func (cmd *TargetCommand) Setup(config command.Config, ui command.UI) error {
 	return nil
 }
 
-func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
-	err := command.MinimumAPIVersionCheck(cmd.Config.BinaryVersion(), cmd.Config.MinCLIVersion())
-	if _, ok := err.(command.MinimumAPIVersionNotMetError); ok {
-		cmd.UI.DisplayTextWithFlavor("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
-			map[string]interface{}{
-				"APIVersion":    cmd.Config.APIVersion(),
-				"MinCLIVersion": cmd.Config.MinCLIVersion(),
-				"BinaryVersion": cmd.Config.BinaryVersion(),
-			})
-	}
-}
-
 func (cmd *TargetCommand) Execute(args []string) error {
 	cmd.notifyCLIUpdateIfNeeded()
 
@@ -67,49 +55,44 @@ func (cmd *TargetCommand) Execute(args []string) error {
 		}
 	}
 
-	err = cmd.setOrg()
-	if err != nil {
-		return err
+	if cmd.Organization != "" {
+		err = cmd.setOrg()
+		if err != nil {
+			return err
+		}
+
+		if cmd.Space == "" {
+			err = cmd.autoTargetSpace(cmd.Config.TargetedOrganization().GUID)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
-	err = cmd.setSpace()
-	if err != nil {
-		return err
+	if cmd.Space != "" {
+		err = cmd.setSpace()
+		if err != nil {
+			return err
+		}
 	}
 
 	return cmd.displayTargetTable(user)
 }
 
-// Setting space
-func (cmd *TargetCommand) setSpace() error {
-	if cmd.Space == "" {
-		return nil
+func (cmd *TargetCommand) notifyCLIUpdateIfNeeded() {
+	err := command.MinimumAPIVersionCheck(cmd.Config.BinaryVersion(), cmd.Config.MinCLIVersion())
+	if _, ok := err.(command.MinimumAPIVersionNotMetError); ok {
+		cmd.UI.DisplayTextWithFlavor("Cloud Foundry API version {{.APIVersion}} requires CLI version {{.MinCLIVersion}}. You are currently on version {{.BinaryVersion}}. To upgrade your CLI, please visit: https://github.com/cloudfoundry/cli#downloads",
+			map[string]interface{}{
+				"APIVersion":    cmd.Config.APIVersion(),
+				"MinCLIVersion": cmd.Config.MinCLIVersion(),
+				"BinaryVersion": cmd.Config.BinaryVersion(),
+			})
 	}
-	emptyOrg := configv3.Organization{}
-	if cmd.Config.TargetedOrganization() == emptyOrg {
-		return shared.NoOrgTargetedError{}
-	}
-
-	space, warnings, err := cmd.Actor.GetSpaceByName(cmd.Config.TargetedOrganization().GUID, cmd.Space)
-	cmd.UI.DisplayWarnings(warnings)
-
-	if err != nil {
-		return shared.SpaceTargetError{
-			Message:   err.Error(),
-			SpaceName: cmd.Space,
-		}
-	}
-
-	cmd.Config.SetSpaceInformation(space.GUID, space.Name, space.AllowSSH)
-	return nil
 }
 
 // Setting organization
 func (cmd *TargetCommand) setOrg() error {
-	if cmd.Organization == "" {
-		return nil
-	}
-
 	var (
 		org      v2action.Organization
 		warnings v2action.Warnings
@@ -117,7 +100,6 @@ func (cmd *TargetCommand) setOrg() error {
 
 	org, warnings, err := cmd.Actor.GetOrganizationByName(cmd.Organization)
 	cmd.UI.DisplayWarnings(warnings)
-
 	if err != nil {
 		return shared.OrgTargetError{
 			Message: err.Error(),
@@ -125,13 +107,7 @@ func (cmd *TargetCommand) setOrg() error {
 	}
 
 	cmd.Config.SetOrganizationInformation(org.GUID, cmd.Organization)
-
 	cmd.Config.UnsetSpaceInformation()
-
-	err = cmd.autoTargetSpace(org.GUID)
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
@@ -139,14 +115,8 @@ func (cmd *TargetCommand) setOrg() error {
 // Auto-target the space if there is only one space in the org
 // and no space arg was provided.
 func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
-	// if the user provided a space as an argument, we don't want to autoTarget
-	if cmd.Space != "" {
-		return nil
-	}
-
 	spaces, warnings, err := cmd.Actor.GetOrganizationSpaces(orgGUID)
 	cmd.UI.DisplayWarnings(warnings)
-
 	if err != nil {
 		return shared.GetOrgSpacesError{
 			Message: err.Error(),
@@ -157,6 +127,27 @@ func (cmd *TargetCommand) autoTargetSpace(orgGUID string) error {
 		space := spaces[0]
 		cmd.Config.SetSpaceInformation(space.GUID, space.Name, space.AllowSSH)
 	}
+
+	return nil
+}
+
+// Setting space
+func (cmd *TargetCommand) setSpace() error {
+	emptyOrg := configv3.Organization{}
+	if cmd.Config.TargetedOrganization() == emptyOrg {
+		return shared.NoOrgTargetedError{}
+	}
+
+	space, warnings, err := cmd.Actor.GetSpaceByName(cmd.Config.TargetedOrganization().GUID, cmd.Space)
+	cmd.UI.DisplayWarnings(warnings)
+	if err != nil {
+		return shared.SpaceTargetError{
+			Message:   err.Error(),
+			SpaceName: cmd.Space,
+		}
+	}
+
+	cmd.Config.SetSpaceInformation(space.GUID, space.Name, space.AllowSSH)
 
 	return nil
 }
