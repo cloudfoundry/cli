@@ -22,6 +22,7 @@ const (
 	ServiceInstancesRequest       = "ServiceInstances"
 	SharedDomainRequest           = "SharedDomain"
 	SpaceServiceInstancesRequest  = "SpaceServiceInstances"
+	SpacesRequest                 = "Spaces"
 	UsersRequest                  = "Users"
 )
 
@@ -41,6 +42,7 @@ var APIRoutes = rata.Routes{
 	{Path: "/v2/service_bindings/:service_binding_guid", Method: http.MethodDelete, Name: DeleteServiceBindingRequest},
 	{Path: "/v2/service_instances", Method: http.MethodGet, Name: ServiceInstancesRequest},
 	{Path: "/v2/shared_domains/:shared_domain_guid", Method: http.MethodGet, Name: SharedDomainRequest},
+	{Path: "/v2/spaces", Method: http.MethodGet, Name: SpacesRequest},
 	{Path: "/v2/spaces/:guid/service_instances", Method: http.MethodGet, Name: SpaceServiceInstancesRequest},
 	{Path: "/v2/spaces/:space_guid/routes", Method: http.MethodGet, Name: RoutesFromSpaceRequest},
 	{Path: "/v2/users", Method: http.MethodPost, Name: UsersRequest},
