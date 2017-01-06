@@ -1,6 +1,7 @@
 package isolated
 
 import (
+	"crypto/rand"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -166,6 +167,30 @@ applications:
 				Eventually(session).Should(Say("Creating route flag-hostname.%s/path...\nOK", sharedDomain.Name))
 				Eventually(session).Should(Say("Creating route %s:1100...\nOK", tcpDomain.Name))
 				Eventually(session).Should(Exit(0))
+			})
+		})
+
+		Context("pushing an app that already exists", func() {
+			It("uses resource matching", func() {
+				randomBytes := make([]byte, 65537)
+				_, err := rand.Read(randomBytes)
+				Expect(err).ToNot(HaveOccurred())
+
+				appName := helpers.PrefixedRandomName("app")
+
+				helpers.WithHelloWorldApp(func(appDir string) {
+					path := filepath.Join(appDir, "large.txt")
+					err = ioutil.WriteFile(path, randomBytes, 0666)
+					Expect(err).ToNot(HaveOccurred())
+
+					session := helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")
+					Eventually(session.Out).Should(Say("Uploading .+, 2 files"))
+					Eventually(session).Should(Exit(0))
+
+					session = helpers.CF("push", appName, "--no-start", "-p", appDir, "-b", "staticfile_buildpack")
+					Eventually(session.Out).Should(Say("Uploading .+, 1 files"))
+					Eventually(session).Should(Exit(0))
+				})
 			})
 		})
 	})

@@ -4468,6 +4468,10 @@
     "translation": "예약된 라우트 포트"
   },
   {
+    "id": "Resource matching API timed out; pushing all app files.",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "앱 다시 스테이징"
   },

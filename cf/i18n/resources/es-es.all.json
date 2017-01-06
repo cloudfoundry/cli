@@ -4468,6 +4468,10 @@
     "translation": "Puertos de ruta reservados"
   },
   {
+    "id": "Resource matching API timed out; pushing all app files.",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "Volver a transferir una app"
   },

@@ -4468,6 +4468,10 @@
     "translation": "保留路徑埠"
   },
   {
+    "id": "Resource matching API timed out; pushing all app files.",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "重新編譯打包應用程式"
   },
