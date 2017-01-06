@@ -1408,6 +1408,10 @@
     "translation": "Recreate the app's executable artifact using the latest pushed app files and the latest environment (variables, service bindings, buildpack, stack, etc.)"
   },
   {
+    "id": "Resource matching API timed out; pushing all app files.",
+    "translation": ""
+  },
+  {
     "id": "Route and domain management:",
     "translation": "Route and domain management:"
   },

@@ -4468,6 +4468,10 @@
     "translation": "予約された経路ポート"
   },
   {
+    "id": "Resource matching API timed out; pushing all app files.",
+    "translation": ""
+  },
+  {
     "id": "Restage an app",
     "translation": "アプリを再ステージングします"
   },

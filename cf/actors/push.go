@@ -22,7 +22,7 @@ const windowsPathPrefix = `\\?\`
 type PushActor interface {
 	UploadApp(appGUID string, zipFile *os.File, presentFiles []resources.AppFileResource) error
 	ProcessPath(dirOrZipFile string, f func(string) error) error
-	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error)
+	GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string, useCache bool) ([]resources.AppFileResource, bool, error)
 	ValidateAppParams(apps []models.AppParams) []error
 	MapManifestRoute(routeName string, app models.Application, appParamsFromContext models.AppParams) error
 }
@@ -105,7 +105,7 @@ func (actor PushActorImpl) ProcessPath(dirOrZipFile string, f func(string) error
 	return nil
 }
 
-func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string) ([]resources.AppFileResource, bool, error) {
+func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir string, uploadDir string, useCache bool) ([]resources.AppFileResource, bool, error) {
 	appFileResource := []resources.AppFileResource{}
 	for _, file := range localFiles {
 		appFileResource = append(appFileResource, resources.AppFileResource{
@@ -115,9 +115,15 @@ func (actor PushActorImpl) GatherFiles(localFiles []models.AppFileFields, appDir
 		})
 	}
 
-	remoteFiles, err := actor.appBitsRepo.GetApplicationFiles(appFileResource)
-	if err != nil {
-		return []resources.AppFileResource{}, false, err
+	var err error
+	// CC returns a list of files that it already has, so an empty list of
+	// remoteFiles is equivalent to not using resource caching at all
+	remoteFiles := []resources.AppFileResource{}
+	if useCache {
+		remoteFiles, err = actor.appBitsRepo.GetApplicationFiles(appFileResource)
+		if err != nil {
+			return []resources.AppFileResource{}, false, err
+		}
 	}
 
 	filesToUpload := make([]models.AppFileFields, len(localFiles), len(localFiles))

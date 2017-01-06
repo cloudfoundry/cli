@@ -26,10 +26,10 @@ import (
 	"code.cloudfoundry.org/cli/cf/requirements"
 	"code.cloudfoundry.org/cli/cf/requirements/requirementsfakes"
 	"code.cloudfoundry.org/cli/cf/terminal"
-	"code.cloudfoundry.org/cli/cf/terminal/terminalfakes"
 	"code.cloudfoundry.org/cli/cf/trace"
 	"code.cloudfoundry.org/cli/util/generic"
 	testconfig "code.cloudfoundry.org/cli/util/testhelpers/configuration"
+	testterm "code.cloudfoundry.org/cli/util/testhelpers/terminal"
 	"code.cloudfoundry.org/cli/util/words/generator/generatorfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -39,7 +39,7 @@ import (
 var _ = Describe("Push Command", func() {
 	var (
 		cmd                        application.Push
-		ui                         *terminalfakes.FakeUI
+		ui                         *testterm.FakeUI
 		configRepo                 coreconfig.Repository
 		manifestRepo               *manifestfakes.FakeRepository
 		starter                    *applicationfakes.FakeStarter
@@ -84,7 +84,7 @@ var _ = Describe("Push Command", func() {
 		minVersionReq = requirements.Passing{Type: "minVersionReq"}
 		requirementsFactory.NewMinAPIVersionRequirementReturns(minVersionReq)
 
-		ui = new(terminalfakes.FakeUI)
+		ui = &testterm.FakeUI{} //new(terminalfakes.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		manifestRepo = new(manifestfakes.FakeRepository)
 		wordGenerator = new(generatorfakes.FakeWordGenerator)
@@ -402,6 +402,38 @@ var _ = Describe("Push Command", func() {
 						Expect(executeErr).To(HaveOccurred())
 
 						Expect(executeErr.Error()).To(ContainSubstring("failed to get file mode"))
+					})
+				})
+
+				Context("when the CC returns 504 Gateway timeout", func() {
+					BeforeEach(func() {
+						var callCount int
+						actor.GatherFilesStub = func(localFiles []models.AppFileFields, appDir string, uploadDir string, useCache bool) ([]resources.AppFileResource, bool, error) {
+							callCount += 1
+							if callCount == 1 {
+								return []resources.AppFileResource{}, false, errors.NewHTTPError(504, "", "")
+							} else {
+								return []resources.AppFileResource{}, false, nil
+							}
+						}
+					})
+
+					It("retries without the cache", func() {
+						Expect(executeErr).ToNot(HaveOccurred())
+
+						Expect(actor.GatherFilesCallCount()).To(Equal(2))
+
+						localFiles, appDir, uploadDir, useCache := actor.GatherFilesArgsForCall(0)
+						Expect(useCache).To(Equal(true))
+
+						localFilesRetry, appDirRetry, uploadDirRetry, useCacheRetry := actor.GatherFilesArgsForCall(1)
+						Expect(localFilesRetry).To(Equal(localFiles))
+						Expect(appDirRetry).To(Equal(appDir))
+						Expect(uploadDirRetry).To(Equal(uploadDir))
+						Expect(useCacheRetry).To(Equal(false))
+
+						Expect(ui.Outputs()).To(ContainElement(
+							"Resource matching API timed out; pushing all app files."))
 					})
 				})
 			})
@@ -988,7 +1020,7 @@ var _ = Describe("Push Command", func() {
 					It("includes the app files in dir", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						actualLocalFiles, _, _ := actor.GatherFilesArgsForCall(0)
+						actualLocalFiles, _, _, _ := actor.GatherFilesArgsForCall(0)
 						Expect(actualLocalFiles).To(Equal(expectedLocalFiles))
 					})
 				})
@@ -1027,7 +1059,7 @@ var _ = Describe("Push Command", func() {
 					It("pushes the contents of the app directory or zip file specified", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
-						_, appDir, _ := actor.GatherFilesArgsForCall(0)
+						_, appDir, _, _ := actor.GatherFilesArgsForCall(0)
 						Expect(appDir).To(Equal("../some/path-to/an-app/file.zip"))
 					})
 				})
@@ -1063,7 +1095,7 @@ var _ = Describe("Push Command", func() {
 						Expect(executeErr).NotTo(HaveOccurred())
 
 						dir, _ := os.Getwd()
-						_, appDir, _ := actor.GatherFilesArgsForCall(0)
+						_, appDir, _, _ := actor.GatherFilesArgsForCall(0)
 						Expect(appDir).To(Equal(dir))
 					})
 				})

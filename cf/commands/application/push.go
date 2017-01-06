@@ -813,7 +813,13 @@ func (cmd *Push) uploadApp(appGUID, appDir, appDirOrZipFile string, localFiles [
 		return err
 	}
 
-	remoteFiles, hasFileToUpload, err := cmd.actor.GatherFiles(localFiles, appDir, uploadDir)
+	remoteFiles, hasFileToUpload, err := cmd.actor.GatherFiles(localFiles, appDir, uploadDir, true)
+
+	if httpError, isHTTPError := err.(errors.HTTPError); isHTTPError && httpError.StatusCode() == 504 {
+		cmd.ui.Warn("Resource matching API timed out; pushing all app files.")
+		remoteFiles, hasFileToUpload, err = cmd.actor.GatherFiles(localFiles, appDir, uploadDir, false)
+	}
+
 	if err != nil {
 		return err
 	}
